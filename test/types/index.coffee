@@ -1,0 +1,1 @@
+exports.text = require './text'

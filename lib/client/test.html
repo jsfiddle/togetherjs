@@ -1,0 +1,46 @@
+<html>
+	<head>
+	<body>
+		<h1>
+			Hi there
+		</h1>
+		<div id='text'></div>
+		<script src="http://localhost:8000/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="stream.js"></script>
+		<script type="text/javascript" src="../types/text.js"></script>
+		<script type="text/javascript" src="client.js"></script>
+		<script type="text/javascript">
+/*	ds.open('sarah', 0, function(data) {
+			console.log('the document has been opened', data);
+			});
+
+	ds.on('sarah', 'op', function(data) {
+			console.log('op', data);
+		});
+ */
+
+	var set = function(str) {
+		div = document.getElementById('text');
+		div.textContent = str;
+	}
+
+	var connection = new ot.Connection('localhost', 8000);
+
+	connection.getOrCreate('hi', ot.types.text, function(doc, error) {
+		console.log('get or create', doc, error);
+		doc.onChanged(function() {
+			console.log('onChanged');
+			set(doc.snapshot);
+		});
+
+		var op = ot.types.text.normalize([{'i':'hi'}, doc.snapshot.length]);
+		doc.submitOp(op, doc.version);
+		set(doc.snapshot);
+	});
+
+//	ds.submit('hi', {'type':'text'}, 0, function() {
+
+
+		</script>
+	</body>
+</html>

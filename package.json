@@ -1,0 +1,22 @@
+{
+	"name": "otdb",
+	"version": "0.1.0",
+	"description": "A database for concurrent document editing",
+	"keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
+	"homepage": "",
+	"author": "Joseph Gentle <josephg@gmail.com>",
+	"main": "server/main",
+	"bin": { "otdb": "server/main.js" },
+	"dependencies": {
+		"socket.io": "*",
+		"socket.io-node-client": "*"
+	},
+	"licenses": [{
+		"type": "BSD",
+		"url": "http://www.freebsd.org/copyright/freebsd-license.html"
+	}],
+	"repository": {
+		"type": "git",
+		"url": "",
+	},
+}

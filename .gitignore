@@ -1,0 +1,4 @@
+*.swp
+.DS_Store
+*.js
+lib/**/*.js
