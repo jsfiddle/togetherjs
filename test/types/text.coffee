@@ -2,7 +2,7 @@ fs = require 'fs'
 util = require 'util'
 assert = require 'assert'
 
-text = require('../../lib/types/text')
+text = require('../../src/types').text
 p = util.debug
 i = util.inspect
 

@@ -2,7 +2,7 @@
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
-types = require '../types/builtin'
+types = require '../types'
 
 applyDeltaListener = null
 

@@ -1,13 +1,13 @@
 # A wrapper around the raw network IO.
 # SocketIO's 'io' must be defined prior to this file being loaded.
 
-unless io?
-#	if window?
-		throw new Error 'Must load socket.io before this library'
-#	else
-#		io = require '../../lib/Socket.io-node-client/io-client'.io
+if window?
+	throw new Error 'Must load socket.io before this library' unless window.io?
+	io = window.io
+else
+	io = require('Socket.io-node-client').io
 
-p = (x) -> console.log x
+p = -> #(x) -> console.log x
 
 # Make 1 per server.
 class DeltaStream
@@ -18,9 +18,9 @@ class DeltaStream
 		@lastSentDoc = null
 		
 		@socket = new io.Socket @hostname, {port:@port}
-		@socket.connect()
 		@socket.on 'connect', @onConnect
 		@socket.on 'message', @onMessage
+		@socket.connect()
 
 	onConnect: ->
 		p 'connected'
@@ -31,6 +31,7 @@ class DeltaStream
 		@callbacks[docName][type] = callback
 
 	onMessage: (data) =>
+		p 'message'
 		setDoc = () =>
 			if data.doc?
 				@lastReceivedDoc = data.doc
@@ -40,7 +41,7 @@ class DeltaStream
 		# Calls the registered callback for this event. If clear is truthy, remove the callback handler
 		# afterwards.
 		emit = (docName, type, clear) =>
-			console.log "emit #{docName} #{type}"
+			p "emit #{docName} #{type}"
 			callback = @callbacks[docName]?[type]
 			if callback?
 				@callbacks[docName][type] = null if clear
@@ -70,7 +71,7 @@ class DeltaStream
 
 	# Send open request, queue up callback.
 	open: (docName, v, callback) ->
-		p 'open'
+		p "open #{docName}"
 		openRequest = {open:docName}
 		openRequest.v = v if v?
 		@socket.send openRequest
@@ -91,12 +92,23 @@ class DeltaStream
 		msg.doc = @lastSentDoc = docName if docName != @lastSentDoc
 		@socket.send msg
 		@on docName, 'r', callback
+	
+	# Close an already open document
+	close: (docName, callback) ->
+		p "close #{docName}"
+		msg = {close:docName}
+		@lastSentDoc = docName
+		@socket.send msg
+	
+	disconnect: ->
+		@socket.disconnect()
+		@socket = null
 
 #{open: open, connect: connect, get: get, submit: submit}
 
-if exports?
-	exports.DeltaStream = DeltaStream
-else
+if window?
 	window.ot ||= {}
 	window.ot.DeltaStream = DeltaStream
+else
+	exports.DeltaStream = DeltaStream
 

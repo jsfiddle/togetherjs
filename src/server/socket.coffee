@@ -1,6 +1,6 @@
 io = require 'socket.io'
 util = require 'util'
-p = util.debug
+p = -> #util.debug
 
 db = require './db'
 events = require './events'
@@ -53,6 +53,7 @@ opReceived = (client, state, docName, version, op) ->
 	delta = {version:version, op:op, source:client.sessionId}
 	db.applyDelta docName, delta, (error, appliedVersion) ->
 		msg = if error?
+			p "Sending error to client: #{error.message}, #{error.stack}"
 			{r:'error', error: error.message}
 		else
 			{r:'ok', v: appliedVersion}
@@ -66,7 +67,8 @@ opReceived = (client, state, docName, version, op) ->
 snapshotRequest = (client, state, docName) ->
 	db.getSnapshot docName, (snapshot) ->
 		snapshot ||= {snapshot: null}
-		snapshot.type = snapshot.type.name if snapshot.type?
+		snapshot.type = if snapshot.type? then snapshot.type.name else null
+		snapshot.v ||= 0
 
 		if docName != state.lastSentDoc
 			snapshot.doc = docName

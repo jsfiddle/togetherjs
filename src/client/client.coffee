@@ -4,7 +4,7 @@ if window? and not window.ot?.DeltaStream?
 	throw new Error 'delta stream must be loaded before this file'
 
 DeltaStream = window?.ot.DeltaStream || require('stream').DeltaStream
-types = window?.ot?.types || require('../types/builtin').types
+types = window?.ot?.types || require('../types').types
 
 exports ||= {}
 
@@ -26,6 +26,8 @@ class Document
 			stream.on @docName, 'op', @onOpReceived
 
 	submitOp: (op, v) ->
+		op = @type.normalize(op) if @type?.normalize?
+
 		while v < @version
 			realOp = @recentOps[v]
 			throw new Error 'Op version too old' unless realOp
@@ -46,8 +48,11 @@ class Document
 		if @inflightOp == null && @pendingOp != null
 			@inflightOp = @pendingOp
 			@pendingOp = null
+			console.log "Version = #{@version}"
 			@stream.submit @docName, @inflightOp, @version, (response) =>
 				throw new Error(response.error) if response.r == 'error'
+				@version++
+				console.log 'Heard back from server.', this, response, @version
 
 				@inflightOp = null
 				@tryFlushPendingOp()
@@ -55,14 +60,14 @@ class Document
 	onOpReceived: (msg) =>
 		# msg is {doc:, op:, v:}
 		throw new Error("Expected docName #{@docName} but got #{msg.doc}") unless msg.doc == @docName
-		throw new Error("Expected version #{@version + 1} but got #{msg.v}") unless msg.v == @version + 1
+		throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 
 		@snapshot = @type.apply @snapshot, msg.op
 		@version++
 
 		@pendingOp = @type.transform @pendingOp, msg.op, 'server' if @pendingOp?
 
-		listener(this) for listener in @listeners
+		listener(msg.op) for listener in @listeners
 
 #		@callback
 

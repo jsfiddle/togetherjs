@@ -1,1 +1,1 @@
-exports.text = require './text'
+require './text'

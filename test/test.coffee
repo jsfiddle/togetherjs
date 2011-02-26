@@ -2,29 +2,32 @@ assert = require 'assert'
 http = require 'http'
 util = require 'util'
 
-randomizer = require './randomizer'
-typetests = require './types'
-
 # For testing the streaming library
 #clientio = require('../../lib/Socket.io-node-client/io-client').io
 clientio = require('Socket.io-node-client').io
 
-server = require '../lib/server'
+server = require '../src/server'
 events = server.events
 db = server.db
 
 server.socket.install(server.server)
 
-types = require '../lib/types/builtin'
+types = require '../src/types'
+randomizer = require './randomizer'
+require './types'
+
+client = require '../src/client'
+DeltaStream = require('../src/client/stream').DeltaStream
 
 p = util.debug
 i = util.inspect
 
+hostname = 'localhost'
 port = 8768
 client = null
 
 makeNewSocket = (callback) ->
-	socket = new clientio.Socket 'localhost', {port: port}
+	socket = new clientio.Socket hostname, {port: port}
 	socket.connect()
 	socket.on 'connect', () -> callback(socket)
 
@@ -47,7 +50,7 @@ expectData = (socket, expectedData, callback) ->
 fetch = (method, path, postData, callback) ->
 	assert.ok client
 
-	request = client.request(method, path, {host: "localhost"})
+	request = client.request(method, path, {host: hostname})
 
 	if postData?
 		postData = JSON.stringify(postData) if typeof(postData) == 'object'
@@ -291,12 +294,12 @@ tests = [
 
 	# Frontend tests
 	should 'return 404 when on GET on a random URL', (pass, fail) ->
-		fetch 'GET', '/ssss', null, (res, data) ->
+		fetch 'GET', "/#{newDocName()}", null, (res, data) ->
 			assert.strictEqual(res.statusCode, 404)
 			pass()
 	
 	should 'PUT returns 405', (pass, fail) ->
-		fetch 'PUT', '/asdf', null, (res, data) ->
+		fetch 'PUT', "/#{newDocName()}", null, (res, data) ->
 			assert.strictEqual res.statusCode, 405
 			# These might be in a different order... this will do for now.
 			assert.strictEqual res.headers.allow, 'GET,POST,DELETE'
@@ -431,7 +434,7 @@ tests = [
 		makeNewSocket (socket) ->
 			socket.send {get:'s9'}
 			socket.on 'message', (data) ->
-				assert.deepEqual data, {doc:'s9', snapshot:null}
+				assert.deepEqual data, {doc:'s9', snapshot:null, type:null, v:0}
 				pass()
 				socket.disconnect()
 
@@ -463,8 +466,86 @@ tests = [
 		randomizer.test(types.text)
 		pass()
 
-	# Client tests
+	# Client stream tests
+	should 'open a document', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
 
+		ds.open name, 0, (msg) ->
+			assert.deepEqual msg, {open:name, v:0}
+			ds.disconnect()
+			pass()
+	
+	should 'submit an op', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.open name, 0, (msg) ->
+			ds.submit name, {type:'simple'}, 0, (msg) ->
+				assert.deepEqual msg, {r:'ok', v:0, doc:name}
+				ds.disconnect()
+				pass()
+	
+	should 'have a docname with the op even when the server skips it', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.submit name, {type:'simple'}, 0, (msg) ->
+			assert.deepEqual msg, {r:'ok', v:0, doc:name}
+			ds.submit name, {position:0, text:'hi'}, 1, (msg) ->
+				assert.deepEqual msg, {r:'ok', v:1, doc:name}
+				ds.disconnect()
+				pass()
+
+	should 'get an empty document returns a null snapshot', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.get name, (msg) ->
+			assert.deepEqual msg, {v:0, type:null, snapshot:null, doc:name}
+			ds.disconnect()
+			pass()
+
+	should 'get a non-empty document gets its snapshot', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.submit name, {type:'simple'}, 0, ->
+			ds.get name, (msg) ->
+				assert.deepEqual msg, {v:1, type:'simple', snapshot:{str:''}, doc:name}
+				ds.disconnect()
+				pass()
+
+	should 'get a stream of ops for an open document', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.open name, 0, (msg) ->
+			db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+				fail(error) if error?
+				assert.strictEqual appliedVersion, 0
+
+		ds.on name, 'op', (data) ->
+			assert.deepEqual data, {doc:name, v:0, op:{type:'simple'}}
+			ds.disconnect()
+			pass()
+
+	should 'not get ops sent after the document was closed', (pass, fail) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.open name, 0, (msg) ->
+			ds.close name
+			ds.open newDocName(), 0, (msg) ->
+				# The document should now be closed.
+				db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+					# We shouldn't get that op...
+					ds.open newDocName(), 0, (msg) ->
+						ds.disconnect()
+						pass()
+
+		ds.on name, 'op', (data) ->
+			fail "Received op for closed document: #{i data}"
 ]
 
 
@@ -472,7 +553,7 @@ tests = [
 ###### Test runner
 
 server.server.listen(8768, () ->
-	client = http.createClient port, "localhost"
+	client = http.createClient port, hostname
 
 	tests_count = tests.length
 	tests_run = 0
