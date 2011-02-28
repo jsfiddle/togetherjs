@@ -34,6 +34,7 @@ makeNewSocket = (callback) ->
 # Expected data is an array of objects.
 expectData = (socket, expectedData, callback) ->
 	listener = (data) ->
+		#		p "expectData recieved #{i data}"
 		expected = expectedData.shift()
 		assert.deepEqual expected, data
 
@@ -105,8 +106,8 @@ tests = [
 
 	# DB tests
 	should 'Return null when asked for the snapshot of a new object', (pass, fail) ->
-		db.getSnapshot newDocName(), (snapshot) ->
-			assert.strictEqual snapshot, null
+		db.getSnapshot newDocName(), (data) ->
+			assert.deepEqual data, {v:0, type:null, snapshot:null}
 			pass()
 
 	should 'Apply a set type op correctly sets the type and version', (pass, fail) ->
@@ -120,14 +121,14 @@ tests = [
 		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
 			fail error if error?
 			assert.strictEqual appliedVersion, 0
-			db.getSnapshot name, (snapshot) ->
-				assert.deepEqual snapshot, {v:1, type:types.simple, snapshot:{str:''}}
+			db.getSnapshot name, (data) ->
+				assert.deepEqual data, {v:1, type:types.simple, snapshot:{str:''}}
 
 				db.applyDelta name, {version:1, op:{position: 0, text:'hi'}}, (error, appliedVersion) ->
 					fail error if error?
 					assert.strictEqual appliedVersion, 1
-					db.getSnapshot name, (snapshot) ->
-						assert.deepEqual snapshot, {v:2, type:types.simple, snapshot:{str:'hi'}}
+					db.getSnapshot name, (data) ->
+						assert.deepEqual data, {v:2, type:types.simple, snapshot:{str:'hi'}}
 						pass()
 
 	should 'Apply op to future version fails', (pass, fail) ->
@@ -141,10 +142,10 @@ tests = [
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
 				{position: 3, text: 'to you '}
-			], (error, snapshot) ->
+			], (error, data) ->
 				assert.strictEqual error, null
-				assert.strictEqual snapshot.v, 4
-				assert.deepEqual snapshot.snapshot.str, 'Hi to you mum'
+				assert.strictEqual data.v, 4
+				assert.deepEqual data.snapshot.str, 'Hi to you mum'
 				pass()
 				
 	should 'be able to apply ops at an old version', (pass, fail) ->
@@ -153,17 +154,17 @@ tests = [
 				{type: 'simple'},
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
-			], (error, snapshot) ->
+			], (error, data) ->
 				assert.strictEqual error, null
-				assert.strictEqual snapshot.v, 3
-				assert.deepEqual snapshot.snapshot.str, 'Hi mum'
+				assert.strictEqual data.v, 3
+				assert.deepEqual data.snapshot.str, 'Hi mum'
 
 				applyOps name, 2, [
 					{position: 2, text: ' to you'}
-				], (error, snapshot) ->
+				], (error, data) ->
 					assert.strictEqual error, null
-					assert.strictEqual snapshot.v, 4
-					assert.deepEqual snapshot.snapshot.str, 'Hi to you mum'
+					assert.strictEqual data.v, 4
+					assert.deepEqual data.snapshot.str, 'Hi to you mum'
 					pass()
 	
 
@@ -346,119 +347,124 @@ tests = [
 	should 'be able to open a document', (pass, fail) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
-			socket.send {open:name, v:0}
-			expectData socket, [{open:name, v:0}], ->
+			socket.send {doc:name, v:0, open:true}
+			expectData socket, [{doc:name, v:0, open:true}], ->
 				pass()
 				socket.disconnect()
 	
 	should 'be able to open a document with no version specified', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
-			socket.send {open:'s2'}
+			socket.send {doc:name, open:true}
 			socket.on 'message', (data) ->
-				assert.deepEqual data, {open:'s2', v:0}
+				assert.deepEqual data, {doc:name, v:0, open:true}
 				pass()
 				socket.disconnect()
 	
 	should 'be able to open a document at a previous version and get ops since', (pass, fail) ->
-		db.applyDelta 's3', {version:0, op:{type:'simple'}}, (error, newVersion) ->
+		name = newDocName()
+		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, newVersion) ->
 			fail(error) if error?
 
 			makeNewSocket (socket) ->
-				socket.send {open:'s3', v:0}
-				expectData socket, [{open:'s3', v:0}, {v:0, op:{type:'simple'}}], ->
+				socket.send {doc:name, v:0, open:true}
+				expectData socket, [{doc:name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
 					pass()
 					socket.disconnect()
 
 	should 'be able to receive ops through an open socket', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
-			socket.send {open:'s4', v:0}
-			expectData socket, [{open:'s4', v:0}], ->
-				applyOps 's4', 0, [{type:'simple'}], (error, snapshot) ->
+			socket.send {doc:name, v:0, open:true}
+			expectData socket, [{doc:name, v:0, open:true}], ->
+				applyOps name, 0, [{type:'simple'}], (error, _) ->
 					throw error if error?
 
-					expectedData = [{v:0, op:{type:'simple'}}]
-					expectData socket, expectedData, ->
+					expectData socket, [{v:0, op:{type:'simple'}}], ->
 						pass()
 						socket.disconnect()
 	
 	should 'be able to send an op', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
-			events.listen 's5', ((v) -> assert.strictEqual v, 0), (delta) ->
+			events.listen name, ((v) -> assert.strictEqual v, 0), (delta) ->
 				assert.strictEqual delta.version, 0
 				assert.deepEqual delta.op, {type:'simple'}
 				pass()
 				socket.disconnect()
 
-			socket.send {doc:'s5', v:0, op:{type:'simple'}}
+			socket.send {doc:name, v:0, op:{type:'simple'}}
 
 	should 'receive confirmation when an op is sent', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
-			expectData socket, [{doc:'s6', v:0, r:'ok'}], () ->
+			expectData socket, [{doc:name, v:0}], () ->
 				pass()
 				socket.disconnect()
 
-			socket.send {doc:'s6', v:0, op:{type:'simple'}}
+			socket.send {doc:name, v:0, op:{type:'simple'}}
 
 	should 'not be sent your own ops back', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.on 'message', (data) ->
 				assert.notDeepEqual data.op, {type:'simple'} if data.op?
 
-			expectData socket, [{open:'s7', v:0}, {v:0, r:'ok'}], () ->
+			expectData socket, [{doc:name, v:0, open:true}, {v:0}], ->
 				# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
 				# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
 				# The second op should come after the first.
-				applyOps 's7', 0, [{position:0, text:'hi'}], (error, snapshot) ->
-					expectData socket, [{v:1, op:{position:0, text:'hi'}}], () ->
+				applyOps name, 0, [{position:0, text:'hi'}], (error, _) ->
+					expectData socket, [{v:1, op:{position:0, text:'hi'}}], ->
 					pass()
 					socket.disconnect()
 
-			socket.send {open:'s7', v:0}
-			socket.send {doc:'s7', v:0, op:{type:'simple'}}
+			socket.send {doc:name, v:0, open:true}
+			socket.send {doc:name, v:0, op:{type:'simple'}}
 
 	should 'get a document snapshot', (pass, fail) ->
-		applyOps 's8', 0, [
+		name = newDocName()
+		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'internet'}
 			], (error, _) ->
 				fail(error) if error?
 
 				makeNewSocket (socket) ->
-					socket.send {get:'s8'}
+					socket.send {doc:name, snapshot:null}
 					socket.on 'message', (data) ->
-						assert.deepEqual data, {doc:'s8', snapshot:{str:'internet'}, v:2, type:'simple'}
+						assert.deepEqual data, {doc:name, snapshot:{str:'internet'}, v:2, type:'simple'}
 						pass()
 						socket.disconnect()
 
 	should 'get a null snapshot when getting a nonexistent document', (pass, fail) ->
+		name = newDocName()
 		makeNewSocket (socket) ->
-			socket.send {get:'s9'}
+			socket.send {doc:name, snapshot:null}
 			socket.on 'message', (data) ->
-				assert.deepEqual data, {doc:'s9', snapshot:null, type:null, v:0}
+				assert.deepEqual data, {doc:name, snapshot:null, type:null, v:0}
 				pass()
 				socket.disconnect()
-
+	
 	should 'be able to close a document', (pass, fail) ->
 		name1 = newDocName()
 		name2 = newDocName()
 		makeNewSocket (socket) ->
-			socket.send {open:name1}
-			expectData socket, [{open:name1, v:0}], ->
-				socket.send {close:name1}
-				# The close message has no reply. We'll open another fake document
-				# to make sure the server has recieved the close message.
-				socket.send {open:name2}
-				expectData socket, [{open:name2, v:0}], ->
-					# name1 should be closed, and name2 should be open.
-					# We should only get the op for name2.
-					db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-						throw error if error?
-					db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
-						throw error if error?
+			socket.send {doc:name1, open:true}
+			socket.send {open:false}
+			socket.send {doc:name2, open:true}
 
-					expectData socket, [{v:0, op:{type:'text'}}], ->
-						pass()
-						socket.disconnect()
+			expectData socket, [{doc:name1, open:true, v:0}, {open:false}, {doc:name2, open:true, v:0}], ->
+				# name1 should be closed, and name2 should be open.
+				# We should only get the op for name2.
+				db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+					throw error if error?
+				db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+					throw error if error?
+
+				expectData socket, [{v:0, op:{type:'text'}}], ->
+					pass()
+					socket.disconnect()
 
 	# Type tests
 	should 'pass text type tests', (pass, fail) ->
@@ -472,7 +478,7 @@ tests = [
 		ds = new DeltaStream hostname, port
 
 		ds.open name, 0, (msg) ->
-			assert.deepEqual msg, {open:name, v:0}
+			assert.deepEqual msg, {doc:name, open:true, v:0}
 			ds.disconnect()
 			pass()
 	
@@ -482,7 +488,7 @@ tests = [
 
 		ds.open name, 0, (msg) ->
 			ds.submit name, {type:'simple'}, 0, (msg) ->
-				assert.deepEqual msg, {r:'ok', v:0, doc:name}
+				assert.deepEqual msg, {v:0, doc:name}
 				ds.disconnect()
 				pass()
 	
@@ -491,9 +497,9 @@ tests = [
 		ds = new DeltaStream hostname, port
 
 		ds.submit name, {type:'simple'}, 0, (msg) ->
-			assert.deepEqual msg, {r:'ok', v:0, doc:name}
+			assert.deepEqual msg, {v:0, doc:name}
 			ds.submit name, {position:0, text:'hi'}, 1, (msg) ->
-				assert.deepEqual msg, {r:'ok', v:1, doc:name}
+				assert.deepEqual msg, {v:1, doc:name}
 				ds.disconnect()
 				pass()
 
@@ -502,7 +508,7 @@ tests = [
 		ds = new DeltaStream hostname, port
 
 		ds.get name, (msg) ->
-			assert.deepEqual msg, {v:0, type:null, snapshot:null, doc:name}
+			assert.deepEqual msg, {doc:name, v:0, type:null, snapshot:null}
 			ds.disconnect()
 			pass()
 
@@ -512,7 +518,7 @@ tests = [
 
 		ds.submit name, {type:'simple'}, 0, ->
 			ds.get name, (msg) ->
-				assert.deepEqual msg, {v:1, type:'simple', snapshot:{str:''}, doc:name}
+				assert.deepEqual msg, {doc:name, v:1, type:'simple', snapshot:{str:''}}
 				ds.disconnect()
 				pass()
 
@@ -535,8 +541,7 @@ tests = [
 		ds = new DeltaStream hostname, port
 
 		ds.open name, 0, (msg) ->
-			ds.close name
-			ds.open newDocName(), 0, (msg) ->
+			ds.close name, ->
 				# The document should now be closed.
 				db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
 					# We shouldn't get that op...

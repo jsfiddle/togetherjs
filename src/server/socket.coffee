@@ -1,80 +1,13 @@
 io = require 'socket.io'
 util = require 'util'
-p = -> #util.debug
 
 db = require './db'
 events = require './events'
 
-open = (client, state, docName, version) ->
-	throw new Error 'No docName specified' unless docName?
-	throw new Error 'Doc already open' if state.listeners[docName]?
-	p "Opening #{docName} on #{client.sessionId} at #{version}"
-
-	sendOpenConfirmation = (v) ->
-		p "#{docName} open on #{client.sessionId}"
-		client.send {open:docName, v:v}
-		state.lastSentDoc = docName
-
-	state.listeners[docName] = listener = (delta) ->
-		return if delta.source == client.sessionId
-
-		opMsg =
-			op: delta.op
-			v: delta.version
-
-		if docName != state.lastSentDoc
-			opMsg.doc = docName
-			state.lastSentDoc = docName
-
-		client.send opMsg
-	
-	if version?
-		# Tell the client the doc is open at the requested version
-		sendOpenConfirmation(version)
-		events.listenFromVersion docName, version, listener
-	else
-		# If the version is blank, we'll open the doc at the most recent version
-		events.listen docName, sendOpenConfirmation, listener
-	
-
-close = (client, state, docName) ->
-	listener = state.listeners[docName]
-	throw new Error 'Doc already closed' unless listener?
-
-	events.removeListener docName, listener
-	delete state.listeners[docName]
-
-
-opReceived = (client, state, docName, version, op) ->
-	docName ?= client.lastReceivedDoc
-	throw new Error 'No docName specified' unless docName?
-	throw new Error 'No version specified' unless version?
-
-	delta = {version:version, op:op, source:client.sessionId}
-	db.applyDelta docName, delta, (error, appliedVersion) ->
-		msg = if error?
-			p "Sending error to client: #{error.message}, #{error.stack}"
-			{r:'error', error: error.message}
-		else
-			{r:'ok', v: appliedVersion}
-
-		if docName != state.lastSentDoc
-			msg.doc = docName
-			state.lastSentDoc = docName
-
-		client.send msg
-
-snapshotRequest = (client, state, docName) ->
-	db.getSnapshot docName, (snapshot) ->
-		snapshot ||= {snapshot: null}
-		snapshot.type = if snapshot.type? then snapshot.type.name else null
-		snapshot.v ||= 0
-
-		if docName != state.lastSentDoc
-			snapshot.doc = docName
-			state.lastSentDoc = docName
-
-		client.send snapshot
+p = util.debug
+i = util.inspect
+p = ->
+i = ->
 
 exports.install = (server = require('./frontend').server) ->
 	socket = io.listen(server)
@@ -82,50 +15,111 @@ exports.install = (server = require('./frontend').server) ->
 	socket.on 'connection', (client) ->
 		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}"
 
-		# This isn't very idiomatic JS... maybe rewrite using currying.
-		state =
-			lastSentDoc: null
-			lastReceivedDoc: null
-			listeners: {} # Map from docName -> listener.
+		lastSentDoc = null
+		lastReceivedDoc = null
+		listeners = {} # Map from docName -> listener.
 
+		send = (msg) ->
+			# msg _must_ have the docname set. We'll remove it if its the same as lastReceivedDoc.
+			delete msg.doc if msg.doc == lastSentDoc
+			lastSentDoc = msg.doc
+			client.send msg
+
+		# Attempt to open a document with a given name. Version is optional.
+		open = (data) ->
+			docName = data.doc
+			version = data.v
+			throw new Error 'Doc already open' if listeners[docName]?
+			p "Opening #{docName} on #{client.sessionId} at #{version}"
+
+			sendOpenConfirmation = (v) ->
+				p "#{docName} open on #{client.sessionId}"
+				send {doc:docName, open:true, v:v}
+
+			listeners[docName] = listener = (delta) ->
+				#p "doc:#{docName} delta:#{i delta} v:#{version}"
+
+				# Skip the delta if this client sent it.
+				return if delta.source == client.sessionId
+
+				opMsg =
+					op: delta.op
+					v: delta.version
+
+				send opMsg
+			
+			if version?
+				# Tell the client the doc is open at the requested version
+				sendOpenConfirmation(version)
+				events.listenFromVersion docName, version, listener
+			else
+				# If the version is blank, we'll open the doc at the most recent version
+				events.listen docName, sendOpenConfirmation, listener
+
+		# The client closes a document
+		close = (data) ->
+			listener = listeners[data.doc]
+			throw new Error 'Doc already closed' unless listener?
+
+			events.removeListener data.doc, listener
+			delete listeners[data.doc]
+			send {doc:data.doc, open:false}
+
+		# We received an op from the client
+		opReceived = (data) ->
+			throw new Error 'No docName specified' unless data.doc?
+			throw new Error 'No version specified' unless data.v?
+
+			delta = {version:data.v, op:data.op, source:client.sessionId}
+			db.applyDelta data.doc, delta, (error, appliedVersion) ->
+				msg = if error?
+					p "Sending error to client: #{error.message}, #{error.stack}"
+					{doc:data.doc, v:null, error: error.message}
+				else
+					{doc:data.doc, v:appliedVersion}
+
+				send msg
+
+		# The client requested a document snapshot
+		snapshotRequest = (data) ->
+			throw new Error 'Snapshot request at version not currently implemented' if data.v?
+			throw new Error 'No docName specified' unless data.doc?
+
+			db.getSnapshot data.doc, (doc) ->
+				msg = {doc:data.doc, v:doc.v, type:doc.type?.name || null, snapshot:doc.snapshot}
+				send msg
+
+		# And now the actual message handler.
 		client.on 'message', (data) ->
+			p 'message ' + i data
+			if data.doc?
+				lastReceivedDoc = data.doc
+			else
+				data.doc = lastReceivedDoc
+
 			try
 				data = JSON.parse data if typeof(data) == 'string'
 
 				if data.open? # Opening a document.
-					docName = data.open
-					version = data.v
+					if data.open
+						open data
+					else
+						close data
 
-					state.lastReceivedDoc = docName
-					open client, state, docName, version
+				else if data.op? # The client is applying an op.
+					opReceived data
 
-				else if data.op? # Applying an op.
-					docName = data.doc || state.lastReceivedDoc
-					version = data.v
-					op = data.op
-
-					state.lastReceivedDoc = docName
-					opReceived client, state, docName, version, op
-
-				else if data.close?
-					docName = data.close
-
-					state.lastReceivedDoc = docName
-					close client, state, docName
-
-				else if data.get? # Snapshot request.
-					docName = data.get
-
-					state.lastReceivedDoc = docName
-					snapshotRequest client, state, docName
+				else if data.snapshot != undefined # Snapshot request.
+					snapshotRequest data
 
 				else
 					p "Unknown message received: #{util.inspect data}"
 
 			catch error
-				p error.stack
+				util.debug error.stack
+				# ... And disconnect the client?
 
 		client.on 'disconnect', ->
-			for docName, listener of state.listeners
+			for docName, listener of listeners
 				events.removeListener docName, listener
 

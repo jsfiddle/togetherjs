@@ -32,73 +32,70 @@ class DeltaStream
 
 	onMessage: (data) =>
 		p 'message'
-		setDoc = () =>
-			if data.doc?
-				@lastReceivedDoc = data.doc
-			else
-				data.doc = @lastReceivedDoc
+		if data.doc?
+			@lastReceivedDoc = data.doc
+		else
+			data.doc = @lastReceivedDoc
 
 		# Calls the registered callback for this event. If clear is truthy, remove the callback handler
 		# afterwards.
-		emit = (docName, type, clear) =>
-			p "emit #{docName} #{type}"
-			callback = @callbacks[docName]?[type]
+		emit = (type, clear) =>
+			p "emit #{data.doc} #{type}"
+			callback = @callbacks[data.doc]?[type]
 			if callback?
-				@callbacks[docName][type] = null if clear
+				@callbacks[data.doc][type] = null if clear
 				callback(data)
 
-		if data.op?
-			console.log 'op', data
-			setDoc()
-			emit data.doc, 'op', no
 
-		else if data.snapshot != undefined
-			p 'snapshot'
-			setDoc()
-			emit data.doc, 'snapshot', yes
+		if data.snapshot != undefined
+			emit 'snapshot', yes
 
 		else if data.open?
-			p 'open'
+			if data.open
+				emit 'open', yes
+			else
+				emit 'close', yes
 
-			@lastReceivedDoc = data.open
-			emit data.open, 'open', yes
+		else if data.v? # Result of sending an op
+			if data.op?
+				# Remote op
+				emit 'op', no
+			else
+				emit 'localop', yes
 
-		else if data.r? # Result of sending an op
-			p 'r'
+	send: (msg) ->
+		if msg.doc == @lastSentDoc
+			delete msg.doc
+		else
+			@lastSentDoc = msg.doc
 
-			setDoc()
-			emit data.doc, 'r', yes
+		@socket.send msg
 
 	# Send open request, queue up callback.
 	open: (docName, v, callback) ->
 		p "open #{docName}"
-		openRequest = {open:docName}
-		openRequest.v = v if v?
-		@socket.send openRequest
-		@lastSentDoc = docName
+		request = {doc:docName, open:true}
+		request.v = v if v?
+		@send request
 		@on docName, 'open', callback
 
 	# Get a document snapshot at the current version
 	get: (docName, callback) ->
 		p "get #{docName}"
-		@socket.send {get:docName}
-		@lastSentDoc = docName
+		@send {doc:docName, snapshot:null}
 		@on docName, 'snapshot', callback
 
 	# Submit an op to the named document
 	submit: (docName, op, version, callback) ->
 		console.log "submit v #{version} on #{docName}", op
-		msg = {v:version, op:op}
-		msg.doc = @lastSentDoc = docName if docName != @lastSentDoc
-		@socket.send msg
-		@on docName, 'r', callback
+		@send {doc:docName, v:version, op:op}
+		@on docName, 'localop', callback
 	
 	# Close an already open document
 	close: (docName, callback) ->
 		p "close #{docName}"
-		msg = {close:docName}
-		@lastSentDoc = docName
-		@socket.send msg
+		@send {doc:docName, open:false}
+		@on docName, 'close', callback
 	
 	disconnect: ->
 		@socket.disconnect()

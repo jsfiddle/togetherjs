@@ -48,7 +48,7 @@ methods =
 	GET: (req, res) ->
 		docName = getDocName req
 		db.getSnapshot docName, (doc) ->
-			if doc?
+			if doc.snapshot?
 				doc.type = doc.type.name
 				sendJSON res, doc
 			else

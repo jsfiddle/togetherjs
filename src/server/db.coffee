@@ -105,12 +105,12 @@ exports.getSnapshot = (docName, callback) ->
 	if record?.snapshot
 		callback {v:record.version, type:record.type, snapshot:record.snapshot}
 	else
-		callback null
+		callback {v:0, type:null, snapshot:null}
 
 # Gets the latest version # of the document. May be more efficient than getSnapshot.
 exports.getVersion = (docName, callback) ->
-	exports.getSnapshot docName, (snapshot) ->
-		callback(snapshot?.v ? 0)
+	exports.getSnapshot docName, (doc) ->
+		callback(doc.v)
 
 # To make sure all the ops (and their event handlers) are processed in order, ops are added
 # to a queue and processed from the front.
