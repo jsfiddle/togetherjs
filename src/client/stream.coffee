@@ -32,6 +32,7 @@ class DeltaStream
 
 	onMessage: (data) =>
 		p 'message'
+		p data
 		if data.doc?
 			@lastReceivedDoc = data.doc
 		else
@@ -56,7 +57,7 @@ class DeltaStream
 			else
 				emit 'close', yes
 
-		else if data.v? # Result of sending an op
+		else if data.v != undefined # Result of sending an op
 			if data.op?
 				# Remote op
 				emit 'op', no

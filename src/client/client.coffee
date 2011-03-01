@@ -3,29 +3,45 @@
 if window? and not window.ot?.DeltaStream?
 	throw new Error 'delta stream must be loaded before this file'
 
-DeltaStream = window?.ot.DeltaStream || require('stream').DeltaStream
-types = window?.ot?.types || require('../types').types
+DeltaStream = window?.ot.DeltaStream || require('./stream').DeltaStream
+types = window?.ot?.types || require('../types')
 
 exports ||= {}
 
+p = -> #require('util').debug
+i = -> #require('util').inspect
+
 class Document
-	constructor: (@stream, @docName, @version, @type, @snapshot) ->
+	# stream is a DeltaStream object.
+	# name is the documents' docName.
+	# version is the version of the document _on the server_
+	constructor: (@stream, @name, @version, @type, @snapshot) ->
+		throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
+
 		# The op that is currently roundtripping to the server, or null.
 		@inflightOp = null
+		@inflightCallbacks = []
+
 		# All ops that are waiting for the server to acknowledge @inflightOp
 		@pendingOp = null
-		# Some recent ops, incase submitOp is called with an old op version number
+		@pendingCallbacks = []
+
+		# Some recent ops, incase submitOp is called with an old op version number.
 		@recentOps = {}
 
 		# Listeners for the document changing
 		@listeners = []
 
-		@stream.open @docName, @version, (msg) =>
-			throw new Error("Expected docName #{@docName} but got #{msg.open}") unless msg.open == @docName
+		@stream.open @name, @version, (msg) =>
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
-			stream.on @docName, 'op', @onOpReceived
+			@stream.on @name, 'op', @onOpReceived
 
-	submitOp: (op, v) ->
+
+	submitOp: (op, v, callback) ->
+		if typeof v == 'function'
+			callback = v
+			v = @version
+
 		op = @type.normalize(op) if @type?.normalize?
 
 		while v < @version
@@ -42,24 +58,34 @@ class Document
 		else
 			@pendingOp = op
 
+		@pendingCallbacks.push callback if callback?
+
 		@tryFlushPendingOp()
 
 	tryFlushPendingOp: () ->
 		if @inflightOp == null && @pendingOp != null
+			# Rotate null -> pending -> inflight, 
 			@inflightOp = @pendingOp
+			@inflightCallbacks = @pendingCallbacks
+
 			@pendingOp = null
-			console.log "Version = #{@version}"
-			@stream.submit @docName, @inflightOp, @version, (response) =>
-				throw new Error(response.error) if response.r == 'error'
+			@pendingCallbacks = []
+
+#			console.log "Version = #{@version}"
+			@stream.submit @name, @inflightOp, @version, (response) =>
+				throw new Error(response.error) if response.v == null
+				throw new Error('Invalid version from server') unless response.v == @version
+
 				@version++
-				console.log 'Heard back from server.', this, response, @version
+				callback() for callback in @inflightCallbacks
+#				console.log 'Heard back from server.', this, response, @version
 
 				@inflightOp = null
 				@tryFlushPendingOp()
 
 	onOpReceived: (msg) =>
 		# msg is {doc:, op:, v:}
-		throw new Error("Expected docName #{@docName} but got #{msg.doc}") unless msg.doc == @docName
+		throw new Error("Expected docName #{@name} but got #{msg.doc}") unless msg.doc == @name
 		throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 
 		@snapshot = @type.apply @snapshot, msg.op
@@ -77,32 +103,40 @@ class Document
 
 
 class Connection
-	constructor: (hostname, port) ->
-		@stream = new DeltaStream(hostname, port)
-		@docs = {}
+	# Private properties
+	docs = {}
+	stream = null
 
-	makeDoc: (docName, version, type, snapshot) ->
-		throw new Error("Document #{@docName} already open") if @docs[docName]
-		doc = new Document(@stream, docName, version, type, snapshot)
-		@docs[docName] = doc
+	makeDoc = (name, version, type, snapshot) ->
+		throw new Error("Document #{name} already open") if docs[name]
+		doc = new Document(stream, name, version, type, snapshot)
+		docs[name] = doc
+
+
+	constructor: (hostname, port) ->
+		stream = new DeltaStream(hostname, port)
 
 	# callback is passed a Document or null
 	# callback(doc)
 	get: (docName, callback) ->
-		return @docs[docName] if @docs[docName]?
+		return docs[docName] if docs[docName]?
 
-		@stream.get @docName, (response) ->
+		stream.get @docName, (response) ->
 			if response.snapshot == null
 				callback(null)
 			else
 				type = builtin.types[response.type]
-				callback @makeDoc(response.docName, response.v, type, response.snapshot)
+				callback makeDoc(response.docName, response.v, type, response.snapshot)
 
 	# Callback is passed a document or an error
+	# type is either a type name (eg 'text' or 'simple') or the actual type object.
+	# Types must be supported by the server.
 	# callback(doc, error)
 	getOrCreate: (docName, type, callback) ->
-		if @docs[docName]?
-			doc = @docs[docName]
+		type = types[type] if typeof type == 'string'
+
+		if docs[docName]?
+			doc = docs[docName]
 			if doc.type == type
 				callback(doc)
 			else
@@ -110,18 +144,19 @@ class Connection
 
 			return
 
-		@stream.get docName, (response) =>
+		stream.get docName, (response) =>
+			#			p (i response)
 			if response.snapshot == null
-				@stream.submit docName, {type: type.name}, 0, (response) =>
-					if response.r == 'ok'
-						callback @makeDoc(docName, 1, type, type.initialVersion())
-					else if response.r == 'error' and response.error == 'Document already exists'
+				stream.submit docName, {type: type.name}, 0, (response) =>
+					if response.v?
+						callback makeDoc(docName, 1, type, type.initialVersion())
+					else if response.v == 'null' and response.error == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..
 						@getOrCreate(docName, type, callback)
 					else
 						callback(null, response.error)
 			else if response.type == type.name
-				callback @makeDoc(docName, response.v, type, response.snapshot)
+				callback makeDoc(docName, response.v, type, response.snapshot)
 			else
 				callback null, "Document already exists with type #{response.type}"
 
@@ -129,3 +164,5 @@ class Connection
 
 if window?
 	window.ot.Connection = Connection
+else
+	exports.Connection = Connection

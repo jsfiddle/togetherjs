@@ -1,6 +1,6 @@
 # An in-memory DB
-p = -> #require('util').debug
-i = -> #require('util').inspect
+p = ->#require('util').debug
+i = ->#require('util').inspect
 
 types = require '../types'
 
@@ -23,7 +23,7 @@ class Record
 	# This should not be called externally.
 	applyInitialOp: (delta, callback) ->
 		if @version > 0
-			callback(new Error('Document already exists'), null)
+			callback(new Error('Type already set'), null)
 			return
 
 		typeName = delta.op.type
@@ -102,7 +102,8 @@ exports.getOps = (docName, versionFrom, versionTo, callback) ->
 # IF the record doesn't exist, this calls callback(null)
 exports.getSnapshot = (docName, callback) ->
 	record = ops[docName]
-	if record?.snapshot
+	p "getSnapshot on '#{docName}': #{i record}"
+	if record?.snapshot?
 		callback {v:record.version, type:record.type, snapshot:record.snapshot}
 	else
 		callback {v:0, type:null, snapshot:null}

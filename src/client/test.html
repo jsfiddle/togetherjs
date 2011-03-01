@@ -23,9 +23,7 @@
 	}
 
 	var connection = new ot.Connection('localhost', 8000);
-	var doc = connection.getOrCreate('hello', ot.types.text);
-
-	doc.onOpen(function(error) {
+	connection.getOrCreate('hello', ot.types.text, function(doc, error) {
 		if(error) {
 			console.error(error);
 		} else {
@@ -34,12 +32,12 @@
 			var op = ot.types.text.normalize([{'i':'hi '}, doc.snapshot.length]);
 			doc.submitOp(op, doc.version);
 			set(doc.snapshot);
-		}
-	});
 
-	doc.onOp(function(op) {
-		console.log('recieved op: ', op);
-		set(doc.snapshot);
+			doc.onChanged(function(op) {
+				console.log('recieved op: ', op);
+				set(doc.snapshot);
+			});
+		}
 	});
 
 //	ds.submit('hi', {'type':'text'}, 0, function() {

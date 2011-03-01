@@ -22,7 +22,7 @@ i = util.inspect
 
 hostname = 'localhost'
 port = 8768
-client = null
+httpclient = null
 
 testCase = require('nodeunit').testCase
 
@@ -30,7 +30,7 @@ testCase = require('nodeunit').testCase
 # Setup the local db server before the tests run.
 # At some stage, it might be worth moving this into a setUp() function of a test runner.
 server.server.listen 8768, () ->
-	client = http.createClient port, hostname
+	httpclient = http.createClient port, hostname
 
 server.socket.install(server.server)
 
@@ -59,9 +59,9 @@ expectData = (socket, expectedData, callback) ->
 # Async fetch. Aggregates whole response and sends to callback.
 # Callback should be function(response, data) {...}
 fetch = (method, path, postData, callback) ->
-	assert.ok client
+	assert.ok httpclient
 
-	request = client.request(method, path, {host: hostname})
+	request = httpclient.request(method, path, {host: hostname})
 
 	if postData?
 		postData = JSON.stringify(postData) if typeof(postData) == 'object'
@@ -186,7 +186,7 @@ exports.db = {
 	
 	'Pass an error to the callback if you delete something that doesn\'t exist': (test) ->
 		db.delete newDocName(), (error) ->
-			assert.ok error
+			test.ok error
 			test.done()
 }
 
@@ -568,6 +568,136 @@ exports.clientstream = {
 
 		ds.on name, 'op', (data) ->
 			throw new Error "Received op for closed document: #{i data}"
+	
+	'submit a set type op on a doc that already has a type returns the right error code': (test) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.submit name, {type:'simple'}, 0, ->
+			ds.submit name, {type:'text'}, 0, (msg) ->
+				test.deepEqual msg, {doc:name, v:null, error:'Type already set'}
+				ds.disconnect()
+				test.done()
+
+	'submit sets a type op with a foreign type': (test) ->
+		name = newDocName()
+		ds = new DeltaStream hostname, port
+
+		ds.submit name, {type:'oogedy boogedy'}, 0, (msg) ->
+			# There should be a way to detect this.
+			test.strictEqual msg.v, null
+			test.done()
 }
 
+exports.client = {
+	'create connection': (test) ->
+		c = new client.Connection(hostname, port)
+		test.ok c
+		test.done()
+	
+	'create a new document': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc, error) ->
+			test.ok doc
+			test.ifError error
 
+			test.strictEqual doc.name, name
+			test.strictEqual doc.type, types.text
+			test.strictEqual doc.version, 1
+			test.done()
+
+	'open a document that is already open': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc1, error) ->
+			test.ifError error
+			test.ok doc1
+			c.getOrCreate name, 'text', (doc2, error) ->
+				test.strictEqual doc1, doc2
+				test.done()
+	
+	'open a document that already exists': (test) ->
+		name = newDocName()
+
+		db.applyDelta name, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+			test.ifError(error)
+
+			c = new client.Connection(hostname, port)
+			c.getOrCreate name, 'text', (doc, error) ->
+				test.ifError error
+				test.ok doc
+
+				test.strictEqual doc.type.name, 'text'
+				test.strictEqual doc.version, 1
+				test.done()
+
+	'open a document with a different type': (test) ->
+		name = newDocName()
+
+		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+			test.ifError(error)
+
+			c = new client.Connection(hostname, port)
+			c.getOrCreate name, 'text', (doc, error) ->
+				test.ok error
+				test.strictEqual doc, null
+				test.done()
+	
+	'submit an op to a document': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc, error) ->
+			test.ifError error
+
+			doc.submitOp [{i:'hi'}], ->
+				test.deepEqual doc.snapshot, 'hi'
+				test.strictEqual doc.version, 2
+				test.done()
+
+			# The document should be updated immediately.
+			test.strictEqual doc.snapshot, 'hi'
+			test.strictEqual doc.version, 1
+	
+	'infer the version when submitting an op': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc, error) ->
+			test.ifError error
+
+			doc.submitOp [{i:'hi'}], ->
+				test.deepEqual doc.snapshot, 'hi'
+				test.strictEqual doc.version, 2
+				test.done()
+	
+	'compose multiple ops together when they are submitted while an op is in flight': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc, error) ->
+			test.ifError error
+
+			doc.submitOp [{i:'hi'}], ->
+				test.strictEqual doc.version, 2
+
+			doc.submitOp [2, {i:'hi'}], ->
+				test.strictEqual doc.version, 3
+			doc.submitOp [4, {i:'hi'}], ->
+				test.strictEqual doc.version, 3
+				test.expect 4
+				test.done()
+	
+	'Receive submitted ops': (test) ->
+		name = newDocName()
+		c = new client.Connection(hostname, port)
+		c.getOrCreate name, 'text', (doc, error) ->
+			test.ifError error
+
+			doc.onChanged (op) ->
+				test.deepEqual op, [{i:'hi'}]
+
+				test.expect 3
+				test.done()
+
+			db.applyDelta name, {version:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
+				test.ifError error
+}
