@@ -87,7 +87,8 @@ class DeltaStream
 
 	# Submit an op to the named document
 	submit: (docName, op, version, callback) ->
-		console.log "submit v #{version} on #{docName}", op
+		p "submit"
+		#console.log "submit v #{version} on #{docName}", op
 		@send {doc:docName, v:version, op:op}
 		@on docName, 'localop', callback
 	

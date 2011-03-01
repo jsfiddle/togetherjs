@@ -10,7 +10,7 @@ p = ->
 i = ->
 
 exports.install = (server = require('./frontend').server) ->
-	socket = io.listen(server)
+	socket = io.listen server, {log:null}
 
 	socket.on 'connection', (client) ->
 		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}"

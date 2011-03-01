@@ -1,6 +1,6 @@
 assert = require 'assert'
 util = require 'util'
-p = util.debug
+p = require('sys').puts
 i = util.inspect
 
 testRandomOp = (type) ->
@@ -80,7 +80,7 @@ exports.test = (type, iterations = 1000) ->
 	assert.ok type.transform
 	assert.ok type.compose, "Running random op tester for types without compose is not yet implemented"
 
-	p "Running #{iterations} of randomized tests for type #{type.name}"
+	p "   Running #{iterations} of randomized tests for type #{type.name}..."
 	for n in [0..iterations]
-		p n if n % 200 == 0
+#		p n if n % 200 == 0
 		testRandomOp(type)

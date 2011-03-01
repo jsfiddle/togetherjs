@@ -10,8 +10,6 @@ server = require '../src/server'
 events = server.events
 db = server.db
 
-server.socket.install(server.server)
-
 types = require '../src/types'
 randomizer = require './randomizer'
 require './types'
@@ -26,6 +24,18 @@ hostname = 'localhost'
 port = 8768
 client = null
 
+testCase = require('nodeunit').testCase
+
+
+# Setup the local db server before the tests run.
+# At some stage, it might be worth moving this into a setUp() function of a test runner.
+server.server.listen 8768, () ->
+	client = http.createClient port, hostname
+
+server.socket.install(server.server)
+
+
+# Make a new socket.io socket connected to the server
 makeNewSocket = (callback) ->
 	socket = new clientio.Socket hostname, {port: port}
 	socket.connect()
@@ -93,322 +103,324 @@ newDocName = do ->
 
 #      TESTS
 
-should = (name, method) -> {name: name, method: method}
-doesnt = (name, method) -> {name: name, method: method, run: false}
-stop = {stop: true}
+# Testing tool tests
+exports.tools = {
+	'create new doc name with each invocation of newDocName()': (test) ->
+		test.notStrictEqual newDocName(), newDocName()
+		test.strictEqual typeof newDocName(), 'string'
+		test.done()
+}
 
-tests = [
-	# Testing tool tests
-	should 'create new doc name with each invocation of newDocName()', (pass, fail) ->
-		assert.notStrictEqual newDocName(), newDocName()
-		assert.strictEqual typeof newDocName(), 'string'
-		pass()
-
-	# DB tests
-	should 'Return null when asked for the snapshot of a new object', (pass, fail) ->
+# DB tests
+exports.db = {
+	'Return null when asked for the snapshot of a new object': (test) ->
 		db.getSnapshot newDocName(), (data) ->
-			assert.deepEqual data, {v:0, type:null, snapshot:null}
-			pass()
+			test.deepEqual data, {v:0, type:null, snapshot:null}
+			test.done()
 
-	should 'Apply a set type op correctly sets the type and version', (pass, fail) ->
+	'Apply a set type op correctly sets the type and version': (test) ->
 		db.applyDelta newDocName(), {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-			fail error if error?
-			assert.strictEqual appliedVersion, 0
-			pass()
+			test.ifError(error)
+			test.strictEqual appliedVersion, 0
+			test.done()
 	
-	should 'Return a fresh snapshot after submitting ops', (pass, fail) ->
+	'Return a fresh snapshot after submitting ops': (test) ->
 		name = newDocName()
 		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-			fail error if error?
-			assert.strictEqual appliedVersion, 0
+			test.ifError(error)
+			test.strictEqual appliedVersion, 0
 			db.getSnapshot name, (data) ->
-				assert.deepEqual data, {v:1, type:types.simple, snapshot:{str:''}}
+				test.deepEqual data, {v:1, type:types.simple, snapshot:{str:''}}
 
 				db.applyDelta name, {version:1, op:{position: 0, text:'hi'}}, (error, appliedVersion) ->
-					fail error if error?
-					assert.strictEqual appliedVersion, 1
+					test.ifError(error)
+					test.strictEqual appliedVersion, 1
 					db.getSnapshot name, (data) ->
-						assert.deepEqual data, {v:2, type:types.simple, snapshot:{str:'hi'}}
-						pass()
+						test.deepEqual data, {v:2, type:types.simple, snapshot:{str:'hi'}}
+						test.done()
 
-	should 'Apply op to future version fails', (pass, fail) ->
+	'Apply op to future version fails': (test) ->
 		db.applyDelta newDocName(), {version:1, type:{v:1,op:{}}}, (err, result) ->
-			assert.ok err
-			pass()
+			test.ok err
+			test.done()
 	
-	should 'be able to apply ops at the most recent version', (pass, fail) ->
+	'Apply ops at the most recent version': (test) ->
 		applyOps newDocName(), 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
 				{position: 3, text: 'to you '}
 			], (error, data) ->
-				assert.strictEqual error, null
-				assert.strictEqual data.v, 4
-				assert.deepEqual data.snapshot.str, 'Hi to you mum'
-				pass()
+				test.strictEqual error, null
+				test.strictEqual data.v, 4
+				test.deepEqual data.snapshot.str, 'Hi to you mum'
+				test.done()
 				
-	should 'be able to apply ops at an old version', (pass, fail) ->
+	'Apply ops at an old version': (test) ->
 		name = newDocName()
 		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
 			], (error, data) ->
-				assert.strictEqual error, null
-				assert.strictEqual data.v, 3
-				assert.deepEqual data.snapshot.str, 'Hi mum'
+				test.strictEqual error, null
+				test.strictEqual data.v, 3
+				test.deepEqual data.snapshot.str, 'Hi mum'
 
 				applyOps name, 2, [
 					{position: 2, text: ' to you'}
 				], (error, data) ->
-					assert.strictEqual error, null
-					assert.strictEqual data.v, 4
-					assert.deepEqual data.snapshot.str, 'Hi to you mum'
-					pass()
+					test.strictEqual error, null
+					test.strictEqual data.v, 4
+					test.deepEqual data.snapshot.str, 'Hi to you mum'
+					test.done()
 	
 
-	should 'delete a document when delete is called', (pass, fail) ->
+	'delete a document when delete is called': (test) ->
 		name = newDocName()
 		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-			fail error if error?
+			test.ifError(error)
 			db.delete name, (error) ->
-				fail error if error?
-				pass()
+				test.ifError(error)
+				test.done()
 	
-	should 'pass an error to the callback if you delete something that doesn\'t exist', (pass, fail) ->
+	'Pass an error to the callback if you delete something that doesn\'t exist': (test) ->
 		db.delete newDocName(), (error) ->
-			fail 'No error!' unless error?
-			pass()
-	
+			assert.ok error
+			test.done()
+}
+
+# Events
+exports.events = {
 	# Events
-	should 'emit events when ops are applied', (pass, fail) ->
+	'emit events when ops are applied': (test) ->
 		expectedVersions = [0...2]
-		events.listen 'G', ((v) -> assert.strictEqual v, 0), (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+		events.listen 'G', ((v) -> test.strictEqual v, 0), (delta) ->
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 
 		applyOps 'G', 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 	
-	should 'emit transformed events when old ops are applied', (pass, fail) ->
+	'emit transformed events when old ops are applied': (test) ->
 		name = newDocName()
 		expectedVersions = [0...3]
-		events.listen name, ((v) -> assert.strictEqual v, 0), (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+		events.listen name, ((v) -> test.strictEqual v, 0), (delta) ->
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 
 		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) ->
-				fail(error) if error?
+				test.ifError(error)
 				db.applyDelta name, {version:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
-					fail(error) if error?
-					assert.strictEqual v, 2
+					test.ifError(error)
+					test.strictEqual v, 2
 	
-	should 'emit events when ops are applied to an existing document', (pass, fail) ->
+	'emit events when ops are applied to an existing document': (test) ->
 		applyOps 'H', 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
-		events.listen 'H', ((v) -> assert.strictEqual v, 2), (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+		events.listen 'H', ((v) -> test.strictEqual v, 2), (delta) ->
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 
 		applyOps 'H', 2, [
 				{position: 0, text: 'Hi'}
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 
-	should 'emit events with listenFromVersion from before the first version', (pass, fail) ->
+	'emit events with listenFromVersion from before the first version': (test) ->
 		expectedVersions = [0...2]
 		events.listenFromVersion 'J', 0, (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 
 		applyOps 'J', 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
-	
+			], (error, _) -> test.ifError(error)
 
-	should 'emit events with listenFromVersion from the first version after its been sent', (pass, fail) ->
+	'emit events with listenFromVersion from the first version after its been sent': (test) ->
 		applyOps 'K', 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [0...2]
 		events.listenFromVersion 'K', 0, (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 	
-	should 'emit events with listenFromVersion from the current version', (pass, fail) ->
+	'emit events with listenFromVersion from the current version': (test) ->
 		applyOps 'L', 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
 		events.listenFromVersion 'L', 2, (delta) ->
-			assert.strictEqual delta.version, expectedVersions.shift()
-			pass() if expectedVersions.length == 0
+			test.strictEqual delta.version, expectedVersions.shift()
+			test.done() if expectedVersions.length == 0
 
 		applyOps 'L', 2, [
 				{position: 0, text: 'Hi'}
 				{position: 0, text: 'Hi'}
-			], (error, _) -> fail(error) if error?
+			], (error, _) -> test.ifError(error)
 
-	should 'stop emitting events after removeListener is called', (pass, fail) ->
+	'stop emitting events after removeListener is called': (test) ->
 		name = newDocName()
 		listener = (delta) ->
-			assert.strictEqual delta.version, 0, 'Listener was not removed correctly'
+			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
 			events.removeListener name, listener
 
-		events.listen name, ((v) -> assert.strictEqual v, 0), listener
+		events.listen name, ((v) -> test.strictEqual v, 0), listener
 
 		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) ->
-				fail(error) if error?
-				pass()
+				test.ifError(error)
+				test.done()
 
-	should 'stop emitting events after removeListener is called when using listenFromVersion', (pass, fail) ->
+	'stop emitting events after removeListener is called when using listenFromVersion': (test) ->
 		name = newDocName()
 		listener = (delta) ->
-			assert.strictEqual delta.version, 0, 'Listener was not removed correctly'
+			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
 			events.removeListener name, listener
 
 		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) ->
-				fail(error) if error?
+				test.ifError(error)
 				events.listenFromVersion name, 0, listener
-				pass()
+				test.done()
+}
 
-	# Frontend tests
-	should 'return 404 when on GET on a random URL', (pass, fail) ->
+# Frontend tests
+exports.frontend = testCase {
+	'return 404 when on GET on a random URL': (test) ->
 		fetch 'GET', "/#{newDocName()}", null, (res, data) ->
-			assert.strictEqual(res.statusCode, 404)
-			pass()
+			test.strictEqual(res.statusCode, 404)
+			test.done()
 	
-	should 'PUT returns 405', (pass, fail) ->
+	'PUT returns 405': (test) ->
 		fetch 'PUT', "/#{newDocName()}", null, (res, data) ->
-			assert.strictEqual res.statusCode, 405
+			test.strictEqual res.statusCode, 405
 			# These might be in a different order... this will do for now.
-			assert.strictEqual res.headers.allow, 'GET,POST,DELETE'
-			pass()
+			test.strictEqual res.headers.allow, 'GET,POST,DELETE'
+			test.done()
 
-	should 'POST a document in the DB returns 200 OK', (pass, fail) ->
+	'POST a document in the DB returns 200 OK': (test) ->
 		fetch 'POST', '/M?v=0', {type:'simple'}, (res, data) ->
-			assert.strictEqual res.statusCode, 200
-			assert.deepEqual JSON.parse(data), {v:0}
+			test.strictEqual res.statusCode, 200
+			test.deepEqual JSON.parse(data), {v:0}
 
 			fetch 'POST', '/M?v=1', {position: 0, text: 'Hi'}, (res, data) ->
-				assert.strictEqual res.statusCode, 200
-				assert.deepEqual JSON.parse(data), {v:1}
+				test.strictEqual res.statusCode, 200
+				test.deepEqual JSON.parse(data), {v:1}
 				fetch 'GET', '/M', null, (res, data) ->
-					assert.strictEqual res.statusCode, 200
-					assert.deepEqual JSON.parse(data), {v:2, type:'simple', snapshot:{str: 'Hi'}}
-					pass()
+					test.strictEqual res.statusCode, 200
+					test.deepEqual JSON.parse(data), {v:2, type:'simple', snapshot:{str: 'Hi'}}
+					test.done()
 		
 
-	should 'POST a document with no version returns 400', (pass, fail) ->
+	'POST a document with no version returns 400': (test) ->
 		fetch 'POST', '/N', {type:'simple'}, (res, data) ->
-			assert.strictEqual res.statusCode, 400
-			pass()
+			test.strictEqual res.statusCode, 400
+			test.done()
 
-	should 'POST a document with invalid JSON returns 400', (pass, fail) ->
+	'POST a document with invalid JSON returns 400': (test) ->
 		fetch 'POST', '/O?v=0', 'invalid>{json', (res, data) ->
-			assert.strictEqual res.statusCode, 400
-			pass()
+			test.strictEqual res.statusCode, 400
+			test.done()
 	
-	should 'DELETE deletes a document', (pass, fail) ->
+	'DELETE deletes a document': (test) ->
 		db.applyDelta 'P', {version:0, op:{type:'simple'}}, (error, newVersion) ->
-			fail(error) if error?
+			test.ifError(error)
 			fetch 'DELETE', '/P', null, (res, data) ->
-				assert.strictEqual res.statusCode, 200
-				pass()
+				test.strictEqual res.statusCode, 200
+				test.done()
 	
-	should 'DELETE returns a 404 message if you delete something that doesn\'t exist', (pass, fail) ->
+	'DELETE returns a 404 message if you delete something that doesn\'t exist': (test) ->
 		fetch 'DELETE', '/Q', null, (res, data) ->
-			assert.strictEqual res.statusCode, 404
-			pass()
-	
-	# Streaming protocol (sockets) tests
+			test.strictEqual res.statusCode, 404
+			test.done()
+}
 
-	should 'be able to open a document', (pass, fail) ->
+exports.stream = {
+	'be able to open a document': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.send {doc:name, v:0, open:true}
 			expectData socket, [{doc:name, v:0, open:true}], ->
-				pass()
+				test.done()
 				socket.disconnect()
 	
-	should 'be able to open a document with no version specified', (pass, fail) ->
+	'be able to open a document with no version specified': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.send {doc:name, open:true}
 			socket.on 'message', (data) ->
-				assert.deepEqual data, {doc:name, v:0, open:true}
-				pass()
+				test.deepEqual data, {doc:name, v:0, open:true}
+				test.done()
 				socket.disconnect()
 	
-	should 'be able to open a document at a previous version and get ops since', (pass, fail) ->
+	'be able to open a document at a previous version and get ops since': (test) ->
 		name = newDocName()
 		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, newVersion) ->
-			fail(error) if error?
+			test.ifError(error)
 
 			makeNewSocket (socket) ->
 				socket.send {doc:name, v:0, open:true}
 				expectData socket, [{doc:name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
-					pass()
+					test.done()
 					socket.disconnect()
 
-	should 'be able to receive ops through an open socket', (pass, fail) ->
+	'be able to receive ops through an open socket': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.send {doc:name, v:0, open:true}
 			expectData socket, [{doc:name, v:0, open:true}], ->
 				applyOps name, 0, [{type:'simple'}], (error, _) ->
-					throw error if error?
+					test.ifError(error)
 
 					expectData socket, [{v:0, op:{type:'simple'}}], ->
-						pass()
+						test.done()
 						socket.disconnect()
 	
-	should 'be able to send an op', (pass, fail) ->
+	'be able to send an op': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
-			events.listen name, ((v) -> assert.strictEqual v, 0), (delta) ->
-				assert.strictEqual delta.version, 0
-				assert.deepEqual delta.op, {type:'simple'}
-				pass()
+			events.listen name, ((v) -> test.strictEqual v, 0), (delta) ->
+				test.strictEqual delta.version, 0
+				test.deepEqual delta.op, {type:'simple'}
+				test.done()
 				socket.disconnect()
 
 			socket.send {doc:name, v:0, op:{type:'simple'}}
 
-	should 'receive confirmation when an op is sent', (pass, fail) ->
+	'receive confirmation when an op is sent': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			expectData socket, [{doc:name, v:0}], () ->
-				pass()
+				test.done()
 				socket.disconnect()
 
 			socket.send {doc:name, v:0, op:{type:'simple'}}
 
-	should 'not be sent your own ops back', (pass, fail) ->
+	'not be sent your own ops back': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.on 'message', (data) ->
-				assert.notDeepEqual data.op, {type:'simple'} if data.op?
+				test.notDeepEqual data.op, {type:'simple'} if data.op?
 
 			expectData socket, [{doc:name, v:0, open:true}, {v:0}], ->
 				# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
@@ -416,37 +428,37 @@ tests = [
 				# The second op should come after the first.
 				applyOps name, 0, [{position:0, text:'hi'}], (error, _) ->
 					expectData socket, [{v:1, op:{position:0, text:'hi'}}], ->
-					pass()
+					test.done()
 					socket.disconnect()
 
 			socket.send {doc:name, v:0, open:true}
 			socket.send {doc:name, v:0, op:{type:'simple'}}
 
-	should 'get a document snapshot', (pass, fail) ->
+	'get a document snapshot': (test) ->
 		name = newDocName()
 		applyOps name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'internet'}
 			], (error, _) ->
-				fail(error) if error?
+				test.ifError(error)
 
 				makeNewSocket (socket) ->
 					socket.send {doc:name, snapshot:null}
 					socket.on 'message', (data) ->
-						assert.deepEqual data, {doc:name, snapshot:{str:'internet'}, v:2, type:'simple'}
-						pass()
+						test.deepEqual data, {doc:name, snapshot:{str:'internet'}, v:2, type:'simple'}
+						test.done()
 						socket.disconnect()
 
-	should 'get a null snapshot when getting a nonexistent document', (pass, fail) ->
+	'get a null snapshot when getting a nonexistent document': (test) ->
 		name = newDocName()
 		makeNewSocket (socket) ->
 			socket.send {doc:name, snapshot:null}
 			socket.on 'message', (data) ->
-				assert.deepEqual data, {doc:name, snapshot:null, type:null, v:0}
-				pass()
+				test.deepEqual data, {doc:name, snapshot:null, type:null, v:0}
+				test.done()
 				socket.disconnect()
 	
-	should 'be able to close a document', (pass, fail) ->
+	'be able to close a document': (test) ->
 		name1 = newDocName()
 		name2 = newDocName()
 		makeNewSocket (socket) ->
@@ -458,85 +470,90 @@ tests = [
 				# name1 should be closed, and name2 should be open.
 				# We should only get the op for name2.
 				db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-					throw error if error?
+					test.ifError(error)
 				db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
-					throw error if error?
+					test.ifError(error)
 
 				expectData socket, [{v:0, op:{type:'text'}}], ->
-					pass()
+					test.done()
 					socket.disconnect()
+}
 
-	# Type tests
-	should 'pass text type tests', (pass, fail) ->
+
+# Type tests
+exports.type = {
+	'test.done text type tests': (test) ->
 		types.text.test()
 		randomizer.test(types.text)
-		pass()
+		test.done()
+}
 
-	# Client stream tests
-	should 'open a document', (pass, fail) ->
+# Client stream tests
+exports.clientstream = {
+	'open a document': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.open name, 0, (msg) ->
-			assert.deepEqual msg, {doc:name, open:true, v:0}
+			test.deepEqual msg, {doc:name, open:true, v:0}
 			ds.disconnect()
-			pass()
+			test.done()
 	
-	should 'submit an op', (pass, fail) ->
+	'submit an op': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.open name, 0, (msg) ->
 			ds.submit name, {type:'simple'}, 0, (msg) ->
-				assert.deepEqual msg, {v:0, doc:name}
+				test.deepEqual msg, {v:0, doc:name}
 				ds.disconnect()
-				pass()
+				test.done()
 	
-	should 'have a docname with the op even when the server skips it', (pass, fail) ->
+	'have a docname with the op even when the server skips it': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.submit name, {type:'simple'}, 0, (msg) ->
-			assert.deepEqual msg, {v:0, doc:name}
+			test.deepEqual msg, {v:0, doc:name}
 			ds.submit name, {position:0, text:'hi'}, 1, (msg) ->
-				assert.deepEqual msg, {v:1, doc:name}
+				test.deepEqual msg, {v:1, doc:name}
 				ds.disconnect()
-				pass()
+				test.done()
 
-	should 'get an empty document returns a null snapshot', (pass, fail) ->
+	'get an empty document returns a null snapshot': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.get name, (msg) ->
-			assert.deepEqual msg, {doc:name, v:0, type:null, snapshot:null}
+			test.deepEqual msg, {doc:name, v:0, type:null, snapshot:null}
 			ds.disconnect()
-			pass()
+			test.done()
 
-	should 'get a non-empty document gets its snapshot', (pass, fail) ->
+	'get a non-empty document gets its snapshot': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.submit name, {type:'simple'}, 0, ->
 			ds.get name, (msg) ->
-				assert.deepEqual msg, {doc:name, v:1, type:'simple', snapshot:{str:''}}
+				test.deepEqual msg, {doc:name, v:1, type:'simple', snapshot:{str:''}}
 				ds.disconnect()
-				pass()
+				test.done()
 
-	should 'get a stream of ops for an open document', (pass, fail) ->
+	'get a stream of ops for an open document': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
 		ds.open name, 0, (msg) ->
 			db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-				fail(error) if error?
-				assert.strictEqual appliedVersion, 0
+				test.ifError(error)
+				test.strictEqual appliedVersion, 0
 
 		ds.on name, 'op', (data) ->
-			assert.deepEqual data, {doc:name, v:0, op:{type:'simple'}}
+			test.deepEqual data, {doc:name, v:0, op:{type:'simple'}}
 			ds.disconnect()
-			pass()
+			test.done()
 
-	should 'not get ops sent after the document was closed', (pass, fail) ->
+	'not get ops sent after the document was closed': (test) ->
 		name = newDocName()
 		ds = new DeltaStream hostname, port
 
@@ -547,64 +564,10 @@ tests = [
 					# We shouldn't get that op...
 					ds.open newDocName(), 0, (msg) ->
 						ds.disconnect()
-						pass()
+						test.done()
 
 		ds.on name, 'op', (data) ->
-			fail "Received op for closed document: #{i data}"
-]
-
-
-
-###### Test runner
-
-server.server.listen(8768, () ->
-	client = http.createClient port, hostname
-
-	tests_count = tests.length
-	tests_run = 0
-	tests_passed = 0
-	stop = false
-
-	maybeStop = () ->
-		if tests_run == tests_count
-			if tests_passed == tests_run
-				console.log "\nAll #{tests_run} tests passed! PARTY!"
-			else
-				console.log "\nPassed #{tests_passed} out of #{tests_run} tests"
-			server.server.close()
-
-	for test in tests
-		stop = true if test.stop? && test.stop == true
-
-		if stop == true or (test.run? and test.run == false)
-			tests_count--
-			continue
-
-		console.log "Should #{test.name}..."
-
-		# Called when a test is complete, regardless of the outcome.
-		testrun = () ->
-			tests_run++
-			maybeStop()
-
-		pass = () ->
-			tests_passed++
-			testrun()
-
-		fail = (message = "no message") ->
-			throw new Error(message)
-			testrun()
-
-		exc = (message = "--") ->
-			console.log "FAIL: It should #{test.name}:\n\t#{message}"
-			testrun()
-
-		try
-			test.method(pass, fail)
-		catch error
-			exc error.stack
-	
-	maybeStop()
-)
+			throw new Error "Received op for closed document: #{i data}"
+}
 
 

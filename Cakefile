@@ -1,7 +1,8 @@
 {exec} = require 'child_process'
 
 task 'test', 'Run all tests', ->
-	test = require './test'
+	reporter = require('nodeunit').reporters.default
+	reporter.run ['test/test.js']
 
 #option '-w', '--watch', 'Watch'
 
