@@ -121,12 +121,12 @@ class Connection
 	get: (docName, callback) ->
 		return docs[docName] if docs[docName]?
 
-		stream.get @docName, (response) ->
+		stream.get docName, (response) ->
 			if response.snapshot == null
 				callback(null)
 			else
-				type = builtin.types[response.type]
-				callback makeDoc(response.docName, response.v, type, response.snapshot)
+				type = types[response.type]
+				callback makeDoc(response.doc, response.v, type, response.snapshot)
 
 	# Callback is passed a document or an error
 	# type is either a type name (eg 'text' or 'simple') or the actual type object.
@@ -145,7 +145,6 @@ class Connection
 			return
 
 		stream.get docName, (response) =>
-			#			p (i response)
 			if response.snapshot == null
 				stream.submit docName, {type: type.name}, 0, (response) =>
 					if response.v?

@@ -613,6 +613,7 @@ exports.client = {
 		c.getOrCreate name, 'text', (doc1, error) ->
 			test.ifError error
 			test.ok doc1
+			test.strictEqual doc1.name, name
 			c.getOrCreate name, 'text', (doc2, error) ->
 				test.strictEqual doc1, doc2
 				test.done()
@@ -649,6 +650,7 @@ exports.client = {
 		c = new client.Connection(hostname, port)
 		c.getOrCreate name, 'text', (doc, error) ->
 			test.ifError error
+			test.strictEqual doc.name, name
 
 			doc.submitOp [{i:'hi'}], ->
 				test.deepEqual doc.snapshot, 'hi'
@@ -664,6 +666,7 @@ exports.client = {
 		c = new client.Connection(hostname, port)
 		c.getOrCreate name, 'text', (doc, error) ->
 			test.ifError error
+			test.strictEqual doc.name, name
 
 			doc.submitOp [{i:'hi'}], ->
 				test.deepEqual doc.snapshot, 'hi'
@@ -675,6 +678,7 @@ exports.client = {
 		c = new client.Connection(hostname, port)
 		c.getOrCreate name, 'text', (doc, error) ->
 			test.ifError error
+			test.strictEqual doc.name, name
 
 			doc.submitOp [{i:'hi'}], ->
 				test.strictEqual doc.version, 2
@@ -683,7 +687,7 @@ exports.client = {
 				test.strictEqual doc.version, 3
 			doc.submitOp [4, {i:'hi'}], ->
 				test.strictEqual doc.version, 3
-				test.expect 4
+				test.expect 5
 				test.done()
 	
 	'Receive submitted ops': (test) ->
@@ -691,13 +695,35 @@ exports.client = {
 		c = new client.Connection(hostname, port)
 		c.getOrCreate name, 'text', (doc, error) ->
 			test.ifError error
+			test.strictEqual doc.name, name
 
 			doc.onChanged (op) ->
 				test.deepEqual op, [{i:'hi'}]
 
-				test.expect 3
+				test.expect 4
 				test.done()
 
 			db.applyDelta name, {version:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
 				test.ifError error
+
+	'get a nonexistent document passes null to the callback': (test) ->
+		c = new client.Connection(hostname, port)
+		c.get newDocName(), (doc) ->
+			test.strictEqual doc, null
+			test.done()
+	
+	'get an existing document returns the document': (test) ->
+		name = newDocName()
+
+		db.applyDelta name, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+			test.ifError(error)
+
+			c = new client.Connection(hostname, port)
+			c.get name, (doc) ->
+				test.ok doc
+
+				test.strictEqual doc.name, name
+				test.strictEqual doc.type.name, 'text'
+				test.strictEqual doc.version, 1
+				test.done()
 }
