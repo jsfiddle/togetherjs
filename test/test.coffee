@@ -35,12 +35,6 @@ server.server.listen 8768, () ->
 server.socket.install(server.server)
 
 
-# Make a new socket.io socket connected to the server
-makeNewSocket = (callback) ->
-	socket = new clientio.Socket hostname, {port: port}
-	socket.connect()
-	socket.on 'connect', () -> callback(socket)
-
 # Expected data is an array of objects.
 expectData = (socket, expectedData, callback) ->
 	listener = (data) ->
@@ -94,11 +88,6 @@ applyOps = (docName, startVersion, ops, callback) ->
 newDocName = do ->
 	index = 1
 	() -> 'doc' + index++
-
-## ** Note
-#
-# Some of the tests below still use named documents. This is because I'm lazy and haven't
-# fixed them all yet. Use newDocName() for all new tests.
 
 
 #      TESTS
@@ -191,98 +180,99 @@ exports.db = {
 }
 
 # Events
-exports.events = {
-	# Events
+exports.events = testCase {
+	setUp: (callback) ->
+		@name = newDocName()
+		callback()
+
 	'emit events when ops are applied': (test) ->
 		expectedVersions = [0...2]
-		events.listen 'G', ((v) -> test.strictEqual v, 0), (delta) ->
+		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		applyOps 'G', 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 	
 	'emit transformed events when old ops are applied': (test) ->
-		name = newDocName()
 		expectedVersions = [0...3]
-		events.listen name, ((v) -> test.strictEqual v, 0), (delta) ->
+		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		applyOps name, 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) ->
+			], (error, _) =>
 				test.ifError(error)
-				db.applyDelta name, {version:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
+				db.applyDelta @name, {version:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
 					test.ifError(error)
 					test.strictEqual v, 2
 	
 	'emit events when ops are applied to an existing document': (test) ->
-		applyOps 'H', 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
-		events.listen 'H', ((v) -> test.strictEqual v, 2), (delta) ->
+		events.listen @name, ((v) -> test.strictEqual v, 2), (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		applyOps 'H', 2, [
+		applyOps @name, 2, [
 				{position: 0, text: 'Hi'}
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 	'emit events with listenFromVersion from before the first version': (test) ->
 		expectedVersions = [0...2]
-		events.listenFromVersion 'J', 0, (delta) ->
+		events.listenFromVersion @name, 0, (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		applyOps 'J', 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 	'emit events with listenFromVersion from the first version after its been sent': (test) ->
-		applyOps 'K', 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [0...2]
-		events.listenFromVersion 'K', 0, (delta) ->
+		events.listenFromVersion @name, 0, (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 	
 	'emit events with listenFromVersion from the current version': (test) ->
-		applyOps 'L', 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
-		events.listenFromVersion 'L', 2, (delta) ->
+		events.listenFromVersion @name, 2, (delta) ->
 			test.strictEqual delta.version, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		applyOps 'L', 2, [
+		applyOps @name, 2, [
 				{position: 0, text: 'Hi'}
 				{position: 0, text: 'Hi'}
 			], (error, _) -> test.ifError(error)
 
 	'stop emitting events after removeListener is called': (test) ->
-		name = newDocName()
-		listener = (delta) ->
+		listener = (delta) =>
 			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
-			events.removeListener name, listener
+			events.removeListener @name, listener
 
-		events.listen name, ((v) -> test.strictEqual v, 0), listener
+		events.listen @name, ((v) -> test.strictEqual v, 0), listener
 
-		applyOps name, 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
 			], (error, _) ->
@@ -290,17 +280,16 @@ exports.events = {
 				test.done()
 
 	'stop emitting events after removeListener is called when using listenFromVersion': (test) ->
-		name = newDocName()
-		listener = (delta) ->
+		listener = (delta) =>
 			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
-			events.removeListener name, listener
+			events.removeListener @name, listener
 
-		applyOps name, 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi'}
-			], (error, _) ->
+			], (error, _) =>
 				test.ifError(error)
-				events.listenFromVersion name, 0, listener
+				events.listenFromVersion @name, 0, listener
 				test.done()
 }
 
@@ -355,128 +344,112 @@ exports.frontend = testCase {
 			test.done()
 }
 
-exports.stream = {
+exports.stream = testCase {
+	setUp: (callback) ->
+		@name = newDocName()
+
+		# Make a new socket.io socket connected to the server's stream interface
+		@socket = new clientio.Socket hostname, {port: port}
+		@socket.connect()
+		@socket.on 'connect', () -> callback()
+	
+	tearDown: (callback) ->
+		@socket.disconnect()
+		callback()
+
 	'be able to open a document': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			socket.send {doc:name, v:0, open:true}
-			expectData socket, [{doc:name, v:0, open:true}], ->
-				test.done()
-				socket.disconnect()
+		@socket.send {doc:@name, v:0, open:true}
+		expectData @socket, [{doc:@name, v:0, open:true}], ->
+			test.done()
 	
 	'be able to open a document with no version specified': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			socket.send {doc:name, open:true}
-			socket.on 'message', (data) ->
-				test.deepEqual data, {doc:name, v:0, open:true}
-				test.done()
-				socket.disconnect()
+		@socket.send {doc:@name, open:true}
+		@socket.on 'message', (data) =>
+			test.deepEqual data, {doc:@name, v:0, open:true}
+			test.done()
 	
 	'be able to open a document at a previous version and get ops since': (test) ->
-		name = newDocName()
-		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, newVersion) ->
+		db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, newVersion) =>
 			test.ifError(error)
 
-			makeNewSocket (socket) ->
-				socket.send {doc:name, v:0, open:true}
-				expectData socket, [{doc:name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
-					test.done()
-					socket.disconnect()
-
-	'be able to receive ops through an open socket': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			socket.send {doc:name, v:0, open:true}
-			expectData socket, [{doc:name, v:0, open:true}], ->
-				applyOps name, 0, [{type:'simple'}], (error, _) ->
-					test.ifError(error)
-
-					expectData socket, [{v:0, op:{type:'simple'}}], ->
-						test.done()
-						socket.disconnect()
-	
-	'be able to send an op': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			events.listen name, ((v) -> test.strictEqual v, 0), (delta) ->
-				test.strictEqual delta.version, 0
-				test.deepEqual delta.op, {type:'simple'}
+			@socket.send {doc:@name, v:0, open:true}
+			expectData @socket, [{doc:@name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
 				test.done()
-				socket.disconnect()
 
-			socket.send {doc:name, v:0, op:{type:'simple'}}
-
-	'receive confirmation when an op is sent': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			expectData socket, [{doc:name, v:0}], () ->
-				test.done()
-				socket.disconnect()
-
-			socket.send {doc:name, v:0, op:{type:'simple'}}
-
-	'not be sent your own ops back': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			socket.on 'message', (data) ->
-				test.notDeepEqual data.op, {type:'simple'} if data.op?
-
-			expectData socket, [{doc:name, v:0, open:true}, {v:0}], ->
-				# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
-				# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
-				# The second op should come after the first.
-				applyOps name, 0, [{position:0, text:'hi'}], (error, _) ->
-					expectData socket, [{v:1, op:{position:0, text:'hi'}}], ->
-					test.done()
-					socket.disconnect()
-
-			socket.send {doc:name, v:0, open:true}
-			socket.send {doc:name, v:0, op:{type:'simple'}}
-
-	'get a document snapshot': (test) ->
-		name = newDocName()
-		applyOps name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'internet'}
-			], (error, _) ->
+	'be able to receive ops through an open @socket': (test) ->
+		@socket.send {doc:@name, v:0, open:true}
+		expectData @socket, [{doc:@name, v:0, open:true}], =>
+			applyOps @name, 0, [{type:'simple'}], (error, _) =>
 				test.ifError(error)
 
-				makeNewSocket (socket) ->
-					socket.send {doc:name, snapshot:null}
-					socket.on 'message', (data) ->
-						test.deepEqual data, {doc:name, snapshot:{str:'internet'}, v:2, type:'simple'}
-						test.done()
-						socket.disconnect()
+				expectData @socket, [{v:0, op:{type:'simple'}}], ->
+					test.done()
+
+	'be able to send an op': (test) ->
+		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) =>
+			test.strictEqual delta.version, 0
+			test.deepEqual delta.op, {type:'simple'}
+			test.done()
+
+		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+
+	'receive confirmation when an op is sent': (test) ->
+		expectData @socket, [{doc:@name, v:0}], () =>
+			test.done()
+
+		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+
+	'not be sent your own ops back': (test) ->
+		@socket.on 'message', (data) ->
+			test.notDeepEqual data.op, {type:'simple'} if data.op?
+
+		expectData @socket, [{doc:@name, v:0, open:true}, {v:0}], =>
+			# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
+			# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
+			# The second op should come after the first.
+			applyOps @name, 0, [{position:0, text:'hi'}], (error, _) =>
+				expectData @socket, [{v:1, op:{position:0, text:'hi'}}], ->
+				test.done()
+
+		@socket.send {doc:@name, v:0, open:true}
+		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+
+	'get a document snapshot': (test) ->
+		applyOps @name, 0, [
+				{type: 'simple'},
+				{position: 0, text: 'internet'}
+			], (error, _) =>
+				test.ifError(error)
+
+				@socket.send {doc:@name, snapshot:null}
+				@socket.on 'message', (data) =>
+					test.deepEqual data, {doc:@name, snapshot:{str:'internet'}, v:2, type:'simple'}
+					test.done()
 
 	'get a null snapshot when getting a nonexistent document': (test) ->
-		name = newDocName()
-		makeNewSocket (socket) ->
-			socket.send {doc:name, snapshot:null}
-			socket.on 'message', (data) ->
-				test.deepEqual data, {doc:name, snapshot:null, type:null, v:0}
-				test.done()
-				socket.disconnect()
+		@socket.send {doc:@name, snapshot:null}
+		@socket.on 'message', (data) =>
+			test.deepEqual data, {doc:@name, snapshot:null, type:null, v:0}
+			test.done()
 	
 	'be able to close a document': (test) ->
 		name1 = newDocName()
 		name2 = newDocName()
-		makeNewSocket (socket) ->
-			socket.send {doc:name1, open:true}
-			socket.send {open:false}
-			socket.send {doc:name2, open:true}
 
-			expectData socket, [{doc:name1, open:true, v:0}, {open:false}, {doc:name2, open:true, v:0}], ->
-				# name1 should be closed, and name2 should be open.
-				# We should only get the op for name2.
-				db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
-					test.ifError(error)
-				db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
-					test.ifError(error)
+		@socket.send {doc:name1, open:true}
+		@socket.send {open:false}
+		@socket.send {doc:name2, open:true}
 
-				expectData socket, [{v:0, op:{type:'text'}}], ->
-					test.done()
-					socket.disconnect()
+		expectData @socket, [{doc:name1, open:true, v:0}, {open:false}, {doc:name2, open:true, v:0}], =>
+			# name1 should be closed, and name2 should be open.
+			# We should only get the op for name2.
+			db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+				test.ifError(error)
+			db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+				test.ifError(error)
+
+			expectData @socket, [{v:0, op:{type:'text'}}], ->
+				test.done()
 }
 
 
@@ -489,143 +462,118 @@ exports.type = {
 }
 
 # Client stream tests
-exports.clientstream = {
-	'open a document': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
+exports.clientstream = testCase {
+	setUp: (callback) ->
+		@name = newDocName()
+		@ds = new DeltaStream hostname, port
+		callback()
 
-		ds.open name, 0, (msg) ->
-			test.deepEqual msg, {doc:name, open:true, v:0}
-			ds.disconnect()
+	tearDown: (callback) ->
+		@ds.disconnect()
+		callback()
+
+	'open a document': (test) ->
+		@ds.open @name, 0, (msg) =>
+			test.deepEqual msg, {doc:@name, open:true, v:0}
 			test.done()
 	
 	'submit an op': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.open name, 0, (msg) ->
-			ds.submit name, {type:'simple'}, 0, (msg) ->
-				test.deepEqual msg, {v:0, doc:name}
-				ds.disconnect()
+		@ds.open @name, 0, (msg) =>
+			@ds.submit @name, {type:'simple'}, 0, (msg) =>
+				test.deepEqual msg, {v:0, doc:@name}
 				test.done()
 	
 	'have a docname with the op even when the server skips it': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.submit name, {type:'simple'}, 0, (msg) ->
-			test.deepEqual msg, {v:0, doc:name}
-			ds.submit name, {position:0, text:'hi'}, 1, (msg) ->
-				test.deepEqual msg, {v:1, doc:name}
-				ds.disconnect()
+		@ds.submit @name, {type:'simple'}, 0, (msg) =>
+			test.deepEqual msg, {v:0, doc:@name}
+			@ds.submit @name, {position:0, text:'hi'}, 1, (msg) =>
+				test.deepEqual msg, {v:1, doc:@name}
 				test.done()
 
 	'get an empty document returns a null snapshot': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.get name, (msg) ->
-			test.deepEqual msg, {doc:name, v:0, type:null, snapshot:null}
-			ds.disconnect()
+		@ds.get @name, (msg) =>
+			test.deepEqual msg, {doc:@name, v:0, type:null, snapshot:null}
 			test.done()
 
 	'get a non-empty document gets its snapshot': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.submit name, {type:'simple'}, 0, ->
-			ds.get name, (msg) ->
-				test.deepEqual msg, {doc:name, v:1, type:'simple', snapshot:{str:''}}
-				ds.disconnect()
+		@ds.submit @name, {type:'simple'}, 0, =>
+			@ds.get @name, (msg) =>
+				test.deepEqual msg, {doc:@name, v:1, type:'simple', snapshot:{str:''}}
 				test.done()
 
 	'get a stream of ops for an open document': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.open name, 0, (msg) ->
-			db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+		@ds.open @name, 0, (msg) =>
+			db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
 				test.ifError(error)
 				test.strictEqual appliedVersion, 0
 
-		ds.on name, 'op', (data) ->
-			test.deepEqual data, {doc:name, v:0, op:{type:'simple'}}
-			ds.disconnect()
+		@ds.on @name, 'op', (data) =>
+			test.deepEqual data, {doc:@name, v:0, op:{type:'simple'}}
 			test.done()
 
 	'not get ops sent after the document was closed': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.open name, 0, (msg) ->
-			ds.close name, ->
+		@ds.open @name, 0, (msg) =>
+			@ds.close @name, =>
 				# The document should now be closed.
-				db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+				db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) =>
 					# We shouldn't get that op...
-					ds.open newDocName(), 0, (msg) ->
-						ds.disconnect()
+					@ds.open newDocName(), 0, (msg) ->
 						test.done()
 
-		ds.on name, 'op', (data) ->
+		@ds.on @name, 'op', (data) ->
 			throw new Error "Received op for closed document: #{i data}"
 	
 	'submit a set type op on a doc that already has a type returns the right error code': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.submit name, {type:'simple'}, 0, ->
-			ds.submit name, {type:'text'}, 0, (msg) ->
-				test.deepEqual msg, {doc:name, v:null, error:'Type already set'}
-				ds.disconnect()
+		@ds.submit @name, {type:'simple'}, 0, =>
+			@ds.submit @name, {type:'text'}, 0, (msg) =>
+				test.deepEqual msg, {doc:@name, v:null, error:'Type already set'}
 				test.done()
 
 	'submit sets a type op with a foreign type': (test) ->
-		name = newDocName()
-		ds = new DeltaStream hostname, port
-
-		ds.submit name, {type:'oogedy boogedy'}, 0, (msg) ->
+		@ds.submit @name, {type:'oogedy boogedy'}, 0, (msg) ->
 			# There should be a way to detect this.
 			test.strictEqual msg.v, null
 			test.done()
 }
 
-exports.client = {
+exports.client = testCase {
+	setUp: (callback) ->
+		@c = new client.Connection(hostname, port)
+		@name = newDocName()
+		callback()
+	
+	tearDown: (callback) ->
+		@c.disconnect()
+		callback()
+
 	'create connection': (test) ->
-		c = new client.Connection(hostname, port)
-		test.ok c
+		test.ok @c
 		test.done()
 	
 	'create a new document': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc, error) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ok doc
 			test.ifError error
 
-			test.strictEqual doc.name, name
+			test.strictEqual doc.name, @name
 			test.strictEqual doc.type, types.text
 			test.strictEqual doc.version, 1
 			test.done()
 
 	'open a document that is already open': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc1, error) ->
+		@c.getOrCreate @name, 'text', (doc1, error) =>
 			test.ifError error
 			test.ok doc1
-			test.strictEqual doc1.name, name
-			c.getOrCreate name, 'text', (doc2, error) ->
+			test.strictEqual doc1.name, @name
+			@c.getOrCreate @name, 'text', (doc2, error) =>
 				test.strictEqual doc1, doc2
 				test.done()
 	
 	'open a document that already exists': (test) ->
-		name = newDocName()
-
-		db.applyDelta name, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+		db.applyDelta @name, {version:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			c = new client.Connection(hostname, port)
-			c.getOrCreate name, 'text', (doc, error) ->
+			@c.getOrCreate @name, 'text', (doc, error) =>
 				test.ifError error
 				test.ok doc
 
@@ -634,25 +582,20 @@ exports.client = {
 				test.done()
 
 	'open a document with a different type': (test) ->
-		name = newDocName()
-
-		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+		db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			c = new client.Connection(hostname, port)
-			c.getOrCreate name, 'text', (doc, error) ->
+			@c.getOrCreate @name, 'text', (doc, error) =>
 				test.ok error
 				test.strictEqual doc, null
 				test.done()
 	
 	'submit an op to a document': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc, error) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ifError error
-			test.strictEqual doc.name, name
+			test.strictEqual doc.name, @name
 
-			doc.submitOp [{i:'hi'}], ->
+			doc.submitOp [{i:'hi'}], =>
 				test.deepEqual doc.snapshot, 'hi'
 				test.strictEqual doc.version, 2
 				test.done()
@@ -662,23 +605,19 @@ exports.client = {
 			test.strictEqual doc.version, 1
 	
 	'infer the version when submitting an op': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc, error) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ifError error
-			test.strictEqual doc.name, name
+			test.strictEqual doc.name, @name
 
-			doc.submitOp [{i:'hi'}], ->
+			doc.submitOp [{i:'hi'}], =>
 				test.deepEqual doc.snapshot, 'hi'
 				test.strictEqual doc.version, 2
 				test.done()
 	
 	'compose multiple ops together when they are submitted while an op is in flight': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc, error) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ifError error
-			test.strictEqual doc.name, name
+			test.strictEqual doc.name, @name
 
 			doc.submitOp [{i:'hi'}], ->
 				test.strictEqual doc.version, 2
@@ -691,11 +630,9 @@ exports.client = {
 				test.done()
 	
 	'Receive submitted ops': (test) ->
-		name = newDocName()
-		c = new client.Connection(hostname, port)
-		c.getOrCreate name, 'text', (doc, error) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ifError error
-			test.strictEqual doc.name, name
+			test.strictEqual doc.name, @name
 
 			doc.onChanged (op) ->
 				test.deepEqual op, [{i:'hi'}]
@@ -703,27 +640,53 @@ exports.client = {
 				test.expect 4
 				test.done()
 
-			db.applyDelta name, {version:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
+			db.applyDelta @name, {version:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
 				test.ifError error
 
 	'get a nonexistent document passes null to the callback': (test) ->
-		c = new client.Connection(hostname, port)
-		c.get newDocName(), (doc) ->
+		@c.get newDocName(), (doc) ->
 			test.strictEqual doc, null
 			test.done()
 	
 	'get an existing document returns the document': (test) ->
-		name = newDocName()
-
-		db.applyDelta name, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+		db.applyDelta @name, {version:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			c = new client.Connection(hostname, port)
-			c.get name, (doc) ->
+			@c.get @name, (doc) =>
 				test.ok doc
 
-				test.strictEqual doc.name, name
+				test.strictEqual doc.name, @name
 				test.strictEqual doc.type.name, 'text'
 				test.strictEqual doc.version, 1
 				test.done()
+}
+
+exports.integration = {
+	'ops submitted on one document get sent to another': (test) ->
+		c1 = new client.Connection(hostname, port)
+		c2 = new client.Connection(hostname, port)
+		
+		# We'll open the same document through both connections.
+		name = newDocName()
+		doc1 = c1.getOrCreate name, 'text', (doc1, error) ->
+			test.ok doc1
+			test.ifError error
+			test.strictEqual doc1.name, name
+
+			c2.get name, (doc2) ->
+				test.ok doc2
+				test.strictEqual doc2.name, name
+				test.strictEqual doc2.type.name, 'text'
+				test.strictEqual doc2.version, 1
+
+				doc1.submitOp [{i:'hi'}]
+
+				doc2.onChanged (op) ->
+					test.deepEqual op, [{i:'hi'}]
+					test.strictEqual doc2.snapshot, 'hi'
+					test.strictEqual doc2.version, 2
+					test.done()
+
+	'same document opened through 2 connections works': (test) ->
+		test.done()
 }

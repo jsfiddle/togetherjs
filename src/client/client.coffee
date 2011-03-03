@@ -103,30 +103,25 @@ class Document
 
 
 class Connection
-	# Private properties
-	docs = {}
-	stream = null
-
-	makeDoc = (name, version, type, snapshot) ->
-		throw new Error("Document #{name} already open") if docs[name]
-		doc = new Document(stream, name, version, type, snapshot)
-		docs[name] = doc
-
+	makeDoc: (name, version, type, snapshot) ->
+		throw new Error("Document #{name} already open") if @docs[name]
+		@docs[name] = new Document(@stream, name, version, type, snapshot)
 
 	constructor: (hostname, port) ->
-		stream = new DeltaStream(hostname, port)
+		@stream = new DeltaStream(hostname, port)
+		@docs = {}
 
 	# callback is passed a Document or null
 	# callback(doc)
 	get: (docName, callback) ->
-		return docs[docName] if docs[docName]?
+		return @docs[docName] if @docs[docName]?
 
-		stream.get docName, (response) ->
+		@stream.get docName, (response) =>
 			if response.snapshot == null
 				callback(null)
 			else
 				type = types[response.type]
-				callback makeDoc(response.doc, response.v, type, response.snapshot)
+				callback @makeDoc(response.doc, response.v, type, response.snapshot)
 
 	# Callback is passed a document or an error
 	# type is either a type name (eg 'text' or 'simple') or the actual type object.
@@ -135,8 +130,8 @@ class Connection
 	getOrCreate: (docName, type, callback) ->
 		type = types[type] if typeof type == 'string'
 
-		if docs[docName]?
-			doc = docs[docName]
+		if @docs[docName]?
+			doc = @docs[docName]
 			if doc.type == type
 				callback(doc)
 			else
@@ -144,22 +139,25 @@ class Connection
 
 			return
 
-		stream.get docName, (response) =>
+		@stream.get docName, (response) =>
 			if response.snapshot == null
-				stream.submit docName, {type: type.name}, 0, (response) =>
+				@stream.submit docName, {type: type.name}, 0, (response) =>
 					if response.v?
-						callback makeDoc(docName, 1, type, type.initialVersion())
+						callback @makeDoc(docName, 1, type, type.initialVersion())
 					else if response.v == 'null' and response.error == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..
 						@getOrCreate(docName, type, callback)
 					else
 						callback(null, response.error)
 			else if response.type == type.name
-				callback makeDoc(docName, response.v, type, response.snapshot)
+				callback @makeDoc(docName, response.v, type, response.snapshot)
 			else
 				callback null, "Document already exists with type #{response.type}"
 
-#	{get:get, getOrCreate:getOrCreate}
+	disconnect: () ->
+		if @stream?
+			@stream.disconnect()
+			@stream = null
 
 if window?
 	window.ot.Connection = Connection
