@@ -455,9 +455,13 @@ exports.stream = testCase {
 
 # Type tests
 exports.type = {
-	'test.done text type tests': (test) ->
+	'text type tests': (test) ->
 		types.text.test()
 		randomizer.test(types.text)
+		test.done()
+
+	'count type tests': (test) ->
+		randomizer.test(types.count)
 		test.done()
 }
 
@@ -659,34 +663,99 @@ exports.client = testCase {
 				test.strictEqual doc.type.name, 'text'
 				test.strictEqual doc.version, 1
 				test.done()
-}
+	
+	'client transforms remote ops before applying them': (test) ->
+		# There's a bit of magic in the timing of this test. It would probably be more consistent
+		# if this test were implemented using a stubbed out backend.
 
-exports.integration = {
-	'ops submitted on one document get sent to another': (test) ->
-		c1 = new client.Connection(hostname, port)
-		c2 = new client.Connection(hostname, port)
+		clientOp = [{i:'client'}]
+		serverOp = [{i:'server'}]
+		serverTransformed = types.text.transform(serverOp, clientOp, 'server')
 		
-		# We'll open the same document through both connections.
-		name = newDocName()
-		doc1 = c1.getOrCreate name, 'text', (doc1, error) ->
-			test.ok doc1
-			test.ifError error
-			test.strictEqual doc1.name, name
+		finalDoc = types.text.initialVersion() # v1
+		finalDoc = types.text.apply(finalDoc, clientOp) # v2
+		finalDoc = types.text.apply(finalDoc, serverTransformed) #v3
 
-			c2.get name, (doc2) ->
-				test.ok doc2
-				test.strictEqual doc2.name, name
-				test.strictEqual doc2.type.name, 'text'
-				test.strictEqual doc2.version, 1
+		@c.getOrCreate @name, 'text', (doc, error) =>
+			opsRemaining = 2
 
-				doc1.submitOp [{i:'hi'}]
-
-				doc2.onChanged (op) ->
-					test.deepEqual op, [{i:'hi'}]
-					test.strictEqual doc2.snapshot, 'hi'
-					test.strictEqual doc2.version, 2
+			onOpApplied = ->
+				opsRemaining--
+				unless opsRemaining
+					test.strictEqual doc.version, 3
+					test.strictEqual doc.snapshot, finalDoc
 					test.done()
 
-	'same document opened through 2 connections works': (test) ->
-		test.done()
+			doc.submitOp clientOp, onOpApplied
+			doc.onChanged (op) ->
+				test.deepEqual op, serverTransformed
+				onOpApplied()
+
+			db.applyDelta @name, {version:1, op:serverOp}, (error, v) ->
+				test.ifError error
+}
+
+exports.integration = testCase {
+	setUp: (callback) ->
+		@c1 = new client.Connection(hostname, port)
+		@c2 = new client.Connection(hostname, port)
+		@name = newDocName()
+
+		@c1.getOrCreate @name, 'text', (@doc1, error) =>
+			assert.ok @doc1
+			callback() if @doc1 && @doc2
+
+		@c2.getOrCreate @name, 'text', (@doc2, error) =>
+			assert.ok @doc2
+			callback() if @doc1 && @doc2
+
+	'ops submitted on one document get sent to another': (test) ->
+		[submittedOp, result] = @doc1.type.generateRandomOp @doc1.snapshot
+		@doc1.submitOp submittedOp
+
+		@doc2.onChanged (op) =>
+			test.deepEqual op, submittedOp
+			test.strictEqual @doc2.snapshot, result
+			test.strictEqual @doc2.version, 2
+			test.done()
+
+	'randomized op spam test': (test) ->
+		opsRemaining = 500
+
+		inflight = 0
+		checkSync = null
+		maxV = 0
+
+		testSome = =>
+			ops = Math.min(Math.floor(Math.random() * 10) + 1, opsRemaining)
+			inflight = ops
+			opsRemaining -= ops
+			
+			for k in [0...ops]
+				doc = if Math.random() > 0.4 then @doc1 else @doc2
+				[op, expected] = @doc1.type.generateRandomOp doc.snapshot
+
+				checkSync = =>
+					if inflight == 0 && @doc1.version == @doc2.version == maxV
+						# The docs are in sync
+						assert.strictEqual @doc1.snapshot, @doc2.snapshot
+
+						if opsRemaining > 0
+							testSome()
+						else
+							test.done()
+
+				doc.submitOp op, ->
+					maxV = Math.max(maxV, doc.version)
+					inflight--
+					checkSync()
+
+		@doc1.onChanged (op) =>
+			maxV = Math.max(maxV, @doc1.version)
+			checkSync()
+		@doc2.onChanged (op) =>
+			maxV = Math.max(maxV, @doc2.version)
+			checkSync()
+
+		testSome()
 }

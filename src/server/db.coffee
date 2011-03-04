@@ -1,6 +1,6 @@
 # An in-memory DB
-p = ->#require('util').debug
-i = ->#require('util').inspect
+p = -> #require('util').debug
+i = -> #require('util').inspect
 
 types = require '../types'
 
@@ -59,14 +59,12 @@ class Record
 			try
 				if @type.transform?
 					for v in [delta.version...@version]
-						p "Doc #{@name} delta #{i delta}"
-						delta.op = @type.transform(delta.op, @ops[v])
+						p "XFORM Doc #{@name} delta #{i delta} by #{i @ops[v]}"
+						delta.op = @type.transform delta.op, @ops[v], 'client'
 						delta.version++
-						p "Doc #{@name} delta #{i delta}"
-	#					p "Op #{util.inspect delta.op} transformed from #{v} to #{v + 1}"
+						p "-> #{i delta}"
 
-
-				p "Doc #{@name} apply #{i delta} to snapshot #{i @snapshot}"
+				p "Server Doc #{@name} apply #{i delta} to snapshot #{i @snapshot}"
 				@snapshot = @type.apply @snapshot, delta.op
 			catch error
 				callback error, null
@@ -80,6 +78,7 @@ class Record
 		@version = @version + 1
 		p "version is #{@version}"
 		callback null, @version - 1
+		p "Server sending out #{i delta}. Snapshot should be #{i @snapshot}"
 		applyDeltaListener? @name, delta
 
 # Map from "docName" -> Record instance

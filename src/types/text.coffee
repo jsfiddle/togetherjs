@@ -2,10 +2,8 @@
 # snapshot = {str:string}
 # transform = ...
 
-i = try
-	require('util').inspect
-catch e
-	->
+p = -> #require('util').debug
+i = -> #require('util').inspect
 
 exports ?= {}
 
@@ -100,6 +98,7 @@ exports.normalize = (op) ->
 
 # Apply the op to the string. Returns the new string.
 exports.apply = (str, op) ->
+	p "Applying #{i op} to '#{str}'"
 	throw new Error('Snapshot should be a string') unless typeof(str) == 'string'
 	checkOp op
 
@@ -114,7 +113,7 @@ exports.apply = (str, op) ->
 		else if component.i?
 			newDoc.push component.i
 		else
-			throw new Error("The deleted text doesn't match the next characters in the document") unless component.d == str[...component.d.length]
+			throw new Error("The deleted text '#{component.d}' doesn't match the next characters in the document '#{str[...component.d.length]}'") unless component.d == str[...component.d.length]
 			str = str[component.d.length..]
 	
 	throw new Error("The applied op doesn't traverse the entire document") unless '' == str
@@ -124,6 +123,9 @@ exports.apply = (str, op) ->
 # transform op1 by op2. Return transformed version of op1.
 # op1 and op2 are unchanged by transform.
 exports.transform = (op, otherOp, opType) ->
+	p "TRANSFORM #{opType} op #{i op} by #{i otherOp}"
+	throw new Error 'opType needs to be specified as \'server\' or \'client\'' unless opType == 'server' || opType == 'client'
+
 	checkOp op
 	checkOp otherOp
 	newOp = []
@@ -143,8 +145,8 @@ exports.transform = (op, otherOp, opType) ->
 		else if component.i? # Insert
 			if opType == 'client'
 				# The server's insert should go first.
-				p = peek()
-				append take() if p?.i
+				o = peek()
+				append take() if o?.i
 
 			# Otherwise, skip the inserted text.
 			append(component.i.length)
@@ -174,6 +176,7 @@ exports.transform = (op, otherOp, opType) ->
 
 # Compose 2 ops into 1 op.
 exports.compose = (op1, op2) ->
+	p "COMPOSE #{i op1} + #{i op2}"
 	checkOp op1
 	checkOp op2
 

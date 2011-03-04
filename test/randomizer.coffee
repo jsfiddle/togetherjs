@@ -1,86 +1,80 @@
 assert = require 'assert'
+helpers = require './helpers'
 util = require 'util'
-p = require('sys').puts
+p = util.debug
 i = util.inspect
 
-testRandomOp = (type) ->
-	generateRandomDoc = type.generateRandomDoc ? type.initialVersion
-	doc0 = generateRandomDoc()
-	op0 = if doc0 then [{i:doc0}] else []
+# Returns [serverDoc, clientDoc]
+testRandomOp = (type, initialDoc = type.initialVersion()) ->
+	makeDoc = -> {
+			ops: []
+			result: initialDoc
+		}
+	server = makeDoc()
+	client = makeDoc()
 
-	[op1, doc1] = type.generateRandomOp doc0
-	[op2, doc2] = type.generateRandomOp doc0
+	for [0..(Math.random() * 2 + 1)]
+		doc = if Math.random() < 0.5 then client else server
+		[op, doc.result] = type.generateRandomOp doc.result
+		doc.ops.push(op)
 
-	doc1Actual = type.apply doc0, op1
-	assert.strictEqual doc1Actual, doc1
-
-	doc2Actual = type.apply doc0, op2
-	assert.strictEqual doc2Actual, doc2
-
-	op1_ = type.transform op1, op2, 'client'
-	op2_ = type.transform op2, op1, 'server'
-
-	# doc3 and doc3_ should be doc0 with both op1 and op2 applied.
-	doc12 = type.apply doc1, op2_
-	doc21 = type.apply doc2, op1_
-	assert.strictEqual doc12, doc21
-
-	op12 = type.compose op1, op2_
-	op21 = type.compose op2, op1_
-
-#	p 'x'
-#	p "#{util.inspect(op1)}  #{util.inspect(op2_)}"
-#	p "#{util.inspect(op2)}  #{util.inspect(op1_)}"
-#	assert.deepEqual c1, c2
-
-	doc012 = type.apply doc0, op12
-	assert.strictEqual doc012, doc12
-
-	doc021 = type.apply doc0, op21
-	assert.strictEqual doc021, doc12
-
-#	p "#{util.inspect(startingStrOp)} #{util.inspect(c1)}"
-	op012 = type.compose op0, op12
-	op021 = type.compose op0, op21
-
-	# The ops should contain just a single insert component with all the document's text
-	expected = if doc012 then [{i:doc012}] else []
-	assert.deepEqual expected, op012
-	assert.deepEqual expected, op021
-
-	doc012_ = type.apply type.initialVersion(), op012
-	assert.deepEqual doc012, doc012_
-	doc021_ = type.apply type.initialVersion(), op021
-	assert.deepEqual doc012, doc021_
-
-	[op3, doc3] = type.generateRandomOp doc1
-#	p "Generate #{util.inspect op3}  '#{doc1}' -> '#{doc3}'"
-
-#	p "Apply #{util.inspect doc1}  #{util.inspect op3}"
-	doc13 = type.apply doc1, op3
-	assert.strictEqual doc13, doc3
+	# First, test type.apply.
+	testApply = (doc) ->
+		s = initialDoc
+		s = type.apply s, op for op in doc.ops
+		assert.strictEqual s, doc.result
 	
-#	p "Compose #{util.inspect op1} + #{util.inspect op3}"
-	op13 = type.compose op1, op3
-	doc013 = type.apply doc0, op13
-	assert.strictEqual doc013, doc3
+	testApply client
+	testApply server
 
-	op2__ = type.transform op2_, op3, 'server'
-	op3_ = type.transform op3, op2_, 'client'
+	# If all the ops are composed together, then applied, we should get the same result.
+	if type.compose?
+		compose = (doc) ->
+			if doc.ops.length > 0
+				doc.composed = helpers.composeList type, doc.ops
+				# .... And this should match the expected document.
+				assert.strictEqual doc.result, type.apply initialDoc, doc.composed
 
-#	p "\ndoc0: #{i doc0}\ndoc1: #{i doc1}\ndoc2: #{i doc2}\ndoc3: #{i doc3}\nop1:  #{i op1}\nop2:  #{i op2}\nop3:  #{i op3}\nop2_: #{i op2_}\nop2__: #{i op2__}"
-	doc132 = type.apply doc13, op2__
-	doc123 = type.apply doc12, op3_
-	assert.strictEqual doc132, doc123
+		compose client
+		compose server
 
+		# Check the diamond property holds
+		if client.composed? && server.composed?
+#			p "original: #{i initialDoc}"
+#			p "server: #{i server.result}"
+#			p "client: #{i client.result}"
+			[server_, client_] = helpers.transformX type, server.composed, client.composed
+#			p "composed client: #{i client_}"
+#			p "composed server: #{i server_}"
+
+			s_c = type.apply server.result, client_
+			c_s = type.apply client.result, server_
+
+			# Interestingly, these will not be the same as s_c and c_s above.
+			# Eg, when:
+			#	server.ops = [ [ { d: 'x' } ], [ { i: 'c' } ] ]
+			#	client.ops = [ 1, { i: 'b' } ]
+			assert.strictEqual s_c, c_s
+	
+	# Now we'll check the n^2 transform method.
+	if client.ops.length > 0 && server.ops.length > 0
+#		p "s #{i server.result} c #{i client.result} XF #{i server.ops} x #{i client.ops}"
+		[s_, c_] = helpers.transformLists type, server.ops, client.ops
+#		p "applying #{i c_} to #{i server.result}"
+		s_c = c_.reduce ((doc, op) -> type.apply(doc, op)), server.result
+		c_s = s_.reduce ((doc, op) -> type.apply(doc, op)), client.result
+
+		assert.strictEqual s_c, c_s
+	
+	client.result
 
 # Run some iterations of the random op tester. Requires a random op generator for the type.
-exports.test = (type, iterations = 1000) ->
+exports.test = (type, iterations = 300) ->
 	assert.ok type.generateRandomOp
 	assert.ok type.transform
-	assert.ok type.compose, "Running random op tester for types without compose is not yet implemented"
 
 	p "   Running #{iterations} of randomized tests for type #{type.name}..."
+	doc = type.initialVersion()
 	for n in [0..iterations]
 #		p n if n % 200 == 0
-		testRandomOp(type)
+		doc = testRandomOp(type, doc)
