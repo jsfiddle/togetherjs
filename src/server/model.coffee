@@ -1,15 +1,19 @@
-# An in-memory DB
+# The model of all the ops. Responsible for applying & transforming remote deltas
+# and managing the storage layer.
+
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
 types = require '../types'
 
-applyDeltaListener = null
+db = require './db'
+
+applyOpListener = null
 
 # Hook for events code. This can be replaced with a function which takes
 # (docName, {op:op, version:v, source:s}) as arguments. It is called every time an op is
 # committed to the document.
-exports.onApplyDelta = (fn) -> applyDeltaListener = fn
+exports.onApplyOp = (fn) -> applyOpListener = fn
 
 class Record
 	constructor: (@name) ->
@@ -21,12 +25,12 @@ class Record
 	
 	# The initial op sets the type. It must have {"type":<typename>}. Other fields ignored.
 	# This should not be called externally.
-	applyInitialOp: (delta, callback) ->
+	applyInitialOp: (op, metadata, callback) ->
 		if @version > 0
 			callback(new Error('Type already set'), null)
 			return
 
-		typeName = delta.op.type
+		typeName = op.type
 		unless typeName?
 			callback(new Error('Invalid op: type required'), null)
 			return
@@ -37,114 +41,87 @@ class Record
 			return
 
 		@snapshot = @type.initialVersion()
-		@commitDeltaInternal(delta, callback)
+		@commitOpInternal(op, metadata, callback)
 
 	# Entrypoint for applying deltas to the object.
 	# Callback is passed (err, finalVersion)
-	# delta = {op:op, version:v, source:s}
-	applyDelta: (delta, callback) ->
-		p "applyOp on #{@name} version #{delta.version} with delta #{i delta}"
+	applyOp: (version, op, metadata, callback) ->
+		p "applyOp on #{@name} version #{version} with op #{i op}"
 
-		unless delta.op?
-			callback new Error('Op missing from delta'), null
-			return
-
-		unless 0 <= delta.version <= @version
+		unless 0 <= version <= @version
 			callback new Error("Invalid version"), null
 			return
 
-		if delta.version == 0
-			@applyInitialOp delta, callback
+		if version == 0
+			@applyInitialOp op, metadata, callback
 		else
 			try
 				if @type.transform?
-					for v in [delta.version...@version]
-						p "XFORM Doc #{@name} delta #{i delta} by #{i @ops[v]}"
-						delta.op = @type.transform delta.op, @ops[v], 'client'
-						delta.version++
-						p "-> #{i delta}"
+					for v in [version...@version]
+						p "XFORM Doc #{@name} op #{i op} by #{i @ops[v]}"
+						op = @type.transform op, @ops[v], 'client'
+						version++
+						p "-> #{i op}"
 
-				p "Server Doc #{@name} apply #{i delta} to snapshot #{i @snapshot}"
-				@snapshot = @type.apply @snapshot, delta.op
+				p "Server Doc #{@name} apply #{i op} to snapshot #{i @snapshot}"
+				@snapshot = @type.apply @snapshot, op
 			catch error
 				callback error, null
 				return
 
-			@commitDeltaInternal(delta, callback)
+			@commitOpInternal(op, metadata, callback)
 
 	# Executed once transform is done. Commits the op.
-	commitDeltaInternal: (delta, callback) ->
-		@ops.push delta.op
+	commitOpInternal: (op, metadata, callback) ->
+		@ops.push op
+		
+		op_data = {op:op, meta:metadata || {}, v:@version}
+		doc_data = {type:@type, snapshot:@snapshot}
+
+		# Should the handlers be called immediately, or after the op has been persisted?
+		db.append @name, op_data, doc_data, ->
+
 		@version = @version + 1
-		p "version is #{@version}"
 		callback null, @version - 1
-		p "Server sending out #{i delta}. Snapshot should be #{i @snapshot}"
-		applyDeltaListener? @name, delta
+		p "Server sending out #{i op}. Snapshot should be #{i @snapshot}"
+		applyOpListener? @name, op_data
 
-# Map from "docName" -> Record instance
-ops = {}
-
-# Callback is called with a list of the ops from versionFrom to versionTo, or
+# Callback is called with a list of the deltas from versionFrom to versionTo, or
 # to the most recent version if versionTo is null.
-exports.getOps = (docName, versionFrom, versionTo, callback) ->
-	record = ops[docName]
-
-	if record?
-		if versionTo?
-			callback record.ops[versionFrom..versionTo]
-		else
-			callback record.ops[versionFrom..]
-	else
-		callback []
+exports.getOps = db.getOps
 
 # Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
-# IF the record doesn't exist, this calls callback(null)
-exports.getSnapshot = (docName, callback) ->
-	record = ops[docName]
-	p "getSnapshot on '#{docName}': #{i record}"
-	if record?.snapshot?
-		callback {v:record.version, type:record.type, snapshot:record.snapshot}
-	else
-		callback {v:0, type:null, snapshot:null}
+exports.getSnapshot = db.getData
 
 # Gets the latest version # of the document. May be more efficient than getSnapshot.
 exports.getVersion = (docName, callback) ->
 	exports.getSnapshot docName, (doc) ->
 		callback(doc.v)
 
-# To make sure all the ops (and their event handlers) are processed in order, ops are added
-# to a queue and processed from the front.
-queuedDeltas = []
+# If ops were processed immediately, a handler could apply another op, and subsequent
+# handlers can recieve ops out of order. This enforces ordering.
+queuedOps = []
 
-applyDeltaInternal = (docName, delta, callback) ->
-	ops[docName] ?= new Record docName
-	ops[docName].applyDelta delta, callback
+records = {}
+applyOpInternal = (docName, op_data, callback) ->
+	records[docName] ?= new Record docName
+	records[docName].applyOp op_data.v, op_data.op, op_data.meta, callback
 
 # This function must not be re-entrant.
 processing = no
-sendDeltas = () ->
+flushOps = () ->
 	return if processing
 
 	processing = yes
-	while queuedDeltas.length > 0
-		params = queuedDeltas.shift()
-		applyDeltaInternal params...
+	while queuedOps.length > 0
+		params = queuedOps.shift()
+		applyOpInternal params...
 	processing = no
 
-# Atomic.
 # The callback is passed (error, applied version #)
-# delta = {op:op, version:v, source:s}
-exports.applyDelta = (docName, delta, callback) ->
-	queuedDeltas.push [docName, delta, callback]
-	sendDeltas()
+# op_data = {op:op, v:v, meta:metadata}
+exports.applyOp = (docName, op_data, callback) ->
+	queuedOps.push [docName, op_data, callback]
+	flushOps()
 
-# Perminantly deletes a document. There is no undo.
-# Callback is callback(error)
-exports.delete = (docName, callback) ->
-	if ops[docName]?
-		delete ops[docName]
-		callback(null)
-	else
-		callback(new Error 'The document does not exist')
-
-
+exports.delete = db.delete

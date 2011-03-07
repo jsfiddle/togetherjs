@@ -10,7 +10,7 @@ else
 p = -> #(x) -> console.log x
 
 # Make 1 per server.
-class DeltaStream
+class OpStream
 	constructor: (@hostname, @port) ->
 		# A hash from docName -> {'open': fn, 'op': fn, 'snapshot': fn, ...}
 		@callbacks = {}
@@ -107,7 +107,7 @@ class DeltaStream
 
 if window?
 	window.ot ||= {}
-	window.ot.DeltaStream = DeltaStream
+	window.ot.OpStream = OpStream
 else
-	exports.DeltaStream = DeltaStream
+	exports.OpStream = OpStream
 

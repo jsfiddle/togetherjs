@@ -8,14 +8,14 @@ clientio = require('Socket.io-node-client').io
 
 server = require '../src/server'
 events = server.events
-db = server.db
+model = server.model
 
 types = require '../src/types'
 randomizer = require './randomizer'
 require './types'
 
 client = require '../src/client'
-DeltaStream = require('../src/client/stream').DeltaStream
+OpStream = require('../src/client/stream').OpStream
 
 p = util.debug
 i = util.inspect
@@ -27,7 +27,7 @@ httpclient = null
 testCase = require('nodeunit').testCase
 
 
-# Setup the local db server before the tests run.
+# Setup the local model server before the tests run.
 # At some stage, it might be worth moving this into a setUp() function of a test runner.
 server.server.listen 8768, () ->
 	httpclient = http.createClient port, hostname
@@ -74,12 +74,12 @@ fetch = (method, path, postData, callback) ->
 # resultant snapshot. Callback format is callback(error, snapshot)
 applyOps = (docName, startVersion, ops, callback) ->
 	op = ops.shift()
-	db.applyDelta docName, {version:startVersion, op:op}, (error, appliedVersion) ->
+	model.applyOp docName, {v:startVersion, op:op}, (error, appliedVersion) ->
 		if error
 			callback(error, null)
 		else
 			if ops.length == 0
-				db.getSnapshot docName, (snapshot) ->
+				model.getSnapshot docName, (snapshot) ->
 					callback(null, snapshot)
 			else
 				applyOps docName, startVersion + 1, ops, callback
@@ -100,41 +100,44 @@ exports.tools = {
 		test.done()
 }
 
-# DB tests
-exports.db = {
+# Model tests
+exports.model = testCase {
+	setUp: (callback) ->
+		@name = newDocName()
+		callback()
+
 	'Return null when asked for the snapshot of a new object': (test) ->
-		db.getSnapshot newDocName(), (data) ->
+		model.getSnapshot @name, (data) ->
 			test.deepEqual data, {v:0, type:null, snapshot:null}
 			test.done()
 
 	'Apply a set type op correctly sets the type and version': (test) ->
-		db.applyDelta newDocName(), {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
 			test.ifError(error)
 			test.strictEqual appliedVersion, 0
 			test.done()
 	
 	'Return a fresh snapshot after submitting ops': (test) ->
-		name = newDocName()
-		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
 			test.strictEqual appliedVersion, 0
-			db.getSnapshot name, (data) ->
+			model.getSnapshot @name, (data) =>
 				test.deepEqual data, {v:1, type:types.simple, snapshot:{str:''}}
 
-				db.applyDelta name, {version:1, op:{position: 0, text:'hi'}}, (error, appliedVersion) ->
+				model.applyOp @name, {v:1, op:{position: 0, text:'hi'}}, (error, appliedVersion) =>
 					test.ifError(error)
 					test.strictEqual appliedVersion, 1
-					db.getSnapshot name, (data) ->
+					model.getSnapshot @name, (data) ->
 						test.deepEqual data, {v:2, type:types.simple, snapshot:{str:'hi'}}
 						test.done()
 
 	'Apply op to future version fails': (test) ->
-		db.applyDelta newDocName(), {version:1, type:{v:1,op:{}}}, (err, result) ->
+		model.applyOp @name, {v:1, type:{v:1,op:{}}}, (err, result) ->
 			test.ok err
 			test.done()
 	
 	'Apply ops at the most recent version': (test) ->
-		applyOps newDocName(), 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
@@ -146,17 +149,16 @@ exports.db = {
 				test.done()
 				
 	'Apply ops at an old version': (test) ->
-		name = newDocName()
-		applyOps name, 0, [
+		applyOps @name, 0, [
 				{type: 'simple'},
 				{position: 0, text: 'Hi '}
 				{position: 3, text: 'mum'}
-			], (error, data) ->
+			], (error, data) =>
 				test.strictEqual error, null
 				test.strictEqual data.v, 3
 				test.deepEqual data.snapshot.str, 'Hi mum'
 
-				applyOps name, 2, [
+				applyOps @name, 2, [
 					{position: 2, text: ' to you'}
 				], (error, data) ->
 					test.strictEqual error, null
@@ -166,17 +168,54 @@ exports.db = {
 	
 
 	'delete a document when delete is called': (test) ->
-		name = newDocName()
-		db.applyDelta name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
-			db.delete name, (error) ->
+			model.delete @name, (error) ->
 				test.ifError(error)
 				test.done()
 	
 	'Pass an error to the callback if you delete something that doesn\'t exist': (test) ->
-		db.delete newDocName(), (error) ->
+		model.delete @name, (error) ->
 			test.ok error
 			test.done()
+	
+	'getOps returns ops in the document': (test) ->
+		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
+		applyOps @name, 0, submittedOps.slice(), (error, _) =>
+			model.getOps @name, 0, 1, (data) ->
+				test.deepEqual data, [{op:submittedOps[0], meta:{}}]
+			model.getOps @name, 0, 2, (data) ->
+				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+			model.getOps @name, 1, 1, (data) ->
+				test.deepEqual data, [{op:submittedOps[1], meta:{}}]
+			model.getOps @name, 2, 1, (data) ->
+				test.deepEqual data, []
+
+			# These should be trimmed to the version
+			model.getOps @name, 0, 1000, (data) ->
+				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+			model.getOps @name, 1, 1000, (data) ->
+				test.deepEqual data, [{op:submittedOps[1], meta:{}}]
+
+			test.expect(6)
+			test.done()
+
+	'getOps on an empty document returns []': (test) ->
+		model.getOps @name, 0, 0, (data) ->
+			test.deepEqual data, []
+
+		model.getOps @name, 0, null, (data) ->
+			test.deepEqual data, []
+
+		test.expect(2)
+		test.done()
+	
+	'getOps with a null count returns all the ops': (test) ->
+		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
+		applyOps @name, 0, submittedOps.slice(), (error, _) =>
+			model.getOps @name, 0, null, (data) ->
+				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+				test.done()
 }
 
 # Events
@@ -187,8 +226,8 @@ exports.events = testCase {
 
 	'emit events when ops are applied': (test) ->
 		expectedVersions = [0...2]
-		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listen @name, ((v) -> test.strictEqual v, 0), (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
 		applyOps @name, 0, [
@@ -198,8 +237,8 @@ exports.events = testCase {
 	
 	'emit transformed events when old ops are applied': (test) ->
 		expectedVersions = [0...3]
-		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listen @name, ((v) -> test.strictEqual v, 0), (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
 		applyOps @name, 0, [
@@ -207,7 +246,7 @@ exports.events = testCase {
 				{position: 0, text: 'Hi'}
 			], (error, _) =>
 				test.ifError(error)
-				db.applyDelta @name, {version:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
+				model.applyOp @name, {v:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
 					test.ifError(error)
 					test.strictEqual v, 2
 	
@@ -218,8 +257,8 @@ exports.events = testCase {
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
-		events.listen @name, ((v) -> test.strictEqual v, 2), (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listen @name, ((v) -> test.strictEqual v, 2), (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
 		applyOps @name, 2, [
@@ -229,8 +268,8 @@ exports.events = testCase {
 
 	'emit events with listenFromVersion from before the first version': (test) ->
 		expectedVersions = [0...2]
-		events.listenFromVersion @name, 0, (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listenFromVersion @name, 0, (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
 		applyOps @name, 0, [
@@ -245,8 +284,8 @@ exports.events = testCase {
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [0...2]
-		events.listenFromVersion @name, 0, (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listenFromVersion @name, 0, (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 	
 	'emit events with listenFromVersion from the current version': (test) ->
@@ -256,8 +295,8 @@ exports.events = testCase {
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [2...4]
-		events.listenFromVersion @name, 2, (delta) ->
-			test.strictEqual delta.version, expectedVersions.shift()
+		events.listenFromVersion @name, 2, (op_data) ->
+			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
 		applyOps @name, 2, [
@@ -266,8 +305,8 @@ exports.events = testCase {
 			], (error, _) -> test.ifError(error)
 
 	'stop emitting events after removeListener is called': (test) ->
-		listener = (delta) =>
-			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
+		listener = (op_data) =>
+			test.strictEqual op_data.v, 0, 'Listener was not removed correctly'
 			events.removeListener @name, listener
 
 		events.listen @name, ((v) -> test.strictEqual v, 0), listener
@@ -280,8 +319,8 @@ exports.events = testCase {
 				test.done()
 
 	'stop emitting events after removeListener is called when using listenFromVersion': (test) ->
-		listener = (delta) =>
-			test.strictEqual delta.version, 0, 'Listener was not removed correctly'
+		listener = (op_data) =>
+			test.strictEqual op_data.v, 0, 'Listener was not removed correctly'
 			events.removeListener @name, listener
 
 		applyOps @name, 0, [
@@ -332,7 +371,7 @@ exports.frontend = testCase {
 			test.done()
 	
 	'DELETE deletes a document': (test) ->
-		db.applyDelta 'P', {version:0, op:{type:'simple'}}, (error, newVersion) ->
+		model.applyOp 'P', {v:0, op:{type:'simple'}}, (error, newVersion) ->
 			test.ifError(error)
 			fetch 'DELETE', '/P', null, (res, data) ->
 				test.strictEqual res.statusCode, 200
@@ -357,26 +396,26 @@ exports.stream = testCase {
 		@socket.disconnect()
 		callback()
 
-	'be able to open a document': (test) ->
+	'open a document': (test) ->
 		@socket.send {doc:@name, v:0, open:true}
 		expectData @socket, [{doc:@name, v:0, open:true}], ->
 			test.done()
 	
-	'be able to open a document with no version specified': (test) ->
+	'open a document with no version specified': (test) ->
 		@socket.send {doc:@name, open:true}
 		@socket.on 'message', (data) =>
 			test.deepEqual data, {doc:@name, v:0, open:true}
 			test.done()
 	
-	'be able to open a document at a previous version and get ops since': (test) ->
-		db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, newVersion) =>
+	'open a document at a previous version and get ops since': (test) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
 			test.ifError(error)
 
 			@socket.send {doc:@name, v:0, open:true}
 			expectData @socket, [{doc:@name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
 				test.done()
 
-	'be able to receive ops through an open @socket': (test) ->
+	'receive ops through an open @socket': (test) ->
 		@socket.send {doc:@name, v:0, open:true}
 		expectData @socket, [{doc:@name, v:0, open:true}], =>
 			applyOps @name, 0, [{type:'simple'}], (error, _) =>
@@ -385,10 +424,10 @@ exports.stream = testCase {
 				expectData @socket, [{v:0, op:{type:'simple'}}], ->
 					test.done()
 
-	'be able to send an op': (test) ->
-		events.listen @name, ((v) -> test.strictEqual v, 0), (delta) =>
-			test.strictEqual delta.version, 0
-			test.deepEqual delta.op, {type:'simple'}
+	'send an op': (test) ->
+		events.listen @name, ((v) -> test.strictEqual v, 0), (opData) =>
+			test.strictEqual opData.v, 0
+			test.deepEqual opData.op, {type:'simple'}
 			test.done()
 
 		@socket.send {doc:@name, v:0, op:{type:'simple'}}
@@ -443,9 +482,9 @@ exports.stream = testCase {
 		expectData @socket, [{doc:name1, open:true, v:0}, {open:false}, {doc:name2, open:true, v:0}], =>
 			# name1 should be closed, and name2 should be open.
 			# We should only get the op for name2.
-			db.applyDelta name1, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+			model.applyOp name1, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
 				test.ifError(error)
-			db.applyDelta name2, {version:0, op:{type:'text'}}, (error, appliedVersion) ->
+			model.applyOp name2, {v:0, op:{type:'text'}}, (error, appliedVersion) ->
 				test.ifError(error)
 
 			expectData @socket, [{v:0, op:{type:'text'}}], ->
@@ -469,7 +508,7 @@ exports.type = {
 exports.clientstream = testCase {
 	setUp: (callback) ->
 		@name = newDocName()
-		@ds = new DeltaStream hostname, port
+		@ds = new OpStream hostname, port
 		callback()
 
 	tearDown: (callback) ->
@@ -507,7 +546,7 @@ exports.clientstream = testCase {
 
 	'get a stream of ops for an open document': (test) ->
 		@ds.open @name, 0, (msg) =>
-			db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) ->
+			model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
 				test.ifError(error)
 				test.strictEqual appliedVersion, 0
 
@@ -519,7 +558,7 @@ exports.clientstream = testCase {
 		@ds.open @name, 0, (msg) =>
 			@ds.close @name, =>
 				# The document should now be closed.
-				db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) =>
+				model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 					# We shouldn't get that op...
 					@ds.open newDocName(), 0, (msg) ->
 						test.done()
@@ -574,7 +613,7 @@ exports.client = testCase {
 				test.done()
 	
 	'open a document that already exists': (test) ->
-		db.applyDelta @name, {version:0, op:{type:'text'}}, (error, appliedVersion) =>
+		model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
 			@c.getOrCreate @name, 'text', (doc, error) =>
@@ -586,7 +625,7 @@ exports.client = testCase {
 				test.done()
 
 	'open a document with a different type': (test) ->
-		db.applyDelta @name, {version:0, op:{type:'simple'}}, (error, appliedVersion) =>
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
 			@c.getOrCreate @name, 'text', (doc, error) =>
@@ -644,7 +683,7 @@ exports.client = testCase {
 				test.expect 4
 				test.done()
 
-			db.applyDelta @name, {version:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
+			model.applyOp @name, {v:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
 				test.ifError error
 
 	'get a nonexistent document passes null to the callback': (test) ->
@@ -653,7 +692,7 @@ exports.client = testCase {
 			test.done()
 	
 	'get an existing document returns the document': (test) ->
-		db.applyDelta @name, {version:0, op:{type:'text'}}, (error, appliedVersion) =>
+		model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
 			@c.get @name, (doc) =>
@@ -691,7 +730,7 @@ exports.client = testCase {
 				test.deepEqual op, serverTransformed
 				onOpApplied()
 
-			db.applyDelta @name, {version:1, op:serverOp}, (error, v) ->
+			model.applyOp @name, {v:1, op:serverOp}, (error, v) ->
 				test.ifError error
 }
 

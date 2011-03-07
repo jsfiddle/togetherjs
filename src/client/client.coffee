@@ -1,9 +1,9 @@
 # Abstraction over raw net stream, for use by a client.
 
-if window? and not window.ot?.DeltaStream?
+if window? and not window.ot?.OpStream?
 	throw new Error 'delta stream must be loaded before this file'
 
-DeltaStream = window?.ot.DeltaStream || require('./stream').DeltaStream
+OpStream = window?.ot.OpStream || require('./stream').OpStream
 types = window?.ot?.types || require('../types')
 
 exports ||= {}
@@ -12,7 +12,7 @@ p = -> #require('util').debug
 i = -> #require('util').inspect
 
 class Document
-	# stream is a DeltaStream object.
+	# stream is a OpStream object.
 	# name is the documents' docName.
 	# version is the version of the document _on the server_
 	constructor: (@stream, @name, @version, @type, @snapshot) ->
@@ -127,7 +127,7 @@ class Connection
 		@docs[name] = new Document(@stream, name, version, type, snapshot)
 
 	constructor: (hostname, port) ->
-		@stream = new DeltaStream(hostname, port)
+		@stream = new OpStream(hostname, port)
 		@docs = {}
 
 	# callback is passed a Document or null

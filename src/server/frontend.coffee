@@ -3,7 +3,7 @@ sys = require 'sys'
 util = require 'util'
 url = require 'url'
 
-db = require './db'
+model = require './model'
 
 send404 = (res, message = '404: Your document could not be found.\n') ->
 	res.writeHead 404, {'Content-Type': 'text/plain'}
@@ -47,7 +47,7 @@ pump = (req, callback) ->
 methods =
 	GET: (req, res) ->
 		docName = getDocName req
-		db.getSnapshot docName, (doc) ->
+		model.getSnapshot docName, (doc) ->
 			if doc.snapshot?
 				doc.type = doc.type.name
 				sendJSON res, doc
@@ -62,8 +62,8 @@ methods =
 			send400 res, 'Version required - attach query parameter ?v=X on your URL'
 		else
 			expectJSONObject req, res, (obj) ->
-				delta = {version:version, op:obj, source:req.socket.remoteAddress}
-				db.applyDelta docName, delta, (error, newVersion) ->
+				opData = {v:version, op:obj, meta:{source:req.socket.remoteAddress}}
+				model.applyOp docName, opData, (error, newVersion) ->
 					if error?
 						send400 res, error.stack
 					else
@@ -71,7 +71,7 @@ methods =
 
 	DELETE: (req, res) ->
 		docName = getDocName req
-		db.delete docName, (error) ->
+		model.delete docName, (error) ->
 			if error?
 				send404 res, error.message
 			else

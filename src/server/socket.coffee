@@ -1,7 +1,7 @@
 io = require 'socket.io'
 util = require 'util'
 
-db = require './db'
+model = require './model'
 events = require './events'
 
 p = util.debug
@@ -36,15 +36,15 @@ exports.install = (server = require('./frontend').server) ->
 				p "#{docName} open on #{client.sessionId}"
 				send {doc:docName, open:true, v:v}
 
-			listeners[docName] = listener = (delta) ->
+			listeners[docName] = listener = (op_data) ->
 				#p "doc:#{docName} delta:#{i delta} v:#{version}"
 
-				# Skip the delta if this client sent it.
-				return if delta.source == client.sessionId
+				# Skip the op if this client sent it.
+				return if op_data.meta?.source == client.sessionId != undefined
 
 				opMsg =
-					op: delta.op
-					v: delta.version
+					op: op_data.op
+					v: op_data.v
 
 				send opMsg
 			
@@ -70,8 +70,8 @@ exports.install = (server = require('./frontend').server) ->
 			throw new Error 'No docName specified' unless data.doc?
 			throw new Error 'No version specified' unless data.v?
 
-			delta = {version:data.v, op:data.op, source:client.sessionId}
-			db.applyDelta data.doc, delta, (error, appliedVersion) ->
+			op_data = {v:data.v, op:data.op, meta:{source:client.sessionId}}
+			model.applyOp data.doc, op_data, (error, appliedVersion) ->
 				msg = if error?
 					p "Sending error to client: #{error.message}, #{error.stack}"
 					{doc:data.doc, v:null, error: error.message}
@@ -85,7 +85,7 @@ exports.install = (server = require('./frontend').server) ->
 			throw new Error 'Snapshot request at version not currently implemented' if data.v?
 			throw new Error 'No docName specified' unless data.doc?
 
-			db.getSnapshot data.doc, (doc) ->
+			model.getSnapshot data.doc, (doc) ->
 				msg = {doc:data.doc, v:doc.v, type:doc.type?.name || null, snapshot:doc.snapshot}
 				send msg
 
