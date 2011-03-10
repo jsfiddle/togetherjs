@@ -39,6 +39,8 @@ exports.install = (server = require('./frontend').server) ->
 				callback()
 
 			docState[docName].listener = listener = (opData) ->
+				throw new Error 'Consistency violation - doc listener invalid' unless docState[docName].listener == listener
+
 				p "follow listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
 				# Skip the op if this client sent it.
@@ -53,8 +55,8 @@ exports.install = (server = require('./frontend').server) ->
 			
 			if version?
 				# Tell the client the doc is open at the requested version
-				sendOpenConfirmation(version)
-				events.listenFromVersion docName, version, listener
+				events.listenFromVersion docName, version, listener, ->
+					sendOpenConfirmation(version)
 			else
 				# If the version is blank, we'll open the doc at the most recent version
 				events.listen docName, sendOpenConfirmation, listener

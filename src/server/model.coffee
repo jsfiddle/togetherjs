@@ -8,6 +8,9 @@ types = require '../types'
 
 db = require './db'
 
+# Set the database to something else.
+exports.setDb = (newDb) -> db = newDb
+
 applyOpListener = null
 
 # Hook for events code. This can be replaced with a function which takes

@@ -634,17 +634,17 @@ exports.clientstream = testCase {
 			test.deepEqual data, {doc:@name, v:0, op:{type:'simple'}}
 			test.done()
 
-	'not get ops sent after the document was unfollowd': (test) ->
+	'not get ops sent after the document was unfollowed': (test) ->
 		@ds.follow @name, 0, (msg) =>
 			@ds.unfollow @name, =>
-				# The document should now be unfollowd.
+				# The document should now be unfollowed.
 				model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 					# We shouldn't get that op...
 					@ds.follow newDocName(), 0, (msg) ->
 						test.done()
 
 		@ds.on @name, 'op', (data) ->
-			throw new Error "Received op for unfollowd document: #{i data}"
+			throw new Error "Received op for unfollowed document: #{i data}"
 	
 	'submit a set type op on a doc that already has a type returns the right error code': (test) ->
 		@ds.submit @name, {type:'simple'}, 0, =>

@@ -30,14 +30,19 @@ exports.listen = (docName, fromVersionCallback, listener) ->
 # Remove a listener from a particular document.
 exports.removeListener = (docName, listener) ->
 	emitterForDoc(docName)?.removeListener('op', listener)
+	p 'Listeners: ' + (i emitterForDoc(docName)?.listeners('op'))
 
 # Listen to all ops from the specified version. The version cannot be in the
 # future.
-exports.listenFromVersion = (docName, version, listener) ->
+# The callback is called once the listener is attached. removeListener() will be
+# ineffective before then.
+exports.listenFromVersion = (docName, version, listener, callback) ->
 	# The listener isn't attached until we have the historical ops from the database.
 	model.getOps docName, version, null, (data) ->
 		emitter = emitterForDoc(docName, yes)
 		emitter.on 'op', listener
+		callback() if callback?
+		p 'Listener added -> ' + (i emitterForDoc(docName)?.listeners('op'))
 
 		for op_data in data
 			op_data.v = version
