@@ -38,7 +38,7 @@ server.socket.install(server.server)
 # Expected data is an array of objects.
 expectData = (socket, expectedData, callback) ->
 	listener = (data) ->
-		#		p "expectData recieved #{i data}"
+		#p "expectData recieved #{i data}"
 		expected = expectedData.shift()
 		assert.deepEqual expected, data
 
@@ -87,7 +87,17 @@ applyOps = (docName, startVersion, ops, callback) ->
 # Generate a new, locally unique document name.
 newDocName = do ->
 	index = 1
-	() -> 'doc' + index++
+	() -> '__testing_doc' + index++
+
+# Returns a function that calls test.done() after it has been called n times
+makePassPart = (test, n) ->
+	remaining = n
+	->
+		remaining--
+		if remaining == 0
+			test.done()
+		else if remaining < 0
+			throw new Error "passPart() called more than #{n} times"
 
 
 #      TESTS
@@ -98,6 +108,19 @@ exports.tools = {
 		test.notStrictEqual newDocName(), newDocName()
 		test.strictEqual typeof newDocName(), 'string'
 		test.done()
+	
+	'makePassPart': (test) ->
+		timesCalled = 0
+		faketest = {
+			done: ->
+				test.strictEqual timesCalled, 3
+				test.done()
+		}
+		
+		passPart = makePassPart test, 3
+		passPart()
+		passPart()
+		passPart()
 }
 
 # Model tests
@@ -170,51 +193,68 @@ exports.model = testCase {
 	'delete a document when delete is called': (test) ->
 		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
-			model.delete @name, (error) ->
-				test.ifError(error)
+			model.delete @name, (deleted) ->
+				test.strictEqual deleted, true
 				test.done()
 	
-	'Pass an error to the callback if you delete something that doesn\'t exist': (test) ->
-		model.delete @name, (error) ->
-			test.ok error
+	'Pass false to the callback if you delete something that doesn\'t exist': (test) ->
+		model.delete @name, (deleted) ->
+			test.strictEqual deleted, false
 			test.done()
 	
 	'getOps returns ops in the document': (test) ->
 		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
+		passPart = makePassPart test, 6
+
 		applyOps @name, 0, submittedOps.slice(), (error, _) =>
 			model.getOps @name, 0, 1, (data) ->
-				test.deepEqual data, [{op:submittedOps[0], meta:{}}]
+				test.deepEqual data, [{op:submittedOps[0]}]
+				passPart()
 			model.getOps @name, 0, 2, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				passPart()
 			model.getOps @name, 1, 1, (data) ->
-				test.deepEqual data, [{op:submittedOps[1], meta:{}}]
+				test.deepEqual data, [{op:submittedOps[1]}]
+				passPart()
 			model.getOps @name, 2, 1, (data) ->
 				test.deepEqual data, []
+				passPart()
 
 			# These should be trimmed to the version
 			model.getOps @name, 0, 1000, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				passPart()
 			model.getOps @name, 1, 1000, (data) ->
-				test.deepEqual data, [{op:submittedOps[1], meta:{}}]
-
-			test.expect(6)
-			test.done()
+				test.deepEqual data, [{op:submittedOps[1]}]
+				passPart()
 
 	'getOps on an empty document returns []': (test) ->
+		passPart = makePassPart test, 2
 		model.getOps @name, 0, 0, (data) ->
 			test.deepEqual data, []
+			passPart()
 
 		model.getOps @name, 0, null, (data) ->
 			test.deepEqual data, []
-
-		test.expect(2)
-		test.done()
-	
+			passPart()
+ 
 	'getOps with a null count returns all the ops': (test) ->
 		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
 		applyOps @name, 0, submittedOps.slice(), (error, _) =>
 			model.getOps @name, 0, null, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op, meta:{}})
+				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				test.done()
+
+	'getVersion on a non-existant doc returns 0': (test) ->
+		model.getVersion @name, (v) ->
+			test.strictEqual v, 0
+			test.done()
+
+	'getVersion on a doc returns its version': (test) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
+			test.ifError(error)
+			model.getVersion @name, (v) ->
+				test.strictEqual v, 1
 				test.done()
 }
 
@@ -251,20 +291,18 @@ exports.events = testCase {
 					test.strictEqual v, 2
 	
 	'emit events when ops are applied to an existing document': (test) ->
-		applyOps @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
-			], (error, _) -> test.ifError(error)
+		applyOps @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
+			test.ifError(error)
 
-		expectedVersions = [2...4]
-		events.listen @name, ((v) -> test.strictEqual v, 2), (op_data) ->
-			test.strictEqual op_data.v, expectedVersions.shift()
-			test.done() if expectedVersions.length == 0
+			expectedVersions = [2...4]
+			events.listen @name, ((v) -> test.strictEqual v, 2), (op_data) ->
+				test.strictEqual op_data.v, expectedVersions.shift()
+				test.done() if expectedVersions.length == 0
 
-		applyOps @name, 2, [
-				{position: 0, text: 'Hi'}
-				{position: 0, text: 'Hi'}
-			], (error, _) -> test.ifError(error)
+			applyOps @name, 2, [
+					{position: 0, text: 'Hi'}
+					{position: 0, text: 'Hi'}
+				], (error, _) -> test.ifError(error)
 
 	'emit events with listenFromVersion from before the first version': (test) ->
 		expectedVersions = [0...2]
@@ -289,20 +327,18 @@ exports.events = testCase {
 			test.done() if expectedVersions.length == 0
 	
 	'emit events with listenFromVersion from the current version': (test) ->
-		applyOps @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
-			], (error, _) -> test.ifError(error)
+		applyOps @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
+			test.ifError(error)
 
-		expectedVersions = [2...4]
-		events.listenFromVersion @name, 2, (op_data) ->
-			test.strictEqual op_data.v, expectedVersions.shift()
-			test.done() if expectedVersions.length == 0
+			expectedVersions = [2...4]
+			events.listenFromVersion @name, 2, (op_data) ->
+				test.strictEqual op_data.v, expectedVersions.shift()
+				test.done() if expectedVersions.length == 0
 
-		applyOps @name, 2, [
-				{position: 0, text: 'Hi'}
-				{position: 0, text: 'Hi'}
-			], (error, _) -> test.ifError(error)
+			applyOps @name, 2, [
+					{position: 0, text: 'Hi'}
+					{position: 0, text: 'Hi'}
+				], (error, _) -> test.ifError(error)
 
 	'stop emitting events after removeListener is called': (test) ->
 		listener = (op_data) =>
@@ -396,33 +432,34 @@ exports.stream = testCase {
 		@socket.disconnect()
 		callback()
 
-	'open a document': (test) ->
-		@socket.send {doc:@name, v:0, open:true}
-		expectData @socket, [{doc:@name, v:0, open:true}], ->
+	'follow a document': (test) ->
+		@socket.send {doc:@name, v:0, follow:true}
+		expectData @socket, [{doc:@name, v:0, follow:true}], ->
 			test.done()
 	
-	'open a document with no version specified': (test) ->
-		@socket.send {doc:@name, open:true}
+	'follow a document with no version specified': (test) ->
+		@socket.send {doc:@name, follow:true}
 		@socket.on 'message', (data) =>
-			test.deepEqual data, {doc:@name, v:0, open:true}
+			test.deepEqual data, {doc:@name, v:0, follow:true}
 			test.done()
 	
-	'open a document at a previous version and get ops since': (test) ->
+	'follow a document at a previous version and get ops since': (test) ->
 		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
 			test.ifError(error)
 
-			@socket.send {doc:@name, v:0, open:true}
-			expectData @socket, [{doc:@name, v:0, open:true}, {v:0, op:{type:'simple'}}], ->
+			expectData @socket, [{doc:@name, v:0, follow:true}, {v:0, op:{type:'simple'}}], ->
 				test.done()
 
-	'receive ops through an open @socket': (test) ->
-		@socket.send {doc:@name, v:0, open:true}
-		expectData @socket, [{doc:@name, v:0, open:true}], =>
+			@socket.send {doc:@name, v:0, follow:true}
+
+	'receive ops through an follow @socket': (test) ->
+		@socket.send {doc:@name, v:0, follow:true}
+		expectData @socket, [{doc:@name, v:0, follow:true}], =>
 			applyOps @name, 0, [{type:'simple'}], (error, _) =>
 				test.ifError(error)
 
-				expectData @socket, [{v:0, op:{type:'simple'}}], ->
-					test.done()
+			expectData @socket, [{v:0, op:{type:'simple'}}], ->
+				test.done()
 
 	'send an op': (test) ->
 		events.listen @name, ((v) -> test.strictEqual v, 0), (opData) =>
@@ -442,15 +479,16 @@ exports.stream = testCase {
 		@socket.on 'message', (data) ->
 			test.notDeepEqual data.op, {type:'simple'} if data.op?
 
-		expectData @socket, [{doc:@name, v:0, open:true}, {v:0}], =>
+		expectData @socket, [{doc:@name, v:0, follow:true}, {v:0}], =>
 			# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
 			# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
 			# The second op should come after the first.
-			applyOps @name, 0, [{position:0, text:'hi'}], (error, _) =>
-				expectData @socket, [{v:1, op:{position:0, text:'hi'}}], ->
+			expectData @socket, [{v:1, op:{position:0, text:'hi'}}], ->
 				test.done()
 
-		@socket.send {doc:@name, v:0, open:true}
+			applyOps @name, 1, [{position:0, text:'hi'}], (error, _) -> test.ifError(error)
+
+		@socket.send {doc:@name, v:0, follow:true}
 		@socket.send {doc:@name, v:0, op:{type:'simple'}}
 
 	'get a document snapshot': (test) ->
@@ -475,12 +513,12 @@ exports.stream = testCase {
 		name1 = newDocName()
 		name2 = newDocName()
 
-		@socket.send {doc:name1, open:true}
-		@socket.send {open:false}
-		@socket.send {doc:name2, open:true}
+		@socket.send {doc:name1, follow:true}
+		@socket.send {follow:false}
+		@socket.send {doc:name2, follow:true}
 
-		expectData @socket, [{doc:name1, open:true, v:0}, {open:false}, {doc:name2, open:true, v:0}], =>
-			# name1 should be closed, and name2 should be open.
+		expectData @socket, [{doc:name1, follow:true, v:0}, {follow:false}, {doc:name2, follow:true, v:0}], =>
+			# name1 should be closed, and name2 should be follow.
 			# We should only get the op for name2.
 			model.applyOp name1, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
 				test.ifError(error)
@@ -515,13 +553,13 @@ exports.clientstream = testCase {
 		@ds.disconnect()
 		callback()
 
-	'open a document': (test) ->
-		@ds.open @name, 0, (msg) =>
-			test.deepEqual msg, {doc:@name, open:true, v:0}
+	'follow a document': (test) ->
+		@ds.follow @name, 0, (msg) =>
+			test.deepEqual msg, {doc:@name, follow:true, v:0}
 			test.done()
 	
 	'submit an op': (test) ->
-		@ds.open @name, 0, (msg) =>
+		@ds.follow @name, 0, (msg) =>
 			@ds.submit @name, {type:'simple'}, 0, (msg) =>
 				test.deepEqual msg, {v:0, doc:@name}
 				test.done()
@@ -535,6 +573,7 @@ exports.clientstream = testCase {
 
 	'get an empty document returns a null snapshot': (test) ->
 		@ds.get @name, (msg) =>
+
 			test.deepEqual msg, {doc:@name, v:0, type:null, snapshot:null}
 			test.done()
 
@@ -544,8 +583,8 @@ exports.clientstream = testCase {
 				test.deepEqual msg, {doc:@name, v:1, type:'simple', snapshot:{str:''}}
 				test.done()
 
-	'get a stream of ops for an open document': (test) ->
-		@ds.open @name, 0, (msg) =>
+	'get a stream of ops for an follow document': (test) ->
+		@ds.follow @name, 0, (msg) =>
 			model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
 				test.ifError(error)
 				test.strictEqual appliedVersion, 0
@@ -554,17 +593,17 @@ exports.clientstream = testCase {
 			test.deepEqual data, {doc:@name, v:0, op:{type:'simple'}}
 			test.done()
 
-	'not get ops sent after the document was closed': (test) ->
-		@ds.open @name, 0, (msg) =>
-			@ds.close @name, =>
-				# The document should now be closed.
+	'not get ops sent after the document was unfollowd': (test) ->
+		@ds.follow @name, 0, (msg) =>
+			@ds.unfollow @name, =>
+				# The document should now be unfollowd.
 				model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 					# We shouldn't get that op...
-					@ds.open newDocName(), 0, (msg) ->
+					@ds.follow newDocName(), 0, (msg) ->
 						test.done()
 
 		@ds.on @name, 'op', (data) ->
-			throw new Error "Received op for closed document: #{i data}"
+			throw new Error "Received op for unfollowd document: #{i data}"
 	
 	'submit a set type op on a doc that already has a type returns the right error code': (test) ->
 		@ds.submit @name, {type:'simple'}, 0, =>

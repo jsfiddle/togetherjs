@@ -17,34 +17,36 @@ exports.install = (server = require('./frontend').server) ->
 
 		lastSentDoc = null
 		lastReceivedDoc = null
-		listeners = {} # Map from docName -> listener.
+		docState = {} # Map from docName -> {listener:fn, queue:[msg], busy:bool}
 
 		send = (msg) ->
+			p "Sending #{i msg}"
 			# msg _must_ have the docname set. We'll remove it if its the same as lastReceivedDoc.
 			delete msg.doc if msg.doc == lastSentDoc
 			lastSentDoc = msg.doc
 			client.send msg
 
-		# Attempt to open a document with a given name. Version is optional.
-		open = (data) ->
+		# Attempt to follow a document with a given name. Version is optional.
+		follow = (data, callback) ->
 			docName = data.doc
 			version = data.v
-			throw new Error 'Doc already open' if listeners[docName]?
-			p "Opening #{docName} on #{client.sessionId} at #{version}"
+			throw new Error 'Doc already followed' if docState[docName].listener?
+			p "Registering follower on #{docName} by #{client.sessionId} at #{version}"
 
 			sendOpenConfirmation = (v) ->
-				p "#{docName} open on #{client.sessionId}"
-				send {doc:docName, open:true, v:v}
+				p "Following #{docName} at #{v} by #{client.sessionId}"
+				send {doc:docName, follow:true, v:v}
+				callback()
 
-			listeners[docName] = listener = (op_data) ->
-				#p "doc:#{docName} delta:#{i delta} v:#{version}"
+			docState[docName].listener = listener = (opData) ->
+				p "follow listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
 				# Skip the op if this client sent it.
-				return if op_data.meta?.source == client.sessionId != undefined
+				return if opData.meta?.source == client.sessionId != undefined
 
 				opMsg =
-					op: op_data.op
-					v: op_data.v
+					op: opData.op
+					v: opData.v
 
 				send opMsg
 			
@@ -56,17 +58,19 @@ exports.install = (server = require('./frontend').server) ->
 				# If the version is blank, we'll open the doc at the most recent version
 				events.listen docName, sendOpenConfirmation, listener
 
-		# The client closes a document
-		close = (data) ->
-			listener = listeners[data.doc]
+		# The client unfollows a document
+		unfollow = (data, callback) ->
+			p "Closing #{data.doc}"
+			listener = docState[data.doc].listener
 			throw new Error 'Doc already closed' unless listener?
 
 			events.removeListener data.doc, listener
-			delete listeners[data.doc]
-			send {doc:data.doc, open:false}
+			docState[data.doc].listener = null
+			send {doc:data.doc, follow:false}
+			callback()
 
 		# We received an op from the client
-		opReceived = (data) ->
+		opReceived = (data, callback) ->
 			throw new Error 'No docName specified' unless data.doc?
 			throw new Error 'No version specified' unless data.v?
 
@@ -79,38 +83,45 @@ exports.install = (server = require('./frontend').server) ->
 					{doc:data.doc, v:appliedVersion}
 
 				send msg
+				callback()
 
 		# The client requested a document snapshot
-		snapshotRequest = (data) ->
+		snapshotRequest = (data, callback) ->
 			throw new Error 'Snapshot request at version not currently implemented' if data.v?
 			throw new Error 'No docName specified' unless data.doc?
 
 			model.getSnapshot data.doc, (doc) ->
 				msg = {doc:data.doc, v:doc.v, type:doc.type?.name || null, snapshot:doc.snapshot}
 				send msg
+				callback()
 
-		# And now the actual message handler.
-		client.on 'message', (data) ->
-			p 'message ' + i data
-			if data.doc?
-				lastReceivedDoc = data.doc
-			else
-				data.doc = lastReceivedDoc
+		flush = (state) ->
+			p "flush state #{i state}"
+			p '1: ' + (i docState)
+			return if state.busy || state.queue.length == 0
+			state.busy = true
 
+			data = state.queue.shift()
+
+			callback = ->
+				p 'flush complete...'
+				state.busy = false
+				p '2: ' + (i docState)
+				flush state
+
+			p "processing data #{i data}"
 			try
-				data = JSON.parse data if typeof(data) == 'string'
-
-				if data.open? # Opening a document.
-					if data.open
-						open data
+				if data.follow? # Opening a document.
+					if data.follow
+						follow data, callback
 					else
-						close data
+						unfollow data, callback
 
 				else if data.op? # The client is applying an op.
-					opReceived data
+					opReceived data, callback
 
 				else if data.snapshot != undefined # Snapshot request.
-					snapshotRequest data
+					snapshotRequest data, callback
 
 				else
 					p "Unknown message received: #{util.inspect data}"
@@ -118,8 +129,36 @@ exports.install = (server = require('./frontend').server) ->
 			catch error
 				util.debug error.stack
 				# ... And disconnect the client?
+				callback()
+
+		# And now the actual message handler.
+		client.on 'message', (data) ->
+			p 'message ' + i data
+
+			try
+				data = JSON.parse data if typeof(data) == 'string'
+
+				if data.doc?
+					lastReceivedDoc = data.doc
+				else
+					throw new Error 'msg.doc missing' unless lastReceivedDoc
+					data.doc = lastReceivedDoc
+			catch error
+				util.debug error.stack
+				return
+
+			p '3: ' + (i docState)
+			docState[data.doc] ||= {listener:null, queue:[], busy:no}
+			docState[data.doc].queue.push data
+			p '4: ' + (i docState)
+			flush docState[data.doc]
 
 		client.on 'disconnect', ->
-			for docName, listener of listeners
-				events.removeListener docName, listener
+			p "client #{client.sessionId} disconnected"
+			for docName, state of docState
+				state.busy = true
+				state.queue = []
+				events.removeListener docName, state.listener if state.listener?
+
+			docState = null
 

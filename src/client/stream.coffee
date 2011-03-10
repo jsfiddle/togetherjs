@@ -12,7 +12,7 @@ p = -> #(x) -> console.log x
 # Make 1 per server.
 class OpStream
 	constructor: (@hostname, @port) ->
-		# A hash from docName -> {'open': fn, 'op': fn, 'snapshot': fn, ...}
+		# A hash from docName -> {'follow': fn, 'op': fn, 'snapshot': fn, ...}
 		@callbacks = {}
 		@lastReceivedDoc = null
 		@lastSentDoc = null
@@ -51,11 +51,11 @@ class OpStream
 		if data.snapshot != undefined
 			emit 'snapshot', yes
 
-		else if data.open?
-			if data.open
-				emit 'open', yes
+		else if data.follow?
+			if data.follow
+				emit 'follow', yes
 			else
-				emit 'close', yes
+				emit 'unfollow', yes
 
 		else if data.v != undefined # Result of sending an op
 			if data.op?
@@ -72,13 +72,13 @@ class OpStream
 
 		@socket.send msg
 
-	# Send open request, queue up callback.
-	open: (docName, v, callback) ->
-		p "open #{docName}"
-		request = {doc:docName, open:true}
+	# Send follow request, queue up callback.
+	follow: (docName, v, callback) ->
+		p "follow #{docName}"
+		request = {doc:docName, follow:true}
 		request.v = v if v?
 		@send request
-		@on docName, 'open', callback
+		@on docName, 'follow', callback
 
 	# Get a document snapshot at the current version
 	get: (docName, callback) ->
@@ -93,17 +93,17 @@ class OpStream
 		@send {doc:docName, v:version, op:op}
 		@on docName, 'localop', callback
 	
-	# Close an already open document
-	close: (docName, callback) ->
-		p "close #{docName}"
-		@send {doc:docName, open:false}
-		@on docName, 'close', callback
+	# Unfollow a document
+	unfollow: (docName, callback) ->
+		p "unfollow #{docName}"
+		@send {doc:docName, follow:false}
+		@on docName, 'unfollow', callback
 	
 	disconnect: ->
 		@socket.disconnect()
 		@socket = null
 
-#{open: open, connect: connect, get: get, submit: submit}
+#{follow: follow, connect: connect, get: get, submit: submit}
 
 if window?
 	window.ot ||= {}

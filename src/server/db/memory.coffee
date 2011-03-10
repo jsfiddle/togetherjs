@@ -34,7 +34,8 @@ exports.append = (docName, op_data, doc_data, callback) ->
 	throw new Error 'Version mismatch in db.append' unless op_data.v == doc.ops.length
 
 	# The version isn't stored.
-	new_op_data = {op:op_data.op, meta:op_data.meta}
+	new_op_data = {op:op_data.op}
+	new_op_data.meta = op_data.meta if op_data.meta?
 	doc.ops.push new_op_data
 
 	doc.data = doc_data
@@ -58,8 +59,8 @@ exports.getVersion = (docName, callback) ->
 exports.delete = (docName, callback) ->
 	if docs[docName]?
 		delete docs[docName]
-		callback(null)
+		callback(yes)
 	else
-		callback(new Error 'The document does not exist')
+		callback(no)
 
 

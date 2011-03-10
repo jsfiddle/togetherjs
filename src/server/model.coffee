@@ -15,77 +15,6 @@ applyOpListener = null
 # committed to the document.
 exports.onApplyOp = (fn) -> applyOpListener = fn
 
-class Record
-	constructor: (@name) ->
-		@ops = []
-		# Version will always be ops.length
-		@version = 0
-
-		# @type and @snapshot will be set when the first op is recieved.
-	
-	# The initial op sets the type. It must have {"type":<typename>}. Other fields ignored.
-	# This should not be called externally.
-	applyInitialOp: (op, metadata, callback) ->
-		if @version > 0
-			callback(new Error('Type already set'), null)
-			return
-
-		typeName = op.type
-		unless typeName?
-			callback(new Error('Invalid op: type required'), null)
-			return
-
-		@type = types[typeName]
-		unless @type?
-			callback(new Error("Invalid op: type '#{typeName}' missing"), null)
-			return
-
-		@snapshot = @type.initialVersion()
-		@commitOpInternal(op, metadata, callback)
-
-	# Entrypoint for applying deltas to the object.
-	# Callback is passed (err, finalVersion)
-	applyOp: (version, op, metadata, callback) ->
-		p "applyOp on #{@name} version #{version} with op #{i op}"
-
-		unless 0 <= version <= @version
-			callback new Error("Invalid version"), null
-			return
-
-		if version == 0
-			@applyInitialOp op, metadata, callback
-		else
-			try
-				if @type.transform?
-					for v in [version...@version]
-						p "XFORM Doc #{@name} op #{i op} by #{i @ops[v]}"
-						op = @type.transform op, @ops[v], 'client'
-						version++
-						p "-> #{i op}"
-
-				p "Server Doc #{@name} apply #{i op} to snapshot #{i @snapshot}"
-				@snapshot = @type.apply @snapshot, op
-			catch error
-				callback error, null
-				return
-
-			@commitOpInternal(op, metadata, callback)
-
-	# Executed once transform is done. Commits the op.
-	commitOpInternal: (op, metadata, callback) ->
-		@ops.push op
-		
-		op_data = {op:op, meta:metadata || {}, v:@version}
-		doc_data = {type:@type, snapshot:@snapshot}
-
-		# Should the handlers be called immediately, or after the op has been persisted?
-		db.append @name, op_data, doc_data, ->
-
-		@version = @version + 1
-		callback null, @version - 1
-		p "Server sending out #{i op}. Snapshot should be #{i @snapshot}"
-		applyOpListener? @name, op_data
-
 # Callback is called with a list of the deltas from versionFrom to versionTo, or
 # to the most recent version if versionTo is null.
 exports.getOps = db.getOps
@@ -94,34 +23,103 @@ exports.getOps = db.getOps
 exports.getSnapshot = db.getData
 
 # Gets the latest version # of the document. May be more efficient than getSnapshot.
-exports.getVersion = (docName, callback) ->
-	exports.getSnapshot docName, (doc) ->
-		callback(doc.v)
+exports.getVersion = db.getVersion
 
-# If ops were processed immediately, a handler could apply another op, and subsequent
-# handlers can recieve ops out of order. This enforces ordering.
-queuedOps = []
+applyOpInternal = (docName, opData, callback) ->
+	p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
+	db.getData docName, (docData) ->
+		opVersion = opData.v
+		op = opData.op
 
-records = {}
-applyOpInternal = (docName, op_data, callback) ->
-	records[docName] ?= new Record docName
-	records[docName].applyOp op_data.v, op_data.op, op_data.meta, callback
+		version = docData.v
+		snapshot = docData.snapshot
+		type = docData.type
+		p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
-# This function must not be re-entrant.
-processing = no
-flushOps = () ->
-	return if processing
+		submit = ->
+			newOpData = {op:op, v:opVersion, meta:opData.meta}
+			newDocData = {snapshot:snapshot, type:type}
 
-	processing = yes
-	while queuedOps.length > 0
-		params = queuedOps.shift()
-		applyOpInternal params...
-	processing = no
+			p "submit #{i newOpData}"
+			db.append docName, newOpData, newDocData, ->
+				p "appended v#{opVersion} to #{docName}. Calling callback..."
+				applyOpListener? docName, newOpData
+				callback null, opVersion
+
+		if opVersion > version
+			callback new Error('Op at future version'), null
+			return
+
+		if opVersion == 0 # The op sets the type of a new document.
+			if version == 0
+				# Set the type.
+				typeName = op.type
+				unless typeName?
+					callback(new Error('Invalid op: type required'), null)
+					return
+
+				type = types[typeName]
+				unless type?
+					callback(new Error("Invalid op: type '#{typeName}' missing"), null)
+					return
+
+				snapshot = type.initialVersion()
+
+				submit()
+			else
+				callback new Error('Type already set'), null
+				return
+			
+		else # Normal op
+			if opVersion < version
+				# We'll need to transform the op to the current version of the document.
+				db.getOps docName, opVersion, version - opVersion, (ops) ->
+					try
+						for realOp in ops
+							p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
+							op = docData.type.transform op, realOp.op, 'client'
+							opVersion++
+							p "-> #{i op}"
+
+						snapshot = docData.type.apply docData.snapshot, op
+					catch error
+						callback error, null
+						return
+
+					submit()
+			else
+				# The op is up to date. Apply and submit.
+				try
+					snapshot = docData.type.apply docData.snapshot, op
+				catch error
+					callback error, null
+					return
+
+				submit()
+
+pendingOps = {} # docName -> {busy:bool, queue:[[op, callback], [op, callback], ...]}
+
+flushOps = (docName) ->
+	state = pendingOps[docName]
+
+	p "flushOps #{docName} state #{i state}"
+	return if state.busy || state.queue.length == 0
+	p "continuing..."
+	state.busy = true
+
+	[opData, callback] = state.queue.shift()
+	applyOpInternal docName, opData, (error, version) ->
+		callback(error, version)
+		state.busy = false
+		flushOps docName
 
 # The callback is passed (error, applied version #)
 # op_data = {op:op, v:v, meta:metadata}
-exports.applyOp = (docName, op_data, callback) ->
-	queuedOps.push [docName, op_data, callback]
-	flushOps()
+exports.applyOp = (docName, opData, callback) ->
+	p "applyOp #{docName} op #{i opData}"
+	# Its important that all ops are applied in order.
+	pendingOps[docName] ||= {busy:false, queue:[]}
+	pendingOps[docName].queue.push [opData, callback]
+	flushOps docName
 
 exports.delete = db.delete

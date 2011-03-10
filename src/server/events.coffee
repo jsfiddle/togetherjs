@@ -2,8 +2,8 @@ model = require './model'
 
 EventEmitter = require('events').EventEmitter
 
-p = require('util').debug
-i = require('util').inspect
+p = -> #require('util').debug
+i = -> #require('util').inspect
 
 # Map from docName to EventEmitter
 emitters = {}
@@ -14,8 +14,9 @@ emitterForDoc = (docName, create = no) ->
 	else
 		emitters[docName]
 
-model.onApplyOp (docName, op_data) ->
-	emitterForDoc(docName)?.emit('op', op_data)
+model.onApplyOp (docName, opData) ->
+	p "onApplyOp #{docName} #{i opData}"
+	emitterForDoc(docName)?.emit('op', opData)
 
 # Registers a listener for ops on a particular document.
 # callback(startingVersion) is called when the listener is first applied. All ops

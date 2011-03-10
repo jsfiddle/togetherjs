@@ -32,7 +32,7 @@ class Document
 		# Listeners for the document changing
 		@listeners = []
 
-		@stream.open @name, @version, (msg) =>
+		@stream.follow @name, @version, (msg) =>
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 			@stream.on @name, 'op', @onOpReceived
 
@@ -123,7 +123,7 @@ class Document
 
 class Connection
 	makeDoc: (name, version, type, snapshot) ->
-		throw new Error("Document #{name} already open") if @docs[name]
+		throw new Error("Document #{name} already followed") if @docs[name]
 		@docs[name] = new Document(@stream, name, version, type, snapshot)
 
 	constructor: (hostname, port) ->

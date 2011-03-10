@@ -71,11 +71,12 @@ methods =
 
 	DELETE: (req, res) ->
 		docName = getDocName req
-		model.delete docName, (error) ->
-			if error?
-				send404 res, error.message
-			else
+		model.delete docName, (result) ->
+			if result
 				send200 res
+			else
+				# The document to be deleted doesn't exist
+				send404 res, "The document to be deleted doesn't exist"
 
 
 router = (req, res) ->

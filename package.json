@@ -5,7 +5,7 @@
 	"keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
 	"homepage": "",
 	"author": "Joseph Gentle <josephg@gmail.com>",
-	"main": "server/main",
+	"main": "lib/server/main.js",
 	"bin": { "otdb": "server/main.js" },
 	"dependencies": {
 		"socket.io": "*",
