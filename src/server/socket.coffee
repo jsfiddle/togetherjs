@@ -47,6 +47,7 @@ exports.install = (server = require('./frontend').server) ->
 				opMsg =
 					op: opData.op
 					v: opData.v
+					meta: opData.meta
 
 				send opMsg
 			
@@ -74,7 +75,10 @@ exports.install = (server = require('./frontend').server) ->
 			throw new Error 'No docName specified' unless data.doc?
 			throw new Error 'No version specified' unless data.v?
 
-			op_data = {v:data.v, op:data.op, meta:{source:client.sessionId}}
+			op_data = {v:data.v, op:data.op}
+			op_data.meta = data.meta || {}
+			op_data.meta.source = client.sessionId
+
 			model.applyOp data.doc, op_data, (error, appliedVersion) ->
 				msg = if error?
 					p "Sending error to client: #{error.message}, #{error.stack}"

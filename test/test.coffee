@@ -35,19 +35,6 @@ server.server.listen 8768, () ->
 server.socket.install(server.server)
 
 
-# Expected data is an array of objects.
-expectData = (socket, expectedData, callback) ->
-	listener = (data) ->
-		#p "expectData recieved #{i data}"
-		expected = expectedData.shift()
-		assert.deepEqual expected, data
-
-		if expectedData.length == 0
-			socket.removeListener 'message', listener
-			callback()
-	
-	socket.on 'message', listener
-
 #     Utility methods
 
 # Async fetch. Aggregates whole response and sends to callback.
@@ -121,6 +108,11 @@ exports.tools = {
 		passPart()
 		passPart()
 		passPart()
+}
+
+# Database tests
+db = testCase {
+
 }
 
 # Model tests
@@ -206,26 +198,28 @@ exports.model = testCase {
 		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
 		passPart = makePassPart test, 6
 
+		getOps = (data) -> data.map ((d) -> d.op)
+
 		applyOps @name, 0, submittedOps.slice(), (error, _) =>
 			model.getOps @name, 0, 1, (data) ->
-				test.deepEqual data, [{op:submittedOps[0]}]
+				test.deepEqual getOps(data), [submittedOps[0]]
 				passPart()
 			model.getOps @name, 0, 2, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				test.deepEqual getOps(data), submittedOps
 				passPart()
 			model.getOps @name, 1, 1, (data) ->
-				test.deepEqual data, [{op:submittedOps[1]}]
+				test.deepEqual getOps(data), [submittedOps[1]]
 				passPart()
 			model.getOps @name, 2, 1, (data) ->
 				test.deepEqual data, []
 				passPart()
 
-			# These should be trimmed to the version
+			# These should be trimmed to just return the version specified
 			model.getOps @name, 0, 1000, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				test.deepEqual getOps(data), submittedOps
 				passPart()
 			model.getOps @name, 1, 1000, (data) ->
-				test.deepEqual data, [{op:submittedOps[1]}]
+				test.deepEqual getOps(data), [submittedOps[1]]
 				passPart()
 
 	'getOps on an empty document returns []': (test) ->
@@ -242,7 +236,26 @@ exports.model = testCase {
 		submittedOps = [{type: 'simple'}, {position: 0, text: 'Hi'}]
 		applyOps @name, 0, submittedOps.slice(), (error, _) =>
 			model.getOps @name, 0, null, (data) ->
-				test.deepEqual data, (submittedOps.map (op) -> {op:op})
+				test.deepEqual data.map((d) -> d.op), submittedOps
+				test.done()
+	
+	'ops submitted have a metadata object added': (test) ->
+		t1 = Date.now()
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
+			model.getOps @name, 0, 1, (data) ->
+				d = data[0]
+				test.deepEqual d.op, {type:'simple'}
+				test.strictEqual typeof d.meta, 'object'
+				test.ok Date.now() >= d.meta.ts >= t1
+				test.done()
+	
+	'metadata is stored': (test) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}, meta:{blah:'blat'}}, (error, appliedVersion) =>
+			model.getOps @name, 0, 1, (data) ->
+				d = data[0]
+				test.deepEqual d.op, {type:'simple'}
+				test.strictEqual typeof d.meta, 'object'
+				test.strictEqual d.meta.blah, 'blat'
 				test.done()
 
 	'getVersion on a non-existant doc returns 0': (test) ->
@@ -419,6 +432,23 @@ exports.frontend = testCase {
 			test.done()
 }
 
+# Expected data is an array of objects.
+expectData = (socket, expectedData, callback) ->
+	listener = (data) ->
+		#p "expectData recieved #{i data}"
+		expected = expectedData.shift()
+		if expected.meta == 'anyObject'
+			assert.strictEqual typeof data.meta, 'object'
+			delete data.meta
+			delete expected.meta
+		assert.deepEqual expected, data
+
+		if expectedData.length == 0
+			socket.removeListener 'message', listener
+			callback()
+	
+	socket.on 'message', listener
+
 exports.stream = testCase {
 	setUp: (callback) ->
 		@name = newDocName()
@@ -442,12 +472,12 @@ exports.stream = testCase {
 		@socket.on 'message', (data) =>
 			test.deepEqual data, {doc:@name, v:0, follow:true}
 			test.done()
-	
+
 	'follow a document at a previous version and get ops since': (test) ->
 		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
 			test.ifError(error)
 
-			expectData @socket, [{doc:@name, v:0, follow:true}, {v:0, op:{type:'simple'}}], ->
+			expectData @socket, [{doc:@name, v:0, follow:true}, {v:0, op:{type:'simple'}, meta:'anyObject'}], ->
 				test.done()
 
 			@socket.send {doc:@name, v:0, follow:true}
@@ -458,7 +488,7 @@ exports.stream = testCase {
 			applyOps @name, 0, [{type:'simple'}], (error, _) =>
 				test.ifError(error)
 
-			expectData @socket, [{v:0, op:{type:'simple'}}], ->
+			expectData @socket, [{v:0, op:{type:'simple'}, meta:'anyObject'}], ->
 				test.done()
 
 	'send an op': (test) ->
@@ -468,6 +498,15 @@ exports.stream = testCase {
 			test.done()
 
 		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+
+	'send an op with metadata': (test) ->
+		events.listen @name, ((v) -> test.strictEqual v, 0), (opData) =>
+			test.strictEqual opData.v, 0
+			test.strictEqual opData.meta.x, 5
+			test.deepEqual opData.op, {type:'simple'}
+			test.done()
+
+		@socket.send {doc:@name, v:0, op:{type:'simple'}, meta:{x:5}}
 
 	'receive confirmation when an op is sent': (test) ->
 		expectData @socket, [{doc:@name, v:0}], () =>
@@ -483,7 +522,7 @@ exports.stream = testCase {
 			# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
 			# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
 			# The second op should come after the first.
-			expectData @socket, [{v:1, op:{position:0, text:'hi'}}], ->
+			expectData @socket, [{v:1, op:{position:0, text:'hi'}, meta:'anyObject'}], ->
 				test.done()
 
 			applyOps @name, 1, [{position:0, text:'hi'}], (error, _) -> test.ifError(error)
@@ -525,7 +564,7 @@ exports.stream = testCase {
 			model.applyOp name2, {v:0, op:{type:'text'}}, (error, appliedVersion) ->
 				test.ifError(error)
 
-			expectData @socket, [{v:0, op:{type:'text'}}], ->
+			expectData @socket, [{v:0, op:{type:'text'}, meta:'anyObject'}], ->
 				test.done()
 }
 
@@ -590,6 +629,8 @@ exports.clientstream = testCase {
 				test.strictEqual appliedVersion, 0
 
 		@ds.on @name, 'op', (data) =>
+			test.ok data.meta
+			delete data.meta
 			test.deepEqual data, {doc:@name, v:0, op:{type:'simple'}}
 			test.done()
 

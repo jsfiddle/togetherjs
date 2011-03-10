@@ -30,6 +30,8 @@ applyOpInternal = (docName, opData, callback) ->
 	db.getData docName, (docData) ->
 		opVersion = opData.v
 		op = opData.op
+		meta = opData.meta || {}
+		meta.ts = Date.now()
 
 		version = docData.v
 		snapshot = docData.snapshot
@@ -37,7 +39,7 @@ applyOpInternal = (docName, opData, callback) ->
 		p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
 		submit = ->
-			newOpData = {op:op, v:opVersion, meta:opData.meta}
+			newOpData = {op:op, v:opVersion, meta:meta}
 			newDocData = {snapshot:snapshot, type:type}
 
 			p "submit #{i newOpData}"
