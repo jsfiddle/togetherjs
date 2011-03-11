@@ -36,7 +36,7 @@ class Document
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 			@stream.on @name, 'op', @onOpReceived
 
-	tryFlushPendingOp: () ->
+	tryFlushPendingOp: ->
 		if @inflightOp == null && @pendingOp != null
 			# Rotate null -> pending -> inflight, 
 			@inflightOp = @pendingOp

@@ -115,6 +115,18 @@ db = testCase {
 
 }
 
+# Type tests
+exports.type = {
+	'text type tests': (test) ->
+		types.text.test()
+		randomizer.test(types.text)
+		test.done()
+
+	'count type tests': (test) ->
+		randomizer.test(types.count)
+		test.done()
+}
+
 # Model tests
 exports.model = testCase {
 	setUp: (callback) ->
@@ -566,19 +578,6 @@ exports.stream = testCase {
 
 			expectData @socket, [{v:0, op:{type:'text'}, meta:'anyObject'}], ->
 				test.done()
-}
-
-
-# Type tests
-exports.type = {
-	'text type tests': (test) ->
-		types.text.test()
-		randomizer.test(types.text)
-		test.done()
-
-	'count type tests': (test) ->
-		randomizer.test(types.count)
-		test.done()
 }
 
 # Client stream tests

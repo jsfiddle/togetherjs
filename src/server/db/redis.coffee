@@ -14,7 +14,6 @@ keyForDoc = (docName) -> "#{prefix}:doc:#{docName}"
 exports.init = (options, callback) ->
 	client = redis.createClient()
 	client.on 'ready', ->
-		console.log 'Redis ready'
 		callback() if callback?
 	
 	client.flushdb()
