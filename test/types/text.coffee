@@ -2,11 +2,12 @@ fs = require 'fs'
 util = require 'util'
 assert = require 'assert'
 
+randomWord = require './randomWord'
 text = require('../../src/types').text
 p = util.debug
 i = util.inspect
 
-testTransforms = () ->
+testTransforms = ->
 	testData = fs.readFileSync(__dirname + '/text-transform-tests.json').toString().split('\n')
 
 	while testData.length >= 4
@@ -52,7 +53,6 @@ testNormalize = () ->
 	assert.deepEqual [{i:'ab'}], text.normalize([0, {i:'a'}, 0, {i:'b'}, 0])
 	assert.deepEqual [{i:'a'}, 1, {i:'b'}], text.normalize([{i:'a'}, 1, {i:'b'}])
 
-
 makeAppend = (op) -> (component) ->
 	return if (component.i? and component.i.length == 0) or (component.d? and component.d.length == 0)
 
@@ -73,11 +73,6 @@ randomInt = (n) -> Math.floor(Math.random() * n)
 # Uncomment to get a consistent random sequence each run.
 #r = 12345
 #randomInt = (n) -> Math.abs((r = (r << 2) ^ (r << 1) - r + 1) % n)
-
-# Return a random word from a corpus each time the method is called
-exports.randomWord = randomWord = do ->
-	words = fs.readFileSync(__dirname + '/jabberwocky.txt').toString().split(/\W+/)
-	() -> words[randomInt(words.length)]
 
 text.generateRandomOp = (docStr) ->
 	initial = docStr

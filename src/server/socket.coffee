@@ -22,8 +22,10 @@ exports.install = (server = require('./frontend').server) ->
 		send = (msg) ->
 			p "Sending #{i msg}"
 			# msg _must_ have the docname set. We'll remove it if its the same as lastReceivedDoc.
-			delete msg.doc if msg.doc == lastSentDoc
-			lastSentDoc = msg.doc
+			if msg.doc == lastSentDoc
+				delete msg.doc
+			else
+				lastSentDoc = msg.doc
 			client.send msg
 
 		# Attempt to follow a document with a given name. Version is optional.
@@ -47,6 +49,7 @@ exports.install = (server = require('./frontend').server) ->
 				return if opData.meta?.source == client.sessionId != undefined
 
 				opMsg =
+					doc: docName
 					op: opData.op
 					v: opData.v
 					meta: opData.meta
@@ -103,7 +106,6 @@ exports.install = (server = require('./frontend').server) ->
 
 		flush = (state) ->
 			p "flush state #{i state}"
-			p '1: ' + (i docState)
 			return if state.busy || state.queue.length == 0
 			state.busy = true
 
@@ -112,7 +114,6 @@ exports.install = (server = require('./frontend').server) ->
 			callback = ->
 				p 'flush complete...'
 				state.busy = false
-				p '2: ' + (i docState)
 				flush state
 
 			p "processing data #{i data}"
@@ -130,7 +131,7 @@ exports.install = (server = require('./frontend').server) ->
 					snapshotRequest data, callback
 
 				else
-					p "Unknown message received: #{util.inspect data}"
+					util.debug "Unknown message received: #{util.inspect data}"
 
 			catch error
 				util.debug error.stack
@@ -153,10 +154,8 @@ exports.install = (server = require('./frontend').server) ->
 				util.debug error.stack
 				return
 
-			p '3: ' + (i docState)
 			docState[data.doc] ||= {listener:null, queue:[], busy:no}
 			docState[data.doc].queue.push data
-			p '4: ' + (i docState)
 			flush docState[data.doc]
 
 		client.on 'disconnect', ->

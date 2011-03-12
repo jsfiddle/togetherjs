@@ -9,6 +9,7 @@ clientio = require('Socket.io-node-client').io
 server = require '../src/server'
 events = server.events
 model = server.model
+db = require '../src/server/db'
 
 types = require '../src/types'
 randomizer = require './randomizer'
@@ -34,6 +35,7 @@ server.server.listen 8768, () ->
 
 server.socket.install(server.server)
 
+db.prepareForTesting?()
 
 #     Utility methods
 
@@ -578,6 +580,47 @@ exports.stream = testCase {
 
 			expectData @socket, [{v:0, op:{type:'text'}, meta:'anyObject'}], ->
 				test.done()
+	
+	'doc names are sent in ops when necessary': (test) ->
+		name1 = newDocName()
+		name2 = newDocName()
+
+		@socket.send {doc:name1, follow:true}
+		@socket.send {doc:name2, follow:true}
+
+		passPart = makePassPart test, 3
+
+		expectData @socket, [{doc:name1, follow:true, v:0}, {doc:name2, follow:true, v:0}], =>
+			model.applyOp name1, {v:0, op:{type:'simple'}}, (error, _) ->
+				test.ifError(error)
+				model.applyOp name2, {v:0, op:{type:'simple'}}, (error, _) ->
+					test.ifError(error)
+					model.applyOp name1, {v:1, op:{position:0, text:'a'}}, (error, _) ->
+						test.ifError(error)
+
+			# All the ops that come through the socket should have the doc name set.
+			@socket.on 'message', (data) =>
+				test.strictEqual data.doc?, true
+				passPart()
+
+	'dont repeat document names': (test) ->
+		passPart = makePassPart test, 3
+		@socket.send {doc:@name, follow:true}
+		expectData @socket, [{doc:@name, follow:true, v:0}], =>
+			@socket.on 'message', (data) =>
+				test.strictEqual data.doc?, false
+				passPart()
+
+			@socket.send {doc:@name, op:{type:'simple'}, v:0}
+			@socket.send {doc:@name, op:{position: 0, text:'a'}, v:1}
+			@socket.send {doc:@name, op:{position: 0, text:'a'}, v:2}
+
+	'an error message is sent through the socket if the operation is invalid': (test) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, _) =>
+			@socket.send {doc:@name, v:0, op:{type:'text'}}
+			expectData @socket, [{doc:@name, v:null, error:'Type already set'}], ->
+				test.done()
+
 }
 
 # Client stream tests

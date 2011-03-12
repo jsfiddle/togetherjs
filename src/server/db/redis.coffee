@@ -15,7 +15,9 @@ exports.init = (options, callback) ->
 	client = redis.createClient()
 	client.on 'ready', ->
 		callback() if callback?
-	
+
+exports.prepareForTesting = ->
+	client.select 15
 	client.flushdb()
 
 # Count is trimmed to the size of the document.
