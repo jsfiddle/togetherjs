@@ -114,7 +114,7 @@ flushOps = (docName) ->
 
 	[opData, callback] = state.queue.shift()
 	applyOpInternal docName, opData, (error, version) ->
-		callback(error, version)
+		callback(error, version) if callback?
 		state.busy = false
 		flushOps docName
 

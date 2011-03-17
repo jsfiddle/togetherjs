@@ -118,12 +118,10 @@ db = testCase {
 }
 
 # Type tests
+#
+# Note - other type tests have migrated into stand-alone tests
+#        in test/types/*
 exports.type = {
-	'text type tests': (test) ->
-		types.text.test()
-		randomizer.test(types.text)
-		test.done()
-
 	'count type tests': (test) ->
 		randomizer.test(types.count)
 		test.done()

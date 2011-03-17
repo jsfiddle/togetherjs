@@ -47,8 +47,12 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 #			p "composed client: #{i client_}"
 #			p "composed server: #{i server_}"
 
+#			p "apply #{i server.result} + #{i client_}"
 			s_c = type.apply server.result, client_
+#			p "-> #{i s_c}"
+#			p "apply #{i client.result} + #{i server_}"
 			c_s = type.apply client.result, server_
+#			p "-> #{i c_s}"
 
 			# Interestingly, these will not be the same as s_c and c_s above.
 			# Eg, when:

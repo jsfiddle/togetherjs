@@ -117,5 +117,5 @@ exports.transform = {
 }
 
 exports.randomizer = (test) ->
-	require('../randomizer').test(type, 20000)
+	require('../randomizer').test type
 	test.done()

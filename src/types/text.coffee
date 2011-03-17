@@ -1,5 +1,5 @@
 # op = [3, {i:'hi'}, 5, {d:'internet'}]
-# snapshot = {str:string}
+# snapshot = string
 # transform = ...
 
 p = -> #require('util').debug
@@ -22,8 +22,9 @@ checkOp = (op) ->
 
 		last = c
 
-# Makes a function for appending components to a given op
-makeAppend = (op) -> (component) ->
+# Makes a function for appending components to a given op.
+# Exported for the randomOpGenerator.
+exports._makeAppend = makeAppend = (op) -> (component) ->
 	if component == 0 || component.i == '' || component.d == ''
 		return
 	else if op.length == 0

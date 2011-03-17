@@ -1,13 +1,12 @@
 fs = require 'fs'
 util = require 'util'
-assert = require 'assert'
 
 randomWord = require './randomWord'
 text = require('../../src/types').text
 p = util.debug
 i = util.inspect
 
-testTransforms = ->
+exports.testTransforms = (test) ->
 	testData = fs.readFileSync(__dirname + '/text-transform-tests.json').toString().split('\n')
 
 	while testData.length >= 4
@@ -22,10 +21,11 @@ testTransforms = ->
 
 #		p "result: #{util.inspect result}"
 
-		assert.deepEqual result, expected
+		test.deepEqual result, expected
 
+	test.done()
 
-testCompose = () ->
+exports.testCompose = (test) ->
 	testData = fs.readFileSync(__dirname + '/text-transform-tests.json').toString().split('\n')
 
 	while testData.length >= 4
@@ -37,35 +37,27 @@ testCompose = () ->
 #		p "Compose #{util.inspect op1} + #{util.inspect op2}"
 
 		result = text.compose(op1, op2)
+		# nothing interesting is done with result... This test just makes sure compose runs
+		# without crashing.
 
 #		p util.inspect(result)
+	
+	test.done()
 
-testNormalize = () ->
-	assert.deepEqual [], text.normalize([0])
-	assert.deepEqual [], text.normalize([{i:''}])
-	assert.deepEqual [], text.normalize([{d:''}])
+exports.testNormalize = (test) ->
+	test.deepEqual [], text.normalize([0])
+	test.deepEqual [], text.normalize([{i:''}])
+	test.deepEqual [], text.normalize([{d:''}])
 
-	assert.deepEqual [2], text.normalize([1,1])
-	assert.deepEqual [2], text.normalize([2,0])
-	assert.deepEqual [{i:'a'}], text.normalize([{i:'a'}, 0])
-	assert.deepEqual [{i:'ab'}], text.normalize([{i:'a'}, {i:'b'}])
-	assert.deepEqual [{i:'ab'}], text.normalize([{i:'ab'}, {i:''}])
-	assert.deepEqual [{i:'ab'}], text.normalize([0, {i:'a'}, 0, {i:'b'}, 0])
-	assert.deepEqual [{i:'a'}, 1, {i:'b'}], text.normalize([{i:'a'}, 1, {i:'b'}])
+	test.deepEqual [2], text.normalize([1,1])
+	test.deepEqual [2], text.normalize([2,0])
+	test.deepEqual [{i:'a'}], text.normalize([{i:'a'}, 0])
+	test.deepEqual [{i:'ab'}], text.normalize([{i:'a'}, {i:'b'}])
+	test.deepEqual [{i:'ab'}], text.normalize([{i:'ab'}, {i:''}])
+	test.deepEqual [{i:'ab'}], text.normalize([0, {i:'a'}, 0, {i:'b'}, 0])
+	test.deepEqual [{i:'a'}, 1, {i:'b'}], text.normalize([{i:'a'}, 1, {i:'b'}])
 
-makeAppend = (op) -> (component) ->
-	return if (component.i? and component.i.length == 0) or (component.d? and component.d.length == 0)
-
-	if op.length == 0
-		op.push component
-	else if typeof(component) == 'number' && typeof(op[op.length - 1]) == 'number'
-		op[op.length - 1] += component
-	else if component.i? && op[op.length - 1].i?
-		op[op.length - 1].i += component.i
-	else if component.d? && op[op.length - 1].d?
-		op[op.length - 1].d += component.d
-	else
-		op.push component
+	test.done()
 
 # Generate a random int 0 <= k < n
 randomInt = (n) -> Math.floor(Math.random() * n)
@@ -80,7 +72,7 @@ text.generateRandomOp = (docStr) ->
 	op = []
 	expectedDoc = ''
 
-	append = makeAppend op
+	append = text._makeAppend op
 	
 	addSkip = () ->
 		length = randomInt(Math.min(docStr.length, 3)) + 1
@@ -120,9 +112,7 @@ text.generateRandomOp = (docStr) ->
 
 text.generateRandomDoc = randomWord
 
-text.test = () ->
-	testTransforms()
-	testCompose()
-	testNormalize()
-
+exports.randomizer = (test) ->
+	require('../randomizer').test text
+	test.done()
 
