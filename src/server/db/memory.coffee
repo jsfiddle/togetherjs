@@ -7,16 +7,15 @@ i = -> #require('util').inspect
 # Version is implicitly defined as the length of the delta list.
 docs = {}
 
-# Count is trimmed to the size of the document.
-# If any documents are passed to the callback, the first one has v = start
-# count can be null. If so, returns all documents from start onwards.
+# If any documents are passed to the callback, the first one has v = start.
+# end can be null. If so, returns all documents from start onwards.
 # Each document returned is in the form {op:o, meta:m}. Version isn't returned.
-exports.getOps = (docName, start, count, callback) ->
+exports.getOps = (docName, start, end, callback) ->
 	ops = docs[docName]?.ops
 
 	if ops?
-		count ||= ops.length - start
-		callback ops[start...(start + count)]
+		end ?= ops.length
+		callback ops[start...end]
 	else
 		callback []
 
@@ -43,7 +42,7 @@ exports.append = (docName, op_data, doc_data, callback) ->
 	callback()
 
 # Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
-exports.getData = (docName, callback) ->
+exports.getSnapshot = (docName, callback) ->
 	p "getSnapshot on '#{docName}'"
 	doc = docs[docName]
 	if doc?

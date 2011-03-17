@@ -23,14 +23,14 @@ exports.onApplyOp = (fn) -> applyOpListener = fn
 exports.getOps = db.getOps
 
 # Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
-exports.getSnapshot = db.getData
+exports.getSnapshot = (docName, callback) -> db.getSnapshot docName, callback
 
 # Gets the latest version # of the document. May be more efficient than getSnapshot.
 exports.getVersion = db.getVersion
 
 applyOpInternal = (docName, opData, callback) ->
 	p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
-	db.getData docName, (docData) ->
+	db.getSnapshot docName, (docData) ->
 		opVersion = opData.v
 		op = opData.op
 		meta = opData.meta || {}
@@ -78,7 +78,7 @@ applyOpInternal = (docName, opData, callback) ->
 		else # Normal op
 			if opVersion < version
 				# We'll need to transform the op to the current version of the document.
-				db.getOps docName, opVersion, version - opVersion, (ops) ->
+				db.getOps docName, opVersion, version, (ops) ->
 					try
 						for realOp in ops
 							p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"

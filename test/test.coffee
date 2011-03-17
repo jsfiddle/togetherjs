@@ -219,10 +219,10 @@ exports.model = testCase {
 			model.getOps @name, 0, 2, (data) ->
 				test.deepEqual getOps(data), submittedOps
 				passPart()
-			model.getOps @name, 1, 1, (data) ->
+			model.getOps @name, 1, 2, (data) ->
 				test.deepEqual getOps(data), [submittedOps[1]]
 				passPart()
-			model.getOps @name, 2, 1, (data) ->
+			model.getOps @name, 2, 3, (data) ->
 				test.deepEqual data, []
 				passPart()
 
@@ -395,51 +395,62 @@ exports.events = testCase {
 
 # Frontend tests
 exports.frontend = testCase {
+	setUp: (callback) ->
+		@name = newDocName()
+		callback()
+
 	'return 404 when on GET on a random URL': (test) ->
-		fetch 'GET', "/#{newDocName()}", null, (res, data) ->
+		fetch 'GET', "/#{@name}", null, (res, data) ->
 			test.strictEqual(res.statusCode, 404)
 			test.done()
 	
+	'GET a document returns the document snapshot': (test) ->
+		applyOps @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
+			fetch 'GET', "/#{@name}", null, (res, data) ->
+				test.strictEqual(res.statusCode, 200)
+				data = JSON.parse data
+				test.deepEqual data, {v:2, type:'simple', snapshot:{str:'Hi'}}
+				test.done()
+
 	'PUT returns 405': (test) ->
-		fetch 'PUT', "/#{newDocName()}", null, (res, data) ->
+		fetch 'PUT', "/#{@name}", null, (res, data) ->
 			test.strictEqual res.statusCode, 405
 			# These might be in a different order... this will do for now.
 			test.strictEqual res.headers.allow, 'GET,POST,DELETE'
 			test.done()
 
 	'POST a document in the DB returns 200 OK': (test) ->
-		fetch 'POST', '/M?v=0', {type:'simple'}, (res, data) ->
+		fetch 'POST', "/#{@name}?v=0", {type:'simple'}, (res, data) =>
 			test.strictEqual res.statusCode, 200
 			test.deepEqual JSON.parse(data), {v:0}
 
-			fetch 'POST', '/M?v=1', {position: 0, text: 'Hi'}, (res, data) ->
+			fetch 'POST', "/#{@name}?v=1", {position: 0, text: 'Hi'}, (res, data) =>
 				test.strictEqual res.statusCode, 200
 				test.deepEqual JSON.parse(data), {v:1}
-				fetch 'GET', '/M', null, (res, data) ->
+				fetch 'GET', "/#{@name}", null, (res, data) ->
 					test.strictEqual res.statusCode, 200
 					test.deepEqual JSON.parse(data), {v:2, type:'simple', snapshot:{str: 'Hi'}}
 					test.done()
-		
 
 	'POST a document with no version returns 400': (test) ->
-		fetch 'POST', '/N', {type:'simple'}, (res, data) ->
+		fetch 'POST', "/#{@name}", {type:'simple'}, (res, data) ->
 			test.strictEqual res.statusCode, 400
 			test.done()
 
 	'POST a document with invalid JSON returns 400': (test) ->
-		fetch 'POST', '/O?v=0', 'invalid>{json', (res, data) ->
+		fetch 'POST', "/#{@name}?v=0", 'invalid>{json', (res, data) ->
 			test.strictEqual res.statusCode, 400
 			test.done()
 	
 	'DELETE deletes a document': (test) ->
-		model.applyOp 'P', {v:0, op:{type:'simple'}}, (error, newVersion) ->
+		model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
 			test.ifError(error)
-			fetch 'DELETE', '/P', null, (res, data) ->
+			fetch 'DELETE', "/#{@name}", null, (res, data) ->
 				test.strictEqual res.statusCode, 200
 				test.done()
 	
 	'DELETE returns a 404 message if you delete something that doesn\'t exist': (test) ->
-		fetch 'DELETE', '/Q', null, (res, data) ->
+		fetch 'DELETE', "/#{@name}", null, (res, data) ->
 			test.strictEqual res.statusCode, 404
 			test.done()
 }
@@ -543,16 +554,13 @@ exports.stream = testCase {
 		@socket.send {doc:@name, v:0, op:{type:'simple'}}
 
 	'get a document snapshot': (test) ->
-		applyOps @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'internet'}
-			], (error, _) =>
-				test.ifError(error)
+		applyOps @name, 0, [{type: 'simple'}, {position: 0, text: 'internet'}], (error, _) =>
+			test.ifError(error)
 
-				@socket.send {doc:@name, snapshot:null}
-				@socket.on 'message', (data) =>
-					test.deepEqual data, {doc:@name, snapshot:{str:'internet'}, v:2, type:'simple'}
-					test.done()
+			@socket.send {doc:@name, snapshot:null}
+			@socket.on 'message', (data) =>
+				test.deepEqual data, {doc:@name, snapshot:{str:'internet'}, v:2, type:'simple'}
+				test.done()
 
 	'get a null snapshot when getting a nonexistent document': (test) ->
 		@socket.send {doc:@name, snapshot:null}

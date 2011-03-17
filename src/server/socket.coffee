@@ -96,7 +96,6 @@ exports.install = (server = require('./frontend').server) ->
 
 		# The client requested a document snapshot
 		snapshotRequest = (data, callback) ->
-			throw new Error 'Snapshot request at version not currently implemented' if data.v?
 			throw new Error 'No docName specified' unless data.doc?
 
 			model.getSnapshot data.doc, (doc) ->

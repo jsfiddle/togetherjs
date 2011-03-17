@@ -20,13 +20,18 @@ exports.prepareForTesting = ->
 	client.select 15
 	client.flushdb()
 
-# Count is trimmed to the size of the document.
+# Get all ops with version = start to version = end. Noninclusive.
+# end is trimmed to the size of the document.
 # If any documents are passed to the callback, the first one has v = start
-# count can be null. If so, returns all documents from start onwards.
+# end can be null. If so, returns all documents from start onwards.
 # Each document returned is in the form {op:o, meta:m}. Version isn't returned.
-exports.getOps = (docName, start, count, callback) ->
-	#	p "getOps #{i start} #{i count} #{callback}"
-	end = if count? then start + count - 1 else -1
+exports.getOps = (docName, start, end, callback) ->
+	# In redis, lrange values are inclusive.
+	if end?
+		end--
+	else
+		end = -1
+
 	client.lrange keyForOps(docName), start, end, (err, values) ->
 		throw err if err?
 		callback values.map((v) -> JSON.parse(v))
@@ -61,7 +66,7 @@ exports.append = (docName, op_data, doc_data, callback) ->
 		callback()
 
 # Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
-exports.getData = (docName, callback) ->
+exports.getSnapshot = (docName, callback) ->
 	p "getSnapshot on '#{docName}'"
 
 	client.get keyForDoc(docName), (err, response) ->
