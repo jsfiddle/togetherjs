@@ -3,10 +3,6 @@
 
 exports.name = 'text2'
 
-util = require 'util'
-p = util.debug
-i = util.inspect
-
 inject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
 
 exports.initialVersion = -> ''
@@ -19,9 +15,7 @@ checkValidComponent = (c) ->
 	d_type = typeof c.d
 	throw new Error 'component needs an i or d field' unless (i_type == 'string') ^ (d_type == 'string')
 
-	throw new Error 'position must be positive' unless c.p >= 0
-	
-	true
+	throw new Error 'position cannot be negative' unless c.p >= 0
 
 checkValidOp = (op) ->
 	checkValidComponent(c) for c in op
@@ -145,8 +139,6 @@ exports.transformX = transformX = (serverOp, clientOp) ->
 	newClientOp = []
 	appendClient = makeAppend newClientOp
 
-#	p "transformSymm #{i serverOp} #{i clientOp}"
-
 	for clientComponent in clientOp
 		# Generate newServerOp by composing serverOp by clientComponent
 		newServerOp = []
@@ -176,10 +168,6 @@ exports.transformX = transformX = (serverOp, clientOp) ->
 		appendClient clientComponent if clientComponent?
 		serverOp = newServerOp
 	
-#	p "transformSymm -> #{i serverOp} #{i newClientOp}"
-	
-	checkValidOp serverOp
-	checkValidOp clientOp
 	[serverOp, newClientOp]
 
 exports.transform = (op, otherOp, type) ->
@@ -191,4 +179,13 @@ exports.transform = (op, otherOp, type) ->
 	else
 		[_, client] = transformX otherOp, op
 		client
+
+invertComponent = (c) ->
+	if c.i?
+		{d:c.i, p:c.p}
+	else
+		{i:c.d, p:c.p}
+
+# No need to use append for invert.
+exports.invert = (op) -> (invertComponent c for c in op.slice().reverse())
 

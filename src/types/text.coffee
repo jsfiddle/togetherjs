@@ -1,6 +1,5 @@
 # op = [3, {i:'hi'}, 5, {d:'internet'}]
 # snapshot = string
-# transform = ...
 
 p = -> #require('util').debug
 i = -> #require('util').inspect
@@ -238,8 +237,7 @@ exports.invert = (op) ->
 	result = []
 	append = makeAppend result
 
-	for component in op
-		append(invertComponent component)
+	append(invertComponent component) for component in op
 	
 	result
 
