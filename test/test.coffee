@@ -1,9 +1,13 @@
+# Monolithic group of unit tests. Run with 'cake test' or Nodeunit. (nodeunit test/test.coffee)
+#
+# It would be better if these tests were split out into multiple files.
+
 assert = require 'assert'
 http = require 'http'
 util = require 'util'
+testCase = require('nodeunit').testCase
 
 # For testing the streaming library
-#clientio = require('../../lib/Socket.io-node-client/io-client').io
 clientio = require('Socket.io-node-client').io
 
 server = require '../src/server'
@@ -12,8 +16,6 @@ model = server.model
 db = require '../src/server/db'
 
 types = require '../src/types'
-randomizer = require './randomizer'
-require './types'
 
 client = require '../src/client'
 OpStream = require('../src/client/stream').OpStream
@@ -21,11 +23,10 @@ OpStream = require('../src/client/stream').OpStream
 p = util.debug
 i = util.inspect
 
+
 hostname = 'localhost'
 port = 8768
 httpclient = null
-
-testCase = require('nodeunit').testCase
 
 
 # Setup the local model server before the tests run.
@@ -36,6 +37,7 @@ server.server.listen 8768, () ->
 server.socket.install(server.server)
 
 db.prepareForTesting?()
+
 
 #     Utility methods
 
@@ -123,6 +125,8 @@ db = testCase {
 #        in test/types/*
 exports.type = {
 	'count type tests': (test) ->
+		randomizer = require './randomizer'
+
 		randomizer.test(types.count)
 		test.done()
 }
@@ -159,7 +163,7 @@ exports.model = testCase {
 						test.done()
 
 	'Apply op to future version fails': (test) ->
-		model.applyOp @name, {v:1, type:{v:1,op:{}}}, (err, result) ->
+		model.applyOp @name, {v:1, op:{}}, (err, result) ->
 			test.ok err
 			test.done()
 	
@@ -766,7 +770,7 @@ exports.client = testCase {
 			test.ifError error
 			test.strictEqual doc.name, @name
 
-			doc.submitOp [{i:'hi'}], =>
+			doc.submitOp [{i:'hi', p:0}], =>
 				test.deepEqual doc.snapshot, 'hi'
 				test.strictEqual doc.version, 2
 				test.done()
@@ -780,7 +784,7 @@ exports.client = testCase {
 			test.ifError error
 			test.strictEqual doc.name, @name
 
-			doc.submitOp [{i:'hi'}], =>
+			doc.submitOp [{i:'hi', p:0}], =>
 				test.deepEqual doc.snapshot, 'hi'
 				test.strictEqual doc.version, 2
 				test.done()
@@ -790,12 +794,12 @@ exports.client = testCase {
 			test.ifError error
 			test.strictEqual doc.name, @name
 
-			doc.submitOp [{i:'hi'}], ->
+			doc.submitOp [{i:'hi', p:0}], ->
 				test.strictEqual doc.version, 2
 
-			doc.submitOp [2, {i:'hi'}], ->
+			doc.submitOp [{i:'hi', p:2}], ->
 				test.strictEqual doc.version, 3
-			doc.submitOp [4, {i:'hi'}], ->
+			doc.submitOp [{i:'hi', p:4}], ->
 				test.strictEqual doc.version, 3
 				test.expect 5
 				test.done()
@@ -806,12 +810,12 @@ exports.client = testCase {
 			test.strictEqual doc.name, @name
 
 			doc.onChanged (op) ->
-				test.deepEqual op, [{i:'hi'}]
+				test.deepEqual op, [{i:'hi', p:0}]
 
 				test.expect 4
 				test.done()
 
-			model.applyOp @name, {v:1, op:[{i:'hi'}]}, (error, appliedVersion) ->
+			model.applyOp @name, {v:1, op:[{i:'hi', p:0}]}, (error, appliedVersion) ->
 				test.ifError error
 
 	'get a nonexistent document passes null to the callback': (test) ->
@@ -835,8 +839,8 @@ exports.client = testCase {
 		# There's a bit of magic in the timing of this test. It would probably be more consistent
 		# if this test were implemented using a stubbed out backend.
 
-		clientOp = [{i:'client'}]
-		serverOp = [{i:'server'}]
+		clientOp = [{i:'client', p:0}]
+		serverOp = [{i:'server', p:0}]
 		serverTransformed = types.text.transform(serverOp, clientOp, 'server')
 		
 		finalDoc = types.text.initialVersion() # v1
@@ -864,6 +868,9 @@ exports.client = testCase {
 
 exports.integration = testCase {
 	setUp: (callback) ->
+		# This is needed for types.text.generateRandomOp
+		require './types/text'
+
 		@c1 = new client.Connection(hostname, port)
 		@c2 = new client.Connection(hostname, port)
 		@name = newDocName()

@@ -2,7 +2,7 @@
 
 task 'test', 'Run all tests', ->
 	reporter = require('nodeunit').reporters.default
-	reporter.run ['test/test.coffee', 'test/types/text.coffee', 'test/types/text2.coffee']
+	reporter.run ['test/types/text.coffee', 'test/types/text-composable.coffee', 'test/test.coffee']
 
 #option '-w', '--watch', 'Watch'
 

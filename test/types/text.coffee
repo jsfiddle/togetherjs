@@ -1,118 +1,122 @@
-fs = require 'fs'
-util = require 'util'
+# Tests for the non-composable op type.
+
+type = require '../../src/types/text'
 
 randomWord = require './randomWord'
-text = require('../../src/types').text
+
+util = require 'util'
 p = util.debug
 i = util.inspect
 
-exports.testTransforms = (test) ->
-	testData = fs.readFileSync(__dirname + '/text-transform-tests.json').toString().split('\n')
-
-	while testData.length >= 4
-		op = JSON.parse(testData.shift())
-		otherOp = JSON.parse(testData.shift())
-		type = testData.shift()
-		expected = JSON.parse(testData.shift())
-
-#		p "Transform #{util.inspect op} by #{util.inspect otherOp} should be #{util.inspect expected}"
-
-		result = text.transform op, otherOp, type
-
-#		p "result: #{util.inspect result}"
-
-		test.deepEqual result, expected
-
-	test.done()
-
-exports.testCompose = (test) ->
-	testData = fs.readFileSync(__dirname + '/text-transform-tests.json').toString().split('\n')
-
-	while testData.length >= 4
-		testData.shift()
-		op1 = JSON.parse(testData.shift())
-		testData.shift()
-		op2 = JSON.parse(testData.shift())
-
-#		p "Compose #{util.inspect op1} + #{util.inspect op2}"
-
-		result = text.compose(op1, op2)
-		# nothing interesting is done with result... This test just makes sure compose runs
-		# without crashing.
-
-#		p util.inspect(result)
-	
-	test.done()
-
-exports.testNormalize = (test) ->
-	test.deepEqual [], text.normalize([0])
-	test.deepEqual [], text.normalize([{i:''}])
-	test.deepEqual [], text.normalize([{d:''}])
-
-	test.deepEqual [2], text.normalize([1,1])
-	test.deepEqual [2], text.normalize([2,0])
-	test.deepEqual [{i:'a'}], text.normalize([{i:'a'}, 0])
-	test.deepEqual [{i:'ab'}], text.normalize([{i:'a'}, {i:'b'}])
-	test.deepEqual [{i:'ab'}], text.normalize([{i:'ab'}, {i:''}])
-	test.deepEqual [{i:'ab'}], text.normalize([0, {i:'a'}, 0, {i:'b'}, 0])
-	test.deepEqual [{i:'a'}, 1, {i:'b'}], text.normalize([{i:'a'}, 1, {i:'b'}])
-
-	test.done()
-
-# Generate a random int 0 <= k < n
-randomInt = (n) -> Math.floor(Math.random() * n)
-
-# Uncomment to get a consistent random sequence each run.
-#r = 12345
-#randomInt = (n) -> Math.abs((r = (r << 2) ^ (r << 1) - r + 1) % n)
-
-text.generateRandomOp = (docStr) ->
-	initial = docStr
+type.generateRandomOp = (docStr) ->
+	pct = 0.9
 
 	op = []
-	expectedDoc = ''
 
-	append = text._makeAppend op
+	while Math.random() < pct
+#		p "docStr = #{i docStr}"
+		pct /= 2
+		
+		if Math.random() > 0.5
+			# Append an insert
+			pos = Math.floor(Math.random() * (docStr.length + 1))
+			str = randomWord() + ' '
+			type._append op, {i:str, p:pos}
+			docStr = docStr[...pos] + str + docStr[pos..]
+		else
+			# Append a delete
+			pos = Math.floor(Math.random() * docStr.length)
+			length = Math.min(Math.floor(Math.random() * 4), docStr.length - pos)
+			type._append op, {d:docStr[pos...(pos + length)], p:pos}
+			docStr = docStr[...pos] + docStr[(pos + length)..]
 	
-	addSkip = () ->
-		length = randomInt(Math.min(docStr.length, 3)) + 1
+#	p "generated op #{i op} -> #{i docStr}"
+	[op, docStr]
 
-		append length
-		expectedDoc += docStr[0...length]
-		docStr = docStr[length..]
+
+exports.compress = {
+	'sanity checks': (test) ->
+		test.deepEqual [], type.compress []
+		test.deepEqual [{i:'blah', p:3}], type.compress [{i:'blah', p:3}]
+		test.deepEqual [{d:'blah', p:3}], type.compress [{d:'blah', p:3}]
+		test.deepEqual [{d:'blah', p:3}, {i:'blah', p:10}], type.compress [{d:'blah', p:3}, {i:'blah', p:10}]
+		test.done()
+
+	'compress inserts': (test) ->
+		test.deepEqual [{i:'xyzabc', p:10}], type.compress [{i:'abc', p:10}, {i:'xyz', p:10}]
+		test.deepEqual [{i:'axyzbc', p:10}], type.compress [{i:'abc', p:10}, {i:'xyz', p:11}]
+		test.deepEqual [{i:'abcxyz', p:10}], type.compress [{i:'abc', p:10}, {i:'xyz', p:13}]
+		test.done()
 	
-	addInsert = () ->
-		# Insert a random word from the list
-		word = randomWord() + ' '
+	'dont compress separate inserts': (test) ->
+		t = (op) ->
+			test.deepEqual op, type.compress op
 
-		append {i:word}
-		expectedDoc += word
+		t [{i:'abc', p:10}, {i:'xyz', p:9}]
+		t [{i:'abc', p:10}, {i:'xyz', p:14}]
+		test.done()
+	
+	'compress deletes': (test) ->
+		test.deepEqual [{d:'xyabc', p:8}], type.compress [{d:'abc', p:10}, {d:'xy', p:8}]
+		test.deepEqual [{d:'xabcy', p:9}], type.compress [{d:'abc', p:10}, {d:'xy', p:9}]
+		test.deepEqual [{d:'abcxy', p:10}], type.compress [{d:'abc', p:10}, {d:'xy', p:10}]
+		test.done()
 
-	addDelete = () ->
-		length = randomInt(Math.min(docStr.length, 7)) + 1
-		deletedStr = docStr[0...length]
+	'dont compress separate deletes': (test) ->
+		t = (op) ->
+			test.deepEqual op, type.compress op
 
-		append {d:deletedStr}
-		docStr = docStr[length..]
+		t [{d:'abc', p:10}, {d:'xyz', p:6}]
+		t [{d:'abc', p:10}, {d:'xyz', p:11}]
+		test.done()
+}
 
-	while docStr.length > 0
-		# If the document is long, we'll bias it toward deletes
-		chance = if initial.length > 100 then 4 else 3
-		switch randomInt(chance)
-			when 0 then addSkip()
-			when 1 then addInsert()
-			when 2, 3 then addDelete()
+exports.compose = {
+	# Compose is actually pretty easy
+	'sanity checks': (test) ->
+		test.deepEqual type.compose([], []), []
+		test.deepEqual type.compose([{i:'x', p:0}], []), [{i:'x', p:0}]
+		test.deepEqual type.compose([], [{i:'x', p:0}]), [{i:'x', p:0}]
+		test.deepEqual type.compose([{i:'y', p:100}], [{i:'x', p:0}]), [{i:'y', p:100}, {i:'x', p:0}]
 
-	# The code above will never insert at the end of the document. Thats important...
-	addInsert() if randomInt(3) == 0
+		test.done()
+}
 
-#	p "#{initial} -> #{expectedDoc}"
-#	p "'#{initial}' -> '#{expectedDoc}' after applying #{util.inspect op}"
-	[op, expectedDoc]
+exports.transform = {
+	'sanity checks': (test) ->
+		test.deepEqual [], type.transform [], [], 'client'
+		test.deepEqual [], type.transform [], [], 'server'
 
-text.generateRandomDoc = randomWord
+		test.deepEqual [{i:'y', p:100}, {i:'x', p:0}], type.transform [{i:'y', p:100}, {i:'x', p:0}], [], 'client'
+		test.deepEqual [], type.transform [], [{i:'y', p:100}, {i:'x', p:0}], 'server'
+		test.done()
+
+	'insert': (test) ->
+		test.deepEqual [[{i:'x', p:10}], [{i:'a', p:1}]], type.transformX [{i:'x', p:9}], [{i:'a', p:1}]
+		test.deepEqual [[{i:'x', p:11}], [{i:'a', p:10}]], type.transformX [{i:'x', p:10}], [{i:'a', p:10}]
+
+		test.deepEqual [[{i:'x', p:10}], [{d:'a', p:9}]], type.transformX [{i:'x', p:11}], [{d:'a', p:9}]
+		test.deepEqual [[{i:'x', p:10}], [{d:'a', p:10}]], type.transformX [{i:'x', p:11}], [{d:'a', p:10}]
+		test.deepEqual [[{i:'x', p:11}], [{d:'a', p:12}]], type.transformX [{i:'x', p:11}], [{d:'a', p:11}]
+
+		test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:11}], 'client'
+		test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'client'
+		test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'server'
+
+		test.done()
+
+	'delete': (test) ->
+		test.deepEqual [[{d:'abc', p:8}], [{d:'xy', p:4}]], type.transformX [{d:'abc', p:10}], [{d:'xy', p:4}]
+		test.deepEqual [[{d:'ac', p:10}], []], type.transformX [{d:'abc', p:10}], [{d:'b', p:11}]
+		test.deepEqual [[], [{d:'ac', p:10}]], type.transformX [{d:'b', p:11}], [{d:'abc', p:10}]
+		test.deepEqual [[{d:'a', p:10}], []], type.transformX [{d:'abc', p:10}], [{d:'bc', p:11}]
+		test.deepEqual [[{d:'c', p:10}], []], type.transformX [{d:'abc', p:10}], [{d:'ab', p:10}]
+		test.deepEqual [[{d:'a', p:10}], [{d:'d', p:10}]], type.transformX [{d:'abc', p:10}], [{d:'bcd', p:11}]
+		test.deepEqual [[{d:'d', p:10}], [{d:'a', p:10}]], type.transformX [{d:'bcd', p:11}], [{d:'abc', p:10}]
+		test.deepEqual [[{d:'abc', p:10}], [{d:'xy', p:10}]], type.transformX [{d:'abc', p:10}], [{d:'xy', p:13}]
+		test.done()
+}
 
 exports.randomizer = (test) ->
-	require('../randomizer').test text
+	require('../randomizer').test type
 	test.done()
-
