@@ -1,130 +1,160 @@
 # The model of all the ops. Responsible for applying & transforming remote deltas
 # and managing the storage layer.
+#
+# Actual storage is handled by the database wrappers in db/*.
 
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
 types = require '../types'
-
 db = require './db'
+Events = require('./events')
 
-# Set the database to something else.
-exports.setDb = (newDb) -> db = newDb
+module.exports = Model = (db) ->
+	return new Model(db) if !(this instanceof Model)
 
-applyOpListener = null
+	# Callback is called with a list of the deltas from versionFrom to versionTo, or
+	# to the most recent version if versionTo is null.
+	#
+	# db.getOps doesn't return the versions. Consider adding them back in.
+	@getOps = db.getOps
 
-# Hook for events code. This can be replaced with a function which takes
-# (docName, {op:op, version:v, source:s}) as arguments. It is called every time an op is
-# committed to the document.
-exports.onApplyOp = (fn) -> applyOpListener = fn
+	# Gets the snapshot data for the specified document.
+	# getSnapshot(docName, callback)
+	# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
+	@getSnapshot = db.getSnapshot
 
-# Callback is called with a list of the deltas from versionFrom to versionTo, or
-# to the most recent version if versionTo is null.
-exports.getOps = db.getOps
+	# Gets the latest version # of the document. May be more efficient than getSnapshot.
+	# getVersion(docName, callback)
+	# callback is called with (version).
+	@getVersion = db.getVersion
 
-# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
-exports.getSnapshot = (docName, callback) -> db.getSnapshot docName, callback
+	applyOpInternal = (docName, opData, callback) ->
+		p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
+		db.getSnapshot docName, (docData) ->
+			opVersion = opData.v
+			op = opData.op
+			meta = opData.meta || {}
+			meta.ts = Date.now()
 
-# Gets the latest version # of the document. May be more efficient than getSnapshot.
-exports.getVersion = db.getVersion
+			version = docData.v
+			snapshot = docData.snapshot
+			type = docData.type
+			p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
-applyOpInternal = (docName, opData, callback) ->
-	p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
-	db.getSnapshot docName, (docData) ->
-		opVersion = opData.v
-		op = opData.op
-		meta = opData.meta || {}
-		meta.ts = Date.now()
+			submit = ->
+				newOpData = {op:op, v:opVersion, meta:meta}
+				newDocData = {snapshot:snapshot, type:type}
 
-		version = docData.v
-		snapshot = docData.snapshot
-		type = docData.type
-		p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
+				p "submit #{i newOpData}"
+				db.append docName, newOpData, newDocData, ->
+					p "appended v#{opVersion} to #{docName}. Calling callback..."
+					events.onApplyOp docName, newOpData
+					callback null, opVersion
 
-		submit = ->
-			newOpData = {op:op, v:opVersion, meta:meta}
-			newDocData = {snapshot:snapshot, type:type}
-
-			p "submit #{i newOpData}"
-			db.append docName, newOpData, newDocData, ->
-				p "appended v#{opVersion} to #{docName}. Calling callback..."
-				applyOpListener? docName, newOpData
-				callback null, opVersion
-
-		if opVersion > version
-			callback new Error('Op at future version'), null
-			return
-
-		if opVersion == 0 # The op sets the type of a new document.
-			if version == 0
-				# Set the type.
-				typeName = op.type
-				unless typeName?
-					callback(new Error('Invalid op: type required'), null)
-					return
-
-				type = types[typeName]
-				unless type?
-					callback(new Error("Invalid op: type '#{typeName}' missing"), null)
-					return
-
-				snapshot = type.initialVersion()
-
-				submit()
-			else
-				callback new Error('Type already set'), null
+			if opVersion > version
+				callback new Error('Op at future version'), null
 				return
-			
-		else # Normal op
-			if opVersion < version
-				# We'll need to transform the op to the current version of the document.
-				db.getOps docName, opVersion, version, (ops) ->
-					try
-						for realOp in ops
-							p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
-							op = docData.type.transform op, realOp.op, 'client'
-							opVersion++
-							p "-> #{i op}"
 
+			if opVersion == 0 # The op sets the type of a new document.
+				if version == 0
+					# Set the type.
+					typeName = op.type
+					unless typeName?
+						callback(new Error('Invalid op: type required'), null)
+						return
+
+					type = types[typeName]
+					unless type?
+						callback(new Error("Invalid op: type '#{typeName}' missing"), null)
+						return
+
+					snapshot = type.initialVersion()
+
+					submit()
+				else
+					callback new Error('Type already set'), null
+					return
+				
+			else # Normal op
+				if opVersion < version
+					# We'll need to transform the op to the current version of the document.
+					db.getOps docName, opVersion, version, (ops) ->
+						try
+							for realOp in ops
+								p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
+								op = docData.type.transform op, realOp.op, 'client'
+								opVersion++
+								p "-> #{i op}"
+
+							snapshot = docData.type.apply docData.snapshot, op
+						catch error
+							callback error, null
+							return
+
+						submit()
+				else
+					# The op is up to date. Apply and submit.
+					try
 						snapshot = docData.type.apply docData.snapshot, op
 					catch error
 						callback error, null
 						return
 
 					submit()
-			else
-				# The op is up to date. Apply and submit.
-				try
-					snapshot = docData.type.apply docData.snapshot, op
-				catch error
-					callback error, null
-					return
 
-				submit()
+	pendingOps = {} # docName -> {busy:bool, queue:[[op, callback], [op, callback], ...]}
 
-pendingOps = {} # docName -> {busy:bool, queue:[[op, callback], [op, callback], ...]}
+	flushOps = (docName) ->
+		state = pendingOps[docName]
 
-flushOps = (docName) ->
-	state = pendingOps[docName]
+		p "flushOps #{docName} state #{i state}"
+		return if state.busy || state.queue.length == 0
+		p "continuing..."
+		state.busy = true
 
-	p "flushOps #{docName} state #{i state}"
-	return if state.busy || state.queue.length == 0
-	p "continuing..."
-	state.busy = true
+		[opData, callback] = state.queue.shift()
+		applyOpInternal docName, opData, (error, version) ->
+			callback(error, version) if callback?
+			state.busy = false
+			flushOps docName
 
-	[opData, callback] = state.queue.shift()
-	applyOpInternal docName, opData, (error, version) ->
-		callback(error, version) if callback?
-		state.busy = false
+	# Apply an op to the specified document.
+	# The callback is passed (error, applied version #)
+	# opData = {op:op, v:v, meta:metadata}
+	@applyOp = (docName, opData, callback) ->
+		p "applyOp #{docName} op #{i opData}"
+		# Its important that all ops are applied in order.
+		pendingOps[docName] ||= {busy:false, queue:[]}
+		pendingOps[docName].queue.push [opData, callback]
 		flushOps docName
 
-# The callback is passed (error, applied version #)
-# op_data = {op:op, v:v, meta:metadata}
-exports.applyOp = (docName, opData, callback) ->
-	p "applyOp #{docName} op #{i opData}"
-	# Its important that all ops are applied in order.
-	pendingOps[docName] ||= {busy:false, queue:[]}
-	pendingOps[docName].queue.push [opData, callback]
-	flushOps docName
+	# Perminantly deletes the specified document.
+	# If listeners are attached, they are removed.
+	# 
+	# WARNING: This event isn't well
+	# supported throughout the code. (Eg, streaming clients aren't told about the
+	# deletion. Subsequent op submissions will fail).
+	@delete = (docName, callback) ->
+		events.removeAllListeners docName
+		db.delete docName, callback
+	
+	events = new Events(this)
 
-exports.delete = db.delete
+	# Register a listener for a particular document.
+	# listen(docName, fromVersionCallback, listener)
+	@listen = events.listen
+
+	# Remove a listener for a particular document.
+	# removeListener(docName, listener)
+	@removeListener = events.removeListener
+
+	# Listen to all ops from the specified version. If version is in the past, all
+	# ops since that version are sent immediately to the listener.
+	# Callback is called once the listener is attached, but before any ops have been passed
+	# to the listener.
+	# 
+	# listenFromVersion(docName, version, listener, callback)
+	@listenFromVersion = events.listenFromVersion
+
+	this

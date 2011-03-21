@@ -1,16 +1,19 @@
 io = require 'socket.io'
 util = require 'util'
 
-model = require './model'
-events = require './events'
+p = -> #util.debug
+i = -> #util.inspect
 
-p = util.debug
-i = util.inspect
-p = ->
-i = ->
+defaultResource = '_stream/socket.io'
 
-exports.install = (server = require('./frontend').server) ->
-	socket = io.listen server, {log:null}
+# Attach the streaming protocol to the supplied http.Server.
+#
+# Options =
+# { resourcePath = path at which the socket.io communicates. Defaults to '/_stream/socketio'. }
+exports.attach = (server, model, options) ->
+	resource = options?.resource ? defaultResource
+
+	socket = io.listen server, {log: null, resource: resource}
 
 	socket.on 'connection', (client) ->
 		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}"
@@ -58,11 +61,11 @@ exports.install = (server = require('./frontend').server) ->
 			
 			if version?
 				# Tell the client the doc is open at the requested version
-				events.listenFromVersion docName, version, listener, ->
+				model.listenFromVersion docName, version, listener, ->
 					sendOpenConfirmation(version)
 			else
 				# If the version is blank, we'll open the doc at the most recent version
-				events.listen docName, sendOpenConfirmation, listener
+				model.listen docName, sendOpenConfirmation, listener
 
 		# The client unfollows a document
 		unfollow = (data, callback) ->
@@ -70,7 +73,7 @@ exports.install = (server = require('./frontend').server) ->
 			listener = docState[data.doc].listener
 			throw new Error 'Doc already closed' unless listener?
 
-			events.removeListener data.doc, listener
+			model.removeListener data.doc, listener
 			docState[data.doc].listener = null
 			send {doc:data.doc, follow:false}
 			callback()
@@ -136,10 +139,10 @@ exports.install = (server = require('./frontend').server) ->
 				util.debug error.stack
 				# ... And disconnect the client?
 				callback()
-
+		
 		# And now the actual message handler.
 		client.on 'message', (data) ->
-			p 'message ' + i data
+			p 'on MESSAGE ' + i data
 
 			try
 				data = JSON.parse data if typeof(data) == 'string'
@@ -162,7 +165,6 @@ exports.install = (server = require('./frontend').server) ->
 			for docName, state of docState
 				state.busy = true
 				state.queue = []
-				events.removeListener docName, state.listener if state.listener?
+				model.removeListener docName, state.listener if state.listener?
 
 			docState = null
-

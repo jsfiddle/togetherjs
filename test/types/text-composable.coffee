@@ -107,6 +107,6 @@ text.generateRandomOp = (docStr) ->
 text.generateRandomDoc = randomWord
 
 exports.randomizer = (test) ->
-	require('../randomizer').test text
+	require('../helpers').randomizerTest text
 	test.done()
 

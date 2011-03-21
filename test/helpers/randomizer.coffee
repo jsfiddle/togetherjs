@@ -1,5 +1,5 @@
 assert = require 'assert'
-helpers = require './helpers'
+helpers = require './misc'
 util = require 'util'
 p = util.debug
 i = util.inspect

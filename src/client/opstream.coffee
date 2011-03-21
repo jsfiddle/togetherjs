@@ -11,13 +11,15 @@ p = -> #(x) -> console.log x
 
 # Make 1 per server.
 class OpStream
-	constructor: (@hostname, @port) ->
+	constructor: (@hostname, @port, resource) ->
 		# A hash from docName -> {'follow': fn, 'op': fn, 'snapshot': fn, ...}
 		@callbacks = {}
 		@lastReceivedDoc = null
 		@lastSentDoc = null
 		
-		@socket = new io.Socket @hostname, {port:@port}
+		# Should the resource be passed in an options object?
+		resource ?= '_stream/socket.io'
+		@socket = new io.Socket @hostname, {port:@port, resource:resource}
 		@socket.on 'connect', @onConnect
 		@socket.on 'message', @onMessage
 		@socket.connect()

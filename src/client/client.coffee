@@ -3,7 +3,7 @@
 if window? and not window.ot?.OpStream?
 	throw new Error 'delta stream must be loaded before this file'
 
-OpStream = window?.ot.OpStream || require('./stream').OpStream
+OpStream = window?.ot.OpStream || require('./opstream').OpStream
 types = window?.ot?.types || require('../types')
 
 exports ||= {}

@@ -152,6 +152,7 @@ transformComponentX = (server, client, destServer, destClient) ->
 	transformComponent destServer, server, client, 'server'
 	transformComponent destClient, client, server, 'client'
 
+# Transforms serverOp by clientOp. Returns [serverOp', clientOp']
 exports.transformX = transformX = (serverOp, clientOp) ->
 	checkValidOp serverOp
 	checkValidOp clientOp
@@ -187,6 +188,7 @@ exports.transformX = transformX = (serverOp, clientOp) ->
 	
 	[serverOp, newClientOp]
 
+# Transforms op with specified type ('server' or 'client') by otherOp.
 exports.transform = (op, otherOp, type) ->
 	throw new Error "type must be 'server' or 'client'" unless type == 'server' or type == 'client'
 
