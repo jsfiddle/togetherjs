@@ -20,7 +20,7 @@ module.exports = testCase {
 		}
 
 		@model = server.createModel options
-		@server = server.createServer options, @model
+		@server = server options, @model
 
 		@server.listen port, =>
 			@ds = new OpStream 'localhost', port

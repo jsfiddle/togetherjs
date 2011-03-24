@@ -29,8 +29,8 @@ module.exports = (options) ->
 	options ?= {}
 	options[k] ?= v for k, v of defaultOptions
 
-	keyForOps = (docName) -> "#{prefix}ops:#{docName}"
-	keyForDoc = (docName) -> "#{prefix}doc:#{docName}"
+	keyForOps = (docName) -> "#{options.prefix}ops:#{docName}"
+	keyForDoc = (docName) -> "#{options.prefix}doc:#{docName}"
 
 	client = redis.createClient options.hostname, options.port, options.redisOptions
 

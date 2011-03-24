@@ -1,10 +1,7 @@
 # Abstraction over raw net stream, for use by a client.
 
-if window? and not window.ot?.OpStream?
-	throw new Error 'delta stream must be loaded before this file'
-
-OpStream = window?.ot.OpStream || require('./opstream').OpStream
-types = window?.ot?.types || require('../types')
+OpStream = window?.whatnot.OpStream || require('./opstream').OpStream
+types = window?.whatnot.types || require('../types')
 
 exports ||= {}
 
@@ -36,7 +33,8 @@ class Document
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 			@stream.on @name, 'op', @onOpReceived
 
-	tryFlushPendingOp: ->
+	# Internal - do not call directly.
+	tryFlushPendingOp: =>
 		if @inflightOp == null && @pendingOp != null
 			# Rotate null -> pending -> inflight, 
 			@inflightOp = @pendingOp
@@ -45,14 +43,21 @@ class Document
 			@pendingOp = null
 			@pendingCallbacks = []
 
-#			console.log "Version = #{@version}"
 			@stream.submit @name, @inflightOp, @version, (response) =>
-				throw new Error(response.error) if response.v == null
+				if response.v == null
+					# Currently, it should be impossible to reach this case.
+					# This case is currently untested.
+					callback(null) for callback in @inflightCallbacks
+					@inflightOp = null
+					# Perhaps the op should be removed from the local document...
+					# @snapshot = @type.apply @snapshot, type.invert(@inflightOp) if type.invert?
+					throw new Error(response.error)
+
 				throw new Error('Invalid version from server') unless response.v == @version
 
 				@serverOps[@version] = @inflightOp
 				@version++
-				callback(@inflightOp) for callback in @inflightCallbacks
+				callback(@inflightOp, null) for callback in @inflightCallbacks
 #				console.log 'Heard back from server.', this, response, @version
 
 				@inflightOp = null
@@ -71,7 +76,7 @@ class Document
 		@serverOps[@version] = op
 
 		# Transform a server op by a client op, and vice versa.
-		xf = (server, client) =>
+		xf = @type.transformX or (server, client) =>
 			server_ = @type.transform server, client, 'server'
 			client_ = @type.transform client, server, 'client'
 			return [server_, client_]
@@ -89,7 +94,7 @@ class Document
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
-	submitOp: (op, v, callback) ->
+	submitOp: (op, v = @version, callback) ->
 		if typeof v == 'function'
 			callback = v
 			v = @version
@@ -112,7 +117,9 @@ class Document
 
 		@pendingCallbacks.push callback if callback?
 
-		@tryFlushPendingOp()
+		# A timeout is used so if the user sends multiple ops at the same time, they'll be composed
+		# together and sent together.
+		setTimeout @tryFlushPendingOp, 0
 
 	# Add an event listener to listen for remote ops. Listener will be passed one parameter;
 	# the op.
@@ -126,8 +133,8 @@ class Connection
 		throw new Error("Document #{name} already followed") if @docs[name]
 		@docs[name] = new Document(@stream, name, version, type, snapshot)
 
-	constructor: (hostname, port) ->
-		@stream = new OpStream(hostname, port)
+	constructor: (hostname, port, basePath) ->
+		@stream = new OpStream(hostname, port, basePath)
 		@docs = {}
 
 	# callback is passed a Document or null
@@ -179,6 +186,6 @@ class Connection
 			@stream = null
 
 if window?
-	window.ot.Connection = Connection
+	window.whatnot.Connection = Connection
 else
 	exports.Connection = Connection

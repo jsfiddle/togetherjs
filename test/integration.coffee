@@ -20,7 +20,7 @@ module.exports = testCase {
 		require './types/text'
 
 		@name = 'testingdoc'
-		@server = server.createServer {db: {type: 'memory'}}
+		@server = server {db: {type: 'memory'}}
 		@server.listen port, =>
 
 			@c1 = new client.Connection 'localhost', port

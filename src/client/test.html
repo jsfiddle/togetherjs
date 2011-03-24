@@ -2,10 +2,10 @@
 	<head>
 	<body>
 		<h1>
-			Hi there
+			The 'hello' document.
 		</h1>
-		<div id='text'></div>
-		<script src="http://localhost:8000/socket.io/socket.io.js"></script>
+		<pre style='font-family: monospace; white-space: pre-wrap;' id='text'></pre>
+		<script src="http://localhost:8000/_stream/socket.io/socket.io.js"></script>
 		<script type="text/javascript" src="../../webclient.js"></script>
 		<script type="text/javascript">
 /*	ds.open('sarah', 0, function(data) {
@@ -19,18 +19,17 @@
 
 	var set = function(str) {
 		div = document.getElementById('text');
-		div.textContent = str;
+		div.innerText = str;
 	}
 
-	var connection = new ot.Connection('localhost', 8000);
-	connection.getOrCreate('hello', ot.types.text, function(doc, error) {
+	var connection = new whatnot.Connection('localhost', 8000);
+	connection.getOrCreate('clientdocs', 'text', function(doc, error) {
 		if(error) {
 			console.error(error);
 		} else {
 			console.log("Document open");
 
-			var op = ot.types.text.normalize([{'i':'hi '}, doc.snapshot.length]);
-			doc.submitOp(op, doc.version);
+			doc.submitOp([{i:'Hi ', p:0}]);
 			set(doc.snapshot);
 
 			doc.onChanged(function(op) {

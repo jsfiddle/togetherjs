@@ -11,18 +11,18 @@ p = -> #(x) -> console.log x
 
 # Make 1 per server.
 class OpStream
-	constructor: (@hostname, @port, resource) ->
-		# A hash from docName -> {'follow': fn, 'op': fn, 'snapshot': fn, ...}
-		@callbacks = {}
-		@lastReceivedDoc = null
-		@lastSentDoc = null
-		
-		# Should the resource be passed in an options object?
-		resource ?= '_stream/socket.io'
+	constructor: (@hostname, @port, path) ->
+		resource = if path then path + '/socket.io' else 'socket.io'
+
 		@socket = new io.Socket @hostname, {port:@port, resource:resource}
 		@socket.on 'connect', @onConnect
 		@socket.on 'message', @onMessage
 		@socket.connect()
+
+		# A hash from docName -> {'follow': fn, 'op': fn, 'snapshot': fn, ...}
+		@callbacks = {}
+		@lastReceivedDoc = null
+		@lastSentDoc = null
 
 	onConnect: ->
 		p 'connected'
@@ -108,8 +108,8 @@ class OpStream
 #{follow: follow, connect: connect, get: get, submit: submit}
 
 if window?
-	window.ot ||= {}
-	window.ot.OpStream = OpStream
+	window.whatnot ||= {}
+	window.whatnot.OpStream = OpStream
 else
 	exports.OpStream = OpStream
 

@@ -4,16 +4,11 @@ util = require 'util'
 p = -> #util.debug
 i = -> #util.inspect
 
-defaultResource = '_stream/socket.io'
-
 # Attach the streaming protocol to the supplied http.Server.
 #
-# Options =
-# { resourcePath = path at which the socket.io communicates. Defaults to '/_stream/socketio'. }
+# Options = {}
 exports.attach = (server, model, options) ->
-	resource = options?.resource ? defaultResource
-
-	socket = io.listen server, {log: null, resource: resource}
+	socket = io.listen server, {log: null}
 
 	socket.on 'connection', (client) ->
 		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}"
@@ -168,3 +163,5 @@ exports.attach = (server, model, options) ->
 				model.removeListener docName, state.listener if state.listener?
 
 			docState = null
+	
+	server

@@ -20,7 +20,7 @@ module.exports = testCase {
 		}
 
 		@model = server.createModel options
-		@server = server.createServer options, @model
+		@server = server options, @model
 
 		@server.listen port, =>
 			@c = new client.Connection 'localhost', port
@@ -101,6 +101,19 @@ module.exports = testCase {
 				test.strictEqual doc.version, 2
 				test.done()
 	
+	'compose multiple ops together when they are submitted together': (test) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
+			test.ifError error
+			test.strictEqual doc.name, @name
+
+			doc.submitOp [{i:'hi', p:0}], ->
+				test.strictEqual doc.version, 2
+
+			doc.submitOp [{i:'hi', p:0}], ->
+				test.strictEqual doc.version, 2
+				test.expect 4
+				test.done()
+
 	'compose multiple ops together when they are submitted while an op is in flight': (test) ->
 		@c.getOrCreate @name, 'text', (doc, error) =>
 			test.ifError error
@@ -109,12 +122,14 @@ module.exports = testCase {
 			doc.submitOp [{i:'hi', p:0}], ->
 				test.strictEqual doc.version, 2
 
-			doc.submitOp [{i:'hi', p:2}], ->
-				test.strictEqual doc.version, 3
-			doc.submitOp [{i:'hi', p:4}], ->
-				test.strictEqual doc.version, 3
-				test.expect 5
-				test.done()
+			setTimeout(->
+				doc.submitOp [{i:'hi', p:2}], ->
+					test.strictEqual doc.version, 3
+				doc.submitOp [{i:'hi', p:4}], ->
+					test.strictEqual doc.version, 3
+					test.expect 5
+					test.done()
+			, 1)
 	
 	'Receive submitted ops': (test) ->
 		@c.getOrCreate @name, 'text', (doc, error) =>

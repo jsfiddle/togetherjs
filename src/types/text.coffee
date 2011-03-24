@@ -209,3 +209,8 @@ invertComponent = (c) ->
 # cancel with one another.
 exports.invert = (op) -> (invertComponent c for c in op.slice().reverse())
 
+if window?
+	window.whatnot ||= {}
+	window.whatnot.types ||= {}
+	window.whatnot.types.text = exports
+

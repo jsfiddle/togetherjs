@@ -15,7 +15,7 @@ task 'build', 'Build the .js files', (options) ->
 
 client = [
 	'types/text'
-	'client/stream'
+	'client/opstream'
 	'client/client'
 ]
 
