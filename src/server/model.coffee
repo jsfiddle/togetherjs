@@ -15,14 +15,16 @@ module.exports = Model = (db) ->
 
 	# Callback is called with a list of the deltas from versionFrom to versionTo, or
 	# to the most recent version if versionTo is null.
-	#
-	# db.getOps doesn't return the versions. Consider adding them back in.
 	@getOps = db.getOps
 
 	# Gets the snapshot data for the specified document.
 	# getSnapshot(docName, callback)
 	# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
-	@getSnapshot = db.getSnapshot
+	@getSnapshot = getSnapshot = (docName, callback) ->
+		db.getSnapshot docName, (data) ->
+			p "getSnapshot #{i data}"
+			data.type = types[data.type] if data.type != null
+			callback data
 
 	# Gets the latest version # of the document. May be more efficient than getSnapshot.
 	# getVersion(docName, callback)
@@ -31,7 +33,7 @@ module.exports = Model = (db) ->
 
 	applyOpInternal = (docName, opData, callback) ->
 		p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
-		db.getSnapshot docName, (docData) ->
+		getSnapshot docName, (docData) ->
 			opVersion = opData.v
 			op = opData.op
 			meta = opData.meta || {}
@@ -44,7 +46,7 @@ module.exports = Model = (db) ->
 
 			submit = ->
 				newOpData = {op:op, v:opVersion, meta:meta}
-				newDocData = {snapshot:snapshot, type:type}
+				newDocData = {snapshot:snapshot, type:type?.name ? null}
 
 				p "submit #{i newOpData}"
 				db.append docName, newOpData, newDocData, ->

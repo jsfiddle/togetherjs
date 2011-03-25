@@ -11,7 +11,8 @@ exports.attach = (server, model, options) ->
 	socket = io.listen server, {log: null}
 
 	socket.on 'connection', (client) ->
-		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}"
+		# There is a bug here where client.request isn't set sometimes.
+		p "New client connected from #{client.request.socket.remoteAddress} with sessionId #{client.sessionId}" if client.request?
 
 		lastSentDoc = null
 		lastReceivedDoc = null

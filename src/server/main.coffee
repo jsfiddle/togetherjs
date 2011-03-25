@@ -1,5 +1,5 @@
 sys = require 'sys'
-createServer = require('./index').createServer
+createServer = require('./index')
 
 server = createServer()
 server.listen 8000

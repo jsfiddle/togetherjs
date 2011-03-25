@@ -51,12 +51,10 @@ module.exports = (model) ->
 				p 'Listener added -> ' + (i emitterForDoc(docName)?.listeners('op'))
 
 				for op_data in data
-					op_data.v = version
 					listener op_data
 
 					# The listener may well remove itself during the catchup phase. If this happens, break early.
 					# This is done in a quite inefficient way. (O(n) where n = #listeners on doc)
 					break unless listener in emitter.listeners('op')
-					version += 1
 	}
 

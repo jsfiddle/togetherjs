@@ -11,7 +11,7 @@ module.exports = ->
 	{
 		# If any documents are passed to the callback, the first one has v = start.
 		# end can be null. If so, returns all documents from start onwards.
-		# Each document returned is in the form {op:o, meta:m}. Version isn't returned.
+		# Each document returned is in the form {op:o, meta:m, v:version}.
 		getOps: (docName, start, end, callback) ->
 			ops = docs[docName]?.ops
 
@@ -33,8 +33,7 @@ module.exports = ->
 
 			throw new Error 'Version mismatch in db.append' unless op_data.v == doc.ops.length
 
-			# The version isn't stored.
-			new_op_data = {op:op_data.op}
+			new_op_data = {op:op_data.op, v:op_data.v}
 			new_op_data.meta = op_data.meta if op_data.meta?
 			doc.ops.push new_op_data
 
@@ -59,9 +58,11 @@ module.exports = ->
 		delete: (docName, callback) ->
 			if docs[docName]?
 				delete docs[docName]
-				callback(yes)
+				callback(yes) if callback?
 			else
-				callback(no)
+				callback(no) if callback?
+
+		close: ->
 	}
 
 
