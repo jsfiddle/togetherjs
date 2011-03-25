@@ -32,7 +32,6 @@ module.exports = testCase {
 		@server.on 'close', callback
 		@server.close()
 
-
 	'create connection': (test) ->
 		test.ok @c
 		test.done()

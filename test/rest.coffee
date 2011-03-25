@@ -99,4 +99,20 @@ module.exports = testCase {
 		fetch 'DELETE', "/doc/#{@name}", null, (res, data) ->
 			test.strictEqual res.statusCode, 404
 			test.done()
+
+	'DELETE doesnt work if you dont select it in the options': (test) ->
+		s = server {db: {type: 'memory'}}, @model
+		p = port + 1
+		s.listen p, =>
+			@model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
+				test.ifError(error)
+				request = http.request {method:'DELETE', path:"/doc/#{@name}", host: 'localhost', port:p}, (res) =>
+					test.strictEqual res.statusCode, 404
+					@model.getVersion @name, (v) ->
+						test.strictEqual v, 1
+
+						s.on 'close', test.done
+						s.close()
+
+				request.end()
 }
