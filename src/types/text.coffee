@@ -85,33 +85,45 @@ exports.compress = compress = (op) -> compose [], op
 
 exports.normalize = compress
 
+# This helper method transforms a position by an op component.
+#
+# If c is an insert, insertAfter specifies whether the transform
+# is pushed after the insert (true) or before it (false).
+#
+# insertAfter is optional for deletes.
+transformPosition = (pos, c, insertAfter) ->
+	if c.i?
+		if c.p < pos || (c.p == pos && insertAfter)
+			pos + c.i.length
+		else
+			pos
+	else
+		# I think this could also be written as: Math.min(c.p, Math.min(c.p - otherC.p, otherC.d.length))
+		# but I think its harder to read that way, and it compiles using ternary operators anyway
+		# so its no slower written like this.
+		if pos <= c.p
+			pos
+		else if pos <= c.p + c.d.length
+			c.p
+		else
+			pos - c.d.length
+
+# Helper method to transform a cursor position as a result of an op.
+#
+# Like transformPosition above, if c is an insert, insertAfter specifies whether the cursor position
+# is pushed after an insert (true) or before it (false).
+exports.transformCursor = (position, op, insertAfter) ->
+	position = transformPosition position, c, insertAfter for c in op
+	position
+
 # Transform an op component by another op component. Asymmetric.
 # The result will be appended to destination.
 transformComponent = (dest, c, otherC, type) ->
 	checkValidOp [c]
 	checkValidOp [otherC]
 
-	# This little method transforms the position in c.p by a delete in otherC.
-	# This could also be written as: Math.min(c.p, Math.min(c.p - otherC.p, otherC.d.length))
-	# but I think its harder to read that way, and it compiles using ternary operators anyway
-	# so its no slower written like this.
-	transposePositionByDelete = ->
-		if c.p <= otherC.p
-			c.p
-		else if c.p <= otherC.p + otherC.d.length
-			otherC.p
-		else
-			c.p - otherC.d.length
-
 	if c.i?
-		if otherC.i? # insert vs insert
-			if otherC.p < c.p || (otherC.p == c.p && type == 'server')
-				append dest, {i:c.i, p:c.p + otherC.i.length}
-			else
-				append dest, c
-
-		else # insert v delete
-			append dest, {i:c.i, p:transposePositionByDelete()}
+		append dest, {i:c.i, p:transformPosition(c.p, otherC, type == 'server')}
 
 	else # Delete
 		if otherC.i? # delete vs insert
@@ -145,9 +157,9 @@ transformComponent = (dest, c, otherC, type) ->
 
 				if newC.d != ''
 					# This could be rewritten similarly to insert v delete, above.
-					newC.p = transposePositionByDelete()
+					newC.p = transformPosition newC.p, otherC
 					append dest, newC
-		
+
 transformComponentX = (server, client, destServer, destClient) ->
 	transformComponent destServer, server, client, 'server'
 	transformComponent destClient, client, server, 'client'

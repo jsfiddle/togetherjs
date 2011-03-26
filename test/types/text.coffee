@@ -117,6 +117,41 @@ exports.transform = {
 		test.done()
 }
 
+exports.transformCursor = {
+	'sanity': (test) ->
+		test.strictEqual 0, type.transformCursor 0, [], true
+		test.strictEqual 0, type.transformCursor 0, [], false
+		test.strictEqual 100, type.transformCursor 100, []
+
+		test.done()
+
+	'vs insert': (test) ->
+		test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], true
+		test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], false
+
+		test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], true
+		test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], false
+
+		test.strictEqual 104, type.transformCursor 100, [{i:'asdf', p:100}], true
+		test.strictEqual 100, type.transformCursor 100, [{i:'asdf', p:100}], false
+		
+		test.done()
+
+	'vs delete': (test) ->
+		test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], true
+		test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], false
+		test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}]
+
+		test.strictEqual 196, type.transformCursor 200, [{d:'asdf', p:100}]
+
+		test.strictEqual 100, type.transformCursor 100, [{d:'asdf', p:100}]
+		test.strictEqual 100, type.transformCursor 102, [{d:'asdf', p:100}]
+		test.strictEqual 100, type.transformCursor 104, [{d:'asdf', p:100}]
+		test.strictEqual 101, type.transformCursor 105, [{d:'asdf', p:100}]
+
+		test.done()
+}
+
 exports.randomizer = (test) ->
 	require('../helpers').randomizerTest type
 	test.done()
