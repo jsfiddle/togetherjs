@@ -8,9 +8,10 @@
 	"main": "lib/server/main.js",
 	"bin": { "otdb": "server/main.js" },
 	"dependencies": {
-		"socket.io": ">= 0.6.0"
-		"socket.io-node-client": "*"
-		"connect": ">= 1.1.1 < 2.0.0"
+		"socket.io": ">= 0.6.0",
+		"socket.io-node-client": "*",
+		"connect": ">= 1.1.1 < 2.0.0",
+		"jumprope": "~1.0.0rc1"
 	},
 	"licenses": [{
 		"type": "BSD",
