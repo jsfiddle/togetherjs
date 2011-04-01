@@ -5,7 +5,7 @@
 			The 'hello' document.
 		</h1>
 		<pre style='font-family: monospace; white-space: pre-wrap;' id='text'></pre>
-		<script src="http://localhost:8000/_stream/socket.io/socket.io.js"></script>
+		<script src="http://localhost:8000/socket.io/socket.io.js"></script>
 		<script type="text/javascript" src="../../webclient.js"></script>
 		<script type="text/javascript">
 /*	ds.open('sarah', 0, function(data) {
@@ -23,7 +23,7 @@
 	}
 
 	var connection = new whatnot.Connection('localhost', 8000);
-	connection.getOrCreate('clientdocs', 'text', function(doc, error) {
+	connection.getOrCreate('sarahtest', 'text', function(doc, error) {
 		if(error) {
 			console.error(error);
 		} else {

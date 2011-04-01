@@ -18,7 +18,9 @@ fetch = (method, path, postData, callback) ->
 	request = http.request {method:method, path:path, host: 'localhost', port:port}, (response) ->
 		data = ''
 		response.on 'data', (chunk) -> data += chunk
-		response.on 'end', -> callback(response, data)
+		response.on 'end', ->
+			data = try JSON.parse(data) catch e then data
+			callback response, data
 
 	if postData?
 		postData = JSON.stringify(postData) if typeof(postData) == 'object'
@@ -61,21 +63,20 @@ module.exports = testCase {
 		helpers.applyOps @model, @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
 			fetch 'GET', "/doc/#{@name}", null, (res, data) ->
 				test.strictEqual(res.statusCode, 200)
-				data = JSON.parse data
 				test.deepEqual data, {v:2, type:'simple', snapshot:{str:'Hi'}}
 				test.done()
 
 	'POST a document in the DB returns 200 OK': (test) ->
 		fetch 'POST', "/doc/#{@name}?v=0", {type:'simple'}, (res, data) =>
 			test.strictEqual res.statusCode, 200
-			test.deepEqual JSON.parse(data), {v:0}
+			test.deepEqual data, {v:0}
 
 			fetch 'POST', "/doc/#{@name}?v=1", {position: 0, text: 'Hi'}, (res, data) =>
 				test.strictEqual res.statusCode, 200
-				test.deepEqual JSON.parse(data), {v:1}
+				test.deepEqual data, {v:1}
 				fetch 'GET', "/doc/#{@name}", null, (res, data) ->
 					test.strictEqual res.statusCode, 200
-					test.deepEqual JSON.parse(data), {v:2, type:'simple', snapshot:{str: 'Hi'}}
+					test.deepEqual data, {v:2, type:'simple', snapshot:{str: 'Hi'}}
 					test.done()
 
 	'POST a document with no version returns 400': (test) ->

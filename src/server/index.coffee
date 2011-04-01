@@ -29,7 +29,7 @@ create.createModel = createModel = (options) ->
 # defaults will be provided.
 #
 # Set options.rest == null or options.socketio == null to turn off that frontend.
-create.attach = attach = (server, model, options) ->
+create.attach = attach = (server, model = createModel(options), options) ->
 	server.use rest(model, options?.rest) if options?.rest != null
 	socketio.attach(server, model, options?.socketio) if options?.socketio != null
 

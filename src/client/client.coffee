@@ -154,6 +154,10 @@ class Connection
 	# Types must be supported by the server.
 	# callback(doc, error)
 	getOrCreate: (docName, type, callback) ->
+		if typeof type == 'function'
+			callback = type
+			type = 'text'
+
 		type = types[type] if typeof type == 'string'
 
 		if @docs[docName]?
