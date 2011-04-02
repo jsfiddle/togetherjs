@@ -21,135 +21,29 @@
 		<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 		<script src="ace/mode-coffee.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="webclient.js"></script>
+		<script src="share.js"></script>
+		<script src="ace.js"></script>
 		<script>
-
-	var Range = require("ace/range").Range;
-
-	// Convert an ace delta into an op understood by share.js
-	var aceDeltaToSharejsOp = function(editorDoc) { return function(delta) {
-		// Get the start position of the range, in no. of characters
-		var getStartOffsetPosition = function(range) {
-			// This is horribly inefficient, but effective!
-			lines = editorDoc.getLines(0, range.start.row);
-			
-			offset = 0;
-			for (var i = 0, length = lines.length; i < length; i++) {
-				if (i < range.start.row) {
-					offset += lines[i].length;
-				} else {
-					offset += range.start.column;
-				}
-			}
-			// Add the row number to include newlines.
-			return offset + range.start.row;
-		}
-
-		var pos = getStartOffsetPosition(delta.range);
-		switch(delta.action) {
-			case 'insertText':
-				return [{i:delta.text, p:pos}];
-			
-			case 'removeText':
-				return [{d:delta.text, p:pos}];
-				
-			case 'insertLines':
-				var text = delta.lines.join('\n') + '\n';
-				return [{i:text, p:pos}];
-				
-			case 'removeLines':
-				var text = delta.lines.join('\n') + '\n';
-				return [{d:text, p:pos}];
-
-			default:
-				console.error("unknown action: " + delta.action, delta);
-				return null;
-		}
-	};};
-
-	// Apply a share.js op to an ace editor document
-	var applyToDoc = function(editorDoc, op) {
-		var offsetToPos = function(offset) {
-			var lines = editorDoc.getAllLines();
-
-			var row = 0;
-			
-			while (row < lines.length && offset > lines[row].length) {
-				// +1 for the newline.
-				offset -= lines[row].length + 1;
-				row += 1;
-			}
-
-			return {row:row, column:offset};
-		};
-
-		for (var i = 0, len = op.length; i < len; i++) {
-			if (typeof op[i].d !== 'undefined') {
-				var range = Range.fromPoints(offsetToPos(op[i].p), offsetToPos(op[i].p + op[i].d.length));
-				editorDoc.remove(range);
-			} else {
-				var pos = offsetToPos(op[i].p);
-				editorDoc.insert(pos, op[i].i);
-			}
-		}
-	};
 
     window.onload = function() {
         var editor = ace.edit("editor");
-		var editorDoc = editor.getSession().getDocument();
-		editorDoc.setNewLineMode('unix');
-		window.doc = editorDoc;
-		var convert = aceDeltaToSharejsOp(editorDoc);
+//		var editorDoc = editor.getSession().getDocument();
+//		editorDoc.setNewLineMode('unix');
+//		window.doc = editorDoc;
+//		var convert = aceDeltaToSharejsOp(editorDoc);
 		
 		var connection = new whatnot.Connection('sephsmac.local', 8000);
-
-		connection.getOrCreate('aetest', function(doc, error) {
-			var check = function() {
-				var editorText = editorDoc.getValue();
-				var otText = doc.snapshot;
-
-				if (editorText !== otText) {
-					console.error("Text does not match!");
-					console.error("editor: " + editorText);
-					console.error("ot:     " + otText);
-				}
-			}
-
+		connection.getOrCreate('acetest2', function(doc, error) {
 			if (error) {
 				console.error(error);
 				return;
 			}
-
-			editorDoc.setValue(doc.snapshot);
-			check();
-
-			var suppress = false;
-			editorDoc.on('change', function(change) {
-				if (suppress) {
-					return;
-				}
-				var op = convert(change.data);
-				if (op) {
-					console.log("Submitting", op[0]);
-					doc.submitOp(op);
-				}
-
-				check();
-			});
-
-			doc.onChanged(function(op) {
-				console.log("Received", op);
-				suppress = true;
-				applyToDoc(editorDoc, op);
-				suppress = false;
-
-				check();
-			});
+			doc.attach_ace(editor);
+			console.log('attached');
 		});
 
 		var CoffeeScriptMode = require("ace/mode/coffee").Mode;
 		editor.getSession().setMode(new CoffeeScriptMode());
-
     };
 		</script>
 	</body>
