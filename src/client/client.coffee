@@ -1,13 +1,21 @@
 # Abstraction over raw net stream, for use by a client.
 
-OpStream = window?.whatnot.OpStream || require('./opstream').OpStream
-types = window?.whatnot.types || require('../types')
+OpStream = window?.sharejs.OpStream || require('./opstream').OpStream
+types = window?.sharejs.types || require('../types')
+MicroEvent = window?.MicroEvent || require '../../thirdparty/microevent.js/microevent'
 
 exports ||= {}
 
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
+# An open document.
+#
+# Documents are event emitters - use doc.subscribe(eventname, fn) to subscribe.
+#
+# Events:
+#  - remoteop (op)
+#  - changed (op)
 class Document
 	# stream is a OpStream object.
 	# name is the documents' docName.
@@ -29,9 +37,19 @@ class Document
 		# Listeners for the document changing
 		@listeners = []
 
+		@stream.on @name, 'op', @onOpReceived
+
+		@createdLocally = no
+
+		@follow()
+	
+	follow: (callback) ->
 		@stream.follow @name, @version, (msg) =>
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
-			@stream.on @name, 'op', @onOpReceived
+			callback() if callback?
+
+	unfollow: (callback) ->
+		@stream.unfollow @name, callback
 
 	# Internal - do not call directly.
 	tryFlushPendingOp: =>
@@ -67,6 +85,12 @@ class Document
 	# Called when an op is received from the server.
 	onOpReceived: (msg) =>
 		# msg is {doc:, op:, v:}
+
+		# There is a bug in socket.io (produced on firefox 3.6) which causes messages
+		# to be duplicated sometimes.
+		# We'll just silently drop subsequent messages.
+		return if msg.v < @version
+
 		throw new Error("Expected docName #{@name} but got #{msg.doc}") unless msg.doc == @name
 		throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 
@@ -90,7 +114,8 @@ class Document
 		@snapshot = @type.apply @snapshot, docOp
 		@version++
 
-		listener(docOp) for listener in @listeners
+		@publish 'remoteop', docOp
+		@publish 'change', docOp
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
@@ -117,16 +142,13 @@ class Document
 
 		@pendingCallbacks.push callback if callback?
 
+		@publish 'change', op
+
 		# A timeout is used so if the user sends multiple ops at the same time, they'll be composed
 		# together and sent together.
 		setTimeout @tryFlushPendingOp, 0
 
-	# Add an event listener to listen for remote ops. Listener will be passed one parameter;
-	# the op.
-	onChanged: (listener) ->
-		@listeners.push(listener)
-
-
+MicroEvent.mixin Document
 
 class Connection
 	makeDoc: (name, version, type, snapshot) ->
@@ -163,9 +185,9 @@ class Connection
 		if @docs[docName]?
 			doc = @docs[docName]
 			if doc.type == type
-				callback(doc)
+				callback doc
 			else
-				callback(doc, 'Document already exists with type ' + doc.type.name)
+				callback doc, 'Document already exists with type ' + doc.type.name
 
 			return
 
@@ -173,16 +195,23 @@ class Connection
 			if response.snapshot == null
 				@stream.submit docName, {type: type.name}, 0, (response) =>
 					if response.v?
-						callback @makeDoc(docName, 1, type, type.initialVersion())
+						doc = @makeDoc(docName, 1, type, type.initialVersion())
+						doc.createdLocally = yes
+						callback doc
 					else if response.v == null and response.error == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..
 						@getOrCreate(docName, type, callback)
 					else
-						callback(null, response.error)
+						callback null, response.error
 			else if response.type == type.name
 				callback @makeDoc(docName, response.v, type, response.snapshot)
 			else
 				callback null, "Document already exists with type #{response.type}"
+
+	# To be written. Create a new document with a random name.
+	# Prefix is an optional string to put on the front of the document name.
+	create: (type, prefix) ->
+		throw new Error('Not implemented')
 
 	disconnect: () ->
 		if @stream?
@@ -190,6 +219,7 @@ class Connection
 			@stream = null
 
 if window?
-	window.whatnot.Connection = Connection
+	window.sharejs.Connection = Connection
+	window.sharejs.Document = Document
 else
 	exports.Connection = Connection

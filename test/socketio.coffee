@@ -4,7 +4,7 @@ port = 8765
 
 testCase = require('nodeunit').testCase
 assert = require 'assert'
-clientio = require('Socket.io-node-client').io
+clientio = require('../thirdparty/Socket.io-node-client/lib/io-client').io
 
 server = require '../src/server'
 
@@ -40,13 +40,13 @@ module.exports = testCase {
 
 		try
 			@model = server.createModel options
-			@server = server.createServer options, @model
+			@server = server options, @model
 
 			@server.listen port, =>
 				@name = 'testingdoc'
 
 				# Make a new socket.io socket connected to the server's stream interface
-				@socket = new clientio.Socket 'localhost', {port: port, resource: '_stream/socket.io'}
+				@socket = new clientio.Socket 'localhost', {port: port, resource: 'socket.io'}
 				@socket.connect()
 				@socket.on 'connect', callback
 		catch e

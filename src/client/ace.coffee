@@ -64,7 +64,7 @@ applyToDoc = (editorDoc, op) ->
 	
 	return
 
-window.whatnot.Document::attach_ace = (editor) ->
+window.sharejs.Document::attach_ace = (editor) ->
 	doc = this
 	editorDoc = editor.getSession().getDocument()
 	editorDoc.setNewLineMode 'unix'
@@ -90,7 +90,7 @@ window.whatnot.Document::attach_ace = (editor) ->
 
 		check()
 
-	doc.onChanged (op) ->
+	doc.subscribe 'remoteop', (op) ->
 #		console.log("Received", op);
 		suppress = true
 		applyToDoc editorDoc, op

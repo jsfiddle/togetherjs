@@ -1,4 +1,5 @@
 *.swp
 .DS_Store
-*.js
-lib/**/*.js
+lib/*
+test/*.js
+test/**/*.js

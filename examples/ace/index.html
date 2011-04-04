@@ -17,31 +17,30 @@
 	</head>
 
 	<body>
-		<div id="editor">Loading...</div>
-		<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-		<script src="ace/mode-coffee.js" type="text/javascript" charset="utf-8"></script>
+		<div id="editor">Connecting...</div>
+		<script src="../lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../lib/ace/mode-coffee.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="share.js"></script>
-		<script src="ace.js"></script>
+		<script src="/share.js"></script>
+		<script src="../lib/ace.js"></script>
 		<script>
 
     window.onload = function() {
         var editor = ace.edit("editor");
-//		var editorDoc = editor.getSession().getDocument();
-//		editorDoc.setNewLineMode('unix');
-//		window.doc = editorDoc;
-//		var convert = aceDeltaToSharejsOp(editorDoc);
-		
-		var connection = new whatnot.Connection('sephsmac.local', 8000);
+		editor.setReadOnly(true);
+		var connection = new sharejs.Connection(window.location.hostname, 8000);
+
 		connection.getOrCreate('acetest2', function(doc, error) {
 			if (error) {
 				console.error(error);
 				return;
 			}
 			doc.attach_ace(editor);
-			console.log('attached');
+			console.log("I'm so attached right now.");
+			editor.setReadOnly(false);
 		});
 
+		// For fun, we'll go into coffeescript syntax mode.
 		var CoffeeScriptMode = require("ace/mode/coffee").Mode;
 		editor.getSession().setMode(new CoffeeScriptMode());
     };

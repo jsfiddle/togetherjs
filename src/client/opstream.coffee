@@ -5,11 +5,13 @@ if window?
 	throw new Error 'Must load socket.io before this library' unless window.io?
 	io = window.io
 else
-	io = require('Socket.io-node-client').io
+	io = require('../../thirdparty/Socket.io-node-client').io
 
 p = -> #(x) -> console.log x
 
 # Make 1 per server.
+#
+# Consider refactoring this to use microevent.
 class OpStream
 	constructor: (@hostname, @port, path) ->
 		resource = if path then path + '/socket.io' else 'socket.io'
@@ -108,8 +110,8 @@ class OpStream
 #{follow: follow, connect: connect, get: get, submit: submit}
 
 if window?
-	window.whatnot ||= {}
-	window.whatnot.OpStream = OpStream
+	window.sharejs ||= {}
+	window.sharejs.OpStream = OpStream
 else
 	exports.OpStream = OpStream
 

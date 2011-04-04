@@ -15,11 +15,13 @@ modules = [
 	'test/model.coffee'
 	'test/events.coffee'
 	'test/rest.coffee'
+	'test/socketio.coffee'
 
 	'test/client-opstream.coffee'
 	'test/client.coffee'
 
 	'test/integration.coffee'
+#	'test/server.coffee'
 ]
 
 

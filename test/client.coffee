@@ -7,6 +7,8 @@ types = require '../src/types'
 
 client = require '../src/client'
 
+makePassPart = require('./helpers').makePassPart
+
 port = 8765
 
 module.exports = testCase {
@@ -135,7 +137,7 @@ module.exports = testCase {
 			test.ifError error
 			test.strictEqual doc.name, @name
 
-			doc.onChanged (op) ->
+			doc.subscribe 'remoteop', (op) ->
 				test.deepEqual op, [{i:'hi', p:0}]
 
 				test.expect 4
@@ -184,12 +186,59 @@ module.exports = testCase {
 					test.done()
 
 			doc.submitOp clientOp, onOpApplied
-			doc.onChanged (op) ->
+			doc.subscribe 'remoteop', (op) ->
 				test.deepEqual op, serverTransformed
 				onOpApplied()
 
 			@model.applyOp @name, {v:1, op:serverOp}, (error, v) ->
 				test.ifError error
+	
+	'doc fires both remoteop and change messages when remote ops are received': (test) ->
+		passPart = makePassPart test, 2
+		@c.getOrCreate @name, 'text', (doc, error) =>
+			sentOp = [{i:'asdf', p:0}]
+			doc.subscribe 'change', (op) ->
+				test.deepEqual op, sentOp
+				passPart()
+			doc.subscribe 'remoteop', (op) ->
+				test.deepEqual op, sentOp
+				passPart()
+
+			@model.applyOp @name, {v:1, op:sentOp}, (error, v) ->
+				test.ifError error
+	
+	'doc only fires change ops from locally sent ops': (test) ->
+		passPart = makePassPart test, 2
+		@c.getOrCreate @name, 'text', (doc, error) ->
+			sentOp = [{i:'asdf', p:0}]
+			doc.subscribe 'change', (op) ->
+				test.deepEqual op, sentOp
+				passPart()
+			doc.subscribe 'remoteop', (op) ->
+				throw new Error 'Should not have received remoteOp event'
+
+			doc.submitOp sentOp, (error, v) ->
+				passPart()
+	
+	'doc does not receive ops after unfollow called': (test) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
+			doc.subscribe 'change', (op) ->
+				throw new Error 'Should not have received op when the doc was unfollowed'
+	
+			doc.unfollow =>
+				@model.applyOp @name, {v:1, op:[{i:'asdf', p:0}]}, (error, v) =>
+					test.done()
+
+	'created locally is set on new docs': (test) ->
+		@c.getOrCreate @name, 'text', (doc, error) =>
+			test.strictEqual doc.createdLocally, true
+			test.done()
+
+	'created locally is not set on old docs': (test) ->
+		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, v) =>
+			@c.getOrCreate @name, 'text', (doc, error) =>
+				test.strictEqual doc.createdLocally, false
+				test.done()
 }
 
 

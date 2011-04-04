@@ -1,12 +1,12 @@
 {
-	"name": "otdb",
+	"name": "sharejs",
 	"version": "0.1.0",
 	"description": "A database for concurrent document editing",
 	"keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
 	"homepage": "",
 	"author": "Joseph Gentle <josephg@gmail.com>",
 	"main": "lib/server/main.js",
-	"bin": { "otdb": "server/main.js" },
+	"bin": { "sharejs": "bin/sharejs" },
 	"dependencies": {
 		"socket.io": ">= 0.6.0",
 		"socket.io-node-client": "*",
@@ -19,6 +19,6 @@
 	}],
 	"repository": {
 		"type": "git",
-		"url": "",
-	},
+		"url": "http://github.com/josephg/sharejs.git"
+	}
 }

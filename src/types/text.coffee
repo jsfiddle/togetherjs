@@ -222,7 +222,7 @@ invertComponent = (c) ->
 exports.invert = (op) -> (invertComponent c for c in op.slice().reverse())
 
 if window?
-	window.whatnot ||= {}
-	window.whatnot.types ||= {}
-	window.whatnot.types.text = exports
+	window.sharejs ||= {}
+	window.sharejs.types ||= {}
+	window.sharejs.types.text = exports
 

@@ -12,7 +12,7 @@ socketio = require './socketio'
 #
 # The model will be created based on options if it is not specified.
 module.exports = create = (options, model = createModel(options)) ->
-	attach(connect(), model, options)
+	attach(connect(), options, model)
 
 # Create an OT document model attached to a database.
 create.createModel = createModel = (options) ->
@@ -29,7 +29,8 @@ create.createModel = createModel = (options) ->
 # defaults will be provided.
 #
 # Set options.rest == null or options.socketio == null to turn off that frontend.
-create.attach = attach = (server, model = createModel(options), options) ->
+create.attach = attach = (server, options, model = createModel(options)) ->
+	server.model = model
 	server.use rest(model, options?.rest) if options?.rest != null
 	socketio.attach(server, model, options?.socketio) if options?.socketio != null
 

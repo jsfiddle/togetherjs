@@ -9,9 +9,13 @@ task 'build', 'Build the .js files', (options) ->
 	#	console.log options
 #	options.watch ||= no
 #	exec "coffee --compile #{if options.watch then '--watch' else ''} --output lib/ src/", (err, stdout, stderr) ->
-	exec "coffee --compile --output lib/ src/", (err, stdout, stderr) ->
+	exec "coffee --compile --bare --output lib/ src/", (err, stdout, stderr) ->
 		throw err if err
 		console.log stdout + stderr
+
+lib = [
+	'thirdparty/microevent.js/microevent.js'
+]
 
 client = [
 	'types/text'
@@ -26,6 +30,7 @@ e = (str, callback) ->
 		callback() if callback?
 
 task 'webclient', 'Assemble the web client into one file', ->
-	clientfiles = ("src/#{c}.coffee" for c in client).join(' ')
+	clientfiles = ("src/#{c}.coffee" for c in client).join ' '
 	e "coffee -cj #{clientfiles}", ->
-		e 'mv concatenation.js webclient.js'
+		e "cat #{lib.join ' '} concatenation.js >share.js", ->
+			e 'rm concatenation.js'
