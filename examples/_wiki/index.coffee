@@ -10,8 +10,8 @@ showdown = new (require('../lib/markdown/showdown').converter)()
 
 template = fs.readFileSync "#{__dirname}/wiki.html.mu", 'utf8'
 
-defaultContent = '''
-# Wowsers
+defaultContent = (name) -> """
+# #{name} page
 
 This wiki page is currently empty.
 
@@ -25,18 +25,21 @@ The text on the left is being rendered with markdown, so you can do all the usua
 [links](http://google.com)
 
 [Go back to the main page](Main)
-'''
+"""
 
 module.exports = (docName, model, res) ->
+	name = docName
+	docName = "wiki:" + docName
+
 	model.getSnapshot docName, (data) ->
 		if data.v == 0
 			model.applyOp docName, {op:{type:'text'}, v:0}
-			model.applyOp docName, {op:[{i:defaultContent, p:0}], v:1}
+			model.applyOp docName, {op:[{i:defaultContent(name), p:0}], v:1}
 
 		content = data.snapshot || ''
 		markdown = showdown.makeHtml content
 		console.log markdown
-		html = Mustache.to_html template, {content, markdown, docName}
+		html = Mustache.to_html template, {content, markdown, name, docName}
 		res.writeHead 200, {'content-type': 'text/html'}
 		res.end html
 

@@ -1,41 +1,14 @@
 <html>
 	<head>
-		<style type="text/css" media="screen">
-			body {
-				overflow: hidden;
-			}
-
-			#left {
-				margin: 0;
-				position: fixed;
-				overflow: scroll;
-				float: left;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				width: 50%;
-			}
-			
-			#view {
-				padding-left: 30px;
-				padding-right: 30px;
-			}
-			
-			#editor { 
-				margin: 0;
-				position: fixed;
-				top: 0;
-				bottom: 0;
-				left: 50%;
-				width: 50%;
-				right: 0;
-			}
-		</style>
-		<link href="/style.css" rel="stylesheet" type="text/css">
+		<link href="/_wiki/style.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
+		<div id="header">
+			<div id="htext">
+				Wiki <strong>{{name}}</strong>
+			</div>
+		</div>
 		<div id="left">
 			<div id="view" class="content">{{{markdown}}}</div>
 		</div>
