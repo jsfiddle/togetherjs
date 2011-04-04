@@ -7,12 +7,13 @@ fs = require 'fs'
 renderer = require '../examples/_static'
 wiki = require '../examples/_wiki'
 
+clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
+
 server = connect(
 	connect.logger(),
 	connect.static(__dirname + '/../examples'),
 	connect.router (app) ->
 		app.get '/share.js', (req, res) ->
-			clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
 			res.setHeader 'content-type', 'application/javascript'
 			res.end clientsrc
 
@@ -20,15 +21,17 @@ server = connect(
 			docName = req.params.docName
 			renderer docName, server.model, res, next
 
+		app.get '/wiki/', (req, res, next) ->
+			res.writeHead 301, {location: '/wiki/Main'}
+			res.end()
+
 		app.get '/wiki/:docName', (req, res, next) ->
 			docName = "wiki:#{req.params.docName}"
 			wiki docName, server.model, res, next
 
 )
 
-# Maybe... don't use the real config here?
-config = fs.readFileSync require.resolve('./sharejs.json'), 'utf8'
-options = JSON.parse config
+options = {db: 'memory'}
 
 # Attach the sharejs REST and Socket.io interfaces to the server
 sharejs.attach server, options
