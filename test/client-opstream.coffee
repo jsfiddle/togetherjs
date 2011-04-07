@@ -7,8 +7,6 @@ OpStream = require('../src/client/opstream').OpStream
 
 helpers = require './helpers'
 
-port = 8765
-
 # Client stream tests
 module.exports = testCase {
 	setUp: (callback) ->
@@ -22,14 +20,14 @@ module.exports = testCase {
 		@model = server.createModel options
 		@server = server options, @model
 
-		@server.listen port, =>
-			@ds = new OpStream 'localhost', port
+		@server.listen =>
+			@ds = new OpStream 'localhost', @server.address().port
 			callback()
 
 	tearDown: (callback) ->
 		@ds.disconnect()
 
-		# Its important the port has closed before the next test is run.
+		# The port should be closed before the next test is run.
 		@server.on 'close', callback
 		@server.close()
 

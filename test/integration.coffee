@@ -12,8 +12,6 @@ types = require '../src/types'
 
 client = require '../src/client'
 
-port = 8765
-
 module.exports = testCase {
 	setUp: (callback) ->
 		# This is needed for types.text.generateRandomOp
@@ -21,7 +19,8 @@ module.exports = testCase {
 
 		@name = 'testingdoc'
 		@server = server {db: {type: 'memory'}}
-		@server.listen port, =>
+		@server.listen =>
+			port = @server.address().port
 
 			@c1 = new client.Connection 'localhost', port
 			@c2 = new client.Connection 'localhost', port

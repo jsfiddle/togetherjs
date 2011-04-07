@@ -9,8 +9,6 @@ client = require '../src/client'
 
 makePassPart = require('./helpers').makePassPart
 
-port = 8765
-
 module.exports = testCase {
 	setUp: (callback) ->
 		@name = 'testingdoc'
@@ -24,8 +22,8 @@ module.exports = testCase {
 		@model = server.createModel options
 		@server = server options, @model
 
-		@server.listen port, =>
-			@c = new client.Connection 'localhost', port
+		@server.listen =>
+			@c = new client.Connection 'localhost', @server.address().port
 			callback()
 	
 	tearDown: (callback) ->

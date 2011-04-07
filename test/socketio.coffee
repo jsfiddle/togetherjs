@@ -1,7 +1,5 @@
 # Tests for the server's socketio interface
 
-port = 8765
-
 testCase = require('nodeunit').testCase
 assert = require 'assert'
 clientio = require('../thirdparty/Socket.io-node-client/lib/io-client').io
@@ -42,11 +40,11 @@ module.exports = testCase {
 			@model = server.createModel options
 			@server = server options, @model
 
-			@server.listen port, =>
+			@server.listen =>
 				@name = 'testingdoc'
 
 				# Make a new socket.io socket connected to the server's stream interface
-				@socket = new clientio.Socket 'localhost', {port: port, resource: 'socket.io'}
+				@socket = new clientio.Socket 'localhost', {port: @server.address().port, resource: 'socket.io'}
 				@socket.connect()
 				@socket.on 'connect', callback
 		catch e
