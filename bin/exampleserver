@@ -4,8 +4,6 @@ connect = require 'connect'
 sharejs = require '../lib/server'
 sys = require 'sys'
 fs = require 'fs'
-renderer = require '../examples/_static'
-wiki = require '../examples/_wiki'
 
 server = connect(
 	connect.logger(),
@@ -16,11 +14,13 @@ server = connect(
 			clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
 			res.end clientsrc
 
+		renderer = require '../examples/_static'
 		app.get '/static/:docName', (req, res, next) ->
 			docName = req.params.docName
 			renderer docName, server.model, res, next
 
-		app.get '/wiki/', (req, res, next) ->
+		wiki = require '../examples/_wiki'
+		app.get '/wiki/?', (req, res, next) ->
 			res.writeHead 301, {location: '/wiki/Main'}
 			res.end()
 
@@ -28,6 +28,10 @@ server = connect(
 			docName = req.params.docName
 			wiki docName, server.model, res, next
 
+		app.get '/pad/?', (req, res, next) ->
+			docName = server.model.randomDocName()
+			res.writeHead 303, {location: '/pad/pad.html#' + docName}
+			res.end()
 )
 
 options = {db: {type:'memory'}}

@@ -34,7 +34,7 @@ type.generateRandomOp = (docStr) ->
 	[op, docStr]
 
 
-exports.compress = {
+exports.compress =
 	'sanity checks': (test) ->
 		test.deepEqual [], type.compress []
 		test.deepEqual [{i:'blah', p:3}], type.compress [{i:'blah', p:3}]
@@ -69,9 +69,8 @@ exports.compress = {
 		t [{d:'abc', p:10}, {d:'xyz', p:6}]
 		t [{d:'abc', p:10}, {d:'xyz', p:11}]
 		test.done()
-}
 
-exports.compose = {
+exports.compose =
 	# Compose is actually pretty easy
 	'sanity checks': (test) ->
 		test.deepEqual type.compose([], []), []
@@ -80,9 +79,8 @@ exports.compose = {
 		test.deepEqual type.compose([{i:'y', p:100}], [{i:'x', p:0}]), [{i:'y', p:100}, {i:'x', p:0}]
 
 		test.done()
-}
 
-exports.transform = {
+exports.transform =
 	'sanity checks': (test) ->
 		test.deepEqual [], type.transform [], [], 'client'
 		test.deepEqual [], type.transform [], [], 'server'
@@ -115,9 +113,8 @@ exports.transform = {
 		test.deepEqual [[{d:'d', p:10}], [{d:'a', p:10}]], type.transformX [{d:'bcd', p:11}], [{d:'abc', p:10}]
 		test.deepEqual [[{d:'abc', p:10}], [{d:'xy', p:10}]], type.transformX [{d:'abc', p:10}], [{d:'xy', p:13}]
 		test.done()
-}
 
-exports.transformCursor = {
+exports.transformCursor =
 	'sanity': (test) ->
 		test.strictEqual 0, type.transformCursor 0, [], true
 		test.strictEqual 0, type.transformCursor 0, [], false
@@ -150,7 +147,34 @@ exports.transformCursor = {
 		test.strictEqual 101, type.transformCursor 105, [{d:'asdf', p:100}]
 
 		test.done()
-}
+
+exports.normalize =
+	'sanity': (test) ->
+		testUnchanged = (op) -> test.deepEqual op, type.normalize op
+		testUnchanged []
+		testUnchanged [{i:'asdf', p:100}]
+		testUnchanged [{i:'asdf', p:100}, {d:'fdsa', p:123}]
+
+		test.done()
+	
+	'add missing p:0': (test) ->
+		test.deepEqual [{i:'abc', p:0}], type.normalize [{i:'abc'}]
+		test.deepEqual [{d:'abc', p:0}], type.normalize [{d:'abc'}]
+		test.deepEqual [{i:'abc', p:0}, {d:'abc', p:0}], type.normalize [{i:'abc'}, {d:'abc'}]
+
+		test.done()
+	
+	'Convert op to an array': (test) ->
+		test.deepEqual [{i:'abc', p:0}], type.normalize {i:'abc', p:0}
+		test.deepEqual [{d:'abc', p:0}], type.normalize {d:'abc', p:0}
+
+		test.done()
+	
+	'really simple op': (test) ->
+		test.deepEqual [{i:'abc', p:0}], type.normalize {i:'abc'}
+
+		test.done()
+
 
 exports.randomizer = (test) ->
 	require('../helpers').randomizerTest type

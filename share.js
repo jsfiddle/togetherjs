@@ -140,7 +140,19 @@ if( typeof module !== "undefined" && ('exports' in module)){
   exports.compress = compress = function(op) {
     return compose([], op);
   };
-  exports.normalize = compress;
+  exports.normalize = function(op) {
+    var c, newOp, _i, _len, _ref;
+    newOp = [];
+    if ((op.i != null) || (op.p != null)) {
+      op = [op];
+    }
+    for (_i = 0, _len = op.length; _i < _len; _i++) {
+      c = op[_i];
+      (_ref = c.p) != null ? _ref : c.p = 0;
+      append(newOp, c);
+    }
+    return newOp;
+  };
   transformPosition = function(pos, c, insertAfter) {
     if (c.i != null) {
       if (c.p < pos || (c.p === pos && insertAfter)) {

@@ -83,7 +83,21 @@ exports.compose = compose = (op1, op2) ->
 # This implementation preserves order and preserves create/delete pairs.
 exports.compress = compress = (op) -> compose [], op
 
-exports.normalize = compress
+exports.normalize = (op) ->
+	newOp = []
+	
+	# Normalize should allow ops which are a single (unwrapped) component:
+	# {i:'asdf', p:23}.
+	# There's no good way to test if something is an array:
+	# http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+	# so this is probably the least bad solution.
+	op = [op] if op.i? or op.p?
+
+	for c in op
+		c.p ?= 0
+		append newOp, c
+	
+	newOp
 
 # This helper method transforms a position by an op component.
 #

@@ -6,7 +6,7 @@ types = require '../src/types'
 
 generate = ->
 	c = new Connection('localhost', 8000)
-	c.getOrCreate 'sarahtest', (doc) ->
+	c.open 'sarahtest', (doc) ->
 		apply = ->
 			[op, _] = types.text.generateRandomOp doc.snapshot
 	#		console.log doc.snapshot

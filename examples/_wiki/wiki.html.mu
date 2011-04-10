@@ -31,7 +31,7 @@
 
 		var connection = new sharejs.Connection(window.location.hostname, 8000);
 
-		connection.getOrCreate('{{{docName}}}', function(doc, error) {
+		connection.open('{{{docName}}}', function(doc, error) {
 			if (error) {
 				console.error(error);
 				return;
