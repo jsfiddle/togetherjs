@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<link href="style.css" rel="stylesheet" type="text/css">
+		<link href="/style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
 		<div id="container">
@@ -11,10 +11,9 @@
 		<script type="text/javascript">
 
 	var elem = document.getElementById('text');
-	var connection = new sharejs.Connection(window.location.hostname, 8000);
 
-	connection.getOrCreate('html', 'text', function(doc, error) {
-		if(error) {
+	sharejs.open('html', 'text', function(doc, error) {
+		if (error) {
 			console.error(error);
 		} else {
 			document.title = doc.name;
@@ -25,6 +24,11 @@
 
 			update();
 			doc.subscribe('change', update);
+
+
+			if (doc.created) {
+				doc.submitOp([{i:"<h1>Hello there.</h1>\n<p>a simple p</p>", p:0}]);
+			}
 		}
 	});
 		</script>

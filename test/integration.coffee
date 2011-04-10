@@ -25,11 +25,11 @@ module.exports = testCase {
 			@c1 = new client.Connection 'localhost', port
 			@c2 = new client.Connection 'localhost', port
 
-			@c1.getOrCreate @name, 'text', (@doc1, error) =>
+			@c1.open @name, 'text', (@doc1, error) =>
 				assert.ok @doc1
 				callback() if @doc1 && @doc2
 
-			@c2.getOrCreate @name, 'text', (@doc2, error) =>
+			@c2.open @name, 'text', (@doc2, error) =>
 				assert.ok @doc2
 				callback() if @doc1 && @doc2
 

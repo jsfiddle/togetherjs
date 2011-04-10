@@ -159,4 +159,10 @@ module.exports = Model = (db) ->
 	# listenFromVersion(docName, version, listener, callback)
 	@listenFromVersion = events.listenFromVersion
 
+	# Generate a random document name
+	@randomDocName = (length = 10) ->
+		# Should use a secure random number generator if available.
+		chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-="
+		(chars[Math.floor(Math.random() * chars.length)] for x in [0...length]).join('')
+
 	this

@@ -150,7 +150,10 @@ exports.attach = (server, model, options) ->
 			try
 				data = JSON.parse data if typeof(data) == 'string'
 
-				if data.doc?
+				if data.doc == null
+					lastReceivedDoc = null
+					data.doc = model.randomDocName()
+				else if data.doc?
 					lastReceivedDoc = data.doc
 				else
 					throw new Error 'msg.doc missing' unless lastReceivedDoc

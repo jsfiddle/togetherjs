@@ -165,5 +165,15 @@ module.exports = testCase {
 			@model.getVersion @name, (v) ->
 				test.strictEqual v, 1
 				test.done()
+	
+	'random doc name creates some doc names': (test) ->
+		name = (@model.randomDocName() for [1..50])
+
+		for n, i in name
+			test.ok n.length > 5
+			# Check that names aren't repeated
+			test.strictEqual (name.lastIndexOf n), i
+		
+		test.done()
 }
 

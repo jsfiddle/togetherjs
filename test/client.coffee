@@ -37,7 +37,7 @@ module.exports = testCase {
 		test.done()
 	
 	'create a new document': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ok doc
 			test.ifError error
 
@@ -47,11 +47,11 @@ module.exports = testCase {
 			test.done()
 
 	'open a document that is already open': (test) ->
-		@c.getOrCreate @name, 'text', (doc1, error) =>
+		@c.open @name, 'text', (doc1, error) =>
 			test.ifError error
 			test.ok doc1
 			test.strictEqual doc1.name, @name
-			@c.getOrCreate @name, 'text', (doc2, error) =>
+			@c.open @name, 'text', (doc2, error) =>
 				test.strictEqual doc1, doc2
 				test.done()
 	
@@ -59,7 +59,7 @@ module.exports = testCase {
 		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			@c.getOrCreate @name, 'text', (doc, error) =>
+			@c.open @name, 'text', (doc, error) =>
 				test.ifError error
 				test.ok doc
 
@@ -71,13 +71,13 @@ module.exports = testCase {
 		@model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			@c.getOrCreate @name, 'text', (doc, error) =>
+			@c.open @name, 'text', (doc, error) =>
 				test.ok error
 				test.strictEqual doc, null
 				test.done()
 	
 	'submit an op to a document': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ifError error
 			test.strictEqual doc.name, @name
 
@@ -91,7 +91,7 @@ module.exports = testCase {
 			test.strictEqual doc.version, 1
 	
 	'infer the version when submitting an op': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ifError error
 			test.strictEqual doc.name, @name
 
@@ -101,7 +101,7 @@ module.exports = testCase {
 				test.done()
 	
 	'compose multiple ops together when they are submitted together': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ifError error
 			test.strictEqual doc.name, @name
 
@@ -114,7 +114,7 @@ module.exports = testCase {
 				test.done()
 
 	'compose multiple ops together when they are submitted while an op is in flight': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ifError error
 			test.strictEqual doc.name, @name
 
@@ -131,7 +131,7 @@ module.exports = testCase {
 			, 1)
 	
 	'Receive submitted ops': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			test.ifError error
 			test.strictEqual doc.name, @name
 
@@ -145,7 +145,7 @@ module.exports = testCase {
 				test.ifError error
 
 	'get a nonexistent document passes null to the callback': (test) ->
-		@c.get @name, (doc) ->
+		@c.openExisting @name, (doc) ->
 			test.strictEqual doc, null
 			test.done()
 	
@@ -153,7 +153,7 @@ module.exports = testCase {
 		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
 			test.ifError(error)
 
-			@c.get @name, (doc) =>
+			@c.openExisting @name, (doc) =>
 				test.ok doc
 
 				test.strictEqual doc.name, @name
@@ -173,7 +173,7 @@ module.exports = testCase {
 		finalDoc = types.text.apply(finalDoc, clientOp) # v2
 		finalDoc = types.text.apply(finalDoc, serverTransformed) #v3
 
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			opsRemaining = 2
 
 			onOpApplied = ->
@@ -193,7 +193,7 @@ module.exports = testCase {
 	
 	'doc fires both remoteop and change messages when remote ops are received': (test) ->
 		passPart = makePassPart test, 2
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			sentOp = [{i:'asdf', p:0}]
 			doc.subscribe 'change', (op) ->
 				test.deepEqual op, sentOp
@@ -207,7 +207,7 @@ module.exports = testCase {
 	
 	'doc only fires change ops from locally sent ops': (test) ->
 		passPart = makePassPart test, 2
-		@c.getOrCreate @name, 'text', (doc, error) ->
+		@c.open @name, 'text', (doc, error) ->
 			sentOp = [{i:'asdf', p:0}]
 			doc.subscribe 'change', (op) ->
 				test.deepEqual op, sentOp
@@ -219,7 +219,7 @@ module.exports = testCase {
 				passPart()
 	
 	'doc does not receive ops after unfollow called': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
+		@c.open @name, 'text', (doc, error) =>
 			doc.subscribe 'change', (op) ->
 				throw new Error 'Should not have received op when the doc was unfollowed'
 	
@@ -228,15 +228,16 @@ module.exports = testCase {
 					test.done()
 
 	'created locally is set on new docs': (test) ->
-		@c.getOrCreate @name, 'text', (doc, error) =>
-			test.strictEqual doc.createdLocally, true
+		@c.open @name, 'text', (doc, error) =>
+			test.strictEqual doc.created, true
 			test.done()
 
 	'created locally is not set on old docs': (test) ->
 		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, v) =>
-			@c.getOrCreate @name, 'text', (doc, error) =>
-				test.strictEqual doc.createdLocally, false
+			@c.open @name, 'text', (doc, error) =>
+				test.strictEqual doc.created, false
 				test.done()
+	
 }
 
 

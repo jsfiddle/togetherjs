@@ -200,6 +200,15 @@ module.exports = testCase {
 			expectData @socket, [{doc:@name, v:null, error:'Type already set'}], ->
 				test.done()
 
+	'sending an op to a null doc creates a new doc': (test) ->
+		@socket.send {doc:null, v:0, op:{type:'text'}}
+		@socket.on 'message', (data) =>
+			test.strictEqual data.v, 0
+			test.equal typeof data.doc, 'string'
+			test.ok data.doc.length > 8
+
+			test.done()
+
 }
 
 

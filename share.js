@@ -52,7 +52,7 @@ if( typeof module !== "undefined" && ('exports' in module)){
 	module.exports	= MicroEvent;
 }
 (function() {
-  var Connection, Document, MicroEvent, OpStream, append, checkValidComponent, checkValidOp, compose, compress, i, inject, invertComponent, io, p, transformComponent, transformComponentX, transformPosition, transformX, types, _base;
+  var Connection, Document, MicroEvent, OpStream, append, checkValidComponent, checkValidOp, compose, compress, connections, getConnection, i, inject, invertComponent, io, open, p, transformComponent, transformComponentX, transformPosition, transformX, types, _base;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   typeof exports != "undefined" && exports !== null ? exports : exports = {};
   exports.name = 'text';
@@ -470,13 +470,23 @@ if( typeof module !== "undefined" && ('exports' in module)){
       this.pendingCallbacks = [];
       this.serverOps = {};
       this.listeners = [];
-      this.stream.follow(this.name, this.version, __bind(function(msg) {
+      this.stream.on(this.name, 'op', this.onOpReceived);
+      this.created = false;
+      this.follow();
+    }
+    Document.prototype.follow = function(callback) {
+      return this.stream.follow(this.name, this.version, __bind(function(msg) {
         if (msg.v !== this.version) {
           throw new Error("Expected version " + this.version + " but got " + msg.v);
         }
-        return this.stream.on(this.name, 'op', this.onOpReceived);
+        if (callback != null) {
+          return callback();
+        }
       }, this));
-    }
+    };
+    Document.prototype.unfollow = function(callback) {
+      return this.stream.unfollow(this.name, callback);
+    };
     Document.prototype.tryFlushPendingOp = function() {
       if (this.inflightOp === null && this.pendingOp !== null) {
         this.inflightOp = this.pendingOp;
@@ -586,7 +596,7 @@ if( typeof module !== "undefined" && ('exports' in module)){
       this.stream = new OpStream(hostname, port, basePath);
       this.docs = {};
     }
-    Connection.prototype.get = function(docName, callback) {
+    Connection.prototype.openExisting = function(docName, callback) {
       if (this.docs[docName] != null) {
         return this.docs[docName];
       }
@@ -600,12 +610,13 @@ if( typeof module !== "undefined" && ('exports' in module)){
         }
       }, this));
     };
-    Connection.prototype.getOrCreate = function(docName, type, callback) {
+    Connection.prototype.open = function(docName, type, callback) {
       var doc;
       if (typeof type === 'function') {
         callback = type;
         type = 'text';
       }
+      callback || (callback = function() {});
       if (typeof type === 'string') {
         type = types[type];
       }
@@ -624,9 +635,11 @@ if( typeof module !== "undefined" && ('exports' in module)){
             type: type.name
           }, 0, __bind(function(response) {
             if (response.v != null) {
-              return callback(this.makeDoc(docName, 1, type, type.initialVersion()));
+              doc = this.makeDoc(docName, 1, type, type.initialVersion());
+              doc.created = true;
+              return callback(doc);
             } else if (response.v === null && response.error === 'Type already set') {
-              return this.getOrCreate(docName, type, callback);
+              return this.open(docName, type, callback);
             } else {
               return callback(null, response.error);
             }
@@ -649,10 +662,32 @@ if( typeof module !== "undefined" && ('exports' in module)){
     };
     return Connection;
   })();
+  connections = {};
+  getConnection = function(hostname, port, basePath) {
+    var address;
+    if (typeof window != "undefined" && window !== null) {
+      hostname != null ? hostname : hostname = window.location.hostname;
+      port != null ? port : port = window.location.port;
+    }
+    address = "" + hostname + ":" + port;
+    return connections[address] || (connections[address] = new Connection(hostname, port, basePath));
+  };
+  open = function(docName, type, options, callback) {
+    var c;
+    if (typeof options === 'function') {
+      callback = options;
+      options = null;
+    }
+    options != null ? options : options = {};
+    c = getConnection(options.hostname, options.port, options.basePath);
+    return c.open(docName, type, callback);
+  };
   if (typeof window != "undefined" && window !== null) {
     window.sharejs.Connection = Connection;
     window.sharejs.Document = Document;
+    window.sharejs.open = open;
   } else {
     exports.Connection = Connection;
+    exports.open = open;
   }
 }).call(this);

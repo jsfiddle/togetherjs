@@ -39,7 +39,7 @@ class Document
 
 		@stream.on @name, 'op', @onOpReceived
 
-		@createdLocally = no
+		@created = no
 
 		@follow()
 	
@@ -159,9 +159,10 @@ class Connection
 		@stream = new OpStream(hostname, port, basePath)
 		@docs = {}
 
+	# Open a document that already exists
 	# callback is passed a Document or null
 	# callback(doc)
-	get: (docName, callback) ->
+	openExisting: (docName, callback) ->
 		return @docs[docName] if @docs[docName]?
 
 		@stream.get docName, (response) =>
@@ -171,14 +172,17 @@ class Connection
 				type = types[response.type]
 				callback @makeDoc(response.doc, response.v, type, response.snapshot)
 
+	# Open a document. It will be created if it doesn't already exist.
 	# Callback is passed a document or an error
 	# type is either a type name (eg 'text' or 'simple') or the actual type object.
 	# Types must be supported by the server.
 	# callback(doc, error)
-	getOrCreate: (docName, type, callback) ->
+	open: (docName, type, callback) ->
 		if typeof type == 'function'
 			callback = type
 			type = 'text'
+
+		callback ||= ->
 
 		type = types[type] if typeof type == 'string'
 
@@ -196,11 +200,11 @@ class Connection
 				@stream.submit docName, {type: type.name}, 0, (response) =>
 					if response.v?
 						doc = @makeDoc(docName, 1, type, type.initialVersion())
-						doc.createdLocally = yes
+						doc.created = yes
 						callback doc
 					else if response.v == null and response.error == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..
-						@getOrCreate(docName, type, callback)
+						@open docName, type, callback
 					else
 						callback null, response.error
 			else if response.type == type.name
@@ -218,8 +222,34 @@ class Connection
 			@stream.disconnect()
 			@stream = null
 
+# This is a private connection pool for implicitly created connections.
+connections = {}
+
+getConnection = (hostname, port, basePath) ->
+	if window?
+		hostname ?= window.location.hostname
+		port ?= window.location.port
+	
+	address = "#{hostname}:#{port}"
+
+	connections[address] ||= new Connection(hostname, port, basePath)
+
+# Open a document with the given name. The connection is created implicitly and reused.
+#
+# There are no unit tests for this function. :(
+open = (docName, type, options, callback) ->
+	if typeof options == 'function'
+		callback = options
+		options = null
+
+	options ?= {}
+	c = getConnection options.hostname, options.port, options.basePath
+	c.open docName, type, callback
+
 if window?
 	window.sharejs.Connection = Connection
 	window.sharejs.Document = Document
+	window.sharejs.open = open
 else
 	exports.Connection = Connection
+	exports.open = open
