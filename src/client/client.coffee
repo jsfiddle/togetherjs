@@ -37,18 +37,22 @@ class Document
 		# Listeners for the document changing
 		@listeners = []
 
-		@stream.on @name, 'op', @onOpReceived
-
 		@created = no
 
 		@follow()
 	
 	follow: (callback) ->
+		@stream.on @name, 'op', @onOpReceived
+
 		@stream.follow @name, @version, (msg) =>
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 			callback() if callback?
 
 	unfollow: (callback) ->
+		# Ignore all inflight ops.
+		# I think there is a bug here if you send an op then immediately unfollow the document, and a server op
+		# happens before your op reaches the server.
+		@stream.removeListener @name, 'op', @onOpReceived
 		@stream.unfollow @name, callback
 
 	# Internal - do not call directly.

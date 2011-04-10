@@ -82,21 +82,34 @@ window.sharejs.Document::attach_ace = (editor) ->
 	editorDoc.setValue doc.snapshot
 	check()
 
+	# When we apply ops from sharejs, ace emits edit events. We need to ignore those
+	# to prevent an infinite typing loop.
 	suppress = false
-	editorDoc.on 'change', (change) ->
+	
+	# Listen for edits in ace
+	editorListener = (change) ->
 		return if suppress
 		op = convertDelta editorDoc, change.data
 		doc.submitOp op
 
 		check()
 
-	doc.subscribe 'remoteop', (op) ->
-#		console.log("Received", op);
+	editorDoc.on 'change', editorListener
+
+	# Listen for remote ops on the sharejs document
+	docListener = (op) ->
 		suppress = true
 		applyToDoc editorDoc, op
 		suppress = false
 
 		check()
-	
+
+	doc.subscribe 'remoteop', docListener
+
+	doc.detach_ace = ->
+		doc.unsubscribe 'remoteop', docListener
+		editorDoc.removeListener 'change', editorListener
+		delete doc.detach_ace
+
 	return
 

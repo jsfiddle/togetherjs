@@ -33,6 +33,9 @@ class OpStream
 		@callbacks[docName] ||= {}
 		throw new Error "Callback already exists for #{docName}, #{type}" if @callbacks[docName][type]?
 		@callbacks[docName][type] = callback
+	
+	removeListener: (docName, type, listener) ->
+		delete @callbacks[docName]?[type]
 
 	onMessage: (data) =>
 		p 'message'

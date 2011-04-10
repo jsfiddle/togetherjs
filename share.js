@@ -364,6 +364,10 @@ if( typeof module !== "undefined" && ('exports' in module)){
       }
       return this.callbacks[docName][type] = callback;
     };
+    OpStream.prototype.removeListener = function(docName, type, listener) {
+      var _ref;
+      return (_ref = this.callbacks[docName]) != null ? delete _ref[type] : void 0;
+    };
     OpStream.prototype.onMessage = function(data) {
       var emit;
       p('message');
@@ -482,11 +486,11 @@ if( typeof module !== "undefined" && ('exports' in module)){
       this.pendingCallbacks = [];
       this.serverOps = {};
       this.listeners = [];
-      this.stream.on(this.name, 'op', this.onOpReceived);
       this.created = false;
       this.follow();
     }
     Document.prototype.follow = function(callback) {
+      this.stream.on(this.name, 'op', this.onOpReceived);
       return this.stream.follow(this.name, this.version, __bind(function(msg) {
         if (msg.v !== this.version) {
           throw new Error("Expected version " + this.version + " but got " + msg.v);
@@ -497,6 +501,7 @@ if( typeof module !== "undefined" && ('exports' in module)){
       }, this));
     };
     Document.prototype.unfollow = function(callback) {
+      this.stream.removeListener(this.name, 'op', this.onOpReceived);
       return this.stream.unfollow(this.name, callback);
     };
     Document.prototype.tryFlushPendingOp = function() {

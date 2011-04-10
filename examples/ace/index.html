@@ -1,22 +1,15 @@
 <html>
 	<head>
-		<style type="text/css" media="screen">
-			body {
-				overflow: hidden;
-			}
-			
-			#editor { 
-				margin: 0;
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-			}
-		</style>
+		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
+		<div id="header">
+			<div id="htext">
+				<b>Editing</b> <input type="text" value="ace" id='namefield'></input>
+			</div>
+		</div>
+
 		<div id="editor">Connecting...</div>
 		<script src="../lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../lib/ace/mode-coffee.js" type="text/javascript" charset="utf-8"></script>
@@ -24,25 +17,51 @@
 		<script src="/share.js"></script>
 		<script src="../lib/ace.js"></script>
 		<script>
+	var connection = new sharejs.Connection(window.location.hostname, window.location.port);
 
-    window.onload = function() {
-        var editor = ace.edit("editor");
+	var doc = null;
+	var editor;
+
+	var setDoc = function(docName) {
+
+		if (doc != null) {
+			doc.unfollow();
+			doc.detach_ace();
+		}
+
 		editor.setReadOnly(true);
-		var connection = new sharejs.Connection(window.location.hostname, 8000);
+		document.title = docName;
 
-		connection.open('ace', function(doc, error) {
+		connection.open(docName, function(newDoc, error) {
+			doc = newDoc;
+
 			if (error) {
 				console.error(error);
 				return;
 			}
 			doc.attach_ace(editor);
-			console.log("I'm so attached right now.");
 			editor.setReadOnly(false);
 		});
+	};
+
+    window.onload = function() {
+        editor = ace.edit("editor");
+		editor.session.setUseWrapMode(true);
 
 		// For fun, we'll go into coffeescript syntax mode.
-		var CoffeeScriptMode = require("ace/mode/coffee").Mode;
-		editor.getSession().setMode(new CoffeeScriptMode());
+		//var CoffeeScriptMode = require("ace/mode/coffee").Mode;
+		//editor.getSession().setMode(new CoffeeScriptMode());
+
+		setDoc('ace');
+
+		var namefield = document.getElementById('namefield');
+		namefield.addEventListener('input', function() {
+			var docName = namefield.value;
+			
+			if (docName) {
+				setDoc(docName);
+			}
+		}, false);
     };
 		</script>
 	</body>
