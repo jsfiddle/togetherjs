@@ -1,8 +1,11 @@
 # Abstraction over raw net stream, for use by a client.
 
-OpStream = window?.sharejs.OpStream || require('./opstream').OpStream
-types = window?.sharejs.types || require('../types')
-MicroEvent = window?.MicroEvent || require '../../thirdparty/microevent.js/microevent'
+if window?
+	types ||= window.sharejs.types
+else
+	OpStream = require('./opstream').OpStream
+	types = require('../types')
+	MicroEvent = require './microevent'
 
 exports ||= {}
 
@@ -11,7 +14,7 @@ i = -> #require('util').inspect
 
 # An open document.
 #
-# Documents are event emitters - use doc.subscribe(eventname, fn) to subscribe.
+# Documents are event emitters - use doc.on(eventname, fn) to subscribe.
 #
 # Events:
 #  - remoteop (op)
@@ -118,8 +121,8 @@ class Document
 		@snapshot = @type.apply @snapshot, docOp
 		@version++
 
-		@publish 'remoteop', docOp
-		@publish 'change', docOp
+		@emit 'remoteop', docOp
+		@emit 'change', docOp
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
@@ -146,7 +149,7 @@ class Document
 
 		@pendingCallbacks.push callback if callback?
 
-		@publish 'change', op
+		@emit 'change', op
 
 		# A timeout is used so if the user sends multiple ops at the same time, they'll be composed
 		# together and sent together.

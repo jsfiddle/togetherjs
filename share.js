@@ -1,59 +1,52 @@
-/**
- * MicroEvent - to make any js object an event emitter (server or browser)
- *
- * - pure javascript - server compatible, browser compatible
- * - dont rely on the browser doms
- * - super simple - you get it immediatly, no mistery, no magic involved
- *
- * - create a MicroEventDebug with goodies to debug
- *   - make it safer to use
-*/
-
-var MicroEvent	= function(){};
-MicroEvent.prototype	= {
-	subscribe	: function(event, fct){
-		this._events = this._events || {};
-		this._events[event] = this._events[event]	|| [];
-		this._events[event].push(fct);
-		return this;
-	},
-	unsubscribe	: function(event, fct){
-		this._events = this._events || {};
-		if( event in this._events === false  )	return this;
-		this._events[event].splice(this._events[event].indexOf(fct), 1);
-		return this;
-	},
-	publish	: function(event /* , args... */){
-		this._events = this._events || {};
-		if( event in this._events === false  )	return this;
-		for(var i = 0; i < this._events[event].length; i++){
-			this._events[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
-		}
-		return this;
-	}
-};
-
-/**
- * mixin will delegate all MicroEvent.js function in the destination object
- *
- * - require('MicroEvent').mixin(Foobar) will make Foobar able to use MicroEvent
- *
- * @param {Object} the object which will support MicroEvent
-*/
-MicroEvent.mixin	= function(destObject){
-	var props	= ['subscribe', 'unsubscribe', 'publish'];
-	for(var i = 0; i < props.length; i ++){
-		destObject.prototype[props[i]]	= MicroEvent.prototype[props[i]];
-	}
-};
-
-// export in common js
-if( typeof module !== "undefined" && ('exports' in module)){
-	module.exports	= MicroEvent;
-}
 (function() {
   var Connection, Document, MicroEvent, OpStream, append, checkValidComponent, checkValidOp, compose, compress, connections, getConnection, i, inject, invertComponent, io, open, p, transformComponent, transformComponentX, transformPosition, transformX, types, _base;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  MicroEvent = (function() {
+    function MicroEvent() {}
+    MicroEvent.prototype.on = function(event, fct) {
+      var _base;
+      this._events || (this._events = {});
+      (_base = this._events)[event] || (_base[event] = []);
+      this._events[event].push(fct);
+      return this;
+    };
+    MicroEvent.prototype.removeListener = function(event, fct) {
+      var idx, _ref;
+      this._events || (this._events = {});
+      idx = (_ref = this._events[event]) != null ? _ref.indexOf(fct) : void 0;
+      if ((idx != null) && idx >= 0) {
+        this._events[event].splice(idx, 1);
+      }
+      return this;
+    };
+    MicroEvent.prototype.emit = function() {
+      var args, event, fn, _i, _len, _ref, _ref2;
+      event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (!((_ref = this._events) != null ? _ref[event] : void 0)) {
+        return this;
+      }
+      _ref2 = this._events[event];
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        fn = _ref2[_i];
+        fn.apply(this, args);
+      }
+      return this;
+    };
+    return MicroEvent;
+  })();
+  MicroEvent.mixin = function(obj) {
+    var fname, proto, _i, _len, _ref;
+    proto = obj.prototype || obj;
+    _ref = ['on', 'removeListener', 'emit'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      fname = _ref[_i];
+      proto[fname] = MicroEvent.prototype[fname];
+    }
+    return obj;
+  };
+  if (typeof module != "undefined" && module !== null ? module.exports : void 0) {
+    module.exports = MicroEvent;
+  }
   typeof exports != "undefined" && exports !== null ? exports : exports = {};
   exports.name = 'text';
   exports.initialVersion = function() {
@@ -462,9 +455,13 @@ if( typeof module !== "undefined" && ('exports' in module)){
   } else {
     exports.OpStream = OpStream;
   }
-  OpStream = (typeof window != "undefined" && window !== null ? window.sharejs.OpStream : void 0) || require('./opstream').OpStream;
-  types = (typeof window != "undefined" && window !== null ? window.sharejs.types : void 0) || require('../types');
-  MicroEvent = (typeof window != "undefined" && window !== null ? window.MicroEvent : void 0) || require('../../thirdparty/microevent.js/microevent');
+  if (window) {
+    types || (types = window.sharejs.types);
+  } else {
+    OpStream = require('./opstream').OpStream;
+    types = require('../types');
+    MicroEvent = require('../../thirdparty/microevent.js/microevent');
+  }
   exports || (exports = {});
   p = function() {};
   i = function() {};
@@ -564,8 +561,8 @@ if( typeof module !== "undefined" && ('exports' in module)){
       }
       this.snapshot = this.type.apply(this.snapshot, docOp);
       this.version++;
-      this.publish('remoteop', docOp);
-      return this.publish('change', docOp);
+      this.emit('remoteop', docOp);
+      return this.emit('change', docOp);
     };
     Document.prototype.submitOp = function(op, v, callback) {
       var realOp, _ref;
@@ -596,7 +593,7 @@ if( typeof module !== "undefined" && ('exports' in module)){
       if (callback != null) {
         this.pendingCallbacks.push(callback);
       }
-      this.publish('change', op);
+      this.emit('change', op);
       return setTimeout(this.tryFlushPendingOp, 0);
     };
     return Document;

@@ -23,7 +23,8 @@
 			}
 
 			update();
-			doc.subscribe('change', update);
+			window.doc = doc;
+			doc.on('change', update);
 
 
 			if (doc.created) {

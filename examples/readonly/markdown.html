@@ -30,7 +30,7 @@
 			}
 
 			update();
-			doc.subscribe('change', update);
+			doc.on('change', update);
 
 			if (doc.created) {
 				doc.submitOp([{i:"A heading\n=========\n\nLets talk about code:\n\n    codey(codey).code;\n", p:0}]);

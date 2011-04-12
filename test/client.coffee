@@ -135,7 +135,7 @@ module.exports = testCase {
 			test.ifError error
 			test.strictEqual doc.name, @name
 
-			doc.subscribe 'remoteop', (op) ->
+			doc.on 'remoteop', (op) ->
 				test.deepEqual op, [{i:'hi', p:0}]
 
 				test.expect 4
@@ -184,7 +184,7 @@ module.exports = testCase {
 					test.done()
 
 			doc.submitOp clientOp, onOpApplied
-			doc.subscribe 'remoteop', (op) ->
+			doc.on 'remoteop', (op) ->
 				test.deepEqual op, serverTransformed
 				onOpApplied()
 
@@ -195,10 +195,10 @@ module.exports = testCase {
 		passPart = makePassPart test, 2
 		@c.open @name, 'text', (doc, error) =>
 			sentOp = [{i:'asdf', p:0}]
-			doc.subscribe 'change', (op) ->
+			doc.on 'change', (op) ->
 				test.deepEqual op, sentOp
 				passPart()
-			doc.subscribe 'remoteop', (op) ->
+			doc.on 'remoteop', (op) ->
 				test.deepEqual op, sentOp
 				passPart()
 
@@ -209,10 +209,10 @@ module.exports = testCase {
 		passPart = makePassPart test, 2
 		@c.open @name, 'text', (doc, error) ->
 			sentOp = [{i:'asdf', p:0}]
-			doc.subscribe 'change', (op) ->
+			doc.on 'change', (op) ->
 				test.deepEqual op, sentOp
 				passPart()
-			doc.subscribe 'remoteop', (op) ->
+			doc.on 'remoteop', (op) ->
 				throw new Error 'Should not have received remoteOp event'
 
 			doc.submitOp sentOp, (error, v) ->
@@ -220,7 +220,7 @@ module.exports = testCase {
 	
 	'doc does not receive ops after unfollow called': (test) ->
 		@c.open @name, 'text', (doc, error) =>
-			doc.subscribe 'change', (op) ->
+			doc.on 'change', (op) ->
 				throw new Error 'Should not have received op when the doc was unfollowed'
 	
 			doc.unfollow =>

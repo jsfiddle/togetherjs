@@ -104,10 +104,10 @@ window.sharejs.Document::attach_ace = (editor) ->
 
 		check()
 
-	doc.subscribe 'remoteop', docListener
+	doc.on 'remoteop', docListener
 
 	doc.detach_ace = ->
-		doc.unsubscribe 'remoteop', docListener
+		doc.removeListener 'remoteop', docListener
 		editorDoc.removeListener 'change', editorListener
 		delete doc.detach_ace
 

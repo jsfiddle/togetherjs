@@ -111,9 +111,9 @@
       suppress = false;
       return check();
     };
-    doc.subscribe('remoteop', docListener);
+    doc.on('remoteop', docListener);
     doc.detach_ace = function() {
-      doc.unsubscribe('remoteop', docListener);
+      doc.removeListener('remoteop', docListener);
       editorDoc.removeListener('change', editorListener);
       return delete doc.detach_ace;
     };

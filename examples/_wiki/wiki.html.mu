@@ -46,7 +46,7 @@
 			window.doc = doc;
 
 			render();
-			doc.subscribe('change', render);
+			doc.on('change', render);
 		});
     };
 		</script>

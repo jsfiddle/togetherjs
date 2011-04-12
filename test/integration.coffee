@@ -44,7 +44,7 @@ module.exports = testCase {
 		[submittedOp, result] = @doc1.type.generateRandomOp @doc1.snapshot
 		@doc1.submitOp submittedOp
 
-		@doc2.subscribe 'remoteop', (op) =>
+		@doc2.on 'remoteop', (op) =>
 			test.deepEqual op, submittedOp
 			test.strictEqual @doc2.snapshot, result
 			test.strictEqual @doc2.version, 2
@@ -84,10 +84,10 @@ module.exports = testCase {
 					inflight--
 					checkSync()
 
-		@doc1.subscribe 'remoteop', (op) =>
+		@doc1.on 'remoteop', (op) =>
 			maxV = Math.max(maxV, @doc1.version)
 			checkSync()
-		@doc2.subscribe 'remoteop', (op) =>
+		@doc2.on 'remoteop', (op) =>
 			maxV = Math.max(maxV, @doc2.version)
 			checkSync()
 
