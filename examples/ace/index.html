@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <html>
 	<head>
 		<link href="style.css" rel="stylesheet" type="text/css">
@@ -55,13 +56,19 @@
 		setDoc('ace');
 
 		var namefield = document.getElementById('namefield');
-		namefield.addEventListener('input', function() {
+		var fn = function() {
 			var docName = namefield.value;
 			
 			if (docName) {
 				setDoc(docName);
 			}
-		}, false);
+		}
+
+		if (namefield.addEventListener) {
+			namefield.addEventListener('input', fn, false);
+		} else {
+			namefield.attachEvent('oninput', fn);
+		}
     };
 		</script>
 	</body>

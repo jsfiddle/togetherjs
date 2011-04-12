@@ -455,12 +455,12 @@
   } else {
     exports.OpStream = OpStream;
   }
-  if (window) {
+  if (typeof window != "undefined" && window !== null) {
     types || (types = window.sharejs.types);
   } else {
     OpStream = require('./opstream').OpStream;
     types = require('../types');
-    MicroEvent = require('../../thirdparty/microevent.js/microevent');
+    MicroEvent = require('./microevent');
   }
   exports || (exports = {});
   p = function() {};
