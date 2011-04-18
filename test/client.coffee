@@ -21,9 +21,10 @@ module.exports = testCase {
 
 		@model = server.createModel options
 		@server = server options, @model
-
+		
 		@server.listen =>
-			@c = new client.Connection 'localhost', @server.address().port
+			@port = @server.address().port
+			@c = new client.Connection 'localhost', @port
 			callback()
 	
 	tearDown: (callback) ->
@@ -31,6 +32,34 @@ module.exports = testCase {
 
 		@server.on 'close', callback
 		@server.close()
+
+	'open using the bare API': (test) ->
+		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			test.ok doc
+			test.ifError error
+
+			test.strictEqual doc.name, @name
+			test.strictEqual doc.type, types.text
+			test.strictEqual doc.version, 1
+			test.done()
+	
+	'open multiple documents using the bare API on the same connection': (test) ->
+		client.open @name, 'text', {host:'localhost', port:@port}, (doc1, error) =>
+			test.ok doc1
+			test.ifError error
+
+			client.open @name + 2, 'text', {host:'localhost', port:@port}, (doc2, error) ->
+				test.ok doc2
+				test.ifError error
+
+				doc2.submitOp {i:'hi'}, ->
+					test.strictEqual doc2.snapshot, 'hi'
+					doc1.submitOp {i:'booyah'}, ->
+						test.strictEqual doc1.snapshot, 'booyah'
+						doc2.close ->
+							doc1.submitOp {i:'more text '}, ->
+								test.strictEqual doc1.snapshot, 'more text booyah'
+								test.done()
 
 	'create connection': (test) ->
 		test.ok @c

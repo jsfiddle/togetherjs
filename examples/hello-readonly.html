@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+		<title>Hello World</title>
+	</head>
+
+	<body>
+		<div id="container">
+			<div id='text' class='content'></div>
+		</div>
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/share.js"></script>
+
+		<script>
+var elem = document.getElementById('text');
+
+sharejs.open('hello', 'text', function(doc, error) {
+	elem.innerHTML = doc.snapshot;
+	doc.on('change', function() {
+		elem.innerHTML = doc.snapshot;
+	});
+});
+		</script>
+	</body>
+</html>	
+

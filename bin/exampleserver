@@ -6,6 +6,7 @@ sys = require 'sys'
 fs = require 'fs'
 
 server = connect(
+	connect.favicon(),
 	connect.logger(),
 	connect.static(__dirname + '/../examples'),
 	connect.router (app) ->

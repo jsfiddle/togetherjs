@@ -44,6 +44,7 @@ class Document
 
 		@follow()
 	
+	# Internal
 	follow: (callback) ->
 		@stream.on @name, 'op', @onOpReceived
 
@@ -51,6 +52,7 @@ class Document
 			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 			callback() if callback?
 
+	# Internal.
 	unfollow: (callback) ->
 		# Ignore all inflight ops.
 		# I think there is a bug here if you send an op then immediately unfollow the document, and a server op
@@ -147,24 +149,42 @@ class Document
 		else
 			@pendingOp = op
 
-		@pendingCallbacks.push callback if callback?
+		@pendingCallbacks.push callback if callback
 
 		@emit 'change', op
 
 		# A timeout is used so if the user sends multiple ops at the same time, they'll be composed
 		# together and sent together.
 		setTimeout @tryFlushPendingOp, 0
+	
+	# Close a document.
+	# No unit tests for this so far.
+	close: (callback) ->
+		@unfollow =>
+			callback() if callback
+			@emit 'closed'
+			return
 
 MicroEvent.mixin Document
 
 class Connection
 	makeDoc: (name, version, type, snapshot) ->
 		throw new Error("Document #{name} already followed") if @docs[name]
-		@docs[name] = new Document(@stream, name, version, type, snapshot)
 
-	constructor: (hostname, port, basePath) ->
-		@stream = new OpStream(hostname, port, basePath)
+		doc = new Document(@stream, name, version, type, snapshot)
+		@docs[name] = doc
+		@numDocs++
+
+		doc.on 'closed', =>
+			delete @docs[name]
+			@numDocs--
+
+		doc
+
+	constructor: (host, port, basePath) ->
+		@stream = new OpStream(host, port, basePath)
 		@docs = {}
+		@numDocs = 0
 
 	# Open a document that already exists
 	# callback is passed a Document or null
@@ -226,20 +246,29 @@ class Connection
 
 	disconnect: () ->
 		if @stream?
+			@emit 'disconnected'
 			@stream.disconnect()
 			@stream = null
+
+MicroEvent.mixin Connection
 
 # This is a private connection pool for implicitly created connections.
 connections = {}
 
-getConnection = (hostname, port, basePath) ->
+getConnection = (host, port, basePath) ->
 	if window?
-		hostname ?= window.location.hostname
+		host ?= window.location.hostname
 		port ?= window.location.port
 	
-	address = "#{hostname}:#{port}"
+	address = host
+	address += ":#{port}" if port?
 
-	connections[address] ||= new Connection(hostname, port, basePath)
+	unless connections[address]
+		c = new Connection(host, port, basePath)
+		c.on 'disconnected', -> delete connections[address]
+		connections[address] = c
+	
+	connections[address]
 
 # Open a document with the given name. The connection is created implicitly and reused.
 #
@@ -250,8 +279,17 @@ open = (docName, type, options, callback) ->
 		options = null
 
 	options ?= {}
-	c = getConnection options.hostname, options.port, options.basePath
-	c.open docName, type, callback
+	c = getConnection options.host, options.port, options.basePath
+	c.open docName, type, (doc) ->
+		# If you're using the bare API, connections are cleaned up as soon as there's no
+		# documents using them.
+		doc.on 'closed', ->
+			setTimeout ->
+					if c.numDocs == 0
+						c.disconnect()
+				, 0
+
+		callback(doc)
 
 if window?
 	window.sharejs.Connection = Connection

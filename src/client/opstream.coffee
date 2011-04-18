@@ -13,10 +13,10 @@ p = -> #(x) -> console.log x
 #
 # Consider refactoring this to use microevent.
 class OpStream
-	constructor: (@hostname, @port, path) ->
+	constructor: (host, port, path) ->
 		resource = if path then path + '/socket.io' else 'socket.io'
 
-		@socket = new io.Socket @hostname, {port:@port, resource:resource}
+		@socket = new io.Socket host, {port:port, resource:resource}
 		@socket.on 'connect', @onConnect
 		@socket.on 'message', @onMessage
 		@socket.connect()
