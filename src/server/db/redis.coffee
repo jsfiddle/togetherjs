@@ -10,7 +10,7 @@ types = require '../../types'
 
 defaultOptions = {
 	# Prefix for all database keys.
-	prefix: 'OTDB:'
+	prefix: 'ShareJS:'
 
 	# Inherit the default options from redis. (Hostname: 127.0.0.1, port: 6379)
 	hostname: null

@@ -10,8 +10,10 @@ types = require '../types'
 db = require './db'
 Events = require('./events')
 
-module.exports = Model = (db) ->
+module.exports = Model = (db, options) ->
 	return new Model(db) if !(this instanceof Model)
+
+	options ?= {}
 
 	# Callback is called with a list of the deltas from versionFrom to versionTo, or
 	# to the most recent version if versionTo is null.
@@ -130,17 +132,19 @@ module.exports = Model = (db) ->
 		pendingOps[docName] ||= {busy:false, queue:[]}
 		pendingOps[docName].queue.push [opData, callback]
 		flushOps docName
-
+	
 	# Perminantly deletes the specified document.
 	# If listeners are attached, they are removed.
 	# 
+	# The callback is called with (true) if any data was deleted, else (false).
+	#
 	# WARNING: This event isn't well
 	# supported throughout the code. (Eg, streaming clients aren't told about the
 	# deletion. Subsequent op submissions will fail).
 	@delete = (docName, callback) ->
 		events.removeAllListeners docName
 		db.delete docName, callback
-	
+
 	events = new Events(this)
 
 	# Register a listener for a particular document.
@@ -165,4 +169,44 @@ module.exports = Model = (db) ->
 		chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-="
 		(chars[Math.floor(Math.random() * chars.length)] for x in [0...length]).join('')
 
+	
+	# Auth stuffs
+
+	options.auth ||= ->
+	options.canRead ||= (client, docName, result) -> result.accept()
+	options.canSubmitOp ||= (client, docName, opData, result) -> result.accept()
+	options.canDelete ||= (client, docName, result) -> result.reject()
+
+	@auth = options.auth
+
+	# Surely there's a nicer way to write these functions, below. I can imagine abstractions,
+	# but they're always more complicated than the code below.
+
+	@clientGetOps = (client, docName, start, end, callback) ->
+		options.canRead client, docName,
+			accept: =>
+				@getOps docName, start, end, (data) -> callback null, data
+			reject: ->
+				callback new Error 'Forbidden'
+
+	@clientGetSnapshot = (client, docName, callback) ->
+		options.canRead client, docName,
+			accept: =>
+				@getSnapshot docName, (data) -> callback null, data
+			reject: ->
+				callback new Error "Forbidden"
+	
+	# Attempt to submit an op from a client. Auth functions
+	# are checked before the op is submitted.
+	@clientSubmitOp = (client, docName, opData, callback) =>
+		options.canSubmitOp client, docName, opData,
+			accept: -> @applyOp docName, opData, callback
+			reject: -> callback new Error 'Forbidden'
+
+	# Callback is passed (error, deleted anything bool)
+	@clientDelete = (client, docName, callback) ->
+		options.canDelete client, docName,
+			accept: -> @delete docName, (result) -> callback null, result
+			reject: -> callback new Error 'Forbidden'
+	
 	this

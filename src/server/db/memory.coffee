@@ -58,9 +58,9 @@ module.exports = ->
 		delete: (docName, callback) ->
 			if docs[docName]?
 				delete docs[docName]
-				callback(yes) if callback?
+				callback yes if callback?
 			else
-				callback(no) if callback?
+				callback no if callback?
 
 		close: ->
 	}

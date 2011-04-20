@@ -8,8 +8,7 @@ var connect = require('connect'),
 
 server = connect(connect.logger());
 
-config = fs.readFileSync(require.resolve('./sharejs.json'), 'utf8'); 
-options = JSON.parse(config);
+options = require('./options');
 
 // Attach the sharejs REST and Socket.io interfaces to the server
 sharejs.attach(server, options);
