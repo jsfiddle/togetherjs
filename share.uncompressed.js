@@ -118,13 +118,13 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       last = newOp[newOp.length - 1];
       if ((last['i'] != null) && (c['i'] != null) && (last['p'] <= (_ref = c['p']) && _ref <= (last['p'] + last['i'].length))) {
         return newOp[newOp.length - 1] = {
-          i: strInject(last['i'], c['p'] - last['p'], c['i']),
-          p: last['p']
+          'i': strInject(last['i'], c['p'] - last['p'], c['i']),
+          'p': last['p']
         };
       } else if ((last['d'] != null) && (c['d'] != null) && (c['p'] <= (_ref2 = last['p']) && _ref2 <= (c['p'] + c['d'].length))) {
         return newOp[newOp.length - 1] = {
-          d: strInject(c['d'], last['p'] - c['p'], last['d']),
-          p: c['p']
+          'd': strInject(c['d'], last['p'] - c['p'], last['d']),
+          'p': c['p']
         };
       } else {
         return newOp.push(c);
@@ -190,37 +190,37 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     checkValidOp([otherC]);
     if (c['i'] != null) {
       return append(dest, {
-        i: c['i'],
-        p: transformPosition(c['p'], otherC, type === 'server')
+        'i': c['i'],
+        'p': transformPosition(c['p'], otherC, type === 'server')
       });
     } else {
       if (otherC['i'] != null) {
         s = c['d'];
         if (c['p'] < otherC['p']) {
           append(dest, {
-            d: s.slice(0, otherC['p'] - c['p']),
-            p: c['p']
+            'd': s.slice(0, otherC['p'] - c['p']),
+            'p': c['p']
           });
           s = s.slice(otherC['p'] - c['p']);
         }
         if (s !== '') {
           return append(dest, {
-            d: s,
-            p: c['p'] + otherC['i'].length
+            'd': s,
+            'p': c['p'] + otherC['i'].length
           });
         }
       } else {
         if (c['p'] >= otherC['p'] + otherC['d'].length) {
           return append(dest, {
-            d: c['d'],
-            p: c['p'] - otherC['d'].length
+            'd': c['d'],
+            'p': c['p'] - otherC['d'].length
           });
         } else if (c['p'] + c['d'].length <= otherC['p']) {
           return append(dest, c);
         } else {
           newC = {
-            d: '',
-            p: c['p']
+            'd': '',
+            'p': c['p']
           };
           if (c['p'] < otherC['p']) {
             newC['d'] = c['d'].slice(0, otherC['p'] - c['p']);
@@ -307,13 +307,13 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   invertComponent = function(c) {
     if (c['i'] != null) {
       return {
-        d: c['i'],
-        p: c['p']
+        'd': c['i'],
+        'p': c['p']
       };
     } else {
       return {
-        i: c['d'],
-        p: c['p']
+        'i': c['d'],
+        'p': c['p']
       };
     }
   };

@@ -27,8 +27,7 @@ text.initialVersion = -> ''
 strInject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
 
 checkValidComponent = (c) ->
-	if typeof c['p'] != 'number'
-		throw new Error 'component missing position field'
+	throw new Error 'component missing position field' if typeof c['p'] != 'number'
 
 	i_type = typeof c['i']
 	d_type = typeof c['d']
@@ -66,9 +65,9 @@ text._append = append = (newOp, c) ->
 
 		# Compose the insert into the previous insert if possible
 		if last['i']? && c['i']? and last['p'] <= c['p'] <= (last['p'] + last['i'].length)
-			newOp[newOp.length - 1] = {i:strInject(last['i'], c['p'] - last['p'], c['i']), p:last['p']}
+			newOp[newOp.length - 1] = {'i':strInject(last['i'], c['p'] - last['p'], c['i']), 'p':last['p']}
 		else if last['d']? && c['d']? and c['p'] <= last['p'] <= (c['p'] + c['d'].length)
-			newOp[newOp.length - 1] = {d:strInject(c['d'], last['p'] - c['p'], last['d']), p:c['p']}
+			newOp[newOp.length - 1] = {'d':strInject(c['d'], last['p'] - c['p'], last['d']), 'p':c['p']}
 		else
 			newOp.push c
 
@@ -140,25 +139,25 @@ transformComponent = (dest, c, otherC, type) ->
 	checkValidOp [otherC]
 
 	if c['i']?
-		append dest, {i:c['i'], p:transformPosition(c['p'], otherC, type == 'server')}
+		append dest, {'i':c['i'], 'p':transformPosition(c['p'], otherC, type == 'server')}
 
 	else # Delete
 		if otherC['i']? # delete vs insert
 			s = c['d']
 			if c['p'] < otherC['p']
-				append dest, {d:s[...otherC['p'] - c['p']], p:c['p']}
+				append dest, {'d':s[...otherC['p'] - c['p']], 'p':c['p']}
 				s = s[(otherC['p'] - c['p'])..]
 			if s != ''
-				append dest, {d:s, p:c['p'] + otherC['i'].length}
+				append dest, {'d':s, 'p':c['p'] + otherC['i'].length}
 
 		else # Delete vs delete
 			if c['p'] >= otherC['p'] + otherC['d'].length
-				append dest, {d:c['d'], p:c['p'] - otherC['d'].length}
+				append dest, {'d':c['d'], 'p':c['p'] - otherC['d'].length}
 			else if c['p'] + c['d'].length <= otherC['p']
 				append dest, c
 			else
 				# They overlap somewhere.
-				newC = {d:'', p:c['p']}
+				newC = {'d':'', 'p':c['p']}
 				if c['p'] < otherC['p']
 					newC['d'] = c['d'][...(otherC['p'] - c['p'])]
 				if c['p'] + c['d'].length > otherC['p'] + otherC['d'].length
@@ -230,9 +229,9 @@ text.transform = (op, otherOp, type) ->
 
 invertComponent = (c) ->
 	if c['i']?
-		{d:c['i'], p:c['p']}
+		{'d':c['i'], 'p':c['p']}
 	else
-		{i:c['d'], p:c['p']}
+		{'i':c['d'], 'p':c['p']}
 
 # No need to use append for invert, because the components won't be able to
 # cancel with one another.
