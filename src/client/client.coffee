@@ -1,13 +1,11 @@
 # Abstraction over raw net stream, for use by a client.
 
-if window?
-	types ||= window.sharejs.types
+if WEB?
+	types ||= exports.types
 else
 	OpStream = require('./opstream').OpStream
 	types = require('../types')
 	MicroEvent = require './microevent'
-
-exports ||= {}
 
 p = -> #require('util').debug
 i = -> #require('util').inspect
@@ -23,8 +21,11 @@ class Document
 	# stream is a OpStream object.
 	# name is the documents' docName.
 	# version is the version of the document _on the server_
-	constructor: (@stream, @name, @version, @type, @snapshot) ->
+	constructor: (@stream, @name, @version, @type, snapshot) ->
 		throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
+
+		# Gotta figure out a better way to make this work with closure.
+		@['snapshot'] = snapshot
 
 		# The op that is currently roundtripping to the server, or null.
 		@inflightOp = null
@@ -49,7 +50,7 @@ class Document
 		@stream.on @name, 'op', @onOpReceived
 
 		@stream.follow @name, @version, (msg) =>
-			throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
+			throw new Error("Expected version #{@version} but got #{msg['v']}") unless msg['v'] == @version
 			callback() if callback?
 
 	# Internal.
@@ -71,16 +72,16 @@ class Document
 			@pendingCallbacks = []
 
 			@stream.submit @name, @inflightOp, @version, (response) =>
-				if response.v == null
+				if response['v'] == null
 					# Currently, it should be impossible to reach this case.
 					# This case is currently untested.
 					callback(null) for callback in @inflightCallbacks
 					@inflightOp = null
 					# Perhaps the op should be removed from the local document...
 					# @snapshot = @type.apply @snapshot, type.invert(@inflightOp) if type.invert?
-					throw new Error(response.error)
+					throw new Error(response['error'])
 
-				throw new Error('Invalid version from server') unless response.v == @version
+				throw new Error('Invalid version from server') unless response['v'] == @version
 
 				@serverOps[@version] = @inflightOp
 				@version++
@@ -98,14 +99,14 @@ class Document
 		# There is a bug in socket.io (produced on firefox 3.6) which causes messages
 		# to be duplicated sometimes.
 		# We'll just silently drop subsequent messages.
-		return if msg.v < @version
+		return if msg['v'] < @version
 
-		throw new Error("Expected docName #{@name} but got #{msg.doc}") unless msg.doc == @name
-		throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
+		throw new Error("Expected docName #{@name} but got #{msg['doc']}") unless msg['doc'] == @name
+		throw new Error("Expected version #{@version} but got #{msg['v']}") unless msg['v'] == @version
 
 #		p "if: #{i @inflightOp} pending: #{i @pendingOp} doc '#{@snapshot}' op: #{i msg.op}"
 
-		op = msg.op
+		op = msg['op']
 		@serverOps[@version] = op
 
 		# Transform a server op by a client op, and vice versa.
@@ -120,7 +121,7 @@ class Document
 		if @pendingOp != null
 			[docOp, @pendingOp] = xf docOp, @pendingOp
 			
-		@snapshot = @type.apply @snapshot, docOp
+		@['snapshot'] = @type.apply @['snapshot'], docOp
 		@version++
 
 		@emit 'remoteop', docOp
@@ -142,7 +143,7 @@ class Document
 			v++
 
 		# If this throws an exception, no changes should have been made to the doc
-		@snapshot = @type.apply @snapshot, op
+		@['snapshot'] = @type.apply @['snapshot'], op
 
 		if @pendingOp != null
 			@pendingOp = @type.compose(@pendingOp, op)
@@ -167,7 +168,18 @@ class Document
 
 MicroEvent.mixin Document
 
+# Export the functions for the closure compiler
+Document.prototype['submitOp'] = Document.prototype.submitOp
+Document.prototype['close'] = Document.prototype.close
+
+
+# A connection to a sharejs server
 class Connection
+	constructor: (host, port, basePath) ->
+		@stream = new OpStream(host, port, basePath)
+		@docs = {}
+		@numDocs = 0
+
 	makeDoc: (name, version, type, snapshot) ->
 		throw new Error("Document #{name} already followed") if @docs[name]
 
@@ -181,11 +193,6 @@ class Connection
 
 		doc
 
-	constructor: (host, port, basePath) ->
-		@stream = new OpStream(host, port, basePath)
-		@docs = {}
-		@numDocs = 0
-
 	# Open a document that already exists
 	# callback is passed a Document or null
 	# callback(doc)
@@ -193,11 +200,11 @@ class Connection
 		return @docs[docName] if @docs[docName]?
 
 		@stream.get docName, (response) =>
-			if response.snapshot == null
+			if response['snapshot'] == null
 				callback(null)
 			else
-				type = types[response.type]
-				callback @makeDoc(response.doc, response.v, type, response.snapshot)
+				type = types[response['type']]
+				callback @makeDoc(response['doc'], response['v'], type, response['snapshot'])
 
 	# Open a document. It will be created if it doesn't already exist.
 	# Callback is passed a document or an error
@@ -223,21 +230,21 @@ class Connection
 			return
 
 		@stream.get docName, (response) =>
-			if response.snapshot == null
-				@stream.submit docName, {type: type.name}, 0, (response) =>
-					if response.v?
+			if response['snapshot'] == null
+				@stream.submit docName, {'type': type.name}, 0, (response) =>
+					if response['v']?
 						doc = @makeDoc(docName, 1, type, type.initialVersion())
 						doc.created = yes
 						callback doc
-					else if response.v == null and response.error == 'Type already set'
+					else if response['v'] == null and response['error'] == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..
 						@open docName, type, callback
 					else
-						callback null, response.error
-			else if response.type == type.name
-				callback @makeDoc(docName, response.v, type, response.snapshot)
+						callback null, response['error']
+			else if response['type'] == type.name
+				callback @makeDoc(docName, response['v'], type, response['snapshot'])
 			else
-				callback null, "Document already exists with type #{response.type}"
+				callback null, "Document already exists with type #{response['type']}"
 
 	# To be written. Create a new document with a random name.
 	# Prefix is an optional string to put on the front of the document name.
@@ -250,13 +257,16 @@ class Connection
 			@stream.disconnect()
 			@stream = null
 
+Connection.prototype['openExisting'] = Connection.prototype.openExisting
+Connection.prototype['open'] = Connection.prototype.open
+
 MicroEvent.mixin Connection
 
 # This is a private connection pool for implicitly created connections.
 connections = {}
 
 getConnection = (host, port, basePath) ->
-	if window?
+	if WEB?
 		host ?= window.location.hostname
 		port ?= window.location.port
 	
@@ -291,10 +301,11 @@ open = (docName, type, options, callback) ->
 
 		callback(doc)
 
-if window?
-	window.sharejs.Connection = Connection
-	window.sharejs.Document = Document
-	window.sharejs.open = open
+if WEB?
+	exports['Connection'] = Connection
+	exports['Document'] = Document
+	exports['open'] = open
+	window['sharejs'] = exports
 else
 	exports.Connection = Connection
 	exports.open = open
