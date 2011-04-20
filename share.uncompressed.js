@@ -476,7 +476,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.pendingCallbacks = [];
       this.serverOps = {};
       this.listeners = [];
-      this.created = false;
+      this['created'] = false;
       this.follow();
     }
     Document.prototype.follow = function(callback) {
@@ -662,7 +662,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           }, 0, __bind(function(response) {
             if (response['v'] != null) {
               doc = this.makeDoc(docName, 1, type, type.initialVersion());
-              doc.created = true;
+              doc['created'] = true;
               return callback(doc);
             } else if (response['v'] === null && response['error'] === 'Type already set') {
               return this.open(docName, type, callback);

@@ -41,7 +41,7 @@ class Document
 		# Listeners for the document changing
 		@listeners = []
 
-		@created = no
+		@['created'] = no
 
 		@follow()
 	
@@ -234,7 +234,7 @@ class Connection
 				@stream.submit docName, {'type': type.name}, 0, (response) =>
 					if response['v']?
 						doc = @makeDoc(docName, 1, type, type.initialVersion())
-						doc.created = yes
+						doc['created'] = yes
 						callback doc
 					else if response['v'] == null and response['error'] == 'Type already set'
 						# Somebody else has created the document. Get the snapshot again..

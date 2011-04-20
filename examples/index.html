@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+		<title>ShareJS Examples</title>
+
+		<style>
+			body {
+			}
+			a.demo {
+				display: table;
+				text-decoration: none;
+
+				border: 1px solid black;
+				border-radius: 20px;
+				background-color: #ddd;
+				margin: 30px;
+				color: black;
+				width: 400px;
+				height: 4em;
+				box-shadow: 5px 5px 5px #888;
+				font-size: 1.2em;
+				position: relative;
+			}
+
+			a.demo > p {
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+			p.name {
+				border-right: 1px solid black;
+				width: 100px;
+				background-color: #aaa;
+				border-radius: 20px 0px 0px 20px;
+				font-family: monospace;
+			}
+
+			p.desc {
+				padding-right: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container">
+			<div id='text' class='content'>
+				<h1>ShareJS Demo Gallery</h1>
+
+				<h2>Hello world demos</h1>
+				<a href="hello-ace.html" class='demo'>
+					<p class='name'>hello ace</p>
+					<p class='desc'>Use the ace editor to edit the 'hello' document</p>
+				</a>
+
+				<a href='hello-readonly.html' class='demo'>
+					<p class='name'>hello readonly</p>
+					<p class='desc'>View the 'hello' document statically</p>
+				</a>
+
+				<h2>Readonly examples</h1>
+				<a href='readonly/html.html' class='demo'>
+					<p class='name'>readonly html</p>
+					<p class='desc'>View the 'html' document as html</p>
+				</a>
+				<a href='readonly/markdown.html' class='demo'>
+					<p class='name'>readonly markdown</p>
+					<p class='desc'>View the 'markdown' document as markdown</p>
+				</a>
+
+				<h2>Static renderer</h2>
+				<a href='static/html' class='demo'>
+					<p class='name'>static</p>
+					<p class='desc'>Statically render the 'html' doc on the server.</p>
+				</a>
+
+				<h2>Complex stuffs</h1>
+				<a href='ace/' class='demo'>
+					<p class='name'>general editor</p>
+					<p class='desc'>Edit any document</p>
+				</a>
+
+				<a href='wiki/' class='demo'>
+					<p class='name'>wiki</p>
+					<p class='desc'>A simple Wiki using markdown.</p>
+				</a>
+
+				<a href='pad/' class='demo'>
+					<p class='name'>pad</p>
+					<p class='desc'>Make a new etherpad-style notepad</p>
+				</a>
+			</div>
+		</div>
+	</body>
+</html>	
+
