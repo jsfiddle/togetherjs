@@ -46,4 +46,4 @@ options = {db: {type:'memory'}}
 sharejs.attach server, options
 
 server.listen 8000
-sys.puts 'Server running at http://127.0.0.1:8000/'
+sys.puts 'Demos running at http://localhost:8000/'
