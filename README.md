@@ -7,3 +7,23 @@ At the moment only plain-text is supported, but JSON and rich text should be sup
 
 Check out [some cool demos](http://sharejs.org:8000/)
 
+
+Installing and running
+----------------------
+
+    npm install share
+
+Run the examples with:
+
+    # sharejs-exampleserver
+
+Run from node using:
+
+    var client = require('share').client;
+
+or
+
+    var sharejs = require('share').server;
+
+More proper docs incoming...
+

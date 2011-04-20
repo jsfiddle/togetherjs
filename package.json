@@ -1,17 +1,21 @@
 {
-	"name": "sharejs",
+	"name": "share",
 	"version": "0.1.0",
 	"description": "A database for concurrent document editing",
 	"keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
 	"homepage": "",
 	"author": "Joseph Gentle <josephg@gmail.com>",
-	"main": "lib/server/main.js",
-	"bin": { "sharejs": "bin/sharejs" },
+	"main": "lib/index.js",
+	"bin": {
+		"sharejs": "bin/sharejs",
+		"sharejs-exampleserver": "bin/exampleserver"
+	},
 	"dependencies": {
 		"socket.io": ">= 0.6.0",
-		"socket.io-node-client": "*",
 		"connect": ">= 1.1.1 < 2.0.0",
-		"jumprope": "~1.0.0rc1"
+		"coffee-script": "~1.0.0",
+		"redis": "*",
+		"nodeunit": "~0.5.0"
 	},
 	"licenses": [{
 		"type": "BSD",
