@@ -15,13 +15,16 @@
 # is equivalent to this op:
 #   [{i:'a', p:0}, {i:'b', p:1}, {i:'c', p:2}]
 
+# NOTE: The global scope here is shared with other sharejs files when built with closure.
+# Be careful what ends up in your namespace.
+
 text = {}
 
 text.name = 'text'
 
 text.initialVersion = -> ''
 
-inject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
+strInject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
 
 checkValidComponent = (c) ->
 	if typeof c['p'] != 'number'
@@ -41,7 +44,7 @@ text.apply = (snapshot, op) ->
 	checkValidOp op
 	for component in op
 		if component['i']?
-			snapshot = inject snapshot, component['p'], component['i']
+			snapshot = strInject snapshot, component['p'], component['i']
 		else
 			deleted = snapshot[component['p']...(component['p'] + component['d'].length)]
 			throw new Error "Delete component '#{component['d']}' does not match deleted text '#{deleted}'" unless component['d'] == deleted
@@ -63,9 +66,9 @@ text._append = append = (newOp, c) ->
 
 		# Compose the insert into the previous insert if possible
 		if last['i']? && c['i']? and last['p'] <= c['p'] <= (last['p'] + last['i'].length)
-			newOp[newOp.length - 1] = {i:inject(last['i'], c['p'] - last['p'], c['i']), p:last['p']}
+			newOp[newOp.length - 1] = {i:strInject(last['i'], c['p'] - last['p'], c['i']), p:last['p']}
 		else if last['d']? && c['d']? and c['p'] <= last['p'] <= (c['p'] + c['d'].length)
-			newOp[newOp.length - 1] = {d:inject(c['d'], last['p'] - c['p'], last['d']), p:c['p']}
+			newOp[newOp.length - 1] = {d:strInject(c['d'], last['p'] - c['p'], last['d']), p:c['p']}
 		else
 			newOp.push c
 

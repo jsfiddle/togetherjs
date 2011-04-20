@@ -50,5 +50,6 @@ task 'webclient', 'Build the web client into one file', ->
 	e "coffee -cj #{clientfiles}", ->
 		e "cat #{lib.join ' '} concatenation.js >share.uncompressed.js", ->
 			e 'rm concatenation.js'
+			console.log "Building with closure's REST API..."
 			compile 'share.uncompressed.js', 'share.js'
 			

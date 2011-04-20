@@ -8,7 +8,7 @@ Copyright 2011 Joseph Gentle
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, OpStream, WEB, append, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, i, inject, invertComponent, io, open, p, text, transformComponent, transformComponentX, transformPosition, transformX, types;
+;  var Connection, Document, MicroEvent, OpStream, WEB, append, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformComponentX, transformPosition, transformX, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -65,7 +65,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   text.initialVersion = function() {
     return '';
   };
-  inject = function(s1, pos, s2) {
+  strInject = function(s1, pos, s2) {
     return s1.slice(0, pos) + s2 + s1.slice(pos);
   };
   checkValidComponent = function(c) {
@@ -96,7 +96,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       component = op[_i];
       if (component['i'] != null) {
-        snapshot = inject(snapshot, component['p'], component['i']);
+        snapshot = strInject(snapshot, component['p'], component['i']);
       } else {
         deleted = snapshot.slice(component['p'], component['p'] + component['d'].length);
         if (component['d'] !== deleted) {
@@ -118,12 +118,12 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       last = newOp[newOp.length - 1];
       if ((last['i'] != null) && (c['i'] != null) && (last['p'] <= (_ref = c['p']) && _ref <= (last['p'] + last['i'].length))) {
         return newOp[newOp.length - 1] = {
-          i: inject(last['i'], c['p'] - last['p'], c['i']),
+          i: strInject(last['i'], c['p'] - last['p'], c['i']),
           p: last['p']
         };
       } else if ((last['d'] != null) && (c['d'] != null) && (c['p'] <= (_ref2 = last['p']) && _ref2 <= (c['p'] + c['d'].length))) {
         return newOp[newOp.length - 1] = {
-          d: inject(c['d'], last['p'] - c['p'], last['d']),
+          d: strInject(c['d'], last['p'] - c['p'], last['d']),
           p: c['p']
         };
       } else {
@@ -341,7 +341,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   } else {
     io = require('../../thirdparty/Socket.io-node-client').io;
   }
-  p = function() {};
   OpStream = (function() {
     function OpStream(host, port, path) {
       this.onMessage = __bind(this.onMessage, this);;      var resource;
@@ -357,9 +356,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.lastReceivedDoc = null;
       this.lastSentDoc = null;
     }
-    OpStream.prototype.onConnect = function() {
-      return p('connected');
-    };
+    OpStream.prototype.onConnect = function() {};
     OpStream.prototype.on = function(docName, type, callback) {
       var _base;
       (_base = this.callbacks)[docName] || (_base[docName] = {});
@@ -374,8 +371,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     };
     OpStream.prototype.onMessage = function(data) {
       var emit;
-      p('message');
-      p(data);
       if (data['doc'] != null) {
         this.lastReceivedDoc = data['doc'];
       } else {
@@ -383,7 +378,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }
       emit = __bind(function(type, clear) {
         var callback, _ref;
-        p("emit " + data.doc + " " + type);
         callback = (_ref = this.callbacks[data['doc']]) != null ? _ref[type] : void 0;
         if (callback != null) {
           if (clear) {
@@ -418,7 +412,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     };
     OpStream.prototype.follow = function(docName, v, callback) {
       var request;
-      p("follow " + docName);
       request = {
         'doc': docName,
         'follow': true
@@ -430,7 +423,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return this.on(docName, 'follow', callback);
     };
     OpStream.prototype.get = function(docName, callback) {
-      p("get " + docName);
       this.send({
         'doc': docName,
         'snapshot': null
@@ -438,7 +430,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return this.on(docName, 'snapshot', callback);
     };
     OpStream.prototype.submit = function(docName, op, version, callback) {
-      p("submit");
       this.send({
         'doc': docName,
         'v': version,
@@ -447,7 +438,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return this.on(docName, 'localop', callback);
     };
     OpStream.prototype.unfollow = function(docName, callback) {
-      p("unfollow " + docName);
       this.send({
         'doc': docName,
         'follow': false
@@ -468,8 +458,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     types = require('../types');
     MicroEvent = require('./microevent');
   }
-  p = function() {};
-  i = function() {};
   Document = (function() {
     function Document(stream, name, version, type, snapshot) {
       this.stream = stream;

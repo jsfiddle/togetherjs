@@ -1,14 +1,14 @@
 # Abstraction over raw net stream, for use by a client.
 
+# NOTE: Variables declared in the global scope here are shared with other client files
+# when built with closure. Be careful what you put in your namespace.
+
 if WEB?
 	types ||= exports.types
 else
 	OpStream = require('./opstream').OpStream
 	types = require('../types')
 	MicroEvent = require './microevent'
-
-p = -> #require('util').debug
-i = -> #require('util').inspect
 
 # An open document.
 #
