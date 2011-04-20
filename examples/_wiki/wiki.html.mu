@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<title>Wiki {{name}}</title>
 		<link href="/_wiki/style.css" rel="stylesheet" type="text/css">
 	</head>
 
