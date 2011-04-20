@@ -5,6 +5,7 @@ sharejs = require '../lib/server'
 sys = require 'sys'
 fs = require 'fs'
 
+clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
 server = connect(
 	connect.favicon(),
 	connect.logger(),
@@ -12,7 +13,6 @@ server = connect(
 	connect.router (app) ->
 		app.get '/share.js', (req, res) ->
 			res.setHeader 'content-type', 'application/javascript'
-			clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
 			res.end clientsrc
 
 		renderer = require '../examples/_static'
@@ -33,6 +33,11 @@ server = connect(
 			docName = server.model.randomDocName()
 			res.writeHead 303, {location: '/pad/pad.html#' + docName}
 			res.end()
+
+		app.get '/?', (req, res, next) ->
+			res.writeHead 302, {location: '/index.html'}
+			res.end()
+
 )
 
 options = {db: {type:'memory'}}
