@@ -1,0 +1,5 @@
+- "lib/utils.js" is a *copy* of
+  <https://github.com/LearnBoost/Socket.IO-node/blob/master/lib/socket.io/utils.js>,
+  even though this package already depends on the "socket.io" package.
+  That sucks.  I don't know of a way to get to socket.io's "utils.js" module
+  with a `require` statement. Anyone?
