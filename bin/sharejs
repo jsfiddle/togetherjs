@@ -3,7 +3,6 @@
 var connect = require('connect'),
 	sharejs = require('../lib/server'),
 	sys = require('sys'),
-	fs = require('fs'),
 	server;
 
 server = connect(connect.logger());
