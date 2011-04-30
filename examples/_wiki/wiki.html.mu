@@ -17,8 +17,8 @@
 		<script src="/lib/markdown/showdown.js" type="text/javascript"></script>
 		<script src="/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="/share.js"></script>
-		<script src="/lib/share.ace.js"></script>
+		<script src="/share/share.js"></script>
+		<script src="/share/share-ace.js"></script>
 		<script>
 
     window.onload = function() {

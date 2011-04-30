@@ -1,4 +1,7 @@
 # Tests for the authentication & authorization code
+#
+# Auth code hasn't been finished yet. This test isn't run by the standard test
+# runner.
 
 testCase = require('nodeunit').testCase
 server = require '../src/server'

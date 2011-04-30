@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 
 var connect = require('connect'),
-	sharejs = require('../lib/server'),
 	sys = require('sys'),
+	sharejs,
 	server;
+
+try {
+	sharejs = require('../lib/server');
+} catch(e) {
+	console.error("\nCould not include server library. Build using:\n % cake build");
+	throw e;
+}
 
 server = connect(connect.logger());
 

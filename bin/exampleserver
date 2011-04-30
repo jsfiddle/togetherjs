@@ -1,19 +1,14 @@
 #!/usr/bin/env coffee
 
 connect = require 'connect'
-sharejs = require '../lib/server'
+sharejs = require '../src/server'
 sys = require 'sys'
-fs = require 'fs'
 
-clientsrc = fs.readFileSync __dirname + '/../share.js', 'utf8'
 server = connect(
 	connect.favicon(),
 	connect.logger(),
 	connect.static(__dirname + '/../examples'),
 	connect.router (app) ->
-		app.get '/share.js', (req, res) ->
-			res.setHeader 'content-type', 'application/javascript'
-			res.end clientsrc
 
 		renderer = require '../examples/_static'
 		app.get '/static/:docName', (req, res, next) ->

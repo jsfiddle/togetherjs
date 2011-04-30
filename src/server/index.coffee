@@ -30,9 +30,13 @@ create.createModel = createModel = (options) ->
 #
 # Set options.rest == null or options.socketio == null to turn off that frontend.
 create.attach = attach = (server, options, model = createModel(options)) ->
+	options ?= {}
+	options.staticpath ?= '/share'
+
 	server.model = model
-	server.use rest(model, options?.rest) if options?.rest != null
-	socketio.attach(server, model, options?.socketio) if options?.socketio != null
+	server.use rest(model, options.rest) if options.rest != null
+	server.use options.staticpath, connect.static("#{__dirname}/../../webclient") if options.staticpath != null
+	socketio.attach(server, model, options.socketio) if options.socketio != null
 
 	server
 

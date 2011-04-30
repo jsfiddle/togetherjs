@@ -1,4 +1,7 @@
 # Make sure the server can run in a few different environments.
+#
+# NOTE: This test hasn't been written yet, and is not run by the standard test runner.
+
 http = require 'http'
 assert = require 'assert'
 

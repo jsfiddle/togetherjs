@@ -66,8 +66,50 @@ There are two ways to run a sharejs server:
   
   This will run a simple server on port 8000, and host all the example code there. Run it and check out `http://localhost:8000/`. The server will just store everything in ram, so don't get too attached to your data.
 
+
+Putting Share.js on your website
+--------------------------------
+
+If you want to get a simple editor working in your webpage with sharejs, here's what you need to do:
+
+First, get an ace editor on your page:
+
+    <div id="editor"></div>
+
+Your web app will need access to the following JS files:
+
+- Ace (http://ace.ajax.org/)
+- SocketIO (http://socket.io/).
+- ShareJS client and ace bindings.
+
+Add these script tags:
+
+    <script src="http://ajaxorg.github.com/ace/build/src/ace.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/share/share.js"></script>
+	<script src="/share/share-ace.js"></script>
+
+And add this code:
+
+    <script>
+        var editor = ace.edit("editor");
+
+        sharejs.open('hello', 'text', {host: 'localhost', port: 8000}, function(doc, error) {
+	        doc.attach_ace(editor);
+        });
+	</script>
+
+Thats about it :)
+
+The hostname and port are not needed if you're hosting your webpage from the same host & port as sharejs.
+
+Have a look at the examples in the repository for demos. If you want to see this examples running, run `# sharejs-exampleserver` and browse to http://localhost:8000/ .
+
+
 Writing a client using node.js
 ------------------------------
+
+The client API is the same whether you're using the web or nodejs.
 
 Here's an example application which opens a document and inserts some text in it. Every time an op is applied to the document, it'll print out the document's version.
 
@@ -91,5 +133,6 @@ Run this from a couple terminal windows when sharejs is running to see it go.
 	    // doc.close();
     });
 
-See [`doc/client.md`](doc/client.md) for full API documentation, and `examples/node*` for some more example apps.
+See [`doc/client.md`](ShareJS/blob/master/doc/client.md) for full API documentation, and `examples/node*` for some more example apps.
+
 

@@ -16,13 +16,18 @@ module.exports = {
 		redisOptions: null
 	},
 
-	// REST frontend options
+	// The server will statically host webclient/ directory at /share/*.
+	// (Eg, the web client can be found at /share/share.js).
+	// Set staticpath: null to disable.
+	staticpath: '/share',
+
+	// REST frontend options. Set rest: null to disable REST frontend.
 	rest: {
 		// Allow the DELETE HTTP command to perminantly delete sharejs documents
 		delete: false
 	},
 
-	// SocketIO frontend options
+	// SocketIO frontend options. Set socketio: null to disable socketIO frontend.
 	socketio: {
 	}
 }

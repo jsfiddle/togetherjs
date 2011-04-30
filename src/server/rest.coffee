@@ -82,4 +82,4 @@ module.exports = (model, options) ->
 	options ?= {}
 	options.delete ?= false
 
-	connect.router((app) -> router(app, model, options))
+	connect.router (app) -> router(app, model, options)
