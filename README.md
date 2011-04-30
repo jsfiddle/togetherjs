@@ -57,7 +57,6 @@ There are two ways to run a sharejs server:
 2. From the command line:
 
         # sharejs
-
   Configuration is pulled from a configuration file that can't be easily edited at the moment. For now, I recommend method #1 above.
 
 3. If you are just mucking around, run:
