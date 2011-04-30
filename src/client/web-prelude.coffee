@@ -1,5 +1,5 @@
 `
-/** @preserve ShareJS v0.2
+/** @preserve ShareJS v0.1.1
 http://sharejs.org
 
 Copyright 2011 Joseph Gentle
