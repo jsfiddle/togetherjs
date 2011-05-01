@@ -63,9 +63,10 @@ Document names are case sensitive.
 The type can be specified as a string (eg, `'text'`) or an object (eg, `require('share').types.text`).
 
 Options is an object which can contain the following fields:
-**`host`**: hostname of the sharejs server
-**`port`**: port of the sharejs server
-**`basePath`**: base path of the socket.io frontend. Leave this blank unless you've fiddled with it in the server configuration
+
+- **`host`**: hostname of the sharejs server
+- **`port`**: port of the sharejs server
+- **`basePath`**: base path of the socket.io frontend. Leave this blank unless you've fiddled with it in the server configuration
 
 In web clients, options can be left out. It will default to:
 
