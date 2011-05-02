@@ -1,3 +1,10 @@
+# This implements the socketio-based network API for ShareJS.
+#
+# This is the frontend used by the javascript client implementation.
+#
+# See documentation for this protocol is in doc/protocol.md
+# Tests are in test/socketio.coffee
+
 io = require 'socket.io'
 util = require 'util'
 
