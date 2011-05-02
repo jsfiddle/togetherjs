@@ -19,12 +19,13 @@ exports.attach = (server, model, options) ->
 		docState = {} # Map from docName -> {listener:fn, queue:[msg], busy:bool}
 
 		send = (msg) ->
-			p "Sending #{i msg}"
 			# msg _must_ have the docname set. We'll remove it if its the same as lastReceivedDoc.
 			if msg.doc == lastSentDoc
 				delete msg.doc
 			else
 				lastSentDoc = msg.doc
+
+			p "Sending #{i msg}"
 			client.send msg
 
 		# Attempt to follow a document with a given name. Version is optional.

@@ -86,12 +86,9 @@ Each message will refer to a particular ShareJS document. Regardless of message 
 
 In the example above, once the client sent doc:'holiday', the client no longer needed to specify the document name as all subsequent messages the client sends refer to doc:'holiday'. The same is true for the server (though the server still needs to send doc:'holiday' in its first message).
 
-
-### Message types
-
 These are all the different messages the client & server can send to each other:
 
-#### Follow a document (Start streaming operations)
+### Follow a document (Start streaming operations)
 
 Client:
 
@@ -105,22 +102,18 @@ or
     {doc:DOCNAME, follow:false, error:ERRORMESSAGE}
 
 
-> This requests that the server send the client every operation applied to the document from the specified version onwards. Operations sent by the client itself are excluded from this stream.
+This requests that the server send the client every operation applied to the document from the specified version onwards. Operations sent by the client itself are excluded from this stream.
 
-> If there have been operations since the named version, they will be sent to the client immediately after confirming that the client is following the document.
+If there have been operations since the named version, they will be sent to the client immediately after confirming that the client is following the document.
 
-> Version is optional. If not specified, it defaults to the most recent version.
+Version is optional. If not specified, it defaults to the most recent version.
 
-> The version specified in its message will be the same as the version specified in the client's request, or the most recent version if the client's request did not include a version.
+The version specified in its message will be the same as the version specified in the client's request, or the most recent version if the client's request did not include a version.
 
----
-
-**NOTE:** You can use this as a ghetto way to get the history of a document. Its kind of awful - I'll add a special API for getting historical operations in a later version.
-
----
+> **NOTE:** You can use this as a ghetto way to get the history of a document. Its kind of awful - I'll add a special API for getting historical operations in a later version.
 
 
-#### Unfollow a document
+### Unfollow a document
 
 Client:
 
@@ -130,10 +123,10 @@ Server response:
 
     {doc:DOCNAME, follow:false}
 
-> Stop following a document. No more ops will be sent to the client. Note that the client may still get ops from the server that were sent before the server received the unfollow command.
+Stop following a document. No more operations will be sent to the client. Note that the client may still receive ops from the server that were sent before the server received the unfollow command.
 
 
-#### Request a document snapshot
+### Request a document snapshot
 
 Client:
 
@@ -147,24 +140,20 @@ or
 
     {doc:DOCNAME, v:VERSION, snapshot:null, error:ERRORMESSAGE}
 
----
-
 > **NOTE:** Requesting a snapshot at a specified version is not currently supported.
 
----
+Request a snapshot at the specified version. The version is optional - If not included, the most recent version will be used.
 
-> Request a snapshot at the specified version. The version is optional - If not included, the most recent version will be used.
-> 
-> The server sends the snapshot back to the client. TYPE is the name of the type of the document, eg, 'text'.
-> 
-> The format of the snapshot object is type dependant. For text, the snapshot is a string containing the contents of the document.
->
-> The snapshot may be null for valid documents. Look for the `error:` field to test if an error occurred in the request.
->
-> If the document does not exist, the server responds with `{doc:DOCNAME, v:0, snapshot:null, type:null}`
+The server sends the snapshot back to the client. TYPE is the name of the type of the document, eg, 'text'.
+
+The format of the snapshot object is type dependant. For text, the snapshot is a string containing the contents of the document.
+
+The snapshot may be null for valid documents. Look for the `error:` field to test if an error occurred in the request.
+
+If the document does not exist, the server responds with `{doc:DOCNAME, v:0, snapshot:null, type:null}`
 
 
-#### Submit an op
+### Submit an op
 
 Client:
 
@@ -178,20 +167,20 @@ or
 
     {doc:DOCNAME, v:null, error:ERRORMESSAGE}
 
-> Submit the operation OP to the server. The op must be valid given the type of the document.
->
-> The op must be 'reasonably' recent. (To prevent denial-of-service attacks, The server can reject ops which are too old).
->
-> The version specified by the client is the version at which the operation is applied. This is the version the document has _before_ it is applied, not _after_ it has been applied. Generally, this should be the most recent version the client knows about.
->
-> The server responds with the version at which the operation was actually applied. Again, this is the version the document was before the operation was applied. Usually, this will be the same as the version specified in the operation.
+Submit the operation OP to the server. The op must be valid given the type of the document.
 
-> If multiple clients send operations at the same time, they are applied in the order they are received by the server. Your operation may be transformed by other operations before it is applied. If your client is following the document, and you will be sent the other operation before being sent confirmation that your operation was applied. The example near the top of this document shows this happening.
+The op must be 'reasonably' recent. (To prevent denial-of-service attacks, The server can reject ops which are too old).
 
-> For text documents, operations are a list of operation components. Each component either inserts or deletes text at a particular location in the document. For example, this inserts 'hi' at position 50 in the document: `[{i:'hi', p:50}]` and this deletes it again: `[{d:'hi', p:50}]`.
->
-> Refer to (**not written yet**) documentation on the op type for specifics on what valid operations look like.
-> 
-> This API is currently also used to set a document's type, which creates the document in the first place. Submit an op which says `{type:TYPENAME}` to set a document's type. **This will be changed in a future update.**
+The version specified by the client is the version at which the operation is applied. This is the version the document has _before_ it is applied, not _after_ it has been applied. Generally, this should be the most recent version the client knows about.
+
+The server responds with the version at which the operation was actually applied. Again, this is the version the document was before the operation was applied. Usually, this will be the same as the version specified in the operation.
+
+If multiple clients send operations at the same time, they are applied in the order they are received by the server. Your operation may be transformed by other operations before it is applied. If your client is following the document, and you will be sent the other operation before being sent confirmation that your operation was applied. The example near the top of this document shows this happening.
+
+For text documents, operations are a list of operation components. Each component either inserts or deletes text at a particular location in the document. For example, this inserts 'hi' at position 50 in the document: `[{i:'hi', p:50}]` and this deletes it again: `[{d:'hi', p:50}]`.
+
+Refer to (**not written yet**) documentation on the op type for specifics on what valid operations look like.
+
+This API is currently also used to set a document's type, which creates the document in the first place. Submit an op which says `{type:TYPENAME}` to set a document's type. **This will be changed in a future update.**
 
 
