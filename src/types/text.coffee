@@ -78,7 +78,6 @@ text.compose = compose = (op1, op2) ->
 	newOp = op1.slice()
 	append newOp, c for c in op2
 
-	checkValidOp newOp
 	newOp
 
 # Attempt to compress the op components together 'as much as possible'.
@@ -175,57 +174,8 @@ transformComponent = (dest, c, otherC, type) ->
 					# This could be rewritten similarly to insert v delete, above.
 					newC['p'] = transformPosition newC['p'], otherC
 					append dest, newC
-
-transformComponentX = (server, client, destServer, destClient) ->
-	transformComponent destServer, server, client, 'server'
-	transformComponent destClient, client, server, 'client'
-
-# Transforms serverOp by clientOp. Returns [serverOp', clientOp']
-text.transformX = transformX = (serverOp, clientOp) ->
-	checkValidOp serverOp
-	checkValidOp clientOp
-
-	newClientOp = []
-
-	for clientComponent in clientOp
-		# Generate newServerOp by composing serverOp by clientComponent
-		newServerOp = []
-
-		k = 0
-		while k < serverOp.length
-			nextC = []
-			transformComponentX serverOp[k], clientComponent, newServerOp, nextC
-			k++
-
-			if nextC.length == 1
-				clientComponent = nextC[0]
-			else if nextC.length == 0
-				append newServerOp, s for s in serverOp[k..]
-				clientComponent = null
-				break
-			else
-				# Recurse.
-				[s_, c_] = transformX serverOp[k..], nextC
-				append newServerOp, s for s in s_
-				append newClientOp, c for c in c_
-				clientComponent = null
-				break
 	
-		append newClientOp, clientComponent if clientComponent?
-		serverOp = newServerOp
-	
-	[serverOp, newClientOp]
-
-# Transforms op with specified type ('server' or 'client') by otherOp.
-text.transform = (op, otherOp, type) ->
-	throw new Error "type must be 'server' or 'client'" unless type == 'server' or type == 'client'
-
-	if type == 'server'
-		[server, _] = transformX op, otherOp
-		server
-	else
-		[_, client] = transformX otherOp, op
-		client
+	dest
 
 invertComponent = (c) ->
 	if c['i']?
@@ -236,6 +186,11 @@ invertComponent = (c) ->
 # No need to use append for invert, because the components won't be able to
 # cancel with one another.
 text.invert = (op) -> (invertComponent c for c in op.slice().reverse())
+
+# The text type really shouldn't need this - it should be possible to define
+# an efficient transform function by making a sort of transform map and passing each
+# op component through it.
+require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append)
 
 if WEB?
 	exports.types ||= {}

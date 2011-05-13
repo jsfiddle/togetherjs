@@ -59,7 +59,7 @@ randomThing = ->
 randomPath = (data) ->
 	path = []
 
-	while Math.random() > 0.7 and typeof data == 'object'
+	while Math.random() > 0.85 and typeof data == 'object'
 		key = randomKey data
 		break unless key?
 
@@ -185,15 +185,13 @@ type.generateRandomOp = (data) ->
 				delete operand[k]
 				{p:path, od:clone(obj)}
 
-#	p "generated op #{i op} -> #{i docStr}"
 	[op, container.data]
 
 
-d = null
-for [1..10]
-	console.log d
-	[op, d] = type.generateRandomOp(d)
-	console.log op
+# The random op tester above will test that the OT functions are admissable, but
+# debugging problems it detects is a pain.
+#
+# These tests should pick up *most* problems with a normal JSON OT implementation.
 
 exports.sanity =
 	'name is json': (test) ->
@@ -201,10 +199,134 @@ exports.sanity =
 		test.done()
 
 	'initialVersion() returns null': (test) ->
-		test.deepEqual type.initialVersion(), {}
+		test.deepEqual type.initialVersion(), null
 		test.done()
 
+exports.number =
+	'Add a number': (test) ->
+		test.deepEqual 3, type.apply 1, [{p:[], na:2}]
+		test.deepEqual [3], type.apply [1], [{p:[0], na:2}]
+		test.done()
 
+	'Compose two adds together with the same path compresses them': (test) ->
+		test.deepEqual [{p:['a', 'b'], na:3}], type.compose [{p:['a', 'b'], na:1}], [{p:['a', 'b'], na:2}]
+		test.deepEqual [{p:['a'], na:1}, {p:['b'], na:2}], type.compose [{p:['a'], na:1}], [{p:['b'], na:2}]
+		test.done()
+
+# Strings should be handled internally by the text type. We'll just do some basic sanity checks here.
+exports.string =
+	'Apply works': (test) ->
+		test.deepEqual 'abc', type.apply 'a', [{p:[1], si:'bc'}]
+		test.deepEqual 'bc', type.apply 'abc', [{p:[0], sd:'a'}]
+		test.deepEqual {x:'abc'}, type.apply {x:'a'}, [{p:['x', 1], si:'bc'}]
+
+		test.done()
+	
+	'transform splits deletes': (test) ->
+		test.deepEqual type.transform([{p:[0], sd:'ab'}], [{p:[1], si:'x'}], 'client'), [{p:[0], sd:'a'}, {p:[2], sd:'b'}]
+		test.done()
+	
+	'deletes cancel each other out': (test) ->
+		test.deepEqual type.transform([{p:['k', 5], sd:'a'}], [{p:['k', 5], sd:'a'}], 'client'), []
+		test.done()
+
+exports.list =
+	'Apply inserts': (test) ->
+		test.deepEqual ['a', 'b', 'c'], type.apply ['b', 'c'], [{p:[0], li:'a'}]
+		test.deepEqual ['a', 'b', 'c'], type.apply ['a', 'c'], [{p:[1], li:'b'}]
+		test.deepEqual ['a', 'b', 'c'], type.apply ['a', 'b'], [{p:[2], li:'c'}]
+		test.done()
+
+	'Apply deletes': (test) ->
+		test.deepEqual ['b', 'c'], type.apply ['a', 'b', 'c'], [{p:[0], ld:'a'}]
+		test.deepEqual ['a', 'c'], type.apply ['a', 'b', 'c'], [{p:[1], ld:'b'}]
+		test.deepEqual ['a', 'b'], type.apply ['a', 'b', 'c'], [{p:[2], ld:'c'}]
+		test.done()
+	
+	'apply replace': (test) ->
+		test.deepEqual ['a', 'y', 'b'], type.apply ['a', 'x', 'b'], [{p:[1], ld:'x', li:'y'}]
+		test.done()
+
+	'apply move': (test) ->
+		test.deepEqual ['a', 'b', 'c'], type.apply ['b', 'a', 'c'], [{p:[1], lm:0}]
+		test.deepEqual ['a', 'b', 'c'], type.apply ['b', 'a', 'c'], [{p:[0], lm:1}]
+		test.done()
+	
+	'Paths are bumped when list elements are inserted or removed': (test) ->
+		test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
+		test.deepEqual [{p:[1, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
+		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], li:'x'}], 'client'
+
+		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], ld:'x'}], 'client'
+		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], ld:'x'}], 'client'
+
+		test.done()
+
+	'Ops on deleted elements become noops': (test) ->
+		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x'}], 'client'
+		test.done()
+	
+	'Ops on replaced elements become noops': (test) ->
+		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x', li:'y'}], 'client'
+		test.done()
+
+	'Deleted data is changed to reflect edits': (test) ->
+		test.deepEqual [{p:[1], ld:'abc'}], type.transform [{p:[1], ld:'a'}], [{p:[1, 1], si:'bc'}], 'client'
+		test.done()
+	
+	'Inserting then deleting an element composes into a no-op': (test) ->
+		test.deepEqual [], type.compose [{p:[1], li:'abc'}], [{p:[1], ld:'abc'}]
+		test.done()
+	
+	'If two inserts are simultaneous, the client op will end up first': (test) ->
+		test.deepEqual [{p:[1], li:'a'}], type.transform [{p:[1], li:'a'}], [{p:[1], li:'b'}], 'client'
+		test.deepEqual [{p:[2], li:'b'}], type.transform [{p:[1], li:'b'}], [{p:[1], li:'a'}], 'server'
+		test.done()
+	
+	'An attempt to re-delete a list element becomes a no-op': (test) ->
+		test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'server'
+		test.done()
+
+	'Ops on a moved element move with the element': (test) ->
+		test.deepEqual [{p:[10], ld:'x'}], type.transform [{p:[4], ld:'x'}], [{p:[4], lm:10}], 'client'
+		test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'client'
+		test.done()
+
+exports.object =
+	'Apply sanity checks': (test) ->
+		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]
+		test.deepEqual {}, type.apply {x:'a'}, [{p:['x'], od:'a'}]
+		test.deepEqual {x:'b'}, type.apply {x:'a'}, [{p:['x'], od:'a', oi:'b'}]
+		test.deepEqual {y:'a'}, type.apply {x:'a'}, [{p:['x'], om:'y'}]
+		test.done()
+	
+	'Ops on deleted elements become noops': (test) ->
+		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x'}], 'client'
+		test.done()
+	
+	'Ops on replaced elements become noops': (test) ->
+		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x', oi:'y'}], 'client'
+		test.done()
+
+	'Deleted data is changed to reflect edits': (test) ->
+		test.deepEqual [{p:[1], ld:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'client'
+		test.done()
+	
+	'If two inserts are simultaneous, the clients insert will win': (test) ->
+		test.deepEqual [{p:[1], oi:'a', od:'b'}], type.transform [{p:[1], oi:'a'}], [{p:[1], oi:'b'}], 'client'
+		test.deepEqual [], type.transform [{p:[1], oi:'b'}], [{p:[1], oi:'a'}], 'server'
+		test.done()
+	
+	'An attempt to re-delete a key becomes a no-op': (test) ->
+		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'client'
+		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
+		test.done()
+	
+	'Ops on a moved element move with the element': (test) ->
+		test.deepEqual [{p:['k2'], od:'x'}], type.transform [{p:['k1'], od:'x'}], [{p:['k1'], om:'k2'}], 'client'
+		test.deepEqual [{p:['k2', 1], si:'a'}], type.transform [{p:['k1', 1], si:'a'}], [{p:['k1'], om:'k2'}], 'client'
+		test.done()
 
 exports.randomizer = (test) ->
 	require('../helpers').randomizerTest type
