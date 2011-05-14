@@ -24,7 +24,7 @@ randomKey = (obj) ->
 		if obj.length == 0
 			undefined
 		else
-			randomInt data.length
+			randomInt obj.length
 	else
 		count = 0
 
@@ -77,7 +77,7 @@ type.generateRandomOp = (data) ->
 		pct *= 0.6
 
 		# Pick a random object in the document operate on.
-		path = randomPath()
+		path = randomPath(data)
 
 		# parent = the container for the operand. parent[key] contains the operand.
 		parent = container
@@ -223,7 +223,7 @@ exports.string =
 		test.done()
 	
 	'transform splits deletes': (test) ->
-		test.deepEqual type.transform([{p:[0], sd:'ab'}], [{p:[1], si:'x'}], 'client'), [{p:[0], sd:'a'}, {p:[2], sd:'b'}]
+		test.deepEqual type.transform([{p:[0], sd:'ab'}], [{p:[1], si:'x'}], 'client'), [{p:[0], sd:'a'}, {p:[1], sd:'b'}]
 		test.done()
 	
 	'deletes cancel each other out': (test) ->
@@ -254,11 +254,14 @@ exports.list =
 	
 	'Paths are bumped when list elements are inserted or removed': (test) ->
 		test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
-		test.deepEqual [{p:[1, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
+		test.deepEqual [{p:[1, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[0], li:'x'}], 'server'
 		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], li:'x'}], 'client'
 
 		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], ld:'x'}], 'client'
 		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [{p:['x',3], si: 'hi'}], type.transform [{p:['x',3], si:'hi'}], [{p:['x',0,'x'], li:0}], 'client'
+		test.deepEqual [{p:['x',3,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',5], li:0}], 'client'
+		test.deepEqual [{p:['x',4,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',0], li:0}], 'client'
 
 		test.done()
 

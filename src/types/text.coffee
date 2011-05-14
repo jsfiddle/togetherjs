@@ -133,7 +133,9 @@ text.transformCursor = (position, op, insertAfter) ->
 
 # Transform an op component by another op component. Asymmetric.
 # The result will be appended to destination.
-transformComponent = (dest, c, otherC, type) ->
+#
+# exported for use in JSON type
+text._transformComponent = transformComponent = (dest, c, otherC, type) ->
 	checkValidOp [c]
 	checkValidOp [otherC]
 

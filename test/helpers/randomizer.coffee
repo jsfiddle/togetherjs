@@ -30,7 +30,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	if type.invert?
 		# Invert all the ops and apply them to result. Should end up with initialDoc.
 		testInvert = (doc, ops) ->
-			snapshot = doc.result
+			snapshot = JSON.parse(JSON.stringify(doc.result))
 
 			# Sadly, coffeescript doesn't seem to support iterating backwards through an array.
 			# reverse() reverses an array in-place so it needs to be cloned first.

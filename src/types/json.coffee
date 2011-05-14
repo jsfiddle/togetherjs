@@ -2,6 +2,8 @@
 #
 # Spec is here: https://github.com/josephg/ShareJS/wiki/JSON-Operations
 
+text = require './text'
+
 exports ?= {}
 
 exports.name = 'json'
@@ -15,8 +17,18 @@ normalizeMovePath = (path, newPath) ->
 
 
 invertComponent = (c) ->
+	c_ = { p: c['p'] }
+	c_['sd'] = c['si'] if c['si'] != undefined
+	c_['si'] = c['sd'] if c['sd'] != undefined
+	c_['od'] = c['oi'] if c['oi'] != undefined
+	c_['oi'] = c['od'] if c['od'] != undefined
+	c_['ld'] = c['li'] if c['li'] != undefined
+	c_['li'] = c['ld'] if c['ld'] != undefined
+	c_['na'] = -c['na'] if c['na'] != undefined
+	# TODO: lm, om
+	c_
 
-exports.invert = (op) -> invertComponent for c in op
+exports.invert = (op) -> invertComponent c for c in op.slice().reverse()
 
 checkValidOp = (op) ->
 
@@ -24,12 +36,13 @@ checkList = (elem) ->
 	throw new Error 'Referenced element not a list' unless Array.isArray && Array.isArray(elem)
 
 checkObj = (elem) ->
-	throw new Error 'Referenced element not an object' unless elem.constructor is not Object
+	throw new Error 'Referenced element not an object' unless elem.constructor is Object
 
-exports.apply = (snapshot, op) ->
+exports.apply = apply = (snapshot, op) ->
 	checkValidOp op
+	op = clone op
 
-	container = {data: snapshot}
+	container = {data: clone snapshot}
 
 	try
 		for c, i in op
@@ -61,7 +74,7 @@ exports.apply = (snapshot, op) ->
 				throw new Error 'Deleted string does not match' unless elem[key...key + c.sd.length] == c.sd
 				parent[parentkey] = elem[...key] + elem[key + c.sd.length..]
 
-			else if c.li != undefined and c.ld != undefined
+			else if c.li != undefined && c.ld != undefined
 				# List replace
 				checkList elem
 
@@ -126,6 +139,9 @@ append = (dest, c) ->
 	if dest.length != 0 and pathMatches c.p, (last = dest[dest.length - 1]).p
 		if last.na != undefined and c.na != undefined
 			last.na += c.na
+		else if last.li != undefined and c.ld == last.li
+			# insert immediately followed by delete becomes a noop.
+			dest.pop()
 		else
 			dest.push c
 	else
@@ -143,14 +159,93 @@ exports.compose = (op1, op2) ->
 exports.normalize = (op) ->
 	op
 
-# Transform a JSON op component against another op component.
+
+# TODO: paths sometimes have string offsets?
+# perhaps instead of {p:['foo',1,3], sd:'bar'} we should have
+#                    {p:['foo'], sd:[1,3,'bar']} ?
+atPath = (obj, path) ->
+	obj = obj[k] for k in path
+	obj
+
+setPath = (obj, path, val) ->
+	obj = obj[k] for k in path[..-2]
+	obj[path[path.length-1]] = val
+
+# true if p1 is beneath (or identical to) p2
+pathIsBeneathPath = (p1, p2, strict) ->
+	return false if p2.length > p1.length
+	return true if !strict && p2.length <= 1
+	for i in [0..p2.length-(strict ? 1 : 2)]
+		if p1[i] != p2[i]
+			return false
+	true
+
+# exported for testing
+exports._transformPath = transformPath = (p, c, insertAfter) ->
+	p = p[0..]
+	if c['li']?
+		if pathIsBeneathPath p, c['p']
+			i = c['p'].length - 1
+			p[i] += 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
+	if c['ld']?
+		if pathIsBeneathPath p, c['p']
+			i = c['p'].length - 1
+			p[i] -= 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
+	p
+
+# hax, copied from test/types/json
+clone = (o) -> JSON.parse(JSON.stringify o)
+
 transformComponent = (dest, c, otherC, type) ->
-	# First, figure out how their paths relate to one another.
+	newP = transformPath c['p'], otherC, type == 'server'
 
-	p1 = p2 = 0
-	while p1 < c.p.length and p2 < otherC.p.length
-		break unless c.p[p1] == otherC.p[p1]
+	if otherC['ld']? || otherC['od']
+		if pathIsBeneathPath c['p'], otherC['p'], true
+			return dest
+	
+	if (target = otherC['lm'] || otherC['om'])
+		# move ops with a moved element
+		if pathIsBeneathPath c['p'], otherC['p'], true
+			c_ = clone c
+			c_['p'] = c['p'][...otherC['p'].length-1].concat([target]).concat(c['p'][otherC['p'].length...])
+			append dest, c_
 
+	else if (data = c['ld'] || c['od']) && pathIsBeneathPath(otherC['p'],c['p'])
+		# apply ops to deleted data
+		oc = clone otherC
+		oc['p'] = oc['p'][c['p'].length..]
+		append dest, { p: newP, ld: apply clone(data), [oc] }
+
+
+	else if c['oi']? && otherC['oi']
+		if type == 'client'
+			append dest, { p: c['p'], od: otherC['oi'], oi: c['oi'] }
+		else
+			# client wins, so this is a noop.
+
+	else if (c['si']? || c['sd']?) && (otherC['si']? || otherC['sd']?) && pathMatches c['p'], otherC['p'], true
+		# String op -- pass through to text type
+		p1 = c['p'][c['p'].length - 1]
+		p2 = otherC['p'][otherC['p'].length - 1]
+		tc1 = { p: p1 }
+		tc2 = { p: p2 }
+		tc1['i'] = c['si'] if c['si']?
+		tc1['d'] = c['sd'] if c['sd']?
+		tc2['i'] = otherC['si'] if otherC['si']?
+		tc2['d'] = otherC['sd'] if otherC['sd']?
+		res = []
+		text._transformComponent res, tc1, tc2, type
+		for tc in res
+			jc = { p: newP[..-2] }
+			jc['p'].push(tc['p'])
+			jc['si'] = tc['i'] if tc['i']?
+			jc['sd'] = tc['d'] if tc['d']?
+			append dest, jc
+
+	else
+		c = clone c
+		c['p'] = newP
+		append dest, c
+	dest
 
 require('./helpers').bootstrapTransform(exports, transformComponent, checkValidOp, append)
-
