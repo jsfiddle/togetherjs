@@ -1,6 +1,6 @@
 (function() {
-
-/** @preserve ShareJS v0.2
+  
+/** @preserve ShareJS v0.1.1
 http://sharejs.org
 
 Copyright 2011 Joseph Gentle
@@ -57,7 +57,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     proto.emit = MicroEvent.prototype.emit;
     return obj;
   };
-  if (typeof module != "undefined" && module !== null ? module.exports : void 0) {
+  if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
     module.exports = MicroEvent;
   }
   text = {};
@@ -154,7 +154,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-      (_ref = c['p']) != null ? _ref : c['p'] = 0;
+            if ((_ref = c['p']) != null) {
+        _ref;
+      } else {
+        c['p'] = 0;
+      };
       append(newOp, c);
     }
     return newOp;
@@ -343,7 +347,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   }
   OpStream = (function() {
     function OpStream(host, port, path) {
-      this.onMessage = __bind(this.onMessage, this);;      var resource;
+      this.onMessage = __bind(this.onMessage, this);      var resource;
       resource = path ? path + '/socket.io' : 'socket.io';
       this.socket = new io['Socket'](host, {
         port: port,
@@ -464,8 +468,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.name = name;
       this.version = version;
       this.type = type;
-      this.onOpReceived = __bind(this.onOpReceived, this);;
-      this.tryFlushPendingOp = __bind(this.tryFlushPendingOp, this);;
+      this.onOpReceived = __bind(this.onOpReceived, this);
+      this.tryFlushPendingOp = __bind(this.tryFlushPendingOp, this);
       if (this.type.compose == null) {
         throw new Error('Handling types without compose() defined is not currently implemented');
       }
@@ -696,8 +700,16 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   getConnection = function(host, port, basePath) {
     var address, c;
     if (WEB != null) {
-      host != null ? host : host = window.location.hostname;
-      port != null ? port : port = window.location.port;
+            if (host != null) {
+        host;
+      } else {
+        host = window.location.hostname;
+      };
+            if (port != null) {
+        port;
+      } else {
+        port = window.location.port;
+      };
     }
     address = host;
     if (port != null) {
@@ -718,7 +730,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       callback = options;
       options = null;
     }
-    options != null ? options : options = {};
+        if (options != null) {
+      options;
+    } else {
+      options = {};
+    };
     c = getConnection(options.host, options.port, options.basePath);
     return c.open(docName, type, function(doc) {
       doc.on('closed', function() {
