@@ -25,7 +25,12 @@ invertComponent = (c) ->
 	c_['ld'] = c['li'] if c['li'] != undefined
 	c_['li'] = c['ld'] if c['ld'] != undefined
 	c_['na'] = -c['na'] if c['na'] != undefined
-	# TODO: lm, om
+	if c['lm'] != undefined
+		c_['lm'] = c['p'][c['p'].length-1]
+		c_['p'] = c['p'][0...c['p'].length - 1].concat([c['lm']])
+	else if c['om'] != undefined
+		c_['om'] = c['p'][c['p'].length-1]
+		c_['p'] = c['p'][0...c['p'].length - 1].concat([c['om']])
 	c_
 
 exports.invert = (op) -> invertComponent c for c in op.slice().reverse()
@@ -142,6 +147,9 @@ append = (dest, c) ->
 		else if last.li != undefined and c.ld == last.li
 			# insert immediately followed by delete becomes a noop.
 			dest.pop()
+		else if last.od != undefined and last.oi == undefined and
+				c.oi != undefined and c.od == undefined
+			last.oi = c.oi
 		else
 			dest.push c
 	else
@@ -171,81 +179,164 @@ setPath = (obj, path, val) ->
 	obj = obj[k] for k in path[..-2]
 	obj[path[path.length-1]] = val
 
-# true if p1 is beneath (or identical to) p2
+# true if p1 is beneath (or identical to, if strict is false) p2
 pathIsBeneathPath = (p1, p2, strict) ->
 	return false if p2.length > p1.length
-	return true if !strict && p2.length <= 1
-	for i in [0..p2.length-(strict ? 1 : 2)]
-		if p1[i] != p2[i]
+	p1 = p1.slice()
+	p2 = p2.slice()
+
+	while p2.length > 0
+		if p1.shift() != p2.shift()
 			return false
-	true
+		
+	return !strict || p1.length > 0
+# pbp [] [] s = not s
+# pbp _ [] s = true
+# pbp (p1:p1s) (p2:p2s) s = p1 == p2 && pbp p1s p2s s
 
 # exported for testing
 exports._transformPath = transformPath = (p, c, insertAfter) ->
-	p = p[0..]
-	if c['li']?
-		if pathIsBeneathPath p, c['p']
+	p = p.slice()
+	if c['li'] != undefined && c['ld'] == undefined
+		# li
+		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
 			i = c['p'].length - 1
 			p[i] += 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
-	if c['ld']?
-		if pathIsBeneathPath p, c['p']
+	else if c['ld'] != undefined && c['li'] == undefined
+		# ld
+		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
 			i = c['p'].length - 1
 			p[i] -= 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
+	else if (target = c['lm'] || c['om']) != undefined
+		# [lo]m
+		# move ops with a moved element
+		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
+			p = p[...c['p'].length-1].concat([target]).concat(p[c['p'].length...])
 	p
 
 # hax, copied from test/types/json
 clone = (o) -> JSON.parse(JSON.stringify o)
 
 transformComponent = (dest, c, otherC, type) ->
-	newP = transformPath c['p'], otherC, type == 'server'
+	j = JSON.stringify
+	console.log 'transformComponenting',j(c),'against',j(otherC),'type:',type
+	res = transformComponent_ dest, c, otherC, type
+	console.log 'got',j dest
+	res
 
-	if otherC['ld']? || otherC['od']
-		if pathIsBeneathPath c['p'], otherC['p'], true
-			return dest
-	
-	if (target = otherC['lm'] || otherC['om'])
-		# move ops with a moved element
-		if pathIsBeneathPath c['p'], otherC['p'], true
-			c_ = clone c
-			c_['p'] = c['p'][...otherC['p'].length-1].concat([target]).concat(c['p'][otherC['p'].length...])
-			append dest, c_
+isLI = (c) -> c['li'] != undefined && c['ld'] == undefined
 
-	else if (data = c['ld'] || c['od']) && pathIsBeneathPath(otherC['p'],c['p'])
-		# apply ops to deleted data
-		oc = clone otherC
-		oc['p'] = oc['p'][c['p'].length..]
-		append dest, { p: newP, ld: apply clone(data), [oc] }
+commonPath = (p1, p2) ->
+	p1 = p1[...p1.length-1]
+	p2 = p2[...p2.length-1]
+	return 0 if p2.length == 0
+	i = 0
+	while p1[i] == p2[i] && i < p1.length
+		i++
+		if i == p2.length
+			return i
+	return
 
-
-	else if c['oi']? && otherC['oi']
-		if type == 'client'
-			append dest, { p: c['p'], od: otherC['oi'], oi: c['oi'] }
-		else
-			# client wins, so this is a noop.
-
-	else if (c['si']? || c['sd']?) && (otherC['si']? || otherC['sd']?) && pathMatches c['p'], otherC['p'], true
-		# String op -- pass through to text type
-		p1 = c['p'][c['p'].length - 1]
-		p2 = otherC['p'][otherC['p'].length - 1]
-		tc1 = { p: p1 }
-		tc2 = { p: p2 }
-		tc1['i'] = c['si'] if c['si']?
-		tc1['d'] = c['sd'] if c['sd']?
-		tc2['i'] = otherC['si'] if otherC['si']?
-		tc2['d'] = otherC['sd'] if otherC['sd']?
-		res = []
-		text._transformComponent res, tc1, tc2, type
-		for tc in res
-			jc = { p: newP[..-2] }
-			jc['p'].push(tc['p'])
-			jc['si'] = tc['i'] if tc['i']?
-			jc['sd'] = tc['d'] if tc['d']?
-			append dest, jc
-
-	else
-		c = clone c
-		c['p'] = newP
+# transform c so it applies to a document with otherC applied.
+transformComponent_ = (dest, c, otherC, type) ->
+	if otherC['na']
 		append dest, c
-	dest
+		return dest
+	c = clone c
+	c['p'].push(0) if c['na'] != undefined
+
+
+	common2 = commonPath otherC.p, c.p
+	if common2? && otherC.p.length > c.p.length
+		# transform based on c
+		if c.ld != undefined
+			oc = clone otherC
+			oc.p = oc.p[c.p.length..]
+			c.ld = apply clone(c.ld), [oc]
+		else if c.od != undefined
+			oc = clone otherC
+			oc.p = oc.p[c.p.length..]
+			c.od = apply clone(c.od), [oc]
+
+			
+	common = commonPath c['p'], otherC['p']
+	commonOperand = common? and c.p.length == otherC.p.length
+	if common?
+		# transform based on otherC
+		if otherC.na != undefined
+			null
+			# output c
+		else if otherC.si != undefined || otherC.sd != undefined
+			# String op -- pass through to text type
+			if c.si != undefined || c.sd != undefined
+				throw new Error("must be a string?") unless commonOperand
+				p1 = c.p[c.p.length - 1]
+				p2 = otherC.p[otherC.p.length - 1]
+				tc1 = { p: p1 }
+				tc2 = { p: p2 }
+				tc1['i'] = c.si if c.si?
+				tc1['d'] = c.sd if c.sd?
+				tc2['i'] = otherC.si if otherC.si?
+				tc2['d'] = otherC.sd if otherC.sd?
+				res = []
+				text._transformComponent res, tc1, tc2, type
+				for tc in res
+					jc = { p: c.p[...common] }
+					jc['p'].push(tc['p'])
+					jc['si'] = tc['i'] if tc['i']?
+					jc['sd'] = tc['d'] if tc['d']?
+					append dest, jc
+				return dest
+		else if otherC.li != undefined && otherC.ld != undefined
+			if otherC.p[common] == c.p[common]
+				# noop
+				return dest
+		else if otherC.li != undefined
+			if c.li != undefined and otherC.p.length == c.p.length and c.p[common] == otherC.p[common]
+				if type == 'server'
+					c.p[common]++
+			else if otherC.p[common] <= c.p[common]
+				c.p[common]++
+		else if otherC.ld != undefined
+			if otherC.p[common] < c.p[common]
+				c.p[common]--
+			else if otherC.p[common] == c.p[common]
+				# -> noop
+				return dest
+		else if otherC.lm != undefined
+			if c.p[common] == otherC.p[common]
+				c.p[common] = otherC.lm
+			else
+				if c.p[common] > otherC.p[common]
+					c.p[common]--
+				if c.p[common] >= otherC.lm
+					c.p[common]++
+		else if otherC.oi != undefined && otherC.od != undefined
+			if c.oi != undefined and c.p[common] == otherC.p[common]
+				if type == 'server'
+					return dest
+				else
+					c.od = otherC.oi
+			else
+				return dest if c.p[common] == otherC.p[common]
+		else if otherC.oi != undefined
+			if c.oi != undefined and c.p[common] == otherC.p[common]
+				# client wins if we try to insert at the same place
+				if type == 'client'
+					append dest, {p:c.p,od:otherC.oi}
+				else
+					return dest
+		else if otherC.od != undefined
+			if c.p[common] == otherC.p[common]
+				if c.oi != undefined
+					delete c.od
+				else
+					return dest
+		else if otherC.om != undefined
+			if c.p[common] == otherC.p[common]
+				c.p[common] = otherC.om
+	
+	append dest, c
+	return dest
 
 require('./helpers').bootstrapTransform(exports, transformComponent, checkValidOp, append)

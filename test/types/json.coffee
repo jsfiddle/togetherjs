@@ -202,6 +202,11 @@ exports.sanity =
 		test.deepEqual type.initialVersion(), null
 		test.done()
 
+	'compose od,oi --> od+oi': (test) ->
+		test.deepEqual [{p:['foo'], od:1, oi:2}], type.compose [{p:['foo'],od:1}],[{p:['foo'],oi:2}]
+		test.deepEqual [{p:['foo'], od:1},{p:['bar'], oi:2}], type.compose [{p:['foo'],od:1}],[{p:['bar'],oi:2}]
+		test.done()
+
 exports.number =
 	'Add a number': (test) ->
 		test.deepEqual 3, type.apply 1, [{p:[], na:2}]
@@ -254,15 +259,17 @@ exports.list =
 	
 	'Paths are bumped when list elements are inserted or removed': (test) ->
 		test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
-		test.deepEqual [{p:[1, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[0], li:'x'}], 'server'
-		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], li:'x'}], 'client'
+		test.deepEqual [{p:[1, 201], si:'hi'}], type.transform [{p:[0, 201], si:'hi'}], [{p:[0], li:'x'}], 'server'
+		test.deepEqual [{p:[0, 202], si:'hi'}], type.transform [{p:[0, 202], si:'hi'}], [{p:[1], li:'x'}], 'client'
 
-		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], ld:'x'}], 'client'
-		test.deepEqual [{p:[0, 200], si:'hi'}], type.transform [{p:[0, 200], si:'hi'}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [{p:[0, 203], si:'hi'}], type.transform [{p:[1, 203], si:'hi'}], [{p:[0], ld:'x'}], 'client'
+		test.deepEqual [{p:[0, 204], si:'hi'}], type.transform [{p:[0, 204], si:'hi'}], [{p:[1], ld:'x'}], 'client'
 		test.deepEqual [{p:['x',3], si: 'hi'}], type.transform [{p:['x',3], si:'hi'}], [{p:['x',0,'x'], li:0}], 'client'
 		test.deepEqual [{p:['x',3,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',5], li:0}], 'client'
 		test.deepEqual [{p:['x',4,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',0], li:0}], 'client'
 
+		test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'client'
+		test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'server'
 		test.done()
 
 	'Ops on deleted elements become noops': (test) ->
@@ -313,12 +320,39 @@ exports.object =
 		test.done()
 
 	'Deleted data is changed to reflect edits': (test) ->
-		test.deepEqual [{p:[1], ld:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'client'
+		test.deepEqual [{p:[1], od:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'client'
 		test.done()
 	
 	'If two inserts are simultaneous, the clients insert will win': (test) ->
 		test.deepEqual [{p:[1], oi:'a', od:'b'}], type.transform [{p:[1], oi:'a'}], [{p:[1], oi:'b'}], 'client'
 		test.deepEqual [], type.transform [{p:[1], oi:'b'}], [{p:[1], oi:'a'}], 'server'
+		test.done()
+
+	'parallel ops on different keys miss each other': (test) ->
+		test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], oi:'z'}], 'client'
+		test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], od:'z'}], 'client'
+		test.done()
+
+	'replacement vs. deletion': (test) ->
+		test.deepEqual [{p:[],oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:['']}], 'server'
+		test.done()
+
+	'replacement vs. replacement': (test) ->
+		test.deepEqual [],                     type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'server'
+		test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'client'
+		test.deepEqual [],                     type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'server'
+		test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'client'
+	
+		# test diamond property
+		serverOps = [ {"p":[],"od":null,"oi":{}} ]
+		clientOps = [ {"p":[],"od":null,"oi":""} ]
+		serverHas = type.apply(null, serverOps)
+		clientHas = type.apply(null, clientOps)
+			
+		[server_, client_] = require('../helpers').transformX type, serverOps, clientOps
+		test.deepEqual clientHas, type.apply serverHas, client_
+		test.deepEqual clientHas, type.apply clientHas, server_
+
 		test.done()
 	
 	'An attempt to re-delete a key becomes a no-op': (test) ->
