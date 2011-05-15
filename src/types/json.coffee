@@ -28,9 +28,6 @@ invertComponent = (c) ->
 	if c['lm'] != undefined
 		c_['lm'] = c['p'][c['p'].length-1]
 		c_['p'] = c['p'][0...c['p'].length - 1].concat([c['lm']])
-	else if c['om'] != undefined
-		c_['om'] = c['p'][c['p'].length-1]
-		c_['p'] = c['p'][0...c['p'].length - 1].concat([c['om']])
 	c_
 
 exports.invert = (op) -> invertComponent c for c in op.slice().reverse()
@@ -118,13 +115,6 @@ exports.apply = apply = (snapshot, op) ->
 
 				# Should check that elem[key] == c.od
 				delete elem[key]
-			else if c.om != undefined
-				# Object move
-				checkObj elem
-
-				throw new Error 'Cannot move value - destination key already exists.' unless elem[c.om] is undefined
-				elem[c.om] = elem[key]
-				delete elem[key]
 	catch e
 		# TODO: Roll back all already applied changes. Write tests before implementing this code.
 		throw e
@@ -194,26 +184,6 @@ pathIsBeneathPath = (p1, p2, strict) ->
 # pbp _ [] s = true
 # pbp (p1:p1s) (p2:p2s) s = p1 == p2 && pbp p1s p2s s
 
-# exported for testing
-exports._transformPath = transformPath = (p, c, insertAfter) ->
-	p = p.slice()
-	if c['li'] != undefined && c['ld'] == undefined
-		# li
-		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
-			i = c['p'].length - 1
-			p[i] += 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
-	else if c['ld'] != undefined && c['li'] == undefined
-		# ld
-		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
-			i = c['p'].length - 1
-			p[i] -= 1 if p[i] > c['p'][i] || (p[i] == c['p'][i] && insertAfter)
-	else if (target = c['lm'] || c['om']) != undefined
-		# [lo]m
-		# move ops with a moved element
-		if pathIsBeneathPath p, c['p'][...c['p'].length-1]
-			p = p[...c['p'].length-1].concat([target]).concat(p[c['p'].length...])
-	p
-
 # hax, copied from test/types/json
 clone = (o) -> JSON.parse(JSON.stringify o)
 
@@ -223,8 +193,6 @@ transformComponent = (dest, c, otherC, type) ->
 	res = transformComponent_ dest, c, otherC, type
 	console.log 'got',j dest
 	res
-
-isLI = (c) -> c['li'] != undefined && c['ld'] == undefined
 
 commonPath = (p1, p2) ->
 	p1 = p1[...p1.length-1]
@@ -332,9 +300,6 @@ transformComponent_ = (dest, c, otherC, type) ->
 					delete c.od
 				else
 					return dest
-		else if otherC.om != undefined
-			if c.p[common] == otherC.p[common]
-				c.p[common] = otherC.om
 	
 	append dest, c
 	return dest

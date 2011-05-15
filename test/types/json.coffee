@@ -87,25 +87,16 @@ type.generateRandomOp = (data) ->
 			key = p
 		operand = parent[key]
 
-		if Math.random() < 0.2 and parent != container
-			# Move
+		if Math.random() < 0.2 and parent != container and Array.isArray(parent)
+			# List move
+			newIndex = randomInt parent.length
 
-			if Array.isArray(parent)
-				newIndex = randomInt parent.length
+			# Remove the element from its current position in the list
+			parent.splice key, 1
+			# Insert it in the new position.
+			parent.splice newIndex, 0, operand
 
-				# Remove the element from its current position in the list
-				parent.splice key, 1
-				# Insert it in the new position.
-				parent.splice newIndex, 0, operand
-
-				{p:path, lm:newIndex}
-			else
-				newKey = randomNewKey parent
-
-				delete parent[key]
-				parent[newKey] = operand
-
-				{p:path, om:newKey}
+			{p:path, lm:newIndex}
 
 		else if Math.random() < 0.3 or operand == null
 			# Replace
@@ -308,7 +299,6 @@ exports.object =
 		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]
 		test.deepEqual {}, type.apply {x:'a'}, [{p:['x'], od:'a'}]
 		test.deepEqual {x:'b'}, type.apply {x:'a'}, [{p:['x'], od:'a', oi:'b'}]
-		test.deepEqual {y:'a'}, type.apply {x:'a'}, [{p:['x'], om:'y'}]
 		test.done()
 	
 	'Ops on deleted elements become noops': (test) ->
@@ -360,11 +350,6 @@ exports.object =
 		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
 		test.done()
 	
-	'Ops on a moved element move with the element': (test) ->
-		test.deepEqual [{p:['k2'], od:'x'}], type.transform [{p:['k1'], od:'x'}], [{p:['k1'], om:'k2'}], 'client'
-		test.deepEqual [{p:['k2', 1], si:'a'}], type.transform [{p:['k1', 1], si:'a'}], [{p:['k1'], om:'k2'}], 'client'
-		test.done()
-
 exports.randomizer = (test) ->
 	require('../helpers').randomizerTest type
 	test.done()
