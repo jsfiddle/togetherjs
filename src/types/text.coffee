@@ -127,7 +127,7 @@ transformPosition = (pos, c, insertAfter) ->
 #
 # Like transformPosition above, if c is an insert, insertAfter specifies whether the cursor position
 # is pushed after an insert (true) or before it (false).
-text.transformCursor = (position, op, insertAfter) ->
+text['transformCursor'] = (position, op, insertAfter) ->
 	position = transformPosition position, c, insertAfter for c in op
 	position
 
