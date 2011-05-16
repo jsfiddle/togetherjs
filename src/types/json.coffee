@@ -308,7 +308,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 			else
 				# -> noop if the other component is deleting the same object (or any
 				# parent)
-				return dest if c.p[common-1] == otherC.p[common-1]
+				return dest if c.p[common] == otherC.p[common]
 		else if otherC.oi != undefined
 			if c.oi != undefined and c.p[common] == otherC.p[common]
 				# client wins if we try to insert at the same place
