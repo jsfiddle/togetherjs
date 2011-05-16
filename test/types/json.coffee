@@ -291,6 +291,7 @@ exports.list =
 	
 	'Inserting then deleting an element composes into a no-op': (test) ->
 		test.deepEqual [], type.compose [{p:[1], li:'abc'}], [{p:[1], ld:'abc'}]
+		test.deepEqual [{p:[1],ld:null,li:'x'}], type.transform [{p:[0],ld:null,li:"x"}], [{p:[0],li:"The"}], 'server'
 		test.done()
 	
 	'If two inserts are simultaneous, the client op will end up first': (test) ->
