@@ -96,12 +96,12 @@ exports.apply = apply = (snapshot, op) ->
 			else if c.lm != undefined
 				# List move
 				checkList elem
-
-				e = elem[key]
-				# Remove it...
-				elem.splice key, 1
-				# And insert it back.
-				elem.splice c.lm, 0, e
+				if c.lm != key
+					e = elem[key]
+					# Remove it...
+					elem.splice key, 1
+					# And insert it back.
+					elem.splice c.lm, 0, e
 
 			else if c.oi != undefined
 				# Object insert / replace
