@@ -348,8 +348,8 @@ transformComponent_ = (dest, c, otherC, type) ->
 				else
 					return dest
 		else if otherC.od != undefined
-			return dest if cplength > otherCplength
 			if c.p[common] == otherC.p[common]
+				return dest if cplength > otherCplength
 				if c.oi != undefined
 					delete c.od
 				else
