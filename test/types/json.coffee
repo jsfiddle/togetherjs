@@ -308,6 +308,18 @@ exports.list =
 	'Ops on a moved element move with the element': (test) ->
 		test.deepEqual [{p:[10], ld:'x'}], type.transform [{p:[4], ld:'x'}], [{p:[4], lm:10}], 'client'
 		test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'client'
+
+		test.deepEqual [{p:[0],li:null}], type.transform [{p:[0],li:null}], [{p:[0],lm:1}], 'client'
+		# [_,_,_,_,5,6,7,_]
+		# c: [_,_,_,_,5,'x',6,7,_]   p:5 li:'x'
+		# s: [_,6,_,_,_,5,7,_]       p:5 lm:1
+		# correct: [_,6,_,_,_,5,'x',7,_]
+		test.deepEqual [{p:[6],li:'x'}], type.transform [{p:[5],li:'x'}], [{p:[5],lm:1}], 'client'
+		# [_,_,_,_,5,6,7,_]
+		# c: [_,_,_,_,5,6,7,_]  p:5 ld:6
+		# s: [_,6,_,_,_,5,7,_]  p:5 lm:1
+		# correct: [_,_,_,_,5,7,_]
+		test.deepEqual [{p:[1],ld:6}], type.transform [{p:[5],ld:6}], [{p:[5],lm:1}], 'client'
 		test.done()
 
 	'Target index of a moved element is changed by ld/li': (test) ->

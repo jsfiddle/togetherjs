@@ -319,7 +319,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 					# we're trying to delete the same element, -> noop
 					return dest
 		else if otherC.lm != undefined
-			if c.p[common] == otherC.p[common]
+			if c.p[common] == otherC.p[common] and c.li == undefined
 				c.p[common] = otherC.lm
 			else
 				if c.p[common] > otherC.p[common]
