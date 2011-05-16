@@ -329,9 +329,10 @@ transformComponent_ = (dest, c, otherC, type) ->
 			else
 				if otherC.lm != otherC.p[common]
 					# it's not a move from x -> x
-					if c.p[common] > otherC.p[common]
+					p = c.p[common]
+					if p > otherC.p[common]
 						c.p[common]--
-					if c.p[common] > otherC.lm or (c.p[common] == otherC.lm and c.li == undefined)
+					if p > otherC.lm or (c.p[common] == otherC.lm and c.li == undefined)
 						c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
