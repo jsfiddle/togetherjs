@@ -331,7 +331,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				if c.p[common] >= otherC.lm
 					c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
-			return dest if cplength > otherCplength
+			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]
 				# we inserted where someone else replaced
 				if type == 'server'
