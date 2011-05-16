@@ -195,7 +195,7 @@ commonPath = (p1, p2) ->
 	p2.unshift('data')
 	p1 = p1[...p1.length-1]
 	p2 = p2[...p2.length-1]
-	return 0 if p2.length == 0
+	return -1 if p2.length == 0
 	i = 0
 	while p1[i] == p2[i] && i < p1.length
 		i++
