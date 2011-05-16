@@ -213,23 +213,26 @@ transformComponent = (dest, c, otherC, type) ->
 # transform c so it applies to a document with otherC applied.
 transformComponent_ = (dest, c, otherC, type) ->
 	c = clone c
-	if otherC['na']
-		if c.ld != undefined
-			oc = clone otherC
-			oc.p = oc.p[c.p.length-1..]
-			c.ld = apply clone(c.ld), [oc]
-		else if c.od != undefined
-			oc = clone otherC
-			oc.p = oc.p[c.p.length-1..]
-			c.od = apply clone(c.od), [oc]
-		append dest, c
-		return dest
 	c['p'].push(0) if c['na'] != undefined
 
 	common = commonPath c['p'], otherC['p']
 	common2 = commonPath otherC.p, c.p
+	console.log common, common2
 
 	c['p'].pop() if c['na'] != undefined # hax
+
+	if otherC['na']
+		if common2? && otherC.p.length >= c.p.length-1 && otherC.p[common2] == c.p[common2]
+			if c.ld != undefined
+				oc = clone otherC
+				oc.p = oc.p[c.p.length-1..]
+				c.ld = apply clone(c.ld), [oc]
+			else if c.od != undefined
+				oc = clone otherC
+				oc.p = oc.p[c.p.length-1..]
+				c.od = apply clone(c.od), [oc]
+		append dest, c
+		return dest
 
 	if common2? && otherC.p.length > c.p.length && c.p[common2] == otherC.p[common2]
 		# transform based on c
@@ -248,7 +251,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 		# transform based on otherC
 		if otherC.na != undefined
 			null
-			# output c
+			# this case is handled above due to icky path hax
 		else if otherC.si != undefined || otherC.sd != undefined
 			# String op -- pass through to text type
 			if c.si != undefined || c.sd != undefined
