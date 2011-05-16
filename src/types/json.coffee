@@ -288,7 +288,8 @@ transformComponent_ = (dest, c, otherC, type) ->
 					# we're trying to delete the same element, -> noop
 					return dest
 		else if otherC.li != undefined
-			if c.li != undefined and otherCplength == cplength and c.p[common] == otherC.p[common]
+			if c.li != undefined and c.ld == undefined and otherCplength == cplength and c.p[common] == otherC.p[common]
+				# in li vs. li, client wins.
 				if type == 'server'
 					c.p[common]++
 			else if otherC.p[common] <= c.p[common]

@@ -341,6 +341,10 @@ exports.list =
 		test.deepEqual [{p:[0],li:'y'}], type.transform [{p:[0],ld:'x',li:'y'}], [{p:[0],ld:'x'}], 'server'
 		test.done()
 
+	'replacement vs. insertion': (test) ->
+		test.deepEqual [{p:[1],ld:{},li:"brillig"}], type.transform [{p:[0],ld:{},li:"brillig"}], [{p:[0],li:36}], 'client'
+		test.done()
+
 exports.object =
 	'Apply sanity checks': (test) ->
 		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]
