@@ -137,7 +137,11 @@ append = (dest, c) ->
 			dest[dest.length - 1] = { p: last.p, na: last.na + c.na }
 		else if last.li != undefined and c.li == undefined and c.ld == last.li
 			# insert immediately followed by delete becomes a noop.
-			dest.pop()
+			if last.ld != undefined
+				# leave the delete part of the replace
+				delete last.li
+			else
+				dest.pop()
 		else if last.od != undefined and last.oi == undefined and
 				c.oi != undefined and c.od == undefined
 			last.oi = c.oi
