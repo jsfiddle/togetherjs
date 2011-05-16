@@ -37,7 +37,7 @@ randomKey = (obj) ->
 randomNewKey = (obj) ->
 	# There's no do-while loop in coffeescript.
 	key = randomWord()
-	key = randomWord() while obj[key]?
+	key = randomWord() while obj[key] != undefined
 	key
 
 # Generate a random object
@@ -161,7 +161,7 @@ type.generateRandomOp = (data) ->
 
 			k = randomKey(operand)
 
-			if Math.random() > 0.5 or not elem?
+			if Math.random() > 0.5 or not k?
 				# Insert
 				k = randomNewKey(operand)
 				obj = randomThing()
@@ -208,6 +208,20 @@ exports.number =
 		test.deepEqual [{p:['a', 'b'], na:3}], type.compose [{p:['a', 'b'], na:1}], [{p:['a', 'b'], na:2}]
 		test.deepEqual [{p:['a'], na:1}, {p:['b'], na:2}], type.compose [{p:['a'], na:1}], [{p:['b'], na:2}]
 		test.done()
+
+	'make sure append doesn\'t overwrite values when it merges na': (test) ->
+		serverHas = 21
+		clientHas = 3
+
+		serverOp = [{"p":[],"od":0,"oi":15},{"p":[],"na":4},{"p":[],"na":1},{"p":[],"na":1}]
+		clientOp = [{"p":[],"na":4},{"p":[],"na":-1}]
+		[server_, client_] = require('../helpers').transformX type, serverOp, clientOp
+
+		s_c = type.apply serverHas, client_
+		c_s = type.apply clientHas, server_
+		test.deepEqual s_c, c_s
+		test.done()
+		
 
 # Strings should be handled internally by the text type. We'll just do some basic sanity checks here.
 exports.string =
@@ -265,6 +279,7 @@ exports.list =
 
 	'Ops on deleted elements become noops': (test) ->
 		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [{p:[0],li:'x'}], type.transform [{p:[0],li:'x'}], [{p:[0],ld:'y'}], 'client'
 		test.done()
 	
 	'Ops on replaced elements become noops': (test) ->
@@ -303,6 +318,7 @@ exports.object =
 	
 	'Ops on deleted elements become noops': (test) ->
 		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x'}], 'client'
+		test.deepEqual [], type.transform [{p:[9],si:"bite "}], [{p:[],od:"agimble s",oi:null}], 'server'
 		test.done()
 	
 	'Ops on replaced elements become noops': (test) ->
@@ -311,6 +327,8 @@ exports.object =
 
 	'Deleted data is changed to reflect edits': (test) ->
 		test.deepEqual [{p:[1], od:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'client'
+		test.deepEqual [{p:[],od:25,oi:[]}], type.transform [{p:[],od:22,oi:[]}], [{p:[],na:3}], 'client'
+		test.deepEqual [{p:[],od:{toves:""},oi:4}], type.transform [{p:[],od:{toves:0},oi:4}], [{p:["toves"],od:0,oi:""}], 'client'
 		test.done()
 	
 	'If two inserts are simultaneous, the clients insert will win': (test) ->
@@ -349,7 +367,7 @@ exports.object =
 		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'client'
 		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
 		test.done()
-	
+
 exports.randomizer = (test) ->
 	require('../helpers').randomizerTest type
 	test.done()

@@ -38,7 +38,7 @@ checkList = (elem) ->
 	throw new Error 'Referenced element not a list' unless Array.isArray && Array.isArray(elem)
 
 checkObj = (elem) ->
-	throw new Error 'Referenced element not an object' unless elem.constructor is Object
+	throw new Error "Referenced element not an object (it was #{JSON.stringify elem})" unless elem.constructor is Object
 
 exports.apply = apply = (snapshot, op) ->
 	checkValidOp op
@@ -68,7 +68,7 @@ exports.apply = apply = (snapshot, op) ->
 
 			else if c.si != undefined
 				# String insert
-				throw new Error 'Referenced element not a string' unless typeof elem is 'string'
+				throw new Error "Referenced element not a string (it was #{JSON.stringify elem})" unless typeof elem is 'string'
 				parent[parentkey] = elem[...key] + c.si + elem[key..]
 			else if c.sd != undefined
 				# String delete
@@ -131,6 +131,7 @@ pathMatches = (p1, p2, ignoreLast) ->
 	true
 
 append = (dest, c) ->
+	c = clone c
 	if dest.length != 0 and pathMatches c.p, (last = dest[dest.length - 1]).p
 		if last.na != undefined and c.na != undefined
 			last.na += c.na
@@ -195,6 +196,10 @@ transformComponent = (dest, c, otherC, type) ->
 	res
 
 commonPath = (p1, p2) ->
+	p1 = p1.slice()
+	p2 = p2.slice()
+	p1.unshift('data')
+	p2.unshift('data')
 	p1 = p1[...p1.length-1]
 	p2 = p2[...p2.length-1]
 	return 0 if p2.length == 0
@@ -202,19 +207,28 @@ commonPath = (p1, p2) ->
 	while p1[i] == p2[i] && i < p1.length
 		i++
 		if i == p2.length
-			return i
+			return i-1
 	return
 
 # transform c so it applies to a document with otherC applied.
 transformComponent_ = (dest, c, otherC, type) ->
+	c = clone c
 	if otherC['na']
+		if c.od != undefined
+			if pathMatches c.p, otherC.p
+				c.od += otherC.na
+		else if c.ld != undefined
+			if pathMatches c.p, otherC.p
+				c.ld += otherC.na
 		append dest, c
 		return dest
-	c = clone c
 	c['p'].push(0) if c['na'] != undefined
 
-
+	common = commonPath c['p'], otherC['p']
 	common2 = commonPath otherC.p, c.p
+
+	c['p'].pop() if c['na'] != undefined # hax
+
 	if common2? && otherC.p.length > c.p.length
 		# transform based on c
 		if c.ld != undefined
@@ -226,8 +240,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 			oc.p = oc.p[c.p.length..]
 			c.od = apply clone(c.od), [oc]
 
-			
-	common = commonPath c['p'], otherC['p']
+
 	commonOperand = common? and c.p.length == otherC.p.length
 	if common?
 		# transform based on otherC
@@ -269,8 +282,12 @@ transformComponent_ = (dest, c, otherC, type) ->
 			if otherC.p[common] < c.p[common]
 				c.p[common]--
 			else if otherC.p[common] == c.p[common]
-				# -> noop
-				return dest
+				if otherC.p.length < c.p.length
+					# we're below the deleted element, so -> noop
+					return dest
+				else if c.ld != undefined
+					# we're trying to delete the same element, -> noop
+					return dest
 		else if otherC.lm != undefined
 			if c.p[common] == otherC.p[common]
 				c.p[common] = otherC.lm
@@ -281,12 +298,17 @@ transformComponent_ = (dest, c, otherC, type) ->
 					c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			if c.oi != undefined and c.p[common] == otherC.p[common]
+				# we inserted where someone else replaced
 				if type == 'server'
+					# client wins
 					return dest
 				else
+					# we win, make our op a replacement
 					c.od = otherC.oi
 			else
-				return dest if c.p[common] == otherC.p[common]
+				# -> noop if the other component is deleting the same object (or any
+				# parent)
+				return dest if c.p[common-1] == otherC.p[common-1]
 		else if otherC.oi != undefined
 			if c.oi != undefined and c.p[common] == otherC.p[common]
 				# client wins if we try to insert at the same place
