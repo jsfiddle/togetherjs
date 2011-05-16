@@ -70,10 +70,9 @@ There are two ways to run a sharejs server:
 
         server.listen(8000);
         console.log('Server running at http://127.0.0.1:8000/');
-
   The above script will start up a ShareJS server on port 8000 which hosts static content from the `my_html_files` directory. See [bin/exampleserver](bin/exampleserver) for a more complex configuration example.
 
-  See the [Connect](http://senchalabs.github.com/connect/) or [Express](http://expressjs.com/) documentation for more complex routing.
+> See the [Connect](http://senchalabs.github.com/connect/) or [Express](http://expressjs.com/) documentation for more complex routing.
 
 2. From the command line:
 
