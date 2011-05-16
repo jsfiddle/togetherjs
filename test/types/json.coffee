@@ -75,7 +75,7 @@ type.generateRandomOp = (data) ->
 		pct *= 0.6
 
 		# Pick a random object in the document operate on.
-		path = randomPath(data)
+		path = randomPath(container['data'])
 
 		# parent = the container for the operand. parent[key] contains the operand.
 		parent = container
