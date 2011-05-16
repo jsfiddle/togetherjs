@@ -278,6 +278,7 @@ exports.list =
 	'Ops on deleted elements become noops': (test) ->
 		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x'}], 'client'
 		test.deepEqual [{p:[0],li:'x'}], type.transform [{p:[0],li:'x'}], [{p:[0],ld:'y'}], 'client'
+		test.deepEqual [], type.transform [{p:[0],na:-3}], [{p:[0],ld:48}], 'client'
 		test.done()
 	
 	'Ops on replaced elements become noops': (test) ->

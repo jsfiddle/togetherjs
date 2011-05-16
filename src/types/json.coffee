@@ -214,39 +214,44 @@ transformComponent = (dest, c, otherC, type) ->
 transformComponent_ = (dest, c, otherC, type) ->
 	c = clone c
 	c['p'].push(0) if c['na'] != undefined
+	otherC['p'].push(0) if otherC['na'] != undefined
 
 	common = commonPath c['p'], otherC['p']
 	common2 = commonPath otherC.p, c.p
 	console.log common, common2
 
+	cplength = c.p.length
+	otherCplength = otherC.p.length
+
 	c['p'].pop() if c['na'] != undefined # hax
+	otherC['p'].pop() if otherC['na'] != undefined
 
 	if otherC['na']
-		if common2? && otherC.p.length >= c.p.length-1 && otherC.p[common2] == c.p[common2]
+		if common2? && otherCplength >= cplength && otherC.p[common2] == c.p[common2]
 			if c.ld != undefined
 				oc = clone otherC
-				oc.p = oc.p[c.p.length-1..]
+				oc.p = oc.p[cplength..]
 				c.ld = apply clone(c.ld), [oc]
 			else if c.od != undefined
 				oc = clone otherC
-				oc.p = oc.p[c.p.length-1..]
+				oc.p = oc.p[cplength..]
 				c.od = apply clone(c.od), [oc]
 		append dest, c
 		return dest
 
-	if common2? && otherC.p.length > c.p.length && c.p[common2] == otherC.p[common2]
+	if common2? && otherCplength > cplength && c.p[common2] == otherC.p[common2]
 		# transform based on c
 		if c.ld != undefined
 			oc = clone otherC
-			oc.p = oc.p[c.p.length..]
+			oc.p = oc.p[cplength..]
 			c.ld = apply clone(c.ld), [oc]
 		else if c.od != undefined
 			oc = clone otherC
-			oc.p = oc.p[c.p.length..]
+			oc.p = oc.p[cplength..]
 			c.od = apply clone(c.od), [oc]
 
 
-	commonOperand = common? and c.p.length == otherC.p.length
+	commonOperand = common? and cplength == otherCplength
 	if common?
 		# transform based on otherC
 		if otherC.na != undefined
@@ -256,8 +261,8 @@ transformComponent_ = (dest, c, otherC, type) ->
 			# String op -- pass through to text type
 			if c.si != undefined || c.sd != undefined
 				throw new Error("must be a string?") unless commonOperand
-				p1 = c.p[c.p.length - 1]
-				p2 = otherC.p[otherC.p.length - 1]
+				p1 = c.p[cplength - 1]
+				p2 = otherC.p[otherCplength - 1]
 				tc1 = { p: p1 }
 				tc2 = { p: p2 }
 				tc1['i'] = c.si if c.si?
@@ -276,27 +281,27 @@ transformComponent_ = (dest, c, otherC, type) ->
 		else if otherC.li != undefined && otherC.ld != undefined
 			if otherC.p[common] == c.p[common]
 				# noop
-				if otherC.p.length < c.p.length
+				if otherCplength < cplength
 					# we're below the deleted element, so -> noop
 					return dest
 				else if c.ld != undefined
 					# we're trying to delete the same element, -> noop
 					return dest
 		else if otherC.li != undefined
-			if c.li != undefined and otherC.p.length == c.p.length and c.p[common] == otherC.p[common]
+			if c.li != undefined and otherCplength == cplength and c.p[common] == otherC.p[common]
 				if type == 'server'
 					c.p[common]++
 			else if otherC.p[common] <= c.p[common]
 				c.p[common]++
 
 			if c.lm != undefined
-				if otherC.p.length == c.p.length
+				if otherCplength == cplength
 					# otherC edits the same list we edit
 					if otherC.p[common] <= c.lm
 						c.lm++
 		else if otherC.ld != undefined
 			if c.lm != undefined
-				if otherC.p.length == c.p.length
+				if otherCplength == cplength
 					if otherC.p[common] == c.p[common]
 						# they deleted the thing we're trying to move
 						return dest
@@ -307,7 +312,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 			if otherC.p[common] < c.p[common]
 				c.p[common]--
 			else if otherC.p[common] == c.p[common]
-				if otherC.p.length < c.p.length
+				if otherCplength < cplength
 					# we're below the deleted element, so -> noop
 					return dest
 				else if c.ld != undefined
@@ -322,7 +327,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				if c.p[common] >= otherC.lm
 					c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
-			return dest if c.p.length > otherC.p.length
+			return dest if cplength > otherCplength
 			if c.oi != undefined and c.p[common] == otherC.p[common]
 				# we inserted where someone else replaced
 				if type == 'server'
@@ -343,7 +348,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				else
 					return dest
 		else if otherC.od != undefined
-			return dest if c.p.length > otherC.p.length
+			return dest if cplength > otherCplength
 			if c.p[common] == otherC.p[common]
 				if c.oi != undefined
 					delete c.od
