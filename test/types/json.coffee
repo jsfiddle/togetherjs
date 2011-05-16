@@ -307,6 +307,20 @@ exports.list =
 		test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'client'
 		test.done()
 
+	'Target index of a moved element is changed by ld/li': (test) ->
+		test.deepEqual [{p:[0],lm:1}], type.transform [{p:[0], lm: 2}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [{p:[1],lm:3}], type.transform [{p:[2], lm: 4}], [{p:[1], ld:'x'}], 'client'
+		test.deepEqual [{p:[0],lm:3}], type.transform [{p:[0], lm: 2}], [{p:[1], li:'x'}], 'client'
+		test.deepEqual [{p:[3],lm:5}], type.transform [{p:[2], lm: 4}], [{p:[1], li:'x'}], 'client'
+		test.done()
+
+	'Tiebreak lm vs. ld/li': (test) ->
+		test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'client'
+		test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'server'
+		test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'client'
+		test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'server'
+		test.done()
+
 exports.object =
 	'Apply sanity checks': (test) ->
 		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]

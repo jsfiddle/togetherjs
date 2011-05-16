@@ -278,7 +278,22 @@ transformComponent_ = (dest, c, otherC, type) ->
 					c.p[common]++
 			else if otherC.p[common] <= c.p[common]
 				c.p[common]++
+
+			if c.lm != undefined
+				if otherC.p.length == c.p.length
+					# otherC edits the same list we edit
+					if otherC.p[common] <= c.lm
+						c.lm++
 		else if otherC.ld != undefined
+			if c.lm != undefined
+				if otherC.p.length == c.p.length
+					if otherC.p[common] == c.p[common]
+						# they deleted the thing we're trying to move
+						return dest
+					# otherC edits the same list we edit
+					if otherC.p[common] <= c.lm
+						c.lm--
+
 			if otherC.p[common] < c.p[common]
 				c.p[common]--
 			else if otherC.p[common] == c.p[common]
