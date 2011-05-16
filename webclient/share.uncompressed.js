@@ -180,7 +180,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }
     }
   };
-  text.transformCursor = function(position, op, insertAfter) {
+  text['transformCursor'] = function(position, op, insertAfter) {
     var c, _i, _len;
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
