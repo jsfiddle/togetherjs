@@ -1,7 +1,7 @@
 fs = require 'fs'
 
 # Generate a random int 0 <= k < n
-randomInt = (n) -> Math.floor(Math.random() * n)
+{randomInt} = require '../helpers'
 
 # Return a random word from a corpus each time the method is called
 module.exports = do ->
