@@ -134,7 +134,7 @@ append = (dest, c) ->
 	c = clone c
 	if dest.length != 0 and pathMatches c.p, (last = dest[dest.length - 1]).p
 		if last.na != undefined and c.na != undefined
-			last.na += c.na
+			dest[dest.length - 1] = { p: last.p, na: last.na + c.na }
 		else if last.li != undefined and c.ld == last.li
 			# insert immediately followed by delete becomes a noop.
 			dest.pop()
