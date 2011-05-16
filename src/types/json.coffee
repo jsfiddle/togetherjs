@@ -214,12 +214,14 @@ transformComponent = (dest, c, otherC, type) ->
 transformComponent_ = (dest, c, otherC, type) ->
 	c = clone c
 	if otherC['na']
-		if c.od != undefined
-			if pathMatches c.p, otherC.p
-				c.od += otherC.na
-		else if c.ld != undefined
-			if pathMatches c.p, otherC.p
-				c.ld += otherC.na
+		if c.ld != undefined
+			oc = clone otherC
+			oc.p = oc.p[c.p.length-1..]
+			c.ld = apply clone(c.ld), [oc]
+		else if c.od != undefined
+			oc = clone otherC
+			oc.p = oc.p[c.p.length-1..]
+			c.od = apply clone(c.od), [oc]
 		append dest, c
 		return dest
 	c['p'].push(0) if c['na'] != undefined
