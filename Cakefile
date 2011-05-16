@@ -13,6 +13,7 @@ task 'build', 'Build the .js files', (options) ->
 client = [
 	'client/web-prelude'
 	'client/microevent'
+	'types/helpers'
 	'types/text'
 	'client/client'
 ]

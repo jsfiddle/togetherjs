@@ -187,15 +187,20 @@ invertComponent = (c) ->
 # cancel with one another.
 text.invert = (op) -> (invertComponent c for c in op.slice().reverse())
 
-# The text type really shouldn't need this - it should be possible to define
-# an efficient transform function by making a sort of transform map and passing each
-# op component through it.
-require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append)
 
 if WEB?
 	exports.types ||= {}
+
+	# This is kind of awful - come up with a better way to hook this helper code up.
+	bootstrapTransform(text, transformComponent, checkValidOp, append)
+
 	# [] is used to prevent closure from renaming types.text
 	exports.types['text'] = text
 else
 	module.exports = text
+
+	# The text type really shouldn't need this - it should be possible to define
+	# an efficient transform function by making a sort of transform map and passing each
+	# op component through it.
+	require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append)
 

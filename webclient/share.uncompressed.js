@@ -8,7 +8,7 @@ Copyright 2011 Joseph Gentle
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, WEB, append, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformPosition, types;
+;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformPosition, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -59,6 +59,79 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   };
   if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
     module.exports = MicroEvent;
+  }
+  bootstrapTransform = function(type, transformComponent, checkValidOp, append) {
+    var transformComponentX, transformX;
+    transformComponentX = function(server, client, destServer, destClient) {
+      transformComponent(destServer, server, client, 'server');
+      return transformComponent(destClient, client, server, 'client');
+    };
+    type.transformX = transformX = function(serverOp, clientOp) {
+      var c, c_, clientComponent, k, newClientOp, newServerOp, nextC, s, s_, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
+      checkValidOp(serverOp);
+      checkValidOp(clientOp);
+      newClientOp = [];
+      for (_i = 0, _len = clientOp.length; _i < _len; _i++) {
+        clientComponent = clientOp[_i];
+        newServerOp = [];
+        k = 0;
+        while (k < serverOp.length) {
+          nextC = [];
+          transformComponentX(serverOp[k], clientComponent, newServerOp, nextC);
+          k++;
+          if (nextC.length === 1) {
+            clientComponent = nextC[0];
+          } else if (nextC.length === 0) {
+            _ref = serverOp.slice(k);
+            for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+              s = _ref[_j];
+              append(newServerOp, s);
+            }
+            clientComponent = null;
+            break;
+          } else {
+            _ref2 = transformX(serverOp.slice(k), nextC), s_ = _ref2[0], c_ = _ref2[1];
+            for (_k = 0, _len3 = s_.length; _k < _len3; _k++) {
+              s = s_[_k];
+              append(newServerOp, s);
+            }
+            for (_l = 0, _len4 = c_.length; _l < _len4; _l++) {
+              c = c_[_l];
+              append(newClientOp, c);
+            }
+            clientComponent = null;
+            break;
+          }
+        }
+        if (clientComponent != null) {
+          append(newClientOp, clientComponent);
+        }
+        serverOp = newServerOp;
+      }
+      return [serverOp, newClientOp];
+    };
+    return type.transform = function(op, otherOp, type) {
+      var client, server, _, _ref, _ref2;
+      if (!(type === 'server' || type === 'client')) {
+        throw new Error("type must be 'server' or 'client'");
+      }
+      if (otherOp.length === 0) {
+        return op;
+      }
+      if (op.length === 1 && otherOp.length === 1) {
+        return transformComponent([], op[0], otherOp[0], type);
+      }
+      if (type === 'server') {
+        _ref = transformX(op, otherOp), server = _ref[0], _ = _ref[1];
+        return server;
+      } else {
+        _ref2 = transformX(otherOp, op), _ = _ref2[0], client = _ref2[1];
+        return client;
+      }
+    };
+  };
+  if (WEB == null) {
+    exports.bootstrapTransform = bootstrapTransform;
   }
   text = {};
   text.name = 'text';
@@ -270,12 +343,13 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     return _results;
   };
-  require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append);
   if (WEB != null) {
     exports.types || (exports.types = {});
+    bootstrapTransform(text, transformComponent, checkValidOp, append);
     exports.types['text'] = text;
   } else {
     module.exports = text;
+    require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append);
   }
   if (WEB != null) {
     types || (types = exports.types);
@@ -513,9 +587,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         return this.docs[docName];
       }
       return this.send({
-        doc: docName,
-        open: true,
-        snapshot: null
+        'doc': docName,
+        'open': true,
+        'snapshot': null
       }, __bind(function(response) {
         if (response.error) {
           return callback(null, new Error(response.error));
@@ -544,11 +618,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         return;
       }
       return this.send({
-        doc: docName,
-        open: true,
-        create: true,
-        snapshot: null,
-        type: type.name
+        'doc': docName,
+        'open': true,
+        'create': true,
+        'snapshot': null,
+        'type': type.name
       }, __bind(function(response) {
         if (response.error) {
           return callback(null, new Error(response.error));

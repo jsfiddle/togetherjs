@@ -4,7 +4,7 @@
 
 # Add transform and transformX functions for an OT type which has transformComponent defined.
 # transformComponent(destination array, component, other component, type - 'server' or 'client')
-exports.bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
+bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
 	transformComponentX = (server, client, destServer, destClient) ->
 		transformComponent destServer, server, client, 'server'
 		transformComponent destClient, client, server, 'client'
@@ -61,4 +61,6 @@ exports.bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
 			[_, client] = transformX otherOp, op
 			client
 
+unless WEB?
+	exports.bootstrapTransform = bootstrapTransform
 

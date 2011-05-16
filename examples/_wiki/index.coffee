@@ -27,19 +27,22 @@ The text on the left is being rendered with markdown, so you can do all the usua
 [Go back to the main page](Main)
 """
 
+render = (content, name, docName, res) ->
+	markdown = showdown.makeHtml content
+	html = Mustache.to_html template, {content, markdown, name, docName}
+	res.writeHead 200, {'content-type': 'text/html'}
+	res.end html
+
 module.exports = (docName, model, res) ->
 	name = docName
 	docName = "wiki:" + docName
 
 	model.getSnapshot docName, (data) ->
-		if data.v == 0
-			model.applyOp docName, {op:{type:'text'}, v:0}
-			model.applyOp docName, {op:[{i:defaultContent(name), p:0}], v:1}
-
-		content = data.snapshot || ''
-		markdown = showdown.makeHtml content
-		console.log markdown
-		html = Mustache.to_html template, {content, markdown, name, docName}
-		res.writeHead 200, {'content-type': 'text/html'}
-		res.end html
+		if data == null
+			model.create docName, 'text', ->
+				content = defaultContent(name)
+				model.applyOp docName, {op:[{i:content, p:0}], v:0}, ->
+					render content, name, docName, res
+		else
+			render data.snapshot, name, docName, res
 
