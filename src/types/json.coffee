@@ -273,7 +273,12 @@ transformComponent_ = (dest, c, otherC, type) ->
 		else if otherC.li != undefined && otherC.ld != undefined
 			if otherC.p[common] == c.p[common]
 				# noop
-				return dest
+				if otherC.p.length < c.p.length
+					# we're below the deleted element, so -> noop
+					return dest
+				else if c.ld != undefined
+					# we're trying to delete the same element, -> noop
+					return dest
 		else if otherC.li != undefined
 			if c.li != undefined and otherC.p.length == c.p.length and c.p[common] == otherC.p[common]
 				if type == 'server'

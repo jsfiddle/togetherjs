@@ -282,6 +282,7 @@ exports.list =
 	
 	'Ops on replaced elements become noops': (test) ->
 		test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x', li:'y'}], 'client'
+		test.deepEqual [{p:[0], li:'hi'}], type.transform [{p:[0], li:'hi'}], [{p:[0], ld:'x', li:'y'}], 'client'
 		test.done()
 
 	'Deleted data is changed to reflect edits': (test) ->
