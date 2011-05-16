@@ -4,6 +4,8 @@ util = require 'util'
 p = util.debug
 i = util.inspect
 
+{randomInt, randomReal} = helpers
+
 # Returns [serverDoc, clientDoc]
 testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	makeDoc = -> {
@@ -13,8 +15,8 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	server = makeDoc()
 	client = makeDoc()
 
-	for [0..(Math.random() * 2 + 1)]
-		doc = if Math.random() < 0.5 then client else server
+	for [0..(randomReal() * 2 + 1)]
+		doc = if randomReal() < 0.5 then client else server
 		[op, doc.result] = type.generateRandomOp doc.result
 		doc.ops.push(op)
 

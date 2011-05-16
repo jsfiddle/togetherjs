@@ -15,9 +15,7 @@ i = util.inspect
 # the changes the op generator will make.
 clone = (o) -> JSON.parse(JSON.stringify(o))
 
-# Generate a random int 0 <= k < n
-# This should probably be moved into a utility function.
-randomInt = (n) -> Math.floor(Math.random() * n)
+{randomInt, randomReal} = require('../helpers')
 
 randomKey = (obj) ->
 	if Array.isArray(obj)
@@ -29,7 +27,7 @@ randomKey = (obj) ->
 		count = 0
 
 		for key of obj
-			result = key if Math.random() < 1/++count
+			result = key if randomReal() < 1/++count
 		result
 
 # Generate a random new key for a value in obj.
@@ -59,7 +57,7 @@ randomThing = ->
 randomPath = (data) ->
 	path = []
 
-	while Math.random() > 0.85 and typeof data == 'object'
+	while randomReal() > 0.85 and typeof data == 'object'
 		key = randomKey data
 		break unless key?
 
@@ -73,7 +71,7 @@ type.generateRandomOp = (data) ->
 
 	container = data: clone(data)
 
-	op = while Math.random() < pct
+	op = while randomReal() < pct
 		pct *= 0.6
 
 		# Pick a random object in the document operate on.
@@ -87,7 +85,7 @@ type.generateRandomOp = (data) ->
 			key = p
 		operand = parent[key]
 
-		if Math.random() < 0.2 and parent != container and Array.isArray(parent)
+		if randomReal() < 0.2 and parent != container and Array.isArray(parent)
 			# List move
 			newIndex = randomInt parent.length
 
@@ -98,7 +96,7 @@ type.generateRandomOp = (data) ->
 
 			{p:path, lm:newIndex}
 
-		else if Math.random() < 0.3 or operand == null
+		else if randomReal() < 0.3 or operand == null
 			# Replace
 
 			newValue = randomThing()
@@ -112,7 +110,7 @@ type.generateRandomOp = (data) ->
 		else if typeof operand == 'string'
 			# String. This code is adapted from the text op generator.
 
-			if Math.random() > 0.5 or operand.length == 0
+			if randomReal() > 0.5 or operand.length == 0
 				# Insert
 				pos = randomInt(operand.length + 1)
 				str = randomWord() + ' '
@@ -140,7 +138,7 @@ type.generateRandomOp = (data) ->
 			# Array. Replace is covered above, so we'll just randomly insert or delete.
 			# This code looks remarkably similar to string insert, above.
 
-			if Math.random() > 0.5 or operand.length == 0
+			if randomReal() > 0.5 or operand.length == 0
 				# Insert
 				pos = randomInt(operand.length + 1)
 				obj = randomThing()
@@ -161,7 +159,7 @@ type.generateRandomOp = (data) ->
 
 			k = randomKey(operand)
 
-			if Math.random() > 0.5 or not k?
+			if randomReal() > 0.5 or not k?
 				# Insert
 				k = randomNewKey(operand)
 				obj = randomThing()
