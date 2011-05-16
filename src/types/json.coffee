@@ -316,8 +316,12 @@ transformComponent_ = (dest, c, otherC, type) ->
 					# we're below the deleted element, so -> noop
 					return dest
 				else if c.ld != undefined
-					# we're trying to delete the same element, -> noop
-					return dest
+					if c.li != undefined
+						# we're replacing, they're deleting. we become an insert.
+						delete c.ld
+					else
+						# we're trying to delete the same element, -> noop
+						return dest
 		else if otherC.lm != undefined
 			if c.p[common] == otherC.p[common] and c.li == undefined
 				c.p[common] = otherC.lm
