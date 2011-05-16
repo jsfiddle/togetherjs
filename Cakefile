@@ -10,9 +10,6 @@ task 'build', 'Build the .js files', (options) ->
 		throw err if err
 		console.log stdout + stderr
 
-lib = [
-]
-
 client = [
 	'client/web-prelude'
 	'client/microevent'
@@ -22,6 +19,7 @@ client = [
 
 # Backticks
 e = (str, callback) ->
+	console.log str
 	exec str, (err, stdout, stderr) ->
 		throw err if err
 		out = stdout + stderr
@@ -46,11 +44,9 @@ compile = (infile, outfile) ->
 task 'webclient', 'Build the web client into one file', ->
 	clientfiles = ("src/#{c}.coffee" for c in client).join ' '
 	# I would really rather do this in pure JS.
-	e "coffee -o webclient -cj #{clientfiles}", ->
-		e "cat #{lib.join ' '} webclient/concatenation.js >webclient/share.uncompressed.js", ->
-			e 'rm webclient/concatenation.js'
-			console.log "Building with closure's REST API..."
-			compile 'webclient/share.uncompressed.js', 'webclient/share.js'
+	e "coffee -j webclient/share.uncompressed.js -c #{clientfiles}", ->
+		console.log "Building with closure's REST API..."
+		compile 'webclient/share.uncompressed.js', 'webclient/share.js'
 	
 	# TODO: This should also be closure compiled.
 	exec "coffee --compile --output webclient/ src/client/ace.coffee", (err, stdout, stderr) ->
