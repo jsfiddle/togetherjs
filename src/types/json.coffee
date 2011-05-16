@@ -188,13 +188,6 @@ pathIsBeneathPath = (p1, p2, strict) ->
 # hax, copied from test/types/json
 clone = (o) -> JSON.parse(JSON.stringify o)
 
-transformComponent = (dest, c, otherC, type) ->
-	j = JSON.stringify
-	console.log 'transformComponenting',j(c),'against',j(otherC),'type:',type
-	res = transformComponent_ dest, c, otherC, type
-	console.log 'got',j dest
-	res
-
 commonPath = (p1, p2) ->
 	p1 = p1.slice()
 	p2 = p2.slice()
@@ -209,6 +202,13 @@ commonPath = (p1, p2) ->
 		if i == p2.length
 			return i-1
 	return
+
+transformComponent = (dest, c, otherC, type) ->
+	j = JSON.stringify
+	console.log 'transformComponenting',j(c),'against',j(otherC),'type:',type
+	res = transformComponent_ dest, c, otherC, type
+	console.log 'got',j dest
+	res
 
 # transform c so it applies to a document with otherC applied.
 transformComponent_ = (dest, c, otherC, type) ->
@@ -229,7 +229,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 
 	c['p'].pop() if c['na'] != undefined # hax
 
-	if common2? && otherC.p.length > c.p.length
+	if common2? && otherC.p.length > c.p.length && c.p[common2] == otherC.p[common2]
 		# transform based on c
 		if c.ld != undefined
 			oc = clone otherC
