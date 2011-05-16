@@ -10,12 +10,15 @@ exports.transformX = transformX = (type, server, client) ->
 
 # Generate a random int 0 <= k < n
 # This should probably be moved into a utility function.
-#randomInt = (n) -> Math.floor(Math.random() * n)
-r = 1234534
-exports.randomInt = randomInt = (n) -> Math.abs((r = (r << 2) ^ (r << 1) - r + 1) % n)
-exports.randomReal = () ->
-	n = randomInt(2147483648)
-	return randomInt(n)/n
+r = 123426
+if r?
+	exports.randomInt = randomInt = (n) -> Math.abs((r = (r << 2) ^ (r << 1) - r + 1) % n)
+	exports.randomReal = () ->
+		n = randomInt(2147483648)
+		return randomInt(n)/n
+else
+	exports.randomInt = (n) -> Math.floor(Math.random() * n)
+	exports.randomReal = Math.random
 
 
 # Transform a list of server ops by a list of client ops.
