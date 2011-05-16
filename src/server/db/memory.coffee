@@ -4,7 +4,7 @@
 # DB implementations should behave.
 
 module.exports = ->
-	# Map from docName -> {ops:[{op:x, meta:m}], data:{snapshot, type}}
+	# Map from docName -> {ops:[{op:x, meta:m}], data:{snapshot, type, meta}}
 	# Version is implicitly defined as the length of the delta list.
 	docs = {}
 
@@ -21,23 +21,49 @@ module.exports = ->
 			else
 				callback []
 
-		# Append an op to a document.
-		# op_data = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
-		# doc_data = resultant document snapshot data. {snapshot:s, type:t}
+		# Create a new document.
+		#
+		# data = {snapshot, type, [meta]}
+		create: (docName, data, callback) ->
+			if docs[docName]
+				callback false
+			else
+				throw new Error 'snapshot missing from data' unless data.snapshot != undefined
+				throw new Error 'type missing from data' unless data.type != undefined
+				throw new Error 'version missing from data' unless typeof data.v == 'number'
+				throw new Error 'meta missing from data' unless typeof data.meta == 'object'
+
+				docs[docName] = {ops:[], data:data}
+				callback true
+
+		# Perminantly delete a document.
+		# Callback is callback(status) where status == true iff a document was deleted.
+		delete: (docName, callback) ->
+			if docs[docName]?
+				delete docs[docName]
+				callback yes if callback?
+			else
+				callback no if callback?
+
+		# Append an op to a document. The document must already exist (via db.create, above).
+		#
+		# opData = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
+		# docData = resultant document snapshot data. {snapshot:s, type:typename}
 		# callback = callback when op committed
-		append: (docName, op_data, doc_data, callback) ->
-			throw new Error 'snapshot missing from data' unless doc_data.snapshot != undefined
-			throw new Error 'type missing from data' unless doc_data.type != undefined
+		append: (docName, opData, docData, callback) ->
+			throw new Error 'snapshot missing from data' unless docData.snapshot != undefined
+			throw new Error 'type missing from data' unless docData.type != undefined
 
-			doc = docs[docName] ||= {ops:[], data:null}
+			doc = docs[docName]
+			throw new Error 'doc missing' unless doc?
 
-			throw new Error 'Version mismatch in db.append' unless op_data.v == doc.ops.length
+			throw new Error 'Version mismatch in db.append' unless opData.v == doc.ops.length
 
-			new_op_data = {op:op_data.op, v:op_data.v}
-			new_op_data.meta = op_data.meta if op_data.meta?
+			new_op_data = {op:opData.op, v:opData.v}
+			new_op_data.meta = opData.meta if opData.meta?
 			doc.ops.push new_op_data
 
-			doc.data = doc_data
+			doc.data = docData
 			
 			callback()
 
@@ -45,22 +71,16 @@ module.exports = ->
 		getSnapshot: (docName, callback) ->
 			doc = docs[docName]
 			if doc?
-				callback {v:doc.ops.length, type:doc.data.type, snapshot:doc.data.snapshot}
+				# The model code will mess with the object sent to the callback. We'll
+				# do a shallow copy of it here to avoid problems.
+				data = {snapshot:doc.data.snapshot, v:doc.data.v, type:doc.data.type, meta:doc.data.meta}
+				callback data
 			else
-				callback {v:0, type:null, snapshot:null}
+				callback null
 
 		# Get the current version of a document
 		getVersion: (docName, callback) ->
-			callback(docs[docName]?.ops.length || 0)
-
-		# Perminantly deletes a document. There is no undo.
-		# Callback is callback(error)
-		delete: (docName, callback) ->
-			if docs[docName]?
-				delete docs[docName]
-				callback yes if callback?
-			else
-				callback no if callback?
+			callback(docs[docName]?.ops.length ? null)
 
 		close: ->
 	}

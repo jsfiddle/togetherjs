@@ -18,7 +18,6 @@ modules = [
 	'test/socketio.coffee'
 
 	'test/microevent.coffee'
-	'test/client-opstream.coffee'
 	'test/client.coffee'
 
 	'test/integration.coffee'

@@ -5,18 +5,24 @@ assert = require 'assert'
 clientio = require('../thirdparty/Socket.io-node-client/lib/io-client').io
 
 server = require '../src/server'
+types = require '../src/types'
 
 helpers = require './helpers'
 newDocName = helpers.newDocName
 applyOps = helpers.applyOps
 makePassPart = helpers.makePassPart
 
-# Expected data is an array of objects.
+ANYOBJECT = new Object
+
+# Helper method to check that subsequent data received by the callback is a particular
+# set of values.
 expectData = (socket, expectedData, callback) ->
+	expectedData = [expectedData] unless Array.isArray expectedData
+
 	listener = (data) ->
 		#p "expectData recieved #{i data}"
 		expected = expectedData.shift()
-		if expected.meta == 'anyObject'
+		if expected.meta == ANYOBJECT
 			assert.strictEqual typeof data.meta, 'object'
 			delete data.meta
 			delete expected.meta
@@ -28,7 +34,7 @@ expectData = (socket, expectedData, callback) ->
 	
 	socket.on 'message', listener
 
-module.exports = testCase {
+module.exports = testCase
 	setUp: (callback) ->
 		options = {
 			socketio: {}
@@ -47,6 +53,9 @@ module.exports = testCase {
 				@socket = new clientio.Socket 'localhost', {port: @server.address().port, resource: 'socket.io'}
 				@socket.connect()
 				@socket.on 'connect', callback
+
+				@expect = (data, callback) =>
+					expectData @socket, data, callback
 		catch e
 			console.log e.stack
 			throw e
@@ -58,123 +67,190 @@ module.exports = testCase {
 		@server.on 'close', callback
 		@server.close()
 
-	'follow a document': (test) ->
-		@socket.send {doc:@name, v:0, follow:true}
-		expectData @socket, [{doc:@name, v:0, follow:true}], ->
-			test.done()
-
-	'follow a document with no version specified': (test) ->
-		@socket.send {doc:@name, follow:true}
-		@socket.on 'message', (data) =>
-			test.deepEqual data, {doc:@name, v:0, follow:true}
-			test.done()
-
-	'follow a document at a previous version and get ops since': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'simple'}}, (error, newVersion) =>
-			test.ifError(error)
-
-			expectData @socket, [{doc:@name, v:0, follow:true}, {v:0, op:{type:'simple'}, meta:'anyObject'}], ->
+	'open an existing document with no version specified opens the document': (test) ->
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, open:true}
+			@expect {doc:@name, v:0, open:true}, =>
+				@model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>
+					@expect {v:0, op:{position:0, text:'hi'}, meta:ANYOBJECT}, ->
+						test.done()
+	
+	'open an existing document with version specified opens the document': (test) ->
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, open:true, v:0}
+			@expect {doc:@name, v:0, open:true}, =>
+				@model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>
+					@expect {v:0, op:{position:0, text:'hi'}, meta:ANYOBJECT}, ->
+						test.done()
+	
+	'open a nonexistant document with create:true creates the document': (test) ->
+		@socket.send {doc:@name, open:true, create:true, type:'simple'}
+		@expect {doc:@name, open:true, create:true, v:0}, =>
+			@model.getSnapshot @name, (docData) ->
+				test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
 				test.done()
 
-			@socket.send {doc:@name, v:0, follow:true}
+	'open a nonexistant document without create fails': (test) ->
+		@socket.send {doc:@name, open:true}
+		@expect {doc:@name, open:false, error:'Document does not exist'}, =>
+			test.done()
 
-	'receive ops through an follow @socket': (test) ->
-		@socket.send {doc:@name, v:0, follow:true}
-		expectData @socket, [{doc:@name, v:0, follow:true}], =>
-			applyOps @model, @name, 0, [{type:'simple'}], (error, _) =>
-				test.ifError(error)
+	'open a nonexistant document at a particular version without create fails': (test) ->
+		@socket.send {doc:@name, open:true, v:0}
+		@expect {doc:@name, open:false, error:'Document does not exist'}, =>
+			test.done()
+	
+	'open a nonexistant document with snapshot:null fails normally': (test) ->
+		@socket.send {doc:@name, open:true, snapshot:null}
+		@expect {doc:@name, open:false, snapshot:null, error:'Document does not exist'}, =>
+			test.done()
 
-			expectData @socket, [{v:0, op:{type:'simple'}, meta:'anyObject'}], ->
+	'get a snapshot of a nonexistant document fails normally': (test) ->
+		@socket.send {doc:@name, snapshot:null}
+		@expect {doc:@name, snapshot:null, error:'Document does not exist'}, =>
+			test.done()
+	
+	'open a nonexistant document with create:true and snapshot:null does not return the snapshot': (test) ->
+		# The snapshot can be inferred.
+		@socket.send {doc:@name, open:true, create:true, type:'text', snapshot:null}
+		@expect {doc:@name, open:true, create:true, v:0}, =>
+			test.done()
+
+	'open a document with a different type fails': (test) ->
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, open:true, type:'text'}
+			@expect {doc:@name, open:false, error:'Type mismatch'}, =>
+				test.done()
+	
+	'open an existing document with create:true opens the current document': (test) ->
+		@model.create @name, 'simple', =>
+			@model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>
+				@socket.send {doc:@name, open:true, create:true, type:'simple', snapshot:null}
+				# The type isn't sent if it can be inferred.
+				@expect {doc:@name, create:false, open:true, v:1, snapshot:{str:'hi'}}, ->
+					test.done()
+
+	'open a document at a previous version and get ops since': (test) ->
+		@model.create @name, 'simple', =>
+			@model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>
+				@socket.send {doc:@name, v:0, open:true, type:'simple'}
+
+				@expect [{doc:@name, v:0, open:true}, {v:0, op:{position:0, text:'hi'}, meta:ANYOBJECT}], ->
+					test.done()
+
+	'create a document without opening it': (test) ->
+		@socket.send {doc:@name, create:true, type:'simple'}
+		@expect {doc:@name, create:true}, =>
+			@model.getSnapshot @name, (docData) ->
+				test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+				test.done()
+	
+	'create a document that already exists returns create:false': (test) ->
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, create:true, type:'simple'}
+			@expect {doc:@name, create:false}, =>
+				test.done()
+
+	'create a document with snapshot:null returns create:true and no snapshot': (test) ->
+		@socket.send {doc:@name, create:true, type:'simple', snapshot:null}
+		@expect {doc:@name, create:true}, =>
+			test.done()
+
+	'receive ops through an open document': (test) ->
+		@socket.send {doc:@name, v:0, open:true, create:true, type:'simple'}
+		@expect {doc:@name, v:0, open:true, create:true}, =>
+			@model.applyOp @name, {op:{position:0, text:'hi'}, v:0}
+
+			@expect {v:0, op:{position:0, text:'hi'}, meta:ANYOBJECT}, ->
 				test.done()
 
 	'send an op': (test) ->
-		@model.listen @name, ((v) -> test.strictEqual v, 0), (opData) =>
-			test.strictEqual opData.v, 0
-			test.deepEqual opData.op, {type:'simple'}
-			test.done()
+		@model.create @name, 'simple', =>
+			listener = (opData) ->
+				test.strictEqual opData.v, 0
+				test.deepEqual opData.op, {position:0, text:'hi'}
+				test.done()
+			@model.listen @name, listener, (v) -> test.strictEqual v, 0
 
-		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+			@socket.send {doc:@name, v:0, op:{position:0, text:'hi'}}
 
 	'send an op with metadata': (test) ->
-		@model.listen @name, ((v) -> test.strictEqual v, 0), (opData) =>
-			test.strictEqual opData.v, 0
-			test.strictEqual opData.meta.x, 5
-			test.deepEqual opData.op, {type:'simple'}
-			test.done()
+		@model.create @name, 'simple', =>
+			listener = (opData) ->
+				test.strictEqual opData.v, 0
+				test.strictEqual opData.meta.x, 5
+				test.deepEqual opData.op, {position:0, text:'hi'}
+				test.done()
+			@model.listen @name, listener, (v) -> test.strictEqual v, 0
 
-		@socket.send {doc:@name, v:0, op:{type:'simple'}, meta:{x:5}}
+			@socket.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{x:5}}
 
 	'receive confirmation when an op is sent': (test) ->
-		expectData @socket, [{doc:@name, v:0}], () =>
-			test.done()
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{x:5}}
 
-		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+			@expect {doc:@name, v:0}, ->
+				test.done()
 
 	'not be sent your own ops back': (test) ->
 		@socket.on 'message', (data) ->
-			test.notDeepEqual data.op, {type:'simple'} if data.op?
+			test.notDeepEqual data.op, {position:0, text:'hi'} if data.op?
 
-		expectData @socket, [{doc:@name, v:0, follow:true}, {v:0}], =>
+		@socket.send {doc:@name, open:true, create:true, type:'simple'}
+		@socket.send {doc:@name, v:0, op:{position:0, text:'hi'}}
+
+		@expect [{doc:@name, v:0, open:true, create:true}, {v:0}], =>
 			# Gonna do this a dodgy way. Because I don't want to wait an undefined amount of time
 			# to make sure the op doesn't come, I'll trigger another op and make sure it recieves that.
 			# The second op should come after the first.
-			expectData @socket, [{v:1, op:{position:0, text:'hi'}, meta:'anyObject'}], ->
+			@expect {v:1, op:{position:0, text:'yo '}, meta:ANYOBJECT}, ->
 				test.done()
 
-			applyOps @model, @name, 1, [{position:0, text:'hi'}], (error, _) -> test.ifError(error)
-
-		@socket.send {doc:@name, v:0, follow:true}
-		@socket.send {doc:@name, v:0, op:{type:'simple'}}
+			@model.applyOp @name, {v:1, op:{position:0, text:'yo '}}
 
 	'get a document snapshot': (test) ->
-		applyOps @model, @name, 0, [{type: 'simple'}, {position: 0, text: 'internet'}], (error, _) =>
-			test.ifError(error)
+		@model.create @name, 'simple', =>
+			@model.applyOp @name, {v:0, op:{position:0, text:'internet'}}, (error, _) =>
+				test.ifError(error)
 
-			@socket.send {doc:@name, snapshot:null}
-			@socket.on 'message', (data) =>
-				test.deepEqual data, {doc:@name, snapshot:{str:'internet'}, v:2, type:'simple'}
-				test.done()
+				@socket.send {doc:@name, snapshot:null}
+				@expect {doc:@name, snapshot:{str:'internet'}, v:1, type:'simple'}, ->
+					test.done()
 
-	'get a null snapshot when getting a nonexistent document': (test) ->
-		@socket.send {doc:@name, snapshot:null}
-		@socket.on 'message', (data) =>
-			test.deepEqual data, {doc:@name, snapshot:null, type:null, v:0}
-			test.done()
-	
 	'be able to close a document': (test) ->
 		name1 = newDocName()
 		name2 = newDocName()
 
-		@socket.send {doc:name1, follow:true}
-		@socket.send {follow:false}
-		@socket.send {doc:name2, follow:true}
+		@socket.send {doc:name1, open:true, create:true, type:'simple'}
+		@socket.send {open:false}
+		@socket.send {doc:name2, open:true, create:true, type:'text'}
 
-		expectData @socket, [{doc:name1, follow:true, v:0}, {follow:false}, {doc:name2, follow:true, v:0}], =>
-			# name1 should be closed, and name2 should be follow.
+		@expect [{doc:name1, open:true, create:true, v:0}, {open:false}, {doc:name2, open:true, create:true, v:0}], =>
+			# name1 should be closed, and name2 should be open.
 			# We should only get the op for name2.
-			@model.applyOp name1, {v:0, op:{type:'simple'}}, (error, appliedVersion) ->
+			@model.applyOp name1, {v:0, op:{position:0, text:'Blargh!'}}, (error, appliedVersion) ->
 				test.ifError(error)
-			@model.applyOp name2, {v:0, op:{type:'text'}}, (error, appliedVersion) ->
+			@model.applyOp name2, {v:0, op:[{i:'hi', p:0}]}, (error, appliedVersion) ->
 				test.ifError(error)
 
-			expectData @socket, [{v:0, op:{type:'text'}, meta:'anyObject'}], ->
+			@expect {v:0, op:[{i:'hi', p:0}], meta:ANYOBJECT}, ->
 				test.done()
 	
 	'doc names are sent in ops when necessary': (test) ->
 		name1 = newDocName()
 		name2 = newDocName()
 
-		@socket.send {doc:name1, follow:true}
-		@socket.send {doc:name2, follow:true}
+		@socket.send {doc:name1, open:true, create:true, type:'simple'}
+		@socket.send {doc:name2, open:true, create:true, type:'simple'}
 
 		passPart = makePassPart test, 3
 
-		expectData @socket, [{doc:name1, follow:true, v:0}, {doc:name2, follow:true, v:0}], =>
-			@model.applyOp name1, {v:0, op:{type:'simple'}}, (error, _) =>
+		@expect [{doc:name1, open:true, create:true, v:0}, {doc:name2, open:true, create:true, v:0}], =>
+			@model.applyOp name1, {v:0, op:{position:0, text:'a'}}, (error, _) =>
 				test.ifError(error)
-				@model.applyOp name2, {v:0, op:{type:'simple'}}, (error, _) =>
+				@model.applyOp name2, {v:0, op:{position:0, text:'b'}}, (error, _) =>
 					test.ifError(error)
-					@model.applyOp name1, {v:1, op:{position:0, text:'a'}}, (error, _) =>
+					@model.applyOp name1, {v:1, op:{position:0, text:'c'}}, (error, _) =>
 						test.ifError(error)
 
 			# All the ops that come through the socket should have the doc name set.
@@ -184,31 +260,31 @@ module.exports = testCase {
 
 	'dont repeat document names': (test) ->
 		passPart = makePassPart test, 3
-		@socket.send {doc:@name, follow:true}
-		expectData @socket, [{doc:@name, follow:true, v:0}], =>
+		@socket.send {doc:@name, open:true, create:true, type:'simple'}
+		@expect {doc:@name, open:true, create:true, v:0}, =>
 			@socket.on 'message', (data) =>
+				# This time, none of the ops should have the document name set.
 				test.strictEqual data.doc?, false
 				passPart()
 
-			@socket.send {doc:@name, op:{type:'simple'}, v:0}
-			@socket.send {doc:@name, op:{position: 0, text:'a'}, v:1}
-			@socket.send {doc:@name, op:{position: 0, text:'a'}, v:2}
+			@socket.send {doc:@name, op:{position: 0, text:'a'}, v:0}
+			@socket.send {doc:@name, op:{position: 0, text:'b'}, v:1}
+			@socket.send {doc:@name, op:{position: 0, text:'c'}, v:2}
 
 	'an error message is sent through the socket if the operation is invalid': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'simple'}}, (error, _) =>
-			@socket.send {doc:@name, v:0, op:{type:'text'}}
-			expectData @socket, [{doc:@name, v:null, error:'Type already set'}], ->
+		@model.create @name, 'simple', =>
+			@socket.send {doc:@name, v:0, op:{position:-100, text:'asdf'}}
+			@expect {doc:@name, v:null, error:'Invalid position'}, ->
 				test.done()
 
-	'sending an op to a null doc creates a new doc': (test) ->
-		@socket.send {doc:null, v:0, op:{type:'text'}}
+	'creating a document with a null doc name creates a new doc': (test) ->
+		@socket.send {doc:null, create:true, type:'simple'}
 		@socket.on 'message', (data) =>
-			test.strictEqual data.v, 0
+			test.strictEqual data.create, true
 			test.equal typeof data.doc, 'string'
 			test.ok data.doc.length > 8
 
-			test.done()
-
-}
-
+			@model.getSnapshot data.doc, (docData) ->
+				test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+				test.done()
 

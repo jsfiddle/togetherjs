@@ -47,7 +47,7 @@ module.exports = testCase {
 		@doc2.on 'remoteop', (op) =>
 			test.deepEqual op, submittedOp
 			test.strictEqual @doc2.snapshot, result
-			test.strictEqual @doc2.version, 2
+			test.strictEqual @doc2.version, 1
 			test.done()
 
 	'randomized op spam test': (test) ->

@@ -17,7 +17,6 @@ client = [
 	'client/web-prelude'
 	'client/microevent'
 	'types/text'
-	'client/opstream'
 	'client/client'
 ]
 

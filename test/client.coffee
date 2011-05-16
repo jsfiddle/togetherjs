@@ -40,7 +40,7 @@ module.exports = testCase {
 
 			test.strictEqual doc.name, @name
 			test.strictEqual doc.type, types.text
-			test.strictEqual doc.version, 1
+			test.strictEqual doc.version, 0
 			test.done()
 	
 	'open multiple documents using the bare API on the same connection': (test) ->
@@ -72,7 +72,7 @@ module.exports = testCase {
 
 			test.strictEqual doc.name, @name
 			test.strictEqual doc.type, types.text
-			test.strictEqual doc.version, 1
+			test.strictEqual doc.version, 0
 			test.done()
 
 	'open a document that is already open': (test) ->
@@ -85,21 +85,17 @@ module.exports = testCase {
 				test.done()
 	
 	'open a document that already exists': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
-			test.ifError(error)
-
+		@model.create @name, 'text', =>
 			@c.open @name, 'text', (doc, error) =>
 				test.ifError error
 				test.ok doc
 
 				test.strictEqual doc.type.name, 'text'
-				test.strictEqual doc.version, 1
+				test.strictEqual doc.version, 0
 				test.done()
 
 	'open a document with a different type': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'simple'}}, (error, appliedVersion) =>
-			test.ifError(error)
-
+		@model.create @name, 'simple', =>
 			@c.open @name, 'text', (doc, error) =>
 				test.ok error
 				test.strictEqual doc, null
@@ -112,12 +108,13 @@ module.exports = testCase {
 
 			doc.submitOp [{i:'hi', p:0}], =>
 				test.deepEqual doc.snapshot, 'hi'
-				test.strictEqual doc.version, 2
+				test.strictEqual doc.version, 1
 				test.done()
 
-			# The document should be updated immediately.
+			# The document snapshot should be updated immediately.
 			test.strictEqual doc.snapshot, 'hi'
-			test.strictEqual doc.version, 1
+			# ... but the version tracks the server version, so thats still 0.
+			test.strictEqual doc.version, 0
 	
 	'infer the version when submitting an op': (test) ->
 		@c.open @name, 'text', (doc, error) =>
@@ -126,7 +123,7 @@ module.exports = testCase {
 
 			doc.submitOp [{i:'hi', p:0}], =>
 				test.deepEqual doc.snapshot, 'hi'
-				test.strictEqual doc.version, 2
+				test.strictEqual doc.version, 1
 				test.done()
 	
 	'compose multiple ops together when they are submitted together': (test) ->
@@ -135,10 +132,10 @@ module.exports = testCase {
 			test.strictEqual doc.name, @name
 
 			doc.submitOp [{i:'hi', p:0}], ->
-				test.strictEqual doc.version, 2
+				test.strictEqual doc.version, 1
 
 			doc.submitOp [{i:'hi', p:0}], ->
-				test.strictEqual doc.version, 2
+				test.strictEqual doc.version, 1
 				test.expect 4
 				test.done()
 
@@ -148,13 +145,13 @@ module.exports = testCase {
 			test.strictEqual doc.name, @name
 
 			doc.submitOp [{i:'hi', p:0}], ->
-				test.strictEqual doc.version, 2
+				test.strictEqual doc.version, 1
 
 			setTimeout(->
 				doc.submitOp [{i:'hi', p:2}], ->
-					test.strictEqual doc.version, 3
+					test.strictEqual doc.version, 2
 				doc.submitOp [{i:'hi', p:4}], ->
-					test.strictEqual doc.version, 3
+					test.strictEqual doc.version, 2
 					test.expect 5
 					test.done()
 			, 1)
@@ -170,7 +167,7 @@ module.exports = testCase {
 				test.expect 4
 				test.done()
 
-			@model.applyOp @name, {v:1, op:[{i:'hi', p:0}]}, (error, appliedVersion) ->
+			@model.applyOp @name, {v:0, op:[{i:'hi', p:0}]}, (error, appliedVersion) ->
 				test.ifError error
 
 	'get a nonexistent document passes null to the callback': (test) ->
@@ -179,15 +176,13 @@ module.exports = testCase {
 			test.done()
 	
 	'get an existing document returns the document': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, appliedVersion) =>
-			test.ifError(error)
-
+		@model.create @name, 'text', =>
 			@c.openExisting @name, (doc) =>
 				test.ok doc
 
 				test.strictEqual doc.name, @name
 				test.strictEqual doc.type.name, 'text'
-				test.strictEqual doc.version, 1
+				test.strictEqual doc.version, 0
 				test.done()
 	
 	'client transforms remote ops before applying them': (test) ->
@@ -208,7 +203,7 @@ module.exports = testCase {
 			onOpApplied = ->
 				opsRemaining--
 				unless opsRemaining
-					test.strictEqual doc.version, 3
+					test.strictEqual doc.version, 2
 					test.strictEqual doc.snapshot, finalDoc
 					test.done()
 
@@ -217,7 +212,7 @@ module.exports = testCase {
 				test.deepEqual op, serverTransformed
 				onOpApplied()
 
-			@model.applyOp @name, {v:1, op:serverOp}, (error, v) ->
+			@model.applyOp @name, {v:0, op:serverOp}, (error, v) ->
 				test.ifError error
 	
 	'doc fires both remoteop and change messages when remote ops are received': (test) ->
@@ -231,7 +226,7 @@ module.exports = testCase {
 				test.deepEqual op, sentOp
 				passPart()
 
-			@model.applyOp @name, {v:1, op:sentOp}, (error, v) ->
+			@model.applyOp @name, {v:0, op:sentOp}, (error, v) ->
 				test.ifError error
 	
 	'doc only fires change ops from locally sent ops': (test) ->
@@ -247,13 +242,13 @@ module.exports = testCase {
 			doc.submitOp sentOp, (error, v) ->
 				passPart()
 	
-	'doc does not receive ops after unfollow called': (test) ->
+	'doc does not receive ops after close called': (test) ->
 		@c.open @name, 'text', (doc, error) =>
 			doc.on 'change', (op) ->
 				throw new Error 'Should not have received op when the doc was unfollowed'
 	
-			doc.unfollow =>
-				@model.applyOp @name, {v:1, op:[{i:'asdf', p:0}]}, (error, v) =>
+			doc.close =>
+				@model.applyOp @name, {v:0, op:[{i:'asdf', p:0}]}, (error, v) =>
 					test.done()
 
 	'created locally is set on new docs': (test) ->
@@ -262,7 +257,7 @@ module.exports = testCase {
 			test.done()
 
 	'created locally is not set on old docs': (test) ->
-		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, v) =>
+		@model.create @name, 'text', =>
 			@c.open @name, 'text', (doc, error) =>
 				test.strictEqual doc.created, false
 				test.done()
