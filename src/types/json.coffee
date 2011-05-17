@@ -350,17 +350,20 @@ transformComponent_ = (dest, c, otherC, type) ->
 						if type == 'server'
 							c.lm++
 			else
-				if c.p[common] == otherC.p[common] and (c.li == undefined or cplength > otherCplength)
-					c.p[common] = otherC.lm
+				from = otherC.p[common]
+				to = otherC.lm
+				p = c.p[common]
+				if from < p
+					c.p[common]--
+				if to < p
+					c.p[common]++
+				console.log commonOperand
+				if p == from
+					if c.li == undefined || cplength > otherCplength
+						c.p[common] = to
 				else
-					if otherC.lm != otherC.p[common]
-						# it's not a move from x -> x
-						p = c.p[common]
-						if p > otherC.p[common]
-							c.p[common]--
-						if p > otherC.lm
-							c.p[common]++
-						if p == otherC.lm and (c.li == undefined or cplength > otherCplength)
+					if p == to
+						if (type == 'server' && c.li != undefined && c.ld == undefined) || cplength > otherCplength
 							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]

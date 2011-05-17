@@ -314,6 +314,8 @@ exports.list =
 	'Ops on a moved element move with the element': (test) ->
 		test.deepEqual [{p:[10], ld:'x'}], type.transform [{p:[4], ld:'x'}], [{p:[4], lm:10}], 'client'
 		test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'client'
+		test.deepEqual [{p:[10, 1], li:'a'}], type.transform [{p:[4, 1], li:'a'}], [{p:[4], lm:10}], 'client'
+		test.deepEqual [{p:[10, 1], ld:'b', li:'a'}], type.transform [{p:[4, 1], ld:'b', li:'a'}], [{p:[4], lm:10}], 'client'
 
 		test.deepEqual [{p:[0],li:null}], type.transform [{p:[0],li:null}], [{p:[0],lm:1}], 'client'
 		# [_,_,_,_,5,6,7,_]
@@ -372,6 +374,7 @@ exports.list =
 	'indices change correctly around a move': (test) ->
 		test.deepEqual [{p:[1,0],li:{}}], type.transform [{p:[0,0],li:{}}], [{p:[1],lm:0}], 'client'
 		test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],ld:{}}], 'client'
+		test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
 		test.done()
 
 
