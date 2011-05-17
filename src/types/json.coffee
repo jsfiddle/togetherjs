@@ -334,7 +334,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				p = c.p[common]
 				if from < p
 					c.p[common]--
-				if to < p || (to == p and from > to)
+				if to < p || (to == p and from > to and (type == 'server' or !commonOperand))
 					c.p[common]++
 				if p == from
 					if (c.li == undefined || c.ld != undefined) || cplength > otherCplength
