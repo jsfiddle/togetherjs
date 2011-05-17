@@ -356,6 +356,10 @@ exports.list =
 		test.deepEqual [{p:[1],ld:{},li:"brillig"}], type.transform [{p:[0],ld:{},li:"brillig"}], [{p:[0],li:36}], 'client'
 		test.done()
 
+	'replacement vs. replacement': (test) ->
+		test.deepEqual [{p:[0],ld:{},li:[]}], type.transform [{p:[0],ld:"",li:[]}], [{p:[0],ld:"",li:{}}], 'server'
+		test.done()
+
 	'composing replace with delete of replaced element results in insert': (test) ->
 		test.deepEqual [{p:[2],ld:[]}], type.compose [{p:[2],ld:[],li:null}], [{p:[2],ld:null}]
 		test.done()
