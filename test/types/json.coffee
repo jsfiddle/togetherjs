@@ -294,6 +294,12 @@ exports.list =
 		test.deepEqual [], type.compose [{p:[1], li:'abc'}], [{p:[1], ld:'abc'}]
 		test.deepEqual [{p:[1],ld:null,li:'x'}], type.transform [{p:[0],ld:null,li:"x"}], [{p:[0],li:"The"}], 'server'
 		test.done()
+
+	'Composing doesn\'t change the original object': (test) ->
+		a = [{p:[0],ld:'abc',li:null}]
+		test.deepEqual [{p:[0],ld:'abc'}], type.compose a, [{p:[0],ld:null}]
+		test.deepEqual [{p:[0],ld:'abc',li:null}], a
+		test.done()
 	
 	'If two inserts are simultaneous, the client op will end up first': (test) ->
 		test.deepEqual [{p:[1], li:'a'}], type.transform [{p:[1], li:'a'}], [{p:[1], li:'b'}], 'client'

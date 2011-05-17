@@ -154,7 +154,7 @@ exports.compose = (op1, op2) ->
 	checkValidOp op1
 	checkValidOp op2
 
-	newOp = op1.slice()
+	newOp = clone op1
 	append newOp, c for c in op2
 
 	newOp
