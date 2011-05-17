@@ -302,7 +302,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 			if c.lm != undefined
 				if otherCplength == cplength
 					# otherC edits the same list we edit
-					if otherC.p[common] <= c.lm
+					if otherC.p[common] < c.lm
 						c.lm++
 		else if otherC.ld != undefined
 			if c.lm != undefined
@@ -355,16 +355,11 @@ transformComponent_ = (dest, c, otherC, type) ->
 				p = c.p[common]
 				if from < p
 					c.p[common]--
-				if to < p
+				if to <= p
 					c.p[common]++
-				console.log commonOperand
 				if p == from
 					if c.li == undefined || cplength > otherCplength
 						c.p[common] = to
-				else
-					if p == to
-						if (type == 'server' && c.li != undefined && c.ld == undefined) || cplength > otherCplength
-							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]

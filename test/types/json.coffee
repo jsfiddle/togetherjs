@@ -328,8 +328,8 @@ exports.list =
 		# s: [_,6,_,_,_,5,7,_]  p:5 lm:1
 		# correct: [_,_,_,_,5,7,_]
 		test.deepEqual [{p:[1],ld:6}], type.transform [{p:[5],ld:6}], [{p:[5],lm:1}], 'client'
-		test.deepEqual [{p:[0],li:{}}], type.transform [{p:[0],li:{}}], [{p:[0],lm:0}], 'server'
-		test.deepEqual [{p:[0],li:[]}], type.transform [{p:[0],li:[]}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[1],li:{}}], type.transform [{p:[0],li:{}}], [{p:[0],lm:0}], 'server'
+		test.deepEqual [{p:[1],li:[]}], type.transform [{p:[0],li:[]}], [{p:[1],lm:0}], 'client'
 		test.deepEqual [{p:[2],li:'x'}], type.transform [{p:[2],li:'x'}], [{p:[0],lm:1}], 'client'
 		test.done()
 
@@ -338,6 +338,7 @@ exports.list =
 		test.deepEqual [{p:[1],lm:3}], type.transform [{p:[2], lm: 4}], [{p:[1], ld:'x'}], 'client'
 		test.deepEqual [{p:[0],lm:3}], type.transform [{p:[0], lm: 2}], [{p:[1], li:'x'}], 'client'
 		test.deepEqual [{p:[3],lm:5}], type.transform [{p:[2], lm: 4}], [{p:[1], li:'x'}], 'client'
+		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0], lm: 0}], [{p:[0], li:28}], 'client'
 		test.done()
 
 	'Tiebreak lm vs. ld/li': (test) ->
@@ -374,7 +375,7 @@ exports.list =
 	'indices change correctly around a move': (test) ->
 		test.deepEqual [{p:[1,0],li:{}}], type.transform [{p:[0,0],li:{}}], [{p:[1],lm:0}], 'client'
 		test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],ld:{}}], 'client'
-		test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
+		test.deepEqual [{p:[2],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
 		test.done()
 
 
