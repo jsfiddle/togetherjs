@@ -322,7 +322,7 @@ exports.list =
 		# c: [_,_,_,_,5,'x',6,7,_]   p:5 li:'x'
 		# s: [_,6,_,_,_,5,7,_]       p:5 lm:1
 		# correct: [_,6,_,_,_,5,'x',7,_]
-		test.deepEqual [{p:[6],li:'x'}], type.transform [{p:[5],li:'x'}], [{p:[5],lm:1}], 'client'
+		test.deepEqual [{p:[5],li:'x'}], type.transform [{p:[5],li:'x'}], [{p:[5],lm:1}], 'client'
 		# [_,_,_,_,5,6,7,_]
 		# c: [_,_,_,_,5,6,7,_]  p:5 ld:6
 		# s: [_,6,_,_,_,5,7,_]  p:5 lm:1
@@ -383,11 +383,21 @@ exports.list =
 		test.deepEqual [{p:[0],lm:0}], type.transform [{p:[0],lm:1}], [{p:[1],ld:{}}], 'client'
 		test.deepEqual [{p:[5],lm:0}], type.transform [{p:[6],lm:0}], [{p:[2],ld:{}}], 'client'
 		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[1],lm:0}], [{p:[2],ld:{}}], 'client'
-		test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
-		test.deepEqual [{p:[0],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[0],lm:1}], 'server'
-		test.deepEqual [{p:[0],ld:1,li:2}], type.transform [{p:[1],ld:1,li:2}], [{p:[1],lm:0}], 'client'
-		test.done()
+		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[2],lm:1}], [{p:[1],ld:3}], 'server'
 
+		test.deepEqual [{p:[2],li:{}}], type.transform [{p:[2],li:{}}], [{p:[1],lm:2}], 'server'
+		test.deepEqual [{p:[2],li:[]}], type.transform [{p:[2],li:[]}], [{p:[1],lm:2}], 'client'
+
+		test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
+		test.deepEqual [{p:[2],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[2],lm:1}], 'client'
+
+		test.deepEqual [{p:[1],li:{}}], type.transform [{p:[1],li:{}}], [{p:[2],lm:1}], 'client'
+		test.deepEqual [{p:[0],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[0],lm:1}], 'server'
+
+		test.deepEqual [{p:[0],ld:1,li:2}], type.transform [{p:[1],ld:1,li:2}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[0],ld:2,li:3}], type.transform [{p:[1],ld:2,li:3}], [{p:[0],lm:1}], 'client'
+		test.deepEqual [{p:[1],ld:3,li:4}], type.transform [{p:[0],ld:3,li:4}], [{p:[1],lm:0}], 'client'
+		test.done()
 
 exports.object =
 	'Apply sanity checks': (test) ->

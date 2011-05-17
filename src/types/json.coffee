@@ -328,17 +328,16 @@ transformComponent_ = (dest, c, otherC, type) ->
 						# tiebreak
 						if type == 'server'
 							c.lm++
-			else
+			else if c.li == undefined || c.ld != undefined || !commonOperand
 				from = otherC.p[common]
 				to = otherC.lm
 				p = c.p[common]
 				if from < p
 					c.p[common]--
-				if to < p || (to == p and from > to and (type == 'server' or !commonOperand))
+				if to < p || (to == p and from > to)
 					c.p[common]++
 				if p == from
-					if (c.li == undefined || c.ld != undefined) || cplength > otherCplength
-						c.p[common] = to
+					c.p[common] = to
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]
