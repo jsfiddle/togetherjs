@@ -162,33 +162,6 @@ exports.compose = (op1, op2) ->
 exports.normalize = (op) ->
 	op
 
-
-# TODO: paths sometimes have string offsets?
-# perhaps instead of {p:['foo',1,3], sd:'bar'} we should have
-#                    {p:['foo'], sd:[1,3,'bar']} ?
-atPath = (obj, path) ->
-	obj = obj[k] for k in path
-	obj
-
-setPath = (obj, path, val) ->
-	obj = obj[k] for k in path[..-2]
-	obj[path[path.length-1]] = val
-
-# true if p1 is beneath (or identical to, if strict is false) p2
-pathIsBeneathPath = (p1, p2, strict) ->
-	return false if p2.length > p1.length
-	p1 = p1.slice()
-	p2 = p2.slice()
-
-	while p2.length > 0
-		if p1.shift() != p2.shift()
-			return false
-		
-	return !strict || p1.length > 0
-# pbp [] [] s = not s
-# pbp _ [] s = true
-# pbp (p1:p1s) (p2:p2s) s = p1 == p2 && pbp p1s p2s s
-
 # hax, copied from test/types/json
 clone = (o) -> JSON.parse(JSON.stringify o)
 
@@ -255,8 +228,8 @@ transformComponent_ = (dest, c, otherC, type) ->
 			c.od = apply clone(c.od), [oc]
 
 
-	commonOperand = common? and cplength == otherCplength
 	if common?
+		commonOperand = cplength == otherCplength
 		# transform based on otherC
 		if otherC.na != undefined
 			null
