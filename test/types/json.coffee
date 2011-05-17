@@ -338,7 +338,7 @@ exports.list =
 		test.deepEqual [{p:[1],lm:3}], type.transform [{p:[2], lm: 4}], [{p:[1], ld:'x'}], 'client'
 		test.deepEqual [{p:[0],lm:3}], type.transform [{p:[0], lm: 2}], [{p:[1], li:'x'}], 'client'
 		test.deepEqual [{p:[3],lm:5}], type.transform [{p:[2], lm: 4}], [{p:[1], li:'x'}], 'client'
-		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0], lm: 0}], [{p:[0], li:28}], 'client'
+		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0], lm: 0}], [{p:[0], li:28}], 'client'
 		test.done()
 
 	'Tiebreak lm vs. ld/li': (test) ->

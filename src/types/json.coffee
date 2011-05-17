@@ -275,7 +275,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 			if c.lm != undefined
 				if otherCplength == cplength
 					# otherC edits the same list we edit
-					if otherC.p[common] < c.lm
+					if otherC.p[common] <= c.lm
 						c.lm++
 		else if otherC.ld != undefined
 			if c.lm != undefined
