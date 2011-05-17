@@ -262,7 +262,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 					# we're below the deleted element, so -> noop
 					return dest
 				else if c.ld != undefined
-					if c.li != undefined
+					if c.li != undefined and type == 'client'
 						c.ld = clone otherC.li
 					else
 						# we're trying to delete the same element, -> noop
