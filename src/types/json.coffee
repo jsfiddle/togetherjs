@@ -350,7 +350,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 						if type == 'server'
 							c.lm++
 			else
-				if c.p[common] == otherC.p[common] and c.li == undefined
+				if c.p[common] == otherC.p[common] and (c.li == undefined or cplength > otherCplength)
 					c.p[common] = otherC.lm
 				else
 					if otherC.lm != otherC.p[common]
@@ -358,7 +358,9 @@ transformComponent_ = (dest, c, otherC, type) ->
 						p = c.p[common]
 						if p > otherC.p[common]
 							c.p[common]--
-						if p > otherC.lm or (c.p[common] == otherC.lm and c.li == undefined)
+						if p > otherC.lm
+							c.p[common]++
+						if p == otherC.lm and (c.li == undefined or cplength > otherCplength)
 							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]

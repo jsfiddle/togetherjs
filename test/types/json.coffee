@@ -363,6 +363,10 @@ exports.list =
 		test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
 		test.done()
 
+	'indices change correctly around a move': (test) ->
+		test.deepEqual [{p:[1,0],li:{}}], type.transform [{"p":[0,0],"li":{}}], [{"p":[1],"lm":0}], 'client'
+		test.done()
+
 
 exports.object =
 	'Apply sanity checks': (test) ->
