@@ -311,7 +311,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 						# they deleted the thing we're trying to move
 						return dest
 					# otherC edits the same list we edit
-					if otherC.p[common] <= c.lm
+					if otherC.p[common] < c.lm
 						c.lm--
 
 			if otherC.p[common] < c.p[common]
