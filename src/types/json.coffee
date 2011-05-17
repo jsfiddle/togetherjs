@@ -328,16 +328,38 @@ transformComponent_ = (dest, c, otherC, type) ->
 						# we're trying to delete the same element, -> noop
 						return dest
 		else if otherC.lm != undefined
-			if c.p[common] == otherC.p[common] and c.li == undefined
-				c.p[common] = otherC.lm
-			else
-				if otherC.lm != otherC.p[common]
-					# it's not a move from x -> x
-					p = c.p[common]
-					if p > otherC.p[common]
+			if c.lm != undefined and cplength == otherCplength
+				# lm vs lm, here we go!
+				from = c.p[common]
+				to = c.lm
+				otherFrom = otherC.p[common]
+				otherTo = otherC.lm
+				if from == otherFrom
+					c.p[common] = otherTo
+				else
+					if from > otherFrom
 						c.p[common]--
-					if p > otherC.lm or (c.p[common] == otherC.lm and c.li == undefined)
+					if from >= otherTo
 						c.p[common]++
+					if to > otherFrom
+						c.lm--
+					if to > otherTo
+						c.lm++
+					else if to == otherTo
+						# tiebreak
+						if type == 'server'
+							c.lm++
+			else
+				if c.p[common] == otherC.p[common] and c.li == undefined
+					c.p[common] = otherC.lm
+				else
+					if otherC.lm != otherC.p[common]
+						# it's not a move from x -> x
+						p = c.p[common]
+						if p > otherC.p[common]
+							c.p[common]--
+						if p > otherC.lm or (c.p[common] == otherC.lm and c.li == undefined)
+							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]

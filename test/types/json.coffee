@@ -351,6 +351,19 @@ exports.list =
 		test.deepEqual [{p:[2],ld:[]}], type.compose [{p:[2],ld:[],li:null}], [{p:[2],ld:null}]
 		test.done()
 
+	'lm vs lm': (test) ->
+		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'server'
+		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0],lm:0}], [{p:[5],lm:0}], 'client'
+		test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[2],lm:1}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'server'
+		test.deepEqual [{p:[3],lm:0}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'client'
+		test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'server'
+		test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
+		test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
+		test.done()
+
+
 exports.object =
 	'Apply sanity checks': (test) ->
 		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]
