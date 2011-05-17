@@ -355,7 +355,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				p = c.p[common]
 				if from < p
 					c.p[common]--
-				if to <= p
+				if to < p || (to == p and from > to)
 					c.p[common]++
 				if p == from
 					if c.li == undefined || cplength > otherCplength
