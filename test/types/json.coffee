@@ -259,6 +259,14 @@ exports.list =
 		test.deepEqual ['a', 'b', 'c'], type.apply ['b', 'a', 'c'], [{p:[1], lm:0}]
 		test.deepEqual ['a', 'b', 'c'], type.apply ['b', 'a', 'c'], [{p:[0], lm:1}]
 		test.done()
+
+	###
+	'null moves compose to nops': (test) ->
+		test.deepEqual [], type.compose [], [{p:[3],lm:3}]
+		test.deepEqual [], type.compose [], [{p:[0,3],lm:3}]
+		test.deepEqual [], type.compose [], [{p:['x','y',0],lm:0}]
+		test.done()
+		###
 	
 	'Paths are bumped when list elements are inserted or removed': (test) ->
 		test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
@@ -366,15 +374,27 @@ exports.list =
 		test.done()
 
 	'lm vs lm': (test) ->
-		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'client'
-		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'server'
-		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[0],lm:0}], [{p:[5],lm:0}], 'client'
+		#test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'client'
+		#test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[5],lm:0}], 'client'
+		test.deepEqual [{p:[4],lm:4}], type.transform [{p:[3],lm:3}], [{p:[5],lm:0}], 'client'
 		test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'client'
+
 		test.deepEqual [{p:[2],lm:1}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'server'
-		test.deepEqual [{p:[3],lm:0}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'client'
+		#test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[5],lm:0}], 'server'
 		test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'server'
+
+		test.deepEqual [{p:[3],lm:0}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'client'
+
 		test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
 		test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
+
+		test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:5}], 'server'
+		test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:1}], 'server'
+		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:1}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[1],lm:2}], type.transform [{p:[0],lm:1}], [{p:[5],lm:0}], 'server'
+		test.deepEqual [{p:[3],lm:2}], type.transform [{p:[2],lm:1}], [{p:[5],lm:0}], 'server'
+		test.deepEqual [{p:[2],lm:1}], type.transform [{p:[3],lm:1}], [{p:[1],lm:3}], 'client'
+		test.deepEqual [{p:[2],lm:3}], type.transform [{p:[1],lm:3}], [{p:[3],lm:1}], 'client'
 		test.done()
 
 	'indices change correctly around a move': (test) ->
@@ -465,6 +485,7 @@ exports.object =
 		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
 		test.done()
 
-exports.randomizer = (test) ->
-	require('../helpers').randomizerTest type
-	test.done()
+#console.log = console.error
+#exports.randomizer = (test) ->
+#	require('../helpers').randomizerTest type, 100000
+#	test.done()

@@ -145,6 +145,8 @@ append = (dest, c) ->
 		else if last.od != undefined and last.oi == undefined and
 				c.oi != undefined and c.od == undefined
 			last.oi = c.oi
+		else if c.lm != undefined and c.p[c.p.length-1] == c.lm
+			null # don't do anything
 		else
 			dest.push c
 	else
@@ -313,21 +315,47 @@ transformComponent_ = (dest, c, otherC, type) ->
 				to = c.lm
 				otherFrom = otherC.p[common]
 				otherTo = otherC.lm
+				f = transformPosByMove = (pos, from, to, bumpIfEqual) ->
+					if from < pos < to
+						pos - 1
+					else if pos < from and (pos > to or (pos == to and bumpIfEqual))
+						pos + 1
+					else
+						pos
+				
+				
+				
 				if from == otherFrom
-					c.p[common] = otherTo
+					# Tie break based on client/server
+					if type == 'client'
+						from = otherTo
+					else
+						return dest
 				else
-					if from > otherFrom
-						c.p[common]--
-					if from >= otherTo
-						c.p[common]++
-					if to > otherFrom
-						c.lm--
-					if to > otherTo
-						c.lm++
-					else if to == otherTo
-						# tiebreak
-						if type == 'server'
-							c.lm++
+					from = transformPosByMove from, otherFrom, otherTo, true
+					to = transformPosByMove to, otherFrom, otherTo, type == 'server'
+
+				c.p[common] = from
+				c.lm = to
+										
+#				if otherFrom == otherTo
+#					# nop
+#				else
+#					if from == otherFrom
+#						c.p[common] = otherTo
+#					else
+#						if from > otherFrom
+#							c.p[common]--
+#						if from > otherTo
+#							c.p[common]++
+#						if to > otherFrom
+#							c.lm--
+#						if to > otherTo
+#							c.lm++
+#						else if to == otherTo
+#							# tiebreak
+#							if type == 'server' or from == to
+#								c.lm++
 			else if c.li == undefined || c.ld != undefined || !commonOperand
 				from = otherC.p[common]
 				to = otherC.lm
