@@ -182,6 +182,13 @@ commonPath = (p1, p2) ->
 			return i-1
 	return
 
+transformPosByMove = (pos, from, to, bumpIfEqual) ->
+	return pos if pos < from and pos < to or pos > from and pos > to
+	if pos != from
+		pos-- if pos > from
+		pos++ if pos > to or (pos == to and bumpIfEqual)
+	pos
+
 transformComponent = (dest, c, otherC, type) ->
 	j = JSON.stringify
 	console.log 'transformComponenting',j(c),'against',j(otherC),'type:',type
@@ -197,7 +204,6 @@ transformComponent_ = (dest, c, otherC, type) ->
 
 	common = commonPath c['p'], otherC['p']
 	common2 = commonPath otherC.p, c.p
-	console.log common, common2
 
 	cplength = c.p.length
 	otherCplength = otherC.p.length
@@ -315,12 +321,7 @@ transformComponent_ = (dest, c, otherC, type) ->
 				to = c.lm
 				otherFrom = otherC.p[common]
 				otherTo = otherC.lm
-				f = transformPosByMove = (pos, from, to, bumpIfEqual) ->
-					if pos != from
-						pos-- if pos > from
-						pos++ if pos > to or (pos == to and bumpIfEqual)
-					pos
-				
+
 				if from == otherFrom
 					# Tie break based on client/server
 					if type == 'client'
@@ -333,35 +334,14 @@ transformComponent_ = (dest, c, otherC, type) ->
 
 				c.p[common] = from
 				c.lm = to
-										
-#				if otherFrom == otherTo
-#					# nop
-#				else
-#					if from == otherFrom
-#						c.p[common] = otherTo
-#					else
-#						if from > otherFrom
-#							c.p[common]--
-#						if from > otherTo
-#							c.p[common]++
-#						if to > otherFrom
-#							c.lm--
-#						if to > otherTo
-#							c.lm++
-#						else if to == otherTo
-#							# tiebreak
-#							if type == 'server' or from == to
-#								c.lm++
-			else if c.li == undefined || c.ld != undefined || !commonOperand
+			else
 				from = otherC.p[common]
 				to = otherC.lm
 				p = c.p[common]
-				if from < p
-					c.p[common]--
-				if to < p || (to == p and from > to)
-					c.p[common]++
-				if p == from
+				if p == from and (c.li == undefined || c.ld != undefined || !commonOperand)
 					c.p[common] = to
+				else
+					c.p[common] = transformPosByMove p, from, to, (type == 'server' || c.ld != undefined || !commonOperand)
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]

@@ -410,8 +410,8 @@ exports.list =
 		test.deepEqual [{p:[1],lm:0}], type.transform [{p:[1],lm:0}], [{p:[2],ld:{}}], 'client'
 		test.deepEqual [{p:[1],lm:1}], type.transform [{p:[2],lm:1}], [{p:[1],ld:3}], 'server'
 
-		test.deepEqual [{p:[2],li:{}}], type.transform [{p:[2],li:{}}], [{p:[1],lm:2}], 'server'
-		test.deepEqual [{p:[2],li:[]}], type.transform [{p:[2],li:[]}], [{p:[1],lm:2}], 'client'
+		test.deepEqual [{p:[1],li:{}}], type.transform [{p:[2],li:{}}], [{p:[1],lm:2}], 'server'
+		test.deepEqual [{p:[1],li:[]}], type.transform [{p:[2],li:[]}], [{p:[1],lm:2}], 'client'
 
 		test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
 		test.deepEqual [{p:[2],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[2],lm:1}], 'client'
