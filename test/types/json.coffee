@@ -395,6 +395,11 @@ exports.list =
 		test.deepEqual [{p:[3],lm:2}], type.transform [{p:[2],lm:1}], [{p:[5],lm:0}], 'server'
 		test.deepEqual [{p:[2],lm:1}], type.transform [{p:[3],lm:1}], [{p:[1],lm:3}], 'client'
 		test.deepEqual [{p:[2],lm:3}], type.transform [{p:[1],lm:3}], [{p:[3],lm:1}], 'client'
+
+		test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'client'
+		test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'server'
+		test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'server'
 		test.done()
 
 	'indices change correctly around a move': (test) ->
