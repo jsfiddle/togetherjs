@@ -374,7 +374,7 @@ exports.list =
 		test.done()
 
 	'lm vs lm': (test) ->
-		#test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'client'
+		test.deepEqual [{p:[0],lm:2}], type.transform [{p:[0],lm:2}], [{p:[2],lm:1}], 'client'
 		#test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[5],lm:0}], 'client'
 		test.deepEqual [{p:[4],lm:4}], type.transform [{p:[3],lm:3}], [{p:[5],lm:0}], 'client'
 		test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'client'
@@ -485,7 +485,7 @@ exports.object =
 		test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
 		test.done()
 
-#console.log = console.error
-#exports.randomizer = (test) ->
-#	require('../helpers').randomizerTest type, 100000
-#	test.done()
+console.log = console.error
+exports.randomizer = (test) ->
+	require('../helpers').randomizerTest type, 100000
+	test.done()

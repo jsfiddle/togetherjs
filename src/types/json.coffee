@@ -316,14 +316,10 @@ transformComponent_ = (dest, c, otherC, type) ->
 				otherFrom = otherC.p[common]
 				otherTo = otherC.lm
 				f = transformPosByMove = (pos, from, to, bumpIfEqual) ->
-					if from < pos < to
-						pos - 1
-					else if pos < from and (pos > to or (pos == to and bumpIfEqual))
-						pos + 1
-					else
-						pos
-				
-				
+					if pos != from
+						pos-- if pos > from
+						pos++ if pos > to or (pos == to and bumpIfEqual)
+					pos
 				
 				if from == otherFrom
 					# Tie break based on client/server
