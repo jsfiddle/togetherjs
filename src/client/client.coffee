@@ -286,7 +286,7 @@ class Connection
 
 		@send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (response) =>
 			if response.error
-				callback null, new Error(response.error)
+				callback null, response.error
 			else
 				response['snapshot'] = type.initialVersion() unless response['snapshot'] != undefined
 				response['type'] = type
@@ -332,16 +332,19 @@ open = (docName, type, options, callback) ->
 
 	options ?= {}
 	c = getConnection options.host, options.port, options.basePath
-	c.open docName, type, (doc) ->
-		# If you're using the bare API, connections are cleaned up as soon as there's no
-		# documents using them.
-		doc.on 'closed', ->
-			setTimeout ->
-					if c.numDocs == 0
-						c.disconnect()
-				, 0
+	c.open docName, type, (doc, error) ->
+		if doc == null
+			callback null, error
+		else
+			# If you're using the bare API, connections are cleaned up as soon as there's no
+			# documents using them.
+			doc.on 'closed', ->
+				setTimeout ->
+						if c.numDocs == 0
+							c.disconnect()
+					, 0
 
-		callback(doc)
+			callback doc
 
 if WEB?
 	exports['Connection'] = Connection

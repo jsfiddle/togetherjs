@@ -13,11 +13,12 @@ module.exports = testCase {
 	setUp: (callback) ->
 		@name = 'testingdoc'
 
-		options = {
+		@auth = {}
+		options =
 			socketio: {}
 			rest: null
 			db: {type: 'memory'}
-		}
+			auth: @auth
 
 		@model = server.createModel options
 		@server = server options, @model
@@ -32,6 +33,18 @@ module.exports = testCase {
 
 		@server.on 'close', callback
 		@server.close()
+	
+	"can't open a document if canRead rejects you": (test) ->
+		@auth.canRead = (client, docName, result) -> result.reject()
+
+		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			test.strictEqual doc, null
+			test.strictEqual error, 'Forbidden'
+
+			@model.getVersion @name, (v) ->
+				# The document shouldn't exist.
+				test.strictEqual v, null
+				test.done()
 
 	'open using the bare API': (test) ->
 		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>

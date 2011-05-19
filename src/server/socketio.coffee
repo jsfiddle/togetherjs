@@ -176,9 +176,13 @@ exports.attach = (server, model, options) ->
 
 			docData = undefined
 			if query.snapshot == null or (query.open == true and query.type)
-				model.clientGetSnapshot client, query.doc, (d) ->
-					docData = d
-					step1Create()
+				model.clientGetSnapshot client, query.doc, (d, error) ->
+					if error == 'Forbidden'
+						fail error
+						return
+					else
+						docData = d
+						step1Create()
 			else
 				step1Create()
 

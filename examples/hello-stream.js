@@ -7,10 +7,19 @@
 
 var client = require('../lib/client');
 
-client.open('hello', 'text', {host: 'localhost', port: 8000}, function(doc, error) {
+client.open('hello', 'json', {host: 'localhost', port: 8000}, function(doc, error) {
+	if (error) {
+		throw error;
+	}
+
 	console.log('Document open at version ' + doc.version);
+	if (doc.created) {
+		console.log('The document was created!');
+	}
+	console.log(JSON.stringify(doc.snapshot));
 
 	doc.on('change', function(op) {
 		console.log("Version: " + doc.version + ":" , op);
+		console.log(JSON.stringify(doc.snapshot));
 	});
 });
