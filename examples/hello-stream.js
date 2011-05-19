@@ -1,5 +1,9 @@
 // A simple node.js program which prints out ops as they are submitted to the
 // 'hello' document.
+//
+// This example uses the compiled JS version of sharejs.
+// % cake build
+// to use.
 
 var client = require('../lib/client');
 
