@@ -4,6 +4,8 @@ util = require 'util'
 p = util.debug
 i = util.inspect
 
+{randomInt, randomReal, seed} = helpers
+
 # Returns [serverDoc, clientDoc]
 testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	makeDoc = -> {
@@ -13,8 +15,8 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	server = makeDoc()
 	client = makeDoc()
 
-	for [0..(Math.random() * 2 + 1)]
-		doc = if Math.random() < 0.5 then client else server
+	for [0..(randomReal() * 2 + 1)]
+		doc = if randomReal() < 0.5 then client else server
 		[op, doc.result] = type.generateRandomOp doc.result
 		doc.ops.push(op)
 
@@ -30,7 +32,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	if type.invert?
 		# Invert all the ops and apply them to result. Should end up with initialDoc.
 		testInvert = (doc, ops) ->
-			snapshot = doc.result
+			snapshot = JSON.parse(JSON.stringify(doc.result))
 
 			# Sadly, coffeescript doesn't seem to support iterating backwards through an array.
 			# reverse() reverses an array in-place so it needs to be cloned first.
@@ -96,9 +98,10 @@ exports.test = (type, iterations = 300) ->
 	assert.ok type.generateRandomOp
 	assert.ok type.transform
 
-	p "   Running #{iterations} of randomized tests for type #{type.name}..."
+	console.error "   Running #{iterations} randomized tests for type #{type.name}..."
+	console.error "     (seed: #{seed})" if seed
 
-	warnUnless = (fn) -> p "NOTE: Not running #{fn} tests because #{type.name} does not have #{fn}() defined" unless type[fn]?
+	warnUnless = (fn) -> console.error "NOTE: Not running #{fn} tests because #{type.name} does not have #{fn}() defined" unless type[fn]?
 	warnUnless 'invert'
 	warnUnless 'compose'
 

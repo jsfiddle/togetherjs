@@ -7,6 +7,20 @@ i = -> #require('util').inspect
 exports.transformX = transformX = (type, server, client) ->
 	[type.transform(server, client, 'server'), type.transform(client, server, 'client')]
 
+
+# new seed every 6 hours
+exports.seed = Math.floor(Date.now() / (1000*60*60*6))
+if exports.seed?
+	{rand_real, seed} = require('./mersenne')
+	seed exports.seed
+	exports.randomReal = rand_real
+else
+	exports.randomReal = Math.random
+
+# Generate a random int 0 <= k < n
+exports.randomInt = (n) -> Math.floor(exports.randomReal() * n)
+
+
 # Transform a list of server ops by a list of client ops.
 # Returns [serverOps', clientOps'].
 # This is O(serverOps.length * clientOps.length)

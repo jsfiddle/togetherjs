@@ -3,9 +3,10 @@ ShareJS
 
 This is a little server (& client library) to allow concurrent editing of any kind of content. The server runs on NodeJS and the client works in NodeJS or a web browser.
 
-At the moment only plain-text is supported, but JSON and rich text should be supported soon.
+ShareJS supports operational transform on plain-text and arbitrary JSON data.
+Rich text support is planned.
 
-Check out [some cool demos](http://sharejs.org:8000/)
+Check out [some cool demos](http://sharejs.org:8000/).
 
 
 Installing and running
