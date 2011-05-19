@@ -424,6 +424,51 @@ exports.list =
 		test.deepEqual [{p:[1],ld:3,li:4}], type.transform [{p:[0],ld:3,li:4}], [{p:[1],lm:0}], 'client'
 		test.done()
 
+	'li vs lm': (test) ->
+		li = (p) -> [{p:[p],li:[]}]
+		lm = (f,t) -> [{p:[f],lm:t}]
+		xf = type.transform
+
+		test.deepEqual (li 0), xf (li 0), (lm 1, 3), 'client'
+		test.deepEqual (li 1), xf (li 1), (lm 1, 3), 'client'
+		test.deepEqual (li 1), xf (li 2), (lm 1, 3), 'client'
+		test.deepEqual (li 2), xf (li 3), (lm 1, 3), 'client'
+		test.deepEqual (li 3), xf (li 4), (lm 1, 3), 'client'
+		test.deepEqual (li 5), xf (li 5), (lm 1, 3), 'client'
+
+		test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 0), 'server'
+		test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 1), 'server'
+		test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 2), 'server'
+		test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 3), 'server'
+		test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 4), 'server'
+		test.deepEqual (lm 1, 3), xf (lm 1, 3), (li 5), 'server'
+
+		test.deepEqual (li 0), xf (li 0), (lm 1, 2), 'client'
+		test.deepEqual (li 1), xf (li 1), (lm 1, 2), 'client'
+		test.deepEqual (li 1), xf (li 2), (lm 1, 2), 'client'
+		test.deepEqual (li 2), xf (li 3), (lm 1, 2), 'client'
+		test.deepEqual (li 4), xf (li 4), (lm 1, 2), 'client'
+
+		test.deepEqual (li 0), xf (li 0), (lm 3, 1), 'client'
+		test.deepEqual (li 1), xf (li 1), (lm 3, 1), 'client'
+		test.deepEqual (li 3), xf (li 2), (lm 3, 1), 'client'
+		test.deepEqual (li 4), xf (li 3), (lm 3, 1), 'client'
+		test.deepEqual (li 4), xf (li 4), (lm 3, 1), 'client'
+
+		test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 0), 'server'
+		test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 1), 'server'
+		test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 2), 'server'
+		test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 3), 'server'
+		test.deepEqual (lm 3, 1), xf (lm 3, 1), (li 4), 'server'
+
+		test.deepEqual (li 0), xf (li 0), (lm 2, 1), 'client'
+		test.deepEqual (li 1), xf (li 1), (lm 2, 1), 'client'
+		test.deepEqual (li 3), xf (li 2), (lm 2, 1), 'client'
+		test.deepEqual (li 3), xf (li 3), (lm 2, 1), 'client'
+		test.deepEqual (li 4), xf (li 4), (lm 2, 1), 'client'
+
+		test.done()
+
 exports.object =
 	'Apply sanity checks': (test) ->
 		test.deepEqual {x:'a', y:'b'}, type.apply {x:'a'}, [{p:['y'], oi:'b'}]
