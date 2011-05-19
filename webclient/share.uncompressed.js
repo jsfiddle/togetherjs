@@ -505,19 +505,19 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     var last;
     c = clone(c);
     if (dest.length !== 0 && json.pathMatches(c['p'], (last = dest[dest.length - 1]).p)) {
-      if (last.na !== void 0 && c['na'] !== void 0) {
+      if (last['na'] !== void 0 && c['na'] !== void 0) {
         return dest[dest.length - 1] = {
-          p: last.p,
-          na: last.na + c['na']
+          p: last['p'],
+          na: last['na'] + c['na']
         };
-      } else if (last.li !== void 0 && c['li'] === void 0 && c['ld'] === last.li) {
-        if (last.ld !== void 0) {
-          return delete last.li;
+      } else if (last['li'] !== void 0 && c['li'] === void 0 && c['ld'] === last['li']) {
+        if (last['ld'] !== void 0) {
+          return delete last['li'];
         } else {
           return dest.pop();
         }
-      } else if (last.od !== void 0 && last.oi === void 0 && c['oi'] !== void 0 && c['od'] === void 0) {
-        return last.oi = c['oi'];
+      } else if (last['od'] !== void 0 && last['oi'] === void 0 && c['oi'] !== void 0 && c['od'] === void 0) {
+        return last['oi'] = c['oi'];
       } else if (c['lm'] !== void 0 && c['p'][c['p'].length - 1] === c['lm']) {
         return null;
       } else {

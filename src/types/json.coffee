@@ -127,18 +127,18 @@ json.pathMatches = (p1, p2, ignoreLast) ->
 json.append = (dest, c) ->
 	c = clone c
 	if dest.length != 0 and json.pathMatches c['p'], (last = dest[dest.length - 1]).p
-		if last.na != undefined and c['na'] != undefined
-			dest[dest.length - 1] = { p: last.p, na: last.na + c['na'] }
-		else if last.li != undefined and c['li'] == undefined and c['ld'] == last.li
+		if last['na'] != undefined and c['na'] != undefined
+			dest[dest.length - 1] = { p: last['p'], na: last['na'] + c['na'] }
+		else if last['li'] != undefined and c['li'] == undefined and c['ld'] == last['li']
 			# insert immediately followed by delete becomes a noop.
-			if last.ld != undefined
+			if last['ld'] != undefined
 				# leave the delete part of the replace
-				delete last.li
+				delete last['li']
 			else
 				dest.pop()
-		else if last.od != undefined and last.oi == undefined and
+		else if last['od'] != undefined and last['oi'] == undefined and
 				c['oi'] != undefined and c['od'] == undefined
-			last.oi = c['oi']
+			last['oi'] = c['oi']
 		else if c['lm'] != undefined and c['p'][c['p'].length-1] == c['lm']
 			null # don't do anything
 		else
