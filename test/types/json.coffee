@@ -85,7 +85,7 @@ type.generateRandomOp = (data) ->
 			key = p
 		operand = parent[key]
 
-		if randomReal() < 0.2 and parent != container and Array.isArray(parent)
+		if randomReal() < 0.4 and parent != container and Array.isArray(parent)
 			# List move
 			newIndex = randomInt parent.length
 
@@ -156,7 +156,6 @@ type.generateRandomOp = (data) ->
 				{p:path, ld:clone(obj)}
 		else
 			# Object
-
 			k = randomKey(operand)
 
 			if randomReal() > 0.5 or not k?
