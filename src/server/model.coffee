@@ -164,7 +164,7 @@ module.exports = Model = (db, options) ->
 	events = new Events(this)
 
 	# Register a listener for a particular document.
-	# listen(docName, fromVersionCallback, listener)
+	# listen(docName, listener, callback)
 	@listen = events.listen
 
 	# Remove a listener for a particular document.
@@ -211,7 +211,7 @@ module.exports = Model = (db, options) ->
 			accept: => @getSnapshot docName, callback
 			reject: -> callback undefined, 'Forbidden'
 	
-	@clientCreate = (client, docName, type, meta, callback) =>
+	@clientCreate = (client, docName, type, meta, callback) ->
 		# We don't check that types[type.name] == type. That might be important at some point.
 		type = types[type] if typeof type == 'string'
 
@@ -221,7 +221,7 @@ module.exports = Model = (db, options) ->
 
 	# Attempt to submit an op from a client. Auth functions
 	# are checked before the op is submitted.
-	@clientSubmitOp = (client, docName, opData, callback) =>
+	@clientSubmitOp = (client, docName, opData, callback) ->
 		auth.canSubmitOp client, docName, opData,
 			accept: => @applyOp docName, opData, callback
 			reject: -> callback null, 'Forbidden'
@@ -233,4 +233,14 @@ module.exports = Model = (db, options) ->
 			accept: => @delete docName, callback
 			reject: -> callback false, 'Forbidden'
 	
+	@clientListen = (client, docName, listener, callback) ->
+		auth.canRead client, docName,
+			accept: => @listen docName, listener, callback
+			reject: -> callback null, 'Forbidden'
+	
+	@clientListenFromVersion = (client, docName, version, listener, callback) ->
+		auth.canRead client, docName,
+			accept: => @listenFromVersion docName, version, listener, callback
+			reject: -> callback null, 'Forbidden'
+
 	this

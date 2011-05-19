@@ -19,17 +19,19 @@ module.exports = testCase {
 			assert.ok status
 			callback()
 
-	'listen on a nonexistant op returns null and ignore the document': (test) ->
-		@model.listen @unused, (-> throw new Error 'should not receive any ops'), (v) =>
+	'listen on a nonexistant doc returns null and ignore the document': (test) ->
+		@model.listen @unused, (-> throw new Error 'should not receive any ops'), (v, error) =>
 			test.strictEqual v, null
+			test.strictEqual error, 'Document does not exist'
 
 			@model.create @unused, 'simple', =>
 				@model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
 					test.done()
 	
-	'listen from version on a nonexistant op returns null and ignores the doc': (test) ->
-		@model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (v) =>
+	'listen from version on a nonexistant doc returns null and ignores the doc': (test) ->
+		@model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (v, error) =>
 			test.strictEqual v, null
+			test.strictEqual error, 'Document does not exist'
 
 			@model.create @unused, 'simple', =>
 				@model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
@@ -41,7 +43,9 @@ module.exports = testCase {
 			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		@model.listen @name, listener, ((v) -> test.strictEqual v, 0)
+		@model.listen @name, listener, (v, error) ->
+			test.strictEqual v, 0
+			test.strictEqual error, undefined
 
 		applyOps @model, @name, 0, [
 				{position:0, text:'A'},
@@ -54,7 +58,9 @@ module.exports = testCase {
 			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
-		@model.listen @name, listener, ((v) -> test.strictEqual v, 0)
+		@model.listen @name, listener, (v, error) ->
+			test.strictEqual v, 0
+			test.strictEqual error, undefined
 
 		applyOps @model, @name, 0, [
 				{position:0, text:'A'},
