@@ -27,9 +27,12 @@ module.exports = (model) ->
 		# Listeners are of the form listener(op, appliedAt)
 		listen: (docName, listener, callback) ->
 			model.getVersion docName, (version) ->
-				# Only attach the listener if the document exists (ie, if version != null)
-				emitterForDoc(docName, yes).on 'op', listener if version != null
-				callback version if callback
+				if version != null
+					# Only attach the listener if the document exists (ie, if version != null)
+					emitterForDoc(docName, yes).on 'op', listener
+					callback version if callback
+				else
+					callback null, 'Document does not exist'
 
 		# Remove a listener from a particular document.
 		removeListener: (docName, listener) ->
@@ -49,7 +52,7 @@ module.exports = (model) ->
 			model.getVersion docName, (docVersion) ->
 				if docVersion == null
 					# The document doesn't exist.
-					callback null if callback
+					callback null, 'Document does not exist' if callback
 					return
 
 				version = docVersion if version > docVersion

@@ -69,10 +69,10 @@ exports.attach = (server, model, options) ->
 			
 			if version?
 				# Tell the client the doc is open at the requested version
-				model.listenFromVersion docName, version, listener, openedAt
+				model.clientListenFromVersion client, docName, version, listener, openedAt
 			else
 				# If the version is blank, we'll open the doc at the most recent version
-				model.listen docName, listener, openedAt
+				model.clientListen client, docName, listener, openedAt
 
 		# Close the named document.
 		# callback([error])
@@ -123,7 +123,7 @@ exports.attach = (server, model, options) ->
 					msg.create = false
 					step2Snapshot()
 				else
-					model.create docName, query.type, query.meta || {}, (result, errorMsg) ->
+					model.clientCreate client, docName, query.type, query.meta || {}, (result, errorMsg) ->
 						if errorMsg == 'Forbidden'
 							fail errorMsg
 							return
@@ -176,7 +176,7 @@ exports.attach = (server, model, options) ->
 
 			docData = undefined
 			if query.snapshot == null or (query.open == true and query.type)
-				model.getSnapshot query.doc, (d) ->
+				model.clientGetSnapshot client, query.doc, (d) ->
 					docData = d
 					step1Create()
 			else
@@ -202,7 +202,7 @@ exports.attach = (server, model, options) ->
 			op_data.meta = query.meta || {}
 			op_data.meta.source = client.sessionId
 
-			model.applyOp query.doc, op_data, (appliedVersion, error) ->
+			model.clientSubmitOp client, query.doc, op_data, (appliedVersion, error) ->
 				msg = if error?
 					p "Sending error to client: #{error}"
 					{doc:query.doc, v:null, error: error}
