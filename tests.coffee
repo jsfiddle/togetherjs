@@ -13,6 +13,7 @@ modules = [
 
 	'test/db.coffee'
 	'test/model.coffee'
+	'test/auth.coffee'
 	'test/events.coffee'
 	'test/rest.coffee'
 	'test/socketio.coffee'

@@ -187,44 +187,49 @@ module.exports = Model = (db, options) ->
 
 	
 	# Auth stuffs.
-	options.auth ||= ->
-	options.canRead ||= (client, docName, result) -> result.accept()
-	options.canCreate ||= (client, docName, type, meta, result) -> result.accept()
-	options.canSubmitOp ||= (client, docName, opData, result) -> result.accept()
-	# canDelete defaults to reject().
-	options.canDelete ||= (client, docName, result) -> result.reject()
+	options.auth ||= {}
 
-	@auth = options.auth
+	auth = options.auth || {}
+
+	auth.auth ||= ->
+	auth.canCreate ||= (client, docName, type, meta, result) -> result.accept()
+	auth.canRead ||= (client, docName, result) -> result.accept()
+	auth.canSubmitOp ||= (client, docName, opData, result) -> result.accept()
+	# canDelete defaults to reject().
+	auth.canDelete ||= (client, docName, result) -> result.reject()
 
 	# Surely there's a nicer way to write these functions, below. I can imagine abstractions,
 	# but they're always more complicated than the code below.
 
 	@clientGetOps = (client, docName, start, end, callback) ->
-		options.canRead client, docName,
+		auth.canRead client, docName,
 			accept: => @getOps docName, start, end, callback
 			reject: -> callback null, 'Forbidden'
 
 	@clientGetSnapshot = (client, docName, callback) ->
-		options.canRead client, docName,
+		auth.canRead client, docName,
 			accept: => @getSnapshot docName, callback
 			reject: -> callback undefined, 'Forbidden'
 	
-	@clientCreate = (client, docName, type, meta, callback, result) =>
-		options.canCreate client, docName, type, meta,
+	@clientCreate = (client, docName, type, meta, callback) =>
+		# We don't check that types[type.name] == type. That might be important at some point.
+		type = types[type] if typeof type == 'string'
+
+		auth.canCreate client, docName, type, meta,
 			accept: => @create docName, type, meta, callback
 			reject: -> callback false, 'Forbidden'
 
 	# Attempt to submit an op from a client. Auth functions
 	# are checked before the op is submitted.
 	@clientSubmitOp = (client, docName, opData, callback) =>
-		options.canSubmitOp client, docName, opData,
+		auth.canSubmitOp client, docName, opData,
 			accept: => @applyOp docName, opData, callback
 			reject: -> callback null, 'Forbidden'
 
 	# Delete the named operation.
 	# Callback is passed (deleted?, error message)
 	@clientDelete = (client, docName, callback) ->
-		options.canDelete client, docName,
+		auth.canDelete client, docName,
 			accept: => @delete docName, callback
 			reject: -> callback false, 'Forbidden'
 	
