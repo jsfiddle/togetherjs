@@ -28,9 +28,9 @@ json.invert = (op) -> json.invertComponent c for c in op.slice().reverse()
 
 json.checkValidOp = (op) ->
 
-Array['isArray'] ||= (o) -> Object.prototype.toString.call(o) == '[object Array]'
+isArray = (o) -> Object.prototype.toString.call(o) == '[object Array]'
 json.checkList = (elem) ->
-	throw new Error 'Referenced element not a list' unless Array.isArray(elem)
+	throw new Error 'Referenced element not a list' unless isArray(elem)
 
 json.checkObj = (elem) ->
 	throw new Error "Referenced element not an object (it was #{JSON.stringify elem})" unless elem.constructor is Object
@@ -159,7 +159,7 @@ json.compose = (op1, op2) ->
 json.normalize = (op) ->
 	newOp = []
 	
-	op = [op] unless Array.isArray op
+	op = [op] unless isArray op
 
 	for c in op
 		c['p'] ?= []

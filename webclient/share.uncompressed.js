@@ -8,7 +8,7 @@ Copyright 2011 ShareJS Authors
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformPosition, types;
+;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, compose, compress, connections, exports, getConnection, invertComponent, io, isArray, open, strInject, text, transformComponent, transformPosition, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -406,11 +406,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return _results;
   };
   json.checkValidOp = function(op) {};
-  Array['isArray'] || (Array['isArray'] = function(o) {
+  isArray = function(o) {
     return Object.prototype.toString.call(o) === '[object Array]';
-  });
+  };
   json.checkList = function(elem) {
-    if (!Array.isArray(elem)) {
+    if (!isArray(elem)) {
       throw new Error('Referenced element not a list');
     }
   };
@@ -544,7 +544,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   json.normalize = function(op) {
     var c, newOp, _i, _len, _ref;
     newOp = [];
-    if (!Array.isArray(op)) {
+    if (!isArray(op)) {
       op = [op];
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
