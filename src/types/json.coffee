@@ -15,7 +15,6 @@ exports.initialVersion = -> null
 # Makes sure a path is a list.
 normalizeMovePath = (path, newPath) ->
 
-
 invertComponent = (c) ->
 	c_ = { p: c['p'] }
 	c_['sd'] = c['si'] if c['si'] != undefined
@@ -182,21 +181,8 @@ commonPath = (p1, p2) ->
 			return i-1
 	return
 
-transformPosByMove = (pos, from, to, bumpIfEqual) ->
-	if pos != from
-		pos-- if pos > from
-		pos++ if pos > to or (pos == to and bumpIfEqual)
-	pos
-
-transformComponent = (dest, c, otherC, type) ->
-	j = JSON.stringify
-	console.log 'transformComponenting',j(c),'against',j(otherC),'type:',type
-	res = transformComponent_ dest, c, otherC, type
-	console.log 'got',j dest
-	res
-
 # transform c so it applies to a document with otherC applied.
-transformComponent_ = (dest, c, otherC, type) ->
+transformComponent = (dest, c, otherC, type) ->
 	c = clone c
 	c['p'].push(0) if c['na'] != undefined
 	otherC['p'].push(0) if otherC['na'] != undefined
