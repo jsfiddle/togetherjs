@@ -43,7 +43,11 @@ module.exports = RedisDb = (options) ->
 		client.setnx keyForDoc(docName), value, (err, result) ->
 			throw err if err?
 
-			callback !!result if callback
+			if callback
+				if result
+					callback true
+				else
+					callback false, 'Document already exists'
 
 	# Get all ops with version = start to version = end. Noninclusive.
 	# end is trimmed to the size of the document.
@@ -116,7 +120,7 @@ module.exports = RedisDb = (options) ->
 				doc_data = JSON.parse(response)
 				callback doc_data
 			else
-				callback null
+				callback null, 'Document does not exist'
 
 	@getVersion = (docName, callback) ->
 		client.llen keyForOps(docName), (err, response) ->
@@ -139,7 +143,12 @@ module.exports = RedisDb = (options) ->
 		client.del keyForOps(docName)
 		client.del keyForDoc(docName), (err, response) ->
 			throw err if err?
-			callback(if response == 1 then yes else no) if callback?
+			if callback
+				if response == 1
+					# Something was deleted.
+					callback true
+				else
+					callback false, 'Document does not exist'
 	
 	# Close the connection to the database
 	@close = ->

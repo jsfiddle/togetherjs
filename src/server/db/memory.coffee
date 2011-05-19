@@ -26,7 +26,7 @@ module.exports = ->
 		# data = {snapshot, type, [meta]}
 		create: (docName, data, callback) ->
 			if docs[docName]
-				callback false
+				callback false, 'Document already exists'
 			else
 				throw new Error 'snapshot missing from data' unless data.snapshot != undefined
 				throw new Error 'type missing from data' unless data.type != undefined
@@ -43,7 +43,7 @@ module.exports = ->
 				delete docs[docName]
 				callback yes if callback?
 			else
-				callback no if callback?
+				callback no, 'Document does not exist' if callback?
 
 		# Append an op to a document. The document must already exist (via db.create, above).
 		#
@@ -76,7 +76,7 @@ module.exports = ->
 				data = {snapshot:doc.data.snapshot, v:doc.data.v, type:doc.data.type, meta:doc.data.meta}
 				callback data
 			else
-				callback null
+				callback null, 'Document does not exist'
 
 		# Get the current version of a document
 		getVersion: (docName, callback) ->

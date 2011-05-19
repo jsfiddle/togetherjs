@@ -64,11 +64,11 @@ router = (app, model, options) ->
 			unless typeof type == 'string' and (meta == undefined or typeof meta == 'object')
 				send400 res, 'Type invalid'
 			else
-				model.create req.params.name, type, meta, (result) ->
+				model.create req.params.name, type, meta, (result, error) ->
 					if result
 						send200 res
 					else
-						send400 res, 'The document already exists'
+						send400 res, error
 
 	# POST submits an op to the document.
 	app.post '/doc/:name', (req, res) ->
@@ -84,7 +84,7 @@ router = (app, model, options) ->
 		else
 			expectJSONObject req, res, (obj) ->
 				opData = {v:version, op:obj, meta:{source:req.socket.remoteAddress}}
-				model.applyOp req.params.name, opData, (error, newVersion) ->
+				model.applyOp req.params.name, opData, (newVersion, error) ->
 					if error?
 						send400 res, error.stack
 					else

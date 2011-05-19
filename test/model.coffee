@@ -23,13 +23,15 @@ module.exports = testCase
 			callback()
 
 	'Return null when asked for the snapshot of a new object': (test) ->
-		@model.getSnapshot @unused, (data) ->
-			test.deepEqual data, null
+		@model.getSnapshot @unused, (data, error) ->
+			test.strictEqual data, null
+			test.strictEqual error, 'Document does not exist'
 			test.done()
 
 	'Calling create sets the type and version': (test) ->
 		# create() has been called in setUp already.
-		@model.getSnapshot @name, (data) =>
+		@model.getSnapshot @name, (data, error) =>
+			test.strictEqual error, undefined
 			test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
 			test.done()
 	
@@ -57,7 +59,7 @@ module.exports = testCase
 					test.done()
 
 	'Return a fresh snapshot after submitting ops': (test) ->
-		@model.applyOp @name, {v:0, op:{position: 0, text:'hi'}}, (error, appliedVersion) =>
+		@model.applyOp @name, {v:0, op:{position: 0, text:'hi'}}, (appliedVersion, error) =>
 			test.ifError(error)
 			test.strictEqual appliedVersion, 0
 			@model.getSnapshot @name, (data) ->
@@ -66,9 +68,9 @@ module.exports = testCase
 
 	'Apply op to future version fails': (test) ->
 		@model.create @name, types.simple, =>
-			@model.applyOp @name, {v:1, op:{position: 0, text: 'hi'}}, (err, result) ->
+			@model.applyOp @name, {v:1, op:{position: 0, text: 'hi'}}, (result, err) ->
 				test.ok err
-				test.strictEqual err.message, 'Op at future version'
+				test.strictEqual err, 'Op at future version'
 				test.done()
 	
 	'Apply ops at the most recent version': (test) ->
@@ -117,47 +119,56 @@ module.exports = testCase
 		getOps = (data) -> data.map ((d) -> d.op)
 
 		applyOps @model, @name, 0, submittedOps.slice(), (error, _) =>
-			@model.getOps @name, 0, 1, (data) ->
+			@model.getOps @name, 0, 1, (data, error) ->
 				test.deepEqual getOps(data), [submittedOps[0]]
+				test.strictEqual error, undefined
 				passPart()
-			@model.getOps @name, 0, 2, (data) ->
+			@model.getOps @name, 0, 2, (data, error) ->
 				test.deepEqual getOps(data), submittedOps
+				test.strictEqual error, undefined
 				passPart()
-			@model.getOps @name, 1, 2, (data) ->
+			@model.getOps @name, 1, 2, (data, error) ->
 				test.deepEqual getOps(data), [submittedOps[1]]
+				test.strictEqual error, undefined
 				passPart()
-			@model.getOps @name, 2, 3, (data) ->
+			@model.getOps @name, 2, 3, (data, error) ->
 				test.deepEqual data, []
+				test.strictEqual error, undefined
 				passPart()
 
 			# These should be trimmed to just return the version specified
-			@model.getOps @name, 0, 1000, (data) ->
+			@model.getOps @name, 0, 1000, (data, error) ->
 				test.deepEqual getOps(data), submittedOps
+				test.strictEqual error, undefined
 				passPart()
-			@model.getOps @name, 1, 1000, (data) ->
+			@model.getOps @name, 1, 1000, (data, error) ->
 				test.deepEqual getOps(data), [submittedOps[1]]
+				test.strictEqual error, undefined
 				passPart()
 
-	'getOps on an empty document returns []': (test) ->
+	'getOps on an empty document returns null, errormsg', (test) ->
 		passPart = makePassPart test, 2
-		@model.getOps @name, 0, 0, (data) ->
-			test.deepEqual data, []
+		@model.getOps @name, 0, 0, (data, error) ->
+			test.deepEqual data, null
+			test.strictEqual error, 'Document does not exist'
 			passPart()
 
-		@model.getOps @name, 0, null, (data) ->
-			test.deepEqual data, []
+		@model.getOps @name, 0, null, (data, error) ->
+			test.deepEqual data, null
+			test.strictEqual error, 'Document does not exist'
 			passPart()
  
 	'getOps with a null count returns all the ops': (test) ->
 		submittedOps = [{position: 0, text: 'Hi'}, {position: 2, text: ' mum'}]
 		applyOps @model, @name, 0, submittedOps.slice(), (error, _) =>
-			@model.getOps @name, 0, null, (data) ->
+			@model.getOps @name, 0, null, (data, error) ->
 				test.deepEqual data.map((d) -> d.op), submittedOps
+				test.strictEqual error, undefined
 				test.done()
 	
 	'ops submitted have a metadata object added': (test) ->
 		t1 = Date.now()
-		@model.applyOp @name, {op:{position: 0, text: 'hi'}, v:0}, (error, appliedVersion) =>
+		@model.applyOp @name, {op:{position: 0, text: 'hi'}, v:0}, (appliedVersion, error) =>
 			test.ifError error
 			@model.getOps @name, 0, 1, (data) ->
 				test.deepEqual data.length, 1
@@ -168,7 +179,7 @@ module.exports = testCase
 				test.done()
 	
 	'metadata is stored': (test) ->
-		@model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}, meta:{blah:'blat'}}, (error, appliedVersion) =>
+		@model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}, meta:{blah:'blat'}}, (appliedVersion, error) =>
 			@model.getOps @name, 0, 1, (data) ->
 				d = data[0]
 				test.deepEqual d.op, {position: 0, text: 'hi'}
@@ -184,7 +195,7 @@ module.exports = testCase
 	'getVersion on a doc returns its version': (test) ->
 		@model.getVersion @name, (v) =>
 			test.strictEqual v, 0
-			@model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}}, (error, appliedVersion) =>
+			@model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}}, (appliedVersion, error) =>
 				test.ifError(error)
 				@model.getVersion @name, (v) ->
 					test.strictEqual v, 1

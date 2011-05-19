@@ -123,7 +123,11 @@ exports.attach = (server, model, options) ->
 					msg.create = false
 					step2Snapshot()
 				else
-					model.create docName, query.type, query.meta || {}, (result) ->
+					model.create docName, query.type, query.meta || {}, (result, errorMsg) ->
+						if errorMsg == 'Forbidden'
+							fail errorMsg
+							return
+
 						msg.create = result
 						step2Snapshot()
 
@@ -198,10 +202,10 @@ exports.attach = (server, model, options) ->
 			op_data.meta = query.meta || {}
 			op_data.meta.source = client.sessionId
 
-			model.applyOp query.doc, op_data, (error, appliedVersion) ->
+			model.applyOp query.doc, op_data, (appliedVersion, error) ->
 				msg = if error?
-					p "Sending error to client: #{error.message}, #{error.stack}"
-					{doc:query.doc, v:null, error: error.message}
+					p "Sending error to client: #{error}"
+					{doc:query.doc, v:null, error: error}
 				else
 					{doc:query.doc, v:appliedVersion}
 
