@@ -54,7 +54,7 @@ Running a server
 
 There are two ways to run a sharejs server:
 
-1. Run from a node.js app:
+1. Embedded in a node.js server app:
 
         var connect = require('connect'),
             sharejs = require('share').server;
@@ -85,6 +85,8 @@ There are two ways to run a sharejs server:
         # sharejs-exampleserver
   
   This will run a simple server on port 8000, and host all the example code there. Run it and check out http://localhost:8000/ . The example server stores everything in ram, so don't get too attached to your data.
+
+> If you're running sharejs from source, you can launch the example server by running `bin/exampleserver`.
 
 
 Putting Share.js on your website
@@ -121,9 +123,9 @@ And add this code:
 
 Thats about it :)
 
-The hostname and port are not needed if you're hosting your webpage from the same host & port as sharejs.
+The easiest way to get your code running is to check sharejs out from source and put your html and css files in the `examples/` directory. Run `bin/exampleserver` to launch the demo server and browse to http://localhost:8000/your-app.html .
 
-Have a look at the examples in the repository for demos. If you want to see this examples running, run `# sharejs-exampleserver` and browse to http://localhost:8000/ .
+See the [wiki](https://github.com/josephg/ShareJS/wiki) for documentation.
 
 
 Writing a client using node.js
@@ -153,6 +155,6 @@ Run this from a couple terminal windows when sharejs is running to see it go.
 	    // doc.close();
     });
 
-See [`doc/client.md`](ShareJS/blob/master/doc/client.md) for full API documentation, and `examples/node*` for some more example apps.
+See [`the wiki`](https://github.com/josephg/ShareJS/wiki) for API documentation, and `examples/node*` for some more example apps.
 
 
