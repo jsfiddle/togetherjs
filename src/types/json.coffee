@@ -338,8 +338,12 @@ transformComponent_ = (dest, c, otherC, type) ->
 				from = otherC.p[common]
 				to = otherC.lm
 				p = c.p[common]
-				if p == from and (c.li == undefined || c.ld != undefined || !commonOperand)
-					c.p[common] = to
+				isli = c.li != undefined and c.ld == undefined and commonOperand
+				if isli
+					if p > from
+						c.p[common]--
+					if p > to
+						c.p[common]++
 				else
 					c.p[common] = transformPosByMove p, from, to, (type == 'server' || c.ld != undefined || !commonOperand)
 		else if otherC.oi != undefined && otherC.od != undefined
