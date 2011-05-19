@@ -251,17 +251,19 @@ transformComponent = (dest, c, otherC, type) ->
 		else if otherC.li != undefined && otherC.ld != undefined
 			if otherC.p[common] == c.p[common]
 				# noop
-				if otherCplength < cplength
+				if !commonOperand
 					# we're below the deleted element, so -> noop
 					return dest
 				else if c.ld != undefined
+					# we're trying to delete the same element, -> noop
 					if c.li != undefined and type == 'client'
+						# we're both replacing one element with another. only one can
+						# survive!
 						c.ld = clone otherC.li
 					else
-						# we're trying to delete the same element, -> noop
 						return dest
 		else if otherC.li != undefined
-			if c.li != undefined and c.ld == undefined and otherCplength == cplength and c.p[common] == otherC.p[common]
+			if c.li != undefined and c.ld == undefined and commonOperand and c.p[common] == otherC.p[common]
 				# in li vs. li, client wins.
 				if type == 'server'
 					c.p[common]++
@@ -269,13 +271,14 @@ transformComponent = (dest, c, otherC, type) ->
 				c.p[common]++
 
 			if c.lm != undefined
-				if otherCplength == cplength
+				if commonOperand
 					# otherC edits the same list we edit
 					if otherC.p[common] <= c.lm
 						c.lm++
+					# changing c.from is handled above.
 		else if otherC.ld != undefined
 			if c.lm != undefined
-				if otherCplength == cplength
+				if commonOperand
 					if otherC.p[common] == c.p[common]
 						# they deleted the thing we're trying to move
 						return dest
@@ -377,19 +380,19 @@ transformComponent = (dest, c, otherC, type) ->
 						if from > to
 							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
-			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
-			if c.oi != undefined and c.p[common] == otherC.p[common]
-				# we inserted where someone else replaced
-				if type == 'server'
-					# client wins
-					return dest
+			if c.p[common] == otherC.p[common]
+				if c.oi != undefined and commonOperand
+					# we inserted where someone else replaced
+					if type == 'server'
+						# client wins
+						return dest
+					else
+						# we win, make our op replace what they inserted
+						c.od = otherC.oi
 				else
-					# we win, make our op a replacement
-					c.od = otherC.oi
-			else
-				# -> noop if the other component is deleting the same object (or any
-				# parent)
-				return dest if c.p[common] == otherC.p[common]
+					# -> noop if the other component is deleting the same object (or any
+					# parent)
+					return dest
 		else if otherC.oi != undefined
 			if c.oi != undefined and c.p[common] == otherC.p[common]
 				# client wins if we try to insert at the same place
@@ -399,7 +402,7 @@ transformComponent = (dest, c, otherC, type) ->
 					return dest
 		else if otherC.od != undefined
 			if c.p[common] == otherC.p[common]
-				return dest if cplength > otherCplength
+				return dest if !commonOperand
 				if c.oi != undefined
 					delete c.od
 				else
