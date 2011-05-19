@@ -24,15 +24,18 @@ test = (opts) -> testCase
 
 	'create evaluates true when a document is called, false when it already exists': (test) ->
 		data = {snapshot:null, type:'simple', meta:{}, v:0}
-		@db.create @name, data, (result) =>
+		@db.create @name, data, (result, error) =>
 			test.strictEqual result, true
-			@db.create @name, data, (result) ->
+			test.strictEqual error, undefined
+			@db.create @name, data, (result, error) ->
 				test.strictEqual result, false
+				test.strictEqual error, 'Document already exists'
 				test.done()
 
 	'getSnapshot returns null for a nonexistant doc': (test) ->
-		@db.getSnapshot @name, (data) ->
+		@db.getSnapshot @name, (data, error) ->
 			test.deepEqual data, null
+			test.deepEqual error, 'Document does not exist'
 			test.done()
 	
 	'getSnapshot has the type, version and snapshot set when a doc is created': (test) ->
@@ -92,8 +95,9 @@ test = (opts) -> testCase
 								passPart()
 
 	'delete a non-existant document passes false to its callback': (test) ->
-		@db.delete @name, (success) ->
+		@db.delete @name, (success, error) ->
 			test.strictEqual success, false
+			test.strictEqual error, 'Document does not exist'
 			test.done()
 
 	'delete deletes a document': (test) ->
@@ -103,8 +107,9 @@ test = (opts) -> testCase
 			@db.append @name,
 				{op:[{i:'hi', p:0}], v:0, meta:{}},
 				{snapshot:'hi', type:'text', v:1}, =>
-					@db.delete @name, (success) =>
+					@db.delete @name, (success, error) =>
 						test.strictEqual success, true
+						test.strictEqual error, undefined
 						@db.getVersion @name, (v) ->
 							test.strictEqual v, null
 							passPart()

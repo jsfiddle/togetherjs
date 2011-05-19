@@ -246,11 +246,11 @@ module.exports = testCase
 		passPart = makePassPart test, 3
 
 		@expect [{doc:name1, open:true, create:true, v:0}, {doc:name2, open:true, create:true, v:0}], =>
-			@model.applyOp name1, {v:0, op:{position:0, text:'a'}}, (error, _) =>
+			@model.applyOp name1, {v:0, op:{position:0, text:'a'}}, (_, error) =>
 				test.ifError(error)
-				@model.applyOp name2, {v:0, op:{position:0, text:'b'}}, (error, _) =>
+				@model.applyOp name2, {v:0, op:{position:0, text:'b'}}, (_, error) =>
 					test.ifError(error)
-					@model.applyOp name1, {v:1, op:{position:0, text:'c'}}, (error, _) =>
+					@model.applyOp name1, {v:1, op:{position:0, text:'c'}}, (_, error) =>
 						test.ifError(error)
 
 			# All the ops that come through the socket should have the doc name set.

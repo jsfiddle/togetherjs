@@ -17,16 +17,27 @@ module.exports = Model = (db, options) ->
 
 	# Callback is called with a list of the deltas from versionFrom to versionTo, or
 	# to the most recent version if versionTo is null.
-	@getOps = db.getOps
+	# The model also checks if the document doesn't exist, and makes getOps return null
+	# if it doesn't. (Later, the model will cache document data locally and that check
+	# will become fast.)
+	@getOps = (docName, start, end, callback) ->
+		db.getVersion docName, (v) ->
+			if v == null
+				callback null, 'Document does not exist'
+			else
+				db.getOps docName, start, end, callback
 
 	# Gets the snapshot data for the specified document.
 	# getSnapshot(docName, callback)
 	# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>, meta: <meta>})
 	@getSnapshot = getSnapshot = (docName, callback) ->
-		db.getSnapshot docName, (data) ->
+		db.getSnapshot docName, (data, error) ->
 			p "getSnapshot #{i data}"
-			data.type = types[data.type] if data?.type
-			callback data
+			if data?
+				data.type = types[data.type] if data?.type
+				callback data
+			else
+				callback data, error
 
 	# Gets the latest version # of the document. May be more efficient than getSnapshot.
 	# getVersion(docName, callback)
@@ -56,7 +67,7 @@ module.exports = Model = (db, options) ->
 		p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
 		getSnapshot docName, (docData) ->
 			unless docData
-				callback new Error('Document does not exist')
+				callback null, 'Document does not exist'
 				return
 
 			opVersion = opData.v
@@ -73,7 +84,7 @@ module.exports = Model = (db, options) ->
 				try
 					snapshot = docData.type.apply docData.snapshot, op
 				catch error
-					callback error, null
+					callback null, error.message
 					return
 
 				newOpData = {op:op, v:opVersion, meta:meta}
@@ -83,10 +94,10 @@ module.exports = Model = (db, options) ->
 				db.append docName, newOpData, newDocData, ->
 					p "appended v#{opVersion} to #{docName}. Calling callback..."
 					events.onApplyOp docName, newOpData
-					callback null, opVersion
+					callback opVersion, undefined
 
 			if opVersion > version
-				callback new Error('Op at future version'), null
+				callback null, 'Op at future version'
 				return
 
 			if opVersion < version
@@ -100,7 +111,7 @@ module.exports = Model = (db, options) ->
 							p "-> #{i op}"
 
 					catch error
-						callback error, null
+						callback null, error.message
 						return
 
 					submit()
@@ -175,11 +186,12 @@ module.exports = Model = (db, options) ->
 		(chars[Math.floor(Math.random() * chars.length)] for x in [0...length]).join('')
 
 	
-	# Auth stuffs
-
+	# Auth stuffs.
 	options.auth ||= ->
 	options.canRead ||= (client, docName, result) -> result.accept()
+	options.canCreate ||= (client, docName, type, meta, result) -> result.accept()
 	options.canSubmitOp ||= (client, docName, opData, result) -> result.accept()
+	# canDelete defaults to reject().
 	options.canDelete ||= (client, docName, result) -> result.reject()
 
 	@auth = options.auth
@@ -189,29 +201,31 @@ module.exports = Model = (db, options) ->
 
 	@clientGetOps = (client, docName, start, end, callback) ->
 		options.canRead client, docName,
-			accept: =>
-				@getOps docName, start, end, (data) -> callback null, data
-			reject: ->
-				callback new Error 'Forbidden'
+			accept: => @getOps docName, start, end, callback
+			reject: -> callback null, 'Forbidden'
 
 	@clientGetSnapshot = (client, docName, callback) ->
 		options.canRead client, docName,
-			accept: =>
-				@getSnapshot docName, (data) -> callback null, data
-			reject: ->
-				callback new Error "Forbidden"
+			accept: => @getSnapshot docName, callback
+			reject: -> callback undefined, 'Forbidden'
 	
+	@clientCreate = (client, docName, type, meta, callback, result) =>
+		options.canCreate client, docName, type, meta,
+			accept: => @create docName, type, meta, callback
+			reject: -> callback false, 'Forbidden'
+
 	# Attempt to submit an op from a client. Auth functions
 	# are checked before the op is submitted.
 	@clientSubmitOp = (client, docName, opData, callback) =>
 		options.canSubmitOp client, docName, opData,
-			accept: -> @applyOp docName, opData, callback
-			reject: -> callback new Error 'Forbidden'
+			accept: => @applyOp docName, opData, callback
+			reject: -> callback null, 'Forbidden'
 
-	# Callback is passed (error, deleted anything bool)
+	# Delete the named operation.
+	# Callback is passed (deleted?, error message)
 	@clientDelete = (client, docName, callback) ->
 		options.canDelete client, docName,
-			accept: -> @delete docName, (result) -> callback null, result
-			reject: -> callback new Error 'Forbidden'
+			accept: => @delete docName, callback
+			reject: -> callback false, 'Forbidden'
 	
 	this

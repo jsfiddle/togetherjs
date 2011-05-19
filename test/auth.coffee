@@ -7,10 +7,13 @@ testCase = require('nodeunit').testCase
 server = require '../src/server'
 
 
-module.exports = testCase {
+module.exports = testCase
 	setUp: (callback) ->
+		# Magic message for connecting a client.
 		@auth = (client, data) ->
 
+		# CRUD.
+		@canCreate = (client, docName, type, meta, result) -> result.accept()
 		@canRead = (client, docName, result) -> result.accept()
 		@canSubmitOp = (client, docName, opData, result) -> result.accept()
 		@canDelete = (client, docName, result) -> result.accept()
@@ -26,14 +29,26 @@ module.exports = testCase {
 		}
 
 		@name = 'testingdoc'
+		@unused = 'testingdoc2'
+
 		@model = server.createModel options
-		callback()
+		@client = {}
+		@model.create @name, 'simple', callback
 	
-	'snapshot allowed if canGetSnapshot calls accept': (test) ->
-		@canGetSnapshot = (docName, client, accept, reject) -> accept()
+	'getSnapshot allowed if canRead() accepts': (test) ->
+		@canRead = (client, docName, result) -> result.accept()
 
-		@model.applyOp @name, {v:0, op:{type:'text'}}, (error, v) ->
-			@model.getSnapshot @name, (data) ->
+		@model.clientGetSnapshot @client, @name, (data, error) =>
+			test.deepEqual data, {v:0, snapshot:{str:''}, meta:{}, type:types.simple}
+			test.strictEqual error, undefined
+			test.done()
 
-		test.done()
-}
+	'getSnapshot disallowed if canRead() rejects': (test) ->
+		@canRead = (client, docName, result) -> result.reject()
+
+		@model.clientGetSnapshot @client, @name, (data, error) =>
+			test.deepEqual data, undefined
+			test.strictEqual error, 'Forbidden'
+			test.done()
+
+
