@@ -366,7 +366,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   json.invertComponent = function(c) {
     var c_;
     c_ = {
-      p: c['p']
+      'p': c['p']
     };
     if (c['si'] !== void 0) {
       c_['sd'] = c['si'];
@@ -421,7 +421,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     json.checkValidOp(op);
     op = clone(op);
     container = {
-      data: clone(snapshot)
+      'data': clone(snapshot)
     };
     try {
       for (i = 0, _len = op.length; i < _len; i++) {
@@ -507,8 +507,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     if (dest.length !== 0 && json.pathMatches(c['p'], (last = dest[dest.length - 1]).p)) {
       if (last['na'] !== void 0 && c['na'] !== void 0) {
         return dest[dest.length - 1] = {
-          p: last['p'],
-          na: last['na'] + c['na']
+          'p': last['p'],
+          'na': last['na'] + c['na']
         };
       } else if (last['li'] !== void 0 && c['li'] === void 0 && c['ld'] === last['li']) {
         if (last['ld'] !== void 0) {
@@ -637,10 +637,10 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           p1 = c['p'][cplength - 1];
           p2 = otherC['p'][otherCplength - 1];
           tc1 = {
-            p: p1
+            'p': p1
           };
           tc2 = {
-            p: p2
+            'p': p2
           };
           if (c['si'] != null) {
             tc1['i'] = c['si'];
@@ -659,7 +659,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           for (_i = 0, _len = res.length; _i < _len; _i++) {
             tc = res[_i];
             jc = {
-              p: c['p'].slice(0, common)
+              'p': c['p'].slice(0, common)
             };
             jc['p'].push(tc['p']);
             if (tc['i'] != null) {
@@ -825,8 +825,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         if (c['oi'] !== void 0 && c['p'][common] === otherC['p'][common]) {
           if (type === 'client') {
             json.append(dest, {
-              p: c['p'],
-              od: otherC['oi']
+              'p': c['p'],
+              'od': otherC['oi']
             });
           } else {
             return dest;

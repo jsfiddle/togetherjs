@@ -11,7 +11,7 @@ json.name = 'json'
 json.initialVersion = -> null
 
 json.invertComponent = (c) ->
-	c_ = { p: c['p'] }
+	c_ = { 'p': c['p'] }
 	c_['sd'] = c['si'] if c['si'] != undefined
 	c_['si'] = c['sd'] if c['sd'] != undefined
 	c_['od'] = c['oi'] if c['oi'] != undefined
@@ -38,7 +38,7 @@ json.apply = (snapshot, op) ->
 	json.checkValidOp op
 	op = clone op
 
-	container = {data: clone snapshot}
+	container = {'data': clone snapshot}
 
 	try
 		for c, i in op
@@ -128,7 +128,7 @@ json.append = (dest, c) ->
 	c = clone c
 	if dest.length != 0 and json.pathMatches c['p'], (last = dest[dest.length - 1]).p
 		if last['na'] != undefined and c['na'] != undefined
-			dest[dest.length - 1] = { p: last['p'], na: last['na'] + c['na'] }
+			dest[dest.length - 1] = { 'p': last['p'], 'na': last['na'] + c['na'] }
 		else if last['li'] != undefined and c['li'] == undefined and c['ld'] == last['li']
 			# insert immediately followed by delete becomes a noop.
 			if last['ld'] != undefined
@@ -237,8 +237,8 @@ json.transformComponent = (dest, c, otherC, type) ->
 				throw new Error("must be a string?") unless commonOperand
 				p1 = c['p'][cplength - 1]
 				p2 = otherC['p'][otherCplength - 1]
-				tc1 = { p: p1 }
-				tc2 = { p: p2 }
+				tc1 = { 'p': p1 }
+				tc2 = { 'p': p2 }
 				tc1['i'] = c['si'] if c['si']?
 				tc1['d'] = c['sd'] if c['sd']?
 				tc2['i'] = otherC['si'] if otherC['si']?
@@ -246,7 +246,7 @@ json.transformComponent = (dest, c, otherC, type) ->
 				res = []
 				text._transformComponent res, tc1, tc2, type
 				for tc in res
-					jc = { p: c['p'][...common] }
+					jc = { 'p': c['p'][...common] }
 					jc['p'].push(tc['p'])
 					jc['si'] = tc['i'] if tc['i']?
 					jc['sd'] = tc['d'] if tc['d']?
@@ -401,7 +401,7 @@ json.transformComponent = (dest, c, otherC, type) ->
 			if c['oi'] != undefined and c['p'][common] == otherC['p'][common]
 				# client wins if we try to insert at the same place
 				if type == 'client'
-					json.append dest, {p:c['p'],od:otherC['oi']}
+					json.append dest, {'p':c['p'],'od':otherC['oi']}
 				else
 					return dest
 		else if otherC['od'] != undefined
