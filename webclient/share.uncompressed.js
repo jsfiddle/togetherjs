@@ -554,7 +554,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       } else {
         c['p'] = [];
       };
-      append(newOp, c);
+      json.append(newOp, c);
     }
     return newOp;
   };

@@ -163,7 +163,7 @@ json.normalize = (op) ->
 
 	for c in op
 		c['p'] ?= []
-		append newOp, c
+		json.append newOp, c
 	
 	newOp
 
