@@ -25,10 +25,11 @@ module.exports = (model) ->
 		# callback(startingVersion) is called when the listener is first applied. All ops
 		# from then on are sent to the user.
 		# Listeners are of the form listener(op, appliedAt)
-		listen: (docName, fromVersionCallback, listener) ->
+		listen: (docName, listener, callback) ->
 			model.getVersion docName, (version) ->
-				emitterForDoc(docName, yes).on 'op', listener
-				fromVersionCallback(version)
+				# Only attach the listener if the document exists (ie, if version != null)
+				emitterForDoc(docName, yes).on 'op', listener if version != null
+				callback version if callback
 
 		# Remove a listener from a particular document.
 		removeListener: (docName, listener) ->
@@ -42,19 +43,29 @@ module.exports = (model) ->
 		# future.
 		# The callback is called once the listener is attached. removeListener() will be
 		# ineffective before then.
+		# Callback(version) if the listener is attached
+		# Callback(null) if the document doesn't exist
 		listenFromVersion: (docName, version, listener, callback) ->
-			# The listener isn't attached until we have the historical ops from the database.
-			model.getOps docName, version, null, (data) ->
-				emitter = emitterForDoc(docName, yes)
-				emitter.on 'op', listener
-				callback() if callback?
-				p 'Listener added -> ' + (i emitterForDoc(docName)?.listeners('op'))
+			model.getVersion docName, (docVersion) ->
+				if docVersion == null
+					# The document doesn't exist.
+					callback null if callback
+					return
 
-				for op_data in data
-					listener op_data
+				version = docVersion if version > docVersion
 
-					# The listener may well remove itself during the catchup phase. If this happens, break early.
-					# This is done in a quite inefficient way. (O(n) where n = #listeners on doc)
-					break unless listener in emitter.listeners('op')
+				# The listener isn't attached until we have the historical ops from the database.
+				model.getOps docName, version, null, (data) ->
+					emitter = emitterForDoc(docName, yes)
+					emitter.on 'op', listener
+					callback version if callback
+					p 'Listener added -> ' + (i emitterForDoc(docName)?.listeners('op'))
+
+					for op_data in data
+						listener op_data
+
+						# The listener may well remove itself during the catchup phase. If this happens, break early.
+						# This is done in a quite inefficient way. (O(n) where n = #listeners on doc)
+						break unless listener in emitter.listeners('op')
 	}
 

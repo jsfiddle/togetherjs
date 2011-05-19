@@ -1,8 +1,8 @@
 `
-/** @preserve ShareJS v0.1.1
+/** @preserve ShareJS v0.2.0
 http://sharejs.org
 
-Copyright 2011 Joseph Gentle
+Copyright 2011 ShareJS Authors
 
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE

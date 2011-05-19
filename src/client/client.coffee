@@ -5,9 +5,11 @@
 
 if WEB?
 	types ||= exports.types
+	throw new Error 'Must load socket.io before this library' unless window['io']
+	io = window['io']
 else
-	OpStream = require('./opstream').OpStream
 	types = require('../types')
+	io = require('../../thirdparty/Socket.io-node-client').io
 	MicroEvent = require './microevent'
 
 # An open document.
@@ -21,7 +23,7 @@ class Document
 	# stream is a OpStream object.
 	# name is the documents' docName.
 	# version is the version of the document _on the server_
-	constructor: (@stream, @name, @version, @type, snapshot) ->
+	constructor: (@connection, @name, @version, @type, snapshot) ->
 		throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
 
 		# Gotta figure out a better way to make this work with closure.
@@ -41,26 +43,6 @@ class Document
 		# Listeners for the document changing
 		@listeners = []
 
-		@['created'] = no
-
-		@follow()
-	
-	# Internal
-	follow: (callback) ->
-		@stream.on @name, 'op', @onOpReceived
-
-		@stream.follow @name, @version, (msg) =>
-			throw new Error("Expected version #{@version} but got #{msg['v']}") unless msg['v'] == @version
-			callback() if callback?
-
-	# Internal.
-	unfollow: (callback) ->
-		# Ignore all inflight ops.
-		# I think there is a bug here if you send an op then immediately unfollow the document, and a server op
-		# happens before your op reaches the server.
-		@stream.removeListener @name, 'op', @onOpReceived
-		@stream.unfollow @name, callback
-
 	# Internal - do not call directly.
 	tryFlushPendingOp: =>
 		if @inflightOp == null && @pendingOp != null
@@ -71,7 +53,7 @@ class Document
 			@pendingOp = null
 			@pendingCallbacks = []
 
-			@stream.submit @name, @inflightOp, @version, (response) =>
+			@connection.send {'doc':@name, 'op':@inflightOp, 'v':@version}, (response) =>
 				if response['v'] == null
 					# Currently, it should be impossible to reach this case.
 					# This case is currently untested.
@@ -86,7 +68,6 @@ class Document
 				@serverOps[@version] = @inflightOp
 				@version++
 				callback(@inflightOp, null) for callback in @inflightCallbacks
-#				console.log 'Heard back from server.', this, response, @version
 
 				@inflightOp = null
 				@tryFlushPendingOp()
@@ -161,7 +142,7 @@ class Document
 	# Close a document.
 	# No unit tests for this so far.
 	close: (callback) ->
-		@unfollow =>
+		@connection.send {'doc':@name, open:false}, =>
 			callback() if callback
 			@emit 'closed'
 			return
@@ -176,14 +157,87 @@ Document.prototype['close'] = Document.prototype.close
 # A connection to a sharejs server
 class Connection
 	constructor: (host, port, basePath) ->
-		@stream = new OpStream(host, port, basePath)
+		resource = if basePath then path + '/socket.io' else 'socket.io'
+
+		@socket = new io['Socket'] host, {port:port, resource:resource}
+
+		@socket['on'] 'connect', @connected
+		@socket['on'] 'disconnect', @disconnected
+		@socket['on'] 'message', @onMessage
+		@socket['connect']()
+
+		@lastReceivedDoc = null
+		@lastSentDoc = null
+
 		@docs = {}
 		@numDocs = 0
 
-	makeDoc: (name, version, type, snapshot) ->
+	disconnected: =>
+		# Start reconnect sequence
+		@emit 'disconnect'
+
+	connected: =>
+		# Stop reconnect sequence
+		@emit 'connect'
+
+	# Send the specified message to the server. The server's response will be passed
+	# to callback. If the message is 'open', ops will be sent to follower()
+	send: (msg, callback) ->
+		docName = msg['doc']
+
+		if docName == @lastSentDoc
+			delete msg['doc']
+		else
+			@lastSentDoc = docName
+
+		@socket['send'] msg
+		
+		if callback
+			register = (type) =>
+				cb = (response) =>
+					if response['doc'] == docName
+						@removeListener type, cb
+						callback(response)
+
+				@on type, cb
+
+			register (if msg['open'] == true then 'open'
+			else if msg['open'] == false then 'close'
+			else if msg['create'] then 'create'
+			else if msg['snapshot'] == null then 'snapshot'
+			else if msg['op'] then 'op response')
+
+	onMessage: (msg) =>
+		docName = msg['doc']
+
+		if docName != undefined
+			@lastReceivedDoc = docName
+		else
+			msg['doc'] = docName = @lastReceivedDoc
+
+		@emit 'message', msg
+
+		type = if msg['open'] == true or (msg['open'] == false and msg['error']) then 'open'
+		else if msg['open'] == false then 'close'
+		else if msg['snapshot'] != undefined then 'snapshot'
+		else if msg['create'] then 'create'
+		else if msg['op'] then 'op'
+		else if msg['v'] != undefined then 'op response'
+
+		@emit type, msg
+
+		if type == 'op'
+			doc = @docs[docName]
+			doc.onOpReceived msg if doc
+
+	makeDoc: (params) ->
+		name = params['doc']
 		throw new Error("Document #{name} already followed") if @docs[name]
 
-		doc = new Document(@stream, name, version, type, snapshot)
+		type = params['type']
+		type = types[type] if typeof type == 'string'
+		doc = new Document(@, name, params['v'], type, params['snapshot'])
+		doc['created'] = !!params['create']
 		@docs[name] = doc
 		@numDocs++
 
@@ -195,23 +249,24 @@ class Connection
 
 	# Open a document that already exists
 	# callback is passed a Document or null
-	# callback(doc)
-	openExisting: (docName, callback) ->
+	# callback(doc, error)
+	'openExisting': (docName, callback) ->
 		return @docs[docName] if @docs[docName]?
 
-		@stream.get docName, (response) =>
-			if response['snapshot'] == null
-				callback(null)
+		@send {'doc':docName, 'open':true, 'snapshot':null}, (response) =>
+			if response.error
+				callback null, new Error(response.error)
 			else
-				type = types[response['type']]
-				callback @makeDoc(response['doc'], response['v'], type, response['snapshot'])
+				# response['doc'] is used instead of docName to allow docName to be null.
+				# In that case, the server generates a random docName to use.
+				callback @makeDoc(response)
 
 	# Open a document. It will be created if it doesn't already exist.
 	# Callback is passed a document or an error
 	# type is either a type name (eg 'text' or 'simple') or the actual type object.
 	# Types must be supported by the server.
 	# callback(doc, error)
-	open: (docName, type, callback) ->
+	'open': (docName, type, callback) ->
 		if typeof type == 'function'
 			callback = type
 			type = 'text'
@@ -225,40 +280,27 @@ class Connection
 			if doc.type == type
 				callback doc
 			else
-				callback doc, 'Document already exists with type ' + doc.type.name
+				callback doc, 'Type mismatch'
 
 			return
 
-		@stream.get docName, (response) =>
-			if response['snapshot'] == null
-				@stream.submit docName, {'type': type.name}, 0, (response) =>
-					if response['v']?
-						doc = @makeDoc(docName, 1, type, type.initialVersion())
-						doc['created'] = yes
-						callback doc
-					else if response['v'] == null and response['error'] == 'Type already set'
-						# Somebody else has created the document. Get the snapshot again..
-						@open docName, type, callback
-					else
-						callback null, response['error']
-			else if response['type'] == type.name
-				callback @makeDoc(docName, response['v'], type, response['snapshot'])
+		@send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (response) =>
+			if response.error
+				callback null, new Error(response.error)
 			else
-				callback null, "Document already exists with type #{response['type']}"
+				response['snapshot'] = type.initialVersion() unless response['snapshot'] != undefined
+				response['type'] = type
+				callback @makeDoc(response)
 
 	# To be written. Create a new document with a random name.
-	# Prefix is an optional string to put on the front of the document name.
-	create: (type, prefix) ->
-		throw new Error('Not implemented')
+	'create': (type, callback) ->
+		open null, type, callback
 
-	disconnect: () ->
+	'disconnect': () ->
 		if @stream?
 			@emit 'disconnected'
 			@stream.disconnect()
 			@stream = null
-
-Connection.prototype['openExisting'] = Connection.prototype.openExisting
-Connection.prototype['open'] = Connection.prototype.open
 
 MicroEvent.mixin Connection
 

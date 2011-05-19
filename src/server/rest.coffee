@@ -30,12 +30,10 @@ expectJSONObject = (req, res, callback) ->
 	pump req, (data) ->
 		try
 			obj = JSON.parse data
+			callback(obj)
 		catch error
 			send400 res, 'Supplied JSON invalid'
 			return
-
-		callback(obj)
-
 
 pump = (req, callback) ->
 	data = ''
@@ -43,19 +41,46 @@ pump = (req, callback) ->
 	req.on 'end', () -> callback(data)
 
 router = (app, model, options) ->
+	# GET returns the document snapshot. The version and type are sent as headers.
+	# I'm not sure what to do with document metadata - it is inaccessable for now.
 	app.get '/doc/:name', (req, res) ->
 		model.getSnapshot req.params.name, (doc) ->
-			if doc.snapshot?
-				doc.type = doc.type.name
-				sendJSON res, doc
+			if doc
+				res.setHeader 'X-OT-Type', doc.type.name
+				res.setHeader 'X-OT-Version', doc.v
+				if typeof doc.snapshot == 'string'
+					send200 res, doc.snapshot
+				else
+					sendJSON res, doc.snapshot
 			else
 				send404 res
+	
+	# Put is used to create a document. The contents are a JSON object with {type:TYPENAME, meta:{...}}
+	app.put '/doc/:name', (req, res) ->
+		expectJSONObject req, res, (obj) ->
+			type = obj?.type
+			meta = obj?.meta
 
+			unless typeof type == 'string' and (meta == undefined or typeof meta == 'object')
+				send400 res, 'Type invalid'
+			else
+				model.create req.params.name, type, meta, (result) ->
+					if result
+						send200 res
+					else
+						send400 res, 'The document already exists'
+
+	# POST submits an op to the document.
 	app.post '/doc/:name', (req, res) ->
 		query = url.parse(req.url, true).query
-		version = parseInt query?.v
-		unless version?
-			send400 res, 'Version required - attach query parameter ?v=X on your URL'
+
+		version = if query?.v?
+			parseInt query?.v
+		else
+			parseInt req.headers['x-ot-version']
+		
+		unless version? and version >= 0
+			send400 res, 'Version required - attach query parameter ?v=X on your URL or set the X-OT-Version header'
 		else
 			expectJSONObject req, res, (obj) ->
 				opData = {v:version, op:obj, meta:{source:req.socket.remoteAddress}}

@@ -1,6 +1,6 @@
 (function() {
-
-/** @preserve ShareJS v0.2
+  
+/** @preserve ShareJS v0.1.1
 http://sharejs.org
 
 Copyright 2011 Joseph Gentle
@@ -8,7 +8,7 @@ Copyright 2011 Joseph Gentle
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, OpStream, WEB, append, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformComponentX, transformPosition, transformX, types;
+;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, compose, compress, connections, exports, getConnection, invertComponent, io, open, strInject, text, transformComponent, transformPosition, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -57,8 +57,81 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     proto.emit = MicroEvent.prototype.emit;
     return obj;
   };
-  if (typeof module != "undefined" && module !== null ? module.exports : void 0) {
+  if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
     module.exports = MicroEvent;
+  }
+  bootstrapTransform = function(type, transformComponent, checkValidOp, append) {
+    var transformComponentX, transformX;
+    transformComponentX = function(server, client, destServer, destClient) {
+      transformComponent(destServer, server, client, 'server');
+      return transformComponent(destClient, client, server, 'client');
+    };
+    type.transformX = transformX = function(serverOp, clientOp) {
+      var c, c_, clientComponent, k, newClientOp, newServerOp, nextC, s, s_, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
+      checkValidOp(serverOp);
+      checkValidOp(clientOp);
+      newClientOp = [];
+      for (_i = 0, _len = clientOp.length; _i < _len; _i++) {
+        clientComponent = clientOp[_i];
+        newServerOp = [];
+        k = 0;
+        while (k < serverOp.length) {
+          nextC = [];
+          transformComponentX(serverOp[k], clientComponent, newServerOp, nextC);
+          k++;
+          if (nextC.length === 1) {
+            clientComponent = nextC[0];
+          } else if (nextC.length === 0) {
+            _ref = serverOp.slice(k);
+            for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+              s = _ref[_j];
+              append(newServerOp, s);
+            }
+            clientComponent = null;
+            break;
+          } else {
+            _ref2 = transformX(serverOp.slice(k), nextC), s_ = _ref2[0], c_ = _ref2[1];
+            for (_k = 0, _len3 = s_.length; _k < _len3; _k++) {
+              s = s_[_k];
+              append(newServerOp, s);
+            }
+            for (_l = 0, _len4 = c_.length; _l < _len4; _l++) {
+              c = c_[_l];
+              append(newClientOp, c);
+            }
+            clientComponent = null;
+            break;
+          }
+        }
+        if (clientComponent != null) {
+          append(newClientOp, clientComponent);
+        }
+        serverOp = newServerOp;
+      }
+      return [serverOp, newClientOp];
+    };
+    return type.transform = function(op, otherOp, type) {
+      var client, server, _, _ref, _ref2;
+      if (!(type === 'server' || type === 'client')) {
+        throw new Error("type must be 'server' or 'client'");
+      }
+      if (otherOp.length === 0) {
+        return op;
+      }
+      if (op.length === 1 && otherOp.length === 1) {
+        return transformComponent([], op[0], otherOp[0], type);
+      }
+      if (type === 'server') {
+        _ref = transformX(op, otherOp), server = _ref[0], _ = _ref[1];
+        return server;
+      } else {
+        _ref2 = transformX(otherOp, op), _ = _ref2[0], client = _ref2[1];
+        return client;
+      }
+    };
+  };
+  if (WEB == null) {
+    exports.bootstrapTransform = bootstrapTransform;
   }
   text = {};
   text.name = 'text';
@@ -140,7 +213,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       c = op2[_i];
       append(newOp, c);
     }
-    checkValidOp(newOp);
     return newOp;
   };
   text.compress = compress = function(op) {
@@ -154,7 +226,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-      (_ref = c['p']) != null ? _ref : c['p'] = 0;
+            if ((_ref = c['p']) != null) {
+        _ref;
+      } else {
+        c['p'] = 0;
+      };
       append(newOp, c);
     }
     return newOp;
@@ -176,7 +252,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }
     }
   };
-  text.transformCursor = function(position, op, insertAfter) {
+  text['transformCursor'] = function(position, op, insertAfter) {
     var c, _i, _len;
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
@@ -189,7 +265,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     checkValidOp([c]);
     checkValidOp([otherC]);
     if (c['i'] != null) {
-      return append(dest, {
+      append(dest, {
         'i': c['i'],
         'p': transformPosition(c['p'], otherC, type === 'server')
       });
@@ -204,19 +280,19 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           s = s.slice(otherC['p'] - c['p']);
         }
         if (s !== '') {
-          return append(dest, {
+          append(dest, {
             'd': s,
             'p': c['p'] + otherC['i'].length
           });
         }
       } else {
         if (c['p'] >= otherC['p'] + otherC['d'].length) {
-          return append(dest, {
+          append(dest, {
             'd': c['d'],
             'p': c['p'] - otherC['d'].length
           });
         } else if (c['p'] + c['d'].length <= otherC['p']) {
-          return append(dest, c);
+          append(dest, c);
         } else {
           newC = {
             'd': '',
@@ -237,72 +313,12 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           }
           if (newC['d'] !== '') {
             newC['p'] = transformPosition(newC['p'], otherC);
-            return append(dest, newC);
+            append(dest, newC);
           }
         }
       }
     }
-  };
-  transformComponentX = function(server, client, destServer, destClient) {
-    transformComponent(destServer, server, client, 'server');
-    return transformComponent(destClient, client, server, 'client');
-  };
-  text.transformX = transformX = function(serverOp, clientOp) {
-    var c, c_, clientComponent, k, newClientOp, newServerOp, nextC, s, s_, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
-    checkValidOp(serverOp);
-    checkValidOp(clientOp);
-    newClientOp = [];
-    for (_i = 0, _len = clientOp.length; _i < _len; _i++) {
-      clientComponent = clientOp[_i];
-      newServerOp = [];
-      k = 0;
-      while (k < serverOp.length) {
-        nextC = [];
-        transformComponentX(serverOp[k], clientComponent, newServerOp, nextC);
-        k++;
-        if (nextC.length === 1) {
-          clientComponent = nextC[0];
-        } else if (nextC.length === 0) {
-          _ref = serverOp.slice(k);
-          for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-            s = _ref[_j];
-            append(newServerOp, s);
-          }
-          clientComponent = null;
-          break;
-        } else {
-          _ref2 = transformX(serverOp.slice(k), nextC), s_ = _ref2[0], c_ = _ref2[1];
-          for (_k = 0, _len3 = s_.length; _k < _len3; _k++) {
-            s = s_[_k];
-            append(newServerOp, s);
-          }
-          for (_l = 0, _len4 = c_.length; _l < _len4; _l++) {
-            c = c_[_l];
-            append(newClientOp, c);
-          }
-          clientComponent = null;
-          break;
-        }
-      }
-      if (clientComponent != null) {
-        append(newClientOp, clientComponent);
-      }
-      serverOp = newServerOp;
-    }
-    return [serverOp, newClientOp];
-  };
-  text.transform = function(op, otherOp, type) {
-    var client, server, _, _ref, _ref2;
-    if (!(type === 'server' || type === 'client')) {
-      throw new Error("type must be 'server' or 'client'");
-    }
-    if (type === 'server') {
-      _ref = transformX(op, otherOp), server = _ref[0], _ = _ref[1];
-      return server;
-    } else {
-      _ref2 = transformX(otherOp, op), _ = _ref2[0], client = _ref2[1];
-      return client;
-    }
+    return dest;
   };
   invertComponent = function(c) {
     if (c['i'] != null) {
@@ -329,143 +345,31 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   };
   if (WEB != null) {
     exports.types || (exports.types = {});
+    bootstrapTransform(text, transformComponent, checkValidOp, append);
     exports.types['text'] = text;
   } else {
     module.exports = text;
+    require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append);
   }
   if (WEB != null) {
+    types || (types = exports.types);
     if (!window['io']) {
       throw new Error('Must load socket.io before this library');
     }
     io = window['io'];
   } else {
-    io = require('../../thirdparty/Socket.io-node-client').io;
-  }
-  OpStream = (function() {
-    function OpStream(host, port, path) {
-      this.onMessage = __bind(this.onMessage, this);;      var resource;
-      resource = path ? path + '/socket.io' : 'socket.io';
-      this.socket = new io['Socket'](host, {
-        port: port,
-        resource: resource
-      });
-      this.socket['on']('connect', this.onConnect);
-      this.socket['on']('message', this.onMessage);
-      this.socket['connect']();
-      this.callbacks = {};
-      this.lastReceivedDoc = null;
-      this.lastSentDoc = null;
-    }
-    OpStream.prototype.onConnect = function() {};
-    OpStream.prototype.on = function(docName, type, callback) {
-      var _base;
-      (_base = this.callbacks)[docName] || (_base[docName] = {});
-      if (this.callbacks[docName][type] != null) {
-        throw new Error("Callback already exists for " + docName + ", " + type);
-      }
-      return this.callbacks[docName][type] = callback;
-    };
-    OpStream.prototype.removeListener = function(docName, type, listener) {
-      var _ref;
-      return (_ref = this.callbacks[docName]) != null ? delete _ref[type] : void 0;
-    };
-    OpStream.prototype.onMessage = function(data) {
-      var emit;
-      if (data['doc'] != null) {
-        this.lastReceivedDoc = data['doc'];
-      } else {
-        data['doc'] = this.lastReceivedDoc;
-      }
-      emit = __bind(function(type, clear) {
-        var callback, _ref;
-        callback = (_ref = this.callbacks[data['doc']]) != null ? _ref[type] : void 0;
-        if (callback != null) {
-          if (clear) {
-            this.callbacks[data['doc']][type] = null;
-          }
-          return callback(data);
-        }
-      }, this);
-      if (data['snapshot'] !== void 0) {
-        return emit('snapshot', true);
-      } else if (data['follow'] != null) {
-        if (data['follow']) {
-          return emit('follow', true);
-        } else {
-          return emit('unfollow', true);
-        }
-      } else if (data['v'] !== void 0) {
-        if (data['op'] != null) {
-          return emit('op', false);
-        } else {
-          return emit('localop', true);
-        }
-      }
-    };
-    OpStream.prototype.send = function(msg) {
-      if (msg['doc'] === this.lastSentDoc) {
-        delete msg['doc'];
-      } else {
-        this.lastSentDoc = msg['doc'];
-      }
-      return this.socket['send'](msg);
-    };
-    OpStream.prototype.follow = function(docName, v, callback) {
-      var request;
-      request = {
-        'doc': docName,
-        'follow': true
-      };
-      if (v != null) {
-        request['v'] = v;
-      }
-      this.send(request);
-      return this.on(docName, 'follow', callback);
-    };
-    OpStream.prototype.get = function(docName, callback) {
-      this.send({
-        'doc': docName,
-        'snapshot': null
-      });
-      return this.on(docName, 'snapshot', callback);
-    };
-    OpStream.prototype.submit = function(docName, op, version, callback) {
-      this.send({
-        'doc': docName,
-        'v': version,
-        'op': op
-      });
-      return this.on(docName, 'localop', callback);
-    };
-    OpStream.prototype.unfollow = function(docName, callback) {
-      this.send({
-        'doc': docName,
-        'follow': false
-      });
-      return this.on(docName, 'unfollow', callback);
-    };
-    OpStream.prototype.disconnect = function() {
-      this.socket['disconnect']();
-      return this.socket = null;
-    };
-    return OpStream;
-  })();
-  exports.OpStream = OpStream;
-  if (WEB != null) {
-    types || (types = exports.types);
-  } else {
-    OpStream = require('./opstream').OpStream;
     types = require('../types');
+    io = require('../../thirdparty/Socket.io-node-client').io;
     MicroEvent = require('./microevent');
   }
   Document = (function() {
-    function Document(stream, name, version, type, snapshot) {
-      this.stream = stream;
+    function Document(connection, name, version, type, snapshot) {
+      this.connection = connection;
       this.name = name;
       this.version = version;
       this.type = type;
-      this.onOpReceived = __bind(this.onOpReceived, this);;
-      this.tryFlushPendingOp = __bind(this.tryFlushPendingOp, this);;
+      this.onOpReceived = __bind(this.onOpReceived, this);
+      this.tryFlushPendingOp = __bind(this.tryFlushPendingOp, this);
       if (this.type.compose == null) {
         throw new Error('Handling types without compose() defined is not currently implemented');
       }
@@ -476,31 +380,18 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.pendingCallbacks = [];
       this.serverOps = {};
       this.listeners = [];
-      this['created'] = false;
-      this.follow();
     }
-    Document.prototype.follow = function(callback) {
-      this.stream.on(this.name, 'op', this.onOpReceived);
-      return this.stream.follow(this.name, this.version, __bind(function(msg) {
-        if (msg['v'] !== this.version) {
-          throw new Error("Expected version " + this.version + " but got " + msg['v']);
-        }
-        if (callback != null) {
-          return callback();
-        }
-      }, this));
-    };
-    Document.prototype.unfollow = function(callback) {
-      this.stream.removeListener(this.name, 'op', this.onOpReceived);
-      return this.stream.unfollow(this.name, callback);
-    };
     Document.prototype.tryFlushPendingOp = function() {
       if (this.inflightOp === null && this.pendingOp !== null) {
         this.inflightOp = this.pendingOp;
         this.inflightCallbacks = this.pendingCallbacks;
         this.pendingOp = null;
         this.pendingCallbacks = [];
-        return this.stream.submit(this.name, this.inflightOp, this.version, __bind(function(response) {
+        return this.connection.send({
+          'doc': this.name,
+          'op': this.inflightOp,
+          'v': this.version
+        }, __bind(function(response) {
           var callback, _i, _j, _len, _len2, _ref, _ref2;
           if (response['v'] === null) {
             _ref = this.inflightCallbacks;
@@ -590,7 +481,10 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return setTimeout(this.tryFlushPendingOp, 0);
     };
     Document.prototype.close = function(callback) {
-      return this.unfollow(__bind(function() {
+      return this.connection.send({
+        'doc': this.name,
+        open: false
+      }, __bind(function() {
         if (callback) {
           callback();
         }
@@ -604,16 +498,82 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   Document.prototype['close'] = Document.prototype.close;
   Connection = (function() {
     function Connection(host, port, basePath) {
-      this.stream = new OpStream(host, port, basePath);
+      this.onMessage = __bind(this.onMessage, this);
+      this.connected = __bind(this.connected, this);
+      this.disconnected = __bind(this.disconnected, this);      var resource;
+      resource = basePath ? path + '/socket.io' : 'socket.io';
+      this.socket = new io['Socket'](host, {
+        port: port,
+        resource: resource
+      });
+      this.socket['on']('connect', this.connected);
+      this.socket['on']('disconnect', this.disconnected);
+      this.socket['on']('message', this.onMessage);
+      this.socket['connect']();
+      this.lastReceivedDoc = null;
+      this.lastSentDoc = null;
       this.docs = {};
       this.numDocs = 0;
     }
-    Connection.prototype.makeDoc = function(name, version, type, snapshot) {
-      var doc;
+    Connection.prototype.disconnected = function() {
+      return this.emit('disconnect');
+    };
+    Connection.prototype.connected = function() {
+      return this.emit('connect');
+    };
+    Connection.prototype.send = function(msg, callback) {
+      var docName, register;
+      docName = msg['doc'];
+      if (docName === this.lastSentDoc) {
+        delete msg['doc'];
+      } else {
+        this.lastSentDoc = docName;
+      }
+      this.socket['send'](msg);
+      if (callback) {
+        register = __bind(function(type) {
+          var cb;
+          cb = __bind(function(response) {
+            if (response['doc'] === docName) {
+              this.removeListener(type, cb);
+              return callback(response);
+            }
+          }, this);
+          return this.on(type, cb);
+        }, this);
+        return register((msg['open'] === true ? 'open' : msg['open'] === false ? 'close' : msg['create'] ? 'create' : msg['snapshot'] === null ? 'snapshot' : msg['op'] ? 'op response' : void 0));
+      }
+    };
+    Connection.prototype.onMessage = function(msg) {
+      var doc, docName, type;
+      docName = msg['doc'];
+      if (docName !== void 0) {
+        this.lastReceivedDoc = docName;
+      } else {
+        msg['doc'] = docName = this.lastReceivedDoc;
+      }
+      this.emit('message', msg);
+      type = msg['open'] === true || (msg['open'] === false && msg['error']) ? 'open' : msg['open'] === false ? 'close' : msg['snapshot'] !== void 0 ? 'snapshot' : msg['create'] ? 'create' : msg['op'] ? 'op' : msg['v'] !== void 0 ? 'op response' : void 0;
+      this.emit(type, msg);
+      if (type === 'op') {
+        doc = this.docs[docName];
+        if (doc) {
+          return doc.onOpReceived(msg);
+        }
+      }
+    };
+    Connection.prototype.makeDoc = function(params) {
+      var doc, name, type;
+      name = params['doc'];
       if (this.docs[name]) {
         throw new Error("Document " + name + " already followed");
       }
-      doc = new Document(this.stream, name, version, type, snapshot);
+      type = params['type'];
+      if (typeof type === 'string') {
+        type = types[type];
+      }
+      doc = new Document(this, name, params['v'], type, params['snapshot']);
+      doc['created'] = !!params['create'];
       this.docs[name] = doc;
       this.numDocs++;
       doc.on('closed', __bind(function() {
@@ -622,21 +582,23 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }, this));
       return doc;
     };
-    Connection.prototype.openExisting = function(docName, callback) {
+    Connection.prototype['openExisting'] = function(docName, callback) {
       if (this.docs[docName] != null) {
         return this.docs[docName];
       }
-      return this.stream.get(docName, __bind(function(response) {
-        var type;
-        if (response['snapshot'] === null) {
-          return callback(null);
+      return this.send({
+        'doc': docName,
+        'open': true,
+        'snapshot': null
+      }, __bind(function(response) {
+        if (response.error) {
+          return callback(null, new Error(response.error));
         } else {
-          type = types[response['type']];
-          return callback(this.makeDoc(response['doc'], response['v'], type, response['snapshot']));
+          return callback(this.makeDoc(response));
         }
       }, this));
     };
-    Connection.prototype.open = function(docName, type, callback) {
+    Connection.prototype['open'] = function(docName, type, callback) {
       var doc;
       if (typeof type === 'function') {
         callback = type;
@@ -651,36 +613,32 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         if (doc.type === type) {
           callback(doc);
         } else {
-          callback(doc, 'Document already exists with type ' + doc.type.name);
+          callback(doc, 'Type mismatch');
         }
         return;
       }
-      return this.stream.get(docName, __bind(function(response) {
-        if (response['snapshot'] === null) {
-          return this.stream.submit(docName, {
-            'type': type.name
-          }, 0, __bind(function(response) {
-            if (response['v'] != null) {
-              doc = this.makeDoc(docName, 1, type, type.initialVersion());
-              doc['created'] = true;
-              return callback(doc);
-            } else if (response['v'] === null && response['error'] === 'Type already set') {
-              return this.open(docName, type, callback);
-            } else {
-              return callback(null, response['error']);
-            }
-          }, this));
-        } else if (response['type'] === type.name) {
-          return callback(this.makeDoc(docName, response['v'], type, response['snapshot']));
+      return this.send({
+        'doc': docName,
+        'open': true,
+        'create': true,
+        'snapshot': null,
+        'type': type.name
+      }, __bind(function(response) {
+        if (response.error) {
+          return callback(null, new Error(response.error));
         } else {
-          return callback(null, "Document already exists with type " + response['type']);
+          if (response['snapshot'] === void 0) {
+            response['snapshot'] = type.initialVersion();
+          }
+          response['type'] = type;
+          return callback(this.makeDoc(response));
         }
       }, this));
     };
-    Connection.prototype.create = function(type, prefix) {
-      throw new Error('Not implemented');
+    Connection.prototype['create'] = function(type, callback) {
+      return open(null, type, callback);
     };
-    Connection.prototype.disconnect = function() {
+    Connection.prototype['disconnect'] = function() {
       if (this.stream != null) {
         this.emit('disconnected');
         this.stream.disconnect();
@@ -689,15 +647,21 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     };
     return Connection;
   })();
-  Connection.prototype['openExisting'] = Connection.prototype.openExisting;
-  Connection.prototype['open'] = Connection.prototype.open;
   MicroEvent.mixin(Connection);
   connections = {};
   getConnection = function(host, port, basePath) {
     var address, c;
     if (WEB != null) {
-      host != null ? host : host = window.location.hostname;
-      port != null ? port : port = window.location.port;
+            if (host != null) {
+        host;
+      } else {
+        host = window.location.hostname;
+      };
+            if (port != null) {
+        port;
+      } else {
+        port = window.location.port;
+      };
     }
     address = host;
     if (port != null) {
@@ -718,7 +682,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       callback = options;
       options = null;
     }
-    options != null ? options : options = {};
+        if (options != null) {
+      options;
+    } else {
+      options = {};
+    };
     c = getConnection(options.host, options.port, options.basePath);
     return c.open(docName, type, function(doc) {
       doc.on('closed', function() {

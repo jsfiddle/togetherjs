@@ -1,6 +1,7 @@
 # Tests for server/model
 
 testCase = require('nodeunit').testCase
+assert = require 'assert'
 
 server = require '../src/server'
 
@@ -12,64 +13,90 @@ module.exports = testCase {
 	setUp: (callback) ->
 		@model = server.createModel {db:{type:'memory'}}
 		@name = 'testingdoc'
+		@unused = 'nonexistantdoc'
 
-		callback()
+		@model.create @name, 'simple', (status) ->
+			assert.ok status
+			callback()
+
+	'listen on a nonexistant op returns null and ignore the document': (test) ->
+		@model.listen @unused, (-> throw new Error 'should not receive any ops'), (v) =>
+			test.strictEqual v, null
+
+			@model.create @unused, 'simple', =>
+				@model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
+					test.done()
+	
+	'listen from version on a nonexistant op returns null and ignores the doc': (test) ->
+		@model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (v) =>
+			test.strictEqual v, null
+
+			@model.create @unused, 'simple', =>
+				@model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
+					test.done()
 
 	'emit events when ops are applied': (test) ->
 		expectedVersions = [0...2]
-		@model.listen @name, ((v) -> test.strictEqual v, 0), (op_data) ->
+		listener = (op_data) ->
 			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
+		@model.listen @name, listener, ((v) -> test.strictEqual v, 0)
+
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) -> test.ifError(error)
 	
 	'emit transformed events when old ops are applied': (test) ->
 		expectedVersions = [0...3]
-		@model.listen @name, ((v) -> test.strictEqual v, 0), (op_data) ->
+		listener = (op_data) ->
 			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
+		@model.listen @name, listener, ((v) -> test.strictEqual v, 0)
+
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) =>
 				test.ifError(error)
-				@model.applyOp @name, {v:1, op:{position: 0, text: 'hi2'}}, (error, v) ->
+				@model.applyOp @name, {v:1, op:{position:0, text:'hi2'}}, (error, v) ->
 					test.ifError(error)
 					test.strictEqual v, 2
 	
 	'emit events when ops are applied to an existing document': (test) ->
-		applyOps @model, @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
+		applyOps @model, @name, 0, [{position:0, text:'A'}, {position:0, text:'Hi'}], (error, _) =>
 			test.ifError(error)
 
 			expectedVersions = [2...4]
-			@model.listen @name, ((v) -> test.strictEqual v, 2), (op_data) ->
+			listener = (op_data) ->
 				test.strictEqual op_data.v, expectedVersions.shift()
 				test.done() if expectedVersions.length == 0
+			@model.listen @name, listener, ((v) -> test.strictEqual v, 2)
 
 			applyOps @model, @name, 2, [
-					{position: 0, text: 'Hi'}
-					{position: 0, text: 'Hi'}
+					{position:0, text:'Hi'}
+					{position:0, text:'Hi'}
 				], (error, _) -> test.ifError(error)
 
 	'emit events with listenFromVersion from before the first version': (test) ->
 		expectedVersions = [0...2]
-		@model.listenFromVersion @name, 0, (op_data) ->
+		listener = (op_data) ->
 			test.strictEqual op_data.v, expectedVersions.shift()
 			test.done() if expectedVersions.length == 0
 
+		@model.listenFromVersion @name, 0, listener, (v) -> test.strictEqual v, 0
+
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) -> test.ifError(error)
 
 	'emit events with listenFromVersion from the first version after its been sent': (test) ->
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) -> test.ifError(error)
 
 		expectedVersions = [0...2]
@@ -78,7 +105,7 @@ module.exports = testCase {
 			test.done() if expectedVersions.length == 0
 	
 	'emit events with listenFromVersion from the current version': (test) ->
-		applyOps @model, @name, 0, [{type: 'simple'}, {position: 0, text: 'Hi'}], (error, _) =>
+		applyOps @model, @name, 0, [{position:0, text:'A'}, {position:0, text:'Hi'}], (error, _) =>
 			test.ifError(error)
 
 			expectedVersions = [2...4]
@@ -87,8 +114,8 @@ module.exports = testCase {
 				test.done() if expectedVersions.length == 0
 
 			applyOps @model, @name, 2, [
-					{position: 0, text: 'Hi'}
-					{position: 0, text: 'Hi'}
+					{position:0, text:'Hi'}
+					{position:0, text:'Hi'}
 				], (error, _) -> test.ifError(error)
 
 	'stop emitting events after removeListener is called': (test) ->
@@ -96,11 +123,11 @@ module.exports = testCase {
 			test.strictEqual op_data.v, 0, 'Listener was not removed correctly'
 			@model.removeListener @name, listener
 
-		@model.listen @name, ((v) -> test.strictEqual v, 0), listener
+		@model.listen @name, listener, ((v) -> test.strictEqual v, 0)
 
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) ->
 				test.ifError(error)
 				test.done()
@@ -111,8 +138,8 @@ module.exports = testCase {
 			@model.removeListener @name, listener
 
 		applyOps @model, @name, 0, [
-				{type: 'simple'},
-				{position: 0, text: 'Hi'}
+				{position:0, text:'A'},
+				{position:0, text:'Hi'}
 			], (error, _) =>
 				test.ifError(error)
 				@model.listenFromVersion @name, 0, listener

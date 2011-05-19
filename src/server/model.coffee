@@ -21,11 +21,11 @@ module.exports = Model = (db, options) ->
 
 	# Gets the snapshot data for the specified document.
 	# getSnapshot(docName, callback)
-	# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>})
+	# Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>, meta: <meta>})
 	@getSnapshot = getSnapshot = (docName, callback) ->
 		db.getSnapshot docName, (data) ->
 			p "getSnapshot #{i data}"
-			data.type = types[data.type] if data.type != null
+			data.type = types[data.type] if data?.type
 			callback data
 
 	# Gets the latest version # of the document. May be more efficient than getSnapshot.
@@ -33,9 +33,32 @@ module.exports = Model = (db, options) ->
 	# callback is called with (version).
 	@getVersion = db.getVersion
 
+	# Create a document.
+	@create = (docName, type, meta, callback) ->
+		type = types[type] if typeof type == 'string'
+		if typeof meta == 'function'
+			callback = meta
+			meta = {}
+
+		meta ||= {}
+
+		newDocData =
+			snapshot:type.initialVersion()
+			type:type.name
+			meta:meta || {}
+			v:0
+
+		p "db.create #{docName}, #{i newDocData}"
+
+		db.create docName, newDocData, callback
+
 	applyOpInternal = (docName, opData, callback) ->
 		p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
 		getSnapshot docName, (docData) ->
+			unless docData
+				callback new Error('Document does not exist')
+				return
+
 			opVersion = opData.v
 			op = opData.op
 			meta = opData.meta || {}
@@ -47,8 +70,14 @@ module.exports = Model = (db, options) ->
 			p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
 			submit = ->
+				try
+					snapshot = docData.type.apply docData.snapshot, op
+				catch error
+					callback error, null
+					return
+
 				newOpData = {op:op, v:opVersion, meta:meta}
-				newDocData = {snapshot:snapshot, type:type?.name ? null}
+				newDocData = {snapshot:snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
 
 				p "submit #{i newOpData}"
 				db.append docName, newOpData, newDocData, ->
@@ -60,52 +89,24 @@ module.exports = Model = (db, options) ->
 				callback new Error('Op at future version'), null
 				return
 
-			if opVersion == 0 # The op sets the type of a new document.
-				if version == 0
-					# Set the type.
-					typeName = op.type
-					unless typeName?
-						callback(new Error('Invalid op: type required'), null)
-						return
-
-					type = types[typeName]
-					unless type?
-						callback(new Error("Invalid op: type '#{typeName}' missing"), null)
-						return
-
-					snapshot = type.initialVersion()
-
-					submit()
-				else
-					callback new Error('Type already set'), null
-					return
-				
-			else # Normal op
-				if opVersion < version
-					# We'll need to transform the op to the current version of the document.
-					db.getOps docName, opVersion, version, (ops) ->
-						try
-							for realOp in ops
-								p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
-								op = docData.type.transform op, realOp.op, 'client'
-								opVersion++
-								p "-> #{i op}"
-
-							snapshot = docData.type.apply docData.snapshot, op
-						catch error
-							callback error, null
-							return
-
-						submit()
-				else
-					# The op is up to date. Apply and submit.
+			if opVersion < version
+				# We'll need to transform the op to the current version of the document.
+				db.getOps docName, opVersion, version, (ops) ->
 					try
-						snapshot = docData.type.apply docData.snapshot, op
+						for realOp in ops
+							p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
+							op = docData.type.transform op, realOp.op, 'client'
+							opVersion++
+							p "-> #{i op}"
+
 					catch error
 						callback error, null
 						return
 
 					submit()
+			else
+				# The op is up to date already. Apply and submit.
+				submit()
 
 	pendingOps = {} # docName -> {busy:bool, queue:[[op, callback], [op, callback], ...]}
 
@@ -126,6 +127,10 @@ module.exports = Model = (db, options) ->
 	# Apply an op to the specified document.
 	# The callback is passed (error, applied version #)
 	# opData = {op:op, v:v, meta:metadata}
+	# 
+	# Ops are queued before being applied so that the following code applies op C before op B:
+	# model.applyOp 'doc', OPA, -> model.applyOp 'doc', OPB
+	# model.applyOp 'doc', OPC
 	@applyOp = (docName, opData, callback) ->
 		p "applyOp #{docName} op #{i opData}"
 		# Its important that all ops are applied in order.

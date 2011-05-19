@@ -5,8 +5,6 @@
 # talking to a single redis backend using redis's transactions.
 
 redis = require 'redis'
-util = require 'util'
-types = require '../../types'
 
 defaultOptions = {
 	# Prefix for all database keys.
@@ -35,7 +33,17 @@ module.exports = RedisDb = (options) ->
 	client = redis.createClient options.hostname, options.port, options.redisOptions
 
 	client.select 15 if options.testing
-		
+
+	# Creates a new document.
+	# data = {snapshot, type:typename, [meta]}
+	# calls callback(true) if the document was created or callback(false) if a document with that name
+	# already exists.
+	@create = (docName, data, callback) ->
+		value = JSON.stringify(data)
+		client.setnx keyForDoc(docName), value, (err, result) ->
+			throw err if err?
+
+			callback !!result if callback
 
 	# Get all ops with version = start to version = end. Noninclusive.
 	# end is trimmed to the size of the document.
@@ -65,19 +73,22 @@ module.exports = RedisDb = (options) ->
 
 	# Append an op to a document.
 	# op_data = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
-	# doc_data = resultant document snapshot data. {snapshot:s, type:t}
+	# doc_data = resultant document snapshot data. {snapshot:s, type:t, meta}
 	# callback = callback when op committed
 	# 
 	# op_data.v MUST be the subsequent version for the document.
+	#
+	# This function has UNDEFINED BEHAVIOUR if you call append before calling create().
+	# (its either that, or I have _another_ check when you append an op that the document already exists
+	# ... and that would slow it down a bit.)
 	@append = (docName, op_data, doc_data, callback) ->
 		throw new Error 'snapshot missing from data' unless doc_data.snapshot != undefined
 		throw new Error 'type missing from data' unless doc_data.type != undefined
 
-		#p "appending to #{docName} v: #{op_data.v}"
-
 		# ****** NOT SAFE FOR MULTIPLE PROCESSES. Rewrite using transactions.
 		
 		resultingVersion = op_data.v + 1
+		throw new Error 'version missing or incorrect in doc data' unless doc_data.v == resultingVersion
 
 		# The version isn't stored.
 		new_op_data = {op:op_data.op, meta:op_data.meta}
@@ -90,8 +101,7 @@ module.exports = RedisDb = (options) ->
 				# Later, rebuild the snapshot.
 				throw "Version mismatch in db.append. '#{docName}' is corrupted."
 		
-		new_doc_data = {snapshot:doc_data.snapshot, type:doc_data.type or null, v:resultingVersion}
-		client.set keyForDoc(docName), JSON.stringify(new_doc_data), (err, response) ->
+		client.set keyForDoc(docName), JSON.stringify(doc_data), (err, response) ->
 			throw err if err?
 
 			# I'm assuming the ops are sent & responses received in order.
@@ -99,8 +109,6 @@ module.exports = RedisDb = (options) ->
 
 	# Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
 	@getSnapshot = (docName, callback) ->
-		#p "getSnapshot on '#{docName}'"
-
 		client.get keyForDoc(docName), (err, response) ->
 			throw err if err?
 
@@ -108,14 +116,22 @@ module.exports = RedisDb = (options) ->
 				doc_data = JSON.parse(response)
 				callback doc_data
 			else
-				callback {v:0, type:null, snapshot:null}
+				callback null
 
 	@getVersion = (docName, callback) ->
 		client.llen keyForOps(docName), (err, response) ->
 			throw err if err?
 
-			#p "v: #{i response}"
-			callback(response)
+			if response == 0
+				# The document might not exist at all.
+				client.exists keyForDoc(docName), (err, response) ->
+					throw err if err?
+					if response
+						callback 0
+					else
+						callback null
+			else
+				callback response
 
 	# Perminantly deletes a document. There is no undo.
 	# Callback takes a single argument which is true iff something was deleted.

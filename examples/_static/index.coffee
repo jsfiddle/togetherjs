@@ -10,7 +10,7 @@ template = fs.readFileSync "#{__dirname}/template.html.mu", 'utf8'
 
 module.exports = (docName, model, res, next) ->
 	model.getSnapshot docName, (data) ->
-		if data.v == 0
+		if data == null
 			# The document does not exist
 			next()
 		else

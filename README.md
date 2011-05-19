@@ -19,6 +19,19 @@ Run the examples with:
 
 ### From source
 
+Install some dependancies
+    
+Mac:
+
+    # sudo brew install redis
+
+Linux:
+   
+    # sudo apt-get install redis
+
+Then:
+
+    # npm install -g socket.io connect coffee-script redis nodeunit
     # git clone git://github.com/josephg/ShareJS.git
     # cd ShareJS
 
@@ -45,14 +58,21 @@ There are two ways to run a sharejs server:
         var connect = require('connect'),
             sharejs = require('share').server;
 
-        var server = connect(connect.logger());
-        var options = {db: {type: 'memory'}}; // See docs for options.
+        var server = connect(
+              connect.logger(),
+              connect.static(__dirname + '/my_html_files')
+            );
+
+        var options = {db: {type: 'memory'}}; // See docs for options. {type: 'redis'} to enable persistance.
 
         // Attach the sharejs REST and Socket.io interfaces to the server
         sharejs.attach(server, options);
 
         server.listen(8000);
         console.log('Server running at http://127.0.0.1:8000/');
+  The above script will start up a ShareJS server on port 8000 which hosts static content from the `my_html_files` directory. See [bin/exampleserver](https://github.com/josephg/ShareJS/blob/master/bin/exampleserver) for a more complex configuration example.
+
+> See the [Connect](http://senchalabs.github.com/connect/) or [Express](http://expressjs.com/) documentation for more complex routing.
 
 2. From the command line:
 
@@ -63,7 +83,7 @@ There are two ways to run a sharejs server:
 
         # sharejs-exampleserver
   
-  This will run a simple server on port 8000, and host all the example code there. Run it and check out `http://localhost:8000/`. The server will just store everything in ram, so don't get too attached to your data.
+  This will run a simple server on port 8000, and host all the example code there. Run it and check out http://localhost:8000/ . The example server stores everything in ram, so don't get too attached to your data.
 
 
 Putting Share.js on your website

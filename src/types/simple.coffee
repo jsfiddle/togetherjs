@@ -3,6 +3,8 @@
 # transform = ...
 
 exports.apply = (snapshot, op) ->
+	throw new Error 'Invalid position' unless 0 <= op.position <= snapshot.str.length
+
 	str = snapshot.str
 	str = str.slice(0, op.position) + op.text + str.slice(op.position)
 	snapshot.str = str
@@ -15,6 +17,6 @@ exports.transform = (op1, op2) ->
 
 	return {position:pos, text:op1.text}
 
-exports.initialVersion = () -> {str:""}
+exports.initialVersion = -> {str:""}
 
 exports.name = 'simple'
