@@ -28,8 +28,9 @@ json.invert = (op) -> json.invertComponent c for c in op.slice().reverse()
 
 json.checkValidOp = (op) ->
 
+Array['isArray'] ||= (o) -> Object.prototype.toString.call(o) == '[object Array]'
 json.checkList = (elem) ->
-	throw new Error 'Referenced element not a list' unless Array.isArray && Array.isArray(elem)
+	throw new Error 'Referenced element not a list' unless Array.isArray(elem)
 
 json.checkObj = (elem) ->
 	throw new Error "Referenced element not an object (it was #{JSON.stringify elem})" unless elem.constructor is Object
@@ -126,7 +127,7 @@ json.pathMatches = (p1, p2, ignoreLast) ->
 
 json.append = (dest, c) ->
 	c = clone c
-	if dest.length != 0 and json.pathMatches c['p'], (last = dest[dest.length - 1]).p
+	if dest.length != 0 and json.pathMatches c['p'], (last = dest[dest.length - 1])['p']
 		if last['na'] != undefined and c['na'] != undefined
 			dest[dest.length - 1] = { 'p': last['p'], 'na': last['na'] + c['na'] }
 		else if last['li'] != undefined and c['li'] == undefined and c['ld'] == last['li']
@@ -156,10 +157,9 @@ json.compose = (op1, op2) ->
 	newOp
 
 json.normalize = (op) ->
-	isArray = (o) -> Object.prototype.toString.call(o) == '[object Array]'
 	newOp = []
 	
-	op = [op] unless isArray op
+	op = [op] unless Array.isArray op
 
 	for c in op
 		c['p'] ?= []

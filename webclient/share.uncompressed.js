@@ -406,8 +406,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return _results;
   };
   json.checkValidOp = function(op) {};
+  Array['isArray'] || (Array['isArray'] = function(o) {
+    return Object.prototype.toString.call(o) === '[object Array]';
+  });
   json.checkList = function(elem) {
-    if (!(Array.isArray && Array.isArray(elem))) {
+    if (!Array.isArray(elem)) {
       throw new Error('Referenced element not a list');
     }
   };
@@ -504,7 +507,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   json.append = function(dest, c) {
     var last;
     c = clone(c);
-    if (dest.length !== 0 && json.pathMatches(c['p'], (last = dest[dest.length - 1]).p)) {
+    if (dest.length !== 0 && json.pathMatches(c['p'], (last = dest[dest.length - 1])['p'])) {
       if (last['na'] !== void 0 && c['na'] !== void 0) {
         return dest[dest.length - 1] = {
           'p': last['p'],
@@ -539,12 +542,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return newOp;
   };
   json.normalize = function(op) {
-    var c, isArray, newOp, _i, _len, _ref;
-    isArray = function(o) {
-      return Object.prototype.toString.call(o) === '[object Array]';
-    };
+    var c, newOp, _i, _len, _ref;
     newOp = [];
-    if (!isArray(op)) {
+    if (!Array.isArray(op)) {
       op = [op];
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
