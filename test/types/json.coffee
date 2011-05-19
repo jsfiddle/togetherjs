@@ -528,5 +528,5 @@ exports.object =
 
 console.log = console.error
 exports.randomizer = (test) ->
-	require('../helpers').randomizerTest type, 100000
+	require('../helpers').randomizerTest type, 10000
 	test.done()

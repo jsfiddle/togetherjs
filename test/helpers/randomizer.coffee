@@ -4,7 +4,7 @@ util = require 'util'
 p = util.debug
 i = util.inspect
 
-{randomInt, randomReal} = helpers
+{randomInt, randomReal, seed} = helpers
 
 # Returns [serverDoc, clientDoc]
 testRandomOp = (type, initialDoc = type.initialVersion()) ->
@@ -98,9 +98,10 @@ exports.test = (type, iterations = 300) ->
 	assert.ok type.generateRandomOp
 	assert.ok type.transform
 
-	p "   Running #{iterations} of randomized tests for type #{type.name}..."
+	console.error "   Running #{iterations} randomized tests for type #{type.name}..."
+	console.error "     (seed: #{seed})" if seed
 
-	warnUnless = (fn) -> p "NOTE: Not running #{fn} tests because #{type.name} does not have #{fn}() defined" unless type[fn]?
+	warnUnless = (fn) -> console.error "NOTE: Not running #{fn} tests because #{type.name} does not have #{fn}() defined" unless type[fn]?
 	warnUnless 'invert'
 	warnUnless 'compose'
 

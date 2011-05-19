@@ -8,17 +8,17 @@ exports.transformX = transformX = (type, server, client) ->
 	[type.transform(server, client, 'server'), type.transform(client, server, 'client')]
 
 
-# Generate a random int 0 <= k < n
-# This should probably be moved into a utility function.
-r = 123426
-if r?
-	exports.randomInt = randomInt = (n) -> Math.abs((r = (r << 2) ^ (r << 1) - r + 1) % n)
-	exports.randomReal = () ->
-		n = randomInt(2147483648)
-		return randomInt(n)/n
+# new seed every 6 hours
+exports.seed = Math.floor(Date.now() / (1000*60*60*6))
+if exports.seed?
+	{rand_real, seed} = require('./mersenne')
+	seed exports.seed
+	exports.randomReal = rand_real
 else
-	exports.randomInt = (n) -> Math.floor(Math.random() * n)
 	exports.randomReal = Math.random
+
+# Generate a random int 0 <= k < n
+exports.randomInt = (n) -> Math.floor(exports.randomReal() * n)
 
 
 # Transform a list of server ops by a list of client ops.
