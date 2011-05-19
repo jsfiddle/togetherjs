@@ -9,25 +9,17 @@ types = require '../src/types'
 
 module.exports = testCase
 	setUp: (callback) ->
-		# Magic message for connecting a client.
-		@auth = (client, data) ->
-
-		# CRUD.
-		@canCreate = (client, docName, type, meta, result) -> result.accept()
-		@canRead = (client, docName, result) -> result.accept()
-		@canSubmitOp = (client, docName, opData, result) -> result.accept()
-		@canDelete = (client, docName, result) -> result.reject()
-
-		options = {
+		options =
 			db: {type: 'memory'}
-			auth: {
+			auth:
+				# Magic message for connecting a client.
 				auth: (client, data) => @auth client, data
+
+				# CRUD.
 				canCreate: (client, docName, type, meta, result) => @canCreate client, docName, type, meta, result
 				canRead: (client, docName, result) => @canRead client, docName, result
 				canSubmitOp: (client, docName, opData, result) => @canSubmitOp client, docName, opData, result
 				canDelete: (client, docName, result) => @canDelete client, docName, result
-			}
-		}
 
 		@name = 'testingdoc'
 		@unused = 'testingdoc2'
