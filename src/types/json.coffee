@@ -156,7 +156,16 @@ json.compose = (op1, op2) ->
 	newOp
 
 json.normalize = (op) ->
-	op
+	isArray = (o) -> Object.prototype.toString.call(o) == '[object Array]'
+	newOp = []
+	
+	op = [op] unless isArray op
+
+	for c in op
+		c['p'] ?= []
+		append newOp, c
+	
+	newOp
 
 # hax, copied from test/types/json
 clone = (o) -> JSON.parse(JSON.stringify o)
@@ -195,11 +204,11 @@ json.transformComponent = (dest, c, otherC, type) ->
 		if common2? && otherCplength >= cplength && otherC['p'][common2] == c['p'][common2]
 			if c['ld'] != undefined
 				oc = clone otherC
-				oc.p = oc.p[cplength..]
+				oc['p'] = oc['p'][cplength..]
 				c['ld'] = json.apply clone(c['ld']), [oc]
 			else if c['od'] != undefined
 				oc = clone otherC
-				oc.p = oc.p[cplength..]
+				oc['p'] = oc['p'][cplength..]
 				c['od'] = json.apply clone(c['od']), [oc]
 		json.append dest, c
 		return dest
@@ -208,11 +217,11 @@ json.transformComponent = (dest, c, otherC, type) ->
 		# transform based on c
 		if c['ld'] != undefined
 			oc = clone otherC
-			oc.p = oc.p[cplength..]
+			oc['p'] = oc['p'][cplength..]
 			c['ld'] = json.apply clone(c['ld']), [oc]
 		else if c['od'] != undefined
 			oc = clone otherC
-			oc.p = oc.p[cplength..]
+			oc['p'] = oc['p'][cplength..]
 			c['od'] = json.apply clone(c['od']), [oc]
 
 

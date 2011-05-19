@@ -539,7 +539,24 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return newOp;
   };
   json.normalize = function(op) {
-    return op;
+    var c, isArray, newOp, _i, _len, _ref;
+    isArray = function(o) {
+      return Object.prototype.toString.call(o) === '[object Array]';
+    };
+    newOp = [];
+    if (!isArray(op)) {
+      op = [op];
+    }
+    for (_i = 0, _len = op.length; _i < _len; _i++) {
+      c = op[_i];
+            if ((_ref = c['p']) != null) {
+        _ref;
+      } else {
+        c['p'] = [];
+      };
+      append(newOp, c);
+    }
+    return newOp;
   };
   clone = function(o) {
     return JSON.parse(JSON.stringify(o));
@@ -586,11 +603,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       if ((common2 != null) && otherCplength >= cplength && otherC['p'][common2] === c['p'][common2]) {
         if (c['ld'] !== void 0) {
           oc = clone(otherC);
-          oc.p = oc.p.slice(cplength);
+          oc['p'] = oc['p'].slice(cplength);
           c['ld'] = json.apply(clone(c['ld']), [oc]);
         } else if (c['od'] !== void 0) {
           oc = clone(otherC);
-          oc.p = oc.p.slice(cplength);
+          oc['p'] = oc['p'].slice(cplength);
           c['od'] = json.apply(clone(c['od']), [oc]);
         }
       }
@@ -600,11 +617,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     if ((common2 != null) && otherCplength > cplength && c['p'][common2] === otherC['p'][common2]) {
       if (c['ld'] !== void 0) {
         oc = clone(otherC);
-        oc.p = oc.p.slice(cplength);
+        oc['p'] = oc['p'].slice(cplength);
         c['ld'] = json.apply(clone(c['ld']), [oc]);
       } else if (c['od'] !== void 0) {
         oc = clone(otherC);
-        oc.p = oc.p.slice(cplength);
+        oc['p'] = oc['p'].slice(cplength);
         c['od'] = json.apply(clone(c['od']), [oc]);
       }
     }
