@@ -183,7 +183,6 @@ commonPath = (p1, p2) ->
 	return
 
 transformPosByMove = (pos, from, to, bumpIfEqual) ->
-	return pos if pos < from and pos < to or pos > from and pos > to
 	if pos != from
 		pos-- if pos > from
 		pos++ if pos > to or (pos == to and bumpIfEqual)
@@ -321,31 +320,76 @@ transformComponent_ = (dest, c, otherC, type) ->
 				to = c.lm
 				otherFrom = otherC.p[common]
 				otherTo = otherC.lm
+				if otherFrom != otherTo
+					# if otherFrom == otherTo, we don't need to change our op.
 
-				if from == otherFrom
-					# Tie break based on client/server
-					if type == 'client'
-						from = otherTo
+					# where did my thing go?
+					if from == otherFrom
+						# they moved it! tie break.
+						if type == 'client'
+							c.p[common] = otherTo
+							if from == to # ugh
+								c.lm = otherTo
+						else
+							return dest
 					else
-						return dest
-				else
-					from = transformPosByMove from, otherFrom, otherTo, true
-					to = transformPosByMove to, otherFrom, otherTo, type == 'server'
+						# they moved around it
+						if from > otherFrom
+							c.p[common]--
+						if from > otherTo
+							c.p[common]++
+						else if from == otherTo
+							if otherFrom > otherTo
+								c.p[common]++
+								if from == to # ugh, again
+									c.lm++
 
-				c.p[common] = from
-				c.lm = to
-			else
+						# step 2: where am i going to put it?
+						if to > otherFrom
+							c.lm--
+						else if to == otherFrom
+							if to > from
+								c.lm--
+						if to > otherTo
+							c.lm++
+						else if to == otherTo
+							# if we're both moving in the same direction, tie break
+							if (otherTo > otherFrom and to > from) or
+								 (otherTo < otherFrom and to < from)
+								if type == 'server'
+									c.lm++
+							else
+								if to > from
+									c.lm++
+								else if to == otherFrom
+									c.lm--
+			else if c.li != undefined and c.ld == undefined and commonOperand
+				# li
 				from = otherC.p[common]
 				to = otherC.lm
 				p = c.p[common]
-				isli = c.li != undefined and c.ld == undefined and commonOperand
-				if isli
+				if p > from
+					c.p[common]--
+				if p > to
+					c.p[common]++
+			else
+				# ld, ld+li, si, sd, na, oi, od, oi+od, any li on an element beneath
+				# the lm
+				#
+				# i.e. things care about where their item is after the move.
+				from = otherC.p[common]
+				to = otherC.lm
+				p = c.p[common]
+				if p == from
+					c.p[common] = to
+				else
 					if p > from
 						c.p[common]--
 					if p > to
 						c.p[common]++
-				else
-					c.p[common] = transformPosByMove p, from, to, (type == 'server' || c.ld != undefined || !commonOperand)
+					else if p == to
+						if from > to
+							c.p[common]++
 		else if otherC.oi != undefined && otherC.od != undefined
 			return dest if cplength > otherCplength and c.p[common] == otherC.p[common]
 			if c.oi != undefined and c.p[common] == otherC.p[common]
