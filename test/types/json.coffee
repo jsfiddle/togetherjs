@@ -40,18 +40,16 @@ randomNewKey = (obj) ->
 
 # Generate a random object
 randomThing = ->
-	switch randomInt 8
+	switch randomInt 6
 		when 0 then null
 		when 1 then ''
 		when 2 then randomWord()
-		when 3 then {}
-		when 4
+		when 3
 			obj = {}
-			obj[randomNewKey(obj)] = randomThing() for [1..randomInt(4)]
+			obj[randomNewKey(obj)] = randomThing() for [1..randomInt(5)]
 			obj
-		when 5 then []
-		when 6 then [randomThing()]
-		when 7 then randomInt(50)
+		when 4 then (randomThing() for [1..randomInt(5)])
+		when 5 then randomInt(50)
 
 # Pick a random path to something in the object.
 randomPath = (data) ->
@@ -528,5 +526,5 @@ exports.object =
 
 console.log = console.error
 exports.randomizer = (test) ->
-	require('../helpers').randomizerTest type, 10000
+	require('../helpers').randomizerTest type, 1000
 	test.done()
