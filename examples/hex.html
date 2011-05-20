@@ -3,16 +3,45 @@
 	<head>
 		<title>Hex</title>
 		<style>
-			body { text-align: center; }
+			html {
+				font-family: Helvetica, arial, sans-serif;
+			}
 			#board { margin: 2em; }
+			#game {
+				position: absolute;
+				left: 400px;
+				width: 640px;
+			}
+			#ot {
+				position: absolute;
+				width: 360px;
+				padding: 20px;
+				font-family: monospace;
+				word-wrap: break-word;
+			}
+			.op {
+				margin-bottom: 0.5em;
+			}
+			h3:first-child { margin-top: 0 }
 		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/share/share.js"></script>
 	</head>
 	<body>
-		<button id='reset' onclick='reset()'>New game</button>
-		<canvas id='board' width='640' height='480'></canvas>
-    <script type="text/javascript">
+		<div id='ot'>
+			<h3>Operations</h3>
+			<div id="ops">
+			</div>
+			<h3>Document</h3>
+			<div id="doc">
+			</div>
+		</div>
+		<div id='game'>
+			<canvas id='board' width='640' height='440'></canvas>
+			<button id='reset' onclick='reset()'>New game</button>
+		</div>
+    <script>
 			var defaultSide = 20, spacing = 5,
 			selectedX = null,
 			selectedY = null,
@@ -109,7 +138,8 @@
 						           spacing*Math.cos(Math.PI/6))*x;
 						var hexY = (hexHeight() + spacing)*y +
 											 (x % 2 == 0 ? 0 :
-						            spacing*Math.sin(Math.PI/6)+ hexHeight()/2);
+						            spacing*Math.sin(Math.PI/6) +
+						            	hexHeight()/2);
 
 						var value = gr.at(x,y);
 						if (value != 0) {
@@ -224,9 +254,26 @@
 				}
 				return num;
 			},
+			mousePos = function (ev) {
+				var posx = 0;
+				var posy = 0;
+				if (!e) var e = window.event;
+				if (e.pageX || e.pageY) 	{
+					posx = e.pageX;
+					posy = e.pageY;
+				} else if (e.clientX || e.clientY) 	{
+					posx = e.clientX + document.body.scrollLeft
+						+ document.documentElement.scrollLeft;
+					posy = e.clientY + document.body.scrollTop
+						+ document.documentElement.scrollTop;
+				}
+				return {x:posx,y:posy}
+			},
 			boardMouseMoved = function (e) {
-				var board = document.getElementById('board');
-				var x = e.clientX - board.offsetLeft, y = e.clientY - board.offsetTop;
+				var board = $('#board').offset();
+				var pos = mousePos(e);
+				var x = pos.x - board.left, y = pos.y - board.top;
+				
 				var hex = hexForPixel(x,y);
 				if (hex) {
 					selectedX = hex.x;
@@ -238,22 +285,22 @@
 				redraw();
 			},
 			boardMouseClicked = function (e) {
-				var board = document.getElementById('board');
-				var x = e.clientX - board.offsetLeft, y = e.clientY - board.offsetTop;
+				var board = $('#board').offset();
+				var pos = mousePos(e);
+				var x = pos.x - board.left, y = pos.y - board.top;
 				var hex = hexForPixel(x,y);
 				if (hex && hex.x >= 0 && hex.x < grid.width &&
 				    hex.y >= 0 && hex.y < grid.height &&
 				    okToPlace(grid, playerTurn, hex.x, hex.y)) {
 					//grid.values[hex.y*grid.width+hex.x] = playerTurn;
-					$state.submitOp({
+					$state.submitOp([{
 						p:['grid','values',hex.y*grid.width+hex.x],
 						ld:0,li:playerTurn
-					})
-					$state.submitOp({
+					},{
 						p:['playerTurn'],
 						od:playerTurn,
 						oi:playerTurn == 1 ? 2 : 1
-					});
+					}]);
 				}
 			},
 			redraw = function () {
@@ -290,8 +337,10 @@
 			reset = function () {
 				clear();
 				playerTurn = 1;
-				$state.submitOp({p:['grid','values'],od:$state.snapshot.grid.values,oi:grid.values});
-				$state.submitOp({p:['playerTurn'],od:$state.snapshot.playerTurn,oi:playerTurn})
+				$state.submitOp([
+					{p:['grid','values'],od:$state.snapshot.grid.values,oi:grid.values},
+					{p:['playerTurn'],od:$state.snapshot.playerTurn,oi:playerTurn}
+				]);
 			},
 			begin = function () {
 				var board = document.getElementById('board');
@@ -301,7 +350,21 @@
 			};
 
 			function stateUpdated(op) {
-				console.log("change:",op)
+				if (op) {
+					var ops = $('#ops');
+					var opel = $('<div class="op" style="display:none">');
+					opel.text(JSON.stringify(op));
+					ops.prepend(opel);
+					opel.fadeIn('fast')
+					var allOps = $('.op');
+					if (allOps.length > 10) {
+						var lastop = allOps.last();
+						lastop.fadeOut('fast', function () {
+							lastop.remove();
+						});
+					}
+				}
+				$('#doc').text(JSON.stringify($state.snapshot))
 				for (k in $state.snapshot.grid) {
 					grid[k] = $state.snapshot.grid[k]
 				}
@@ -309,19 +372,36 @@
 				redraw();
 			}
 
-			var $state;
+			var randomDocName = function(length) {
+				var chars, x;
+				if (length == null) {
+					length = 10;
+				}
+				chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=";
+				var name = [];
+				for (x = 0; x < length; x++) {
+					name.push(chars[Math.floor(Math.random() * chars.length)]);
+				}
+				return name.join('');
+			};
 
-			sharejs.open('hex', 'json', function (doc, error) {
+			var $state;
+			if (!document.location.hash) {
+				document.location.hash = '#' + randomDocName();
+			}
+			var docname = 'hex:' + document.location.hash.slice(1)
+
+			sharejs.open(docname, 'json', function (doc, error) {
 				$state = doc;
+				doc.on('change', function (op) {
+					stateUpdated(op)
+				})
 				if (doc.created) {
 					clear()
 					doc.submitOp([{p:[],od:null,oi:{grid:grid,playerTurn:1}}])
 				} else {
 					stateUpdated()
 				}
-				doc.on('change', function (op) {
-					stateUpdated(op)
-				})
 				begin()
 			})
 		</script>
