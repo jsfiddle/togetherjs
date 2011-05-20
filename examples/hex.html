@@ -6,6 +6,7 @@
 			html {
 				font-family: Helvetica, arial, sans-serif;
 			}
+			h3 { font-family: monospace; }
 			#board { margin: 2em; }
 			#game {
 				position: absolute;
@@ -31,6 +32,7 @@
 			}
 			#chat input {
 				font-size: inherit;
+				font-family: inherit;
 				width: 100%;
 				margin-top: 5px;
 			}
@@ -63,6 +65,15 @@
 		<div id='game'>
 			<canvas id='board' width='600' height='440'></canvas>
 			<button id='reset' onclick='reset()'>New game</button>
+			<div id='rules'>
+				<h3>How to play</h3>
+				<ul>
+					<li>Pieces can't be placed next to pieces of a different color.</li>
+					<li>A hex is your territory if one of your pieces is next to it. If
+					there are two pieces of different colors next to a hex, it belongs to
+					neither player.</li>
+					<li>Try to win more territory than your opponent!</li>
+			</div>
 		</div>
 		<div id='chat'>
 			<h3>Chat</h3>
@@ -117,6 +128,7 @@
 
 			$('#message').keydown(function (e) {
 				if ((e.keyCode || e.which) == 13) {
+					if (!e.srcElement.value) return;
 					// enter was pressed
 					$state.submitOp({
 						p: ['chat',0],
@@ -484,10 +496,12 @@
 				$('#chat #messages').append(msg);
 				var allMsgs = $('.message');
 				if (allMsgs.length > 15) {
-					var e = allMsgs.first();
-					e.fadeOut('slow', function () {
-						e.remove();
-					});
+					(function () {
+						var e = allMsgs.first();
+						e.fadeOut('slow', function () {
+							e.remove();
+						});
+					})();
 				}
 			}
 
@@ -500,10 +514,12 @@
 					opel.fadeIn('fast')
 					var allOps = $('.op');
 					if (allOps.length > 10) {
-						var lastop = allOps.last();
-						lastop.fadeOut('fast', function () {
-							lastop.remove();
-						});
+						(function () {
+							var lastop = allOps.last();
+							lastop.fadeOut('fast', function () {
+								lastop.remove();
+							});
+						})()
 					}
 					op.forEach(function (c) {
 						if (c.p[0] == 'chat' && c.li) {
