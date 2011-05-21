@@ -7,11 +7,15 @@
 				font-family: Helvetica, arial, sans-serif;
 			}
 			h3 { font-family: monospace; }
-			#board { margin: 2em; }
+			h3:first-child { margin-top: 0 }
+			#board { margin: 2em; margin-bottom: 0.5em; }
 			#game {
 				position: absolute;
 				left: 400px;
 				width: 560px;
+			}
+			#rules {
+				margin-top: 0.5em;
 			}
 			#ot {
 				position: absolute;
@@ -47,7 +51,6 @@
 			.message .text {
 				display: inline;
 			}
-			h3:first-child { margin-top: 0 }
 		</style>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
@@ -63,8 +66,8 @@
 			</div>
 		</div>
 		<div id='game'>
-			<canvas id='board' width='600' height='440'></canvas>
-			<button id='reset' onclick='reset()'>New game</button>
+			<canvas id='board' width='600' height='420'></canvas>
+			<button id='reset' onclick='reset()'>Reset board</button>
 			<div id='rules'>
 				<h3>How to play</h3>
 				<ul>
@@ -484,7 +487,6 @@
 				}
 				var h = (x % 89)/89;
 				var color = hslToRgb(h, 0.7, 0.3)
-				console.log(color)
 				return color;
 			}
 
@@ -494,14 +496,14 @@
 				$('.user', msg).text(m.from);
 				$('.user', msg).css('color',colorForName(m.from));
 				$('#chat #messages').append(msg);
-				var allMsgs = $('.message');
+				var allMsgs = $('.message')
 				if (allMsgs.length > 15) {
-					(function () {
-						var e = allMsgs.first();
+					allMsgs.slice(0, Math.max(0,allMsgs.length - 15)).each(function () {
+						var e = $(this);
 						e.fadeOut('slow', function () {
 							e.remove();
 						});
-					})();
+					});
 				}
 			}
 
@@ -514,12 +516,12 @@
 					opel.fadeIn('fast')
 					var allOps = $('.op');
 					if (allOps.length > 10) {
-						(function () {
-							var lastop = allOps.last();
-							lastop.fadeOut('fast', function () {
-								lastop.remove();
+						allOps.slice(0, Math.max(0,allOps.length - 10)).each(function () {
+							var e = $(this);
+							e.fadeOut('fast', function () {
+								e.remove();
 							});
-						})()
+						});
 					}
 					op.forEach(function (c) {
 						if (c.p[0] == 'chat' && c.li) {
