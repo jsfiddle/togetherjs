@@ -6,6 +6,7 @@
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
+queue = require './syncqueue'
 types = require '../types'
 db = require './db'
 Events = require('./events')
@@ -119,21 +120,7 @@ module.exports = Model = (db, options) ->
 				# The op is up to date already. Apply and submit.
 				submit()
 
-	pendingOps = {} # docName -> {busy:bool, queue:[[op, callback], [op, callback], ...]}
-
-	flushOps = (docName) ->
-		state = pendingOps[docName]
-
-		p "flushOps #{docName} state #{i state}"
-		return if state.busy || state.queue.length == 0
-		p "continuing..."
-		state.busy = true
-
-		[opData, callback] = state.queue.shift()
-		applyOpInternal docName, opData, (error, version) ->
-			callback(error, version) if callback?
-			state.busy = false
-			flushOps docName
+	queues = {} # docName -> syncQueue
 
 	# Apply an op to the specified document.
 	# The callback is passed (error, applied version #)
@@ -144,10 +131,10 @@ module.exports = Model = (db, options) ->
 	# model.applyOp 'doc', OPC
 	@applyOp = (docName, opData, callback) ->
 		p "applyOp #{docName} op #{i opData}"
+
 		# Its important that all ops are applied in order.
-		pendingOps[docName] ||= {busy:false, queue:[]}
-		pendingOps[docName].queue.push [opData, callback]
-		flushOps docName
+		queues[docName] ||= queue (opData, callback) -> applyOpInternal docName, opData, callback
+		queues[docName](opData, callback)
 	
 	# Perminantly deletes the specified document.
 	# If listeners are attached, they are removed.
