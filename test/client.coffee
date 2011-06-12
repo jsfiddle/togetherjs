@@ -9,7 +9,7 @@ client = require '../src/client'
 
 makePassPart = require('./helpers').makePassPart
 
-module.exports = testCase {
+module.exports = testCase
 	setUp: (callback) ->
 		@name = 'testingdoc'
 
@@ -33,18 +33,6 @@ module.exports = testCase {
 
 		@server.on 'close', callback
 		@server.close()
-	
-	"can't open a document if canRead rejects you": (test) ->
-		@auth.canRead = (client, docName, result) -> result.reject()
-
-		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
-			test.strictEqual doc, null
-			test.strictEqual error, 'Forbidden'
-
-			@model.getVersion @name, (v) ->
-				# The document shouldn't exist.
-				test.strictEqual v, null
-				test.done()
 
 	'open using the bare API': (test) ->
 		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
@@ -274,7 +262,26 @@ module.exports = testCase {
 			@c.open @name, 'text', (doc, error) =>
 				test.strictEqual doc.created, false
 				test.done()
-	
-}
+		
+	"can't open a document if canRead rejects you": (test) ->
+		@auth.canRead = (client, docName, result) -> result.reject()
 
+		client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			test.strictEqual doc, null
+			test.strictEqual error, 'Forbidden'
+
+			@model.getVersion @name, (v) ->
+				# The document shouldn't exist.
+				test.strictEqual v, null
+				test.done()
+
+# This isn't working yet. I might have to rethink it.
+#	'opening a document with a null name will open a new document with a random document name': (test) ->
+#		client.open null, 'text', {host:'localhost', port:@port}, (doc, error) ->
+#			console.log doc.name
+#
+#			test.strictEqual doc.snapshot, ''
+#			test.strictEqual doc.type.name, 'text'
+#			test.strictEqual doc.created, true
+#			test.done()
 

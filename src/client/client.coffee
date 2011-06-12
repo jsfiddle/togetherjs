@@ -166,9 +166,6 @@ class Connection
 		@socket['on'] 'message', @onMessage
 		@socket['connect']()
 
-		@lastReceivedDoc = null
-		@lastSentDoc = null
-
 		@docs = {}
 		@numDocs = 0
 
@@ -275,7 +272,7 @@ class Connection
 
 		type = types[type] if typeof type == 'string'
 
-		if @docs[docName]?
+		if docName? and @docs[docName]?
 			doc = @docs[docName]
 			if doc.type == type
 				callback doc

@@ -124,7 +124,7 @@ exports.attach = (server, model, options) ->
 					step2Snapshot()
 				else
 					model.clientCreate client, docName, query.type, query.meta || {}, (result, errorMsg) ->
-						if errorMsg == 'Forbidden'
+						if errorMsg? and errorMsg != 'Document already exists'
 							fail errorMsg
 							return
 
@@ -144,6 +144,7 @@ exports.attach = (server, model, options) ->
 					msg.snapshot = docData.snapshot
 				else
 					fail 'Document does not exist'
+					return
 
 				step3Open()
 
@@ -176,9 +177,9 @@ exports.attach = (server, model, options) ->
 
 			docData = undefined
 			if query.snapshot == null or (query.open == true and query.type)
-				model.clientGetSnapshot client, query.doc, (d, error) ->
-					if error == 'Forbidden'
-						fail error
+				model.clientGetSnapshot client, query.doc, (d, errorMsg) ->
+					if errorMsg? and errorMsg != 'Document does not exist'
+						fail errorMsg
 						return
 					else
 						docData = d
