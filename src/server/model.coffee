@@ -64,62 +64,6 @@ module.exports = Model = (db, options) ->
 
 		db.create docName, newDocData, callback
 
-	applyOpInternal = (docName, opData, callback) ->
-		p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
-		getSnapshot docName, (docData) ->
-			unless docData
-				callback null, 'Document does not exist'
-				return
-
-			opVersion = opData.v
-			op = opData.op
-			meta = opData.meta || {}
-			meta.ts = Date.now()
-
-			version = docData.v
-			snapshot = docData.snapshot
-			type = docData.type
-			p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
-
-			submit = ->
-				try
-					snapshot = docData.type.apply docData.snapshot, op
-				catch error
-					callback null, error.message
-					return
-
-				newOpData = {op:op, v:opVersion, meta:meta}
-				newDocData = {snapshot:snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
-
-				p "submit #{i newOpData}"
-				db.append docName, newOpData, newDocData, ->
-					p "appended v#{opVersion} to #{docName}. Calling callback..."
-					events.onApplyOp docName, newOpData
-					callback opVersion, undefined
-
-			if opVersion > version
-				callback null, 'Op at future version'
-				return
-
-			if opVersion < version
-				# We'll need to transform the op to the current version of the document.
-				db.getOps docName, opVersion, version, (ops) ->
-					try
-						for realOp in ops
-							p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
-							op = docData.type.transform op, realOp.op, 'client'
-							opVersion++
-							p "-> #{i op}"
-
-					catch error
-						callback null, error.message
-						return
-
-					submit()
-			else
-				# The op is up to date already. Apply and submit.
-				submit()
-
 	queues = {} # docName -> syncQueue
 
 	# Apply an op to the specified document.
@@ -133,7 +77,62 @@ module.exports = Model = (db, options) ->
 		p "applyOp #{docName} op #{i opData}"
 
 		# Its important that all ops are applied in order.
-		queues[docName] ||= queue (opData, callback) -> applyOpInternal docName, opData, callback
+		queues[docName] ||= queue (opData, callback) ->
+			p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
+			getSnapshot docName, (docData) ->
+				unless docData
+					callback null, 'Document does not exist'
+					return
+
+				opVersion = opData.v
+				op = opData.op
+				meta = opData.meta || {}
+				meta.ts = Date.now()
+
+				version = docData.v
+				snapshot = docData.snapshot
+				type = docData.type
+				p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
+
+				submit = ->
+					try
+						snapshot = docData.type.apply docData.snapshot, op
+					catch error
+						callback null, error.message
+						return
+
+					newOpData = {op:op, v:opVersion, meta:meta}
+					newDocData = {snapshot:snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
+
+					p "submit #{i newOpData}"
+					db.append docName, newOpData, newDocData, ->
+						p "appended v#{opVersion} to #{docName}. Calling callback..."
+						events.onApplyOp docName, newOpData
+						callback opVersion, undefined
+
+				if opVersion > version
+					callback null, 'Op at future version'
+					return
+
+				if opVersion < version
+					# We'll need to transform the op to the current version of the document.
+					db.getOps docName, opVersion, version, (ops) ->
+						try
+							for realOp in ops
+								p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
+								op = docData.type.transform op, realOp.op, 'client'
+								opVersion++
+								p "-> #{i op}"
+
+						catch error
+							callback null, error.message
+							return
+
+						submit()
+				else
+					# The op is up to date already. Apply and submit.
+					submit()
+
 		queues[docName](opData, callback)
 	
 	# Perminantly deletes the specified document.
