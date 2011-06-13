@@ -8,7 +8,7 @@ Copyright 2011 ShareJS Authors
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, compose, compress, connections, exports, getConnection, invertComponent, io, isArray, open, strInject, text, transformComponent, transformPosition, types;
+;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, open, strInject, text, transformComponent, transformPosition, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -66,7 +66,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       transformComponent(destServer, server, client, 'server');
       return transformComponent(destClient, client, server, 'client');
     };
-    type.transformX = transformX = function(serverOp, clientOp) {
+    type.transformX = type['transformX'] = transformX = function(serverOp, clientOp) {
       var c, c_, clientComponent, k, newClientOp, newServerOp, nextC, s, s_, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
       checkValidOp(serverOp);
       checkValidOp(clientOp);
@@ -110,7 +110,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }
       return [serverOp, newClientOp];
     };
-    return type.transform = function(op, otherOp, type) {
+    return type.transform = type['transform'] = function(op, otherOp, type) {
       var client, server, _, _ref, _ref2;
       if (!(type === 'server' || type === 'client')) {
         throw new Error("type must be 'server' or 'client'");
@@ -135,7 +135,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   }
   text = {};
   text.name = 'text';
-  text.initialVersion = function() {
+  text['initialVersion'] = text.initialVersion = function() {
     return '';
   };
   strInject = function(s1, pos, s2) {
@@ -204,7 +204,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       }
     }
   };
-  text.compose = compose = function(op1, op2) {
+  text['compose'] = text.compose = function(op1, op2) {
     var c, newOp, _i, _len;
     checkValidOp(op1);
     checkValidOp(op2);
@@ -215,8 +215,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     return newOp;
   };
-  text.compress = compress = function(op) {
-    return compose([], op);
+  text['compress'] = text.compress = function(op) {
+    return text.compose([], op);
   };
   text.normalize = function(op) {
     var c, newOp, _i, _len, _ref;
@@ -333,7 +333,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       };
     }
   };
-  text.invert = function(op) {
+  text.invert = text['invert'] = function(op) {
     var c, _i, _len, _ref, _results;
     _ref = op.slice().reverse();
     _results = [];
@@ -1015,8 +1015,6 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.socket['on']('disconnect', this.disconnected);
       this.socket['on']('message', this.onMessage);
       this.socket['connect']();
-      this.lastReceivedDoc = null;
-      this.lastSentDoc = null;
       this.docs = {};
       this.numDocs = 0;
     }
@@ -1113,7 +1111,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       if (typeof type === 'string') {
         type = types[type];
       }
-      if (this.docs[docName] != null) {
+      if ((docName != null) && (this.docs[docName] != null)) {
         doc = this.docs[docName];
         if (doc.type === type) {
           callback(doc);
@@ -1130,7 +1128,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         'type': type.name
       }, __bind(function(response) {
         if (response.error) {
-          return callback(null, new Error(response.error));
+          return callback(null, response.error);
         } else {
           if (response['snapshot'] === void 0) {
             response['snapshot'] = type.initialVersion();
@@ -1193,15 +1191,19 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       options = {};
     };
     c = getConnection(options.host, options.port, options.basePath);
-    return c.open(docName, type, function(doc) {
-      doc.on('closed', function() {
-        return setTimeout(function() {
-          if (c.numDocs === 0) {
-            return c.disconnect();
-          }
-        }, 0);
-      });
-      return callback(doc);
+    return c.open(docName, type, function(doc, error) {
+      if (doc === null) {
+        return callback(null, error);
+      } else {
+        doc.on('closed', function() {
+          return setTimeout(function() {
+            if (c.numDocs === 0) {
+              return c.disconnect();
+            }
+          }, 0);
+        });
+        return callback(doc);
+      }
     });
   };
   if (WEB != null) {

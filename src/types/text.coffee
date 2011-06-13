@@ -22,7 +22,7 @@ text = {}
 
 text.name = 'text'
 
-text.initialVersion = -> ''
+text['initialVersion'] = text.initialVersion = -> ''
 
 strInject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
 
@@ -71,7 +71,7 @@ text._append = append = (newOp, c) ->
 		else
 			newOp.push c
 
-text.compose = compose = (op1, op2) ->
+text['compose'] = text.compose = (op1, op2) ->
 	checkValidOp op1
 	checkValidOp op2
 
@@ -82,7 +82,7 @@ text.compose = compose = (op1, op2) ->
 
 # Attempt to compress the op components together 'as much as possible'.
 # This implementation preserves order and preserves create/delete pairs.
-text.compress = compress = (op) -> compose [], op
+text['compress'] = text.compress = (op) -> text.compose [], op
 
 text.normalize = (op) ->
 	newOp = []
@@ -187,7 +187,7 @@ invertComponent = (c) ->
 
 # No need to use append for invert, because the components won't be able to
 # cancel with one another.
-text.invert = (op) -> (invertComponent c for c in op.slice().reverse())
+text.invert = text['invert'] = (op) -> (invertComponent c for c in op.slice().reverse())
 
 
 if WEB?

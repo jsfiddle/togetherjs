@@ -10,7 +10,7 @@ bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
 		transformComponent destClient, client, server, 'client'
 
 	# Transforms serverOp by clientOp. Returns [serverOp', clientOp']
-	type.transformX = transformX = (serverOp, clientOp) ->
+	type.transformX = type['transformX'] = transformX = (serverOp, clientOp) ->
 		checkValidOp serverOp
 		checkValidOp clientOp
 
@@ -46,7 +46,7 @@ bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
 		[serverOp, newClientOp]
 
 	# Transforms op with specified type ('server' or 'client') by otherOp.
-	type.transform = (op, otherOp, type) ->
+	type.transform = type['transform'] = (op, otherOp, type) ->
 		throw new Error "type must be 'server' or 'client'" unless type == 'server' or type == 'client'
 
 		return op if otherOp.length == 0
