@@ -1,5 +1,8 @@
 // ShareJS options
 module.exports = {
+	// Port to listen on
+	port: 8000,
+
 	// Database options
 	db: {
 		// DB type. Options are 'redis' or 'memory'. 'redis' requires the
