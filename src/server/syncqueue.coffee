@@ -2,6 +2,20 @@
 # ensuring that process() is only executing once at a time.
 #
 # process(data, callback) _MUST_ eventually call its callback.
+#
+# Example:
+#
+# queue = require 'syncqueue'
+#
+# fn = queue (data, callback) ->
+#     asyncthing data, ->
+#         callback(321)
+#
+# fn(1)
+# fn(2)
+# fn(3, (result) -> console.log(result))
+#
+#   ^--- async thing will only be running once at any time.
 
 module.exports = (process) ->
 	throw new Error('process is not a function') unless typeof process == 'function'
