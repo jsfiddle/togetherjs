@@ -4,6 +4,12 @@ connect = require 'connect'
 sharejs = require '../src/server'
 sys = require 'sys'
 
+argv = require('optimist').
+	usage("Usage: $0 [-p portnum]").
+	default('p', 8000).
+	alias('p', 'port').
+	argv
+
 server = connect(
 	connect.favicon(),
 	connect.logger(),
@@ -36,9 +42,10 @@ server = connect(
 )
 
 options = {db: {type:'memory'}}
+port = argv.p
 
 # Attach the sharejs REST and Socket.io interfaces to the server
 sharejs.attach server, options
 
-server.listen 8000
-sys.puts 'Demos running at http://localhost:8000/'
+server.listen port
+sys.puts "Demos running at http://localhost:#{port}/"
