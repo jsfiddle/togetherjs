@@ -1,6 +1,7 @@
 {exec} = require 'child_process'
 closure = require './thirdparty/closure'
 fs = require 'fs'
+path = require 'path'
 
 task 'test', 'Run all tests', ->
 	require './tests'
@@ -17,6 +18,11 @@ client = [
 	'types/text'
 	'types/json'
 	'client/client'
+]
+
+extras = [
+	'client/ace'
+	'client/textarea'
 ]
 
 # Backticks
@@ -44,14 +50,14 @@ compile = (infile, outfile) ->
 			
 
 task 'webclient', 'Build the web client into one file', ->
-	clientfiles = ("src/#{c}.coffee" for c in client).join ' '
+	files = (names) -> ("src/#{c}.coffee" for c in names).join ' '
+	clientfiles = files client
 	# I would really rather do this in pure JS.
 	e "coffee -j webclient/share.uncompressed.js -c #{clientfiles}", ->
 		console.log "Building with closure's REST API..."
 		compile 'webclient/share.uncompressed.js', 'webclient/share.js'
 	
 	# TODO: This should also be closure compiled.
-	exec "coffee --compile --output webclient/ src/client/ace.coffee", (err, stdout, stderr) ->
-		e "mv webclient/ace.js webclient/share-ace.js"
+	extrafiles = files extras
+	e "coffee --compile --output webclient/ #{extrafiles}"
 
-			
