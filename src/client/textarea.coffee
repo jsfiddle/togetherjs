@@ -30,13 +30,13 @@ window.sharejs.Document::attach_textarea = (elem) ->
 
 
 	genOp = (event) ->
-		console.log event
+		# console.log event
 
 		onNextTick = (fn) -> setTimeout fn, 10
 		onNextTick ->
-			console.log doc.snapshot, elem.value
+			# console.log doc.snapshot, elem.value
 			op = opFromDiff doc.snapshot, elem.value
-			console.log op
+			# console.log op
 			doc.submitOp op unless op.length == 0
 
 	elem.addEventListener event, genOp, false for event in ['textInput', 'keydown', 'keyup', 'select', 'cut', 'paste']

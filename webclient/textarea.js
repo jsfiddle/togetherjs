@@ -35,15 +35,12 @@
     });
     genOp = function(event) {
       var onNextTick;
-      console.log(event);
       onNextTick = function(fn) {
         return setTimeout(fn, 10);
       };
       return onNextTick(function() {
         var op;
-        console.log(doc.snapshot, elem.value);
         op = opFromDiff(doc.snapshot, elem.value);
-        console.log(op);
         if (op.length !== 0) {
           return doc.submitOp(op);
         }
