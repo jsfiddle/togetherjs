@@ -4,8 +4,6 @@
 
 fs = require 'fs'
 
-console.log __dirname
-
 script = fs.readFileSync(__dirname + '/../../webclient/share.js', 'utf8')
 
 window = {}

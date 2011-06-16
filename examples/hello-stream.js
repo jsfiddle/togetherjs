@@ -7,7 +7,7 @@
 
 var client = require('../lib/client');
 
-client.open('hello', 'json', {host: 'localhost', port: 8000}, function(doc, error) {
+client.open('hello', 'text', {host: 'localhost', port: 8000}, function(doc, error) {
 	if (error) {
 		throw error;
 	}
