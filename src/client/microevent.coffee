@@ -13,8 +13,16 @@ class MicroEvent
 
 	removeListener: (event, fct) ->
 		@_events ||= {}
-		idx = @_events[event]?.indexOf fct
-		@_events[event].splice(idx, 1) if idx? and idx >= 0
+		listeners = (@_events[event] ||= [])
+		
+		# Sadly, there's no IE8- support for indexOf.
+		i = 0
+		while i < listeners.length
+			if listeners[i] == fct
+				listeners.splice i, 1
+			else
+				i++
+
 		this
 
 	emit: (event, args...) ->
