@@ -20,13 +20,17 @@
 		<textarea id="textarea"></textarea>
 
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="/share/share.js"></script>
+		<script src="/share/share.uncompressed.js"></script>
 		<script src="/share/textarea.js"></script>
 		<script>
 var elem = document.getElementById('textarea');
 
 sharejs.open('hello', 'text', function(doc, error) {
-	doc.attach_textarea(elem);
+	if (error) {
+		console.log(error);
+	} else {
+		doc.attach_textarea(elem);
+	}
 });
 		</script>
 	</body>

@@ -5,7 +5,6 @@
 #
 # This algorithm is O(N), but I suspect you could speed it up somehow using regular expressions.
 opFromDiff = (oldval, newval) ->
-	return [] if oldval == newval # This is fast because of how javascript strings work
 	commonStart = 0
 	commonStart++ while oldval.charAt(commonStart) == newval.charAt(commonStart)
 
@@ -19,25 +18,32 @@ opFromDiff = (oldval, newval) ->
 window.sharejs.Document::attach_textarea = (elem) ->
 	doc = this
 	elem.value = @snapshot
+	prevvalue = elem.value
 
 	@on 'remoteop', (op) ->
 		newSelection = [
-			doc.type.transformCursor elem.selectionStart, op, false
-			doc.type.transformCursor elem.selectionEnd, op, false
+			doc.type.transformCursor elem.selectionStart, op, true
+			doc.type.transformCursor elem.selectionEnd, op, true
 		]
 		elem.value = doc.snapshot
 		[elem.selectionStart, elem.selectionEnd] = newSelection
 
-
 	genOp = (event) ->
-		# console.log event
+		#console.log event
 
-		onNextTick = (fn) -> setTimeout fn, 10
+		onNextTick = (fn) -> setTimeout fn, 0
 		onNextTick ->
-			# console.log doc.snapshot, elem.value
-			op = opFromDiff doc.snapshot, elem.value
-			# console.log op
-			doc.submitOp op unless op.length == 0
+			#console.log doc.snapshot, elem.value
+			if elem.value != prevvalue
+				# IE constantly replaces unix newlines with \r\n. ShareJS docs
+				# should only have unix newlines.
+				prevvalue = elem.value
+				op = opFromDiff doc.snapshot, elem.value.replace /\r\n/g, '\n'
+				doc.submitOp op unless op.length == 0
 
-	elem.addEventListener event, genOp, false for event in ['textInput', 'keydown', 'keyup', 'select', 'cut', 'paste']
+	for event in ['textInput', 'keydown', 'keyup', 'select', 'cut', 'paste']
+		if elem.addEventListener
+			elem.addEventListener event, genOp, false
+		else
+			elem.attachEvent 'on'+event, genOp
 

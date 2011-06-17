@@ -2,9 +2,6 @@
   var opFromDiff;
   opFromDiff = function(oldval, newval) {
     var commonEnd, commonStart;
-    if (oldval === newval) {
-      return [];
-    }
     commonStart = 0;
     while (oldval.charAt(commonStart) === newval.charAt(commonStart)) {
       commonStart++;
@@ -24,25 +21,29 @@
     ]);
   };
   window.sharejs.Document.prototype.attach_textarea = function(elem) {
-    var doc, event, genOp, _i, _len, _ref, _results;
+    var doc, event, genOp, prevvalue, _i, _len, _ref, _results;
     doc = this;
     elem.value = this.snapshot;
+    prevvalue = elem.value;
     this.on('remoteop', function(op) {
       var newSelection;
-      newSelection = [doc.type.transformCursor(elem.selectionStart, op, false), doc.type.transformCursor(elem.selectionEnd, op, false)];
+      newSelection = [doc.type.transformCursor(elem.selectionStart, op, true), doc.type.transformCursor(elem.selectionEnd, op, true)];
       elem.value = doc.snapshot;
       return elem.selectionStart = newSelection[0], elem.selectionEnd = newSelection[1], newSelection;
     });
     genOp = function(event) {
       var onNextTick;
       onNextTick = function(fn) {
-        return setTimeout(fn, 10);
+        return setTimeout(fn, 0);
       };
       return onNextTick(function() {
         var op;
-        op = opFromDiff(doc.snapshot, elem.value);
-        if (op.length !== 0) {
-          return doc.submitOp(op);
+        if (elem.value !== prevvalue) {
+          prevvalue = elem.value;
+          op = opFromDiff(doc.snapshot, elem.value.replace(/\r\n/g, '\n'));
+          if (op.length !== 0) {
+            return doc.submitOp(op);
+          }
         }
       });
     };
@@ -50,7 +51,7 @@
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];
-      _results.push(elem.addEventListener(event, genOp, false));
+      _results.push(elem.addEventListener ? elem.addEventListener(event, genOp, false) : elem.attachEvent('on' + event, genOp));
     }
     return _results;
   };

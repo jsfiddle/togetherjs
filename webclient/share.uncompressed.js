@@ -26,11 +26,16 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return this;
     };
     MicroEvent.prototype.removeListener = function(event, fct) {
-      var idx, _ref;
+      var i, listeners, _base;
       this._events || (this._events = {});
-      idx = (_ref = this._events[event]) != null ? _ref.indexOf(fct) : void 0;
-      if ((idx != null) && idx >= 0) {
-        this._events[event].splice(idx, 1);
+      listeners = ((_base = this._events)[event] || (_base[event] = []));
+      i = 0;
+      while (i < listeners.length) {
+        if (listeners[i] === fct) {
+          listeners.splice(i, 1);
+        } else {
+          i++;
+        }
       }
       return this;
     };
