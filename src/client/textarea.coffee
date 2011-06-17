@@ -5,6 +5,7 @@
 #
 # This algorithm is O(N), but I suspect you could speed it up somehow using regular expressions.
 opFromDiff = (oldval, newval) ->
+	return [] if oldval == newval
 	commonStart = 0
 	commonStart++ while oldval.charAt(commonStart) == newval.charAt(commonStart)
 
@@ -25,7 +26,11 @@ window.sharejs.Document::attach_textarea = (elem) ->
 			doc.type.transformCursor elem.selectionStart, op, true
 			doc.type.transformCursor elem.selectionEnd, op, true
 		]
+		scrollTop = elem.scrollTop
+
 		elem.value = doc.snapshot
+
+		elem.scrollTop = scrollTop if elem.scrollTop != scrollTop
 		[elem.selectionStart, elem.selectionEnd] = newSelection
 
 	genOp = (event) ->

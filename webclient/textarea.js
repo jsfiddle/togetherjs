@@ -2,6 +2,9 @@
   var opFromDiff;
   opFromDiff = function(oldval, newval) {
     var commonEnd, commonStart;
+    if (oldval === newval) {
+      return [];
+    }
     commonStart = 0;
     while (oldval.charAt(commonStart) === newval.charAt(commonStart)) {
       commonStart++;
@@ -26,9 +29,13 @@
     elem.value = this.snapshot;
     prevvalue = elem.value;
     this.on('remoteop', function(op) {
-      var newSelection;
+      var newSelection, scrollTop;
       newSelection = [doc.type.transformCursor(elem.selectionStart, op, true), doc.type.transformCursor(elem.selectionEnd, op, true)];
+      scrollTop = elem.scrollTop;
       elem.value = doc.snapshot;
+      if (elem.scrollTop !== scrollTop) {
+        elem.scrollTop = scrollTop;
+      }
       return elem.selectionStart = newSelection[0], elem.selectionEnd = newSelection[1], newSelection;
     });
     genOp = function(event) {
