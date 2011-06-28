@@ -13,6 +13,8 @@ Installing and running
 ----------------------
 
     npm install share
+    cd node_modules/share
+    cake build
 
 Run the examples with:
 
