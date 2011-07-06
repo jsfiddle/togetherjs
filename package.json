@@ -16,7 +16,8 @@
 		"coffee-script": "> 1.1.0",
 		"redis": "*",
 		"nodeunit": "~0.5.0",
-		"optimist": ">= 0.2.4"
+		"optimist": ">= 0.2.4",
+  "websocket-client": ">= 1.0.0"
 	},
 	"licenses": [{
 		"type": "BSD",
