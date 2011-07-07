@@ -30,7 +30,7 @@ module.exports = RedisDb = (options) ->
 	keyForOps = (docName) -> "#{options.prefix}ops:#{docName}"
 	keyForDoc = (docName) -> "#{options.prefix}doc:#{docName}"
 
-	client = redis.createClient options.hostname, options.port, options.redisOptions
+	client = redis.createClient options.port, options.hostname, options.redisOptions
 
 	client.select 15 if options.testing
 
