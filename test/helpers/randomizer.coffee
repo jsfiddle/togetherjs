@@ -15,7 +15,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 	server = makeDoc()
 	client = makeDoc()
 
-	for [0..(randomReal() * 2 + 1)]
+	for [0...4]
 		doc = if randomReal() < 0.5 then client else server
 		[op, doc.result] = type.generateRandomOp doc.result
 		doc.ops.push(op)
@@ -107,5 +107,5 @@ exports.test = (type, iterations = 300) ->
 
 	doc = type.initialVersion()
 	for n in [0..iterations]
-#		p n if n % 200 == 0
+		p n if n % 200 == 0
 		doc = testRandomOp(type, doc)
