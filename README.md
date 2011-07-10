@@ -14,10 +14,6 @@ Installing and running
 
     npm install share
 
-> Note: Until I update sharejs in npm, you'll need this too:
->     cd node_modules/share
->     cake build
-
 Run the examples with:
 
     # sharejs-exampleserver
