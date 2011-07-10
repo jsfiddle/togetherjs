@@ -9,6 +9,7 @@ class MicroEvent
 		@_events ||= {}
 		@_events[event] ||= []
 		@_events[event].push(fct)
+		delete fct._dead
 		this
 
 	removeListener: (event, fct) ->
@@ -20,6 +21,7 @@ class MicroEvent
 		while i < listeners.length
 			if listeners[i] == fct
 				listeners.splice i, 1
+				fct._dead = true
 			else
 				i++
 
@@ -27,7 +29,7 @@ class MicroEvent
 
 	emit: (event, args...) ->
 		return this unless @_events?[event]
-		fn.apply this, args for fn in @_events[event]
+		fn.apply this, args for fn in @_events[event].slice() when !fn._dead
 		this
 
 # mixin will delegate all MicroEvent.js function in the destination object

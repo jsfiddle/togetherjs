@@ -59,6 +59,32 @@ tests =
 		@e.removeListener 'foo', ->
 		@e.emit 'foo'
 
+	'removing an event listener while handling an event works (before)': (test) ->
+		fn2 = -> throw new Error 'should not be fired'
+		@e.on 'foo', => @e.removeListener 'foo', fn2
+		@e.on 'foo', fn2
+
+		@e.emit 'foo'
+		test.done()
+
+	'removing an event listener while handling an event works (after)': (test) ->
+		passPart = makePassPart test, 3
+		fn = -> passPart()
+		@e.on 'foo', fn
+		@e.on 'foo', =>
+			@e.removeListener 'foo', fn
+			passPart()
+		@e.on 'foo', passPart
+		@e.emit 'foo'
+	
+	'you can remove an event and add it back again and it fires': (test) ->
+		fn = -> test.done()
+		@e.on 'foo', fn
+		@e.removeListener 'foo', fn
+		@e.on 'foo', fn
+		@e.emit 'foo'
+
+
 
 # The tests above are run both with a new MicroEvent and with an object with
 # microevent mixed in.
