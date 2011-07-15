@@ -1,6 +1,6 @@
 (function() {
   
-/** @preserve ShareJS v0.2.0
+/** @preserve ShareJS v0.2.1
 http://sharejs.org
 
 Copyright 2011 ShareJS Authors
@@ -8,7 +8,7 @@ Copyright 2011 ShareJS Authors
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, open, strInject, text, transformComponent, transformPosition, types;
+;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, nextTick, open, strInject, text, transformComponent, transformPosition, types;
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   exports = {};
   /**
@@ -16,6 +16,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
    @type {boolean}
 */;
   WEB = true;
+  nextTick = (typeof process !== "undefined" && process !== null ? process.nextTick : void 0) || function(fn) {
+    return setTimeout(fn, 0);
+  };
   MicroEvent = (function() {
     function MicroEvent() {}
     MicroEvent.prototype.on = function(event, fct) {
@@ -32,11 +35,24 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       i = 0;
       while (i < listeners.length) {
         if (listeners[i] === fct) {
-          listeners.splice(i, 1);
-        } else {
-          i++;
+          listeners[i] = void 0;
         }
+        i++;
       }
+      nextTick(function() {
+        var x;
+        return listeners = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = listeners.length; _i < _len; _i++) {
+            x = listeners[_i];
+            if (x) {
+              _results.push(x);
+            }
+          }
+          return _results;
+        })();
+      });
       return this;
     };
     MicroEvent.prototype.emit = function() {
@@ -48,7 +64,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       _ref2 = this._events[event];
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         fn = _ref2[_i];
-        fn.apply(this, args);
+        if (fn) {
+          fn.apply(this, args);
+        }
       }
       return this;
     };

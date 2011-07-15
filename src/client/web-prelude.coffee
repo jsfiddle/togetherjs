@@ -1,5 +1,5 @@
 `
-/** @preserve ShareJS v0.2.0
+/** @preserve ShareJS v0.2.2
 http://sharejs.org
 
 Copyright 2011 ShareJS Authors
