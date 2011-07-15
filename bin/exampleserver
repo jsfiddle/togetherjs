@@ -12,7 +12,6 @@ argv = require('optimist').
 
 server = connect(
 	connect.favicon(),
-	connect.logger(),
 	connect.static(__dirname + '/../examples'),
 	connect.router (app) ->
 
@@ -33,6 +32,7 @@ server = connect(
 		app.get '/pad/?', (req, res, next) ->
 			docName = server.model.randomDocName()
 			res.writeHead 303, {location: '/pad/pad.html#' + docName}
+			res.write ''
 			res.end()
 
 		app.get '/?', (req, res, next) ->
@@ -41,6 +41,8 @@ server = connect(
 
 )
 
+# Change to this to enable persistance
+#options = {db: {type:'redis'}}
 options = {db: {type:'memory'}}
 port = argv.p
 
