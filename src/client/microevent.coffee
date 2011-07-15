@@ -4,12 +4,13 @@
 # microevent.js is copyright Jerome Etienne, and licensed under the MIT license:
 # https://github.com/jeromeetienne/microevent.js
 
+nextTick = process?.nextTick || (fn) -> setTimeout fn, 0
+
 class MicroEvent
 	on: (event, fct) ->
 		@_events ||= {}
 		@_events[event] ||= []
 		@_events[event].push(fct)
-		delete fct._dead
 		this
 
 	removeListener: (event, fct) ->
@@ -19,17 +20,16 @@ class MicroEvent
 		# Sadly, there's no IE8- support for indexOf.
 		i = 0
 		while i < listeners.length
-			if listeners[i] == fct
-				listeners.splice i, 1
-				fct._dead = true
-			else
-				i++
+			listeners[i] = undefined if listeners[i] == fct
+			i++
+
+		nextTick -> listeners = (x for x in listeners when x)
 
 		this
 
 	emit: (event, args...) ->
 		return this unless @_events?[event]
-		fn.apply this, args for fn in @_events[event].slice() when !fn._dead
+		fn.apply this, args for fn in @_events[event] when fn
 		this
 
 # mixin will delegate all MicroEvent.js function in the destination object

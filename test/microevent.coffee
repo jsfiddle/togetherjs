@@ -83,6 +83,14 @@ tests =
 		@e.removeListener 'foo', fn
 		@e.on 'foo', fn
 		@e.emit 'foo'
+	
+	'a listener added to two events, then removed from one, still gets called': (test) ->
+		fn = -> test.done()
+		@e.on 'foo', fn
+		@e.on 'bar', fn
+		@e.removeListener 'foo', fn
+		@e.emit 'bar'
+
 
 
 
