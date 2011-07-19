@@ -10,6 +10,7 @@ modules = [
 	'test/types/count.coffee'
 	'test/types/text.coffee'
 	'test/types/text-composable.coffee'
+	'test/types/text-tp2.coffee'
 	'test/types/json.coffee'
 
 	'test/db.coffee'
