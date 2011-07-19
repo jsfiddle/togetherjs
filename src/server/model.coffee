@@ -120,7 +120,7 @@ module.exports = Model = (db, options) ->
 						try
 							for realOp in ops
 								p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
-								op = docData.type.transform op, realOp.op, 'client'
+								op = docData.type.transform op, realOp.op, 'left'
 								opVersion++
 								p "-> #{i op}"
 

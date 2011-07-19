@@ -78,24 +78,24 @@ genTests = (type) ->
 
 	transform:
 		'sanity checks': (test) ->
-			test.deepEqual [], type.transform [], [], 'client'
-			test.deepEqual [], type.transform [], [], 'server'
+			test.deepEqual [], type.transform [], [], 'left'
+			test.deepEqual [], type.transform [], [], 'right'
 
-			test.deepEqual [{i:'y', p:100}, {i:'x', p:0}], type.transform [{i:'y', p:100}, {i:'x', p:0}], [], 'client'
-			test.deepEqual [], type.transform [], [{i:'y', p:100}, {i:'x', p:0}], 'server'
+			test.deepEqual [{i:'y', p:100}, {i:'x', p:0}], type.transform [{i:'y', p:100}, {i:'x', p:0}], [], 'left'
+			test.deepEqual [], type.transform [], [{i:'y', p:100}, {i:'x', p:0}], 'right'
 			test.done()
 
 		'insert': (test) ->
 			test.deepEqual [[{i:'x', p:10}], [{i:'a', p:1}]], type.transformX [{i:'x', p:9}], [{i:'a', p:1}]
-			test.deepEqual [[{i:'x', p:11}], [{i:'a', p:10}]], type.transformX [{i:'x', p:10}], [{i:'a', p:10}]
+			test.deepEqual [[{i:'x', p:10}], [{i:'a', p:11}]], type.transformX [{i:'x', p:10}], [{i:'a', p:10}]
 
 			test.deepEqual [[{i:'x', p:10}], [{d:'a', p:9}]], type.transformX [{i:'x', p:11}], [{d:'a', p:9}]
 			test.deepEqual [[{i:'x', p:10}], [{d:'a', p:10}]], type.transformX [{i:'x', p:11}], [{d:'a', p:10}]
 			test.deepEqual [[{i:'x', p:11}], [{d:'a', p:12}]], type.transformX [{i:'x', p:11}], [{d:'a', p:11}]
 
-			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:11}], 'client'
-			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'client'
-			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'server'
+			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:11}], 'left'
+			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'left'
+			test.deepEqual [{i:'x', p:10}], type.transform [{i:'x', p:10}], [{d:'a', p:10}], 'right'
 
 			test.done()
 

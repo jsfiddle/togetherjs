@@ -192,7 +192,7 @@ module.exports = testCase
 
 		clientOp = [{i:'client', p:0}]
 		serverOp = [{i:'server', p:0}]
-		serverTransformed = types.text.transform(serverOp, clientOp, 'server')
+		serverTransformed = types.text.transform(serverOp, clientOp, 'right')
 		
 		finalDoc = types.text.initialVersion() # v1
 		finalDoc = types.text.apply(finalDoc, clientOp) # v2

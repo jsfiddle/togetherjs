@@ -1,6 +1,6 @@
 (function() {
   
-/** @preserve ShareJS v0.2.1
+/** @preserve ShareJS v0.2.2
 http://sharejs.org
 
 Copyright 2011 ShareJS Authors
@@ -85,58 +85,58 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   }
   bootstrapTransform = function(type, transformComponent, checkValidOp, append) {
     var transformComponentX, transformX;
-    transformComponentX = function(server, client, destServer, destClient) {
-      transformComponent(destServer, server, client, 'server');
-      return transformComponent(destClient, client, server, 'client');
+    transformComponentX = function(left, right, destLeft, destRight) {
+      transformComponent(destLeft, left, right, 'left');
+      return transformComponent(destRight, right, left, 'right');
     };
-    type.transformX = type['transformX'] = transformX = function(serverOp, clientOp) {
-      var c, c_, clientComponent, k, newClientOp, newServerOp, nextC, s, s_, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
-      checkValidOp(serverOp);
-      checkValidOp(clientOp);
-      newClientOp = [];
-      for (_i = 0, _len = clientOp.length; _i < _len; _i++) {
-        clientComponent = clientOp[_i];
-        newServerOp = [];
+    type.transformX = type['transformX'] = transformX = function(leftOp, rightOp) {
+      var k, l, l_, newLeftOp, newRightOp, nextC, r, r_, rightComponent, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
+      checkValidOp(leftOp);
+      checkValidOp(rightOp);
+      newRightOp = [];
+      for (_i = 0, _len = rightOp.length; _i < _len; _i++) {
+        rightComponent = rightOp[_i];
+        newLeftOp = [];
         k = 0;
-        while (k < serverOp.length) {
+        while (k < leftOp.length) {
           nextC = [];
-          transformComponentX(serverOp[k], clientComponent, newServerOp, nextC);
+          transformComponentX(leftOp[k], rightComponent, newLeftOp, nextC);
           k++;
           if (nextC.length === 1) {
-            clientComponent = nextC[0];
+            rightComponent = nextC[0];
           } else if (nextC.length === 0) {
-            _ref = serverOp.slice(k);
+            _ref = leftOp.slice(k);
             for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-              s = _ref[_j];
-              append(newServerOp, s);
+              l = _ref[_j];
+              append(newLeftOp, l);
             }
-            clientComponent = null;
+            rightComponent = null;
             break;
           } else {
-            _ref2 = transformX(serverOp.slice(k), nextC), s_ = _ref2[0], c_ = _ref2[1];
-            for (_k = 0, _len3 = s_.length; _k < _len3; _k++) {
-              s = s_[_k];
-              append(newServerOp, s);
+            _ref2 = transformX(leftOp.slice(k), nextC), l_ = _ref2[0], r_ = _ref2[1];
+            for (_k = 0, _len3 = l_.length; _k < _len3; _k++) {
+              l = l_[_k];
+              append(newLeftOp, l);
             }
-            for (_l = 0, _len4 = c_.length; _l < _len4; _l++) {
-              c = c_[_l];
-              append(newClientOp, c);
+            for (_l = 0, _len4 = r_.length; _l < _len4; _l++) {
+              r = r_[_l];
+              append(newRightOp, r);
             }
-            clientComponent = null;
+            rightComponent = null;
             break;
           }
         }
-        if (clientComponent != null) {
-          append(newClientOp, clientComponent);
+        if (rightComponent != null) {
+          append(newRightOp, rightComponent);
         }
-        serverOp = newServerOp;
+        leftOp = newLeftOp;
       }
-      return [serverOp, newClientOp];
+      return [leftOp, newRightOp];
     };
     return type.transform = type['transform'] = function(op, otherOp, type) {
-      var client, server, _, _ref, _ref2;
-      if (!(type === 'server' || type === 'client')) {
-        throw new Error("type must be 'server' or 'client'");
+      var left, right, _, _ref, _ref2;
+      if (!(type === 'left' || type === 'right')) {
+        throw new Error("type must be 'left' or 'right'");
       }
       if (otherOp.length === 0) {
         return op;
@@ -144,12 +144,12 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       if (op.length === 1 && otherOp.length === 1) {
         return transformComponent([], op[0], otherOp[0], type);
       }
-      if (type === 'server') {
-        _ref = transformX(op, otherOp), server = _ref[0], _ = _ref[1];
-        return server;
+      if (type === 'left') {
+        _ref = transformX(op, otherOp), left = _ref[0], _ = _ref[1];
+        return left;
       } else {
-        _ref2 = transformX(otherOp, op), _ = _ref2[0], client = _ref2[1];
-        return client;
+        _ref2 = transformX(otherOp, op), _ = _ref2[0], right = _ref2[1];
+        return right;
       }
     };
   };
@@ -290,7 +290,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     if (c['i'] != null) {
       append(dest, {
         'i': c['i'],
-        'p': transformPosition(c['p'], otherC, type === 'server')
+        'p': transformPosition(c['p'], otherC, type === 'right')
       });
     } else {
       if (otherC['i'] != null) {
@@ -700,7 +700,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           if (!commonOperand) {
             return dest;
           } else if (c['ld'] !== void 0) {
-            if (c['li'] !== void 0 && type === 'client') {
+            if (c['li'] !== void 0 && type === 'left') {
               c['ld'] = clone(otherC['li']);
             } else {
               return dest;
@@ -709,7 +709,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         }
       } else if (otherC['li'] !== void 0) {
         if (c['li'] !== void 0 && c['ld'] === void 0 && commonOperand && c['p'][common] === otherC['p'][common]) {
-          if (type === 'server') {
+          if (type === 'right') {
             c['p'][common]++;
           }
         } else if (otherC['p'][common] <= c['p'][common]) {
@@ -757,7 +757,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           otherTo = otherC['lm'];
           if (otherFrom !== otherTo) {
             if (from === otherFrom) {
-              if (type === 'client') {
+              if (type === 'left') {
                 c['p'][common] = otherTo;
                 if (from === to) {
                   c['lm'] = otherTo;
@@ -790,7 +790,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
                 c['lm']++;
               } else if (to === otherTo) {
                 if ((otherTo > otherFrom && to > from) || (otherTo < otherFrom && to < from)) {
-                  if (type === 'server') {
+                  if (type === 'right') {
                     c['lm']++;
                   }
                 } else {
@@ -835,7 +835,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       } else if (otherC['oi'] !== void 0 && otherC['od'] !== void 0) {
         if (c['p'][common] === otherC['p'][common]) {
           if (c['oi'] !== void 0 && commonOperand) {
-            if (type === 'server') {
+            if (type === 'right') {
               return dest;
             } else {
               c['od'] = otherC['oi'];
@@ -846,7 +846,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         }
       } else if (otherC['oi'] !== void 0) {
         if (c['oi'] !== void 0 && c['p'][common] === otherC['p'][common]) {
-          if (type === 'client') {
+          if (type === 'left') {
             json.append(dest, {
               'p': c['p'],
               'od': otherC['oi']
@@ -960,8 +960,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.serverOps[this.version] = op;
       xf = this.type.transformX || __bind(function(server, client) {
         var client_, server_;
-        server_ = this.type.transform(server, client, 'server');
-        client_ = this.type.transform(client, server, 'client');
+        server_ = this.type.transform(server, client, 'right');
+        client_ = this.type.transform(client, server, 'left');
         return [server_, client_];
       }, this);
       docOp = op;
@@ -993,7 +993,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         if (!realOp) {
           throw new Error('Op version too old');
         }
-        op = this.type.transform(op, realOp, 'client');
+        op = this.type.transform(op, realOp, 'left');
         v++;
       }
       this['snapshot'] = this.type.apply(this['snapshot'], op);

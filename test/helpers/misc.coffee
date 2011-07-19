@@ -4,9 +4,8 @@ i = -> #require('util').inspect
 
 # Cross-transform function. Transform server by client and client by server. Returns
 # [server, client].
-exports.transformX = transformX = (type, server, client) ->
-	[type.transform(server, client, 'server'), type.transform(client, server, 'client')]
-
+exports.transformX = transformX = (type, left, right) ->
+	[type.transform(left, right, 'left'), type.transform(right, left, 'right')]
 
 # new seed every 6 hours
 exports.seed = Math.floor(Date.now() / (1000*60*60*6))
@@ -19,7 +18,6 @@ else
 
 # Generate a random int 0 <= k < n
 exports.randomInt = (n) -> Math.floor(exports.randomReal() * n)
-
 
 # Transform a list of server ops by a list of client ops.
 # Returns [serverOps', clientOps'].
@@ -36,14 +34,7 @@ exports.transformLists = (type, serverOps, clientOps) ->
 	[serverOps, clientOps]
 
 # Compose a list of ops together
-exports.composeList = (type, ops) ->
-	result = null
-	for op in ops
-		if result == null
-			result = op
-		else
-			result = type.compose result, op
-	result
+exports.composeList = (type, ops) -> ops.reduce type.compose
 
 # Returns a function that calls test.done() after it has been called n times
 exports.makePassPart = (test, n) ->

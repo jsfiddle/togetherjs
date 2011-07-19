@@ -206,15 +206,15 @@ genTests = (type) ->
 			test.done()
 
 		'make sure append doesn\'t overwrite values when it merges na': (test) ->
-			serverHas = 21
-			clientHas = 3
+			rightHas = 21
+			leftHas = 3
 
-			serverOp = [{"p":[],"od":0,"oi":15},{"p":[],"na":4},{"p":[],"na":1},{"p":[],"na":1}]
-			clientOp = [{"p":[],"na":4},{"p":[],"na":-1}]
-			[server_, client_] = require('../helpers').transformX type, serverOp, clientOp
+			rightOp = [{"p":[],"od":0,"oi":15},{"p":[],"na":4},{"p":[],"na":1},{"p":[],"na":1}]
+			leftOp = [{"p":[],"na":4},{"p":[],"na":-1}]
+			[right_, left_] = require('../helpers').transformX type, rightOp, leftOp
 
-			s_c = type.apply serverHas, client_
-			c_s = type.apply clientHas, server_
+			s_c = type.apply rightHas, left_
+			c_s = type.apply leftHas, right_
 			test.deepEqual s_c, c_s
 			test.done()
 			
@@ -229,11 +229,11 @@ genTests = (type) ->
 			test.done()
 		
 		'transform splits deletes': (test) ->
-			test.deepEqual type.transform([{p:[0], sd:'ab'}], [{p:[1], si:'x'}], 'client'), [{p:[0], sd:'a'}, {p:[1], sd:'b'}]
+			test.deepEqual type.transform([{p:[0], sd:'ab'}], [{p:[1], si:'x'}], 'left'), [{p:[0], sd:'a'}, {p:[1], sd:'b'}]
 			test.done()
 		
 		'deletes cancel each other out': (test) ->
-			test.deepEqual type.transform([{p:['k', 5], sd:'a'}], [{p:['k', 5], sd:'a'}], 'client'), []
+			test.deepEqual type.transform([{p:['k', 5], sd:'a'}], [{p:['k', 5], sd:'a'}], 'left'), []
 			test.done()
 
 	list:
@@ -267,38 +267,38 @@ genTests = (type) ->
 			###
 		
 		'Paths are bumped when list elements are inserted or removed': (test) ->
-			test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'client'
-			test.deepEqual [{p:[1, 201], si:'hi'}], type.transform [{p:[0, 201], si:'hi'}], [{p:[0], li:'x'}], 'server'
-			test.deepEqual [{p:[0, 202], si:'hi'}], type.transform [{p:[0, 202], si:'hi'}], [{p:[1], li:'x'}], 'client'
+			test.deepEqual [{p:[2, 200], si:'hi'}], type.transform [{p:[1, 200], si:'hi'}], [{p:[0], li:'x'}], 'left'
+			test.deepEqual [{p:[1, 201], si:'hi'}], type.transform [{p:[0, 201], si:'hi'}], [{p:[0], li:'x'}], 'right'
+			test.deepEqual [{p:[0, 202], si:'hi'}], type.transform [{p:[0, 202], si:'hi'}], [{p:[1], li:'x'}], 'left'
 
-			test.deepEqual [{p:[0, 203], si:'hi'}], type.transform [{p:[1, 203], si:'hi'}], [{p:[0], ld:'x'}], 'client'
-			test.deepEqual [{p:[0, 204], si:'hi'}], type.transform [{p:[0, 204], si:'hi'}], [{p:[1], ld:'x'}], 'client'
-			test.deepEqual [{p:['x',3], si: 'hi'}], type.transform [{p:['x',3], si:'hi'}], [{p:['x',0,'x'], li:0}], 'client'
-			test.deepEqual [{p:['x',3,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',5], li:0}], 'client'
-			test.deepEqual [{p:['x',4,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',0], li:0}], 'client'
+			test.deepEqual [{p:[0, 203], si:'hi'}], type.transform [{p:[1, 203], si:'hi'}], [{p:[0], ld:'x'}], 'left'
+			test.deepEqual [{p:[0, 204], si:'hi'}], type.transform [{p:[0, 204], si:'hi'}], [{p:[1], ld:'x'}], 'left'
+			test.deepEqual [{p:['x',3], si: 'hi'}], type.transform [{p:['x',3], si:'hi'}], [{p:['x',0,'x'], li:0}], 'left'
+			test.deepEqual [{p:['x',3,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',5], li:0}], 'left'
+			test.deepEqual [{p:['x',4,'x'], si: 'hi'}], type.transform [{p:['x',3,'x'], si:'hi'}], [{p:['x',0], li:0}], 'left'
 
-			test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'client'
-			test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'server'
+			test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'left'
+			test.deepEqual [{p:[1],ld:2}], type.transform [{p:[0],ld:2}], [{p:[0],li:1}], 'right'
 			test.done()
 
 		'Ops on deleted elements become noops': (test) ->
-			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x'}], 'client'
-			test.deepEqual [{p:[0],li:'x'}], type.transform [{p:[0],li:'x'}], [{p:[0],ld:'y'}], 'client'
-			test.deepEqual [], type.transform [{p:[0],na:-3}], [{p:[0],ld:48}], 'client'
+			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x'}], 'left'
+			test.deepEqual [{p:[0],li:'x'}], type.transform [{p:[0],li:'x'}], [{p:[0],ld:'y'}], 'left'
+			test.deepEqual [], type.transform [{p:[0],na:-3}], [{p:[0],ld:48}], 'left'
 			test.done()
 		
 		'Ops on replaced elements become noops': (test) ->
-			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x', li:'y'}], 'client'
-			test.deepEqual [{p:[0], li:'hi'}], type.transform [{p:[0], li:'hi'}], [{p:[0], ld:'x', li:'y'}], 'client'
+			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], ld:'x', li:'y'}], 'left'
+			test.deepEqual [{p:[0], li:'hi'}], type.transform [{p:[0], li:'hi'}], [{p:[0], ld:'x', li:'y'}], 'left'
 			test.done()
 
 		'Deleted data is changed to reflect edits': (test) ->
-			test.deepEqual [{p:[1], ld:'abc'}], type.transform [{p:[1], ld:'a'}], [{p:[1, 1], si:'bc'}], 'client'
+			test.deepEqual [{p:[1], ld:'abc'}], type.transform [{p:[1], ld:'a'}], [{p:[1, 1], si:'bc'}], 'left'
 			test.done()
 		
 		'Inserting then deleting an element composes into a no-op': (test) ->
 			test.deepEqual [], type.compose [{p:[1], li:'abc'}], [{p:[1], ld:'abc'}]
-			test.deepEqual [{p:[1],ld:null,li:'x'}], type.transform [{p:[0],ld:null,li:"x"}], [{p:[0],li:"The"}], 'server'
+			test.deepEqual [{p:[1],ld:null,li:'x'}], type.transform [{p:[0],ld:null,li:"x"}], [{p:[0],li:"The"}], 'right'
 			test.done()
 
 		'Composing doesn\'t change the original object': (test) ->
@@ -307,64 +307,64 @@ genTests = (type) ->
 			test.deepEqual [{p:[0],ld:'abc',li:null}], a
 			test.done()
 		
-		'If two inserts are simultaneous, the client op will end up first': (test) ->
-			test.deepEqual [{p:[1], li:'a'}], type.transform [{p:[1], li:'a'}], [{p:[1], li:'b'}], 'client'
-			test.deepEqual [{p:[2], li:'b'}], type.transform [{p:[1], li:'b'}], [{p:[1], li:'a'}], 'server'
+		'If two inserts are simultaneous, the left op will end up first': (test) ->
+			test.deepEqual [{p:[1], li:'a'}], type.transform [{p:[1], li:'a'}], [{p:[1], li:'b'}], 'left'
+			test.deepEqual [{p:[2], li:'b'}], type.transform [{p:[1], li:'b'}], [{p:[1], li:'a'}], 'right'
 			test.done()
 		
 		'An attempt to re-delete a list element becomes a no-op': (test) ->
-			test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'client'
-			test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'server'
+			test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'left'
+			test.deepEqual [], type.transform [{p:[1], ld:'x'}], [{p:[1], ld:'x'}], 'right'
 			test.done()
 
 		'Ops on a moved element move with the element': (test) ->
-			test.deepEqual [{p:[10], ld:'x'}], type.transform [{p:[4], ld:'x'}], [{p:[4], lm:10}], 'client'
-			test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'client'
-			test.deepEqual [{p:[10, 1], li:'a'}], type.transform [{p:[4, 1], li:'a'}], [{p:[4], lm:10}], 'client'
-			test.deepEqual [{p:[10, 1], ld:'b', li:'a'}], type.transform [{p:[4, 1], ld:'b', li:'a'}], [{p:[4], lm:10}], 'client'
+			test.deepEqual [{p:[10], ld:'x'}], type.transform [{p:[4], ld:'x'}], [{p:[4], lm:10}], 'left'
+			test.deepEqual [{p:[10, 1], si:'a'}], type.transform [{p:[4, 1], si:'a'}], [{p:[4], lm:10}], 'left'
+			test.deepEqual [{p:[10, 1], li:'a'}], type.transform [{p:[4, 1], li:'a'}], [{p:[4], lm:10}], 'left'
+			test.deepEqual [{p:[10, 1], ld:'b', li:'a'}], type.transform [{p:[4, 1], ld:'b', li:'a'}], [{p:[4], lm:10}], 'left'
 
-			test.deepEqual [{p:[0],li:null}], type.transform [{p:[0],li:null}], [{p:[0],lm:1}], 'client'
+			test.deepEqual [{p:[0],li:null}], type.transform [{p:[0],li:null}], [{p:[0],lm:1}], 'left'
 			# [_,_,_,_,5,6,7,_]
 			# c: [_,_,_,_,5,'x',6,7,_]   p:5 li:'x'
 			# s: [_,6,_,_,_,5,7,_]       p:5 lm:1
 			# correct: [_,6,_,_,_,5,'x',7,_]
-			test.deepEqual [{p:[6],li:'x'}], type.transform [{p:[5],li:'x'}], [{p:[5],lm:1}], 'client'
+			test.deepEqual [{p:[6],li:'x'}], type.transform [{p:[5],li:'x'}], [{p:[5],lm:1}], 'left'
 			# [_,_,_,_,5,6,7,_]
 			# c: [_,_,_,_,5,6,7,_]  p:5 ld:6
 			# s: [_,6,_,_,_,5,7,_]  p:5 lm:1
 			# correct: [_,_,_,_,5,7,_]
-			test.deepEqual [{p:[1],ld:6}], type.transform [{p:[5],ld:6}], [{p:[5],lm:1}], 'client'
-			#test.deepEqual [{p:[0],li:{}}], type.transform [{p:[0],li:{}}], [{p:[0],lm:0}], 'server'
-			test.deepEqual [{p:[0],li:[]}], type.transform [{p:[0],li:[]}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[2],li:'x'}], type.transform [{p:[2],li:'x'}], [{p:[0],lm:1}], 'client'
+			test.deepEqual [{p:[1],ld:6}], type.transform [{p:[5],ld:6}], [{p:[5],lm:1}], 'left'
+			#test.deepEqual [{p:[0],li:{}}], type.transform [{p:[0],li:{}}], [{p:[0],lm:0}], 'right'
+			test.deepEqual [{p:[0],li:[]}], type.transform [{p:[0],li:[]}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[2],li:'x'}], type.transform [{p:[2],li:'x'}], [{p:[0],lm:1}], 'left'
 			test.done()
 
 		'Target index of a moved element is changed by ld/li': (test) ->
-			test.deepEqual [{p:[0],lm:1}], type.transform [{p:[0], lm: 2}], [{p:[1], ld:'x'}], 'client'
-			test.deepEqual [{p:[1],lm:3}], type.transform [{p:[2], lm: 4}], [{p:[1], ld:'x'}], 'client'
-			test.deepEqual [{p:[0],lm:3}], type.transform [{p:[0], lm: 2}], [{p:[1], li:'x'}], 'client'
-			test.deepEqual [{p:[3],lm:5}], type.transform [{p:[2], lm: 4}], [{p:[1], li:'x'}], 'client'
-			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0], lm: 0}], [{p:[0], li:28}], 'client'
+			test.deepEqual [{p:[0],lm:1}], type.transform [{p:[0], lm: 2}], [{p:[1], ld:'x'}], 'left'
+			test.deepEqual [{p:[1],lm:3}], type.transform [{p:[2], lm: 4}], [{p:[1], ld:'x'}], 'left'
+			test.deepEqual [{p:[0],lm:3}], type.transform [{p:[0], lm: 2}], [{p:[1], li:'x'}], 'left'
+			test.deepEqual [{p:[3],lm:5}], type.transform [{p:[2], lm: 4}], [{p:[1], li:'x'}], 'left'
+			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0], lm: 0}], [{p:[0], li:28}], 'left'
 			test.done()
 
 		'Tiebreak lm vs. ld/li': (test) ->
-			test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'client'
-			test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'server'
-			test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'client'
-			test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'server'
+			test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'left'
+			test.deepEqual [], type.transform [{p:[0], lm: 2}], [{p:[0], ld:'x'}], 'right'
+			test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'left'
+			test.deepEqual [{p:[1], lm:3}], type.transform [{p:[0], lm: 2}], [{p:[0], li:'x'}], 'right'
 			test.done()
 
 		'replacement vs. deletion': (test) ->
-			test.deepEqual [{p:[0],li:'y'}], type.transform [{p:[0],ld:'x',li:'y'}], [{p:[0],ld:'x'}], 'server'
+			test.deepEqual [{p:[0],li:'y'}], type.transform [{p:[0],ld:'x',li:'y'}], [{p:[0],ld:'x'}], 'right'
 			test.done()
 
 		'replacement vs. insertion': (test) ->
-			test.deepEqual [{p:[1],ld:{},li:"brillig"}], type.transform [{p:[0],ld:{},li:"brillig"}], [{p:[0],li:36}], 'client'
+			test.deepEqual [{p:[1],ld:{},li:"brillig"}], type.transform [{p:[0],ld:{},li:"brillig"}], [{p:[0],li:36}], 'left'
 			test.done()
 
 		'replacement vs. replacement': (test) ->
-			test.deepEqual [], type.transform [{p:[0],ld:null,li:[]}], [{p:[0],ld:null,li:0}], 'server'
-			test.deepEqual [{p:[0],ld:[],li:0}], type.transform [{p:[0],ld:null,li:0}], [{p:[0],ld:null,li:[]}], 'client'
+			test.deepEqual [], type.transform [{p:[0],ld:null,li:[]}], [{p:[0],ld:null,li:0}], 'right'
+			test.deepEqual [{p:[0],ld:[],li:0}], type.transform [{p:[0],ld:null,li:0}], [{p:[0],ld:null,li:[]}], 'left'
 			test.done()
 
 		'composing replace with delete of replaced element results in insert': (test) ->
@@ -372,50 +372,50 @@ genTests = (type) ->
 			test.done()
 
 		'lm vs lm': (test) ->
-			test.deepEqual [{p:[0],lm:2}], type.transform [{p:[0],lm:2}], [{p:[2],lm:1}], 'client'
-			test.deepEqual [{p:[4],lm:4}], type.transform [{p:[3],lm:3}], [{p:[5],lm:0}], 'client'
-			test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[2],lm:1}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'server'
-			test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'server'
-			test.deepEqual [{p:[3],lm:0}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'client'
-			test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
-			test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'client'
-			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:5}], 'server'
-			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:1}], 'server'
-			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:1}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[1],lm:2}], type.transform [{p:[0],lm:1}], [{p:[5],lm:0}], 'server'
-			test.deepEqual [{p:[3],lm:2}], type.transform [{p:[2],lm:1}], [{p:[5],lm:0}], 'server'
-			test.deepEqual [{p:[2],lm:1}], type.transform [{p:[3],lm:1}], [{p:[1],lm:3}], 'client'
-			test.deepEqual [{p:[2],lm:3}], type.transform [{p:[1],lm:3}], [{p:[3],lm:1}], 'client'
-			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'client'
-			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'server'
-			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'server'
-			test.deepEqual [{p:[0],lm:2}], type.transform [{p:[0],lm:1}], [{p:[2],lm:1}], 'client'
-			test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:1}], [{p:[0],lm:1}], 'server'
-			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[0],lm:1}], [{p:[1],lm:3}], 'client'
-			test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:1}], [{p:[3],lm:2}], 'client'
-			test.deepEqual [{p:[3],lm:3}], type.transform [{p:[3],lm:2}], [{p:[2],lm:1}], 'client'
+			test.deepEqual [{p:[0],lm:2}], type.transform [{p:[0],lm:2}], [{p:[2],lm:1}], 'left'
+			test.deepEqual [{p:[4],lm:4}], type.transform [{p:[3],lm:3}], [{p:[5],lm:0}], 'left'
+			test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[2],lm:1}], type.transform [{p:[2],lm:0}], [{p:[1],lm:0}], 'right'
+			test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'right'
+			test.deepEqual [{p:[3],lm:0}], type.transform [{p:[2],lm:0}], [{p:[5],lm:0}], 'left'
+			test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'left'
+			test.deepEqual [{p:[0],lm:5}], type.transform [{p:[2],lm:5}], [{p:[2],lm:0}], 'left'
+			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:5}], 'right'
+			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],lm:1}], 'right'
+			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:1}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[1],lm:2}], type.transform [{p:[0],lm:1}], [{p:[5],lm:0}], 'right'
+			test.deepEqual [{p:[3],lm:2}], type.transform [{p:[2],lm:1}], [{p:[5],lm:0}], 'right'
+			test.deepEqual [{p:[2],lm:1}], type.transform [{p:[3],lm:1}], [{p:[1],lm:3}], 'left'
+			test.deepEqual [{p:[2],lm:3}], type.transform [{p:[1],lm:3}], [{p:[3],lm:1}], 'left'
+			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'left'
+			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[0],lm:1}], 'right'
+			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[2],lm:6}], type.transform [{p:[2],lm:6}], [{p:[1],lm:0}], 'right'
+			test.deepEqual [{p:[0],lm:2}], type.transform [{p:[0],lm:1}], [{p:[2],lm:1}], 'left'
+			test.deepEqual [{p:[2],lm:0}], type.transform [{p:[2],lm:1}], [{p:[0],lm:1}], 'right'
+			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[0],lm:0}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[0],lm:1}], [{p:[1],lm:3}], 'left'
+			test.deepEqual [{p:[3],lm:1}], type.transform [{p:[2],lm:1}], [{p:[3],lm:2}], 'left'
+			test.deepEqual [{p:[3],lm:3}], type.transform [{p:[3],lm:2}], [{p:[2],lm:1}], 'left'
 			test.done()
 
 		'indices change correctly around a move': (test) ->
-			test.deepEqual [{p:[1,0],li:{}}], type.transform [{p:[0,0],li:{}}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],ld:{}}], 'client'
-			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[0],lm:1}], [{p:[1],ld:{}}], 'client'
-			test.deepEqual [{p:[5],lm:0}], type.transform [{p:[6],lm:0}], [{p:[2],ld:{}}], 'client'
-			test.deepEqual [{p:[1],lm:0}], type.transform [{p:[1],lm:0}], [{p:[2],ld:{}}], 'client'
-			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[2],lm:1}], [{p:[1],ld:3}], 'server'
+			test.deepEqual [{p:[1,0],li:{}}], type.transform [{p:[0,0],li:{}}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[1],lm:0}], [{p:[0],ld:{}}], 'left'
+			test.deepEqual [{p:[0],lm:0}], type.transform [{p:[0],lm:1}], [{p:[1],ld:{}}], 'left'
+			test.deepEqual [{p:[5],lm:0}], type.transform [{p:[6],lm:0}], [{p:[2],ld:{}}], 'left'
+			test.deepEqual [{p:[1],lm:0}], type.transform [{p:[1],lm:0}], [{p:[2],ld:{}}], 'left'
+			test.deepEqual [{p:[1],lm:1}], type.transform [{p:[2],lm:1}], [{p:[1],ld:3}], 'right'
 
-			test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'server'
-			test.deepEqual [{p:[2],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[2],lm:1}], 'client'
+			test.deepEqual [{p:[1],ld:{}}], type.transform [{p:[2],ld:{}}], [{p:[1],lm:2}], 'right'
+			test.deepEqual [{p:[2],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[2],lm:1}], 'left'
 
 
-			test.deepEqual [{p:[0],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[0],lm:1}], 'server'
+			test.deepEqual [{p:[0],ld:{}}], type.transform [{p:[1],ld:{}}], [{p:[0],lm:1}], 'right'
 
-			test.deepEqual [{p:[0],ld:1,li:2}], type.transform [{p:[1],ld:1,li:2}], [{p:[1],lm:0}], 'client'
-			test.deepEqual [{p:[0],ld:2,li:3}], type.transform [{p:[1],ld:2,li:3}], [{p:[0],lm:1}], 'client'
-			test.deepEqual [{p:[1],ld:3,li:4}], type.transform [{p:[0],ld:3,li:4}], [{p:[1],lm:0}], 'client'
+			test.deepEqual [{p:[0],ld:1,li:2}], type.transform [{p:[1],ld:1,li:2}], [{p:[1],lm:0}], 'left'
+			test.deepEqual [{p:[0],ld:2,li:3}], type.transform [{p:[1],ld:2,li:3}], [{p:[0],lm:1}], 'left'
+			test.deepEqual [{p:[1],ld:3,li:4}], type.transform [{p:[0],ld:3,li:4}], [{p:[1],lm:0}], 'left'
 			test.done()
 
 		'li vs lm': (test) ->
@@ -423,39 +423,39 @@ genTests = (type) ->
 			lm = (f,t) -> [{p:[f],lm:t}]
 			xf = type.transform
 
-			test.deepEqual (li 0), xf (li 0), (lm 1, 3), 'client'
-			test.deepEqual (li 1), xf (li 1), (lm 1, 3), 'client'
-			test.deepEqual (li 1), xf (li 2), (lm 1, 3), 'client'
-			test.deepEqual (li 2), xf (li 3), (lm 1, 3), 'client'
-			test.deepEqual (li 4), xf (li 4), (lm 1, 3), 'client'
+			test.deepEqual (li 0), xf (li 0), (lm 1, 3), 'left'
+			test.deepEqual (li 1), xf (li 1), (lm 1, 3), 'left'
+			test.deepEqual (li 1), xf (li 2), (lm 1, 3), 'left'
+			test.deepEqual (li 2), xf (li 3), (lm 1, 3), 'left'
+			test.deepEqual (li 4), xf (li 4), (lm 1, 3), 'left'
 
-			test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 0), 'server'
-			test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 1), 'server'
-			test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 2), 'server'
-			test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 3), 'server'
-			test.deepEqual (lm 1, 3), xf (lm 1, 3), (li 4), 'server'
+			test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 0), 'right'
+			test.deepEqual (lm 2, 4), xf (lm 1, 3), (li 1), 'right'
+			test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 2), 'right'
+			test.deepEqual (lm 1, 4), xf (lm 1, 3), (li 3), 'right'
+			test.deepEqual (lm 1, 3), xf (lm 1, 3), (li 4), 'right'
 
-			test.deepEqual (li 0), xf (li 0), (lm 1, 2), 'client'
-			test.deepEqual (li 1), xf (li 1), (lm 1, 2), 'client'
-			test.deepEqual (li 1), xf (li 2), (lm 1, 2), 'client'
-			test.deepEqual (li 3), xf (li 3), (lm 1, 2), 'client'
+			test.deepEqual (li 0), xf (li 0), (lm 1, 2), 'left'
+			test.deepEqual (li 1), xf (li 1), (lm 1, 2), 'left'
+			test.deepEqual (li 1), xf (li 2), (lm 1, 2), 'left'
+			test.deepEqual (li 3), xf (li 3), (lm 1, 2), 'left'
 
-			test.deepEqual (li 0), xf (li 0), (lm 3, 1), 'client'
-			test.deepEqual (li 1), xf (li 1), (lm 3, 1), 'client'
-			test.deepEqual (li 3), xf (li 2), (lm 3, 1), 'client'
-			test.deepEqual (li 4), xf (li 3), (lm 3, 1), 'client'
-			test.deepEqual (li 4), xf (li 4), (lm 3, 1), 'client'
+			test.deepEqual (li 0), xf (li 0), (lm 3, 1), 'left'
+			test.deepEqual (li 1), xf (li 1), (lm 3, 1), 'left'
+			test.deepEqual (li 3), xf (li 2), (lm 3, 1), 'left'
+			test.deepEqual (li 4), xf (li 3), (lm 3, 1), 'left'
+			test.deepEqual (li 4), xf (li 4), (lm 3, 1), 'left'
 
-			test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 0), 'server'
-			test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 1), 'server'
-			test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 2), 'server'
-			test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 3), 'server'
-			test.deepEqual (lm 3, 1), xf (lm 3, 1), (li 4), 'server'
+			test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 0), 'right'
+			test.deepEqual (lm 4, 2), xf (lm 3, 1), (li 1), 'right'
+			test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 2), 'right'
+			test.deepEqual (lm 4, 1), xf (lm 3, 1), (li 3), 'right'
+			test.deepEqual (lm 3, 1), xf (lm 3, 1), (li 4), 'right'
 
-			test.deepEqual (li 0), xf (li 0), (lm 2, 1), 'client'
-			test.deepEqual (li 1), xf (li 1), (lm 2, 1), 'client'
-			test.deepEqual (li 3), xf (li 2), (lm 2, 1), 'client'
-			test.deepEqual (li 3), xf (li 3), (lm 2, 1), 'client'
+			test.deepEqual (li 0), xf (li 0), (lm 2, 1), 'left'
+			test.deepEqual (li 1), xf (li 1), (lm 2, 1), 'left'
+			test.deepEqual (li 3), xf (li 2), (lm 2, 1), 'left'
+			test.deepEqual (li 3), xf (li 3), (lm 2, 1), 'left'
 
 			test.done()
 
@@ -467,62 +467,62 @@ genTests = (type) ->
 			test.done()
 		
 		'Ops on deleted elements become noops': (test) ->
-			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x'}], 'client'
-			test.deepEqual [], type.transform [{p:[9],si:"bite "}], [{p:[],od:"agimble s",oi:null}], 'server'
+			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x'}], 'left'
+			test.deepEqual [], type.transform [{p:[9],si:"bite "}], [{p:[],od:"agimble s",oi:null}], 'right'
 			test.done()
 		
 		'Ops on replaced elements become noops': (test) ->
-			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x', oi:'y'}], 'client'
+			test.deepEqual [], type.transform [{p:[1, 0], si:'hi'}], [{p:[1], od:'x', oi:'y'}], 'left'
 			test.done()
 
 		'Deleted data is changed to reflect edits': (test) ->
-			test.deepEqual [{p:[1], od:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'client'
-			test.deepEqual [{p:[],od:25,oi:[]}], type.transform [{p:[],od:22,oi:[]}], [{p:[],na:3}], 'client'
-			test.deepEqual [{p:[],od:{toves:""},oi:4}], type.transform [{p:[],od:{toves:0},oi:4}], [{p:["toves"],od:0,oi:""}], 'client'
-			test.deepEqual [{p:[],od:"thou an",oi:[]}], type.transform [{p:[],od:"thou and ",oi:[]}], [{p:[7],sd:"d "}], 'client'
-			test.deepEqual [], type.transform([{p:["bird"],na:2}], [{p:[],od:{bird:38},oi:20}], 'server')
-			test.deepEqual [{p:[],od:{bird:40},oi:20}], type.transform([{p:[],od:{bird:38},oi:20}], [{p:["bird"],na:2}], 'client')
-			test.deepEqual [{p:['He'],od:[]}], type.transform [{p:["He"],od:[]}], [{p:["The"],na:-3}], 'server'
-			test.deepEqual [], type.transform [{p:["He"],oi:{}}], [{p:[],od:{},oi:"the"}], 'client'
+			test.deepEqual [{p:[1], od:'abc'}], type.transform [{p:[1], od:'a'}], [{p:[1, 1], si:'bc'}], 'left'
+			test.deepEqual [{p:[],od:25,oi:[]}], type.transform [{p:[],od:22,oi:[]}], [{p:[],na:3}], 'left'
+			test.deepEqual [{p:[],od:{toves:""},oi:4}], type.transform [{p:[],od:{toves:0},oi:4}], [{p:["toves"],od:0,oi:""}], 'left'
+			test.deepEqual [{p:[],od:"thou an",oi:[]}], type.transform [{p:[],od:"thou and ",oi:[]}], [{p:[7],sd:"d "}], 'left'
+			test.deepEqual [], type.transform([{p:["bird"],na:2}], [{p:[],od:{bird:38},oi:20}], 'right')
+			test.deepEqual [{p:[],od:{bird:40},oi:20}], type.transform([{p:[],od:{bird:38},oi:20}], [{p:["bird"],na:2}], 'left')
+			test.deepEqual [{p:['He'],od:[]}], type.transform [{p:["He"],od:[]}], [{p:["The"],na:-3}], 'right'
+			test.deepEqual [], type.transform [{p:["He"],oi:{}}], [{p:[],od:{},oi:"the"}], 'left'
 			test.done()
 		
-		'If two inserts are simultaneous, the clients insert will win': (test) ->
-			test.deepEqual [{p:[1], oi:'a', od:'b'}], type.transform [{p:[1], oi:'a'}], [{p:[1], oi:'b'}], 'client'
-			test.deepEqual [], type.transform [{p:[1], oi:'b'}], [{p:[1], oi:'a'}], 'server'
+		'If two inserts are simultaneous, the lefts insert will win': (test) ->
+			test.deepEqual [{p:[1], oi:'a', od:'b'}], type.transform [{p:[1], oi:'a'}], [{p:[1], oi:'b'}], 'left'
+			test.deepEqual [], type.transform [{p:[1], oi:'b'}], [{p:[1], oi:'a'}], 'right'
 			test.done()
 
 		'parallel ops on different keys miss each other': (test) ->
-			test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], oi:'z'}], 'client'
-			test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], od:'z'}], 'client'
-			test.deepEqual [{p:["in","he"],oi:{}}], type.transform [{p:["in","he"],oi:{}}], [{p:["and"],od:{}}], 'server'
-			test.deepEqual [{p:['x',0],si:"his "}], type.transform [{p:['x',0],si:"his "}], [{p:['y'],od:0,oi:1}], 'server'
+			test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], oi:'z'}], 'left'
+			test.deepEqual [{p:['a'], oi: 'x'}], type.transform [{p:['a'], oi:'x'}], [{p:['b'], od:'z'}], 'left'
+			test.deepEqual [{p:["in","he"],oi:{}}], type.transform [{p:["in","he"],oi:{}}], [{p:["and"],od:{}}], 'right'
+			test.deepEqual [{p:['x',0],si:"his "}], type.transform [{p:['x',0],si:"his "}], [{p:['y'],od:0,oi:1}], 'right'
 			test.done()
 
 		'replacement vs. deletion': (test) ->
-			test.deepEqual [{p:[],oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:['']}], 'server'
+			test.deepEqual [{p:[],oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:['']}], 'right'
 			test.done()
 
 		'replacement vs. replacement': (test) ->
-			test.deepEqual [],                     type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'server'
-			test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'client'
-			test.deepEqual [],                     type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'server'
-			test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'client'
+			test.deepEqual [],                     type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'right'
+			test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:['']},{p:[],oi:{}}], [{p:[],od:['']},{p:[],oi:null}], 'left'
+			test.deepEqual [],                     type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'right'
+			test.deepEqual [{p:[],od:null,oi:{}}], type.transform [{p:[],od:[''],oi:{}}], [{p:[],od:[''],oi:null}], 'left'
 		
 			# test diamond property
-			serverOps = [ {"p":[],"od":null,"oi":{}} ]
-			clientOps = [ {"p":[],"od":null,"oi":""} ]
-			serverHas = type.apply(null, serverOps)
-			clientHas = type.apply(null, clientOps)
+			rightOps = [ {"p":[],"od":null,"oi":{}} ]
+			leftOps = [ {"p":[],"od":null,"oi":""} ]
+			rightHas = type.apply(null, rightOps)
+			leftHas = type.apply(null, leftOps)
 				
-			[server_, client_] = require('../helpers').transformX type, serverOps, clientOps
-			test.deepEqual clientHas, type.apply serverHas, client_
-			test.deepEqual clientHas, type.apply clientHas, server_
+			[left_, right_] = require('../helpers').transformX type, leftOps, rightOps
+			test.deepEqual leftHas, type.apply rightHas, left_
+			test.deepEqual leftHas, type.apply leftHas, right_
 
 			test.done()
 		
 		'An attempt to re-delete a key becomes a no-op': (test) ->
-			test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'client'
-			test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'server'
+			test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'left'
+			test.deepEqual [], type.transform [{p:['k'], od:'x'}], [{p:['k'], od:'x'}], 'right'
 			test.done()
 
 	randomizer: (test) ->

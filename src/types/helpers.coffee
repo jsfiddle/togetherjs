@@ -3,63 +3,63 @@
 # and transforming them requires N^2 work.
 
 # Add transform and transformX functions for an OT type which has transformComponent defined.
-# transformComponent(destination array, component, other component, type - 'server' or 'client')
+# transformComponent(destination array, component, other component, side)
 bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
-	transformComponentX = (server, client, destServer, destClient) ->
-		transformComponent destServer, server, client, 'server'
-		transformComponent destClient, client, server, 'client'
+	transformComponentX = (left, right, destLeft, destRight) ->
+		transformComponent destLeft, left, right, 'left'
+		transformComponent destRight, right, left, 'right'
 
-	# Transforms serverOp by clientOp. Returns [serverOp', clientOp']
-	type.transformX = type['transformX'] = transformX = (serverOp, clientOp) ->
-		checkValidOp serverOp
-		checkValidOp clientOp
+	# Transforms rightOp by leftOp. Returns ['rightOp', clientOp']
+	type.transformX = type['transformX'] = transformX = (leftOp, rightOp) ->
+		checkValidOp leftOp
+		checkValidOp rightOp
 
-		newClientOp = []
+		newRightOp = []
 
-		for clientComponent in clientOp
-			# Generate newServerOp by composing serverOp by clientComponent
-			newServerOp = []
+		for rightComponent in rightOp
+			# Generate newLeftOp by composing leftOp by rightComponent
+			newLeftOp = []
 
 			k = 0
-			while k < serverOp.length
+			while k < leftOp.length
 				nextC = []
-				transformComponentX serverOp[k], clientComponent, newServerOp, nextC
+				transformComponentX leftOp[k], rightComponent, newLeftOp, nextC
 				k++
 
 				if nextC.length == 1
-					clientComponent = nextC[0]
+					rightComponent = nextC[0]
 				else if nextC.length == 0
-					append newServerOp, s for s in serverOp[k..]
-					clientComponent = null
+					append newLeftOp, l for l in leftOp[k..]
+					rightComponent = null
 					break
 				else
 					# Recurse.
-					[s_, c_] = transformX serverOp[k..], nextC
-					append newServerOp, s for s in s_
-					append newClientOp, c for c in c_
-					clientComponent = null
+					[l_, r_] = transformX leftOp[k..], nextC
+					append newLeftOp, l for l in l_
+					append newRightOp, r for r in r_
+					rightComponent = null
 					break
 		
-			append newClientOp, clientComponent if clientComponent?
-			serverOp = newServerOp
+			append newRightOp, rightComponent if rightComponent?
+			leftOp = newLeftOp
 		
-		[serverOp, newClientOp]
+		[leftOp, newRightOp]
 
-	# Transforms op with specified type ('server' or 'client') by otherOp.
+	# Transforms op with specified type ('left' or 'right') by otherOp.
 	type.transform = type['transform'] = (op, otherOp, type) ->
-		throw new Error "type must be 'server' or 'client'" unless type == 'server' or type == 'client'
+		throw new Error "type must be 'left' or 'right'" unless type == 'left' or type == 'right'
 
 		return op if otherOp.length == 0
 
 		# TODO: Benchmark with and without this line. I _think_ it'll make a big difference...?
 		return transformComponent [], op[0], otherOp[0], type if op.length == 1 and otherOp.length == 1
 
-		if type == 'server'
-			[server, _] = transformX op, otherOp
-			server
+		if type == 'left'
+			[left, _] = transformX op, otherOp
+			left
 		else
-			[_, client] = transformX otherOp, op
-			client
+			[_, right] = transformX otherOp, op
+			right
 
 unless WEB?
 	exports.bootstrapTransform = bootstrapTransform

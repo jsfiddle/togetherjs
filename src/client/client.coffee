@@ -91,16 +91,16 @@ class Document
 		@serverOps[@version] = op
 
 		# Transform a server op by a client op, and vice versa.
-		xf = @type.transformX or (server, client) =>
-			server_ = @type.transform server, client, 'server'
-			client_ = @type.transform client, server, 'client'
-			return [server_, client_]
+		xf = @type.transformX or (client, server) =>
+			client_ = @type.transform client, server, 'left'
+			server_ = @type.transform server, client, 'right'
+			return [client_, server_]
 
 		docOp = op
 		if @inflightOp != null
-			[docOp, @inflightOp] = xf docOp, @inflightOp
+			[@inflightOp, docOp] = xf @inflightOp, docOp
 		if @pendingOp != null
-			[docOp, @pendingOp] = xf docOp, @pendingOp
+			[@pendingOp, docOp] = xf @pendingOp, docOp
 			
 		@['snapshot'] = @type.apply @['snapshot'], docOp
 		@version++
@@ -120,7 +120,7 @@ class Document
 		while v < @version
 			realOp = @recentOps[v]
 			throw new Error 'Op version too old' unless realOp
-			op = @type.transform(op, realOp, 'client')
+			op = @type.transform op, realOp, 'left'
 			v++
 
 		# If this throws an exception, no changes should have been made to the doc

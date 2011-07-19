@@ -136,9 +136,8 @@ exports.apply = (str, op) ->
 
 # transform op1 by op2. Return transformed version of op1.
 # op1 and op2 are unchanged by transform.
-exports.transform = (op, otherOp, opType) ->
-	p "TRANSFORM #{opType} op #{i op} by #{i otherOp}"
-	throw new Error 'opType needs to be specified as \'server\' or \'client\'' unless opType == 'server' || opType == 'client'
+exports.transform = (op, otherOp, side) ->
+	throw new Error "side (#{side} must be 'left' or 'right'" unless side == 'left' or side == 'right'
 
 	checkOp op
 	checkOp otherOp
@@ -157,8 +156,8 @@ exports.transform = (op, otherOp, opType) ->
 				append chunk
 				length -= componentLength chunk unless typeof(chunk) == 'object' && chunk.i?
 		else if component.i? # Insert
-			if opType == 'client'
-				# The server's insert should go first.
+			if side == 'left'
+				# The left insert should go first.
 				o = peek()
 				append take() if o?.i
 

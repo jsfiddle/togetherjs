@@ -260,7 +260,7 @@ json.transformComponent = (dest, c, otherC, type) ->
 					return dest
 				else if c['ld'] != undefined
 					# we're trying to delete the same element, -> noop
-					if c['li'] != undefined and type == 'client'
+					if c['li'] != undefined and type == 'left'
 						# we're both replacing one element with another. only one can
 						# survive!
 						c['ld'] = clone otherC['li']
@@ -268,8 +268,8 @@ json.transformComponent = (dest, c, otherC, type) ->
 						return dest
 		else if otherC['li'] != undefined
 			if c['li'] != undefined and c['ld'] == undefined and commonOperand and c['p'][common] == otherC['p'][common]
-				# in li vs. li, client wins.
-				if type == 'server'
+				# in li vs. li, left wins.
+				if type == 'right'
 					c['p'][common]++
 			else if otherC['p'][common] <= c['p'][common]
 				c['p'][common]++
@@ -319,7 +319,7 @@ json.transformComponent = (dest, c, otherC, type) ->
 					# where did my thing go?
 					if from == otherFrom
 						# they moved it! tie break.
-						if type == 'client'
+						if type == 'left'
 							c['p'][common] = otherTo
 							if from == to # ugh
 								c['lm'] = otherTo
@@ -349,7 +349,7 @@ json.transformComponent = (dest, c, otherC, type) ->
 							# if we're both moving in the same direction, tie break
 							if (otherTo > otherFrom and to > from) or
 								 (otherTo < otherFrom and to < from)
-								if type == 'server'
+								if type == 'right'
 									c['lm']++
 							else
 								if to > from
@@ -387,8 +387,8 @@ json.transformComponent = (dest, c, otherC, type) ->
 			if c['p'][common] == otherC['p'][common]
 				if c['oi'] != undefined and commonOperand
 					# we inserted where someone else replaced
-					if type == 'server'
-						# client wins
+					if type == 'right'
+						# left wins
 						return dest
 					else
 						# we win, make our op replace what they inserted
@@ -399,8 +399,8 @@ json.transformComponent = (dest, c, otherC, type) ->
 					return dest
 		else if otherC['oi'] != undefined
 			if c['oi'] != undefined and c['p'][common] == otherC['p'][common]
-				# client wins if we try to insert at the same place
-				if type == 'client'
+				# left wins if we try to insert at the same place
+				if type == 'left'
 					json.append dest, {'p':c['p'],'od':otherC['oi']}
 				else
 					return dest

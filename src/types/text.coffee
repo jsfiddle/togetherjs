@@ -140,7 +140,7 @@ text._transformComponent = transformComponent = (dest, c, otherC, type) ->
 	checkValidOp [otherC]
 
 	if c['i']?
-		append dest, {'i':c['i'], 'p':transformPosition(c['p'], otherC, type == 'server')}
+		append dest, {'i':c['i'], 'p':transformPosition(c['p'], otherC, type == 'right')}
 
 	else # Delete
 		if otherC['i']? # delete vs insert
