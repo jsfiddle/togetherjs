@@ -21,13 +21,10 @@
 # Eg, the document: 'Hello .....world' ('.' denotes tombstoned (deleted) characters)
 # would be represented by a document snapshot of ['Hello ', 5, 'world']
 
-exports ?= {}
-
-exports.name = 'text-tp2'
-
-exports.tp2 = true
-
-exports.initialVersion = -> []
+type =
+	name: 'text-tp2'
+	tp2: true
+	initialVersion: -> []
 
 checkOp = (op) ->
 	throw new Error('Op must be an array of components') unless Array.isArray(op)
@@ -49,18 +46,26 @@ checkOp = (op) ->
 
 # Take the next part from the specified position in a document snapshot.
 # position = {index, offset}. It will be updated.
-exports._takePart = takePart = (doc, position, maxlength) ->
+type._takePart = takePart = (doc, position, maxlength, tombsIndivisible) ->
 	throw new Error 'Operation goes past the end of the document' if position.index >= doc.length
 
 	part = doc[position.index]
 	# peel off doc[0]
 	result = if typeof(part) == 'string'
-		part[position.offset...(position.offset + maxlength)]
+		if maxlength != undefined
+			part[position.offset...(position.offset + maxlength)]
+		else
+			part[position.offset...]
 	else
-		Math.min(maxlength, part - position.offset)
+		if maxlength == undefined or tombsIndivisible
+			part - position.offset
+		else
+			Math.min(maxlength, part - position.offset)
+	
+	resultLen = result.length || result
 
-	if (part.length || part) - position.offset > maxlength
-		position.offset += maxlength
+	if (part.length || part) - position.offset > resultLen
+		position.offset += resultLen
 	else
 		position.index++
 		position.offset = 0
@@ -68,7 +73,7 @@ exports._takePart = takePart = (doc, position, maxlength) ->
 	result
 
 # Append a part to the end of a list
-exports._appendPart = appendPart = (doc, p) ->
+type._appendPart = appendPart = (doc, p) ->
 	if doc.length == 0
 		doc.push p
 	else if typeof(doc[doc.length - 1]) == typeof(p)
@@ -78,7 +83,7 @@ exports._appendPart = appendPart = (doc, p) ->
 	return
 
 # Apply the op to the document. The document is not modified in the process.
-exports.apply = (doc, op) ->
+type.apply = (doc, op) ->
 	throw new Error('Snapshot is invalid') unless Array.isArray(doc)
 	checkOp op
 
@@ -107,7 +112,7 @@ exports.apply = (doc, op) ->
 
 # Append an op component to the end of the specified op.
 # Exported for the randomOpGenerator.
-exports._append = append = (op, component) ->
+type._append = append = (op, component) ->
 	if component == 0 || component.i == '' || component.i == 0 || component.d == 0
 		return
 	else if op.length == 0
@@ -174,7 +179,7 @@ componentLength = (component) ->
 
 # Normalize an op, removing all empty skips and empty inserts / deletes. Concatenate
 # adjacent inserts and deletes.
-exports.normalize = (op) ->
+type.normalize = (op) ->
 	newOp = []
 	append newOp, component for component in op
 	newOp
@@ -230,15 +235,17 @@ transformer = (op, otherOp, goForwards, side) ->
 # transform op1 by op2. Return transformed version of op1.
 # op1 and op2 are unchanged by transform.
 # side should be 'left' or 'right', depending on if op1.id <> op2.id. 'left' == client op.
-exports.transform = (op, otherOp, side) ->
+type.transform = (op, otherOp, side) ->
 	throw new Error "side (#{side}) should be 'left' or 'right'" unless side == 'left' or side == 'right'
 	transformer op, otherOp, true, side
 
 # Prune is the inverse of transform.
-exports.prune = (op, otherOp) -> transformer op, otherOp, false
+type.prune = (op, otherOp) -> transformer op, otherOp, false
 
 # Compose 2 ops into 1 op.
-exports.compose = (op1, op2) ->
+type.compose = (op1, op2) ->
+	return op2 if op1 == null or op1 == undefined
+
 	checkOp op1
 	checkOp op2
 
@@ -282,8 +289,60 @@ exports.compose = (op1, op2) ->
 
 	result
 
-if window?
-	window.ot ||= {}
-	window.ot.types ||= {}
-	window.ot.types.text = exports
+# ------------ Text document API methods
+
+appendSkipChars = (op, doc, pos, maxlength) ->
+	while (maxlength == undefined || maxlength > 0) and pos.index < doc.length
+		part = takePart doc, pos, maxlength, true
+		maxlength -= part.length if maxlength != undefined and typeof part is 'string'
+		append op, (part.length || part)
+
+class type.Document
+	@implements: {'text':true}
+
+	# The number of characters in the string
+	getLength: ->
+		sum = 0
+		sum += elem.length for elem in @snapshot when typeof elem is 'string'
+		sum
+
+	# Flatten a document into a string
+	getText: ->
+		strings = (elem for elem in @snapshot when typeof elem is 'string')
+		strings.join ''
+
+	# Editing methods. These return operations, and will be wrapped by the client.
+	insert: (text, pos, callback) ->
+		op = []
+		docPos = {index:0, offset:0}
+
+		appendSkipChars op, @snapshot, docPos, pos
+		append op, {'i':text}
+		appendSkipChars op, @snapshot, docPos
+		
+		@submitOp op, callback
+	
+	del: (length, pos, callback) ->
+		op = []
+		docPos = {index:0, offset:0}
+
+		appendSkipChars op, @snapshot, docPos, pos
+		
+		while length > 0
+			part = takePart @snapshot, docPos, length, true
+			if typeof part is 'string'
+				append op, {'d':part.length}
+				length -= part.length
+			else
+				append op, part
+		
+		appendSkipChars op, @snapshot, docPos
+
+		@submitOp op, callback
+
+if WEB?
+	exports.types ||= {}
+	exports.types['text-tp2'] = type
+else
+	module.exports = type
 
