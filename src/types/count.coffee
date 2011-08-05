@@ -1,5 +1,8 @@
 # This is a simple type used for testing other OT code. Each op is [expectedSnapshot, increment]
 
+exports.name = 'count'
+exports.initialVersion = () -> 1
+
 exports.apply = (snapshot, op) ->
 	[v, inc] = op
 	throw new Error "Op #{v} != snapshot #{snapshot}" unless snapshot == v
@@ -17,6 +20,3 @@ exports.compose = (op1, op2) ->
 exports.generateRandomOp = (doc) ->
 	[[doc, 1], doc + 1]
 
-exports.initialVersion = () -> 1
-
-exports.name = 'count'
