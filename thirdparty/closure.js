@@ -38,8 +38,10 @@ function compile(code, next) {
           js_code: code.toString('utf-8'),
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           output_format: 'json',
-          output_info: 'compiled_code',
-		  // Uncomment this to enable pretty-printing of the compiled output
+          output_info: ['errors', 'warnings', 'compiled_code', 'statistics'],
+          warning_level: 'VERBOSE'
+
+          // Uncomment this to enable pretty-printing of the compiled output
           // formatting: 'pretty_print'
         }),
         client = http.createClient(80, host).on('error', next),
@@ -55,22 +57,52 @@ function compile(code, next) {
       if (res.statusCode != 200)
         next(new Error('Unexpected HTTP response: ' + res.statusCode));
       else
-        capture(res, 'utf-8', parseResponse);
+        capture(res, 'utf8', parseResponse);
     });
 
     function parseResponse(err, data) {
       err ? next(err) : loadJSON(data, function(err, obj) {
         var error;
-        if (err)
+        if (err) {
           next(err);
-        else if ((error = obj.errors || obj.serverErrors || obj.warnings))
-          next(new Error('Failed to compile: ' + sys.inspect(error)));
-        else
+        } else if (obj.serverErrors) {
+          next(new Error('Failed to compile due to server error: ' + sys.inspect(error)));
+        } else if (obj.errors) {
+          printErrors(code, obj.errors);
+          next(new Error('Failed to compile due to JS errors (see above)'));
+        } else {
+          if (obj.warnings) {
+            printErrors(code, obj.warnings);
+          }
           next(null, obj.compiledCode);
+        }
       });
     }
   } catch (err) {
     next(err);
+  }
+}
+
+String.prototype.repeat = function(num) {
+  return new Array(isNaN(num)? 1 : ++num).join(this);
+}
+
+function printErrors(code, errors) {
+  var lines = code.split('\n');
+  errors = errors.filter(function(e) {
+    return e.type != 'JSC_INEXISTENT_PROPERTY' && e.type != 'JSC_WRONG_ARGUMENT_COUNT';
+  });
+  if (errors.length === 0) {
+    return;
+  }
+
+  console.log(errors.length + ' problem(s):');
+  for (var i = 0; i < errors.length; i++) {
+    var e = errors[i];
+    console.error((e.error ? 'ERROR: ' : 'WARNING: ') + (e.error || e.warning) + ' of type ' + e.type + ' in ' + e.file + ':' + e.lineno);
+    console.error(lines[e.lineno - 1]);
+    console.error('-'.repeat(e.charno) + '^');
+    console.error();
   }
 }
 
@@ -84,8 +116,9 @@ function compile(code, next) {
 function capture(input, encoding, next) {
   var buffer = '';
 
+  input.setEncoding(encoding);
   input.on('data', function(chunk) {
-    buffer += chunk.toString(encoding);
+    buffer += chunk;
   });
 
   input.on('end', function() {
