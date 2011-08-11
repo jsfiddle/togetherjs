@@ -22,7 +22,7 @@ text = {}
 
 text.name = 'text'
 
-text['initialVersion'] = text.initialVersion = -> ''
+text['create'] = text.create = -> ''
 
 strInject = (s1, pos, s2) -> s1[...pos] + s2 + s1[pos..]
 

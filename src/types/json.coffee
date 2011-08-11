@@ -4,11 +4,11 @@
 
 text = require './text' unless WEB?
 
-json ?= {}
+json = {}
 
 json.name = 'json'
 
-json.initialVersion = -> null
+json.create = -> null
 
 json.invertComponent = (c) ->
 	c_ = { 'p': c['p'] }
@@ -35,7 +35,7 @@ json.checkList = (elem) ->
 json.checkObj = (elem) ->
 	throw new Error "Referenced element not an object (it was #{JSON.stringify elem})" unless elem.constructor is Object
 
-json.apply = (snapshot, op) ->
+json.apply = json['apply'] = (snapshot, op) ->
 	json.checkValidOp op
 	op = clone op
 
@@ -110,9 +110,11 @@ json.apply = (snapshot, op) ->
 
 				# Should check that elem[key] == c['od']
 				delete elem[key]
-	catch e
+			else
+				throw new Error 'invalid / missing instruction in op'
+	catch error
 		# TODO: Roll back all already applied changes. Write tests before implementing this code.
-		throw e
+		throw error
 
 	container['data']
 
@@ -147,7 +149,7 @@ json.append = (dest, c) ->
 	else
 		dest.push c
 
-json.compose = (op1, op2) ->
+json['compose'] = json.compose = (op1, op2) ->
 	json.checkValidOp op1
 	json.checkValidOp op2
 
@@ -229,7 +231,6 @@ json.transformComponent = (dest, c, otherC, type) ->
 		commonOperand = cplength == otherCplength
 		# transform based on otherC
 		if otherC['na'] != undefined
-			null
 			# this case is handled above due to icky path hax
 		else if otherC['si'] != undefined || otherC['sd'] != undefined
 			# String op -- pass through to text type

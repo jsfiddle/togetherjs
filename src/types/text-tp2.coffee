@@ -24,7 +24,23 @@
 type =
 	name: 'text-tp2'
 	tp2: true
-	initialVersion: -> []
+	create: -> {charLength:0, totalLength:0, positionCache:[], data:[]}
+	serialize: (doc) ->
+		throw new Error 'invalid doc snapshot' unless doc.data
+		doc.data
+	deserialize: (data) ->
+		doc = type.create()
+		doc.data = data
+		
+		for component in data
+			if typeof component is 'string'
+				doc.charLength += component.length
+				doc.totalLength += component.length
+			else
+				doc.totalLength += component
+		
+		doc
+
 
 checkOp = (op) ->
 	throw new Error('Op must be an array of components') unless Array.isArray(op)
@@ -46,11 +62,11 @@ checkOp = (op) ->
 
 # Take the next part from the specified position in a document snapshot.
 # position = {index, offset}. It will be updated.
-type._takePart = takePart = (doc, position, maxlength, tombsIndivisible) ->
-	throw new Error 'Operation goes past the end of the document' if position.index >= doc.length
+type._takeDoc = takeDoc = (doc, position, maxlength, tombsIndivisible) ->
+	throw new Error 'Operation goes past the end of the document' if position.index >= doc.data.length
 
-	part = doc[position.index]
-	# peel off doc[0]
+	part = doc.data[position.index]
+	# peel off data[0]
 	result = if typeof(part) == 'string'
 		if maxlength != undefined
 			part[position.offset...(position.offset + maxlength)]
@@ -72,41 +88,52 @@ type._takePart = takePart = (doc, position, maxlength, tombsIndivisible) ->
 	
 	result
 
-# Append a part to the end of a list
-type._appendPart = appendPart = (doc, p) ->
-	if doc.length == 0
-		doc.push p
-	else if typeof(doc[doc.length - 1]) == typeof(p)
-		doc[doc.length - 1] += p
+# Append a part to the end of a document
+type._appendDoc = appendDoc = (doc, p) ->
+	return if p == 0 or p == ''
+
+	if typeof p is 'string'
+		doc.charLength += p.length
+		doc.totalLength += p.length
 	else
-		doc.push p
+		doc.totalLength += p
+
+	data = doc.data
+	if data.length == 0
+		data.push p
+	else if typeof(data[data.length - 1]) == typeof(p)
+		data[data.length - 1] += p
+	else
+		data.push p
 	return
 
 # Apply the op to the document. The document is not modified in the process.
 type.apply = (doc, op) ->
-	throw new Error('Snapshot is invalid') unless Array.isArray(doc)
+	unless doc.totalLength != undefined and doc.charLength != undefined and doc.data.length != undefined
+		throw new Error('Snapshot is invalid')
+
 	checkOp op
 
-	newDoc = []
+	newDoc = type.create()
 	position = {index:0, offset:0}
 
 	for component in op
-		if typeof(component) == 'number'
+		if typeof(component) is 'number'
 			remainder = component
 			while remainder > 0
-				part = takePart doc, position, remainder
+				part = takeDoc doc, position, remainder
 				
-				appendPart newDoc, part
+				appendDoc newDoc, part
 				remainder -= part.length || part
 
 		else if component.i != undefined
-			appendPart newDoc, component.i
+			appendDoc newDoc, component.i
 		else if component.d != undefined
 			remainder = component.d
 			while remainder > 0
-				part = takePart doc, position, remainder
+				part = takeDoc doc, position, remainder
 				remainder -= part.length || part
-			appendPart newDoc, component.d
+			appendDoc newDoc, component.d
 	
 	newDoc
 
@@ -231,7 +258,6 @@ transformer = (op, otherOp, goForwards, side) ->
 
 	newOp
 
-
 # transform op1 by op2. Return transformed version of op1.
 # op1 and op2 are unchanged by transform.
 # side should be 'left' or 'right', depending on if op1.id <> op2.id. 'left' == client op.
@@ -289,59 +315,7 @@ type.compose = (op1, op2) ->
 
 	result
 
-# ------------ Text document API methods
-
-appendSkipChars = (op, doc, pos, maxlength) ->
-	while (maxlength == undefined || maxlength > 0) and pos.index < doc.length
-		part = takePart doc, pos, maxlength, true
-		maxlength -= part.length if maxlength != undefined and typeof part is 'string'
-		append op, (part.length || part)
-
-class type.Document
-	@implements: {'text':true}
-
-	# The number of characters in the string
-	getLength: ->
-		sum = 0
-		sum += elem.length for elem in @snapshot when typeof elem is 'string'
-		sum
-
-	# Flatten a document into a string
-	getText: ->
-		strings = (elem for elem in @snapshot when typeof elem is 'string')
-		strings.join ''
-
-	# Editing methods. These return operations, and will be wrapped by the client.
-	insert: (text, pos, callback) ->
-		op = []
-		docPos = {index:0, offset:0}
-
-		appendSkipChars op, @snapshot, docPos, pos
-		append op, {'i':text}
-		appendSkipChars op, @snapshot, docPos
-		
-		@submitOp op, callback
-	
-	del: (length, pos, callback) ->
-		op = []
-		docPos = {index:0, offset:0}
-
-		appendSkipChars op, @snapshot, docPos, pos
-		
-		while length > 0
-			part = takePart @snapshot, docPos, length, true
-			if typeof part is 'string'
-				append op, {'d':part.length}
-				length -= part.length
-			else
-				append op, part
-		
-		appendSkipChars op, @snapshot, docPos
-
-		@submitOp op, callback
-
 if WEB?
-	exports.types ||= {}
 	exports.types['text-tp2'] = type
 else
 	module.exports = type

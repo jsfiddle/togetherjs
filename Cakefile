@@ -16,6 +16,7 @@ client = [
 	'client/microevent'
 	'types/helpers'
 	'types/text'
+	'types/text-api'
 	'types/json'
 	'client/client'
 ]

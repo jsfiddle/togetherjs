@@ -7,7 +7,7 @@ i = -> #util.inspect
 {randomInt, randomReal, seed} = helpers
 
 # Returns client result
-testRandomOp = (type, initialDoc = type.initialVersion()) ->
+testRandomOp = (type, initialDoc = type.create()) ->
 	makeDoc = -> {
 			ops: []
 			result: initialDoc
@@ -22,11 +22,18 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 
 	p "Doc #{i initialDoc} + #{i ops} = #{i result}" for {ops, result} in [client, client2, server]
 
+	checkSnapshotsEq = (a, b) ->
+		if type.serialize
+			assert.deepEqual type.serialize(a), type.serialize(b)
+		else
+			assert.deepEqual a, b
+
 	# First, test type.apply.
 	testApply = (doc) ->
 		s = initialDoc
 		s = type.apply s, op for op in doc.ops
-		assert.deepEqual s, doc.result
+
+		checkSnapshotsEq s, doc.result
 	
 	testApply set for set in opSets
 
@@ -42,7 +49,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 				op_ = type.invert op
 				snapshot = type.apply snapshot, op_
 
-			assert.deepEqual snapshot, initialDoc
+			checkSnapshotsEq snapshot, initialDoc
 	
 		testInvert set for set in opSets
 
@@ -53,7 +60,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 			if doc.ops.length > 0
 				doc.composed = helpers.composeList type, doc.ops
 				# .... And this should match the expected document.
-				assert.deepEqual doc.result, type.apply initialDoc, doc.composed
+				checkSnapshotsEq doc.result, type.apply initialDoc, doc.composed
 
 		compose set for set in opSets
 
@@ -70,7 +77,7 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 			# Eg, when:
 			#	server.ops = [ [ { d: 'x' } ], [ { i: 'c' } ] ]
 			#	client.ops = [ 1, { i: 'b' } ]
-			assert.deepEqual s_c, c_s
+			checkSnapshotsEq s_c, c_s
 
 			if type.tp2 and client2.composed?
 				# TP2 requires that T(op3, op1 . T(op2, op1)) == T(op3, op2 . T(op1, op2)).
@@ -101,15 +108,15 @@ testRandomOp = (type, initialDoc = type.initialVersion()) ->
 		s_c = c_.reduce type.apply, server.result
 		c_s = s_.reduce type.apply, client.result
 
-		assert.deepEqual s_c, c_s
+		checkSnapshotsEq s_c, c_s
 
 		# ... And we'll do a round-trip using invert().
 		if type.invert?
 			c_inv = c_.slice().reverse().map type.invert
 			server_result_ = c_inv.reduce type.apply, s_c
-			assert.deepEqual server.result, server_result_
+			checkSnapshotsEq server.result, server_result_
 			orig_ = server.ops.slice().reverse().map(type.invert).reduce(type.apply, server_result_)
-			assert.deepEqual orig_, initialDoc
+			checkSnapshotsEq orig_, initialDoc
 	
 	client.result
 
@@ -146,7 +153,7 @@ exports.test = (type, iterations = 1000) ->
 	warnUnless 'invert'
 	warnUnless 'compose'
 
-	doc = type.initialVersion()
+	doc = type.create()
 
 	console.time 'randomizer'
 	iterationsPerPct = iterations / 100

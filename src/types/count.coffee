@@ -1,7 +1,7 @@
 # This is a simple type used for testing other OT code. Each op is [expectedSnapshot, increment]
 
 exports.name = 'count'
-exports.initialVersion = () -> 1
+exports.create = -> 1
 
 exports.apply = (snapshot, op) ->
 	[v, inc] = op

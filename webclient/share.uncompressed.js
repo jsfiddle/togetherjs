@@ -8,17 +8,18 @@ Copyright 2011 ShareJS Authors
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
-;  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, nextTick, open, strInject, text, transformComponent, transformPosition, types;
-  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+;
+  var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, json, nextTick, open, strInject, text, transformComponent, transformPosition, types;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   exports = {};
   /**
    @const
    @type {boolean}
 */;
   WEB = true;
-  nextTick = (typeof process !== "undefined" && process !== null ? process.nextTick : void 0) || function(fn) {
+  nextTick = WEB != null ? function(fn) {
     return setTimeout(fn, 0);
-  };
+  } : nextTick = process['nextTick'];
   MicroEvent = (function() {
     function MicroEvent() {}
     MicroEvent.prototype.on = function(event, fct) {
@@ -39,20 +40,21 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         }
         i++;
       }
-      nextTick(function() {
+      nextTick(__bind(function() {
         var x;
-        return listeners = (function() {
-          var _i, _len, _results;
+        return this._events[event] = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this._events[event];
           _results = [];
-          for (_i = 0, _len = listeners.length; _i < _len; _i++) {
-            x = listeners[_i];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            x = _ref[_i];
             if (x) {
               _results.push(x);
             }
           }
           return _results;
-        })();
-      });
+        }).call(this);
+      }, this));
       return this;
     };
     MicroEvent.prototype.emit = function() {
@@ -158,7 +160,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   }
   text = {};
   text.name = 'text';
-  text['initialVersion'] = text.initialVersion = function() {
+  text['create'] = text.create = function() {
     return '';
   };
   strInject = function(s1, pos, s2) {
@@ -249,11 +251,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-            if ((_ref = c['p']) != null) {
-        _ref;
-      } else {
+      if ((_ref = c['p']) == null) {
         c['p'] = 0;
-      };
+      }
       append(newOp, c);
     }
     return newOp;
@@ -377,13 +377,64 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   if (WEB == null) {
     text = require('./text');
   }
-    if (typeof json !== "undefined" && json !== null) {
-    json;
-  } else {
-    json = {};
+  text.api = {
+    provides: {
+      'text': true
+    },
+    getLength: function() {
+      return this.snapshot.length;
+    },
+    getText: function() {
+      return this.snapshot;
+    },
+    insert: function(text, pos, callback) {
+      var op;
+      if (pos == null) {
+        pos = 0;
+      }
+      op = [
+        {
+          'p': pos,
+          'i': text
+        }
+      ];
+      this.submitOp(op, callback);
+      return op;
+    },
+    del: function(length, pos, callback) {
+      var op;
+      op = [
+        {
+          'p': pos,
+          'd': this.snapshot.slice(pos, pos + length)
+        }
+      ];
+      this.submitOp(op, callback);
+      return op;
+    },
+    _register: function() {
+      return this.on('remoteop', function(op) {
+        var component, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = op.length; _i < _len; _i++) {
+          component = op[_i];
+          _results.push(component['i'] !== void 0 ? this.emit('insert', component['i'], component['p']) : this.emit('delete', component['d'], component['p']));
+        }
+        return _results;
+      });
+    }
   };
+  text.api['provides'] = text.api.provides;
+  text.api['getLength'] = text.api.getLength;
+  text.api['getText'] = text.api.getText;
+  text.api['insert'] = text.api.insert;
+  text.api['del'] = text.api.del;
+  if (WEB == null) {
+    text = require('./text');
+  }
+  json = {};
   json.name = 'json';
-  json.initialVersion = function() {
+  json.create = function() {
     return null;
   };
   json.invertComponent = function(c) {
@@ -442,7 +493,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       throw new Error("Referenced element not an object (it was " + (JSON.stringify(elem)) + ")");
     }
   };
-  json.apply = function(snapshot, op) {
+  json.apply = json['apply'] = function(snapshot, op) {
     var c, container, e, elem, i, key, p, parent, parentkey, _i, _len, _len2, _ref;
     json.checkValidOp(op);
     op = clone(op);
@@ -507,10 +558,12 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         } else if (c['od'] !== void 0) {
           json.checkObj(elem);
           delete elem[key];
+        } else {
+          throw new Error('invalid / missing instruction in op');
         }
       }
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
     return container['data'];
   };
@@ -553,7 +606,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       return dest.push(c);
     }
   };
-  json.compose = function(op1, op2) {
+  json['compose'] = json.compose = function(op1, op2) {
     var c, newOp, _i, _len;
     json.checkValidOp(op1);
     json.checkValidOp(op2);
@@ -572,11 +625,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-            if ((_ref = c['p']) != null) {
-        _ref;
-      } else {
+      if ((_ref = c['p']) == null) {
         c['p'] = [];
-      };
+      }
       json.append(newOp, c);
     }
     return newOp;
@@ -650,9 +701,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     if (common != null) {
       commonOperand = cplength === otherCplength;
-      if (otherC['na'] !== void 0) {
-        null;
-      } else if (otherC['si'] !== void 0 || otherC['sd'] !== void 0) {
+      if (otherC['na'] !== void 0) {} else if (otherC['si'] !== void 0 || otherC['sd'] !== void 0) {
         if (c['si'] !== void 0 || c['sd'] !== void 0) {
           if (!commonOperand) {
             throw new Error("must be a string?");
@@ -890,63 +939,60 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     io = require('../../thirdparty/Socket.io-node-client').io;
     MicroEvent = require('./microevent');
   }
-  Document = (function() {
-    function Document(connection, name, version, type, snapshot) {
-      this.connection = connection;
-      this.name = name;
-      this.version = version;
-      this.type = type;
-      this.onOpReceived = __bind(this.onOpReceived, this);
-      this.tryFlushPendingOp = __bind(this.tryFlushPendingOp, this);
-      if (this.type.compose == null) {
-        throw new Error('Handling types without compose() defined is not currently implemented');
-      }
-      this['snapshot'] = snapshot;
-      this.inflightOp = null;
-      this.inflightCallbacks = [];
-      this.pendingOp = null;
-      this.pendingCallbacks = [];
-      this.serverOps = {};
-      this.listeners = [];
+  Document = function(connection, name, version, type, snapshot) {
+    var inflightCallbacks, inflightOp, k, listeners, pendingCallbacks, pendingOp, serverOps, tryFlushPendingOp, v, _ref;
+    this.name = name;
+    this.version = version;
+    this.type = type;
+    if (this.type.compose == null) {
+      throw new Error('Handling types without compose() defined is not currently implemented');
     }
-    Document.prototype.tryFlushPendingOp = function() {
-      if (this.inflightOp === null && this.pendingOp !== null) {
-        this.inflightOp = this.pendingOp;
-        this.inflightCallbacks = this.pendingCallbacks;
-        this.pendingOp = null;
-        this.pendingCallbacks = [];
-        return this.connection.send({
+    this.setSnapshot = function(s) {
+      return this['snapshot'] = this.snapshot = s;
+    };
+    this.setSnapshot(snapshot);
+    inflightOp = null;
+    inflightCallbacks = [];
+    pendingOp = null;
+    pendingCallbacks = [];
+    serverOps = {};
+    listeners = [];
+    tryFlushPendingOp = __bind(function() {
+      if (inflightOp === null && pendingOp !== null) {
+        inflightOp = pendingOp;
+        inflightCallbacks = pendingCallbacks;
+        pendingOp = null;
+        pendingCallbacks = [];
+        return connection.send({
           'doc': this.name,
-          'op': this.inflightOp,
+          'op': inflightOp,
           'v': this.version
         }, __bind(function(response) {
-          var callback, _i, _j, _len, _len2, _ref, _ref2;
+          var callback, _i, _j, _len, _len2;
           if (response['v'] === null) {
-            _ref = this.inflightCallbacks;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              callback = _ref[_i];
+            for (_i = 0, _len = inflightCallbacks.length; _i < _len; _i++) {
+              callback = inflightCallbacks[_i];
               callback(null);
             }
-            this.inflightOp = null;
+            inflightOp = null;
             throw new Error(response['error']);
           }
           if (response['v'] !== this.version) {
             throw new Error('Invalid version from server');
           }
-          this.serverOps[this.version] = this.inflightOp;
+          serverOps[this.version] = inflightOp;
           this.version++;
-          _ref2 = this.inflightCallbacks;
-          for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-            callback = _ref2[_j];
-            callback(this.inflightOp, null);
+          for (_j = 0, _len2 = inflightCallbacks.length; _j < _len2; _j++) {
+            callback = inflightCallbacks[_j];
+            callback(inflightOp, null);
           }
-          this.inflightOp = null;
-          return this.tryFlushPendingOp();
+          inflightOp = null;
+          return tryFlushPendingOp();
         }, this));
       }
-    };
-    Document.prototype.onOpReceived = function(msg) {
-      var docOp, op, xf, _ref, _ref2;
+    }, this);
+    this._onOpReceived = function(msg) {
+      var docOp, oldSnapshot, op, xf, _ref, _ref2;
       if (msg['v'] < this.version) {
         return;
       }
@@ -957,26 +1003,27 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         throw new Error("Expected version " + this.version + " but got " + msg['v']);
       }
       op = msg['op'];
-      this.serverOps[this.version] = op;
-      xf = this.type.transformX || __bind(function(server, client) {
+      serverOps[this.version] = op;
+      xf = this.type.transformX || __bind(function(client, server) {
         var client_, server_;
-        server_ = this.type.transform(server, client, 'right');
         client_ = this.type.transform(client, server, 'left');
-        return [server_, client_];
+        server_ = this.type.transform(server, client, 'right');
+        return [client_, server_];
       }, this);
       docOp = op;
-      if (this.inflightOp !== null) {
-        _ref = xf(docOp, this.inflightOp), docOp = _ref[0], this.inflightOp = _ref[1];
+      if (inflightOp !== null) {
+        _ref = xf(inflightOp, docOp), inflightOp = _ref[0], docOp = _ref[1];
       }
-      if (this.pendingOp !== null) {
-        _ref2 = xf(docOp, this.pendingOp), docOp = _ref2[0], this.pendingOp = _ref2[1];
+      if (pendingOp !== null) {
+        _ref2 = xf(pendingOp, docOp), pendingOp = _ref2[0], docOp = _ref2[1];
       }
-      this['snapshot'] = this.type.apply(this['snapshot'], docOp);
+      oldSnapshot = this.snapshot;
+      this.setSnapshot(this.type.apply(oldSnapshot, docOp));
       this.version++;
-      this.emit('remoteop', docOp);
-      return this.emit('change', docOp);
+      this.emit('remoteop', docOp, oldSnapshot);
+      return this.emit('change', docOp, oldSnapshot);
     };
-    Document.prototype.submitOp = function(op, v, callback) {
+    this['submitOp'] = this.submitOp = function(op, v, callback) {
       var realOp, _ref;
       if (v == null) {
         v = this.version;
@@ -989,27 +1036,27 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         op = this.type.normalize(op);
       }
       while (v < this.version) {
-        realOp = this.recentOps[v];
+        realOp = serverOps[v];
         if (!realOp) {
           throw new Error('Op version too old');
         }
         op = this.type.transform(op, realOp, 'left');
         v++;
       }
-      this['snapshot'] = this.type.apply(this['snapshot'], op);
-      if (this.pendingOp !== null) {
-        this.pendingOp = this.type.compose(this.pendingOp, op);
+      this.setSnapshot(this.type.apply(this.snapshot, op));
+      if (pendingOp !== null) {
+        pendingOp = this.type.compose(pendingOp, op);
       } else {
-        this.pendingOp = op;
+        pendingOp = op;
       }
       if (callback) {
-        this.pendingCallbacks.push(callback);
+        pendingCallbacks.push(callback);
       }
       this.emit('change', op);
-      return setTimeout(this.tryFlushPendingOp, 0);
+      return setTimeout(tryFlushPendingOp, 0);
     };
-    Document.prototype.close = function(callback) {
-      return this.connection.send({
+    this['close'] = this.close = function(callback) {
+      return connection.send({
         'doc': this.name,
         open: false
       }, __bind(function() {
@@ -1019,16 +1066,25 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         this.emit('closed');
       }, this));
     };
-    return Document;
-  })();
+    if (this.type.api) {
+      _ref = this.type.api;
+      for (k in _ref) {
+        v = _ref[k];
+        this[k] = v;
+      }
+      this._register();
+    } else {
+      this.provides = this['provides'] = {};
+    }
+    return this;
+  };
   MicroEvent.mixin(Document);
-  Document.prototype['submitOp'] = Document.prototype.submitOp;
-  Document.prototype['close'] = Document.prototype.close;
   Connection = (function() {
     function Connection(host, port, basePath) {
       this.onMessage = __bind(this.onMessage, this);
       this.connected = __bind(this.connected, this);
-      this.disconnected = __bind(this.disconnected, this);      var resource;
+      this.disconnected = __bind(this.disconnected, this);
+      var resource;
       resource = basePath ? path + '/socket.io' : 'socket.io';
       this.socket = new io['Socket'](host, {
         port: port,
@@ -1084,7 +1140,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       if (type === 'op') {
         doc = this.docs[docName];
         if (doc) {
-          return doc.onOpReceived(msg);
+          return doc._onOpReceived(msg);
         }
       }
     };
@@ -1154,7 +1210,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           return callback(null, response.error);
         } else {
           if (response['snapshot'] === void 0) {
-            response['snapshot'] = type.initialVersion();
+            response['snapshot'] = type.create();
           }
           response['type'] = type;
           return callback(this.makeDoc(response));
@@ -1178,16 +1234,12 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   getConnection = function(host, port, basePath) {
     var address, c;
     if (WEB != null) {
-            if (host != null) {
-        host;
-      } else {
+      if (host == null) {
         host = window.location.hostname;
-      };
-            if (port != null) {
-        port;
-      } else {
+      }
+      if (port == null) {
         port = window.location.port;
-      };
+      }
     }
     address = host;
     if (port != null) {
@@ -1208,11 +1260,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       callback = options;
       options = null;
     }
-        if (options != null) {
-      options;
-    } else {
+    if (options == null) {
       options = {};
-    };
+    }
     c = getConnection(options.host, options.port, options.basePath);
     return c.open(docName, type, function(doc, error) {
       if (doc === null) {

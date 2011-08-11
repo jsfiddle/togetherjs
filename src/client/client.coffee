@@ -19,62 +19,63 @@ else
 # Events:
 #  - remoteop (op)
 #  - changed (op)
-class Document
-	# stream is a OpStream object.
-	# name is the documents' docName.
-	# version is the version of the document _on the server_
-	constructor: (@connection, @name, @version, @type, snapshot) ->
-		throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
+#
+# stream is a OpStream object.
+# name is the documents' docName.
+# version is the version of the document _on the server_
+Document = (connection, @name, @version, @type, snapshot) ->
+	throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
 
-		# Gotta figure out a better way to make this work with closure.
-		@['snapshot'] = snapshot
+	# Gotta figure out a cleaner way to make this work with closure.
+	@setSnapshot = (s) -> @['snapshot'] = @snapshot = s
+	@setSnapshot(snapshot)
 
-		# The op that is currently roundtripping to the server, or null.
-		@inflightOp = null
-		@inflightCallbacks = []
+	# The op that is currently roundtripping to the server, or null.
+	inflightOp = null
+	inflightCallbacks = []
 
-		# All ops that are waiting for the server to acknowledge @inflightOp
-		@pendingOp = null
-		@pendingCallbacks = []
+	# All ops that are waiting for the server to acknowledge @inflightOp
+	pendingOp = null
+	pendingCallbacks = []
 
-		# Some recent ops, incase submitOp is called with an old op version number.
-		@serverOps = {}
+	# Some recent ops, incase submitOp is called with an old op version number.
+	serverOps = {}
 
-		# Listeners for the document changing
-		@listeners = []
+	# Listeners for the document changing
+	listeners = []
 
 	# Internal - do not call directly.
-	tryFlushPendingOp: =>
-		if @inflightOp == null && @pendingOp != null
+	tryFlushPendingOp = =>
+		if inflightOp == null && pendingOp != null
 			# Rotate null -> pending -> inflight, 
-			@inflightOp = @pendingOp
-			@inflightCallbacks = @pendingCallbacks
+			inflightOp = pendingOp
+			inflightCallbacks = pendingCallbacks
 
-			@pendingOp = null
-			@pendingCallbacks = []
+			pendingOp = null
+			pendingCallbacks = []
 
-			@connection.send {'doc':@name, 'op':@inflightOp, 'v':@version}, (response) =>
+			connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response) =>
 				if response['v'] == null
 					# Currently, it should be impossible to reach this case.
 					# This case is currently untested.
-					callback(null) for callback in @inflightCallbacks
-					@inflightOp = null
+					callback(null) for callback in inflightCallbacks
+					inflightOp = null
 					# Perhaps the op should be removed from the local document...
 					# @snapshot = @type.apply @snapshot, type.invert(@inflightOp) if type.invert?
 					throw new Error(response['error'])
 
 				throw new Error('Invalid version from server') unless response['v'] == @version
 
-				@serverOps[@version] = @inflightOp
+				serverOps[@version] = inflightOp
 				@version++
-				callback(@inflightOp, null) for callback in @inflightCallbacks
+				callback(inflightOp, null) for callback in inflightCallbacks
 
-				@inflightOp = null
-				@tryFlushPendingOp()
+				inflightOp = null
+				tryFlushPendingOp()
 
 	# Internal - do not call directly.
 	# Called when an op is received from the server.
-	onOpReceived: (msg) =>
+	@_onOpReceived = (msg) ->
 		# msg is {doc:, op:, v:}
 
 		# There is a bug in socket.io (produced on firefox 3.6) which causes messages
@@ -88,7 +89,7 @@ class Document
 #		p "if: #{i @inflightOp} pending: #{i @pendingOp} doc '#{@snapshot}' op: #{i msg.op}"
 
 		op = msg['op']
-		@serverOps[@version] = op
+		serverOps[@version] = op
 
 		# Transform a server op by a client op, and vice versa.
 		xf = @type.transformX or (client, server) =>
@@ -97,20 +98,21 @@ class Document
 			return [client_, server_]
 
 		docOp = op
-		if @inflightOp != null
-			[@inflightOp, docOp] = xf @inflightOp, docOp
-		if @pendingOp != null
-			[@pendingOp, docOp] = xf @pendingOp, docOp
+		if inflightOp != null
+			[inflightOp, docOp] = xf inflightOp, docOp
+		if pendingOp != null
+			[pendingOp, docOp] = xf pendingOp, docOp
 			
-		@['snapshot'] = @type.apply @['snapshot'], docOp
+		oldSnapshot = @snapshot
+		@setSnapshot(@type.apply oldSnapshot, docOp)
 		@version++
 
-		@emit 'remoteop', docOp
-		@emit 'change', docOp
+		@emit 'remoteop', docOp, oldSnapshot
+		@emit 'change', docOp, oldSnapshot
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
-	submitOp: (op, v = @version, callback) ->
+	@['submitOp'] = @submitOp = (op, v = @version, callback) ->
 		if typeof v == 'function'
 			callback = v
 			v = @version
@@ -118,41 +120,45 @@ class Document
 		op = @type.normalize(op) if @type?.normalize?
 
 		while v < @version
-			realOp = @recentOps[v]
+			# TODO: Add tests for this
+			realOp = serverOps[v]
 			throw new Error 'Op version too old' unless realOp
 			op = @type.transform op, realOp, 'left'
 			v++
 
 		# If this throws an exception, no changes should have been made to the doc
-		@['snapshot'] = @type.apply @['snapshot'], op
+		@setSnapshot(@type.apply @snapshot, op)
 
-		if @pendingOp != null
-			@pendingOp = @type.compose(@pendingOp, op)
+		if pendingOp != null
+			pendingOp = @type.compose(pendingOp, op)
 		else
-			@pendingOp = op
+			pendingOp = op
 
-		@pendingCallbacks.push callback if callback
+		pendingCallbacks.push callback if callback
 
 		@emit 'change', op
 
 		# A timeout is used so if the user sends multiple ops at the same time, they'll be composed
 		# together and sent together.
-		setTimeout @tryFlushPendingOp, 0
+		setTimeout tryFlushPendingOp, 0
 	
 	# Close a document.
 	# No unit tests for this so far.
-	close: (callback) ->
-		@connection.send {'doc':@name, open:false}, =>
+	@['close'] = @close = (callback) ->
+		connection.send {'doc':@name, open:false}, =>
 			callback() if callback
 			@emit 'closed'
 			return
+	
+	if @type.api
+		this[k] = v for k, v of @type.api
+		@_register()
+	else
+		@provides = @['provides'] = {}
+
+	this
 
 MicroEvent.mixin Document
-
-# Export the functions for the closure compiler
-Document.prototype['submitOp'] = Document.prototype.submitOp
-Document.prototype['close'] = Document.prototype.close
-
 
 # A connection to a sharejs server
 class Connection
@@ -225,7 +231,7 @@ class Connection
 
 		if type == 'op'
 			doc = @docs[docName]
-			doc.onOpReceived msg if doc
+			doc._onOpReceived msg if doc
 
 	makeDoc: (params) ->
 		name = params['doc']
@@ -285,7 +291,7 @@ class Connection
 			if response.error
 				callback null, response.error
 			else
-				response['snapshot'] = type.initialVersion() unless response['snapshot'] != undefined
+				response['snapshot'] = type.create() unless response['snapshot'] != undefined
 				response['type'] = type
 				callback @makeDoc(response)
 

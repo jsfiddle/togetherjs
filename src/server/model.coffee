@@ -55,7 +55,7 @@ module.exports = Model = (db, options) ->
 		meta ||= {}
 
 		newDocData =
-			snapshot:type.initialVersion()
+			snapshot:type.create()
 			type:type.name
 			meta:meta || {}
 			v:0
@@ -89,9 +89,7 @@ module.exports = Model = (db, options) ->
 				meta = opData.meta || {}
 				meta.ts = Date.now()
 
-				version = docData.v
-				snapshot = docData.snapshot
-				type = docData.type
+				{v:version, snapshot, type} = docData
 				p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
 				submit = ->
@@ -101,8 +99,8 @@ module.exports = Model = (db, options) ->
 						callback null, error.message
 						return
 
-					newOpData = {op:op, v:opVersion, meta:meta}
-					newDocData = {snapshot:snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
+					newOpData = {op, v:opVersion, meta}
+					newDocData = {snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
 
 					p "submit #{i newOpData}"
 					db.append docName, newOpData, newDocData, ->

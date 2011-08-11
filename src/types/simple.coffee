@@ -17,6 +17,6 @@ exports.transform = (op1, op2) ->
 
 	return {position:pos, text:op1.text}
 
-exports.initialVersion = -> {str:""}
+exports.create = -> {str:""}
 
 exports.name = 'simple'

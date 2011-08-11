@@ -42,7 +42,7 @@ function compile(code, next) {
           warning_level: 'VERBOSE'
 
           // Uncomment this to enable pretty-printing of the compiled output
-          // formatting: 'pretty_print'
+          //formatting: 'pretty_print'
         }),
         client = http.createClient(80, host).on('error', next),
         req = client.request('POST', '/compile', {
@@ -89,8 +89,9 @@ String.prototype.repeat = function(num) {
 
 function printErrors(code, errors) {
   var lines = code.split('\n');
+  ignored = {'JSC_INEXISTENT_PROPERTY':true, 'JSC_WRONG_ARGUMENT_COUNT':true, 'JSC_NOT_A_CONSTRUCTOR':true}
   errors = errors.filter(function(e) {
-    return e.type != 'JSC_INEXISTENT_PROPERTY' && e.type != 'JSC_WRONG_ARGUMENT_COUNT';
+    return !ignored[e.type]
   });
   if (errors.length === 0) {
     return;

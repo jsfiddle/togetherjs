@@ -4,17 +4,26 @@ randomWord = require './randomWord'
 {randomInt, randomReal} = require('../helpers')
 
 types = require '../../src/types'
+MicroEvent = require '../../src/client/microevent'
 
 textTypes = {}
-textTypes[name] = type for name, type of types when type.Document?.implements['text']
+textTypes[name] = type for name, type of types when type.api?.provides?['text']
 
 genTests = (type) ->
-	class Doc extends type.Document
-		constructor: ->
-			@snapshot = type.initialVersion()
-		
-		submitOp: (op) ->
+	# Add the randomization function
+	try require "./#{type.name}"
+
+	Doc = ->
+		@snapshot = type.create()
+
+		@submitOp = (op) ->
 			@snapshot = type.apply @snapshot, op
+
+		@_register()
+		this
+
+	Doc.prototype = type.api
+	MicroEvent.mixin Doc
 
 	'empty document has no length': (test) ->
 		doc = new Doc
@@ -23,7 +32,24 @@ genTests = (type) ->
 		test.strictEqual doc.getLength(), 0
 		test.done()
 
-	randomizer: (test) ->
+	sanity: (test) ->
+		doc = new Doc
+
+		doc.insert 'hi'
+		test.strictEqual doc.getText(), 'hi'
+		test.strictEqual doc.getLength(), 2
+
+		doc.insert ' mum', 2
+		test.strictEqual doc.getText(), 'hi mum'
+		test.strictEqual doc.getLength(), 6
+
+		doc.del 3, 0
+		test.strictEqual doc.getText(), 'mum'
+		test.strictEqual doc.getLength(), 3
+
+		test.done()
+	
+	'randomize generating functions': (test) ->
 		doc = new Doc
 
 		content = ''
@@ -47,6 +73,29 @@ genTests = (type) ->
 				content = content[...pos] + content[(pos + length)..]
 				#console.log "-> content = '#{content}'"
 	
+		test.done()
+
+	'randomize emit': (test) ->
+		doc = new Doc
+		contents = ''
+
+		doc.on 'insert', (text, pos) ->
+			contents = contents[...pos] + text + contents[pos...]
+		doc.on 'delete', (text, pos) ->
+#			console.warn "delete '#{text}' at #{pos}, contents = '#{contents}'"
+			assert.strictEqual contents[pos...(pos + text.length)], text
+			contents = contents[...pos] + contents[(pos + text.length)...]
+#			console.warn "-> contents = '#{contents}'"
+
+		for i in [1..1000]
+			[op, newDoc] = type.generateRandomOp doc.snapshot
+
+#			console.warn op
+			doc.emit 'remoteop', op, doc.snapshot
+			doc.submitOp op
+
+			assert.strictEqual doc.getText(), contents
+
 		test.done()
 
 exports[name] = genTests(type) for name, type of textTypes

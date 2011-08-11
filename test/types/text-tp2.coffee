@@ -71,10 +71,33 @@ exports.testNormalize = (test) ->
 
 	test.done()
 
+checkLengths = (test, doc) ->
+	totalLength = doc.data.reduce ((x, y) -> x + (y.length || y)), 0
+	charLength = doc.data.reduce ((x, y) -> x + (y.length || 0)), 0
+	test.strictEqual doc.charLength, charLength
+	test.strictEqual doc.totalLength, totalLength
+
+exports.testDeserialize = (test) ->
+	td = (data) ->
+		doc = text.deserialize data
+		test.deepEqual doc.data, data
+		checkLengths test, doc
+	
+	td []
+	td ['hi']
+	td [100]
+	td [100, 'hi', 50, 'there']
+	td [100, 'hi', 50, 'there', 30]
+
+	test.done()
+
 exports.testApply = (test) ->
-	ta = (doc, op, expected) ->
+	ta = (data, op, expected) ->
+		doc = text.deserialize data
 		newDoc = text.apply doc, op
-		test.deepEqual newDoc, expected
+
+		test.deepEqual newDoc.data, expected
+		checkLengths test, newDoc
 
 	ta [''], [{i: 5}], [5]
 	ta ['abc', 1, 'defghij'], [{d:5}, 6], [5, 'efghij']
@@ -89,70 +112,70 @@ exports.testCompose = (test) ->
 	tc [{i:'abcde'}], [3, {d:1}, 1], [{i:'abc'}, {i:1}, {i:'e'}]
 
 	test.done()
-	
+
 text.generateRandomOp = (doc) ->
 	position = {index:0, offset:0}
-	remainder = totalLength = doc.reduce ((x, y) -> x + (y.length || y)), 0
 
-	newDoc = []
+	remainder = doc.totalLength
+
+	newDoc = text.create()
 
 	op = []
 
-	{_appendPart:appendPart, _takePart:takePart, _append:append} = text
+	{_appendDoc:appendDoc, _takeDoc:takeDoc, _append:append} = text
 
-	addSkip = ->
-		length = Math.min(remainder, randomInt(totalLength / 2) + 1)
+	addSkip = (length = Math.min(remainder, randomInt(doc.totalLength / 2) + 1)) ->
 		remainder -= length
 
 		append op, length
 		while length > 0
-			part = takePart doc, position, length
-			appendPart newDoc, part
+			part = takeDoc doc, position, length
+			appendDoc newDoc, part
 			length -= part.length || part
 
 	addInsert = ->
 		# Insert a random word from the list
 		content = if randomInt(2) then randomWord() + ' ' else randomInt(5) + 1
 		append op, {i:content}
-		appendPart newDoc, content
+		appendDoc newDoc, content
 
 	addDelete = ->
-		length = Math.min(remainder, randomInt(totalLength / 2) + 1)
+		length = Math.min(remainder, randomInt(doc.totalLength / 2) + 1)
 		remainder -= length
 
-		appendPart newDoc, length
+		appendDoc newDoc, length
 		append op, {d:length}
 
 		while length > 0
-			part = takePart doc, position, length
+			part = takeDoc doc, position, length
 			length -= part.length || part
 
-	while remainder > 0
-		# If the document is long, we'll bias it toward deletes
-		switch randomInt 3
-			when 0 then addSkip()
-			when 1 then addInsert()
-			when 2 then addDelete()
+	r = 0.9
+	while remainder > 0 and randomReal() < r
+		addSkip() if randomReal() < 0.8
+
+		r *= 0.8
+		
+		if randomReal() < 0.9
+			if randomReal() < 0.3 then addInsert() else addDelete()
+	
+	addSkip(remainder) if remainder > 0
 
 	# The code above will never insert at the end of the document. Thats important...
-	addInsert() if randomInt(3) == 0
-
-#	p "#{initial} -> #{expectedDoc}"
-#	p "#{i doc} -> #{i newDoc} after applying #{i op}"
-
-	
-#	console.log "complexity: #{doc.length}"
+	addInsert() if randomReal() < 0.3
 
 	[op, newDoc]
 
 text.generateRandomDoc = ->
 	stringNext = randomInt(2) == 0
-	for [0...randomInt(10)]
+	data = for [0...randomInt(10)]
 		stringNext = !stringNext
 		if stringNext
 			randomWord() + ' '
 		else
 			randomInt(5) + 1
+
+	doc = text.deserialize data
 
 exports.randomizer = (test) ->
 	randomizerTest text

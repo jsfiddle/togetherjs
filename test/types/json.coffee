@@ -185,8 +185,8 @@ genTests = (type) ->
 			test.strictEqual type.name, 'json'
 			test.done()
 
-		'initialVersion() returns null': (test) ->
-			test.deepEqual type.initialVersion(), null
+		'create() returns null': (test) ->
+			test.deepEqual type.create(), null
 			test.done()
 
 		'compose od,oi --> od+oi': (test) ->
@@ -530,4 +530,4 @@ genTests = (type) ->
 		test.done()
 
 exports.node = genTests nativetype
-exports.webclient = genTests(require('../helpers/webclient').types.json)
+exports.webclient = genTests require('../helpers/webclient').types.json

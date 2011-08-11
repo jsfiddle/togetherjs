@@ -3,7 +3,7 @@
 Range = require("ace/range").Range
 
 # Convert an ace delta into an op understood by share.js
-convertDelta = (editorDoc, delta) ->
+applyToShareJS = (editorDoc, delta, doc) ->
 	# Get the start position of the range, in no. of characters
 	getStartOffsetPosition = (range) ->
 		# This is quite inefficient - getLines makes a copy of the entire
@@ -25,53 +25,34 @@ convertDelta = (editorDoc, delta) ->
 	pos = getStartOffsetPosition(delta.range)
 
 	switch delta.action
-		when 'insertText' then [{i:delta.text, p:pos}]
-		when 'removeText' then [{d:delta.text, p:pos}]
+		when 'insertText' then doc.insert delta.text, pos
+		when 'removeText' then doc.del delta.text.length, pos
 		
 		when 'insertLines'
 			text = delta.lines.join('\n') + '\n'
-			[{i:text, p:pos}]
+			doc.insert text, pos
 			
 		when 'removeLines'
 			text = delta.lines.join('\n') + '\n'
-			[{d:text, p:pos}]
+			doc.del text.length, pos
 
 		else throw new Error "unknown action: #{delta.action}"
-
-# Apply a share.js op to an ace editor document
-applyToDoc = (editorDoc, op) ->
-	offsetToPos = (offset) ->
-		# Again, very inefficient.
-		lines = editorDoc.getAllLines()
-
-		row = 0
-		for line, row in lines
-			break if offset <= line.length
-
-			# +1 for the newline.
-			offset -= lines[row].length + 1
-
-		row:row, column:offset
-
-	for c in op
-		if c.d?
-			# Delete
-			range = Range.fromPoints offsetToPos(c.p), offsetToPos(c.p + c.d.length)
-			editorDoc.remove range
-		else
-			# Insert
-			editorDoc.insert offsetToPos(c.p), c.i
 	
 	return
 
-window.sharejs.Document::attach_ace = (editor) ->
+# Attach an ace editor to the document. The editor's contents are replaced
+# with the document's contents unless keepEditorContents is true. (In which case the document's
+# contents are nuked and replaced with the editor's).
+window.sharejs.Document::attach_ace = (editor, keepEditorContents) ->
+	throw new Error 'Only text documents can be attached to ace' unless @provides['text']
+
 	doc = this
 	editorDoc = editor.getSession().getDocument()
 	editorDoc.setNewLineMode 'unix'
 
 	check = ->
 		editorText = editorDoc.getValue()
-		otText = doc.snapshot
+		otText = doc.getText()
 
 		if editorText != otText
 			console.error "Text does not match!"
@@ -79,7 +60,12 @@ window.sharejs.Document::attach_ace = (editor) ->
 			console.error "ot:     #{otText}"
 			# Should probably also replace the editor text with the doc snapshot.
 
-	editorDoc.setValue doc.snapshot
+	if keepEditorContents
+		doc.del doc.getText().length, 0
+		doc.insert editorDoc.getValue()
+	else
+		editorDoc.setValue doc.asText()
+
 	check()
 
 	# When we apply ops from sharejs, ace emits edit events. We need to ignore those
@@ -89,8 +75,7 @@ window.sharejs.Document::attach_ace = (editor) ->
 	# Listen for edits in ace
 	editorListener = (change) ->
 		return if suppress
-		op = convertDelta editorDoc, change.data
-		doc.submitOp op
+		applyToShareJS editorDoc, change.data, doc
 
 		check()
 
@@ -104,7 +89,33 @@ window.sharejs.Document::attach_ace = (editor) ->
 
 		check()
 
-	doc.on 'remoteop', docListener
+
+	# Horribly inefficient.
+	offsetToPos = (offset) ->
+		# Again, very inefficient.
+		lines = editorDoc.getAllLines()
+
+		row = 0
+		for line, row in lines
+			break if offset <= line.length
+
+			# +1 for the newline.
+			offset -= lines[row].length + 1
+
+		row:row, column:offset
+
+	doc.on 'insert', (text, pos) ->
+		suppress = true
+		editorDoc.insert offsetToPos(c.p), c.i
+		suppress = false
+		check()
+
+	doc.on 'delete', (text, pos) ->
+		suppress = true
+		range = Range.fromPoints offsetToPos(pos), offsetToPos(pos + text.length)
+		editorDoc.remove range
+		suppress = false
+		check()
 
 	doc.detach_ace = ->
 		doc.removeListener 'remoteop', docListener

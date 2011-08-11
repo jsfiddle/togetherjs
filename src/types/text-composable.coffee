@@ -18,7 +18,7 @@ exports ?= {}
 
 exports.name = 'text-composable'
 
-exports.initialVersion = () -> ""
+exports.create = -> ''
 
 # -------- Utility methods
 
