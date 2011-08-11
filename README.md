@@ -1,3 +1,5 @@
+**WARNING: This is still pretty beta.**
+
 ShareJS
 =======
 
@@ -127,6 +129,7 @@ The easiest way to get your code running is to check sharejs out from source and
 
 See the [wiki](https://github.com/josephg/ShareJS/wiki) for documentation.
 
+Its also possible to use sharejs without ace. See the textarea example for details.
 
 Writing a client using node.js
 ------------------------------
@@ -142,7 +145,7 @@ Run this from a couple terminal windows when sharejs is running to see it go.
     // Open the 'hello' document, which should have type 'text':
     client.open('hello', 'text', {host: 'localhost', port: 8000}, function(doc, error) {
         // Insert some text at the start of the document (position 0):
-        doc.submitOp({i:"Hi there!\n", p:0});
+        doc.insert("Hi there!\n", 0);
 
         // Get the contents of the document for some reason:
         console.log(doc.snapshot);
