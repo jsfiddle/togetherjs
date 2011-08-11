@@ -79,7 +79,9 @@ exports.attach = (server, model, options) ->
 		close = (docName, callback) ->
 			p "Closing #{docName}"
 			listener = docState[docName].listener
-			callback 'Doc already closed' unless listener?
+			unless listener?
+				callback 'Doc already closed'
+				return
 
 			model.removeListener docName, listener
 			docState[docName].listener = null

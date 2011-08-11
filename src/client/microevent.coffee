@@ -4,7 +4,7 @@
 # microevent.js is copyright Jerome Etienne, and licensed under the MIT license:
 # https://github.com/jeromeetienne/microevent.js
 
-nextTick = process?.nextTick || (fn) -> setTimeout fn, 0
+nextTick = if WEB? then (fn) -> setTimeout fn, 0 else nextTick = process['nextTick']
 
 class MicroEvent
 	on: (event, fct) ->
@@ -23,7 +23,7 @@ class MicroEvent
 			listeners[i] = undefined if listeners[i] == fct
 			i++
 
-		nextTick -> listeners = (x for x in listeners when x)
+		nextTick => @_events[event] = (x for x in @_events[event] when x)
 
 		this
 
