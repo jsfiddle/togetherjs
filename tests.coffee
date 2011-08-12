@@ -11,6 +11,7 @@ modules = [
 	'test/types/text.coffee'
 	'test/types/text-composable.coffee'
 	'test/types/text-tp2.coffee'
+	'test/types/text-api.coffee'
 	'test/types/json.coffee'
 
 	'test/db.coffee'
