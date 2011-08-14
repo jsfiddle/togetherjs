@@ -26,6 +26,7 @@ exports.attach = (server, model, options) ->
 
 		# Map from docName -> {listener:fn, queue:[msg], busy:bool}
 		docState = {}
+		closed = false
 
 		# Send a message to the client.
 		# msg _must_ have the doc:DOCNAME property set. We'll remove it if its the same as lastReceivedDoc.
@@ -254,7 +255,7 @@ exports.attach = (server, model, options) ->
 		messageListener = (query) ->
 			# There seems to be a bug in socket.io where messages are detected
 			# after the client disconnects.
-			if docState == null
+			if closed
 				console.log "WARNING: received query from client after the client disconnected."
 				console.log client
 				return
@@ -281,11 +282,12 @@ exports.attach = (server, model, options) ->
 		client.on 'message', messageListener
 		client.on 'disconnect', ->
 			p "client #{client.sessionId} disconnected"
+			closed = true
 			for docName, state of docState
 				state.busy = true
 				state.queue = []
 				model.removeListener docName, state.listener if state.listener?
 			client.removeListener 'message', messageListener
-			docState = null
+			docState = {}
 	
 	server
