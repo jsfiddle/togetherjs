@@ -20,10 +20,9 @@ Run the examples with:
 
     # sharejs-exampleserver
 
-If you want redis support, you'll need to install redis and the node redis hooks:
+If you want redis support, you'll need to install redis:
 
     # sudo brew install redis
-    # npm install hiredis
 
 ### From source
 
@@ -42,7 +41,6 @@ Then:
     # git clone git://github.com/josephg/ShareJS.git
     # cd ShareJS
     # npm link
-	# npm install hiredis
 
 Run the tests:
 
