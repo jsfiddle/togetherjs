@@ -1,6 +1,6 @@
 (function() {
   
-/** @preserve ShareJS v0.2.2
+/** @preserve ShareJS v0.3.0
 http://sharejs.org
 
 Copyright 2011 ShareJS Authors

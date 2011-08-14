@@ -42,20 +42,22 @@
     editorDoc = editor.getSession().getDocument();
     editorDoc.setNewLineMode('unix');
     check = function() {
-      var editorText, otText;
-      editorText = editorDoc.getValue();
-      otText = doc.getText();
-      if (editorText !== otText) {
-        console.error("Text does not match!");
-        console.error("editor: " + editorText);
-        return console.error("ot:     " + otText);
-      }
+      return window.setTimeout(function() {
+        var editorText, otText;
+        editorText = editorDoc.getValue();
+        otText = doc.getText();
+        if (editorText !== otText) {
+          console.error("Text does not match!");
+          console.error("editor: " + editorText);
+          return console.error("ot:     " + otText);
+        }
+      }, 0);
     };
     if (keepEditorContents) {
       doc.del(doc.getText().length, 0);
-      doc.insert(editorDoc.getValue());
+      doc.insert(editorDoc.getValue(), 0);
     } else {
-      editorDoc.setValue(doc.asText());
+      editorDoc.setValue(doc.getText());
     }
     check();
     suppress = false;
@@ -91,7 +93,7 @@
     };
     doc.on('insert', function(text, pos) {
       suppress = true;
-      editorDoc.insert(offsetToPos(c.p), c.i);
+      editorDoc.insert(offsetToPos(pos), text);
       suppress = false;
       return check();
     });

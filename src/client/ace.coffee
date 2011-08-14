@@ -51,20 +51,22 @@ window.sharejs.Document::attach_ace = (editor, keepEditorContents) ->
 	editorDoc.setNewLineMode 'unix'
 
 	check = ->
-		editorText = editorDoc.getValue()
-		otText = doc.getText()
+		window.setTimeout ->
+				editorText = editorDoc.getValue()
+				otText = doc.getText()
 
-		if editorText != otText
-			console.error "Text does not match!"
-			console.error "editor: #{editorText}"
-			console.error "ot:     #{otText}"
-			# Should probably also replace the editor text with the doc snapshot.
+				if editorText != otText
+					console.error "Text does not match!"
+					console.error "editor: #{editorText}"
+					console.error "ot:     #{otText}"
+					# Should probably also replace the editor text with the doc snapshot.
+			, 0
 
 	if keepEditorContents
 		doc.del doc.getText().length, 0
-		doc.insert editorDoc.getValue()
+		doc.insert editorDoc.getValue(), 0
 	else
-		editorDoc.setValue doc.asText()
+		editorDoc.setValue doc.getText()
 
 	check()
 
@@ -106,7 +108,7 @@ window.sharejs.Document::attach_ace = (editor, keepEditorContents) ->
 
 	doc.on 'insert', (text, pos) ->
 		suppress = true
-		editorDoc.insert offsetToPos(c.p), c.i
+		editorDoc.insert offsetToPos(pos), text
 		suppress = false
 		check()
 
