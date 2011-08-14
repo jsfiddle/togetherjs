@@ -7,6 +7,8 @@ reporter = require('nodeunit').reporters.default
 modules = [
 	'test/testhelpers.coffee'
 
+	'test/version.coffee'
+
 	'test/types/count.coffee'
 	'test/types/text.coffee'
 	'test/types/text-composable.coffee'

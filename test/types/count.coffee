@@ -3,7 +3,7 @@
 randomizer = require('../helpers').randomizerTest
 types = require '../../src/types'
 
-module.exports = (test) ->
+exports.randomizer = (test) ->
 	randomizer types.count
 	test.done()
 

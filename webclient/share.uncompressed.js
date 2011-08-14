@@ -11,7 +11,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
 ;
   var Connection, Document, MicroEvent, WEB, append, bootstrapTransform, checkValidComponent, checkValidOp, clone, connections, exports, getConnection, invertComponent, io, isArray, json, nextTick, open, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
-  exports = {};
+  exports = {
+    'version': '0.3.0'
+  };
   /**
    @const
    @type {boolean}

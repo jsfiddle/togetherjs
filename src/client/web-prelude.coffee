@@ -10,7 +10,8 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
 `
 
 # This will be exported to window.sharejs
-exports = {}
+exports =
+	'version': '0.3.0'
 
 
 # Hint to the closure compiler to optimize out code for node.js.
