@@ -1,9 +1,9 @@
 (function() {
-  var opFromDiff;
-  opFromDiff = function(oldval, newval) {
+  var applyChange;
+  applyChange = function(doc, oldval, newval) {
     var commonEnd, commonStart;
     if (oldval === newval) {
-      return [];
+      return;
     }
     commonStart = 0;
     while (oldval.charAt(commonStart) === newval.charAt(commonStart)) {
@@ -13,30 +13,49 @@
     while (oldval.charAt(oldval.length - 1 - commonEnd) === newval.charAt(newval.length - 1 - commonEnd) && commonEnd + commonStart < oldval.length && commonEnd + commonStart < newval.length) {
       commonEnd++;
     }
-    return window.sharejs.types.text.normalize([
-      {
-        p: commonStart,
-        d: oldval.slice(commonStart, oldval.length - commonEnd)
-      }, {
-        p: commonStart,
-        i: newval.slice(commonStart, newval.length - commonEnd)
-      }
-    ]);
+    if (oldval.length !== commonStart + commonEnd) {
+      doc.del(oldval.length - commonStart - commonEnd, commonStart);
+    }
+    if (newval.length !== commonStart + commonEnd) {
+      return doc.insert(newval.slice(commonStart, newval.length - commonEnd), commonStart);
+    }
   };
   window.sharejs.Document.prototype.attach_textarea = function(elem) {
-    var doc, event, genOp, prevvalue, _i, _len, _ref, _results;
+    var doc, event, genOp, prevvalue, replaceText, _i, _len, _ref, _results;
     doc = this;
     elem.value = this.snapshot;
     prevvalue = elem.value;
-    this.on('remoteop', function(op) {
+    replaceText = function(newText, transformCursor) {
       var newSelection, scrollTop;
-      newSelection = [doc.type.transformCursor(elem.selectionStart, op, true), doc.type.transformCursor(elem.selectionEnd, op, true)];
+      newSelection = [transformCursor(elem.selectionStart), transformCursor(elem.selectionEnd)];
       scrollTop = elem.scrollTop;
-      elem.value = doc.snapshot;
+      elem.value = newText;
       if (elem.scrollTop !== scrollTop) {
         elem.scrollTop = scrollTop;
       }
       return elem.selectionStart = newSelection[0], elem.selectionEnd = newSelection[1], newSelection;
+    };
+    this.on('insert', function(text, pos) {
+      var transformCursor;
+      transformCursor = function(cursor) {
+        if (pos <= cursor) {
+          return cursor + text.length;
+        } else {
+          return cursor;
+        }
+      };
+      return replaceText(elem.value.slice(0, pos) + text + elem.value.slice(pos), transformCursor);
+    });
+    this.on('delete', function(text, pos) {
+      var transformCursor;
+      transformCursor = function(cursor) {
+        if (pos < cursor) {
+          return cursor - Math.min(text.length, cursor - pos);
+        } else {
+          return cursor;
+        }
+      };
+      return replaceText(elem.value.slice(0, pos) + elem.value.slice(pos + text.length), transformCursor);
     });
     genOp = function(event) {
       var onNextTick;
@@ -44,13 +63,9 @@
         return setTimeout(fn, 0);
       };
       return onNextTick(function() {
-        var op;
         if (elem.value !== prevvalue) {
           prevvalue = elem.value;
-          op = opFromDiff(doc.snapshot, elem.value.replace(/\r\n/g, '\n'));
-          if (op.length !== 0) {
-            return doc.submitOp(op);
-          }
+          return applyChange(doc, doc.getText(), elem.value.replace(/\r\n/g, '\n'));
         }
       });
     };
