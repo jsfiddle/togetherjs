@@ -14,11 +14,16 @@ Check out [some cool demos](http://sharejs.org:8000/).
 Installing and running
 ----------------------
 
-    npm install share
+    # npm install share
 
 Run the examples with:
 
     # sharejs-exampleserver
+
+If you want redis support, you'll need to install redis and the node redis hooks:
+
+    # sudo brew install redis
+    # npm install hiredis
 
 ### From source
 
@@ -34,9 +39,10 @@ Linux:
 
 Then:
 
-    # npm install -g socket.io connect coffee-script redis nodeunit
     # git clone git://github.com/josephg/ShareJS.git
     # cd ShareJS
+    # npm link
+	# npm install hiredis
 
 Run the tests:
 
@@ -111,7 +117,7 @@ Add these script tags:
     <script src="http://ajaxorg.github.com/ace/build/src/ace.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="/share/share.js"></script>
-	<script src="/share/share-ace.js"></script>
+	<script src="/share/ace.js"></script>
 
 And add this code:
 
