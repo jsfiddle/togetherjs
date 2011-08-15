@@ -20,7 +20,7 @@
       return doc.insert(newval.slice(commonStart, newval.length - commonEnd), commonStart);
     }
   };
-  window.sharejs.Document.prototype.attach_textarea = function(elem) {
+  window.sharejs.Doc.prototype.attach_textarea = function(elem) {
     var doc, event, genOp, prevvalue, replaceText, _i, _len, _ref, _results;
     doc = this;
     elem.value = this.snapshot;

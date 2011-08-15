@@ -33,7 +33,7 @@
         throw new Error("unknown action: " + delta.action);
     }
   };
-  window.sharejs.Document.prototype.attach_ace = function(editor, keepEditorContents) {
+  window.sharejs.Doc.prototype.attach_ace = function(editor, keepEditorContents) {
     var check, doc, docListener, editorDoc, editorListener, offsetToPos, suppress;
     if (!this.provides['text']) {
       throw new Error('Only text documents can be attached to ace');

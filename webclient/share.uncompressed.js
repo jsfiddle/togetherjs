@@ -9,7 +9,7 @@ BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
 */
 ;
-  var Connection, Document, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, connections, exports, getConnection, invertComponent, io, nextTick, open, strInject, text, transformComponent, transformPosition, types;
+  var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, connections, exports, getConnection, invertComponent, io, nextTick, open, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   exports = {
     'version': '0.3.0'
@@ -444,7 +444,8 @@ var WEB = true;
     io = require('../../thirdparty/Socket.io-node-client').io;
     MicroEvent = require('./microevent');
   }
-  Document = function(connection, name, version, type, snapshot) {
+  /** @constructor */;
+  Doc = function(connection, name, version, type, snapshot) {
     var inflightCallbacks, inflightOp, k, listeners, pendingCallbacks, pendingOp, serverOps, tryFlushPendingOp, v, _ref;
     this.name = name;
     this.version = version;
@@ -583,7 +584,7 @@ var WEB = true;
     }
     return this;
   };
-  MicroEvent.mixin(Document);
+  MicroEvent.mixin(Doc);
   Connection = (function() {
     function Connection(host, port, basePath) {
       this.onMessage = __bind(this.onMessage, this);
@@ -653,13 +654,13 @@ var WEB = true;
       var doc, name, type;
       name = params['doc'];
       if (this.docs[name]) {
-        throw new Error("Document " + name + " already followed");
+        throw new Error("Doc " + name + " already open");
       }
       type = params['type'];
       if (typeof type === 'string') {
         type = types[type];
       }
-      doc = new Document(this, name, params['v'], type, params['snapshot']);
+      doc = new Doc(this, name, params['v'], type, params['snapshot']);
       doc['created'] = !!params['create'];
       this.docs[name] = doc;
       this.numDocs++;
@@ -786,7 +787,7 @@ var WEB = true;
   };
   if (typeof WEB !== "undefined" && WEB !== null) {
     exports['Connection'] = Connection;
-    exports['Document'] = Document;
+    exports['Doc'] = Doc;
     exports['open'] = open;
     window['sharejs'] = exports;
   } else {

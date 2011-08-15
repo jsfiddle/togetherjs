@@ -16,7 +16,7 @@ applyChange = (doc, oldval, newval) ->
 	doc.del oldval.length - commonStart - commonEnd, commonStart unless oldval.length == commonStart + commonEnd
 	doc.insert newval[commonStart ... newval.length - commonEnd], commonStart unless newval.length == commonStart + commonEnd
 
-window.sharejs.Document::attach_textarea = (elem) ->
+window.sharejs.Doc::attach_textarea = (elem) ->
 	doc = this
 	elem.value = @snapshot
 	prevvalue = elem.value

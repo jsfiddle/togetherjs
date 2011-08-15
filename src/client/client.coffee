@@ -23,7 +23,8 @@ else
 # stream is a OpStream object.
 # name is the documents' docName.
 # version is the version of the document _on the server_
-Document = (connection, @name, @version, @type, snapshot) ->
+`/** @constructor */`
+Doc = (connection, @name, @version, @type, snapshot) ->
 	throw new Error('Handling types without compose() defined is not currently implemented') unless @type['compose']?
 
 	# Gotta figure out a cleaner way to make this work with closure.
@@ -158,7 +159,7 @@ Document = (connection, @name, @version, @type, snapshot) ->
 
 	this
 
-MicroEvent.mixin Document
+MicroEvent.mixin Doc
 
 # A connection to a sharejs server
 class Connection
@@ -235,11 +236,11 @@ class Connection
 
 	makeDoc: (params) ->
 		name = params['doc']
-		throw new Error("Document #{name} already followed") if @docs[name]
+		throw new Error("Doc #{name} already open") if @docs[name]
 
 		type = params['type']
 		type = types[type] if typeof type == 'string'
-		doc = new Document(@, name, params['v'], type, params['snapshot'])
+		doc = new Doc(@, name, params['v'], type, params['snapshot'])
 		doc['created'] = !!params['create']
 		@docs[name] = doc
 		@numDocs++
@@ -251,7 +252,7 @@ class Connection
 		doc
 
 	# Open a document that already exists
-	# callback is passed a Document or null
+	# callback is passed a Doc or null
 	# callback(doc, error)
 	'openExisting': (docName, callback) ->
 		return @docs[docName] if @docs[docName]?
@@ -351,7 +352,7 @@ open = (docName, type, options, callback) ->
 
 if WEB?
 	exports['Connection'] = Connection
-	exports['Document'] = Document
+	exports['Doc'] = Doc
 	exports['open'] = open
 	window['sharejs'] = exports
 else

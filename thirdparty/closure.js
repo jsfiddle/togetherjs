@@ -89,7 +89,7 @@ String.prototype.repeat = function(num) {
 
 function printErrors(code, errors) {
   var lines = code.split('\n');
-  ignored = {'JSC_INEXISTENT_PROPERTY':true, 'JSC_WRONG_ARGUMENT_COUNT':true, 'JSC_NOT_A_CONSTRUCTOR':true}
+  ignored = {'JSC_INEXISTENT_PROPERTY':true, 'JSC_WRONG_ARGUMENT_COUNT':true}
   errors = errors.filter(function(e) {
     return !ignored[e.type]
   });
