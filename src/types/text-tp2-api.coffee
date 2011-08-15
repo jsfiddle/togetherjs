@@ -13,8 +13,8 @@ appendSkipChars = (op, doc, pos, maxlength) ->
 		maxlength -= part.length if maxlength != undefined and typeof part is 'string'
 		append op, (part.length || part)
 
-type.api =
-	provides: {'text':true}
+type['api'] =
+	'provides': {'text':true}
 
 	# The number of characters in the string
 	'getLength': -> @snapshot.charLength
@@ -56,7 +56,7 @@ type.api =
 		@submitOp op, callback
 		op
 
-	_register: ->
+	'_register': ->
 		# Interpret recieved ops + generate more detailed events for them
 		@on 'remoteop', (op, snapshot) ->
 			textPos = 0

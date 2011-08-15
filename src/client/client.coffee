@@ -153,7 +153,7 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 	
 	if @type['api']
 		this[k] = v for k, v of @type['api']
-		@_register()
+		@['_register']?()
 	else
 		@provides = @['provides'] = {}
 

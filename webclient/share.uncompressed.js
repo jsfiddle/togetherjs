@@ -82,7 +82,7 @@ var WEB = true;
     proto = obj.prototype || obj;
     proto.on = proto['on'] = MicroEvent.prototype.on;
     proto.removeListener = proto['removeListener'] = MicroEvent.prototype.removeListener;
-    proto.emit = MicroEvent.prototype.emit;
+    proto.emit = proto['emit'] = MicroEvent.prototype.emit;
     return obj;
   };
   if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
@@ -380,17 +380,17 @@ var WEB = true;
   if (typeof WEB === 'undefined') {
     text = require('./text');
   }
-  text.api = {
-    provides: {
+  text['api'] = {
+    'provides': {
       'text': true
     },
-    getLength: function() {
+    'getLength': function() {
       return this.snapshot.length;
     },
-    getText: function() {
+    'getText': function() {
       return this.snapshot;
     },
-    insert: function(text, pos, callback) {
+    'insert': function(text, pos, callback) {
       var op;
       if (pos == null) {
         pos = 0;
@@ -404,7 +404,7 @@ var WEB = true;
       this.submitOp(op, callback);
       return op;
     },
-    del: function(length, pos, callback) {
+    'del': function(length, pos, callback) {
       var op;
       op = [
         {
@@ -415,7 +415,7 @@ var WEB = true;
       this.submitOp(op, callback);
       return op;
     },
-    _register: function() {
+    '_register': function() {
       return this.on('remoteop', function(op) {
         var component, _i, _len, _results;
         _results = [];
@@ -427,12 +427,6 @@ var WEB = true;
       });
     }
   };
-  text['api'] = text.api;
-  text.api['provides'] = text.api.provides;
-  text.api['getLength'] = text.api.getLength;
-  text.api['getText'] = text.api.getText;
-  text.api['insert'] = text.api.insert;
-  text.api['del'] = text.api.del;
   if (typeof WEB !== "undefined" && WEB !== null) {
     types || (types = exports.types);
     if (!window['io']) {
@@ -578,7 +572,9 @@ var WEB = true;
         v = _ref[k];
         this[k] = v;
       }
-      this._register();
+      if (typeof this['_register'] === "function") {
+        this['_register']();
+      }
     } else {
       this.provides = this['provides'] = {};
     }

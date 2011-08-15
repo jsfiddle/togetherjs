@@ -371,8 +371,8 @@ var WEB = true;
     }
     return _results;
   };
-  type.api = {
-    provides: {
+  type['api'] = {
+    'provides': {
       'text': true
     },
     'getLength': function() {
@@ -435,7 +435,7 @@ var WEB = true;
       this.submitOp(op, callback);
       return op;
     },
-    _register: function() {
+    '_register': function() {
       return this.on('remoteop', function(op, snapshot) {
         var component, docPos, part, remainder, textPos, _i, _len;
         textPos = 0;
