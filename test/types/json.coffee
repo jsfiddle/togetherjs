@@ -194,6 +194,16 @@ genTests = (type) ->
 			test.deepEqual [{p:['foo'], od:1},{p:['bar'], oi:2}], type.compose [{p:['foo'],od:1}],[{p:['bar'],oi:2}]
 			test.done()
 
+		'transform returns sane values': (test) ->
+			t = (op1, op2) ->
+				test.deepEqual op1, type.transform op1, op2, 'left'
+				test.deepEqual op1, type.transform op1, op2, 'right'
+
+			t [], []
+			t [{p:['foo'], oi:1}], []
+			t [{p:['foo'], oi:1}], [{p:['bar'], oi:2}]
+			test.done()
+
 	number:
 		'Add a number': (test) ->
 			test.deepEqual 3, type.apply 1, [{p:[], na:2}]

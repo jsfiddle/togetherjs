@@ -24,7 +24,7 @@ else
 # name is the documents' docName.
 # version is the version of the document _on the server_
 Document = (connection, @name, @version, @type, snapshot) ->
-	throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
+	throw new Error('Handling types without compose() defined is not currently implemented') unless @type['compose']?
 
 	# Gotta figure out a cleaner way to make this work with closure.
 	@setSnapshot = (s) -> @['snapshot'] = @snapshot = s
@@ -92,9 +92,9 @@ Document = (connection, @name, @version, @type, snapshot) ->
 		serverOps[@version] = op
 
 		# Transform a server op by a client op, and vice versa.
-		xf = @type.transformX or (client, server) =>
-			client_ = @type.transform client, server, 'left'
-			server_ = @type.transform server, client, 'right'
+		xf = @type['transformX'] or (client, server) =>
+			client_ = @type['transform'] client, server, 'left'
+			server_ = @type['transform'] server, client, 'right'
 			return [client_, server_]
 
 		docOp = op
@@ -104,7 +104,7 @@ Document = (connection, @name, @version, @type, snapshot) ->
 			[pendingOp, docOp] = xf pendingOp, docOp
 			
 		oldSnapshot = @snapshot
-		@setSnapshot(@type.apply oldSnapshot, docOp)
+		@setSnapshot(@type['apply'] oldSnapshot, docOp)
 		@version++
 
 		@emit 'remoteop', docOp, oldSnapshot
@@ -117,20 +117,20 @@ Document = (connection, @name, @version, @type, snapshot) ->
 			callback = v
 			v = @version
 
-		op = @type.normalize(op) if @type?.normalize?
+		op = @type['normalize'](op) if @type['normalize']?
 
 		while v < @version
 			# TODO: Add tests for this
 			realOp = serverOps[v]
 			throw new Error 'Op version too old' unless realOp
-			op = @type.transform op, realOp, 'left'
+			op = @type['transform'] op, realOp, 'left'
 			v++
 
 		# If this throws an exception, no changes should have been made to the doc
-		@setSnapshot(@type.apply @snapshot, op)
+		@setSnapshot(@type['apply'] @snapshot, op)
 
 		if pendingOp != null
-			pendingOp = @type.compose(pendingOp, op)
+			pendingOp = @type['compose'](pendingOp, op)
 		else
 			pendingOp = op
 
@@ -150,8 +150,8 @@ Document = (connection, @name, @version, @type, snapshot) ->
 			@emit 'closed'
 			return
 	
-	if @type.api
-		this[k] = v for k, v of @type.api
+	if @type['api']
+		this[k] = v for k, v of @type['api']
 		@_register()
 	else
 		@provides = @['provides'] = {}

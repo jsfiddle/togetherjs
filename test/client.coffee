@@ -300,6 +300,13 @@ genTests = (client) ->
 
 				@model.applyOp @name, {op:[{i:'hi', p:0}], v:0, meta:{}}
 
+		'Works with an externally referenced type (like JSON)': (test) ->
+			client.open @name, 'json', {host:'localhost', port:@port}, (doc, error) =>
+				test.ifError error
+				test.strictEqual doc.snapshot, null
+				doc.submitOp [{p:[], od:null, oi:[1,2,3]}], ->
+					test.deepEqual doc.snapshot, [1,2,3]
+					test.done()
 
 	# This isn't working yet. I might have to rethink it.
 	#	'opening a document with a null name will open a new document with a random document name': (test) ->

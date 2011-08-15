@@ -135,7 +135,7 @@ text['transformCursor'] = (position, op, insertAfter) ->
 # The result will be appended to destination.
 #
 # exported for use in JSON type
-text._transformComponent = transformComponent = (dest, c, otherC, type) ->
+text['_tc'] = transformComponent = (dest, c, otherC, type) ->
 	checkValidOp [c]
 	checkValidOp [otherC]
 

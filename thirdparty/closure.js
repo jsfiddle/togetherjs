@@ -42,7 +42,7 @@ function compile(code, next) {
           warning_level: 'VERBOSE'
 
           // Uncomment this to enable pretty-printing of the compiled output
-          //formatting: 'pretty_print'
+          //, formatting: 'pretty_print'
         }),
         client = http.createClient(80, host).on('error', next),
         req = client.request('POST', '/compile', {

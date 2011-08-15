@@ -2,7 +2,10 @@
 #
 # Spec is here: https://github.com/josephg/ShareJS/wiki/JSON-Operations
 
-text = require './text' unless WEB?
+if WEB?
+	text = exports.types['text']
+else
+	text = require './text'
 
 json = {}
 
@@ -24,7 +27,7 @@ json.invertComponent = (c) ->
 		c_['p'] = c['p'][0...c['p'].length - 1].concat([c['lm']])
 	c_
 
-json.invert = (op) -> json.invertComponent c for c in op.slice().reverse()
+json['invert'] = json.invert = (op) -> json.invertComponent c for c in op.slice().reverse()
 
 json.checkValidOp = (op) ->
 
@@ -158,7 +161,7 @@ json['compose'] = json.compose = (op1, op2) ->
 
 	newOp
 
-json.normalize = (op) ->
+json['normalize'] = json.normalize = (op) ->
 	newOp = []
 	
 	op = [op] unless isArray op
@@ -233,19 +236,24 @@ json.transformComponent = (dest, c, otherC, type) ->
 		if otherC['na'] != undefined
 			# this case is handled above due to icky path hax
 		else if otherC['si'] != undefined || otherC['sd'] != undefined
-			# String op -- pass through to text type
+			# String op vs string op - pass through to text type
 			if c['si'] != undefined || c['sd'] != undefined
 				throw new Error("must be a string?") unless commonOperand
-				p1 = c['p'][cplength - 1]
-				p2 = otherC['p'][otherCplength - 1]
-				tc1 = { 'p': p1 }
-				tc2 = { 'p': p2 }
-				tc1['i'] = c['si'] if c['si']?
-				tc1['d'] = c['sd'] if c['sd']?
-				tc2['i'] = otherC['si'] if otherC['si']?
-				tc2['d'] = otherC['sd'] if otherC['sd']?
+
+				# Convert an op component to a text op component
+				convert = (component) ->
+					newC = 'p':component['p'][component['p'].length - 1]
+					if component['si']
+						newC['i'] = component['si']
+					else
+						newC['d'] = component['sd']
+					newC
+
+				tc1 = convert c
+				tc2 = convert otherC
+					
 				res = []
-				text._transformComponent res, tc1, tc2, type
+				text['_tc'] res, tc1, tc2, type
 				for tc in res
 					jc = { 'p': c['p'][...common] }
 					jc['p'].push(tc['p'])
@@ -420,7 +428,7 @@ if WEB?
 	exports.types ||= {}
 
 	# This is kind of awful - come up with a better way to hook this helper code up.
-	bootstrapTransform(json, json.transformComponent, json.checkValidOp, json.append)
+	exports['_bt'](json, json.transformComponent, json.checkValidOp, json.append)
 
 	# [] is used to prevent closure from renaming types.text
 	exports.types['json'] = json

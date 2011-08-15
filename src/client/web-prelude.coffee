@@ -18,5 +18,6 @@ exports =
 `/**
    @const
    @type {boolean}
-*/`
-WEB = true
+*/
+var WEB = true;
+`

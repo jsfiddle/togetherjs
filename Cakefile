@@ -17,7 +17,6 @@ client = [
 	'types/helpers'
 	'types/text'
 	'types/text-api'
-	'types/json'
 	'client/client'
 ]
 
@@ -55,12 +54,23 @@ expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 buildclosure = (filenames, dest) ->
 	filenames = expandNames filenames
 	# I would really rather do this in pure JS.
-	e "coffee -j #{dest}/share.uncompressed.js -c #{filenames}", ->
-		console.log "Building with closure's REST API..."
-		compile "#{dest}/share.uncompressed.js", "#{dest}/share.js"
-	
+	e "coffee -j #{dest}.uncompressed.js -c #{filenames}", ->
+		console.log "Building #{dest} with closure's REST API..."
+		compile "#{dest}.uncompressed.js", "#{dest}.js"
+
+buildtype = (name) ->
+	filenames = ['types/web-prelude', "types/#{name}"]
+
+	try
+		fs.statSync "src/types/#{name}-api.coffee"
+		filenames.push "types/#{name}-api"
+
+	buildclosure filenames, "webclient/#{name}"
+
 task 'webclient', 'Build the web client into one file', ->
-	buildclosure client, 'webclient'
+	buildclosure client, 'webclient/share'
+	buildtype 'json'
+	buildtype 'text-tp2'
 
 	# TODO: This should also be closure compiled.
 	extrafiles = expandNames extras

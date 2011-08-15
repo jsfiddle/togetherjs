@@ -1,6 +1,6 @@
 # Text document API for text
 
-text = require './text' unless WEB?
+text = require './text' if typeof WEB is 'undefined'
 
 text.api =
 	provides: {'text':true}
@@ -32,6 +32,8 @@ text.api =
 				else
 					@emit 'delete', component['d'], component['p']
 
+# ... for closure. *sigh*
+text['api'] = text.api
 text.api['provides'] = text.api.provides
 text.api['getLength'] = text.api.getLength
 text.api['getText'] = text.api.getText
