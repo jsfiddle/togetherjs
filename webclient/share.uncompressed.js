@@ -606,7 +606,7 @@ var WEB = true;
       return this.emit('connect');
     };
     Connection.prototype.send = function(msg, callback) {
-      var docName, register;
+      var docName, register, type;
       docName = msg['doc'];
       if (docName === this.lastSentDoc) {
         delete msg['doc'];
@@ -625,7 +625,8 @@ var WEB = true;
           }, this);
           return this.on(type, cb);
         }, this);
-        return register((msg['open'] === true ? 'open' : msg['open'] === false ? 'close' : msg['create'] ? 'create' : msg['snapshot'] === null ? 'snapshot' : msg['op'] ? 'op response' : void 0));
+        type = msg['open'] === true ? 'open' : msg['open'] === false ? 'close' : msg['create'] ? 'create' : msg['snapshot'] === null ? 'snapshot' : msg['op'] ? 'op response' : void 0;
+        return register(type);
       }
     };
     Connection.prototype.onMessage = function(msg) {
@@ -723,10 +724,10 @@ var WEB = true;
       return open(null, type, callback);
     };
     Connection.prototype['disconnect'] = function() {
-      if (this.stream != null) {
+      if (this.socket) {
         this.emit('disconnected');
-        this.stream.disconnect();
-        return this.stream = null;
+        this.socket['disconnect']();
+        return this.socket = null;
       }
     };
     return Connection;
@@ -768,18 +769,24 @@ var WEB = true;
     c = getConnection(options.host, options.port, options.basePath);
     return c.open(docName, type, function(doc, error) {
       if (doc === null) {
+        if (c.numDocs === 0) {
+          c['disconnect']();
+        }
         return callback(null, error);
       } else {
         doc.on('closed', function() {
           return setTimeout(function() {
             if (c.numDocs === 0) {
-              return c.disconnect();
+              return c['disconnect']();
             }
           }, 0);
         });
         return callback(doc);
       }
     });
+  };
+  exports.f = function() {
+    return console.log(connections);
   };
   if (typeof WEB !== "undefined" && WEB !== null) {
     exports['Connection'] = Connection;

@@ -20,7 +20,7 @@ else
 #  - remoteop (op)
 #  - changed (op)
 #
-# stream is a OpStream object.
+# connection is a Connection object.
 # name is the documents' docName.
 # version is the version of the document _on the server_
 `/** @constructor */`
@@ -205,11 +205,13 @@ class Connection
 
 				@on type, cb
 
-			register (if msg['open'] == true then 'open'
+			type = if msg['open'] == true then 'open'
 			else if msg['open'] == false then 'close'
 			else if msg['create'] then 'create'
 			else if msg['snapshot'] == null then 'snapshot'
-			else if msg['op'] then 'op response')
+			else if msg['op'] then 'op response'
+
+			register type
 
 	onMessage: (msg) =>
 		docName = msg['doc']
@@ -301,10 +303,10 @@ class Connection
 		open null, type, callback
 
 	'disconnect': () ->
-		if @stream?
+		if @socket
 			@emit 'disconnected'
-			@stream.disconnect()
-			@stream = null
+			@socket['disconnect']()
+			@socket = null
 
 MicroEvent.mixin Connection
 
@@ -338,6 +340,7 @@ open = (docName, type, options, callback) ->
 	c = getConnection options.host, options.port, options.basePath
 	c.open docName, type, (doc, error) ->
 		if doc == null
+			c['disconnect']() if c.numDocs == 0
 			callback null, error
 		else
 			# If you're using the bare API, connections are cleaned up as soon as there's no
@@ -345,10 +348,13 @@ open = (docName, type, options, callback) ->
 			doc.on 'closed', ->
 				setTimeout ->
 						if c.numDocs == 0
-							c.disconnect()
+							c['disconnect']()
 					, 0
 
 			callback doc
+
+exports.f = ->
+	console.log connections
 
 if WEB?
 	exports['Connection'] = Connection

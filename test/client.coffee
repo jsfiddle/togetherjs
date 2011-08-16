@@ -44,8 +44,10 @@ genTests = (client) ->
 				test.strictEqual doc.name, @name
 				test.strictEqual doc.type.name, types.text.name
 				test.strictEqual doc.version, 0
+
+				doc.close()
 				test.done()
-		
+
 		'open multiple documents using the bare API on the same connection': (test) ->
 			client.open @name, 'text', {host:'localhost', port:@port}, (doc1, error) =>
 				test.ok doc1
@@ -62,12 +64,15 @@ genTests = (client) ->
 							doc2.close ->
 								doc1.submitOp {i:'more text '}, ->
 									test.strictEqual doc1.snapshot, 'more text booyah'
+									
+									doc1.close()
+									doc2.close()
 									test.done()
 
 		'create connection': (test) ->
 			test.ok @c
 			test.done()
-		
+
 		'create a new document': (test) ->
 			@c.open @name, 'text', (doc, error) =>
 				test.ok doc
@@ -217,7 +222,7 @@ genTests = (client) ->
 
 				@model.applyOp @name, {v:0, op:serverOp}, (error, v) ->
 					test.ifError error
-		
+
 		'doc fires both remoteop and change messages when remote ops are received': (test) ->
 			passPart = makePassPart test, 2
 			@c.open @name, 'text', (doc, error) =>
@@ -264,7 +269,7 @@ genTests = (client) ->
 				@c.open @name, 'text', (doc, error) =>
 					test.strictEqual doc.created, false
 					test.done()
-			
+
 		"can't open a document if canRead rejects you": (test) ->
 			@auth.canRead = (client, docName, result) -> result.reject()
 
@@ -280,6 +285,7 @@ genTests = (client) ->
 		'Text API is advertised': (test) ->
 			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
 				test.strictEqual doc.provides?.text, true
+				doc.close()
 				test.done()
 		
 		'Text API can be used to insert into the document': (test) ->
@@ -289,6 +295,7 @@ genTests = (client) ->
 
 					@model.getSnapshot @name, (data) ->
 						test.strictEqual data.snapshot, 'hi'
+						doc.close()
 						test.done()
 		
 		'Text documents emit high level editing events': (test) ->
@@ -296,6 +303,7 @@ genTests = (client) ->
 				doc.on 'insert', (text, pos) ->
 					test.strictEqual text, 'hi'
 					test.strictEqual pos, 0
+					doc.close()
 					test.done()
 
 				@model.applyOp @name, {op:[{i:'hi', p:0}], v:0, meta:{}}
@@ -306,6 +314,7 @@ genTests = (client) ->
 				test.strictEqual doc.snapshot, null
 				doc.submitOp [{p:[], od:null, oi:[1,2,3]}], ->
 					test.deepEqual doc.snapshot, [1,2,3]
+					doc.close()
 					test.done()
 
 	# This isn't working yet. I might have to rethink it.
