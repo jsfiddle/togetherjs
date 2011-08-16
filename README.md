@@ -11,6 +11,9 @@ Rich text support is planned.
 Check out [some cool demos](http://sharejs.org:8000/).
 API Documentation is on [`the wiki`](https://github.com/josephg/ShareJS/wiki).
 
+[![Build Status](https://secure.travis-ci.org/josephg/ShareJS.png)](http://travis-ci.org/josephg/ShareJS)
+
+
 Installing and running
 ----------------------
 
