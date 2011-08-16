@@ -1,2 +1,2 @@
-before_script: "npm install . nodeunit coffee-script"
+before_script: "npm install && npm install nodeunit coffee-script"
 script: "npm test"
