@@ -13,14 +13,14 @@ var doc = null;
 var write = function() {
 	if (timeout == null) {
 		timeout = setTimeout(function() {
-			console.log("Saved version " + doc.version);
+			console.log("Saved version " + doc.version + " as " + filename);
 			fs.writeFile(filename, doc.snapshot);
 			timeout = null;
 		}, 1000);
 	}
 }
 
-client.open('hello', 'text', {host: 'localhost', port: 8000}, function(d, error) {
+client.open('hello', 'text', 'http://localhost:8000/sjs', function(d, error) {
 	doc = d;
 	console.log('Document open at version ' + doc.version);
 
