@@ -1,34 +1,32 @@
 # This runs all the tests.
 #
-# Requires nodeunit.
+# run with:
+# % nodeunit tests.coffee
 
-reporter = require('nodeunit').reporters.default
-# Using glob for this would be better.
 modules = [
-	'test/testhelpers.coffee'
+	'testhelpers'
 
-	'test/version.coffee'
+	'version'
 
-	'test/types/count.coffee'
-	'test/types/text.coffee'
-	'test/types/text-composable.coffee'
-	'test/types/text-tp2.coffee'
-	'test/types/text-api.coffee'
-	'test/types/json.coffee'
+	'types/count'
+	'types/text'
+	'types/text-composable'
+	'types/text-tp2'
+	'types/text-api'
+	'types/json'
 
-	'test/db.coffee'
-	'test/model.coffee'
-	'test/auth.coffee'
-	'test/events.coffee'
-	'test/rest.coffee'
-	'test/socketio.coffee'
+	'db'
+	'model'
+	'auth'
+	'events'
+	'rest'
+	'socketio'
 
-	'test/microevent.coffee'
-	'test/client.coffee'
+	'microevent'
+	'client'
 
-	'test/integration.coffee'
-#	'test/server.coffee'
+	'integration'
 ]
 
-reporter.run modules
+exports[module] = require "./test/#{module}" for module in modules
 

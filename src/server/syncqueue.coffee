@@ -27,7 +27,7 @@ module.exports = (process) ->
 
 		busy = true
 		[data, callback] = queue.shift()
-		process data, (result...) ->
+		process data, (result...) -> # TODO: Make this not use varargs - varargs are really slow.
 			callback.apply null, result if callback
 			busy = false
 			flush()

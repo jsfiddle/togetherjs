@@ -37,10 +37,11 @@ module.exports = testCase
 		@server.listen =>
 			port = @server.address().port
 
-			@c1 = new client.Connection 'localhost', port
-			@c2 = new client.Connection 'localhost', port
-
-			callback()
+			@c1 = new client.Connection "http://localhost:#{port}/sjs"
+			@c1.on 'connect', =>
+				@c2 = new client.Connection "http://localhost:#{port}/sjs"
+				@c2.on 'connect', =>
+					callback()
 
 	tearDown: (callback) ->
 		@c1.disconnect()

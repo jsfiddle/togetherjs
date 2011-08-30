@@ -4,7 +4,9 @@ fs = require 'fs'
 path = require 'path'
 
 task 'test', 'Run all tests', ->
-	require './tests'
+	# run directly to get all the delicious output
+	exec 'nodeunit tests.coffee', (err, stdout, stderr) ->
+		throw err if err
 
 task 'build', 'Build the .js files', (options) ->
 	exec "coffee --compile --bare --output lib/ src/", (err, stdout, stderr) ->
@@ -48,6 +50,8 @@ compile = (infile, outfile) ->
 
 		console.log "Closure compiled: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
 
+# Uncomment to skip closure compiler
+#compile = (infile, outfile) -> e "cp #{infile} #{outfile}"
 
 expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 

@@ -6,7 +6,9 @@
 /// By Ben Weaver:
 /// http://www.benweaver.com/blog/use-the-google-closure-service-with-nodejs.html
 
-var sys = require('sys');
+var sys = require('sys'),
+	qs = require('querystring'),
+	http = require('http');
 
 exports.compile = compile;
 
@@ -29,12 +31,10 @@ exports.compile = compile;
 //     });
 //
 // Returns nothing.
-function compile(code, next) {
+function compile(code, opts, next) {
   try {
-    var qs = require('querystring'),
-        http = require('http'),
-        host = 'closure-compiler.appspot.com',
-        body = qs.stringify({
+	  var host = 'closure-compiler.appspot.com';
+	  var data = {
           js_code: code.toString('utf-8'),
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           output_format: 'json',
@@ -43,7 +43,15 @@ function compile(code, next) {
 
           // Uncomment this to enable pretty-printing of the compiled output
           //, formatting: 'pretty_print'
-        }),
+        }
+	  if (typeof(opts) !== 'object') {
+		  next = opts;
+		  opts = {};
+	  }
+	  for (var k in opts) {
+		  data[k] = opts[k];
+	  }
+      var body = qs.stringify(data),
         client = http.createClient(80, host).on('error', next),
         req = client.request('POST', '/compile', {
           'Host': host,
@@ -68,11 +76,11 @@ function compile(code, next) {
         } else if (obj.serverErrors) {
           next(new Error('Failed to compile due to server error: ' + sys.inspect(error)));
         } else if (obj.errors) {
-          printErrors(code, obj.errors);
+          printErrors(code, opts.js_externs, obj.errors);
           next(new Error('Failed to compile due to JS errors (see above)'));
         } else {
           if (obj.warnings) {
-            printErrors(code, obj.warnings);
+            printErrors(code, opts.js_externs, obj.warnings);
           }
           next(null, obj.compiledCode);
         }
@@ -87,9 +95,13 @@ String.prototype.repeat = function(num) {
   return new Array(isNaN(num)? 1 : ++num).join(this);
 }
 
-function printErrors(code, errors) {
+function printErrors(code, externs, errors) {
   var lines = code.split('\n');
-  ignored = {'JSC_INEXISTENT_PROPERTY':true, 'JSC_WRONG_ARGUMENT_COUNT':true}
+  var extern_lines;
+  if (externs) {
+    extern_lines = externs.split('\n');
+  }
+  ignored = {'JSC_INEXISTENT_PROPERTY':true, 'JSC_WRONG_ARGUMENT_COUNT':true};
   errors = errors.filter(function(e) {
     return !ignored[e.type]
   });
@@ -101,7 +113,11 @@ function printErrors(code, errors) {
   for (var i = 0; i < errors.length; i++) {
     var e = errors[i];
     console.error((e.error ? 'ERROR: ' : 'WARNING: ') + (e.error || e.warning) + ' of type ' + e.type + ' in ' + e.file + ':' + e.lineno);
-    console.error(lines[e.lineno - 1]);
+	if (e.file.match(/^Externs/)) {
+		console.error(extern_lines[e.lineno - 1]);
+	} else {
+		console.error(lines[e.lineno - 1]);
+	}
     console.error('-'.repeat(e.charno) + '^');
     console.error();
   }

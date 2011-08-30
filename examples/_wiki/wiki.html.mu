@@ -30,7 +30,11 @@
 		editor.session.setUseWrapMode(true);
 		editor.setShowPrintMargin(false);
 
-		var connection = new sharejs.Connection(window.location.hostname, 8000);
+		// This could instead be written simply as:
+		// sharejs.open('{{{docName}}}', function(doc, error) {
+		//   ...
+
+		var connection = new sharejs.Connection('http://' + window.location.hostname + ':' + 8000 + '/sjs');
 
 		connection.open('{{{docName}}}', function(doc, error) {
 			if (error) {

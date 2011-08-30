@@ -27,8 +27,8 @@ genTests = (client) ->
 			
 			@server.listen =>
 				@port = @server.address().port
-				@c = new client.Connection 'localhost', @port
-				callback()
+				@c = new client.Connection "http://localhost:#{@port}/sjs"
+				@c.on 'connect', callback
 		
 		tearDown: (callback) ->
 			@c.disconnect()
@@ -37,7 +37,7 @@ genTests = (client) ->
 			@server.close()
 
 		'open using the bare API': (test) ->
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
 				test.ok doc
 				test.ifError error
 
@@ -49,11 +49,11 @@ genTests = (client) ->
 				test.done()
 
 		'open multiple documents using the bare API on the same connection': (test) ->
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc1, error) =>
+			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc1, error) =>
 				test.ok doc1
 				test.ifError error
 
-				client.open @name + 2, 'text', {host:'localhost', port:@port}, (doc2, error) ->
+				client.open @name + 2, 'text', "http://localhost:#{@port}/sjs", (doc2, error) ->
 					test.ok doc2
 					test.ifError error
 
@@ -68,6 +68,14 @@ genTests = (client) ->
 									doc1.close()
 									doc2.close()
 									test.done()
+
+		x: (test) ->
+			test.ok @c
+			test.done()
+
+		a: (test) ->
+			test.ok @c
+			test.done()
 
 		'create connection': (test) ->
 			test.ok @c
@@ -273,7 +281,7 @@ genTests = (client) ->
 		"can't open a document if canRead rejects you": (test) ->
 			@auth.canRead = (client, docName, result) -> result.reject()
 
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
 				test.strictEqual doc, null
 				test.strictEqual error, 'Forbidden'
 
@@ -283,13 +291,13 @@ genTests = (client) ->
 					test.done()
 
 		'Text API is advertised': (test) ->
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			@c.open @name, 'text', (doc, error) ->
 				test.strictEqual doc.provides?.text, true
 				doc.close()
 				test.done()
 		
 		'Text API can be used to insert into the document': (test) ->
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			@c.open @name, 'text', (doc, error) =>
 				doc.insert 'hi', 0, =>
 					test.strictEqual doc.getText(), 'hi'
 
@@ -299,7 +307,7 @@ genTests = (client) ->
 						test.done()
 		
 		'Text documents emit high level editing events': (test) ->
-			client.open @name, 'text', {host:'localhost', port:@port}, (doc, error) =>
+			@c.open @name, 'text', (doc, error) =>
 				doc.on 'insert', (text, pos) ->
 					test.strictEqual text, 'hi'
 					test.strictEqual pos, 0
@@ -309,7 +317,7 @@ genTests = (client) ->
 				@model.applyOp @name, {op:[{i:'hi', p:0}], v:0, meta:{}}
 
 		'Works with an externally referenced type (like JSON)': (test) ->
-			client.open @name, 'json', {host:'localhost', port:@port}, (doc, error) =>
+			@c.open @name, 'json', (doc, error) ->
 				test.ifError error
 				test.strictEqual doc.snapshot, null
 				doc.submitOp [{p:[], od:null, oi:[1,2,3]}], ->

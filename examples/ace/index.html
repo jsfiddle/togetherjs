@@ -18,8 +18,6 @@
 		<script src="/share/share.js"></script>
 		<script src="/share/ace.js"></script>
 		<script>
-	var connection = new sharejs.Connection(window.location.hostname, window.location.port);
-
 	var doc = null;
 	var editor;
 
@@ -33,7 +31,7 @@
 		editor.setReadOnly(true);
 		document.title = docName;
 
-		connection.open(docName, function(newDoc, error) {
+		sharejs.open(docName, function(newDoc, error) {
 			doc = newDoc;
 
 			if (error) {

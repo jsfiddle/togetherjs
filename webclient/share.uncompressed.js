@@ -435,7 +435,7 @@ var WEB = true;
     io = window['io'];
   } else {
     types = require('../types');
-    io = require('../../thirdparty/Socket.io-node-client').io;
+    io = require('socket.io-client');
     MicroEvent = require('./microevent');
   }
   /** @constructor */;
@@ -582,20 +582,20 @@ var WEB = true;
   };
   MicroEvent.mixin(Doc);
   Connection = (function() {
-    function Connection(host, port, basePath) {
+    function Connection(origin) {
       this.onMessage = __bind(this.onMessage, this);
       this.connected = __bind(this.connected, this);
-      this.disconnected = __bind(this.disconnected, this);
-      var resource;
-      resource = basePath ? path + '/socket.io' : 'socket.io';
-      this.socket = new io['Socket'](host, {
-        port: port,
-        resource: resource
+      this.disconnected = __bind(this.disconnected, this);      this.socket = io['connect'](origin, {
+        'force new connection': true
       });
       this.socket['on']('connect', this.connected);
       this.socket['on']('disconnect', this.disconnected);
       this.socket['on']('message', this.onMessage);
-      this.socket['connect']();
+      if (this.socket['socket']['connected']) {
+        setTimeout((__bind(function() {
+          return this.connected();
+        }, this)), 0);
+      }
       this.docs = {};
       this.numDocs = 0;
     }
@@ -613,7 +613,7 @@ var WEB = true;
       } else {
         this.lastSentDoc = docName;
       }
-      this.socket['send'](msg);
+      this.socket['json']['send'](msg);
       if (callback) {
         register = __bind(function(type) {
           var cb;
@@ -734,39 +734,30 @@ var WEB = true;
   })();
   MicroEvent.mixin(Connection);
   connections = {};
-  getConnection = function(host, port, basePath) {
-    var address, c;
+  getConnection = function(origin) {
+    var c, location;
     if (typeof WEB !== "undefined" && WEB !== null) {
-      if (host == null) {
-        host = window.location.hostname;
-      }
-      if (port == null) {
-        port = window.location.port;
+      location = window.location;
+      if (origin == null) {
+        origin = "" + location.protocol + "//" + location.hostname + "/sjs";
       }
     }
-    address = host;
-    if (port != null) {
-      address += ":" + port;
-    }
-    if (!connections[address]) {
-      c = new Connection(host, port, basePath);
+    if (!connections[origin]) {
+      c = new Connection(origin);
       c.on('disconnected', function() {
-        return delete connections[address];
+        return delete connections[origin];
       });
-      connections[address] = c;
+      connections[origin] = c;
     }
-    return connections[address];
+    return connections[origin];
   };
-  open = function(docName, type, options, callback) {
+  open = function(docName, type, origin, callback) {
     var c;
-    if (typeof options === 'function') {
-      callback = options;
-      options = null;
+    if (typeof origin === 'function') {
+      callback = origin;
+      origin = null;
     }
-    if (options == null) {
-      options = {};
-    }
-    c = getConnection(options.host, options.port, options.basePath);
+    c = getConnection(origin);
     return c.open(docName, type, function(doc, error) {
       if (doc === null) {
         if (c.numDocs === 0) {

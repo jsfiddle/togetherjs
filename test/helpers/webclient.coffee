@@ -5,7 +5,7 @@
 fs = require 'fs'
 
 window = {}
-window.io = require('../../thirdparty/Socket.io-node-client/lib/io-client').io
+window.io = require 'socket.io-client'
 
 for filename in ['share', 'json']
 	script = fs.readFileSync("#{__dirname}/../../webclient/#{filename}.js", 'utf8')

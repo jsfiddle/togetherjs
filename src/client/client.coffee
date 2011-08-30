@@ -8,8 +8,8 @@ if WEB?
 	throw new Error 'Must load socket.io before this library' unless window['io']
 	io = window['io']
 else
-	types = require('../types')
-	io = require('../../thirdparty/Socket.io-node-client').io
+	types = require '../types'
+	io = require 'socket.io-client'
 	MicroEvent = require './microevent'
 
 # An open document.
@@ -163,15 +163,21 @@ MicroEvent.mixin Doc
 
 # A connection to a sharejs server
 class Connection
-	constructor: (host, port, basePath) ->
-		resource = if basePath then path + '/socket.io' else 'socket.io'
-
-		@socket = new io['Socket'] host, {port:port, resource:resource}
+	constructor: (origin) ->
+		# We can't reuse connections because the socket.io server doesn't
+		# emit connected events when a new connection comes in. Multiple documents
+		# are already multiplexed over the connection by socket.io anyway, so it
+		# shouldn't matter too much unless you're doing something particularly wacky.
+		@socket = io['connect'] origin, 'force new connection': true
 
 		@socket['on'] 'connect', @connected
 		@socket['on'] 'disconnect', @disconnected
 		@socket['on'] 'message', @onMessage
-		@socket['connect']()
+
+		# This avoids a bug in socket.io-client (v0.7.9) which causes
+		# subsequent connections on the same host to not fire a .connect event
+		if @socket['socket']['connected']
+			setTimeout (=> @connected()), 0
 
 		@docs = {}
 		@numDocs = 0
@@ -194,7 +200,7 @@ class Connection
 		else
 			@lastSentDoc = docName
 
-		@socket['send'] msg
+		@socket['json']['send'] msg
 		
 		if callback
 			register = (type) =>
@@ -313,31 +319,27 @@ MicroEvent.mixin Connection
 # This is a private connection pool for implicitly created connections.
 connections = {}
 
-getConnection = (host, port, basePath) ->
+getConnection = (origin) ->
 	if WEB?
-		host ?= window.location.hostname
-		port ?= window.location.port
+		location = window.location
+		origin ?= "#{location.protocol}//#{location.hostname}/sjs"
 	
-	address = host
-	address += ":#{port}" if port?
-
-	unless connections[address]
-		c = new Connection(host, port, basePath)
-		c.on 'disconnected', -> delete connections[address]
-		connections[address] = c
+	unless connections[origin]
+		c = new Connection origin
+		c.on 'disconnected', -> delete connections[origin]
+		connections[origin] = c
 	
-	connections[address]
+	connections[origin]
 
 # Open a document with the given name. The connection is created implicitly and reused.
 #
 # There are no unit tests for this function. :(
-open = (docName, type, options, callback) ->
-	if typeof options == 'function'
-		callback = options
-		options = null
+open = (docName, type, origin, callback) ->
+	if typeof origin == 'function'
+		callback = origin
+		origin = null
 
-	options ?= {}
-	c = getConnection options.host, options.port, options.basePath
+	c = getConnection origin
 	c.open docName, type, (doc, error) ->
 		if doc == null
 			c['disconnect']() if c.numDocs == 0
