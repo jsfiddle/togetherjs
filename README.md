@@ -11,6 +11,7 @@ Rich text support is planned.
 Check out [some cool demos](http://sharejs.org:8000/).
 API Documentation is on [`the wiki`](https://github.com/josephg/ShareJS/wiki).
 
+> Note: CI appears broken because socket.io isn't cleaning itself up after running. Socket.io dudes are working on it :)
 [![Build Status](https://secure.travis-ci.org/josephg/ShareJS.png)](http://travis-ci.org/josephg/ShareJS)
 
 
