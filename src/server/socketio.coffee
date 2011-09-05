@@ -20,7 +20,20 @@ exports.attach = (server, model, options) ->
 	io.configure ->
 		io.set 'log level', 1
 	
-	io.of('/sjs').authorization(model.auth).on 'connection', (socket) ->
+	authClient = (handshakeData, callback) ->
+		model.clientConnect handshakeData, (client, error) ->
+			if error
+				# Its important that we don't pass the error message to the client here - leaving it as null
+				# will ensure the client recieves the normal 'not_authorized' message and thus
+				# emits 'connect_failed' instead of 'error'
+				callback null, false
+			else
+				handshakeData.client = client
+				callback null, true
+
+	io.of('/sjs').authorization(authClient).on 'connection', (socket) ->
+		client = socket.handshake.client
+
 		# There seems to be a bug in socket.io where socket.request isn't set sometimes.
 		p "New socket connected from #{socket.request.socket.remoteAddress} with id #{socket.id}" if socket.request?
 
@@ -64,19 +77,20 @@ exports.attach = (server, model, options) ->
 
 				send opMsg
 
-			openedAt = (version) ->
-				if version == null
-					callback null, 'Document does not exist'
+			openedAt = (version, error) ->
+				error ||= 'Document does not exist' if version == null
+				if error
+					callback null, error
 				else
 					callback version
 				return
 			
 			if version?
 				# Tell the socket the doc is open at the requested version
-				model.clientListenFromVersion socket, docName, version, listener, openedAt
+				model.clientListenFromVersion client, docName, version, listener, openedAt
 			else
 				# If the version is blank, we'll open the doc at the most recent version
-				model.clientListen socket, docName, listener, openedAt
+				model.clientListen client, docName, listener, openedAt
 
 		# Close the named document.
 		# callback([error])
@@ -129,7 +143,7 @@ exports.attach = (server, model, options) ->
 					msg.create = false
 					step2Snapshot()
 				else
-					model.clientCreate socket, docName, query.type, query.meta || {}, (result, errorMsg) ->
+					model.clientCreate client, docName, query.type, query.meta || {}, (result, errorMsg) ->
 						if errorMsg? and errorMsg != 'Document already exists'
 							fail errorMsg
 							return
@@ -183,7 +197,7 @@ exports.attach = (server, model, options) ->
 
 			docData = undefined
 			if query.snapshot == null or (query.open == true and query.type)
-				model.clientGetSnapshot socket, query.doc, (d, errorMsg) ->
+				model.clientGetSnapshot client, query.doc, (d, errorMsg) ->
 					if errorMsg? and errorMsg != 'Document does not exist'
 						fail errorMsg
 						return
@@ -213,7 +227,7 @@ exports.attach = (server, model, options) ->
 			op_data.meta = query.meta || {}
 			op_data.meta.source = socket.id
 
-			model.clientSubmitOp socket, query.doc, op_data, (appliedVersion, error) ->
+			model.clientSubmitOp client, query.doc, op_data, (appliedVersion, error) ->
 				msg = if error?
 					p "Sending error to socket: #{error}"
 					{doc:query.doc, v:null, error: error}

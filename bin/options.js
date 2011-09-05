@@ -26,11 +26,15 @@ module.exports = {
 
 	// REST frontend options. Set rest: null to disable REST frontend.
 	rest: {
-		// Allow the DELETE HTTP command to perminantly delete sharejs documents
-		delete: false
 	},
 
 	// SocketIO frontend options. Set socketio: null to disable socketIO frontend.
 	socketio: {
-	}
+	},
+
+	// Authentication code to test if clients are allowed to perform different actions.
+	// See documentation for details.
+	//auth: function(client, action) {
+	//	action.allow();
+	//}
 }

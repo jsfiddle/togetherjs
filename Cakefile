@@ -5,7 +5,7 @@ path = require 'path'
 
 task 'test', 'Run all tests', ->
 	# run directly to get all the delicious output
-  console.log 'Running tests...'
+	console.log 'Running tests...'
 	exec 'nodeunit tests.coffee', (err, stdout, stderr) ->
 		throw err if err
 

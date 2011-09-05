@@ -36,10 +36,13 @@ expectData = (socket, expectedData, callback) ->
 
 module.exports = testCase
 	setUp: (callback) ->
+		@auth = (client, action) -> action.accept()
+
 		options = {
 			socketio: {}
 			rest: null
 			db: {type: 'memory'}
+			auth: (client, action) => @auth client, action
 		}
 
 		try
@@ -285,5 +288,97 @@ module.exports = testCase
 
 			@model.getSnapshot data.doc, (docData) ->
 				test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+				test.done()
+
+# ---- Auth-related tests
+	'The client object is persisted across requests': (test) ->
+		c = null
+
+		@auth = (client, action) =>
+			if c
+				test.strictEqual c, client
+			else
+				c = client
+			action.accept()
+
+		@socket.json.send {doc:@name, open:true, create:true, type:'simple'}
+		@expect {doc:@name, open:true, create:true, v:0}, =>
+			@socket.json.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{x:5}}
+			@expect {v:0}, ->
+				test.expect 3
+				test.done()
+
+	'Cannot connect if auth rejects you': (test) ->
+		@auth = (client, action) ->
+			test.strictEqual action.type, 'connect'
+			test.ok client.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
+			test.strictEqual typeof client.remotePort, 'number'
+			test.strictEqual typeof client.id, 'string'
+			test.ok client.id.length > 5
+			test.ok client.connectTime
+
+			test.strictEqual typeof client.headers, 'object'
+
+			# I can't edit the headers using socket.io-client's API. I'd test the default headers in this
+			# object, but the default XHR headers aren't part of socket.io's API, so they could change between
+			# versions and break the test.
+			test.strictEqual client.headers['user-agent'], 'node.js'
+
+			action.reject()
+
+		socket = clientio.connect "http://localhost:#{@server.address().port}/sjs", 'force new connection': true
+		socket.on 'connect', ->
+			test.fail 'connection succeeded despite auth failure'
+
+		socket.on 'connect_failed', ->
+			test.expect 8
+			test.done()
+
+	'Cannot open a document if you cannot listen': (test) ->
+		@auth = (client, action) =>
+			if action.name == 'listen'
+				action.reject()
+			else
+				action.accept()
+
+		@model.create @name, 'simple', =>
+			@socket.json.send {doc:@name, open:true}
+			@expect {doc:@name, open:false, error:'Forbidden'}, ->
+				test.done()
+
+	'Cannot open a document if you cannot get a snapshot': (test) ->
+		@auth = (client, action) =>
+			if action.name == 'get snapshot'
+				action.reject()
+			else
+				action.accept()
+
+		@model.create @name, 'simple', =>
+			@socket.json.send {doc:@name, open:true, snapshot:null}
+			@expect {doc:@name, open:false, snapshot:null, error:'Forbidden'}, ->
+				test.done()
+
+	'Cannot create a document if youre not allowed to create': (test) ->
+		@auth = (client, action) =>
+			if action.name == 'create'
+				action.reject()
+			else
+				action.accept()
+
+		@socket.json.send {doc:@name, open:true, create:true, type:'simple'}
+		@expect {doc:@name, open:false, error:'Forbidden'}, ->
+			test.done()
+
+	'Cannot submit an op if auth rejects you': (test) ->
+		@auth = (client, action) ->
+			if action.type == 'update'
+				action.reject()
+			else
+				action.accept()
+
+		@socket.json.send {doc:@name, open:true, create:true, type:'simple', snapshot:null}
+		@expect {doc:@name, open:true, create:true, v:0}, =>
+			@socket.json.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{}}
+			@expect {v:null, error:'Forbidden'}, ->
 				test.done()
 

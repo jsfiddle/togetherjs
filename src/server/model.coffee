@@ -208,10 +208,11 @@ module.exports = Model = (db, options) ->
 		auth client, action
 
 	# At some stage, I'll probably pull this out into a class. No rush though.
-	createClient = (data) ->
+	createClient = (data) =>
 		headers: data.headers
 		connectTime: new Date
-		address: data.address
+		remoteAddress: data.address.address
+		remotePort: data.address.port
 		# I'm not sure we can support these properties on the REST API
 		#xdomain: data.xdomain
 		#secure: data.secure

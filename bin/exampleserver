@@ -40,13 +40,16 @@ server = connect(
 
 )
 
-# Change to this to enable persistance
-options = {db: {type:'memory'}}
+options =
+	db:
+		type:'memory'
+	auth: (client, action) ->
+		action.accept()
 
 # Lets try and enable redis persistance if redis is installed...
 try
 	require 'redis'
-	options = {db: {type:'redis'}}
+	options.db = type:'redis'
 
 console.log "Options: ", options
 
