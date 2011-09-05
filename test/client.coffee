@@ -280,7 +280,11 @@ genTests = (client) ->
 					test.done()
 
 		"can't open a document if canRead rejects you": (test) ->
-			@auth.canRead = (client, docName, result) -> result.reject()
+			@auth = (client, action) ->
+        if action.type == 'read'
+          action.reject()
+         else
+          action.accept()
 
 			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
 				test.strictEqual doc, null
