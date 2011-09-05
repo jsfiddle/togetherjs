@@ -1,25 +1,38 @@
 # Tests for the authentication & authorization code
 #
-# Auth code hasn't been finished yet. This test isn't run by the standard test
-# runner.
+# Auth code is still quite new and will likely change. 
 
 testCase = require('nodeunit').testCase
 server = require '../src/server'
 types = require '../src/types'
+assert = require 'assert'
 
-module.exports = testCase
+genTests = (async) -> testCase
 	setUp: (callback) ->
 		options =
 			db: {type: 'memory'}
-			auth:
-				# Magic message for connecting a client.
-				auth: (client, data) => @auth client, data
+			auth: (client, action) =>
+				assert.strictEqual client, @client, 'client missing or invalid'
+				assert.fail 'Action missing type', action unless action.type?
+				assert.fail 'type invalid', action unless action.type in ['connect', 'create', 'read', 'update', 'delete']
+				assert.fail 'name invalid', action unless typeof action.name is 'string'
+				assert.fail 'accept() missing or invalid', action unless typeof action.accept is 'function'
+				assert.fail 'reject() missing or invalid', action unless typeof action.reject is 'function'
 
-				# CRUD.
-				canCreate: (client, docName, type, meta, result) => @canCreate client, docName, type, meta, result
-				canRead: (client, docName, result) => @canRead client, docName, result
-				canSubmitOp: (client, docName, opData, result) => @canSubmitOp client, docName, opData, result
-				canDelete: (client, docName, result) => @canDelete client, docName, result
+				if async
+					auth = @auth
+					process.nextTick => auth client, action
+				else
+					@auth client, action
+
+# The API should look like this:
+#		auth = (client, action) ->
+#			if action == 'connect'
+#				client.sessionMetadata.username = 'nornagon'
+#				action.accept()
+
+		@auth = (client, action) ->
+			throw new Error "Unexpected call to @can(#{action})"
 
 		@name = 'testingdoc'
 		@unused = 'testingdoc2'
@@ -27,137 +40,165 @@ module.exports = testCase
 		@model = server.createModel options
 		@client = {}
 		@model.create @name, 'simple', -> callback()
-	
-	'getSnapshot allowed if canRead() accepts': (test) ->
-		@canRead = (client, docName, result) =>
-			test.strictEqual client, @client
-			test.strictEqual docName, @name
-			result.accept()
 
+	'getSnapshot works if auth accepts': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+			test.strictEqual action.type, 'read'
+			test.strictEqual action.name, 'get snapshot'
+			action.accept()
+
+		# The object was created in setUp, above.
 		@model.clientGetSnapshot @client, @name, (data, error) ->
 			test.deepEqual data, {v:0, snapshot:{str:''}, meta:{}, type:types.simple}
-			test.strictEqual error, undefined
+			test.fail error if error
 
 			test.expect 4
 			test.done()
 	
-	'getSnapshot disallowed if canRead() rejects': (test) ->
-		@canRead = (client, docName, result) -> result.reject()
+	'getSnapshot disallowed if auth rejects': (test) ->
+		@auth = (client, action) -> action.reject()
 
 		@model.clientGetSnapshot @client, @name, (data, error) =>
 			test.strictEqual error, 'Forbidden'
-			test.deepEqual data, undefined
+			test.fail data if data
 			test.done()
 
-	'getOps works if canRead() accepts': (test) ->
-		@canRead = (client, docName, result) =>
-			test.strictEqual client, @client
-			test.strictEqual docName, @name
-			result.accept()
+	'getOps works if auth accepts': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+			test.strictEqual action.type, 'read'
+			test.strictEqual action.name, 'get ops'
+			test.strictEqual action.start, 0
+			test.strictEqual action.end, 1
+			action.accept()
 
 		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
 			@model.clientGetOps @client, @name, 0, 1, (data, error) ->
 				test.strictEqual data.length, 1
 				test.deepEqual data[0].op, {position:0, text:'hi'}
-				test.strictEqual error, undefined
+				test.fail error if error
 
-				test.expect 5
+				test.expect 7
 				test.done()
 	
-	'getOps returns forbidden if canRead() rejects': (test) ->
-		@canRead = (client, docName, result) -> result.reject()
+	'getOps returns forbidden': (test) ->
+		@auth = (client, action) -> action.reject()
 
 		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
 			@model.clientGetOps @client, @name, 0, 1, (data, error) ->
 				test.strictEqual error, 'Forbidden'
-				test.strictEqual data, null
+				test.fail data if data
 				test.done()
 
 	'getOps returns Document does not exist for documents that dont exist if its allowed': (test) ->
-		@canRead = (client, docName, result) -> result.accept()
+		@auth = (client, action) -> action.accept()
 
 		@model.clientGetOps @client, @unused, 0, 1, (data, error) ->
-			test.strictEqual data, null
+			test.fail data if data
 			test.strictEqual error, 'Document does not exist'
 			test.done()
 	
 	"getOps returns forbidden for documents that don't exist if it can't read": (test) ->
-		@canRead = (client, docName, result) -> result.reject()
+		@auth = (client, action) -> action.reject()
 
 		@model.clientGetOps @client, @unused, 0, 1, (data, error) ->
-			test.strictEqual data, null
+			test.fail data if data
 			test.strictEqual error, 'Forbidden'
 			test.done()
 
 	'create allowed if canCreate() accept': (test) ->
-		@canCreate = (client, docName, type, meta, result) =>
-			test.strictEqual client, @client
-			test.strictEqual docName, @unused
-			test.strictEqual type.name, 'simple'
-			test.ok meta
-			result.accept()
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @unused
+			test.strictEqual action.docType.name, 'simple'
+			test.ok action.meta
 
-		@model.clientCreate @client, @unused, 'simple', {}, (result, error) ->
+			test.strictEqual action.type, 'create'
+			test.strictEqual action.name, 'create'
+	
+			action.accept()
+
+		@model.clientCreate @client, @unused, 'simple', {}, (result, error) =>
 			test.strictEqual result, true
-			test.strictEqual error, undefined
+			test.fail error if error
 
-			test.expect 6
-			test.done()
+			@model.getVersion @unused, (v) ->
+				test.strictEqual v, 0
+
+				test.expect 7
+				test.done()
 	
 	'create not allowed if canCreate() rejects': (test) ->
-		@canCreate = (client, docName, type, meta, result) =>
-			result.reject()
+		@auth = (client, action) -> action.reject()
 
-		@model.clientCreate @client, @unused, 'simple', {}, (result, error) ->
+		@model.clientCreate @client, @unused, 'simple', {}, (result, error) =>
 			test.strictEqual error, 'Forbidden'
-			test.strictEqual result, false
-			test.done()
+
+			@model.getVersion @unused, (v) ->
+				test.strictEqual v, null
+				test.fail result if result
+				test.done()
 	
-	'applyOps allowed if canSubmitOps allows': (test) ->
-		@canSubmitOp = (client, docName, opData, result) =>
-			test.strictEqual client, @client
-			test.strictEqual docName, @name
-			test.deepEqual opData, {v:0, op:{position:0, text:'hi'}}
-			result.accept()
+	'create returns false if the document already exists, and youre allowed to know': (test) ->
+		@auth = (client, action) -> action.accept()
+		
+		@model.clientCreate @client, @name, 'simple', {}, (result, error) ->
+			test.strictEqual result, false
+			test.strictEqual error, 'Document already exists'
+			test.done()
+
+	'applyOps works': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+			test.strictEqual action.v, 0
+			test.deepEqual action.op, {position:0, text:'hi'}
+			test.ok action.meta
+
+			test.strictEqual action.type, 'update'
+			test.strictEqual action.name, 'submit op'
+
+			action.accept()
 
 		@model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
 			test.strictEqual result, 0
-			test.strictEqual error, undefined
+			test.fail error if error
 
 			@model.getVersion @name, (v) ->
 				test.strictEqual v, 1
-				test.expect 6
+				test.expect 8
 				test.done()
 	
-	'applyOps disallowed if canSubmitOps rejects': (test) ->
-		@canSubmitOp = (client, docName, opData, result) -> result.reject()
+	'applyOps doesnt work if rejected': (test) ->
+		@auth = (client, action) -> action.reject()
 
 		@model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
-			test.strictEqual result, null
+			test.fail result if result
 			test.strictEqual error, 'Forbidden'
 
 			@model.getVersion @name, (v) ->
 				test.strictEqual v, 0
 				test.done()
 	
-	'applyOps on a nonexistant document returns Forbidden if canSubmitOp rejects': (test) ->
+	'applyOps on a nonexistant document returns Forbidden': (test) ->
 		# Its important that information about documents doesn't leak unintentionally.
-		@canSubmitOp = (client, docName, opData, result) -> result.reject()
+		@auth = (client, action) -> action.reject()
 
 		@model.clientSubmitOp @client, @unused, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
-			test.strictEqual result, null
+			test.fail result if result
 			test.strictEqual error, 'Forbidden'
 			test.done()
 
-	'delete works if canDelete allows it': (test) ->
-		@canDelete = (client, docName, result) =>
-			test.strictEqual client, @client
-			test.strictEqual docName, @name
-			result.accept()
+	'delete works if allowed': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+
+			test.strictEqual action.type, 'delete'
+			test.strictEqual action.name, 'delete'
+			action.accept()
 
 		@model.clientDelete @client, @name, (result, error) =>
 			test.strictEqual result, true
-			test.strictEqual error, undefined
+			test.fail error if error
 
 			@model.getVersion @name, (v) ->
 				# The document should not exist anymore.
@@ -166,10 +207,10 @@ module.exports = testCase
 				test.done()
 	
 	'delete fails if canDelete does not allow it': (test) ->
-		@canDelete = (client, docName, result) -> result.reject()
+		@auth = (client, action) -> action.reject()
 
 		@model.clientDelete @client, @name, (result, error) =>
-			test.strictEqual result, false
+			test.strictEqual !!result, false
 			test.strictEqual error, 'Forbidden'
 
 			@model.getVersion @name, (v) ->
@@ -177,10 +218,47 @@ module.exports = testCase
 				test.done()
 	
 	'delete returns forbidden on a nonexistant document': (test) ->
-		@canDelete = (client, docName, result) -> result.reject()
+		@auth = (client, action) -> action.reject()
 
 		@model.clientDelete @client, @unused, (result, error) ->
-			test.strictEqual result, false
+			test.strictEqual !!result, false
 			test.strictEqual error, 'Forbidden'
 			test.done()
 
+	'An auth function calling accept/reject multiple times throws an exception': (test) ->
+		@auth = (client, action) ->
+			action.accept()
+			test.throws -> action.accept()
+
+		@model.clientGetSnapshot @client, @unused, ->
+
+		@auth = (client, action) ->
+			action.accept()
+			test.throws -> action.reject()
+
+		@model.clientGetSnapshot @client, @unused, ->
+
+		@auth = (client, action) ->
+			action.reject()
+			test.throws -> action.accept()
+
+		@model.clientGetSnapshot @client, @unused, ->
+
+		@auth = (client, action) ->
+			action.reject()
+			test.throws -> action.reject()
+
+		@model.clientGetSnapshot @client, @unused, ->
+
+		@auth = (client, action) ->
+			action.reject()
+			process.nextTick ->
+				test.throws -> action.reject()
+
+		@model.clientGetSnapshot @client, @unused, ->
+
+		test.done()
+
+
+exports.sync = genTests false
+exports.async = genTests true

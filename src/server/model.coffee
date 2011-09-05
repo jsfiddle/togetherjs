@@ -164,67 +164,103 @@ module.exports = Model = (db, options) ->
 	@listenFromVersion = events.listenFromVersion
 
 	# Generate a random document name
-	@randomDocName = (length = 10) ->
+	@generateId = (length = 10) ->
 		# Should use a secure random number generator if available.
 		chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-="
 		(chars[Math.floor(Math.random() * chars.length)] for x in [0...length]).join('')
 
 	
-	# Auth stuffs.
-	options.auth ||= {}
+	# ------------ Auth stuffs.
 
-	auth = options.auth || {}
+	# By default, accept any client's connection + data submission.
+	# Don't let anyone delete documents though.
+	auth = options.auth || (client, action) ->
+		if action.type in ['connect', 'read', 'create', 'update'] then action.accept() else action.reject()
 
-	auth.auth ||= ->
-	auth.canCreate ||= (client, docName, type, meta, result) -> result.accept()
-	auth.canRead ||= (client, docName, result) -> result.accept()
-	auth.canSubmitOp ||= (client, docName, opData, result) -> result.accept()
-	# canDelete defaults to reject().
-	auth.canDelete ||= (client, docName, result) -> result.reject()
+	# This method wraps auth() above. It creates the action and calls auth.
+	# If authentication succeeds, acceptCallback() is called if it exists.
+	# otherwise userCallback(true) is called.
+	#
+	# If authentication fails, userCallback(null, 'Forbidden') is called.
+	#
+	# If supplied, actionData is turned into the action.
+	doAuth = (client, actionData, name, userCallback, acceptCallback) ->
+		action = actionData || {}
+		action.name = name
+		action.type = switch name
+			when 'connect' then 'connect'
+			when 'create' then 'create'
+			when 'get snapshot', 'get ops', 'listen' then 'read'
+			when 'submit op' then 'update'
+			when 'delete' then 'delete'
+			else throw new Error "Invalid action name #{name}"
 
-	# Surely there's a nicer way to write these functions, below. I can imagine abstractions,
-	# but they're always more complicated than the code below.
+		responded = false
+		action.reject = ->
+			throw new Error 'Multiple accept/reject calls made' if responded
+			responded = true
+			userCallback null, 'Forbidden'
+		action.accept = ->
+			throw new Error 'Multiple accept/reject calls made' if responded
+			responded = true
+			acceptCallback()
+
+		auth client, action
+
+	# At some stage, I'll probably pull this out into a class. No rush though.
+	createClient = (data) ->
+		headers: data.headers
+		connectTime: new Date
+		address: data.address
+		# I'm not sure we can support these properties on the REST API
+		#xdomain: data.xdomain
+		#secure: data.secure
+		id: @generateId 8 # How many random characters are enough?
+
+
+	# I wish there was a cleaner way to write all of these.
+
+	@clientConnect = (data, callback) ->
+		client = createClient data
+		doAuth client, null, 'connect', callback, ->
+			# Maybe store a set of clients in the model?
+			# clients[client.id] = client ?
+			callback client
 
 	@clientGetOps = (client, docName, start, end, callback) ->
-		auth.canRead client, docName,
-			accept: => @getOps docName, start, end, callback
-			reject: -> callback null, 'Forbidden'
+		doAuth client, {docName, start, end}, 'get ops', callback, =>
+			@getOps docName, start, end, callback
 
 	@clientGetSnapshot = (client, docName, callback) ->
-		auth.canRead client, docName,
-			accept: => @getSnapshot docName, callback
-			reject: -> callback undefined, 'Forbidden'
+		doAuth client, {docName}, 'get snapshot', callback, =>
+			@getSnapshot docName, callback
 	
 	@clientCreate = (client, docName, type, meta, callback) ->
 		# We don't check that types[type.name] == type. That might be important at some point.
 		type = types[type] if typeof type == 'string'
 
-		auth.canCreate client, docName, type, meta,
-			accept: => @create docName, type, meta, callback
-			reject: -> callback false, 'Forbidden'
+		doAuth client, {docName, docType:type, meta}, 'create', callback, =>
+			@create docName, type, meta, callback
 
 	# Attempt to submit an op from a client. Auth functions
 	# are checked before the op is submitted.
 	@clientSubmitOp = (client, docName, opData, callback) ->
-		auth.canSubmitOp client, docName, opData,
-			accept: => @applyOp docName, opData, callback
-			reject: -> callback null, 'Forbidden'
+		opData.meta ||= {}
+		doAuth client, {docName, op:opData.op, v:opData.v, meta:opData.meta}, 'submit op', callback, =>
+			@applyOp docName, opData, callback
 
 	# Delete the named operation.
 	# Callback is passed (deleted?, error message)
 	@clientDelete = (client, docName, callback) ->
-		auth.canDelete client, docName,
-			accept: => @delete docName, callback
-			reject: -> callback false, 'Forbidden'
+		doAuth client, {docName}, 'delete', callback, =>
+			@delete docName, callback
 	
 	@clientListen = (client, docName, listener, callback) ->
-		auth.canRead client, docName,
-			accept: => @listen docName, listener, callback
-			reject: -> callback null, 'Forbidden'
+		doAuth client, {docName}, 'listen', callback, =>
+			@listen docName, listener, callback
 	
 	@clientListenFromVersion = (client, docName, version, listener, callback) ->
-		auth.canRead client, docName,
-			accept: => @listenFromVersion docName, version, listener, callback
-			reject: -> callback null, 'Forbidden'
+		doAuth client, {docName, v:version}, 'listen', callback, =>
+			@listenFromVersion docName, version, listener, callback
 
 	this

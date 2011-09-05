@@ -20,7 +20,7 @@ exports.attach = (server, model, options) ->
 	io.configure ->
 		io.set 'log level', 1
 	
-	io.of('/sjs').on 'connection', (socket) ->
+	io.of('/sjs').authorization(model.auth).on 'connection', (socket) ->
 		# There seems to be a bug in socket.io where socket.request isn't set sometimes.
 		p "New socket connected from #{socket.request.socket.remoteAddress} with id #{socket.id}" if socket.request?
 
@@ -268,7 +268,7 @@ exports.attach = (server, model, options) ->
 
 				if query.doc == null
 					lastReceivedDoc = null
-					query.doc = model.randomDocName()
+					query.doc = model.generateId()
 				else if query.doc != undefined
 					lastReceivedDoc = query.doc
 				else

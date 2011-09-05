@@ -15,12 +15,13 @@ genTests = (client) ->
 		setUp: (callback) ->
 			@name = 'testingdoc'
 
-			@auth = {}
+			@auth = (client, action) -> action.accept()
+
 			options =
 				socketio: {}
 				rest: null
 				db: {type: 'memory'}
-				auth: @auth
+				auth: (client, action) => @auth client, action
 
 			@model = server.createModel options
 			@server = server options, @model
