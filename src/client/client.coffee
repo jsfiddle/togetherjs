@@ -28,8 +28,8 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 	throw new Error('Handling types without compose() defined is not currently implemented') unless @type['compose']?
 
 	# Gotta figure out a cleaner way to make this work with closure.
-	@setSnapshot = (s) -> @['snapshot'] = @snapshot = s
-	@setSnapshot(snapshot)
+	setSnapshot = (s) => @['snapshot'] = @snapshot = s
+	setSnapshot(snapshot)
 
 	# The op that is currently roundtripping to the server, or null.
 	inflightOp = null
@@ -57,19 +57,33 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 			connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response) =>
 				if response['v'] == null
-					# Currently, it should be impossible to reach this case.
-					# This case is currently untested.
-					callback(null) for callback in inflightCallbacks
-					inflightOp = null
-					# Perhaps the op should be removed from the local document...
-					# @snapshot = @type.apply @snapshot, type.invert(@inflightOp) if type.invert?
-					throw new Error(response['error'])
+					# This will happen if the server rejects edits from the client.
+					# We'll send the error message to the user and roll back the change.
+					#
+					# If the server isn't going to allow edits anyway, we should probably
+					# figure out some way to flag that (readonly:true in the open request?)
 
-				throw new Error('Invalid version from server') unless response['v'] == @version
+					if type['invert']
 
-				serverOps[@version] = inflightOp
-				@version++
-				callback(inflightOp, null) for callback in inflightCallbacks
+						undo = @type['invert'] inflightOp
+						undo = @type['transform'] undo, pendingOp, 'left' if pendingOp
+
+						#console.warn "if #{JSON.stringify(inflightOp)} undo #{JSON.stringify(undo)} pending #{JSON.stringify(pendingOp)}"
+						#console.warn "snapshot", JSON.stringify(@snapshot)
+
+						# Now we have to transform the undo operation by any server ops & pending ops
+						setSnapshot @type['apply'](@snapshot, undo)
+					else
+						throw new Error "Op apply failed (#{response['error']}) and the OT type does not define an invert function."
+
+					callback(null, response['error']) for callback in inflightCallbacks
+					#throw new Error(response['error'])
+				else
+					throw new Error('Invalid version from server') unless response['v'] == @version
+
+					serverOps[@version] = inflightOp
+					@version++
+					callback(inflightOp, null) for callback in inflightCallbacks
 
 				inflightOp = null
 				tryFlushPendingOp()
@@ -105,7 +119,7 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 			[pendingOp, docOp] = xf pendingOp, docOp
 			
 		oldSnapshot = @snapshot
-		@setSnapshot(@type['apply'] oldSnapshot, docOp)
+		setSnapshot(@type['apply'] oldSnapshot, docOp)
 		@version++
 
 		@emit 'remoteop', docOp, oldSnapshot
@@ -113,22 +127,11 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
-	@['submitOp'] = @submitOp = (op, v = @version, callback) ->
-		if typeof v == 'function'
-			callback = v
-			v = @version
-
+	@['submitOp'] = @submitOp = (op, callback) ->
 		op = @type['normalize'](op) if @type['normalize']?
 
-		while v < @version
-			# TODO: Add tests for this
-			realOp = serverOps[v]
-			throw new Error 'Op version too old' unless realOp
-			op = @type['transform'] op, realOp, 'left'
-			v++
-
 		# If this throws an exception, no changes should have been made to the doc
-		@setSnapshot(@type['apply'] @snapshot, op)
+		setSnapshot(@type['apply'] @snapshot, op)
 
 		if pendingOp != null
 			pendingOp = @type['compose'](pendingOp, op)

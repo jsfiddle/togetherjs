@@ -131,7 +131,8 @@ module.exports = Model = (db, options) ->
 					# The op is up to date already. Apply and submit.
 					submit()
 
-		queues[docName](opData, callback)
+		# process.nextTick is used to avoid an obscure timing problem involving listenFromVersion.
+		process.nextTick -> queues[docName](opData, callback)
 	
 	# Perminantly deletes the specified document.
 	# If listeners are attached, they are removed.
@@ -261,7 +262,13 @@ module.exports = Model = (db, options) ->
 			@listen docName, listener, callback
 	
 	@clientListenFromVersion = (client, docName, version, listener, callback) ->
-		doAuth client, {docName, v:version}, 'listen', callback, =>
-			@listenFromVersion docName, version, listener, callback
+		# If the specified version is older than the current version, we have to also check that the
+		# client is allowed to get_ops from the specified version.
+		#
+		# We _could_ check the version number of the document and then only check get_ops if
+		# the specified version is old, but an auth check is _probably_ faster than a db roundtrip.
+		doAuth client, {docName, start:version, end:null}, 'get ops', callback, =>
+			doAuth client, {docName, v:version}, 'listen', callback, =>
+				@listenFromVersion docName, version, listener, callback
 
 	this

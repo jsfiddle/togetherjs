@@ -440,17 +440,17 @@ var WEB = true;
   }
   /** @constructor */;
   Doc = function(connection, name, version, type, snapshot) {
-    var inflightCallbacks, inflightOp, k, listeners, pendingCallbacks, pendingOp, serverOps, tryFlushPendingOp, v, _ref;
+    var inflightCallbacks, inflightOp, k, listeners, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, _ref;
     this.name = name;
     this.version = version;
     this.type = type;
     if (this.type['compose'] == null) {
       throw new Error('Handling types without compose() defined is not currently implemented');
     }
-    this.setSnapshot = function(s) {
+    setSnapshot = __bind(function(s) {
       return this['snapshot'] = this.snapshot = s;
-    };
-    this.setSnapshot(snapshot);
+    }, this);
+    setSnapshot(snapshot);
     inflightOp = null;
     inflightCallbacks = [];
     pendingOp = null;
@@ -468,23 +468,31 @@ var WEB = true;
           'op': inflightOp,
           'v': this.version
         }, __bind(function(response) {
-          var callback, _i, _j, _len, _len2;
+          var callback, undo, _i, _j, _len, _len2;
           if (response['v'] === null) {
+            if (type['invert']) {
+              undo = this.type['invert'](inflightOp);
+              if (pendingOp) {
+                undo = this.type['transform'](undo, pendingOp, 'left');
+              }
+              setSnapshot(this.type['apply'](this.snapshot, undo));
+            } else {
+              throw new Error("Op apply failed (" + response['error'] + ") and the OT type does not define an invert function.");
+            }
             for (_i = 0, _len = inflightCallbacks.length; _i < _len; _i++) {
               callback = inflightCallbacks[_i];
-              callback(null);
+              callback(null, response['error']);
             }
-            inflightOp = null;
-            throw new Error(response['error']);
-          }
-          if (response['v'] !== this.version) {
-            throw new Error('Invalid version from server');
-          }
-          serverOps[this.version] = inflightOp;
-          this.version++;
-          for (_j = 0, _len2 = inflightCallbacks.length; _j < _len2; _j++) {
-            callback = inflightCallbacks[_j];
-            callback(inflightOp, null);
+          } else {
+            if (response['v'] !== this.version) {
+              throw new Error('Invalid version from server');
+            }
+            serverOps[this.version] = inflightOp;
+            this.version++;
+            for (_j = 0, _len2 = inflightCallbacks.length; _j < _len2; _j++) {
+              callback = inflightCallbacks[_j];
+              callback(inflightOp, null);
+            }
           }
           inflightOp = null;
           return tryFlushPendingOp();
@@ -518,32 +526,16 @@ var WEB = true;
         _ref2 = xf(pendingOp, docOp), pendingOp = _ref2[0], docOp = _ref2[1];
       }
       oldSnapshot = this.snapshot;
-      this.setSnapshot(this.type['apply'](oldSnapshot, docOp));
+      setSnapshot(this.type['apply'](oldSnapshot, docOp));
       this.version++;
       this.emit('remoteop', docOp, oldSnapshot);
       return this.emit('change', docOp, oldSnapshot);
     };
-    this['submitOp'] = this.submitOp = function(op, v, callback) {
-      var realOp;
-      if (v == null) {
-        v = this.version;
-      }
-      if (typeof v === 'function') {
-        callback = v;
-        v = this.version;
-      }
+    this['submitOp'] = this.submitOp = function(op, callback) {
       if (this.type['normalize'] != null) {
         op = this.type['normalize'](op);
       }
-      while (v < this.version) {
-        realOp = serverOps[v];
-        if (!realOp) {
-          throw new Error('Op version too old');
-        }
-        op = this.type['transform'](op, realOp, 'left');
-        v++;
-      }
-      this.setSnapshot(this.type['apply'](this.snapshot, op));
+      setSnapshot(this.type['apply'](this.snapshot, op));
       if (pendingOp !== null) {
         pendingOp = this.type['compose'](pendingOp, op);
       } else {

@@ -70,14 +70,6 @@ genTests = (client) ->
 									doc2.close()
 									test.done()
 
-		x: (test) ->
-			test.ok @c
-			test.done()
-
-		a: (test) ->
-			test.ok @c
-			test.done()
-
 		'create connection': (test) ->
 			test.ok @c
 			test.done()
@@ -279,7 +271,7 @@ genTests = (client) ->
 					test.strictEqual doc.created, false
 					test.done()
 
-		"can't open a document if canRead rejects you": (test) ->
+		"can't open a document if auth rejects you": (test) ->
 			@auth = (client, action) ->
 				if action.type == 'read'
 					action.reject()
@@ -293,7 +285,25 @@ genTests = (client) ->
 				@model.getVersion @name, (v) ->
 					# The document shouldn't exist.
 					test.strictEqual v, null
+					
+					doc.close()
 					test.done()
+
+		"Can't submit an op if auth rejects you": (test) ->
+			@auth = (client, action) ->
+				if action.name == 'submit op' and action.op[0].i == 'a'
+					action.reject()
+				else
+					action.accept()
+
+			@c.open @name, 'text', (doc, error) =>
+				doc.insert 'hi', 0, (op, error) =>
+					test.strictEqual error, 'Forbidden'
+					test.strictEqual doc.getText(), ''
+
+					@model.getSnapshot @name, (data) ->
+						test.strictEqual data.snapshot, ''
+						test.done()
 
 		'Text API is advertised': (test) ->
 			@c.open @name, 'text', (doc, error) ->

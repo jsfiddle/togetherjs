@@ -18,7 +18,7 @@ module.exports = (model) ->
 	{
 		# Hook for model code. This is called every time an op is committed to the document.
 		onApplyOp: (docName, opData) ->
-			p "onApplyOp #{docName} #{i opData}"
+			p "onApplyOp #{docName} #{i opData} - #{emitterForDoc(docName)?.listeners('op')}"
 			emitterForDoc(docName)?.emit('op', opData)
 
 		# Registers a listener for ops on a particular document.

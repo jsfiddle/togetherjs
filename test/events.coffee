@@ -9,7 +9,7 @@ helpers = require './helpers'
 applyOps = helpers.applyOps
 
 # Event tests
-module.exports = testCase {
+module.exports = testCase
 	setUp: (callback) ->
 		@model = server.createModel {db:{type:'memory'}}
 		@name = 'testingdoc'
@@ -79,7 +79,7 @@ module.exports = testCase {
 			listener = (op_data) ->
 				test.strictEqual op_data.v, expectedVersions.shift()
 				test.done() if expectedVersions.length == 0
-			@model.listen @name, listener, ((v) -> test.strictEqual v, 2)
+			@model.listen @name, listener, (v) -> test.strictEqual v, 2
 
 			applyOps @model, @name, 2, [
 					{position:0, text:'Hi'}
@@ -123,6 +123,25 @@ module.exports = testCase {
 					{position:0, text:'Hi'}
 					{position:0, text:'Hi'}
 				], (error, _) -> test.ifError(error)
+	
+	'If you listenFromVersion and submit ops in the callback, the listener gets called in the right order': (test) ->
+		# Test written in response to a bug found in the wild
+		seenv0 = false
+		listener = (data) ->
+			unless seenv0
+				test.deepEqual data.op, {position:0, text:'hi'}
+				test.strictEqual data.v, 0
+				seenv0 = true
+			else
+				test.deepEqual data.op, {position:2, text:' there'}
+				test.strictEqual data.v, 1
+				test.done()
+
+		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
+			process.nextTick => # I have no idea why I need this process.nextTick, but I do...
+				@model.listenFromVersion @name, 0, listener, (result, error) =>
+					test.fail error if error
+					@model.applyOp @name, {v:1, op:{position:2, text:' there'}}
 
 	'stop emitting events after removeListener is called': (test) ->
 		listener = (op_data) =>
@@ -150,6 +169,4 @@ module.exports = testCase {
 				test.ifError(error)
 				@model.listenFromVersion @name, 0, listener
 				test.done()
-}
-
 

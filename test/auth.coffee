@@ -1,6 +1,15 @@
 # Tests for the authentication & authorization code
 #
+# Docs:
+# https://github.com/josephg/ShareJS/wiki/User-access-control
+#
 # Auth code is still quite new and will likely change. 
+#
+# The API should look like this:
+#		auth = (client, action) ->
+#			if action == 'connect'
+#				client.sessionMetadata.username = 'nornagon'
+#				action.accept()
 
 testCase = require('nodeunit').testCase
 server = require '../src/server'
@@ -19,17 +28,15 @@ genTests = (async) -> testCase
 				assert.fail 'accept() missing or invalid', action unless typeof action.accept is 'function'
 				assert.fail 'reject() missing or invalid', action unless typeof action.reject is 'function'
 
+				assert.fail 'docName missing' if action.name != 'connect' and typeof action.docName != 'string'
+				# If I were super paranoid, I'd switch based on the action name and make sure that all the fields are correct
+				# as per the docs. But the tests below should cover it.
+
 				if async
 					auth = @auth
 					process.nextTick => auth client, action
 				else
 					@auth client, action
-
-# The API should look like this:
-#		auth = (client, action) ->
-#			if action == 'connect'
-#				client.sessionMetadata.username = 'nornagon'
-#				action.accept()
 
 		@auth = (client, action) ->
 			throw new Error "Unexpected call to @can(#{action})"
@@ -187,6 +194,98 @@ genTests = (async) -> testCase
 			test.fail result if result
 			test.strictEqual error, 'Forbidden'
 			test.done()
+	
+	'Listen works': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+
+			test.strictEqual action.type, 'read'
+			test.strictEqual action.name, 'listen'
+
+			action.accept()
+
+		listener = (data) ->
+			test.deepEqual data.op, {position:0, text:'hi'}
+			test.strictEqual data.v, 0
+			test.done()
+
+		@model.clientListen @client, @name, listener, (result, error) =>
+			test.fail error if error
+			@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
+
+	'Listen denied if listen returns false': (test) ->
+		@auth = (client, action) -> action.reject()
+
+		listener = (data) -> test.fail 'listener should not be called'
+
+		@model.clientListen @client, @name, listener, (result, error) =>
+			test.fail result if result
+			test.strictEqual error, 'Forbidden'
+
+			@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
+				test.done()
+
+	'Listen from version works': (test) ->
+		@auth = (client, action) =>
+			test.strictEqual action.docName, @name
+
+			test.strictEqual action.type, 'read'
+			test.ok action.name == 'listen' or action.name == 'get ops'
+
+			action.accept()
+
+		# First, we should see v0
+		seenv0 = false
+		listener = (data) ->
+			unless seenv0
+				assert.deepEqual data.op, {position:0, text:'hi'}
+				assert.strictEqual data.v, 0
+				seenv0 = true
+			else
+				assert.deepEqual data.op, {position:2, text:' there'}
+				assert.strictEqual data.v, 1
+				test.done()
+
+		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
+			@model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+				test.fail error if error
+				@model.applyOp @name, {v:1, op:{position:2, text:' there'}}
+
+	'Listen from version denied if listen rejects': (test) ->
+		@auth = (client, action) =>
+			if action.name == 'listen' then action.reject() else action.accept()
+
+		listener = (data) ->
+			test.fail 'should not be called.'
+
+		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
+			# Both of these should fail.
+			@model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+				test.strictEqual error, 'Forbidden'
+				test.fail result if result?
+				@model.clientListenFromVersion @client, @name, 1, listener, (result, error) =>
+					test.strictEqual error, 'Forbidden'
+					test.fail result if result?
+					@model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->
+						process.nextTick -> test.done()
+
+	'Listen from version denied if get ops rejects': (test) ->
+		@auth = (client, action) =>
+			if action.name == 'get ops' then action.reject() else action.accept()
+
+		listener = (data) ->
+			test.fail 'should not be called.'
+
+		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
+			# Both of these should fail.
+			@model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+				test.strictEqual error, 'Forbidden'
+				test.fail result if result?
+				# I'm only checking that listenFromVersion fails when you try and listen from an old version.
+				# There's no particular reason for it to fail if you try and listen from the current version
+				# and you don't allow get ops.
+				@model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->
+					process.nextTick -> test.done()
 
 	'delete works if allowed': (test) ->
 		@auth = (client, action) =>

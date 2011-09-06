@@ -51,7 +51,7 @@ module.exports = testCase
 		@server.close()
 
 	'ops submitted on one document get sent to another': (test) ->
-		doubleOpen @c1, @c2, @name, 'text', (doc1, doc2) =>
+		doubleOpen @c1, @c2, @name, 'text', (doc1, doc2) ->
 			[submittedOp, result] = doc1.type.generateRandomOp doc1.snapshot
 			doc1.submitOp submittedOp
 

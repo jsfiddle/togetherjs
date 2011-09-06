@@ -68,21 +68,21 @@ text.generateRandomOp = (docStr) ->
 
 	append = text._makeAppend op
 	
-	addSkip = () ->
+	addSkip = ->
 		length = randomInt(Math.min(docStr.length, 3)) + 1
 
 		append length
 		expectedDoc += docStr[0...length]
 		docStr = docStr[length..]
 	
-	addInsert = () ->
+	addInsert = ->
 		# Insert a random word from the list
 		word = randomWord() + ' '
 
 		append {i:word}
 		expectedDoc += word
 
-	addDelete = () ->
+	addDelete = ->
 		length = randomInt(Math.min(docStr.length, 7)) + 1
 		deletedStr = docStr[0...length]
 
