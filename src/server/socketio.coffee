@@ -230,7 +230,7 @@ exports.attach = (server, model, options) ->
 			model.clientSubmitOp client, query.doc, op_data, (appliedVersion, error) ->
 				msg = if error?
 					p "Sending error to socket: #{error}"
-					{doc:query.doc, v:null, error: error}
+					{doc:query.doc, v:null, error:error}
 				else
 					{doc:query.doc, v:appliedVersion}
 

@@ -182,7 +182,7 @@ module.exports = Model = (db, options) ->
 	# If authentication succeeds, acceptCallback() is called if it exists.
 	# otherwise userCallback(true) is called.
 	#
-	# If authentication fails, userCallback(null, 'Forbidden') is called.
+	# If authentication fails, userCallback(null, 'forbidden') is called.
 	#
 	# If supplied, actionData is turned into the action.
 	doAuth = (client, actionData, name, userCallback, acceptCallback) ->
@@ -200,7 +200,7 @@ module.exports = Model = (db, options) ->
 		action.reject = ->
 			throw new Error 'Multiple accept/reject calls made' if responded
 			responded = true
-			userCallback null, 'Forbidden'
+			userCallback null, 'forbidden'
 		action.accept = ->
 			throw new Error 'Multiple accept/reject calls made' if responded
 			responded = true

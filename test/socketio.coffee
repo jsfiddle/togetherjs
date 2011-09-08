@@ -291,7 +291,7 @@ module.exports = testCase
 				test.done()
 
 # ---- Auth-related tests
-	'The client object is persisted across requests': (test) ->
+	'The auth client object is persisted across requests': (test) ->
 		c = null
 
 		@auth = (client, action) =>
@@ -343,7 +343,7 @@ module.exports = testCase
 
 		@model.create @name, 'simple', =>
 			@socket.json.send {doc:@name, open:true}
-			@expect {doc:@name, open:false, error:'Forbidden'}, ->
+			@expect {doc:@name, open:false, error:'forbidden'}, ->
 				test.done()
 
 	'Cannot open a document if you cannot get a snapshot': (test) ->
@@ -355,7 +355,7 @@ module.exports = testCase
 
 		@model.create @name, 'simple', =>
 			@socket.json.send {doc:@name, open:true, snapshot:null}
-			@expect {doc:@name, open:false, snapshot:null, error:'Forbidden'}, ->
+			@expect {doc:@name, open:false, snapshot:null, error:'forbidden'}, ->
 				test.done()
 
 	'Cannot create a document if youre not allowed to create': (test) ->
@@ -366,7 +366,7 @@ module.exports = testCase
 				action.accept()
 
 		@socket.json.send {doc:@name, open:true, create:true, type:'simple'}
-		@expect {doc:@name, open:false, error:'Forbidden'}, ->
+		@expect {doc:@name, open:false, error:'forbidden'}, ->
 			test.done()
 
 	'Cannot submit an op if auth rejects you': (test) ->
@@ -379,6 +379,6 @@ module.exports = testCase
 		@socket.json.send {doc:@name, open:true, create:true, type:'simple', snapshot:null}
 		@expect {doc:@name, open:true, create:true, v:0}, =>
 			@socket.json.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{}}
-			@expect {v:null, error:'Forbidden'}, ->
+			@expect {v:null, error:'forbidden'}, ->
 				test.done()
 

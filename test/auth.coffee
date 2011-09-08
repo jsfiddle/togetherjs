@@ -67,7 +67,7 @@ genTests = (async) -> testCase
 		@auth = (client, action) -> action.reject()
 
 		@model.clientGetSnapshot @client, @name, (data, error) =>
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 			test.fail data if data
 			test.done()
 
@@ -94,7 +94,7 @@ genTests = (async) -> testCase
 
 		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
 			@model.clientGetOps @client, @name, 0, 1, (data, error) ->
-				test.strictEqual error, 'Forbidden'
+				test.strictEqual error, 'forbidden'
 				test.fail data if data
 				test.done()
 
@@ -111,7 +111,7 @@ genTests = (async) -> testCase
 
 		@model.clientGetOps @client, @unused, 0, 1, (data, error) ->
 			test.fail data if data
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 			test.done()
 
 	'create allowed if canCreate() accept': (test) ->
@@ -139,7 +139,7 @@ genTests = (async) -> testCase
 		@auth = (client, action) -> action.reject()
 
 		@model.clientCreate @client, @unused, 'simple', {}, (result, error) =>
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 
 			@model.getVersion @unused, (v) ->
 				test.strictEqual v, null
@@ -180,19 +180,19 @@ genTests = (async) -> testCase
 
 		@model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
 			test.fail result if result
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 
 			@model.getVersion @name, (v) ->
 				test.strictEqual v, 0
 				test.done()
 	
-	'applyOps on a nonexistant document returns Forbidden': (test) ->
+	'applyOps on a nonexistant document returns forbidden': (test) ->
 		# Its important that information about documents doesn't leak unintentionally.
 		@auth = (client, action) -> action.reject()
 
 		@model.clientSubmitOp @client, @unused, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
 			test.fail result if result
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 			test.done()
 	
 	'Listen works': (test) ->
@@ -220,7 +220,7 @@ genTests = (async) -> testCase
 
 		@model.clientListen @client, @name, listener, (result, error) =>
 			test.fail result if result
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 
 			@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
 				test.done()
@@ -261,10 +261,10 @@ genTests = (async) -> testCase
 		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
 			# Both of these should fail.
 			@model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
-				test.strictEqual error, 'Forbidden'
+				test.strictEqual error, 'forbidden'
 				test.fail result if result?
 				@model.clientListenFromVersion @client, @name, 1, listener, (result, error) =>
-					test.strictEqual error, 'Forbidden'
+					test.strictEqual error, 'forbidden'
 					test.fail result if result?
 					@model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->
 						process.nextTick -> test.done()
@@ -279,7 +279,7 @@ genTests = (async) -> testCase
 		@model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
 			# Both of these should fail.
 			@model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
-				test.strictEqual error, 'Forbidden'
+				test.strictEqual error, 'forbidden'
 				test.fail result if result?
 				# I'm only checking that listenFromVersion fails when you try and listen from an old version.
 				# There's no particular reason for it to fail if you try and listen from the current version
@@ -310,7 +310,7 @@ genTests = (async) -> testCase
 
 		@model.clientDelete @client, @name, (result, error) =>
 			test.strictEqual !!result, false
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 
 			@model.getVersion @name, (v) ->
 				test.strictEqual v, 0
@@ -321,7 +321,7 @@ genTests = (async) -> testCase
 
 		@model.clientDelete @client, @unused, (result, error) ->
 			test.strictEqual !!result, false
-			test.strictEqual error, 'Forbidden'
+			test.strictEqual error, 'forbidden'
 			test.done()
 
 	'An auth function calling accept/reject multiple times throws an exception': (test) ->
