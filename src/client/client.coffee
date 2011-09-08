@@ -1,6 +1,16 @@
-# Abstraction over raw net stream, for use by a client.
-
-# NOTE: Variables declared in the global scope here are shared with other client files
+# This file implements the sharejs client, as defined here:
+# https://github.com/josephg/ShareJS/wiki/Client-API
+#
+# It works from both a node.js context and a web context (though in the latter case,
+# it needs to be compiled to work.)
+#
+# This file is a bit of a mess. I'm dreadfully sorry about that. It passes all the tests,
+# so I have hope that its *correct* even if its not clean.
+#
+# It should become a little nicer once I start using more of the new RPC features added
+# in socket.io 0.7.
+#
+# Note that Variables declared in the global scope here are shared with other client files
 # when built with closure. Be careful what you put in your namespace.
 
 if WEB?
@@ -29,7 +39,7 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 	# Gotta figure out a cleaner way to make this work with closure.
 	setSnapshot = (s) => @['snapshot'] = @snapshot = s
-	setSnapshot(snapshot)
+	setSnapshot snapshot
 
 	# The op that is currently roundtripping to the server, or null.
 	inflightOp = null
@@ -45,7 +55,6 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 	# Listeners for the document changing
 	listeners = []
 
-	# Internal - do not call directly.
 	tryFlushPendingOp = =>
 		if inflightOp == null && pendingOp != null
 			# Rotate null -> pending -> inflight, 
@@ -55,8 +64,8 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 			pendingOp = null
 			pendingCallbacks = []
 
-			connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response) =>
-				if response['v'] == null
+			connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response, error) =>
+				if error
 					# This will happen if the server rejects edits from the client.
 					# We'll send the error message to the user and roll back the change.
 					#
@@ -76,7 +85,7 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 					else
 						throw new Error "Op apply failed (#{response['error']}) and the OT type does not define an invert function."
 
-					callback(null, response['error']) for callback in inflightCallbacks
+					callback(null, error) for callback in inflightCallbacks
 					#throw new Error(response['error'])
 				else
 					throw new Error('Invalid version from server') unless response['v'] == @version
@@ -146,6 +155,9 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		# together and sent together.
 		setTimeout tryFlushPendingOp, 0
 	
+	# Force an immediate flush. This is useful for testing.
+	@['flush'] = -> tryFlushPendingOp()
+	
 	# Close a document.
 	# No unit tests for this so far.
 	@['close'] = @close = (callback) ->
@@ -167,6 +179,14 @@ MicroEvent.mixin Doc
 # A connection to a sharejs server
 class Connection
 	constructor: (origin) ->
+		@docs = {}
+		@numDocs = 0
+
+		# Map of docName -> map of type -> function(data, error)
+		#
+		# Once socket.io isn't buggy, this will be rewritten to use socket.io's RPC.
+		@handlers = {}
+
 		# We can't reuse connections because the socket.io server doesn't
 		# emit connected events when a new connection comes in. Multiple documents
 		# are already multiplexed over the connection by socket.io anyway, so it
@@ -176,14 +196,20 @@ class Connection
 		@socket['on'] 'connect', @connected
 		@socket['on'] 'disconnect', @disconnected
 		@socket['on'] 'message', @onMessage
+		@socket['on'] 'connect_failed', (error) =>
+			error = 'forbidden' if error == 'unauthorized' # For consistency with the server
+			@socket = null
+			@emit 'connect failed', error
+			# Cancel all hanging messages
+			for docName, h of @handlers
+				for t, callbacks of h
+					callback null, error for callback in callbacks
 
 		# This avoids a bug in socket.io-client (v0.7.9) which causes
 		# subsequent connections on the same host to not fire a .connect event
 		if @socket['socket']['connected']
 			setTimeout (=> @connected()), 0
 
-		@docs = {}
-		@numDocs = 0
 
 	disconnected: =>
 		# Start reconnect sequence
@@ -195,7 +221,12 @@ class Connection
 
 	# Send the specified message to the server. The server's response will be passed
 	# to callback. If the message is 'open', ops will be sent to follower()
+	#
+	# The callback is optional. It takes (data, error). Data might be missing if the
+	# error was a connection error.
 	send: (msg, callback) ->
+		throw new Error 'Cannot send messages to a closed connection' if @socket == null
+
 		docName = msg['doc']
 
 		if docName == @lastSentDoc
@@ -206,21 +237,20 @@ class Connection
 		@socket['json']['send'] msg
 		
 		if callback
-			register = (type) =>
-				cb = (response) =>
-					if response['doc'] == docName
-						@removeListener type, cb
-						callback(response)
-
-				@on type, cb
-
 			type = if msg['open'] == true then 'open'
 			else if msg['open'] == false then 'close'
 			else if msg['create'] then 'create'
 			else if msg['snapshot'] == null then 'snapshot'
 			else if msg['op'] then 'op response'
 
-			register type
+			#cb = (response) =>
+				#	if response['doc'] == docName
+				#	@removeListener type, cb
+				#	callback response, response['error']
+
+			docHandlers = (@handlers[docName] ||= {})
+			callbacks = (docHandlers[type] ||= [])
+			callbacks.push callback
 
 	onMessage: (msg) =>
 		docName = msg['doc']
@@ -232,6 +262,8 @@ class Connection
 
 		@emit 'message', msg
 
+		# This should probably be rewritten to use socketio's message response stuff instead.
+		# (it was originally written for socket.io 0.6)
 		type = if msg['open'] == true or (msg['open'] == false and msg['error']) then 'open'
 		else if msg['open'] == false then 'close'
 		else if msg['snapshot'] != undefined then 'snapshot'
@@ -239,7 +271,10 @@ class Connection
 		else if msg['op'] then 'op'
 		else if msg['v'] != undefined then 'op response'
 
-		@emit type, msg
+		callbacks = @handlers[docName]?[type]
+		if callbacks
+			delete @handlers[docName][type]
+			c msg, msg['error'] for c in callbacks
 
 		if type == 'op'
 			doc = @docs[docName]
@@ -266,11 +301,15 @@ class Connection
 	# callback is passed a Doc or null
 	# callback(doc, error)
 	'openExisting': (docName, callback) ->
+		if @socket == null # The connection is perminantly disconnected
+			callback null, 'connection closed'
+			return
+
 		return @docs[docName] if @docs[docName]?
 
-		@send {'doc':docName, 'open':true, 'snapshot':null}, (response) =>
-			if response.error
-				callback null, new Error(response.error)
+		@send {'doc':docName, 'open':true, 'snapshot':null}, (response, error) =>
+			if error
+				callback null, error
 			else
 				# response['doc'] is used instead of docName to allow docName to be null.
 				# In that case, the server generates a random docName to use.
@@ -282,6 +321,10 @@ class Connection
 	# Types must be supported by the server.
 	# callback(doc, error)
 	'open': (docName, type, callback) ->
+		if @socket == null # The connection is perminantly disconnected
+			callback null, 'connection closed'
+			return
+
 		if typeof type == 'function'
 			callback = type
 			type = 'text'
@@ -289,6 +332,8 @@ class Connection
 		callback ||= ->
 
 		type = types[type] if typeof type == 'string'
+
+		throw new Error "OT code for document type missing" unless type
 
 		if docName? and @docs[docName]?
 			doc = @docs[docName]
@@ -299,11 +344,11 @@ class Connection
 
 			return
 
-		@send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (response) =>
-			if response.error
-				callback null, response.error
+		@send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (response, error) =>
+			if error
+				callback null, error
 			else
-				response['snapshot'] = type.create() unless response['snapshot'] != undefined
+				response['snapshot'] = type['create']() unless response['snapshot'] != undefined
 				response['type'] = type
 				callback @makeDoc(response)
 
@@ -330,6 +375,7 @@ getConnection = (origin) ->
 	unless connections[origin]
 		c = new Connection origin
 		c.on 'disconnected', -> delete connections[origin]
+		c.on 'connect failed', -> delete connections[origin]
 		connections[origin] = c
 	
 	connections[origin]
@@ -357,9 +403,8 @@ open = (docName, type, origin, callback) ->
 					, 0
 
 			callback doc
-
-exports.f = ->
-	console.log connections
+	
+	c.on 'connect failed'
 
 if WEB?
 	exports['Connection'] = Connection
@@ -369,3 +414,5 @@ if WEB?
 else
 	exports.Connection = Connection
 	exports.open = open
+
+#	exports.f = -> console.log connections

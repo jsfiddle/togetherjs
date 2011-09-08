@@ -60,6 +60,9 @@ var WEB = true;
       }, this));
       return this;
     };
+    MicroEvent.prototype.getListeners = function(event) {
+      return this._events[event];
+    };
     MicroEvent.prototype.emit = function() {
       var args, event, fn, _i, _len, _ref, _ref2;
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
@@ -467,9 +470,9 @@ var WEB = true;
           'doc': this.name,
           'op': inflightOp,
           'v': this.version
-        }, __bind(function(response) {
+        }, __bind(function(response, error) {
           var callback, undo, _i, _j, _len, _len2;
-          if (response['v'] === null) {
+          if (error) {
             if (type['invert']) {
               undo = this.type['invert'](inflightOp);
               if (pendingOp) {
@@ -481,7 +484,7 @@ var WEB = true;
             }
             for (_i = 0, _len = inflightCallbacks.length; _i < _len; _i++) {
               callback = inflightCallbacks[_i];
-              callback(null, response['error']);
+              callback(null, error);
             }
           } else {
             if (response['v'] !== this.version) {
@@ -547,6 +550,9 @@ var WEB = true;
       this.emit('change', op);
       return setTimeout(tryFlushPendingOp, 0);
     };
+    this['flush'] = function() {
+      return tryFlushPendingOp();
+    };
     this['close'] = this.close = function(callback) {
       return connection.send({
         'doc': this.name,
@@ -577,19 +583,51 @@ var WEB = true;
     function Connection(origin) {
       this.onMessage = __bind(this.onMessage, this);
       this.connected = __bind(this.connected, this);
-      this.disconnected = __bind(this.disconnected, this);      this.socket = io['connect'](origin, {
+      this.disconnected = __bind(this.disconnected, this);      this.docs = {};
+      this.numDocs = 0;
+      this.handlers = {};
+      this.socket = io['connect'](origin, {
         'force new connection': true
       });
       this.socket['on']('connect', this.connected);
       this.socket['on']('disconnect', this.disconnected);
       this.socket['on']('message', this.onMessage);
+      this.socket['on']('connect_failed', __bind(function(error) {
+        var callback, callbacks, docName, h, t, _ref, _results;
+        if (error === 'unauthorized') {
+          error = 'forbidden';
+        }
+        this.socket = null;
+        this.emit('connect failed', error);
+        _ref = this.handlers;
+        _results = [];
+        for (docName in _ref) {
+          h = _ref[docName];
+          _results.push((function() {
+            var _results2;
+            _results2 = [];
+            for (t in h) {
+              callbacks = h[t];
+              _results2.push((function() {
+                var _i, _len, _results3;
+                _results3 = [];
+                for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+                  callback = callbacks[_i];
+                  _results3.push(callback(null, error));
+                }
+                return _results3;
+              })());
+            }
+            return _results2;
+          })());
+        }
+        return _results;
+      }, this));
       if (this.socket['socket']['connected']) {
         setTimeout((__bind(function() {
           return this.connected();
         }, this)), 0);
       }
-      this.docs = {};
-      this.numDocs = 0;
     }
     Connection.prototype.disconnected = function() {
       return this.emit('disconnect');
@@ -598,7 +636,10 @@ var WEB = true;
       return this.emit('connect');
     };
     Connection.prototype.send = function(msg, callback) {
-      var docName, register, type;
+      var callbacks, docHandlers, docName, type, _base;
+      if (this.socket === null) {
+        throw new Error('Cannot send messages to a closed connection');
+      }
       docName = msg['doc'];
       if (docName === this.lastSentDoc) {
         delete msg['doc'];
@@ -607,22 +648,14 @@ var WEB = true;
       }
       this.socket['json']['send'](msg);
       if (callback) {
-        register = __bind(function(type) {
-          var cb;
-          cb = __bind(function(response) {
-            if (response['doc'] === docName) {
-              this.removeListener(type, cb);
-              return callback(response);
-            }
-          }, this);
-          return this.on(type, cb);
-        }, this);
         type = msg['open'] === true ? 'open' : msg['open'] === false ? 'close' : msg['create'] ? 'create' : msg['snapshot'] === null ? 'snapshot' : msg['op'] ? 'op response' : void 0;
-        return register(type);
+        docHandlers = ((_base = this.handlers)[docName] || (_base[docName] = {}));
+        callbacks = (docHandlers[type] || (docHandlers[type] = []));
+        return callbacks.push(callback);
       }
     };
     Connection.prototype.onMessage = function(msg) {
-      var doc, docName, type;
+      var c, callbacks, doc, docName, type, _i, _len, _ref;
       docName = msg['doc'];
       if (docName !== void 0) {
         this.lastReceivedDoc = docName;
@@ -631,7 +664,14 @@ var WEB = true;
       }
       this.emit('message', msg);
       type = msg['open'] === true || (msg['open'] === false && msg['error']) ? 'open' : msg['open'] === false ? 'close' : msg['snapshot'] !== void 0 ? 'snapshot' : msg['create'] ? 'create' : msg['op'] ? 'op' : msg['v'] !== void 0 ? 'op response' : void 0;
-      this.emit(type, msg);
+      callbacks = (_ref = this.handlers[docName]) != null ? _ref[type] : void 0;
+      if (callbacks) {
+        delete this.handlers[docName][type];
+        for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+          c = callbacks[_i];
+          c(msg, msg['error']);
+        }
+      }
       if (type === 'op') {
         doc = this.docs[docName];
         if (doc) {
@@ -660,6 +700,10 @@ var WEB = true;
       return doc;
     };
     Connection.prototype['openExisting'] = function(docName, callback) {
+      if (this.socket === null) {
+        callback(null, 'connection closed');
+        return;
+      }
       if (this.docs[docName] != null) {
         return this.docs[docName];
       }
@@ -667,9 +711,9 @@ var WEB = true;
         'doc': docName,
         'open': true,
         'snapshot': null
-      }, __bind(function(response) {
-        if (response.error) {
-          return callback(null, new Error(response.error));
+      }, __bind(function(response, error) {
+        if (error) {
+          return callback(null, error);
         } else {
           return callback(this.makeDoc(response));
         }
@@ -677,6 +721,10 @@ var WEB = true;
     };
     Connection.prototype['open'] = function(docName, type, callback) {
       var doc;
+      if (this.socket === null) {
+        callback(null, 'connection closed');
+        return;
+      }
       if (typeof type === 'function') {
         callback = type;
         type = 'text';
@@ -684,6 +732,9 @@ var WEB = true;
       callback || (callback = function() {});
       if (typeof type === 'string') {
         type = types[type];
+      }
+      if (!type) {
+        throw new Error("OT code for document type missing");
       }
       if ((docName != null) && (this.docs[docName] != null)) {
         doc = this.docs[docName];
@@ -700,12 +751,12 @@ var WEB = true;
         'create': true,
         'snapshot': null,
         'type': type.name
-      }, __bind(function(response) {
-        if (response.error) {
-          return callback(null, response.error);
+      }, __bind(function(response, error) {
+        if (error) {
+          return callback(null, error);
         } else {
           if (response['snapshot'] === void 0) {
-            response['snapshot'] = type.create();
+            response['snapshot'] = type['create']();
           }
           response['type'] = type;
           return callback(this.makeDoc(response));
@@ -739,6 +790,9 @@ var WEB = true;
       c.on('disconnected', function() {
         return delete connections[origin];
       });
+      c.on('connect failed', function() {
+        return delete connections[origin];
+      });
       connections[origin] = c;
     }
     return connections[origin];
@@ -750,7 +804,7 @@ var WEB = true;
       origin = null;
     }
     c = getConnection(origin);
-    return c.open(docName, type, function(doc, error) {
+    c.open(docName, type, function(doc, error) {
       if (doc === null) {
         if (c.numDocs === 0) {
           c['disconnect']();
@@ -767,9 +821,7 @@ var WEB = true;
         return callback(doc);
       }
     });
-  };
-  exports.f = function() {
-    return console.log(connections);
+    return c.on('connect failed');
   };
   if (typeof WEB !== "undefined" && WEB !== null) {
     exports['Connection'] = Connection;

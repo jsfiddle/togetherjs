@@ -42,6 +42,7 @@ genTests = (client) ->
 				test.ok doc
 				test.ifError error
 
+				test.strictEqual doc.snapshot, ''
 				test.strictEqual doc.name, @name
 				test.strictEqual doc.type.name, types.text.name
 				test.strictEqual doc.version, 0
@@ -125,16 +126,18 @@ genTests = (client) ->
 				# ... but the version tracks the server version, so thats still 0.
 				test.strictEqual doc.version, 0
 		
-		'infer the version when submitting an op': (test) ->
+		'submitting an op while another op is inflight works': (test) ->
 			@c.open @name, 'text', (doc, error) =>
 				test.ifError error
-				test.strictEqual doc.name, @name
 
-				doc.submitOp [{i:'hi', p:0}], =>
-					test.deepEqual doc.snapshot, 'hi'
+				doc.submitOp [{i:'hi', p:0}], ->
 					test.strictEqual doc.version, 1
+				doc.flush()
+
+				doc.submitOp [{i:'hi', p:2}], ->
+					test.strictEqual doc.version, 2
 					test.done()
-		
+
 		'compose multiple ops together when they are submitted together': (test) ->
 			@c.open @name, 'text', (doc, error) =>
 				test.ifError error
@@ -151,19 +154,17 @@ genTests = (client) ->
 		'compose multiple ops together when they are submitted while an op is in flight': (test) ->
 			@c.open @name, 'text', (doc, error) =>
 				test.ifError error
-				test.strictEqual doc.name, @name
 
 				doc.submitOp [{i:'hi', p:0}], ->
 					test.strictEqual doc.version, 1
+				doc.flush()
 
-				setTimeout(->
-					doc.submitOp [{i:'hi', p:2}], ->
-						test.strictEqual doc.version, 2
-					doc.submitOp [{i:'hi', p:4}], ->
-						test.strictEqual doc.version, 2
-						test.expect 5
-						test.done()
-				, 1)
+				doc.submitOp [{i:'hi', p:2}], ->
+					test.strictEqual doc.version, 2
+				doc.submitOp [{i:'hi', p:4}], ->
+					test.strictEqual doc.version, 2
+					test.expect 4
+					test.done()
 		
 		'Receive submitted ops': (test) ->
 			@c.open @name, 'text', (doc, error) =>
@@ -271,35 +272,75 @@ genTests = (client) ->
 					test.strictEqual doc.created, false
 					test.done()
 
-		"can't open a document if auth rejects you": (test) ->
+		'new Connection emits errors if auth rejects you': (test) ->
+			@auth = (client, action) -> action.reject()
+
+			c = new client.Connection "http://localhost:#{@port}/sjs"
+			c.on 'connect', ->
+				test.fail 'connection shouldnt have connected'
+			c.on 'connect failed', (error) ->
+				test.strictEqual error, 'forbidden'
+				test.done()
+
+		'(new Connection).open() fails if auth rejects the connection': (test) ->
+			@auth = (client, action) -> action.reject()
+
+			passPart = makePassPart test, 2
+			c = new client.Connection "http://localhost:#{@port}/sjs"
+
+			# Immediately opening a document should fail when the connection fails
+			c.open @name, 'text', (doc, error) =>
+				test.fail doc if doc
+				test.strictEqual error, 'forbidden'
+				passPart()
+
+			c.on 'connect failed', =>
+				# The connection is now in an invalid state. Lets try and open a document...
+				c.open @name, 'text', (doc, error) =>
+					test.fail doc if doc
+					test.strictEqual error, 'connection closed'
+					passPart()
+
+		'(new Connection).open() fails if auth disallows reads': (test) ->
 			@auth = (client, action) ->
-				if action.type == 'read'
-					action.reject()
-				else
-					action.accept()
+				if action.type == 'read' then action.reject() else action.accept()
+
+			c = new client.Connection "http://localhost:#{@port}/sjs"
+			c.open @name, 'text', (doc, error) =>
+				test.fail doc if doc
+				test.strictEqual error, 'forbidden'
+				test.done()
+
+		'client.open fails if auth rejects the connection': (test) ->
+			@auth = (client, action) -> action.reject()
 
 			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
-				test.strictEqual doc, null
-				test.strictEqual error, 'Forbidden'
+				test.fail doc if doc
+				test.strictEqual error, 'forbidden'
+				test.done()
 
-				@model.getVersion @name, (v) ->
-					# The document shouldn't exist.
-					test.strictEqual v, null
-					
-					doc.close()
-					test.done()
+		'client.open fails if auth disallows reads': (test) ->
+			@auth = (client, action) ->
+				if action.type == 'read' then action.reject() else action.accept()
+
+			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
+				test.fail doc if doc
+				test.strictEqual error, 'forbidden'
+				test.done()
 
 		"Can't submit an op if auth rejects you": (test) ->
 			@auth = (client, action) ->
-				if action.name == 'submit op' and action.op[0].i == 'a'
+				if action.name == 'submit op' and action.op[0].i == 'hi'
 					action.reject()
 				else
 					action.accept()
 
 			@c.open @name, 'text', (doc, error) =>
 				doc.insert 'hi', 0, (op, error) =>
-					test.strictEqual error, 'Forbidden'
+					test.strictEqual error, 'forbidden'
 					test.strictEqual doc.getText(), ''
+					# Also need to test that ops sent afterwards get sent correctly.
+					# because that behaviour IS CURRENTLY BROKEN
 
 					@model.getSnapshot @name, (data) ->
 						test.strictEqual data.snapshot, ''
@@ -340,6 +381,11 @@ genTests = (client) ->
 					doc.close()
 					test.done()
 
+		'.open() throws an exception if the type is missing': (test) ->
+			test.throws ->
+				@c.open @name, 'does not exist', ->
+			test.done()
+
 	# This isn't working yet. I might have to rethink it.
 	#	'opening a document with a null name will open a new document with a random document name': (test) ->
 	#		client.open null, 'text', {host:'localhost', port:@port}, (doc, error) ->
@@ -349,6 +395,7 @@ genTests = (client) ->
 	#			test.strictEqual doc.type.name, 'text'
 	#			test.strictEqual doc.created, true
 	#			test.done()
+
 
 exports.native = genTests nativeclient
 exports.webclient = genTests webclient
