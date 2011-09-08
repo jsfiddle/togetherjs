@@ -47,7 +47,7 @@ compile = (infile, outfile) ->
 		smaller = Math.round((1 - (code.length / file.length)) * 100)
 
 		output = outfile
-		fs.writeFileSync output, code
+		fs.writeFileSync output, "(function(){\n#{code}})();"
 
 		console.log "Closure compiled: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
 
