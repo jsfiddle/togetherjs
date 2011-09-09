@@ -182,8 +182,7 @@ test = (opts) -> testCase
 
 exports.memory = test {type: 'memory', 'testing': true}
 
-# The redis tests work, but require that you have redis installed. This is a problem on the 
-# continuous integration machine. For now, I'm disabling the redis tests until I can rig up
-# something better.
-#exports.redis = test {type: 'redis', 'testing': true}
+try
+	require 'redis'
+	exports.redis = test {type: 'redis', 'testing': true}
 
