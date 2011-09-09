@@ -29,7 +29,7 @@ server = connect(
 			wiki docName, server.model, res, next
 
 		app.get '/pad/?', (req, res, next) ->
-			docName = server.model.randomDocName()
+			docName = server.model.generateId 5
 			res.writeHead 303, {location: '/pad/pad.html#' + docName}
 			res.write ''
 			res.end()
