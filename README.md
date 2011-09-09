@@ -1,17 +1,15 @@
-**WARNING: This is still pretty beta.**
-
 ShareJS
 =======
 
 This is a little server (& client library) to allow concurrent editing of any kind of content. The server runs on NodeJS and the client works in NodeJS or a web browser.
 
-ShareJS supports operational transform on plain-text and arbitrary JSON data.
-Rich text support is planned.
+ShareJS currently supports operational transform on plain-text and arbitrary JSON data.
 
-Check out [some cool demos](http://sharejs.org:8000/).
-API Documentation is on [`the wiki`](https://github.com/josephg/ShareJS/wiki).
+[Cool demos](http://sharejs.org:8000/).
+[API Documentation](https://github.com/josephg/ShareJS/wiki).
+[Google groups for discussions and announcements](https://groups.google.com/forum/?fromgroups#!forum/sharejs)
 
-> Note: CI appears broken because socket.io isn't cleaning itself up after running. Socket.io dudes are working on it :)
+> Note: CI sometimes breaks for random reasons even though the tests work locally. Don't stress!
 [![Build Status](https://secure.travis-ci.org/josephg/ShareJS.png)](http://travis-ci.org/josephg/ShareJS)
 
 
