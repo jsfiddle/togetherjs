@@ -15,6 +15,14 @@ ShareJS currently supports operational transform on plain-text and arbitrary JSO
 [![Build Status](https://secure.travis-ci.org/josephg/ShareJS.png)](http://travis-ci.org/josephg/ShareJS)
 
 
+Browser support
+---------------
+
+ShareJS **should** work with all of them ![logos of all of all the browsers](http://twitter.github.com/bootstrap/assets/img/browsers.png)
+
+That said, I only test regularly with FF, Safari and Chrome, and occasionally with IE8+. **File bug reports if you have issues**
+
+
 Installing and running
 ----------------------
 
