@@ -352,6 +352,25 @@ genTests = (client) ->
 						test.strictEqual snapshot, ''
 						test.done()
 
+		'If an operation is rejected, the undo is applied as if auth did it': (test) ->
+			# I'm still not 100% sure about this functionality. Basically, the problem is that
+			# if the client's op is rejected by the server, the editor window should update
+			# to reflect the undo.
+			#
+			# The decision is to treat the undo as if the server applied it, since in some
+			# sense it did when it rejected the op being applied in the first place.
+			
+			@auth = (client, action) ->
+				if action.name == 'submit op' then action.reject() else action.accept()
+
+			@c.open @name, 'text', (doc, error) =>
+				doc.on 'delete', (text, pos) ->
+					test.strictEqual text, 'hi'
+					test.strictEqual pos, 0
+					test.done()
+
+				doc.insert 'hi', 0
+
 		'If auth rejects your op, other transforms work correctly': (test) ->
 			# This should probably have a randomized tester as well.
 			@auth = (client, action) ->

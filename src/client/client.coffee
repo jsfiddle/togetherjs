@@ -58,6 +58,16 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		server_ = @type['transform'] server, client, 'right'
 		return [client_, server_]
 	
+	otApply = (docOp, isRemote) =>
+		oldSnapshot = @snapshot
+		setSnapshot @type['apply'](@snapshot, docOp)
+
+		# Its important that these event handlers are called with oldSnapshot.
+		# The reason is that the OT type APIs might need to access the snapshots to
+		# determine information about the received op.
+		@emit 'remoteop', docOp, oldSnapshot if isRemote
+		@emit 'change', docOp, oldSnapshot
+	
 	tryFlushPendingOp = =>
 		if inflightOp == null && pendingOp != null
 			# Rotate null -> pending -> inflight, 
@@ -82,11 +92,17 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 						undo = @type['invert'] oldInflightOp
 
+						# Now we have to transform the undo operation by any server ops & pending ops
 						if pendingOp
 							[pendingOp, undo] = xf pendingOp, undo
 
-						# Now we have to transform the undo operation by any server ops & pending ops
-						setSnapshot @type['apply'](@snapshot, undo)
+						# ... and apply it locally, reverting the changes.
+						# 
+						# This call will also call @emit 'remoteop'. I'm still not 100% sure about this
+						# functionality, because its really a local op. Basically, the problem is that
+						# if the client's op is rejected by the server, the editor window should update
+						# to reflect the undo.
+						otApply undo, true
 					else
 						throw new Error "Op apply failed (#{response['error']}) and the OT type does not define an invert function."
 
@@ -124,12 +140,9 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		if pendingOp != null
 			[pendingOp, docOp] = xf pendingOp, docOp
 			
-		oldSnapshot = @snapshot
-		setSnapshot(@type['apply'] oldSnapshot, docOp)
 		@version++
-
-		@emit 'remoteop', docOp, oldSnapshot
-		@emit 'change', docOp, oldSnapshot
+		# Finally, apply the op to @snapshot and trigger any event listeners
+		otApply docOp, true
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.

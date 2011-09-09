@@ -440,7 +440,7 @@ var WEB = true;
   }
   /** @constructor */;
   Doc = function(connection, name, version, type, snapshot) {
-    var inflightCallbacks, inflightOp, k, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, xf, _ref;
+    var inflightCallbacks, inflightOp, k, otApply, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, xf, _ref;
     this.name = name;
     this.version = version;
     this.type = type;
@@ -462,6 +462,15 @@ var WEB = true;
       server_ = this.type['transform'](server, client, 'right');
       return [client_, server_];
     }, this);
+    otApply = __bind(function(docOp, isRemote) {
+      var oldSnapshot;
+      oldSnapshot = this.snapshot;
+      setSnapshot(this.type['apply'](this.snapshot, docOp));
+      if (isRemote) {
+        this.emit('remoteop', docOp, oldSnapshot);
+      }
+      return this.emit('change', docOp, oldSnapshot);
+    }, this);
     tryFlushPendingOp = __bind(function() {
       if (inflightOp === null && pendingOp !== null) {
         inflightOp = pendingOp;
@@ -482,7 +491,7 @@ var WEB = true;
               if (pendingOp) {
                 _ref = xf(pendingOp, undo), pendingOp = _ref[0], undo = _ref[1];
               }
-              setSnapshot(this.type['apply'](this.snapshot, undo));
+              otApply(undo, true);
             } else {
               throw new Error("Op apply failed (" + response['error'] + ") and the OT type does not define an invert function.");
             }
@@ -506,7 +515,7 @@ var WEB = true;
       }
     }, this);
     this._onOpReceived = function(msg) {
-      var docOp, oldSnapshot, op, _ref, _ref2;
+      var docOp, op, _ref, _ref2;
       if (msg['v'] < this.version) {
         return;
       }
@@ -525,11 +534,8 @@ var WEB = true;
       if (pendingOp !== null) {
         _ref2 = xf(pendingOp, docOp), pendingOp = _ref2[0], docOp = _ref2[1];
       }
-      oldSnapshot = this.snapshot;
-      setSnapshot(this.type['apply'](oldSnapshot, docOp));
       this.version++;
-      this.emit('remoteop', docOp, oldSnapshot);
-      return this.emit('change', docOp, oldSnapshot);
+      return otApply(docOp, true);
     };
     this['submitOp'] = this.submitOp = function(op, callback) {
       if (this.type['normalize'] != null) {
