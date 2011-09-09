@@ -1,5 +1,5 @@
 {exec} = require 'child_process'
-closure = require './thirdparty/closure'
+closure = require './closure'
 fs = require 'fs'
 path = require 'path'
 
