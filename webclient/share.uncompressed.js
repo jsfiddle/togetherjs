@@ -60,9 +60,6 @@ var WEB = true;
       }, this));
       return this;
     };
-    MicroEvent.prototype.getListeners = function(event) {
-      return this._events[event];
-    };
     MicroEvent.prototype.emit = function() {
       var args, event, fn, _i, _len, _ref, _ref2;
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
