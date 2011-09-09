@@ -36,15 +36,19 @@ exports.transformLists = (type, serverOps, clientOps) ->
 # Compose a list of ops together
 exports.composeList = (type, ops) -> ops.reduce type.compose
 
-# Returns a function that calls test.done() after it has been called n times
-exports.makePassPart = (test, n) ->
+# Wait for the function to be called a given number of times, then call the callback.
+exports.expectCalls = expectCalls = (n, callback) ->
 	remaining = n
 	->
 		remaining--
 		if remaining == 0
-			test.done()
+			callback()
 		else if remaining < 0
-			throw new Error "passPart() called more than #{n} times"
+			throw new Error "expectCalls called more than #{n} times"
+
+# Returns a function that calls test.done() after it has been called n times
+exports.makePassPart = (test, n) ->
+	expectCalls n, -> test.done()
 
 # Callback will be called after all the ops have been applied, with the
 # resultant snapshot. Callback format is callback(error, snapshot)

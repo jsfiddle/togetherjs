@@ -52,9 +52,12 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 	# Some recent ops, incase submitOp is called with an old op version number.
 	serverOps = {}
 
-	# Listeners for the document changing
-	listeners = []
-
+	# Transform a server op by a client op, and vice versa.
+	xf = @type['transformX'] or (client, server) =>
+		client_ = @type['transform'] client, server, 'left'
+		server_ = @type['transform'] server, client, 'right'
+		return [client_, server_]
+	
 	tryFlushPendingOp = =>
 		if inflightOp == null && pendingOp != null
 			# Rotate null -> pending -> inflight, 
@@ -65,6 +68,9 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 			pendingCallbacks = []
 
 			connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response, error) =>
+				oldInflightOp = inflightOp
+				inflightOp = null
+
 				if error
 					# This will happen if the server rejects edits from the client.
 					# We'll send the error message to the user and roll back the change.
@@ -74,11 +80,10 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 					if type['invert']
 
-						undo = @type['invert'] inflightOp
-						undo = @type['transform'] undo, pendingOp, 'left' if pendingOp
+						undo = @type['invert'] oldInflightOp
 
-						#console.warn "if #{JSON.stringify(inflightOp)} undo #{JSON.stringify(undo)} pending #{JSON.stringify(pendingOp)}"
-						#console.warn "snapshot", JSON.stringify(@snapshot)
+						if pendingOp
+							[pendingOp, undo] = xf pendingOp, undo
 
 						# Now we have to transform the undo operation by any server ops & pending ops
 						setSnapshot @type['apply'](@snapshot, undo)
@@ -86,15 +91,13 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 						throw new Error "Op apply failed (#{response['error']}) and the OT type does not define an invert function."
 
 					callback(null, error) for callback in inflightCallbacks
-					#throw new Error(response['error'])
 				else
 					throw new Error('Invalid version from server') unless response['v'] == @version
 
-					serverOps[@version] = inflightOp
+					serverOps[@version] = oldInflightOp
 					@version++
-					callback(inflightOp, null) for callback in inflightCallbacks
+					callback(oldInflightOp, null) for callback in inflightCallbacks
 
-				inflightOp = null
 				tryFlushPendingOp()
 
 	# Internal - do not call directly.
@@ -114,12 +117,6 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 		op = msg['op']
 		serverOps[@version] = op
-
-		# Transform a server op by a client op, and vice versa.
-		xf = @type['transformX'] or (client, server) =>
-			client_ = @type['transform'] client, server, 'left'
-			server_ = @type['transform'] server, client, 'right'
-			return [client_, server_]
 
 		docOp = op
 		if inflightOp != null

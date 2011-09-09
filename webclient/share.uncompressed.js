@@ -440,7 +440,7 @@ var WEB = true;
   }
   /** @constructor */;
   Doc = function(connection, name, version, type, snapshot) {
-    var inflightCallbacks, inflightOp, k, listeners, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, _ref;
+    var inflightCallbacks, inflightOp, k, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, xf, _ref;
     this.name = name;
     this.version = version;
     this.type = type;
@@ -456,7 +456,12 @@ var WEB = true;
     pendingOp = null;
     pendingCallbacks = [];
     serverOps = {};
-    listeners = [];
+    xf = this.type['transformX'] || __bind(function(client, server) {
+      var client_, server_;
+      client_ = this.type['transform'](client, server, 'left');
+      server_ = this.type['transform'](server, client, 'right');
+      return [client_, server_];
+    }, this);
     tryFlushPendingOp = __bind(function() {
       if (inflightOp === null && pendingOp !== null) {
         inflightOp = pendingOp;
@@ -468,12 +473,14 @@ var WEB = true;
           'op': inflightOp,
           'v': this.version
         }, __bind(function(response, error) {
-          var callback, undo, _i, _j, _len, _len2;
+          var callback, oldInflightOp, undo, _i, _j, _len, _len2, _ref;
+          oldInflightOp = inflightOp;
+          inflightOp = null;
           if (error) {
             if (type['invert']) {
-              undo = this.type['invert'](inflightOp);
+              undo = this.type['invert'](oldInflightOp);
               if (pendingOp) {
-                undo = this.type['transform'](undo, pendingOp, 'left');
+                _ref = xf(pendingOp, undo), pendingOp = _ref[0], undo = _ref[1];
               }
               setSnapshot(this.type['apply'](this.snapshot, undo));
             } else {
@@ -487,20 +494,19 @@ var WEB = true;
             if (response['v'] !== this.version) {
               throw new Error('Invalid version from server');
             }
-            serverOps[this.version] = inflightOp;
+            serverOps[this.version] = oldInflightOp;
             this.version++;
             for (_j = 0, _len2 = inflightCallbacks.length; _j < _len2; _j++) {
               callback = inflightCallbacks[_j];
-              callback(inflightOp, null);
+              callback(oldInflightOp, null);
             }
           }
-          inflightOp = null;
           return tryFlushPendingOp();
         }, this));
       }
     }, this);
     this._onOpReceived = function(msg) {
-      var docOp, oldSnapshot, op, xf, _ref, _ref2;
+      var docOp, oldSnapshot, op, _ref, _ref2;
       if (msg['v'] < this.version) {
         return;
       }
@@ -512,12 +518,6 @@ var WEB = true;
       }
       op = msg['op'];
       serverOps[this.version] = op;
-      xf = this.type['transformX'] || __bind(function(client, server) {
-        var client_, server_;
-        client_ = this.type['transform'](client, server, 'left');
-        server_ = this.type['transform'](server, client, 'right');
-        return [client_, server_];
-      }, this);
       docOp = op;
       if (inflightOp !== null) {
         _ref = xf(inflightOp, docOp), inflightOp = _ref[0], docOp = _ref[1];

@@ -8,7 +8,7 @@ types = require '../src/types'
 nativeclient = require '../src/client'
 webclient = require './helpers/webclient'
 
-makePassPart = require('./helpers').makePassPart
+{makePassPart, expectCalls} = require('./helpers')
 
 genTests = (client) ->
 	testCase
@@ -125,6 +125,15 @@ genTests = (client) ->
 				test.strictEqual doc.snapshot, 'hi'
 				# ... but the version tracks the server version, so thats still 0.
 				test.strictEqual doc.version, 0
+
+		'submit an op to a document using the API works': (test) ->
+			@c.open @name, 'text', (doc, error) =>
+				doc.insert 'hi', 0, =>
+					test.strictEqual doc.snapshot, 'hi'
+					test.strictEqual doc.getText(), 'hi'
+					@model.getSnapshot @name, ({snapshot}) ->
+						test.strictEqual snapshot, 'hi'
+						test.done()
 		
 		'submitting an op while another op is inflight works': (test) ->
 			@c.open @name, 'text', (doc, error) =>
@@ -330,10 +339,7 @@ genTests = (client) ->
 
 		"Can't submit an op if auth rejects you": (test) ->
 			@auth = (client, action) ->
-				if action.name == 'submit op' and action.op[0].i == 'hi'
-					action.reject()
-				else
-					action.accept()
+				if action.name == 'submit op' then action.reject() else action.accept()
 
 			@c.open @name, 'text', (doc, error) =>
 				doc.insert 'hi', 0, (op, error) =>
@@ -342,9 +348,43 @@ genTests = (client) ->
 					# Also need to test that ops sent afterwards get sent correctly.
 					# because that behaviour IS CURRENTLY BROKEN
 
-					@model.getSnapshot @name, (data) ->
-						test.strictEqual data.snapshot, ''
+					@model.getSnapshot @name, ({snapshot}) ->
+						test.strictEqual snapshot, ''
 						test.done()
+
+		'If auth rejects your op, other transforms work correctly': (test) ->
+			# This should probably have a randomized tester as well.
+			@auth = (client, action) ->
+				if action.name == 'submit op' and action.op[0].d == 'cC'
+					action.reject()
+				else
+					action.accept()
+
+			@c.open @name, 'text', (doc, error) =>
+				doc.insert 'abcCBA', 0, =>
+					e = expectCalls 3, =>
+						# The b's are successfully deleted, the ds are added by the server and the
+						# op to delete the cs is denied.
+						@model.getSnapshot @name, ({snapshot}) ->
+							test.deepEqual snapshot, 'acdDCA'
+							test.done()
+
+					doc.del 2, 2, (op, error) => # Delete the 'cC', so the document becomes 'abBA'
+						# This op is denied by the auth code
+						test.strictEqual error, 'forbidden'
+						e()
+
+					test.strictEqual doc.getText(), 'abBA'
+					doc.flush()
+
+					# Simultaneously, we'll apply another op locally:
+					doc.del 2, 1, -> # Delete the 'bB'
+						e()
+					test.strictEqual doc.getText(), 'aA'
+
+					# ... and yet another op on the server. (Remember, the server hasn't seen either op yet.)
+					@model.applyOp @name, {op:[{i:'dD', p:3}], v:1, meta:{}}, =>
+						@model.getSnapshot @name, e
 
 		'Text API is advertised': (test) ->
 			@c.open @name, 'text', (doc, error) ->
@@ -395,7 +435,6 @@ genTests = (client) ->
 	#			test.strictEqual doc.type.name, 'text'
 	#			test.strictEqual doc.created, true
 	#			test.done()
-
 
 exports.native = genTests nativeclient
 exports.webclient = genTests webclient
