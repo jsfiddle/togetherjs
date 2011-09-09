@@ -27,10 +27,11 @@ Run the examples with:
 If you want redis support, you'll need to install redis:
 
     # sudo brew install redis
+    # npm install -g redis
 
 ### From source
 
-Install some dependancies
+Install redis (optional)
     
 * Mac:
 
@@ -44,6 +45,7 @@ Then:
 
     # git clone git://github.com/josephg/ShareJS.git
     # cd ShareJS
+    # npm install redis   # If you want redis support
     # npm link
 
 Run the tests:
