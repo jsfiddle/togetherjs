@@ -1,34 +1,34 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Wave textbox test page</title>
+		<link href="ace/style.css" rel="stylesheet" type="text/css">
+		<title>Textarea demo - ShareJS</title>
 		<meta charset="utf-8">
 		<style>
-			body {
-				width: 800px;
-				margin: auto;
-			}
-			textarea {
-				height: 400px;
-				width: 800px;
+			#editor {
+				font-size: 1em;
 			}
 		</style>
 	</head>
 	<body>
-		<h2>Testing, testing, 1, 2, 3...</h3>
-		<h4>Example textarea:</h4>
-		<textarea id="textarea"></textarea>
+		<div id="header">
+			<div id="htext">
+				Editing <b>hello</b> with a textarea</input>
+			</div>
+		</div>
+		<textarea id="editor" disabled>Loading...</textarea>
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/share/share.uncompressed.js"></script>
 		<script src="/share/textarea.js"></script>
 		<script>
-var elem = document.getElementById('textarea');
+var elem = document.getElementById('editor');
 
 sharejs.open('hello', 'text', function(doc, error) {
 	if (error) {
 		console.log(error);
 	} else {
+		elem.disabled = false;
 		doc.attach_textarea(elem);
 	}
 });
