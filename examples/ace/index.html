@@ -43,13 +43,16 @@
 		});
 	};
 
-    window.onload = function() {
-        editor = ace.edit("editor");
+	window.onload = function() {
+		editor = ace.edit("editor");
 		editor.session.setUseWrapMode(true);
 
 		// For fun, we'll go into coffeescript syntax mode.
-		//var CoffeeScriptMode = require("ace/mode/coffee").Mode;
-		//editor.getSession().setMode(new CoffeeScriptMode());
+		var CoffeeScriptMode = require("ace/mode/coffee").Mode;
+		var session = editor.getSession();
+		session.setMode(new CoffeeScriptMode());
+		session.setTabSize(2);
+		session.setUseSoftTabs(true);
 
 		setDoc('ace');
 
@@ -67,7 +70,7 @@
 		} else {
 			namefield.attachEvent('oninput', fn);
 		}
-    };
+	};
 		</script>
 	</body>
 </html>	
