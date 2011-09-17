@@ -1,9 +1,7 @@
 (function() {
   
-/** @preserve ShareJS v0.3.0
+/** @preserve ShareJS v0.4.0
 http://sharejs.org
-
-Copyright 2011 ShareJS Authors
 
 BSD licensed:
 https://github.com/josephg/ShareJS/raw/master/LICENSE
@@ -12,7 +10,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, connections, exports, getConnection, invertComponent, io, nextTick, open, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   exports = {
-    'version': '0.3.0'
+    'version': '0.4.0'
   };
   /**
    @const
@@ -520,7 +518,7 @@ var WEB = true;
         return;
       }
       if (msg['doc'] !== this.name) {
-        throw new Error("Expected docName " + this.name + " but got " + msg['doc']);
+        throw new Error("Expected docName '" + this.name + "' but got " + msg['doc']);
       }
       if (msg['v'] !== this.version) {
         throw new Error("Expected version " + this.version + " but got " + msg['v']);
