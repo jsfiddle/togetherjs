@@ -8,7 +8,7 @@ util = require 'util'
 server = require '../src/server'
 types = require '../src/types'
 
-helpers = require './helpers'
+{makePassPart, newDocName} = require './helpers'
 
 # Async fetch. Aggregates whole response and sends to callback.
 # Callback should be function(response, data) {...}
@@ -17,7 +17,7 @@ fetch = (method, port, path, postData, extraHeaders, callback) ->
 		callback = extraHeaders
 		extraHeaders = null
 
-	headers = extraHeaders || {}
+	headers = extraHeaders || {'x-testing': 'booyah'}
 
 	request = http.request {method, path, host: 'localhost', port, headers}, (response) ->
 		data = ''
@@ -39,11 +39,14 @@ module.exports = testCase
 	setUp: (callback) ->
 		@name = 'testingdoc'
 
+		@auth = (client, action) -> action.accept()
+
 		# Create a new server which just exposes the REST interface with default options
 		options = {
 			socketio: null
 			rest: {delete: true}
 			db: {type: 'memory'}
+			auth: (client, action) => @auth client, action
 		}
 
 		# For some reason, exceptions thrown in setUp() are ignored.
@@ -128,27 +131,118 @@ module.exports = testCase
 	
 	'DELETE deletes a document': (test) ->
 		@model.create @name, 'simple', =>
-			fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) ->
+			fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) =>
 				test.strictEqual res.statusCode, 200
-				test.done()
+
+				@model.getSnapshot @name, (doc) ->
+					test.strictEqual doc, null
+					test.done()
 	
 	'DELETE returns a 404 message if you delete something that doesn\'t exist': (test) ->
 		fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) ->
 			test.strictEqual res.statusCode, 404
 			test.done()
 
-	'DELETE doesnt work if you dont select it in the options': (test) ->
-		s = server {db: {type: 'memory'}}, @model
-		s.listen =>
-			p = s.address().port
-			@model.create @name, 'simple', =>
-				request = http.request {method:'DELETE', path:"/doc/#{@name}", host: 'localhost', port:p}, (res) =>
-					test.strictEqual res.statusCode, 404
-					@model.getVersion @name, (v) ->
-						test.strictEqual v, 0
+	'Cannot do anything if the server doesnt allow client connections': (test) ->
+		@auth = (client, action) ->
+			test.strictEqual action.type, 'connect'
+			test.ok client.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
+			test.strictEqual typeof client.remotePort, 'number'
+			test.strictEqual typeof client.id, 'string'
+			test.ok client.id.length > 5
+			test.ok client.connectTime
 
-						s.on 'close', test.done
-						s.close()
+			test.strictEqual typeof client.headers, 'object'
 
-				request.end()
+			# This is added above
+			test.strictEqual client.headers['x-testing'], 'booyah'
 
+			action.reject()
+
+		passPart = makePassPart test, 7
+		checkResponse = (res, data) ->
+			test.strictEqual(res.statusCode, 403)
+			test.deepEqual data, 'Forbidden'
+			passPart()
+
+		# Non existant document
+		doc1 = newDocName()
+
+		# Get
+		fetch 'GET', @port, "/doc/#{doc1}", null, checkResponse
+
+		# Create
+		fetch 'PUT', @port, "/doc/#{doc1}", {type:'simple'}, checkResponse
+
+		# Submit an op to a nonexistant doc
+		fetch 'POST', @port, "/doc/#{doc1}?v=0", {position: 0, text: 'Hi'}, checkResponse
+
+		# Existing document
+		doc2 = newDocName()
+		@model.create doc2, 'simple', =>
+			@model.applyOp doc2, {v:0, op:{position: 0, text: 'Hi'}}, =>
+				fetch 'GET', @port, "/doc/#{doc2}", null, checkResponse
+		
+				# Create an existing document
+				fetch 'PUT', @port, "/doc/#{doc2}", {type:'simple'}, checkResponse
+
+				# Submit an op to an existing document
+				fetch 'POST', @port, "/doc/#{doc2}?v=0", {position: 0, text: 'Hi'}, checkResponse
+
+				# Delete a document
+				fetch 'DELETE', @port, "/doc/#{doc2}", null, checkResponse
+
+	'Cant GET if read is rejected': (test) ->
+		@auth = (client, action) -> if action.type == 'read' then action.reject() else action.accept()
+
+		@model.create @name, 'simple', =>
+			@model.applyOp @name, {v:0, op:{position: 0, text: 'Hi'}}, =>
+				fetch 'GET', @port, "/doc/#{@name}", null, (res, data) ->
+					test.strictEqual(res.statusCode, 403)
+					test.deepEqual data, 'Forbidden'
+					test.done()
+
+	'Cant PUT if create is rejected': (test) ->
+		@auth = (client, action) -> if action.type == 'create' then action.reject() else action.accept()
+
+		fetch 'PUT', @port, "/doc/#{@name}", {type:'simple'}, (res, data) =>
+			test.strictEqual res.statusCode, 403
+			test.deepEqual data, 'Forbidden'
+
+			@model.getSnapshot @name, (doc) ->
+				test.deepEqual doc, null
+				test.done()
+
+	'Cant POST if submit op is rejected': (test) ->
+		@auth = (client, action) -> if action.type == 'update' then action.reject() else action.accept()
+
+		@model.create @name, 'simple', =>
+			fetch 'POST', @port, "/doc/#{@name}?v=0", {position: 0, text: 'Hi'}, (res, data) =>
+				test.strictEqual res.statusCode, 403
+				test.deepEqual data, 'Forbidden'
+
+				# & Check the document is unchanged
+				@model.getSnapshot @name, (doc) ->
+					test.deepEqual doc, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
+					test.done()
+
+	'A Forbidden DELETE on a nonexistant document returns 403': (test) ->
+		@auth = (client, action) -> if action.type == 'delete' then action.reject() else action.accept()
+
+		fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) ->
+			test.strictEqual res.statusCode, 403
+			test.deepEqual data, 'Forbidden'
+			test.done()
+
+	'Cant DELETE if delete is rejected': (test) ->
+		@auth = (client, action) -> if action.type == 'delete' then action.reject() else action.accept()
+
+		@model.create @name, 'simple', =>
+			fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) =>
+				test.strictEqual res.statusCode, 403
+				test.deepEqual data, 'Forbidden'
+
+				@model.getSnapshot @name, (doc) ->
+					test.ok doc
+					test.done()
+	
