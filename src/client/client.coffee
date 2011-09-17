@@ -126,7 +126,7 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		# We'll just silently drop subsequent messages.
 		return if msg['v'] < @version
 
-		throw new Error("Expected docName #{@name} but got #{msg['doc']}") unless msg['doc'] == @name
+		throw new Error("Expected docName '#{@name}' but got #{msg['doc']}") unless msg['doc'] == @name
 		throw new Error("Expected version #{@version} but got #{msg['v']}") unless msg['v'] == @version
 
 #		p "if: #{i @inflightOp} pending: #{i @pendingOp} doc '#{@snapshot}' op: #{i msg.op}"
