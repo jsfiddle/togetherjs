@@ -158,7 +158,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   }
   text = {};
   text.name = 'text';
-  text['create'] = text.create = function() {
+  text.create = text.create = function() {
     return '';
   };
   strInject = function(s1, pos, s2) {
@@ -166,15 +166,15 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   };
   checkValidComponent = function(c) {
     var d_type, i_type;
-    if (typeof c['p'] !== 'number') {
+    if (typeof c.p !== 'number') {
       throw new Error('component missing position field');
     }
-    i_type = typeof c['i'];
-    d_type = typeof c['d'];
+    i_type = typeof c.i;
+    d_type = typeof c.d;
     if (!((i_type === 'string') ^ (d_type === 'string'))) {
       throw new Error('component needs an i or d field');
     }
-    if (!(c['p'] >= 0)) {
+    if (!(c.p >= 0)) {
       throw new Error('position cannot be negative');
     }
   };
@@ -191,43 +191,43 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     checkValidOp(op);
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       component = op[_i];
-      if (component['i'] != null) {
-        snapshot = strInject(snapshot, component['p'], component['i']);
+      if (component.i != null) {
+        snapshot = strInject(snapshot, component.p, component.i);
       } else {
-        deleted = snapshot.slice(component['p'], component['p'] + component['d'].length);
-        if (component['d'] !== deleted) {
-          throw new Error("Delete component '" + component['d'] + "' does not match deleted text '" + deleted + "'");
+        deleted = snapshot.slice(component.p, component.p + component.d.length);
+        if (component.d !== deleted) {
+          throw new Error("Delete component '" + component.d + "' does not match deleted text '" + deleted + "'");
         }
-        snapshot = snapshot.slice(0, component['p']) + snapshot.slice(component['p'] + component['d'].length);
+        snapshot = snapshot.slice(0, component.p) + snapshot.slice(component.p + component.d.length);
       }
     }
     return snapshot;
   };
   text._append = append = function(newOp, c) {
     var last, _ref, _ref2;
-    if (c['i'] === '' || c['d'] === '') {
+    if (c.i === '' || c.d === '') {
       return;
     }
     if (newOp.length === 0) {
       return newOp.push(c);
     } else {
       last = newOp[newOp.length - 1];
-      if ((last['i'] != null) && (c['i'] != null) && (last['p'] <= (_ref = c['p']) && _ref <= (last['p'] + last['i'].length))) {
+      if ((last.i != null) && (c.i != null) && (last.p <= (_ref = c.p) && _ref <= (last.p + last.i.length))) {
         return newOp[newOp.length - 1] = {
-          'i': strInject(last['i'], c['p'] - last['p'], c['i']),
-          'p': last['p']
+          i: strInject(last.i, c.p - last.p, c.i),
+          p: last.p
         };
-      } else if ((last['d'] != null) && (c['d'] != null) && (c['p'] <= (_ref2 = last['p']) && _ref2 <= (c['p'] + c['d'].length))) {
+      } else if ((last.d != null) && (c.d != null) && (c.p <= (_ref2 = last.p) && _ref2 <= (c.p + c.d.length))) {
         return newOp[newOp.length - 1] = {
-          'd': strInject(c['d'], last['p'] - c['p'], last['d']),
-          'p': c['p']
+          d: strInject(c.d, last.p - c.p, last.d),
+          p: c.p
         };
       } else {
         return newOp.push(c);
       }
     }
   };
-  text['compose'] = text.compose = function(op1, op2) {
+  text.compose = function(op1, op2) {
     var c, newOp, _i, _len;
     checkValidOp(op1);
     checkValidOp(op2);
@@ -238,42 +238,42 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     return newOp;
   };
-  text['compress'] = text.compress = function(op) {
+  text.compress = function(op) {
     return text.compose([], op);
   };
   text.normalize = function(op) {
     var c, newOp, _i, _len, _ref;
     newOp = [];
-    if ((op['i'] != null) || (op['p'] != null)) {
+    if ((op.i != null) || (op.p != null)) {
       op = [op];
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-      if ((_ref = c['p']) == null) {
-        c['p'] = 0;
+      if ((_ref = c.p) == null) {
+        c.p = 0;
       }
       append(newOp, c);
     }
     return newOp;
   };
   transformPosition = function(pos, c, insertAfter) {
-    if (c['i'] != null) {
-      if (c['p'] < pos || (c['p'] === pos && insertAfter)) {
-        return pos + c['i'].length;
+    if (c.i != null) {
+      if (c.p < pos || (c.p === pos && insertAfter)) {
+        return pos + c.i.length;
       } else {
         return pos;
       }
     } else {
-      if (pos <= c['p']) {
+      if (pos <= c.p) {
         return pos;
-      } else if (pos <= c['p'] + c['d'].length) {
-        return c['p'];
+      } else if (pos <= c.p + c.d.length) {
+        return c.p;
       } else {
-        return pos - c['d'].length;
+        return pos - c.d.length;
       }
     }
   };
-  text['transformCursor'] = function(position, op, insertAfter) {
+  text.transformCursor = function(position, op, insertAfter) {
     var c, _i, _len;
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
@@ -281,59 +281,59 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }
     return position;
   };
-  text['_tc'] = transformComponent = function(dest, c, otherC, type) {
+  text._tc = transformComponent = function(dest, c, otherC, type) {
     var cIntersect, intersectEnd, intersectStart, newC, otherIntersect, s;
     checkValidOp([c]);
     checkValidOp([otherC]);
-    if (c['i'] != null) {
+    if (c.i != null) {
       append(dest, {
-        'i': c['i'],
-        'p': transformPosition(c['p'], otherC, type === 'right')
+        i: c.i,
+        p: transformPosition(c.p, otherC, type === 'right')
       });
     } else {
-      if (otherC['i'] != null) {
-        s = c['d'];
-        if (c['p'] < otherC['p']) {
+      if (otherC.i != null) {
+        s = c.d;
+        if (c.p < otherC.p) {
           append(dest, {
-            'd': s.slice(0, otherC['p'] - c['p']),
-            'p': c['p']
+            d: s.slice(0, otherC.p - c.p),
+            p: c.p
           });
-          s = s.slice(otherC['p'] - c['p']);
+          s = s.slice(otherC.p - c.p);
         }
         if (s !== '') {
           append(dest, {
-            'd': s,
-            'p': c['p'] + otherC['i'].length
+            d: s,
+            p: c.p + otherC.i.length
           });
         }
       } else {
-        if (c['p'] >= otherC['p'] + otherC['d'].length) {
+        if (c.p >= otherC.p + otherC.d.length) {
           append(dest, {
-            'd': c['d'],
-            'p': c['p'] - otherC['d'].length
+            d: c.d,
+            p: c.p - otherC.d.length
           });
-        } else if (c['p'] + c['d'].length <= otherC['p']) {
+        } else if (c.p + c.d.length <= otherC.p) {
           append(dest, c);
         } else {
           newC = {
-            'd': '',
-            'p': c['p']
+            d: '',
+            p: c.p
           };
-          if (c['p'] < otherC['p']) {
-            newC['d'] = c['d'].slice(0, otherC['p'] - c['p']);
+          if (c.p < otherC.p) {
+            newC.d = c.d.slice(0, otherC.p - c.p);
           }
-          if (c['p'] + c['d'].length > otherC['p'] + otherC['d'].length) {
-            newC['d'] += c['d'].slice(otherC['p'] + otherC['d'].length - c['p']);
+          if (c.p + c.d.length > otherC.p + otherC.d.length) {
+            newC.d += c.d.slice(otherC.p + otherC.d.length - c.p);
           }
-          intersectStart = Math.max(c['p'], otherC['p']);
-          intersectEnd = Math.min(c['p'] + c['d'].length, otherC['p'] + otherC['d'].length);
-          cIntersect = c['d'].slice(intersectStart - c['p'], intersectEnd - c['p']);
-          otherIntersect = otherC['d'].slice(intersectStart - otherC['p'], intersectEnd - otherC['p']);
+          intersectStart = Math.max(c.p, otherC.p);
+          intersectEnd = Math.min(c.p + c.d.length, otherC.p + otherC.d.length);
+          cIntersect = c.d.slice(intersectStart - c.p, intersectEnd - c.p);
+          otherIntersect = otherC.d.slice(intersectStart - otherC.p, intersectEnd - otherC.p);
           if (cIntersect !== otherIntersect) {
             throw new Error('Delete ops delete different text in the same region of the document');
           }
-          if (newC['d'] !== '') {
-            newC['p'] = transformPosition(newC['p'], otherC);
+          if (newC.d !== '') {
+            newC.p = transformPosition(newC.p, otherC);
             append(dest, newC);
           }
         }
@@ -342,19 +342,19 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return dest;
   };
   invertComponent = function(c) {
-    if (c['i'] != null) {
+    if (c.i != null) {
       return {
-        'd': c['i'],
-        'p': c['p']
+        d: c.i,
+        p: c.p
       };
     } else {
       return {
-        'i': c['d'],
-        'p': c['p']
+        i: c.d,
+        p: c.p
       };
     }
   };
-  text.invert = text['invert'] = function(op) {
+  text.invert = function(op) {
     var c, _i, _len, _ref, _results;
     _ref = op.slice().reverse();
     _results = [];
@@ -367,7 +367,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   if (typeof WEB !== "undefined" && WEB !== null) {
     exports.types || (exports.types = {});
     bootstrapTransform(text, transformComponent, checkValidOp, append);
-    exports.types['text'] = text;
+    exports.types.text = text;
   } else {
     module.exports = text;
     require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append);
