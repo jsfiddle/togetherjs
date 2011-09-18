@@ -57,6 +57,12 @@ module.exports = testCase
 				@model.getSnapshot @name, (data) =>
 					test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
 					test.done()
+	
+	'Cant create a document with a slash in the name': (test) ->
+		@model.create 'foo/bar', types.text, (result, error) ->
+			test.strictEqual result, false
+			test.strictEqual error, 'Invalid document name'
+			test.done()
 
 	'Return a fresh snapshot after submitting ops': (test) ->
 		@model.applyOp @name, {v:0, op:{position: 0, text:'hi'}}, (appliedVersion, error) =>

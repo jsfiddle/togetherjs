@@ -54,6 +54,10 @@ module.exports = Model = (db, options) ->
 			callback = meta
 			meta = {}
 
+		if docName.match /\//
+			callback false, 'Invalid document name'
+			return
+
 		meta ||= {}
 
 		newDocData =
