@@ -12,12 +12,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   exports = {
     'version': '0.4.0'
   };
-  /**
-   @const
-   @type {boolean}
-*/
-var WEB = true;
-;
+  if (typeof WEB === 'undefined') {
+    WEB = true;
+  }
   nextTick = typeof WEB !== "undefined" && WEB !== null ? function(fn) {
     return setTimeout(fn, 0);
   } : nextTick = process['nextTick'];

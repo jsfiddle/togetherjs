@@ -1,5 +1,4 @@
 {exec} = require 'child_process'
-closure = require './closure'
 fs = require 'fs'
 path = require 'path'
 
@@ -39,20 +38,26 @@ e = (str, callback) ->
 
 compile = (infile, outfile) ->
 	# Closure compile the JS
-	file = fs.readFileSync infile, 'utf8'
+	source = fs.readFileSync infile, 'utf8'
 
-	closure.compile file, (err, code) ->
-		throw err if err?
+	{parser, uglify} = require 'uglify-js'
 
-		smaller = Math.round((1 - (code.length / file.length)) * 100)
+	opts =
+		defines:
+			WEB: ['name', 'true']
 
-		output = outfile
-		fs.writeFileSync output, "(function(){\n#{code}})();"
+	ast = parser.parse source
+	#ast = uglify.ast_mangle ast, defines: WEB: ['name', 'true']
+	ast = uglify.ast_mangle ast, opts
+	ast = uglify.ast_squeeze ast
+	code = uglify.gen_code ast
 
-		console.log "Closure compiled: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
+	smaller = Math.round((1 - (code.length / source.length)) * 100)
 
-# Uncomment to skip closure compiler
-#compile = (infile, outfile) -> e "cp #{infile} #{outfile}"
+	output = outfile
+	fs.writeFileSync output, code
+
+	console.log "Closure compiled: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
 
 expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 

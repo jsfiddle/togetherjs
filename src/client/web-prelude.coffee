@@ -13,9 +13,9 @@ exports =
 
 
 # Hint to the closure compiler to optimize out code for node.js.
-`/**
-   @const
-   @type {boolean}
-*/
-var WEB = true;
-`
+#
+# This is compiled out when compiled with uglifyjs. Its important for the
+# share.uncompressed.js.
+if typeof WEB == 'undefined'
+	# This will put WEB in the global scope in a browser.
+	window.WEB = true
