@@ -13,7 +13,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     'version': '0.4.0'
   };
   if (typeof WEB === 'undefined') {
-    WEB = true;
+    window.WEB = true;
   }
   nextTick = typeof WEB !== "undefined" && WEB !== null ? function(fn) {
     return setTimeout(fn, 0);
@@ -75,9 +75,9 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   MicroEvent.mixin = function(obj) {
     var proto;
     proto = obj.prototype || obj;
-    proto.on = proto['on'] = MicroEvent.prototype.on;
-    proto.removeListener = proto['removeListener'] = MicroEvent.prototype.removeListener;
-    proto.emit = proto['emit'] = MicroEvent.prototype.emit;
+    proto.on = MicroEvent.prototype.on;
+    proto.removeListener = MicroEvent.prototype.removeListener;
+    proto.emit = MicroEvent.prototype.emit;
     return obj;
   };
   if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
@@ -424,10 +424,10 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
   };
   if (typeof WEB !== "undefined" && WEB !== null) {
     types || (types = exports.types);
-    if (!window['io']) {
+    if (!window.io) {
       throw new Error('Must load socket.io before this library');
     }
-    io = window['io'];
+    io = window.io;
   } else {
     types = require('../types');
     io = require('socket.io-client');
@@ -439,11 +439,11 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     this.name = name;
     this.version = version;
     this.type = type;
-    if (this.type['compose'] == null) {
+    if (this.type.compose == null) {
       throw new Error('Handling types without compose() defined is not currently implemented');
     }
     setSnapshot = __bind(function(s) {
-      return this['snapshot'] = this.snapshot = s;
+      return this.snapshot = s;
     }, this);
     setSnapshot(snapshot);
     inflightOp = null;
@@ -451,16 +451,16 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     pendingOp = null;
     pendingCallbacks = [];
     serverOps = {};
-    xf = this.type['transformX'] || __bind(function(client, server) {
+    xf = this.type.transformX || __bind(function(client, server) {
       var client_, server_;
-      client_ = this.type['transform'](client, server, 'left');
-      server_ = this.type['transform'](server, client, 'right');
+      client_ = this.type.transform(client, server, 'left');
+      server_ = this.type.transform(server, client, 'right');
       return [client_, server_];
     }, this);
     otApply = __bind(function(docOp, isRemote) {
       var oldSnapshot;
       oldSnapshot = this.snapshot;
-      setSnapshot(this.type['apply'](this.snapshot, docOp));
+      setSnapshot(this.type.apply(this.snapshot, docOp));
       if (isRemote) {
         this.emit('remoteop', docOp, oldSnapshot);
       }
@@ -481,21 +481,21 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
           oldInflightOp = inflightOp;
           inflightOp = null;
           if (error) {
-            if (type['invert']) {
-              undo = this.type['invert'](oldInflightOp);
+            if (type.invert) {
+              undo = this.type.invert(oldInflightOp);
               if (pendingOp) {
                 _ref = xf(pendingOp, undo), pendingOp = _ref[0], undo = _ref[1];
               }
               otApply(undo, true);
             } else {
-              throw new Error("Op apply failed (" + response['error'] + ") and the OT type does not define an invert function.");
+              throw new Error("Op apply failed (" + response.error + ") and the OT type does not define an invert function.");
             }
             for (_i = 0, _len = inflightCallbacks.length; _i < _len; _i++) {
               callback = inflightCallbacks[_i];
               callback(null, error);
             }
           } else {
-            if (response['v'] !== this.version) {
+            if (response.v !== this.version) {
               throw new Error('Invalid version from server');
             }
             serverOps[this.version] = oldInflightOp;
@@ -511,16 +511,16 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     }, this);
     this._onOpReceived = function(msg) {
       var docOp, op, _ref, _ref2;
-      if (msg['v'] < this.version) {
+      if (msg.v < this.version) {
         return;
       }
-      if (msg['doc'] !== this.name) {
-        throw new Error("Expected docName '" + this.name + "' but got " + msg['doc']);
+      if (msg.doc !== this.name) {
+        throw new Error("Expected docName '" + this.name + "' but got " + msg.doc);
       }
-      if (msg['v'] !== this.version) {
-        throw new Error("Expected version " + this.version + " but got " + msg['v']);
+      if (msg.v !== this.version) {
+        throw new Error("Expected version " + this.version + " but got " + msg.v);
       }
-      op = msg['op'];
+      op = msg.op;
       serverOps[this.version] = op;
       docOp = op;
       if (inflightOp !== null) {
@@ -532,13 +532,13 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.version++;
       return otApply(docOp, true);
     };
-    this['submitOp'] = this.submitOp = function(op, callback) {
-      if (this.type['normalize'] != null) {
-        op = this.type['normalize'](op);
+    this.submitOp = function(op, callback) {
+      if (this.type.normalize != null) {
+        op = this.type.normalize(op);
       }
-      setSnapshot(this.type['apply'](this.snapshot, op));
+      setSnapshot(this.type.apply(this.snapshot, op));
       if (pendingOp !== null) {
-        pendingOp = this.type['compose'](pendingOp, op);
+        pendingOp = this.type.compose(pendingOp, op);
       } else {
         pendingOp = op;
       }
@@ -548,10 +548,10 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.emit('change', op);
       return setTimeout(tryFlushPendingOp, 0);
     };
-    this['flush'] = function() {
+    this.flush = function() {
       return tryFlushPendingOp();
     };
-    this['close'] = this.close = function(callback) {
+    this.close = function(callback) {
       return connection.send({
         'doc': this.name,
         open: false
@@ -562,17 +562,17 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         this.emit('closed');
       }, this));
     };
-    if (this.type['api']) {
-      _ref = this.type['api'];
+    if (this.type.api) {
+      _ref = this.type.api;
       for (k in _ref) {
         v = _ref[k];
         this[k] = v;
       }
-      if (typeof this['_register'] === "function") {
-        this['_register']();
+      if (typeof this._register === "function") {
+        this._register();
       }
     } else {
-      this.provides = this['provides'] = {};
+      this.provides = {};
     }
     return this;
   };
@@ -584,13 +584,13 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       this.disconnected = __bind(this.disconnected, this);      this.docs = {};
       this.numDocs = 0;
       this.handlers = {};
-      this.socket = io['connect'](origin, {
+      this.socket = io.connect(origin, {
         'force new connection': true
       });
-      this.socket['on']('connect', this.connected);
-      this.socket['on']('disconnect', this.disconnected);
-      this.socket['on']('message', this.onMessage);
-      this.socket['on']('connect_failed', __bind(function(error) {
+      this.socket.on('connect', this.connected);
+      this.socket.on('disconnect', this.disconnected);
+      this.socket.on('message', this.onMessage);
+      this.socket.on('connect_failed', __bind(function(error) {
         var callback, callbacks, docName, h, t, _ref, _results;
         if (error === 'unauthorized') {
           error = 'forbidden';
@@ -621,7 +621,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         }
         return _results;
       }, this));
-      if (this.socket['socket']['connected']) {
+      if (this.socket.socket.connected) {
         setTimeout((__bind(function() {
           return this.connected();
         }, this)), 0);
@@ -638,15 +638,15 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
       if (this.socket === null) {
         throw new Error('Cannot send messages to a closed connection');
       }
-      docName = msg['doc'];
+      docName = msg.doc;
       if (docName === this.lastSentDoc) {
-        delete msg['doc'];
+        delete msg.doc;
       } else {
         this.lastSentDoc = docName;
       }
-      this.socket['json']['send'](msg);
+      this.socket.json.send(msg);
       if (callback) {
-        type = msg['open'] === true ? 'open' : msg['open'] === false ? 'close' : msg['create'] ? 'create' : msg['snapshot'] === null ? 'snapshot' : msg['op'] ? 'op response' : void 0;
+        type = msg.open === true ? 'open' : msg.open === false ? 'close' : msg.create ? 'create' : msg.snapshot === null ? 'snapshot' : msg.op ? 'op response' : void 0;
         docHandlers = ((_base = this.handlers)[docName] || (_base[docName] = {}));
         callbacks = (docHandlers[type] || (docHandlers[type] = []));
         return callbacks.push(callback);
@@ -654,20 +654,20 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     };
     Connection.prototype.onMessage = function(msg) {
       var c, callbacks, doc, docName, type, _i, _len, _ref;
-      docName = msg['doc'];
+      docName = msg.doc;
       if (docName !== void 0) {
         this.lastReceivedDoc = docName;
       } else {
-        msg['doc'] = docName = this.lastReceivedDoc;
+        msg.doc = docName = this.lastReceivedDoc;
       }
       this.emit('message', msg);
-      type = msg['open'] === true || (msg['open'] === false && msg['error']) ? 'open' : msg['open'] === false ? 'close' : msg['snapshot'] !== void 0 ? 'snapshot' : msg['create'] ? 'create' : msg['op'] ? 'op' : msg['v'] !== void 0 ? 'op response' : void 0;
+      type = msg.open === true || (msg.open === false && msg.error) ? 'open' : msg.open === false ? 'close' : msg.snapshot !== void 0 ? 'snapshot' : msg.create ? 'create' : msg.op ? 'op' : msg.v !== void 0 ? 'op response' : void 0;
       callbacks = (_ref = this.handlers[docName]) != null ? _ref[type] : void 0;
       if (callbacks) {
         delete this.handlers[docName][type];
         for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
           c = callbacks[_i];
-          c(msg, msg['error']);
+          c(msg, msg.error);
         }
       }
       if (type === 'op') {
@@ -679,16 +679,16 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     };
     Connection.prototype.makeDoc = function(params) {
       var doc, name, type;
-      name = params['doc'];
+      name = params.doc;
       if (this.docs[name]) {
         throw new Error("Doc " + name + " already open");
       }
-      type = params['type'];
+      type = params.type;
       if (typeof type === 'string') {
         type = types[type];
       }
-      doc = new Doc(this, name, params['v'], type, params['snapshot']);
-      doc['created'] = !!params['create'];
+      doc = new Doc(this, name, params.v, type, params.snapshot);
+      doc.created = !!params.create;
       this.docs[name] = doc;
       this.numDocs++;
       doc.on('closed', __bind(function() {
@@ -717,7 +717,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         }
       }, this));
     };
-    Connection.prototype['open'] = function(docName, type, callback) {
+    Connection.prototype.open = function(docName, type, callback) {
       var doc;
       if (this.socket === null) {
         callback(null, 'connection closed');
@@ -753,21 +753,21 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
         if (error) {
           return callback(null, error);
         } else {
-          if (response['snapshot'] === void 0) {
-            response['snapshot'] = type['create']();
+          if (response.snapshot === void 0) {
+            response.snapshot = type.create();
           }
-          response['type'] = type;
+          response.type = type;
           return callback(this.makeDoc(response));
         }
       }, this));
     };
-    Connection.prototype['create'] = function(type, callback) {
+    Connection.prototype.create = function(type, callback) {
       return open(null, type, callback);
     };
-    Connection.prototype['disconnect'] = function() {
+    Connection.prototype.disconnect = function() {
       if (this.socket) {
         this.emit('disconnected');
-        this.socket['disconnect']();
+        this.socket.disconnect();
         return this.socket = null;
       }
     };
@@ -805,14 +805,14 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     c.open(docName, type, function(doc, error) {
       if (doc === null) {
         if (c.numDocs === 0) {
-          c['disconnect']();
+          c.disconnect();
         }
         return callback(null, error);
       } else {
         doc.on('closed', function() {
           return setTimeout(function() {
             if (c.numDocs === 0) {
-              return c['disconnect']();
+              return c.disconnect();
             }
           }, 0);
         });
@@ -822,10 +822,10 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     return c.on('connect failed');
   };
   if (typeof WEB !== "undefined" && WEB !== null) {
-    exports['Connection'] = Connection;
-    exports['Doc'] = Doc;
-    exports['open'] = open;
-    window['sharejs'] = exports;
+    exports.Connection = Connection;
+    exports.Doc = Doc;
+    exports.open = open;
+    window.sharejs = exports;
   } else {
     exports.Connection = Connection;
     exports.open = open;

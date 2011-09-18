@@ -20,6 +20,7 @@ for script in ['share', 'json']
 	# This is handled by window.WEB=true in web-prelude, but that obviously doesn't work here.
 	code = "var WEB=true; #{code}" if TEST_UNCOMPRESSED
 
+	console.log "Evaling #{script}"
 	eval code
 
 module.exports = window.sharejs

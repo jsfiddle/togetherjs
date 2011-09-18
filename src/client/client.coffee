@@ -15,8 +15,8 @@
 
 if WEB?
 	types ||= exports.types
-	throw new Error 'Must load socket.io before this library' unless window['io']
-	io = window['io']
+	throw new Error 'Must load socket.io before this library' unless window.io
+	io = window.io
 else
 	types = require '../types'
 	io = require 'socket.io-client'
@@ -35,10 +35,10 @@ else
 # version is the version of the document _on the server_
 `/** @constructor */`
 Doc = (connection, @name, @version, @type, snapshot) ->
-	throw new Error('Handling types without compose() defined is not currently implemented') unless @type['compose']?
+	throw new Error('Handling types without compose() defined is not currently implemented') unless @type.compose?
 
 	# Gotta figure out a cleaner way to make this work with closure.
-	setSnapshot = (s) => @['snapshot'] = @snapshot = s
+	setSnapshot = (s) => @snapshot = s
 	setSnapshot snapshot
 
 	# The op that is currently roundtripping to the server, or null.
@@ -53,14 +53,14 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 	serverOps = {}
 
 	# Transform a server op by a client op, and vice versa.
-	xf = @type['transformX'] or (client, server) =>
-		client_ = @type['transform'] client, server, 'left'
-		server_ = @type['transform'] server, client, 'right'
+	xf = @type.transformX or (client, server) =>
+		client_ = @type.transform client, server, 'left'
+		server_ = @type.transform server, client, 'right'
 		return [client_, server_]
 	
 	otApply = (docOp, isRemote) =>
 		oldSnapshot = @snapshot
-		setSnapshot @type['apply'](@snapshot, docOp)
+		setSnapshot @type.apply(@snapshot, docOp)
 
 		# Its important that these event handlers are called with oldSnapshot.
 		# The reason is that the OT type APIs might need to access the snapshots to
@@ -88,9 +88,9 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 					# If the server isn't going to allow edits anyway, we should probably
 					# figure out some way to flag that (readonly:true in the open request?)
 
-					if type['invert']
+					if type.invert
 
-						undo = @type['invert'] oldInflightOp
+						undo = @type.invert oldInflightOp
 
 						# Now we have to transform the undo operation by any server ops & pending ops
 						if pendingOp
@@ -104,11 +104,11 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 						# to reflect the undo.
 						otApply undo, true
 					else
-						throw new Error "Op apply failed (#{response['error']}) and the OT type does not define an invert function."
+						throw new Error "Op apply failed (#{response.error}) and the OT type does not define an invert function."
 
 					callback(null, error) for callback in inflightCallbacks
 				else
-					throw new Error('Invalid version from server') unless response['v'] == @version
+					throw new Error('Invalid version from server') unless response.v == @version
 
 					serverOps[@version] = oldInflightOp
 					@version++
@@ -124,14 +124,14 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		# There is a bug in socket.io (produced on firefox 3.6) which causes messages
 		# to be duplicated sometimes.
 		# We'll just silently drop subsequent messages.
-		return if msg['v'] < @version
+		return if msg.v < @version
 
-		throw new Error("Expected docName '#{@name}' but got #{msg['doc']}") unless msg['doc'] == @name
-		throw new Error("Expected version #{@version} but got #{msg['v']}") unless msg['v'] == @version
+		throw new Error("Expected docName '#{@name}' but got #{msg.doc}") unless msg.doc == @name
+		throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
 
 #		p "if: #{i @inflightOp} pending: #{i @pendingOp} doc '#{@snapshot}' op: #{i msg.op}"
 
-		op = msg['op']
+		op = msg.op
 		serverOps[@version] = op
 
 		docOp = op
@@ -146,14 +146,14 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 
 	# Submit an op to the server. The op maybe held for a little while before being sent, as only one
 	# op can be inflight at any time.
-	@['submitOp'] = @submitOp = (op, callback) ->
-		op = @type['normalize'](op) if @type['normalize']?
+	@submitOp = (op, callback) ->
+		op = @type.normalize(op) if @type.normalize?
 
 		# If this throws an exception, no changes should have been made to the doc
-		setSnapshot(@type['apply'] @snapshot, op)
+		setSnapshot(@type.apply @snapshot, op)
 
 		if pendingOp != null
-			pendingOp = @type['compose'](pendingOp, op)
+			pendingOp = @type.compose(pendingOp, op)
 		else
 			pendingOp = op
 
@@ -166,21 +166,21 @@ Doc = (connection, @name, @version, @type, snapshot) ->
 		setTimeout tryFlushPendingOp, 0
 	
 	# Force an immediate flush. This is useful for testing.
-	@['flush'] = -> tryFlushPendingOp()
+	@flush = -> tryFlushPendingOp()
 	
 	# Close a document.
 	# No unit tests for this so far.
-	@['close'] = @close = (callback) ->
+	@close = (callback) ->
 		connection.send {'doc':@name, open:false}, =>
 			callback() if callback
 			@emit 'closed'
 			return
 	
-	if @type['api']
-		this[k] = v for k, v of @type['api']
-		@['_register']?()
+	if @type.api
+		this[k] = v for k, v of @type.api
+		@_register?()
 	else
-		@provides = @['provides'] = {}
+		@provides = {}
 
 	this
 
@@ -201,12 +201,12 @@ class Connection
 		# emit connected events when a new connection comes in. Multiple documents
 		# are already multiplexed over the connection by socket.io anyway, so it
 		# shouldn't matter too much unless you're doing something particularly wacky.
-		@socket = io['connect'] origin, 'force new connection': true
+		@socket = io.connect origin, 'force new connection': true
 
-		@socket['on'] 'connect', @connected
-		@socket['on'] 'disconnect', @disconnected
-		@socket['on'] 'message', @onMessage
-		@socket['on'] 'connect_failed', (error) =>
+		@socket.on 'connect', @connected
+		@socket.on 'disconnect', @disconnected
+		@socket.on 'message', @onMessage
+		@socket.on 'connect_failed', (error) =>
 			error = 'forbidden' if error == 'unauthorized' # For consistency with the server
 			@socket = null
 			@emit 'connect failed', error
@@ -217,7 +217,7 @@ class Connection
 
 		# This avoids a bug in socket.io-client (v0.7.9) which causes
 		# subsequent connections on the same host to not fire a .connect event
-		if @socket['socket']['connected']
+		if @socket.socket.connected
 			setTimeout (=> @connected()), 0
 
 
@@ -237,67 +237,67 @@ class Connection
 	send: (msg, callback) ->
 		throw new Error 'Cannot send messages to a closed connection' if @socket == null
 
-		docName = msg['doc']
+		docName = msg.doc
 
 		if docName == @lastSentDoc
-			delete msg['doc']
+			delete msg.doc
 		else
 			@lastSentDoc = docName
 
-		@socket['json']['send'] msg
+		@socket.json.send msg
 		
 		if callback
-			type = if msg['open'] == true then 'open'
-			else if msg['open'] == false then 'close'
-			else if msg['create'] then 'create'
-			else if msg['snapshot'] == null then 'snapshot'
-			else if msg['op'] then 'op response'
+			type = if msg.open == true then 'open'
+			else if msg.open == false then 'close'
+			else if msg.create then 'create'
+			else if msg.snapshot == null then 'snapshot'
+			else if msg.op then 'op response'
 
 			#cb = (response) =>
-				#	if response['doc'] == docName
+				#	if response.doc == docName
 				#	@removeListener type, cb
-				#	callback response, response['error']
+				#	callback response, response.error
 
 			docHandlers = (@handlers[docName] ||= {})
 			callbacks = (docHandlers[type] ||= [])
 			callbacks.push callback
 
 	onMessage: (msg) =>
-		docName = msg['doc']
+		docName = msg.doc
 
 		if docName != undefined
 			@lastReceivedDoc = docName
 		else
-			msg['doc'] = docName = @lastReceivedDoc
+			msg.doc = docName = @lastReceivedDoc
 
 		@emit 'message', msg
 
 		# This should probably be rewritten to use socketio's message response stuff instead.
 		# (it was originally written for socket.io 0.6)
-		type = if msg['open'] == true or (msg['open'] == false and msg['error']) then 'open'
-		else if msg['open'] == false then 'close'
-		else if msg['snapshot'] != undefined then 'snapshot'
-		else if msg['create'] then 'create'
-		else if msg['op'] then 'op'
-		else if msg['v'] != undefined then 'op response'
+		type = if msg.open == true or (msg.open == false and msg.error) then 'open'
+		else if msg.open == false then 'close'
+		else if msg.snapshot != undefined then 'snapshot'
+		else if msg.create then 'create'
+		else if msg.op then 'op'
+		else if msg.v != undefined then 'op response'
 
 		callbacks = @handlers[docName]?[type]
 		if callbacks
 			delete @handlers[docName][type]
-			c msg, msg['error'] for c in callbacks
+			c msg, msg.error for c in callbacks
 
 		if type == 'op'
 			doc = @docs[docName]
 			doc._onOpReceived msg if doc
 
 	makeDoc: (params) ->
-		name = params['doc']
+		name = params.doc
 		throw new Error("Doc #{name} already open") if @docs[name]
 
-		type = params['type']
+		type = params.type
 		type = types[type] if typeof type == 'string'
-		doc = new Doc(@, name, params['v'], type, params['snapshot'])
-		doc['created'] = !!params['create']
+		doc = new Doc(@, name, params.v, type, params.snapshot)
+		doc.created = !!params.create
 		@docs[name] = doc
 		@numDocs++
 
@@ -321,7 +321,7 @@ class Connection
 			if error
 				callback null, error
 			else
-				# response['doc'] is used instead of docName to allow docName to be null.
+				# response.doc is used instead of docName to allow docName to be null.
 				# In that case, the server generates a random docName to use.
 				callback @makeDoc(response)
 
@@ -330,7 +330,7 @@ class Connection
 	# type is either a type name (eg 'text' or 'simple') or the actual type object.
 	# Types must be supported by the server.
 	# callback(doc, error)
-	'open': (docName, type, callback) ->
+	open: (docName, type, callback) ->
 		if @socket == null # The connection is perminantly disconnected
 			callback null, 'connection closed'
 			return
@@ -358,18 +358,18 @@ class Connection
 			if error
 				callback null, error
 			else
-				response['snapshot'] = type['create']() unless response['snapshot'] != undefined
-				response['type'] = type
+				response.snapshot = type.create() unless response.snapshot != undefined
+				response.type = type
 				callback @makeDoc(response)
 
 	# To be written. Create a new document with a random name.
-	'create': (type, callback) ->
+	create: (type, callback) ->
 		open null, type, callback
 
-	'disconnect': () ->
+	disconnect: () ->
 		if @socket
 			@emit 'disconnected'
-			@socket['disconnect']()
+			@socket.disconnect()
 			@socket = null
 
 MicroEvent.mixin Connection
@@ -401,7 +401,7 @@ open = (docName, type, origin, callback) ->
 	c = getConnection origin
 	c.open docName, type, (doc, error) ->
 		if doc == null
-			c['disconnect']() if c.numDocs == 0
+			c.disconnect() if c.numDocs == 0
 			callback null, error
 		else
 			# If you're using the bare API, connections are cleaned up as soon as there's no
@@ -409,7 +409,7 @@ open = (docName, type, origin, callback) ->
 			doc.on 'closed', ->
 				setTimeout ->
 						if c.numDocs == 0
-							c['disconnect']()
+							c.disconnect()
 					, 0
 
 			callback doc
@@ -417,12 +417,10 @@ open = (docName, type, origin, callback) ->
 	c.on 'connect failed'
 
 if WEB?
-	exports['Connection'] = Connection
-	exports['Doc'] = Doc
-	exports['open'] = open
-	window['sharejs'] = exports
+	exports.Connection = Connection
+	exports.Doc = Doc
+	exports.open = open
+	window.sharejs = exports
 else
 	exports.Connection = Connection
 	exports.open = open
-
-#	exports.f = -> console.log connections

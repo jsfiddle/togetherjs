@@ -37,9 +37,9 @@ MicroEvent.mixin = (obj) ->
 	proto = obj.prototype || obj
 
 	# Damn closure compiler :/
-	proto.on = proto['on'] = MicroEvent.prototype.on
-	proto.removeListener = proto['removeListener'] = MicroEvent.prototype.removeListener
-	proto.emit = proto['emit'] = MicroEvent.prototype.emit
+	proto.on = MicroEvent.prototype.on
+	proto.removeListener = MicroEvent.prototype.removeListener
+	proto.emit = MicroEvent.prototype.emit
 	obj
 
 module.exports = MicroEvent if module?.exports
