@@ -47,7 +47,7 @@ compile = (infile, outfile) ->
 			WEB: ['name', 'true']
 
 	ast = parser.parse source
-	#ast = uglify.ast_mangle ast, defines: WEB: ['name', 'true']
+	ast = uglify.ast_lift_variables ast
 	ast = uglify.ast_mangle ast, opts
 	ast = uglify.ast_squeeze ast
 	code = uglify.gen_code ast
