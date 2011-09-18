@@ -6,10 +6,12 @@
 p = -> #require('util').debug
 i = -> #require('util').inspect
 
+hat = require 'hat'
+
 queue = require './syncqueue'
 types = require '../types'
 db = require './db'
-Events = require('./events')
+Events = require './events'
 
 module.exports = Model = (db, options) ->
 	return new Model(db) if !(this instanceof Model)
@@ -163,13 +165,6 @@ module.exports = Model = (db, options) ->
 	# 
 	# listenFromVersion(docName, version, listener, callback)
 	@listenFromVersion = events.listenFromVersion
-
-	# Generate a random document name
-	@generateId = (length = 10) ->
-		# Should use a secure random number generator if available.
-		chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-="
-		(chars[Math.floor(Math.random() * chars.length)] for x in [0...length]).join('')
-
 	
 	# ------------ Auth stuffs.
 
@@ -217,7 +212,7 @@ module.exports = Model = (db, options) ->
 		# I'm not sure we can support these properties on the REST API
 		#xdomain: data.xdomain
 		#secure: data.secure
-		id: @generateId 8 # How many random characters are enough?
+		id: hat()
 
 
 	# I wish there was a cleaner way to write all of these.

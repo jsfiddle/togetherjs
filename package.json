@@ -15,7 +15,8 @@
 		"socket.io-client": "~0.8",
 		"connect": ">= 1.1.1 < 2.0.0",
 		"optimist": ">= 0.2.4",
-		"uglify-js": "~1"
+		"uglify-js": "~1",
+		"hat": "*"
 	},
 	"devDependencies": {
 		"nodeunit": "~0.5.0",

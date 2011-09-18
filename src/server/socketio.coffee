@@ -7,6 +7,7 @@
 
 socketio = require 'socket.io'
 util = require 'util'
+hat = require 'hat'
 
 p = ->#util.debug
 i = ->#util.inspect
@@ -282,7 +283,7 @@ exports.attach = (server, model, options) ->
 
 				if query.doc == null
 					lastReceivedDoc = null
-					query.doc = model.generateId()
+					query.doc = hat()
 				else if query.doc != undefined
 					lastReceivedDoc = query.doc
 				else
