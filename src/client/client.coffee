@@ -416,11 +416,6 @@ open = (docName, type, origin, callback) ->
 	
 	c.on 'connect failed'
 
-if WEB?
-	exports.Connection = Connection
-	exports.Doc = Doc
-	exports.open = open
-	window.sharejs = exports
-else
-	exports.Connection = Connection
-	exports.open = open
+exports.Connection = Connection
+exports.Doc = Doc
+exports.open = open

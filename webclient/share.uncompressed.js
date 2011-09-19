@@ -1,15 +1,7 @@
 (function() {
-  
-/** @preserve ShareJS v0.4.0
-http://sharejs.org
-
-BSD licensed:
-https://github.com/josephg/ShareJS/raw/master/LICENSE
-*/
-;
   var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, connections, exports, getConnection, invertComponent, io, nextTick, open, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
-  exports = {
+  window.sharejs = exports = {
     'version': '0.4.0'
   };
   if (typeof WEB === 'undefined') {
@@ -821,13 +813,7 @@ https://github.com/josephg/ShareJS/raw/master/LICENSE
     });
     return c.on('connect failed');
   };
-  if (typeof WEB !== "undefined" && WEB !== null) {
-    exports.Connection = Connection;
-    exports.Doc = Doc;
-    exports.open = open;
-    window.sharejs = exports;
-  } else {
-    exports.Connection = Connection;
-    exports.open = open;
-  }
+  exports.Connection = Connection;
+  exports.Doc = Doc;
+  exports.open = open;
 }).call(this);

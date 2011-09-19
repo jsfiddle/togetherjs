@@ -1,21 +1,13 @@
-`
-/** @preserve ShareJS v0.4.0
-http://sharejs.org
+# This file is included at the top of the compiled client-side javascript
 
-BSD licensed:
-https://github.com/josephg/ShareJS/raw/master/LICENSE
-*/
-`
-
-# This will be exported to window.sharejs
-exports =
+# This way all the modules can add stuff to exports, and for the web client they'll all get exported.
+window.sharejs = exports =
 	'version': '0.4.0'
 
-
-# Hint to the closure compiler to optimize out code for node.js.
+# This is compiled out when compiled with uglifyjs, but its important for the share.uncompressed.js.
 #
-# This is compiled out when compiled with uglifyjs. Its important for the
-# share.uncompressed.js.
+# Maybe I should rename WEB to __SHAREJS_WEB or something, but its only relevant for testing
+# anyway.
 if typeof WEB == 'undefined'
 	# This will put WEB in the global scope in a browser.
 	window.WEB = true

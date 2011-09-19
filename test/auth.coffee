@@ -12,9 +12,11 @@
 #				action.accept()
 
 testCase = require('nodeunit').testCase
+assert = require 'assert'
+
 server = require '../src/server'
 types = require '../src/types'
-assert = require 'assert'
+{makePassPart} = require './helpers'
 
 genTests = (async) -> testCase
 	setUp: (callback) ->
@@ -45,6 +47,9 @@ genTests = (async) -> testCase
 		@unused = 'testingdoc2'
 
 		@model = server.createModel options
+		@connectionData =
+			headers: {'x-junk': 'rawr'}
+			remoteAddress: '127.0.0.1'
 		@client = {}
 		@model.create @name, 'simple', -> callback()
 
@@ -65,10 +70,7 @@ genTests = (async) -> testCase
 
 			action.accept()
 		
-		data =
-			headers: {'x-junk': 'rawr'}
-			remoteAddress: '127.0.0.1'
-		@model.clientConnect data, (c, error) ->
+		@model.clientConnect @connectionData, (c, error) ->
 			test.fail error if error
 			test.strictEqual client, c
 			test.ok client.id
@@ -77,13 +79,22 @@ genTests = (async) -> testCase
 	'clientConnect returns an error if a client isnt allowed to connect': (test) ->
 		@auth = (c, action) -> action.reject()
 
-		data =
-			headers: {'x-junk': 'rawr'}
-			remoteAddress: '127.0.0.1'
-		@model.clientConnect data, (client, error) ->
+		@model.clientConnect @connectionData, (client, error) ->
 			test.strictEqual error, 'forbidden'
 			test.fail client if client
 			test.done()
+	
+	'client ids are unique': (test) ->
+		@auth = (c, action) -> action.accept()
+
+		ids = {}
+		passPart = makePassPart test, 1000
+
+		for __ignored in [1..1000] # Cant use for [1..1000] - https://github.com/jashkenas/coffee-script/issues/1714
+			@model.clientConnect @connectionData, (client, error) ->
+				throw new Error "repeat ID detected (#{client.id})" if ids[client.id]
+				ids[client.id] = true
+				passPart()
 
 	'getSnapshot works if auth accepts': (test) ->
 		@auth = (client, action) =>
