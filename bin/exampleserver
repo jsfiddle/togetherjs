@@ -2,6 +2,7 @@
 
 connect = require 'connect'
 sharejs = require '../src/server'
+hat = require('hat').rack(32, 36)
 
 argv = require('optimist').
 	usage("Usage: $0 [-p portnum]").
@@ -29,7 +30,7 @@ server = connect(
 			wiki docName, server.model, res, next
 
 		app.get '/pad/?', (req, res, next) ->
-			docName = server.model.generateId 5
+			docName = hat()
 			res.writeHead 303, {location: '/pad/pad.html#' + docName}
 			res.write ''
 			res.end()
