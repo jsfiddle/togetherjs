@@ -147,7 +147,6 @@ module.exports = testCase
 		@auth = (client, action) ->
 			test.strictEqual action.type, 'connect'
 			test.ok client.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
-			test.strictEqual typeof client.remotePort, 'number'
 			test.strictEqual typeof client.id, 'string'
 			test.ok client.id.length > 5
 			test.ok client.connectTime

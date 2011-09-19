@@ -22,7 +22,12 @@ exports.attach = (server, model, options) ->
 		io.set 'log level', 1
 	
 	authClient = (handshakeData, callback) ->
-		model.clientConnect handshakeData, (client, error) ->
+		data =
+			headers: handshakeData.headers
+			remoteAddress: handshakeData.address.address
+			secure: handshakeData.secure
+
+		model.clientConnect data, (client, error) ->
 			if error
 				# Its important that we don't pass the error message to the client here - leaving it as null
 				# will ensure the client recieves the normal 'not_authorized' message and thus

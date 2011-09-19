@@ -62,9 +62,7 @@ router = (app, model, options) ->
 	auth = (req, res, next) ->
 		data =
 			headers: req.headers
-			address:
-				address: req.connection.remoteAddress
-				port: req.connection.remotePort
+			remoteAddress: req.connection.remoteAddress
 
 		model.clientConnect data, (client, error) ->
 			if client

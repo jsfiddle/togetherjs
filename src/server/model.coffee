@@ -208,16 +208,15 @@ module.exports = Model = (db, options) ->
 		auth client, action
 
 	# At some stage, I'll probably pull this out into a class. No rush though.
-	createClient = (data) =>
-		headers: data.headers
+	createClient = (data) ->
+		id: hat()
 		connectTime: new Date
-		remoteAddress: data.address.address
-		remotePort: data.address.port
-		# I'm not sure we can support these properties on the REST API
+		headers: data.headers
+		remoteAddress: data.remoteAddress
+		# We have access to these with socket.io, but I'm not sure we can support
+		# these properties on the REST API.
 		#xdomain: data.xdomain
 		#secure: data.secure
-		id: hat()
-
 
 	# I wish there was a cleaner way to write all of these.
 

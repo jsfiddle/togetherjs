@@ -21,7 +21,7 @@ genTests = (async) -> testCase
 		options =
 			db: {type: 'memory'}
 			auth: (client, action) =>
-				assert.strictEqual client, @client, 'client missing or invalid'
+				assert.strictEqual client, @client, 'client missing or invalid' unless action.name == 'connect'
 				assert.fail 'Action missing type', action unless action.type?
 				assert.fail 'type invalid', action unless action.type in ['connect', 'create', 'read', 'update', 'delete']
 				assert.fail 'name invalid', action unless typeof action.name is 'string'
@@ -47,6 +47,43 @@ genTests = (async) -> testCase
 		@model = server.createModel options
 		@client = {}
 		@model.create @name, 'simple', -> callback()
+
+	'A client is created when auth accepts clientConnect': (test) ->
+		client = null
+
+		@auth = (c, action) =>
+			test.strictEqual action.type, 'connect'
+			test.strictEqual action.name, 'connect'
+
+			client = c
+			test.strictEqual typeof client.id, 'string'
+			test.ok client.id.length > 8
+			now = Date.now()
+			test.ok now - 1000 < client.connectTime.getTime() <= now
+			test.strictEqual client.remoteAddress, '127.0.0.1'
+			test.deepEqual client.headers, {'x-junk': 'rawr'}
+
+			action.accept()
+		
+		data =
+			headers: {'x-junk': 'rawr'}
+			remoteAddress: '127.0.0.1'
+		@model.clientConnect data, (c, error) ->
+			test.fail error if error
+			test.strictEqual client, c
+			test.ok client.id
+			test.done()
+	
+	'clientConnect returns an error if a client isnt allowed to connect': (test) ->
+		@auth = (c, action) -> action.reject()
+
+		data =
+			headers: {'x-junk': 'rawr'}
+			remoteAddress: '127.0.0.1'
+		@model.clientConnect data, (client, error) ->
+			test.strictEqual error, 'forbidden'
+			test.fail client if client
+			test.done()
 
 	'getSnapshot works if auth accepts': (test) ->
 		@auth = (client, action) =>
