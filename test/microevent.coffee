@@ -5,7 +5,6 @@ testCase = require('nodeunit').testCase
 MicroEvent = require '../src/client/microevent'
 makePassPart = require('./helpers').makePassPart
 
-
 tests =
 	'emit an event with no listeners does nothing': (test) ->
 		@e.emit 'a'
@@ -90,7 +89,6 @@ tests =
 		@e.on 'bar', fn
 		@e.removeListener 'foo', fn
 		@e.emit 'bar'
-
 
 
 

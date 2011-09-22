@@ -4,7 +4,7 @@
 # microevent.js is copyright Jerome Etienne, and licensed under the MIT license:
 # https://github.com/jeromeetienne/microevent.js
 
-nextTick = if WEB? then (fn) -> setTimeout fn, 0 else nextTick = process['nextTick']
+nextTick = if WEB? then (fn) -> setTimeout fn, 0 else process['nextTick']
 
 class MicroEvent
 	on: (event, fct) ->
@@ -42,5 +42,5 @@ MicroEvent.mixin = (obj) ->
 	proto.emit = MicroEvent.prototype.emit
 	obj
 
-module.exports = MicroEvent if module?.exports
+module.exports = MicroEvent unless WEB?
 

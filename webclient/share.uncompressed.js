@@ -1,5 +1,5 @@
 (function() {
-  var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, connections, exports, getConnection, invertComponent, io, nextTick, open, strInject, text, transformComponent, transformPosition, types;
+  var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, exports, invertComponent, io, nextTick, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   window.sharejs = exports = {
     'version': '0.4.1'
@@ -9,7 +9,7 @@
   }
   nextTick = typeof WEB !== "undefined" && WEB !== null ? function(fn) {
     return setTimeout(fn, 0);
-  } : nextTick = process['nextTick'];
+  } : process['nextTick'];
   MicroEvent = (function() {
     function MicroEvent() {}
     MicroEvent.prototype.on = function(event, fct) {
@@ -72,7 +72,7 @@
     proto.emit = MicroEvent.prototype.emit;
     return obj;
   };
-  if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
+  if (typeof WEB === "undefined" || WEB === null) {
     module.exports = MicroEvent;
   }
   exports['_bt'] = bootstrapTransform = function(type, transformComponent, checkValidOp, append) {
@@ -414,30 +414,15 @@
       });
     }
   };
-  if (typeof WEB !== "undefined" && WEB !== null) {
-    types || (types = exports.types);
-    if (!window.io) {
-      throw new Error('Must load socket.io before this library');
-    }
-    io = window.io;
-  } else {
-    types = require('../types');
-    io = require('socket.io-client');
-    MicroEvent = require('./microevent');
-  }
-  /** @constructor */;
   Doc = function(connection, name, version, type, snapshot) {
-    var inflightCallbacks, inflightOp, k, otApply, pendingCallbacks, pendingOp, serverOps, setSnapshot, tryFlushPendingOp, v, xf, _ref;
+    var inflightCallbacks, inflightOp, k, otApply, pendingCallbacks, pendingOp, serverOps, v, xf, _ref;
     this.name = name;
     this.version = version;
     this.type = type;
+    this.snapshot = snapshot;
     if (this.type.compose == null) {
       throw new Error('Handling types without compose() defined is not currently implemented');
     }
-    setSnapshot = __bind(function(s) {
-      return this.snapshot = s;
-    }, this);
-    setSnapshot(snapshot);
     inflightOp = null;
     inflightCallbacks = [];
     pendingOp = null;
@@ -452,13 +437,13 @@
     otApply = __bind(function(docOp, isRemote) {
       var oldSnapshot;
       oldSnapshot = this.snapshot;
-      setSnapshot(this.type.apply(this.snapshot, docOp));
+      this.snapshot = this.type.apply(this.snapshot, docOp);
       if (isRemote) {
         this.emit('remoteop', docOp, oldSnapshot);
       }
       return this.emit('change', docOp, oldSnapshot);
     }, this);
-    tryFlushPendingOp = __bind(function() {
+    this.flush = __bind(function() {
       if (inflightOp === null && pendingOp !== null) {
         inflightOp = pendingOp;
         inflightCallbacks = pendingCallbacks;
@@ -497,7 +482,7 @@
               callback(oldInflightOp, null);
             }
           }
-          return tryFlushPendingOp();
+          return this.flush();
         }, this));
       }
     }, this);
@@ -528,7 +513,7 @@
       if (this.type.normalize != null) {
         op = this.type.normalize(op);
       }
-      setSnapshot(this.type.apply(this.snapshot, op));
+      this.snapshot = this.type.apply(this.snapshot, op);
       if (pendingOp !== null) {
         pendingOp = this.type.compose(pendingOp, op);
       } else {
@@ -538,10 +523,7 @@
         pendingCallbacks.push(callback);
       }
       this.emit('change', op);
-      return setTimeout(tryFlushPendingOp, 0);
-    };
-    this.flush = function() {
-      return tryFlushPendingOp();
+      return setTimeout(this.flush, 0);
     };
     this.close = function(callback) {
       return connection.send({
@@ -568,7 +550,22 @@
     }
     return this;
   };
+  if (typeof WEB === "undefined" || WEB === null) {
+    MicroEvent = require('./microevent');
+  }
   MicroEvent.mixin(Doc);
+  exports.Doc = Doc;
+  if (typeof WEB !== "undefined" && WEB !== null) {
+    types || (types = exports.types);
+    if (!window.io) {
+      throw new Error('Must load socket.io before this library');
+    }
+    io = window.io;
+  } else {
+    types = require('../types');
+    io = require('socket.io-client');
+    Doc = require('./doc').Doc;
+  }
   Connection = (function() {
     function Connection(origin) {
       this.onMessage = __bind(this.onMessage, this);
@@ -689,7 +686,7 @@
       }, this));
       return doc;
     };
-    Connection.prototype['openExisting'] = function(docName, callback) {
+    Connection.prototype.openExisting = function(docName, callback) {
       if (this.socket === null) {
         callback(null, 'connection closed');
         return;
@@ -765,55 +762,66 @@
     };
     return Connection;
   })();
+  if (typeof WEB === "undefined" || WEB === null) {
+    MicroEvent = require('./microevent');
+  }
   MicroEvent.mixin(Connection);
-  connections = {};
-  getConnection = function(origin) {
-    var c, location;
-    if (typeof WEB !== "undefined" && WEB !== null) {
-      location = window.location;
-      if (origin == null) {
-        origin = "" + location.protocol + "//" + location.hostname + "/sjs";
-      }
-    }
-    if (!connections[origin]) {
-      c = new Connection(origin);
-      c.on('disconnected', function() {
-        return delete connections[origin];
-      });
-      c.on('connect failed', function() {
-        return delete connections[origin];
-      });
-      connections[origin] = c;
-    }
-    return connections[origin];
-  };
-  open = function(docName, type, origin, callback) {
-    var c;
-    if (typeof origin === 'function') {
-      callback = origin;
-      origin = null;
-    }
-    c = getConnection(origin);
-    c.open(docName, type, function(doc, error) {
-      if (doc === null) {
-        if (c.numDocs === 0) {
-          c.disconnect();
-        }
-        return callback(null, error);
-      } else {
-        doc.on('closed', function() {
-          return setTimeout(function() {
-            if (c.numDocs === 0) {
-              return c.disconnect();
-            }
-          }, 0);
-        });
-        return callback(doc);
-      }
-    });
-    return c.on('connect failed');
-  };
   exports.Connection = Connection;
-  exports.Doc = Doc;
-  exports.open = open;
+  if (typeof WEB === "undefined" || WEB === null) {
+    Connection = require('./connection').Connection;
+  }
+  exports.open = (function() {
+    var connections, getConnection;
+    connections = {};
+    getConnection = function(origin) {
+      var c, location;
+      if (typeof WEB !== "undefined" && WEB !== null) {
+        location = window.location;
+        if (origin == null) {
+          origin = "" + location.protocol + "//" + location.hostname + "/sjs";
+        }
+      }
+      if (!connections[origin]) {
+        c = new Connection(origin);
+        c.on('disconnected', function() {
+          return delete connections[origin];
+        });
+        c.on('connect failed', function() {
+          return delete connections[origin];
+        });
+        connections[origin] = c;
+      }
+      return connections[origin];
+    };
+    return function(docName, type, origin, callback) {
+      var c;
+      if (typeof origin === 'function') {
+        callback = origin;
+        origin = null;
+      }
+      c = getConnection(origin);
+      c.open(docName, type, function(doc, error) {
+        if (doc === null) {
+          if (c.numDocs === 0) {
+            c.disconnect();
+          }
+          return callback(null, error);
+        } else {
+          doc.on('closed', function() {
+            return setTimeout(function() {
+              if (c.numDocs === 0) {
+                return c.disconnect();
+              }
+            }, 0);
+          });
+          return callback(doc);
+        }
+      });
+      return c.on('connect failed');
+    };
+  })();
+  if (typeof WEB === "undefined" || WEB === null) {
+    exports.Doc = require('./doc').Doc;
+    exports.Connection = require('./connection').Connection;
+  }
 }).call(this);

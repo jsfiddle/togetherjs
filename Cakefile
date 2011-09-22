@@ -19,7 +19,9 @@ client = [
 	'types/helpers'
 	'types/text'
 	'types/text-api'
-	'client/client'
+	'client/doc'
+	'client/connection'
+	'client/index'
 ]
 
 extras = [
@@ -36,8 +38,8 @@ e = (str, callback) ->
 		console.log out if out != ''
 		callback() if callback?
 
-compile = (infile, outfile) ->
-	# Closure compile the JS
+makeUgly = (infile, outfile) ->
+	# Uglify compile the JS
 	source = fs.readFileSync infile, 'utf8'
 
 	{parser, uglify} = require 'uglify-js'
@@ -57,16 +59,16 @@ compile = (infile, outfile) ->
 	output = outfile
 	fs.writeFileSync output, code
 
-	console.log "Closure compiled: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
+	console.log "Uglified: #{smaller}% smaller (#{code.length} bytes} written to #{output}"
 
 expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 
-buildclosure = (filenames, dest) ->
+compile = (filenames, dest) ->
 	filenames = expandNames filenames
 	# I would really rather do this in pure JS.
 	e "coffee -j #{dest}.uncompressed.js -c #{filenames}", ->
-		console.log "Building #{dest} with closure's REST API..."
-		compile "#{dest}.uncompressed.js", "#{dest}.js"
+		console.log "Uglifying #{dest}"
+		makeUgly "#{dest}.uncompressed.js", "#{dest}.js"
 
 buildtype = (name) ->
 	filenames = ['types/web-prelude', "types/#{name}"]
@@ -75,10 +77,10 @@ buildtype = (name) ->
 		fs.statSync "src/types/#{name}-api.coffee"
 		filenames.push "types/#{name}-api"
 
-	buildclosure filenames, "webclient/#{name}"
+	compile filenames, "webclient/#{name}"
 
 task 'webclient', 'Build the web client into one file', ->
-	buildclosure client, 'webclient/share'
+	compile client, 'webclient/share'
 	buildtype 'json'
 	buildtype 'text-tp2'
 

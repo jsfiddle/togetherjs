@@ -44,7 +44,7 @@ module.exports = testCase
 		# Create a new server which just exposes the REST interface with default options
 		options = {
 			socketio: null
-			rest: {delete: true}
+			rest: {}
 			db: {type: 'memory'}
 			auth: (client, action) => @auth client, action
 		}
