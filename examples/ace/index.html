@@ -26,6 +26,7 @@
 		if (doc != null) {
 			doc.close();
 			doc.detach_ace();
+			doc = null;
 		}
 
 		editor.setReadOnly(true);
