@@ -23,16 +23,16 @@
 
 	var setDoc = function(docName) {
 
-		if (doc != null) {
-			doc.close();
-			doc.detach_ace();
-			doc = null;
-		}
-
 		editor.setReadOnly(true);
 		document.title = docName;
 
 		sharejs.open(docName, function(newDoc, error) {
+			
+			if (doc != null) {
+				doc.close();
+				doc.detach_ace();
+			}
+
 			doc = newDoc;
 
 			if (error) {
