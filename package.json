@@ -1,6 +1,6 @@
 {
 	"name": "share",
-	"version": "0.4.1",
+	"version": "0.5.0",
 	"description": "A database for concurrent document editing",
 	"keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
 	"homepage": "",
@@ -18,11 +18,12 @@
 		"uglify-js": "~1",
 		"hat": "*",
 		"request": ">= 2.1.1",
-		"underscore": ">= 1.1.7"
+		"underscore": ">= 1.1.7",
+		"coffee-script": "> 1.1.0",
+		"hat": "*"
 	},
 	"devDependencies": {
-		"nodeunit": "~0.5.0",
-		"coffee-script": "> 1.1.0"
+		"nodeunit": "~0.5.0"
 	},
 	"engine": "node >= 0.4.4",
 	"scripts": {

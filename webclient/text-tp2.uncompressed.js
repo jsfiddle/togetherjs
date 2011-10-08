@@ -4,7 +4,8 @@
    @type {boolean}
 */
 var WEB = true;
-;  var append, appendDoc, appendSkipChars, checkOp, componentLength, exports, makeTake, takeDoc, transformer, type;
+;
+  var append, appendDoc, appendSkipChars, checkOp, componentLength, exports, makeTake, takeDoc, transformer, type;
   exports = window['sharejs'];
   type = {
     name: 'text-tp2',
@@ -146,9 +147,7 @@ var WEB = true;
   };
   type._append = append = function(op, component) {
     var last;
-    if (component === 0 || component.i === '' || component.i === 0 || component.d === 0) {
-      ;
-    } else if (op.length === 0) {
+    if (component === 0 || component.i === '' || component.i === 0 || component.d === 0) {} else if (op.length === 0) {
       return op.push(component);
     } else {
       last = op[op.length - 1];

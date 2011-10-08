@@ -2,7 +2,7 @@
   var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, exports, invertComponent, io, nextTick, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   window.sharejs = exports = {
-    'version': '0.4.1'
+    'version': '0.5.0'
   };
   if (typeof WEB === 'undefined') {
     window.WEB = true;
@@ -241,11 +241,9 @@
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-            if ((_ref = c.p) != null) {
-        _ref;
-      } else {
+      if ((_ref = c.p) == null) {
         c.p = 0;
-      };
+      }
       append(newOp, c);
     }
     return newOp;
@@ -774,11 +772,9 @@
       var c, del, location;
       if (typeof WEB !== "undefined" && WEB !== null) {
         location = window.location;
-                if (origin != null) {
-          origin;
-        } else {
+        if (origin == null) {
           origin = "" + location.protocol + "//" + location.hostname + "/sjs";
-        };
+        }
       }
       if (!connections[origin]) {
         c = new Connection(origin);

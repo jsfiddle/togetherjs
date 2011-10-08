@@ -4,7 +4,8 @@
    @type {boolean}
 */
 var WEB = true;
-;  var SubDoc, clone, depath, exports, isArray, json, pathEquals, text, traverse;
+;
+  var SubDoc, clone, depath, exports, isArray, json, pathEquals, text, traverse;
   var __slice = Array.prototype.slice;
   exports = window['sharejs'];
   if (typeof WEB !== "undefined" && WEB !== null) {
@@ -205,11 +206,9 @@ var WEB = true;
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-            if ((_ref = c.p) != null) {
-        _ref;
-      } else {
+      if ((_ref = c.p) == null) {
         c.p = [];
-      };
+      }
       json.append(newOp, c);
     }
     return newOp;
