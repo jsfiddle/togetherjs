@@ -526,7 +526,10 @@
       return setTimeout(this.flush, 0);
     };
     this.close = function(callback) {
-      return connection.send({
+      if (connection.socket === null) {
+        return typeof callback === "function" ? callback() : void 0;
+      }
+      connection.send({
         'doc': this.name,
         open: false
       }, __bind(function() {
@@ -535,6 +538,7 @@
         }
         this.emit('closed');
       }, this));
+      return this.emit('closing');
     };
     if (this.type.api) {
       _ref = this.type.api;
@@ -571,8 +575,8 @@
       this.onMessage = __bind(this.onMessage, this);
       this.connected = __bind(this.connected, this);
       this.disconnected = __bind(this.disconnected, this);      this.docs = {};
-      this.numDocs = 0;
       this.handlers = {};
+      this.state = 'connecting';
       this.socket = io.connect(origin, {
         'force new connection': true
       });
@@ -610,14 +614,10 @@
         }
         return _results;
       }, this));
-      if (this.socket.socket.connected) {
-        setTimeout((__bind(function() {
-          return this.connected();
-        }, this)), 0);
-      }
     }
     Connection.prototype.disconnected = function() {
-      return this.emit('disconnect');
+      this.emit('disconnect');
+      return this.socket = null;
     };
     Connection.prototype.connected = function() {
       return this.emit('connect');
@@ -625,7 +625,7 @@
     Connection.prototype.send = function(msg, callback) {
       var callbacks, docHandlers, docName, type, _base;
       if (this.socket === null) {
-        throw new Error('Cannot send messages to a closed connection');
+        throw new Error("Cannot send message " + (JSON.stringify(msg)) + " to a closed connection");
       }
       docName = msg.doc;
       if (docName === this.lastSentDoc) {
@@ -679,10 +679,8 @@
       doc = new Doc(this, name, params.v, type, params.snapshot);
       doc.created = !!params.create;
       this.docs[name] = doc;
-      this.numDocs++;
-      doc.on('closed', __bind(function() {
-        delete this.docs[name];
-        return this.numDocs--;
+      doc.on('closing', __bind(function() {
+        return delete this.docs[name];
       }, this));
       return doc;
     };
@@ -755,7 +753,7 @@
     };
     Connection.prototype.disconnect = function() {
       if (this.socket) {
-        this.emit('disconnected');
+        this.emit('disconnecting');
         this.socket.disconnect();
         return this.socket = null;
       }
@@ -774,7 +772,7 @@
     var connections, getConnection;
     connections = {};
     getConnection = function(origin) {
-      var c, location;
+      var c, del, location;
       if (typeof WEB !== "undefined" && WEB !== null) {
         location = window.location;
         if (origin == null) {
@@ -783,12 +781,12 @@
       }
       if (!connections[origin]) {
         c = new Connection(origin);
-        c.on('disconnected', function() {
+        c.numDocs = 0;
+        del = function() {
           return delete connections[origin];
-        });
-        c.on('connect failed', function() {
-          return delete connections[origin];
-        });
+        };
+        c.on('disconnecting', del);
+        c.on('connect failed', del);
         connections[origin] = c;
       }
       return connections[origin];
@@ -800,19 +798,20 @@
         origin = null;
       }
       c = getConnection(origin);
+      c.numDocs++;
       c.open(docName, type, function(doc, error) {
         if (doc === null) {
+          c.numDocs--;
           if (c.numDocs === 0) {
             c.disconnect();
           }
           return callback(null, error);
         } else {
-          doc.on('closed', function() {
-            return setTimeout(function() {
-              if (c.numDocs === 0) {
-                return c.disconnect();
-              }
-            }, 0);
+          doc.on('closing', function() {
+            c.numDocs--;
+            if (c.numDocs === 0) {
+              return c.disconnect();
+            }
           });
           return callback(doc);
         }

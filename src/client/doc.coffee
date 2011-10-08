@@ -154,10 +154,12 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
 	# Close a document.
 	# No unit tests for this so far.
 	@close = (callback) ->
+		return callback?() if connection.socket == null
 		connection.send {'doc':@name, open:false}, =>
 			callback() if callback
 			@emit 'closed'
 			return
+		@emit 'closing'
 	
 	if @type.api
 		this[k] = v for k, v of @type.api

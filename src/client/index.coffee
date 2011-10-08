@@ -29,8 +29,11 @@ exports.open = do ->
 		
 		unless connections[origin]
 			c = new Connection origin
-			c.on 'disconnected', -> delete connections[origin]
-			c.on 'connect failed', -> delete connections[origin]
+			c.numDocs = 0
+
+			del = -> delete connections[origin]
+			c.on 'disconnecting', del
+			c.on 'connect failed', del
 			connections[origin] = c
 		
 		connections[origin]
@@ -41,22 +44,24 @@ exports.open = do ->
 			origin = null
 
 		c = getConnection origin
+		c.numDocs++
 		c.open docName, type, (doc, error) ->
 			if doc == null
+				c.numDocs--
 				c.disconnect() if c.numDocs == 0
 				callback null, error
 			else
 				# If you're using the bare API, connections are cleaned up as soon as there's no
 				# documents using them.
-				doc.on 'closed', ->
-					setTimeout ->
-							if c.numDocs == 0
-								c.disconnect()
-						, 0
+				doc.on 'closing', ->
+					c.numDocs--
+					if c.numDocs == 0
+						c.disconnect()
 
 				callback doc
 		
 		c.on 'connect failed'
+
 
 unless WEB?
 	exports.Doc = require('./doc').Doc

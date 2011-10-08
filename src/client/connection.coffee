@@ -23,12 +23,13 @@ else
 class Connection
 	constructor: (origin) ->
 		@docs = {}
-		@numDocs = 0
 
 		# Map of docName -> map of type -> function(data, error)
 		#
 		# Once socket.io isn't buggy, this will be rewritten to use socket.io's RPC.
 		@handlers = {}
+
+		@state = 'connecting'
 
 		# We can't reuse connections because the socket.io server doesn't
 		# emit connected events when a new connection comes in. Multiple documents
@@ -50,12 +51,13 @@ class Connection
 
 		# This avoids a bug in socket.io-client (v0.7.9) which causes
 		# subsequent connections on the same host to not fire a .connect event
-		if @socket.socket.connected
-			setTimeout (=> @connected()), 0
+		#if @socket.socket.connected
+		#	setTimeout (=> @connected()), 0
 
 	disconnected: =>
 		# Start reconnect sequence
 		@emit 'disconnect'
+		@socket = null
 
 	connected: =>
 		# Stop reconnect sequence
@@ -67,7 +69,7 @@ class Connection
 	# The callback is optional. It takes (data, error). Data might be missing if the
 	# error was a connection error.
 	send: (msg, callback) ->
-		throw new Error 'Cannot send messages to a closed connection' if @socket == null
+		throw new Error "Cannot send message #{JSON.stringify msg} to a closed connection" if @socket == null
 
 		docName = msg.doc
 
@@ -131,11 +133,9 @@ class Connection
 		doc = new Doc(@, name, params.v, type, params.snapshot)
 		doc.created = !!params.create
 		@docs[name] = doc
-		@numDocs++
 
-		doc.on 'closed', =>
+		doc.on 'closing', =>
 			delete @docs[name]
-			@numDocs--
 
 		doc
 
@@ -200,7 +200,7 @@ class Connection
 
 	disconnect: () ->
 		if @socket
-			@emit 'disconnected'
+			@emit 'disconnecting'
 			@socket.disconnect()
 			@socket = null
 

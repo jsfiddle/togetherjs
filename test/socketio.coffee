@@ -1,4 +1,17 @@
 # Tests for the server's socketio interface
+#
+# I've had the very occasional flakeyness with these tests:
+#
+#  Error: EADDRINUSE, Address already in use
+#    at doConnect (net.js:549:5)
+#    at net.js:725:9
+#    at dns.js:192:30
+#    at Object.lookup (dns.js:190:11)
+#    at Socket.connect (net.js:712:20)
+#    at Object.createConnection (net.js:265:5)
+# 
+# I don't know what is causing this. - Its happening when the socket.io client connects
+# to the socket.io server.
 
 testCase = require('nodeunit').testCase
 assert = require 'assert'

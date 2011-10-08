@@ -10,7 +10,16 @@ assert = require 'assert'
 server = require '../src/server'
 types = require '../src/types'
 
-client = require '../src/client'
+nativeclient = require '../src/client'
+webclient = require './helpers/webclient'
+
+{randomReal} = require './helpers'
+
+nowOrLater = (fn) ->
+	if randomReal() < 0.5
+		fn()
+	else
+		process.nextTick fn
 
 # Open the same document from 2 connections.
 # So intense.
@@ -27,7 +36,7 @@ doubleOpen = (c1, c2, docName, type, callback) ->
 		assert.ok doc2
 		callback doc1, doc2 if doc1 && doc2
 
-module.exports = testCase
+genTests = (client) -> testCase
 	setUp: (callback) ->
 		# This is needed for types.text.generateRandomOp
 		require './types/text'
@@ -35,11 +44,14 @@ module.exports = testCase
 		@name = 'testingdoc'
 		@server = server {db: {type: 'memory'}}
 		@server.listen =>
-			port = @server.address().port
+			@port = @server.address().port
 
-			@c1 = new client.Connection "http://localhost:#{port}/sjs"
+			# We use 127.0.0.1 here so if the process runs out of file handles,
+			# we'll get the correct error message instead of a generic DNS connection
+			# error.
+			@c1 = new client.Connection "http://127.0.0.1:#{@port}/sjs"
 			@c1.on 'connect', =>
-				@c2 = new client.Connection "http://localhost:#{port}/sjs"
+				@c2 = new client.Connection "http://127.0.0.1:#{@port}/sjs"
 				@c2.on 'connect', =>
 					callback()
 
@@ -74,6 +86,29 @@ module.exports = testCase
 			doc2.on 'remoteop', (op) ->
 				test.deepEqual doc2.snapshot, {}
 				test.done()
+
+	'Closing and opening documents works': (test) ->
+		num = 0
+		nextDocName = -> "doc#{num++}"
+
+		host = "http://127.0.0.1:#{@port}/sjs"
+
+		more = ->
+			client.open nextDocName(), 'text', host, (doc, error) =>
+				nowOrLater ->
+					doc.close()
+
+					# This test consumes open file handles. If you want to set
+					# it higher, you need to run:
+					#  % ulimit -n 8096
+					# to increase the OS limit. This happens because of a bug in
+					# socket.io.
+					if num < 30
+						nowOrLater more
+					else
+						test.done()
+
+		more()
 
 	'randomized op spam test': (test) ->
 		doubleOpen @c1, @c2, @name, 'text', (doc1, doc2) =>
@@ -121,3 +156,5 @@ module.exports = testCase
 
 	# TODO: Add a randomized tester which also randomly denies ops.
 
+exports.native = genTests nativeclient
+exports.webclient = genTests webclient
