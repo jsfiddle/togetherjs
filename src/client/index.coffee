@@ -53,7 +53,7 @@ exports.open = do ->
 			else
 				# If you're using the bare API, connections are cleaned up as soon as there's no
 				# documents using them.
-				doc.on 'closing', ->
+				doc.on 'closed', ->
 					c.numDocs--
 					if c.numDocs == 0
 						c.disconnect()
