@@ -73,7 +73,7 @@ module.exports = Model = (db, options) ->
 	queues = {} # docName -> syncQueue
 
 	# Apply an op to the specified document.
-	# The callback is passed (error, applied version #)
+	# The callback is passed (applied version #, error)
 	# opData = {op:op, v:v, meta:metadata}
 	# 
 	# Ops are queued before being applied so that the following code applies op C before op B:
