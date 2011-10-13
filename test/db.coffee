@@ -181,6 +181,7 @@ test = (opts) -> testCase
 					passPart()
 
 exports.memory = test {type: 'memory', 'testing': true}
+exports.couchdb = test {type: 'couchdb', 'testing': true}
 
 try
 	require 'redis'

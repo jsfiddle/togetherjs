@@ -7,16 +7,8 @@ module.exports = {
 	db: {
 		// DB type. Options are 'redis' or 'memory'. 'redis' requires the
 		// redis npm package. 'memory' has no dependancies and no options.
-		type: 'redis',
-
-		// The prefix for database entries
-		prefix: 'ShareJS:',
-
-		// The hostname, port and options to pass to redis.
-		// null lets redis decide - redis by default connects to localhost port 6379.
-		hostname: null,
-		port: null,
-		redisOptions: null
+		type: 'couchdb',
+		hostname: "http://admin:admin@localhost"
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
