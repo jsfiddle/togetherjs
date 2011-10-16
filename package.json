@@ -16,7 +16,9 @@
 		"connect": ">= 1.1.1 < 2.0.0",
 		"optimist": ">= 0.2.4",
 		"uglify-js": "~1",
-		"hat": "*"
+		"hat": "*",
+		"request": ">= 2.1.1",
+		"underscore": ">= 1.1.7"
 	},
 	"devDependencies": {
 		"nodeunit": "~0.5.0",

@@ -5,7 +5,7 @@ module.exports = {
 
 	// Database options
 	db: {
-		// DB type. Options are 'redis' or 'memory'. 'redis' requires the
+		// DB type. Options are 'redis', 'couchdb' or 'memory'. 'redis' requires the
 		// redis npm package. 'memory' has no dependancies and no options.
 		type: 'redis',
 
@@ -17,6 +17,12 @@ module.exports = {
 		hostname: null,
 		port: null,
 		redisOptions: null
+
+		// To use CouchDB uncomment this section then run bin/setup_couch:
+		// type: 'couchdb',
+		// hostname: "http://admin:admin@localhost"
+		// port: 5984
+
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
@@ -30,6 +36,8 @@ module.exports = {
 
 	// SocketIO frontend options. Set socketio: null to disable socketIO frontend.
 	socketio: {
+	  // Specify tuples for io.configure:
+	  // 'transports': ['xhr-polling', 'flashsocket']
 	},
 
 	// Authentication code to test if clients are allowed to perform different actions.
