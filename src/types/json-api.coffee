@@ -11,15 +11,22 @@ class SubDoc
   constructor: (@doc, @path) ->
   at: (path...) -> @doc.at @path.concat depath path
   get: -> @doc.getAt @path
+  # for objects and lists
   set: (value, cb) -> @doc.setAt @path, value, cb
-  delete: (cb) -> @doc.deleteAt @path, cb
-  insertText: (text, pos, cb) -> @doc.insertTextAt @path, text, pos, cb
-  deleteText: (length, pos, cb) -> @doc.deleteTextAt @path, length, pos, cb
+  # for strings and lists.
   insert: (pos, value, cb) -> @doc.insertAt @path, pos, value, cb
+  # for strings
+  del: (pos, length, cb) -> @doc.deleteTextAt @path, length, pos, cb
+  # for objects and lists
+  remove: (cb) -> @doc.removeAt @path, cb
   push: (value, cb) -> @insert @get().length, value, cb
   move: (from, to, cb) -> @doc.moveAt @path, from, to, cb
   add: (amount, cb) -> @doc.addAt @path, amount, cb
   on: (event, cb) -> @doc.addListener @path, event, cb
+
+  # text API compatibility
+  getLength: -> @get().length
+  getText: -> @get()
 
 traverse = (snapshot, path) ->
   container = data:snapshot
@@ -59,7 +66,7 @@ json['api'] =
     else throw 'bad path'
     @submitOp [op], cb
 
-  'deleteAt': (path, cb) ->
+  'removeAt': (path, cb) ->
     {elem, key} = traverse @snapshot, path
     throw 'no element at that path' unless elem[key]
     op = {p:path}
@@ -71,8 +78,13 @@ json['api'] =
     @submitOp [op], cb
 
   'insertAt': (path, pos, value, cb) ->
-    op = [{p:path.concat(pos),li:value}]
-    @submitOp op, cb
+    {elem, key} = traverse @snapshot, path
+    op = {p:path.concat pos}
+    if elem[key].constructor == Array
+      op.li = value
+    else if typeof elem[key] == 'string'
+      op.si = value
+    @submitOp [op], cb
 
   'moveAt': (path, from, to, cb) ->
     op = [{p:path.concat(from), lm:to}]
@@ -80,11 +92,6 @@ json['api'] =
 
   'addAt': (path, amount, cb) ->
     op = [{p:path, na:amount}]
-    @submitOp op, cb
-
-  'insertTextAt': (path, text, pos, cb) ->
-    pos = 0 unless pos?
-    op = [{'p':path.concat(pos), 'si':text}]
     @submitOp op, cb
 
   'deleteTextAt': (path, length, pos, cb) ->
@@ -126,14 +133,18 @@ json['api'] =
             switch event
               when 'insert'
                 if c.li != undefined and c.ld == undefined
-                  cb(c.li, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.li)
                 else if c.oi != undefined and c.od == undefined
-                  cb(c.oi, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.oi)
+                else if c.si != undefined
+                  cb(c.p[c.p.length-1], c.si)
               when 'delete'
                 if c.li == undefined and c.ld != undefined
-                  cb(c.ld, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.ld)
                 else if c.oi == undefined and c.od != undefined
-                  cb(c.od, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.od)
+                else if c.sd != undefined
+                  cb(c.p[c.p.length-1], c.sd)
               when 'replace'
                 if c.li != undefined and c.ld != undefined
                   cb(c.ld, c.li, c.p[c.p.length-1])
@@ -142,12 +153,6 @@ json['api'] =
               when 'move'
                 if c.lm != undefined
                   cb(c.p[c.p.length-1], c.lm)
-              when 'text-insert'
-                if c.si != undefined
-                  cb(c.si, c.p[c.p.length-1])
-              when 'text-delete'
-                if c.sd != undefined
-                  cb(c.sd, c.p[c.p.length-1])
               when 'add'
                 if c.na != undefined
                   cb(c.na)

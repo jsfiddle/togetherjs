@@ -24,7 +24,7 @@ type['api'] =
 		strings = (elem for elem in @snapshot.data when typeof elem is 'string')
 		strings.join ''
 
-	'insert': (text, pos, callback) ->
+	'insert': (pos, text, callback) ->
 		pos = 0 if pos == undefined
 
 		op = []
@@ -37,7 +37,7 @@ type['api'] =
 		@submitOp op, callback
 		op
 	
-	'del': (length, pos, callback) ->
+	'del': (pos, length, callback) ->
 		op = []
 		docPos = {index:0, offset:0}
 
@@ -74,7 +74,7 @@ type['api'] =
 				else if component.i != undefined
 					# Insert
 					if typeof component.i is 'string'
-						@emit 'insert', component.i, textPos
+						@emit 'insert', textPos, component.i
 						textPos += component.i.length
 				else
 					# Delete
@@ -82,7 +82,7 @@ type['api'] =
 					while remainder > 0
 						part = takeDoc snapshot, docPos, remainder
 						if typeof part is 'string'
-							@emit 'delete', part, textPos
+							@emit 'delete', textPos, part
 						remainder -= part.length || part
 
 			return

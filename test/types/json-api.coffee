@@ -45,23 +45,23 @@ module.exports =
     assert.deepEqual doc.get(), [1,5,3]
     test.done()
 
-  'delete': (test) ->
+  'remove': (test) ->
     doc = new Doc {hi:[1,2,3]}
     hi = doc.at('hi')
-    hi.at(0).delete()
+    hi.at(0).remove()
     assert.deepEqual doc.get(), {hi:[2,3]}
-    hi.delete()
+    hi.remove()
     assert.deepEqual doc.get(), {}
     test.done()
 
   'insert text': (test) ->
     doc = new Doc {text:"Hello there!"}
-    doc.at('text').insertText(', ShareJS', 11)
+    doc.at('text').insert 11, ', ShareJS'
     assert.deepEqual doc.get(), {text:'Hello there, ShareJS!'}
     test.done()
   'delete text': (test) ->
     doc = new Doc {text:"Sup, share?"}
-    doc.at('text').deleteText(7, 3)
+    doc.at('text').del(3, 7)
     assert.deepEqual doc.get(), {text:'Sup?'}
     test.done()
 
@@ -91,7 +91,7 @@ module.exports =
 
   'basic listeners': (test) ->
     doc = new Doc {list:[1]}
-    doc.at('list').on 'insert', (num, pos) ->
+    doc.at('list').on 'insert', (pos, num) ->
       assert.equal num, 4
       assert.equal pos, 0
       test.done()
@@ -115,7 +115,7 @@ module.exports =
 
   'listener moves on li': (test) ->
     doc = new Doc ['bar']
-    doc.at(0).on 'text-insert', (s, i) ->
+    doc.at(0).on 'insert', (i, s) ->
       assert.equal s, 'foo'
       assert.equal i, 0
       test.done()
@@ -124,16 +124,16 @@ module.exports =
 
   'listener moves on ld': (test) ->
     doc = new Doc ['asdf','bar']
-    doc.at(1).on 'text-insert', (s, i) ->
+    doc.at(1).on 'insert', (i, s) ->
       assert.equal s, 'foo'
       assert.equal i, 0
       test.done()
-    doc.at(0).delete()
+    doc.at(0).remove()
     doc.emit 'remoteop', [{p:[0,0], si:'foo'}]
 
   'listener moves on lm': (test) ->
     doc = new Doc ['asdf','bar']
-    doc.at(1).on 'text-insert', (s, i) ->
+    doc.at(1).on 'insert', (i, s) ->
       assert.equal s, 'foo'
       assert.equal i, 0
       test.done()

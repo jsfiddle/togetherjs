@@ -35,20 +35,20 @@ genTests = (type) ->
 	sanity: (test) ->
 		doc = new Doc
 
-		doc.insert 'hi'
+		doc.insert 0, 'hi'
 		test.strictEqual doc.getText(), 'hi'
 		test.strictEqual doc.getLength(), 2
 
-		doc.insert ' mum', 2
+		doc.insert 2, ' mum'
 		test.strictEqual doc.getText(), 'hi mum'
 		test.strictEqual doc.getLength(), 6
 
-		doc.del 3, 0
+		doc.del 0, 3
 		test.strictEqual doc.getText(), 'mum'
 		test.strictEqual doc.getLength(), 3
 
 		test.done()
-	
+
 	'randomize generating functions': (test) ->
 		doc = new Doc
 
@@ -62,26 +62,26 @@ genTests = (type) ->
 				# Insert
 				pos = randomInt(content.length + 1)
 				str = randomWord() + ' '
-				doc.insert str, pos
+				doc.insert pos, str
 				content = content[...pos] + str + content[pos..]
 			else
 				# Delete
 				pos = randomInt content.length
 				length = Math.min(randomInt(4), content.length - pos)
 				#console.log "pos = #{pos} len = #{length} content = '#{content}'"
-				doc.del length, pos
+				doc.del pos, length
 				content = content[...pos] + content[(pos + length)..]
 				#console.log "-> content = '#{content}'"
-	
+
 		test.done()
 
 	'randomize emit': (test) ->
 		doc = new Doc
 		contents = ''
 
-		doc.on 'insert', (text, pos) ->
+		doc.on 'insert', (pos, text) ->
 			contents = contents[...pos] + text + contents[pos...]
-		doc.on 'delete', (text, pos) ->
+		doc.on 'delete', (pos, text) ->
 #			console.warn "delete '#{text}' at #{pos}, contents = '#{contents}'"
 			assert.strictEqual contents[pos...(pos + text.length)], text
 			contents = contents[...pos] + contents[(pos + text.length)...]

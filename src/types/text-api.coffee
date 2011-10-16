@@ -11,14 +11,13 @@ text['api'] =
 	# Get the text contents of a document
 	'getText': -> @snapshot
 
-	'insert': (text, pos, callback) ->
-		pos = 0 unless pos?
+	'insert': (pos, text, callback) ->
 		op = [{'p':pos, 'i':text}]
 		
 		@submitOp op, callback
 		op
 	
-	'del': (length, pos, callback) ->
+	'del': (pos, length, callback) ->
 		op = [{'p':pos, 'd':@snapshot[pos...(pos + length)]}]
 
 		@submitOp op, callback
@@ -28,6 +27,6 @@ text['api'] =
 		@on 'remoteop', (op) ->
 			for component in op
 				if component['i'] != undefined
-					@emit 'insert', component['i'], component['p']
+					@emit 'insert', component['p'], component['i']
 				else
-					@emit 'delete', component['d'], component['p']
+					@emit 'delete', component['p'], component['d']
