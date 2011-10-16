@@ -14,6 +14,7 @@ modules = [
 	'types/text-tp2'
 	'types/text-api'
 	'types/json'
+	'types/json-api'
 
 	'db'
 	'model'
