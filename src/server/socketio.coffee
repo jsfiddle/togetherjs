@@ -20,7 +20,9 @@ exports.attach = (server, model, options) ->
 
 	io.configure ->
 		io.set 'log level', 1
-	
+		for option in options
+			io.set option, options[option]
+
 	authClient = (handshakeData, callback) ->
 		data =
 			headers: handshakeData.headers
