@@ -5,10 +5,24 @@ module.exports = {
 
 	// Database options
 	db: {
-		// DB type. Options are 'redis' or 'memory'. 'redis' requires the
+		// DB type. Options are 'redis', 'couchdb' or 'memory'. 'redis' requires the
 		// redis npm package. 'memory' has no dependancies and no options.
-		type: 'couchdb',
-		hostname: "http://admin:admin@localhost"
+		type: 'redis',
+
+		// The prefix for database entries
+		prefix: 'ShareJS:',
+
+		// The hostname, port and options to pass to redis.
+		// null lets redis decide - redis by default connects to localhost port 6379.
+		hostname: null,
+		port: null,
+		redisOptions: null
+
+		// To use CouchDB:
+		// type: 'couchdb',
+		// hostname: "http://admin:admin@localhost"
+		// port: 5984
+
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
@@ -22,6 +36,8 @@ module.exports = {
 
 	// SocketIO frontend options. Set socketio: null to disable socketIO frontend.
 	socketio: {
+	  // Specify tuples for io.configure:
+	  // 'transports': ['xhr-polling', 'flashsocket']
 	},
 
 	// Authentication code to test if clients are allowed to perform different actions.
