@@ -98,7 +98,7 @@ module.exports =
     doc.emit 'remoteop', [{p:['list',0],li:4}], doc.get()
   'object replace listener': (test) ->
     doc = new Doc {foo:'bar'}
-    doc.at().on 'replace', (before, after, pos) ->
+    doc.at().on 'replace', (pos, before, after) ->
       assert.equal before, 'bar'
       assert.equal after, 'baz'
       assert.equal pos, 'foo'
@@ -106,7 +106,7 @@ module.exports =
     doc.emit 'remoteop', [{p:['foo'],od:'bar',oi:'baz'}]
   'list replace listener': (test) ->
     doc = new Doc ['bar']
-    doc.at().on 'replace', (before, after, pos) ->
+    doc.at().on 'replace', (pos, before, after) ->
       assert.equal before, 'bar'
       assert.equal after, 'baz'
       assert.equal pos, 0

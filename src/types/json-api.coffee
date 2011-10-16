@@ -147,9 +147,9 @@ json['api'] =
                   cb(c.p[c.p.length-1], c.sd)
               when 'replace'
                 if c.li != undefined and c.ld != undefined
-                  cb(c.ld, c.li, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.ld, c.li)
                 else if c.oi != undefined and c.od != undefined
-                  cb(c.od, c.oi, c.p[c.p.length-1])
+                  cb(c.p[c.p.length-1], c.od, c.oi)
               when 'move'
                 if c.lm != undefined
                   cb(c.p[c.p.length-1], c.lm)
