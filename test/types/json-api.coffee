@@ -154,3 +154,34 @@ module.exports =
     doc.at('foo').set('baz')
     doc.emit 'remoteop', [{p:['foo',0], si:'asdf'}]
     test.done()
+
+  'child op one level': (test) ->
+    doc = new Doc {foo:'bar'}
+    doc.at().on 'child op', (p, op) ->
+      assert.deepEqual p, ['foo',0]
+      assert.equal op.si, 'baz'
+      test.done()
+    doc.emit 'remoteop', [{p:['foo',0], si:'baz'}]
+
+  'child op two levels': (test) ->
+    doc = new Doc {foo:['bar']}
+    doc.at().on 'child op', (p, op) ->
+      assert.deepEqual p, ['foo',0,3]
+      assert.deepEqual op.si, 'baz'
+      test.done()
+    doc.emit 'remoteop', [{p:['foo',0,3],si:'baz'}]
+
+  'child op path snipping': (test) ->
+    doc = new Doc {foo:['bar']}
+    doc.at('foo').on 'child op', (p, op) ->
+      assert.deepEqual p, [0,3]
+      assert.deepEqual op.si, 'baz'
+      test.done()
+    doc.emit 'remoteop', [{p:['foo',0,3],si:'baz'}]
+
+  'child op not sent when op outside node': (test) ->
+    doc = new Doc {foo:['bar']}
+    doc.at('foo').on 'child op', ->
+      assert.ok false
+    doc.at('baz').set('hi')
+    test.done()
