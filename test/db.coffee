@@ -181,7 +181,9 @@ test = (opts) -> testCase
 					passPart()
 
 exports.memory = test {type: 'memory', 'testing': true}
-exports.couchdb = test {type: 'couchdb', 'testing': true}
+
+options = require '../bin/options'
+exports.couchdb = test {type: 'couchdb', 'testing': true} if options.db.type == 'couchdb'
 
 try
 	require 'redis'

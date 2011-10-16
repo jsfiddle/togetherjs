@@ -20,7 +20,7 @@ module.exports = {
 
 		// To use CouchDB uncomment this section then run bin/setup_couch:
 		// type: 'couchdb',
-		// hostname: "http://admin:admin@localhost"
+		// hostname: "http://admin:admin@localhost",
 		// port: 5984
 
 	},
