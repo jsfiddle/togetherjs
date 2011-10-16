@@ -241,9 +241,11 @@
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-      if ((_ref = c.p) == null) {
+            if ((_ref = c.p) != null) {
+        _ref;
+      } else {
         c.p = 0;
-      }
+      };
       append(newOp, c);
     }
     return newOp;
@@ -377,11 +379,8 @@
     'getText': function() {
       return this.snapshot;
     },
-    'insert': function(text, pos, callback) {
+    'insert': function(pos, text, callback) {
       var op;
-      if (pos == null) {
-        pos = 0;
-      }
       op = [
         {
           'p': pos,
@@ -391,7 +390,7 @@
       this.submitOp(op, callback);
       return op;
     },
-    'del': function(length, pos, callback) {
+    'del': function(pos, length, callback) {
       var op;
       op = [
         {
@@ -408,7 +407,7 @@
         _results = [];
         for (_i = 0, _len = op.length; _i < _len; _i++) {
           component = op[_i];
-          _results.push(component['i'] !== void 0 ? this.emit('insert', component['i'], component['p']) : this.emit('delete', component['d'], component['p']));
+          _results.push(component['i'] !== void 0 ? this.emit('insert', component['p'], component['i']) : this.emit('delete', component['p'], component['d']));
         }
         return _results;
       });
@@ -438,10 +437,10 @@
       var oldSnapshot;
       oldSnapshot = this.snapshot;
       this.snapshot = this.type.apply(this.snapshot, docOp);
+      this.emit('change', docOp, oldSnapshot);
       if (isRemote) {
-        this.emit('remoteop', docOp, oldSnapshot);
+        return this.emit('remoteop', docOp, oldSnapshot);
       }
-      return this.emit('change', docOp, oldSnapshot);
     }, this);
     this.flush = __bind(function() {
       if (inflightOp === null && pendingOp !== null) {
@@ -775,9 +774,11 @@
       var c, del, location;
       if (typeof WEB !== "undefined" && WEB !== null) {
         location = window.location;
-        if (origin == null) {
+                if (origin != null) {
+          origin;
+        } else {
           origin = "" + location.protocol + "//" + location.hostname + "/sjs";
-        }
+        };
       }
       if (!connections[origin]) {
         c = new Connection(origin);

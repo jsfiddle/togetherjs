@@ -4,8 +4,8 @@
    @type {boolean}
 */
 var WEB = true;
-;
-  var clone, exports, isArray, json, text;
+;  var SubDoc, clone, depath, exports, isArray, json, pathEquals, text, traverse;
+  var __slice = Array.prototype.slice;
   exports = window['sharejs'];
   if (typeof WEB !== "undefined" && WEB !== null) {
     text = exports.types.text;
@@ -205,9 +205,11 @@ var WEB = true;
     }
     for (_i = 0, _len = op.length; _i < _len; _i++) {
       c = op[_i];
-      if ((_ref = c.p) == null) {
+            if ((_ref = c.p) != null) {
+        _ref;
+      } else {
         c.p = [];
-      }
+      };
       json.append(newOp, c);
     }
     return newOp;
@@ -502,4 +504,301 @@ var WEB = true;
     module.exports = json;
     require('./helpers').bootstrapTransform(json, json.transformComponent, json.checkValidOp, json.append);
   }
+  if (typeof WEB === 'undefined') {
+    json = require('./json');
+  }
+  depath = function(path) {
+    if (path.length === 1 && path[0].constructor === Array) {
+      return path[0];
+    } else {
+      return path;
+    }
+  };
+  SubDoc = (function() {
+    function SubDoc(doc, path) {
+      this.doc = doc;
+      this.path = path;
+    }
+    SubDoc.prototype.at = function() {
+      var path;
+      path = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return this.doc.at(this.path.concat(depath(path)));
+    };
+    SubDoc.prototype.get = function() {
+      return this.doc.getAt(this.path);
+    };
+    SubDoc.prototype.set = function(value, cb) {
+      return this.doc.setAt(this.path, value, cb);
+    };
+    SubDoc.prototype.insert = function(pos, value, cb) {
+      return this.doc.insertAt(this.path, pos, value, cb);
+    };
+    SubDoc.prototype.del = function(pos, length, cb) {
+      return this.doc.deleteTextAt(this.path, length, pos, cb);
+    };
+    SubDoc.prototype.remove = function(cb) {
+      return this.doc.removeAt(this.path, cb);
+    };
+    SubDoc.prototype.push = function(value, cb) {
+      return this.insert(this.get().length, value, cb);
+    };
+    SubDoc.prototype.move = function(from, to, cb) {
+      return this.doc.moveAt(this.path, from, to, cb);
+    };
+    SubDoc.prototype.add = function(amount, cb) {
+      return this.doc.addAt(this.path, amount, cb);
+    };
+    SubDoc.prototype.on = function(event, cb) {
+      return this.doc.addListener(this.path, event, cb);
+    };
+    SubDoc.prototype.getLength = function() {
+      return this.get().length;
+    };
+    SubDoc.prototype.getText = function() {
+      return this.get();
+    };
+    return SubDoc;
+  })();
+  traverse = function(snapshot, path) {
+    var container, elem, key, p, _i, _len;
+    container = {
+      data: snapshot
+    };
+    key = 'data';
+    elem = container;
+    for (_i = 0, _len = path.length; _i < _len; _i++) {
+      p = path[_i];
+      elem = elem[key];
+      key = p;
+      if (typeof elem === 'undefined') {
+        throw 'bad path';
+      }
+    }
+    return {
+      elem: elem,
+      key: key
+    };
+  };
+  pathEquals = function(p1, p2) {
+    var e, i, _len;
+    if (p1.length !== p2.length) {
+      return false;
+    }
+    for (i = 0, _len = p1.length; i < _len; i++) {
+      e = p1[i];
+      if (e !== p2[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  json['api'] = {
+    'provides': {
+      'json': true
+    },
+    'get': function() {
+      return this.snapshot;
+    },
+    'at': function() {
+      var path;
+      path = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return new SubDoc(this, depath(path));
+    },
+    'getAt': function(path) {
+      var elem, key, _ref;
+      _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
+      return elem[key];
+    },
+    'setAt': function(path, value, cb) {
+      var elem, key, op, _ref;
+      _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
+      op = {
+        p: path
+      };
+      if (elem.constructor === Array) {
+        op.li = value;
+        if (elem[key]) {
+          op.ld = elem[key];
+        }
+      } else if (typeof elem === 'object') {
+        op.oi = value;
+        if (elem[key]) {
+          op.od = elem[key];
+        }
+      } else {
+        throw 'bad path';
+      }
+      return this.submitOp([op], cb);
+    },
+    'removeAt': function(path, cb) {
+      var elem, key, op, _ref;
+      _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
+      if (!elem[key]) {
+        throw 'no element at that path';
+      }
+      op = {
+        p: path
+      };
+      if (elem.constructor === Array) {
+        op.ld = elem[key];
+      } else if (typeof elem === 'object') {
+        op.od = elem[key];
+      } else {
+        throw 'bad path';
+      }
+      return this.submitOp([op], cb);
+    },
+    'insertAt': function(path, pos, value, cb) {
+      var elem, key, op, _ref;
+      _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
+      op = {
+        p: path.concat(pos)
+      };
+      if (elem[key].constructor === Array) {
+        op.li = value;
+      } else if (typeof elem[key] === 'string') {
+        op.si = value;
+      }
+      return this.submitOp([op], cb);
+    },
+    'moveAt': function(path, from, to, cb) {
+      var op;
+      op = [
+        {
+          p: path.concat(from),
+          lm: to
+        }
+      ];
+      return this.submitOp(op, cb);
+    },
+    'addAt': function(path, amount, cb) {
+      var op;
+      op = [
+        {
+          p: path,
+          na: amount
+        }
+      ];
+      return this.submitOp(op, cb);
+    },
+    'deleteTextAt': function(path, length, pos, cb) {
+      var elem, key, op, _ref;
+      _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
+      op = [
+        {
+          'p': path.concat(pos),
+          'sd': elem[key].slice(pos, pos + length)
+        }
+      ];
+      return this.submitOp(op, cb);
+    },
+    'addListener': function(path, event, cb) {
+      return this._listeners.push({
+        path: path,
+        event: event,
+        cb: cb
+      });
+    },
+    '_register': function() {
+      this._listeners = [];
+      this.on('change', function(op) {
+        var c, dummy, i, l, to_remove, xformed, _i, _len, _len2, _ref, _results;
+        _results = [];
+        for (_i = 0, _len = op.length; _i < _len; _i++) {
+          c = op[_i];
+          if (c.na !== void 0 || c.si !== void 0 || c.sd !== void 0) {
+            continue;
+          }
+          to_remove = [];
+          _ref = this._listeners;
+          for (i = 0, _len2 = _ref.length; i < _len2; i++) {
+            l = _ref[i];
+            dummy = {
+              p: l.path,
+              na: 0
+            };
+            xformed = this.type.transformComponent([], dummy, c, 'left');
+            if (xformed.length === 0) {
+              to_remove.push(i);
+            } else if (xformed.length === 1) {
+              l.path = xformed[0].p;
+            } else {
+              throw "Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components.";
+            }
+          }
+          to_remove.sort(function(a, b) {
+            return b - a;
+          });
+          _results.push((function() {
+            var _j, _len3, _results2;
+            _results2 = [];
+            for (_j = 0, _len3 = to_remove.length; _j < _len3; _j++) {
+              i = to_remove[_j];
+              _results2.push(this._listeners.splice(i, 1));
+            }
+            return _results2;
+          }).call(this));
+        }
+        return _results;
+      });
+      return this.on('remoteop', function(op) {
+        var c, cb, event, match_path, path, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = op.length; _i < _len; _i++) {
+          c = op[_i];
+          match_path = c.na === void 0 ? c.p.slice(0, c.p.length - 1) : c.p;
+          _results.push((function() {
+            var _j, _len2, _ref, _ref2, _results2;
+            _ref = this._listeners;
+            _results2 = [];
+            for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+              _ref2 = _ref[_j], path = _ref2.path, event = _ref2.event, cb = _ref2.cb;
+              _results2.push((function() {
+                if (pathEquals(path, match_path)) {
+                  switch (event) {
+                    case 'insert':
+                      if (c.li !== void 0 && c.ld === void 0) {
+                        return cb(c.p[c.p.length - 1], c.li);
+                      } else if (c.oi !== void 0 && c.od === void 0) {
+                        return cb(c.p[c.p.length - 1], c.oi);
+                      } else if (c.si !== void 0) {
+                        return cb(c.p[c.p.length - 1], c.si);
+                      }
+                      break;
+                    case 'delete':
+                      if (c.li === void 0 && c.ld !== void 0) {
+                        return cb(c.p[c.p.length - 1], c.ld);
+                      } else if (c.oi === void 0 && c.od !== void 0) {
+                        return cb(c.p[c.p.length - 1], c.od);
+                      } else if (c.sd !== void 0) {
+                        return cb(c.p[c.p.length - 1], c.sd);
+                      }
+                      break;
+                    case 'replace':
+                      if (c.li !== void 0 && c.ld !== void 0) {
+                        return cb(c.ld, c.li, c.p[c.p.length - 1]);
+                      } else if (c.oi !== void 0 && c.od !== void 0) {
+                        return cb(c.od, c.oi, c.p[c.p.length - 1]);
+                      }
+                      break;
+                    case 'move':
+                      if (c.lm !== void 0) {
+                        return cb(c.p[c.p.length - 1], c.lm);
+                      }
+                      break;
+                    case 'add':
+                      if (c.na !== void 0) {
+                        return cb(c.na);
+                      }
+                  }
+                }
+              })());
+            }
+            return _results2;
+          }).call(this));
+        }
+        return _results;
+      });
+    }
+  };
 }).call(this);

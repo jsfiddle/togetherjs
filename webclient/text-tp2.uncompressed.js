@@ -4,8 +4,7 @@
    @type {boolean}
 */
 var WEB = true;
-;
-  var append, appendDoc, appendSkipChars, checkOp, componentLength, exports, makeTake, takeDoc, transformer, type;
+;  var append, appendDoc, appendSkipChars, checkOp, componentLength, exports, makeTake, takeDoc, transformer, type;
   exports = window['sharejs'];
   type = {
     name: 'text-tp2',
@@ -147,7 +146,9 @@ var WEB = true;
   };
   type._append = append = function(op, component) {
     var last;
-    if (component === 0 || component.i === '' || component.i === 0 || component.d === 0) {} else if (op.length === 0) {
+    if (component === 0 || component.i === '' || component.i === 0 || component.d === 0) {
+      ;
+    } else if (op.length === 0) {
       return op.push(component);
     } else {
       last = op[op.length - 1];
@@ -394,7 +395,7 @@ var WEB = true;
       }).call(this);
       return strings.join('');
     },
-    'insert': function(text, pos, callback) {
+    'insert': function(pos, text, callback) {
       var docPos, op;
       if (pos === void 0) {
         pos = 0;
@@ -412,7 +413,7 @@ var WEB = true;
       this.submitOp(op, callback);
       return op;
     },
-    'del': function(length, pos, callback) {
+    'del': function(pos, length, callback) {
       var docPos, op, part;
       op = [];
       docPos = {
@@ -456,7 +457,7 @@ var WEB = true;
             }
           } else if (component.i !== void 0) {
             if (typeof component.i === 'string') {
-              this.emit('insert', component.i, textPos);
+              this.emit('insert', textPos, component.i);
               textPos += component.i.length;
             }
           } else {
@@ -464,7 +465,7 @@ var WEB = true;
             while (remainder > 0) {
               part = takeDoc(snapshot, docPos, remainder);
               if (typeof part === 'string') {
-                this.emit('delete', part, textPos);
+                this.emit('delete', textPos, part);
               }
               remainder -= part.length || part;
             }

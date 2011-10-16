@@ -128,7 +128,7 @@ genTests = (client) ->
 
 		'submit an op to a document using the API works': (test) ->
 			@c.open @name, 'text', (doc, error) =>
-				doc.insert 'hi', 0, =>
+				doc.insert 0, 'hi', =>
 					test.strictEqual doc.snapshot, 'hi'
 					test.strictEqual doc.getText(), 'hi'
 					@model.getSnapshot @name, ({snapshot}) ->
@@ -342,7 +342,7 @@ genTests = (client) ->
 				if action.name == 'submit op' then action.reject() else action.accept()
 
 			@c.open @name, 'text', (doc, error) =>
-				doc.insert 'hi', 0, (op, error) =>
+				doc.insert 0, 'hi', (op, error) =>
 					test.strictEqual error, 'forbidden'
 					test.strictEqual doc.getText(), ''
 					# Also need to test that ops sent afterwards get sent correctly.
@@ -357,12 +357,12 @@ genTests = (client) ->
 				if action.name == 'submit op' then action.reject() else action.accept()
 
 			@c.open @name, 'text', (doc, error) =>
-				doc.on 'delete', (text, pos) ->
+				doc.on 'delete', (pos, text) ->
 					test.strictEqual text, 'hi'
 					test.strictEqual pos, 0
 					test.done()
 
-				doc.insert 'hi', 0
+				doc.insert 0, 'hi'
 
 		'If auth rejects your op, other transforms work correctly': (test) ->
 			# This should probably have a randomized tester as well.
@@ -373,7 +373,7 @@ genTests = (client) ->
 					action.accept()
 
 			@c.open @name, 'text', (doc, error) =>
-				doc.insert 'abcCBA', 0, =>
+				doc.insert 0, 'abcCBA', =>
 					e = expectCalls 3, =>
 						# The b's are successfully deleted, the ds are added by the server and the
 						# op to delete the cs is denied.
@@ -390,7 +390,7 @@ genTests = (client) ->
 					doc.flush()
 
 					# Simultaneously, we'll apply another op locally:
-					doc.del 2, 1, -> # Delete the 'bB'
+					doc.del 1, 2, -> # Delete the 'bB'
 						e()
 					test.strictEqual doc.getText(), 'aA'
 
@@ -406,7 +406,7 @@ genTests = (client) ->
 		
 		'Text API can be used to insert into the document': (test) ->
 			@c.open @name, 'text', (doc, error) =>
-				doc.insert 'hi', 0, =>
+				doc.insert 0, 'hi', =>
 					test.strictEqual doc.getText(), 'hi'
 
 					@model.getSnapshot @name, (data) ->
@@ -416,7 +416,7 @@ genTests = (client) ->
 		
 		'Text documents emit high level editing events': (test) ->
 			@c.open @name, 'text', (doc, error) =>
-				doc.on 'insert', (text, pos) ->
+				doc.on 'insert', (pos, text) ->
 					test.strictEqual text, 'hi'
 					test.strictEqual pos, 0
 					doc.close()
