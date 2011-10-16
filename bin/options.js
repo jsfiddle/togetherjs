@@ -18,7 +18,7 @@ module.exports = {
 		port: null,
 		redisOptions: null
 
-		// To use CouchDB:
+		// To use CouchDB uncomment this section then run bin/setup_couch:
 		// type: 'couchdb',
 		// hostname: "http://admin:admin@localhost"
 		// port: 5984
