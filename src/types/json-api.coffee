@@ -96,6 +96,28 @@ json['api'] =
     @_listeners.push {path, event, cb}
   '_register': ->
     @_listeners = []
+    @on 'change', (op) ->
+      for c in op
+        if c.na != undefined or c.si != undefined or c.sd != undefined
+          # no change to structure
+          continue
+        to_remove = []
+        for l, i in @_listeners
+          # Transform a dummy op by the incoming op to work out what
+          # should happen to the listener.
+          dummy = {p:l.path, na:0}
+          xformed = @type.transformComponent [], dummy, c, 'left'
+          if xformed.length == 0
+            # The op was transformed to noop, so we should delete the listener.
+            to_remove.push i
+          else if xformed.length == 1
+            # The op remained, so grab its new path into the listener.
+            l.path = xformed[0].p
+          else
+            throw "Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components."
+        to_remove.sort (a, b) -> b - a
+        for i in to_remove
+          @_listeners.splice i, 1
     @on 'remoteop', (op) ->
       for c in op
         match_path = if c.na == undefined then c.p[...c.p.length-1] else c.p

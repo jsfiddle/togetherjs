@@ -47,8 +47,8 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
 		# Its important that these event handlers are called with oldSnapshot.
 		# The reason is that the OT type APIs might need to access the snapshots to
 		# determine information about the received op.
-		@emit 'remoteop', docOp, oldSnapshot if isRemote
 		@emit 'change', docOp, oldSnapshot
+		@emit 'remoteop', docOp, oldSnapshot if isRemote
 	
 	# Send ops to the server, if appropriate.
 	#
