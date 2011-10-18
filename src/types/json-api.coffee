@@ -23,6 +23,7 @@ class SubDoc
   move: (from, to, cb) -> @doc.moveAt @path, from, to, cb
   add: (amount, cb) -> @doc.addAt @path, amount, cb
   on: (event, cb) -> @doc.addListener @path, event, cb
+  removeListener: (l) -> @doc.removeListener l
 
   # text API compatibility
   getLength: -> @get().length
@@ -100,7 +101,14 @@ json['api'] =
     @submitOp op, cb
 
   'addListener': (path, event, cb) ->
-    @_listeners.push {path, event, cb}
+    l = {path, event, cb}
+    @_listeners.push l
+    l
+  'removeListener': (l) ->
+    i = @_listeners.indexOf l
+    return false if i < 0
+    @_listeners.splice i, 1
+    return true
   '_register': ->
     @_listeners = []
     @on 'change', (op) ->
