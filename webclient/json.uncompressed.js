@@ -551,6 +551,9 @@ var WEB = true;
     SubDoc.prototype.on = function(event, cb) {
       return this.doc.addListener(this.path, event, cb);
     };
+    SubDoc.prototype.removeListener = function(l) {
+      return this.doc.removeListener(l);
+    };
     SubDoc.prototype.getLength = function() {
       return this.get().length;
     };
@@ -617,12 +620,12 @@ var WEB = true;
       };
       if (elem.constructor === Array) {
         op.li = value;
-        if (elem[key]) {
+        if (elem[key] != null) {
           op.ld = elem[key];
         }
       } else if (typeof elem === 'object') {
         op.oi = value;
-        if (elem[key]) {
+        if (elem[key] != null) {
           op.od = elem[key];
         }
       } else {
@@ -693,11 +696,23 @@ var WEB = true;
       return this.submitOp(op, cb);
     },
     'addListener': function(path, event, cb) {
-      return this._listeners.push({
+      var l;
+      l = {
         path: path,
         event: event,
         cb: cb
-      });
+      };
+      this._listeners.push(l);
+      return l;
+    },
+    'removeListener': function(l) {
+      var i;
+      i = this._listeners.indexOf(l);
+      if (i < 0) {
+        return false;
+      }
+      this._listeners.splice(i, 1);
+      return true;
     },
     '_register': function() {
       this._listeners = [];
@@ -742,7 +757,7 @@ var WEB = true;
         return _results;
       });
       return this.on('remoteop', function(op) {
-        var c, cb, event, match_path, path, _i, _len, _results;
+        var c, cb, child_path, common, event, match_path, path, _i, _len, _results;
         _results = [];
         for (_i = 0, _len = op.length; _i < _len; _i++) {
           c = op[_i];
@@ -776,9 +791,9 @@ var WEB = true;
                       break;
                     case 'replace':
                       if (c.li !== void 0 && c.ld !== void 0) {
-                        return cb(c.ld, c.li, c.p[c.p.length - 1]);
+                        return cb(c.p[c.p.length - 1], c.ld, c.li);
                       } else if (c.oi !== void 0 && c.od !== void 0) {
-                        return cb(c.od, c.oi, c.p[c.p.length - 1]);
+                        return cb(c.p[c.p.length - 1], c.od, c.oi);
                       }
                       break;
                     case 'move':
@@ -791,8 +806,16 @@ var WEB = true;
                         return cb(c.na);
                       }
                   }
+                } else if ((common = this.type.commonPath(match_path, path)) != null) {
+                  if (event === 'child op') {
+                    if (match_path.length === path.length) {
+                      throw "paths match length and have commonality, but aren't equal?";
+                    }
+                    child_path = c.p.slice(common + 1);
+                    return cb(child_path, c);
+                  }
                 }
-              })());
+              }).call(this));
             }
             return _results2;
           }).call(this));
