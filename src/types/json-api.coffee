@@ -69,7 +69,7 @@ json['api'] =
 
   'removeAt': (path, cb) ->
     {elem, key} = traverse @snapshot, path
-    throw 'no element at that path' unless elem[key]
+    throw 'no element at that path' unless elem[key]?
     op = {p:path}
     if elem.constructor == Array
       op.ld = elem[key]

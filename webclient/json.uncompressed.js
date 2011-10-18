@@ -636,7 +636,7 @@ var WEB = true;
     'removeAt': function(path, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
-      if (!elem[key]) {
+      if (elem[key] == null) {
         throw 'no element at that path';
       }
       op = {
