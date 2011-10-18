@@ -60,10 +60,10 @@ json['api'] =
     op = {p:path}
     if elem.constructor == Array
       op.li = value
-      op.ld = elem[key] if elem[key]
+      op.ld = elem[key] if elem[key]?
     else if typeof elem == 'object'
       op.oi = value
-      op.od = elem[key] if elem[key]
+      op.od = elem[key] if elem[key]?
     else throw 'bad path'
     @submitOp [op], cb
 
