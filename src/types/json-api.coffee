@@ -60,16 +60,16 @@ json['api'] =
     op = {p:path}
     if elem.constructor == Array
       op.li = value
-      op.ld = elem[key] if elem[key]?
+      op.ld = elem[key] if typeof elem[key] != 'undefined'
     else if typeof elem == 'object'
       op.oi = value
-      op.od = elem[key] if elem[key]?
+      op.od = elem[key] if typeof elem[key] != 'undefined'
     else throw 'bad path'
     @submitOp [op], cb
 
   'removeAt': (path, cb) ->
     {elem, key} = traverse @snapshot, path
-    throw 'no element at that path' unless elem[key]?
+    throw 'no element at that path' unless typeof elem[key] != 'undefined'
     op = {p:path}
     if elem.constructor == Array
       op.ld = elem[key]

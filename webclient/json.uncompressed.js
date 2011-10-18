@@ -620,12 +620,12 @@ var WEB = true;
       };
       if (elem.constructor === Array) {
         op.li = value;
-        if (elem[key] != null) {
+        if (typeof elem[key] !== 'undefined') {
           op.ld = elem[key];
         }
       } else if (typeof elem === 'object') {
         op.oi = value;
-        if (elem[key] != null) {
+        if (typeof elem[key] !== 'undefined') {
           op.od = elem[key];
         }
       } else {
@@ -636,7 +636,7 @@ var WEB = true;
     'removeAt': function(path, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
-      if (elem[key] == null) {
+      if (typeof elem[key] === 'undefined') {
         throw 'no element at that path';
       }
       op = {
