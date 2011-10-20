@@ -16,12 +16,8 @@
 		"connect": ">= 1.1.1 < 2.0.0",
 		"optimist": ">= 0.2.4",
 		"uglify-js": "~1",
-<<<<<<< HEAD
-		"hat": "*",
 		"request": ">= 2.1.1",
 		"underscore": ">= 1.1.7",
-=======
->>>>>>> 7f2d728... Fixed package.json file and synchronized version numbers
 		"coffee-script": "> 1.1.0",
 		"hat": "*"
 	},
