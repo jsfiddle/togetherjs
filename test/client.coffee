@@ -186,7 +186,7 @@ genTests = (client) ->
 					test.expect 4
 					test.done()
 
-				@model.applyOp @name, {v:0, op:[{i:'hi', p:0}]}, (data, error) ->
+				@model.applyOp @name, {v:0, op:[{i:'hi', p:0}]}, (version, error) ->
 					test.ifError error
 
 		'get a nonexistent document passes null to the callback': (test) ->
@@ -231,7 +231,7 @@ genTests = (client) ->
 					test.deepEqual op, serverTransformed
 					onOpApplied()
 
-				@model.applyOp @name, {v:0, op:serverOp}, (data, error) ->
+				@model.applyOp @name, {v:0, op:serverOp}, (version, error) ->
 					test.ifError error
 
 		'doc fires both remoteop and change messages when remote ops are received': (test) ->
@@ -245,7 +245,7 @@ genTests = (client) ->
 					test.deepEqual op, sentOp
 					passPart()
 
-				@model.applyOp @name, {v:0, op:sentOp}, (data, error) ->
+				@model.applyOp @name, {v:0, op:sentOp}, (version, error) ->
 					test.ifError error
 		
 		'doc only fires change ops from locally sent ops': (test) ->
@@ -267,7 +267,7 @@ genTests = (client) ->
 					throw new Error 'Should not have received op when the doc was unfollowed'
 		
 				doc.close =>
-					@model.applyOp @name, {v:0, op:[{i:'asdf', p:0}]}, (data, error) =>
+					@model.applyOp @name, {v:0, op:[{i:'asdf', p:0}]}, (version, error) =>
 						test.done()
 
 		'created locally is set on new docs': (test) ->
@@ -441,7 +441,7 @@ genTests = (client) ->
 		'Submitting an op and closing straight after works': (test) ->
 			# This catches a real bug.
 			client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
-				doc.insert 'hi', 0
+				doc.insert 0, 'hi'
 				doc.close ->
 					test.done()
 
