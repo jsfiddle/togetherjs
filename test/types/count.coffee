@@ -4,6 +4,6 @@ randomizer = require('../helpers').randomizerTest
 types = require '../../src/types'
 
 exports.randomizer = (test) ->
-	randomizer types.count
-	test.done()
+  randomizer types.count
+  test.done()
 

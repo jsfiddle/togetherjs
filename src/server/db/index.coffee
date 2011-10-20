@@ -10,11 +10,11 @@
 defaultType = 'redis'
 
 module.exports = (options) ->
-	type = options?.type ? defaultType
-	Db = switch type
-		when 'redis' then require './redis'
-		when 'couchdb' then require './couchdb'
-		when 'memory' then require './memory'
-		else throw new Error "Invalid or unsupported database type: '#{type}'"
-	
-	new Db(options)
+  type = options?.type ? defaultType
+  Db = switch type
+    when 'redis' then require './redis'
+    when 'couchdb' then require './couchdb'
+    when 'memory' then require './memory'
+    else throw new Error "Invalid or unsupported database type: '#{type}'"
+  
+  new Db(options)

@@ -18,21 +18,21 @@
 #   ^--- async thing will only be running once at any time.
 
 module.exports = (process) ->
-	throw new Error('process is not a function') unless typeof process == 'function'
-	queue = []
-	busy = false
-	
-	flush = ->
-		return if busy or queue.length == 0
+  throw new Error('process is not a function') unless typeof process == 'function'
+  queue = []
+  busy = false
+  
+  flush = ->
+    return if busy or queue.length == 0
 
-		busy = true
-		[data, callback] = queue.shift()
-		process data, (result...) -> # TODO: Make this not use varargs - varargs are really slow.
-			callback.apply null, result if callback
-			busy = false
-			flush()
+    busy = true
+    [data, callback] = queue.shift()
+    process data, (result...) -> # TODO: Make this not use varargs - varargs are really slow.
+      callback.apply null, result if callback
+      busy = false
+      flush()
 
-	(data, callback) ->
-		queue.push [data, callback]
-		flush()
+  (data, callback) ->
+    queue.push [data, callback]
+    flush()
 

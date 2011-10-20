@@ -13,14 +13,14 @@ window = {}
 window.io = require 'socket.io-client'
 
 for script in ['share', 'json']
-	script = "#{script}.uncompressed" if TEST_UNCOMPRESSED
-	code = fs.readFileSync("#{__dirname}/../../webclient/#{script}.js", 'utf8')
+  script = "#{script}.uncompressed" if TEST_UNCOMPRESSED
+  code = fs.readFileSync("#{__dirname}/../../webclient/#{script}.js", 'utf8')
 
-	# We also need to make sure the uncompressed version of the script knows its in a browser.
-	# This is handled by window.WEB=true in web-prelude, but that obviously doesn't work here.
-	code = "var WEB=true; #{code}" if TEST_UNCOMPRESSED
+  # We also need to make sure the uncompressed version of the script knows its in a browser.
+  # This is handled by window.WEB=true in web-prelude, but that obviously doesn't work here.
+  code = "var WEB=true; #{code}" if TEST_UNCOMPRESSED
 
-	console.log "Evaling #{script}"
-	eval code
+  console.log "Evaling #{script}"
+  eval code
 
 module.exports = window.sharejs

@@ -4,29 +4,29 @@
 # % nodeunit tests.coffee
 
 modules = [
-	'testhelpers'
+  'testhelpers'
 
-	'version'
+  'version'
 
-	'types/count'
-	'types/text'
-	'types/text-composable'
-	'types/text-tp2'
-	'types/text-api'
-	'types/json'
-	'types/json-api'
+  'types/count'
+  'types/text'
+  'types/text-composable'
+  'types/text-tp2'
+  'types/text-api'
+  'types/json'
+  'types/json-api'
 
-	'db'
-	'model'
-	'auth'
-	'events'
-	'rest'
-#	'socketio'
+  'db'
+  'model'
+  'auth'
+  'events'
+  'rest'
+#  'socketio'
 
-	'microevent'
-#	'client'
+  'microevent'
+#  'client'
 
-	'integration'
+  'integration'
 ]
 
 exports[module] = require "./test/#{module}" for module in modules
@@ -34,6 +34,6 @@ exports[module] = require "./test/#{module}" for module in modules
 # This is a little hack to get around the lack of cleanup done by socket.io. It should terminate
 # the node.js process 2 seconds after all the tests are complete.
 exports.cleanup = (test) ->
-	test.done()
-	setTimeout (-> process.exit(0)), 2000
+  test.done()
+  setTimeout (-> process.exit(0)), 2000
 
