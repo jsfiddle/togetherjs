@@ -36,7 +36,7 @@ create.attach = attach = (server, options, model = createModel(options)) ->
 	server.model = model
 	server.use rest(model, options.rest) if options.rest != null
 	server.use options.staticpath, connect.static("#{__dirname}/../../webclient") if options.staticpath != null
-	socketio.attach(server, model, options.socketio) if options.socketio != null
+	socketio.attach(server, model, options.socketio ? {}) if options.socketio != null
 
 	server
 
