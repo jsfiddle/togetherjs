@@ -13,8 +13,8 @@ applyChange = (doc, oldval, newval) ->
   commonEnd++ while oldval.charAt(oldval.length - 1 - commonEnd) == newval.charAt(newval.length - 1 - commonEnd) and
     commonEnd + commonStart < oldval.length and commonEnd + commonStart < newval.length
 
-  doc.del oldval.length - commonStart - commonEnd, commonStart unless oldval.length == commonStart + commonEnd
-  doc.insert newval[commonStart ... newval.length - commonEnd], commonStart unless newval.length == commonStart + commonEnd
+  doc.del commonStart, oldval.length - commonStart - commonEnd unless oldval.length == commonStart + commonEnd
+  doc.insert commonStart, newval[commonStart ... newval.length - commonEnd] unless newval.length == commonStart + commonEnd
 
 window.sharejs.Doc::attach_textarea = (elem) ->
   doc = this
@@ -32,7 +32,7 @@ window.sharejs.Doc::attach_textarea = (elem) ->
     elem.scrollTop = scrollTop if elem.scrollTop != scrollTop
     [elem.selectionStart, elem.selectionEnd] = newSelection
 
-  @on 'insert', (text, pos) ->
+  @on 'insert', (pos, text) ->
     transformCursor = (cursor) ->
       if pos <= cursor
         cursor + text.length
@@ -41,7 +41,7 @@ window.sharejs.Doc::attach_textarea = (elem) ->
 
     replaceText elem.value[...pos] + text + elem.value[pos..], transformCursor
   
-  @on 'delete', (text, pos) ->
+  @on 'delete', (pos, text) ->
     transformCursor = (cursor) ->
       if pos < cursor
         cursor - Math.min(text.length, cursor - pos)

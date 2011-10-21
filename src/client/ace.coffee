@@ -25,16 +25,16 @@ applyToShareJS = (editorDoc, delta, doc) ->
   pos = getStartOffsetPosition(delta.range)
 
   switch delta.action
-    when 'insertText' then doc.insert delta.text, pos
-    when 'removeText' then doc.del delta.text.length, pos
+    when 'insertText' then doc.insert pos, delta.text
+    when 'removeText' then doc.del pos, delta.text.length
     
     when 'insertLines'
       text = delta.lines.join('\n') + '\n'
-      doc.insert text, pos
+      doc.insert pos, text
       
     when 'removeLines'
       text = delta.lines.join('\n') + '\n'
-      doc.del text.length, pos
+      doc.del pos, text.length
 
     else throw new Error "unknown action: #{delta.action}"
   
@@ -63,8 +63,8 @@ window.sharejs.Doc::attach_ace = (editor, keepEditorContents) ->
       , 0
 
   if keepEditorContents
-    doc.del doc.getText().length, 0
-    doc.insert editorDoc.getValue(), 0
+    doc.del 0, doc.getText().length
+    doc.insert 0, editorDoc.getValue()
   else
     editorDoc.setValue doc.getText()
 
@@ -106,13 +106,13 @@ window.sharejs.Doc::attach_ace = (editor, keepEditorContents) ->
 
     row:row, column:offset
 
-  doc.on 'insert', (text, pos) ->
+  doc.on 'insert', (pos, text) ->
     suppress = true
     editorDoc.insert offsetToPos(pos), text
     suppress = false
     check()
 
-  doc.on 'delete', (text, pos) ->
+  doc.on 'delete', (pos, text) ->
     suppress = true
     range = Range.fromPoints offsetToPos(pos), offsetToPos(pos + text.length)
     editorDoc.remove range

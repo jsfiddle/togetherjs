@@ -16,18 +16,18 @@
     pos = getStartOffsetPosition(delta.range);
     switch (delta.action) {
       case 'insertText':
-        doc.insert(delta.text, pos);
+        doc.insert(pos, delta.text);
         break;
       case 'removeText':
-        doc.del(delta.text.length, pos);
+        doc.del(pos, delta.text.length);
         break;
       case 'insertLines':
         text = delta.lines.join('\n') + '\n';
-        doc.insert(text, pos);
+        doc.insert(pos, text);
         break;
       case 'removeLines':
         text = delta.lines.join('\n') + '\n';
-        doc.del(text.length, pos);
+        doc.del(pos, text.length);
         break;
       default:
         throw new Error("unknown action: " + delta.action);
@@ -54,8 +54,8 @@
       }, 0);
     };
     if (keepEditorContents) {
-      doc.del(doc.getText().length, 0);
-      doc.insert(editorDoc.getValue(), 0);
+      doc.del(0, doc.getText().length);
+      doc.insert(0, editorDoc.getValue());
     } else {
       editorDoc.setValue(doc.getText());
     }
@@ -91,13 +91,13 @@
         column: offset
       };
     };
-    doc.on('insert', function(text, pos) {
+    doc.on('insert', function(pos, text) {
       suppress = true;
       editorDoc.insert(offsetToPos(pos), text);
       suppress = false;
       return check();
     });
-    doc.on('delete', function(text, pos) {
+    doc.on('delete', function(pos, text) {
       var range;
       suppress = true;
       range = Range.fromPoints(offsetToPos(pos), offsetToPos(pos + text.length));

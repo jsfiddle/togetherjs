@@ -14,10 +14,10 @@
       commonEnd++;
     }
     if (oldval.length !== commonStart + commonEnd) {
-      doc.del(oldval.length - commonStart - commonEnd, commonStart);
+      doc.del(commonStart, oldval.length - commonStart - commonEnd);
     }
     if (newval.length !== commonStart + commonEnd) {
-      return doc.insert(newval.slice(commonStart, newval.length - commonEnd), commonStart);
+      return doc.insert(commonStart, newval.slice(commonStart, newval.length - commonEnd));
     }
   };
   window.sharejs.Doc.prototype.attach_textarea = function(elem) {
@@ -35,7 +35,7 @@
       }
       return elem.selectionStart = newSelection[0], elem.selectionEnd = newSelection[1], newSelection;
     };
-    this.on('insert', function(text, pos) {
+    this.on('insert', function(pos, text) {
       var transformCursor;
       transformCursor = function(cursor) {
         if (pos <= cursor) {
@@ -46,7 +46,7 @@
       };
       return replaceText(elem.value.slice(0, pos) + text + elem.value.slice(pos), transformCursor);
     });
-    this.on('delete', function(text, pos) {
+    this.on('delete', function(pos, text) {
       var transformCursor;
       transformCursor = function(cursor) {
         if (pos < cursor) {
