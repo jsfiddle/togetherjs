@@ -101,7 +101,7 @@ module.exports = testCase
   'open a nonexistant document with create:true creates the document': (test) ->
     @socket.json.send {doc:@name, open:true, create:true, type:'simple'}
     @expect {doc:@name, open:true, create:true, v:0}, =>
-      @model.getSnapshot @name, (docData) ->
+      @model.getSnapshot @name, (error, docData) ->
         test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
         test.done()
 
@@ -156,7 +156,7 @@ module.exports = testCase
   'create a document without opening it': (test) ->
     @socket.json.send {doc:@name, create:true, type:'simple'}
     @expect {doc:@name, create:true}, =>
-      @model.getSnapshot @name, (docData) ->
+      @model.getSnapshot @name, (error, docData) ->
         test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
         test.done()
   
@@ -185,7 +185,7 @@ module.exports = testCase
         test.strictEqual opData.v, 0
         test.deepEqual opData.op, {position:0, text:'hi'}
         test.done()
-      @model.listen @name, listener, (v) -> test.strictEqual v, 0
+      @model.listen @name, listener, (error, v) -> test.strictEqual v, 0
 
       @socket.json.send {doc:@name, v:0, op:{position:0, text:'hi'}}
 
@@ -196,7 +196,7 @@ module.exports = testCase
         test.strictEqual opData.meta.x, 5
         test.deepEqual opData.op, {position:0, text:'hi'}
         test.done()
-      @model.listen @name, listener, (v) -> test.strictEqual v, 0
+      @model.listen @name, listener, (error, v) -> test.strictEqual v, 0
 
       @socket.json.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{x:5}}
 
@@ -244,9 +244,9 @@ module.exports = testCase
       # name1 should be closed, and name2 should be open.
       # We should only get the op for name2.
       @model.applyOp name1, {v:0, op:{position:0, text:'Blargh!'}}, (error, appliedVersion) ->
-        test.ifError(error)
+        test.fail error if error
       @model.applyOp name2, {v:0, op:[{i:'hi', p:0}]}, (error, appliedVersion) ->
-        test.ifError(error)
+        test.fail error if error
 
       @expect {v:0, op:[{i:'hi', p:0}], meta:ANYOBJECT}, ->
         test.done()
@@ -261,12 +261,12 @@ module.exports = testCase
     passPart = makePassPart test, 3
 
     @expect [{doc:name1, open:true, create:true, v:0}, {doc:name2, open:true, create:true, v:0}], =>
-      @model.applyOp name1, {v:0, op:{position:0, text:'a'}}, (_, error) =>
-        test.ifError(error)
-        @model.applyOp name2, {v:0, op:{position:0, text:'b'}}, (_, error) =>
-          test.ifError(error)
-          @model.applyOp name1, {v:1, op:{position:0, text:'c'}}, (_, error) =>
-            test.ifError(error)
+      @model.applyOp name1, {v:0, op:{position:0, text:'a'}}, (error) =>
+        test.fail error if error
+        @model.applyOp name2, {v:0, op:{position:0, text:'b'}}, (error) =>
+          test.fail error if error
+          @model.applyOp name1, {v:1, op:{position:0, text:'c'}}, (error) =>
+            test.fail error if error
 
       # All the ops that come through the socket should have the doc name set.
       @socket.on 'message', (data) =>
@@ -288,6 +288,7 @@ module.exports = testCase
 
   'an error message is sent through the socket if the operation is invalid': (test) ->
     @model.create @name, 'simple', =>
+      # This might cause the model code to print out an error stack trace
       @socket.json.send {doc:@name, v:0, op:{position:-100, text:'asdf'}}
       @expect {doc:@name, v:null, error:'Invalid position'}, ->
         test.done()
@@ -299,7 +300,7 @@ module.exports = testCase
       test.equal typeof data.doc, 'string'
       test.ok data.doc.length > 8
 
-      @model.getSnapshot data.doc, (docData) ->
+      @model.getSnapshot data.doc, (error, docData) ->
         test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
         test.done()
 

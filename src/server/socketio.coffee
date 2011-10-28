@@ -29,7 +29,7 @@ exports.attach = (server, model, options) ->
       remoteAddress: handshakeData.address.address
       secure: handshakeData.secure
 
-    model.clientConnect data, (client, error) ->
+    model.clientConnect data, (error, client) ->
       if error
         # Its important that we don't pass the error message to the client here - leaving it as null
         # will ensure the client recieves the normal 'not_authorized' message and thus
@@ -64,9 +64,9 @@ exports.attach = (server, model, options) ->
       socket.json.send msg
 
     # Open the given document name, at the requested version.
-    # callback(opened at version, [error])
+    # callback(error, version)
     open = (docName, version, callback) ->
-      callback null, 'Doc already opened' if docState[docName].listener?
+      callback 'Doc already opened' if docState[docName].listener?
       p "Registering listener on #{docName} by #{socket.id} at #{version}"
 
       docState[docName].listener = listener = (opData) ->
@@ -84,30 +84,20 @@ exports.attach = (server, model, options) ->
           meta: opData.meta
 
         send opMsg
-
-      openedAt = (version, error) ->
-        error ||= 'Document does not exist' if version == null
-        if error
-          callback null, error
-        else
-          callback version
-        return
       
       if version?
         # Tell the socket the doc is open at the requested version
-        model.clientListenFromVersion client, docName, version, listener, openedAt
+        model.clientListenFromVersion client, docName, version, listener, callback
       else
         # If the version is blank, we'll open the doc at the most recent version
-        model.clientListen client, docName, listener, openedAt
+        model.clientListen client, docName, listener, callback
 
     # Close the named document.
     # callback([error])
     close = (docName, callback) ->
       p "Closing #{docName}"
       listener = docState[docName].listener
-      unless listener?
-        callback 'Doc already closed'
-        return
+      return callback 'Doc already closed' unless listener?
 
       model.removeListener docName, listener
       docState[docName].listener = null
@@ -151,10 +141,8 @@ exports.attach = (server, model, options) ->
           msg.create = false
           step2Snapshot()
         else
-          model.clientCreate client, docName, query.type, query.meta || {}, (result, errorMsg) ->
-            if errorMsg? and errorMsg != 'Document already exists'
-              fail errorMsg
-              return
+          model.clientCreate client, docName, query.type, query.meta || {}, (error, result) ->
+            return fail error if error and error != 'Document already exists'
 
             msg.create = result
             step2Snapshot()
@@ -188,7 +176,7 @@ exports.attach = (server, model, options) ->
           fail 'Type mismatch'
           return
 
-        open docName, query.v, (version, error) ->
+        open docName, query.v, (error, version) ->
           if error
             fail error
           else
@@ -205,13 +193,11 @@ exports.attach = (server, model, options) ->
 
       docData = undefined
       if query.snapshot == null or (query.open == true and query.type)
-        model.clientGetSnapshot client, query.doc, (d, errorMsg) ->
-          if errorMsg? and errorMsg != 'Document does not exist'
-            fail errorMsg
-            return
-          else
-            docData = d
-            step1Create()
+        model.clientGetSnapshot client, query.doc, (error, data) ->
+          return fail error if error and error != 'Document does not exist'
+
+          docData = data
+          step1Create()
       else
         step1Create()
 
@@ -235,8 +221,8 @@ exports.attach = (server, model, options) ->
       op_data.meta = query.meta || {}
       op_data.meta.source = socket.id
 
-      model.clientSubmitOp client, query.doc, op_data, (appliedVersion, error) ->
-        msg = if error?
+      model.clientSubmitOp client, query.doc, op_data, (error, appliedVersion) ->
+        msg = if error
           p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}
         else

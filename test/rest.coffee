@@ -95,7 +95,7 @@ module.exports = testCase
     fetch 'PUT', @port, "/doc/#{@name}", {type:'simple'}, (res, data) =>
       test.strictEqual res.statusCode, 200
 
-      @model.getSnapshot @name, (doc) ->
+      @model.getSnapshot @name, (error, doc) ->
         test.deepEqual doc, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         test.done()
 
@@ -105,7 +105,7 @@ module.exports = testCase
         test.strictEqual res.statusCode, 200
         test.deepEqual data, {v:0}
 
-        @model.getSnapshot @name, (doc) ->
+        @model.getSnapshot @name, (error, doc) ->
           test.deepEqual doc, {v:1, type:types.simple, snapshot:{str:'Hi'}, meta:{}}
           test.done()
   
@@ -115,7 +115,7 @@ module.exports = testCase
         test.strictEqual res.statusCode, 200
         test.deepEqual data, {v:0}
 
-        @model.getSnapshot @name, (doc) ->
+        @model.getSnapshot @name, (error, doc) ->
           test.deepEqual doc, {v:1, type:types.simple, snapshot:{str:'Hi'}, meta:{}}
           test.done()
   
@@ -134,7 +134,7 @@ module.exports = testCase
       fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) =>
         test.strictEqual res.statusCode, 200
 
-        @model.getSnapshot @name, (doc) ->
+        @model.getSnapshot @name, (error, doc) ->
           test.strictEqual doc, null
           test.done()
   
@@ -208,7 +208,7 @@ module.exports = testCase
       test.strictEqual res.statusCode, 403
       test.deepEqual data, 'Forbidden'
 
-      @model.getSnapshot @name, (doc) ->
+      @model.getSnapshot @name, (error, doc) ->
         test.deepEqual doc, null
         test.done()
 
@@ -221,7 +221,7 @@ module.exports = testCase
         test.deepEqual data, 'Forbidden'
 
         # & Check the document is unchanged
-        @model.getSnapshot @name, (doc) ->
+        @model.getSnapshot @name, (error, doc) ->
           test.deepEqual doc, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
           test.done()
 
@@ -241,7 +241,7 @@ module.exports = testCase
         test.strictEqual res.statusCode, 403
         test.deepEqual data, 'Forbidden'
 
-        @model.getSnapshot @name, (doc) ->
+        @model.getSnapshot @name, (error, doc) ->
           test.ok doc
           test.done()
   
