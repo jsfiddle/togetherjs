@@ -47,7 +47,7 @@ class Connection
       # Cancel all hanging messages
       for docName, h of @handlers
         for t, callbacks of h
-          callback null, error for callback in callbacks
+          callback error for callback in callbacks
 
     # This avoids a bug in socket.io-client (v0.7.9) which causes
     # subsequent connections on the same host to not fire a .connect event
@@ -66,7 +66,7 @@ class Connection
   # Send the specified message to the server. The server's response will be passed
   # to callback. If the message is 'open', ops will be sent to follower()
   #
-  # The callback is optional. It takes (data, error). Data might be missing if the
+  # The callback is optional. It takes (error, data). Data might be missing if the
   # error was a connection error.
   send: (msg, callback) ->
     throw new Error "Cannot send message #{JSON.stringify msg} to a closed connection" if @socket == null
@@ -118,7 +118,7 @@ class Connection
     callbacks = @handlers[docName]?[type]
     if callbacks
       delete @handlers[docName][type]
-      c msg, msg.error for c in callbacks
+      c msg.error, msg for c in callbacks
 
     if type == 'op'
       doc = @docs[docName]
@@ -140,31 +140,30 @@ class Connection
     doc
 
   # Open a document that already exists
-  # callback is passed a Doc or null
-  # callback(doc, error)
+  # callback(error, doc)
   openExisting: (docName, callback) ->
     if @socket == null # The connection is perminantly disconnected
-      callback null, 'connection closed'
+      callback 'connection closed'
       return
 
     return @docs[docName] if @docs[docName]?
 
-    @send {'doc':docName, 'open':true, 'snapshot':null}, (response, error) =>
+    @send {'doc':docName, 'open':true, 'snapshot':null}, (error, response) =>
       if error
-        callback null, error
+        callback error
       else
         # response.doc is used instead of docName to allow docName to be null.
         # In that case, the server generates a random docName to use.
-        callback @makeDoc(response)
+        callback null, @makeDoc(response)
 
   # Open a document. It will be created if it doesn't already exist.
   # Callback is passed a document or an error
   # type is either a type name (eg 'text' or 'simple') or the actual type object.
   # Types must be supported by the server.
-  # callback(doc, error)
+  # callback(error, doc)
   open: (docName, type, callback) ->
     if @socket == null # The connection is perminantly disconnected
-      callback null, 'connection closed'
+      callback 'connection closed'
       return
 
     if typeof type == 'function'
@@ -180,19 +179,19 @@ class Connection
     if docName? and @docs[docName]?
       doc = @docs[docName]
       if doc.type == type
-        callback doc
+        callback null, doc
       else
-        callback doc, 'Type mismatch'
+        callback 'Type mismatch', doc
 
       return
 
-    @send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (response, error) =>
+    @send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (error, response) =>
       if error
-        callback null, error
+        callback error
       else
         response.snapshot = type.create() unless response.snapshot != undefined
         response.type = type
-        callback @makeDoc(response)
+        callback null, @makeDoc(response)
 
   # To be written. Create a new document with a random name.
   create: (type, callback) ->

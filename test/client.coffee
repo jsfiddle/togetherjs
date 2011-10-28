@@ -37,7 +37,7 @@ genTests = (client) -> testCase
     @server.close()
 
   'open using the bare API': (test) ->
-    client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
       test.ok doc
       test.ifError error
 
@@ -50,11 +50,11 @@ genTests = (client) -> testCase
       test.done()
 
   'open multiple documents using the bare API on the same connection': (test) ->
-    client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc1, error) =>
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc1) =>
       test.ok doc1
       test.ifError error
 
-      client.open @name + 2, 'text', "http://localhost:#{@port}/sjs", (doc2, error) ->
+      client.open @name + 2, 'text', "http://localhost:#{@port}/sjs", (error, doc2) ->
         test.ok doc2
         test.ifError error
 
@@ -75,7 +75,7 @@ genTests = (client) -> testCase
     test.done()
 
   'create a new document': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ok doc
       test.ifError error
 
@@ -85,17 +85,17 @@ genTests = (client) -> testCase
       test.done()
 
   'open a document that is already open': (test) ->
-    @c.open @name, 'text', (doc1, error) =>
+    @c.open @name, 'text', (error, doc1) =>
       test.ifError error
       test.ok doc1
       test.strictEqual doc1.name, @name
-      @c.open @name, 'text', (doc2, error) =>
+      @c.open @name, 'text', (error, doc2) =>
         test.strictEqual doc1, doc2
         test.done()
   
   'open a document that already exists': (test) ->
     @model.create @name, 'text', =>
-      @c.open @name, 'text', (doc, error) =>
+      @c.open @name, 'text', (error, doc) =>
         test.ifError error
         test.ok doc
 
@@ -105,13 +105,13 @@ genTests = (client) -> testCase
 
   'open a document with a different type': (test) ->
     @model.create @name, 'simple', =>
-      @c.open @name, 'text', (doc, error) =>
+      @c.open @name, 'text', (error, doc) =>
         test.ok error
-        test.strictEqual doc, null
+        test.equal doc, null
         test.done()
   
   'submit an op to a document': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ifError error
       test.strictEqual doc.name, @name
 
@@ -126,7 +126,7 @@ genTests = (client) -> testCase
       test.strictEqual doc.version, 0
 
   'submit an op to a document using the API works': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.insert 0, 'hi', =>
         test.strictEqual doc.snapshot, 'hi'
         test.strictEqual doc.getText(), 'hi'
@@ -135,7 +135,7 @@ genTests = (client) -> testCase
           test.done()
   
   'submitting an op while another op is inflight works': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ifError error
 
       doc.submitOp [{i:'hi', p:0}], ->
@@ -147,7 +147,7 @@ genTests = (client) -> testCase
         test.done()
 
   'compose multiple ops together when they are submitted together': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ifError error
       test.strictEqual doc.name, @name
 
@@ -160,7 +160,7 @@ genTests = (client) -> testCase
         test.done()
 
   'compose multiple ops together when they are submitted while an op is in flight': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ifError error
 
       doc.submitOp [{i:'hi', p:0}], ->
@@ -175,7 +175,7 @@ genTests = (client) -> testCase
         test.done()
   
   'Receive submitted ops': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.ifError error
       test.strictEqual doc.name, @name
 
@@ -189,13 +189,15 @@ genTests = (client) -> testCase
         test.fail error if error
 
   'get a nonexistent document passes null to the callback': (test) ->
-    @c.openExisting @name, (doc) ->
-      test.strictEqual doc, null
+    @c.openExisting @name, (error, doc) ->
+      test.strictEqual error, 'Document does not exist'
+      test.equal doc, null
       test.done()
   
   'get an existing document returns the document': (test) ->
     @model.create @name, 'text', =>
-      @c.openExisting @name, (doc) =>
+      @c.openExisting @name, (error, doc) =>
+        test.equal error, null
         test.ok doc
 
         test.strictEqual doc.name, @name
@@ -215,7 +217,7 @@ genTests = (client) -> testCase
     finalDoc = types.text.apply(finalDoc, clientOp) # v2
     finalDoc = types.text.apply(finalDoc, serverTransformed) #v3
 
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       opsRemaining = 2
 
       onOpApplied = ->
@@ -235,7 +237,7 @@ genTests = (client) -> testCase
 
   'doc fires both remoteop and change messages when remote ops are received': (test) ->
     passPart = makePassPart test, 2
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       sentOp = [{i:'asdf', p:0}]
       doc.on 'change', (op) ->
         test.deepEqual op, sentOp
@@ -249,7 +251,7 @@ genTests = (client) -> testCase
   
   'doc only fires change ops from locally sent ops': (test) ->
     passPart = makePassPart test, 2
-    @c.open @name, 'text', (doc, error) ->
+    @c.open @name, 'text', (error, doc) ->
       sentOp = [{i:'asdf', p:0}]
       doc.on 'change', (op) ->
         test.deepEqual op, sentOp
@@ -261,7 +263,7 @@ genTests = (client) -> testCase
         passPart()
   
   'doc does not receive ops after close called': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.on 'change', (op) ->
         throw new Error 'Should not have received op when the doc was unfollowed'
   
@@ -270,13 +272,13 @@ genTests = (client) -> testCase
           test.done()
 
   'created locally is set on new docs': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       test.strictEqual doc.created, true
       test.done()
 
   'created locally is not set on old docs': (test) ->
     @model.create @name, 'text', =>
-      @c.open @name, 'text', (doc, error) =>
+      @c.open @name, 'text', (error, doc) =>
         test.strictEqual doc.created, false
         test.done()
 
@@ -297,14 +299,14 @@ genTests = (client) -> testCase
     c = new client.Connection "http://localhost:#{@port}/sjs"
 
     # Immediately opening a document should fail when the connection fails
-    c.open @name, 'text', (doc, error) =>
+    c.open @name, 'text', (error, doc) =>
       test.fail doc if doc
       test.strictEqual error, 'forbidden'
       passPart()
 
     c.on 'connect failed', =>
       # The connection is now in an invalid state. Lets try and open a document...
-      c.open @name, 'text', (doc, error) =>
+      c.open @name, 'text', (error, doc) =>
         test.fail doc if doc
         test.strictEqual error, 'connection closed'
         passPart()
@@ -314,7 +316,7 @@ genTests = (client) -> testCase
       if action.type == 'read' then action.reject() else action.accept()
 
     c = new client.Connection "http://localhost:#{@port}/sjs"
-    c.open @name, 'text', (doc, error) =>
+    c.open @name, 'text', (error, doc) =>
       test.fail doc if doc
       test.strictEqual error, 'forbidden'
       test.done()
@@ -322,7 +324,7 @@ genTests = (client) -> testCase
   'client.open fails if auth rejects the connection': (test) ->
     @auth = (client, action) -> action.reject()
 
-    client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
       test.fail doc if doc
       test.strictEqual error, 'forbidden'
       test.done()
@@ -331,7 +333,7 @@ genTests = (client) -> testCase
     @auth = (client, action) ->
       if action.type == 'read' then action.reject() else action.accept()
 
-    client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
       test.fail doc if doc
       test.strictEqual error, 'forbidden'
       test.done()
@@ -340,8 +342,8 @@ genTests = (client) -> testCase
     @auth = (client, action) ->
       if action.name == 'submit op' then action.reject() else action.accept()
 
-    @c.open @name, 'text', (doc, error) =>
-      doc.insert 0, 'hi', (op, error) =>
+    @c.open @name, 'text', (error, doc) =>
+      doc.insert 0, 'hi', (error, op) =>
         test.strictEqual error, 'forbidden'
         test.strictEqual doc.getText(), ''
         # Also need to test that ops sent afterwards get sent correctly.
@@ -355,7 +357,7 @@ genTests = (client) -> testCase
     @auth = (client, action) ->
       if action.name == 'submit op' then action.reject() else action.accept()
 
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.on 'delete', (pos, text) ->
         test.strictEqual text, 'hi'
         test.strictEqual pos, 0
@@ -371,7 +373,7 @@ genTests = (client) -> testCase
       else
         action.accept()
 
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.insert 0, 'abcCBA', =>
         e = expectCalls 3, =>
           # The b's are successfully deleted, the ds are added by the server and the
@@ -380,7 +382,7 @@ genTests = (client) -> testCase
             test.deepEqual snapshot, 'acdDCA'
             test.done()
 
-        doc.del 2, 2, (op, error) => # Delete the 'cC', so the document becomes 'abBA'
+        doc.del 2, 2, (error, op) => # Delete the 'cC', so the document becomes 'abBA'
           # This op is denied by the auth code
           test.strictEqual error, 'forbidden'
           e()
@@ -398,13 +400,13 @@ genTests = (client) -> testCase
           @model.getSnapshot @name, e
 
   'Text API is advertised': (test) ->
-    @c.open @name, 'text', (doc, error) ->
+    @c.open @name, 'text', (error, doc) ->
       test.strictEqual doc.provides?.text, true
       doc.close()
       test.done()
   
   'Text API can be used to insert into the document': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.insert 0, 'hi', =>
         test.strictEqual doc.getText(), 'hi'
 
@@ -414,7 +416,7 @@ genTests = (client) -> testCase
           test.done()
   
   'Text documents emit high level editing events': (test) ->
-    @c.open @name, 'text', (doc, error) =>
+    @c.open @name, 'text', (error, doc) =>
       doc.on 'insert', (pos, text) ->
         test.strictEqual text, 'hi'
         test.strictEqual pos, 0
@@ -424,7 +426,7 @@ genTests = (client) -> testCase
       @model.applyOp @name, {op:[{i:'hi', p:0}], v:0, meta:{}}
 
   'Works with an externally referenced type (like JSON)': (test) ->
-    @c.open @name, 'json', (doc, error) ->
+    @c.open @name, 'json', (error, doc) ->
       test.ifError error
       test.strictEqual doc.snapshot, null
       doc.submitOp [{p:[], od:null, oi:[1,2,3]}], ->
@@ -439,14 +441,16 @@ genTests = (client) -> testCase
 
   'Submitting an op and closing straight after works': (test) ->
     # This catches a real bug.
-    client.open @name, 'text', "http://localhost:#{@port}/sjs", (doc, error) =>
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
       doc.insert 0, 'hi'
       doc.close ->
         test.done()
 
+   # ** This is missing tests for submitOp receiving an error through its callback
+
 # This isn't working yet. I might have to rethink it.
 #  'opening a document with a null name will open a new document with a random document name': (test) ->
-#    client.open null, 'text', {host:'localhost', port:@port}, (doc, error) ->
+#    client.open null, 'text', {host:'localhost', port:@port}, (error, doc) ->
 #      console.log doc.name
 #
 #      test.strictEqual doc.snapshot, ''

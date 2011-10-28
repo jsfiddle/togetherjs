@@ -63,7 +63,7 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
       pendingOp = null
       pendingCallbacks = []
 
-      connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (response, error) =>
+      connection.send {'doc':@name, 'op':inflightOp, 'v':@version}, (error, response) =>
         oldInflightOp = inflightOp
         inflightOp = null
 
@@ -92,13 +92,13 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
           else
             throw new Error "Op apply failed (#{response.error}) and the OT type does not define an invert function."
 
-          callback(null, error) for callback in inflightCallbacks
+          callback error for callback in inflightCallbacks
         else
           throw new Error('Invalid version from server') unless response.v == @version
 
           serverOps[@version] = oldInflightOp
           @version++
-          callback(oldInflightOp, null) for callback in inflightCallbacks
+          callback null, oldInflightOp for callback in inflightCallbacks
 
         @flush()
 
@@ -155,8 +155,9 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
   # No unit tests for this so far.
   @close = (callback) ->
     return callback?() if connection.socket == null
+
     connection.send {'doc':@name, open:false}, =>
-      callback() if callback
+      callback?()
       @emit 'closed'
       return
     @emit 'closing'

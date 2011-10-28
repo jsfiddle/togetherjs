@@ -450,7 +450,7 @@
           'doc': this.name,
           'op': inflightOp,
           'v': this.version
-        }, __bind(function(response, error) {
+        }, __bind(function(error, response) {
           var callback, oldInflightOp, undo, _i, _j, _len, _len2, _ref;
           oldInflightOp = inflightOp;
           inflightOp = null;
@@ -466,7 +466,7 @@
             }
             for (_i = 0, _len = inflightCallbacks.length; _i < _len; _i++) {
               callback = inflightCallbacks[_i];
-              callback(null, error);
+              callback(error);
             }
           } else {
             if (response.v !== this.version) {
@@ -476,7 +476,7 @@
             this.version++;
             for (_j = 0, _len2 = inflightCallbacks.length; _j < _len2; _j++) {
               callback = inflightCallbacks[_j];
-              callback(oldInflightOp, null);
+              callback(null, oldInflightOp);
             }
           }
           return this.flush();
@@ -530,7 +530,7 @@
         'doc': this.name,
         open: false
       }, __bind(function() {
-        if (callback) {
+        if (typeof callback === "function") {
           callback();
         }
         this.emit('closed');
@@ -601,7 +601,7 @@
                 _results3 = [];
                 for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
                   callback = callbacks[_i];
-                  _results3.push(callback(null, error));
+                  _results3.push(callback(error));
                 }
                 return _results3;
               })());
@@ -653,7 +653,7 @@
         delete this.handlers[docName][type];
         for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
           c = callbacks[_i];
-          c(msg, msg.error);
+          c(msg.error, msg);
         }
       }
       if (type === 'op') {
@@ -683,7 +683,7 @@
     };
     Connection.prototype.openExisting = function(docName, callback) {
       if (this.socket === null) {
-        callback(null, 'connection closed');
+        callback('connection closed');
         return;
       }
       if (this.docs[docName] != null) {
@@ -693,18 +693,18 @@
         'doc': docName,
         'open': true,
         'snapshot': null
-      }, __bind(function(response, error) {
+      }, __bind(function(error, response) {
         if (error) {
-          return callback(null, error);
+          return callback(error);
         } else {
-          return callback(this.makeDoc(response));
+          return callback(null, this.makeDoc(response));
         }
       }, this));
     };
     Connection.prototype.open = function(docName, type, callback) {
       var doc;
       if (this.socket === null) {
-        callback(null, 'connection closed');
+        callback('connection closed');
         return;
       }
       if (typeof type === 'function') {
@@ -721,9 +721,9 @@
       if ((docName != null) && (this.docs[docName] != null)) {
         doc = this.docs[docName];
         if (doc.type === type) {
-          callback(doc);
+          callback(null, doc);
         } else {
-          callback(doc, 'Type mismatch');
+          callback('Type mismatch', doc);
         }
         return;
       }
@@ -733,15 +733,15 @@
         'create': true,
         'snapshot': null,
         'type': type.name
-      }, __bind(function(response, error) {
+      }, __bind(function(error, response) {
         if (error) {
-          return callback(null, error);
+          return callback(error);
         } else {
           if (response.snapshot === void 0) {
             response.snapshot = type.create();
           }
           response.type = type;
-          return callback(this.makeDoc(response));
+          return callback(null, this.makeDoc(response));
         }
       }, this));
     };
@@ -796,13 +796,13 @@
       }
       c = getConnection(origin);
       c.numDocs++;
-      c.open(docName, type, function(doc, error) {
-        if (doc === null) {
+      c.open(docName, type, function(error, doc) {
+        if (error) {
           c.numDocs--;
           if (c.numDocs === 0) {
             c.disconnect();
           }
-          return callback(null, error);
+          return callback(error);
         } else {
           doc.on('closed', function() {
             c.numDocs--;
@@ -810,7 +810,7 @@
               return c.disconnect();
             }
           });
-          return callback(doc);
+          return callback(null, doc);
         }
       });
       return c.on('connect failed');

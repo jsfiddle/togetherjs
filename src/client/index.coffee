@@ -45,11 +45,11 @@ exports.open = do ->
 
     c = getConnection origin
     c.numDocs++
-    c.open docName, type, (doc, error) ->
-      if doc == null
+    c.open docName, type, (error, doc) ->
+      if error
         c.numDocs--
         c.disconnect() if c.numDocs == 0
-        callback null, error
+        callback error
       else
         # If you're using the bare API, connections are cleaned up as soon as there's no
         # documents using them.
@@ -57,8 +57,8 @@ exports.open = do ->
           c.numDocs--
           if c.numDocs == 0
             c.disconnect()
-
-        callback doc
+        
+        callback null, doc
     
     c.on 'connect failed'
 
