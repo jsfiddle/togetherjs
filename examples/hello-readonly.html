@@ -16,7 +16,7 @@
 		<script>
 var elem = document.getElementById('text');
 
-sharejs.open('hello', 'text', function(doc, error) {
+sharejs.open('hello', 'text', function(error, doc) {
 	elem.innerHTML = doc.snapshot;
 	doc.on('change', function() {
 		elem.innerHTML = doc.snapshot;

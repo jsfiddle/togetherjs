@@ -17,7 +17,7 @@
 	// To convert markdown -> HTML
 	var converter = new Showdown.converter();
 
-	sharejs.open('markdown', 'text', function(doc, error) {
+	sharejs.open('markdown', 'text', function(error, doc) {
 		if (error) {
 			console.error(error);
 		} else {

@@ -37,7 +37,7 @@ module.exports = (docName, model, res) ->
 	name = docName
 	docName = "wiki:" + docName
 
-	model.getSnapshot docName, (data) ->
+	model.getSnapshot docName, (error, data) ->
 		if data == null
 			model.create docName, 'text', ->
 				content = defaultContent(name)

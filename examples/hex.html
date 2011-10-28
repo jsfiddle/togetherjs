@@ -550,7 +550,7 @@
 			}
 			var docname = 'hex:' + document.location.hash.slice(1)
 
-			sharejs.open(docname, 'json', function (doc, error) {
+			sharejs.open(docname, 'json', function(error, doc) {
 				$state = doc;
 				doc.on('change', function (op) {
 					stateUpdated(op)

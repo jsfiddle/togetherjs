@@ -31,7 +31,7 @@
 
 		var docName = "pad:" + document.location.hash.slice(1);
 
-		sharejs.open(docName, 'text', function(doc, error) {
+		sharejs.open(docName, 'text', function(error, doc) {
 			if (error) {
 				console.error(error);
 				return;

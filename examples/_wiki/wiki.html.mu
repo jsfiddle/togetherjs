@@ -36,7 +36,7 @@
 
 		var connection = new sharejs.Connection('http://' + window.location.hostname + ':' + 8000 + '/sjs');
 
-		connection.open('{{{docName}}}', function(doc, error) {
+		connection.open('{{{docName}}}', function(error, doc) {
 			if (error) {
 				console.error(error);
 				return;

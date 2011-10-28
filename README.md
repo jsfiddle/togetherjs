@@ -143,7 +143,7 @@ And add this code:
 <script>
     var editor = ace.edit("editor");
 
-    sharejs.open('hello', 'text', function(doc, error) {
+    sharejs.open('hello', 'text', function(error, doc) {
         doc.attach_ace(editor);
     });
 </script>
@@ -170,7 +170,7 @@ Run this from a couple terminal windows when sharejs is running to see it go.
 var client = require('share').client;
 
 // Open the 'hello' document, which should have type 'text':
-client.open('hello', 'text', 'http://localhost:8000/sjs', function(doc, error) {
+client.open('hello', 'text', 'http://localhost:8000/sjs', function(error, doc) {
     // Insert some text at the start of the document (position 0):
     doc.insert("Hi there!\n", 0);
 

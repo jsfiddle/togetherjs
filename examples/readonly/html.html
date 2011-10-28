@@ -12,7 +12,7 @@
 
 	var elem = document.getElementById('text');
 
-	sharejs.open('html', 'text', function(doc, error) {
+	sharejs.open('html', 'text', function(error, doc) {
 		if (error) {
 			console.error(error);
 		} else {

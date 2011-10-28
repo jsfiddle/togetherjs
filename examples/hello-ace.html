@@ -22,7 +22,7 @@
 		<script>
 var editor = ace.edit("editor");
 
-sharejs.open('hello', 'text', function(doc, error) {
+sharejs.open('hello', 'text', function(error, doc) {
 	doc.attach_ace(editor);
 });
 		</script>
