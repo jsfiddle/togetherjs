@@ -26,12 +26,12 @@ nowOrLater = (fn) ->
 doubleOpen = (c1, c2, docName, type, callback) ->
   doc1 = doc2 = undefined
 
-  c1.open docName, type, (d, error) ->
+  c1.open docName, type, (error, d) ->
     doc1 = d
     assert.ok doc1
     callback doc1, doc2 if doc1 && doc2
 
-  c2.open docName, type, (d, error) ->
+  c2.open docName, type, (error, d) ->
     doc2 = d
     assert.ok doc2
     callback doc1, doc2 if doc1 && doc2
@@ -94,7 +94,7 @@ genTests = (client) -> testCase
     host = "http://127.0.0.1:#{@port}/sjs"
 
     more = ->
-      client.open nextDocName(), 'text', host, (doc, error) =>
+      client.open nextDocName(), 'text', host, (error, doc) =>
         nowOrLater ->
           doc.close()
 
