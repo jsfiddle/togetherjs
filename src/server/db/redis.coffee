@@ -45,9 +45,9 @@ module.exports = RedisDb = (options) ->
 
       if callback
         if result
-          callback true
+          callback null, true
         else
-          callback false, 'Document already exists'
+          callback 'Document already exists', false
 
   # Get all ops with version = start to version = end. Noninclusive.
   # end is trimmed to the size of the document.
@@ -56,7 +56,7 @@ module.exports = RedisDb = (options) ->
   # Each document returned is in the form {op:o, meta:m, v:version}.
   @getOps = (docName, start, end, callback) ->
     if start == end
-      callback []
+      callback null, []
       return
 
     # In redis, lrange values are inclusive.
@@ -73,7 +73,7 @@ module.exports = RedisDb = (options) ->
         data.v = v++
         data
       
-      callback ops
+      callback null, ops
 
   # Append an op to a document.
   # op_data = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
@@ -118,9 +118,9 @@ module.exports = RedisDb = (options) ->
 
       if response != null
         doc_data = JSON.parse(response)
-        callback doc_data
+        callback null, doc_data
       else
-        callback null, 'Document does not exist'
+        callback 'Document does not exist'
 
   @getVersion = (docName, callback) ->
     client.llen keyForOps(docName), (err, response) ->
@@ -131,11 +131,11 @@ module.exports = RedisDb = (options) ->
         client.exists keyForDoc(docName), (err, response) ->
           throw err if err?
           if response
-            callback 0
+            callback null, 0
           else
-            callback null
+            callback 'Document does not exist'
       else
-        callback response
+        callback null, response
 
   # Perminantly deletes a document. There is no undo.
   # Callback takes a single argument which is true iff something was deleted.
@@ -146,9 +146,9 @@ module.exports = RedisDb = (options) ->
       if callback
         if response == 1
           # Something was deleted.
-          callback true
+          callback null, true
         else
-          callback false, 'Document does not exist'
+          callback 'Document does not exist', false
   
   # Close the connection to the database
   @close = ->

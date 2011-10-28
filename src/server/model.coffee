@@ -18,33 +18,34 @@ module.exports = Model = (db, options) ->
 
   options ?= {}
 
-  # Callback is called with a list of the deltas from versionFrom to versionTo, or
+  # Callback is called with (error, deltas)
+  # Deltas is a list of the deltas from versionFrom to versionTo, or
   # to the most recent version if versionTo is null.
-  # The model also checks if the document doesn't exist, and makes getOps return null
-  # if it doesn't. (Later, the model will cache document data locally and that check
-  # will become fast.)
+  #
+  # At time of writing, error is always null. If the document doesn't exist or if
+  # start / end are too long, the ops are trimmed.
   @getOps = (docName, start, end, callback) ->
-    db.getVersion docName, (v) ->
-      if v == null
-        callback null, 'Document does not exist'
+    db.getVersion docName, (error, v) ->
+      if error
+        callback error, null
       else
         db.getOps docName, start, end, callback
 
   # Gets the snapshot data for the specified document.
   # getSnapshot(docName, callback)
-  # Callback is called with ({v: <version>, type: <type>, snapshot: <snapshot>, meta: <meta>})
+  # Callback is called with (error, {v: <version>, type: <type>, snapshot: <snapshot>, meta: <meta>})
   @getSnapshot = getSnapshot = (docName, callback) ->
-    db.getSnapshot docName, (data, error) ->
+    db.getSnapshot docName, (error, data) ->
       p "getSnapshot #{i data}"
       if data?
         data.type = types[data.type] if data?.type
-        callback data
+        callback null, data
       else
-        callback data, error
+        callback error, null
 
   # Gets the latest version # of the document. May be more efficient than getSnapshot.
   # getVersion(docName, callback)
-  # callback is called with (version).
+  # callback is called with (error, version).
   @getVersion = db.getVersion
 
   # Create a document.
@@ -55,7 +56,7 @@ module.exports = Model = (db, options) ->
       meta = {}
 
     if docName.match /\//
-      callback false, 'Invalid document name'
+      callback 'Invalid document name', false
       return
 
     meta ||= {}
@@ -73,7 +74,7 @@ module.exports = Model = (db, options) ->
   queues = {} # docName -> syncQueue
 
   # Apply an op to the specified document.
-  # The callback is passed (applied version #, error)
+  # The callback is passed (error, applied version #)
   # opData = {op:op, v:v, meta:metadata}
   # 
   # Ops are queued before being applied so that the following code applies op C before op B:
@@ -85,10 +86,8 @@ module.exports = Model = (db, options) ->
     # Its important that all ops are applied in order.
     queues[docName] ||= queue (opData, callback) ->
       p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
-      getSnapshot docName, (docData) ->
-        unless docData
-          callback null, 'Document does not exist'
-          return
+      getSnapshot docName, (error, docData) ->
+        return callback error if error
 
         opVersion = opData.v
         op = opData.op
@@ -102,7 +101,8 @@ module.exports = Model = (db, options) ->
           try
             snapshot = docData.type.apply docData.snapshot, op
           catch error
-            callback null, error.message
+            console.error error.stack
+            callback error.message
             return
 
           newOpData = {op, v:opVersion, meta}
@@ -110,17 +110,20 @@ module.exports = Model = (db, options) ->
 
           p "submit #{i newOpData}"
           db.append docName, newOpData, newDocData, ->
+            # Success!
             p "appended v#{opVersion} to #{docName}. Calling callback..."
             events.onApplyOp docName, newOpData
-            callback opVersion, undefined
+            callback null, opVersion
 
         if opVersion > version
-          callback null, 'Op at future version'
+          callback 'Op at future version'
           return
 
         if opVersion < version
           # We'll need to transform the op to the current version of the document.
-          db.getOps docName, opVersion, version, (ops) ->
+          db.getOps docName, opVersion, version, (error, ops) ->
+            return callback error if error
+
             try
               for realOp in ops
                 p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
@@ -129,7 +132,8 @@ module.exports = Model = (db, options) ->
                 p "-> #{i op}"
 
             catch error
-              callback null, error.message
+              console.error error.stack
+              callback error.message
               return
 
             submit()
@@ -145,8 +149,7 @@ module.exports = Model = (db, options) ->
   # 
   # The callback is called with (true) if any data was deleted, else (false).
   #
-  # WARNING: This event isn't well
-  # supported throughout the code. (Eg, streaming clients aren't told about the
+  # WARNING: This isn't well supported throughout the code. (Eg, streaming clients aren't told about the
   # deletion. Subsequent op submissions will fail).
   @delete = (docName, callback) ->
     events.removeAllListeners docName
@@ -181,7 +184,7 @@ module.exports = Model = (db, options) ->
   # If authentication succeeds, acceptCallback() is called if it exists.
   # otherwise userCallback(true) is called.
   #
-  # If authentication fails, userCallback(null, 'forbidden') is called.
+  # If authentication fails, userCallback('forbidden', null) is called.
   #
   # If supplied, actionData is turned into the action.
   doAuth = (client, actionData, name, userCallback, acceptCallback) ->
@@ -199,7 +202,7 @@ module.exports = Model = (db, options) ->
     action.reject = ->
       throw new Error 'Multiple accept/reject calls made' if responded
       responded = true
-      userCallback null, 'forbidden'
+      userCallback 'forbidden', null
     action.accept = ->
       throw new Error 'Multiple accept/reject calls made' if responded
       responded = true

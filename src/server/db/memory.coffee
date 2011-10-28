@@ -12,21 +12,26 @@ module.exports = ->
     # If any documents are passed to the callback, the first one has v = start.
     # end can be null. If so, returns all documents from start onwards.
     # Each document returned is in the form {op:o, meta:m, v:version}.
+    #
+    # If the document does not exist, getOps doesn't return an error. This is because
+    # its really awkward to figure out whether or not the document exists for things
+    # like the redis database backend. I guess its a bit gross having this inconsistant
+    # with the other DB calls, but its certainly convenient.
     getOps: (docName, start, end, callback) ->
       ops = docs[docName]?.ops
 
       if ops?
         end ?= ops.length
-        callback ops[start...end]
+        callback null, ops[start...end]
       else
-        callback []
+        callback null, []
 
     # Create a new document.
     #
     # data = {snapshot, type, [meta]}
     create: (docName, data, callback) ->
       if docs[docName]
-        callback false, 'Document already exists'
+        callback 'Document already exists', false
       else
         throw new Error 'snapshot missing from data' unless data.snapshot != undefined
         throw new Error 'type missing from data' unless data.type != undefined
@@ -34,16 +39,16 @@ module.exports = ->
         throw new Error 'meta missing from data' unless typeof data.meta == 'object'
 
         docs[docName] = {ops:[], data:data}
-        callback true
+        callback? null, true
 
     # Perminantly delete a document.
     # Callback is callback(status) where status == true iff a document was deleted.
     delete: (docName, callback) ->
       if docs[docName]?
         delete docs[docName]
-        callback yes if callback?
+        callback? null, yes
       else
-        callback no, 'Document does not exist' if callback?
+        callback? 'Document does not exist', no
 
     # Append an op to a document. The document must already exist (via db.create, above).
     #
@@ -65,7 +70,7 @@ module.exports = ->
 
       doc.data = docData
       
-      callback()
+      callback?()
 
     # Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
     getSnapshot: (docName, callback) ->
@@ -74,13 +79,16 @@ module.exports = ->
         # The model code will mess with the object sent to the callback. We'll
         # do a shallow copy of it here to avoid problems.
         data = {snapshot:doc.data.snapshot, v:doc.data.v, type:doc.data.type, meta:doc.data.meta}
-        callback data
+        callback null, data
       else
-        callback null, 'Document does not exist'
+        callback 'Document does not exist'
 
     # Get the current version of a document
     getVersion: (docName, callback) ->
-      callback(docs[docName]?.ops.length ? null)
+      if docs[docName]?
+        callback null, docs[docName].ops.length
+      else
+        callback 'Document does not exist'
 
     close: ->
   }

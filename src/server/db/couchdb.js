@@ -38,7 +38,7 @@ module.exports = function(options) {
   return {
     getOps: function(docName, start, end, callback) {
       if (start === end) {
-        callback([]);
+        callback(null, []);
         return;
       }
       
@@ -47,7 +47,7 @@ module.exports = function(options) {
       
       request({uri: ops + encodeOptions({startkey: [docName, start], endkey: [docName, end], include_docs: true})}
         , function(err, resp, body) {
-          callback(_(body.rows).map(function(row) { return {op: row.doc.op, meta: row.doc.meta, v: row.doc.v} }));
+          callback(null, _(body.rows).map(function(row) { return {op: row.doc.op, meta: row.doc.meta, v: row.doc.v} }));
         })
     },
     // in the context of couchdb mapreduce this create function doesn't
@@ -61,19 +61,23 @@ module.exports = function(options) {
       if (!_.isObject(data.meta)) throw new Error('meta missing from data');
 
       var doc = {_id: docName, type: "document", data: data};
+      console.warn('sdf');
       request.post({uri: db, body: doc}
         , function(err, resp, body) {
-          if (err) callback(false, err);
-          if (body.error === "conflict") callback(false, 'Document already exists');
-          if (body.ok) callback(true);          
-        })
+          if (err) callback(err, false);
+          if (body.ok) callback(null, true);          
+          if (body.error) {
+            if (body.error === "conflict") callback('Document already exists', false);
+            else callback(body.error + ' reason: ' + body.reason, false);
+          }
+        });
     },
     delete: function(docName, callback) {
       var docID = db + '/' + docName;
       request.get(docID
         , function(err, resp, body) {
           if (resp.statusCode === 404) {
-            if(callback) callback(false, 'Document does not exist');
+            if(callback) callback('Document does not exist', false);
           } else {
             var docs = [_.extend({}, body, {_deleted: true})];
             request({uri: ops + encodeOptions({startkey: [docName,0], endkey: [docName,9999], include_docs: true})}
@@ -81,7 +85,7 @@ module.exports = function(options) {
                 _(body.rows).each(function(row) { docs.push(_.extend({}, row.doc, {_deleted: true})) });
                 request.post({url: db + '/_bulk_docs', body: {docs: docs}}
                   , function(err, resp, body) {
-                    if (!err && callback) callback(true);
+                    if (!err && callback) callback(null, true);
                   })
               })
           }
@@ -101,7 +105,7 @@ module.exports = function(options) {
               opData.docName = docName;
               request.post({uri: db, body: opData}
                 , function(err, resp, body) {
-                  if (body.ok) callback(true);
+                  if (body.ok) callback();
                 })
             })
         })
@@ -111,9 +115,9 @@ module.exports = function(options) {
       request.get(docID
         , function(err, resp, body) {
           if (resp.statusCode === 404) {
-            callback(null, 'Document does not exist');
+            callback('Document does not exist');
           } else {
-            callback(body.data);
+            callback(null, body.data);
           }
         })
     },
@@ -121,9 +125,9 @@ module.exports = function(options) {
       request(db + '/' + docName
         , function(err, resp, body) {
          if(resp.statusCode === 404) {
-           callback(null, 'Document does not exist');
+           callback('Document does not exist');
          } else {
-           callback(body.data.v);
+           callback(null, body.data.v);
          }
       })
     },

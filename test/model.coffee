@@ -18,65 +18,68 @@ module.exports = testCase
     @name = 'testingdoc'
     @unused = 'testingdoc2'
 
-    @model.create @name, 'simple', (status) =>
+    @model.create @name, 'simple', (error, status) =>
+      assert.equal error, null
       assert.ok status
       callback()
 
   'Return null when asked for the snapshot of a new object': (test) ->
-    @model.getSnapshot @unused, (data, error) ->
-      test.strictEqual data, null
+    @model.getSnapshot @unused, (error, data) ->
+      test.equal data, null
       test.strictEqual error, 'Document does not exist'
       test.done()
 
   'Calling create sets the type and version': (test) ->
     # create() has been called in setUp already.
-    @model.getSnapshot @name, (data, error) =>
-      test.strictEqual error, undefined
+    @model.getSnapshot @name, (error, data) =>
+      test.equal error, null
       test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
       test.done()
   
   'Calling create works with a type literal instead of a string': (test) ->
-    @model.create @unused, types.simple, (status) =>
+    @model.create @unused, types.simple, (error, status) =>
+      test.equal error, null
       test.strictEqual status, true
-      @model.getSnapshot @name, (data) =>
+      @model.getSnapshot @name, (error, data) =>
+        test.equal error, null
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         test.done()
   
   'Creating a document a second time has no effect': (test) ->
-    @model.create @name, types.text, (status) =>
+    @model.create @name, types.text, (error, status) =>
       test.strictEqual status, false
-      @model.getSnapshot @name, (data) =>
+      @model.getSnapshot @name, (error, data) =>
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         test.done()
   
   'Subsequent calls to getSnapshot work': (test) ->
-    # Written in response to a bug. Odd, isn't it?
-    @model.create @name, types.text, (status) =>
-      @model.getSnapshot @name, (data) =>
+    # Written in response to a real bug. (!!)
+    @model.create @name, types.text, (error, status) =>
+      @model.getSnapshot @name, (error, data) =>
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
-        @model.getSnapshot @name, (data) =>
+        @model.getSnapshot @name, (error, data) =>
+          test.equal error, null
           test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
           test.done()
   
   'Cant create a document with a slash in the name': (test) ->
-    @model.create 'foo/bar', types.text, (result, error) ->
+    @model.create 'foo/bar', types.text, (error, result) ->
       test.strictEqual result, false
       test.strictEqual error, 'Invalid document name'
       test.done()
 
   'Return a fresh snapshot after submitting ops': (test) ->
-    @model.applyOp @name, {v:0, op:{position: 0, text:'hi'}}, (appliedVersion, error) =>
-      test.ifError(error)
+    @model.applyOp @name, {v:0, op:{position: 0, text:'hi'}}, (error, appliedVersion) =>
+      test.equal error, null
       test.strictEqual appliedVersion, 0
-      @model.getSnapshot @name, (data) ->
+      @model.getSnapshot @name, (error, data) ->
         test.deepEqual data, {v:1, type:types.simple, snapshot:{str:'hi'}, meta:{}}
         test.done()
 
   'Apply op to future version fails': (test) ->
     @model.create @name, types.simple, =>
-      @model.applyOp @name, {v:1, op:{position: 0, text: 'hi'}}, (result, err) ->
-        test.ok err
-        test.strictEqual err, 'Op at future version'
+      @model.applyOp @name, {v:1, op:{position: 0, text: 'hi'}}, (error, result) ->
+        test.strictEqual error, 'Op at future version'
         test.done()
   
   'Apply ops at the most recent version': (test) ->
@@ -107,14 +110,17 @@ module.exports = testCase
           test.done()
 
   'delete a document when delete is called': (test) ->
-    @model.delete @name, (deleted) =>
+    @model.delete @name, (error, deleted) =>
+      test.equal error, null
       test.strictEqual deleted, true
-      @model.getSnapshot @name, (data) ->
+      @model.getSnapshot @name, (error, data) ->
+        test.equal error, 'Document does not exist'
         test.strictEqual data, null
         test.done()
   
   "Pass false to the callback if you delete something that doesn't exist": (test) ->
-    @model.delete @unused, (deleted) ->
+    @model.delete @unused, (error, deleted) ->
+      test.strictEqual error, 'Document does not exist'
       test.strictEqual deleted, false
       test.done()
   
@@ -125,58 +131,56 @@ module.exports = testCase
     getOps = (data) -> data.map ((d) -> d.op)
 
     applyOps @model, @name, 0, submittedOps.slice(), (error, _) =>
-      @model.getOps @name, 0, 1, (data, error) ->
+      @model.getOps @name, 0, 1, (error, data) ->
         test.deepEqual getOps(data), [submittedOps[0]]
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
-      @model.getOps @name, 0, 2, (data, error) ->
+      @model.getOps @name, 0, 2, (error, data) ->
         test.deepEqual getOps(data), submittedOps
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
-      @model.getOps @name, 1, 2, (data, error) ->
+      @model.getOps @name, 1, 2, (error, data) ->
         test.deepEqual getOps(data), [submittedOps[1]]
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
-      @model.getOps @name, 2, 3, (data, error) ->
+      @model.getOps @name, 2, 3, (error, data) ->
         test.deepEqual data, []
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
 
       # These should be trimmed to just return the version specified
-      @model.getOps @name, 0, 1000, (data, error) ->
+      @model.getOps @name, 0, 1000, (error, data) ->
         test.deepEqual getOps(data), submittedOps
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
-      @model.getOps @name, 1, 1000, (data, error) ->
+      @model.getOps @name, 1, 1000, (error, data) ->
         test.deepEqual getOps(data), [submittedOps[1]]
-        test.strictEqual error, undefined
+        test.equal error, null
         passPart()
 
-  'getOps on an empty document returns null, errormsg', (test) ->
+  'getOps on an empty document returns an empty list': (test) ->
     passPart = makePassPart test, 2
-    @model.getOps @name, 0, 0, (data, error) ->
-      test.deepEqual data, null
-      test.strictEqual error, 'Document does not exist'
+    @model.getOps @name, 0, 0, (error, data) ->
+      test.deepEqual data, []
       passPart()
 
-    @model.getOps @name, 0, null, (data, error) ->
-      test.deepEqual data, null
-      test.strictEqual error, 'Document does not exist'
+    @model.getOps @name, 0, null, (error, data) ->
+      test.deepEqual data, []
       passPart()
  
   'getOps with a null count returns all the ops': (test) ->
     submittedOps = [{position: 0, text: 'Hi'}, {position: 2, text: ' mum'}]
     applyOps @model, @name, 0, submittedOps.slice(), (error, _) =>
-      @model.getOps @name, 0, null, (data, error) ->
+      @model.getOps @name, 0, null, (error, data) ->
+        test.equal error, null
         test.deepEqual data.map((d) -> d.op), submittedOps
-        test.strictEqual error, undefined
         test.done()
   
   'ops submitted have a metadata object added': (test) ->
     t1 = Date.now()
-    @model.applyOp @name, {op:{position: 0, text: 'hi'}, v:0}, (appliedVersion, error) =>
+    @model.applyOp @name, {op:{position: 0, text: 'hi'}, v:0}, (error, version) =>
       test.ifError error
-      @model.getOps @name, 0, 1, (data) ->
+      @model.getOps @name, 0, 1, (error, data) ->
         test.deepEqual data.length, 1
         d = data[0]
         test.deepEqual d.op, {position: 0, text: 'hi'}
@@ -185,8 +189,8 @@ module.exports = testCase
         test.done()
   
   'metadata is stored': (test) ->
-    @model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}, meta:{blah:'blat'}}, (appliedVersion, error) =>
-      @model.getOps @name, 0, 1, (data) ->
+    @model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}, meta:{blah:'blat'}}, (error, version) =>
+      @model.getOps @name, 0, 1, (error, data) ->
         d = data[0]
         test.deepEqual d.op, {position: 0, text: 'hi'}
         test.strictEqual typeof d.meta, 'object'
@@ -194,26 +198,19 @@ module.exports = testCase
         test.done()
 
   'getVersion on a non-existant doc returns null': (test) ->
-    @model.getVersion @unused, (v) ->
-      test.strictEqual v, null
+    @model.getVersion @unused, (error, v) ->
+      test.strictEqual error, 'Document does not exist'
+      test.equal v, null
       test.done()
 
   'getVersion on a doc returns its version': (test) ->
-    @model.getVersion @name, (v) =>
+    @model.getVersion @name, (error, v) =>
+      test.equal error, null
       test.strictEqual v, 0
-      @model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}}, (appliedVersion, error) =>
+      @model.applyOp @name, {v:0, op:{position: 0, text: 'hi'}}, (error, appliedVersion) =>
         test.ifError(error)
-        @model.getVersion @name, (v) ->
+        @model.getVersion @name, (error, v) ->
+          test.equal error, null
           test.strictEqual v, 1
           test.done()
-  
-  'random doc name creates some doc names': (test) ->
-    name = (@model.randomDocName() for [1..50])
-
-    for n, i in name
-      test.ok n.length > 5
-      # Check that names aren't repeated
-      test.strictEqual (name.lastIndexOf n), i
-    
-    test.done()
-
+ 

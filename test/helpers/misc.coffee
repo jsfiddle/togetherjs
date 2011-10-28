@@ -56,13 +56,12 @@ exports.makePassPart = (test, n) ->
 # It might be worth moving this to model so others can use this method.
 exports.applyOps = applyOps = (model, docName, startVersion, ops, callback) =>
   op = ops.shift()
-  model.applyOp docName, {v:startVersion, op:op}, (appliedVersion, errorMsg) =>
-    if errorMsg
-      callback(new Error(errorMsg), null)
+  model.applyOp docName, {v:startVersion, op:op}, (error, appliedVersion) =>
+    if error
+      callback error
     else
       if ops.length == 0
-        model.getSnapshot docName, (snapshot) ->
-          callback(null, snapshot)
+        model.getSnapshot docName, callback
       else
         applyOps model, docName, startVersion + 1, ops, callback
 
