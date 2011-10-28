@@ -131,7 +131,7 @@ genTests = (client) ->
         doc.insert 0, 'hi', =>
           test.strictEqual doc.snapshot, 'hi'
           test.strictEqual doc.getText(), 'hi'
-          @model.getSnapshot @name, ({snapshot}) ->
+          @model.getSnapshot @name, (error, {snapshot}) ->
             test.strictEqual snapshot, 'hi'
             test.done()
     
@@ -183,11 +183,11 @@ genTests = (client) ->
         doc.on 'remoteop', (op) ->
           test.deepEqual op, [{i:'hi', p:0}]
 
-          test.expect 4
+          test.expect 3
           test.done()
 
-        @model.applyOp @name, {v:0, op:[{i:'hi', p:0}]}, (version, error) ->
-          test.ifError error
+        @model.applyOp @name, {v:0, op:[{i:'hi', p:0}]}, (error, version) ->
+          test.fail error if error
 
     'get a nonexistent document passes null to the callback': (test) ->
       @c.openExisting @name, (doc) ->
@@ -231,8 +231,8 @@ genTests = (client) ->
           test.deepEqual op, serverTransformed
           onOpApplied()
 
-        @model.applyOp @name, {v:0, op:serverOp}, (version, error) ->
-          test.ifError error
+        @model.applyOp @name, {v:0, op:serverOp}, (error) ->
+          test.fail error if error
 
     'doc fires both remoteop and change messages when remote ops are received': (test) ->
       passPart = makePassPart test, 2
@@ -245,8 +245,8 @@ genTests = (client) ->
           test.deepEqual op, sentOp
           passPart()
 
-        @model.applyOp @name, {v:0, op:sentOp}, (version, error) ->
-          test.ifError error
+        @model.applyOp @name, {v:0, op:sentOp}, (error) ->
+          test.fail error if error
     
     'doc only fires change ops from locally sent ops': (test) ->
       passPart = makePassPart test, 2
@@ -267,7 +267,7 @@ genTests = (client) ->
           throw new Error 'Should not have received op when the doc was unfollowed'
     
         doc.close =>
-          @model.applyOp @name, {v:0, op:[{i:'asdf', p:0}]}, (version, error) =>
+          @model.applyOp @name, {v:0, op:[{i:'asdf', p:0}]}, =>
             test.done()
 
     'created locally is set on new docs': (test) ->
@@ -348,7 +348,7 @@ genTests = (client) ->
           # Also need to test that ops sent afterwards get sent correctly.
           # because that behaviour IS CURRENTLY BROKEN
 
-          @model.getSnapshot @name, ({snapshot}) ->
+          @model.getSnapshot @name, (error, {snapshot}) ->
             test.strictEqual snapshot, ''
             test.done()
 
@@ -377,7 +377,7 @@ genTests = (client) ->
           e = expectCalls 3, =>
             # The b's are successfully deleted, the ds are added by the server and the
             # op to delete the cs is denied.
-            @model.getSnapshot @name, ({snapshot}) ->
+            @model.getSnapshot @name, (error, {snapshot}) ->
               test.deepEqual snapshot, 'acdDCA'
               test.done()
 
@@ -409,7 +409,7 @@ genTests = (client) ->
         doc.insert 0, 'hi', =>
           test.strictEqual doc.getText(), 'hi'
 
-          @model.getSnapshot @name, (data) ->
+          @model.getSnapshot @name, (error, data) ->
             test.strictEqual data.snapshot, 'hi'
             doc.close()
             test.done()
