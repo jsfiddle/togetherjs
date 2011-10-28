@@ -15,23 +15,23 @@ module.exports = testCase
     @name = 'testingdoc'
     @unused = 'nonexistantdoc'
 
-    @model.create @name, 'simple', (status) ->
+    @model.create @name, 'simple', (error, status) ->
       assert.ok status
       callback()
 
   'listen on a nonexistant doc returns null and ignore the document': (test) ->
-    @model.listen @unused, (-> throw new Error 'should not receive any ops'), (v, error) =>
-      test.strictEqual v, null
+    @model.listen @unused, (-> throw new Error 'should not receive any ops'), (error, v) =>
       test.strictEqual error, 'Document does not exist'
+      test.equal v, null
 
       @model.create @unused, 'simple', =>
         @model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
           test.done()
   
   'listen from version on a nonexistant doc returns null and ignores the doc': (test) ->
-    @model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (v, error) =>
-      test.strictEqual v, null
+    @model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (error, v) =>
       test.strictEqual error, 'Document does not exist'
+      test.equal v, null
 
       @model.create @unused, 'simple', =>
         @model.applyOp @unused, {v:0, op:{position:0, text:'hi'}}, ->
@@ -43,9 +43,9 @@ module.exports = testCase
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
 
-    @model.listen @name, listener, (v, error) ->
+    @model.listen @name, listener, (error, v) ->
+      test.equal error, null
       test.strictEqual v, 0
-      test.strictEqual error, undefined
 
     applyOps @model, @name, 0, [
         {position:0, text:'A'},
@@ -58,17 +58,17 @@ module.exports = testCase
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
 
-    @model.listen @name, listener, (v, error) ->
+    @model.listen @name, listener, (error, v) ->
+      test.equal error, null
       test.strictEqual v, 0
-      test.strictEqual error, undefined
 
     applyOps @model, @name, 0, [
         {position:0, text:'A'},
         {position:0, text:'Hi'}
       ], (error, _) =>
         test.ifError(error)
-        @model.applyOp @name, {v:1, op:{position:0, text:'hi2'}}, (v, error) ->
-          test.strictEqual undefined, error
+        @model.applyOp @name, {v:1, op:{position:0, text:'hi2'}}, (error, v) ->
+          test.equal error, null
           test.strictEqual v, 2
   
   'emit events when ops are applied to an existing document': (test) ->
@@ -79,7 +79,9 @@ module.exports = testCase
       listener = (op_data) ->
         test.strictEqual op_data.v, expectedVersions.shift()
         test.done() if expectedVersions.length == 0
-      @model.listen @name, listener, (v) -> test.strictEqual v, 2
+      @model.listen @name, listener, (error, v) ->
+        test.equal error, null
+        test.strictEqual v, 2
 
       applyOps @model, @name, 2, [
           {position:0, text:'Hi'}
@@ -92,7 +94,9 @@ module.exports = testCase
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
 
-    @model.listenFromVersion @name, 0, listener, (v) -> test.strictEqual v, 0
+    @model.listenFromVersion @name, 0, listener, (error, v) ->
+      test.equal error, null
+      test.strictEqual v, 0
 
     applyOps @model, @name, 0, [
         {position:0, text:'A'},
@@ -106,6 +110,7 @@ module.exports = testCase
       ], (error, _) -> test.ifError(error)
 
     expectedVersions = [0...2]
+    # I'm not passing a listenfromversion callback
     @model.listenFromVersion @name, 0, (op_data) ->
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
@@ -139,7 +144,7 @@ module.exports = testCase
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       process.nextTick => # I have no idea why I need this process.nextTick, but I do...
-        @model.listenFromVersion @name, 0, listener, (result, error) =>
+        @model.listenFromVersion @name, 0, listener, (error, result) =>
           test.fail error if error
           @model.applyOp @name, {v:1, op:{position:2, text:' there'}}
 
@@ -148,7 +153,9 @@ module.exports = testCase
       test.strictEqual op_data.v, 0, 'Listener was not removed correctly'
       @model.removeListener @name, listener
 
-    @model.listen @name, listener, ((v) -> test.strictEqual v, 0)
+    @model.listen @name, listener, (error, v) ->
+      test.equal error, null
+      test.strictEqual v, 0
 
     applyOps @model, @name, 0, [
         {position:0, text:'A'},

@@ -26,13 +26,12 @@ module.exports = (model) ->
     # from then on are sent to the user.
     # Listeners are of the form listener(op, appliedAt)
     listen: (docName, listener, callback) ->
-      model.getVersion docName, (version) ->
-        if version != null
-          # Only attach the listener if the document exists (ie, if version != null)
-          emitterForDoc(docName, yes).on 'op', listener
-          callback version if callback
-        else
-          callback null, 'Document does not exist'
+      model.getVersion docName, (error, version) ->
+        return callback? error if error
+
+        # Only attach the listener if the document exists (ie, if version != null)
+        emitterForDoc(docName, yes).on 'op', listener
+        callback? null, version
 
     # Remove a listener from a particular document.
     removeListener: (docName, listener) ->
@@ -49,19 +48,18 @@ module.exports = (model) ->
     # Callback(version) if the listener is attached
     # Callback(null) if the document doesn't exist
     listenFromVersion: (docName, version, listener, callback) ->
-      model.getVersion docName, (docVersion) ->
-        if docVersion == null
-          # The document doesn't exist.
-          callback null, 'Document does not exist' if callback
-          return
+      model.getVersion docName, (error, docVersion) ->
+        return callback? error if error
 
         version = docVersion if version > docVersion
 
         # The listener isn't attached until we have the historical ops from the database.
-        model.getOps docName, version, null, (data) ->
+        model.getOps docName, version, null, (error, data) ->
+          return callback? error if error
+
           emitter = emitterForDoc(docName, yes)
           emitter.on 'op', listener
-          callback version if callback
+          callback? null, version
           p 'Listener added -> ' + (i emitterForDoc(docName)?.listeners('op'))
 
           for op_data in data
