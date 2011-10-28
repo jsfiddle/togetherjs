@@ -228,7 +228,7 @@ module.exports = Model = (db, options) ->
     doAuth client, null, 'connect', callback, ->
       # Maybe store a set of clients in the model?
       # clients[client.id] = client ?
-      callback client
+      callback null, client
 
   @clientGetOps = (client, docName, start, end, callback) ->
     doAuth client, {docName, start, end}, 'get ops', callback, =>

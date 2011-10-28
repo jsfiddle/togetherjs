@@ -70,16 +70,16 @@ genTests = (async) -> testCase
 
       action.accept()
     
-    @model.clientConnect @connectionData, (c, error) ->
+    @model.clientConnect @connectionData, (error, c) ->
       test.fail error if error
       test.strictEqual client, c
       test.ok client.id
       test.done()
-  
+
   'clientConnect returns an error if a client isnt allowed to connect': (test) ->
     @auth = (c, action) -> action.reject()
 
-    @model.clientConnect @connectionData, (client, error) ->
+    @model.clientConnect @connectionData, (error, client) ->
       test.strictEqual error, 'forbidden'
       test.fail client if client
       test.done()
@@ -91,7 +91,7 @@ genTests = (async) -> testCase
     passPart = makePassPart test, 1000
 
     for __ignored in [1..1000] # Cant use for [1..1000] - https://github.com/jashkenas/coffee-script/issues/1714
-      @model.clientConnect @connectionData, (client, error) ->
+      @model.clientConnect @connectionData, (error, client) ->
         throw new Error "repeat ID detected (#{client.id})" if ids[client.id]
         ids[client.id] = true
         passPart()
@@ -104,7 +104,7 @@ genTests = (async) -> testCase
       action.accept()
 
     # The object was created in setUp, above.
-    @model.clientGetSnapshot @client, @name, (data, error) ->
+    @model.clientGetSnapshot @client, @name, (error, data) ->
       test.deepEqual data, {v:0, snapshot:{str:''}, meta:{}, type:types.simple}
       test.fail error if error
 
@@ -114,7 +114,7 @@ genTests = (async) -> testCase
   'getSnapshot disallowed if auth rejects': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientGetSnapshot @client, @name, (data, error) =>
+    @model.clientGetSnapshot @client, @name, (error, data) =>
       test.strictEqual error, 'forbidden'
       test.fail data if data
       test.done()
@@ -129,7 +129,7 @@ genTests = (async) -> testCase
       action.accept()
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
-      @model.clientGetOps @client, @name, 0, 1, (data, error) ->
+      @model.clientGetOps @client, @name, 0, 1, (error, data) ->
         test.strictEqual data.length, 1
         test.deepEqual data[0].op, {position:0, text:'hi'}
         test.fail error if error
@@ -141,7 +141,7 @@ genTests = (async) -> testCase
     @auth = (client, action) -> action.reject()
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
-      @model.clientGetOps @client, @name, 0, 1, (data, error) ->
+      @model.clientGetOps @client, @name, 0, 1, (error, data) ->
         test.strictEqual error, 'forbidden'
         test.fail data if data
         test.done()
@@ -149,7 +149,7 @@ genTests = (async) -> testCase
   'getOps returns Document does not exist for documents that dont exist if its allowed': (test) ->
     @auth = (client, action) -> action.accept()
 
-    @model.clientGetOps @client, @unused, 0, 1, (data, error) ->
+    @model.clientGetOps @client, @unused, 0, 1, (error, data) ->
       test.fail data if data
       test.strictEqual error, 'Document does not exist'
       test.done()
@@ -157,7 +157,7 @@ genTests = (async) -> testCase
   "getOps returns forbidden for documents that don't exist if it can't read": (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientGetOps @client, @unused, 0, 1, (data, error) ->
+    @model.clientGetOps @client, @unused, 0, 1, (error, data) ->
       test.fail data if data
       test.strictEqual error, 'forbidden'
       test.done()
@@ -173,11 +173,12 @@ genTests = (async) -> testCase
   
       action.accept()
 
-    @model.clientCreate @client, @unused, 'simple', {}, (result, error) =>
+    @model.clientCreate @client, @unused, 'simple', {}, (error, result) =>
       test.strictEqual result, true
       test.fail error if error
 
-      @model.getVersion @unused, (v) ->
+      @model.getVersion @unused, (error, v) ->
+        test.fail error if error
         test.strictEqual v, 0
 
         test.expect 7
@@ -186,18 +187,18 @@ genTests = (async) -> testCase
   'create not allowed if canCreate() rejects': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientCreate @client, @unused, 'simple', {}, (result, error) =>
+    @model.clientCreate @client, @unused, 'simple', {}, (error, result) =>
       test.strictEqual error, 'forbidden'
 
-      @model.getVersion @unused, (v) ->
-        test.strictEqual v, null
+      @model.getVersion @unused, (error, v) ->
+        test.strictEqual 'Document does not exist', error
         test.fail result if result
         test.done()
   
   'create returns false if the document already exists, and youre allowed to know': (test) ->
     @auth = (client, action) -> action.accept()
     
-    @model.clientCreate @client, @name, 'simple', {}, (result, error) ->
+    @model.clientCreate @client, @name, 'simple', {}, (error, result) ->
       test.strictEqual result, false
       test.strictEqual error, 'Document already exists'
       test.done()
@@ -214,11 +215,11 @@ genTests = (async) -> testCase
 
       action.accept()
 
-    @model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
-      test.strictEqual result, 0
+    @model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (error, result) =>
       test.fail error if error
+      test.strictEqual result, 0
 
-      @model.getVersion @name, (v) ->
+      @model.getVersion @name, (error, v) ->
         test.strictEqual v, 1
         test.expect 8
         test.done()
@@ -226,11 +227,11 @@ genTests = (async) -> testCase
   'applyOps doesnt work if rejected': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
+    @model.clientSubmitOp @client, @name, {v:0, op:{position:0, text:'hi'}}, (error, result) =>
       test.fail result if result
       test.strictEqual error, 'forbidden'
 
-      @model.getVersion @name, (v) ->
+      @model.getVersion @name, (error, v) ->
         test.strictEqual v, 0
         test.done()
   
@@ -238,7 +239,7 @@ genTests = (async) -> testCase
     # Its important that information about documents doesn't leak unintentionally.
     @auth = (client, action) -> action.reject()
 
-    @model.clientSubmitOp @client, @unused, {v:0, op:{position:0, text:'hi'}}, (result, error) =>
+    @model.clientSubmitOp @client, @unused, {v:0, op:{position:0, text:'hi'}}, (error, result) =>
       test.fail result if result
       test.strictEqual error, 'forbidden'
       test.done()
@@ -257,7 +258,7 @@ genTests = (async) -> testCase
       test.strictEqual data.v, 0
       test.done()
 
-    @model.clientListen @client, @name, listener, (result, error) =>
+    @model.clientListen @client, @name, listener, (error, result) =>
       test.fail error if error
       @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
 
@@ -266,7 +267,7 @@ genTests = (async) -> testCase
 
     listener = (data) -> test.fail 'listener should not be called'
 
-    @model.clientListen @client, @name, listener, (result, error) =>
+    @model.clientListen @client, @name, listener, (error, result) =>
       test.fail result if result
       test.strictEqual error, 'forbidden'
 
@@ -295,7 +296,7 @@ genTests = (async) -> testCase
         test.done()
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
-      @model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
         test.fail error if error
         @model.applyOp @name, {v:1, op:{position:2, text:' there'}}
 
@@ -308,10 +309,10 @@ genTests = (async) -> testCase
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       # Both of these should fail.
-      @model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
         test.strictEqual error, 'forbidden'
         test.fail result if result?
-        @model.clientListenFromVersion @client, @name, 1, listener, (result, error) =>
+        @model.clientListenFromVersion @client, @name, 1, listener, (error, result) =>
           test.strictEqual error, 'forbidden'
           test.fail result if result?
           @model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->
@@ -326,7 +327,7 @@ genTests = (async) -> testCase
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       # Both of these should fail.
-      @model.clientListenFromVersion @client, @name, 0, listener, (result, error) =>
+      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
         test.strictEqual error, 'forbidden'
         test.fail result if result?
         # I'm only checking that listenFromVersion fails when you try and listen from an old version.
@@ -343,31 +344,31 @@ genTests = (async) -> testCase
       test.strictEqual action.name, 'delete'
       action.accept()
 
-    @model.clientDelete @client, @name, (result, error) =>
-      test.strictEqual result, true
+    @model.clientDelete @client, @name, (error, result) =>
       test.fail error if error
+      test.strictEqual result, true
 
-      @model.getVersion @name, (v) ->
+      @model.getVersion @name, (error, v) ->
         # The document should not exist anymore.
-        test.strictEqual v, null
+        test.strictEqual error, 'Document does not exist'
         test.expect 5
         test.done()
   
   'delete fails if canDelete does not allow it': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientDelete @client, @name, (result, error) =>
+    @model.clientDelete @client, @name, (error, result) =>
       test.strictEqual !!result, false
       test.strictEqual error, 'forbidden'
 
-      @model.getVersion @name, (v) ->
+      @model.getVersion @name, (error, v) ->
         test.strictEqual v, 0
         test.done()
   
   'delete returns forbidden on a nonexistant document': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientDelete @client, @unused, (result, error) ->
+    @model.clientDelete @client, @unused, (error, result) ->
       test.strictEqual !!result, false
       test.strictEqual error, 'forbidden'
       test.done()
@@ -405,7 +406,6 @@ genTests = (async) -> testCase
     @model.clientGetSnapshot @client, @unused, ->
 
     test.done()
-
 
 exports.sync = genTests false
 exports.async = genTests true
