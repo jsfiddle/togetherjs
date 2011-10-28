@@ -61,7 +61,6 @@ module.exports = function(options) {
       if (!_.isObject(data.meta)) throw new Error('meta missing from data');
 
       var doc = {_id: docName, type: "document", data: data};
-      console.warn('sdf');
       request.post({uri: db, body: doc}
         , function(err, resp, body) {
           if (err) callback(err, false);

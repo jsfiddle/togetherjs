@@ -13,15 +13,15 @@ module.exports = {
 		prefix: 'ShareJS:',
 
 		// The hostname, port and options to pass to redis.
-		// null lets redis decide - redis by default connects to localhost port 6379.
-		hostname: null,
-		port: null,
-		redisOptions: null
+		// null lets the database decide - redis by default connects to localhost port 6379.
+		//hostname: null,
+		//port: null,
+		//redisOptions: null
 
 		// To use CouchDB uncomment this section then run bin/setup_couch:
-		// type: 'couchdb',
-		// hostname: "http://admin:admin@localhost",
-		// port: 5984
+		//type: 'couchdb',
+		//hostname: "http://admin:admin@localhost",
+		//port: 5984
 
 	},
 
