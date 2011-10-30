@@ -1,14 +1,10 @@
 # Tests for the databases. This code is tested with all the database implementations.
 
-testCase = require('nodeunit').testCase
+{testCase} = require 'nodeunit'
 
 createDb = require '../src/server/db'
-helpers = require './helpers'
-makePassPart = helpers.makePassPart
+{makePassPart} = require './helpers'
 types = require '../src/types'
-
-# remove me
-request = require 'request'
 
 newDocName = do ->
   num = 0
@@ -117,7 +113,7 @@ test = (opts) -> testCase
         test.equal error, null
         @db.getOps @name, 0, 1, (error, ops) ->
           test.equal error, null
-          test.deepEqual ops, [{op:{position:0, str:'hi'}, meta:{}, v:0}]
+          test.deepEqual ops, [{op:{position:0, str:'hi'}, meta:{}}]
           test.done()
   
   'snapshot is updated when a second op is applied': (test) ->
@@ -238,10 +234,10 @@ test = (opts) -> testCase
           test.deepEqual ops, []
           passPart()
         @db.getOps @name, 0, 1, (error, ops) ->
-          test.deepEqual ops, [{op:[{p:0,i:'hi'}], meta:{}, v:0}]
+          test.deepEqual ops, [{op:[{p:0,i:'hi'}], meta:{}}]
           passPart()
         @db.getOps @name, 0, null, (error, ops) ->
-          test.deepEqual ops, [{op:[{p:0,i:'hi'}], meta:{}, v:0}]
+          test.deepEqual ops, [{op:[{p:0,i:'hi'}], meta:{}}]
           passPart()
         @db.getOps @name, 1, 1, (error, ops) ->
           test.deepEqual ops, []

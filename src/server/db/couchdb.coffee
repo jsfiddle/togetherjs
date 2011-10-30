@@ -86,7 +86,7 @@ module.exports = (options) ->
     request uriForOps(docName, start, end), (err, resp, body) ->
       # Rows look like this:
       # {"id":"<uuid>","key":["doc name",0],"value":{"op":[{"p":0,"i":"hi"}],"meta":{}}}
-      data = ({op: row.value.op, meta: row.value.meta, v: row.key[1]} for row in body.rows)
+      data = ({op: row.value.op, meta: row.value.meta} for row in body.rows)
       callback null, data
   
   # callback(error, db metadata)

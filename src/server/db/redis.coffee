@@ -66,12 +66,7 @@ module.exports = RedisDb = (options) ->
 
     client.lrange keyForOps(docName), start, end, (err, values) ->
       throw err if err?
-      v = start
-      ops = for value in values
-        data = JSON.parse value
-        data.v = v++
-        data
-      
+      ops = (JSON.parse value for value in values)
       callback null, ops
 
   # Write an op to a document.

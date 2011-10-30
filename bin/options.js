@@ -5,8 +5,11 @@ module.exports = {
 
 	// Database options
 	db: {
-		// DB type. Options are 'redis', 'couchdb' or 'memory'. 'redis' requires the
-		// redis npm package. 'memory' has no dependancies and no options.
+		// DB type. Options are 'redis', 'couchdb' or 'none'. 'redis' requires the
+		// redis npm package.
+    //
+    // If you don't want a database, you can also say db: null. With no database,
+    // all documents are deleted when the server restarts.
 		type: 'redis',
 
 		// The prefix for database entries
@@ -18,11 +21,10 @@ module.exports = {
 		//port: null,
 		//redisOptions: null
 
-		// To use CouchDB uncomment this section then run bin/setup_couch:
+		// To use CouchDB uncomment this section then run bin/setup_couch.
+    // Database URI Defaults to http://localhost:5984/sharejs .
 		//type: 'couchdb',
-		//hostname: "http://admin:admin@localhost",
-		//port: 5984
-
+		//uri: "http://admin:admin@localhost:5984/ot",
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
