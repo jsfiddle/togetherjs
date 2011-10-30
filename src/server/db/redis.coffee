@@ -41,13 +41,12 @@ module.exports = RedisDb = (options) ->
   @create = (docName, data, callback) ->
     value = JSON.stringify(data)
     client.setnx keyForDoc(docName), value, (err, result) ->
-      throw err if err?
+      return callback? err if err
 
-      if callback
-        if result
-          callback null, true
-        else
-          callback 'Document already exists', false
+      if result
+        callback? null
+      else
+        callback? 'Document already exists'
 
   # Get all ops with version = start to version = end. Noninclusive.
   # end is trimmed to the size of the document.
@@ -75,41 +74,41 @@ module.exports = RedisDb = (options) ->
       
       callback null, ops
 
-  # Append an op to a document.
-  # op_data = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
-  # doc_data = resultant document snapshot data. {snapshot:s, type:t, meta}
+  # Write an op to a document.
+  #
+  # opData = {op:the op to append, v:version, meta:optional metadata object containing author, etc.}
   # callback = callback when op committed
   # 
-  # op_data.v MUST be the subsequent version for the document.
+  # opData.v MUST be the subsequent version for the document.
   #
   # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
   # (its either that, or I have _another_ check when you append an op that the document already exists
   # ... and that would slow it down a bit.)
-  @append = (docName, op_data, doc_data, callback) ->
-    throw new Error 'snapshot missing from data' unless doc_data.snapshot != undefined
-    throw new Error 'type missing from data' unless doc_data.type != undefined
-
-    # ****** NOT SAFE FOR MULTIPLE PROCESSES. Rewrite using transactions.
-    
-    resultingVersion = op_data.v + 1
-    throw new Error 'version missing or incorrect in doc data' unless doc_data.v == resultingVersion
+  @writeOp = (docName, opData, callback) ->
+    # ****** NOT SAFE FOR MULTIPLE PROCESSES. Rewrite me using transactions or something.
 
     # The version isn't stored.
-    new_op_data = {op:op_data.op, meta:op_data.meta}
-    json = JSON.stringify(new_op_data)
+    json = JSON.stringify {op:opData.op, meta:opData.meta}
     client.rpush keyForOps(docName), json, (err, response) ->
-      throw err if err?
+      return callback err if err
 
-      unless resultingVersion == response
+      if response == opData.v + 1
+        callback()
+      else
         # The document has been corrupted by the change. For now, throw an exception.
         # Later, rebuild the snapshot.
-        throw "Version mismatch in db.append. '#{docName}' is corrupted."
+        callback "Version mismatch in db.append. '#{docName}' is corrupted."
     
-    client.set keyForDoc(docName), JSON.stringify(doc_data), (err, response) ->
-      throw err if err?
-
-      # I'm assuming the ops are sent & responses received in order.
-      callback()
+  # Write new snapshot data to the database.
+  #
+  # docData = resultant document snapshot data. {snapshot:s, type:t, meta}
+  #
+  # The callback just takes an optional error.
+  #
+  # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
+  @writeSnapshot = (docName, docData, dbMeta, callback) ->
+    client.set keyForDoc(docName), JSON.stringify(docData), (err, response) ->
+      callback? err
 
   # Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
   @getSnapshot = (docName, callback) ->
@@ -122,33 +121,18 @@ module.exports = RedisDb = (options) ->
       else
         callback 'Document does not exist'
 
-  @getVersion = (docName, callback) ->
-    client.llen keyForOps(docName), (err, response) ->
-      throw err if err?
-
-      if response == 0
-        # The document might not exist at all.
-        client.exists keyForDoc(docName), (err, response) ->
-          throw err if err?
-          if response
-            callback null, 0
-          else
-            callback 'Document does not exist'
-      else
-        callback null, response
-
   # Perminantly deletes a document. There is no undo.
   # Callback takes a single argument which is true iff something was deleted.
-  @delete = (docName, callback) ->
+  @delete = (docName, dbMeta, callback) ->
     client.del keyForOps(docName)
     client.del keyForDoc(docName), (err, response) ->
       throw err if err?
       if callback
         if response == 1
           # Something was deleted.
-          callback null, true
+          callback null
         else
-          callback 'Document does not exist', false
+          callback 'Document does not exist'
   
   # Close the connection to the database
   @close = ->

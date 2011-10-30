@@ -1,110 +1,148 @@
 # OT storage for CouchDB
 # Author: Max Ogden (@maxogden)
+#
+# The couchdb database contains two kinds of documents:
+#
+# - Document snapshots have a key which is doc:the document name
+# - Document ops have a random key, but docName: defined.
 
 request = require('request').defaults json: true
-_ = require 'underscore'
 
-defaults =
-  port: 5984
-  hostname: "http://localhost"
-  db: "ot"
+# Helper method to parse errors out of couchdb. There's way more ways
+# things can go wrong, but I think this catches all the ones I care about.
+#
+# callback(error) or callback()
+parseError = (err, resp, body, callback) ->
+  body = body[0] if Array.isArray body and body.length >= 1
 
-encodeOptions = (options) ->
-  buf = []
-  if options? and typeof options is "object"
-    for own name, value of options
-      value = JSON.stringify value if name in ['key', 'startkey', 'endkey']
-
-      buf.push "#{encodeURIComponent(name)}=#{encodeURIComponent(value)}"
-  
-  if buf.length is 0
-    ""
+  if err
+    # This indicates an HTTP error
+    callback err
+  else if resp.statusCode is 404
+    callback 'Document does not exist'
+  else if resp.statusCode is 403
+    callback 'forbidden'
+  else if typeof body is 'object'
+    if body.error is 'conflict'
+      callback 'Document already exists'
+    else if body.error
+      callback "#{body.error} reason: #{body.reason}"
+    else
+      callback()
   else
-    "?" + buf.join "&"
+    callback()
 
 module.exports = (options) ->
-  options = _.extend {}, defaults, options
+  db = options.uri or "http://localhost:5984/sharejs"
 
-  db = options.hostname + ":" + options.port + '/' + options.db
-  ops = db + '/_design/sharejs/_view/operations'
+  uriForDoc = (docName) -> "#{db}/doc:#{encodeURIComponent docName}"
+  uriForOps = (docName, start, end, include_docs) ->
+    startkey = encodeURIComponent(JSON.stringify [docName, start])
+    # {} is sorted after all numbers - so this will get all ops in the case that end is null.
+    endkey = encodeURIComponent(JSON.stringify [docName, end ? {}])
+
+    # Another way to write this method would be to use node's builtin uri-encoder.
+    extra = if include_docs then '&include_docs=true' else ''
+    "#{db}/_design/sharejs/_view/operations?startkey=#{startkey}&endkey=#{endkey}&inclusive_end=false#{extra}"
+
+  # Helper method to get the revision of a document snapshot.
+  getRev = (docName, dbMeta, callback) ->
+    if dbMeta?.rev
+      callback null, dbMeta.rev
+    else
+      # JSON defaults to true, and that makes request think I'm trying to sneak a request
+      # body in. Ugh.
+      request.head {uri:uriForDoc(docName), json:false}, (err, resp, body) ->
+        parseError err, resp, body, (error) ->
+          if error
+            callback error
+          else
+            # The etag is the rev in quotes.
+            callback null, JSON.parse(resp.headers.etag)
   
+  writeSnapshotInternal = (docName, data, rev, callback) ->
+    body = data
+    body.fieldType = 'Document'
+    body._rev = rev if rev?
+
+    request.put uri:(uriForDoc docName), body:body, (err, resp, body) ->
+      parseError err, resp, body, (error) ->
+        if error
+          #console.log 'create error'
+          # This will send write conflicts as 'document already exists'. Thats kinda wierd, but
+          # it shouldn't happen anyway
+          callback? error
+        else
+          # We pass the document revision back to the db cache so it can give it back to couchdb on subsequent requests.
+          callback? null, {rev: body.rev}
+
+  # getOps returns all ops between start and end. end can be null.
   getOps: (docName, start, end, callback) ->
     return callback null, [] if start == end
     
     # Its a bit gross having this end parameter here....
-    if end then end-- else end = 999999
+    endkey = if end? then [docName, end - 1]
     
-    request uri: ops + encodeOptions(startkey: [docName, start], endkey: [docName, end], include_docs: true), (err, resp, body) ->
-      # Can we just return row.doc? What else is in it?
-      data = ({op: row.doc.op, meta: row.doc.meta, v: row.doc.v} for row in body.rows)
+    request uriForOps(docName, start, end), (err, resp, body) ->
+      # Rows look like this:
+      # {"id":"<uuid>","key":["doc name",0],"value":{"op":[{"p":0,"i":"hi"}],"meta":{}}}
+      data = ({op: row.value.op, meta: row.value.meta, v: row.key[1]} for row in body.rows)
       callback null, data
   
-  # in the context of couchdb mapreduce this create function doesn't
-  # really make sense, since the existence of operations is an implicit
-  # indicator that a document exists and each op gets it's own doc.
-  # regardless, to make the test suite pass, im storing 'document' documents
+  # callback(error, db metadata)
   create: (docName, data, callback) ->
-    throw new Error 'snapshot missing from data' unless data.snapshot != undefined
-    throw new Error 'type missing from data' unless data.type != undefined
-    throw new Error 'version missing from data' unless typeof data.v == 'number'
-    throw new Error 'meta missing from data' unless typeof data.meta == 'object'
-
-    doc = {_id: docName, type: "document", data}
-    request.post uri: db, body: doc, (err, resp, body) ->
-      if err
-        callback? err, false
-      else if body.ok
-        callback? null, true
-      else
-        if body.error is "conflict"
-          callback? 'Document already exists', false
-        else
-          callback? body.error + ' reason: ' + body.reason, false
+    writeSnapshotInternal docName, data, null, callback
  
-  delete: (docName, callback) ->
-    request "#{db}/#{docName}", (err, resp, body) ->
-      return callback? 'Document does not exist', false if resp.statusCode is 404
+  delete: del = (docName, dbMeta, callback) ->
+    getRev docName, dbMeta, (error, rev) ->
+      return callback? error if error
 
-      docs = [_.extend({}, body, {_deleted: true})]
-      # Again with the hard version number limit. Version numbers can actually get really large - a couple hours of editing
-      # easily pushes 10k ops.
-      request uri: ops + encodeOptions({startkey:[docName,0], endkey:[docName,999999], include_docs: true}), (err, resp, body) ->
-        docs.push _.extend({}, row.doc, {_deleted: true}) for row in body.rows
+      docs = [{_id:"doc:#{docName}", _rev:rev, _deleted:true}]
+      # Its annoying, but we need to get the revision from the document. I don't think there's a simple way to do this.
+      # This request will get all the ops twice.
+      request uriForOps(docName, 0, null, true), (err, resp, body) ->
+        # Rows look like this:
+        # {"id":"<uuid>","key":["doc name",0],"value":{"op":[{"p":0,"i":"hi"}],"meta":{}},
+        #  "doc":{"_id":"<uuid>","_rev":"1-21a40c56ebd5d424ffe56950e77bc847","op":[{"p":0,"i":"hi"}],"v":0,"meta":{},"docName":"doc6"}}
+        for row in body.rows
+          row.doc._deleted = true
+          docs.push row.doc
 
-        request.post {url: db + '/_bulk_docs', body: {docs}}, (err, resp, body) ->
-          if err
-            callback? err, false
+        request.post url: "#{db}/_bulk_docs", body: {docs}, (err, resp, body) ->
+          if body[0].error is 'conflict'
+            # Somebody has edited the document since we did a GET on the revision information. Recurse.
+            # By passing null to dbMeta I'm forcing the revision information to be reacquired.
+            del docName, null, callback
           else
-            callback? null, true
+            parseError err, resp, body, (error) -> callback? error
  
-  append: (docName, opData, docData, callback) ->
-    throw new Error 'snapshot missing from data' unless docData.snapshot != undefined
-    throw new Error 'type missing from data' unless docData.type != undefined
-    
-    request "#{db}/#{docName}", (err, resp, body) ->
-      return callback? 'Document does not exist' if resp.statusCode is 404
+  writeOp: (docName, opData, callback) ->
+    body =
+      docName: docName
+      op: opData.op
+      v: opData.v
+      meta: opData.meta
 
-      body.data = docData
-      request.post url: db, body: body, (err, resp, body) ->
-        opData.docName = docName
-        request.post {uri: db, body: opData}, (err, resp, body) ->
-          if body?.ok
-            callback?()
-          else
-            callback? err or body.error
+    request.post url:db, body:body, (err, resp, body) ->
+      parseError err, resp, body, callback
+
+  writeSnapshot: (docName, docData, dbMeta, callback) ->
+    getRev docName, dbMeta, (error, rev) ->
+      return callback? error if error
+
+      writeSnapshotInternal docName, docData, rev, callback
 
   getSnapshot: (docName, callback) ->
-    request "#{db}/#{docName}", (err, resp, body) ->
-      if resp.statusCode is 404
-        callback 'Document does not exist'
-      else
-        callback null, body.data
-
-  getVersion: (docName, callback) ->
-    request "#{db}/#{docName}", (err, resp, body) ->
-      if resp.statusCode is 404
-        callback 'Document does not exist'
-      else
-        callback null, body.data.v
+    request uriForDoc(docName), (err, resp, body) ->
+      parseError err, resp, body, (error) ->
+        if error
+          callback error
+        else
+          callback null,
+              snapshot: body.snapshot
+              type: body.type
+              meta: body.meta
+              v: body.v
+            , {rev: body._rev} # dbMeta
 
   close: ->
