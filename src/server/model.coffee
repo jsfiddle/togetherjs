@@ -12,11 +12,14 @@ queue = require './syncqueue'
 types = require '../types'
 db = require './db'
 Events = require './events'
+DocCache = require './doccache'
 
 module.exports = Model = (db, options) ->
   return new Model(db) if !(this instanceof Model)
 
   options ?= {}
+
+  cache = new DocCache db, options
 
   # Callback is called with (error, deltas)
   # Deltas is a list of the deltas from versionFrom to versionTo, or
@@ -37,11 +40,11 @@ module.exports = Model = (db, options) ->
   @getSnapshot = getSnapshot = (docName, callback) ->
     db.getSnapshot docName, (error, data) ->
       p "getSnapshot #{i data}"
-      if data?
-        data.type = types[data.type] if data?.type
-        callback null, data
+      if error
+        callback error
       else
-        callback error, null
+        data.type = types[data.type] if typeof data.type is 'string'
+        callback null, data
 
   # Gets the latest version # of the document. May be more efficient than getSnapshot.
   # getVersion(docName, callback)
@@ -143,6 +146,11 @@ module.exports = Model = (db, options) ->
 
     # process.nextTick is used to avoid an obscure timing problem involving listenFromVersion.
     process.nextTick -> queues[docName](opData, callback)
+
+  # Not yet implemented.
+  @applyMetaOp = (docName, metaOpData, callback) ->
+    {v, op} = metaOpData
+    throw new Error 'Not implemented'
   
   # Perminantly deletes the specified document.
   # If listeners are attached, they are removed.

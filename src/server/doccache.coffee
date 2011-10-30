@@ -100,24 +100,16 @@ module.exports = DocCache = (db, options) ->
   
   # The database doesn't put version numbers on each op (they can be inferred from context anyway).
   # docCache will add them back, because they're useful.
-  getOpsInternal = (docName, start, end, extraCheck, callback) ->
+  getOpsInternal = (docName, start, end, callback) ->
     return callback 'Document does not exist' unless db
 
     db.getOps docName, start, end, (error, ops) ->
       return callback error if error
 
-      if extraCheck and ops.length is 0 and !docs[docName]
-        # The document might not exist. I'll load the document just to be sure.
-        db.getSnapshot docName, (error) ->
-          if error
-            callback error
-          else
-            callback null, []
-      else
-        v = start
-        op.v = v++ for op in ops
+      v = start
+      op.v = v++ for op in ops
 
-        callback null, ops
+      callback null, ops
 
   # Load the named document into the cache. This function is re-entrant.
   #
@@ -153,7 +145,7 @@ module.exports = DocCache = (db, options) ->
           # The server can close without saving the most recent document snapshot.
           # In this case, there are extra ops which need to be applied before
           # returning the snapshot.
-          getOpsInternal docName, data.v, null, false, (error, ops) ->
+          getOpsInternal docName, data.v, null, (error, ops) ->
             return callback error if error
 
             if ops.length > 0
@@ -251,7 +243,7 @@ module.exports = DocCache = (db, options) ->
 
     options.stats?.cacheMiss 'getOps'
 
-    getOpsInternal docName, start, end, true, callback
+    getOpsInternal docName, start, end, callback
 
   # Create a new document.
   #

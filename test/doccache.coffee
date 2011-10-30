@@ -500,28 +500,6 @@ module.exports = testCase
                 test.deepEqual data, [{v:2, op:[123], meta:{}}]
                 test.done()
 
-  "getOps sends an error if the document doesn't exist": (test) ->
-    @db.getSnapshot = (docName, callback) -> callback 'Document does not exist'
-    @db.getOps = (docName, start, end, callback) -> callback null, []
-
-    @cache.getOps @name, 0, null, (error, data) ->
-      test.strictEqual error, 'Document does not exist'
-      test.equal data, null
-      test.done()
-  
-  "getOps sends an error if the document was deleted": (test) ->
-    @db.create = (docName, data, callback) -> callback()
-    @db.delete = (docName, dbMeta, callback) -> callback()
-    @db.getSnapshot = (docName, callback) -> callback 'Document does not exist'
-    @db.getOps = (docName, start, end, callback) -> callback null, []
-
-    @cache.create @name, {snapshot:{str:'hi'}, type:'simple', meta:{}, v:0}, (error) =>
-      @cache.delete @name, (error) =>
-        @cache.getOps @name, 0, null, (error, data) ->
-          test.strictEqual error, 'Document does not exist'
-          test.equal data, null
-          test.done()
-
   "getOps sends an error if the document doesn't exist with no db": (test) ->
     @setDb null
 
