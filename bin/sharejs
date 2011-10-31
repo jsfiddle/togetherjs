@@ -1,24 +1,27 @@
 #!/usr/bin/env node
 
+require('coffee-script');
+
 var connect = require('connect'),
 	sys = require('sys'),
-	sharejs,
+	sharejs = require('../src'),
 	server;
-
-try {
-	sharejs = require('../lib/server');
-} catch(e) {
-	console.error("\nCould not include server library. Build using:\n % cake build");
-	throw e;
-}
 
 server = connect(connect.logger());
 
 options = require('./options') || {};
 
+sys.puts("ShareJS server v" + sharejs.version);
+
 // Attach the sharejs REST and Socket.io interfaces to the server
-sharejs.attach(server, options);
+sharejs.server.attach(server, options);
 
 var port = options.port || 8000;
+
 server.listen(port);
 sys.puts('Server running at http://127.0.0.1:' + port + '/');
+
+process.on('uncaughtException', function (err) {
+  console.error('An error has occurred. Please file a ticket here: https://github.com/josephg/ShareJS/issues');
+  console.error('Version ' + sharejs.version + ': ' + err.stack);
+});

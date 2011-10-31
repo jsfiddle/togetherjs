@@ -7,7 +7,7 @@
 
 require('coffee-script'); 
 var connect = require('connect'),
-	sharejs = require('../src/server'),
+	sharejs = require('../src'),
 	hat = require('hat').rack(32, 36);
 
 var argv = require('optimist').
@@ -72,12 +72,18 @@ try {
   options.db = {type: 'redis'};
 } catch (e) {}
 
+console.log("ShareJS example server v" + sharejs.version);
 console.log("Options: ", options);
 
 var port = argv.p;
 
 // Attach the sharejs REST and Socket.io interfaces to the server
-sharejs.attach(server, options);
+sharejs.server.attach(server, options);
 
 server.listen(port);
 console.log("Demos running at http://localhost:" + port);
+
+process.on('uncaughtException', function (err) {
+  console.error('An error has occurred. Please file a ticket here: https://github.com/josephg/ShareJS/issues');
+  console.error('Version ' + sharejs.version + ': ' + err.stack);
+});
