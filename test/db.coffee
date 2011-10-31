@@ -248,7 +248,7 @@ test = (Db, options) -> testCase
           passPart()
 
 options = require '../bin/options'
-exports.couchdb = test require('../src/server/db/couchdb') #if options.db.type == 'couchdb'
+exports.couchdb = test require('../src/server/db/couchdb') if options.db.type == 'couchdb'
 
 try
   require 'redis'
