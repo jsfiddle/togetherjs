@@ -186,6 +186,8 @@ client.open('hello', 'text', 'http://localhost:8000/sjs', function(error, doc) {
 });
 ```
 
+> **NOTE:** If you're using the current version in npm (0.4) or earler, the argument order is the other way around (`function(doc, error)`).
+
 See [`the wiki`](https://github.com/josephg/ShareJS/wiki) for API documentation, and `examples/node*` for some more example apps.
 
 
