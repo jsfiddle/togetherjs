@@ -17,7 +17,7 @@ mark = do ->
 			sinceRecord -= flagfall
 			now = Date.now()
 			elapsed = now - lastTime
-			console.log "#{flagfall} ops in #{elapsed} ms - #{1000 * flagfall / elapsed} ops per second"
+			console.log "#{flagfall} ops in #{elapsed} ms - #{Math.floor(1000 * flagfall / elapsed)} ops per second"
 			lastTime = now
 
 generator = (doc) ->
@@ -58,10 +58,11 @@ generator = (doc) ->
 		op
 
 generate = ->
-	c = new Connection('localhost', 8000)
-	c.open 'spam3', (doc) ->
+	c = new Connection('http://localhost:8000/sjs')
+	c.open 'spam6', (doc, error) ->
+		console.error error if error
 		apply = ->
-			#			console.log "v: #{doc.version} length #{doc.snapshot.length}"
+			#console.log "v: #{doc.version} length #{doc.snapshot.length}"
 			op = generator doc.snapshot
 			doc.submitOp op, ->
 				mark()
@@ -69,4 +70,5 @@ generate = ->
 
 		apply()
 
-generate() for [1..10]
+process.title = "benchmark"
+generate() for [1..1]
