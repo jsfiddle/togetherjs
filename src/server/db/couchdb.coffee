@@ -33,6 +33,7 @@ parseError = (err, resp, body, callback) ->
     callback()
 
 module.exports = (options) ->
+  options ?= {}
   db = options.uri or "http://localhost:5984/sharejs"
 
   uriForDoc = (docName) -> "#{db}/doc:#{encodeURIComponent docName}"

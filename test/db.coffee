@@ -10,10 +10,10 @@ newDocName = do ->
   num = 0
   -> "doc#{num++}"
 
-test = (opts) -> testCase
+test = (Db, options) -> testCase
   setUp: (callback) ->
     @name = newDocName()
-    @db = createDb opts
+    @db = new Db options
     @db.delete @name, null, =>
       callback()
 
@@ -185,7 +185,8 @@ test = (opts) -> testCase
 
         passPart()
 
-      @db.delete @name, null, callback for [1..20]
+      # you can use the proper syntax once coffeescript >1.1.2 lands.
+      @db.delete @name, null, callback for __ignored in [1..20]
 
   'delete with no callback doesnt crash': (test) ->
     @db.delete @name
@@ -247,9 +248,9 @@ test = (opts) -> testCase
           passPart()
 
 options = require '../bin/options'
-exports.couchdb = test {type: 'couchdb', 'testing': true} #if options.db.type == 'couchdb'
+exports.couchdb = test require('../src/server/db/couchdb') #if options.db.type == 'couchdb'
 
 try
   require 'redis'
-  exports.redis = test {type: 'redis', 'testing': true}
+  exports.redis = test require('../src/server/db/redis')
 

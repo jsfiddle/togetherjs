@@ -94,11 +94,11 @@ router = (app, model, options) ->
       unless typeof type == 'string' and (meta == undefined or typeof meta == 'object')
         send400 res, 'Type invalid'
       else
-        model.clientCreate req._client, req.params.name, type, meta, (error, result) ->
-          if result
-            send200 res
-          else
+        model.clientCreate req._client, req.params.name, type, meta, (error) ->
+          if error
             sendError res, error
+          else
+            send200 res
 
   # POST submits an op to the document.
   app.post '/doc/:name', auth, (req, res) ->
@@ -121,11 +121,11 @@ router = (app, model, options) ->
             sendJSON res, {v:newVersion}
 
   app.delete '/doc/:name', auth, (req, res) ->
-    model.clientDelete req._client, req.params.name, (error, result) ->
-      if result
-        send200 res
-      else
+    model.clientDelete req._client, req.params.name, (error) ->
+      if error
         sendError res, error
+      else
+        send200 res
 
 # Attach the frontend to the supplied http.Server.
 # 

@@ -21,7 +21,7 @@ types = require '../src/types'
 genTests = (async) -> testCase
   setUp: (callback) ->
     options =
-      db: {type: 'memory'}
+      db: {type: 'none'}
       auth: (client, action) =>
         assert.strictEqual client, @client, 'client missing or invalid' unless action.name == 'connect'
         assert.fail 'Action missing type', action unless action.type?
@@ -173,15 +173,14 @@ genTests = (async) -> testCase
   
       action.accept()
 
-    @model.clientCreate @client, @unused, 'simple', {}, (error, result) =>
-      test.strictEqual result, true
+    @model.clientCreate @client, @unused, 'simple', {}, (error) =>
       test.fail error if error
 
       @model.getVersion @unused, (error, v) ->
         test.fail error if error
         test.strictEqual v, 0
 
-        test.expect 7
+        test.expect 6
         test.done()
   
   'create not allowed if canCreate() rejects': (test) ->
@@ -198,8 +197,7 @@ genTests = (async) -> testCase
   'create returns false if the document already exists, and youre allowed to know': (test) ->
     @auth = (client, action) -> action.accept()
     
-    @model.clientCreate @client, @name, 'simple', {}, (error, result) ->
-      test.strictEqual result, false
+    @model.clientCreate @client, @name, 'simple', {}, (error) ->
       test.strictEqual error, 'Document already exists'
       test.done()
 
@@ -344,21 +342,19 @@ genTests = (async) -> testCase
       test.strictEqual action.name, 'delete'
       action.accept()
 
-    @model.clientDelete @client, @name, (error, result) =>
+    @model.clientDelete @client, @name, (error) =>
       test.fail error if error
-      test.strictEqual result, true
 
       @model.getVersion @name, (error, v) ->
         # The document should not exist anymore.
         test.strictEqual error, 'Document does not exist'
-        test.expect 5
+        test.expect 4
         test.done()
   
   'delete fails if canDelete does not allow it': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientDelete @client, @name, (error, result) =>
-      test.strictEqual !!result, false
+    @model.clientDelete @client, @name, (error) =>
       test.strictEqual error, 'forbidden'
 
       @model.getVersion @name, (error, v) ->
@@ -368,8 +364,7 @@ genTests = (async) -> testCase
   'delete returns forbidden on a nonexistant document': (test) ->
     @auth = (client, action) -> action.reject()
 
-    @model.clientDelete @client, @unused, (error, result) ->
-      test.strictEqual !!result, false
+    @model.clientDelete @client, @unused, (error) ->
       test.strictEqual error, 'forbidden'
       test.done()
 

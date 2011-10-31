@@ -1,10 +1,9 @@
-# This file implements a simple document snapshot cache. It also does a sort of
-# grab-bag of functionality we need from the sharejs database layer.
+# This file caches open documents and manages the interactions with the database.
 #
-# The cache wraps your database and stores document snapshots in memory
-# for all documents which are open by at least one client. If you don't
+# Document snapshots are stored in memory for all documents which are open by at
+# least one client, or if they have been accessed recently. If you don't
 # have a database specified, the cache will store all documents which have
-# ever been opened in memory.
+# ever been opened.
 #
 # Because the database doesn't store metadata (like cursor positions), the
 # cache stores this information too.
@@ -22,11 +21,13 @@
 # - Managing when to save ops & when to save snapshots.
 # - getOps has version numbers added to the returned ops
 
-types = require '../types'
+types = require '../../types'
 
 # The cache wraps a database, or null.
 module.exports = DocCache = (db, options) ->
   return new DocCache(db, options) if !(this instanceof DocCache)
+
+  options ?= {}
 
   # Map from docName -> {
   #   ops:[{op, meta}]
@@ -177,9 +178,17 @@ module.exports = DocCache = (db, options) ->
     process.nextTick ->
       # This is an awkward way to find out the number of clients on a document. If this
       # causes performance issues, add a numClients field to the document.
-      if Object.keys(doc.clients).length is 0 and (db or options.forceReaping)
+      #
+      # The first check is because its possible that between refreshReapingTimeout being called and this
+      # event being fired, someone called delete() on the document and hence the doc is something else now.
+      if doc == docs[docName] and Object.keys(doc.clients).length is 0 and (db or options.forceReaping)
         clearTimeout doc.reapTimer
-        doc.reapTimer = setTimeout (-> delete docs[docName]), options.reapTime
+        doc.reapTimer = reapTimer = setTimeout ->
+            tryWriteSnapshot docName, ->
+              # If the reaping timeout has been refreshed while we're writing the snapshot,
+              # don't reap.
+              delete docs[docName] if docs[docName].reapTimer is reapTimer
+          , options.reapTime
 
   # ** Public methods
 
@@ -228,7 +237,7 @@ module.exports = DocCache = (db, options) ->
       version = docs[docName].data.v
 
       # Ops contains an array of ops. The last op in the list is the last op applied
-      end ?= version - 1
+      end ?= version
       start = Math.min start, end
 
       # Base is the version number of the oldest op we have cached
@@ -239,7 +248,7 @@ module.exports = DocCache = (db, options) ->
         refreshReapingTimeout docName
         options.stats?.cacheHit 'getOps'
 
-        return callback null, ops[(start - base)..(end - base)]
+        return callback null, ops[(start - base)...(end - base)]
 
     options.stats?.cacheMiss 'getOps'
 
@@ -300,8 +309,15 @@ module.exports = DocCache = (db, options) ->
 
   tryWriteSnapshot = (docName, callback) ->
     return callback?() unless db
+
     doc = docs[docName]
+
+    # The doc is closed
     return callback?() unless doc
+
+    # The document is already saved.
+    return callback?() if doc.committedVersion is doc.data.v
+
     return callback? 'Another snapshot write is in progress' if doc.snapshotWriteLock
 
     doc.snapshotWriteLock = true
@@ -310,14 +326,20 @@ module.exports = DocCache = (db, options) ->
 
     writeSnapshot = db?.writeSnapshot or (docName, docData, dbMeta, callback) -> callback()
 
-    # We have to cache the version in the closure because the version in the doc object could
-    # be updated between now and when the callback returns
-    version = doc.data.v
+    data =
+      v: doc.data.v
+      meta: doc.data.meta
+      snapshot: doc.data.snapshot
+      # The database doesn't know about object types.
+      type: doc.data.type.name
 
     # Commit snapshot.
-    writeSnapshot docName, doc.data, doc.dbMeta, (error, dbMeta) ->
+    writeSnapshot docName, data, doc.dbMeta, (error, dbMeta) ->
       doc.snapshotWriteLock = false
-      doc.committedVersion = version
+
+      # We have to use data.v here because the version in the doc could
+      # have been updated between the call to writeSnapshot() and now.
+      doc.committedVersion = data.v
       doc.dbMeta = dbMeta
 
       callback? error
@@ -349,12 +371,17 @@ module.exports = DocCache = (db, options) ->
       writeOp = db?.writeOp or (docName, newOpData, callback) -> callback()
        
       writeOp docName, newOpData, (error) ->
+
         if error
           # The user should probably know about this.
           console.warn "Error writing ops to database: #{error}"
           return callback? error
 
-        doc.data = newDocData
+        # Not copying in the type.
+        doc.data.v = newDocData.v
+        doc.data.snapshot = newDocData.snapshot
+        doc.data.meta = newDocData.meta
+
         doc.ops.push newOpData
         doc.ops.shift() if db and doc.ops.length > options.numCachedOps
 
@@ -378,6 +405,16 @@ module.exports = DocCache = (db, options) ->
       else
         callback null, doc.data
 
+  # Get the version of the document. This is a convenience method. Internally, it loads the
+  # whole document. (It doesn't need to do that much work, but its always used in situations
+  # where we're going to need a bunch of other information about the document anyway, so there's
+  # no benefit optimising it.)
+  #
+  # callback(error, version)
+  @getVersion = (docName, callback) ->
+    @getSnapshot docName, (error, data) ->
+      callback error, data?.v
+
   # Flush saves all snapshot data to the database
   @flush = (callback) ->
     return callback?() unless db
@@ -397,7 +434,7 @@ module.exports = DocCache = (db, options) ->
     callback?() if pendingWrites is 0
 
   @close = (callback) ->
-    flush ->
+    @flush ->
       db?.close()
       callback?()
 

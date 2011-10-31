@@ -104,48 +104,87 @@ exports.attach = (server, model, options) ->
       callback()
 
     # Handles messages with any combination of the open:true, create:true and snapshot:null parameters
-    handleOpenCreateSnapshot = (query, callback) ->
-      throw new Error 'No docName specified' unless query.doc?
-
-      if query.create == true
-        if typeof query.type != 'string'
-          throw new Error 'create:true requires type specified'
-
-      if query.meta != undefined
-        unless typeof query.meta == 'object' and Array.isArray(query.meta) == false
-          throw new Error 'meta must be an object'
-
+    handleOpenCreateSnapshot = (query, finished) ->
       docName = query.doc
       msg = doc:docName
 
-      fail = (errorMsg) ->
-        close(docName) if msg.open == true
-        msg.open = false if query.open == true
-        msg.snapshot = null if query.snapshot != undefined
-        delete msg.create
+      callback = (error) ->
+        if error
+          close(docName) if msg.open == true
+          msg.open = false if query.open == true
+          msg.snapshot = null if query.snapshot != undefined
+          delete msg.create
 
-        msg.error = errorMsg
+          msg.error = error
+
         send msg
+        finished()
+
+      return callback 'No docName specified' unless query.doc?
+
+      if query.create == true
+        if typeof query.type != 'string'
+          return callback 'create:true requires type specified'
+
+      if query.meta != undefined
+        unless typeof query.meta == 'object' and Array.isArray(query.meta) == false
+          return callback 'meta must be an object'
+
+      docData = undefined
+      # Technically, we don't need a snapshot if the user called create but not open or createSnapshot,
+      # but no clients do that yet anyway.
+      #
+      # It might be nice to add a 'createOrGet()' method to model / db manager. But most
+      # of the time clients are opening an existing document rather than creating a new one anyway.
+      ###
+      model.clientGetSnapshot client, query.doc, (error, data) ->
+        maybeCreate = (callback) ->
+          if query.create and error is 'Document does not exist'
+            model.clientCreate client, docName, query.type, query.meta or {}, callback
+          else
+            callback error, data
+
+        maybeCreate (error, data) ->
+          if query.create
+            msg.create = !!error
+          if error is 'Document already exists'
+            msg.create = false
+          else if error and (!msg.create or error isnt 'Document already exists')
+            # This is the real final callback, to say an error has occurred.
+            return callback error
+          else if query.create or query.snapshot is null
+
+
+          if query.snapshot isnt null
+      ###
 
       # This is implemented with a series of cascading methods for each different type of
       # thing this method can handle. This would be so much nicer with an async library. Welcome to
       # callback hell.
 
       step1Create = ->
-        if query.create != true
-          step2Snapshot()
-          return
+        return step2Snapshot() if query.create != true
 
         # The document obviously already exists if we have a snapshot.
         if docData
           msg.create = false
           step2Snapshot()
         else
-          model.clientCreate client, docName, query.type, query.meta || {}, (error, result) ->
-            return fail error if error and error != 'Document already exists'
+          model.clientCreate client, docName, query.type, query.meta || {}, (error) ->
+            if error is 'Document already exists'
+              # We've called getSnapshot (-> null), then createClient (-> already exists). Its possible
+              # another client has called createClient first.
+              model.clientGetSnapshot client, docName, (error, data) ->
+                return callback error if error
 
-            msg.create = result
-            step2Snapshot()
+                docData = data
+                msg.create = false
+                step2Snapshot()
+            else if error
+              callback error
+            else
+              msg.create = !error
+              step2Snapshot()
 
       # The socket requested a document snapshot
       step2Snapshot = ->
@@ -159,42 +198,31 @@ exports.attach = (server, model, options) ->
           msg.type = docData.type.name unless query.type == docData.type.name
           msg.snapshot = docData.snapshot
         else
-          fail 'Document does not exist'
-          return
+          return callback 'Document does not exist'
 
         step3Open()
 
       # Attempt to open a document with a given name. Version is optional.
       # callback(opened at version) or callback(null, errormessage)
       step3Open = ->
-        if query.open != true
-          finish()
-          return
+        return callback() if query.open != true
 
-        if query.type and docData != null and query.type != docData.type.name
-          # Verify the type matches
-          fail 'Type mismatch'
-          return
+        # Verify the type matches
+        return callback 'Type mismatch' if query.type and docData and query.type != docData.type.name
 
         open docName, query.v, (error, version) ->
-          if error
-            fail error
-          else
-            # + Should fail if the type is wrong.
+          return callback error if error
 
-            p "Opened #{docName} at #{version} by #{socket.id}"
-            msg.open = true
-            msg.v = version
-            finish()
+          # + Should fail if the type is wrong.
 
-      finish = ->
-        send msg
-        callback()
+          p "Opened #{docName} at #{version} by #{socket.id}"
+          msg.open = true
+          msg.v = version
+          callback()
 
-      docData = undefined
       if query.snapshot == null or (query.open == true and query.type)
         model.clientGetSnapshot client, query.doc, (error, data) ->
-          return fail error if error and error != 'Document does not exist'
+          return callback error if error and error != 'Document does not exist'
 
           docData = data
           step1Create()
@@ -264,6 +292,7 @@ exports.attach = (server, model, options) ->
     
     # And now the actual message handler.
     messageListener = (query) ->
+      p "Server recieved message #{i query}"
       # There seems to be a bug in socket.io where messages are detected
       # after the client disconnects.
       if closed

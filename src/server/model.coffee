@@ -1,25 +1,18 @@
 # The model of all the ops. Responsible for applying & transforming remote deltas
 # and managing the storage layer.
 #
-# Actual storage is handled by the database wrappers in db/*.
-
-p = -> #require('util').debug
-i = -> #require('util').inspect
+# Actual storage is handled by the database wrappers in db/*, wrapped by DocCache
 
 hat = require 'hat'
 
 queue = require './syncqueue'
 types = require '../types'
-db = require './db'
 Events = require './events'
-DocCache = require './doccache'
 
 module.exports = Model = (db, options) ->
-  return new Model(db) if !(this instanceof Model)
+  return new Model(db, options) if !(this instanceof Model)
 
   options ?= {}
-
-  cache = new DocCache db, options
 
   # Callback is called with (error, deltas)
   # Deltas is a list of the deltas from versionFrom to versionTo, or
@@ -27,53 +20,40 @@ module.exports = Model = (db, options) ->
   #
   # At time of writing, error is always null. If the document doesn't exist or if
   # start / end are too long, the ops are trimmed.
-  @getOps = (docName, start, end, callback) ->
-    db.getVersion docName, (error, v) ->
-      if error
-        callback error, null
-      else
-        db.getOps docName, start, end, callback
+  @getOps = (docName, start, end, callback) -> db.getOps docName, start, end, callback
 
   # Gets the snapshot data for the specified document.
   # getSnapshot(docName, callback)
   # Callback is called with (error, {v: <version>, type: <type>, snapshot: <snapshot>, meta: <meta>})
-  @getSnapshot = getSnapshot = (docName, callback) ->
-    db.getSnapshot docName, (error, data) ->
-      p "getSnapshot #{i data}"
-      if error
-        callback error
-      else
-        data.type = types[data.type] if typeof data.type is 'string'
-        callback null, data
+  @getSnapshot = getSnapshot = (docName, callback) -> db.getSnapshot docName, callback
 
-  # Gets the latest version # of the document. May be more efficient than getSnapshot.
+  # Gets the latest version # of the document.
   # getVersion(docName, callback)
   # callback is called with (error, version).
-  @getVersion = db.getVersion
+  @getVersion = (docName, callback) -> db.getVersion docName, callback
 
   # Create a document.
   @create = (docName, type, meta, callback) ->
+    [meta, callback] = [{}, meta] if typeof meta == 'function'
+
     type = types[type] if typeof type == 'string'
-    if typeof meta == 'function'
-      callback = meta
-      meta = {}
+    return callback? 'Type not found' unless type
 
-    if docName.match /\//
-      callback 'Invalid document name', false
-      return
+    return callback? 'Invalid document name' if docName.match /\//
 
-    meta ||= {}
-
-    newDocData =
+    docData =
       snapshot:type.create()
-      type:type.name
+      type:type
       meta:meta || {}
       v:0
 
-    p "db.create #{docName}, #{i newDocData}"
+    db.create docName, docData, (error) ->
+      if error
+        callback error
+      else
+        callback null, docData
 
-    db.create docName, newDocData, callback
-
+  # applyOp is not re-entrant for the same docName. Hence its logic is wrapped in a queue structure.
   queues = {} # docName -> syncQueue
 
   # Apply an op to the specified document.
@@ -84,11 +64,8 @@ module.exports = Model = (db, options) ->
   # model.applyOp 'doc', OPA, -> model.applyOp 'doc', OPB
   # model.applyOp 'doc', OPC
   @applyOp = (docName, opData, callback) ->
-    p "applyOp #{docName} op #{i opData}"
-
     # Its important that all ops are applied in order.
     queues[docName] ||= queue (opData, callback) ->
-      p "applyOpInternal v#{opData.v} #{i opData.op} to #{docName}."
       getSnapshot docName, (error, docData) ->
         return callback error if error
 
@@ -98,7 +75,6 @@ module.exports = Model = (db, options) ->
         meta.ts = Date.now()
 
         {v:version, snapshot, type} = docData
-        p "applyOp hasdata v#{opVersion} #{i op} to #{docName}."
 
         submit = ->
           try
@@ -111,10 +87,8 @@ module.exports = Model = (db, options) ->
           newOpData = {op, v:opVersion, meta}
           newDocData = {snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
 
-          p "submit #{i newOpData}"
           db.append docName, newOpData, newDocData, ->
             # Success!
-            p "appended v#{opVersion} to #{docName}. Calling callback..."
             events.onApplyOp docName, newOpData
             callback null, opVersion
 
@@ -129,10 +103,8 @@ module.exports = Model = (db, options) ->
 
             try
               for realOp in ops
-                p "XFORM Doc #{docName} op #{i op} by #{i realOp.op}"
                 op = docData.type.transform op, realOp.op, 'left'
                 opVersion++
-                p "-> #{i op}"
 
             catch error
               console.error error.stack

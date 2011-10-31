@@ -18,8 +18,9 @@ module.exports = create = (options, model = createModel(options)) ->
 create.createModel = createModel = (options) ->
   dbOptions = options?.db
 
-  db = new Db(dbOptions)
-  new Model(db, options)
+  db = new Db dbOptions
+
+  new Model db, options
 
 
 # Attach the OT server frontends to the provided Node HTTP server. Use this if you

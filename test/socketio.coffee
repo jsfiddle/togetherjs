@@ -54,7 +54,7 @@ module.exports = testCase
     options = {
       socketio: {}
       rest: null
-      db: {type: 'memory'}
+      db: {type: 'none'}
       auth: (client, action) => @auth client, action
     }
 
@@ -84,6 +84,7 @@ module.exports = testCase
 
   'open an existing document with no version specified opens the document': (test) ->
     @model.create @name, 'simple', =>
+      console.warn 'sdfd'
       @socket.json.send {doc:@name, open:true}
       @expect {doc:@name, v:0, open:true}, =>
         @model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>

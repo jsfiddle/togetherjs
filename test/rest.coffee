@@ -45,7 +45,7 @@ module.exports = testCase
     options = {
       socketio: null
       rest: {}
-      db: {type: 'memory'}
+      db: {type: 'none'}
       auth: (client, action) => @auth client, action
     }
 
@@ -135,7 +135,7 @@ module.exports = testCase
         test.strictEqual res.statusCode, 200
 
         @model.getSnapshot @name, (error, doc) ->
-          test.strictEqual doc, null
+          test.equal doc, null
           test.done()
   
   'DELETE returns a 404 message if you delete something that doesn\'t exist': (test) ->
@@ -191,7 +191,7 @@ module.exports = testCase
         # Delete a document
         fetch 'DELETE', @port, "/doc/#{doc2}", null, checkResponse
 
-  'Cant GET if read is rejected': (test) ->
+  "Can't GET if read is rejected": (test) ->
     @auth = (client, action) -> if action.type == 'read' then action.reject() else action.accept()
 
     @model.create @name, 'simple', =>
@@ -201,7 +201,7 @@ module.exports = testCase
           test.deepEqual data, 'Forbidden'
           test.done()
 
-  'Cant PUT if create is rejected': (test) ->
+  "Can't PUT if create is rejected": (test) ->
     @auth = (client, action) -> if action.type == 'create' then action.reject() else action.accept()
 
     fetch 'PUT', @port, "/doc/#{@name}", {type:'simple'}, (res, data) =>
@@ -209,10 +209,10 @@ module.exports = testCase
       test.deepEqual data, 'Forbidden'
 
       @model.getSnapshot @name, (error, doc) ->
-        test.deepEqual doc, null
+        test.equal doc, null
         test.done()
 
-  'Cant POST if submit op is rejected': (test) ->
+  "Can't POST if submit op is rejected": (test) ->
     @auth = (client, action) -> if action.type == 'update' then action.reject() else action.accept()
 
     @model.create @name, 'simple', =>
@@ -233,7 +233,7 @@ module.exports = testCase
       test.deepEqual data, 'Forbidden'
       test.done()
 
-  'Cant DELETE if delete is rejected': (test) ->
+  "Can't DELETE if delete is rejected": (test) ->
     @auth = (client, action) -> if action.type == 'delete' then action.reject() else action.accept()
 
     @model.create @name, 'simple', =>

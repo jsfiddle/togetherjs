@@ -44,7 +44,7 @@ module.exports = RedisDb = (options) ->
       return callback? err if err
 
       if result
-        callback? null
+        callback?()
       else
         callback? 'Document already exists'
 
@@ -111,8 +111,8 @@ module.exports = RedisDb = (options) ->
       throw err if err?
 
       if response != null
-        doc_data = JSON.parse(response)
-        callback null, doc_data
+        docData = JSON.parse(response)
+        callback null, docData
       else
         callback 'Document does not exist'
 

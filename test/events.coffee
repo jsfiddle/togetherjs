@@ -11,12 +11,12 @@ applyOps = helpers.applyOps
 # Event tests
 module.exports = testCase
   setUp: (callback) ->
-    @model = server.createModel {db:{type:'memory'}}
+    @model = server.createModel {db:{type:'none'}}
     @name = 'testingdoc'
     @unused = 'nonexistantdoc'
 
-    @model.create @name, 'simple', (error, status) ->
-      assert.ok status
+    @model.create @name, 'simple', (error) ->
+      assert.fail error if error
       callback()
 
   'listen on a nonexistant doc returns null and ignore the document': (test) ->

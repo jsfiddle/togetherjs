@@ -28,21 +28,23 @@ doubleOpen = (c1, c2, docName, type, callback) ->
 
   c1.open docName, type, (error, d) ->
     doc1 = d
+    assert.equal null, error
     assert.ok doc1
     callback doc1, doc2 if doc1 && doc2
 
   c2.open docName, type, (error, d) ->
     doc2 = d
+    assert.equal null, error
     assert.ok doc2
     callback doc1, doc2 if doc1 && doc2
 
-genTests = (client) -> testCase
+genTests = (client, dbType) -> testCase
   setUp: (callback) ->
     # This is needed for types.text.generateRandomOp
     require './types/text'
 
     @name = 'testingdoc'
-    @server = server {db: {type: 'memory'}}
+    @server = server {db: {type: dbType}}
     @server.listen =>
       @port = @server.address().port
 
@@ -63,29 +65,31 @@ genTests = (client) -> testCase
     @server.close()
 
   'ops submitted on one document get sent to another': (test) ->
-    doubleOpen @c1, @c2, @name, 'text', (doc1, doc2) ->
-      [submittedOp, result] = doc1.type.generateRandomOp doc1.snapshot
-      doc1.submitOp submittedOp
+    @server.model.delete @name, =>
+      doubleOpen @c1, @c2, @name, 'text', (doc1, doc2) ->
+        [submittedOp, result] = doc1.type.generateRandomOp doc1.snapshot
+        doc1.submitOp submittedOp
 
-      doc2.on 'remoteop', (op) =>
-        test.deepEqual op, submittedOp
-        test.strictEqual doc2.snapshot, result
-        test.strictEqual doc2.version, 1
-        test.done()
+        doc2.on 'remoteop', (op) =>
+          test.deepEqual op, submittedOp
+          test.strictEqual doc2.snapshot, result
+          test.strictEqual doc2.version, 1
+          test.done()
 
   'JSON documents work': (test) ->
-    doubleOpen @c1, @c2, 'jsondocument', 'json', (doc1, doc2) ->
-      test.strictEqual doc1.snapshot, null
-      test.strictEqual doc1.version, 0
-      test.strictEqual doc2.snapshot, null
-      test.strictEqual doc2.version, 0
-      test.ok doc1.created != doc2.created
+    @server.model.delete 'jsondocument', =>
+      doubleOpen @c1, @c2, 'jsondocument', 'json', (doc1, doc2) ->
+        test.strictEqual doc1.snapshot, null
+        test.strictEqual doc1.version, 0
+        test.strictEqual doc2.snapshot, null
+        test.strictEqual doc2.version, 0
+        test.ok doc1.created != doc2.created
 
-      doc1.submitOp [{p:[], od:null, oi:{}}]
+        doc1.submitOp [{p:[], od:null, oi:{}}]
 
-      doc2.on 'remoteop', (op) ->
-        test.deepEqual doc2.snapshot, {}
-        test.done()
+        doc2.on 'remoteop', (op) ->
+          test.deepEqual doc2.snapshot, {}
+          test.done()
 
   'Closing and opening documents works': (test) ->
     num = 0
@@ -156,5 +160,15 @@ genTests = (client) -> testCase
 
   # TODO: Add a randomized tester which also randomly denies ops.
 
-exports.native = genTests nativeclient
-exports.webclient = genTests webclient
+exports['native memory'] = genTests nativeclient, 'none'
+exports['webclient memory'] = genTests webclient, 'none'
+
+options = require '../bin/options'
+if options.db.type == 'couchdb'
+  exports['native memory'] = genTests nativeclient, 'couchdb'
+  exports['webclient memory'] = genTests webclient, 'couchdb'
+
+try
+  require 'redis'
+  exports['native redis'] = genTests nativeclient, 'redis'
+  exports['webclient redis'] = genTests webclient, 'redis'

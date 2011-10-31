@@ -1,4 +1,10 @@
 # Tests for server/model
+#
+# There used to be a lot of logic in model (which these tests verified). That logic has since
+# been moved into the db manager and it has separate tests. - So, most of these tests are
+# redundant and can probably be deleted.
+#
+# The auth stuff (which the model *does* do) has a separate test suite (/test/auth.coffee).
 
 assert = require 'assert'
 testCase = require('nodeunit').testCase
@@ -13,14 +19,13 @@ makePassPart = helpers.makePassPart
 # Model tests
 module.exports = testCase
   setUp: (callback) ->
-    @model = server.createModel {db:{type:'memory'}}
+    @model = server.createModel {db:{type:'none'}}
     # When the test is run, a document exists with @name, and @unused is unused.
     @name = 'testingdoc'
     @unused = 'testingdoc2'
 
-    @model.create @name, 'simple', (error, status) =>
+    @model.create @name, 'simple', (error) =>
       assert.equal error, null
-      assert.ok status
       callback()
 
   'Return null when asked for the snapshot of a new object': (test) ->
@@ -37,24 +42,23 @@ module.exports = testCase
       test.done()
   
   'Calling create works with a type literal instead of a string': (test) ->
-    @model.create @unused, types.simple, (error, status) =>
+    @model.create @unused, types.simple, (error) =>
       test.equal error, null
-      test.strictEqual status, true
       @model.getSnapshot @name, (error, data) =>
         test.equal error, null
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         test.done()
   
   'Creating a document a second time has no effect': (test) ->
-    @model.create @name, types.text, (error, status) =>
-      test.strictEqual status, false
+    @model.create @name, types.text, (error) =>
+      test.strictEqual error, 'Document already exists'
       @model.getSnapshot @name, (error, data) =>
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         test.done()
   
   'Subsequent calls to getSnapshot work': (test) ->
     # Written in response to a real bug. (!!)
-    @model.create @name, types.text, (error, status) =>
+    @model.create @name, types.text, (error) =>
       @model.getSnapshot @name, (error, data) =>
         test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
         @model.getSnapshot @name, (error, data) =>
@@ -62,9 +66,8 @@ module.exports = testCase
           test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
           test.done()
   
-  'Cant create a document with a slash in the name': (test) ->
-    @model.create 'foo/bar', types.text, (error, result) ->
-      test.strictEqual result, false
+  "Can't create a document with a slash in the name": (test) ->
+    @model.create 'foo/bar', types.text, (error) ->
       test.strictEqual error, 'Invalid document name'
       test.done()
 
@@ -110,18 +113,16 @@ module.exports = testCase
           test.done()
 
   'delete a document when delete is called': (test) ->
-    @model.delete @name, (error, deleted) =>
+    @model.delete @name, (error) =>
       test.equal error, null
-      test.strictEqual deleted, true
       @model.getSnapshot @name, (error, data) ->
-        test.equal error, 'Document does not exist'
-        test.strictEqual data, null
+        test.strictEqual error, 'Document does not exist'
+        test.equal data, null
         test.done()
   
   "Pass false to the callback if you delete something that doesn't exist": (test) ->
-    @model.delete @unused, (error, deleted) ->
+    @model.delete @unused, (error) ->
       test.strictEqual error, 'Document does not exist'
-      test.strictEqual deleted, false
       test.done()
   
   'getOps returns ops in the document': (test) ->
