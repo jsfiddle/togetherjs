@@ -16,15 +16,23 @@ module.exports = (model) ->
       emitters[docName]
 
   # Hook for model code. This is called every time an op is committed to the document.
-  onApplyOp: (docName, opData) ->
+  @onApplyOp = (docName, opData) ->
     p "onApplyOp #{docName} #{i opData} - #{emitterForDoc(docName)?.listeners('op')}"
     emitterForDoc(docName)?.emit('op', opData)
 
+  # Remove a listener from a particular document.
+  @removeListener = (docName, listener) ->
+    emitterForDoc(docName)?.removeListener('op', listener)
+    p 'Listeners: ' + (i emitterForDoc(docName)?.listeners('op'))
+
+  @removeAllListeners = (docName) ->
+    emitterForDoc(docName)?.removeAllListeners 'op'
+
   # Registers a listener for ops on a particular document.
-  # callback(startingVersion) is called when the listener is first applied. All ops
+  # callback(error, startingVersion) is called when the listener is first applied. All ops
   # from then on are sent to the user.
   # Listeners are of the form listener(op, appliedAt)
-  listen: (docName, listener, callback) ->
+  @listen = (docName, listener, callback) ->
     model.getVersion docName, (error, version) ->
       return callback? error if error
 
@@ -32,21 +40,14 @@ module.exports = (model) ->
       emitterForDoc(docName, yes).on 'op', listener
       callback? null, version
 
-  # Remove a listener from a particular document.
-  removeListener: (docName, listener) ->
-    emitterForDoc(docName)?.removeListener('op', listener)
-    p 'Listeners: ' + (i emitterForDoc(docName)?.listeners('op'))
-
-  removeAllListeners: (docName) ->
-    emitterForDoc(docName)?.removeAllListeners 'op'
-
   # Listen to all ops from the specified version. The version cannot be in the
   # future.
   # The callback is called once the listener is attached. removeListener() will be
   # ineffective before then.
-  # Callback(version) if the listener is attached
-  # Callback(null) if the document doesn't exist
-  listenFromVersion: (docName, version, listener, callback) ->
+  # Callback(error, version)
+  @listenFromVersion = (docName, version, listener, callback) ->
+    return @listen docName, listener, callback unless version?
+
     model.getVersion docName, (error, docVersion) ->
       return callback? error if error
 
@@ -68,3 +69,4 @@ module.exports = (model) ->
           # This is done in a quite inefficient way. (O(n) where n = #listeners on doc)
           break unless listener in emitter.listeners('op')
 
+  this

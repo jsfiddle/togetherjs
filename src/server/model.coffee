@@ -173,7 +173,7 @@ module.exports = Model = (db, options) ->
     action.type = switch name
       when 'connect' then 'connect'
       when 'create' then 'create'
-      when 'get snapshot', 'get ops', 'listen' then 'read'
+      when 'get snapshot', 'get ops', 'open' then 'read'
       when 'submit op' then 'update'
       when 'delete' then 'delete'
       else throw new Error "Invalid action name #{name}"
@@ -196,6 +196,10 @@ module.exports = Model = (db, options) ->
     connectTime: new Date
     headers: data.headers
     remoteAddress: data.remoteAddress
+
+    # This is a map from docName -> true
+    openDocs: {}
+
     # We have access to these with socket.io, but I'm not sure we can support
     # these properties on the REST API.
     #xdomain: data.xdomain
@@ -209,6 +213,9 @@ module.exports = Model = (db, options) ->
       # Maybe store a set of clients in the model?
       # clients[client.id] = client ?
       callback null, client
+
+  @clientDisconnect = (client) ->
+    db.docClosed docName, client for docName of client.openDocs
 
   @clientGetOps = (client, docName, start, end, callback) ->
     doAuth client, {docName, start, end}, 'get ops', callback, =>
@@ -238,18 +245,31 @@ module.exports = Model = (db, options) ->
     doAuth client, {docName}, 'delete', callback, =>
       @delete docName, callback
   
-  @clientListen = (client, docName, listener, callback) ->
-    doAuth client, {docName}, 'listen', callback, =>
-      @listen docName, listener, callback
-  
-  @clientListenFromVersion = (client, docName, version, listener, callback) ->
-    # If the specified version is older than the current version, we have to also check that the
-    # client is allowed to get_ops from the specified version.
-    #
-    # We _could_ check the version number of the document and then only check get_ops if
-    # the specified version is old, but an auth check is _probably_ faster than a db roundtrip.
-    doAuth client, {docName, start:version, end:null}, 'get ops', callback, =>
-      doAuth client, {docName, v:version}, 'listen', callback, =>
-        @listenFromVersion docName, version, listener, callback
+  # Open the named document for reading.
+  @clientOpen = (client, docName, version, listener, callback) ->
+    # I might want to promote some form of this method.
+    clientDidOpen = =>
+      db.docOpened docName, client, (error) =>
+        return callback? error if error
+
+        client.openDocs[docName] = true
+        @listenFromVersion docName, version, listener, (error, v) ->
+          if error
+            delete client.openDocs[docName]
+            db.docClosed docName, client
+
+          callback? error, v
+
+    # Urgh no nice way to share this callbacky code.
+    if version?
+      # If the specified version is older than the current version, we have to also check that the
+      # client is allowed to get_ops from the specified version.
+      #
+      # We _could_ check the version number of the document and then only check getOps if
+      # the specified version is old, but an auth check is _probably_ faster than a db roundtrip.
+      doAuth client, {docName, start:version, end:null}, 'get ops', callback, ->
+        doAuth client, {docName, v:version}, 'open', callback, clientDidOpen
+    else
+      doAuth client, {docName}, 'open', callback, clientDidOpen
 
   this

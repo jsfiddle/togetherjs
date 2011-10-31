@@ -50,7 +50,11 @@ genTests = (async) -> testCase
     @connectionData =
       headers: {'x-junk': 'rawr'}
       remoteAddress: '127.0.0.1'
-    @client = {}
+
+    @client =
+      id:'abcde12345'
+      openDocs:{}
+
     @model.create @name, 'simple', -> callback()
 
   'A client is created when auth accepts clientConnect': (test) ->
@@ -98,6 +102,7 @@ genTests = (async) -> testCase
 
   'getSnapshot works if auth accepts': (test) ->
     @auth = (client, action) =>
+      test.ok client.id
       test.strictEqual action.docName, @name
       test.strictEqual action.type, 'read'
       test.strictEqual action.name, 'get snapshot'
@@ -108,7 +113,7 @@ genTests = (async) -> testCase
       test.deepEqual data, {v:0, snapshot:{str:''}, meta:{}, type:types.simple}
       test.fail error if error
 
-      test.expect 4
+      test.expect 5
       test.done()
   
   'getSnapshot disallowed if auth rejects': (test) ->
@@ -121,6 +126,7 @@ genTests = (async) -> testCase
 
   'getOps works if auth accepts': (test) ->
     @auth = (client, action) =>
+      test.ok client.id
       test.strictEqual action.docName, @name
       test.strictEqual action.type, 'read'
       test.strictEqual action.name, 'get ops'
@@ -134,7 +140,7 @@ genTests = (async) -> testCase
         test.deepEqual data[0].op, {position:0, text:'hi'}
         test.fail error if error
 
-        test.expect 7
+        test.expect 8
         test.done()
   
   'getOps returns forbidden': (test) ->
@@ -164,6 +170,8 @@ genTests = (async) -> testCase
 
   'create allowed if canCreate() accept': (test) ->
     @auth = (client, action) =>
+      test.ok client.id
+
       test.strictEqual action.docName, @unused
       test.strictEqual action.docType.name, 'simple'
       test.ok action.meta
@@ -180,7 +188,7 @@ genTests = (async) -> testCase
         test.fail error if error
         test.strictEqual v, 0
 
-        test.expect 6
+        test.expect 7
         test.done()
   
   'create not allowed if canCreate() rejects': (test) ->
@@ -203,6 +211,8 @@ genTests = (async) -> testCase
 
   'applyOps works': (test) ->
     @auth = (client, action) =>
+      test.ok client.id
+
       test.strictEqual action.docName, @name
       test.strictEqual action.v, 0
       test.deepEqual action.op, {position:0, text:'hi'}
@@ -219,7 +229,7 @@ genTests = (async) -> testCase
 
       @model.getVersion @name, (error, v) ->
         test.strictEqual v, 1
-        test.expect 8
+        test.expect 9
         test.done()
   
   'applyOps doesnt work if rejected': (test) ->
@@ -242,12 +252,12 @@ genTests = (async) -> testCase
       test.strictEqual error, 'forbidden'
       test.done()
   
-  'Listen works': (test) ->
+  'Open works': (test) ->
     @auth = (client, action) =>
       test.strictEqual action.docName, @name
 
       test.strictEqual action.type, 'read'
-      test.strictEqual action.name, 'listen'
+      test.strictEqual action.name, 'open'
 
       action.accept()
 
@@ -256,28 +266,28 @@ genTests = (async) -> testCase
       test.strictEqual data.v, 0
       test.done()
 
-    @model.clientListen @client, @name, listener, (error, result) =>
+    @model.clientOpen @client, @name, null, listener, (error, result) =>
       test.fail error if error
       @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
 
-  'Listen denied if listen returns false': (test) ->
+  'Open denied if auth open returns false': (test) ->
     @auth = (client, action) -> action.reject()
 
     listener = (data) -> test.fail 'listener should not be called'
 
-    @model.clientListen @client, @name, listener, (error, result) =>
+    @model.clientOpen @client, @name, null, listener, (error, result) =>
       test.fail result if result
       test.strictEqual error, 'forbidden'
 
       @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, ->
         test.done()
 
-  'Listen from version works': (test) ->
+  'Open at version works': (test) ->
     @auth = (client, action) =>
       test.strictEqual action.docName, @name
 
       test.strictEqual action.type, 'read'
-      test.ok action.name == 'listen' or action.name == 'get ops'
+      test.ok action.name == 'open' or action.name == 'get ops'
 
       action.accept()
 
@@ -294,29 +304,29 @@ genTests = (async) -> testCase
         test.done()
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
-      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
+      @model.clientOpen @client, @name, 0, listener, (error, result) =>
         test.fail error if error
         @model.applyOp @name, {v:1, op:{position:2, text:' there'}}
 
-  'Listen from version denied if listen rejects': (test) ->
+  'Open at version denied if auth rejects': (test) ->
     @auth = (client, action) =>
-      if action.name == 'listen' then action.reject() else action.accept()
+      if action.name == 'open' then action.reject() else action.accept()
 
     listener = (data) ->
       test.fail 'should not be called.'
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       # Both of these should fail.
-      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
+      @model.clientOpen @client, @name, 0, listener, (error, result) =>
         test.strictEqual error, 'forbidden'
         test.fail result if result?
-        @model.clientListenFromVersion @client, @name, 1, listener, (error, result) =>
+        @model.clientOpen @client, @name, 1, listener, (error, result) =>
           test.strictEqual error, 'forbidden'
           test.fail result if result?
           @model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->
             process.nextTick -> test.done()
 
-  'Listen from version denied if get ops rejects': (test) ->
+  'Open at version denied if get ops rejects': (test) ->
     @auth = (client, action) =>
       if action.name == 'get ops' then action.reject() else action.accept()
 
@@ -325,10 +335,10 @@ genTests = (async) -> testCase
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       # Both of these should fail.
-      @model.clientListenFromVersion @client, @name, 0, listener, (error, result) =>
+      @model.clientOpen @client, @name, 0, listener, (error, result) =>
         test.strictEqual error, 'forbidden'
         test.fail result if result?
-        # I'm only checking that listenFromVersion fails when you try and listen from an old version.
+        # I'm only checking that open fails when you try and listen from an old version.
         # There's no particular reason for it to fail if you try and listen from the current version
         # and you don't allow get ops.
         @model.applyOp @name, {v:1, op:{position:2, text:' there'}}, ->

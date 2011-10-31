@@ -85,12 +85,8 @@ exports.attach = (server, model, options) ->
 
         send opMsg
       
-      if version?
-        # Tell the socket the doc is open at the requested version
-        model.clientListenFromVersion client, docName, version, listener, callback
-      else
-        # If the version is blank, we'll open the doc at the most recent version
-        model.clientListen client, docName, listener, callback
+      # Tell the socket the doc is open at the requested version
+      model.clientOpen client, docName, version, listener, callback
 
     # Close the named document.
     # callback([error])
