@@ -40,6 +40,8 @@ genTests = (async) -> testCase
       @db = db
       @man = new Manager db, reapTime: 10, numCachedOps: 2, opsBeforeCommit: 2
 
+    # Most of this gubbins isn't needed. I added it here to track down an exception which was being
+    # thrown -between- tests during async mode.
     if async
       # ... I want to make sure the callback doesn't use @db from a future test when it gets called.
       thisdb = @db
@@ -61,7 +63,7 @@ genTests = (async) -> testCase
     else
       @setDb @db
 
-    console.warn "db id #{id}"
+    #console.warn "db id #{id}"
 
     callback()
 

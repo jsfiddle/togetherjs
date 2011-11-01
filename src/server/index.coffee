@@ -7,6 +7,7 @@ Db = require './db'
 
 rest = require './rest'
 socketio = require './socketio'
+browserChannel = require './browserchannel'
 
 # Create an HTTP server and attach whatever frontends are specified in the options.
 #
@@ -35,9 +36,12 @@ create.attach = attach = (server, options, model = createModel(options)) ->
   options.staticpath ?= '/share'
 
   server.model = model
-  server.use rest(model, options.rest) if options.rest != null
+
   server.use options.staticpath, connect.static("#{__dirname}/../../webclient") if options.staticpath != null
-  socketio.attach(server, model, options.socketio ? {}) if options.socketio != null
+
+  server.use rest(model, options.rest) if options.rest != null
+  socketio.attach(server, model, options.socketio or {}) if options.socketio != null
+  server.use browserChannel(model, options.browserChannel) if options.browserChannel != null
 
   server
 

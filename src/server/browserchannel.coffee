@@ -1,81 +1,114 @@
-# This implements the socketio-based network API for ShareJS.
+# This implements the network API for ShareJS thats not broken.
 #
-# This is the frontend used by the javascript socket implementation.
-#
-# See documentation for this protocol is in doc/protocol.md
-# Tests are in test/socketio.coffee
+# This uses an updated version of the socket.io protocol
 
-socketio = require 'socket.io'
+browserChannel = require('browserchannel').server
 util = require 'util'
 hat = require 'hat'
 
-p = ->#util.debug
-i = ->#util.inspect
+syncQueue = require './syncqueue'
 
 # Attach the streaming protocol to the supplied http.Server.
 #
 # Options = {}
-exports.attach = (server, model, options) ->
-  io = socketio.listen server
+module.exports = (model, options) ->
+  options or= {}
 
-  io.configure ->
-    io.set 'log level', 1
-    for option in options
-      io.set option, options[option]
-
-  authClient = (handshakeData, callback) ->
+  browserChannel options, (session) ->
+    console.log "New BC session from #{session.address} with id #{session.id}"
     data =
-      headers: handshakeData.headers
-      remoteAddress: handshakeData.address.address
-      secure: handshakeData.secure
+      headers: session.headers
+      remoteAddress: session.address
 
-    model.clientConnect data, (error, client) ->
-      if error
-        # Its important that we don't pass the error message to the client here - leaving it as null
-        # will ensure the client recieves the normal 'not_authorized' message and thus
-        # emits 'connect_failed' instead of 'error'
-        callback null, false
-      else
-        handshakeData.client = client
-        callback null, true
+    # This is the corresponding sharejs object. It is set when the
+    # session is authenticated.
+    client = null
 
-  io.of('/sjs').authorization(authClient).on 'connection', (socket) ->
-    client = socket.handshake.client
+    # To save on network traffic, the client & server can leave out the docName with each message to mean
+    # 'same as the last message'
+    lastSentDocName = null
+    lastReceivedDocName = null
 
-    # There seems to be a bug in socket.io where socket.request isn't set sometimes.
-    p "New socket connected from #{socket.request.socket.remoteAddress} with id #{socket.id}" if socket.request?
-
-    lastSentDoc = null
-    lastReceivedDoc = null
-
-    # Map from docName -> {listener:fn, queue:[msg], busy:bool}
+    # Map from docName -> {queue, listener if open}
     docState = {}
-    closed = false
+
+    # We'll only handle one message from each client at a time.
+    handleMessage = (query) ->
+      console.log "Message from #{session.id}", query
+
+      # The client can specify null as the docName to get a random doc name.
+      if query.doc is null
+        query.doc = lastReceivedDoc = hat()
+      else if query.doc != undefined
+        lastReceivedDoc = query.doc
+      else
+        unless lastReceivedDoc
+          console.warn "msg.doc missing in query #{JSON.stringify query} from #{client.id}"
+          # The disconnect handler will be called when we do this, which will clean up the open docs.
+          return session.abort()
+
+        query.doc = lastReceivedDoc
+
+      docState[query.doc] or= queue: syncQueue (query, callback) ->
+        # When the session is closed, we'll nuke docState. When that happens, no more messages
+        # should be handled.
+        return callback() unless docState
+
+        # Close messages are {open:false}
+        if query.open == false
+          handleClose query, callback
+   
+        # Open messages are {open:true}. There's a lot of shared logic with getting snapshots
+        # and creating documents. These operations can be done together; and I'll handle them
+        # together.
+        else if query.open or query.snapshot is null or query.create
+          # You can open, request a snapshot and create all in the same
+          # request. They're all handled together.
+          handleOpenCreateSnapshot query, callback
+
+        # The socket is submitting an op.
+        else if query.op?
+          handleOp query, callback
+
+        else
+          console.warn "Invalid query #{JSON.stringify query} from #{client.id}"
+          session.abort()
+          callback()
+
+      # ... And add the message to the queue.
+      docState[query.doc].queue query
+
+
+    # # Some utility methods for message handlers
 
     # Send a message to the socket.
     # msg _must_ have the doc:DOCNAME property set. We'll remove it if its the same as lastReceivedDoc.
-    send = (msg) ->
-      if msg.doc == lastSentDoc
-        delete msg.doc
+    send = (response) ->
+      if response.doc is lastSentDoc
+        delete response.doc
       else
-        lastSentDoc = msg.doc
+        lastSentDoc = response.doc
 
-      p "Sending #{i msg}"
-      socket.json.send msg
+      # Its invalid to send a message to a closed session. We'll silently drop messages if the
+      # session has closed.
+      if session.state isnt 'closed'
+        console.log "Sending", response
+        session.send response
 
     # Open the given document name, at the requested version.
     # callback(error, version)
     open = (docName, version, callback) ->
-      callback 'Doc already opened' if docState[docName].listener?
-      p "Registering listener on #{docName} by #{socket.id} at #{version}"
+      return callback 'Session closed' unless docState
+      return callback 'Document already open' if docState[docName].listener
+      #p "Registering listener on #{docName} by #{socket.id} at #{version}"
 
       docState[docName].listener = listener = (opData) ->
         throw new Error 'Consistency violation - doc listener invalid' unless docState[docName].listener == listener
 
-        p "listener doc:#{docName} opdata:#{i opData} v:#{version}"
+        #p "listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
         # Skip the op if this socket sent it.
-        return if opData.meta?.source == client.id
+        return if opData.meta.source is client.id
 
         opMsg =
           doc: docName
@@ -91,12 +124,14 @@ exports.attach = (server, model, options) ->
     # Close the named document.
     # callback([error])
     close = (docName, callback) ->
-      p "Closing #{docName}"
+      #p "Closing #{docName}"
+      return callback 'Session closed' unless docState
       listener = docState[docName].listener
       return callback 'Doc already closed' unless listener?
 
+      # The model should really have a clientClose() method.
       model.removeListener docName, listener
-      docState[docName].listener = null
+      delete docState[docName].listener
       callback()
 
     # Handles messages with any combination of the open:true, create:true and snapshot:null parameters
@@ -211,7 +246,7 @@ exports.attach = (server, model, options) ->
 
           # + Should fail if the type is wrong.
 
-          p "Opened #{docName} at #{version} by #{socket.id}"
+          #p "Opened #{docName} at #{version} by #{socket.id}"
           msg.open = true
           msg.v = version
           callback()
@@ -238,16 +273,16 @@ exports.attach = (server, model, options) ->
 
     # We received an op from the socket
     handleOp = (query, callback) ->
-      throw new Error 'No docName specified' unless query.doc?
-      throw new Error 'No version specified' unless query.v?
+      # ...
+      #throw new Error 'No version specified' unless query.v?
 
       op_data = {v:query.v, op:query.op}
-      op_data.meta = query.meta || {}
-      op_data.meta.source = socket.id
+      #op_data.meta = query.meta || {}
+      #op_data.meta.source = client.id
 
       model.clientSubmitOp client, query.doc, op_data, (error, appliedVersion) ->
         msg = if error
-          p "Sending error to socket: #{error}"
+          #p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}
         else
           {doc:query.doc, v:appliedVersion}
@@ -255,75 +290,29 @@ exports.attach = (server, model, options) ->
         send msg
         callback()
 
-    flush = (state) ->
-      return if state.busy || state.queue.length == 0
-      state.busy = true
+    # We don't process any messages from the client until they've authorized. Instead,
+    # they are stored in this buffer.
+    buffer = []
+    session.on 'message', bufferMsg = (msg) -> buffer.push msg
 
-      query = state.queue.shift()
+    model.clientConnect data, (error, client_) ->
+      if error
+        # The client is not authorized, so they shouldn't try and reconnect.
+        client.stop()
+      else
+        client = client_
 
-      callback = ->
-        state.busy = false
-        flush state
+        # Ok. Now we can handle all the messages in the buffer. They'll go straight to
+        # handleMessage from now on.
+        session.removeListener 'message', bufferMsg
+        handleMessage msg for msg in buffer
+        buffer = null
+        session.on 'message', handleMessage
 
-      p "processing query #{i query}"
-      try
-        if query.open == false
-          handleClose query, callback
 
-        else if query.open != undefined or query.snapshot != undefined or query.create
-          # You can open, request a snapshot and create all in the same
-          # request. They're all handled together.
-          handleOpenCreateSnapshot query, callback
+    session.on 'close', ->
+      console.log "Client #{client.id} disconnected"
+      for docName, {listener} of docState
+        model.removeListener docName, listener if listener
+      docState = null
 
-        else if query.op? # The socket is applying an op.
-          handleOp query, callback
-
-        else
-          util.debug "Unknown message received: #{util.inspect query}"
-
-      catch error
-        util.debug error.stack
-        # ... And disconnect the socket?
-        callback()
-    
-    # And now the actual message handler.
-    messageListener = (query) ->
-      p "Server recieved message #{i query}"
-      # There seems to be a bug in socket.io where messages are detected
-      # after the client disconnects.
-      if closed
-        console.warn "WARNING: received query from socket after the socket disconnected."
-        console.warn socket
-        return
-
-      try
-        query = JSON.parse query if typeof(query) == 'string'
-
-        if query.doc == null
-          lastReceivedDoc = null
-          query.doc = hat()
-        else if query.doc != undefined
-          lastReceivedDoc = query.doc
-        else
-          throw new Error 'msg.doc missing. Probably the client reconnected without telling us - this is a socket.io bug.' unless lastReceivedDoc
-          query.doc = lastReceivedDoc
-      catch error
-        util.debug error.stack
-        return
-
-      docState[query.doc] ||= {listener:null, queue:[], busy:no}
-      docState[query.doc].queue.push query
-      flush docState[query.doc]
-
-    socket.on 'message', messageListener
-    socket.on 'disconnect', ->
-      p "socket #{socket.id} disconnected"
-      closed = true
-      for docName, state of docState
-        state.busy = true
-        state.queue = []
-        model.removeListener docName, state.listener if state.listener?
-      socket.removeListener 'message', messageListener
-      docState = {}
-  
-  server

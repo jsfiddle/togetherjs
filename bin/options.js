@@ -42,6 +42,9 @@ module.exports = {
 	  // 'transports': ['xhr-polling', 'flashsocket']
 	},
 
+  // Browserchannel server options. Set browserChannel:null to disable browserchannel.
+  browserChannel: {},
+
 	// Authentication code to test if clients are allowed to perform different actions.
 	// See documentation for details.
 	//auth: function(client, action) {

@@ -236,6 +236,8 @@ module.exports = Model = (db, options) ->
   # are checked before the op is submitted.
   @clientSubmitOp = (client, docName, opData, callback) ->
     opData.meta ||= {}
+    opData.meta.source = client.id
+
     doAuth client, {docName, op:opData.op, v:opData.v, meta:opData.meta}, 'submit op', callback, =>
       @applyOp docName, opData, callback
 
