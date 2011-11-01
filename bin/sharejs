@@ -21,6 +21,7 @@ var port = options.port || 8000;
 server.listen(port);
 sys.puts('Server running at http://127.0.0.1:' + port + '/');
 
+process.title = 'sharejs'
 process.on('uncaughtException', function (err) {
   console.error('An error has occurred. Please file a ticket here: https://github.com/josephg/ShareJS/issues');
   console.error('Version ' + sharejs.version + ': ' + err.stack);

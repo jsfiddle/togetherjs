@@ -59,12 +59,14 @@ generator = (doc) ->
 
 generate = ->
   c = new Connection('http://localhost:8000/sjs')
-  c.open 'spam6', (doc, error) ->
+  c.open 'spam6', (error, doc) ->
     console.error error if error
     apply = ->
       #console.log "v: #{doc.version} length #{doc.snapshot.length}"
       op = generator doc.snapshot
+      #console.time 'op'
       doc.submitOp op, ->
+        #console.timeEnd 'op'
         mark()
         apply()
 
