@@ -1,6 +1,25 @@
 # This implements the network API for ShareJS thats not broken.
 #
-# This uses an updated version of the socket.io protocol
+# This uses an updated version of the socket.io protocol.
+#
+# When a client connects the server first authenticates the client and sends it:
+#
+# S: {auth:<client id>}
+#  or
+# S: {auth:null, error:'forbidden'}
+#
+# After that, the client can open documents:
+#
+# C: {doc:'foo', open:true, snapshot:null, create:true, type:'text'}
+# S: {doc:'foo', open:true, snapshot:{snapshot:'hi there', v:5, meta:{}}, create:false}
+#
+# ...
+#
+# The client can send open requests as soon as the socket has opened - it doesn't need to
+# wait for auth.
+#
+# The wire protocol is documented here:
+# https://github.com/josephg/ShareJS/wiki/Wire-Protocol
 
 browserChannel = require('browserchannel').server
 util = require 'util'

@@ -347,7 +347,7 @@ module.exports = testCase
       test.expect 7
       test.done()
 
-  'Cannot open a document if you cannot listen': (test) ->
+  'Cannot open a document if auth rejects you': (test) ->
     @auth = (client, action) =>
       if action.name == 'open'
         action.reject()
