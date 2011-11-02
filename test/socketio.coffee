@@ -84,7 +84,6 @@ module.exports = testCase
 
   'open an existing document with no version specified opens the document': (test) ->
     @model.create @name, 'simple', =>
-      console.warn 'sdfd'
       @socket.json.send {doc:@name, open:true}
       @expect {doc:@name, v:0, open:true}, =>
         @model.applyOp @name, {op:{position:0, text:'hi'}, v:0}, =>
@@ -350,7 +349,7 @@ module.exports = testCase
 
   'Cannot open a document if you cannot listen': (test) ->
     @auth = (client, action) =>
-      if action.name == 'listen'
+      if action.name == 'open'
         action.reject()
       else
         action.accept()
