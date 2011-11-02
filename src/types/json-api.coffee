@@ -36,7 +36,7 @@ traverse = (snapshot, path) ->
   for p in path
     elem = elem[key]
     key = p
-    throw 'bad path' if typeof elem == 'undefined'
+    throw new Error 'bad path' if typeof elem == 'undefined'
   {elem, key}
 
 pathEquals = (p1, p2) ->
@@ -45,17 +45,17 @@ pathEquals = (p1, p2) ->
     return false if e != p2[i]
   true
 
-json['api'] =
-  'provides': {'json':true}
+json.api =
+  provides: {json:true}
 
-  'get': -> @snapshot
-  'at': (path...) -> new SubDoc this, depath path
+  get: -> @snapshot
+  at: (path...) -> new SubDoc this, depath path
 
-  'getAt': (path) ->
+  getAt: (path) ->
     {elem, key} = traverse @snapshot, path
     return elem[key]
 
-  'setAt': (path, value, cb) ->
+  setAt: (path, value, cb) ->
     {elem, key} = traverse @snapshot, path
     op = {p:path}
     if elem.constructor == Array
@@ -64,21 +64,21 @@ json['api'] =
     else if typeof elem == 'object'
       op.oi = value
       op.od = elem[key] if typeof elem[key] != 'undefined'
-    else throw 'bad path'
+    else throw new Error 'bad path'
     @submitOp [op], cb
 
-  'removeAt': (path, cb) ->
+  removeAt: (path, cb) ->
     {elem, key} = traverse @snapshot, path
-    throw 'no element at that path' unless typeof elem[key] != 'undefined'
+    throw new Error 'no element at that path' unless typeof elem[key] != 'undefined'
     op = {p:path}
     if elem.constructor == Array
       op.ld = elem[key]
     else if typeof elem == 'object'
       op.od = elem[key]
-    else throw 'bad path'
+    else throw new Error 'bad path'
     @submitOp [op], cb
 
-  'insertAt': (path, pos, value, cb) ->
+  insertAt: (path, pos, value, cb) ->
     {elem, key} = traverse @snapshot, path
     op = {p:path.concat pos}
     if elem[key].constructor == Array
@@ -87,29 +87,29 @@ json['api'] =
       op.si = value
     @submitOp [op], cb
 
-  'moveAt': (path, from, to, cb) ->
+  moveAt: (path, from, to, cb) ->
     op = [{p:path.concat(from), lm:to}]
     @submitOp op, cb
 
-  'addAt': (path, amount, cb) ->
+  addAt: (path, amount, cb) ->
     op = [{p:path, na:amount}]
     @submitOp op, cb
 
-  'deleteTextAt': (path, length, pos, cb) ->
+  deleteTextAt: (path, length, pos, cb) ->
     {elem, key} = traverse @snapshot, path
-    op = [{'p':path.concat(pos), 'sd':elem[key][pos...(pos + length)]}]
+    op = [{p:path.concat(pos), sd:elem[key][pos...(pos + length)]}]
     @submitOp op, cb
 
-  'addListener': (path, event, cb) ->
+  addListener: (path, event, cb) ->
     l = {path, event, cb}
     @_listeners.push l
     l
-  'removeListener': (l) ->
+  removeListener: (l) ->
     i = @_listeners.indexOf l
     return false if i < 0
     @_listeners.splice i, 1
     return true
-  '_register': ->
+  _register: ->
     @_listeners = []
     @on 'change', (op) ->
       for c in op
@@ -129,7 +129,7 @@ json['api'] =
             # The op remained, so grab its new path into the listener.
             l.path = xformed[0].p
           else
-            throw "Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components."
+            throw new Error "Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components."
         to_remove.sort (a, b) -> b - a
         for i in to_remove
           @_listeners.splice i, 1
@@ -167,6 +167,6 @@ json['api'] =
           else if (common = @type.commonPath match_path, path)?
             if event == 'child op'
               if match_path.length == path.length
-                throw "paths match length and have commonality, but aren't equal?"
+                throw new Error "paths match length and have commonality, but aren't equal?"
               child_path = c.p[common+1..]
               cb(child_path, c)
