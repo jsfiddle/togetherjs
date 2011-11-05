@@ -2,7 +2,7 @@
   var Connection, Doc, MicroEvent, append, bootstrapTransform, checkValidComponent, checkValidOp, exports, invertComponent, io, nextTick, strInject, text, transformComponent, transformPosition, types;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   window.sharejs = exports = {
-    'version': '0.5.0'
+    'version': '0.5.0-pre'
   };
   if (typeof WEB === 'undefined') {
     window.WEB = true;

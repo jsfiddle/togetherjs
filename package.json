@@ -1,6 +1,6 @@
 {
   "name": "share",
-  "version": "0.5.0",
+  "version": "0.5.0-pre",
   "description": "A database for concurrent document editing",
   "keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
   "homepage": "",
