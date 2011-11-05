@@ -29,3 +29,8 @@ body {
 	right: 0;
 }
 
+#htext a {
+  color: #aaf;
+  font-weight: bold;
+}
+

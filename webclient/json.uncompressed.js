@@ -573,7 +573,7 @@ var WEB = true;
       elem = elem[key];
       key = p;
       if (typeof elem === 'undefined') {
-        throw 'bad path';
+        throw new Error('bad path');
       }
     }
     return {
@@ -594,24 +594,27 @@ var WEB = true;
     }
     return true;
   };
-  json['api'] = {
-    'provides': {
-      'json': true
+  json.api = {
+    provides: {
+      json: true
     },
-    'get': function() {
-      return this.snapshot;
-    },
-    'at': function() {
+    at: function() {
       var path;
       path = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       return new SubDoc(this, depath(path));
     },
-    'getAt': function(path) {
+    get: function() {
+      return this.snapshot;
+    },
+    set: function(value, cb) {
+      return this.setAt([], value, cb);
+    },
+    getAt: function(path) {
       var elem, key, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
       return elem[key];
     },
-    'setAt': function(path, value, cb) {
+    setAt: function(path, value, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
       op = {
@@ -628,15 +631,15 @@ var WEB = true;
           op.od = elem[key];
         }
       } else {
-        throw 'bad path';
+        throw new Error('bad path');
       }
       return this.submitOp([op], cb);
     },
-    'removeAt': function(path, cb) {
+    removeAt: function(path, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
       if (typeof elem[key] === 'undefined') {
-        throw 'no element at that path';
+        throw new Error('no element at that path');
       }
       op = {
         p: path
@@ -646,11 +649,11 @@ var WEB = true;
       } else if (typeof elem === 'object') {
         op.od = elem[key];
       } else {
-        throw 'bad path';
+        throw new Error('bad path');
       }
       return this.submitOp([op], cb);
     },
-    'insertAt': function(path, pos, value, cb) {
+    insertAt: function(path, pos, value, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
       op = {
@@ -663,7 +666,7 @@ var WEB = true;
       }
       return this.submitOp([op], cb);
     },
-    'moveAt': function(path, from, to, cb) {
+    moveAt: function(path, from, to, cb) {
       var op;
       op = [
         {
@@ -673,7 +676,7 @@ var WEB = true;
       ];
       return this.submitOp(op, cb);
     },
-    'addAt': function(path, amount, cb) {
+    addAt: function(path, amount, cb) {
       var op;
       op = [
         {
@@ -683,18 +686,18 @@ var WEB = true;
       ];
       return this.submitOp(op, cb);
     },
-    'deleteTextAt': function(path, length, pos, cb) {
+    deleteTextAt: function(path, length, pos, cb) {
       var elem, key, op, _ref;
       _ref = traverse(this.snapshot, path), elem = _ref.elem, key = _ref.key;
       op = [
         {
-          'p': path.concat(pos),
-          'sd': elem[key].slice(pos, pos + length)
+          p: path.concat(pos),
+          sd: elem[key].slice(pos, pos + length)
         }
       ];
       return this.submitOp(op, cb);
     },
-    'addListener': function(path, event, cb) {
+    addListener: function(path, event, cb) {
       var l;
       l = {
         path: path,
@@ -704,7 +707,7 @@ var WEB = true;
       this._listeners.push(l);
       return l;
     },
-    'removeListener': function(l) {
+    removeListener: function(l) {
       var i;
       i = this._listeners.indexOf(l);
       if (i < 0) {
@@ -713,7 +716,7 @@ var WEB = true;
       this._listeners.splice(i, 1);
       return true;
     },
-    '_register': function() {
+    _register: function() {
       this._listeners = [];
       this.on('change', function(op) {
         var c, dummy, i, l, to_remove, xformed, _i, _len, _len2, _ref, _results;
@@ -737,7 +740,7 @@ var WEB = true;
             } else if (xformed.length === 1) {
               l.path = xformed[0].p;
             } else {
-              throw "Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components.";
+              throw new Error("Bad assumption in json-api: xforming an 'si' op will always result in 0 or 1 components.");
             }
           }
           to_remove.sort(function(a, b) {
@@ -808,7 +811,7 @@ var WEB = true;
                 } else if ((common = this.type.commonPath(match_path, path)) != null) {
                   if (event === 'child op') {
                     if (match_path.length === path.length) {
-                      throw "paths match length and have commonality, but aren't equal?";
+                      throw new Error("paths match length and have commonality, but aren't equal?");
                     }
                     child_path = c.p.slice(common + 1);
                     return cb(child_path, c);

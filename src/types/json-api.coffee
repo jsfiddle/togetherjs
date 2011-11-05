@@ -48,8 +48,10 @@ pathEquals = (p1, p2) ->
 json.api =
   provides: {json:true}
 
-  get: -> @snapshot
   at: (path...) -> new SubDoc this, depath path
+
+  get: -> @snapshot
+  set: (value, cb) -> @setAt [], value, cb
 
   getAt: (path) ->
     {elem, key} = traverse @snapshot, path

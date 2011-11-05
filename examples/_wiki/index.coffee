@@ -38,7 +38,7 @@ module.exports = (docName, model, res) ->
 	docName = "wiki:" + docName
 
 	model.getSnapshot docName, (error, data) ->
-		if data == null
+		if error is 'Document does not exist'
 			model.create docName, 'text', ->
 				content = defaultContent(name)
 				model.applyOp docName, {op:[{i:content, p:0}], v:0}, ->

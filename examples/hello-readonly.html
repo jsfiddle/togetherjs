@@ -17,9 +17,9 @@
 var elem = document.getElementById('text');
 
 sharejs.open('hello', 'text', function(error, doc) {
-	elem.innerHTML = doc.snapshot;
+	elem.innerText = doc.snapshot;
 	doc.on('change', function() {
-		elem.innerHTML = doc.snapshot;
+		elem.innerText = doc.snapshot;
 	});
 });
 		</script>
