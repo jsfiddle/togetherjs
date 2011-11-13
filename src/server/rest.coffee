@@ -4,7 +4,6 @@
 
 http = require 'http'
 sys = require 'sys'
-util = require 'util'
 url = require 'url'
 
 connect = require 'connect'

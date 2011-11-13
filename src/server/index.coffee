@@ -43,7 +43,11 @@ create.attach = attach = (server, options, model = createModel(options)) ->
   # done properly.
   server.use rest(createClient, options.rest) if options.rest != null
   socketio.attach(server, createClient, options.socketio or {}) if options.socketio != null
-  server.use browserChannel(createClient, options.browserChannel) if options.browserChannel != null
+
+  if options.browserChannel != null
+    options.browserChannel ?= {}
+    options.browserChannel.server = server
+    server.use browserChannel(createClient, options.browserChannel)
 
   server
 

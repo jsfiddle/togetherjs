@@ -22,6 +22,7 @@ modules = [
   'events'
   'rest'
 #  'socketio'
+  'browserchannel'
 
   'microevent'
 #  'client'

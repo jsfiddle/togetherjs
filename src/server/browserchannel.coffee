@@ -34,7 +34,7 @@ module.exports = (createClient, options) ->
   options or= {}
 
   browserChannel options, (session) ->
-    console.log "New BC session from #{session.address} with id #{session.id}"
+    #console.log "New BC session from #{session.address} with id #{session.id}"
     data =
       headers: session.headers
       remoteAddress: session.address
@@ -45,15 +45,15 @@ module.exports = (createClient, options) ->
 
     # To save on network traffic, the client & server can leave out the docName with each message to mean
     # 'same as the last message'
-    lastSentDocName = null
-    lastReceivedDocName = null
+    lastSentDoc = null
+    lastReceivedDoc = null
 
     # Map from docName -> {queue, listener if open}
     docState = {}
 
     # We'll only handle one message from each client at a time.
     handleMessage = (query) ->
-      console.log "Message from #{session.id}", query
+      #console.log "Message from #{session.id}", query
 
       # The client can specify null as the docName to get a random doc name.
       if query.doc is null
@@ -111,7 +111,7 @@ module.exports = (createClient, options) ->
       # Its invalid to send a message to a closed session. We'll silently drop messages if the
       # session has closed.
       if session.state isnt 'closed'
-        console.log "Sending", response
+        #console.log "Sending", response
         session.send response
 
     # Open the given document name, at the requested version.
@@ -296,7 +296,7 @@ module.exports = (createClient, options) ->
       # ...
       #throw new Error 'No version specified' unless query.v?
 
-      opData = {v:query.v, op:query.op}
+      opData = {v:query.v, op:query.op, meta:query.meta}
 
       client.submitOp query.doc, opData, (error, appliedVersion) ->
         msg = if error
@@ -316,9 +316,11 @@ module.exports = (createClient, options) ->
     createClient data, (error, client_) ->
       if error
         # The client is not authorized, so they shouldn't try and reconnect.
-        client.stop()
+        session.send {auth:null, error}
+        session.stop()
       else
         client = client_
+        session.send auth:client.id
 
         # Ok. Now we can handle all the messages in the buffer. They'll go straight to
         # handleMessage from now on.
@@ -328,7 +330,8 @@ module.exports = (createClient, options) ->
         session.on 'message', handleMessage
 
     session.on 'close', ->
-      console.log "Client #{client.id} disconnected"
+      return unless client
+      #console.log "Client #{client.id} disconnected"
       for docName, {listener} of docState
         client.removeListener docName if listener
       docState = null
