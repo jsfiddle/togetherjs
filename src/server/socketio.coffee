@@ -4,6 +4,9 @@
 #
 # See documentation for this protocol is in doc/protocol.md
 # Tests are in test/socketio.coffee
+#
+# This code will be removed in a future version of sharejs because socket.io is
+# too buggy.
 
 socketio = require 'socket.io'
 util = require 'util'
@@ -15,7 +18,7 @@ i = ->#util.inspect
 # Attach the streaming protocol to the supplied http.Server.
 #
 # Options = {}
-exports.attach = (server, model, options) ->
+exports.attach = (server, createClient, options) ->
   io = socketio.listen server
 
   io.configure ->
@@ -29,7 +32,7 @@ exports.attach = (server, model, options) ->
       remoteAddress: handshakeData.address.address
       secure: handshakeData.secure
 
-    model.clientConnect data, (error, client) ->
+    createClient data, (error, client) ->
       if error
         # Its important that we don't pass the error message to the client here - leaving it as null
         # will ensure the client recieves the normal 'not_authorized' message and thus
@@ -86,7 +89,9 @@ exports.attach = (server, model, options) ->
         send opMsg
       
       # Tell the socket the doc is open at the requested version
-      model.clientOpen client, docName, version, listener, callback
+      client.listen docName, version, listener, (error, v) ->
+        delete docState[docName].listener if error
+        callback error, v
 
     # Close the named document.
     # callback([error])
@@ -95,7 +100,7 @@ exports.attach = (server, model, options) ->
       listener = docState[docName].listener
       return callback 'Doc already closed' unless listener?
 
-      model.removeListener docName, listener
+      client.removeListener docName
       docState[docName].listener = null
       callback()
 
@@ -166,11 +171,11 @@ exports.attach = (server, model, options) ->
           msg.create = false
           step2Snapshot()
         else
-          model.clientCreate client, docName, query.type, query.meta || {}, (error) ->
+          client.create docName, query.type, query.meta || {}, (error) ->
             if error is 'Document already exists'
               # We've called getSnapshot (-> null), then createClient (-> already exists). Its possible
               # another client has called createClient first.
-              model.clientGetSnapshot client, docName, (error, data) ->
+              client.getSnapshot docName, (error, data) ->
                 return callback error if error
 
                 docData = data
@@ -217,7 +222,7 @@ exports.attach = (server, model, options) ->
           callback()
 
       if query.snapshot == null or (query.open == true and query.type)
-        model.clientGetSnapshot client, query.doc, (error, data) ->
+        client.getSnapshot query.doc, (error, data) ->
           return callback error if error and error != 'Document does not exist'
 
           docData = data
@@ -245,7 +250,7 @@ exports.attach = (server, model, options) ->
       op_data.meta = query.meta || {}
       op_data.meta.source = socket.id
 
-      model.clientSubmitOp client, query.doc, op_data, (error, appliedVersion) ->
+      client.submitOp query.doc, op_data, (error, appliedVersion) ->
         msg = if error
           p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}
@@ -322,7 +327,7 @@ exports.attach = (server, model, options) ->
       for docName, state of docState
         state.busy = true
         state.queue = []
-        model.removeListener docName, state.listener if state.listener?
+        client.removeListener docName if state.listener?
       socket.removeListener 'message', messageListener
       docState = {}
   

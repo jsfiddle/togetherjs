@@ -20,19 +20,23 @@
 module.exports = (process) ->
   throw new Error('process is not a function') unless typeof process == 'function'
   queue = []
-  busy = false
   
-  flush = ->
-    return if busy or queue.length == 0
-
-    busy = true
-    [data, callback] = queue.shift()
-    process data, (result...) -> # TODO: Make this not use varargs - varargs are really slow.
-      callback.apply null, result if callback
-      busy = false
-      flush()
-
-  (data, callback) ->
+  enqueue = (data, callback) ->
     queue.push [data, callback]
     flush()
+
+  enqueue.busy = false
+
+  flush = ->
+    return if enqueue.busy or queue.length == 0
+
+    enqueue.busy = true
+    [data, callback] = queue.shift()
+    process data, (result...) -> # TODO: Make this not use varargs - varargs are really slow.
+      enqueue.busy = false
+      # This is called after busy = false so a user can check if enqueue.busy is set in the callback.
+      callback.apply null, result if callback
+      flush()
+
+  enqueue
 

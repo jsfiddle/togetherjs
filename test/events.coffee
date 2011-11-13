@@ -4,6 +4,7 @@ testCase = require('nodeunit').testCase
 assert = require 'assert'
 
 server = require '../src/server'
+types = require '../src/types'
 
 helpers = require './helpers'
 applyOps = helpers.applyOps
@@ -19,6 +20,23 @@ module.exports = testCase
       assert.fail error if error
       callback()
 
+  'model emits a create event when a document is created': (test) ->
+    @model.on 'create', (name, data) =>
+      test.strictEqual name, @unused
+      test.deepEqual data, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
+
+    @model.create @unused, 'simple', ->
+      test.expect 2
+      test.done()
+
+  'model emits a delete event when a document is deleted': (test) ->
+    @model.on 'delete', (name) =>
+      test.strictEqual name, @name
+
+    @model.delete @name, ->
+      test.expect 1
+      test.done()
+
   'listen on a nonexistant doc returns null and ignore the document': (test) ->
     @model.listen @unused, (-> throw new Error 'should not receive any ops'), (error, v) =>
       test.strictEqual error, 'Document does not exist'
@@ -29,7 +47,7 @@ module.exports = testCase
           test.done()
   
   'listen from version on a nonexistant doc returns null and ignores the doc': (test) ->
-    @model.listenFromVersion @unused, 0, (-> throw new Error 'should not receive any ops'), (error, v) =>
+    @model.listen @unused, 0, (-> throw new Error 'should not receive any ops'), (error, v) =>
       test.strictEqual error, 'Document does not exist'
       test.equal v, null
 
@@ -88,13 +106,13 @@ module.exports = testCase
           {position:0, text:'Hi'}
         ], (error, _) -> test.ifError(error)
 
-  'emit events with listenFromVersion from before the first version': (test) ->
+  'emit events with listen from before the first version': (test) ->
     expectedVersions = [0...2]
     listener = (op_data) ->
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
 
-    @model.listenFromVersion @name, 0, listener, (error, v) ->
+    @model.listen @name, 0, listener, (error, v) ->
       test.equal error, null
       test.strictEqual v, 0
 
@@ -103,7 +121,7 @@ module.exports = testCase
         {position:0, text:'Hi'}
       ], (error, _) -> test.ifError(error)
 
-  'emit events with listenFromVersion from the first version after its been sent': (test) ->
+  'emit events with listen from the first version after its been sent': (test) ->
     applyOps @model, @name, 0, [
         {position:0, text:'A'},
         {position:0, text:'Hi'}
@@ -111,16 +129,16 @@ module.exports = testCase
 
     expectedVersions = [0...2]
     # I'm not passing a listenfromversion callback
-    @model.listenFromVersion @name, 0, (op_data) ->
+    @model.listen @name, 0, (op_data) ->
       test.strictEqual op_data.v, expectedVersions.shift()
       test.done() if expectedVersions.length == 0
   
-  'emit events with listenFromVersion from the current version': (test) ->
+  'emit events with listen from the current version': (test) ->
     applyOps @model, @name, 0, [{position:0, text:'A'}, {position:0, text:'Hi'}], (error, _) =>
       test.ifError(error)
 
       expectedVersions = [2...4]
-      @model.listenFromVersion @name, 2, (op_data) ->
+      @model.listen @name, 2, (op_data) ->
         test.strictEqual op_data.v, expectedVersions.shift()
         test.done() if expectedVersions.length == 0
 
@@ -129,7 +147,7 @@ module.exports = testCase
           {position:0, text:'Hi'}
         ], (error, _) -> test.ifError(error)
   
-  'If you listenFromVersion and submit ops in the callback, the listener gets called in the right order': (test) ->
+  'If you listen and submit ops in the callback, the listener gets called in the right order': (test) ->
     # Test written in response to a bug found in the wild
     seenv0 = false
     listener = (data) ->
@@ -144,8 +162,9 @@ module.exports = testCase
 
     @model.applyOp @name, {v:0, op:{position:0, text:'hi'}}, =>
       process.nextTick => # I have no idea why I need this process.nextTick, but I do...
-        @model.listenFromVersion @name, 0, listener, (error, result) =>
+        @model.listen @name, 0, listener, (error, result) =>
           test.fail error if error
+          test.strictEqual result, 0
           @model.applyOp @name, {v:1, op:{position:2, text:' there'}}
 
   'stop emitting events after removeListener is called': (test) ->
@@ -164,7 +183,7 @@ module.exports = testCase
         test.ifError(error)
         test.done()
 
-  'stop emitting events after removeListener is called when using listenFromVersion': (test) ->
+  'stop emitting events after removeListener is called when using listen': (test) ->
     listener = (op_data) =>
       test.strictEqual op_data.v, 0, 'Listener was not removed correctly'
       @model.removeListener @name, listener
@@ -174,6 +193,6 @@ module.exports = testCase
         {position:0, text:'Hi'}
       ], (error, _) =>
         test.ifError(error)
-        @model.listenFromVersion @name, 0, listener
+        @model.listen @name, 0, listener
         test.done()
 

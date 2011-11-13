@@ -17,7 +17,6 @@ modules = [
   'types/json-api'
 
   'db'
-  'docmanager'
   'model'
   'auth'
   'events'

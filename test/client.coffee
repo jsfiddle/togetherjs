@@ -19,7 +19,7 @@ genTests = (client) -> testCase
     options =
       socketio: {}
       rest: null
-      db: {type: 'memory'}
+      db: {type: 'none'}
       auth: (client, action) => @auth client, action
 
     @model = server.createModel options

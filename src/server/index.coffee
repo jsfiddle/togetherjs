@@ -3,7 +3,7 @@
 connect = require 'connect'
 
 Model = require './model'
-Db = require './db'
+createDb = require './db'
 
 rest = require './rest'
 socketio = require './socketio'
@@ -19,10 +19,8 @@ module.exports = create = (options, model = createModel(options)) ->
 create.createModel = createModel = (options) ->
   dbOptions = options?.db
 
-  db = new Db dbOptions
-
+  db = createDb dbOptions
   new Model db, options
-
 
 # Attach the OT server frontends to the provided Node HTTP server. Use this if you
 # already have a http.Server or https.Server and want to make some URL paths do OT.
@@ -39,9 +37,13 @@ create.attach = attach = (server, options, model = createModel(options)) ->
 
   server.use options.staticpath, connect.static("#{__dirname}/../../webclient") if options.staticpath != null
 
-  server.use rest(model, options.rest) if options.rest != null
-  socketio.attach(server, model, options.socketio or {}) if options.socketio != null
-  server.use browserChannel(model, options.browserChannel) if options.browserChannel != null
+  createClient = require('./auth') model, options
+
+  # The client frontend doesn't get access to the model at all, to make sure security stuff is
+  # done properly.
+  server.use rest(createClient, options.rest) if options.rest != null
+  socketio.attach(server, createClient, options.socketio or {}) if options.socketio != null
+  server.use browserChannel(createClient, options.browserChannel) if options.browserChannel != null
 
   server
 

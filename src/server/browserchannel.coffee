@@ -30,7 +30,7 @@ syncQueue = require './syncqueue'
 # Attach the streaming protocol to the supplied http.Server.
 #
 # Options = {}
-module.exports = (model, options) ->
+module.exports = (createClient, options) ->
   options or= {}
 
   browserChannel options, (session) ->
@@ -138,7 +138,9 @@ module.exports = (model, options) ->
         send opMsg
       
       # Tell the socket the doc is open at the requested version
-      model.clientOpen client, docName, version, listener, callback
+      client.listen docName, version, listener, (error, v) ->
+        delete docState[docName].listener if error
+        callback error, v
 
     # Close the named document.
     # callback([error])
@@ -148,8 +150,7 @@ module.exports = (model, options) ->
       listener = docState[docName].listener
       return callback 'Doc already closed' unless listener?
 
-      # The model should really have a clientClose() method.
-      model.removeListener docName, listener
+      client.removeListener docName
       delete docState[docName].listener
       callback()
 
@@ -187,10 +188,10 @@ module.exports = (model, options) ->
       # It might be nice to add a 'createOrGet()' method to model / db manager. But most
       # of the time clients are opening an existing document rather than creating a new one anyway.
       ###
-      model.clientGetSnapshot client, query.doc, (error, data) ->
+      client.getSnapshot query.doc, (error, data) ->
         maybeCreate = (callback) ->
           if query.create and error is 'Document does not exist'
-            model.clientCreate client, docName, query.type, query.meta or {}, callback
+            client.create docName, query.type, query.meta or {}, callback
           else
             callback error, data
 
@@ -220,11 +221,11 @@ module.exports = (model, options) ->
           msg.create = false
           step2Snapshot()
         else
-          model.clientCreate client, docName, query.type, query.meta || {}, (error) ->
+          client.create docName, query.type, query.meta || {}, (error) ->
             if error is 'Document already exists'
               # We've called getSnapshot (-> null), then createClient (-> already exists). Its possible
               # another client has called createClient first.
-              model.clientGetSnapshot client, docName, (error, data) ->
+              client.getSnapshot docName, (error, data) ->
                 return callback error if error
 
                 docData = data
@@ -271,7 +272,7 @@ module.exports = (model, options) ->
           callback()
 
       if query.snapshot == null or (query.open == true and query.type)
-        model.clientGetSnapshot client, query.doc, (error, data) ->
+        client.getSnapshot query.doc, (error, data) ->
           return callback error if error and error != 'Document does not exist'
 
           docData = data
@@ -295,11 +296,9 @@ module.exports = (model, options) ->
       # ...
       #throw new Error 'No version specified' unless query.v?
 
-      op_data = {v:query.v, op:query.op}
-      #op_data.meta = query.meta || {}
-      #op_data.meta.source = client.id
+      opData = {v:query.v, op:query.op}
 
-      model.clientSubmitOp client, query.doc, op_data, (error, appliedVersion) ->
+      client.submitOp query.doc, opData, (error, appliedVersion) ->
         msg = if error
           #p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}
@@ -314,7 +313,7 @@ module.exports = (model, options) ->
     buffer = []
     session.on 'message', bufferMsg = (msg) -> buffer.push msg
 
-    model.clientConnect data, (error, client_) ->
+    createClient data, (error, client_) ->
       if error
         # The client is not authorized, so they shouldn't try and reconnect.
         client.stop()
@@ -328,10 +327,9 @@ module.exports = (model, options) ->
         buffer = null
         session.on 'message', handleMessage
 
-
     session.on 'close', ->
       console.log "Client #{client.id} disconnected"
       for docName, {listener} of docState
-        model.removeListener docName, listener if listener
+        client.removeListener docName if listener
       docState = null
 

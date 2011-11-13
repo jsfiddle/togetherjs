@@ -58,13 +58,13 @@ pump = (req, callback) ->
 # connect.router will be removed in connect 2.0 - this code will have to be rewritten or
 # more libraries pulled in.
 # https://github.com/senchalabs/connect/issues/262
-router = (app, model, options) ->
+router = (app, createClient, options) ->
   auth = (req, res, next) ->
     data =
       headers: req.headers
       remoteAddress: req.connection.remoteAddress
 
-    model.clientConnect data, (error, client) ->
+    createClient data, (error, client) ->
       if client
         req._client = client
         next()
@@ -74,7 +74,7 @@ router = (app, model, options) ->
   # GET returns the document snapshot. The version and type are sent as headers.
   # I'm not sure what to do with document metadata - it is inaccessable for now.
   app.get '/doc/:name', auth, (req, res) ->
-    model.clientGetSnapshot req._client, req.params.name, (error, doc) ->
+    req._client.getSnapshot req.params.name, (error, doc) ->
       if doc
         res.setHeader 'X-OT-Type', doc.type.name
         res.setHeader 'X-OT-Version', doc.v
@@ -94,7 +94,7 @@ router = (app, model, options) ->
       unless typeof type == 'string' and (meta == undefined or typeof meta == 'object')
         send400 res, 'Type invalid'
       else
-        model.clientCreate req._client, req.params.name, type, meta, (error) ->
+        req._client.create req.params.name, type, meta, (error) ->
           if error
             sendError res, error
           else
@@ -114,14 +114,14 @@ router = (app, model, options) ->
     else
       expectJSONObject req, res, (obj) ->
         opData = {v:version, op:obj, meta:{source:req.socket.remoteAddress}}
-        model.clientSubmitOp req._client, req.params.name, opData, (error, newVersion) ->
+        req._client.submitOp req.params.name, opData, (error, newVersion) ->
           if error?
             sendError res, error
           else
             sendJSON res, {v:newVersion}
 
   app.delete '/doc/:name', auth, (req, res) ->
-    model.clientDelete req._client, req.params.name, (error) ->
+    req._client.delete req.params.name, (error) ->
       if error
         sendError res, error
       else
@@ -130,5 +130,5 @@ router = (app, model, options) ->
 # Attach the frontend to the supplied http.Server.
 # 
 # As of sharejs 0.4.0, options is ignored. To control the deleting of documents, specify an auth() function.
-module.exports = (model, options) ->
-  connect.router (app) -> router(app, model, options)
+module.exports = (createClient, options) ->
+  connect.router (app) -> router(app, createClient, options)

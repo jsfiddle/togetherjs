@@ -35,3 +35,24 @@ module.exports =
     f()
     f 123, -> test.done()
 
+  'Queue has busy = false before anything has happened': (test) ->
+    f = queue (data, callback) ->
+    test.strictEqual f.busy, false
+    test.done()
+
+  'Queue has busy = true while its working before anything has happened': (test) ->
+    f = queue (data, callback) ->
+      process.nextTick ->
+        callback()
+
+    f()
+    test.strictEqual f.busy, true
+    test.done()
+
+  'Queue has busy = false when its done': (test) ->
+    f = queue (data, callback) ->
+      callback()
+
+    f 123, ->
+      test.strictEqual f.busy, false
+      test.done()

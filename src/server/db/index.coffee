@@ -8,7 +8,6 @@
 #  require('server/db').create {type:'redis'}
 
 defaultType = 'redis'
-Manager = require './manager'
 
 module.exports = (options) ->
   options ?= {}
@@ -16,9 +15,9 @@ module.exports = (options) ->
 
   console.warn "Database type: 'memory' detected. This has been deprecated and will
  be removed in a future version. Use 'none' instead, or just remove the db:{} block
- from your options. (The behaviour has remained the same.)" if type is 'memory'
+ from your options." if type is 'memory'
 
-  db = if type in ['none', 'memory']
+  if type in ['none', 'memory']
     null
   else
     Db = switch type
@@ -26,5 +25,3 @@ module.exports = (options) ->
       when 'couchdb' then require './couchdb'
       else throw new Error "Invalid or unsupported database type: '#{type}'"
     new Db options
-
-  new Manager db
