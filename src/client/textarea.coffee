@@ -34,7 +34,7 @@ window.sharejs.Doc::attach_textarea = (elem) ->
 
   @on 'insert', (pos, text) ->
     transformCursor = (cursor) ->
-      if pos <= cursor
+      if pos < cursor
         cursor + text.length
       else
         cursor
