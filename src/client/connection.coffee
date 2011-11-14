@@ -148,7 +148,7 @@ class Connection
 
     return @docs[docName] if @docs[docName]?
 
-    @send {'doc':docName, 'open':true, 'snapshot':null}, (error, response) =>
+    @send {doc:docName, open:true, snapshot:null}, (error, response) =>
       if error
         callback error
       else
@@ -185,7 +185,7 @@ class Connection
 
       return
 
-    @send {'doc':docName, 'open':true, 'create':true, 'snapshot':null, 'type':type.name}, (error, response) =>
+    @send {doc:docName, open:true, create:true, snapshot:null, type:type.name}, (error, response) =>
       if error
         callback error
       else

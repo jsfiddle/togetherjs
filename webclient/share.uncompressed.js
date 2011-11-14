@@ -690,9 +690,9 @@
         return this.docs[docName];
       }
       return this.send({
-        'doc': docName,
-        'open': true,
-        'snapshot': null
+        doc: docName,
+        open: true,
+        snapshot: null
       }, __bind(function(error, response) {
         if (error) {
           return callback(error);
@@ -728,11 +728,11 @@
         return;
       }
       return this.send({
-        'doc': docName,
-        'open': true,
-        'create': true,
-        'snapshot': null,
-        'type': type.name
+        doc: docName,
+        open: true,
+        create: true,
+        snapshot: null,
+        type: type.name
       }, __bind(function(error, response) {
         if (error) {
           return callback(error);
