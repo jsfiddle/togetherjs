@@ -23,5 +23,6 @@ module.exports = (options) ->
     Db = switch type
       when 'redis' then require './redis'
       when 'couchdb' then require './couchdb'
+      when 'pg' then require './pg'
       else throw new Error "Invalid or unsupported database type: '#{type}'"
     new Db options
