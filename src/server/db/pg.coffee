@@ -1,4 +1,49 @@
-# This is an implementation of the OT data backend for PostgreSQL.
+# This is an implementation of the OT data backend for PostgreSQL. It requires
+# that you have two tables defined in your schema: one for the snapshots
+# and one for the operations. You must also install the 'pg' package.
+#
+#
+# Example usage:
+#
+#     var connect = require('connect');
+#     var share   = require('share').server;
+#
+#     var server = connect(connect.logger());
+#
+#     var options = {
+#       db: {
+#         type:                 'pg',
+#         uri:                  'tcp://josh:@localhost/sharejs',
+#         document_name_column: 'document_name',
+#         operations_table:     'operations',
+#         snapshot_table:       'snapshots'
+#       }
+#     };
+#
+#     share.attach(server, options);
+#     server.listen(9000);
+#
+#
+# Example schema:
+#
+#     CREATE TABLE snapshots (
+#       document_name text NOT NULL,
+#       version int4 NOT NULL,
+#       type text NOT NULL,
+#       snapshot text NOT NULL,
+#       meta text NOT NULL,
+#       created_at timestamp(6) NOT NULL,
+#       CONSTRAINT snapshots_pkey PRIMARY KEY (document_name, version)
+#     );
+#
+#     CREATE TABLE operations (
+#       document_name text NOT NULL,
+#       version int4 NOT NULL,
+#       operation text NOT NULL,
+#       meta text NOT NULL,
+#       created_at timestamp(6) NOT NULL,
+#       CONSTRAINT operations_pkey PRIMARY KEY (document_name, version)
+#     );
 
 pg = require('pg').native
 
