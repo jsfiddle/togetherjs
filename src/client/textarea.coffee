@@ -38,8 +38,9 @@ window.sharejs.Doc::attach_textarea = (elem) ->
         cursor + text.length
       else
         cursor
-
-    replaceText elem.value[...pos] + text + elem.value[pos..], transformCursor
+    #for IE8 and Opera that replace \n with \r\n.
+    prevvalue = elem.value.replace /\r\n/g, '\n'
+    replaceText prevvalue[...pos] + text + prevvalue[pos..], transformCursor
   
   @on 'delete', (pos, text) ->
     transformCursor = (cursor) ->
@@ -47,8 +48,9 @@ window.sharejs.Doc::attach_textarea = (elem) ->
         cursor - Math.min(text.length, cursor - pos)
       else
         cursor
-
-    replaceText elem.value[...pos] + elem.value[pos + text.length..], transformCursor
+    #for IE8 and Opera that replace \n with \r\n.
+    prevvalue = elem.value.replace /\r\n/g, '\n'
+    replaceText prevvalue[...pos] + prevvalue[pos + text.length..], transformCursor
 
   genOp = (event) ->
     onNextTick = (fn) -> setTimeout fn, 0
