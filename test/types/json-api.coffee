@@ -179,6 +179,13 @@ module.exports =
       test.done()
     doc.emit 'remoteop', [{p:['foo',0,3],si:'baz'}]
 
+  'common operation paths intersection': (test) ->
+    # as discussed: https://github.com/josephg/ShareJS/issues/48
+    doc = new Doc name: "name", components: []
+    doc.at("name").on "insert", (p, op) ->
+    doc.at("components").on "child op", (p, op) -> test.done()
+    doc.emit 'remoteop', [{p:['name', 4], si:'X'}]
+
   'child op not sent when op outside node': (test) ->
     doc = new Doc {foo:['bar']}
     doc.at('foo').on 'child op', ->

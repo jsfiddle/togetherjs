@@ -3,7 +3,6 @@
 # See the docs for details and examples about how the protocol works.
 
 http = require 'http'
-sys = require 'sys'
 url = require 'url'
 
 connect = require 'connect'

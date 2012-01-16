@@ -8,7 +8,7 @@ types = require '../src/types'
 
 newDocName = do ->
   num = 0
-  -> "doc#{num++}"
+  -> "__testing_doc#{num++}"
 
 test = (Db, options) -> testCase
   setUp: (callback) ->
@@ -254,3 +254,6 @@ try
   require 'redis'
   exports.redis = test require('../src/server/db/redis')
 
+try
+if options.db.type == 'pg'
+  exports.pg = test require('../src/server/db/pg'), options.db

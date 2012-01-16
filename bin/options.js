@@ -10,8 +10,10 @@ module.exports = {
     //
     // If you don't want a database, you can also say db: null. With no database,
     // all documents are deleted when the server restarts.
-		type: 'redis',
 
+    // By default, sharejs tries to use the redis DB backend.
+		type: 'redis',
+   
 		// The prefix for database entries
 		prefix: 'ShareJS:',
 
@@ -21,10 +23,25 @@ module.exports = {
 		//port: null,
 		//redisOptions: null
 
+
 		// To use CouchDB uncomment this section then run bin/setup_couch.
     // Database URI Defaults to http://localhost:5984/sharejs .
 		//type: 'couchdb',
 		//uri: "http://admin:admin@localhost:5984/ot",
+
+
+    // To use postgresql uncomment this section then run bin/setup_pg
+    //type: 'pg',
+    //uri: 'tcp://josephg:@localhost/postgres',
+
+    // By default, sharejs will create its tables in a schema called 'sharejs'.
+    //schema: 'sharejs',
+    //operations_table: 'ops',
+    //snapshot_table: 'snapshots',
+
+    // sharejs will automatically try and create the DB tables if they don't exist. You
+    // can create the database tables manually using bin/setup_pg.
+    //create_tables_automatically: true,
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
