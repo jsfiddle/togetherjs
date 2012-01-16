@@ -241,52 +241,51 @@ module.exports = Model = (db, options) ->
     if docs[docName]
       # The document is already loaded. Return immediately.
       options.stats?.cacheHit? 'getSnapshot'
-      callback null, docs[docName]
-    else
-      # We're a memory store. If we don't have it, nobody does.
-      return callback 'Document does not exist' unless db
+      return callback null, docs[docName]
 
-      callbacks = awaitingGetSnapshot[docName]
+    # We're a memory store. If we don't have it, nobody does.
+    return callback 'Document does not exist' unless db
 
-      if callbacks
-        # The document is being loaded already. Add ourselves as a callback.
-        callbacks.push callback
-      else
-        options.stats?.cacheMiss? 'getSnapshot'
+    callbacks = awaitingGetSnapshot[docName]
 
-        # The document isn't loaded and isn't being loaded. Load it.
-        awaitingGetSnapshot[docName] = [callback]
-        db.getSnapshot docName, (error, data, dbMeta) ->
-          return add docName, error if error
+    # The document is being loaded already. Add ourselves as a callback.
+    return callbacks.push callback if callbacks
 
-          type = types[data.type]
-          unless type
-            console.warn "Type '#{data.type}' missing"
-            return callback "Type not found"
-          data.type = type
+    options.stats?.cacheMiss? 'getSnapshot'
 
-          committedVersion = data.v
+    # The document isn't loaded and isn't being loaded. Load it.
+    awaitingGetSnapshot[docName] = [callback]
+    db.getSnapshot docName, (error, data, dbMeta) ->
+      return add docName, error if error
 
-          # The server can close without saving the most recent document snapshot.
-          # In this case, there are extra ops which need to be applied before
-          # returning the snapshot.
-          getOpsInternal docName, data.v, null, (error, ops) ->
-            return callback error if error
+      type = types[data.type]
+      unless type
+        console.warn "Type '#{data.type}' missing"
+        return callback "Type not found"
+      data.type = type
 
-            if ops.length > 0
-              console.log "Catchup #{docName} #{data.v} -> #{data.v + ops.length}"
+      committedVersion = data.v
 
-              try
-                for op in ops
-                  data.snapshot = type.apply data.snapshot, op.op
-                  data.v++
-              catch e
-                # This should never happen - it indicates that whats in the
-                # database is invalid.
-                console.error "Op data invalid for #{docName}: #{e.stack}"
-                return callback 'Op data invalid'
+      # The server can close without saving the most recent document snapshot.
+      # In this case, there are extra ops which need to be applied before
+      # returning the snapshot.
+      getOpsInternal docName, data.v, null, (error, ops) ->
+        return callback error if error
 
-            add docName, error, data, committedVersion, ops, dbMeta
+        if ops.length > 0
+          console.log "Catchup #{docName} #{data.v} -> #{data.v + ops.length}"
+
+          try
+            for op in ops
+              data.snapshot = type.apply data.snapshot, op.op
+              data.v++
+          catch e
+            # This should never happen - it indicates that whats in the
+            # database is invalid.
+            console.error "Op data invalid for #{docName}: #{e.stack}"
+            return callback 'Op data invalid'
+
+        add docName, error, data, committedVersion, ops, dbMeta
 
   # This makes sure the cache contains a document. If the doc cache doesn't contain
   # a document, it is loaded from the database and stored.
