@@ -14,6 +14,7 @@ defaultOptions = {
   hostname: null
   port: null
   redisOptions: null
+  auth: null
 
   # If this is set to true, the client will select db 15 and wipe all data in
   # this database.
@@ -31,6 +32,9 @@ module.exports = RedisDb = (options) ->
   keyForDoc = (docName) -> "#{options.prefix}doc:#{docName}"
 
   client = redis.createClient options.port, options.hostname, options.redisOptions
+
+  if options.auth and typeof options.auth == "string"
+    client.auth(if ":" in options.auth then options.auth.split(":").pop() else options.auth)
 
   client.select 15 if options.testing
 
