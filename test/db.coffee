@@ -254,3 +254,6 @@ try
   require 'redis'
   exports.redis = test require('../src/server/db/redis')
 
+try
+  require 'pg'
+  exports.pg = test require('../src/server/db/pg'), uri: "tcp://collin:@localhost/pasteup_development"
