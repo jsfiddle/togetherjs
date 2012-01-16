@@ -8,7 +8,7 @@ types = require '../src/types'
 
 newDocName = do ->
   num = 0
-  -> "doc#{num++}"
+  -> "__testing_doc#{num++}"
 
 test = (Db, options) -> testCase
   setUp: (callback) ->
@@ -255,5 +255,5 @@ try
   exports.redis = test require('../src/server/db/redis')
 
 try
-  require 'pg'
-  exports.pg = test require('../src/server/db/pg'), uri: "tcp://collin:@localhost/pasteup_development"
+if options.db.type == 'pg'
+  exports.pg = test require('../src/server/db/pg'), options.db
