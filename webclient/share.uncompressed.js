@@ -730,7 +730,7 @@
         return _this.emit('error', e);
       };
       this.socket.onopen = function() {
-        _this.lastError = null;
+        _this.lastError = _this.lastReceivedDoc = _this.lastSentDoc = null;
         return _this.setState('handshaking');
       };
       this.socket.onconnecting = function() {
@@ -844,7 +844,6 @@
       }
       if (!connections[origin]) {
         c = new Connection(origin);
-        c.numDocs = 0;
         del = function() {
           return delete connections[origin];
         };
@@ -864,18 +863,23 @@
       c.numDocs++;
       c.open(docName, type, function(error, doc) {
         if (error) {
-          c.numDocs--;
-          if (c.numDocs === 0) c.disconnect();
           return callback(error);
         } else {
           doc.on('closed', function() {
-            c.numDocs--;
-            if (c.numDocs === 0) return c.disconnect();
+            var d, name, numDocs, _ref;
+            numDocs = 0;
+            _ref = c.docs;
+            for (name in _ref) {
+              d = _ref[name];
+              if (d.state !== 'closed' || d.autoOpen) numDocs++;
+            }
+            if (numDocs === 0) return c.disconnect();
           });
           return callback(null, doc);
         }
       });
-      return c.on('connect failed');
+      c.on('connect failed');
+      return c;
     };
   })();
 

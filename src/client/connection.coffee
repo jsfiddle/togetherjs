@@ -60,18 +60,22 @@ class Connection
 
     @connected = false
     @socket.onclose = (reason) =>
+      #console.warn 'onclose', reason
       @setState 'disconnected', reason
       if reason in ['Closed', 'Stopped by server']
         @setState 'stopped', @lastError or reason
 
     @socket.onerror = (e) =>
+      #console.warn 'onerror', e
       @emit 'error', e
 
     @socket.onopen = =>
-      @lastError = null
+      #console.warn 'onopen'
+      @lastError = @lastReceivedDoc = @lastSentDoc = null
       @setState 'handshaking'
 
     @socket.onconnecting = =>
+      #console.warn 'connecting'
       @setState 'connecting'
 
   setState: (state, data) ->
@@ -99,6 +103,7 @@ class Connection
 
   disconnect: ->
     # This will call @socket.onclose(), which in turn will emit the 'disconnected' event.
+    #console.warn 'calling close on the socket'
     @socket.close()
 
   # *** Doc management
