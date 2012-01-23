@@ -89,7 +89,7 @@ section {
 <!--            <li class="active"><a href="#">Intro</a></li>-->
           </ul>
           <ul class="nav secondary-nav">
-            <li><a><span class="label" id="status">Loading</span></a></li>
+            <li><a><span class="label warning" id="status">Loading...</span></a></li>
             <li><a href="demos.html">Demos</a></li>
             <li><a href="https://github.com/josephg/ShareJS/wiki">Documentation</a></li>
             <li><a href="https://github.com/josephg/ShareJS">Github</a></li>
@@ -216,7 +216,7 @@ $(function() {
   var register = function(state, klass, text) {
     connection.on(state, function() {
       status.className = 'label ' + klass;
-      status.innerText = text;
+      status.innerHTML = text;
     });
   };
 
