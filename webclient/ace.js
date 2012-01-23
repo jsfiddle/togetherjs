@@ -1,6 +1,8 @@
 (function() {
   var Range, applyToShareJS;
+
   Range = require("ace/range").Range;
+
   applyToShareJS = function(editorDoc, delta, doc) {
     var getStartOffsetPosition, pos, text;
     getStartOffsetPosition = function(range) {
@@ -33,6 +35,7 @@
         throw new Error("unknown action: " + delta.action);
     }
   };
+
   window.sharejs.Doc.prototype.attach_ace = function(editor, keepEditorContents) {
     var check, doc, docListener, editorDoc, editorListener, offsetToPos, suppress;
     if (!this.provides['text']) {
@@ -62,9 +65,7 @@
     check();
     suppress = false;
     editorListener = function(change) {
-      if (suppress) {
-        return;
-      }
+      if (suppress) return;
       applyToShareJS(editorDoc, change.data, doc);
       return check();
     };
@@ -81,9 +82,7 @@
       row = 0;
       for (row = 0, _len = lines.length; row < _len; row++) {
         line = lines[row];
-        if (offset <= line.length) {
-          break;
-        }
+        if (offset <= line.length) break;
         offset -= lines[row].length + 1;
       }
       return {
@@ -111,4 +110,5 @@
       return delete doc.detach_ace;
     };
   };
+
 }).call(this);

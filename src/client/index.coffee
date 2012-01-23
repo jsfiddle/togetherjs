@@ -25,7 +25,7 @@ exports.open = do ->
   getConnection = (origin) ->
     if WEB?
       location = window.location
-      origin ?= "#{location.protocol}//#{location.hostname}/sjs"
+      origin ?= "#{location.protocol}//#{location.host}/channel"
     
     unless connections[origin]
       c = new Connection origin

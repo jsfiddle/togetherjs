@@ -42,10 +42,13 @@ create.attach = attach = (server, options, model = createModel(options)) ->
   # The client frontend doesn't get access to the model at all, to make sure security stuff is
   # done properly.
   server.use rest(createClient, options.rest) if options.rest != null
-  socketio.attach(server, createClient, options.socketio or {}) if options.socketio != null
+
+  # Socketio frontend is now disabled by default.
+  socketio.attach(server, createClient, options.socketio or {}) if options.socketio?
 
   if options.browserChannel != null
     options.browserChannel ?= {}
+    #options.browserChannel.base ?= '/sjs'
     options.browserChannel.server = server
     server.use browserChannel(createClient, options.browserChannel)
 

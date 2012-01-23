@@ -8,7 +8,7 @@ fs = require('fs')
 argv = require('optimist')
 	.usage('Usage: $0 -d docname [--url URL] [-f filename]')
 	.default('d', 'hello')
-	.default('url', 'http://localhost:8000/sjs')
+	.default('url', 'http://localhost:8000/channel')
 	.argv
 
 filename = argv.f || argv.d

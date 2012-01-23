@@ -1,9 +1,9 @@
-# A Connection manages a socket.io connection to a sharejs server.
+# A Connection wraps a persistant BC connection to a sharejs server.
 #
 # This class implements the client side of the protocol defined here:
 # https://github.com/josephg/ShareJS/wiki/Wire-Protocol
 #
-# The equivalent server code is in src/server/socketio.coffee.
+# The equivalent server code is in src/server/browserchannel.coffee.
 #
 # This file is a bit of a mess. I'm dreadfully sorry about that. It passes all the tests,
 # so I have hope that its *correct* even if its not clean.
@@ -13,148 +13,111 @@
 
 if WEB?
   types ||= exports.types
-  throw new Error 'Must load socket.io before this library' unless window.io
-  io = window.io
+  throw new Error 'Must load browserchannel before this library' unless window.BCSocket
+  {BCSocket} = window
 else
   types = require '../types'
-  io = require 'socket.io-client'
+  {BCSocket} = require 'browserchannel'
   Doc = require('./doc').Doc
 
 class Connection
-  constructor: (origin) ->
+  constructor: (host) ->
+    # Map of docname -> doc
     @docs = {}
 
-    # Map of docName -> map of type -> function(data, error)
-    #
-    # Once socket.io isn't buggy, this will be rewritten to use socket.io's RPC.
-    @handlers = {}
-
+    # States:
+    # - 'connecting': The connection is being established
+    # - 'handshaking': The connection has been established, but we don't have the auth ID yet
+    # - 'ok': We have connected and recieved our client ID. Ready for data.
+    # - 'disconnected': The connection is closed, but it will not reconnect automatically.
+    # - 'stopped': The connection is closed, and will not reconnect.
     @state = 'connecting'
+    @socket = new BCSocket host, reconnect:true
 
-    # We can't reuse connections because the socket.io server doesn't
-    # emit connected events when a new connection comes in. Multiple documents
-    # are already multiplexed over the connection by socket.io anyway, so it
-    # shouldn't matter too much unless you're doing something particularly wacky.
-    @socket = io.connect origin, 'force new connection': true
+    @socket.onmessage = (msg) =>
+      if msg.auth is null
+        # Auth failed.
+        @lastError = msg.error # 'forbidden'
+        @disconnect()
+        return @emit 'connect failed', msg.error
+      else if msg.auth
+        # Our very own client id.
+        @id = msg.auth
+        @setState 'ok'
+        return
 
-    @socket.on 'connect', @connected
-    @socket.on 'disconnect', @disconnected
-    @socket.on 'message', @onMessage
-    @socket.on 'connect_failed', (error) =>
-      error = 'forbidden' if error == 'unauthorized' # For consistency with the server
-      @socket = null
-      @emit 'connect failed', error
-      # Cancel all hanging messages
-      for docName, h of @handlers
-        for t, callbacks of h
-          callback error for callback in callbacks
+      docName = msg.doc
 
-    # This avoids a bug in socket.io-client (v0.7.9) which causes
-    # subsequent connections on the same host to not fire a .connect event
-    #if @socket.socket.connected
-    #  setTimeout (=> @connected()), 0
+      if docName isnt undefined
+        @lastReceivedDoc = docName
+      else
+        msg.doc = docName = @lastReceivedDoc
 
-  disconnected: =>
-    # Start reconnect sequence
-    @emit 'disconnect'
-    @socket = null
+      if @docs[docName]
+        @docs[docName]._onMessage msg
+      else
+        console?.error 'Unhandled message', msg
 
-  connected: =>
-    # Stop reconnect sequence
-    @emit 'connect'
+    @connected = false
+    @socket.onclose = (reason) =>
+      @setState 'disconnected', reason
+      if reason in ['Closed', 'Stopped by server']
+        @setState 'stopped', @lastError or reason
 
-  # Send the specified message to the server. The server's response will be passed
-  # to callback. If the message is 'open', ops will be sent to follower()
-  #
-  # The callback is optional. It takes (error, data). Data might be missing if the
-  # error was a connection error.
-  send: (msg, callback) ->
-    throw new Error "Cannot send message #{JSON.stringify msg} to a closed connection" if @socket == null
+    @socket.onerror = (e) =>
+      @emit 'error', e
 
-    docName = msg.doc
+    @socket.onopen = =>
+      @lastError = null
+      @setState 'handshaking'
 
-    if docName == @lastSentDoc
-      delete msg.doc
+    @socket.onconnecting = =>
+      @setState 'connecting'
+
+  setState: (state, data) ->
+    return if @state is state
+    @state = state
+
+    delete @id if state is 'disconnected'
+    @emit state, data
+
+    # Documents could just subscribe to the state change events, but there's less state to
+    # clean up when you close a document if I just notify the doucments directly.
+    for docName, doc of @docs
+      doc._connectionStateChanged state, data
+
+  send: (data) ->
+    docName = data.doc
+
+    if docName is @lastSentDoc
+      delete data.doc
     else
       @lastSentDoc = docName
 
-    @socket.json.send msg
-    
-    if callback
-      type = if msg.open == true then 'open'
-      else if msg.open == false then 'close'
-      else if msg.create then 'create'
-      else if msg.snapshot == null then 'snapshot'
-      else if msg.op then 'op response'
+    #console.warn 'c->s', data
+    @socket.send data
 
-      #cb = (response) =>
-        #  if response.doc == docName
-        #  @removeListener type, cb
-        #  callback response, response.error
+  disconnect: ->
+    # This will call @socket.onclose(), which in turn will emit the 'disconnected' event.
+    @socket.close()
 
-      docHandlers = (@handlers[docName] ||= {})
-      callbacks = (docHandlers[type] ||= [])
-      callbacks.push callback
-
-  onMessage: (msg) =>
-    docName = msg.doc
-
-    if docName != undefined
-      @lastReceivedDoc = docName
-    else
-      msg.doc = docName = @lastReceivedDoc
-
-    @emit 'message', msg
-
-    # This should probably be rewritten to use socketio's message response stuff instead.
-    # (it was originally written for socket.io 0.6)
-    type = if msg.open == true or (msg.open == false and msg.error) then 'open'
-    else if msg.open == false then 'close'
-    else if msg.snapshot != undefined then 'snapshot'
-    else if msg.create then 'create'
-    else if msg.op then 'op'
-    else if msg.v != undefined then 'op response'
-
-    callbacks = @handlers[docName]?[type]
-    if callbacks
-      delete @handlers[docName][type]
-      c msg.error, msg for c in callbacks
-
-    if type == 'op'
-      doc = @docs[docName]
-      doc._onOpReceived msg if doc
-
-  makeDoc: (params) ->
-    name = params.doc
+  # *** Doc management
+ 
+  makeDoc: (name, data, callback) ->
     throw new Error("Doc #{name} already open") if @docs[name]
-
-    type = params.type
-    type = types[type] if typeof type == 'string'
-    doc = new Doc(@, name, params.v, type, params.snapshot)
-    doc.created = !!params.create
+    doc = new Doc(@, name, data)
     @docs[name] = doc
 
-    doc.on 'closing', =>
-      delete @docs[name]
-
-    doc
+    doc.open (error) =>
+      delete @docs[name] if error
+      callback error, (doc unless error)
 
   # Open a document that already exists
   # callback(error, doc)
   openExisting: (docName, callback) ->
-    if @socket == null # The connection is perminantly disconnected
-      callback 'connection closed'
-      return
-
-    return @docs[docName] if @docs[docName]?
-
-    @send {doc:docName, open:true, snapshot:null}, (error, response) =>
-      if error
-        callback error
-      else
-        # response.doc is used instead of docName to allow docName to be null.
-        # In that case, the server generates a random docName to use.
-        callback null, @makeDoc(response)
+    return callback 'connection closed' if @state is 'stopped'
+    return callback null, @docs[docName] if @docs[docName]
+    doc = @makeDoc docName, {}, callback
 
   # Open a document. It will be created if it doesn't already exist.
   # Callback is passed a document or an error
@@ -162,46 +125,33 @@ class Connection
   # Types must be supported by the server.
   # callback(error, doc)
   open: (docName, type, callback) ->
-    if @socket == null # The connection is perminantly disconnected
-      callback 'connection closed'
-      return
+    return callback 'connection closed' if @state is 'stopped'
 
-    if typeof type == 'function'
+    if typeof type is 'function'
       callback = type
       type = 'text'
 
     callback ||= ->
 
-    type = types[type] if typeof type == 'string'
+    type = types[type] if typeof type is 'string'
 
     throw new Error "OT code for document type missing" unless type
 
-    if docName? and @docs[docName]?
+    throw new Error 'Server-generated random doc names are not currently supported' unless docName?
+
+    if @docs[docName]
       doc = @docs[docName]
       if doc.type == type
         callback null, doc
       else
         callback 'Type mismatch', doc
-
       return
 
-    @send {doc:docName, open:true, create:true, snapshot:null, type:type.name}, (error, response) =>
-      if error
-        callback error
-      else
-        response.snapshot = type.create() unless response.snapshot != undefined
-        response.type = type
-        callback null, @makeDoc(response)
+    @makeDoc docName, {create:true, type:type.name}, callback
 
-  # To be written. Create a new document with a random name.
-  create: (type, callback) ->
-    open null, type, callback
-
-  disconnect: () ->
-    if @socket
-      @emit 'disconnecting'
-      @socket.disconnect()
-      @socket = null
+# Not currently working.
+#  create: (type, callback) ->
+#    open null, type, callback
 
 # Make connections event emitters.
 unless WEB?

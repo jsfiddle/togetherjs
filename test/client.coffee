@@ -17,8 +17,9 @@ genTests = (client) -> testCase
     @auth = (client, action) -> action.accept()
 
     options =
-      socketio: {}
+      socketio: null
       rest: null
+      browserChannel: {base: '/sjs'}
       db: {type: 'none'}
       auth: (client, action) => @auth client, action
 
@@ -28,14 +29,14 @@ genTests = (client) -> testCase
     @server.listen =>
       @port = @server.address().port
       @c = new client.Connection "http://localhost:#{@port}/sjs"
-      @c.on 'connect', callback
+      @c.on 'ok', callback
   
   tearDown: (callback) ->
     @c.disconnect()
 
     @server.on 'close', callback
     @server.close()
-
+  
   'open using the bare API': (test) ->
     client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
       test.ok doc
@@ -291,7 +292,7 @@ genTests = (client) -> testCase
     c.on 'connect failed', (error) ->
       test.strictEqual error, 'forbidden'
       test.done()
-
+  
   '(new Connection).open() fails if auth rejects the connection': (test) ->
     @auth = (client, action) -> action.reject()
 
@@ -319,6 +320,7 @@ genTests = (client) -> testCase
     c.open @name, 'text', (error, doc) =>
       test.fail doc if doc
       test.strictEqual error, 'forbidden'
+      c.disconnect()
       test.done()
 
   'client.open fails if auth rejects the connection': (test) ->
