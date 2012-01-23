@@ -13,7 +13,7 @@ module.exports = (model, options) ->
   auth = options.auth or (client, action) ->
     if action.type in ['connect', 'read', 'create', 'update'] then action.accept() else action.reject()
 
-  # At some stage, I'll probably pull this out into a class. No rush though.
+  # Performance would improve if this class were pulled out of the surrounding closure.
   class Client
     constructor: (data) ->
       @id = hat()
