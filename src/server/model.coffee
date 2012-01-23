@@ -571,6 +571,11 @@ module.exports = Model = (db, options) ->
     # If nothing was queued, terminate immediately.
     callback?() if pendingWrites is 0
 
+  # Close the database connection. This is needed so nodejs can shut down cleanly.
+  @closeDb = ->
+    db?.close?()
+    db = null
+
   return
 
 # Model inherits from EventEmitter.

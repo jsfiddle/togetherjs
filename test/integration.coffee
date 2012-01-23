@@ -51,9 +51,9 @@ genTests = (client, dbType) -> testCase
       # We use 127.0.0.1 here so if the process runs out of file handles,
       # we'll get the correct error message instead of a generic DNS connection
       # error.
-      @c1 = new client.Connection "http://127.0.0.1:#{@port}/sjs"
+      @c1 = new client.Connection "http://127.0.0.1:#{@port}/channel"
       @c1.on 'connect', =>
-        @c2 = new client.Connection "http://127.0.0.1:#{@port}/sjs"
+        @c2 = new client.Connection "http://127.0.0.1:#{@port}/channel"
         @c2.on 'connect', =>
           callback()
 
@@ -95,7 +95,7 @@ genTests = (client, dbType) -> testCase
     num = 0
     nextDocName = -> "doc#{num++}"
 
-    host = "http://127.0.0.1:#{@port}/sjs"
+    host = "http://127.0.0.1:#{@port}/channel"
 
     more = ->
       client.open nextDocName(), 'text', host, (error, doc) =>

@@ -705,6 +705,7 @@
         } else if (msg.auth) {
           _this.id = msg.auth;
           _this.setState('ok');
+          _this.emit('connect');
           return;
         }
         docName = msg.doc;
