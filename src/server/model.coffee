@@ -91,41 +91,41 @@ module.exports = Model = (db, options) ->
 
   # Its important that all ops are applied in order. This helper method creates the op submission queue
   # for a single document. This contains the logic for transforming & applying ops.
-  makeOpQueue = (docName, doc) -> queue (op, callback) ->
-    return callback 'Version missing' unless op.v >= 0
+  makeOpQueue = (docName, doc) -> queue (opData, callback) ->
+    return callback 'Version missing' unless opData.v >= 0
     
-    op.meta ||= {}
-    op.meta.ts = Date.now()
+    opData.meta ||= {}
+    opData.meta.ts = Date.now()
 
-    return callback 'Op at future version' if op.v > doc.v
+    return callback 'Op at future version' if opData.v > doc.v
 
     # Punt the transforming work back to the client if the op is too old.
-    return callback 'Op too old' if op.v + options.maximumAge < doc.v
+    return callback 'Op too old' if opData.v + options.maximumAge < doc.v
 
     # We'll need to transform the op to the current version of the document. This
     # calls the callback immediately if opVersion == doc.v.
-    getOps docName, op.v, doc.v, (error, ops) ->
+    getOps docName, opData.v, doc.v, (error, ops) ->
       return callback error if error
 
-      unless doc.v - op.v == ops.length
+      unless doc.v - opData.v == ops.length
         # This should never happen. It indicates that we didn't get all the ops we
         # asked for. Its important that the submitted op is correctly transformed.
         console.error "Could not get old ops in model for document #{docName}"
-        console.error "Expected ops #{op.v} to #{doc.v} and got #{ops.length} ops"
+        console.error "Expected ops #{opData.v} to #{doc.v} and got #{ops.length} ops"
         return callback 'Internal error'
 
       if ops.length > 0
         try
           # If there's enough ops, it might be worth spinning this out into a webworker thread.
           for oldOp in ops
-            op.op = doc.type.transform op.op, oldOp.op, 'left'
-            op.v++
+            opData.op = doc.type.transform opData.op, oldOp.op, 'left'
+            opData.v++
         catch error
           console.error error.stack
           return callback error.message
 
       try
-        snapshot = doc.type.apply doc.snapshot, op.op
+        snapshot = doc.type.apply doc.snapshot, opData.op
       catch error
         console.error error.stack
         return callback error.message
@@ -135,16 +135,16 @@ module.exports = Model = (db, options) ->
       #
       # This should never happen in practice, but its a nice little check to make sure everything
       # is hunky-dory.
-      unless op.v == doc.v
+      unless opData.v == doc.v
         # This should never happen.
         console.error "Version mismatch detected in model. File a ticket - this is a bug."
-        console.error "Expecting #{op.v} == #{doc.v}"
+        console.error "Expecting #{opData.v} == #{doc.v}"
         return callback 'Internal error'
 
       #newDocData = {snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
       writeOp = db?.writeOp or (docName, newOpData, callback) -> callback()
 
-      writeOp docName, op, (error) ->
+      writeOp docName, opData, (error) ->
         if error
           # The user should probably know about this.
           console.warn "Error writing ops to database: #{error}"
@@ -158,18 +158,18 @@ module.exports = Model = (db, options) ->
         # All the heavy lifting is now done. Finally, we'll update the cache with the new data
         # and (maybe!) save a new document snapshot to the database.
 
-        doc.v = op.v + 1
+        doc.v = opData.v + 1
         doc.snapshot = snapshot
 
-        doc.ops.push op
+        doc.ops.push opData
         doc.ops.shift() if db and doc.ops.length > options.numCachedOps
 
-        model.emit 'applyOp', docName, op, snapshot, oldSnapshot
-        doc.eventEmitter.emit 'op', op, snapshot, oldSnapshot
+        model.emit 'applyOp', docName, opData, snapshot, oldSnapshot
+        doc.eventEmitter.emit 'op', opData, snapshot, oldSnapshot
 
         # The callback is called with the version of the document at which the op was applied.
         # This is the op.v after transformation, and its doc.v - 1.
-        callback null, op.v
+        callback null, opData.v
     
         # I need a decent strategy here for deciding whether or not to save the snapshot.
         #
