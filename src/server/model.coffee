@@ -118,6 +118,12 @@ module.exports = Model = (db, options) ->
         try
           # If there's enough ops, it might be worth spinning this out into a webworker thread.
           for oldOp in ops
+            # Dup detection works by sending the id(s) the op has been submitted with previously.
+            # If the id matches, we reject it. The client can also detect the op has been submitted
+            # already if it sees its own previous id in the ops it sees when it does catchup.
+            if oldOp.meta.source and opData.dupIfSource and oldOp.meta.source in opData.dupIfSource
+              return callback 'Op already submitted'
+
             opData.op = doc.type.transform opData.op, oldOp.op, 'left'
             opData.v++
         catch error
