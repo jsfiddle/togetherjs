@@ -296,7 +296,7 @@ module.exports = (createClient, options) ->
       # ...
       #throw new Error 'No version specified' unless query.v?
 
-      opData = {v:query.v, op:query.op, meta:query.meta}
+      opData = {v:query.v, op:query.op, meta:query.meta, dupIfSource:query.dupIfSource}
 
       client.submitOp query.doc, opData, (error, appliedVersion) ->
         msg = if error

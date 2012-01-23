@@ -81,8 +81,9 @@ module.exports = (model, options) ->
     submitOp: (docName, opData, callback) ->
       opData.meta ||= {}
       opData.meta.source = @id
+      dupIfSource = opData.dupIfSource or []
 
-      @doAuth {docName, op:opData.op, v:opData.v, meta:opData.meta}, 'submit op', callback, =>
+      @doAuth {docName, op:opData.op, v:opData.v, meta:opData.meta, dupIfSource}, 'submit op', callback, =>
         model.applyOp docName, opData, callback
 
     # Delete the named operation.
