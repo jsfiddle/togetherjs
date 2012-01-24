@@ -105,17 +105,24 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
   # Internal API
   # The connection uses this method to notify a document that an op is received from the server.
   @_onOpReceived = (msg) ->
-    # msg is {doc:, op:, v:}
+    # msg is {doc:, op:, v:, meta:}
 
     # There is a bug in socket.io (produced on firefox 3.6) which causes messages
     # to be duplicated sometimes.
-    # We'll just silently drop subsequent messages.
-    return if msg.v < @version
+    # We'll just silently drop subsequent messages. This is not possible for metaOps
+    return if msg.op and msg.v < @version
 
     throw new Error("Expected docName '#{@name}' but got #{msg.doc}") unless msg.doc == @name
-    throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version
+    throw new Error("Expected version #{@version} but got #{msg.v}") unless msg.v == @version or msg.meta
 
 #    p "if: #{i @inflightOp} pending: #{i @pendingOp} doc '#{@snapshot}' op: #{i msg.op}"
+
+    if msg.meta
+      {path, value} = msg.meta
+
+      if path?[0] == 'shout'
+        @emit 'shout', value
+        return
 
     op = msg.op
     serverOps[@version] = op
@@ -150,6 +157,10 @@ Doc = (connection, @name, @version, @type, @snapshot) ->
     # A timeout is used so if the user sends multiple ops at the same time, they'll be composed
     # together and sent together.
     setTimeout @flush, 0
+  
+  @shout = (msg) =>
+    # Meta ops don't have to queue, they can go direct. Good/bad idea?
+    connection.send {'doc':@name, 'meta': { path: ['shout'], value: msg } }
   
   # Close a document.
   # No unit tests for this so far.

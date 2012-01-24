@@ -72,6 +72,7 @@ exports.attach = (server, createClient, options) ->
       callback 'Doc already opened' if docState[docName].listener?
       p "Registering listener on #{docName} by #{socket.id} at #{version}"
 
+      # This passes op events to the client
       docState[docName].listener = listener = (opData) ->
         throw new Error 'Consistency violation - doc listener invalid' unless docState[docName].listener == listener
 
@@ -244,7 +245,7 @@ exports.attach = (server, createClient, options) ->
     # We received an op from the socket
     handleOp = (query, callback) ->
       throw new Error 'No docName specified' unless query.doc?
-      throw new Error 'No version specified' unless query.v?
+      throw new Error 'No version specified' unless query.v? or (query.meta?.path? and query.meta?.value?)
 
       op_data = {v:query.v, op:query.op}
       op_data.meta = query.meta || {}
@@ -257,6 +258,7 @@ exports.attach = (server, createClient, options) ->
         else
           {doc:query.doc, v:appliedVersion}
 
+        p "sending #{i msg}"
         send msg
         callback()
 
@@ -280,7 +282,7 @@ exports.attach = (server, createClient, options) ->
           # request. They're all handled together.
           handleOpenCreateSnapshot query, callback
 
-        else if query.op? # The socket is applying an op.
+        else if query.op? or query.meta? # The socket is applying an op.
           handleOp query, callback
 
         else

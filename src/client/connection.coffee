@@ -112,7 +112,7 @@ class Connection
     else if msg.open == false then 'close'
     else if msg.snapshot != undefined then 'snapshot'
     else if msg.create then 'create'
-    else if msg.op then 'op'
+    else if msg.op or msg.meta then 'op'
     else if msg.v != undefined then 'op response'
 
     callbacks = @handlers[docName]?[type]
