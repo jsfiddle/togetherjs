@@ -25,9 +25,11 @@ modules = [
   'browserchannel'
 
   'microevent'
-#  'client'
 
-  'integration'
+  'client'
+
+  # These tests are currently flakey.
+#  'integration'
 ]
 
 exports[module] = require "./test/#{module}" for module in modules
