@@ -37,6 +37,16 @@ exports.open = do ->
     
     connections[origin]
 
+  # If you're using the bare API, connections are cleaned up as soon as there's no
+  # documents using them.
+  maybeClose = (c) ->
+    numDocs = 0
+    for name, doc of c.docs
+      numDocs++ if doc.state isnt 'closed' || doc.autoOpen
+
+    if numDocs == 0
+      c.disconnect()
+ 
   (docName, type, origin, callback) ->
     if typeof origin == 'function'
       callback = origin
@@ -47,17 +57,10 @@ exports.open = do ->
     c.open docName, type, (error, doc) ->
       if error
         callback error
+        maybeClose c
       else
-        # If you're using the bare API, connections are cleaned up as soon as there's no
-        # documents using them.
-        doc.on 'closed', ->
-          numDocs = 0
-          for name, d of c.docs
-            numDocs++ if d.state isnt 'closed' || d.autoOpen
-
-          if numDocs == 0
-            c.disconnect()
-        
+        doc.on 'closed', -> maybeClose c
+       
         callback null, doc
     
     c.on 'connect failed'
