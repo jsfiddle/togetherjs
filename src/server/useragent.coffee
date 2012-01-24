@@ -1,4 +1,5 @@
-# This class exposes an authenticated interface to the model code.
+# A useragent is assigned to each client when the client connects. The useragent is responsible for making
+# sure all requests are authorized and maintaining document metadata.
 #
 # This is used by all the client frontends to interact with the server.
 
@@ -8,12 +9,12 @@ types = require '../types'
 # This module exports a function which you can call with the model and options. Calling the function
 # returns _another_ function which you can call when clients connect.
 module.exports = (model, options) ->
-  # By default, accept any client's connection + data submission.
+  # By default, accept all connections + data submissions.
   # Don't let anyone delete documents though.
-  auth = options.auth or (client, action) ->
+  auth = options.auth or (agent, action) ->
     if action.type in ['connect', 'read', 'create', 'update'] then action.accept() else action.reject()
 
-  class Client
+  class UserAgent
     constructor: (data) ->
       @id = hat()
       @connectTime = new Date
@@ -95,7 +96,7 @@ module.exports = (model, options) ->
     listen: (docName, version, listener, callback) ->
       authOps = if version?
         # If the specified version is older than the current version, we have to also check that the
-        # client is allowed to get ops from the specified version.
+        # agent is allowed to get ops from the specified version.
         #
         # We _could_ check the version number of the document and then only check getOps if
         # the specified version is old, but an auth check is almost certainly faster than a db roundtrip.
@@ -119,12 +120,11 @@ module.exports = (model, options) ->
       model.removeListener docName, @listeners[docName]
       delete @listeners[docName]
 
-  # Finally, return a function which takes client data and returns an authenticated client object
+  # Finally, return a function which takes client data and returns an authenticated useragent object
   # through a callback.
   (data, callback) ->
-    client = new Client data
-    client.doAuth null, 'connect', callback, ->
-      client.idLocked = true
-      # Maybe store a set of clients? Is that useful?
-      callback null, client
+    agent = new UserAgent data
+    agent.doAuth null, 'connect', callback, ->
+      # Maybe store a set of agents? Is that useful?
+      callback null, agent
 

@@ -18,7 +18,7 @@ modules = [
 
   'db'
   'model'
-  'auth'
+  'useragent'
   'events'
   'rest'
 #  'socketio'

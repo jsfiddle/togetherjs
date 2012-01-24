@@ -1,10 +1,11 @@
-# This implements the network API for ShareJS thats not broken.
+# This implements the network API for ShareJS.
 #
-# This uses an updated version of the socket.io protocol.
+# The wire protocol is speccced out here:
+# https://github.com/josephg/ShareJS/wiki/Wire-Protocol
 #
-# When a client connects the server first authenticates the client and sends it:
+# When a client connects the server first authenticates it and sends:
 #
-# S: {auth:<client id>}
+# S: {auth:<agent id>}
 #  or
 # S: {auth:null, error:'forbidden'}
 #
@@ -30,7 +31,7 @@ syncQueue = require './syncqueue'
 # Attach the streaming protocol to the supplied http.Server.
 #
 # Options = {}
-module.exports = (createClient, options) ->
+module.exports = (createAgent, options) ->
   options or= {}
 
   browserChannel options, (session) ->
@@ -39,11 +40,12 @@ module.exports = (createClient, options) ->
       headers: session.headers
       remoteAddress: session.address
 
-    # This is the corresponding sharejs object. It is set when the
-    # session is authenticated.
-    client = null
+    # This is the user agent through which a connecting client acts. It is set when the
+    # session is authenticated. The agent is responsible for making sure client requests are
+    # properly authorized, and metadata is kept up to date.
+    agent = null
 
-    # To save on network traffic, the client & server can leave out the docName with each message to mean
+    # To save on network traffic, the agent & server can leave out the docName with each message to mean
     # 'same as the last message'
     lastSentDoc = null
     lastReceivedDoc = null
@@ -55,14 +57,14 @@ module.exports = (createClient, options) ->
     handleMessage = (query) ->
       #console.log "Message from #{session.id}", query
 
-      # The client can specify null as the docName to get a random doc name.
+      # The agent can specify null as the docName to get a random doc name.
       if query.doc is null
         query.doc = lastReceivedDoc = hat()
       else if query.doc != undefined
         lastReceivedDoc = query.doc
       else
         unless lastReceivedDoc
-          console.warn "msg.doc missing in query #{JSON.stringify query} from #{client.id}"
+          console.warn "msg.doc missing in query #{JSON.stringify query} from #{agent.id}"
           # The disconnect handler will be called when we do this, which will clean up the open docs.
           return session.abort()
 
@@ -90,7 +92,7 @@ module.exports = (createClient, options) ->
           handleOp query, callback
 
         else
-          console.warn "Invalid query #{JSON.stringify query} from #{client.id}"
+          console.warn "Invalid query #{JSON.stringify query} from #{agent.id}"
           session.abort()
           callback()
 
@@ -127,7 +129,7 @@ module.exports = (createClient, options) ->
         #p "listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
         # Skip the op if this socket sent it.
-        return if opData.meta.source is client.id
+        return if opData.meta.source is agent.id
 
         opMsg =
           doc: docName
@@ -138,7 +140,7 @@ module.exports = (createClient, options) ->
         send opMsg
       
       # Tell the socket the doc is open at the requested version
-      client.listen docName, version, listener, (error, v) ->
+      agent.listen docName, version, listener, (error, v) ->
         delete docState[docName].listener if error
         callback error, v
 
@@ -150,7 +152,7 @@ module.exports = (createClient, options) ->
       listener = docState[docName].listener
       return callback 'Doc already closed' unless listener?
 
-      client.removeListener docName
+      agent.removeListener docName
       delete docState[docName].listener
       callback()
 
@@ -188,10 +190,10 @@ module.exports = (createClient, options) ->
       # It might be nice to add a 'createOrGet()' method to model / db manager. But most
       # of the time clients are opening an existing document rather than creating a new one anyway.
       ###
-      client.getSnapshot query.doc, (error, data) ->
+      agent.getSnapshot query.doc, (error, data) ->
         maybeCreate = (callback) ->
           if query.create and error is 'Document does not exist'
-            client.create docName, query.type, query.meta or {}, callback
+            agent.create docName, query.type, query.meta or {}, callback
           else
             callback error, data
 
@@ -221,11 +223,11 @@ module.exports = (createClient, options) ->
           msg.create = false
           step2Snapshot()
         else
-          client.create docName, query.type, query.meta || {}, (error) ->
+          agent.create docName, query.type, query.meta || {}, (error) ->
             if error is 'Document already exists'
-              # We've called getSnapshot (-> null), then createClient (-> already exists). Its possible
-              # another client has called createClient first.
-              client.getSnapshot docName, (error, data) ->
+              # We've called getSnapshot (-> null), then createAgent (-> already exists). Its possible
+              # another agent has called createAgent first.
+              agent.getSnapshot docName, (error, data) ->
                 return callback error if error
 
                 docData = data
@@ -272,7 +274,7 @@ module.exports = (createClient, options) ->
           callback()
 
       if query.snapshot == null or (query.open == true and query.type)
-        client.getSnapshot query.doc, (error, data) ->
+        agent.getSnapshot query.doc, (error, data) ->
           return callback error if error and error != 'Document does not exist'
 
           docData = data
@@ -298,7 +300,7 @@ module.exports = (createClient, options) ->
 
       opData = {v:query.v, op:query.op, meta:query.meta, dupIfSource:query.dupIfSource}
 
-      client.submitOp query.doc, opData, (error, appliedVersion) ->
+      agent.submitOp query.doc, opData, (error, appliedVersion) ->
         msg = if error
           #p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}
@@ -308,19 +310,19 @@ module.exports = (createClient, options) ->
         send msg
         callback()
 
-    # We don't process any messages from the client until they've authorized. Instead,
+    # We don't process any messages from the agent until they've authorized. Instead,
     # they are stored in this buffer.
     buffer = []
     session.on 'message', bufferMsg = (msg) -> buffer.push msg
 
-    createClient data, (error, client_) ->
+    createAgent data, (error, agent_) ->
       if error
         # The client is not authorized, so they shouldn't try and reconnect.
         session.send {auth:null, error}
         session.stop()
       else
-        client = client_
-        session.send auth:client.id
+        agent = agent_
+        session.send auth:agent.id
 
         # Ok. Now we can handle all the messages in the buffer. They'll go straight to
         # handleMessage from now on.
@@ -330,9 +332,9 @@ module.exports = (createClient, options) ->
         session.on 'message', handleMessage
 
     session.on 'close', ->
-      return unless client
-      #console.log "Client #{client.id} disconnected"
+      return unless agent
+      #console.log "Client #{agent.id} disconnected"
       for docName, {listener} of docState
-        client.removeListener docName if listener
+        agent.removeListener docName if listener
       docState = null
 
