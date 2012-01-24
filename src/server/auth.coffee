@@ -23,10 +23,6 @@ module.exports = (model, options) ->
       # This is a map from docName -> listener function
       @listeners = {}
 
-      # The ID can be edited by the auth function, but only during connect. We'll throw an exception
-      # if they try to edit their ID later.
-      @idLocked = false
-
       # We have access to these with socket.io, but I'm not sure we can support
       # these properties on the REST API or sockjs, etc.
       #xdomain: data.xdomain
@@ -122,11 +118,6 @@ module.exports = (model, options) ->
       throw new Error 'Document is not open' unless @listeners[docName]
       model.removeListener docName, @listeners[docName]
       delete @listeners[docName]
-
-    setId: (newId) ->
-      throw new Error 'Cannot edit ID after the client has connected' if @idLocked
-      throw new Error 'ID must be a string' unless typeof newId is 'string'
-      @id = newId
 
   # Finally, return a function which takes client data and returns an authenticated client object
   # through a callback.
