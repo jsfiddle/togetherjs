@@ -705,7 +705,6 @@
         } else if (msg.auth) {
           _this.id = msg.auth;
           _this.setState('ok');
-          _this.emit('connect');
           return;
         }
         docName = msg.doc;
@@ -833,7 +832,7 @@
   }
 
   exports.open = (function() {
-    var connections, getConnection;
+    var connections, getConnection, maybeClose;
     connections = {};
     getConnection = function(origin) {
       var c, del, location;
@@ -854,6 +853,16 @@
       }
       return connections[origin];
     };
+    maybeClose = function(c) {
+      var doc, name, numDocs, _ref;
+      numDocs = 0;
+      _ref = c.docs;
+      for (name in _ref) {
+        doc = _ref[name];
+        if (doc.state !== 'closed' || doc.autoOpen) numDocs++;
+      }
+      if (numDocs === 0) return c.disconnect();
+    };
     return function(docName, type, origin, callback) {
       var c;
       if (typeof origin === 'function') {
@@ -864,17 +873,11 @@
       c.numDocs++;
       c.open(docName, type, function(error, doc) {
         if (error) {
-          return callback(error);
+          callback(error);
+          return maybeClose(c);
         } else {
           doc.on('closed', function() {
-            var d, name, numDocs, _ref;
-            numDocs = 0;
-            _ref = c.docs;
-            for (name in _ref) {
-              d = _ref[name];
-              if (d.state !== 'closed' || d.autoOpen) numDocs++;
-            }
-            if (numDocs === 0) return c.disconnect();
+            return maybeClose(c);
           });
           return callback(null, doc);
         }
