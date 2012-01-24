@@ -44,8 +44,6 @@ class Connection
         # Our very own client id.
         @id = msg.auth
         @setState 'ok'
-        # For backwards compatibility
-        @emit 'connect'
         return
 
       docName = msg.doc
