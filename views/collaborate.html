@@ -1,0 +1,16 @@
+<div id="head">
+  <h1>Your stuff.</h1>
+</div>
+<div id="main">
+  <div id="navigation">
+    <ul>
+      {for resource in resources}
+      <li><a href="http://localhost:9001/p/{resource.key}" target="etherpad">{resource.name}</a></li>
+      {/for}
+    </ul>
+  </div>
+
+  <div id="content">
+    <iframe name="etherpad" src="http://localhost:9001/p/{key}"></iframe>
+  </div>
+</div>

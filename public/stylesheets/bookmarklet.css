@@ -1,0 +1,25 @@
+#towtruck_top_bar_wrapper{
+  width: 100%;
+  position: fixed;
+  top:0;
+  z-index: 1000;
+}
+
+/*
+Reset-type stuff: 
+*/
+#towtruck_top_bar a, #towtruck_top_bar div, #towtruck_top_bar p{
+  color: white;
+}
+
+#towtruck_top_bar {
+  background-color:rgba(50,50,50,0.8);
+  border: 2px solid white;
+  border-top: none;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+  width: 200px;
+  height: 100px;
+  margin: 0 auto;
+ 
+}

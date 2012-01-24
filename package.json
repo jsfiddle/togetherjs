@@ -1,0 +1,12 @@
+{
+    "name": "TowTruck"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      "express": "2.5.5"
+		, "redis": "0.7.1"
+		, "whiskers": "0.1.4"
+		, "sha1": "0.0.1"
+		, "etherpad-lite-client": "0.2.0"
+  }
+}
