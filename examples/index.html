@@ -192,7 +192,6 @@ You’re writing a web app. Your app contains data that users edit. Your users s
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
-<!--<script src="/socket.io/socket.io.js"></script>-->
 <script src="/channel/bcsocket.js"></script>
 <script src="/share/share.js"></script>
 <script src="/share/textarea.js"></script>
@@ -212,6 +211,7 @@ $(function() {
   	}
   });
 
+  // *** Connection status display
   var status = document.getElementById('status');
   var register = function(state, klass, text) {
     connection.on(state, function() {
@@ -225,7 +225,7 @@ $(function() {
   register('disconnected', 'important', 'Offline');
   register('stopped', 'important', 'Error');
   
-  // *** Trains
+  // *** Draggable trains example
   sharejs.open('thomas', 'json', function(error, doc) {
     if (error) {
       if (console) {
