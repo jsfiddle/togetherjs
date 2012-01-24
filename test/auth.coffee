@@ -109,6 +109,26 @@ genTests = (async) -> testCase
         ids[client.id] = true
         passPart()
 
+  'client ids can be edited during connect': (test) ->
+    @auth = (c, action) ->
+      c.setId 'sam'
+      action.accept()
+
+    @clientConnect @connectionData, (error, client) ->
+      test.fail error if error
+      test.strictEqual client.id, 'sam'
+      test.done()
+
+  'client ids cannot be edited later': (test) -> @connect =>
+    @auth = (c, action) ->
+      c.setId 'sam'
+      action.accept()
+
+    test.throws ->
+      @client.getSnapshot @name, ->
+
+    test.done()
+
   # *** getSnapshot
 
   'getSnapshot works if auth accepts': (test) -> @connect =>

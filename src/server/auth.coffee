@@ -13,7 +13,6 @@ module.exports = (model, options) ->
   auth = options.auth or (client, action) ->
     if action.type in ['connect', 'read', 'create', 'update'] then action.accept() else action.reject()
 
-  # Performance would improve if this class were pulled out of the surrounding closure.
   class Client
     constructor: (data) ->
       @id = hat()
@@ -23,6 +22,10 @@ module.exports = (model, options) ->
 
       # This is a map from docName -> listener function
       @listeners = {}
+
+      # The ID can be edited by the auth function, but only during connect. We'll throw an exception
+      # if they try to edit their ID later.
+      @idLocked = false
 
       # We have access to these with socket.io, but I'm not sure we can support
       # these properties on the REST API or sockjs, etc.
@@ -120,11 +123,17 @@ module.exports = (model, options) ->
       model.removeListener docName, @listeners[docName]
       delete @listeners[docName]
 
+    setId: (newId) ->
+      throw new Error 'Cannot edit ID after the client has connected' if @idLocked
+      throw new Error 'ID must be a string' unless typeof newId is 'string'
+      @id = newId
+
   # Finally, return a function which takes client data and returns an authenticated client object
   # through a callback.
   (data, callback) ->
     client = new Client data
     client.doAuth null, 'connect', callback, ->
+      client.idLocked = true
       # Maybe store a set of clients? Is that useful?
       callback null, client
 
