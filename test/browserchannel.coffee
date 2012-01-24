@@ -304,15 +304,15 @@ module.exports = testCase
         test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
         test.done()
 
-# ---- Auth-related tests
-  'The auth client object is persisted across requests': (test) ->
-    c = null
+# ---- User agent tests
+  'The user agent is persisted across requests': (test) ->
+    a = null
 
-    @auth = (client, action) =>
-      if c
-        test.strictEqual c, client
+    @auth = (agent, action) =>
+      if a
+        test.strictEqual a, agent
       else
-        c = client
+        a = agent
       action.accept()
 
     @socket.send {doc:@name, open:true, create:true, type:'simple'}
@@ -323,19 +323,19 @@ module.exports = testCase
         test.done()
 
   'Cannot connect if auth rejects you': (test) ->
-    @auth = (client, action) ->
+    @auth = (agent, action) ->
       test.strictEqual action.type, 'connect'
-      test.ok client.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
-      test.strictEqual typeof client.id, 'string'
-      test.ok client.id.length > 5
-      test.ok client.connectTime
+      test.ok agent.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
+      test.strictEqual typeof agent.sessionId, 'string'
+      test.ok agent.sessionId.length > 5
+      test.ok agent.connectTime
 
-      test.strictEqual typeof client.headers, 'object'
+      test.strictEqual typeof agent.headers, 'object'
 
-      # I can't edit the headers using socket.io-client's API. I'd test the default headers in this
+      # I can't edit the headers using socket.io-agent's API. I'd test the default headers in this
       # object, but the default XHR headers aren't part of socket.io's API, so they could change between
       # versions and break the test.
-      test.strictEqual client.headers['user-agent'], 'node.js'
+      test.strictEqual agent.headers['user-agent'], 'node.js'
 
       action.reject()
 
@@ -347,7 +347,7 @@ module.exports = testCase
         test.done()
 
   'Cannot open a document if auth rejects you': (test) ->
-    @auth = (client, action) =>
+    @auth = (agent, action) =>
       if action.name == 'open'
         action.reject()
       else
@@ -359,7 +359,7 @@ module.exports = testCase
         test.done()
 
   'Cannot open a document if you cannot get a snapshot': (test) ->
-    @auth = (client, action) =>
+    @auth = (agent, action) =>
       if action.name == 'get snapshot'
         action.reject()
       else
@@ -371,7 +371,7 @@ module.exports = testCase
         test.done()
 
   'Cannot create a document if youre not allowed to create': (test) ->
-    @auth = (client, action) =>
+    @auth = (agent, action) =>
       if action.name == 'create'
         action.reject()
       else
@@ -382,7 +382,7 @@ module.exports = testCase
       test.done()
 
   'Cannot submit an op if auth rejects you': (test) ->
-    @auth = (client, action) ->
+    @auth = (agent, action) ->
       if action.type == 'update'
         action.reject()
       else

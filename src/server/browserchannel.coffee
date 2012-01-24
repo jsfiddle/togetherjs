@@ -5,7 +5,7 @@
 #
 # When a client connects the server first authenticates it and sends:
 #
-# S: {auth:<agent id>}
+# S: {auth:<agent session id>}
 #  or
 # S: {auth:null, error:'forbidden'}
 #
@@ -64,7 +64,7 @@ module.exports = (createAgent, options) ->
         lastReceivedDoc = query.doc
       else
         unless lastReceivedDoc
-          console.warn "msg.doc missing in query #{JSON.stringify query} from #{agent.id}"
+          console.warn "msg.doc missing in query #{JSON.stringify query} from #{agent.sessionId}"
           # The disconnect handler will be called when we do this, which will clean up the open docs.
           return session.abort()
 
@@ -92,7 +92,7 @@ module.exports = (createAgent, options) ->
           handleOp query, callback
 
         else
-          console.warn "Invalid query #{JSON.stringify query} from #{agent.id}"
+          console.warn "Invalid query #{JSON.stringify query} from #{agent.sessionId}"
           session.abort()
           callback()
 
@@ -129,7 +129,7 @@ module.exports = (createAgent, options) ->
         #p "listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
         # Skip the op if this socket sent it.
-        return if opData.meta.source is agent.id
+        return if opData.meta.source is agent.sessionId
 
         opMsg =
           doc: docName
@@ -322,7 +322,7 @@ module.exports = (createAgent, options) ->
         session.stop()
       else
         agent = agent_
-        session.send auth:agent.id
+        session.send auth:agent.sessionId
 
         # Ok. Now we can handle all the messages in the buffer. They'll go straight to
         # handleMessage from now on.
@@ -333,7 +333,7 @@ module.exports = (createAgent, options) ->
 
     session.on 'close', ->
       return unless agent
-      #console.log "Client #{agent.id} disconnected"
+      #console.log "Client #{agent.sessionId} disconnected"
       for docName, {listener} of docState
         agent.removeListener docName if listener
       docState = null

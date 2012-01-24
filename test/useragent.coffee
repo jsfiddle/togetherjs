@@ -74,8 +74,8 @@ genTests = (async) -> testCase
       test.strictEqual action.name, 'connect'
 
       agent = c
-      test.strictEqual typeof agent.id, 'string'
-      test.ok agent.id.length > 8
+      test.strictEqual typeof agent.sessionId, 'string'
+      test.ok agent.sessionId.length > 8
       now = Date.now()
       test.ok now - 1000 < agent.connectTime.getTime() <= now
       test.strictEqual agent.remoteAddress, '127.0.0.1'
@@ -86,7 +86,7 @@ genTests = (async) -> testCase
     @agentConnect @connectionData, (error, c) ->
       test.fail error if error
       test.strictEqual agent, c
-      test.ok agent.id
+      test.ok agent.sessionId
       test.done()
 
   'agentConnect returns an error if a client isnt allowed to connect': (test) ->
@@ -97,7 +97,7 @@ genTests = (async) -> testCase
       test.fail agent if agent
       test.done()
   
-  'agent ids are unique': (test) ->
+  'agent.sessionIds are unique': (test) ->
     @auth = (c, action) -> action.accept()
 
     ids = {}
@@ -105,15 +105,15 @@ genTests = (async) -> testCase
 
     for __ignored in [1..1000] # Cant use for [1..1000] - https://github.com/jashkenas/coffee-script/issues/1714
       @agentConnect @connectionData, (error, agent) ->
-        throw new Error "repeat ID detected (#{agent.id})" if ids[agent.id]
-        ids[agent.id] = true
+        throw new Error "repeat ID detected (#{agent.sessionId})" if ids[agent.sessionId]
+        ids[agent.sessionId] = true
         passPart()
 
   # *** getSnapshot
 
   'getSnapshot works if auth accepts': (test) -> @connect =>
     @auth = (agent, action) =>
-      test.ok agent.id
+      test.ok agent.sessionId
       test.strictEqual action.docName, @name
       test.strictEqual action.type, 'read'
       test.strictEqual action.name, 'get snapshot'
@@ -143,7 +143,7 @@ genTests = (async) -> testCase
  
   'getOps works if auth accepts': (test) -> @connect =>
     @auth = (agent, action) =>
-      test.ok agent.id
+      test.ok agent.sessionId
       test.strictEqual action.docName, @name
       test.strictEqual action.type, 'read'
       test.strictEqual action.name, 'get ops'
@@ -187,7 +187,7 @@ genTests = (async) -> testCase
 
   'create allowed if canCreate() accept': (test) -> @connect =>
     @auth = (agent, action) =>
-      test.ok agent.id
+      test.ok agent.sessionId
 
       test.strictEqual action.docName, @name
       test.strictEqual action.docType.name, 'simple'
@@ -208,6 +208,8 @@ genTests = (async) -> testCase
       test.equal error, null
       test.expect 10
       test.done()
+
+#  'create sets the client id as the au
   
   'create not allowed if canCreate() rejects': (test) -> @connect =>
     @auth = (agent, action) -> action.reject()
@@ -228,11 +230,11 @@ genTests = (async) -> testCase
   # *** Submit ops
 
   'submitOp works': (test) -> @connect =>
-    clientId = null
+    sessionId = null
 
     @auth = (agent, action) =>
-      test.ok agent.id
-      clientId = agent.id
+      test.ok agent.sessionId
+      sessionId = agent.sessionId
 
       test.strictEqual action.docName, @name
       test.strictEqual action.v, 100
@@ -246,7 +248,7 @@ genTests = (async) -> testCase
 
     @model.applyOp = (docName, opData, callback) =>
       test.strictEqual docName, @name
-      test.strictEqual opData.meta.source, clientId
+      test.strictEqual opData.meta.source, sessionId
       delete opData.meta
       test.deepEqual opData, {v:100, op:{position:0, text:'hi'}}
       callback null, 100
