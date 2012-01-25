@@ -429,6 +429,7 @@
     function Doc(connection, name, openData) {
       this.connection = connection;
       this.name = name;
+      this.shout = __bind(this.shout, this);
       this.flush = __bind(this.flush, this);
       openData || (openData = {});
       this.version = openData.v;
@@ -500,7 +501,7 @@
     };
 
     Doc.prototype._onMessage = function(msg) {
-      var callback, docOp, error, oldInflightOp, op, response, undo, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var callback, docOp, error, oldInflightOp, op, path, response, undo, value, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
       if (msg.open === true) {
         this.state = 'open';
         this._create = false;
@@ -595,6 +596,14 @@
         }
         this.version++;
         return this._otApply(docOp, true);
+      } else if (msg.meta) {
+        _ref7 = msg.meta, path = _ref7.path, value = _ref7.value;
+        switch (path != null ? path[0] : void 0) {
+          case 'shout':
+            return this.emit('shout', value);
+          default:
+            return typeof console !== "undefined" && console !== null ? console.warn('Unhandled meta op:', msg) : void 0;
+        }
       } else {
         return typeof console !== "undefined" && console !== null ? console.warn('Unhandled document message:', msg) : void 0;
       }
@@ -626,6 +635,16 @@
       if (callback) this.pendingCallbacks.push(callback);
       this.emit('change', op);
       return setTimeout(this.flush, 0);
+    };
+
+    Doc.prototype.shout = function(msg) {
+      return this.connection.send({
+        doc: this.name,
+        meta: {
+          path: ['shout'],
+          value: msg
+        }
+      });
     };
 
     Doc.prototype.open = function(callback) {
