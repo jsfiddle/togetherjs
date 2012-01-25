@@ -189,9 +189,10 @@ class Doc
         # The op applied successfully.
         throw new Error('Invalid version from server') unless msg.v == @version
 
-        @serverOps[@version] = oldInflightOp
-        @version++
-        callback null, oldInflightOp for callback in @inflightCallbacks
+        if oldInflightOp
+          @serverOps[@version] = oldInflightOp
+          @version++
+          callback null, oldInflightOp for callback in @inflightCallbacks
 
       # Send the next op.
       @flush()
