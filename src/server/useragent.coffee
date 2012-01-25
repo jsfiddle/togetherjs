@@ -16,7 +16,7 @@ module.exports = (model, options) ->
 
   class UserAgent
     constructor: (data) ->
-      @id = hat()
+      @sessionId = hat()
       @connectTime = new Date
       @headers = data.headers
       @remoteAddress = data.remoteAddress
@@ -81,7 +81,7 @@ module.exports = (model, options) ->
 
     submitOp: (docName, opData, callback) ->
       opData.meta ||= {}
-      opData.meta.source = @id
+      opData.meta.source = @sessionId
       dupIfSource = opData.dupIfSource or []
 
       # If ops and meta get coalesced, they should be separated here.

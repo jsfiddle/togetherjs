@@ -125,14 +125,14 @@ First, get an ace editor on your page:
 Your web app will need access to the following JS files:
 
 - Ace (http://ace.ajax.org/)
-- SocketIO (http://socket.io/).
+- Browserchannel
 - ShareJS client and ace bindings.
 
 Add these script tags:
 
 ```html
 <script src="http://ajaxorg.github.com/ace/build/src/ace.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+<script src="/channel/bcsocket.js"></script>
 <script src="/share/share.js"></script>
 <script src="/share/ace.js"></script>
 ```
