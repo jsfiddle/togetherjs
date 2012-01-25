@@ -45,10 +45,50 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-
-app.get('/1', function(req, resp){
-
-  redis.get(1, function(err, reply){
+app.get('/v/:id', function(req, resp){
+  var bundleId = parseInt(req.params.id, 36);
+  
+  
+  redis.get(bundleId, function(err, bundle){
+    //TODO: Error checking for 404 etc.
+    bundle = JSON.parse(bundle);
+    console.log(bundleId + '_' + bundle.root);
+    resp.header('Content-Type', bundle.resources[bundle.root].contentType);
+    etherpad.getText({padID: bundleId + '_' + bundle.root}, function(error, data){
+      var rootContent = data['text']
+      
+      
+      var resources = [];
+      
+      for (x in bundle.resources){
+        var extension = '';
+        var contentType = bundle.resources[x].contentType;
+        if (contentType.indexOf('javascript') > 0){
+          extension = '.js';
+        }
+        else if (contentType.indexOf('text/css') == 0){
+          extension = '.css';
+        }
+        resources.push({id: x, originalUrl: bundle.resources[x].originalUrl});
+      }
+      // Sort by length of the originalUrl so that we don't clobber 
+      // things we shouldn't when replacing with new url.
+      resources.sort(function(a,b){
+        a.originalUrl.length > b.originalUrl.length ? 1 : -1
+      });
+      
+      
+      resp.send(rootContent);
+    });
+    
+    
+    
+  });
+});
+app.get('/c/:id', function(req, resp){
+  var bundleId = parseInt(req.params.id, 36);
+  
+  redis.get(bundleId, function(err, reply){
     var bundle = JSON.parse(reply);
     
     var resources = [];
@@ -79,63 +119,72 @@ app.get('/1', function(req, resp){
     resources.sort(function(a,b){ a.name > b.name ? 1 : -1});
 
     console.log(resources);
-    resp.render('collaborate', {key: bundle.id + '_' + bundle.root, 'resources': resources});
+    resp.render('collaborate', {
+      'bundleId': bundle.id,
+      'rootKey': bundle.id + '_' + bundle.root, 
+      'resources': resources.reverse(), 
+      'thisUrl': 'http://localhost:3000' + req.url,
+      'layout': false      
+    });
   });
   
 });
 
 app.post('/bundle', function(req, resp){
-  resp.header('Access-Control-Allow-Origin', '*');
-  var sha1 = require('sha1');
+  redis.incr('global:last_bundle_id', function (err, bundleId) {
+    bundleId = parseInt(bundleId);
+    
+    resp.header('Access-Control-Allow-Origin', '*');
+    var sha1 = require('sha1');
+
+    var bundle = {
+      id: bundleId,
+      resources: {
+      }
+    };
   
-  var bundle = {
-    id: 1,
-    resources: {
-    }
-  };
+  
+    var resources = req.body.resources;
   
   
-  var resources = req.body.resources;
-  
-  
-  // Cycle through each resource
-  for(x in resources){
-    // For now we ignore those that don't have any data
-    // they weren't properly downloaed and are probably available
-    // publically.
-    if (resources[x]['content-type'] == null){
-      console.info("Ignoring " + x);
-      delete resources[x];
-    }
-    else{
-      var hash = sha1(x);
-      
-      // Set the root object of the bundle
-      if (req.body.root == x)
-        bundle.root = hash;
-      
-      var contentType = resources[x]['content-type'];
-      bundle.resources[hash] = {
-        'originalUrl': x,
-        'contentType': contentType
-      };
-      
-      redis.set(bundle.id, JSON.stringify(bundle));
-      
-      //SECURITY: This is an obvious way to get a resource on this server and do bad things...
-      // Now we persist it. Images go to redis, 
-      if (contentType.indexOf('image') == 0){
-        redis.set(bundle.id + "_" + hash, resources[x].data);
+    // Cycle through each resource
+    for(x in resources){
+      // For now we ignore those that don't have any data
+      // they weren't properly downloaed and are probably available
+      // publically.
+      if (resources[x]['content-type'] == null){
+        console.info("Ignoring " + x);
+        delete resources[x];
       }
       else{
-        var id = bundle.id + "_" + hash;
-        etherpad.createPad({padID: id, text: resources[x].data});        
+        var hash = sha1(x);
+      
+        // Set the root object of the bundle
+        if (req.body.root == x)
+          bundle.root = hash;
+      
+        var contentType = resources[x]['content-type'];
+        bundle.resources[hash] = {
+          'originalUrl': x,
+          'contentType': contentType
+        };
+      
+        redis.set(bundle.id, JSON.stringify(bundle));
+      
+        //SECURITY: This is an obvious way to get a resource on this server and do bad things...
+        // Now we persist it. Images go to redis, 
+        if (contentType.indexOf('image') == 0){
+          redis.set(bundle.id + "_" + hash, resources[x].data);
+        }
+        else{
+          var id = bundle.id + "_" + hash;
+          etherpad.createPad({padID: id, text: resources[x].data});        
+        }
       }
     }
-  }
-  console.log(bundle);
-
-  resp.send('');
+    console.log(bundle);
+    resp.render('towtruck_response', {url: 'http://localhost:3000/c/' + bundleId.toString(36)});
+  });
 });
 
 app.all('/bundle', function(req, resp){

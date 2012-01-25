@@ -102,6 +102,7 @@ var TowTruck = {
       url: 'http://localhost:3000/bundle', 
       data: JSON.stringify(this.bundle),
       success: function(data, status){
+        jQuery('#towtruck_top_bar').html(jQuery(data));
         console.log('Tada');
       },
       contentType: 'text/plain',

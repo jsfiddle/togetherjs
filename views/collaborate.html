@@ -1,16 +1,121 @@
-<div id="head">
-  <h1>Your stuff.</h1>
-</div>
-<div id="main">
-  <div id="navigation">
-    <ul>
-      {for resource in resources}
-      <li><a href="http://localhost:9001/p/{resource.key}" target="etherpad">{resource.name}</a></li>
-      {/for}
-    </ul>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>TowTruck - Call When You're Stuck</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <div id="content">
-    <iframe name="etherpad" src="http://localhost:9001/p/{key}"></iframe>
-  </div>
-</div>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/bootstrap/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css" media="screen">
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="/bootstrap/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="/javascripts/collaborate.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+      $(function(){
+        $("#{rootKey}_tab").addClass('active');
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <!-- <link rel="shortcut icon" href="/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png"> -->
+  </head>
+
+  <body class="collaborate">
+    <div id="share_modal" class="modal hide fade">
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">×</a>
+        <h3>Share With a Friend</h3>
+      </div>
+      <div class="modal-body">
+        <form><fieldset><input type="text" class="share" value="{thisUrl}"/></fieldset></form>
+        <p>
+          <span class="label notice">Notice</span> 
+          Anyone with this URL will be able to edit your file.
+        </p>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn primary" data-dismiss="modal">Close</a>
+      </div>
+    </div>
+
+    <div class="navbar navbar-fixed">
+      <div class="navbar-inner">
+        <div class="fluid-container">
+          <a class="brand" href="#">TowTruck - Editing</a>
+          <p class="pull-right">
+            <a id="download_button" class="btn" href="#"><i class="file"></i> Download</a>
+            <a id="share_button" class="btn" data-toggle="modal" href="#share_modal"><i class="share"></i> Share</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fluid-container sidebar-left">
+      <div class="fluid-sidebar">
+        <div class="side-nav">
+          <h5 class="nav-label">Sidebar</h5>
+          <ul class="nav-group">
+            <li class="active"><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+          </ul>
+          <h5 class="nav-label">Sidebar</h5>
+          <ul class="nav-group">
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+          </ul>
+          <h5 class="nav-label">Sidebar</h5>
+          <ul class="nav-group">
+            <li><a class="nav-item" href="#">Link</a></li>
+            <li><a class="nav-item" href="#">Link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fluid-content">
+        <ul id="file_tab_nav" class="nav tabs">
+
+          {for resource in resources}
+          <li id="{resource.key}_tab" class="FileTab"><a href="http://localhost:9001/p/{resource.key}?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad">{resource.name}</a></li>
+          {/for}
+        </ul>
+        
+        <iframe 
+          id="etherpad" 
+          frameBorder="0" 
+          name="etherpad" 
+          src="http://localhost:9001/p/{rootKey}?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
+        ></iframe>
+        
+      </div>
+
+    </div>
+    
+    <footer>
+      <div class="container">
+        <div class="row">
+          <a href="http://mozillalabs.com/">
+            <img src="https://mozillalabs.com/wp-content/themes/labs2.0/img/mozilla-logo.png" width="41" height="31" alt="Mozilla Logo">
+            <strong>Copyright © 2005-2010 Mozilla.</strong>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>
