@@ -214,6 +214,15 @@ module.exports = testCase
 
       @model.applyOp @name, {v:1, op:{position:0, text:'yo '}}
 
+  'detect duplicate ops using dupIfSource': (test) ->
+    @socket.send {doc:@name, open:true, create:true, type:'simple'}
+    @socket.send {doc:@name, v:0, op:{position:0, text:'hi'}}
+    # Resending the op... In reality, this would be sent in a new session.
+    @socket.send {doc:@name, v:0, op:{position:0, text:'hi'}, dupIfSource:[@id]}
+
+    @expect [{doc:@name, v:0, open:true, create:true}, {v:0}, {v:null, error:'Op already submitted'}], ->
+      test.done()
+
   'get a document snapshot': (test) ->
     @model.create @name, 'simple', =>
       @model.applyOp @name, {v:0, op:{position:0, text:'internet'}}, (error, _) =>

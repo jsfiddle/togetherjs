@@ -376,8 +376,19 @@ genTests = (async) -> testCase
       @model.getSnapshot @name, (error, data) ->
         test.deepEqual data, {snapshot:{str:'hello world'}, type:types.simple, meta:{}, v:101}
         test.done()
+
+  'applyOp ignores irrelevant dupIfSource:[...] arguments in op data': (test) ->
+    @db.writeOp = (docName, opData, callback) -> callback()
+
+    @db.getSnapshot = (docName, callback) -> callback null, {snapshot:{str:'hello'}, type:'simple', meta:{}, v:100}
+    @db.getOps = (docName, start, end, callback) -> callback null, []
+
+    @model.applyOp @name, {v:100, op:{position:5, text:' world'}, meta:{}, dupIfSource:['ignore']}, (error, v) =>
+      test.equal error, null
+      test.strictEqual v, 100
+      test.done()
   
-  'applyOp returns an error if the op version is missing': (test) ->
+  'applyOp rejects ops with a missing version': (test) ->
     @db.getSnapshot = (docName, callback) -> callback null, {snapshot:{str:'hello'}, type:'simple', meta:{}, v:100}
     @db.getOps = (docName, start, end, callback) -> callback null, []
 
@@ -399,8 +410,19 @@ genTests = (async) -> testCase
     @db.getSnapshot = (docName, callback) -> callback null, {snapshot:{str:'hello'}, type:'simple', meta:{}, v:100}
     @db.getOps = (docName, start, end, callback) -> callback null, []
 
+    # The maximum age is overridden above to 2.
     @model.applyOp @name, {v:97, op:{position:5, text:' world'}, meta:{}}, (error, v) =>
       test.strictEqual error, 'Op too old'
+      test.equal v, null
+      test.done()
+
+  'applyOp rejects duplicate ops using dupIfSource:[...]': (test) ->
+    @db.getSnapshot = (docName, callback) -> callback null, {snapshot:{str:'hello'}, type:'simple', meta:{}, v:100}
+    @db.getOps = (docName, start, end, callback) ->
+      callback null, [{op:{position:2, text:' there'}, meta:{source:'user1'}}]
+
+    @model.applyOp @name, {v:100, op:{position:5, text:' world'}, meta:{}, dupIfSource:['ignored', 'user1']}, (error, v) =>
+      test.strictEqual error, 'Op already submitted'
       test.equal v, null
       test.done()
 

@@ -93,41 +93,47 @@ module.exports = Model = (db, options) ->
 
   # Its important that all ops are applied in order. This helper method creates the op submission queue
   # for a single document. This contains the logic for transforming & applying ops.
-  makeOpQueue = (docName, doc) -> queue (op, callback) ->
-    return callback 'Version missing' unless op.v >= 0
+  makeOpQueue = (docName, doc) -> queue (opData, callback) ->
+    return callback 'Version missing' unless opData.v >= 0
     
-    op.meta ||= {}
-    op.meta.ts = Date.now()
+    opData.meta ||= {}
+    opData.meta.ts = Date.now()
 
-    return callback 'Op at future version' if op.v > doc.v
+    return callback 'Op at future version' if opData.v > doc.v
 
     # Punt the transforming work back to the client if the op is too old.
-    return callback 'Op too old' if op.v + options.maximumAge < doc.v
+    return callback 'Op too old' if opData.v + options.maximumAge < doc.v
 
     # We'll need to transform the op to the current version of the document. This
     # calls the callback immediately if opVersion == doc.v.
-    getOps docName, op.v, doc.v, (error, ops) ->
+    getOps docName, opData.v, doc.v, (error, ops) ->
       return callback error if error
 
-      unless doc.v - op.v == ops.length
+      unless doc.v - opData.v == ops.length
         # This should never happen. It indicates that we didn't get all the ops we
         # asked for. Its important that the submitted op is correctly transformed.
         console.error "Could not get old ops in model for document #{docName}"
-        console.error "Expected ops #{op.v} to #{doc.v} and got #{ops.length} ops"
+        console.error "Expected ops #{opData.v} to #{doc.v} and got #{ops.length} ops"
         return callback 'Internal error'
 
       if ops.length > 0
         try
           # If there's enough ops, it might be worth spinning this out into a webworker thread.
           for oldOp in ops
-            op.op = doc.type.transform op.op, oldOp.op, 'left'
-            op.v++
+            # Dup detection works by sending the id(s) the op has been submitted with previously.
+            # If the id matches, we reject it. The client can also detect the op has been submitted
+            # already if it sees its own previous id in the ops it sees when it does catchup.
+            if oldOp.meta.source and opData.dupIfSource and oldOp.meta.source in opData.dupIfSource
+              return callback 'Op already submitted'
+
+            opData.op = doc.type.transform opData.op, oldOp.op, 'left'
+            opData.v++
         catch error
           console.error error.stack
           return callback error.message
 
       try
-        snapshot = doc.type.apply doc.snapshot, op.op
+        snapshot = doc.type.apply doc.snapshot, opData.op
       catch error
         console.error error.stack
         return callback error.message
@@ -137,16 +143,16 @@ module.exports = Model = (db, options) ->
       #
       # This should never happen in practice, but its a nice little check to make sure everything
       # is hunky-dory.
-      unless op.v == doc.v
+      unless opData.v == doc.v
         # This should never happen.
         console.error "Version mismatch detected in model. File a ticket - this is a bug."
-        console.error "Expecting #{op.v} == #{doc.v}"
+        console.error "Expecting #{opData.v} == #{doc.v}"
         return callback 'Internal error'
 
       #newDocData = {snapshot, type:type.name, v:opVersion + 1, meta:docData.meta}
       writeOp = db?.writeOp or (docName, newOpData, callback) -> callback()
 
-      writeOp docName, op, (error) ->
+      writeOp docName, opData, (error) ->
         if error
           # The user should probably know about this.
           console.warn "Error writing ops to database: #{error}"
@@ -160,18 +166,18 @@ module.exports = Model = (db, options) ->
         # All the heavy lifting is now done. Finally, we'll update the cache with the new data
         # and (maybe!) save a new document snapshot to the database.
 
-        doc.v = op.v + 1
+        doc.v = opData.v + 1
         doc.snapshot = snapshot
 
-        doc.ops.push op
+        doc.ops.push opData
         doc.ops.shift() if db and doc.ops.length > options.numCachedOps
 
-        model.emit 'applyOp', docName, op, snapshot, oldSnapshot
-        doc.eventEmitter.emit 'op', op, snapshot, oldSnapshot
+        model.emit 'applyOp', docName, opData, snapshot, oldSnapshot
+        doc.eventEmitter.emit 'op', opData, snapshot, oldSnapshot
 
         # The callback is called with the version of the document at which the op was applied.
         # This is the op.v after transformation, and its doc.v - 1.
-        callback null, op.v
+        callback null, opData.v
     
         # I need a decent strategy here for deciding whether or not to save the snapshot.
         #
@@ -243,52 +249,51 @@ module.exports = Model = (db, options) ->
     if docs[docName]
       # The document is already loaded. Return immediately.
       options.stats?.cacheHit? 'getSnapshot'
-      callback null, docs[docName]
-    else
-      # We're a memory store. If we don't have it, nobody does.
-      return callback 'Document does not exist' unless db
+      return callback null, docs[docName]
 
-      callbacks = awaitingGetSnapshot[docName]
+    # We're a memory store. If we don't have it, nobody does.
+    return callback 'Document does not exist' unless db
 
-      if callbacks
-        # The document is being loaded already. Add ourselves as a callback.
-        callbacks.push callback
-      else
-        options.stats?.cacheMiss? 'getSnapshot'
+    callbacks = awaitingGetSnapshot[docName]
 
-        # The document isn't loaded and isn't being loaded. Load it.
-        awaitingGetSnapshot[docName] = [callback]
-        db.getSnapshot docName, (error, data, dbMeta) ->
-          return add docName, error if error
+    # The document is being loaded already. Add ourselves as a callback.
+    return callbacks.push callback if callbacks
 
-          type = types[data.type]
-          unless type
-            console.warn "Type '#{data.type}' missing"
-            return callback "Type not found"
-          data.type = type
+    options.stats?.cacheMiss? 'getSnapshot'
 
-          committedVersion = data.v
+    # The document isn't loaded and isn't being loaded. Load it.
+    awaitingGetSnapshot[docName] = [callback]
+    db.getSnapshot docName, (error, data, dbMeta) ->
+      return add docName, error if error
 
-          # The server can close without saving the most recent document snapshot.
-          # In this case, there are extra ops which need to be applied before
-          # returning the snapshot.
-          getOpsInternal docName, data.v, null, (error, ops) ->
-            return callback error if error
+      type = types[data.type]
+      unless type
+        console.warn "Type '#{data.type}' missing"
+        return callback "Type not found"
+      data.type = type
 
-            if ops.length > 0
-              console.log "Catchup #{docName} #{data.v} -> #{data.v + ops.length}"
+      committedVersion = data.v
 
-              try
-                for op in ops
-                  data.snapshot = type.apply data.snapshot, op.op
-                  data.v++
-              catch e
-                # This should never happen - it indicates that whats in the
-                # database is invalid.
-                console.error "Op data invalid for #{docName}: #{e.stack}"
-                return callback 'Op data invalid'
+      # The server can close without saving the most recent document snapshot.
+      # In this case, there are extra ops which need to be applied before
+      # returning the snapshot.
+      getOpsInternal docName, data.v, null, (error, ops) ->
+        return callback error if error
 
-            add docName, error, data, committedVersion, ops, dbMeta
+        if ops.length > 0
+          console.log "Catchup #{docName} #{data.v} -> #{data.v + ops.length}"
+
+          try
+            for op in ops
+              data.snapshot = type.apply data.snapshot, op.op
+              data.v++
+          catch e
+            # This should never happen - it indicates that whats in the
+            # database is invalid.
+            console.error "Op data invalid for #{docName}: #{e.stack}"
+            return callback 'Op data invalid'
+
+        add docName, error, data, committedVersion, ops, dbMeta
 
   # This makes sure the cache contains a document. If the doc cache doesn't contain
   # a document, it is loaded from the database and stored.
@@ -585,6 +590,11 @@ module.exports = Model = (db, options) ->
 
     # If nothing was queued, terminate immediately.
     callback?() if pendingWrites is 0
+
+  # Close the database connection. This is needed so nodejs can shut down cleanly.
+  @closeDb = ->
+    db?.close?()
+    db = null
 
   return
 

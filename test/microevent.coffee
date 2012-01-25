@@ -91,7 +91,6 @@ tests =
     @e.emit 'bar'
 
 
-
 # The tests above are run both with a new MicroEvent and with an object with
 # microevent mixed in.
 

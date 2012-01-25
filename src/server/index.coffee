@@ -34,20 +34,24 @@ create.attach = attach = (server, options, model = createModel(options)) ->
   options.staticpath ?= '/share'
 
   server.model = model
+  server.on 'close', -> model.closeDb()
 
   server.use options.staticpath, connect.static("#{__dirname}/../../webclient") if options.staticpath != null
 
-  createClient = require('./auth') model, options
+  createAgent = require('./useragent') model, options
 
   # The client frontend doesn't get access to the model at all, to make sure security stuff is
   # done properly.
-  server.use rest(createClient, options.rest) if options.rest != null
-  socketio.attach(server, createClient, options.socketio or {}) if options.socketio != null
+  server.use rest(createAgent, options.rest) if options.rest != null
+
+  # Socketio frontend is now disabled by default.
+  socketio.attach(server, createAgent, options.socketio or {}) if options.socketio?
 
   if options.browserChannel != null
     options.browserChannel ?= {}
+    #options.browserChannel.base ?= '/sjs'
     options.browserChannel.server = server
-    server.use browserChannel(createClient, options.browserChannel)
+    server.use browserChannel(createAgent, options.browserChannel)
 
   server
 

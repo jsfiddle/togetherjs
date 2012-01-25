@@ -16,7 +16,7 @@
     <div id="editor">{{{content}}}</div>
     <script src="/lib/markdown/showdown.js" type="text/javascript"></script>
     <script src="/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="/channel/bcsocket.js"></script>
     <script src="/share/share.js"></script>
     <script src="/share/ace.js"></script>
     <script>
@@ -33,7 +33,7 @@ window.onload = function() {
   // sharejs.open('{{{docName}}}', function(doc, error) {
   //   ...
 
-  var connection = new sharejs.Connection('http://' + window.location.hostname + ':' + 8000 + '/sjs');
+  var connection = new sharejs.Connection('http://' + window.location.hostname + ':' + 8000 + '/channel');
 
   connection.open('{{{docName}}}', function(error, doc) {
     if (error) {

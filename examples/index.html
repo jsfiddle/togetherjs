@@ -89,6 +89,7 @@ section {
 <!--            <li class="active"><a href="#">Intro</a></li>-->
           </ul>
           <ul class="nav secondary-nav">
+            <li><a><span class="label warning" id="status">Loading...</span></a></li>
             <li><a href="demos.html">Demos</a></li>
             <li><a href="https://github.com/josephg/ShareJS/wiki">Documentation</a></li>
             <li><a href="https://github.com/josephg/ShareJS">Github</a></li>
@@ -102,7 +103,7 @@ section {
 <section id="intro">
 <div class="page-header"><h1>ShareJS – Live concurrent editing in your app.</h1></div>
 
-<p>ShareJS is an Operational Transform library for NodeJS & browsers. It lets you easily do live concurrent editing
+<p>ShareJS is an Operational Transform library for NodeJS &amp; browsers. It lets you easily do live concurrent editing
 in your app.</p>
 
 <div class="row">
@@ -126,7 +127,7 @@ sharejs.open('blag', 'text', function(error, doc) {
 </section>
 <section id="body">
 <p>
-You’re writing a web app. Your app contains data that users edit. Your users should be able to user your app from multiple computers if they need to. Sometimes you want multiple users to view & edit the same data.</p>
+You’re writing a web app. Your app contains data that users edit. Your users should be able to user your app from multiple computers if they need to. Sometimes you want multiple users to view &amp; edit the same data.</p>
 
 <p>How do you make that work, without the data going out of sync and without losing anything?</p>
 
@@ -138,7 +139,7 @@ You’re writing a web app. Your app contains data that users edit. Your users s
 
 <p>I am an ex <a href="http://wave.google.com">Google Wave</a> engineer. Wave took 2 years to write and if we rewrote it today, it would take almost as long to write a second time. (What??)</p>
 
-<p>Enter <strong><a href="https://github.com/josephg/ShareJS">ShareJS</a></strong>. ShareJS is a simple (~4k LOC) coffeescript server & web client library for OT. With ShareJS, your website can let your users collaboratively edit text documents and arbitrary JSON data in realtime. (Like this one.)</p>
+<p>Enter <strong><a href="https://github.com/josephg/ShareJS">ShareJS</a></strong>. ShareJS is a simple (~4k LOC) coffeescript server &amp; web client library for OT. With ShareJS, your website can let your users collaboratively edit text documents and arbitrary JSON data in realtime. (Like this one.)</p>
 
 </section>
 <section id="worky">
@@ -147,7 +148,7 @@ You’re writing a web app. Your app contains data that users edit. Your users s
 
 <p>Like <a href="http://subversion.tigris.org/">subversion</a>, the server has a version number. If multiple users submit an operation at the same version, one of the edits is applied directly and the other user’s edit is automatically transformed by the server and then applied. Transforming is a bit like a <a href="http://book.git-scm.com/4_rebasing.html">git rebase operation</a>.</p>
 
-<p>In your browser, your edits are visible immediately. Edits from other people get transformed on top of yours. Unlike normal SCM systems, the algorithm is very careful to make sure that everyone ends up with the same document, no matter what order the operations are actually applied in. This allows the whole update & commit stuff to happen completely automatically, in realtime. There are no conflict markers or any of that jazz.</p>
+<p>In your browser, your edits are visible immediately. Edits from other people get transformed on top of yours. Unlike normal SCM systems, the algorithm is very careful to make sure that everyone ends up with the same document, no matter what order the operations are actually applied in. This allows the whole update &amp; commit stuff to happen completely automatically, in realtime. There are no conflict markers or any of that jazz.</p>
 
 </section>
 <section id="examples">
@@ -190,8 +191,8 @@ You’re writing a web app. Your app contains data that users edit. Your users s
 </footer>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+<script src="/channel/bcsocket.js"></script>
 <script src="/share/share.js"></script>
 <script src="/share/textarea.js"></script>
 <script src="/lib/prettify.js"></script>
@@ -201,7 +202,7 @@ $(function() {
   // *** Editor window
   var elem = document.getElementById('pad');
   
-  sharejs.open('blag', 'text', function(error, doc) {
+  var connection = sharejs.open('blag', 'text', function(error, doc) {
   	if (error) {
   		console.log(error);
   	} else {
@@ -209,8 +210,22 @@ $(function() {
   		doc.attach_textarea(elem);
   	}
   });
+
+  // *** Connection status display
+  var status = document.getElementById('status');
+  var register = function(state, klass, text) {
+    connection.on(state, function() {
+      status.className = 'label ' + klass;
+      status.innerHTML = text;
+    });
+  };
+
+  register('ok', 'success', 'Online');
+  register('connecting', 'warning', 'Connecting...');
+  register('disconnected', 'important', 'Offline');
+  register('stopped', 'important', 'Error');
   
-  // *** Trains
+  // *** Draggable trains example
   sharejs.open('thomas', 'json', function(error, doc) {
     if (error) {
       if (console) {
@@ -238,13 +253,13 @@ $(function() {
     var dragFrom = null;
     
     doc.at().on('move', function(from, to) {
-      console.log('move', from, to);
+      //console.log('move', from, to);
       if (dragFrom === from) {
         dragFrom = to;
       } else {
-        console.log('#trains :nth-child(' + (from + 1) + ')');
-        console.log($('#trains :nth-child(' + 1 + ')'));
-        console.log($('#trains :nth-child(' + 2 + ')'));
+        //console.log('#trains :nth-child(' + (from + 1) + ')');
+        //console.log($('#trains :nth-child(' + 1 + ')'));
+        //console.log($('#trains :nth-child(' + 2 + ')'));
 
         if (to === 0) {
           $('#trains :nth-child(' + (from + 1) + ')')
@@ -270,7 +285,7 @@ $(function() {
       },
       change: function(event, ui) {
         var newPos = ui.placeholder.index();
-        console.log('sending move', dragFrom, newPos);
+        //console.log('sending move', dragFrom, newPos);
         doc.at().move(dragFrom, newPos);
         dragFrom = newPos;
       },
