@@ -1,10 +1,10 @@
-body {
+body.collaborate {
   padding-top: 60px; 
 }
 .tabs {
   margin-bottom: 0;
 }
-#file_tab_nav{
+#file_tab_nav {
   padding-left: 40px;
 }
 
@@ -13,11 +13,11 @@ body {
   height: 100%;
 }
 
-.modal{
+.modal {
   display: none;
 }
 
-footer{
+footer {
   width: 100%;
   background-color: #222;
   position: absolute;
@@ -27,7 +27,7 @@ footer{
   display:none;
 }
 
-input.share{
+input.share {
   border: none;
   height: 3em;
   width: 100%;
@@ -35,4 +35,42 @@ input.share{
   font-weight: bold;
   color: #0097ff;
   font-size: 2em;
+}
+
+#bookmarklet_arrow {
+  position: absolute;
+  top: 80px;
+}
+
+/* Jumbotrons
+-------------------------------------------------- */
+.jumbotron {
+  position: relative;
+  text-shadow: 0 1px 0 #fff;
+}
+.jumbotron h1 {
+  margin-right: 40%;
+  margin-bottom: 9px;
+  font-size: 90px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.jumbotron p {
+  margin-right: 32%;
+  margin-bottom: 20px;
+  font-size: 25px;
+  font-weight: 300;
+  line-height: 36px;
+}
+.jumbotron .btn-large {
+  font-size: 20px;
+  padding: 14px 24px;
+  margin-right: 5px;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+.jumbotron .download-info {
+  font-size: 16px;
+  color: #999;
 }
