@@ -9,8 +9,16 @@ Installation
 1. [Node JS](http://nodejs.org/)
 2. [npm](http://npmjs.org/)
 3. [Redis](http://redis.io/)
+4. [Etherpad Lite](http://etherpad.org/download/)
 
-http://redis.io/download
+### Sync submodule (Twitter bootstrap)
+
+$ git submodule update --init --recursive
+
+Running the Server
+------------------
+
+./app.js
 
 Data Keys
 ---------
