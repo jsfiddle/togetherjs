@@ -38,8 +38,7 @@ genTests = (async) -> testCase
         else
           @auth agent, action
 
-    @auth = (agent, action) ->
-      throw new Error "Unexpected call to @auth(#{action.name})"
+    @auth = (agent, action) -> action.accept()
 
     @name = 'testingdoc'
 
@@ -201,15 +200,49 @@ genTests = (async) -> testCase
     @model.create = (docName, type, meta, callback) =>
       test.strictEqual docName, @name
       test.strictEqual type, types.simple
-      test.deepEqual meta, {}
       callback()
 
     @agent.create @name, 'simple', {}, (error) =>
       test.equal error, null
-      test.expect 10
+      test.expect 9
       test.done()
 
-#  'create sets the client id as the au
+  'create sets meta.creator:agent.name if the agent has .name set': (test) -> @connect =>
+    # Technically, this should probably be set during the initial connect, but it doesn't matter.
+    @agent.name = 'laura'
+
+    @model.create = (docName, type, meta, callback) =>
+      test.strictEqual meta.creator, 'laura'
+      callback()
+
+    @agent.create @name, 'simple', {}, (error) =>
+      test.equal error, null
+      test.expect 2
+      test.done()
+
+  'create does not set meta.creator if the agent does not have .name set': (test) -> @connect =>
+    @model.create = (docName, type, meta, callback) =>
+      test.strictEqual meta.creator, undefined
+      callback()
+
+    @agent.create @name, 'simple', {}, (error) => test.done()
+
+  'create sets meta.ctime and mtime': (test) -> @connect =>
+    @model.create = (docName, type, meta, callback) =>
+      test.ok (Date.now() - meta.ctime) < 20
+      test.ok (Date.now() - meta.mtime) < 20
+      callback()
+
+    @agent.create @name, 'simple', {}, (error) => test.done()
+
+  "A client can't override ctime, mtime and creator": (test) -> @connect =>
+    @model.create = (docName, type, meta, callback) =>
+      test.ok (Date.now() - meta.ctime) < 20
+      test.ok (Date.now() - meta.mtime) < 20
+      test.strictEqual meta.creator, undefined
+      callback()
+
+    @agent.create @name, 'simple', {creator:'fred', ctime:10, mtime:20}, (error) => test.done()
   
   'create not allowed if canCreate() rejects': (test) -> @connect =>
     @auth = (agent, action) -> action.reject()

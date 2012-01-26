@@ -24,6 +24,9 @@ module.exports = (model, options) ->
       # This is a map from docName -> listener function
       @listeners = {}
 
+      # Should be manually set by the auth function.
+      @name = null
+
       # We have access to these with socket.io, but I'm not sure we can support
       # these properties on the REST API or sockjs, etc.
       #xdomain: data.xdomain
@@ -73,6 +76,13 @@ module.exports = (model, options) ->
     create: (docName, type, meta, callback) ->
       # We don't check that types[type.name] == type. That might be important at some point.
       type = types[type] if typeof type == 'string'
+
+      # I'm not sure what client-specified metadata should be allowed in the document metadata
+      # object. For now, I'm going to ignore all create metadata until I know how it should work.
+      meta = {}
+
+      meta.creator = @name if @name
+      meta.ctime = meta.mtime = Date.now()
 
       # The action object has a 'type' property already. Hence the doc type is renamed to 'docType'
       @doAuth {docName, docType:type, meta}, 'create', callback, =>
