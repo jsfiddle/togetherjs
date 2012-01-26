@@ -39,14 +39,15 @@ module.exports = testCase
   setUp: (callback) ->
     @name = 'testingdoc'
 
-    @auth = (client, action) -> action.accept()
+    @auth = (agent, action) -> action.accept()
 
     # Create a new server which just exposes the REST interface with default options
     options = {
       socketio: null
+      browserChannel: null
       rest: {}
       db: {type: 'none'}
-      auth: (client, action) => @auth client, action
+      auth: (agent, action) => @auth agent, action
     }
 
     # For some reason, exceptions thrown in setUp() are ignored.
@@ -96,7 +97,12 @@ module.exports = testCase
       test.strictEqual res.statusCode, 200
 
       @model.getSnapshot @name, (error, doc) ->
-        test.deepEqual doc, {v:0, type:types.simple, snapshot:{str:''}, meta:{}}
+        meta = doc.meta
+        delete doc.meta
+        test.deepEqual doc, {v:0, type:types.simple, snapshot:{str:''}}
+        test.ok meta
+        test.strictEqual typeof(meta.ctime), 'number'
+        test.strictEqual typeof(meta.mtime), 'number'
         test.done()
 
   'POST a document in the DB returns 200 OK': (test) ->
@@ -144,17 +150,17 @@ module.exports = testCase
       test.done()
 
   'Cannot do anything if the server doesnt allow client connections': (test) ->
-    @auth = (client, action) ->
+    @auth = (agent, action) ->
       test.strictEqual action.type, 'connect'
-      test.ok client.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
-      test.strictEqual typeof client.id, 'string'
-      test.ok client.id.length > 5
-      test.ok client.connectTime
+      test.ok agent.remoteAddress in ['localhost', '127.0.0.1'] # Is there a nicer way to do this?
+      test.strictEqual typeof agent.sessionId, 'string'
+      test.ok agent.sessionId.length > 5
+      test.ok agent.connectTime
 
-      test.strictEqual typeof client.headers, 'object'
+      test.strictEqual typeof agent.headers, 'object'
 
       # This is added above
-      test.strictEqual client.headers['x-testing'], 'booyah'
+      test.strictEqual agent.headers['x-testing'], 'booyah'
 
       action.reject()
 

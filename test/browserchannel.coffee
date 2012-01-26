@@ -93,7 +93,11 @@ module.exports = testCase
     @socket.send {doc:@name, open:true, create:true, type:'simple'}
     @expect {doc:@name, open:true, create:true, v:0}, =>
       @model.getSnapshot @name, (error, docData) ->
-        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+        test.ok docData.meta
+        test.strictEqual typeof(docData.meta.ctime), 'number'
+        test.strictEqual typeof(docData.meta.mtime), 'number'
+        delete docData.meta
+        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple}
         test.done()
 
   'open a nonexistant document without create fails': (test) ->
@@ -148,7 +152,9 @@ module.exports = testCase
     @socket.send {doc:@name, create:true, type:'simple'}
     @expect {doc:@name, create:true}, =>
       @model.getSnapshot @name, (error, docData) ->
-        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+        test.ok docData.meta
+        delete docData.meta
+        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple}
         test.done()
   
   'create a document that already exists returns create:false': (test) ->
@@ -301,7 +307,11 @@ module.exports = testCase
       test.ok data.doc.length > 8
 
       @model.getSnapshot data.doc, (error, docData) ->
-        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple, meta:{}}
+        test.ok docData.meta
+        test.strictEqual typeof(docData.meta.ctime), 'number'
+        test.strictEqual typeof(docData.meta.mtime), 'number'
+        delete docData.meta
+        test.deepEqual docData, {snapshot:{str:''}, v:0, type:types.simple}
         test.done()
 
 # ---- User agent tests
