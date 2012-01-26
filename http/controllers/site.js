@@ -10,5 +10,5 @@ function getBookmarklet(){
 }
 
 exports.index = function(req, res){
-  res.render('index', {bodyClass: 'home', layout: false, bookmarkletHref: getBookmarklet()})
+  res.render('site/index', {bodyClass: 'home', layout: false, bookmarkletHref: getBookmarklet()})
 };

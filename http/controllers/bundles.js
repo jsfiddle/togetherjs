@@ -40,7 +40,7 @@ exports.collaborate = function(req, resp){
     resources.sort(function(a,b){ a.name > b.name ? 1 : -1});
 
     console.log(resources);
-    resp.render('collaborate', {
+    resp.render('bundles/collaborate', {
       'bundleId': bundle.id,
       'rootKey': bundle.id + '_' + bundle.root, 
       'resources': resources.reverse(), 
@@ -141,7 +141,7 @@ exports.create = function(req, resp){
       }
     }
     console.log(bundle);
-    resp.render('towtruck_response', {url: 'http://localhost:3000/c/' + bundleId.toString(36)});
+    resp.render('bundles/create', {url: 'http://localhost:3000/c/' + bundleId.toString(36)});
   });
 };
 

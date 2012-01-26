@@ -5,47 +5,47 @@ var express = require('express');
 var whiskers = require('whiskers');
 var fs = require('fs');
 
-var app = module.exports = express.createServer();
+var http = module.exports = express.createServer();
 
 // Configuration
 
-app.configure(function(){
-  app.use(express.logger());
-  app.use(express.resourceParserHack());
-  app.use(express.bodyParser());
+http.configure(function(){
+  http.use(express.logger());
+  http.use(express.resourceParserHack());
+  http.use(express.bodyParser());
   
   
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'html');
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+  http.set('views', __dirname + '/http/views');
+  http.set('view engine', 'html');
+  http.use(express.methodOverride());
+  http.use(http.router);
+  http.use(express.static(__dirname + '/http/public'));
   
-  app.register('.html', whiskers);
+  http.register('.html', whiskers);
 
 });
 
-app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+http.configure('development', function(){
+  http.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-app.configure('production', function(){
-  app.use(express.errorHandler()); 
+http.configure('production', function(){
+  http.use(express.errorHandler()); 
 });
 
 // Routes
 
 routes = {
-  bundles: require('./controllers/bundles'),
-  site: require ('./controllers/site')
+  bundles: require('./http/controllers/bundles'),
+  site: require ('./http/controllers/site')
 };
 
-app.get('/', routes.site.index);
+http.get('/', routes.site.index);
 
-app.get('/c/:id',   routes.bundles.collaborate);
-app.get('/v/:id',   routes.bundles.view);
-app.post('/bundle', routes.bundles.create);
-app.all('/bundle',  routes.bundles.allowCorsRequests);
+http.get('/c/:id',   routes.bundles.collaborate);
+http.get('/v/:id',   routes.bundles.view);
+http.post('/bundle', routes.bundles.create);
+http.all('/bundle',  routes.bundles.allowCorsRequests);
 
-app.listen(3000);
-console.log("TowTruck server listening on port %d in %s mode", app.address().port, app.settings.env);
+http.listen(3000);
+console.log("TowTruck HTTP server listening on port %d in %s mode", http.address().port, http.settings.env);
