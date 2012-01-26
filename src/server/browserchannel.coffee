@@ -57,6 +57,19 @@ module.exports = (createAgent, options) ->
     handleMessage = (query) ->
       #console.log "Message from #{session.id}", query
 
+      error = null
+      error = 'Invalid docName' unless query.doc is null or typeof query.doc is 'string' or (query.doc is undefined and lastReceivedDoc)
+      error = "'create' must be true or missing" unless query.create in [true, undefined]
+      error = "'open' must be true, false or missing" unless query.open in [true, false, undefined]
+      error = "'snapshot' must be null or missing" unless query.snapshot in [null, undefined]
+      error = "'type' invalid" unless query.type is undefined or typeof query.type is 'string'
+      error = "'v' invalid" unless query.v is undefined or (typeof query.v is 'number' and query.v >= 0)
+      
+      if error
+        console.warn "Invalid query #{JSON.stringify query} from #{agent.sessionId}: #{error}"
+        session.abort()
+        return callback()
+
       # The agent can specify null as the docName to get a random doc name.
       if query.doc is null
         query.doc = lastReceivedDoc = hat()
@@ -184,32 +197,6 @@ module.exports = (createAgent, options) ->
           return callback 'meta must be an object'
 
       docData = undefined
-      # Technically, we don't need a snapshot if the user called create but not open or createSnapshot,
-      # but no clients do that yet anyway.
-      #
-      # It might be nice to add a 'createOrGet()' method to model / db manager. But most
-      # of the time clients are opening an existing document rather than creating a new one anyway.
-      ###
-      agent.getSnapshot query.doc, (error, data) ->
-        maybeCreate = (callback) ->
-          if query.create and error is 'Document does not exist'
-            agent.create docName, query.type, query.meta or {}, callback
-          else
-            callback error, data
-
-        maybeCreate (error, data) ->
-          if query.create
-            msg.create = !!error
-          if error is 'Document already exists'
-            msg.create = false
-          else if error and (!msg.create or error isnt 'Document already exists')
-            # This is the real final callback, to say an error has occurred.
-            return callback error
-          else if query.create or query.snapshot is null
-
-
-          if query.snapshot isnt null
-      ###
 
       # This is implemented with a series of cascading methods for each different type of
       # thing this method can handle. This would be so much nicer with an async library. Welcome to
@@ -225,8 +212,8 @@ module.exports = (createAgent, options) ->
         else
           agent.create docName, query.type, query.meta || {}, (error) ->
             if error is 'Document already exists'
-              # We've called getSnapshot (-> null), then createAgent (-> already exists). Its possible
-              # another agent has called createAgent first.
+              # We've called getSnapshot (-> null), then create (-> already exists). Its possible
+              # another agent has called create() between our getSnapshot and create() calls.
               agent.getSnapshot docName, (error, data) ->
                 return callback error if error
 
@@ -236,11 +223,14 @@ module.exports = (createAgent, options) ->
             else if error
               callback error
             else
-              msg.create = !error
+              msg.create = true
               step2Snapshot()
 
       # The socket requested a document snapshot
       step2Snapshot = ->
+#        if query.create or query.open or query.snapshot == null
+#          msg.meta = docData.meta
+
         # Skip inserting a snapshot if the document was just created.
         if query.snapshot != null or msg.create == true
           step3Open()
@@ -273,7 +263,9 @@ module.exports = (createAgent, options) ->
           msg.v = version
           callback()
 
-      if query.snapshot == null or (query.open == true and query.type)
+      # Technically, we don't need a snapshot if the user called create but not open or createSnapshot,
+      # but no clients do that yet anyway.
+      if query.snapshot == null or query.open == true #and query.type
         agent.getSnapshot query.doc, (error, data) ->
           return callback error if error and error != 'Document does not exist'
 
