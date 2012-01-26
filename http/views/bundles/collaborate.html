@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -64,19 +67,19 @@
 
     <div class="fluid-container sidebar-left">
       <div class="fluid-sidebar">
-        <chat>
-          <h3 class="nav-label">Chat</h5>
-          <dialog>
+        <div id="chat">
+          <h3 class="nav-label">Chat</h3>
+          <dl>
             <dt>@Simon</dt>
             <dd>Hey, what seems to be the problem?</dd>
             <dt>@Frank</dt>
             <dd>I don't know, but I'm getting an error.</dd>
-          </dialog>
+          </dl>
           <form>
             <input type="text" id="chat_input" class="span3" placeholder="Type something…" />
             <button type="submit" class="btn pull-right primary">Go</button>
           </form>
-        </chat>
+        </div>
       </div>
       <div class="fluid-content">
         <ul id="file_tab_nav" class="nav tabs">
@@ -86,6 +89,7 @@
           {/for}
         </ul>
         
+        <!-- frameBorder="0" is not valid HTML5, but it saves us from hacking etherpad -->
         <iframe 
           id="etherpad" 
           frameBorder="0" 
@@ -103,6 +107,7 @@
           <a href="http://mozillalabs.com/">
             <img src="https://mozillalabs.com/wp-content/themes/labs2.0/img/mozilla-logo.png" width="41" height="31" alt="Mozilla Logo">
             <strong>Copyright © 2005-2010 Mozilla.</strong>
+          </a>
         </div>
       </div>
     </footer>
