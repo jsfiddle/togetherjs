@@ -35,7 +35,7 @@
     <div id="share_modal" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">×</a>
-        <h3>Share With a Friend</h3>
+        <h3>Get Help by Sharing With a Friend</h3>
       </div>
       <div class="modal-body">
         <form><fieldset><input type="text" class="share" value="{thisUrl}"/></fieldset></form>
@@ -64,13 +64,19 @@
 
     <div class="fluid-container sidebar-left">
       <div class="fluid-sidebar">
-        <div class="side-nav">
-          <h5 class="nav-label">Collaborators</h5>
-          <ul class="nav-group">
-            <li><a class="nav-item" href="#">Simon</a></li>
-            <li><a class="nav-item" href="#">You</a></li>
-          </ul>
-        </div>
+        <chat>
+          <h3 class="nav-label">Chat</h5>
+          <dialog>
+            <dt>@Simon</dt>
+            <dd>Hey, what seems to be the problem?</dd>
+            <dt>@Frank</dt>
+            <dd>I don't know, but I'm getting an error.</dd>
+          </dialog>
+          <form>
+            <input type="text" id="chat_input" class="span3" placeholder="Type something…" />
+            <button type="submit" class="btn pull-right primary">Go</button>
+          </form>
+        </chat>
       </div>
       <div class="fluid-content">
         <ul id="file_tab_nav" class="nav tabs">

@@ -1,6 +1,20 @@
 body.collaborate {
   padding-top: 60px; 
 }
+
+body.collaborate chat {
+  height: 100%;
+  position: absolute;
+}
+body.collaborate chat form {
+  position: absolute;
+  bottom: 0;
+}
+body.collaborate chat dl {
+  overflow-y: auto;
+  height: 70%;
+}
+
 .tabs {
   margin-bottom: 0;
 }
