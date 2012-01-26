@@ -23,7 +23,7 @@
     
     <script type="text/javascript">
       $(function(){
-        $("#{rootKey}_tab").addClass('active');
+        $("#<%= rootKey%>_tab").addClass('active');
       });
     </script>
 
@@ -41,7 +41,7 @@
         <h3>Get Help by Sharing With a Friend</h3>
       </div>
       <div class="modal-body">
-        <form><fieldset><input type="text" class="share" value="{thisUrl}"/></fieldset></form>
+        <form><fieldset><input type="text" class="share" value="<%= thisUrl%>"/></fieldset></form>
         <p>
           <span class="label notice">Notice</span> 
           Anyone with this URL will be able to edit your file.
@@ -84,9 +84,9 @@
       <div class="fluid-content">
         <ul id="file_tab_nav" class="nav tabs">
 
-          {for resource in resources}
-          <li id="{resource.key}_tab" class="FileTab"><a href="http://localhost:9001/p/{resource.key}?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad">{resource.name}</a></li>
-          {/for}
+          <% for resources.forEach(function(resource){ %>
+          <li id="<%= resource.key %>_tab" class="FileTab"><a href="http://localhost:9001/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name%></a></li>
+          <% } %>
         </ul>
         
         <!-- frameBorder="0" is not valid HTML5, but it saves us from hacking etherpad -->
@@ -94,7 +94,7 @@
           id="etherpad" 
           frameBorder="0" 
           name="etherpad" 
-          src="http://localhost:9001/p/{rootKey}?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
+          src="http://localhost:9001/p/<%= rootKey%>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
         ></iframe>
         
       </div>

@@ -6,7 +6,7 @@
 
 // Module dependencies.
 var express = require('express');
-var whiskers = require('whiskers');
+var ejs = require('ejs');
 var fs = require('fs');
 
 var http = module.exports = express.createServer();
@@ -20,12 +20,11 @@ http.configure(function(){
   
   
   http.set('views', __dirname + '/http/views');
-  http.set('view engine', 'html');
+  http.set('view engine', 'ejs');
+  
   http.use(express.methodOverride());
   http.use(http.router);
   http.use(express.static(__dirname + '/http/public'));
-  
-  http.register('.html', whiskers);
 
 });
 
