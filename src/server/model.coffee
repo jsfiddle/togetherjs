@@ -499,23 +499,20 @@ module.exports = Model = (db, options) ->
   @applyMetaOp = (docName, metaOpData, callback) ->
     {path, value} = metaOpData.meta
    
-    if isArray path
-      load docName, (error, doc) ->
-        if error?
-          callback? error
-        else
-          applied = false
-          switch path[0]
-            when 'shout'
-              doc.eventEmitter.emit 'op', metaOpData
-              applied = true
+    return callback? "path should be an array" unless isArray path
 
-          model.emit 'applyMetaOp', docName, path, value if applied
-          callback? null, doc.v
-    else
-      callback? "path should be an array"
+    load docName, (error, doc) ->
+      if error?
+        callback? error
+      else
+        applied = false
+        switch path[0]
+          when 'shout'
+            doc.eventEmitter.emit 'op', metaOpData
+            applied = true
 
-
+        model.emit 'applyMetaOp', docName, path, value if applied
+        callback? null, doc.v
 
   # Listen to all ops from the specified version. If version is in the past, all
   # ops since that version are sent immediately to the listener.
