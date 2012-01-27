@@ -292,7 +292,8 @@ module.exports = (createAgent, options) ->
 
       opData = {v:query.v, op:query.op, meta:query.meta, dupIfSource:query.dupIfSource}
 
-      agent.submitOp query.doc, opData, (error, appliedVersion) ->
+      # If it's a metaOp don't send a response
+      agent.submitOp query.doc, opData, if (not opData.op? and opData.meta?.path?) then callback else (error, appliedVersion) ->
         msg = if error
           #p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}

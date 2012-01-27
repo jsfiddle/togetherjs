@@ -511,9 +511,9 @@ module.exports = Model = (db, options) ->
               applied = true
 
           model.emit 'applyMetaOp', docName, path, value if applied
-          callback error, doc.v
+          callback? null, doc.v
     else
-      callback? new Error "path should be an array"
+      callback? "path should be an array"
 
 
 
