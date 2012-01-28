@@ -45,6 +45,8 @@ routes = {
 
 http.get('/', routes.site.index);
 
+http.get('/bookmarklet.js', routes.site.bookmarklet);
+
 http.get('/c/:id',   routes.bundles.collaborate);
 http.get('/v/:id',   routes.bundles.view);
 http.post('/bundle', routes.bundles.create);

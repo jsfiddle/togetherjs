@@ -23,7 +23,7 @@
     
     <script type="text/javascript">
       $(function(){
-        $("#<%= rootKey%>_tab").addClass('active');
+        $("#<%= rootKey %>_tab").addClass('active');
       });
     </script>
 
@@ -58,6 +58,7 @@
         <div class="fluid-container">
           <a class="brand" href="#">TowTruck - Editing</a>
           <p class="pull-right">
+            <a id="play_button" class="btn" href="http://localhost:3000/v/<%= bundleKey%>" target="RenderTowtruck"><i class="icon play"></i>View in Browser</a>
             <a id="download_button" class="btn" href="#"><i class="icon file"></i> Download</a>
             <a id="share_button" class="btn" data-toggle="modal" href="#share_modal"><i class="icon share"></i> Share</a>
           </p>
@@ -83,10 +84,9 @@
       </div>
       <div class="fluid-content">
         <ul id="file_tab_nav" class="nav tabs">
-
-          <% for resources.forEach(function(resource){ %>
-          <li id="<%= resource.key %>_tab" class="FileTab"><a href="http://localhost:9001/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name%></a></li>
-          <% } %>
+          <% resources.forEach(function(resource){ %>
+          <li id="<%= resource.key %>_tab" class="FileTab"><a href="http://localhost:9001/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name %></a></li>
+          <% }) %>
         </ul>
         
         <!-- frameBorder="0" is not valid HTML5, but it saves us from hacking etherpad -->
