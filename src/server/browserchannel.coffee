@@ -101,7 +101,7 @@ module.exports = (createAgent, options) ->
           handleOpenCreateSnapshot query, callback
 
         # The socket is submitting an op.
-        else if query.op?
+        else if query.op? or query.meta?.path?
           handleOp query, callback
 
         else
@@ -292,7 +292,8 @@ module.exports = (createAgent, options) ->
 
       opData = {v:query.v, op:query.op, meta:query.meta, dupIfSource:query.dupIfSource}
 
-      agent.submitOp query.doc, opData, (error, appliedVersion) ->
+      # If it's a metaOp don't send a response
+      agent.submitOp query.doc, opData, if (not opData.op? and opData.meta?.path?) then callback else (error, appliedVersion) ->
         msg = if error
           #p "Sending error to socket: #{error}"
           {doc:query.doc, v:null, error:error}

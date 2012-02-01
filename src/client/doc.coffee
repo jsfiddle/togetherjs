@@ -223,6 +223,15 @@ class Doc
       # Finally, apply the op to @snapshot and trigger any event listeners
       @_otApply docOp, true
 
+    else if msg.meta
+      {path, value} = msg.meta
+
+      switch path?[0]
+        when 'shout'
+          return @emit 'shout', value
+        else
+          console?.warn 'Unhandled meta op:', msg
+
     else
       console?.warn 'Unhandled document message:', msg
 
@@ -263,7 +272,11 @@ class Doc
     # A timeout is used so if the user sends multiple ops at the same time, they'll be composed
     # & sent together.
     setTimeout @flush, 0
-
+  
+  shout: (msg) =>
+    # Meta ops don't have to queue, they can go direct. Good/bad idea?
+    @connection.send {doc:@name, meta: { path: ['shout'], value: msg } }
+  
   # Open a document. The document starts closed.
   open: (callback) ->
     @autoOpen = true

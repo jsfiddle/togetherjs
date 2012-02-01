@@ -8,6 +8,8 @@
 queue = require './syncqueue'
 types = require '../types'
 
+isArray = (o) -> Object.prototype.toString.call(o) == '[object Array]'
+
 # This constructor creates a new Model object. There will be one model object
 # per server context.
 #
@@ -492,10 +494,25 @@ module.exports = Model = (db, options) ->
       refreshReapingTimeout docName
       callback? error, newVersion
 
-  # Not yet implemented.
+  # TODO: store (some) metadata in DB
+  # TODO: op and meta should be combineable in the op that gets sent
   @applyMetaOp = (docName, metaOpData, callback) ->
-    {v, op} = metaOpData
-    throw new Error 'Not implemented'
+    {path, value} = metaOpData.meta
+   
+    return callback? "path should be an array" unless isArray path
+
+    load docName, (error, doc) ->
+      if error?
+        callback? error
+      else
+        applied = false
+        switch path[0]
+          when 'shout'
+            doc.eventEmitter.emit 'op', metaOpData
+            applied = true
+
+        model.emit 'applyMetaOp', docName, path, value if applied
+        callback? null, doc.v
 
   # Listen to all ops from the specified version. If version is in the past, all
   # ops since that version are sent immediately to the listener.

@@ -47,6 +47,7 @@ module.exports = (model, options) ->
         when 'create' then 'create'
         when 'get snapshot', 'get ops', 'open' then 'read'
         when 'submit op' then 'update'
+        when 'submit meta' then 'update'
         when 'delete' then 'delete'
         else throw new Error "Invalid action name #{name}"
 
@@ -93,8 +94,13 @@ module.exports = (model, options) ->
       opData.meta.source = @sessionId
       dupIfSource = opData.dupIfSource or []
 
-      @doAuth {docName, op:opData.op, v:opData.v, meta:opData.meta, dupIfSource}, 'submit op', callback, =>
-        model.applyOp docName, opData, callback
+      # If ops and meta get coalesced, they should be separated here.
+      if opData.op
+        @doAuth {docName, op:opData.op, v:opData.v, meta:opData.meta, dupIfSource}, 'submit op', callback, =>
+          model.applyOp docName, opData, callback
+      else
+        @doAuth {docName, meta:opData.meta}, 'submit meta', callback, =>
+          model.applyMetaOp docName, opData, callback
 
     # Delete the named operation.
     # Callback is passed (deleted?, error message)
