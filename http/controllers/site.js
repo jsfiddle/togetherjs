@@ -18,6 +18,6 @@ exports.index = function(req, res){
 };
 
 exports.bookmarklet = function(req, res){
-  resp.header('Content-Type', 'application/javascript');
+  res.header('Content-Type', 'application/javascript');
   res.render('site/bookmarklet.js.ejs', {layout: false});
 };
