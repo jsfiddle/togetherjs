@@ -1,12 +1,14 @@
 {
-    "name": "TowTruck"
-  , "version": "0.0.1"
-  , "private": true
-  , "dependencies": {
-      "express": "2.5.5"
-		, "redis": "0.7.1"
-		, "ejs": "0.6.1"
-		, "sha1": "0.0.1"
-		, "etherpad-lite-client": "0.2.0"
-  }
+	"name": "TowTruck",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"express": "2.5.5",
+		"redis": "0.7.1",
+		"ejs": "0.6.1",
+		"sha1": "0.0.1",
+		"etherpad-lite-client": "0.2.0",
+		"less": "1.2.1",
+		"uglify-js": "1.2.5"
+	}
 }
