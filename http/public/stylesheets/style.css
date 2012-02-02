@@ -22,8 +22,10 @@ body.collaborate #chat dl {
 .tabs {
   margin-bottom: 0;
 }
+
 #file_tab_nav {
   padding-left: 40px;
+  margin-bottom: 0;
 }
 
 #etherpad {
