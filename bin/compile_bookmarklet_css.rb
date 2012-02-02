@@ -6,15 +6,33 @@ require 'bundler/setup'
 # require 'tempfile'
 require 'less'
 
+def usage(reason)
+  puts "\nThe supplied path doesn't look like a bootstrap project.\n\n" if reason == :bad_path
+
+  puts "Usage:"
+  puts "\t#{$0} <path to bootstrap project clone>"
+  puts "\t(See https://github.com/twitter/bootstrap/ for repo)"
+  exit(0)
+end
+
+usage unless ARGV.size == 1
+
+BOOTSTRAP = File.expand_path(ARGV[0])
+
+usage(:bad_path) unless File.exist?("#{BOOTSTRAP}/Makefile")
+
+File.open("#{BOOTSTRAP}/Makefile") do |f|
+  if f.read(9) != 'BOOTSTRAP'
+    usage(:bad_path)
+  end
+end
+
 APP_ROOT = File.expand_path(File.dirname(__FILE__) + '/../')
-
-
 
 
 def read_contents(*libs)
   libs = [libs].flatten
-
-  libs.map{|lib| File.read("#{APP_ROOT}/http/public/bootstrap/lib/#{lib.to_s}.less")}
+  libs.map{|lib| File.read("#{BOOTSTRAP}/less/#{lib.to_s}.less")}
 end
 
 less_content = []
