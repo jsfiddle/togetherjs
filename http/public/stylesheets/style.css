@@ -8,10 +8,8 @@ body.collaborate {
 
 body.collaborate #chat {
   height: 100%;
-  position: absolute;
 }
 body.collaborate #chat form {
-  position: absolute;
   bottom: 0;
 }
 body.collaborate #chat dl {
@@ -30,7 +28,6 @@ body.collaborate #chat dl {
 
 #etherpad {
   width: 100%;
-  height: 100%;
 }
 
 .modal {

@@ -68,18 +68,20 @@
     </div>
     <div class="container-fluid">
       <div class="row-fluid">
-        <div class="chat span3">
-          <h3 class="nav-label">Chat</h3>
-          <dl>
-            <dt>@Simon</dt>
-            <dd>Hey, what seems to be the problem?</dd>
-            <dt>@Frank</dt>
-            <dd>I don't know, but I'm getting an error.</dd>
-          </dl>
-          <form>
-            <input type="text" id="chat_input" placeholder="Type something…" />
-            <button type="submit" class="btn pull-right primary">Go</button>
-          </form>
+        <div class="span3">
+          <div id="chat">
+            <h3 class="nav-label">Chat</h3>
+            <dl>
+              <dt>@Simon</dt>
+              <dd>Hey, what seems to be the problem?</dd>
+              <dt>@Frank</dt>
+              <dd>I don't know, but I'm getting an error.</dd>
+            </dl>
+            <form>
+              <input type="text" id="chat_input" placeholder="Type something…" />
+              <button type="submit" class="btn pull-right primary">Go</button>
+            </form>
+          </div>
         </div>
         <div class="span9" id="editor">
           <ul id="file_tab_nav" class="nav nav-tabs">
@@ -101,12 +103,14 @@
 
    
     <footer>
-      <div class="container">
-        <div class="row">
-          <a href="http://mozillalabs.com/">
-            <img src="https://mozillalabs.com/wp-content/themes/labs2.0/img/mozilla-logo.png" width="41" height="31" alt="Mozilla Logo">
-            <strong>Copyright © 2005-2010 Mozilla.</strong>
-          </a>
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12">
+            <a href="http://mozillalabs.com/">
+              <img src="https://mozillalabs.com/wp-content/themes/labs2.0/img/mozilla-logo.png" width="41" height="31" alt="Mozilla Logo">
+              <strong>Copyright © 2005-2010 Mozilla.</strong>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
