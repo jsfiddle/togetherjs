@@ -4,7 +4,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 cd ..
 APP_ROOT=`pwd`
 BOOTSTRAP=$1
-export PATH=$PATH:$APP_ROOT/node_modules/.bin
+export PATH=$APP_ROOT/node_modules/.bin:$PATH
 
 ACTIVE_LESSC=`which lessc`
 
