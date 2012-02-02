@@ -27,7 +27,7 @@ if [ -f `which lessc` ]; then
   else
     echo "ERROR: Bootstrap not found at $BOOTSTRAP"
     echo 
-    echo -e "Usage: \n\t$0 <path to bootstrap checkout>"
+    echo -e "Usage: \n\t$0 <path to bootstrap clone>"
     echo -e "\t(See https://github.com/twitter/bootstrap/ for details)"
   fi
 else
