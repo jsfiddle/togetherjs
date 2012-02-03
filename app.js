@@ -47,17 +47,21 @@ http.configure('production', function(){
 
 routes = {
   bundles: require('./http/controllers/bundles'),
-  site: require ('./http/controllers/site')
+  site: require('./http/controllers/site'),
+  resources: require('./http/controllers/resources')
 };
 
 http.get('/', routes.site.index);
-
 http.get('/bookmarklet.js', routes.site.bookmarklet);
+
+http.get('/resources/:id.:extension', routes.resources.viewEditable);
+http.get('/resources/:id/:contentType1/:contentType2', routes.resources.viewResource);
 
 http.get('/c/:id',   routes.bundles.collaborate);
 http.get('/v/:id',   routes.bundles.view);
 http.post('/bundle', routes.bundles.create);
-http.all('/bundle',  routes.bundles.allowCorsRequests);
+http.all('/bundle',  routes.site.allowCorsRequests);
+
 
 http.listen(config.get('bind_to').port);
 if (http.address() == null){
