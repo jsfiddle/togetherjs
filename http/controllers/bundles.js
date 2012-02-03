@@ -2,12 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var redis = require('redis').createClient();
-var etherpad = require('etherpad-lite-client').connect({
-  apikey: 'jZZMcZVwJKJS5jRJALhqATeOAgY2SV0a',
-  host: 'localhost',
-  port: 9001,
-});
+
+
+const
+config = require('../../lib/configuration');
+
+var redis = require('redis').createClient(config.get('redis').port, config.get('redis').host);
+
+var etherpad = require('etherpad-lite-client').connect(config.get('etherpad'));
 
 
 exports.collaborate = function(req, resp){
@@ -42,15 +44,15 @@ exports.collaborate = function(req, resp){
       }
     }
     resources.sort(function(a,b){ a.name > b.name ? 1 : -1});
-
-    console.log(resources);
     
     resp.render('bundles/collaborate', {
       'bundleId': bundle.id,
       'bundleKey': bundle.id.toString(36),
       'rootKey': bundle.id + '_' + bundle.root, 
       'resources': resources.reverse(), 
-      'thisUrl': 'http://localhost:3000' + req.url,
+      'thisPath': req.url,
+      'publicUrl': config.get('public_url'),
+      'etherpadUrl': config.get('etherpad').publicUrl,
       'layout': false      
     });
   });
@@ -147,7 +149,7 @@ exports.create = function(req, resp){
       }
     }
     console.log(bundle);
-    resp.render('bundles/create', {layout: false, url: 'http://localhost:3000/c/' + bundleId.toString(36)});
+    resp.render('bundles/create', {layout: false, url: config.get('public_url') + '/c/' + bundleId.toString(36)});
   });
 };
 

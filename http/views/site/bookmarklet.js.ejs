@@ -4,9 +4,6 @@
 
 <%- partial('jquery.1.7.1.min.js.ejs') %> 
 
-//TODO: Insert this from constant.
-var BASE_URL = 'http://localhost:3000';
-
 //TODO: Make the jquery non-conflicting with other jQueries too.
 jQuery.noConflict();
 
@@ -103,7 +100,7 @@ var TowTruck = {
   postBundle: function(){
     jQuery.ajax({
       type: 'POST',
-      url: 'http://localhost:3000/bundle', 
+      url: baseUrl + '/bundle',
       data: JSON.stringify(this.bundle),
       success: function(url, status){
         jQuery('#tow_truck_share_url').text(url)
@@ -124,7 +121,7 @@ function addStyleSheetLink(path){
   link.rel = "stylesheet";
   link.type = "text/css";
   link.media = "screen";
-  link.href = BASE_URL + path;
+  link.href = baseUrl + path;
   document.head.appendChild(link);
 }
 

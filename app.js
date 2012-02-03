@@ -4,12 +4,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Module dependencies.
-var express = require('express');
-var ejs = require('ejs');
-var fs = require('fs');
 
-var http = module.exports = express.createServer();
+
+// Module dependencies.
+const
+path = require('path'),
+express = require('express'),
+ejs = require('ejs'),
+fs = require('fs');
+
+const config = require('./lib/configuration');
+
+var http = undefined;
+http = express.createServer();
 
 // Configuration
 
@@ -52,5 +59,5 @@ http.get('/v/:id',   routes.bundles.view);
 http.post('/bundle', routes.bundles.create);
 http.all('/bundle',  routes.bundles.allowCorsRequests);
 
-http.listen(3000);
+http.listen(config.get('bind_to').port);
 console.log("TowTruck HTTP server listening on port %d in %s mode", http.address().port, http.settings.env);

@@ -42,7 +42,7 @@
         <h3>Get Help by Sharing With a Friend</h3>
       </div>
       <div class="modal-body">
-        <form><fieldset><input type="text" class="share" value="<%= thisUrl%>"/></fieldset></form>
+        <form><fieldset><input type="text" class="share" value="<%= publicUrl%><%= thisPath %>"/></fieldset></form>
         <p>
           <span class="label notice">Notice</span> 
           Anyone with this URL will be able to edit your file.
@@ -59,7 +59,7 @@
         <div class="container-fluid">
           <a class="brand" href="#">TowTruck - Editing</a>
           <p class="pull-right">
-            <a id="play_button" class="btn" href="http://localhost:3000/v/<%= bundleKey%>" target="RenderTowtruck"><i class="icon play"></i>View in Browser</a>
+            <a id="play_button" class="btn" href="<%= publicUrl %>/v/<%= bundleKey%>" target="RenderTowtruck"><i class="icon play"></i>View in Browser</a>
             <a id="download_button" class="btn" href="#"><i class="icon file"></i> Download</a>
             <a id="share_button" class="btn" data-toggle="modal" href="#share_modal"><i class="icon share"></i> Share</a>
           </p>
@@ -86,7 +86,7 @@
         <div class="span9" id="editor">
           <ul id="file_tab_nav" class="nav nav-tabs">
             <% resources.forEach(function(resource){ %>
-            <li id="<%= resource.key %>_tab" class="FileTab"><a href="http://localhost:9001/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name %></a></li>
+            <li id="<%= resource.key %>_tab" class="FileTab"><a href="<%= etherpadUrl %>/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name %></a></li>
             <% }) %>
           </ul>
         
@@ -95,7 +95,7 @@
             id="etherpad" 
             frameBorder="0" 
             name="etherpad" 
-            src="http://localhost:9001/p/<%= rootKey%>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
+            src="<%= etherpadUrl %>/p/<%= rootKey%>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
           ></iframe>
         </div>
       </div>
