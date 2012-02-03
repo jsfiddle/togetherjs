@@ -25,7 +25,13 @@ exports.index = function(req, res){
 /*
  * GET /bookmarklet.js
  */
-exports.bookmarklet = function(req, res){
-  res.header('Content-Type', 'application/javascript');
-  res.render('site/bookmarklet.js.ejs', {layout: false, baseUrl: config.get('public_url')});
+exports.bookmarklet = function(req, resp){
+  resp.header('Access-Control-Allow-Origin', '*');
+  resp.header('Content-Type', 'application/javascript');
+  resp.render('site/bookmarklet.js.ejs', {layout: false, baseUrl: config.get('public_url')});
+};
+
+exports.allowCorsRequests = function(req, resp){
+  resp.header('Access-Control-Allow-Origin', '*');
+  resp.send('');
 };
