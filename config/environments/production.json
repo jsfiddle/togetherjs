@@ -1,1 +1,9 @@
-{}
+{
+  "public_url": "http://towtruck.mozillalabs.com",
+  "etherpad": {
+    "public_url": "http://etherpad.towtruck.mozillalabs.com",
+    "host": "http://etherpad.towtruck.mozillalabs.com",
+    "port": 80,
+    "apikey": "XXX"
+  }
+}
