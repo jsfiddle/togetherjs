@@ -10,7 +10,7 @@ function getBookmarkletHref(){
   //TODO: Cleanup
   var baseCode = "javascript:(function()%7Bvar%20script=document.createElement('script');script.src='" + 
                  config.get('public_url') + 
-                 "/bookmarklet.js';script.className='TowTruck';document.head.appendChild(script);%7D)();"
+                 "/bookmarklet.js';script.className='tow-truck';document.head.appendChild(script);%7D)();"
 
   return baseCode;
 }
