@@ -60,4 +60,8 @@ http.post('/bundle', routes.bundles.create);
 http.all('/bundle',  routes.bundles.allowCorsRequests);
 
 http.listen(config.get('bind_to').port);
+if (http.address() == null){
+  console.log("Error listening to " + JSON.stringify(config.get('bind_to')));
+  process.exit(1);
+}
 console.log("TowTruck HTTP server listening on port %d in %s mode", http.address().port, http.settings.env);
