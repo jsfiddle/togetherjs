@@ -7,7 +7,8 @@
 const
 config = require('../../lib/configuration');
 
-var redis = require('redis').createClient(config.get('redis').port, config.get('redis').host);
+// Load the configured redis client.
+var redis = require('../../lib/redis');
 
 var etherpad = require('etherpad-lite-client').connect(config.get('etherpad'));
 
@@ -58,6 +59,10 @@ exports.collaborate = function(req, resp){
   });
 };
 
+function escapeRegEx(text) {
+  return text.replace(/[\=\-\[\]\{\}\(\)\*\+\?\.\,\\\/\^\$\|\#]/g, "\\$&");
+}
+
 exports.view = function(req, resp){
   var bundleId = parseInt(req.params.id, 36);
   
@@ -65,7 +70,7 @@ exports.view = function(req, resp){
   redis.get(bundleId, function(err, bundle){
     //TODO: Error checking for 404 etc.
     bundle = JSON.parse(bundle);
-    console.log(bundleId + '_' + bundle.root);
+    console.log(bundle);
     resp.header('Content-Type', bundle.resources[bundle.root].contentType);
     etherpad.getText({padID: bundleId + '_' + bundle.root}, function(error, data){
       var rootContent = data['text']
@@ -82,14 +87,31 @@ exports.view = function(req, resp){
         else if (contentType.indexOf('text/css') == 0){
           extension = '.css';
         }
-        resources.push({id: x, originalUrl: bundle.resources[x].originalUrl});
+        
+        
+        if (extension != ''){
+          resources.push({
+            id: x, 
+            originalUrl: bundle.resources[x].originalUrl,
+            newUrl: "/resources/" + bundleId + "_" + x + extension
+          });
+        }
+        else{
+        
+        }
       }
       // Sort by length of the originalUrl so that we don't clobber 
       // things we shouldn't when replacing with new url.
-      resources.sort(function(a,b){
-        a.originalUrl.length > b.originalUrl.length ? 1 : -1
+      resources = resources.sort(function(a,b){
+        return b.originalUrl.length - a.originalUrl.length;
       });
       
+      //TODO: Figure out how to replace image urls in a sane manner. -- For now we just give them full-path
+      for (i in resources){
+        var resource = resources[i];
+        var regex = new RegExp("[\\\"\']" + escapeRegEx(resource.originalUrl) + "[\\\"\']", "g");
+        rootContent = rootContent.replace(regex, "\"" + resource.newUrl + "\"");
+      }
       
       resp.send(rootContent);
     });  
@@ -153,7 +175,3 @@ exports.create = function(req, resp){
   });
 };
 
-exports.allowCorsRequests = function(req, resp){
-  resp.header('Access-Control-Allow-Origin', '*');
-  resp.send('');
-};
