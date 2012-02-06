@@ -53,7 +53,7 @@ exports.collaborate = function(req, resp){
       'resources': resources.reverse(), 
       'thisPath': req.url,
       'publicUrl': config.get('public_url'),
-      'etherpadUrl': config.get('etherpad').publicUrl,
+      'etherpadUrl': config.get('etherpad')['public_url'],
       'layout': false      
     });
   });

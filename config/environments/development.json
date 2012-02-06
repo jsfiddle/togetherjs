@@ -4,6 +4,10 @@
   },
   "public_url": "http://localhost:3000",
   "etherpad": {
+    "public_url": "http://localhost:9001",
+    "host": "localhost",
+    "port": 80,
     "apikey": "jZZMcZVwJKJS5jRJALhqATeOAgY2SV0a"
   }
+
 }

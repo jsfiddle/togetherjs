@@ -1,8 +1,8 @@
 {
-  "public_url": "http://towtruck.mozillalabs.com",
+  "public_url": "http://towtruck.vcap.mozillalabs.com",
   "etherpad": {
-    "public_url": "http://etherpad.towtruck.mozillalabs.com",
-    "host": "http://etherpad.towtruck.mozillalabs.com",
+    "public_url": "http://towtruck-etherpad.vcap.mozillalabs.com",
+    "host": "towtruck-etherpad.vcap.mozillalabs.com",
     "port": 80,
     "apikey": "XXX"
   }
