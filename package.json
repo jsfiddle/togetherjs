@@ -7,7 +7,7 @@
     "redis": "0.7.1",
     "ejs": "0.6.1",
     "sha1": "0.0.1",
-    "etherpad-lite-client": "0.2.0",
+    "etherpad-lite-client": "git://github.com/simonwex/etherpad-lite-client-js.git#master",
     "less": "1.2.1",
     "winston": "0.5.6",
     "convict": "0.0.6",
