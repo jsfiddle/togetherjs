@@ -19,7 +19,11 @@ function getBookmarkletHref(){
  * GET home page.
  */
 exports.index = function(req, res){
-  res.render('site', {bodyClass: 'home', layout: false, bookmarkletHref: getBookmarkletHref()});
+  var environmentTag = '';
+  if (config.get('env') != 'production'){
+    environmentTag = '[' + config.get('env').substring(0, 3) + ']';
+  }
+  res.render('site', {bodyClass: 'home', layout: false, bookmarkletHref: getBookmarkletHref(), 'environmentTag': environmentTag});
 };
 
 /*
