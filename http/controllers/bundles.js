@@ -69,13 +69,15 @@ exports.view = function(req, resp){
   
   redis.get(bundleId, function(err, bundle){
     //TODO: Error checking for 404 etc.
+    if (err){
+      console.log(err);
+    }
+
     bundle = JSON.parse(bundle);
-    console.log(bundle);
+
     resp.header('Content-Type', bundle.resources[bundle.root].contentType);
     etherpad.getText({padID: bundleId + '_' + bundle.root}, function(error, data){
       var rootContent = data['text']
-      
-      
       var resources = [];
       
       for (x in bundle.resources){
@@ -119,59 +121,77 @@ exports.view = function(req, resp){
 };
 
 exports.create = function(req, resp){
-  redis.incr('global:last_bundle_id', function (err, bundleId) {
-    bundleId = parseInt(bundleId);
-    
-    resp.header('Access-Control-Allow-Origin', '*');
-    var sha1 = require('sha1');
+  resp.header('Access-Control-Allow-Origin', '*');
 
-    var bundle = {
-      id: bundleId,
-      resources: {
-      }
-    };
-  
-  
-    var resources = req.body.resources;
-  
-  
-    // Cycle through each resource
-    for(x in resources){
-      // For now we ignore those that don't have any data
-      // they weren't properly downloaed and are probably available
-      // publically.
-      if (resources[x]['content-type'] == null){
-        console.info("Ignoring " + x);
-        delete resources[x];
-      }
-      else{
-        var hash = sha1(x);
+  var buf = '';
+    
+  req.setEncoding('utf8');
+  req.on('data', function(chunk) {
+    buf += chunk;
+    console.log('data received');
+  });
+  req.on('end', function(){
+    try {
+      var postedBundle = buf.length ? JSON.parse(buf) : {};
+      var root = postedBundle.root;
+      var resources = postedBundle.resources;
+
+      redis.incr('global:last_bundle_id', function (err, bundleId) {
       
-        // Set the root object of the bundle
-        if (req.body.root == x)
-          bundle.root = hash;
-      
-        var contentType = resources[x]['content-type'];
-        bundle.resources[hash] = {
-          'originalUrl': x,
-          'contentType': contentType
+        bundleId = parseInt(bundleId);
+
+        var bundle = {
+          id: bundleId,
+          resources: {
+          }
         };
+
+        // Cycle through each resource
+        for(x in resources){
+          // For now we ignore those that don't have any data
+          // they weren't properly downloaed and are probably available
+          // publically.
+          if (resources[x]['content-type'] == null){
+            console.info("Ignoring " + x);
+            delete resources[x];
+          }
+          else{
+            var sha1 = require('sha1');
+            var hash = sha1(x);
       
-        redis.set(bundle.id, JSON.stringify(bundle));
+            // Set the root object of the bundle
+            if (root == x)
+              bundle.root = hash;
       
-        //SECURITY: This is an obvious way to get a resource on this server and do bad things...
-        // Now we persist it. Images go to redis, 
-        if (contentType.indexOf('image') == 0){
-          redis.set(bundle.id + "_" + hash, resources[x].data);
+            var contentType = resources[x]['content-type'];
+            bundle.resources[hash] = {
+              'originalUrl': x,
+              'contentType': contentType
+            };
+
+            redis.set(bundle.id, JSON.stringify(bundle));
+
+            //SECURITY: This is an obvious way to get a resource on this server and do bad things...
+            // Now we persist it. Images go to redis, 
+            if (contentType.indexOf('image') == 0){
+              redis.set(bundle.id + "_" + hash, resources[x].data);
+            }
+            else{
+              var id = bundle.id + "_" + hash;
+              etherpad.createPad({padID: id, text: resources[x].data}, function(err, x){
+                console.log("Response from creating pad " + id + ":");
+                console.log({'Etherpad Error': err});
+              });
+            }
+          }
         }
-        else{
-          var id = bundle.id + "_" + hash;
-          etherpad.createPad({padID: id, text: resources[x].data});        
-        }
-      }
+        console.log(bundle);
+        resp.render('bundles/create', {layout: false, url: config.get('public_url') + '/c/' + bundleId.toString(36)});
+      });
     }
-    console.log(bundle);
-    resp.render('bundles/create', {layout: false, url: config.get('public_url') + '/c/' + bundleId.toString(36)});
+    catch (err){
+      resp.render('bundles/create', {layout: false, url: config.get('public_url') + '/error'});
+    }
   });
 };
 
