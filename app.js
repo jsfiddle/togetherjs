@@ -22,9 +22,6 @@ http = express.createServer();
 
 http.configure(function(){
   http.use(express.logger());
-  http.use(express.resourceParserHack());
-  http.use(express.bodyParser());
-  
   
   http.set('views', __dirname + '/http/views');
   http.set('view engine', 'ejs');
