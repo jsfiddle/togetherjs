@@ -7,7 +7,7 @@ url = require 'url'
 
 connect = require 'connect'
 
-send403 = (res, message = 'Forbidden') ->
+send403 = (res, message = 'Forbidden\n') ->
   res.writeHead 403, {'Content-Type': 'text/plain'}
   res.end message
 
@@ -16,20 +16,20 @@ send404 = (res, message = '404: Your document could not be found.\n') ->
   res.end message
 
 sendError = (res, message) ->
-  if message == 'forbidden'
+  if message is 'forbidden'
     send403 res
-  else if message == 'Document does not exist'
+  else if message is 'Document does not exist'
     send404 res
   else
-    console.warn "REST server does not know how to send error: '#{message}'"
+    #console.warn "REST server does not know how to send error: '#{message}'"
     res.writeHead 500, {'Content-Type': 'text/plain'}
-    res.end "Error: #{message}"
+    res.end "#{message}\n"
 
 send400 = (res, message) ->
   res.writeHead 400, {'Content-Type': 'text/plain'}
   res.end message
 
-send200 = (res, message = 'OK') ->
+send200 = (res, message = "OK\n") ->
   res.writeHead 200, {'Content-Type': 'text/plain'}
   res.end message
 

@@ -23,6 +23,7 @@ fetch = (method, port, path, postData, extraHeaders, callback) ->
     data = ''
     response.on 'data', (chunk) -> data += chunk
     response.on 'end', ->
+      data = data.trim()
       if response.headers['content-type'] == 'application/json'
         data = JSON.parse(data)
 
@@ -135,6 +136,13 @@ module.exports = testCase
       test.strictEqual res.statusCode, 400
       test.done()
   
+  "Can't POST an op to a nonexistant document": (test) ->
+    # This was found in the wild -
+    # https://github.com/josephg/ShareJS/issues/66
+    fetch 'POST', @port, "/doc/#{@name}?v=0", {foo:'bar'}, (res, data) ->
+      test.strictEqual res.statusCode, 404
+      test.done()
+    
   'DELETE deletes a document': (test) ->
     @model.create @name, 'simple', =>
       fetch 'DELETE', @port, "/doc/#{@name}", null, (res, data) =>
@@ -250,4 +258,5 @@ module.exports = testCase
         @model.getSnapshot @name, (error, doc) ->
           test.ok doc
           test.done()
-  
+
+
