@@ -95,14 +95,13 @@ module.exports = Model = (db, options) ->
   # for a single document. This contains the logic for transforming & applying ops.
   makeOpQueue = (docName, doc) -> queue (opData, callback) ->
     return callback 'Version missing' unless opData.v >= 0
-    
-    opData.meta ||= {}
-    opData.meta.ts = Date.now()
-
     return callback 'Op at future version' if opData.v > doc.v
 
     # Punt the transforming work back to the client if the op is too old.
     return callback 'Op too old' if opData.v + options.maximumAge < doc.v
+
+    opData.meta ||= {}
+    opData.meta.ts = Date.now()
 
     # We'll need to transform the op to the current version of the document. This
     # calls the callback immediately if opVersion == doc.v.
@@ -370,13 +369,11 @@ module.exports = Model = (db, options) ->
   @create = (docName, type, meta, callback) ->
     [meta, callback] = [{}, meta] if typeof meta is 'function'
 
+    return callback? 'Invalid document name' if docName.match /\//
     return callback? 'Document already exists' if docs[docName]
 
     type = types[type] if typeof type == 'string'
-
     return callback? 'Type not found' unless type
-    return callback? 'Invalid document name' if docName.match /\//
-    return callback? 'Document already exists' if docs[docName]
 
     data =
       snapshot:type.create()
@@ -385,6 +382,7 @@ module.exports = Model = (db, options) ->
       v:0
 
     done = (error, dbMeta) ->
+      # dbMeta can be used to cache extra state needed by the database to access the document, like an ID or something.
       return callback? error if error
 
       # From here on we'll store the object version of the type name.
@@ -490,9 +488,12 @@ module.exports = Model = (db, options) ->
   # model.applyOp 'doc', OPC
   @applyOp = (docName, opData, callback) ->
     # All the logic for this is in makeOpQueue, above.
-    load docName, (error, doc) -> process.nextTick -> doc.opQueue opData, (error, newVersion) ->
-      refreshReapingTimeout docName
-      callback? error, newVersion
+    load docName, (error, doc) ->
+      return callback error if error
+
+      process.nextTick -> doc.opQueue opData, (error, newVersion) ->
+        refreshReapingTimeout docName
+        callback? error, newVersion
 
   # TODO: store (some) metadata in DB
   # TODO: op and meta should be combineable in the op that gets sent
