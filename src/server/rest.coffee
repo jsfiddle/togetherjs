@@ -15,15 +15,25 @@ send404 = (res, message = '404: Your document could not be found.\n') ->
   res.writeHead 404, {'Content-Type': 'text/plain'}
   res.end message
 
-sendError = (res, message) ->
-  if message is 'forbidden'
-    send403 res
-  else if message is 'Document does not exist'
-    send404 res
+sendError = (res, message, head = false) ->
+  if message == 'forbidden'
+    if head
+      send403 res, ""
+    else
+      send403 res
+  else if message == 'Document does not exist'
+    if head
+      send404 res, ""
+    else
+      send404 res
   else
-    #console.warn "REST server does not know how to send error: '#{message}'"
-    res.writeHead 500, {'Content-Type': 'text/plain'}
-    res.end "#{message}\n"
+    console.warn "REST server does not know how to send error: '#{message}'"
+    if head
+      res.writeHead 500, {'Content-Type': 'text/plain'}
+      res.end "Error: #{message}\n"
+    else
+      res.writeHead 500, {}
+      res.end ""
 
 send400 = (res, message) ->
   res.writeHead 400, {'Content-Type': 'text/plain'}
@@ -73,16 +83,22 @@ router = (app, createClient, options) ->
   # I'm not sure what to do with document metadata - it is inaccessable for now.
   app.get '/doc/:name', auth, (req, res) ->
     req._client.getSnapshot req.params.name, (error, doc) ->
-      if doc
+      if doc  
         res.setHeader 'X-OT-Type', doc.type.name
         res.setHeader 'X-OT-Version', doc.v
-        if typeof doc.snapshot == 'string'
-          send200 res, doc.snapshot
+        if req.method == "HEAD"
+          send200 res, ""
         else
-          sendJSON res, doc.snapshot
+          if typeof doc.snapshot == 'string'
+            send200 res, doc.snapshot
+          else
+            sendJSON res, doc.snapshot
       else
-        sendError res, error
-  
+        if req.method == "HEAD"
+          sendError res, error, true
+        else
+          sendError res, error
+          
   # Put is used to create a document. The contents are a JSON object with {type:TYPENAME, meta:{...}}
   app.put '/doc/:name', auth, (req, res) ->
     expectJSONObject req, res, (obj) ->

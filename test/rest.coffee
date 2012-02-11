@@ -71,7 +71,23 @@ module.exports = testCase
     fetch 'GET', @port, "/doc/#{@name}", null, (res, data) ->
       test.strictEqual(res.statusCode, 404)
       test.done()
+      
+   'return 404 and empty body when on HEAD on a nonexistant document': (test) ->
+    fetch 'HEAD', @port, "/doc/#{@name}", null, (res, data) ->
+      test.strictEqual res.statusCode, 404
+      test.strictEqual data, ''
+      test.done()
   
+  'return 200, empty body, version and type when on HEAD on a document': (test) ->
+    @model.create @name, 'simple', =>
+      @model.applyOp @name, {v:0, op:{position: 0, text: 'Hi'}}, =>
+        fetch 'HEAD', @port, "/doc/#{@name}", null, (res, data, headers) ->
+          test.strictEqual res.statusCode, 200
+          test.strictEqual headers['x-ot-version'], '1'
+          test.strictEqual headers['x-ot-type'], 'simple'
+          test.strictEqual data, ''
+          test.done()
+          
   'GET a document returns the document snapshot': (test) ->
     @model.create @name, 'simple', =>
       @model.applyOp @name, {v:0, op:{position: 0, text: 'Hi'}}, =>
