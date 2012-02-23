@@ -6,7 +6,7 @@ require 'bundler/setup'
 # require 'tempfile'
 require 'less'
 
-def usage(reason)
+def usage(reason = nil)
   puts "\nThe supplied path doesn't look like a bootstrap project.\n\n" if reason == :bad_path
 
   puts "Usage:"
