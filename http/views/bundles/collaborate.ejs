@@ -16,17 +16,18 @@
 
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" >
     <link href="/stylesheets/style.css"   rel="stylesheet" type="text/css" media="screen">
-    
+
     <script src="http://code.jquery.com/jquery-1.7.1.min.js" type="text/javascript"></script>
     <script src="/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="/bootstrap/js/bootstrap-modal.js" type="text/javascript"></script>
-    <script src="/javascripts/collaborate.js" type="text/javascript"></script>
-    
     <script type="text/javascript">
+      var BUNDLE_ID = "<%= bundleId %>";
+
       $(function(){
         $("#<%= rootKey %>_tab").addClass('active');
       });
     </script>
+    <script src="/javascripts/collaborate.js" type="text/javascript"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <!-- Le fav and touch icons -->
     <!-- <link rel="shortcut icon" href="/images/favicon.ico">
@@ -44,7 +45,7 @@
       <div class="modal-body">
         <form><fieldset><input type="text" class="share" value="<%= publicUrl%><%= thisPath %>"/></fieldset></form>
         <p>
-          <span class="label notice">Notice</span> 
+          <span class="label notice">Notice</span>
           Anyone with this URL will be able to edit your file.
         </p>
 
@@ -69,15 +70,17 @@
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span3">
-          <div id="chat">
-            <h3 class="nav-label">Chat</h3>
+          <div id="collaborators" style="display:none">
+            <h3 class="nav-label">Collaborators:</h3>
+            <ul>
+              <li class="alert alert-info">@you</li>
+            </ul>
+          </div>
+          <div id="timeline" style="display:none;">
+            <h3 class="nav-label">Timeline</h3>
             <dl>
-              <dt>@Simon</dt>
-              <dd>Hey, what seems to be the problem?</dd>
-              <dt>@Frank</dt>
-              <dd>I don't know, but I'm getting an error.</dd>
             </dl>
-            <form>
+            <form style="display:none">
               <input type="text" id="chat_input" placeholder="Type something…" />
               <button type="submit" class="btn pull-right primary">Go</button>
             </form>
@@ -89,19 +92,19 @@
             <li id="<%= resource.key %>_tab" class="FileTab"><a href="<%= etherpadUrl %>/p/<%= resource.key %>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false" target="etherpad"><%= resource.name %></a></li>
             <% }) %>
           </ul>
-        
+
           <!-- frameBorder="0" is not valid HTML5, but it saves us from hacking etherpad -->
-          <iframe 
-            id="etherpad" 
-            frameBorder="0" 
-            name="etherpad" 
+          <iframe
+            id="etherpad"
+            frameBorder="0"
+            name="etherpad"
             src="<%= etherpadUrl %>/p/<%= rootKey%>?useMonospaceFont=true&amp;showChat=false&amp;showControls=false"
           ></iframe>
         </div>
       </div>
     </div>
 
-   
+
     <footer>
       <div class="container-fluid">
         <div class="row-fluid">

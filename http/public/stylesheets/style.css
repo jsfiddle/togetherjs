@@ -6,13 +6,23 @@ body.collaborate {
   padding-top: 60px; 
 }
 
-body.collaborate #chat {
+body.collaborate #collaborators ul{
+  list-style-type: none;
+  padding-top: 1em;
+}
+body.collaborate #collaborators ul li{
+  display: inline;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+
+body.collaborate #timeline {
   height: 100%;
 }
-body.collaborate #chat form {
+body.collaborate #timeline form {
   bottom: 0;
 }
-body.collaborate #chat dl {
+body.collaborate #timeline dl {
   overflow-y: auto;
   height: 70%;
 }

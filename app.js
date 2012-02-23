@@ -18,14 +18,16 @@ const config = require('./lib/configuration');
 var http = undefined;
 http = express.createServer();
 
+var io = require('socket.io').listen(http);
+
 // Configuration
 
 http.configure(function(){
   http.use(express.logger());
-  
+
   http.set('views', __dirname + '/http/views');
   http.set('view engine', 'ejs');
-  
+
   http.use(express.methodOverride());
   http.use(http.router);
   http.use(express.static(__dirname + '/http/public'));
@@ -33,15 +35,73 @@ http.configure(function(){
 });
 
 http.configure('development', function(){
-  http.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  http.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 http.configure('production', function(){
-  http.use(express.errorHandler()); 
+  http.use(express.errorHandler());
 });
 
-// Routes
+// Chat and presence stuff:
+var activeBundles = {};
+io.sockets.on('connection', function(socket){
+  socket.on('adduser', function(data){
+    console.log({'activeBundles': activeBundles});
 
+    socket.username = data['username'];
+    socket.bundleId = data['bundleId'];
+
+    if (!socket.username){
+      socket.username = 'anonymous';
+    }
+    console.log({"activeBundles[socket.bundleId]": activeBundles[socket.bundleId]});
+    // Initialize and add the user to the bundle.
+    if (!activeBundles[socket.bundleId]){
+      activeBundles[socket.bundleId] = [];
+    }
+    activeBundles[socket.bundleId].push(socket.username);
+
+    socket.join(socket.bundleId);
+    socket.broadcast.to(socket.bundleId).emit('appendToTimeline', socket.username, "Has joined to collaborate.");
+    socket.broadcast.to(socket.bundleId).emit('updateCollaborators', activeBundles[socket.bundleId]);
+    socket.emit('updateCollaborators', activeBundles[socket.bundleId]);
+  });
+
+  socket.on('disconnect', function(){
+    // Remove user from collaborators list
+    try{
+      if (activeBundles[socket.bundleId].indexOf(socket.username) >= 0){
+        activeBundles[socket.bundleId].splice(activeBundles[socket.bundleId].indexOf(socket.username), 1);
+      }
+
+  		if (activeBundles[socket.bundleId].length == 0){
+  		  delete activeBundles[socket.bundleId];
+  	  }
+  	  else{
+  	    socket.broadcast.to(socket.bundleId).emit('updateCollaborators', activeBundles[socket.bundleId]);
+        socket.broadcast.to(socket.bundleId).emit('appendToTimeline', socket.username, "Has left.");
+      }
+    }
+    catch(err){
+      //Swallow this one.
+    }
+    finally{
+      socket.leave(socket.bundleId);
+    }
+	});
+
+  socket.on('openResource', function(resource){
+    socket.broadcast.to(socket.bundleId).emit(
+      'appendToTimeline',
+      socket.username,
+      "Is now working on <a class=\"FollowMe\" target=\"etherpad\" data-target-id=\"" + resource.id + "\" href=\"" + resource.href + "\">" + resource.name + "</a>"
+    );
+  });
+
+});
+
+
+// HTTP Routes
 routes = {
   bundles: require('./http/controllers/bundles'),
   site: require('./http/controllers/site'),
@@ -59,6 +119,9 @@ http.get('/v/:id',   routes.bundles.view);
 http.post('/bundle', routes.bundles.create);
 http.all('/bundle',  routes.site.allowCorsRequests);
 
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
 
 http.listen(config.get('bind_to').port);
 if (http.address() == null){

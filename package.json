@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "express": "2.5.5",
+    "socket.io": "0.8.7",
     "redis": "0.7.1",
     "ejs": "0.6.1",
     "sha1": "0.0.1",
