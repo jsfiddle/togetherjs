@@ -513,6 +513,10 @@ var WEB = true;
       return this.doc.removeListener(l);
     };
 
+    if (typeof WEB !== "undefined" && WEB !== null) {
+      SubDoc.prototype.attach_textarea = exports.Doc.prototype.attach_textarea;
+    }
+
     SubDoc.prototype.getLength = function() {
       return this.get().length;
     };

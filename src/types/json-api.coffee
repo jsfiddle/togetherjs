@@ -24,6 +24,8 @@ class SubDoc
   add: (amount, cb) -> @doc.addAt @path, amount, cb
   on: (event, cb) -> @doc.addListener @path, event, cb
   removeListener: (l) -> @doc.removeListener l
+  if WEB?
+    attach_textarea: exports.Doc::attach_textarea
 
   # text API compatibility
   getLength: -> @get().length
