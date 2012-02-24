@@ -43,7 +43,7 @@ applyToShareJS = (editorDoc, delta, doc) ->
 # Attach an ace editor to the document. The editor's contents are replaced
 # with the document's contents unless keepEditorContents is true. (In which case the document's
 # contents are nuked and replaced with the editor's).
-window.sharejs.Doc::attach_ace = (editor, keepEditorContents) ->
+window.sharejs.extendDoc 'attach_ace', (editor, keepEditorContents) ->
   throw new Error 'Only text documents can be attached to ace' unless @provides['text']
 
   doc = this

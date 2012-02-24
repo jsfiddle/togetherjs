@@ -5,7 +5,7 @@
 */
 var WEB = true;
 ;
-  var SubDoc, clone, depath, exports, isArray, json, pathEquals, text, traverse,
+  var SubDoc, clone, depath, exports, extendDoc, isArray, json, pathEquals, text, traverse,
     __slice = Array.prototype.slice;
 
   exports = window['sharejs'];
@@ -452,6 +452,14 @@ var WEB = true;
 
   if (typeof WEB === 'undefined') json = require('./json');
 
+  if (typeof WEB !== "undefined" && WEB !== null) {
+    extendDoc = exports.extendDoc;
+    exports.extendDoc = function(name, fn) {
+      SubDoc.prototype[name] = fn;
+      return extendDoc(name, fn);
+    };
+  }
+
   depath = function(path) {
     if (path.length === 1 && path[0].constructor === Array) {
       return path[0];
@@ -512,10 +520,6 @@ var WEB = true;
     SubDoc.prototype.removeListener = function(l) {
       return this.doc.removeListener(l);
     };
-
-    if (typeof WEB !== "undefined" && WEB !== null) {
-      SubDoc.prototype.attach_textarea = exports.Doc.prototype.attach_textarea;
-    }
 
     SubDoc.prototype.getLength = function() {
       return this.get().length;

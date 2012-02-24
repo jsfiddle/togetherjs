@@ -2,6 +2,12 @@
 
 json = require './json' if typeof WEB is 'undefined'
 
+if WEB?
+  extendDoc = exports.extendDoc
+  exports.extendDoc = (name, fn) ->
+    SubDoc::[name] = fn
+    extendDoc name, fn
+
 depath = (path) ->
   if path.length == 1 and path[0].constructor == Array
     path[0]
@@ -24,8 +30,6 @@ class SubDoc
   add: (amount, cb) -> @doc.addAt @path, amount, cb
   on: (event, cb) -> @doc.addListener @path, event, cb
   removeListener: (l) -> @doc.removeListener l
-  if WEB?
-    attach_textarea: exports.Doc::attach_textarea
 
   # text API compatibility
   getLength: -> @get().length
