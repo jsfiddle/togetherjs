@@ -23,7 +23,7 @@
   window.sharejs.extendDoc('attach_textarea', function(elem) {
     var doc, event, genOp, prevvalue, replaceText, _i, _len, _ref, _results;
     doc = this;
-    elem.value = this.get();
+    elem.value = this.getText();
     prevvalue = elem.value;
     replaceText = function(newText, transformCursor) {
       var newSelection, scrollTop;

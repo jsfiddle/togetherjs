@@ -18,7 +18,7 @@ applyChange = (doc, oldval, newval) ->
 
 window.sharejs.extendDoc 'attach_textarea', (elem) ->
   doc = this
-  elem.value = @get()
+  elem.value = @getText()
   prevvalue = elem.value
 
   replaceText = (newText, transformCursor) ->
