@@ -1,6 +1,10 @@
 unless WEB?
   types = require '../types'
 
+if WEB?
+  exports.extendDoc = (name, fn) ->
+    Doc::[name] = fn
+
 # A Doc is a client's view on a sharejs document.
 #
 # Documents are created by calling Connection.open().
