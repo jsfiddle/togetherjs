@@ -152,7 +152,7 @@
 
   text.name = 'text';
 
-  text.create = text.create = function() {
+  text.create = function() {
     return '';
   };
 
