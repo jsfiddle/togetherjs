@@ -9,7 +9,7 @@
   </div>
 </div>
 
-<div id="editor">Connecting...</div>
+<div id="editor"></div>
 <script src="/lib/cm/lib/codemirror.js"></script>
 <script src="/lib/cm/mode/coffeescript/coffeescript.js"></script>
 <script src="/channel/bcsocket.js"></script>
@@ -38,12 +38,10 @@ function setDoc(docName) {
 };
 
 window.onload = function() {
-  var ed = document.getElementById('editor');
-  editor = CodeMirror(function(elt) {
-    ed.parentNode.replaceChild(elt, ed);
-  }, { mode: "coffeescript", tabSize: 2 });
+  //var ed = document.getElementById('editor');
+  editor = CodeMirror(document.body, { mode: "coffeescript", tabSize: 2 });
 
-  setDoc('cm');     // Hooking sharjs and codemirror for the first time!
+  setDoc('cm');  // Hooking ShareJS and CodeMirror for the first time.
 
   var namefield = document.getElementById('namefield');
   function fn() {
