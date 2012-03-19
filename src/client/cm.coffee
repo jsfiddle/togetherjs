@@ -85,10 +85,10 @@ window.sharejs.Doc::attach_cm = (editor, keepEditorContents) ->
     suppress = false
     check()
 
-  @detach_ace = ->
+  @detach_cm = ->
     # TODO: can we remove the insert and delete event callbacks?
     editor.setOption 'onChange', null
-    delete @detach_ace
+    delete @detach_cm
 
   return
 
