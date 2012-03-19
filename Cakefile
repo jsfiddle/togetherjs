@@ -26,6 +26,7 @@ client = [
 
 extras = [
 	'client/ace'
+	'client/cm'
 	'client/textarea'
 ]
 
