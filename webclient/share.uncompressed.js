@@ -424,6 +424,12 @@
 
   if (typeof WEB === "undefined" || WEB === null) types = require('../types');
 
+  if (typeof WEB !== "undefined" && WEB !== null) {
+    exports.extendDoc = function(name, fn) {
+      return Doc.prototype[name] = fn;
+    };
+  }
+
   Doc = (function() {
 
     function Doc(connection, name, openData) {

@@ -11,7 +11,6 @@
     }
     startPos += delta.from.ch;
     if (delta.to.line === delta.from.line && delta.to.ch === delta.from.ch) {
-      console.log('I start:', startPos, 'text:', delta.text);
       doc.insert(startPos, delta.text.join('\n'));
     } else {
       delLen = delta.to.ch - delta.from.ch;
@@ -19,10 +18,7 @@
         delLen += editorDoc.lineInfo(i).text.length + 1;
         i++;
       }
-      console.log('D start:', startPos, 'len:', delLen);
-      console.log('before:', JSON.stringify(doc.snapshot));
       doc.del(startPos, delLen);
-      console.log('after:', JSON.stringify(doc.snapshot));
       if (delta.text) doc.insert(startPos, delta.text.join('\n'));
     }
     if (delta.next) return applyToShareJS(editorDoc, delta.next, doc);
@@ -42,7 +38,8 @@
         if (editorText !== otText) {
           console.error("Text does not match!");
           console.error("editor: " + editorText);
-          return console.error("ot:     " + otText);
+          console.error("ot:     " + otText);
+          return editor.setValue(sharedoc.snapshot);
         }
       }, 0);
     };
@@ -57,7 +54,6 @@
     editorListener = function(ed, change) {
       if (suppress) return;
       applyToShareJS(editor, change, sharedoc);
-      console.log('Applied change');
       return check();
     };
     editor.setOption('onChange', editorListener);
