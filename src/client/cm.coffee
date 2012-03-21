@@ -31,7 +31,7 @@ applyToShareJS = (editorDoc, delta, doc) ->
 # Attach a CodeMirror editor to the document. The editor's contents are replaced
 # with the document's contents unless keepEditorContents is true. (In which case
 # the document's contents are nuked and replaced with the editor's).
-window.sharejs.Doc::attach_cm = (editor, keepEditorContents) ->
+window.sharejs.extendDoc 'attach_cm', (editor, keepEditorContents) ->
   unless @provides.text
     throw new Error 'Only text documents can be attached to CodeMirror2'
 
@@ -39,7 +39,7 @@ window.sharejs.Doc::attach_cm = (editor, keepEditorContents) ->
   check = ->
     window.setTimeout ->
         editorText = editor.getValue()
-        otText = sharedoc.getText()
+        otText = sharedoc.snapshot
 
         if editorText != otText
           console.error "Text does not match!"
