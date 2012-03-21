@@ -39,14 +39,14 @@ window.sharejs.extendDoc 'attach_cm', (editor, keepEditorContents) ->
   check = ->
     window.setTimeout ->
         editorText = editor.getValue()
-        otText = sharedoc.snapshot
+        otText = sharedoc.getValue()
 
         if editorText != otText
           console.error "Text does not match!"
           console.error "editor: #{editorText}"
           console.error "ot:     #{otText}"
           # Replace the editor text with the doc snapshot.
-          editor.setValue sharedoc.snapshot
+          editor.setValue sharedoc.getValue()
       , 0
 
   if keepEditorContents

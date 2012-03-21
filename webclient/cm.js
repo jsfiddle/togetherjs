@@ -24,7 +24,7 @@
     if (delta.next) return applyToShareJS(editorDoc, delta.next, doc);
   };
 
-  window.sharejs.Doc.prototype.attach_cm = function(editor, keepEditorContents) {
+  window.sharejs.extendDoc('attach_cm', function(editor, keepEditorContents) {
     var check, editorListener, sharedoc, suppress;
     if (!this.provides.text) {
       throw new Error('Only text documents can be attached to CodeMirror2');
@@ -34,12 +34,12 @@
       return window.setTimeout(function() {
         var editorText, otText;
         editorText = editor.getValue();
-        otText = sharedoc.getText();
+        otText = sharedoc.getValue();
         if (editorText !== otText) {
           console.error("Text does not match!");
           console.error("editor: " + editorText);
           console.error("ot:     " + otText);
-          return editor.setValue(sharedoc.snapshot);
+          return editor.setValue(sharedoc.getValue());
         }
       }, 0);
     };
@@ -72,10 +72,10 @@
       suppress = false;
       return check();
     });
-    this.detach_ace = function() {
+    this.detach_cm = function() {
       editor.setOption('onChange', null);
-      return delete this.detach_ace;
+      return delete this.detach_cm;
     };
-  };
+  });
 
 }).call(this);
