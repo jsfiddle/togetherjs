@@ -1,5 +1,13 @@
 module("Slowparse");
 
+function documentFragmentHTML(doc) {
+  var div = document.createElement("div");
+  for (var i = 0; i < doc.childNodes.length; i++) {
+    div.appendChild(doc.childNodes[i].cloneNode(true));
+  }
+  return div.innerHTML;
+}
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var result = Slowparse.HTML(document, html);
@@ -38,7 +46,7 @@ test("parsing of valid HTML", function() {
         '"foo"',
         "attr node parseInfo.value.start/end positions are correct");
 
-  equal(outerHTML(doc), html,
+  equal(documentFragmentHTML(doc), html,
         "serialization of generated DOM matches original HTML");
 });
 
