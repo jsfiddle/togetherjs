@@ -29,6 +29,13 @@ var Slowparse = (function() {
       position: function() {
         return pos + linePos;
       },
+      nextNonWhitespace: function() {
+        while (1) {
+          var token = this.next();
+          if (token === null || token.string.trim().length)
+            return token;
+        }
+      },
       next: function() {
         while (stream.eol()) {
           pos += currentLine.length;
@@ -76,9 +83,9 @@ var Slowparse = (function() {
                 }
               };
               // TODO: Verify this next token is an '='.
-              tokenizer.next();
+              tokenizer.nextNonWhitespace();
               // TODO: Verify this next token is an attribute value.
-              token = tokenizer.next();
+              token = tokenizer.nextNonWhitespace();
               attr.parseInfo.value = {
                 start: token.position,
                 end: token.position + token.string.length
@@ -98,6 +105,8 @@ var Slowparse = (function() {
           if (token) {
             var htmlState = token.state.htmlState;
             if (htmlState.type == "openTag") {
+              // TODO: make sure this is a valid tag name, or a
+              // DOM exception will be thrown.
               var element = document.createElement(htmlState.tagName);
               currentNode.appendChild(element);
               currentNode = element;

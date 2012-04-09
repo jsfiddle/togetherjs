@@ -58,6 +58,40 @@ test("parsing of valid HTML", function() {
         "serialization of generated DOM matches original HTML");
 });
 
+[
+  '<p class = "foo">hello there</p>',
+  '<p class="foo"  >hello there</p>',
+  '<p \nclass="foo">hello there</p>',
+  '< p class = "foo">hello there</p>',
+  '<p class="foo">hello there</ p>',
+  '<p class="foo">hello there</p >'
+].forEach(function(html) {
+  test("parsing of valid HTML w/ whitespace: " +
+       JSON.stringify(html), function() {
+    var canonicalHTML = '<p class="foo">hello there</p>';
+    var result = Slowparse.HTML(document, html);
+
+    ok(result.document, "document is returned");
+    equal(result.error, null, "no errors are reported");
+    
+    var textNode = result.document.childNodes[0].childNodes[0];
+    equal(substring(html, textNode.parseInfo),
+          "hello there",
+          "text node parseInfo.start/end positions are correct");
+
+    var attr = result.document.childNodes[0].attributes[0];
+    equal(substring(html, attr.parseInfo.name),
+          "class",
+          "attr node parseInfo.name.start/end positions are correct");
+    equal(substring(html, attr.parseInfo.value),
+          '"foo"',
+          "attr node parseInfo.value.start/end positions are correct");
+
+    equal(documentFragmentHTML(result.document), canonicalHTML,
+          "Document fragment is correct.");
+  });
+});
+
 test("parsing of invalid HTML", function() {
   var html = '<p class="foo">hello there';
   var result = Slowparse.HTML(document, html);
