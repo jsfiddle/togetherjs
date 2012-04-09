@@ -65,6 +65,7 @@ var Slowparse = (function() {
           if (token) {
             var htmlState = token.state.htmlState;
             if (htmlState.type == "endTag") {
+              currentNode.parseInfo.openTag.end = token.position + 1;
               return;
             } else if (token.style == "attribute") {
               var attr = document.createAttribute(token.string);
@@ -101,8 +102,10 @@ var Slowparse = (function() {
               currentNode.appendChild(element);
               currentNode = element;
               currentNode.parseInfo = {
-                start: token.position,
-                end: undefined
+                openTag: {
+                  start: token.position,
+                  end: undefined
+                }
               };
               parseOpenTag(tokenizer);
             } else if (htmlState.type == null) {
@@ -115,7 +118,11 @@ var Slowparse = (function() {
             } else if (htmlState.type == "closeTag") {
               // TODO: Verify this token is a matching close tag.
               // TODO: Verify this next token is an endTag.
-              currentNode.parseInfo.end = tokenizer.next().position + 1;
+              tokenizer.next();
+              currentNode.parseInfo.closeTag = {
+                start: token.position,
+                end: tokenizer.position() + 1
+              };
               currentNode = currentNode.parentNode;
             } else {
               throw new Error("unexpected htmlState.type: " + htmlState.type);

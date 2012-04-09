@@ -29,8 +29,10 @@ test("parsing of valid HTML", function() {
 
   equal(p.nodeName, "P", "first child of generated DOM is <p>");
   ok('parseInfo' in p, "<p> has 'parseInfo' expando property");
-  equal(p.parseInfo.start, 0, "<p> parseInfo.start is correct");
-  equal(p.parseInfo.end, html.length, "<p> parseInfo.end is correct");
+  equal(substring(html, p.parseInfo.openTag), '<p class="foo">',
+        "<p> parseInfo.openTag start/end positions are correct");
+  equal(substring(html, p.parseInfo.closeTag), '</p>',
+        "<p> parseInfo.closeTag start/end positions are correct");
   equal(p.childNodes.length, 1, "<p> has one child");
   equal(p.attributes.length, 1, "<p> has one attribute");
 
@@ -66,4 +68,6 @@ test("parsing of invalid HTML", function() {
   equal(error.type, "UNCLOSED_TAG", "parser dies b/c of unclosed tag");
   equal(error.position, html.length, "parser dies at end of string");
   equal(error.node, p, "affiliated node of error is <p>");
+  equal(substring(html, p.parseInfo.openTag), '<p class="foo">',
+        "<p> parseInfo.openTag start/end positions are correct");
 });
