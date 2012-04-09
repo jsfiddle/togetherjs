@@ -2,7 +2,7 @@ Slowparse is an experimental JavaScript-based HTML parser for Mozilla Webmaking 
 
 Until now, most of Mozilla's Webmaking experiments that involve writing HTML ([lovebomb.me][], [Storything][], [X-Ray Goggles][], etc) have used `.innerHTML` to parse HTML into a DOM. However, this has a number of disadvantages:
 
-* It's difficult to map an element in the generated DOM back to its original HTML source code. This is useful in a variety of scenarios such as Jessica Klein's [lovebomb mockups][] and [webmaker tutorials][].
+* It's difficult to map an element in the generated DOM back to its location in the original HTML source code. This is useful in a variety of scenarios such as Jessica Klein's [lovebomb mockups][] and [webmaker tutorials][].
 
 * It's completely insecure. For our webmaker initiatives that really need to scale, we'd like to have more fine-grained control over what kinds of elements and attributes are allowed in code.
 
