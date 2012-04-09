@@ -1,11 +1,17 @@
 module("Slowparse");
 
+// Get the innerHTML of a document fragment.
 function documentFragmentHTML(doc) {
   var div = document.createElement("div");
   for (var i = 0; i < doc.childNodes.length; i++) {
     div.appendChild(doc.childNodes[i].cloneNode(true));
   }
   return div.innerHTML;
+}
+
+// Return a string's substring based on an object with {start, end} keys.
+function substring(string, interval) {
+  return string.slice(interval.start, interval.end);
 }
 
 test("parsing of valid HTML", function() {
@@ -32,17 +38,17 @@ test("parsing of valid HTML", function() {
 
   equal(textNode.nodeType, textNode.TEXT_NODE, "<p>'s child is a text node.");
   ok('parseInfo' in textNode, "text node has 'parseInfo' expando property");
-  equal(html.slice(textNode.parseInfo.start, textNode.parseInfo.end),
+  equal(substring(html, textNode.parseInfo),
         "hello there",
         "text node parseInfo.start/end positions are correct");
 
   var attr = p.attributes[0];
 
   ok('parseInfo' in attr, "attr node has 'parseInfo' expando property");
-  equal(html.slice(attr.parseInfo.name.start, attr.parseInfo.name.end),
+  equal(substring(html, attr.parseInfo.name),
         "class",
         "attr node parseInfo.name.start/end positions are correct");
-  equal(html.slice(attr.parseInfo.value.start, attr.parseInfo.value.end),
+  equal(substring(html, attr.parseInfo.value),
         '"foo"',
         "attr node parseInfo.value.start/end positions are correct");
 
