@@ -31,17 +31,6 @@ function assertParseInfo(html, node, name, map) {
   }
 }
 
-test("parsing of text w/ newlines", function() {
-  var html = '<p>hello\nthere</p>';
-  var result = Slowparse.HTML(document, html);
-  
-  ok(result.document, "document is returned");
-  equal(result.error, null, "no errors are reported");
-
-  equal(documentFragmentHTML(result.document),
-        "<p>hello\nthere</p>");
-});
-
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var result = Slowparse.HTML(document, html);
@@ -76,6 +65,22 @@ test("parsing of valid HTML", function() {
 
   equal(documentFragmentHTML(doc), html,
         "serialization of generated DOM matches original HTML");
+});
+
+[
+  '<p>hello\nthere</p>',
+  '<p>\n  hello there</p>'
+].forEach(function(html) {
+  test("parsing of text content w/ newlines: " + 
+       JSON.stringify(html), function() {
+    var result = Slowparse.HTML(document, html);
+  
+    ok(result.document, "document is returned");
+    equal(result.error, null, "no errors are reported");
+
+    equal(documentFragmentHTML(result.document),
+          html);
+  });
 });
 
 [

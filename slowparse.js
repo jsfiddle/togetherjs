@@ -63,7 +63,6 @@ var Slowparse = (function() {
           state: state
         };
         linePos = stream.pos;
-        //console.log(token.string, token.state.htmlState.type);
         return token;
       }
     };
@@ -127,7 +126,7 @@ var Slowparse = (function() {
                 }
               };
               parseOpenTag(tokenizer);
-            } else if (htmlState.type == null) {
+            } else if (token.style == null) {
               var textNode = document.createTextNode(token.string);
               currentNode.appendChild(textNode);
               textNode.parseInfo = {
@@ -162,7 +161,7 @@ var Slowparse = (function() {
       try {
         parseText(tokenizer);
       } catch (e) {
-        if (e instanceof ParseError) {
+        if (e.options) {
           error = e.options;
         } else
           throw e;
