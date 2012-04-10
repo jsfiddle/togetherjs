@@ -42,12 +42,11 @@ var Slowparse = (function() {
           linePos = 0;
           if (lines.length == 0)
             return null;
-          pos++;
           advanceLine();
           return {
             string: '\n',
             style: null,
-            position: pos
+            position: pos++
           };
         }
         var styleName = htmlMode.token(stream, state);
