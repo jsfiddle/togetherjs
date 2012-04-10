@@ -8,6 +8,88 @@ var Slowparse = (function() {
   ParseError.prototype = Error.prototype;
   
   function Tokenizer(html) {
+    var tokens = [];
+    var modes = {
+      text: function(pos) {
+        var text = '',
+            i = pos;
+        
+        function pushTextToken() {
+          if (text) {
+            tokens.push({
+              style: null,
+              string: text,
+              position: pos
+            });
+            text = '';
+          }
+        }
+        
+        while (i < html.length) {
+          if (html[i] == '<') {
+            pushTextToken();
+            pos = i = modes.startTag(i);
+          } else {
+            text += html[i];
+            i++;
+          }
+        }
+        pushTextToken();
+        return i;
+      },
+      startTag: function(pos) {
+        var i = pos + 1;
+        
+        while (i < html.length && html[i].match(/[A-Za-z\/]/))
+          i++;
+        tokens.push({
+          style: 'tag',
+          string: html.slice(pos, i),
+          position: pos
+        });
+        
+        if (i < html.length)
+          return modes.endTag(i);
+      },
+      endTag: function(pos) {
+        var i = pos;
+        while (i < html.length) {
+          // TODO: Process attributes, whitespace.
+          if (html[i] == '>') {
+            tokens.push({
+              style: 'tag',
+              string: '>',
+              position: i
+            });
+            return i + 1;
+          }
+          i++;
+        }
+        return i;
+      }
+    };
+    
+    modes.text(0);
+    tokens.reverse();
+    
+    return (function() {
+      var pos = 0;
+      return {
+        position: function() {
+          return pos;
+        },
+        next: function() {
+          if (tokens.length == 0)
+            return null;
+          var token = tokens.pop();
+          pos += token.string.length;
+          return token;
+        }
+      };
+    })();
+  }
+  
+  function CodeMirrorTokenizer(html) {
     var htmlMode = CodeMirror.getMode({
       indentUnit: 2
     }, "htmlmixed");
@@ -62,10 +144,12 @@ var Slowparse = (function() {
   }
   
   var Slowparse = {
+    Tokenizer: Tokenizer,
+    CodeMirrorTokenizer: CodeMirrorTokenizer,
     HTML: function(document, html) {
       var fragment = document.createDocumentFragment();
       var error = null;
-      var tokenizer = Tokenizer(html);
+      var tokenizer = CodeMirrorTokenizer(html);
       var currentNode = fragment;
       
       function parseOpenTag(tokenizer) {
