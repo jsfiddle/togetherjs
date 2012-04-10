@@ -9,9 +9,26 @@ function documentFragmentHTML(doc) {
   return div.innerHTML;
 }
 
-// Return a string's substring based on an object with {start, end} keys.
-function substring(string, interval) {
-  return string.slice(interval.start, interval.end);
+function assertParseInfo(html, node, name, map) {
+  function getDottedProperty(obj, property) {
+    var parts = property.split('.');
+    parts.forEach(function(part) {
+      if (!(part in obj))
+        return null;
+      obj = obj[part];
+    });
+    return obj;
+  }
+
+  for (var dottedName in map) {
+    var baseName = name + "." + dottedName;
+    var interval = getDottedProperty(node, dottedName);
+    ok(interval, baseName + " exists");
+    if (interval) {
+      equal(html.slice(interval.start, interval.end), map[dottedName],
+            baseName + " start/end positions are correct");
+    }
+  }
 }
 
 test("parsing of valid HTML", function() {
@@ -28,31 +45,23 @@ test("parsing of valid HTML", function() {
   var p = doc.childNodes[0];
 
   equal(p.nodeName, "P", "first child of generated DOM is <p>");
-  ok('parseInfo' in p, "<p> has 'parseInfo' expando property");
-  equal(substring(html, p.parseInfo.openTag), '<p class="foo">',
-        "<p> parseInfo.openTag start/end positions are correct");
-  equal(substring(html, p.parseInfo.closeTag), '</p>',
-        "<p> parseInfo.closeTag start/end positions are correct");
+  assertParseInfo(html, p, "p", {
+    'parseInfo.openTag': '<p class="foo">',
+    'parseInfo.closeTag': '</p>'
+  });
   equal(p.childNodes.length, 1, "<p> has one child");
   equal(p.attributes.length, 1, "<p> has one attribute");
 
   var textNode = p.childNodes[0];
 
   equal(textNode.nodeType, textNode.TEXT_NODE, "<p>'s child is a text node.");
-  ok('parseInfo' in textNode, "text node has 'parseInfo' expando property");
-  equal(substring(html, textNode.parseInfo),
-        "hello there",
-        "text node parseInfo.start/end positions are correct");
-
-  var attr = p.attributes[0];
-
-  ok('parseInfo' in attr, "attr node has 'parseInfo' expando property");
-  equal(substring(html, attr.parseInfo.name),
-        "class",
-        "attr node parseInfo.name.start/end positions are correct");
-  equal(substring(html, attr.parseInfo.value),
-        '"foo"',
-        "attr node parseInfo.value.start/end positions are correct");
+  assertParseInfo(html, textNode, "textNode", {
+    'parseInfo': 'hello there',
+  });
+  assertParseInfo(html, p.attributes[0], "attr", {
+    'parseInfo.name': 'class',
+    'parseInfo.value': '"foo"'
+  });
 
   equal(documentFragmentHTML(doc), html,
         "serialization of generated DOM matches original HTML");
@@ -73,19 +82,15 @@ test("parsing of valid HTML", function() {
 
     ok(result.document, "document is returned");
     equal(result.error, null, "no errors are reported");
-    
-    var textNode = result.document.childNodes[0].childNodes[0];
-    equal(substring(html, textNode.parseInfo),
-          "hello there",
-          "text node parseInfo.start/end positions are correct");
 
-    var attr = result.document.childNodes[0].attributes[0];
-    equal(substring(html, attr.parseInfo.name),
-          "class",
-          "attr node parseInfo.name.start/end positions are correct");
-    equal(substring(html, attr.parseInfo.value),
-          '"foo"',
-          "attr node parseInfo.value.start/end positions are correct");
+    var p = result.document.childNodes[0];
+    assertParseInfo(html, p.childNodes[0], "textNode", {
+      'parseInfo': 'hello there'
+    });
+    assertParseInfo(html, p.attributes[0], "attr", {
+      'parseInfo.name': 'class',
+      'parseInfo.value': '"foo"'
+    });
 
     equal(documentFragmentHTML(result.document), canonicalHTML,
           "Document fragment is correct.");
@@ -102,6 +107,7 @@ test("parsing of invalid HTML", function() {
   equal(error.type, "UNCLOSED_TAG", "parser dies b/c of unclosed tag");
   equal(error.position, html.length, "parser dies at end of string");
   equal(error.node, p, "affiliated node of error is <p>");
-  equal(substring(html, p.parseInfo.openTag), '<p class="foo">',
-        "<p> parseInfo.openTag start/end positions are correct");
+  assertParseInfo(html, p, "p", {
+    'parseInfo.openTag': '<p class="foo">'
+  });
 });
