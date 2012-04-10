@@ -76,6 +76,8 @@ var Slowparse = (function() {
               currentNode.parseInfo.openTag.end = token.position + 1;
               return;
             } else if (token.style == "attribute") {
+              // TODO: make sure this is a valid attribute name, or a
+              // DOM exception will be thrown.
               var attr = document.createAttribute(token.string);
               attr.parseInfo = {
                 name: {
@@ -115,9 +117,13 @@ var Slowparse = (function() {
                 };
                 currentNode = currentNode.parentNode;
               } else {
-                // TODO: make sure this is a valid tag name, or a
-                // DOM exception will be thrown.
                 var tagName = token.string.slice(1);
+                if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
+                  throw new ParseError({
+                    type: "INVALID_TAG_NAME",
+                    value: tagName,
+                    position: token.position + 1
+                  });
                 var element = document.createElement(tagName);
                 currentNode.appendChild(element);
                 currentNode = element;

@@ -112,7 +112,7 @@ test("parsing of valid HTML", function() {
   });
 });
 
-test("parsing of invalid HTML", function() {
+test("parsing of invalid HTML: UNCLOSED_TAG", function() {
   var html = '<p class="foo">hello there';
   var result = Slowparse.HTML(document, html);
   var error = result.error;
@@ -125,4 +125,14 @@ test("parsing of invalid HTML", function() {
   assertParseInfo(html, p, "p", {
     'parseInfo.openTag': '<p class="foo">'
   });
+});
+
+test("parsing of invalid HTML: INVALID_TAG_NAME", function() {
+  var html = '< p>hello there</p>';
+  var error = Slowparse.HTML(document, html).error;
+  
+  equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
+  equal(html.slice(error.position,
+                   error.position + error.value.length), error.value);
+  equal(error.value, " p");
 });
