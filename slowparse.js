@@ -30,10 +30,16 @@ var Slowparse = (function() {
         return this.next();
     },
     eatWhile: function(matcher) {
+      var wereAnyEaten = false;
       while (!this.end()) {
-        if (!this.eat(matcher))
-          return;
+        if (this.eat(matcher))
+          wereAnyEaten = true;
+        else
+          return wereAnyEaten;
       }
+    },
+    eatSpace: function() {
+      return this.eatWhile(/[\s\n]/);
     },
     pushToken: function(style) {
       if (this.pos == this.tokenStart)
@@ -71,10 +77,32 @@ var Slowparse = (function() {
         if (!stream.end())
           modes.endTag();
       },
-      endTag: function() {
-        stream.eatWhile(/[^>]/);
+      attributeValue: function() {
+        if (stream.next() != '"')
+          throw new Error("unquoted attributes are unimplemented");
+        stream.eatWhile(/[^"]/);
         stream.next();
-        stream.pushToken('tag');
+        stream.pushToken('string');
+      },
+      endTag: function() {
+        while (!stream.end()) {
+          if (stream.eatWhile(/[A-Za-z]/)) {
+            stream.pushToken('attribute');
+            stream.eatSpace() && stream.pushToken(null);
+            if (stream.peek() == '=') {
+              stream.next();
+              stream.pushToken(null);
+              modes.attributeValue();
+            }
+          } else if (stream.eatSpace()) {
+            stream.pushToken(null);
+          } else if (stream.peek() == '>') {
+            stream.next();
+            stream.pushToken('tag');
+            return;
+          } else
+            throw new Error("don't know what to do with " + stream.peek());
+        }
       }
     };
     

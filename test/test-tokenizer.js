@@ -70,3 +70,38 @@ test("<p>hi</p> is tokenized", function() {
     }
   ]);
 });
+
+test("attributes are tokenized", function() {
+  deepEqual(getAllTokens('<p class="foo">'), [
+    {
+      "position": 0,
+      "string": "<p",
+      "style": "tag"
+    },
+    {
+      "position": 2,
+      "string": " ",
+      "style": null
+    },
+    {
+      "position": 3,
+      "string": "class",
+      "style": "attribute"
+    },
+    {
+      "position": 8,
+      "string": "=",
+      "style": null
+    },
+    {
+      "position": 9,
+      "string": "\"foo\"",
+      "style": "string"
+    },
+    {
+      "position": 14,
+      "string": ">",
+      "style": "tag"
+    }
+  ]);
+});
