@@ -47,20 +47,14 @@ var Slowparse = (function() {
           return {
             string: '\n',
             style: null,
-            position: pos,
-            state: {
-              htmlState: {
-                type: null
-              }
-            }
+            position: pos
           };
         }
         var styleName = htmlMode.token(stream, state);
         var token = {
           string: currentLine.slice(linePos, stream.pos),
           style: styleName,
-          position: pos + linePos,
-          state: state
+          position: pos + linePos
         };
         linePos = stream.pos;
         return token;
@@ -79,8 +73,7 @@ var Slowparse = (function() {
         while (1) {
           var token = tokenizer.next();
           if (token) {
-            var htmlState = token.state.htmlState;
-            if (htmlState.type == "endTag") {
+            if (token.style == "tag" && token.string == ">") {
               currentNode.parseInfo.openTag.end = token.position + 1;
               return;
             } else if (token.style == "attribute") {
@@ -112,20 +105,31 @@ var Slowparse = (function() {
         while (1) {
           var token = tokenizer.next();
           if (token) {
-            var htmlState = token.state.htmlState;
-            if (htmlState.type == "openTag") {
-              // TODO: make sure this is a valid tag name, or a
-              // DOM exception will be thrown.
-              var element = document.createElement(htmlState.tagName);
-              currentNode.appendChild(element);
-              currentNode = element;
-              currentNode.parseInfo = {
-                openTag: {
+            if (token.style == "tag") {
+              if (token.string.slice(0, 2) == "</") {
+                // TODO: Verify this token is a matching close tag.
+                // TODO: Verify this next token is an endTag.
+                tokenizer.nextNonWhitespace();
+                currentNode.parseInfo.closeTag = {
                   start: token.position,
-                  end: undefined
-                }
-              };
-              parseOpenTag(tokenizer);
+                  end: tokenizer.position() + 1
+                };
+                currentNode = currentNode.parentNode;
+              } else {
+                // TODO: make sure this is a valid tag name, or a
+                // DOM exception will be thrown.
+                var tagName = token.string.slice(1);
+                var element = document.createElement(tagName);
+                currentNode.appendChild(element);
+                currentNode = element;
+                currentNode.parseInfo = {
+                  openTag: {
+                    start: token.position,
+                    end: undefined
+                  }
+                };
+                parseOpenTag(tokenizer);
+              }
             } else if (token.style == null) {
               var textNode = document.createTextNode(token.string);
               currentNode.appendChild(textNode);
@@ -133,17 +137,8 @@ var Slowparse = (function() {
                 start: token.position,
                 end: token.position + token.string.length
               };
-            } else if (htmlState.type == "closeTag") {
-              // TODO: Verify this token is a matching close tag.
-              // TODO: Verify this next token is an endTag.
-              tokenizer.nextNonWhitespace();
-              currentNode.parseInfo.closeTag = {
-                start: token.position,
-                end: tokenizer.position() + 1
-              };
-              currentNode = currentNode.parentNode;
             } else {
-              throw new Error("unexpected htmlState.type: " + htmlState.type);
+              throw new Error("unexpected token: " + JSON.stringify(token));
             }
           } else {
             if (currentNode !== fragment) {
