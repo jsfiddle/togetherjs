@@ -6,74 +6,84 @@ var Slowparse = (function() {
   }
   
   ParseError.prototype = Error.prototype;
+
+  function Stream(text) {
+    this.tokens = [];
+    this.text = text;
+    this.pos = 0;
+    this.tokenStart = 0;
+  }
+  
+  Stream.prototype = {
+    peek: function() {
+      return this.text[this.pos];
+    },
+    next: function() {
+      return this.text[this.pos++];
+    },
+    end: function() {
+      return (this.pos == this.text.length);
+    },
+    pushToken: function(style) {
+      if (this.pos == this.tokenStart)
+        return;
+      this.tokens.push({
+        style: style,
+        position: this.tokenStart,
+        string: this.text.slice(this.tokenStart, this.pos)
+      });
+      this.tokenStart = this.pos;
+    }
+  };
   
   function Tokenizer(html) {
-    var tokens = [];
+    var stream = new Stream(html);
     var modes = {
-      text: function(pos) {
-        var text = '',
-            i = pos;
-        
-        function pushTextToken() {
-          if (text) {
-            tokens.push({
-              style: null,
-              string: text,
-              position: pos
-            });
-            text = '';
-          }
+      text: function() {
+        while (!stream.end()) {
+          if (stream.peek() == '<') {
+            stream.pushToken(null);
+            modes.startTag();
+          } else
+            stream.next();
         }
-        
-        while (i < html.length) {
-          if (html[i] == '<') {
-            pushTextToken();
-            pos = i = modes.startTag(i);
-          } else {
-            text += html[i];
-            i++;
-          }
-        }
-        pushTextToken();
-        return i;
+
+        stream.pushToken(null);
       },
-      startTag: function(pos) {
-        var i = pos + 1;
-        
-        while (i < html.length && html[i].match(/[A-Za-z\/]/))
-          i++;
-        tokens.push({
-          style: 'tag',
-          string: html.slice(pos, i),
-          position: pos
-        });
-        
-        if (i < html.length)
-          return modes.endTag(i);
-      },
-      endTag: function(pos) {
-        var i = pos;
-        while (i < html.length) {
-          // TODO: Process attributes, whitespace.
-          if (html[i] == '>') {
-            tokens.push({
-              style: 'tag',
-              string: '>',
-              position: i
-            });
-            return i + 1;
-          }
-          i++;
+      startTag: function() {
+        if (stream.next() != '<')
+          throw new Error('assertion failed, expected to be on "<"');
+
+        while (!stream.end()) {
+          if (stream.peek().match(/[A-Za-z\/]/))
+            stream.next();
+          else
+            break;
         }
-        return i;
+        stream.pushToken('tag');
+
+        if (!stream.end())
+          modes.endTag();
+      },
+      endTag: function() {
+        console.log("END");
+        while (!stream.end()) {
+          if (stream.peek() == '>') {
+            stream.next();
+            stream.pushToken('tag');
+            return;
+          } else
+            stream.next();
+        }
       }
     };
     
-    modes.text(0);
-    tokens.reverse();
+    modes.text();
     
     return (function() {
       var pos = 0;
+      var tokens = stream.tokens.slice().reverse();
+
       return {
         position: function() {
           return pos;
