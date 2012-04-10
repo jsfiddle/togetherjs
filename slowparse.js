@@ -127,7 +127,7 @@ var Slowparse = (function() {
             } else if (htmlState.type == "closeTag") {
               // TODO: Verify this token is a matching close tag.
               // TODO: Verify this next token is an endTag.
-              tokenizer.next();
+              tokenizer.nextNonWhitespace();
               currentNode.parseInfo.closeTag = {
                 start: token.position,
                 end: tokenizer.position() + 1

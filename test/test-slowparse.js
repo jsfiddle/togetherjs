@@ -68,16 +68,16 @@ test("parsing of valid HTML", function() {
 });
 
 [
-  '<p class = "foo">hello there</p>',
-  '<p class="foo"  >hello there</p>',
-  '<p \nclass="foo">hello there</p>',
-  '< p class = "foo">hello there</p>',
-  '<p class="foo">hello there</ p>',
-  '<p class="foo">hello there</p >'
+  '<p class = "foo">hello there</p><p>u</p>',
+  '<p class="foo"  >hello there</p><p>u</p>',
+  '<p \nclass="foo">hello there</p><p>u</p>',
+  '< p class = "foo">hello there</p><p>u</p>',
+  '<p class="foo">hello there</ p><p>u</p>',
+  '<p class="foo">hello there</p ><p>u</p>'
 ].forEach(function(html) {
   test("parsing of valid HTML w/ whitespace: " +
        JSON.stringify(html), function() {
-    var canonicalHTML = '<p class="foo">hello there</p>';
+    var canonicalHTML = '<p class="foo">hello there</p><p>u</p>';
     var result = Slowparse.HTML(document, html);
 
     ok(result.document, "document is returned");
