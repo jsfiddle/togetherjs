@@ -1,8 +1,8 @@
 var Slowparse = (function() {
-  function ParseError(options) {
+  function ParseError(parseInfo) {
     this.name = "ParseError";
-    this.message = options.type;
-    this.options = options;
+    this.message = parseInfo.type;
+    this.parseInfo = parseInfo;
   }
   
   ParseError.prototype = Error.prototype;
@@ -161,8 +161,8 @@ var Slowparse = (function() {
       try {
         parseText(tokenizer);
       } catch (e) {
-        if (e.options) {
-          error = e.options;
+        if (e.parseInfo) {
+          error = e.parseInfo;
         } else
           throw e;
       }
