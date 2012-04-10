@@ -19,10 +19,21 @@ var Slowparse = (function() {
       return this.text[this.pos];
     },
     next: function() {
-      return this.text[this.pos++];
+      if (!this.end())
+        return this.text[this.pos++];
     },
     end: function() {
       return (this.pos == this.text.length);
+    },
+    eat: function(matcher) {
+      if (this.peek().match(matcher))
+        return this.next();
+    },
+    eatWhile: function(matcher) {
+      while (!this.end()) {
+        if (!this.eat(matcher))
+          return;
+      }
     },
     pushToken: function(style) {
       if (this.pos == this.tokenStart)
@@ -54,27 +65,16 @@ var Slowparse = (function() {
         if (stream.next() != '<')
           throw new Error('assertion failed, expected to be on "<"');
 
-        while (!stream.end()) {
-          if (stream.peek().match(/[A-Za-z\/]/))
-            stream.next();
-          else
-            break;
-        }
+        stream.eatWhile(/[A-Za-z\/]/);
         stream.pushToken('tag');
 
         if (!stream.end())
           modes.endTag();
       },
       endTag: function() {
-        console.log("END");
-        while (!stream.end()) {
-          if (stream.peek() == '>') {
-            stream.next();
-            stream.pushToken('tag');
-            return;
-          } else
-            stream.next();
-        }
+        stream.eatWhile(/[^>]/);
+        stream.next();
+        stream.pushToken('tag');
       }
     };
     
