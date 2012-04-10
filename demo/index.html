@@ -5,8 +5,11 @@
 <link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
 <link rel="stylesheet" href="jsbin-codemirror-theme.css">
 <style>
-html {
+html, body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
 }
 
 textarea.html {
@@ -16,11 +19,13 @@ textarea.html {
 
 .column {
   width: 25%;
+  height: 100%;
   display: inline-block;
   vertical-align: top;
   -webkit-box-sizing: border-box;
   border-left: 1px dotted black;
   padding-left: 10px;
+  padding-right: 10px;
 }
 
 .column:first-child {
@@ -30,6 +35,10 @@ textarea.html {
 .column > aside {
   height: 4em;
   font-size: small;
+}
+
+.error {
+  color: firebrick;
 }
 </style>
 <div class="column">
