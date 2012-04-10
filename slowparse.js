@@ -44,6 +44,16 @@ var Slowparse = (function() {
             return null;
           pos++;
           advanceLine();
+          return {
+            string: '\n',
+            style: null,
+            position: pos,
+            state: {
+              htmlState: {
+                type: null
+              }
+            }
+          };
         }
         var styleName = htmlMode.token(stream, state);
         var token = {
