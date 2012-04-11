@@ -132,15 +132,16 @@ function linkRenderedDomToSource(rendered) {
 
 var ErrorReporters = {
   MISMATCHED_CLOSE_TAG: function(error, template) {
+    var html = editor.getValue();
     template.find("code.open-tag")
-      .text('<' + error.node.nodeName.toLowerCase() + '>');
+      .text('<' + error.openTagName + '>');
     template.find("code.close-tag")
-      .text(error.value.toLowerCase() + '>');
+      .text('</' + error.closeTagName + '>');
     template.find("span.open-tag").mouseover(function() {
-      selectInterval(error.node.parseInfo.openTag);
+      selectInterval(error.openTag);
     });
     template.find("span.close-tag").mouseover(function() {
-      selectInterval(error);
+      selectInterval(error.closeTag);
     });
   }
 };

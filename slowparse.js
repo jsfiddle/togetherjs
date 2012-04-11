@@ -2,16 +2,7 @@ var Slowparse = (function() {
   function ParseError(parseInfo) {
     this.name = "ParseError";
     this.message = parseInfo.type;
-    this.parseInfo = {
-      type: parseInfo.type
-    };
-    if (parseInfo.node)
-      this.parseInfo.node = parseInfo.node;
-    if (parseInfo.token) {
-      this.parseInfo.value = parseInfo.token.value;
-      this.parseInfo.start = parseInfo.token.interval.start;
-      this.parseInfo.end = parseInfo.token.interval.end;
-    }
+    this.parseInfo = parseInfo;
   }
   
   ParseError.prototype = Error.prototype;
@@ -87,19 +78,22 @@ var Slowparse = (function() {
         this.domBuilder.currentNode.parseInfo.closeTag = {
           start: token.interval.start
         };
-        if (tagName.slice(1).toLowerCase() !=
-            this.domBuilder.currentNode.nodeName.toLowerCase())
+        var openTagName = this.domBuilder.currentNode.nodeName.toLowerCase();
+        var closeTagName = tagName.slice(1).toLowerCase();
+        if (closeTagName != openTagName)
           throw new ParseError({
             type: "MISMATCHED_CLOSE_TAG",
-            node: this.domBuilder.currentNode,
-            token: token
+            openTagName: openTagName,
+            closeTagName: closeTagName,
+            openTag: this.domBuilder.currentNode.parseInfo.openTag,
+            closeTag: token.interval
           });
         this._parseEndCloseTag();
       } else {
         if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
           throw new ParseError({
             type: "INVALID_TAG_NAME",
-            token: token
+            openTag: token.interval
           });
         this.domBuilder.pushElement(tagName, {
           openTag: {
@@ -179,7 +173,7 @@ var Slowparse = (function() {
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
         throw new ParseError({
           type: "UNCLOSED_TAG",
-          node: this.domBuilder.currentNode
+          openTag: this.domBuilder.currentNode.parseInfo.openTag
         });
     }
   };
