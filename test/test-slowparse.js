@@ -136,8 +136,8 @@ test("parse error: MISMATCHED_CLOSE_TAG", function() {
   var error = Slowparse.HTML(document, html).error;
   
   equal(error.type, "MISMATCHED_CLOSE_TAG");
-  equal(error.openTagName, 'p');
-  equal(error.closeTagName, 'i');
+  equal(error.openTag.name, 'p');
+  equal(error.closeTag.name, 'i');
   assertParseInfo(html, error, "error", {
     'openTag': '<p>',
     'closeTag': '</i'

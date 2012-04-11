@@ -134,9 +134,9 @@ var ErrorReporters = {
   MISMATCHED_CLOSE_TAG: function(error, template) {
     var html = editor.getValue();
     template.find("code.open-tag")
-      .text('<' + error.openTagName + '>');
+      .text('<' + error.openTag.name + '>');
     template.find("code.close-tag")
-      .text('</' + error.closeTagName + '>');
+      .text('</' + error.closeTag.name + '>');
     template.find("span.open-tag").mouseover(function() {
       selectInterval(error.openTag);
     });

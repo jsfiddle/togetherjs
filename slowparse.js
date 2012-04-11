@@ -1,4 +1,15 @@
 var Slowparse = (function() {
+  function combine(a, b) {
+    var obj = {}, name;
+    for (name in a) {
+      obj[name] = a[name];
+    }
+    for (name in b) {
+      obj[name] = b[name];
+    }
+    return obj;
+  }
+  
   function ParseError(parseInfo) {
     this.name = "ParseError";
     this.message = parseInfo.type;
@@ -83,10 +94,12 @@ var Slowparse = (function() {
         if (closeTagName != openTagName)
           throw new ParseError({
             type: "MISMATCHED_CLOSE_TAG",
-            openTagName: openTagName,
-            closeTagName: closeTagName,
-            openTag: this.domBuilder.currentNode.parseInfo.openTag,
-            closeTag: token.interval
+            openTag: combine({
+              name: openTagName
+            }, this.domBuilder.currentNode.parseInfo.openTag),
+            closeTag: combine({
+              name: closeTagName
+            }, token.interval)
           });
         this._parseEndCloseTag();
       } else {
