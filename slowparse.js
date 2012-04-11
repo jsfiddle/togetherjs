@@ -233,6 +233,9 @@ var Slowparse = (function() {
         document: domBuilder.fragment,
         error: error
       };
+    },
+    findError: function(html) {
+      return this.HTML(document, html).error;
     }
   };
   
