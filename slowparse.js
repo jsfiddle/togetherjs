@@ -55,140 +55,124 @@ var Slowparse = (function() {
     },
   };
   
-  function parseHTML(html, domBuilder) {
-    var stream = new Stream(html);
-    var error = null;
-    
-    var helpers = {
-      buildTextNode: function() {
-        var token = stream.makeToken();
-        if (token) {
-          domBuilder.text(token.value, token.interval);
-        }
-      },
-    };
-    
-    var modes = {
-      text: function() {
-        while (!stream.end()) {
-          if (stream.peek() == '<') {
-            helpers.buildTextNode();
-            modes.startTag();
-          } else
-            stream.next();
-        }
-
-        helpers.buildTextNode();
-
-        if (domBuilder.currentNode != domBuilder.fragment)
-          throw new ParseError({
-            type: "UNCLOSED_TAG",
-            node: domBuilder.currentNode,
-            position: stream.pos
-          });
-      },
-      startTag: function() {
-        if (stream.next() != '<')
-          throw new Error('assertion failed, expected to be on "<"');
-
-        stream.eatWhile(/[A-Za-z\/]/);
-        var token = stream.makeToken();
-        var tagName = token.value.slice(1);
-        if (tagName[0] == '/') {
-          domBuilder.currentNode.parseInfo.closeTag = {
-            start: token.interval.start
-          };
-          if (tagName.slice(1).toLowerCase() !=
-              domBuilder.currentNode.nodeName.toLowerCase())
-            throw new Error("TODO: parse error for unmatching close tag");
-          modes.endCloseTag();
-        } else {
-          if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
-            throw new ParseError({
-              type: "INVALID_TAG_NAME",
-              value: tagName,
-              position: token.interval.start + 1
-            });
-          domBuilder.pushElement(tagName, {
-            openTag: {
-              start: token.interval.start
-            }
-          });
-
-          if (!stream.end())
-            modes.endOpenTag();
-        }
-      },
-      quotedAttributeValue: function() {
-        stream.eatSpace();
-        stream.makeToken();
-        if (stream.next() != '"')
-          throw new Error("TODO: unquoted attributes are unimplemented");
-        stream.eatWhile(/[^"]/);
-        if (stream.next() != '"')
-          throw new Error("TODO: parse error for unterminated attr value");
-      },
-      endCloseTag: function() {
-        stream.eatSpace();
-        if (stream.next() != '>') {
-          if (stream.end())
-            throw new Error("TODO: parse error for unterminated close tag");
-          else
-            throw new Error("TODO: parse error for garbage in close tag");
-        }
-        var end = stream.makeToken().interval.end;
-        domBuilder.currentNode.parseInfo.closeTag.end = end;
-        domBuilder.popElement();
-      },
-      attribute: function() {
-        var nameTok = stream.makeToken();
-        stream.eatSpace();
-        if (stream.peek() == '=') {
-          stream.next();
-          modes.quotedAttributeValue();
-          var valueTok = stream.makeToken();
-          domBuilder.attribute(nameTok.value, valueTok.value.slice(1, -1), {
-            name: nameTok.interval,
-            value: valueTok.interval
-          });
-        } else
-          throw new Error("TODO: boolean attributes are unimplemented");
-      },
-      endOpenTag: function() {
-        while (!stream.end()) {
-          if (stream.eatWhile(/[A-Za-z]/)) {
-            modes.attribute();
-          } else if (stream.eatSpace()) {
-            stream.makeToken();
-          } else if (stream.peek() == '>') {
-            stream.next();
-            var end = stream.makeToken().interval.end;
-            domBuilder.currentNode.parseInfo.openTag.end = end;
-            return;
-          } else if (stream.end()) {
-            throw new Error("TODO: parse error for unterminated open tag");
-          } else
-            throw new Error("TODO: parse error for unexpected garbage: " +
-                            stream.peek());
-        }
-      }
-    };
-    
-    try {
-      modes.text();
-    } catch (e) {
-      if (e.parseInfo) {
-        error = e.parseInfo;
-      } else
-        throw e;
-    }
-    
-    return {
-      document: domBuilder.fragment,
-      error: error
-    };
+  function HTMLParser(stream, domBuilder) {
+    this.stream = stream;
+    this.domBuilder = domBuilder;
   }
 
+  HTMLParser.prototype = {
+    _buildTextNode: function() {
+      var token = this.stream.makeToken();
+      if (token) {
+        this.domBuilder.text(token.value, token.interval);
+      }
+    },
+    _parseStartTag: function() {
+      if (this.stream.next() != '<')
+        throw new Error('assertion failed, expected to be on "<"');
+
+      this.stream.eatWhile(/[A-Za-z\/]/);
+      var token = this.stream.makeToken();
+      var tagName = token.value.slice(1);
+      if (tagName[0] == '/') {
+        this.domBuilder.currentNode.parseInfo.closeTag = {
+          start: token.interval.start
+        };
+        if (tagName.slice(1).toLowerCase() !=
+            this.domBuilder.currentNode.nodeName.toLowerCase())
+          throw new Error("TODO: parse error for unmatching close tag");
+        this._parseEndCloseTag();
+      } else {
+        if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
+          throw new ParseError({
+            type: "INVALID_TAG_NAME",
+            value: tagName,
+            position: token.interval.start + 1
+          });
+        this.domBuilder.pushElement(tagName, {
+          openTag: {
+            start: token.interval.start
+          }
+        });
+
+        if (!this.stream.end())
+          this._parseEndOpenTag();
+      }
+    },
+    _parseQuotedAttributeValue: function() {
+      this.stream.eatSpace();
+      this.stream.makeToken();
+      if (this.stream.next() != '"')
+        throw new Error("TODO: unquoted attributes are unimplemented");
+      this.stream.eatWhile(/[^"]/);
+      if (this.stream.next() != '"')
+        throw new Error("TODO: parse error for unterminated attr value");
+    },
+    _parseEndCloseTag: function() {
+      this.stream.eatSpace();
+      if (this.stream.next() != '>') {
+        if (this.stream.end())
+          throw new Error("TODO: parse error for unterminated close tag");
+        else
+          throw new Error("TODO: parse error for garbage in close tag");
+      }
+      var end = this.stream.makeToken().interval.end;
+      this.domBuilder.currentNode.parseInfo.closeTag.end = end;
+      this.domBuilder.popElement();
+    },
+    _parseAttribute: function() {
+      var nameTok = this.stream.makeToken();
+      this.stream.eatSpace();
+      if (this.stream.peek() == '=') {
+        this.stream.next();
+        this._parseQuotedAttributeValue();
+        var valueTok = this.stream.makeToken();
+        var unquotedValue = valueTok.value.slice(1, -1);
+        this.domBuilder.attribute(nameTok.value, unquotedValue, {
+          name: nameTok.interval,
+          value: valueTok.interval
+        });
+      } else
+        throw new Error("TODO: boolean attributes are unimplemented");
+    },
+    _parseEndOpenTag: function() {
+      while (!this.stream.end()) {
+        if (this.stream.eatWhile(/[A-Za-z]/)) {
+          this._parseAttribute();
+        } else if (this.stream.eatSpace()) {
+          this.stream.makeToken();
+        } else if (this.stream.peek() == '>') {
+          this.stream.next();
+          var end = this.stream.makeToken().interval.end;
+          this.domBuilder.currentNode.parseInfo.openTag.end = end;
+          return;
+        } else if (this.stream.end()) {
+          throw new Error("TODO: parse error for unterminated open tag");
+        } else
+          throw new Error("TODO: parse error for unexpected garbage: " +
+                          this.stream.peek());
+      }
+    },
+    parse: function() {
+      while (!this.stream.end()) {
+        if (this.stream.peek() == '<') {
+          this._buildTextNode();
+          this._parseStartTag();
+        } else
+          this.stream.next();
+      }
+
+      this._buildTextNode();
+
+      if (this.domBuilder.currentNode != this.domBuilder.fragment)
+        throw new ParseError({
+          type: "UNCLOSED_TAG",
+          node: this.domBuilder.currentNode,
+          position: this.stream.pos
+        });
+    }
+  };
+  
   function DOMBuilder(document) {
     this.document = document;
     this.fragment = document.createDocumentFragment();
@@ -220,7 +204,24 @@ var Slowparse = (function() {
   
   var Slowparse = {
     HTML: function(document, html) {
-      return parseHTML(html, new DOMBuilder(document));
+      var stream = new Stream(html),
+          domBuilder = new DOMBuilder(document),
+          parser = new HTMLParser(stream, domBuilder),
+          error = null;
+
+      try {
+        parser.parse();
+      } catch (e) {
+        if (e.parseInfo) {
+          error = e.parseInfo;
+        } else
+          throw e;
+      }
+
+      return {
+        document: domBuilder.fragment,
+        error: error
+      };
     }
   };
   
