@@ -9,8 +9,8 @@ var Slowparse = (function() {
       this.parseInfo.node = parseInfo.node;
     if (parseInfo.token) {
       this.parseInfo.value = parseInfo.token.value;
-      this.parseInfo.start = parseInfo.token.start;
-      this.parseInfo.end = parseInfo.token.end;
+      this.parseInfo.start = parseInfo.token.interval.start;
+      this.parseInfo.end = parseInfo.token.interval.end;
     }
   }
   

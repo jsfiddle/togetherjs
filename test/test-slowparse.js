@@ -130,7 +130,7 @@ test("parse error: INVALID_TAG_NAME", function() {
   var error = Slowparse.HTML(document, html).error;
   
   equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
-  assertParseInfo(html, html.slice(error.start, error.end), error.value);
+  equal(html.slice(error.start, error.end), error.value);
   equal(error.value, "<");
 });
 
@@ -141,7 +141,8 @@ test("parse error: MISMATCHED_CLOSE_TAG", function() {
   var p = result.document.childNodes[0];
   
   equal(error.type, "MISMATCHED_CLOSE_TAG");
-  assertParseInfo(html, html.slice(error.start, error.end), error.value);
+  
+  equal(html.slice(error.start, error.end), error.value);
   equal(error.value, "</i");
   
   equal(p.nodeName, "P", "first child of generated DOM is <p>");
