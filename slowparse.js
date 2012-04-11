@@ -163,7 +163,8 @@ var Slowparse = (function() {
             domBuilder.currentNode.parseInfo.openTag.end = end;
             return;
           } else
-            throw new Error("don't know what to do with " + stream.peek());
+            throw new Error("TODO: don't know what to do with " +
+                            stream.peek());
         }
       }
     };
