@@ -78,6 +78,7 @@ var Slowparse = (function() {
           modes.endTag();
       },
       attributeValue: function() {
+        stream.eatSpace() && stream.pushToken(null);
         if (stream.next() != '"')
           throw new Error("unquoted attributes are unimplemented");
         stream.eatWhile(/[^"]/);
@@ -111,10 +112,17 @@ var Slowparse = (function() {
     return (function() {
       var pos = 0;
       var tokens = stream.tokens.slice().reverse();
-
+      
       return {
         position: function() {
           return pos;
+        },
+        nextNonWhitespace: function() {
+          while (1) {
+            var token = this.next();
+            if (token === null || token.string.trim().length)
+              return token;
+          }
         },
         next: function() {
           if (tokens.length == 0)
@@ -187,7 +195,7 @@ var Slowparse = (function() {
     HTML: function(document, html) {
       var fragment = document.createDocumentFragment();
       var error = null;
-      var tokenizer = CodeMirrorTokenizer(html);
+      var tokenizer = Tokenizer(html);
       var currentNode = fragment;
       
       function parseOpenTag(tokenizer) {

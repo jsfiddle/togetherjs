@@ -87,7 +87,6 @@ test("parsing of valid HTML", function() {
   '<p class = "foo">hello there</p><p>u</p>',
   '<p class="foo"  >hello there</p><p>u</p>',
   '<p \nclass="foo">hello there</p><p>u</p>',
-  '<p class="foo">hello there</ p><p>u</p>',
   '<p class="foo">hello there</p ><p>u</p>'
 ].forEach(function(html) {
   test("parsing of valid HTML w/ whitespace: " +
@@ -134,5 +133,5 @@ test("parsing of invalid HTML: INVALID_TAG_NAME", function() {
   equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
   equal(html.slice(error.position,
                    error.position + error.value.length), error.value);
-  equal(error.value, " p");
+  equal(error.value, "");
 });
