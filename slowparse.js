@@ -131,7 +131,10 @@ var Slowparse = (function() {
       endCloseTag: function() {
         stream.eatSpace();
         if (stream.next() != '>') {
-          throw new Error("TODO: parse error for garbage in close tag");
+          if (stream.end())
+            throw new Error("TODO: parse error for unterminated close tag");
+          else
+            throw new Error("TODO: parse error for garbage in close tag");
         }
         var end = stream.makeToken().interval.end;
         domBuilder.currentNode.parseInfo.closeTag.end = end;
