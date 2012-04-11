@@ -8,7 +8,6 @@ var Slowparse = (function() {
   ParseError.prototype = Error.prototype;
 
   function Stream(text) {
-    this.tokens = [];
     this.text = text;
     this.pos = 0;
     this.tokenStart = 0;
@@ -41,65 +40,125 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
-    pushToken: function(style) {
+    makeToken: function() {
       if (this.pos == this.tokenStart)
-        return;
-      this.tokens.push({
-        style: style,
-        position: this.tokenStart,
-        string: this.text.slice(this.tokenStart, this.pos)
-      });
+        return null;
+      var token = {
+        value: this.text.slice(this.tokenStart, this.pos),
+        interval: {
+          start: this.tokenStart,
+          end: this.pos
+        }
+      };
       this.tokenStart = this.pos;
-    }
+      return token;
+    },
   };
   
-  function Tokenizer(html) {
+  function parseHTML(html, domBuilder) {
     var stream = new Stream(html);
+    var error = null;
+    
+    var helpers = {
+      buildTextNode: function() {
+        var token = stream.makeToken();
+        if (token) {
+          domBuilder.text(token.value, token.interval);
+        }
+      },
+    };
+    
     var modes = {
       text: function() {
         while (!stream.end()) {
           if (stream.peek() == '<') {
-            stream.pushToken(null);
+            helpers.buildTextNode();
             modes.startTag();
           } else
             stream.next();
         }
 
-        stream.pushToken(null);
+        helpers.buildTextNode();
+
+        if (domBuilder.currentNode != domBuilder.fragment)
+          throw new ParseError({
+            type: "UNCLOSED_TAG",
+            node: domBuilder.currentNode,
+            position: stream.pos
+          });
       },
       startTag: function() {
         if (stream.next() != '<')
           throw new Error('assertion failed, expected to be on "<"');
 
         stream.eatWhile(/[A-Za-z\/]/);
-        stream.pushToken('tag');
+        var token = stream.makeToken();
+        var tagName = token.value.slice(1);
+        if (tagName[0] == '/') {
+          domBuilder.currentNode.parseInfo.closeTag = {
+            start: token.interval.start
+          };
+          // TODO: Verify this is a matching close tag.
+          modes.endCloseTag();
+        } else {
+          if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
+            throw new ParseError({
+              type: "INVALID_TAG_NAME",
+              value: tagName,
+              position: token.interval.start + 1
+            });
+          domBuilder.pushElement(tagName, {
+            openTag: {
+              start: token.interval.start
+            }
+          });
 
-        if (!stream.end())
-          modes.endTag();
+          if (!stream.end())
+            modes.endOpenTag();
+        }
       },
-      attributeValue: function() {
-        stream.eatSpace() && stream.pushToken(null);
+      quotedAttributeValue: function() {
+        stream.eatSpace();
+        stream.makeToken();
         if (stream.next() != '"')
-          throw new Error("unquoted attributes are unimplemented");
+          throw new Error("TODO: unquoted attributes are unimplemented");
         stream.eatWhile(/[^"]/);
-        stream.next();
-        stream.pushToken('string');
+        if (stream.next() != '"')
+          throw new Error("TODO: parse error for unterminated attr value");
       },
-      endTag: function() {
+      endCloseTag: function() {
+        stream.eatSpace();
+        if (stream.next() != '>') {
+          throw new Error("TODO: parse error for garbage in close tag");
+        }
+        var end = stream.makeToken().interval.end;
+        domBuilder.currentNode.parseInfo.closeTag.end = end;
+        domBuilder.popElement();
+      },
+      attribute: function() {
+        var nameTok = stream.makeToken();
+        stream.eatSpace();
+        if (stream.peek() == '=') {
+          stream.next();
+          modes.quotedAttributeValue();
+          var valueTok = stream.makeToken();
+          domBuilder.attribute(nameTok.value, valueTok.value.slice(1, -1), {
+            name: nameTok.interval,
+            value: valueTok.interval
+          });
+        } else
+          throw new Error("TODO: boolean attributes are unimplemented");
+      },
+      endOpenTag: function() {
         while (!stream.end()) {
           if (stream.eatWhile(/[A-Za-z]/)) {
-            stream.pushToken('attribute');
-            stream.eatSpace() && stream.pushToken(null);
-            if (stream.peek() == '=') {
-              stream.next();
-              stream.pushToken(null);
-              modes.attributeValue();
-            }
+            modes.attribute();
           } else if (stream.eatSpace()) {
-            stream.pushToken(null);
+            stream.makeToken();
           } else if (stream.peek() == '>') {
             stream.next();
-            stream.pushToken('tag');
+            var end = stream.makeToken().interval.end;
+            domBuilder.currentNode.parseInfo.openTag.end = end;
             return;
           } else
             throw new Error("don't know what to do with " + stream.peek());
@@ -107,145 +166,53 @@ var Slowparse = (function() {
       }
     };
     
-    modes.text();
+    try {
+      modes.text();
+    } catch (e) {
+      if (e.parseInfo) {
+        error = e.parseInfo;
+      } else
+        throw e;
+    }
     
-    return (function() {
-      var pos = 0;
-      var tokens = stream.tokens.slice().reverse();
-      
-      return {
-        position: function() {
-          return pos;
-        },
-        nextNonWhitespace: function() {
-          while (1) {
-            var token = this.next();
-            if (token === null || token.string.trim().length)
-              return token;
-          }
-        },
-        next: function() {
-          if (tokens.length == 0)
-            return null;
-          var token = tokens.pop();
-          pos += token.string.length;
-          return token;
-        }
-      };
-    })();
+    return {
+      document: domBuilder.fragment,
+      error: error
+    };
+  }
+
+  function DOMBuilder(document) {
+    this.document = document;
+    this.fragment = document.createDocumentFragment();
+    this.currentNode = this.fragment;
   }
   
+  DOMBuilder.prototype = {
+    pushElement: function(tagName, parseInfo) {
+      var node = this.document.createElement(tagName);
+      node.parseInfo = parseInfo;
+      this.currentNode.appendChild(node);
+      this.currentNode = node;
+    },
+    popElement: function() {
+      this.currentNode = this.currentNode.parentNode;
+    },
+    attribute: function(name, value, parseInfo) {
+      var attrNode = this.document.createAttribute(name);
+      attrNode.parseInfo = parseInfo;
+      attrNode.nodeValue = value;
+      this.currentNode.attributes.setNamedItem(attrNode);
+    },
+    text: function(text, parseInfo) {
+      var textNode = this.document.createTextNode(text);
+      textNode.parseInfo = parseInfo;
+      this.currentNode.appendChild(textNode);
+    }
+  };
+  
   var Slowparse = {
-    Tokenizer: Tokenizer,
     HTML: function(document, html) {
-      var fragment = document.createDocumentFragment();
-      var error = null;
-      var tokenizer = Tokenizer(html);
-      var currentNode = fragment;
-      
-      function parseOpenTag(tokenizer) {
-        while (1) {
-          var token = tokenizer.next();
-          if (token) {
-            if (token.style == "tag" && token.string == ">") {
-              currentNode.parseInfo.openTag.end = token.position + 1;
-              return;
-            } else if (token.style == "attribute") {
-              // TODO: make sure this is a valid attribute name, or a
-              // DOM exception will be thrown.
-              var attr = document.createAttribute(token.string);
-              attr.parseInfo = {
-                name: {
-                  start: token.position,
-                  end: token.position + token.string.length
-                }
-              };
-              // TODO: Verify this next token is an '='.
-              tokenizer.nextNonWhitespace();
-              // TODO: Verify this next token is an attribute value.
-              token = tokenizer.nextNonWhitespace();
-              attr.parseInfo.value = {
-                start: token.position,
-                end: token.position + token.string.length
-              };
-              attr.nodeValue = token.string.slice(1, -1);
-              currentNode.attributes.setNamedItem(attr);
-            }
-          } else {
-            throw new Error("TODO: Report an unclosed tag error");
-          }
-        }
-      }
-      
-      function parseText(tokenizer) {
-        while (1) {
-          var token = tokenizer.next();
-          if (token) {
-            if (token.style == "tag") {
-              if (token.string.slice(0, 2) == "</") {
-                // TODO: Verify this token is a matching close tag.
-                // TODO: Verify this next token is an endTag.
-                tokenizer.nextNonWhitespace();
-                currentNode.parseInfo.closeTag = {
-                  start: token.position,
-                  end: tokenizer.position() + 1
-                };
-                currentNode = currentNode.parentNode;
-              } else {
-                var tagName = token.string.slice(1);
-                if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
-                  throw new ParseError({
-                    type: "INVALID_TAG_NAME",
-                    value: tagName,
-                    position: token.position + 1
-                  });
-                var element = document.createElement(tagName);
-                currentNode.appendChild(element);
-                currentNode = element;
-                currentNode.parseInfo = {
-                  openTag: {
-                    start: token.position,
-                    end: undefined
-                  }
-                };
-                parseOpenTag(tokenizer);
-              }
-            } else if (token.style == null) {
-              var textNode = document.createTextNode(token.string);
-              currentNode.appendChild(textNode);
-              textNode.parseInfo = {
-                start: token.position,
-                end: token.position + token.string.length
-              };
-            } else {
-              throw new Error("unexpected token: " + JSON.stringify(token));
-            }
-          } else {
-            if (currentNode !== fragment) {
-              throw new ParseError({
-                type: "UNCLOSED_TAG",
-                node: currentNode,
-                position: tokenizer.position()
-              });
-            }
-            return;
-          }
-        }
-      }
-
-      try {
-        parseText(tokenizer);
-      } catch (e) {
-        if (e.parseInfo) {
-          error = e.parseInfo;
-        } else
-          throw e;
-      }
-      
-      return {
-        document: fragment,
-        error: error
-      };
+      return parseHTML(html, new DOMBuilder(document));
     }
   };
   
