@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Slowparse Error Reporting Specification</title>
+<style>
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body {
+  width: 960px;
+  margin: 0 auto 1em auto;
+}
+
+div.report > h2:before {
+  content: "ERROR TYPE: ";
+  color: gray;
+}
+
+pre, div.js {
+  font-family: Menlo, Monaco, "Lucida Console", monospace;
+}
+
+div.console {
+  background: black;
+  padding: 10px;
+}
+
+div.js {
+  color: lightgreen;
+}
+
+div.js > div {
+  display: pre;
+}
+
+div.js > div:before {
+  content: '> ';
+  color: gray;
+}
+
+pre.result {
+  color: lightgray;
+}
+
+pre.html {
+  background: lightgray;
+  color: black;
+  padding: 10px;
+}
+</style>
+<h1>Slowparse Error Reporting Specification</h1>
+<div id="templates" style="display: none">
+  <div class="report">
+    <h2></h2>
+    <h3>Example Offending HTML</h3>
+    <pre class="html"></pre>
+    <h3>Example JavaScript Code</h3>
+    <div class="console">
+      <div class="js">
+        <div>var html = {{HTML}};</div>
+        <div>console.log(Slowparse.HTML(document, html).error);</div>
+      </div>
+      <pre class="result"></pre>
+    </div>
+  </div>
+</div>
+<script type="text/x-bad-html">
+  <p>hi</i>
+</script>
+<script type="text/x-bad-html">
+  <p>hi
+</script>
+<script src="jquery.min.js"></script>
+<script src="../slowparse.js"></script>
+<script>
+$(window).ready(function() {
+  $('script[type="text/x-bad-html"]').each(function() {
+    var badHtml = $(this).text().trim();
+    var error = Slowparse.HTML(document, badHtml).error;
+    var t = $("#templates .report").clone();
+    var js = $(".js > div:first-child", t).text();
+    
+    js = js.replace("{{HTML}}", JSON.stringify(badHtml));
+
+    delete error['node'];
+    $(".js > div:first-child", t).text(js);
+    $("h2", t).text(error.type);
+    $(".html", t).text(badHtml);
+    $(".result", t).text(JSON.stringify(error, null, "  "));
+    
+    $(this).replaceWith(t);
+  });
+});
+</script>
