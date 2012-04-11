@@ -100,7 +100,7 @@ var Slowparse = (function() {
           };
           if (tagName.slice(1).toLowerCase() !=
               domBuilder.currentNode.nodeName.toLowerCase())
-            throw new Error("TODO: parse err for unmatching close tag");
+            throw new Error("TODO: parse error for unmatching close tag");
           modes.endCloseTag();
         } else {
           if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
@@ -166,9 +166,9 @@ var Slowparse = (function() {
             domBuilder.currentNode.parseInfo.openTag.end = end;
             return;
           } else if (stream.end()) {
-            throw new Error("TODO: parse err for unterminated open tag");
+            throw new Error("TODO: parse error for unterminated open tag");
           } else
-            throw new Error("TODO: don't know what to do with " +
+            throw new Error("TODO: parse error for unexpected garbage: " +
                             stream.peek());
         }
       }
