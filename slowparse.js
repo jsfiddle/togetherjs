@@ -135,63 +135,8 @@ var Slowparse = (function() {
     })();
   }
   
-  function CodeMirrorTokenizer(html) {
-    var htmlMode = CodeMirror.getMode({
-      indentUnit: 2
-    }, "htmlmixed");
-    var state = htmlMode.startState();
-    var lines = html.split('\n').reverse();
-    var pos = 0;
-    var linePos = 0;
-    var currentLine;
-    var stream;
-
-    function advanceLine() {
-      currentLine = lines.pop();
-      stream = new CodeMirror.StringStream(currentLine);
-    }
-    
-    advanceLine();
-    
-    return {
-      position: function() {
-        return pos + linePos;
-      },
-      nextNonWhitespace: function() {
-        while (1) {
-          var token = this.next();
-          if (token === null || token.string.trim().length)
-            return token;
-        }
-      },
-      next: function() {
-        while (stream.eol()) {
-          pos += currentLine.length;
-          linePos = 0;
-          if (lines.length == 0)
-            return null;
-          advanceLine();
-          return {
-            string: '\n',
-            style: null,
-            position: pos++
-          };
-        }
-        var styleName = htmlMode.token(stream, state);
-        var token = {
-          string: currentLine.slice(linePos, stream.pos),
-          style: styleName,
-          position: pos + linePos
-        };
-        linePos = stream.pos;
-        return token;
-      }
-    };
-  }
-  
   var Slowparse = {
     Tokenizer: Tokenizer,
-    CodeMirrorTokenizer: CodeMirrorTokenizer,
     HTML: function(document, html) {
       var fragment = document.createDocumentFragment();
       var error = null;
