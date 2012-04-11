@@ -165,6 +165,8 @@ var Slowparse = (function() {
             var end = stream.makeToken().interval.end;
             domBuilder.currentNode.parseInfo.openTag.end = end;
             return;
+          } else if (stream.end()) {
+            throw new Error("TODO: parse err for unterminated open tag");
           } else
             throw new Error("TODO: don't know what to do with " +
                             stream.peek());
