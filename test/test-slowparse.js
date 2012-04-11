@@ -111,7 +111,7 @@ test("parsing of valid HTML", function() {
   });
 });
 
-test("parsing of invalid HTML: UNCLOSED_TAG", function() {
+test("parse error: UNCLOSED_TAG", function() {
   var html = '<p class="foo">hello there';
   var result = Slowparse.HTML(document, html);
   var error = result.error;
@@ -119,19 +119,34 @@ test("parsing of invalid HTML: UNCLOSED_TAG", function() {
   
   equal(p.nodeName, "P", "first child of generated DOM is <p>");
   equal(error.type, "UNCLOSED_TAG", "parser dies b/c of unclosed tag");
-  equal(error.position, html.length, "parser dies at end of string");
   equal(error.node, p, "affiliated node of error is <p>");
   assertParseInfo(html, p, "p", {
     'parseInfo.openTag': '<p class="foo">'
   });
 });
 
-test("parsing of invalid HTML: INVALID_TAG_NAME", function() {
+test("parse error: INVALID_TAG_NAME", function() {
   var html = '< p>hello there</p>';
   var error = Slowparse.HTML(document, html).error;
   
   equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
-  equal(html.slice(error.position,
-                   error.position + error.value.length), error.value);
-  equal(error.value, "");
+  assertParseInfo(html, html.slice(error.start, error.end), error.value);
+  equal(error.value, "<");
+});
+
+test("parse error: MISMATCHED_CLOSE_TAG", function() {
+  var html = '<p>hello there</i>';
+  var result = Slowparse.HTML(document, html);
+  var error = result.error;
+  var p = result.document.childNodes[0];
+  
+  equal(error.type, "MISMATCHED_CLOSE_TAG");
+  assertParseInfo(html, html.slice(error.start, error.end), error.value);
+  equal(error.value, "</i");
+  
+  equal(p.nodeName, "P", "first child of generated DOM is <p>");
+  equal(error.node, p, "affiliated node of error is <p>");
+  assertParseInfo(html, p, "p", {
+    'parseInfo.openTag': '<p>'
+  });
 });

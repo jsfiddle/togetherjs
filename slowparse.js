@@ -2,7 +2,16 @@ var Slowparse = (function() {
   function ParseError(parseInfo) {
     this.name = "ParseError";
     this.message = parseInfo.type;
-    this.parseInfo = parseInfo;
+    this.parseInfo = {
+      type: parseInfo.type
+    };
+    if (parseInfo.node)
+      this.parseInfo.node = parseInfo.node;
+    if (parseInfo.token) {
+      this.parseInfo.value = parseInfo.token.value;
+      this.parseInfo.start = parseInfo.token.start;
+      this.parseInfo.end = parseInfo.token.end;
+    }
   }
   
   ParseError.prototype = Error.prototype;
@@ -80,14 +89,17 @@ var Slowparse = (function() {
         };
         if (tagName.slice(1).toLowerCase() !=
             this.domBuilder.currentNode.nodeName.toLowerCase())
-          throw new Error("TODO: parse error for unmatching close tag");
+          throw new ParseError({
+            type: "MISMATCHED_CLOSE_TAG",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
         this._parseEndCloseTag();
       } else {
         if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
           throw new ParseError({
             type: "INVALID_TAG_NAME",
-            value: tagName,
-            position: token.interval.start + 1
+            token: token
           });
         this.domBuilder.pushElement(tagName, {
           openTag: {
@@ -167,8 +179,7 @@ var Slowparse = (function() {
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
         throw new ParseError({
           type: "UNCLOSED_TAG",
-          node: this.domBuilder.currentNode,
-          position: this.stream.pos
+          node: this.domBuilder.currentNode
         });
     }
   };
