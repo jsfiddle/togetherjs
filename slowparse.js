@@ -98,7 +98,9 @@ var Slowparse = (function() {
           domBuilder.currentNode.parseInfo.closeTag = {
             start: token.interval.start
           };
-          // TODO: Verify this is a matching close tag.
+          if (tagName.slice(1).toLowerCase() !=
+              domBuilder.currentNode.nodeName.toLowerCase())
+            throw new Error("TODO: parse err for unmatching close tag");
           modes.endCloseTag();
         } else {
           if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
