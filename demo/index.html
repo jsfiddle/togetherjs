@@ -88,6 +88,7 @@ function selectInterval(interval) {
   var start = editor.coordsFromIndex(interval.start);
   var end = editor.coordsFromIndex(interval.end);
   editor.setSelection(start, end);
+  editor.focus();
 }
 
 function linkRenderedDomToSource(rendered) {
