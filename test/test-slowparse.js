@@ -116,6 +116,7 @@ test("parse error: UNCLOSED_TAG", function() {
   var error = Slowparse.HTML(document, html).error;
 
   equal(error.type, "UNCLOSED_TAG", "parser dies b/c of unclosed tag");
+  equal(error.openTag.name, 'p');
   assertParseInfo(html, error, "error", {
     'openTag': '<p class="foo">'
   });
@@ -126,6 +127,7 @@ test("parse error: INVALID_TAG_NAME", function() {
   var error = Slowparse.HTML(document, html).error;
   
   equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
+  equal(error.openTag.name, '');
   assertParseInfo(html, error, "error", {
     'openTag': '<'
   });

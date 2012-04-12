@@ -106,7 +106,9 @@ var Slowparse = (function() {
         if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
           throw new ParseError({
             type: "INVALID_TAG_NAME",
-            openTag: token.interval
+            openTag: combine({
+              name: tagName
+            }, token.interval)
           });
         this.domBuilder.pushElement(tagName, {
           openTag: {
@@ -186,7 +188,9 @@ var Slowparse = (function() {
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
         throw new ParseError({
           type: "UNCLOSED_TAG",
-          openTag: this.domBuilder.currentNode.parseInfo.openTag
+          openTag: combine({
+            name: this.domBuilder.currentNode.nodeName.toLowerCase()
+          }, this.domBuilder.currentNode.parseInfo.openTag)
         });
     }
   };

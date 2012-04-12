@@ -74,6 +74,15 @@ textarea.html {
     doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
     <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.
   </div>
+  <div class="error-msg UNCLOSED_TAG">
+    The <code>&lt;{{openTag.name}}&gt;</code> tag 
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 
+    never closes.
+  </div>
+  <div class="error-msg INVALID_TAG_NAME">
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">this</em> appears
+    to be the beginning of a tag, but does not have a valid tag name.
+  </div>
 </div>
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
