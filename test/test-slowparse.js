@@ -110,38 +110,3 @@ test("parsing of valid HTML", function() {
           "Document fragment is correct.");
   });
 });
-
-test("parse error: UNCLOSED_TAG", function() {
-  var html = '<p class="foo">hello there';
-  var error = Slowparse.HTML(document, html).error;
-
-  equal(error.type, "UNCLOSED_TAG", "parser dies b/c of unclosed tag");
-  equal(error.openTag.name, 'p');
-  assertParseInfo(html, error, "error", {
-    'openTag': '<p class="foo">'
-  });
-});
-
-test("parse error: INVALID_TAG_NAME", function() {
-  var html = '< p>hello there</p>';
-  var error = Slowparse.HTML(document, html).error;
-  
-  equal(error.type, "INVALID_TAG_NAME", "parser dies b/c of invalid tag");
-  equal(error.openTag.name, '');
-  assertParseInfo(html, error, "error", {
-    'openTag': '<'
-  });
-});
-
-test("parse error: MISMATCHED_CLOSE_TAG", function() {
-  var html = '<p>hello there</i>';
-  var error = Slowparse.HTML(document, html).error;
-  
-  equal(error.type, "MISMATCHED_CLOSE_TAG");
-  equal(error.openTag.name, 'p');
-  equal(error.closeTag.name, 'i');
-  assertParseInfo(html, error, "error", {
-    'openTag': '<p>',
-    'closeTag': '</i'
-  });
-});

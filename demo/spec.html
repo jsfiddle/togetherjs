@@ -92,15 +92,56 @@ a {
   </div>
   <div class="error-msgs"></div>
 </div>
-<script type="text/x-bad-html">
-  <p>hi</i>
-</script>
-<script type="text/x-bad-html">
-  hello <em>there
-</script>
-<script type="text/x-bad-html">
-  <-lol>
-</script>
+<div class="test">
+  <script type="text/x-bad-html">
+    <p>hi</i>
+  </script>
+  <script type="application/json">
+  {
+    "type": "MISMATCHED_CLOSE_TAG",
+    "openTag": {
+      "name": "p",
+      "start": 0,
+      "end": 3
+    },
+    "closeTag": {
+      "name": "i",
+      "start": 5,
+      "end": 8
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    hello <em>there
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNCLOSED_TAG",
+    "openTag": {
+      "name": "em",
+      "start": 6,
+      "end": 10
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <-lol>
+  </script>
+  <script type="application/json">
+  {
+    "type": "INVALID_TAG_NAME",
+    "openTag": {
+      "name": "",
+      "start": 0,
+      "end": 1
+    }
+  }
+  </script>
+</div>
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
 <script src="../slowparse.js"></script>
@@ -164,8 +205,9 @@ function refreshAnchor() {
 
 $(window).ready(function() {
   $("#templates .error-msgs").load("error-msgs.html", function() {
-    $('script[type="text/x-bad-html"]').each(function() {
-      var badHtml = $(this).text().trim();
+    $('div.test').each(function() {
+      var badHtmlElement = $('script[type="text/x-bad-html"]', this);
+      var badHtml = badHtmlElement.text().trim();
       var error = Slowparse.HTML(document, badHtml).error;
       var t = $("#templates .report").clone();
       var js = $(".js > div:first-child", t).text();
@@ -184,9 +226,10 @@ $(window).ready(function() {
       } else
         $(".error", t).text("ERROR: No error message available.");
 
-      $(this).replaceWith(t);
+      badHtmlElement.replaceWith(t);
     });
     refreshAnchor();
+    $("html").addClass("done-loading");
   });
 });
 </script>
