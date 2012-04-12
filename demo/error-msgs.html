@@ -1,0 +1,16 @@
+<div class="error-msg MISMATCHED_CLOSE_TAG">
+  The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+  <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+  doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
+  <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.
+</div>
+<div class="error-msg UNCLOSED_TAG">
+  The <code>&lt;{{openTag.name}}&gt;</code> tag 
+  <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 
+  never closes.
+</div>
+<div class="error-msg INVALID_TAG_NAME">
+  The <code>&lt;</code> character
+  <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> appears
+  to be the beginning of a tag, but is not followed by a valid tag name.
+</div>

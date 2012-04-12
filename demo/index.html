@@ -64,26 +64,10 @@ textarea.html {
   <div class="dom"></div>
 </div><div class="column">
   <h2>Errors</h2>
-  <aside>If any errors occurred while parsing, they will be shown here. Also see the <a href="http://toolness.github.com/slowparse/demo/spec.html">spec</a>.</aside>
+  <aside>If any errors occurred while parsing, they will be shown here. Also see the <a href="spec.html">spec</a>.</aside>
   <div class="error"></div>
 </div>
-<div id="templates" style="display: none">
-  <div class="error-msg MISMATCHED_CLOSE_TAG">
-    The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
-    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
-    doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
-    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.
-  </div>
-  <div class="error-msg UNCLOSED_TAG">
-    The <code>&lt;{{openTag.name}}&gt;</code> tag 
-    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 
-    never closes.
-  </div>
-  <div class="error-msg INVALID_TAG_NAME">
-    <em data-highlight="{{openTag.start}},{{openTag.end}}">this</em> appears
-    to be the beginning of a tag, but does not have a valid tag name.
-  </div>
-</div>
+<div id="templates" style="display: none"></div>
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
 <script src="codemirror2/lib/codemirror.js"></script>
@@ -185,20 +169,22 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 });
 
 $(window).ready(function() {
-  function onChange() {
-    processHTML(editor.getValue());
-  }
+  $("#templates").load("error-msgs.html", function() {
+    function onChange() {
+      processHTML(editor.getValue());
+    }
   
-  editor = CodeMirror.fromTextArea($(".html")[0], {
-    mode: "text/html",
-    theme: "jsbin",
-    tabMode: "indent",
-    lineWrapping: true,
-    lineNumbers: true,
-    onChange: onChange
-  });
+    editor = CodeMirror.fromTextArea($(".html")[0], {
+      mode: "text/html",
+      theme: "jsbin",
+      tabMode: "indent",
+      lineWrapping: true,
+      lineNumbers: true,
+      onChange: onChange
+    });
 
-  editor.focus();
-  onChange();
+    editor.focus();
+    onChange();
+  });
 });
 </script>
