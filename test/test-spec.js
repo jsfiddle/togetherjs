@@ -11,7 +11,7 @@ function testSpec($, window) {
   });
 }
 
-asyncTest("Frame loads", function() {
+asyncTest("frame loads", function() {
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", "../demo/spec.html");
   document.body.appendChild(iframe);
