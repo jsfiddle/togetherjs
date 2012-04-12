@@ -43,7 +43,8 @@ textarea.html {
   color: firebrick;
 }
 
-.error span {
+.error em[data-highlight] {
+  font-style: inherit;
   color: red;
   text-decoration: underline;
   cursor: pointer;
@@ -68,10 +69,14 @@ textarea.html {
 </div>
 <div id="templates" style="display: none">
   <div class="error-msg MISMATCHED_CLOSE_TAG">
-    The closing <code class="close-tag"></code> tag <span class="close-tag">here</span> doesn't pair with the opening <code class="open-tag"></code> tag <span class="open-tag">here</span>.
+    The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+    doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.
   </div>
 </div>
 <script src="jquery.min.js"></script>
+<script src="underscore.min.js"></script>
 <script src="codemirror2/lib/codemirror.js"></script>
 <script src="codemirror2/mode/xml/xml.js"></script>
 <script src="codemirror2/mode/javascript/javascript.js"></script>
@@ -83,6 +88,10 @@ textarea.html {
 <script src="render-dom.js"></script>
 <script>
 var editor;
+
+_.templateSettings = {
+  escape: /\{\{(.+?)\}\}/g
+};
 
 function selectInterval(interval) {
   var start = editor.coordsFromIndex(interval.start);
@@ -130,21 +139,6 @@ function linkRenderedDomToSource(rendered) {
     .mouseover(highlighter("parseInfo.value"));
 }
 
-var ErrorReporters = {
-  MISMATCHED_CLOSE_TAG: function(error, template) {
-    template.find("code.open-tag")
-      .text('<' + error.openTag.name + '>');
-    template.find("code.close-tag")
-      .text('</' + error.closeTag.name + '>');
-    template.find("span.open-tag").mouseover(function() {
-      selectInterval(error.openTag);
-    });
-    template.find("span.close-tag").mouseover(function() {
-      selectInterval(error.closeTag);
-    });
-  }
-};
-
 function processHTML(html) {
   $(".dom, .rendered-dom, .error").empty();
   
@@ -165,15 +159,21 @@ function processHTML(html) {
   $(".rendered-dom").append(rendered);
   linkRenderedDomToSource(rendered);
   if (result.error) {
-    var reporter = ErrorReporters[result.error.type];
-    if (reporter) {
-      var template = $("#templates .error-msg." + result.error.type).clone();
-      $(".error").empty().append(template);
-      reporter(result.error, template);
+    var template = $("#templates .error-msg." + result.error.type);
+    if (template.length) {
+      $(".error").html(_.template(template.html(), result.error));
     } else
       $(".error").text(result.error.type);
   }
 }
+
+$(document).on("mouseover", "[data-highlight]", function(event) {
+  var interval = $(this).attr("data-highlight").split(",");
+  selectInterval({
+    start: parseInt(interval[0]),
+    end: parseInt(interval[1])
+  });
+});
 
 $(window).ready(function() {
   function onChange() {
