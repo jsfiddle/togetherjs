@@ -17,6 +17,11 @@ div.report > h2:before {
   color: gray;
 }
 
+.test.failed div.report > h2:before {
+  content: 'FATAL ERROR';
+  color: black;
+}
+
 pre, div.js {
   font-family: Menlo, Monaco, "Lucida Console", monospace;
 }
@@ -64,6 +69,14 @@ pre.html {
 
 a {
   color: inherit;
+}
+
+.test.failed, .test.failed .html {
+  background: firebrick;
+}
+
+.test.failed div.console {
+  background: darkred;
 }
 </style>
 <h1>Slowparse Error Reporting Specification</h1>

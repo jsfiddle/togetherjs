@@ -60,15 +60,24 @@ $(window).ready(function() {
     $('div.test').each(function() {
       var badHtmlElement = $('script[type="text/x-bad-html"]', this);
       var badHtml = badHtmlElement.text().trim();
-      var error = Slowparse.HTML(document, badHtml).error;
       var t = $("#templates .report").clone();
       var js = $(".js > div:first-child", t).text();
-    
-      js = js.replace("{{HTML}}", JSON.stringify(badHtml));
+      var error;
 
+      js = js.replace("{{HTML}}", JSON.stringify(badHtml));
       $(".js > div:first-child", t).text(js);
-      $("h2", t).text(error.type).attr("id", error.type);
       $(".html", t).text(badHtml);
+      try {
+        error = Slowparse.HTML(document, badHtml).error;
+      } catch (e) {
+        $(this).addClass("failed");
+        $("h2", t).text("");
+        $(".result", t).text(e.toString());
+        badHtmlElement.replaceWith(t);
+        return;
+      }
+      
+      $("h2", t).text(error.type).attr("id", error.type);
       $(".result", t).text(JSON.stringify(error, null, "  "));
 
       var errMsg = $("#templates .error-msg." + error.type);
