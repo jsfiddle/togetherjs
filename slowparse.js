@@ -163,7 +163,10 @@ var Slowparse = (function() {
       this.stream.eatSpace();
       this.stream.makeToken();
       if (this.stream.next() != '"')
-        throw new Error("TODO: unquoted attributes are unimplemented");
+        throw new ParseError({
+          type: "UNQUOTED_ATTR_VALUE",
+          start: this.stream.makeToken().interval.start
+        });
       this.stream.eatWhile(/[^"]/);
     },
     _parseEndCloseTag: function() {

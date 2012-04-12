@@ -155,6 +155,17 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    <a class=foo bar>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNQUOTED_ATTR_VALUE",
+    "start": 9
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     hello <em class="foo>there</em>
   </script>
   <script type="application/json">
