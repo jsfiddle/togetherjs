@@ -171,16 +171,15 @@ var Slowparse = (function() {
     },
     _parseEndCloseTag: function() {
       this.stream.eatSpace();
-      if (this.stream.next() != '>') {
-        if (this.stream.end())
-          throw new ParseError({
-            type: "UNTERMINATED_CLOSE_TAG",
+      if (this.stream.next() != '>')
+        throw new ParseError({
+          type: "UNTERMINATED_CLOSE_TAG",
+          closeTag: {
+            name: this.domBuilder.currentNode.nodeName.toLowerCase(),
             start: this.domBuilder.currentNode.parseInfo.closeTag.start,
-            tagName: this.domBuilder.currentNode.nodeName.toLowerCase()
-          });
-        else
-          throw new Error("TODO: parse error for garbage in close tag");
-      }
+            end: this.stream.makeToken().interval.start
+          }
+        });
       var end = this.stream.makeToken().interval.end;
       this.domBuilder.currentNode.parseInfo.closeTag.end = end;
       this.domBuilder.popElement();

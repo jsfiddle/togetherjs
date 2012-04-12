@@ -155,13 +155,16 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
-    <a></a
+    hello <em>there</em dude.
   </script>
   <script type="application/json">
   {
     "type": "UNTERMINATED_CLOSE_TAG",
-    "start": 3,
-    "tagName": "a"
+    "closeTag": {
+      "name": "em",
+      "start": 15,
+      "end": 19
+    }
   }
   </script>
 </div>
