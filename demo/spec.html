@@ -140,6 +140,15 @@ jQuery.fn.extend({
   }
 });
 
+function refreshAnchor() {
+  var anchor = window.location.hash.slice(1);
+  if (anchor) {
+    var anchoredElement = document.getElementById(anchor);
+    if (anchoredElement)
+      anchoredElement.scrollIntoView();
+  }
+}
+
 $(window).ready(function() {
   $("#templates .error-msgs").load("error-msgs.html", function() {
     $('script[type="text/x-bad-html"]').each(function() {
@@ -151,7 +160,7 @@ $(window).ready(function() {
       js = js.replace("{{HTML}}", JSON.stringify(badHtml));
 
       $(".js > div:first-child", t).text(js);
-      $("h2", t).text(error.type);
+      $("h2", t).text(error.type).attr("id", error.type);
       $(".html", t).text(badHtml);
       $(".result", t).text(JSON.stringify(error, null, "  "));
 
@@ -164,6 +173,7 @@ $(window).ready(function() {
 
       $(this).replaceWith(t);
     });
+    refreshAnchor();
   });
 });
 </script>
