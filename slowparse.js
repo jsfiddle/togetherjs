@@ -1,23 +1,74 @@
 var Slowparse = (function() {
-  function combine(a, b) {
-    var obj = {}, name;
-    for (name in a) {
-      obj[name] = a[name];
-    }
-    for (name in b) {
-      obj[name] = b[name];
-    }
-    return obj;
-  }
-  
   function ParseError(parseInfo) {
     this.name = "ParseError";
+    if (typeof(parseInfo) == "string") {
+      var name = parseInfo;
+      var args = [];
+      for (var i = 1; i < arguments.length; i++)
+        args.push(arguments[i]);
+      parseInfo = ParseErrorBuilders[name].apply(ParseErrorBuilders, args);
+      parseInfo.type = name;
+    }
     this.message = parseInfo.type;
     this.parseInfo = parseInfo;
   }
   
   ParseError.prototype = Error.prototype;
 
+  var ParseErrorBuilders = {
+    _combine: function(a, b) {
+      var obj = {}, name;
+      for (name in a) {
+        obj[name] = a[name];
+      }
+      for (name in b) {
+        obj[name] = b[name];
+      }
+      return obj;
+    },
+    UNCLOSED_TAG: function(parser) {
+      return {
+        openTag: this._combine({
+          name: parser.domBuilder.currentNode.nodeName.toLowerCase()
+        }, parser.domBuilder.currentNode.parseInfo.openTag)
+      };
+    },
+    INVALID_TAG_NAME: function(tagName, token) {
+      return {
+        openTag: this._combine({
+          name: tagName
+        }, token.interval)
+      };
+    },
+    MISMATCHED_CLOSE_TAG: function(parser, openTagName, closeTagName, token) {
+      return {
+        openTag: this._combine({
+          name: openTagName
+        }, parser.domBuilder.currentNode.parseInfo.openTag),
+        closeTag: this._combine({
+          name: closeTagName
+        }, token.interval)
+      };
+    },
+    UNTERMINATED_ATTR_VALUE: function(parser, nameTok) {
+      return {
+        openTag: this._combine({
+          name: parser.domBuilder.currentNode.nodeName.toLowerCase()
+        }, parser.domBuilder.currentNode.parseInfo.openTag),
+        attribute: {
+          name: {
+            value: nameTok.value,
+            start: nameTok.interval.start,
+            end: nameTok.interval.end
+          },
+          value: {
+            start: parser.stream.makeToken().interval.start
+          }
+        },
+      };
+    }
+  };
+  
   function Stream(text) {
     this.text = text;
     this.pos = 0;
@@ -92,24 +143,12 @@ var Slowparse = (function() {
         var openTagName = this.domBuilder.currentNode.nodeName.toLowerCase();
         var closeTagName = tagName.slice(1).toLowerCase();
         if (closeTagName != openTagName)
-          throw new ParseError({
-            type: "MISMATCHED_CLOSE_TAG",
-            openTag: combine({
-              name: openTagName
-            }, this.domBuilder.currentNode.parseInfo.openTag),
-            closeTag: combine({
-              name: closeTagName
-            }, token.interval)
-          });
+          throw new ParseError("MISMATCHED_CLOSE_TAG", this, openTagName, 
+                               closeTagName, token);
         this._parseEndCloseTag();
       } else {
         if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
-          throw new ParseError({
-            type: "INVALID_TAG_NAME",
-            openTag: combine({
-              name: tagName
-            }, token.interval)
-          });
+          throw new ParseError("INVALID_TAG_NAME", tagName, token);
         this.domBuilder.pushElement(tagName, {
           openTag: {
             start: token.interval.start
@@ -146,22 +185,7 @@ var Slowparse = (function() {
         this.stream.next();
         this._parseQuotedAttributeValue();
         if (this.stream.next() != '"')
-          throw new ParseError({
-            type: "UNTERMINATED_ATTR_VALUE",
-            openTag: combine({
-              name: this.domBuilder.currentNode.nodeName.toLowerCase()
-            }, this.domBuilder.currentNode.parseInfo.openTag),
-            attribute: {
-              name: {
-                value: nameTok.value,
-                start: nameTok.interval.start,
-                end: nameTok.interval.end
-              },
-              value: {
-                start: this.stream.makeToken().interval.start
-              }
-            },
-          });
+          throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
         var valueTok = this.stream.makeToken();
         var unquotedValue = valueTok.value.slice(1, -1);
         this.domBuilder.attribute(nameTok.value, unquotedValue, {
@@ -201,12 +225,7 @@ var Slowparse = (function() {
       this._buildTextNode();
 
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
-        throw new ParseError({
-          type: "UNCLOSED_TAG",
-          openTag: combine({
-            name: this.domBuilder.currentNode.nodeName.toLowerCase()
-          }, this.domBuilder.currentNode.parseInfo.openTag)
-        });
+        throw new ParseError("UNCLOSED_TAG", this);
     }
   };
   
