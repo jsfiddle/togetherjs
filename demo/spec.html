@@ -163,6 +163,15 @@ a {
     "start": 9
   }
   </script>
+  <h3>Notes</h3>
+  <p>The HTML5 specification actually allows unquoted attribute
+    values, so long as they don't have spaces in them. However,
+    this isn't commonly done outside of minifying HTML. Furthermore, by
+    complicating the standard, our predictions about the user's
+    intent also become ambiguous, which results in more cryptic
+    and confusing error messages. By choosing to enforce monotony, we
+    ease the learning process and provide more helpful
+    errors.</p>
 </div>
 <div class="test">
   <script type="text/x-bad-html">
