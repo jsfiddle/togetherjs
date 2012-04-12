@@ -7,7 +7,13 @@ var Slowparse = (function() {
       for (var i = 1; i < arguments.length; i++)
         args.push(arguments[i]);
       parseInfo = ParseErrorBuilders[name].apply(ParseErrorBuilders, args);
-      parseInfo.type = name;
+
+      // This is a weird way of setting an attribute, but we want to
+      // make the JSON serialize so the 'type' appears first, as it
+      // makes our documentation read better.
+      parseInfo = ParseErrorBuilders._combine({
+        type: name
+      }, parseInfo);
     }
     this.message = parseInfo.type;
     this.parseInfo = parseInfo;
