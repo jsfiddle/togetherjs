@@ -173,7 +173,11 @@ var Slowparse = (function() {
       this.stream.eatSpace();
       if (this.stream.next() != '>') {
         if (this.stream.end())
-          throw new Error("TODO: parse error for unterminated close tag");
+          throw new ParseError({
+            type: "UNTERMINATED_CLOSE_TAG",
+            start: this.domBuilder.currentNode.parseInfo.closeTag.start,
+            tagName: this.domBuilder.currentNode.nodeName.toLowerCase()
+          });
         else
           throw new Error("TODO: parse error for garbage in close tag");
       }
