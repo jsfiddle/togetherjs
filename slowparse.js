@@ -126,8 +126,6 @@ var Slowparse = (function() {
       if (this.stream.next() != '"')
         throw new Error("TODO: unquoted attributes are unimplemented");
       this.stream.eatWhile(/[^"]/);
-      if (this.stream.next() != '"')
-        throw new Error("TODO: parse error for unterminated attr value");
     },
     _parseEndCloseTag: function() {
       this.stream.eatSpace();
@@ -147,6 +145,23 @@ var Slowparse = (function() {
       if (this.stream.peek() == '=') {
         this.stream.next();
         this._parseQuotedAttributeValue();
+        if (this.stream.next() != '"')
+          throw new ParseError({
+            type: "UNTERMINATED_ATTR_VALUE",
+            openTag: combine({
+              name: this.domBuilder.currentNode.nodeName.toLowerCase()
+            }, this.domBuilder.currentNode.parseInfo.openTag),
+            attribute: {
+              name: {
+                value: nameTok.value,
+                start: nameTok.interval.start,
+                end: nameTok.interval.end
+              },
+              value: {
+                start: this.stream.makeToken().interval.start
+              }
+            },
+          });
         var valueTok = this.stream.makeToken();
         var unquotedValue = valueTok.value.slice(1, -1);
         this.domBuilder.attribute(nameTok.value, unquotedValue, {

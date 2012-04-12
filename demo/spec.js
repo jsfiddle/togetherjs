@@ -15,7 +15,7 @@ jQuery.fn.extend({
       var parts = $(this).attr("data-highlight").split(",");
       slices.push({
         start: parseInt(parts[0]),
-        end: parseInt(parts[1]),
+        end: parts[1] ? parseInt(parts[1]) : undefined,
         linkedNode: this
       });
       $(this).attr("class", "color-" + (n + 1));

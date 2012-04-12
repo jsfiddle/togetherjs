@@ -6,7 +6,11 @@ function testSpec($, window) {
     var actualJson = $(".result", this).text();
     var expectedJson = $('script[type="application/json"]', this).text();
     test($("h2", this).attr("id") + " error type", function() {
-      deepEqual(JSON.parse(expectedJson), JSON.parse(actualJson));
+      expectedJson = JSON.parse(expectedJson);
+      ok(expectedJson, "expectedJson is valid JSON");
+      actualJson = JSON.parse(actualJson);
+      ok(actualJson, "actualJson is valid JSON");
+      deepEqual(actualJson, expectedJson, "expectedJson matches actualJson");
     });
   });
 }
