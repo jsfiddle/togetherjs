@@ -190,6 +190,21 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    hello <em </em>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNTERMINATED_OPEN_TAG",
+    "openTag": {
+      "start": 6,
+      "end": 10,
+      "name": "em"
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     hello <em class="foo>there</em>
   </script>
   <script type="application/json">

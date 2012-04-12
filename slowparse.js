@@ -218,11 +218,15 @@ var Slowparse = (function() {
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
           return;
-        } else if (this.stream.end()) {
-          throw new Error("TODO: parse error for unterminated open tag");
         } else
-          throw new Error("TODO: parse error for unexpected garbage: " +
-                          this.stream.peek());
+          throw new ParseError({
+            type: "UNTERMINATED_OPEN_TAG",
+            openTag: {
+              start: this.domBuilder.currentNode.parseInfo.openTag.start,
+              end: this.stream.pos,
+              name: this.domBuilder.currentNode.nodeName.toLowerCase()
+            }
+          });
       }
     },
     parse: function() {
