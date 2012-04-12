@@ -132,7 +132,6 @@ function linkRenderedDomToSource(rendered) {
 
 var ErrorReporters = {
   MISMATCHED_CLOSE_TAG: function(error, template) {
-    var html = editor.getValue();
     template.find("code.open-tag")
       .text('<' + error.openTag.name + '>');
     template.find("code.close-tag")
