@@ -9,6 +9,8 @@ function documentFragmentHTML(doc) {
   return div.innerHTML;
 }
 
+// Ensure that an object containing {start,end} keys correspond
+// to a particular substring of HTML source code.
 function assertParseInfo(html, node, name, map) {
   function getDottedProperty(obj, property) {
     var parts = property.split('.');
@@ -31,14 +33,31 @@ function assertParseInfo(html, node, name, map) {
   }
 }
 
-test("parsing of valid HTML", function() {
-  var html = '<p class="foo">hello there</p>';
+// Parse the given HTML, ensure it has no errors, and return the
+// parsed document.
+function parseWithoutErrors(html) {
   var result = Slowparse.HTML(document, html);
   
   ok(result.document, "document is returned");
   equal(result.error, null, "no errors are reported");
   
-  var doc = result.document;
+  return result.document;
+}
+
+// Test many snippets of valid HTML, passing the HTML and its document
+// to a callback function that does the actual testing. Useful for 
+// testing that many different inputs result in the same output.
+function testManySnippets(name, htmlStrings, cb) {
+  htmlStrings.forEach(function(html) {
+    test(name + ": " + JSON.stringify(html), function() {
+      cb(html, parseWithoutErrors(html));
+    });
+  });
+}
+
+test("parsing of valid HTML", function() {
+  var html = '<p class="foo">hello there</p>';
+  var doc = parseWithoutErrors(html);
   
   equal(doc.childNodes.length, 1, "document has one child");
   
@@ -67,46 +86,29 @@ test("parsing of valid HTML", function() {
         "serialization of generated DOM matches original HTML");
 });
 
-[
+testManySnippets("parsing of text content w/ newlines", [
   '<p>hello\nthere</p>',
   '<p>\n  hello there</p>'
-].forEach(function(html) {
-  test("parsing of text content w/ newlines: " + 
-       JSON.stringify(html), function() {
-    var result = Slowparse.HTML(document, html);
-  
-    ok(result.document, "document is returned");
-    equal(result.error, null, "no errors are reported");
-
-    equal(documentFragmentHTML(result.document),
-          html);
-  });
+], function(html, doc) {
+  equal(documentFragmentHTML(doc), html);
 });
 
-[
+testManySnippets("parsing of valid HTML w/ whitespace", [
   '<p class = "foo">hello there</p><p>u</p>',
   '<p class="foo"  >hello there</p><p>u</p>',
   '<p \nclass="foo">hello there</p><p>u</p>',
   '<p class="foo">hello there</p ><p>u</p>'
-].forEach(function(html) {
-  test("parsing of valid HTML w/ whitespace: " +
-       JSON.stringify(html), function() {
-    var canonicalHTML = '<p class="foo">hello there</p><p>u</p>';
-    var result = Slowparse.HTML(document, html);
-
-    ok(result.document, "document is returned");
-    equal(result.error, null, "no errors are reported");
-
-    var p = result.document.childNodes[0];
-    assertParseInfo(html, p.childNodes[0], "textNode", {
-      'parseInfo': 'hello there'
-    });
-    assertParseInfo(html, p.attributes[0], "attr", {
-      'parseInfo.name': 'class',
-      'parseInfo.value': '"foo"'
-    });
-
-    equal(documentFragmentHTML(result.document), canonicalHTML,
-          "Document fragment is correct.");
+], function(html, doc) {
+  var canonicalHTML = '<p class="foo">hello there</p><p>u</p>';
+  var p = doc.childNodes[0];
+  assertParseInfo(html, p.childNodes[0], "textNode", {
+    'parseInfo': 'hello there'
   });
+  assertParseInfo(html, p.attributes[0], "attr", {
+    'parseInfo.name': 'class',
+    'parseInfo.value': '"foo"'
+  });
+
+  equal(documentFragmentHTML(doc), canonicalHTML,
+        "Document fragment is correct.");
 });
