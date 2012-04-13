@@ -1,4 +1,24 @@
 var Slowparse = (function() {
+  var CHARACTER_ENTITY_REFS = {
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    amp: "&"
+  };
+  
+  function replaceEntityRefs(text) {
+    return text.replace(/&([A-Za-z]+);/g, function(ref, name) {
+      name = name.toLowerCase();
+      if (name in CHARACTER_ENTITY_REFS)
+        return CHARACTER_ENTITY_REFS[name];
+
+      // Be forgiving -- if the text doesn't map to a known character
+      // entity reference, just return the original string instead of
+      // raising an error.
+      return ref;
+    });
+  }
+  
   function ParseError(parseInfo) {
     this.name = "ParseError";
     if (typeof(parseInfo) == "string") {
@@ -132,7 +152,7 @@ var Slowparse = (function() {
     _buildTextNode: function() {
       var token = this.stream.makeToken();
       if (token) {
-        this.domBuilder.text(token.value, token.interval);
+        this.domBuilder.text(replaceEntityRefs(token.value), token.interval);
       }
     },
     _parseStartTag: function() {
@@ -199,7 +219,7 @@ var Slowparse = (function() {
         if (this.stream.next() != '"')
           throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
         var valueTok = this.stream.makeToken();
-        var unquotedValue = valueTok.value.slice(1, -1);
+        var unquotedValue = replaceEntityRefs(valueTok.value.slice(1, -1));
         this.domBuilder.attribute(nameTok.value, unquotedValue, {
           name: nameTok.interval,
           value: valueTok.interval
@@ -275,6 +295,7 @@ var Slowparse = (function() {
   };
   
   var Slowparse = {
+    replaceEntityRefs: replaceEntityRefs,
     HTML: function(document, html) {
       var stream = new Stream(html),
           domBuilder = new DOMBuilder(document),

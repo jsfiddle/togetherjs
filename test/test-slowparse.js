@@ -112,3 +112,39 @@ testManySnippets("parsing of valid HTML w/ whitespace", [
   equal(documentFragmentHTML(doc), canonicalHTML,
         "Document fragment is correct.");
 });
+
+test("replaceEntityRefs", function() {
+  [
+    ["&lt;", "<"],
+    ["&gt;", ">"],
+    ["&amp;", "&"],
+    ["&quot;", '"'],
+    ["&QUOT;", '"', "matches are case-insensitive"],
+    ["&lt;p&gt; tag", "<p> tag", "multiple refs are replaced"],
+    ["hello &garbage;", "hello &garbage;", "replacer is forgiving"]
+  ].forEach(function(arg) {
+    equal(Slowparse.replaceEntityRefs(arg[0]), arg[1],
+          "replaceEntityRefs(" + JSON.stringify(arg[0]) + ") == " +
+          JSON.stringify(arg[1]) + (arg[2] ? " (" + arg[2] + ")" : ""));
+  });
+});
+
+test("parsing of text content w/ HTML entities", function() {
+  var html = '<p>&lt;p&gt;</p>';
+  var doc = parseWithoutErrors(html);
+  var textNode = doc.childNodes[0].childNodes[0];
+  equal(textNode.nodeValue, '<p>');
+  assertParseInfo(html, textNode, "textNode", {
+    'parseInfo': '&lt;p&gt;',
+  });
+});
+
+test("parsing of attr content w/ HTML entities", function() {
+  var html = '<p class="1 &lt; 2 &LT; 3"></p>';
+  var doc = parseWithoutErrors(html);
+  var attrNode = doc.childNodes[0].attributes[0];
+  equal(attrNode.nodeValue, '1 < 2 < 3');
+  assertParseInfo(html, attrNode, "attr", {
+    'parseInfo.value': '"1 &lt; 2 &LT; 3"',
+  });
+});
