@@ -30,6 +30,14 @@ var Slowparse = (function() {
       if (!this.end())
         return this.text[this.pos++];
     },
+    nextN: function(n) {
+      var text = "";
+      var available = Math.min(this.text.length - this.pos, n);
+      while(available-->0) {
+        text = this.text[this.pos + available] + text;
+      }
+      return text;
+    },
     end: function() {
       return (this.pos == this.text.length);
     },
@@ -49,6 +57,9 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
+    markTokenStart: function() {
+      this.tokenStart = this.pos;
+    },
     makeToken: function() {
       if (this.pos == this.tokenStart)
         return null;
@@ -64,9 +75,125 @@ var Slowparse = (function() {
     },
   };
   
+  function CSSParser(stream, domBuilder) {
+    this.stream = stream;
+    this.domBuilder = domBuilder;
+  }
+
+  CSSParser.prototype = {
+    _unknownCSSProperty: function(propertyName) {
+      // FIXME: we can simply use an array of known CSS property names with an .indexOf
+      return false;
+    },
+    _parseSelector: function() {      
+      this.stream.eatWhile(/[^{<]/);
+      var token = this.stream.makeToken();
+      if (token === null) 
+        return;
+
+      var selector = token.value.trim();
+      if (selector && selector === '') 
+        return;
+      if (!(selector && selector.match(/^[A-Za-z\-\_]+$/)))
+        throw new ParseError({
+          type: "INVALID_CSS_SELECTOR_NAME",
+          token: token
+        });
+
+      if (!this.stream.end()) {
+        var next = this.stream.peek();
+        if (next === '<') {
+          // end of CSS!
+          return;
+        }
+        else if (next === '{') {
+          this.stream.eatWhile(/[\s\n{]/);
+          this.stream.markTokenStart();
+          this._parseDeclaration();
+        }
+        else {
+          throw new ParseError({
+            type: "MISSING_CSS_BLOCK_OPENER",
+            token: token
+          });
+        }
+      }
+    },
+    _parseDeclaration: function() {        
+      this.stream.eatWhile(/[\s\n]/);
+      this.stream.markTokenStart();
+
+      if (this.stream.peek() === '}') {
+        this.stream.next();
+        this.stream.eatWhile(/[^<]/);
+        return;
+      } 
+      this._parseProperty();
+    },
+    _parseProperty: function() {
+      var rule = this.stream.eatWhile(/[^}<;:]/);
+      var token = this.stream.makeToken();
+      var next = this.stream.next();
+      if (next === ':') {
+        // proper parsing goes here
+        var property = token.value.trim();
+        if (!( property && property.match(/^[A-Za-z\-\_]+$/)) || this._unknownCSSProperty(property))
+          // FIXME: make sure this maps to not-allowed-characters!
+          throw new ParseError({
+            type: "INVALID_CSS_PROPERTY_NAME",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+
+        this._parseValue();
+      }
+      else {
+        throw new ParseError({
+            type: "INVALID_CSS_DECLARATION",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+      }
+    },
+    _parseValue: function() {
+      var rule = this.stream.eatWhile(/[^}<;]/);
+      var token = this.stream.makeToken();
+      var next = this.stream.next();
+      if (next === ';') {
+        this._parseDeclaration();
+      }
+      else if (next === '}') {
+        this._parseSelector();
+      }
+      else {
+        throw new ParseError({
+            type: "INVALID_CSS_RULE",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+      }
+    },
+    parse: function() {
+      var sliceStart = this.stream.pos;
+      this.stream.eatWhile(/[\s\n]/);
+      this.stream.markTokenStart();
+      this._parseSelector();
+      var sliceEnd = this.stream.pos;
+      var token = {
+        value: this.stream.text.slice(sliceStart, sliceEnd),
+        interval: {
+          start: sliceStart,
+          end: sliceEnd
+        }
+      };
+      return token;
+    }
+  }
+
   function HTMLParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
+    this.cssParser = new CSSParser(stream, domBuilder);
   }
 
   HTMLParser.prototype = {
@@ -106,9 +233,8 @@ var Slowparse = (function() {
             start: token.interval.start
           }
         });
-
         if (!this.stream.end())
-          this._parseEndOpenTag();
+          this._parseEndOpenTag(tagName);
       }
     },
     _parseQuotedAttributeValue: function() {
@@ -147,7 +273,7 @@ var Slowparse = (function() {
       } else
         throw new Error("TODO: boolean attributes are unimplemented");
     },
-    _parseEndOpenTag: function() {
+    _parseEndOpenTag: function(tagName) {
       while (!this.stream.end()) {
         if (this.stream.eatWhile(/[A-Za-z]/)) {
           this._parseAttribute();
@@ -157,6 +283,15 @@ var Slowparse = (function() {
           this.stream.next();
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
+
+          // special handling for style elements:
+          // we need to parse the CSS code here
+          if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
+            var token = this.cssParser.parse();
+            // FIXME: this leaves some rogue characters!
+            this.domBuilder.text(token.value, token.interval);
+          }
+
           return;
         } else if (this.stream.end()) {
           throw new Error("TODO: parse error for unterminated open tag");
