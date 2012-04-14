@@ -105,6 +105,21 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    hi</i>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNEXPECTED_CLOSE_TAG",
+    "closeTag": {
+      "name": "i",
+      "start": 2,
+      "end": 5
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     <p>hi</i>
   </script>
   <script type="application/json">

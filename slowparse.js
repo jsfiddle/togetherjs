@@ -68,6 +68,13 @@ var Slowparse = (function() {
         }, token.interval)
       };
     },
+    UNEXPECTED_CLOSE_TAG: function(parser, closeTagName, token) {
+      return {
+        closeTag: this._combine({
+          name: closeTagName
+        }, token.interval)
+      };
+    },
     MISMATCHED_CLOSE_TAG: function(parser, openTagName, closeTagName, token) {
       return {
         openTag: this._combine({
@@ -205,11 +212,14 @@ var Slowparse = (function() {
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
       if (tagName[0] == '/') {
+        var closeTagName = tagName.slice(1).toLowerCase();
+        if (!this.domBuilder.currentNode.parseInfo)
+          throw new ParseError("UNEXPECTED_CLOSE_TAG", this, closeTagName,
+                               token);
         this.domBuilder.currentNode.parseInfo.closeTag = {
           start: token.interval.start
         };
         var openTagName = this.domBuilder.currentNode.nodeName.toLowerCase();
-        var closeTagName = tagName.slice(1).toLowerCase();
         if (closeTagName != openTagName)
           throw new ParseError("MISMATCHED_CLOSE_TAG", this, openTagName, 
                                closeTagName, token);
