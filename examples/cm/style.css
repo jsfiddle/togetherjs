@@ -1,0 +1,35 @@
+body {
+  overflow: hidden;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 30px;
+  width: 100%;
+  background-color: black;
+}
+
+#htext {
+  line-height: 30px;
+  vertical-align: middle;
+
+  padding-left: 10px;
+  color: white;
+  font-family: baskerville, palatino, 'palatino linotype', georgia, serif;
+}
+
+div.CodeMirror {
+  margin: 0;
+  position: absolute;
+  top: 30px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+div.CodeMirror-scroll {
+  height: 100%;
+}
+
