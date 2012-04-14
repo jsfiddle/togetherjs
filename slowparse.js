@@ -92,6 +92,29 @@ var Slowparse = (function() {
           }
         },
       };
+    },
+    UNQUOTED_ATTR_VALUE: function(parser) {
+      return {
+        start: parser.stream.makeToken().interval.start
+      };
+    },
+    UNTERMINATED_OPEN_TAG: function(parser) {
+      return {
+        openTag: {
+          start: parser.domBuilder.currentNode.parseInfo.openTag.start,
+          end: parser.stream.pos,
+          name: parser.domBuilder.currentNode.nodeName.toLowerCase()
+        }
+      };
+    },
+    UNTERMINATED_CLOSE_TAG: function(parser) {
+      return {
+        closeTag: {
+          name: parser.domBuilder.currentNode.nodeName.toLowerCase(),
+          start: parser.domBuilder.currentNode.parseInfo.closeTag.start,
+          end: parser.stream.makeToken().interval.start
+        }
+      };
     }
   };
   
@@ -189,23 +212,13 @@ var Slowparse = (function() {
       this.stream.eatSpace();
       this.stream.makeToken();
       if (this.stream.next() != '"')
-        throw new ParseError({
-          type: "UNQUOTED_ATTR_VALUE",
-          start: this.stream.makeToken().interval.start
-        });
+        throw new ParseError("UNQUOTED_ATTR_VALUE", this);
       this.stream.eatWhile(/[^"]/);
     },
     _parseEndCloseTag: function() {
       this.stream.eatSpace();
       if (this.stream.next() != '>')
-        throw new ParseError({
-          type: "UNTERMINATED_CLOSE_TAG",
-          closeTag: {
-            name: this.domBuilder.currentNode.nodeName.toLowerCase(),
-            start: this.domBuilder.currentNode.parseInfo.closeTag.start,
-            end: this.stream.makeToken().interval.start
-          }
-        });
+        throw new ParseError("UNTERMINATED_CLOSE_TAG", this);
       var end = this.stream.makeToken().interval.end;
       this.domBuilder.currentNode.parseInfo.closeTag.end = end;
       this.domBuilder.popElement();
@@ -239,14 +252,7 @@ var Slowparse = (function() {
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
           return;
         } else
-          throw new ParseError({
-            type: "UNTERMINATED_OPEN_TAG",
-            openTag: {
-              start: this.domBuilder.currentNode.parseInfo.openTag.start,
-              end: this.stream.pos,
-              name: this.domBuilder.currentNode.nodeName.toLowerCase()
-            }
-          });
+          throw new ParseError("UNTERMINATED_OPEN_TAG", this);
       }
     },
     parse: function() {
