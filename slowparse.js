@@ -6,15 +6,17 @@ var Slowparse = (function() {
     amp: "&"
   };
   
+  // Replace named character entity references (e.g. '&lt;') in the given
+  // text string and return the result. If an entity name is unrecognized,
+  // don't replace it at all; this makes the function "forgiving".
+  //
+  // This function does not currently replace numeric character entity
+  // references (e.g., '&#160;').
   function replaceEntityRefs(text) {
     return text.replace(/&([A-Za-z]+);/g, function(ref, name) {
       name = name.toLowerCase();
       if (name in CHARACTER_ENTITY_REFS)
         return CHARACTER_ENTITY_REFS[name];
-
-      // Be forgiving -- if the text doesn't map to a known character
-      // entity reference, just return the original string instead of
-      // raising an error.
       return ref;
     });
   }
@@ -118,6 +120,9 @@ var Slowparse = (function() {
     }
   };
   
+  // The interface for this stream class is inspired by CodeMirror's:
+  //
+  // http://codemirror.net/doc/manual.html#modeapi
   function Stream(text) {
     this.text = text;
     this.pos = 0;
@@ -125,20 +130,30 @@ var Slowparse = (function() {
   }
   
   Stream.prototype = {
+    // Returns the next character in the stream without advancing it.
+    // Will return undefined at the end of the text.
     peek: function() {
       return this.text[this.pos];
     },
+    // Returns the next character in the stream and advances it.
+    // Also returns undefined when no more characters are available.
     next: function() {
       if (!this.end())
         return this.text[this.pos++];
     },
+    // Returns true only if the stream is at the end of the text.
     end: function() {
       return (this.pos == this.text.length);
     },
-    eat: function(matcher) {
-      if (this.peek().match(matcher))
+    // 'match' must be a regular expression. If the next character in the
+    // stream 'matches' the given argument, it is consumed and returned.
+    // Otherwise, undefined is returned.
+    eat: function(match) {
+      if (this.peek().match(match))
         return this.next();
     },
+    // Repeatedly calls eat with the given argument, until it fails.
+    // Returns true if any characters were eaten.
     eatWhile: function(matcher) {
       var wereAnyEaten = false;
       while (!this.end()) {
@@ -148,9 +163,13 @@ var Slowparse = (function() {
           return wereAnyEaten;
       }
     },
+    // Shortcut for eatWhile when matching white-space (including newlines).
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
+    // Generates a JSON-serializable token object representing the interval
+    // of text between the end of the last generated token and the current
+    // stream position.
     makeToken: function() {
       if (this.pos == this.tokenStart)
         return null;
@@ -163,7 +182,7 @@ var Slowparse = (function() {
       };
       this.tokenStart = this.pos;
       return token;
-    },
+    }
   };
   
   function HTMLParser(stream, domBuilder) {
