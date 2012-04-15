@@ -22,7 +22,7 @@
     "hat": "*"
   },
   "devDependencies": {
-    "nodeunit": "~0.5.0"
+    "nodeunit": "*"
   },
   "engine": "node >= 0.4.4",
   "scripts": {
