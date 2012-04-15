@@ -12,7 +12,7 @@
 # reference.
 
 if WEB?
-  types ||= exports.types
+  types = exports.types
   throw new Error 'Must load browserchannel before this library' unless window.BCSocket
   {BCSocket} = window
 else

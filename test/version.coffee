@@ -3,14 +3,14 @@ web = require './helpers/webclient'
 
 fs = require 'fs'
 
-package = JSON.parse fs.readFileSync("#{__dirname}/../package.json")
+p = require '../package.json'
 
 module.exports =
   'node version': (test) ->
     test.ok node.version
-    test.strictEqual node.version, package.version
+    test.strictEqual node.version, p.version
     test.done()
 
   'web version': (test) ->
-    test.strictEqual web.version, package.version
+    test.strictEqual web.version, p.version
     test.done()
