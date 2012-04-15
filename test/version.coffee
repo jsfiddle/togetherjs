@@ -3,7 +3,8 @@ web = require './helpers/webclient'
 
 fs = require 'fs'
 
-p = require '../package.json'
+# For some reason requiring a json file breaks travisCI.
+p = JSON.parse fs.readFileSync("#{__dirname}/../package.json")
 
 module.exports =
   'node version': (test) ->
