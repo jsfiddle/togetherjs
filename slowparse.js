@@ -117,11 +117,14 @@ var Slowparse = (function() {
       };
     },
     UNTERMINATED_CLOSE_TAG: function(parser) {
+      var end = parser.stream.pos;
+      if (!parser.stream.end())
+        end = parser.stream.makeToken().interval.start;
       return {
         closeTag: {
           name: parser.domBuilder.currentNode.nodeName.toLowerCase(),
           start: parser.domBuilder.currentNode.parseInfo.closeTag.start,
-          end: parser.stream.makeToken().interval.start
+          end: end
         }
       };
     },

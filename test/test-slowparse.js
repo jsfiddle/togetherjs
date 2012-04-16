@@ -155,3 +155,10 @@ test("parsing of attr content w/ HTML entities", function() {
     'parseInfo.value': '"1 &lt; 2 &LT; 3"',
   });
 });
+
+test("UNTERMINATED_CLOSE_TAG works at end of stream", function() {
+  var html = "<span>test</span";
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "UNTERMINATED_CLOSE_TAG");
+  equal(error.closeTag.end, html.length);
+});
