@@ -272,6 +272,7 @@ var Slowparse = (function() {
         //        our accept/reject policies
         throw new ParseError({
           type: "INVALID_CSS_SELECTOR_NAME",
+          node: this.domBuilder.currentNode,
           token: token
         });
 
@@ -297,6 +298,7 @@ var Slowparse = (function() {
         else {
           throw new ParseError({
             type: "MISSING_CSS_BLOCK_OPENER",
+            node: this.domBuilder.currentNode,
             token: token
           });
         }
@@ -406,6 +408,23 @@ var Slowparse = (function() {
   }
 
   HTMLParser.prototype = {
+    htmlElements: ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base",
+                   "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button",
+                   "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "datalist", "dd",
+                   "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption",
+                   "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6",
+                   "head", "header", "hgroup", "hr",
+                   "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li",
+                   "link", "listing", "map", "mark", "marquee", "menu", "meta", "meter", "nav", "nobr", "noframes",
+                   "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre",
+                   "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source",
+                   "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td",
+                   "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var",
+                   "video", "wbr", "xmp"],
+    _knownHTMLElement: function(tagName) {
+      window.console.log("checking "+tagName);
+      return this.htmlElements.indexOf(tagName) > -1;
+    },
     _buildTextNode: function() {
       var token = this.stream.makeToken();
       if (token) {
@@ -416,9 +435,10 @@ var Slowparse = (function() {
       if (this.stream.next() != '<')
         throw new Error('assertion failed, expected to be on "<"');
 
-      this.stream.eatWhile(/[A-Za-z\/]/);
+      this.stream.eatWhile(/[\w\d\/]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
+      window.console.log(tagName);
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
         if (!this.domBuilder.currentNode.parseInfo)
@@ -433,7 +453,7 @@ var Slowparse = (function() {
                                closeTagName, token);
         this._parseEndCloseTag();
       } else {
-        if (!(tagName && tagName.match(/^[A-Za-z]+$/)))
+        if (!(tagName && this._knownHTMLElement(tagName)))
           throw new ParseError("INVALID_TAG_NAME", tagName, token);
         this.domBuilder.pushElement(tagName, {
           openTag: {
