@@ -86,6 +86,13 @@ test("parsing of valid HTML", function() {
         "serialization of generated DOM matches original HTML");
 });
 
+testManySnippets("parsing of HTML with void elements:", [
+  '<br>',
+  '<img src="http://www.mozilla.org/favicon.ico">'
+], function(html, doc) {
+  equal(documentFragmentHTML(doc), html);
+});
+
 testManySnippets("parsing of text content w/ newlines", [
   '<p>hello\nthere</p>',
   '<p>\n  hello there</p>'

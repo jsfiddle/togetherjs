@@ -404,6 +404,9 @@ var Slowparse = (function() {
   }
 
   HTMLParser.prototype = {
+    voidHtmlElements: ["area", "base", "br", "col", "command", "embed", "hr",
+                       "img", "input", "keygen", "link", "meta", "param",
+                       "source", "track", "wbr"],
     htmlElements: ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base",
                    "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button",
                    "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "datalist", "dd",
@@ -501,6 +504,10 @@ var Slowparse = (function() {
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
 
+          if (tagName &&
+              (this.voidHtmlElements.indexOf(tagName.toLowerCase()) != -1))
+            this.domBuilder.popElement();
+          
           // special handling for style elements: we need to parse the CSS code here
           if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
             var token = this.cssParser.parse();
