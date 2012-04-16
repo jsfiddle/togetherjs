@@ -137,9 +137,10 @@ var Slowparse = (function() {
         }
       };
     },  
-    INVALID_CSS_PROPERTY_NAME: function(parser, start, end) {
+    INVALID_CSS_PROPERTY_NAME: function(parser, name, start, end) {
       return {
         cssProperty: {
+          name: name,
           start: start,
           end: end
         }
@@ -353,7 +354,7 @@ var Slowparse = (function() {
         var property = token.value.trim();
         var propertyStart = token.interval.start;
         if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
-          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.interval.start, token.interval.end);
+          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.value, token.interval.start, token.interval.end);
         this.stream.eatWhile(/[\s]/);
         this.stream.markTokenStart();
         this._parseValue(selectorStart, propertyStart);
