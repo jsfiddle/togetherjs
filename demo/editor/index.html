@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Two-Paned Editor</title>
+<link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
+<link rel="stylesheet" href="../jsbin-codemirror-theme.css">
+<style>
+html, body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.html {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  width: 50%;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+  height: 100%;
+}
+
+.error, .preview {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50%;
+  height: 100%;
+  border: none;
+}
+
+.error {
+  background: rgba(128, 0, 0, 0.75);
+  color: white;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+}
+
+.error em[data-highlight] {
+  font-style: normal;
+  text-decoration: underline;
+  cursor: pointer;
+}
+</style>
+<textarea class="html">&lt;p&gt;tinker with me.&lt;/p&gt;</textarea>
+<iframe class="preview" src="blank.html"></iframe>
+<div class="error" style="display: none"></div>
+<div id="templates" style="display: none">
+  <div class="error-msgs"></div>
+</div>
+<script src="../jquery.min.js"></script>
+<script src="../underscore.min.js"></script>
+<script src="../codemirror2/lib/codemirror.js"></script>
+<script src="../codemirror2/mode/xml/xml.js"></script>
+<script src="../codemirror2/mode/javascript/javascript.js"></script>
+<script src="../codemirror2/mode/css/css.js"></script>
+<script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
+<script src="../../slowparse.js"></script>
+<script>
+// TODOS:
+//
+// * Mouseover of DOM elements in preview area should highlight the relevant
+//   source code.
+//
+// * Mouseover of tag names and attributes on page should show relevant
+//   MDN help tooltip, with link to more information on MDN (e.g. via
+//   shift-click).
+//
+// * Error messages should highlight the relevant text in the code
+//   by default, without the user having to mouseover the word "here".
+//
+// * On mouseover of word "here" in error message, the associated source code
+//   should scroll into view if not already visible.
+//
+// * Unrecognized tags and attributes should also dim the preview area
+//   and provide alternate suggestions atop it, with MDN blurbs on each
+//   and links to more information on MDN. Relevant source code should
+//   be highlighted.
+//
+// * Images that don't load should also dim the preview area and provide
+//   help atop it, e.g. telling the user to check the URL and make sure
+//   it's an image and not a web page. Relevant source code should
+//   be highlighted.
+
+var editor;
+
+_.templateSettings = {
+  escape: /\{\{(.+?)\}\}/g
+};
+
+function selectInterval(interval) {
+  var start = editor.coordsFromIndex(interval.start);
+  var end = editor.coordsFromIndex(interval.end);
+  editor.setSelection(start, end);
+  editor.focus();
+}
+
+$(document).on("mouseover", "[data-highlight]", function(event) {
+  var interval = $(this).attr("data-highlight").split(",");
+  selectInterval({
+    start: parseInt(interval[0]),
+    end: parseInt(interval[1])
+  });
+});
+
+function reportError(error) {
+  var template = $("#templates .error-msg." + error.type);
+  $(".error").html(_.template(template.html(), error)).show();
+}
+
+function updatePreview(html) {
+  $(".error").hide();
+  var doc = $(".preview").contents()[0];
+  doc.open();
+  doc.write(html);
+  doc.close();
+}
+
+function onChange() {
+  var html = editor.getValue();
+  var result = Slowparse.HTML(document, html);
+  if (result.error) {
+    reportError(result.error);
+  } else {
+    updatePreview(html);
+  }
+}
+
+$(window).load(function() {
+  $("#templates .error-msgs").load("../error-msgs.html", function() {
+    editor = CodeMirror.fromTextArea($(".html")[0], {
+      mode: "text/html",
+      theme: "jsbin",
+      tabMode: "indent",
+      lineWrapping: true,
+      lineNumbers: true,
+      onChange: onChange
+    });
+    editor.focus();
+    onChange();
+  });
+});
+</script>
