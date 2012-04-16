@@ -570,6 +570,8 @@ var Slowparse = (function() {
   };
 
   var Slowparse = {
+    HTML_ELEMENT_NAMES: HTMLParser.prototype.htmlElements,
+    CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
     replaceEntityRefs: replaceEntityRefs,
     HTML: function(document, html) {
       var stream = new Stream(html),

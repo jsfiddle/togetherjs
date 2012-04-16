@@ -162,3 +162,11 @@ test("UNTERMINATED_CLOSE_TAG works at end of stream", function() {
   equal(error.type, "UNTERMINATED_CLOSE_TAG");
   equal(error.closeTag.end, html.length);
 });
+
+test("Slowparse.HTML_ELEMENT_NAMES", function() {
+  ok(Slowparse.HTML_ELEMENT_NAMES.indexOf("p") != -1);
+});
+
+test("Slowparse.CSS_PROPERTY_NAMES", function() {
+  ok(Slowparse.CSS_PROPERTY_NAMES.indexOf("color") != -1);
+});
