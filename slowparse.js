@@ -30,14 +30,6 @@ var Slowparse = (function() {
       if (!this.end())
         return this.text[this.pos++];
     },
-    nextN: function(n) {
-      var text = "";
-      var available = Math.min(this.text.length - this.pos, n);
-      while(available-->0) {
-        text = this.text[this.pos + available] + text;
-      }
-      return text;
-    },
     end: function() {
       return (this.pos == this.text.length);
     },
@@ -134,27 +126,42 @@ var Slowparse = (function() {
       return this.cssProperties.indexOf(propertyName) === -1;
     },
     _parseSelector: function() {
-      this.stream.eatWhile(/[^{<]/);
+      this.stream.eatWhile(/[^\{\}<]/);
       var token = this.stream.makeToken();
       if (token === null)
         return;
 
       var selector = token.value.trim();
-      if (selector && selector === '')
-        return;
-      if (!(selector && selector.match(/^[A-Za-z\-\_]+$/)))
+      token.value = selector;
+      
+      //window.console.log("selector:");
+      //window.console.log(token);
+      //window.console.log("---");
+
+      if (!(selector) || (selector && selector === '')) // && selector.match(/^[A-Za-z #~=\.\|"\(\)\[\]\:\+\*\-\_]+$/)))
+        // FIXME: the regexp or even charset for selectors is complex, so I'm leaving
+        //        this for when everything's up and running and we can start refining
+        //        our accept/reject policies
         throw new ParseError({
           type: "INVALID_CSS_SELECTOR_NAME",
           token: token
         });
 
       if (!this.stream.end()) {
-        var next = this.stream.peek();
-        if (next === '<') {
+        var peek = this.stream.peek();
+        if (peek === '<') {
           // end of CSS!
+          //window.console.log("end of CSS text block");
           return;
         }
-        else if (next === '{') {
+        else if (peek === '}') {
+          //window.console.log("CSS block end (selector level)");
+          this.stream.eatWhile(/[}\s\n]/);
+          this.stream.markTokenStart();
+          this._parseSelector();        
+        }
+        else if (peek === '{') {
+          //window.console.log("CSS block start");
           this.stream.eatWhile(/[\s\n{]/);
           this.stream.markTokenStart();
           this._parseDeclaration();
@@ -172,29 +179,44 @@ var Slowparse = (function() {
       this.stream.markTokenStart();
 
       if (this.stream.peek() === '}') {
+        //window.console.log("CSS block end (Declaration level)");
         this.stream.next();
-        this.stream.eatWhile(/[^<]/);
-        return;
+        this.stream.eatSpace();
+        this._parseSelector();
       }
       this._parseProperty();
     },
     _parseProperty: function() {
       var rule = this.stream.eatWhile(/[^}<;:]/);
       var token = this.stream.makeToken();
+
+      //window.console.log("property:");
+      //window.console.log(token);
+      //window.console.log("---");
+
       var next = this.stream.next();
-      if (next === ':') {
+
+      
+      if(token === null && next === '}') {
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
+        this._parseSelector();
+      }
+
+      else if (next === ':') {
         // proper parsing goes here
         var property = token.value.trim();
-        if (!( property && property.match(/^[A-Za-z\-\_]+$/)) || this._unknownCSSProperty(property))
-          // FIXME: make sure this maps to not-allowed-characters!
+        if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
           throw new ParseError({
             type: "INVALID_CSS_PROPERTY_NAME",
             node: this.domBuilder.currentNode,
             token: token
           });
-
+        this.stream.eatWhile(/[\s]/);
+        this.stream.markTokenStart();
         this._parseValue();
       }
+      
       else {
         throw new ParseError({
             type: "INVALID_CSS_DECLARATION",
@@ -206,11 +228,22 @@ var Slowparse = (function() {
     _parseValue: function() {
       var rule = this.stream.eatWhile(/[^}<;]/);
       var token = this.stream.makeToken();
+
+      //window.console.log("value:");
+      //window.console.log(token);
+      //window.console.log("---");
+
       var next = this.stream.next();
       if (next === ';') {
-        this._parseDeclaration();
+        //window.console.log("end of prop:value; pair");
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
+        this._parseProperty();
       }
       else if (next === '}') {
+        //window.console.log("end of rule set");
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
         this._parseSelector();
       }
       else {
