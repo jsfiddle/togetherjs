@@ -43,3 +43,17 @@
     <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>
     doesn't end with a <code>&gt;</code>.</p>
 </div>
+
+<!-- CSS ERRORS -->
+<div class="error-msg INVALID_CSS_DECLARATION">
+  <p><em data-highlight="{{cssDeclaration.start}},{{cssDeclaration.end}}">This</em>
+    CSS declaration never closes.</p>
+</div>
+<div class="error-msg INVALID_CSS_PROPERTY_NAME">
+  <p><em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">This</em>
+    CSS property does not exist.</p>
+</div>
+<div class="error-msg INVALID_CSS_RULE">
+  <p><em data-highlight="{{cssRule.start}},{{cssRule.end}}">This</em>
+    CSS rule is not legal CSS.</p>
+</div>
