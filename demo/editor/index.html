@@ -45,8 +45,17 @@ html, body {
 
 .error em[data-highlight] {
   font-style: normal;
-  text-decoration: underline;
   cursor: pointer;
+}
+
+.error em.highlight-1, .CodeMirror span.highlight-1 {
+  color: black;
+  background: yellow;
+}
+
+.error em.highlight-2, .CodeMirror span.highlight-2 {
+  color: white;
+  background: gray;
 }
 </style>
 <textarea class="html">&lt;p&gt;tinker with me.&lt;/p&gt;</textarea>
@@ -72,9 +81,6 @@ html, body {
 // * Mouseover of tag names and attributes on page should show relevant
 //   MDN help tooltip, with link to more information on MDN (e.g. via
 //   shift-click).
-//
-// * Error messages should highlight the relevant text in the code
-//   by default, without the user having to mouseover the word "here".
 //
 // * On mouseover of word "here" in error message, the associated source code
 //   should scroll into view if not already visible.
@@ -112,7 +118,28 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 
 function reportError(error) {
   var template = $("#templates .error-msg." + error.type);
-  $(".error").html(_.template(template.html(), error)).show();
+  $(".error").html(_.template(template.html(), error)).show()
+    .find("[data-highlight]").each(setErrorHighlight);
+}
+
+function setErrorHighlight(i) {
+  var className = "highlight-" + (i+1);
+  var interval = $(this).attr("data-highlight").split(",");
+  var start = editor.coordsFromIndex(interval[0]);
+  var end = editor.coordsFromIndex(interval[1]);
+  var mark = editor.markText(start, end, className);
+  $(this).addClass(className).data("mark", mark);
+}
+
+function clearErrorHighlights() {
+  $(".error").find("[data-highlight]").each(function() {
+    // Odd, from the CodeMirror docs you'd think this would remove
+    // the class from the highlighted text, too, but it doesn't.
+    // I guess we're just garbage collecting here.
+    $(this).data("mark").clear();
+  });
+  for (var i = 1; i <= 5; i++)
+    $(".CodeMirror .highlight-" + i).removeClass("highlight-" + i);
 }
 
 function updatePreview(html) {
@@ -126,6 +153,7 @@ function updatePreview(html) {
 function onChange() {
   var html = editor.getValue();
   var result = Slowparse.HTML(document, html);
+  clearErrorHighlights();
   if (result.error) {
     reportError(result.error);
   } else {
