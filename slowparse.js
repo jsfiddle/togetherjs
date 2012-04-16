@@ -124,6 +124,31 @@ var Slowparse = (function() {
           end: parser.stream.makeToken().interval.start
         }
       };
+    },
+    // CSS errors
+    INVALID_CSS_DECLARATION: function(parser, start, end) {
+      return {
+        cssDeclaration: {
+          start: start,
+          end: end
+        }
+      };
+    },  
+    INVALID_CSS_PROPERTY_NAME: function(parser, start, end) {
+      return {
+        cssProperty: {
+          start: start,
+          end: end
+        }
+      };
+    },
+    INVALID_CSS_RULE: function(parser, start, end) {
+      return {
+        cssRule: {
+          start: start,
+          end: end
+        }
+      };
     }
   };
   
@@ -261,12 +286,9 @@ var Slowparse = (function() {
 
       var selector = token.value.trim();
       token.value = selector;
-      
-      //window.console.log("selector:");
-      //window.console.log(token);
-      //window.console.log("---");
+      var selectorStart = token.interval.start;
 
-      if (!(selector) || (selector && selector === '')) // && selector.match(/^[A-Za-z #~=\.\|"\(\)\[\]\:\+\*\-\_]+$/)))
+      if (!(selector) || (selector && selector === ''))
         // FIXME: the regexp or even charset for selectors is complex, so I'm leaving
         //        this for when everything's up and running and we can start refining
         //        our accept/reject policies
@@ -280,20 +302,17 @@ var Slowparse = (function() {
         var peek = this.stream.peek();
         if (peek === '<') {
           // end of CSS!
-          //window.console.log("end of CSS text block");
           return;
         }
         else if (peek === '}') {
-          //window.console.log("CSS block end (selector level)");
           this.stream.eatWhile(/[}\s\n]/);
           this.stream.markTokenStart();
           this._parseSelector();        
         }
         else if (peek === '{') {
-          //window.console.log("CSS block start");
           this.stream.eatWhile(/[\s\n{]/);
           this.stream.markTokenStart();
-          this._parseDeclaration();
+          this._parseDeclaration(selectorStart);
         }
         else {
           throw new ParseError({
@@ -304,29 +323,22 @@ var Slowparse = (function() {
         }
       }
     },
-    _parseDeclaration: function() {
+    _parseDeclaration: function(selectorStart) {
       this.stream.eatWhile(/[\s\n]/);
       this.stream.markTokenStart();
 
       if (this.stream.peek() === '}') {
-        //window.console.log("CSS block end (Declaration level)");
         this.stream.next();
         this.stream.eatSpace();
         this._parseSelector();
+      } else {
+        this._parseProperty(selectorStart);
       }
-      this._parseProperty();
     },
-    _parseProperty: function() {
+    _parseProperty: function(selectorStart) {
       var rule = this.stream.eatWhile(/[^}<;:]/);
       var token = this.stream.makeToken();
-
-      //window.console.log("property:");
-      //window.console.log(token);
-      //window.console.log("---");
-
-      var next = this.stream.next();
-
-      
+      var next = this.stream.next();      
       if(token === null && next === '}') {
         this.stream.eatWhile(/[\s\n]/);
         this.stream.markTokenStart();
@@ -336,59 +348,43 @@ var Slowparse = (function() {
       else if (next === ':') {
         // proper parsing goes here
         var property = token.value.trim();
+        var propertyStart = token.interval.start;
         if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
-          throw new ParseError({
-            type: "INVALID_CSS_PROPERTY_NAME",
-            node: this.domBuilder.currentNode,
-            token: token
-          });
+          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.interval.start, token.interval.end);
         this.stream.eatWhile(/[\s]/);
         this.stream.markTokenStart();
-        this._parseValue();
+        this._parseValue(selectorStart, propertyStart);
       }
       
       else {
-        throw new ParseError({
-            type: "INVALID_CSS_DECLARATION",
-            node: this.domBuilder.currentNode,
-            token: token
-          });
+        throw new ParseError("INVALID_CSS_DECLARATION", this, selectorStart, this.stream.pos-1);
       }
     },
-    _parseValue: function() {
+    _parseValue: function(selectorStart, propertyStart) {
       var rule = this.stream.eatWhile(/[^}<;]/);
       var token = this.stream.makeToken();
-
-      //window.console.log("value:");
-      //window.console.log(token);
-      //window.console.log("---");
-
       var next = this.stream.next();
       if (next === ';') {
-        //window.console.log("end of prop:value; pair");
         this.stream.eatWhile(/[\s\n]/);
         this.stream.markTokenStart();
-        this._parseProperty();
+        this._parseProperty(selectorStart);
       }
       else if (next === '}') {
-        //window.console.log("end of rule set");
         this.stream.eatWhile(/[\s\n]/);
         this.stream.markTokenStart();
         this._parseSelector();
       }
       else {
-        throw new ParseError({
-            type: "INVALID_CSS_RULE",
-            node: this.domBuilder.currentNode,
-            token: token
-          });
+        throw new ParseError("INVALID_CSS_RULE", this, propertyStart, token.interval.end+1);
       }
     },
     parse: function() {
       var sliceStart = this.stream.pos;
       this.stream.eatWhile(/[\s\n]/);
       this.stream.markTokenStart();
+
       this._parseSelector();
+
       var sliceEnd = this.stream.pos;
       var token = {
         value: this.stream.text.slice(sliceStart, sliceEnd),
@@ -422,7 +418,6 @@ var Slowparse = (function() {
                    "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var",
                    "video", "wbr", "xmp"],
     _knownHTMLElement: function(tagName) {
-      window.console.log("checking "+tagName);
       return this.htmlElements.indexOf(tagName) > -1;
     },
     _buildTextNode: function() {
@@ -438,7 +433,6 @@ var Slowparse = (function() {
       this.stream.eatWhile(/[\w\d\/]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
-      window.console.log(tagName);
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
         if (!this.domBuilder.currentNode.parseInfo)

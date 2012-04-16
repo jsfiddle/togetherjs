@@ -242,6 +242,59 @@ a {
   }
   </script>
 </div>
+
+
+<!-- CSS errors -->
+<div class="test">
+  <script type="text/x-bad-html">
+    <style>
+      a { color: red; }
+      p {
+    </style>
+  </script>
+  <script type="application/json">
+    {
+      "type": "INVALID_CSS_DECLARATION",
+      "cssDeclaration": {
+        "start": 38,
+        "end": 46
+      }
+    }
+    </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <style>
+      a { colour: red; }
+    </style>
+  </script>
+  <script type="application/json">
+    {
+      "type": "INVALID_CSS_PROPERTY_NAME",
+      "cssProperty": {
+        "start": 18,
+        "end": 24
+      }
+    }
+    </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <style>
+      a { color: red<; }
+    </style>
+  </script>
+  <script type="application/json">
+    {
+      "type": "INVALID_CSS_RULE",
+      "cssRule": {
+        "start": 18,
+        "end": 24
+      }
+    }
+    </script>
+</div>
+
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
 <script src="../slowparse.js"></script>
