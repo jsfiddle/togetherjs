@@ -40,7 +40,7 @@ var Slowparse = (function() {
     this.message = parseInfo.type;
     this.parseInfo = parseInfo;
   }
-  
+
   ParseError.prototype = Error.prototype;
 
   var ParseErrorBuilders = {
@@ -135,7 +135,7 @@ var Slowparse = (function() {
     this.pos = 0;
     this.tokenStart = 0;
   }
-  
+
   Stream.prototype = {
     // Returns the next character in the stream without advancing it.
     // Will return undefined at the end of the text.
@@ -174,6 +174,9 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
+    markTokenStart: function() {
+      this.tokenStart = this.pos;
+    },
     // Generates a JSON-serializable token object representing the interval
     // of text between the end of the last generated token and the current
     // stream position.
@@ -191,10 +194,215 @@ var Slowparse = (function() {
       return token;
     }
   };
-  
+
+  function CSSParser(stream, domBuilder) {
+    this.stream = stream;
+    this.domBuilder = domBuilder;
+  }
+
+  CSSParser.prototype = {
+    cssProperties: ["alignment-adjust","alignment-baseline","animation","animation-delay","animation-direction",
+                    "animation-duration","animation-iteration-count","animation-name","animation-play-state",
+                    "animation-timing-function","appearance","azimuth","backface-visibility","background",
+                    "background-attachment","background-clip","background-color","background-image","background-origin",
+                    "background-position","background-repeat","background-size","baseline-shift","binding","bleed",
+                    "bookmark-label","bookmark-level","bookmark-state","bookmark-target","border","border-bottom",
+                    "border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style",
+                    "border-bottom-width","border-collapse","border-color","border-image","border-image-outset",
+                    "border-image-repeat","border-image-slice","border-image-source","border-image-width",
+                    "border-left","border-left-color","border-left-style","border-left-width","border-radius",
+                    "border-right","border-right-color","border-right-style","border-right-width","border-spacing",
+                    "border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius",
+                    "border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow",
+                    "box-sizing","break-after","break-before","break-inside","caption-side","clear","clip","color",
+                    "color-profile","column-count","column-fill","column-gap","column-rule","column-rule-color",
+                    "column-rule-style","column-rule-width","column-span","column-width","columns","content",
+                    "counter-increment","counter-reset","crop","cue","cue-after","cue-before","cursor","direction",
+                    "display","dominant-baseline","drop-initial-after-adjust","drop-initial-after-align",
+                    "drop-initial-before-adjust","drop-initial-before-align","drop-initial-size","drop-initial-value",
+                    "elevation","empty-cells","fit","fit-position","flex-align","flex-flow","flex-line-pack",
+                    "flex-order","flex-pack","float","float-offset","font","font-family","font-size","font-size-adjust",
+                    "font-stretch","font-style","font-variant","font-weight","grid-columns","grid-rows",
+                    "hanging-punctuation","height","hyphenate-after","hyphenate-before","hyphenate-character",
+                    "hyphenate-lines","hyphenate-resource","hyphens","icon","image-orientation","image-rendering",
+                    "image-resolution","inline-box-align","left","letter-spacing","line-break","line-height",
+                    "line-stacking","line-stacking-ruby","line-stacking-shift","line-stacking-strategy","list-style",
+                    "list-style-image","list-style-position","list-style-type","margin","margin-bottom","margin-left",
+                    "margin-right","margin-top","marker-offset","marks","marquee-direction","marquee-loop",
+                    "marquee-play-count","marquee-speed","marquee-style","max-height","max-width","min-height",
+                    "min-width","move-to","nav-down","nav-index","nav-left","nav-right","nav-up","opacity","orphans",
+                    "outline","outline-color","outline-offset","outline-style","outline-width","overflow",
+                    "overflow-style","overflow-wrap","overflow-x","overflow-y","padding","padding-bottom",
+                    "padding-left","padding-right","padding-top","page","page-break-after","page-break-before",
+                    "page-break-inside","page-policy","pause","pause-after","pause-before","perspective",
+                    "perspective-origin","phonemes","pitch","pitch-range","play-during","position","presentation-level",
+                    "punctuation-trim","quotes","rendering-intent","resize","rest","rest-after","rest-before",
+                    "richness","right","rotation","rotation-point","ruby-align","ruby-overhang","ruby-position",
+                    "ruby-span","size","speak","speak-header","speak-numeral","speak-punctuation","speech-rate",
+                    "stress","string-set","tab-size","table-layout","target","target-name","target-new",
+                    "target-position","text-align","text-align-last","text-decoration","text-decoration-color",
+                    "text-decoration-line","text-decoration-skip","text-decoration-style","text-emphasis",
+                    "text-emphasis-color","text-emphasis-position","text-emphasis-style","text-height","text-indent",
+                    "text-justify","text-outline","text-shadow","text-space-collapse","text-transform",
+                    "text-underline-position","text-wrap","top","transform","transform-origin","transform-style",
+                    "transition","transition-delay","transition-duration","transition-property",
+                    "transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance",
+                    "voice-duration","voice-family","voice-pitch","voice-pitch-range","voice-rate","voice-stress",
+                    "voice-volume","volume","white-space","widows","width","word-break","word-spacing","word-wrap",
+                    "z-index"],
+    _unknownCSSProperty: function(propertyName) {
+      return this.cssProperties.indexOf(propertyName) === -1;
+    },
+    _parseSelector: function() {
+      this.stream.eatWhile(/[^\{\}<]/);
+      var token = this.stream.makeToken();
+      if (token === null)
+        return;
+
+      var selector = token.value.trim();
+      token.value = selector;
+      
+      //window.console.log("selector:");
+      //window.console.log(token);
+      //window.console.log("---");
+
+      if (!(selector) || (selector && selector === '')) // && selector.match(/^[A-Za-z #~=\.\|"\(\)\[\]\:\+\*\-\_]+$/)))
+        // FIXME: the regexp or even charset for selectors is complex, so I'm leaving
+        //        this for when everything's up and running and we can start refining
+        //        our accept/reject policies
+        throw new ParseError({
+          type: "INVALID_CSS_SELECTOR_NAME",
+          token: token
+        });
+
+      if (!this.stream.end()) {
+        var peek = this.stream.peek();
+        if (peek === '<') {
+          // end of CSS!
+          //window.console.log("end of CSS text block");
+          return;
+        }
+        else if (peek === '}') {
+          //window.console.log("CSS block end (selector level)");
+          this.stream.eatWhile(/[}\s\n]/);
+          this.stream.markTokenStart();
+          this._parseSelector();        
+        }
+        else if (peek === '{') {
+          //window.console.log("CSS block start");
+          this.stream.eatWhile(/[\s\n{]/);
+          this.stream.markTokenStart();
+          this._parseDeclaration();
+        }
+        else {
+          throw new ParseError({
+            type: "MISSING_CSS_BLOCK_OPENER",
+            token: token
+          });
+        }
+      }
+    },
+    _parseDeclaration: function() {
+      this.stream.eatWhile(/[\s\n]/);
+      this.stream.markTokenStart();
+
+      if (this.stream.peek() === '}') {
+        //window.console.log("CSS block end (Declaration level)");
+        this.stream.next();
+        this.stream.eatSpace();
+        this._parseSelector();
+      }
+      this._parseProperty();
+    },
+    _parseProperty: function() {
+      var rule = this.stream.eatWhile(/[^}<;:]/);
+      var token = this.stream.makeToken();
+
+      //window.console.log("property:");
+      //window.console.log(token);
+      //window.console.log("---");
+
+      var next = this.stream.next();
+
+      
+      if(token === null && next === '}') {
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
+        this._parseSelector();
+      }
+
+      else if (next === ':') {
+        // proper parsing goes here
+        var property = token.value.trim();
+        if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
+          throw new ParseError({
+            type: "INVALID_CSS_PROPERTY_NAME",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+        this.stream.eatWhile(/[\s]/);
+        this.stream.markTokenStart();
+        this._parseValue();
+      }
+      
+      else {
+        throw new ParseError({
+            type: "INVALID_CSS_DECLARATION",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+      }
+    },
+    _parseValue: function() {
+      var rule = this.stream.eatWhile(/[^}<;]/);
+      var token = this.stream.makeToken();
+
+      //window.console.log("value:");
+      //window.console.log(token);
+      //window.console.log("---");
+
+      var next = this.stream.next();
+      if (next === ';') {
+        //window.console.log("end of prop:value; pair");
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
+        this._parseProperty();
+      }
+      else if (next === '}') {
+        //window.console.log("end of rule set");
+        this.stream.eatWhile(/[\s\n]/);
+        this.stream.markTokenStart();
+        this._parseSelector();
+      }
+      else {
+        throw new ParseError({
+            type: "INVALID_CSS_RULE",
+            node: this.domBuilder.currentNode,
+            token: token
+          });
+      }
+    },
+    parse: function() {
+      var sliceStart = this.stream.pos;
+      this.stream.eatWhile(/[\s\n]/);
+      this.stream.markTokenStart();
+      this._parseSelector();
+      var sliceEnd = this.stream.pos;
+      var token = {
+        value: this.stream.text.slice(sliceStart, sliceEnd),
+        interval: {
+          start: sliceStart,
+          end: sliceEnd
+        }
+      };
+      return token;
+    }
+  }
+
   function HTMLParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
+    this.cssParser = new CSSParser(stream, domBuilder);
   }
 
   HTMLParser.prototype = {
@@ -232,9 +440,8 @@ var Slowparse = (function() {
             start: token.interval.start
           }
         });
-
         if (!this.stream.end())
-          this._parseEndOpenTag();
+          this._parseEndOpenTag(tagName);
       }
     },
     _parseQuotedAttributeValue: function() {
@@ -269,7 +476,7 @@ var Slowparse = (function() {
       } else
         throw new Error("TODO: boolean attributes are unimplemented");
     },
-    _parseEndOpenTag: function() {
+    _parseEndOpenTag: function(tagName) {
       while (!this.stream.end()) {
         if (this.stream.eatWhile(/[A-Za-z]/)) {
           this._parseAttribute();
@@ -279,6 +486,15 @@ var Slowparse = (function() {
           this.stream.next();
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
+
+          // special handling for style elements: we need to parse the CSS code here
+          if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
+            var token = this.cssParser.parse();
+            // FIXME: tokenizing inside the css parser seems to yield
+            //        an odd placement when resuming HTML parsing.
+            this.domBuilder.text(token.value, token.interval);
+          }
+
           return;
         } else
           throw new ParseError("UNTERMINATED_OPEN_TAG", this);
@@ -299,13 +515,13 @@ var Slowparse = (function() {
         throw new ParseError("UNCLOSED_TAG", this);
     }
   };
-  
+
   function DOMBuilder(document) {
     this.document = document;
     this.fragment = document.createDocumentFragment();
     this.currentNode = this.fragment;
   }
-  
+
   DOMBuilder.prototype = {
     pushElement: function(tagName, parseInfo) {
       var node = this.document.createElement(tagName);
@@ -328,7 +544,7 @@ var Slowparse = (function() {
       this.currentNode.appendChild(textNode);
     }
   };
-  
+
   var Slowparse = {
     replaceEntityRefs: replaceEntityRefs,
     HTML: function(document, html) {
@@ -355,6 +571,6 @@ var Slowparse = (function() {
       return this.HTML(document, html).error;
     }
   };
-  
+
   return Slowparse;
 })();
