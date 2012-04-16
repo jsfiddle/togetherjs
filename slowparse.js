@@ -13,7 +13,7 @@ var Slowparse = (function() {
       this.parseInfo.end = parseInfo.token.interval.end;
     }
   }
-  
+
   ParseError.prototype = Error.prototype;
 
   function Stream(text) {
@@ -21,7 +21,7 @@ var Slowparse = (function() {
     this.pos = 0;
     this.tokenStart = 0;
   }
-  
+
   Stream.prototype = {
     peek: function() {
       return this.text[this.pos];
@@ -74,25 +74,73 @@ var Slowparse = (function() {
       return token;
     },
   };
-  
+
   function CSSParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
   }
 
   CSSParser.prototype = {
+    cssProperties: ["alignment-adjust","alignment-baseline","animation","animation-delay","animation-direction",
+                    "animation-duration","animation-iteration-count","animation-name","animation-play-state",
+                    "animation-timing-function","appearance","azimuth","backface-visibility","background",
+                    "background-attachment","background-clip","background-color","background-image","background-origin",
+                    "background-position","background-repeat","background-size","baseline-shift","binding","bleed",
+                    "bookmark-label","bookmark-level","bookmark-state","bookmark-target","border","border-bottom",
+                    "border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style",
+                    "border-bottom-width","border-collapse","border-color","border-image","border-image-outset",
+                    "border-image-repeat","border-image-slice","border-image-source","border-image-width",
+                    "border-left","border-left-color","border-left-style","border-left-width","border-radius",
+                    "border-right","border-right-color","border-right-style","border-right-width","border-spacing",
+                    "border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius",
+                    "border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow",
+                    "box-sizing","break-after","break-before","break-inside","caption-side","clear","clip","color",
+                    "color-profile","column-count","column-fill","column-gap","column-rule","column-rule-color",
+                    "column-rule-style","column-rule-width","column-span","column-width","columns","content",
+                    "counter-increment","counter-reset","crop","cue","cue-after","cue-before","cursor","direction",
+                    "display","dominant-baseline","drop-initial-after-adjust","drop-initial-after-align",
+                    "drop-initial-before-adjust","drop-initial-before-align","drop-initial-size","drop-initial-value",
+                    "elevation","empty-cells","fit","fit-position","flex-align","flex-flow","flex-line-pack",
+                    "flex-order","flex-pack","float","float-offset","font","font-family","font-size","font-size-adjust",
+                    "font-stretch","font-style","font-variant","font-weight","grid-columns","grid-rows",
+                    "hanging-punctuation","height","hyphenate-after","hyphenate-before","hyphenate-character",
+                    "hyphenate-lines","hyphenate-resource","hyphens","icon","image-orientation","image-rendering",
+                    "image-resolution","inline-box-align","left","letter-spacing","line-break","line-height",
+                    "line-stacking","line-stacking-ruby","line-stacking-shift","line-stacking-strategy","list-style",
+                    "list-style-image","list-style-position","list-style-type","margin","margin-bottom","margin-left",
+                    "margin-right","margin-top","marker-offset","marks","marquee-direction","marquee-loop",
+                    "marquee-play-count","marquee-speed","marquee-style","max-height","max-width","min-height",
+                    "min-width","move-to","nav-down","nav-index","nav-left","nav-right","nav-up","opacity","orphans",
+                    "outline","outline-color","outline-offset","outline-style","outline-width","overflow",
+                    "overflow-style","overflow-wrap","overflow-x","overflow-y","padding","padding-bottom",
+                    "padding-left","padding-right","padding-top","page","page-break-after","page-break-before",
+                    "page-break-inside","page-policy","pause","pause-after","pause-before","perspective",
+                    "perspective-origin","phonemes","pitch","pitch-range","play-during","position","presentation-level",
+                    "punctuation-trim","quotes","rendering-intent","resize","rest","rest-after","rest-before",
+                    "richness","right","rotation","rotation-point","ruby-align","ruby-overhang","ruby-position",
+                    "ruby-span","size","speak","speak-header","speak-numeral","speak-punctuation","speech-rate",
+                    "stress","string-set","tab-size","table-layout","target","target-name","target-new",
+                    "target-position","text-align","text-align-last","text-decoration","text-decoration-color",
+                    "text-decoration-line","text-decoration-skip","text-decoration-style","text-emphasis",
+                    "text-emphasis-color","text-emphasis-position","text-emphasis-style","text-height","text-indent",
+                    "text-justify","text-outline","text-shadow","text-space-collapse","text-transform",
+                    "text-underline-position","text-wrap","top","transform","transform-origin","transform-style",
+                    "transition","transition-delay","transition-duration","transition-property",
+                    "transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance",
+                    "voice-duration","voice-family","voice-pitch","voice-pitch-range","voice-rate","voice-stress",
+                    "voice-volume","volume","white-space","widows","width","word-break","word-spacing","word-wrap",
+                    "z-index"],
     _unknownCSSProperty: function(propertyName) {
-      // FIXME: we can simply use an array of known CSS property names with an .indexOf
-      return false;
+      return this.cssProperties.indexOf(propertyName) === -1;
     },
-    _parseSelector: function() {      
+    _parseSelector: function() {
       this.stream.eatWhile(/[^{<]/);
       var token = this.stream.makeToken();
-      if (token === null) 
+      if (token === null)
         return;
 
       var selector = token.value.trim();
-      if (selector && selector === '') 
+      if (selector && selector === '')
         return;
       if (!(selector && selector.match(/^[A-Za-z\-\_]+$/)))
         throw new ParseError({
@@ -119,7 +167,7 @@ var Slowparse = (function() {
         }
       }
     },
-    _parseDeclaration: function() {        
+    _parseDeclaration: function() {
       this.stream.eatWhile(/[\s\n]/);
       this.stream.markTokenStart();
 
@@ -127,7 +175,7 @@ var Slowparse = (function() {
         this.stream.next();
         this.stream.eatWhile(/[^<]/);
         return;
-      } 
+      }
       this._parseProperty();
     },
     _parseProperty: function() {
@@ -284,11 +332,11 @@ var Slowparse = (function() {
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
 
-          // special handling for style elements:
-          // we need to parse the CSS code here
+          // special handling for style elements: we need to parse the CSS code here
           if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
             var token = this.cssParser.parse();
-            // FIXME: this leaves some rogue characters!
+            // FIXME: tokenizing inside the css parser seems to yield
+            //        an odd placement when resuming HTML parsing.
             this.domBuilder.text(token.value, token.interval);
           }
 
@@ -318,13 +366,13 @@ var Slowparse = (function() {
         });
     }
   };
-  
+
   function DOMBuilder(document) {
     this.document = document;
     this.fragment = document.createDocumentFragment();
     this.currentNode = this.fragment;
   }
-  
+
   DOMBuilder.prototype = {
     pushElement: function(tagName, parseInfo) {
       var node = this.document.createElement(tagName);
@@ -347,7 +395,7 @@ var Slowparse = (function() {
       this.currentNode.appendChild(textNode);
     }
   };
-  
+
   var Slowparse = {
     HTML: function(document, html) {
       var stream = new Stream(html),
@@ -370,6 +418,6 @@ var Slowparse = (function() {
       };
     }
   };
-  
+
   return Slowparse;
 })();
