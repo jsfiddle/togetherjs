@@ -40,6 +40,7 @@ html, body {
   background: rgba(128, 0, 0, 0.75);
   color: white;
   padding: 10px;
+  overflow: auto;
   -webkit-box-sizing: border-box;
 }
 
@@ -62,6 +63,10 @@ html, body {
   color: inherit;
 }
 
+.suggestions li p {
+  font-size: smaller;
+}
+
 code {
   font-family: Menlo, Monaco, consolas, monospace;
   font-size: smaller;
@@ -71,7 +76,7 @@ code {
 <script type="text/html" id="initial-html">
 <style>
   p {
-    color: blue;
+    colo: blue;
   }
 </style>
 <p>Tinker with me.</p>
@@ -83,7 +88,10 @@ code {
   <div class="suggestions">
     <p>Following are some suggestions that may help. Click on one for more detailed information.</p>
     <ul>
-      <li><code><a href="" target="mdn"></a></code></li>
+      <li>
+        <code><a href="" target="mdn"></a></code>
+        <p></p>
+      </li>
     </ul>
   </div>
 </div>
@@ -95,6 +103,7 @@ code {
 <script src="../codemirror2/mode/css/css.js"></script>
 <script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
 <script src="../../slowparse.js"></script>
+<script src="hacktionary-data.js"></script>
 <script>
 // TODOS:
 //
@@ -154,6 +163,10 @@ function createSuggestions(options) {
     suggItem.find('a')
       .attr("href", options.baseURL + sugg)
       .text(sugg);
+    if (sugg in options.blurbs) {
+      suggItem.find('p').html(options.blurbs[sugg]);
+      suggItem.find('p a').attr("target", "mdn");
+    }
     suggItem.appendTo(suggs.find('ul'));
   });
   return suggs;
@@ -167,13 +180,15 @@ function reportError(error) {
     createSuggestions({
       name: error.openTag.name,
       lexicon: Slowparse.HTML_ELEMENT_NAMES,
-      baseURL: "https://developer.mozilla.org/en/HTML/Element/"
+      baseURL: "https://developer.mozilla.org/en/HTML/Element/",
+      blurbs: HacktionaryData["html-element-docs"]
     }).appendTo(".error");
   } else if (error.type == "INVALID_CSS_PROPERTY_NAME") {
     createSuggestions({
       name: error.cssProperty.name,
       lexicon: Slowparse.CSS_PROPERTY_NAMES,
-      baseURL: "https://developer.mozilla.org/en/CSS/"
+      baseURL: "https://developer.mozilla.org/en/CSS/",
+      blurbs: HacktionaryData["css-property-docs"]
     }).appendTo(".error");
   }
 }
