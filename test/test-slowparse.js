@@ -60,6 +60,17 @@ function testManySnippets(name, htmlStrings, cb) {
   });
 }
 
+// Test a snippet of CSS.
+function testStyleSheet(name, css, cb) {
+  test(name + ": " + JSON.stringify(css), function() {
+    var html = '<style>' + css + '</style>';
+    var doc = parseWithoutErrors(html);
+    var styleContents = doc.childNodes[0].childNodes[0];
+    equal(styleContents.nodeValue, css);
+    cb(html, css, styleContents);
+  });
+}
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var doc = parseWithoutErrors(html);
@@ -125,18 +136,28 @@ testManySnippets("parsing of valid HTML w/ whitespace", [
         "Document fragment is correct.");
 });
 
-test("parsing of <style> element", function() {
-  var html = '<style>body { color: pink }</style>';
-  var doc = parseWithoutErrors(html);
-  var styleContents = doc.childNodes[0].childNodes[0];
-  equal(styleContents.nodeValue, 'body { color: pink }');
-  assertParseInfo(html, styleContents, "style", {
-    'parseInfo': 'body { color: pink }',
-    'parseInfo.rules[0].selector': 'body',
-    'parseInfo.rules[0].declarations': '{ color: pink }',
-    'parseInfo.rules[0].declarations.properties[0].name': 'color',
-    'parseInfo.rules[0].declarations.properties[0].value': 'pink'
-  });
+testStyleSheet("parsing of CSS rule w/ one decl, no semicolon",
+               "body { color: pink }",
+               function(html, css, styleContents) {
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo': 'body { color: pink }',
+      'parseInfo.rules[0].selector': 'body',
+      'parseInfo.rules[0].declarations': '{ color: pink }',
+      'parseInfo.rules[0].declarations.properties[0].name': 'color',
+      'parseInfo.rules[0].declarations.properties[0].value': 'pink'
+    });
+});
+
+testStyleSheet("parsing of CSS rule w/ one decl and semicolon",
+               "body { color: pink; }",
+               function(html, css, styleContents) {
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo': 'body { color: pink; }',
+      'parseInfo.rules[0].selector': 'body',
+      'parseInfo.rules[0].declarations': '{ color: pink; }',
+      'parseInfo.rules[0].declarations.properties[0].name': 'color',
+      'parseInfo.rules[0].declarations.properties[0].value': 'pink'
+    });
 });
 
 test("replaceEntityRefs", function() {
