@@ -15,9 +15,14 @@ function assertParseInfo(html, node, name, map) {
   function getDottedProperty(obj, property) {
     var parts = property.split('.');
     parts.forEach(function(part) {
+      var arrayIndexMatch = part.match(/^(.+)\[(\d+)\]$/);
+      if (arrayIndexMatch)
+        part = arrayIndexMatch[1];
       if (!(part in obj))
         return null;
       obj = obj[part];
+      if (arrayIndexMatch)
+        obj = obj[parseInt(arrayIndexMatch[2])];
     });
     return obj;
   }
@@ -118,6 +123,20 @@ testManySnippets("parsing of valid HTML w/ whitespace", [
 
   equal(documentFragmentHTML(doc), canonicalHTML,
         "Document fragment is correct.");
+});
+
+test("parsing of <style> element", function() {
+  var html = '<style>body { color: pink }</style>';
+  var doc = parseWithoutErrors(html);
+  var styleContents = doc.childNodes[0].childNodes[0];
+  equal(styleContents.nodeValue, 'body { color: pink }');
+  assertParseInfo(html, styleContents, "style", {
+    'parseInfo': 'body { color: pink }',
+    'parseInfo.rules[0].selector': 'body',
+    'parseInfo.rules[0].declarations': '{ color: pink }',
+    'parseInfo.rules[0].declarations.properties[0].name': 'color',
+    'parseInfo.rules[0].declarations.properties[0].value': 'pink'
+  });
 });
 
 test("replaceEntityRefs", function() {

@@ -283,12 +283,18 @@ var Slowparse = (function() {
       return this.cssProperties.indexOf(propertyName) === -1;
     },
     _parseSelector: function() {
+      if (this.currentRule) {
+        this.rules.push(this.currentRule);
+        this.currentRule = null;
+      }
+      
       this.stream.eatWhile(/[^\{\}<]/);
       var token = this.stream.makeToken();
       if (token === null)
         return;
 
       var selector = token.value.trim();
+      var oldTokenValue = token.value;
       token.value = selector;
       var selectorStart = token.interval.start;
 
@@ -302,6 +308,18 @@ var Slowparse = (function() {
           token: token
         });
 
+      this.currentRule = {
+        selector: {
+          start: token.interval.start,
+          end: token.interval.end - (oldTokenValue.length - selector.length)
+        },
+        declarations: {
+          start: null,
+          end: null,
+          properties: []
+        }
+      };
+      
       if (!this.stream.end()) {
         var peek = this.stream.peek();
         if (peek === '<') {
@@ -309,11 +327,13 @@ var Slowparse = (function() {
           return;
         }
         else if (peek === '}') {
+          this.currentRule.declarations.end = this.stream.pos;
           this.stream.eatWhile(/[}\s\n]/);
           this.stream.markTokenStart();
           this._parseSelector();        
         }
         else if (peek === '{') {
+          this.currentRule.declarations.start = this.stream.pos;
           this.stream.eatWhile(/[\s\n{]/);
           this.stream.markTokenStart();
           this._parseDeclaration(selectorStart);
@@ -332,6 +352,7 @@ var Slowparse = (function() {
       this.stream.markTokenStart();
 
       if (this.stream.peek() === '}') {
+        this.currentRule.declarations.end = this.stream.pos;
         this.stream.next();
         this.stream.eatSpace();
         this._parseSelector();
@@ -344,12 +365,16 @@ var Slowparse = (function() {
       var token = this.stream.makeToken();
       var next = this.stream.next();      
       if(token === null && next === '}') {
+        this.currentRule.declarations.end = this.stream.pos - 1;
         this.stream.eatWhile(/[\s\n]/);
         this.stream.markTokenStart();
         this._parseSelector();
       }
 
       else if (next === ':') {
+        this.currentProperty = {
+          name: token.interval
+        };
         // proper parsing goes here
         var property = token.value.trim();
         var propertyStart = token.interval.start;
@@ -367,6 +392,13 @@ var Slowparse = (function() {
     _parseValue: function(selectorStart, propertyStart) {
       var rule = this.stream.eatWhile(/[^}<;]/);
       var token = this.stream.makeToken();
+      var trimmedValue = token.value.trim();
+      this.currentProperty.value = {
+        start: token.interval.start,
+        end: token.interval.end - (token.value.length - trimmedValue.length)
+      };
+      this.currentRule.declarations.properties.push(this.currentProperty);
+      this.currentProperty = null;
       var next = this.stream.next();
       if (next === ';') {
         this.stream.eatWhile(/[\s\n]/);
@@ -374,6 +406,7 @@ var Slowparse = (function() {
         this._parseProperty(selectorStart);
       }
       else if (next === '}') {
+        this.currentRule.declarations.end = this.stream.pos;
         this.stream.eatWhile(/[\s\n]/);
         this.stream.markTokenStart();
         this._parseSelector();
@@ -383,6 +416,7 @@ var Slowparse = (function() {
       }
     },
     parse: function() {
+      this.rules = [];
       var sliceStart = this.stream.pos;
       this.stream.eatWhile(/[\s\n]/);
       this.stream.markTokenStart();
@@ -392,11 +426,13 @@ var Slowparse = (function() {
       var sliceEnd = this.stream.pos;
       var token = {
         value: this.stream.text.slice(sliceStart, sliceEnd),
-        interval: {
+        parseInfo: {
           start: sliceStart,
-          end: sliceEnd
+          end: sliceEnd,
+          rules: this.rules
         }
       };
+      this.rules = null;
       return token;
     }
   }
@@ -517,7 +553,7 @@ var Slowparse = (function() {
             var token = this.cssParser.parse();
             // FIXME: tokenizing inside the css parser seems to yield
             //        an odd placement when resuming HTML parsing.
-            this.domBuilder.text(token.value, token.interval);
+            this.domBuilder.text(token.value, token.parseInfo);
           }
 
           return;
