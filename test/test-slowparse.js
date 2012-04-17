@@ -144,6 +144,8 @@ testManySnippets("parsing of valid HTML w/ whitespace", [
 testStyleSheet("parsing of CSS rule w/ one decl, no semicolon",
                "body { color: pink }",
                function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
+    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
     assertParseInfo(html, styleContents, "style", {
       'parseInfo': 'body { color: pink }',
       'parseInfo.rules[0].selector': 'body',
@@ -156,12 +158,26 @@ testStyleSheet("parsing of CSS rule w/ one decl, no semicolon",
 testStyleSheet("parsing of CSS rule w/ one decl and semicolon",
                "body { color: pink; }",
                function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
+    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
     assertParseInfo(html, styleContents, "style", {
       'parseInfo': 'body { color: pink; }',
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations': '{ color: pink; }',
       'parseInfo.rules[0].declarations.properties[0].name': 'color',
       'parseInfo.rules[0].declarations.properties[0].value': 'pink'
+    });
+});
+
+testStyleSheet("parsing of empty CSS rule",
+               "body {}",
+               function(html, css, styleContents) {
+   equal(styleContents.parseInfo.rules.length, 1);
+   equal(styleContents.parseInfo.rules[0].declarations.properties.length, 0);
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo': 'body {}',
+      'parseInfo.rules[0].selector': 'body',
+      'parseInfo.rules[0].declarations': '{}'
     });
 });
 
@@ -174,6 +190,8 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace",
                 "body\n {\n color: \npink \n; }",
                 "body\n {\n color: \npink; }\n"],
                function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
+    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
     assertParseInfo(html, styleContents, "style", {
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations.properties[0].name': 'color',

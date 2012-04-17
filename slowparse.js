@@ -352,7 +352,7 @@ var Slowparse = (function() {
       this.stream.markTokenStart();
 
       if (this.stream.peek() === '}') {
-        this.currentRule.declarations.end = this.stream.pos;
+        this.currentRule.declarations.end = this.stream.pos + 1;
         this.stream.next();
         this.stream.eatSpace();
         this._parseSelector();
