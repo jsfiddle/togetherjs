@@ -327,6 +327,8 @@ var Slowparse = (function() {
           return;
         }
         else if (peek === '}') {
+          // TODO: When is this code called? As of Apr 17, 2012, none of
+          // our unit tests trigger this.
           this.currentRule.declarations.end = this.stream.pos;
           this.stream.eatWhile(/[}\s\n]/);
           this.stream.markTokenStart();
