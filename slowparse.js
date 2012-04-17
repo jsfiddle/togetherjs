@@ -372,14 +372,17 @@ var Slowparse = (function() {
       }
 
       else if (next === ':') {
-        this.currentProperty = {
-          name: token.interval
-        };
         // proper parsing goes here
         var property = token.value.trim();
         var propertyStart = token.interval.start;
         if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
           throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.value, token.interval.start, token.interval.end);
+        this.currentProperty = {
+          name: {
+            start: token.interval.start,
+            end: token.interval.end - (token.value.length - property.length)
+          }
+        };
         this.stream.eatWhile(/[\s]/);
         this.stream.markTokenStart();
         this._parseValue(selectorStart, propertyStart);

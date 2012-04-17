@@ -60,14 +60,19 @@ function testManySnippets(name, htmlStrings, cb) {
   });
 }
 
-// Test a snippet of CSS.
-function testStyleSheet(name, css, cb) {
-  test(name + ": " + JSON.stringify(css), function() {
-    var html = '<style>' + css + '</style>';
-    var doc = parseWithoutErrors(html);
-    var styleContents = doc.childNodes[0].childNodes[0];
-    equal(styleContents.nodeValue, css);
-    cb(html, css, styleContents);
+// Test one or more snippets of CSS.
+function testStyleSheet(name, cssList, cb) {
+  if (typeof(cssList) == "string")
+    cssList = [cssList];
+  
+  cssList.forEach(function(css) {
+    test(name + ": " + JSON.stringify(css), function() {
+      var html = '<style>' + css + '</style>';
+      var doc = parseWithoutErrors(html);
+      var styleContents = doc.childNodes[0].childNodes[0];
+      equal(styleContents.nodeValue, css);
+      cb(html, css, styleContents);
+    });
   });
 }
 
@@ -155,6 +160,22 @@ testStyleSheet("parsing of CSS rule w/ one decl and semicolon",
       'parseInfo': 'body { color: pink; }',
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations': '{ color: pink; }',
+      'parseInfo.rules[0].declarations.properties[0].name': 'color',
+      'parseInfo.rules[0].declarations.properties[0].value': 'pink'
+    });
+});
+
+testStyleSheet("parsing of CSS rule w/ funky whitespace",
+               ["body\n { color: pink; }",
+                "body\n {\n color: pink; }",
+                "body\n {\n color: \npink; }",
+                "body\n {\n color: \npink\n\n }",
+                "body\n {\n color : \npink\n\n }",
+                "body\n {\n color: \npink \n; }",
+                "body\n {\n color: \npink; }\n"],
+               function(html, css, styleContents) {
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations.properties[0].name': 'color',
       'parseInfo.rules[0].declarations.properties[0].value': 'pink'
     });
