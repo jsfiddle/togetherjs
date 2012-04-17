@@ -1,3 +1,5 @@
+// Data here is ultimately scraped from MDN:
+// https://github.com/toolness/hacktionary
 var HacktionaryData = {
   "short-element-descriptions": {
     "a": "anchor or hyperlink",
