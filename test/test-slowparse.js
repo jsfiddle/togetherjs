@@ -76,6 +76,41 @@ function testStyleSheet(name, cssList, cb) {
   });
 }
 
+test("Stream.match()", function() {
+  var stream = new Slowparse.Stream("blArgle");
+  ok(stream.match("blArgle"));
+  equal(stream.pos, 0);
+  ok(!stream.match("blargle"));
+  equal(stream.pos, 0);
+  ok(stream.match("blargle", false, true));
+  equal(stream.pos, 0);
+  ok(stream.match("bla", true, true));
+  equal(stream.pos, 3);
+  ok(stream.match("rgle", true));
+  equal(stream.pos, 7);
+});
+
+test("parsing of valid DOCTYPE", function() {
+  var html = '<!DOCTYPE html><p>hi</p>';
+  var doc = parseWithoutErrors(html);
+  assertParseInfo(html, doc, "document", {
+    'parseInfo.doctype': '<!DOCTYPE html>'
+  });
+});
+
+test("parsing of misplaced DOCTYPE", function() {
+  var html = '<p>hi</p><!DOCTYPE html>';
+  var result = Slowparse.HTML(document, html);
+  deepEqual(result.error, {
+    "openTag": {
+      "end": 10,
+      "name": "",
+      "start": 9
+    },
+    "type": "INVALID_TAG_NAME"
+  });
+});
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var doc = parseWithoutErrors(html);

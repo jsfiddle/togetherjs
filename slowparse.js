@@ -221,6 +221,23 @@ var Slowparse = (function() {
       };
       this.tokenStart = this.pos;
       return token;
+    },
+    // Act like a multi-character eat—if consume is true or not given—or a
+    // look-ahead that doesn't update the stream position—if it is false.
+    // string must be a string. caseFold can be set to true to make the match
+    // case-insensitive.
+    match: function(string, consume, caseFold) {
+      var substring = this.text.slice(this.pos, this.pos + string.length);
+      if (caseFold) {
+        string = string.toLowerCase();
+        substring = substring.toLowerCase();
+      }
+      if (string == substring) {
+        if (consume)
+          this.pos += string.length;
+        return true;
+      }
+      return false;
     }
   };
 
@@ -449,6 +466,7 @@ var Slowparse = (function() {
   }
 
   HTMLParser.prototype = {
+    html5Doctype: '<!DOCTYPE html>',
     voidHtmlElements: ["area", "base", "br", "col", "command", "embed", "hr",
                        "img", "input", "keygen", "link", "meta", "param",
                        "source", "track", "wbr"],
@@ -567,6 +585,14 @@ var Slowparse = (function() {
       }
     },
     parse: function() {
+      if (this.stream.match(this.html5Doctype, true, true))
+        this.domBuilder.fragment.parseInfo = {
+          doctype: {
+            start: 0,
+            end: this.stream.pos
+          }
+        };
+      
       while (!this.stream.end()) {
         if (this.stream.peek() == '<') {
           this._buildTextNode();
@@ -615,6 +641,7 @@ var Slowparse = (function() {
     HTML_ELEMENT_NAMES: HTMLParser.prototype.htmlElements,
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
     replaceEntityRefs: replaceEntityRefs,
+    Stream: Stream,
     HTML: function(document, html) {
       var stream = new Stream(html),
           domBuilder = new DOMBuilder(document),
