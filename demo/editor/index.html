@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<base target="_blank">
 <title>Two-Paned Editor</title>
 <link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
 <link rel="stylesheet" href="../jsbin-codemirror-theme.css">
@@ -71,25 +72,53 @@ code {
   font-family: Menlo, Monaco, consolas, monospace;
   font-size: smaller;
 }
+
+.help {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  max-width: 50%;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: small;
+  -webkit-box-sizing: border-box;
+}
+
+.help a {
+  color: inherit;
+}
+
+.help a.learn-more {
+  display: inline-block;
+  padding: 2px;
+  margin: 1px;
+  font-size: smaller;
+  background: lightgray;
+  color: #222222;
+}
 </style>
 <textarea class="html"></textarea>
 <script type="text/html" id="initial-html">
 <style>
   p {
-    colo: blue;
+    color: blue;
   }
 </style>
 <p>Tinker with me.</p>
 </script>
 <iframe class="preview" src="blank.html"></iframe>
 <div class="error" style="display: none"></div>
+<div class="help" style="display: none"></div>
 <div id="templates" style="display: none">
+  <a class="learn-more" href="">Learn more&hellip;</a>
   <div class="error-msgs"></div>
   <div class="suggestions">
     <p>Following are some suggestions that may help. Click on one for more detailed information.</p>
     <ul>
       <li>
-        <code><a href="" target="mdn"></a></code>
+        <code><a href=""></a></code>
         <p></p>
       </li>
     </ul>
@@ -129,6 +158,7 @@ code {
 //   be highlighted.
 
 var editor;
+var helpIndex = [];
 
 _.templateSettings = {
   escape: /\{\{(.+?)\}\}/g
@@ -149,6 +179,63 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
   });
 });
 
+function getIndexFromPos(editor, pos) {
+  var index = pos.ch;
+  for (var i = 0; i < pos.line; i++)
+    index += editor.getLine(i).length + 1;
+  return index;
+}
+
+function buildHelpIndex(element, index) {
+  var i, child,
+      html = editor.getValue(),
+      pi = element.parseInfo,
+      tagInfo = {type: "tag", value: element.nodeName.toLowerCase()};
+  if (pi) {
+    if (pi.openTag)
+      for (i = pi.openTag.start; i < pi.openTag.end; i++)
+        index[i] = tagInfo;
+    if (pi.closeTag)
+      for (i = pi.closeTag.start; i < pi.closeTag.end; i++)
+        index[i] = tagInfo;
+  }
+  for (i = 0; i < element.childNodes.length; i++) {
+    child = element.childNodes[i];
+    if (child.nodeType == element.ELEMENT_NODE) {
+      buildHelpIndex(child, index);
+    }
+    if (element.nodeName == "STYLE" && child.parseInfo.rules) {
+      child.parseInfo.rules.forEach(function(rule) {
+        rule.declarations.properties.forEach(function(prop) {
+          var tagInfo = {
+            type: "cssProperty",
+            value: html.slice(prop.name.start, prop.name.end).toLowerCase()
+          };
+          for (var i = prop.name.start; i < prop.name.end; i++)
+            index[i] = tagInfo;
+        });
+      });
+    }
+  }
+}
+
+function getHelp(pos) {
+  var index = getIndexFromPos(editor, pos),
+      help = helpIndex[index];
+  if (help) {
+    if (help.type == "tag")
+      return {
+        html: HacktionaryData["html-element-docs"][help.value],
+        url: MDN_URLS.html + help.value
+      };
+    else if (help.type = "cssProperty")
+      return {
+        html: HacktionaryData["css-property-docs"][help.value],
+        url: MDN_URLS.css + help.value
+      };
+  }
+}
+
 function createSuggestions(options) {
   // TODO: Substring matching isn't very useful; we should use something
   // better, like string distance, and/or hard-code particular suggestions
@@ -167,14 +254,17 @@ function createSuggestions(options) {
     suggItem.find('a')
       .attr("href", options.baseURL + sugg)
       .text(sugg);
-    if (sugg in options.blurbs) {
+    if (sugg in options.blurbs)
       suggItem.find('p').html(options.blurbs[sugg]);
-      suggItem.find('p a').attr("target", "mdn");
-    }
     suggItem.appendTo(suggs.find('ul'));
   });
   return suggs;
 }
+
+var MDN_URLS = {
+  html: "https://developer.mozilla.org/en/HTML/Element/",
+  css: "https://developer.mozilla.org/en/CSS/"
+};
 
 function reportError(error) {
   var template = $("#templates .error-msg." + error.type);
@@ -184,14 +274,14 @@ function reportError(error) {
     createSuggestions({
       name: error.openTag.name,
       lexicon: Slowparse.HTML_ELEMENT_NAMES,
-      baseURL: "https://developer.mozilla.org/en/HTML/Element/",
+      baseURL: MDN_URLS.html,
       blurbs: HacktionaryData["html-element-docs"]
     }).appendTo(".error");
   } else if (error.type == "INVALID_CSS_PROPERTY_NAME") {
     createSuggestions({
       name: error.cssProperty.name,
       lexicon: Slowparse.CSS_PROPERTY_NAMES,
-      baseURL: "https://developer.mozilla.org/en/CSS/",
+      baseURL: MDN_URLS.css,
       blurbs: HacktionaryData["css-property-docs"]
     }).appendTo(".error");
   }
@@ -228,10 +318,13 @@ function updatePreview(html) {
 function onChange() {
   var html = editor.getValue();
   var result = Slowparse.HTML(document, html);
+  helpIndex = [];  
   clearErrorHighlights();
   if (result.error) {
+    $(".help").hide();
     reportError(result.error);
   } else {
+    buildHelpIndex(result.document, helpIndex);
     updatePreview(html);
   }
 }
@@ -245,7 +338,16 @@ $(window).load(function() {
       tabMode: "indent",
       lineWrapping: true,
       lineNumbers: true,
-      onChange: onChange
+      onChange: onChange,
+      onCursorActivity: function() {
+        var help = getHelp(editor.getCursor());
+        if (help) {
+          var learn = $("#templates .learn-more").clone()
+            .attr("href", help.url);
+          $(".help").html(help.html).append(learn).show();
+        } else
+          $(".help").hide();
+      }
     });
     editor.focus();
     onChange();
