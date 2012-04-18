@@ -150,6 +150,10 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 });
 
 function createSuggestions(options) {
+  // TODO: Substring matching isn't very useful; we should use something
+  // better, like string distance, and/or hard-code particular suggestions
+  // that we see in the wild (e.g. suggest 'color' when user writes
+  // 'font-color' or 'text-color'). 
   var name = options.name.toLowerCase();
   var matches = options.lexicon.filter(function(s) {
     return s.indexOf(name) != -1;
