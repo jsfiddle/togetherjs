@@ -103,13 +103,15 @@ function getHelp(pos) {
   var index = getIndexFromPos(editor, pos),
       help = helpIndex[index];
   if (help) {
-    if (help.type == "tag")
+    if (help.type == "tag" &&
+        help.value in HacktionaryData["html-element-docs"])
       return {
         html: HacktionaryData["html-element-docs"][help.value],
         url: MDN_URLS.html + help.value,
         highlights: help.highlights
       };
-    else if (help.type == "cssProperty")
+    else if (help.type == "cssProperty" &&
+             help.value in HacktionaryData["css-property-docs"])
       return {
         html: HacktionaryData["css-property-docs"][help.value],
         url: MDN_URLS.css + help.value,
