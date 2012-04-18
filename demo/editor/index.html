@@ -126,6 +126,7 @@ code {
 <div class="error" style="display: none"></div>
 <div class="help" style="display: none"></div>
 <div id="templates" style="display: none">
+  <div class="selector-help">This is a CSS selector. It describes the kinds of HTML elements that a CSS rule's style will be applied to.</div>
   <a class="learn-more" href="">more&hellip;</a>
   <div class="error-msgs"></div>
   <div class="suggestions">
@@ -229,6 +230,12 @@ function buildHelpIndex(element, index) {
     }
     if (element.nodeName == "STYLE" && child.parseInfo.rules) {
       child.parseInfo.rules.forEach(function(rule) {
+        var selectorInfo = {
+          type: "cssSelector",
+          highlights: [rule.selector]
+        };
+        for (var i = rule.selector.start; i < rule.selector.end; i++)
+          index[i] = selectorInfo;
         rule.declarations.properties.forEach(function(prop) {
           var cssInfo = {
             type: "cssProperty",
@@ -253,10 +260,16 @@ function getHelp(pos) {
         url: MDN_URLS.html + help.value,
         highlights: help.highlights
       };
-    else if (help.type = "cssProperty")
+    else if (help.type == "cssProperty")
       return {
         html: HacktionaryData["css-property-docs"][help.value],
         url: MDN_URLS.css + help.value,
+        highlights: help.highlights
+      };
+    else if (help.type == "cssSelector")
+      return {
+        html: $("#templates .selector-help").html(),
+        url: MDN_URLS.cssSelectors,
         highlights: help.highlights
       };
   }
@@ -289,7 +302,8 @@ function createSuggestions(options) {
 
 var MDN_URLS = {
   html: "https://developer.mozilla.org/en/HTML/Element/",
-  css: "https://developer.mozilla.org/en/CSS/"
+  css: "https://developer.mozilla.org/en/CSS/",
+  cssSelectors: "https://developer.mozilla.org/en/CSS/Getting_Started/Selectors"
 };
 
 function reportError(error) {
