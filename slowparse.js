@@ -579,8 +579,12 @@ var Slowparse = (function() {
           name: nameTok.interval,
           value: valueTok.interval
         });
-      } else
-        throw new Error("TODO: boolean attributes are unimplemented");
+      } else {
+        this.stream.makeToken();
+        this.domBuilder.attribute(nameTok.value, '', {
+          name: nameTok.interval
+        });
+      }
     },
     _parseEndOpenTag: function(tagName) {
       while (!this.stream.end()) {

@@ -119,6 +119,37 @@ test("parsing of HTML comments", function() {
   });
 });
 
+test("parsing of elements with boolean attributes", function() {
+  var html = '<a href></a>';
+  var doc = parseWithoutErrors(html);
+  var attr = doc.childNodes[0].attributes[0];
+  equal(attr.nodeName, 'href');
+  equal(attr.nodeValue, '');
+  assertParseInfo(html, attr, "attr", {
+    'parseInfo.name': 'href'
+  });
+  
+  var error = Slowparse.HTML(document, '<a href+></a>').error;
+  equal(error.type, 'UNTERMINATED_OPEN_TAG');
+
+  html = '<a href class="foo"></a>';
+  doc = parseWithoutErrors(html);
+  var attr1 = doc.childNodes[0].attributes[0];
+  var attr2 = doc.childNodes[0].attributes[1];
+  equal(attr1.nodeName, 'href');
+  equal(attr1.nodeValue, '');
+  equal(attr2.nodeName, 'class');
+  equal(attr2.nodeValue, 'foo');
+  assertParseInfo(html, attr1, "attr1", {
+    'parseInfo.name': 'href'
+  });
+  ok(attr1.parseInfo.value === undefined);
+  assertParseInfo(html, attr2, "attr2", {
+    'parseInfo.name': 'class',
+    'parseInfo.value': '"foo"'
+  });
+});
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var doc = parseWithoutErrors(html);
