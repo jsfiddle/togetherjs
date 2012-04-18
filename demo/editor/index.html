@@ -60,6 +60,10 @@ html, body {
   background: gray;
 }
 
+.CodeMirror span.cursor-help-highlight {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .suggestions a {
   color: inherit;
 }
@@ -165,6 +169,7 @@ code {
 
 var editor;
 var helpIndex = [];
+var cursorHelpMarks = [];
 
 _.templateSettings = {
   escape: /\{\{(.+?)\}\}/g
@@ -196,14 +201,22 @@ function buildHelpIndex(element, index) {
   var i, child,
       html = editor.getValue(),
       pi = element.parseInfo,
-      tagInfo = {type: "tag", value: element.nodeName.toLowerCase()};
+      tagInfo = {
+        type: "tag",
+        value: element.nodeName.toLowerCase(),
+        highlights: []
+      };
   if (pi) {
-    if (pi.openTag)
+    if (pi.openTag) {
+      tagInfo.highlights.push(pi.openTag);
       for (i = pi.openTag.start; i < pi.openTag.end; i++)
         index[i] = tagInfo;
-    if (pi.closeTag)
+    }
+    if (pi.closeTag) {
+      tagInfo.highlights.push(pi.closeTag);
       for (i = pi.closeTag.start; i < pi.closeTag.end; i++)
         index[i] = tagInfo;
+    }
   }
   for (i = 0; i < element.childNodes.length; i++) {
     child = element.childNodes[i];
@@ -213,12 +226,13 @@ function buildHelpIndex(element, index) {
     if (element.nodeName == "STYLE" && child.parseInfo.rules) {
       child.parseInfo.rules.forEach(function(rule) {
         rule.declarations.properties.forEach(function(prop) {
-          var tagInfo = {
+          var cssInfo = {
             type: "cssProperty",
-            value: html.slice(prop.name.start, prop.name.end).toLowerCase()
+            value: html.slice(prop.name.start, prop.name.end).toLowerCase(),
+            highlights: [prop.name]
           };
           for (var i = prop.name.start; i < prop.name.end; i++)
-            index[i] = tagInfo;
+            index[i] = cssInfo;
         });
       });
     }
@@ -232,12 +246,14 @@ function getHelp(pos) {
     if (help.type == "tag")
       return {
         html: HacktionaryData["html-element-docs"][help.value],
-        url: MDN_URLS.html + help.value
+        url: MDN_URLS.html + help.value,
+        highlights: help.highlights
       };
     else if (help.type = "cssProperty")
       return {
         html: HacktionaryData["css-property-docs"][help.value],
-        url: MDN_URLS.css + help.value
+        url: MDN_URLS.css + help.value,
+        highlights: help.highlights
       };
   }
 }
@@ -335,6 +351,30 @@ function onChange() {
   }
 }
 
+function onCursorActivity() {
+  $(".CodeMirror .highlight").removeClass("cursor-help-highlight");
+  cursorHelpMarks.forEach(function(mark) {
+    // Odd, from the CodeMirror docs you'd think this would remove
+    // the class from the highlighted text, too, but it doesn't.
+    // I guess we're just garbage collecting here.
+    mark.clear();
+  });
+  cursorHelpMarks = [];
+  var help = getHelp(editor.getCursor());
+  if (help) {
+    var learn = $("#templates .learn-more").clone()
+      .attr("href", help.url);
+    $(".help").html(help.html).append(learn).show();
+    help.highlights.forEach(function(interval) {
+      var start = editor.coordsFromIndex(interval.start);
+      var end = editor.coordsFromIndex(interval.end);
+      var mark = editor.markText(start, end, "cursor-help-highlight");
+      cursorHelpMarks.push(mark);
+    });
+  } else
+    $(".help").hide();
+}
+
 $(window).load(function() {
   $(".html").val($("#initial-html").text().trim());
   $("#templates .error-msgs").load("../error-msgs.html", function() {
@@ -345,18 +385,11 @@ $(window).load(function() {
       lineWrapping: true,
       lineNumbers: true,
       onChange: onChange,
-      onCursorActivity: function() {
-        var help = getHelp(editor.getCursor());
-        if (help) {
-          var learn = $("#templates .learn-more").clone()
-            .attr("href", help.url);
-          $(".help").html(help.html).append(learn).show();
-        } else
-          $(".help").hide();
-      }
+      onCursorActivity: onCursorActivity
     });
     editor.focus();
     onChange();
+    onCursorActivity();
   });
 });
 </script>
