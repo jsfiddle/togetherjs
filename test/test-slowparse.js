@@ -278,6 +278,20 @@ test("parsing of attr content w/ HTML entities", function() {
   });
 });
 
+test("UNTERMINATED_ATTR_VALUE works at end of stream", function() {
+  var html = '<a href="';
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "UNTERMINATED_ATTR_VALUE");
+  equal(error.attribute.value.start, html.length-1);
+});
+
+test("UNQUOTED_ATTR_VALUE works at end of stream", function() {
+  var html = '<a href=';
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "UNQUOTED_ATTR_VALUE");
+  equal(error.start, html.length);
+});
+
 test("UNTERMINATED_CLOSE_TAG works at end of stream", function() {
   var html = "<span>test</span";
   var error = Slowparse.HTML(document, html).error;

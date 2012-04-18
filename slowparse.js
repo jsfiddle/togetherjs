@@ -108,8 +108,11 @@ var Slowparse = (function() {
       };
     },
     UNQUOTED_ATTR_VALUE: function(parser) {
+      var pos = parser.stream.pos;
+      if (!parser.stream.end())
+        pos = parser.stream.makeToken().interval.start;
       return {
-        start: parser.stream.makeToken().interval.start
+        start: pos
       };
     },
     UNTERMINATED_OPEN_TAG: function(parser) {
