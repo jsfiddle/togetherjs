@@ -111,6 +111,14 @@ test("parsing of misplaced DOCTYPE", function() {
   });
 });
 
+test("parsing of HTML comments", function() {
+  var html = 'hi<!--testing-->there';
+  var doc = parseWithoutErrors(html);
+  assertParseInfo(html, doc.childNodes[1], "comment", {
+    'parseInfo': '<!--testing-->'
+  });
+});
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var doc = parseWithoutErrors(html);

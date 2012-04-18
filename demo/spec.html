@@ -295,6 +295,17 @@ a {
     }
     </script>
 </div>
+<div class="test">
+  <script type="text/x-bad-html">
+    hi<!--blah
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNTERMINATED_COMMENT",
+    "start": 2
+  }
+  </script>
+</div>
 
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>

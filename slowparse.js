@@ -85,6 +85,11 @@ var Slowparse = (function() {
         }, token.interval)
       };
     },
+    UNTERMINATED_COMMENT: function(token) {
+      return {
+        start: token.interval.start
+      };
+    },
     UNTERMINATED_ATTR_VALUE: function(parser, nameTok) {
       return {
         openTag: this._combine({
@@ -492,10 +497,28 @@ var Slowparse = (function() {
         this.domBuilder.text(replaceEntityRefs(token.value), token.interval);
       }
     },
+    _parseComment: function() {
+      var token;
+      while (!this.stream.end()) {
+        if (this.stream.match('-->', true)) {
+          token = this.stream.makeToken();
+          this.domBuilder.comment(token.value.slice(4, -3), token.interval);
+          return;
+        }
+        this.stream.next();
+      }
+      token = this.stream.makeToken();
+      throw new ParseError("UNTERMINATED_COMMENT", token);
+    },
     _parseStartTag: function() {
       if (this.stream.next() != '<')
         throw new Error('assertion failed, expected to be on "<"');
 
+      if (this.stream.match('!--', true)) {
+        this._parseComment();
+        return;
+      }
+      
       this.stream.eatWhile(/[\w\d\/]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
@@ -623,6 +646,11 @@ var Slowparse = (function() {
     },
     popElement: function() {
       this.currentNode = this.currentNode.parentNode;
+    },
+    comment: function(data, parseInfo) {
+      var comment = this.document.createComment(data);
+      comment.parseInfo = parseInfo;
+      this.currentNode.appendChild(comment);
     },
     attribute: function(name, value, parseInfo) {
       var attrNode = this.document.createAttribute(name);
