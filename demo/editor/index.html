@@ -92,11 +92,17 @@ code {
 
 .help a.learn-more {
   display: inline-block;
-  padding: 2px;
-  margin: 1px;
+  text-decoration: none;
+  padding: 1px;
+  margin: 0px 2px 0px 2px;
   font-size: smaller;
   background: lightgray;
   color: #222222;
+}
+
+.help a.learn-more:hover {
+  background: white;
+  color: black;
 }
 </style>
 <textarea class="html"></textarea>
@@ -112,7 +118,7 @@ code {
 <div class="error" style="display: none"></div>
 <div class="help" style="display: none"></div>
 <div id="templates" style="display: none">
-  <a class="learn-more" href="">Learn more&hellip;</a>
+  <a class="learn-more" href="">more&hellip;</a>
   <div class="error-msgs"></div>
   <div class="suggestions">
     <p>Following are some suggestions that may help. Click on one for more detailed information.</p>
