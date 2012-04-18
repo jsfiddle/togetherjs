@@ -353,6 +353,10 @@ function onChange() {
     buildHelpIndex(result.document, helpIndex);
     updatePreview(html);
   }
+  // Cursor activity would've been fired before us, so call it again
+  // to make sure it displays the right context-sensitive help based
+  // on the new state of the document.
+  onCursorActivity();
 }
 
 function onCursorActivity() {
