@@ -119,6 +119,12 @@ test("parsing of HTML comments", function() {
   });
 });
 
+test("UNQUOTED_ATTR_VALUE in <h2><span start=</h2>", function() {
+  // https://github.com/toolness/slowparse/issues/6
+  var err = Slowparse.HTML(document, '<h2><span start=</h2>').error;
+  equal(err.type, "UNQUOTED_ATTR_VALUE");
+});
+
 test("parsing of elements with boolean attributes", function() {
   var html = '<a href></a>';
   var doc = parseWithoutErrors(html);
