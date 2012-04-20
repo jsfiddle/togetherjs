@@ -497,14 +497,15 @@ var Slowparse = (function() {
       // if we get here, we have a selector string.
       token.value = token.value.trim();
       var selector = token.value,
-          selectorStart = token.interval.start;
+          selectorStart = token.interval.start,
+          selectorEnd = selectorStart + selector.length;
 
       // set up a ruleset object for this selector
       this.currentRule = {
         selector: {
           value: selector,
-          start: token.interval.start,
-          end: token.interval.end
+          start: selectorStart,
+          end: selectorEnd
         },
         declarations: {
           start: null,
@@ -517,7 +518,7 @@ var Slowparse = (function() {
       // or whether we're in a terminal state, based on the
       // next character in the stream.
       if (this.stream.end() || peek === '<') {
-        throw new ParseError("UNFINISHED_CSS_SELECTOR", this, token.interval.start, token.interval.end, selector);
+        throw new ParseError("UNFINISHED_CSS_SELECTOR", this, selectorStart, selectorEnd, selector);
       }
 
       if (!this.stream.end()) {
@@ -527,18 +528,18 @@ var Slowparse = (function() {
           // The only legal continuation is the opening { character.
           // If that's the character we see, we can mark the start
           // of the declaractions block and start parsing them.
-          this.currentRule.declarations.start = this.stream.pos;
+          this.currentRule.declarations.start = this.stream.pos-1;
           this._parseDeclaration(selector, selectorStart);
         } else if (next === ';' || next === '}') {
           // parse error: we should have seen { instead
-          throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, token.interval.start, token.interval.end, selector);
+          throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, selectorStart, selectorEnd, selector);
         } else {
           // fallback error: an unexpected character was found!
           throw new ParseError("UNCAUGHT_CSS_PARSE_ERROR", this, token.interval.start, token.interval.end, errorMsg);
         }
       } else {
         // if the stream ended after the selector, we want the user to follow up with {
-        throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, token.interval.start, token.interval.end, selector);
+        throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, selectorStart, selectorEnd, selector);
       }
     },
     /**
@@ -567,7 +568,7 @@ var Slowparse = (function() {
       // declaration's value, which will let us throw a sensible debug error
       // in case the stream is empty at this point, or points to </style>
       else if (value && (this.stream.end() || peek === '<')) {
-        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart, this.stream.pos, value);
+        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart, selectorStart+value.length, value);
       }
       
       // if we're still in this function at this point, all is well
@@ -595,16 +596,17 @@ var Slowparse = (function() {
           token = this.stream.makeToken();
 
       if (token === null) {
-        throw new ParseError("MISSING_CSS_PROPERTY", this, selectorStart, this.stream.pos, selector);
+        throw new ParseError("MISSING_CSS_PROPERTY", this, selectorStart, selectorStart+selector.length, selector);
       }
 
       var property = token.value.trim();
-      var propertyStart = token.interval.start;
+          propertyStart = token.interval.start,
+          propertyEnd = propertyStart + property.length;
       var next = this.stream.next(),
           errorMsg = "[_parseProperty] Expected }, <, ; or :, instead found "+next;
 
       if ((this.stream.end() && next !== ':') || next === '<' || next === '}') {
-        throw new ParseError("UNFINISHED_CSS_PROPERTY", this, token.interval.start, token.interval.end, property);
+        throw new ParseError("UNFINISHED_CSS_PROPERTY", this, propertyStart, propertyEnd, property);
       }
 
       // we record property:value pairs as we run through the stream,
@@ -614,8 +616,8 @@ var Slowparse = (function() {
       this.currentProperty = {
         name: {
           value: property,
-          start: token.interval.start,
-          end: token.interval.end - (token.value.length - property.length)
+          start: propertyStart,
+          end: propertyEnd
         }
       };
 
@@ -624,13 +626,13 @@ var Slowparse = (function() {
         // before we continue, we must make sure the string we found is a real
         // CSS property. It must consist of specific characters, and 
         if (!( property && property.match(/^[a-z\-]+$/)) || !this._knownCSSProperty(property))
-          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.interval.start, token.interval.end, property);
+          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, propertyStart, propertyEnd, property);
         this.stream.markTokenStartAfterSpace();
         this._parseValue(selector, selectorStart, property, propertyStart);
       }
       // anything else, at this point, constitutes an error
       else if (next === ';') {
-        throw new ParseError("MISSING_CSS_VALUE", this, token.interval.start, token.interval.end, property);
+        throw new ParseError("MISSING_CSS_VALUE", this, propertyStart, propertyEnd, property);
       }
       else if (next === '{') {
         throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart, propertyStart, selector);
@@ -652,35 +654,38 @@ var Slowparse = (function() {
           token = this.stream.makeToken();
           
       if(token === null) {
-        throw new ParseError("MISSING_CSS_VALUE", this, propertyStart, this.stream.pos-1, property);
+        throw new ParseError("MISSING_CSS_VALUE", this, propertyStart, propertyStart+property.length, property);
       }
 
       var next = (!this.stream.end() ? this.stream.next() : "end of stream"),
           errorMsg = "[_parseValue] Expected }, <, or ;, instead found "+next;
       token.value = token.value.trim();
-      var value = token.value;
+      var value = token.value,
+          valueStart = token.interval.start,
+          valueEnd = valueStart + value.length;
 
       // at this point we can fill in the value part of the current
       // property:value; pair. However, we hold off binding it until
       // we are sure there are no parse errors.
       this.currentProperty.value = {
         value: value,
-        start: token.interval.start,
-        end: token.interval.end
+        start: valueStart,
+        end: valueEnd
       }
 
       if ((this.stream.end() && next !== ';') || next === '<') {
-        throw new ParseError("UNFINISHED_CSS_VALUE", this, token.interval.start, token.interval.end, value);
+        throw new ParseError("UNFINISHED_CSS_VALUE", this, valueStart, valueEnd, value);
       }
 
       if (next === ';') {
         // normal CSS rule termination; try to read a new property/value pair
         this._bindCurrentRule();
         this.stream.markTokenStartAfterSpace();
-        this._parseDeclaration(selector, token.interval.start, value);
+        this._parseDeclaration(selector, valueStart, value);
       }
       else if (next === '}') {
         // block level termination: try to read a new selector
+        this.currentRule.declarations.end = this.stream.pos;
         this._bindCurrentRule();
         this.stream.markTokenStartAfterSpace();
         this._parseSelector();
@@ -895,7 +900,6 @@ var Slowparse = (function() {
           if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
             var cssBlock = this.cssParser.parse();
             this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
-            window.console.log(cssBlock);
           }
 
           return;
@@ -989,6 +993,8 @@ var Slowparse = (function() {
                             HTMLParser.prototype.obsoleteHtmlElements)),
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
     replaceEntityRefs: replaceEntityRefs,
+    Stream: Stream,
+
     // run HTML code through the slowparser
     HTML: function(document, html) {
       var stream = new Stream(html),
