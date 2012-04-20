@@ -1,3 +1,17 @@
+/**
+ * Slowparse is a token stream parser for HTML+CSS text,
+ * recording regions of interest during the parse run and
+ * signaling any errors detected accompanied by relevant
+ * regions in the text stream, to make 'debugging' easy.
+ *
+ * Slowparse is effectively a finite state machine for
+ * HTML+CSS strings, and will switch between the HTML
+ * and CSS parsers while maintaining a single token stream.
+ *
+ * Clean termination means the code is good, premature
+ * termination means an error occurred, and will result
+ * in a ParseError being thrown.
+ */
 var Slowparse = (function() {
   var CHARACTER_ENTITY_REFS = {
     lt: "<",
@@ -6,12 +20,14 @@ var Slowparse = (function() {
     amp: "&"
   };
   
-  // Replace named character entity references (e.g. '&lt;') in the given
-  // text string and return the result. If an entity name is unrecognized,
-  // don't replace it at all; this makes the function "forgiving".
-  //
-  // This function does not currently replace numeric character entity
-  // references (e.g., '&#160;').
+  /**
+   * Replace named character entity references (e.g. '&lt;') in the given
+   * text string and return the result. If an entity name is unrecognized,
+   * don't replace it at all; this makes the function "forgiving".
+   *
+   * This function does not currently replace numeric character entity
+   * references (e.g., '&#160;').
+   */
   function replaceEntityRefs(text) {
     return text.replace(/&([A-Za-z]+);/g, function(ref, name) {
       name = name.toLowerCase();
@@ -21,6 +37,9 @@ var Slowparse = (function() {
     });
   }
   
+  /**
+   * FIXME: document
+   */
   function ParseError(parseInfo) {
     this.name = "ParseError";
     if (typeof(parseInfo) == "string") {
@@ -30,8 +49,8 @@ var Slowparse = (function() {
         args.push(arguments[i]);
       parseInfo = ParseErrorBuilders[name].apply(ParseErrorBuilders, args);
 
-      // This is a weird way of setting an attribute, but we want to
-      // make the JSON serialize so the 'type' appears first, as it
+      // This may seem a weird way of setting an attribute, but we want
+      // to make the JSON serialize so the 'type' appears first, as it
       // makes our documentation read better.
       parseInfo = ParseErrorBuilders._combine({
         type: name
@@ -137,30 +156,103 @@ var Slowparse = (function() {
       };
     },
     // CSS errors
-    INVALID_CSS_DECLARATION: function(parser, start, end) {
-      return {
-        cssDeclaration: {
-          start: start,
-          end: end
-        }
-      };
-    },  
-    INVALID_CSS_PROPERTY_NAME: function(parser, name, start, end) {
-      return {
-        cssProperty: {
-          name: name,
-          start: start,
-          end: end
-        }
-      };
+    INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
+        return {
+            cssProperty: {
+                start: start,
+                end: end,
+                property: property
+            }
+        };
     },
-    INVALID_CSS_RULE: function(parser, start, end) {
-      return {
-        cssRule: {
-          start: start,
-          end: end
-        }
-      };
+    MISSING_CSS_SELECTOR: function(parser, start, end) {
+        return {
+            cssBlock: {
+                start: start,
+                end: end
+            }
+        };
+    },
+    UNFINISHED_CSS_SELECTOR: function(parser, start, end, selector) {
+        return {
+            cssSelector: {
+                start: start,
+                end: end,
+                selector: selector
+            }
+        };
+    },
+    MISSING_CSS_BLOCK_OPENER: function(parser, start, end, selector) {
+        return {
+            cssSelector: {
+                start: start,
+                end: end,
+                selector: selector
+            }
+        };
+    },
+    INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
+        return {
+            cssProperty: {
+                start: start,
+                end: end,
+                property: property
+            }
+        };
+    },
+    MISSING_CSS_PROPERTY: function(parser, start, end, selector) {
+        return {
+            cssSelector: {
+                start: start,
+                end: end,
+                selector: selector
+            }
+        };
+    },
+    UNFINISHED_CSS_PROPERTY: function(parser, start, end, property) {
+        return {
+            cssProperty: {
+                start: start,
+                end: end,
+                property: property
+            }
+        };
+    },
+    MISSING_CSS_VALUE: function(parser, start, end, property) {
+        return {
+            cssProperty: {
+                start: start,
+                end: end,
+                property: property
+            }
+        };
+    },
+    UNFINISHED_CSS_VALUE: function(parser, start, end, value) {
+        return {
+            cssValue: {
+                start: start,
+                end: end,
+                value: value
+            }
+        };
+    },
+    MISSING_CSS_BLOCK_CLOSER: function(parser, start, end, value) {
+        return {
+            cssValue: {
+                start: start,
+                end: end,
+                value: value
+            }
+        };
+    },
+    UNCAUGHT_CSS_PARSE_ERROR: function(parser, start, end, msg) {
+        return {
+            error: {
+                start: start,
+                end: end,
+                msg: msg
+            }
+        };
     }
   };
   
@@ -211,8 +303,15 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
+    // Set the start for the next token to "where we are now".
     markTokenStart: function() {
       this.tokenStart = this.pos;
+    },
+    // Wrapper function for eating up space, then marking the start for
+    // a new token.
+    markTokenStartAfterSpace: function() {
+      this.eatSpace();
+      this.markTokenStart();
     },
     // Generates a JSON-serializable token object representing the interval
     // of text between the end of the last generated token and the current
@@ -249,12 +348,20 @@ var Slowparse = (function() {
     }
   };
 
+
+  /**
+   * Set up the CSS token stream parser object.
+   * This object has references to the stream,
+   * as well as the HTML dom builder that is
+   * used by the HTML parser. 
+   */
   function CSSParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
   }
 
   CSSParser.prototype = {
+    // all currently valid CSS properties (CSS1-CSS3). This list does not contain vendor prefixes
     cssProperties: ["alignment-adjust","alignment-baseline","animation","animation-delay","animation-direction",
                     "animation-duration","animation-iteration-count","animation-name","animation-play-state",
                     "animation-timing-function","appearance","azimuth","backface-visibility","background",
@@ -304,39 +411,101 @@ var Slowparse = (function() {
                     "voice-duration","voice-family","voice-pitch","voice-pitch-range","voice-rate","voice-stress",
                     "voice-volume","volume","white-space","widows","width","word-break","word-spacing","word-wrap",
                     "z-index"],
-    _unknownCSSProperty: function(propertyName) {
-      return this.cssProperties.indexOf(propertyName) === -1;
+    // Verify that a specific string is a known CSS property
+    _knownCSSProperty: function(propertyName) {
+      return this.cssProperties.indexOf(propertyName) > -1;
     },
+    /**
+     * The CSS master parse function takes the token stream,
+     * assumed to have its pointer inside a CSS element, and
+     * will try to parse the content inside it as CSS until
+     * it hits the end of the CSS element.
+     * Any parse errors along the way will result in the code
+     * throwing a ParseError.
+     */
+    parse: function() {
+      // this tracks the CSS rulesets for the CSS block
+      this.rules = [];
+      // this tracks comment blocks inside the CSS
+      this.comments = [];
+      // this tracks the current ruleset, cleared on
+      // every new selector found
+      this.currentRuleSet = [];
+
+      // parsing is based on finite states, and a call
+      // to parseSelector will run through any number
+      // of states until it either throws an error,
+      // or terminates cleanly.
+      var sliceStart = this.stream.pos;
+      this.stream.markTokenStartAfterSpace();
+      this._parseSelector();
+      var sliceEnd = this.stream.pos;
+
+      // If we get here, the CSS block has no errors,
+      // and we report the start/end of the CSS block
+      // in the stream, as well as the rules/comments
+      // for the calling HTMLparser to work with.
+      var cssBlock = {
+        value: this.stream.text.slice(sliceStart, sliceEnd),
+        parseInfo: {
+          start: sliceStart,
+          end: sliceEnd,
+          rules: this.rules,
+          comments: this.comments
+        }
+      };
+
+      this.rules = null;
+      this.comments = null;
+      return cssBlock;
+    },
+    /**
+     * Parse CSS selectors
+     *
+     * A selector is a string, and terminates on {, which signals
+     * the start of a CSS property/value pair (which may be empty)
+     * There are a few characters in selectors that are an immediate error:
+     *
+     *   ;  Rule terminator (ERROR: missing block opener)
+     *   }  End of css block (ERROR: missing block opener)
+     *   <  End of <style> element, start of </style> (ERROR: css declaration has no body)
+     *
+     * (We cannot flag : as an error because pseudo-classes use : as prefix)
+     */
     _parseSelector: function() {
+      // we keep track of rulesets per selector
       if (this.currentRule) {
         this.rules.push(this.currentRule);
         this.currentRule = null;
       }
+
+      // gobbel all characters that could be part of the selector
+      this.stream.eatWhile(/[^\{;\}<]/);
+      var token = this.stream.makeToken(),
+          peek = this.stream.peek();
       
-      this.stream.eatWhile(/[^\{\}<]/);
-      var token = this.stream.makeToken();
-      if (token === null)
-        return;
+      // if there was nothing to select, we're either done,
+      // or an error occurred
+      if (token === null) {
+        if (!this.stream.end() && this.stream.peek() === '<') {
+          // clean termination!
+          return;
+        }
+        throw new ParseError("MISSING_CSS_SELECTOR", this, this.stream.pos-1, this.stream.pos);
+      }
 
-      var selector = token.value.trim();
-      var oldTokenValue = token.value;
-      token.value = selector;
-      var selectorStart = token.interval.start;
+      // if we get here, we have a selector string.
+      token.value = token.value.trim();
+      var selector = token.value,
+          selectorStart = token.interval.start,
+          selectorEnd = selectorStart + selector.length;
 
-      if (!(selector) || (selector && selector === ''))
-        // FIXME: the regexp or even charset for selectors is complex, so I'm leaving
-        //        this for when everything's up and running and we can start refining
-        //        our accept/reject policies
-        throw new ParseError({
-          type: "INVALID_CSS_SELECTOR_NAME",
-          node: this.domBuilder.currentNode,
-          token: token
-        });
-
+      // set up a ruleset object for this selector
       this.currentRule = {
         selector: {
-          start: token.interval.start,
-          end: token.interval.end - (oldTokenValue.length - selector.length)
+          value: selector,
+          start: selectorStart,
+          end: selectorEnd
         },
         declarations: {
           start: null,
@@ -344,129 +513,208 @@ var Slowparse = (function() {
           properties: []
         }
       };
-      
+
+      // Now we start to analyse whether we can continue,
+      // or whether we're in a terminal state, based on the
+      // next character in the stream.
+      if (this.stream.end() || peek === '<') {
+        throw new ParseError("UNFINISHED_CSS_SELECTOR", this, selectorStart, selectorEnd, selector);
+      }
+
       if (!this.stream.end()) {
-        var peek = this.stream.peek();
-        if (peek === '<') {
-          // end of CSS!
-          return;
+        var next = this.stream.next(),
+            errorMsg = "[_parseSelector] Expected {, }, ; or :, instead found "+next;
+        if (next === '{') {
+          // The only legal continuation is the opening { character.
+          // If that's the character we see, we can mark the start
+          // of the declaractions block and start parsing them.
+          this.currentRule.declarations.start = this.stream.pos-1;
+          this._parseDeclaration(selector, selectorStart);
+        } else if (next === ';' || next === '}') {
+          // parse error: we should have seen { instead
+          throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, selectorStart, selectorEnd, selector);
+        } else {
+          // fallback error: an unexpected character was found!
+          throw new ParseError("UNCAUGHT_CSS_PARSE_ERROR", this, token.interval.start, token.interval.end, errorMsg);
         }
-        else if (peek === '}') {
-          // TODO: When is this code called? As of Apr 17, 2012, none of
-          // our unit tests trigger this.
-          this.currentRule.declarations.end = this.stream.pos;
-          this.stream.eatWhile(/[}\s\n]/);
-          this.stream.markTokenStart();
-          this._parseSelector();        
-        }
-        else if (peek === '{') {
-          this.currentRule.declarations.start = this.stream.pos;
-          this.stream.eatWhile(/[\s\n{]/);
-          this.stream.markTokenStart();
-          this._parseDeclaration(selectorStart);
-        }
-        else {
-          throw new ParseError({
-            type: "MISSING_CSS_BLOCK_OPENER",
-            node: this.domBuilder.currentNode,
-            token: token
-          });
-        }
-      }
-    },
-    _parseDeclaration: function(selectorStart) {
-      this.stream.eatWhile(/[\s\n]/);
-      this.stream.markTokenStart();
-
-      if (this.stream.peek() === '}') {
-        this.currentRule.declarations.end = this.stream.pos + 1;
-        this.stream.next();
-        this.stream.eatSpace();
-        this._parseSelector();
       } else {
-        this._parseProperty(selectorStart);
+        // if the stream ended after the selector, we want the user to follow up with {
+        throw new ParseError("MISSING_CSS_BLOCK_OPENER", this, selectorStart, selectorEnd, selector);
       }
     },
-    _parseProperty: function(selectorStart) {
-      var rule = this.stream.eatWhile(/[^}<;:]/);
-      var token = this.stream.makeToken();
-      var next = this.stream.next();      
-      if(token === null && next === '}') {
+    /**
+     * Parse CSS declarations
+     *
+     * A declaration is a "property: value;" pair. It can be empty,
+     * in which case the next character must be }
+     */
+    _parseDeclaration: function(selector, selectorStart, value) {
+      // forward the stream to the next non-space character
+      this.stream.markTokenStartAfterSpace();
+      var peek = this.stream.peek();
+      // what is the next character?
+      if (peek === '}') {
+        // if it's } then this is an empty block, and we
+        // should move on to trying to read a new selector ruleset.
+        this.stream.next();
         this.currentRule.declarations.end = this.stream.pos;
-        this.stream.eatWhile(/[\s\n]/);
-        this.stream.markTokenStart();
+        this.stream.markTokenStartAfterSpace();
         this._parseSelector();
       }
-
-      else if (next === ':') {
-        // proper parsing goes here
-        var property = token.value.trim();
-        var propertyStart = token.interval.start;
-        if (!( property && property.match(/^[a-z\-]+$/)) || this._unknownCSSProperty(property))
-          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, token.value, token.interval.start, token.interval.end);
-        this.currentProperty = {
-          name: {
-            start: token.interval.start,
-            end: token.interval.end - (token.value.length - property.length)
-          }
-        };
-        this.stream.eatWhile(/[\s]/);
-        this.stream.markTokenStart();
-        this._parseValue(selectorStart, propertyStart);
+      // administratively important: there are two ways for parseDeclaration
+      // to have been called. One is from parseSelector, which is "the normal
+      // way", the other from parseValue, after finding a properly closed
+      // property:value; pair. In this case "value" will be the last
+      // declaration's value, which will let us throw a sensible debug error
+      // in case the stream is empty at this point, or points to </style>
+      else if (value && (this.stream.end() || peek === '<')) {
+        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart, selectorStart+value.length, value);
       }
       
+      // if we're still in this function at this point, all is well
+      // and we can move on to property parsing.
       else {
-        throw new ParseError("INVALID_CSS_DECLARATION", this, selectorStart, this.stream.pos-1);
+        this._parseProperty(selector, selectorStart);
       }
     },
-    _parseValue: function(selectorStart, propertyStart) {
-      var rule = this.stream.eatWhile(/[^}<;]/);
-      var token = this.stream.makeToken();
-      var trimmedValue = token.value.trim();
-      this.currentProperty.value = {
-        start: token.interval.start,
-        end: token.interval.end - (token.value.length - trimmedValue.length)
+    /**
+     * Parse CSS properties
+     *
+     * There is a fixed list of CSS properties, we we must check two things:
+     * does the token string contain a syntax-legal property, and is that
+     * property in the set of known ones.
+     * 
+     * Properties are terminated by :, but we might also see the following
+     * characters, which should signal an error:
+     *
+     *   ;  Rule terminator (ERROR: missing value)
+     *   }  End of css block (ERROR: missing value)
+     *   <  End of <style> element, start of </style> (ERROR: missing value)
+     */
+    _parseProperty: function(selector, selectorStart) {
+      var property = this.stream.eatWhile(/[^\{\}<;:]/),
+          token = this.stream.makeToken();
+
+      if (token === null) {
+        throw new ParseError("MISSING_CSS_PROPERTY", this, selectorStart, selectorStart+selector.length, selector);
+      }
+
+      var property = token.value.trim();
+          propertyStart = token.interval.start,
+          propertyEnd = propertyStart + property.length;
+      var next = this.stream.next(),
+          errorMsg = "[_parseProperty] Expected }, <, ; or :, instead found "+next;
+
+      if ((this.stream.end() && next !== ':') || next === '<' || next === '}') {
+        throw new ParseError("UNFINISHED_CSS_PROPERTY", this, propertyStart, propertyEnd, property);
+      }
+
+      // we record property:value pairs as we run through the stream,
+      // which are added to the set of property:value pairs in the
+      // rules.properties array. (the push happens when we have a clean
+      // run in parseValue)
+      this.currentProperty = {
+        name: {
+          value: property,
+          start: propertyStart,
+          end: propertyEnd
+        }
       };
-      this.currentRule.declarations.properties.push(this.currentProperty);
-      this.currentProperty = null;
-      var next = this.stream.next();
+
+      // if we find a colon, we have a property and now need a value to go along with it
+      if (next === ':') {
+        // before we continue, we must make sure the string we found is a real
+        // CSS property. It must consist of specific characters, and 
+        if (!( property && property.match(/^[a-z\-]+$/)) || !this._knownCSSProperty(property))
+          throw new ParseError("INVALID_CSS_PROPERTY_NAME", this, propertyStart, propertyEnd, property);
+        this.stream.markTokenStartAfterSpace();
+        this._parseValue(selector, selectorStart, property, propertyStart);
+      }
+      // anything else, at this point, constitutes an error
+      else if (next === ';') {
+        throw new ParseError("MISSING_CSS_VALUE", this, propertyStart, propertyEnd, property);
+      }
+      else if (next === '{') {
+        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart, propertyStart, selector);
+      }
+      else {
+        // fallback error: an unexpected character was found!
+        throw new ParseError("UNCAUGHT_CSS_PARSE_ERROR", this, token.interval.start, token.interval.end, errorMsg);
+      }
+    },
+    /**
+     * Parse CSS values
+     *
+     * Value must end either in ; or in }. We may also find:
+     *
+     *   <  End of <style> element, start of </style> (ERROR: missing block closer)
+     */
+    _parseValue: function(selector, selectorStart, property, propertyStart) {
+      var rule = this.stream.eatWhile(/[^}<;]/),
+          token = this.stream.makeToken();
+          
+      if(token === null) {
+        throw new ParseError("MISSING_CSS_VALUE", this, propertyStart, propertyStart+property.length, property);
+      }
+
+      var next = (!this.stream.end() ? this.stream.next() : "end of stream"),
+          errorMsg = "[_parseValue] Expected }, <, or ;, instead found "+next;
+      token.value = token.value.trim();
+      var value = token.value,
+          valueStart = token.interval.start,
+          valueEnd = valueStart + value.length;
+
+      // at this point we can fill in the value part of the current
+      // property:value; pair. However, we hold off binding it until
+      // we are sure there are no parse errors.
+      this.currentProperty.value = {
+        value: value,
+        start: valueStart,
+        end: valueEnd
+      }
+
+      if ((this.stream.end() && next !== ';') || next === '<') {
+        throw new ParseError("UNFINISHED_CSS_VALUE", this, valueStart, valueEnd, value);
+      }
+
       if (next === ';') {
-        this.stream.eatWhile(/[\s\n]/);
-        this.stream.markTokenStart();
-        this._parseProperty(selectorStart);
+        // normal CSS rule termination; try to read a new property/value pair
+        this._bindCurrentRule();
+        this.stream.markTokenStartAfterSpace();
+        this._parseDeclaration(selector, valueStart, value);
       }
       else if (next === '}') {
+        // block level termination: try to read a new selector
         this.currentRule.declarations.end = this.stream.pos;
-        this.stream.eatWhile(/[\s\n]/);
-        this.stream.markTokenStart();
+        this._bindCurrentRule();
+        this.stream.markTokenStartAfterSpace();
         this._parseSelector();
       }
       else {
-        throw new ParseError("INVALID_CSS_RULE", this, propertyStart, token.interval.end+1);
+        // fallback error: an unexpected character was found!
+        throw new ParseError("UNCAUGHT_CSS_PARSE_ERROR", this, token.interval.start, token.interval.end, errorMsg);
       }
     },
-    parse: function() {
-      this.rules = [];
-      var sliceStart = this.stream.pos;
-      this.stream.eatWhile(/[\s\n]/);
-      this.stream.markTokenStart();
-
-      this._parseSelector();
-
-      var sliceEnd = this.stream.pos;
-      var token = {
-        value: this.stream.text.slice(sliceStart, sliceEnd),
-        parseInfo: {
-          start: sliceStart,
-          end: sliceEnd,
-          rules: this.rules
-        }
-      };
-      this.rules = null;
-      return token;
+    /**
+     * This helper function binds the "currrent property:value" object
+     * in the current ruleset, and resets it for the next selector block. 
+     */
+    _bindCurrentRule: function() {
+      this.currentRule.declarations.properties.push(this.currentProperty);
+      this.currentProperty = null;
     }
   }
 
+
+  /**
+   * Set up the HTML token stream parser object.
+   * This object has references to the stream,
+   * as well as a dom builder that is used to
+   * track the DOM while we run through the 
+   * token stream, used for catching discrepancies
+   * between what the DOM says we "should" find
+   * vs. what we actually find in the token stream.
+   */
   function HTMLParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
@@ -478,22 +726,36 @@ var Slowparse = (function() {
     voidHtmlElements: ["area", "base", "br", "col", "command", "embed", "hr",
                        "img", "input", "keygen", "link", "meta", "param",
                        "source", "track", "wbr"],
-    htmlElements: ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base",
-                   "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button",
-                   "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "datalist", "dd",
-                   "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption",
-                   "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6",
-                   "head", "header", "hgroup", "hr",
-                   "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li",
-                   "link", "listing", "map", "mark", "marquee", "menu", "meta", "meter", "nav", "nobr", "noframes",
-                   "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre",
-                   "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source",
-                   "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td",
-                   "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var",
-                   "video", "wbr", "xmp"],
+    // but these elements should be:
+    htmlElements: ["a", "abbr", "address", "area", "article", "aside", "audio", "b", "base",
+                   "bdi", "bdo", "bgsound", "blink", "blockquote", "body", "br", "button",
+                   "canvas", "caption", "cite", "code", "col", "colgroup", "command", "datalist", "dd",
+                   "del", "details", "dfn", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption",
+                   "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6",
+                   "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd",
+                   "keygen", "label", "legend", "li", "link", "map", "mark", "marquee", "menu", "meta",
+                   "meter", "nav", "nobr", "noscript", "object", "ol", "optgroup", "option", "output",
+                   "p", "param", "pre", "progress", "q", "rp", "rt", "ruby", "samp", "script", "section",
+                   "select", "small", "source", "spacer", "span", "strong", "style", "sub", "summary",
+                   "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title",
+                   "tr", "track", "u", "ul", "var", "video", "wbr"],
+    // lastly, there is also the list of HTML elements that are now obsolete,
+    // but possibly still encountered in the wild on popular sites.
+    obsoleteHtmlElements: ["acronym", "applet", "basefont", "big", "center", "dir", "font",
+                           "isindex", "listing", "noframes", "plaintext", "s", "strike", "tt", 
+                           "xmp"],
+    /**
+     * Helper function to determine whether a given string
+     * is a legal HTML element tag.
+     */
     _knownHTMLElement: function(tagName) {
-      return this.htmlElements.indexOf(tagName) > -1;
+      return this.voidHtmlElements.indexOf(tagName) > -1 || 
+              this.htmlElements.indexOf(tagName) > -1 ||
+              this.obsoleteHtmlElements.indexOf(tagName) > -1;
     },
+    /**
+     * Helper function to build a DOM text node
+     */
     _buildTextNode: function() {
       var token = this.stream.makeToken();
       if (token) {
@@ -525,22 +787,31 @@ var Slowparse = (function() {
       this.stream.eatWhile(/[\w\d\/]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
+      
+      // is this actually a closing tag?
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
         if (!this.domBuilder.currentNode.parseInfo)
-          throw new ParseError("UNEXPECTED_CLOSE_TAG", this, closeTagName,
-                               token);
+          throw new ParseError("UNEXPECTED_CLOSE_TAG", this, closeTagName, token);
         this.domBuilder.currentNode.parseInfo.closeTag = {
           start: token.interval.start
         };
         var openTagName = this.domBuilder.currentNode.nodeName.toLowerCase();
         if (closeTagName != openTagName)
-          throw new ParseError("MISMATCHED_CLOSE_TAG", this, openTagName, 
-                               closeTagName, token);
+          throw new ParseError("MISMATCHED_CLOSE_TAG", this, openTagName, closeTagName, token);
+          
+        // if we get here, no errors were thrown, and we just
+        // keep parsing as a closing tag.
         this._parseEndCloseTag();
-      } else {
+      }
+      
+      else {
+        // if this is an opening tag, but for something that isn't a
+        // legal HTML element, we throw a parse error
         if (!(tagName && this._knownHTMLElement(tagName)))
           throw new ParseError("INVALID_TAG_NAME", tagName, token);
+
+        // if we get here, let's keep parsing this tag!
         this.domBuilder.pushElement(tagName, {
           openTag: {
             start: token.interval.start
@@ -550,6 +821,10 @@ var Slowparse = (function() {
           this._parseEndOpenTag(tagName);
       }
     },
+    /**
+     * Parse the rest of an opener tag, as it might contain
+     * attribute="value" data.
+     */
     _parseQuotedAttributeValue: function() {
       this.stream.eatSpace();
       this.stream.makeToken();
@@ -557,6 +832,9 @@ var Slowparse = (function() {
         throw new ParseError("UNQUOTED_ATTR_VALUE", this);
       this.stream.eatWhile(/[^"]/);
     },
+    /**
+     * Parse HTML element closing tag
+     */
     _parseEndCloseTag: function() {
       this.stream.eatSpace();
       if (this.stream.next() != '>')
@@ -565,6 +843,9 @@ var Slowparse = (function() {
       this.domBuilder.currentNode.parseInfo.closeTag.end = end;
       this.domBuilder.popElement();
     },
+    /**
+     * Parse an HTML tag attribute
+     */
     _parseAttribute: function() {
       var nameTok = this.stream.makeToken();
       this.stream.eatSpace();
@@ -586,27 +867,39 @@ var Slowparse = (function() {
         });
       }
     },
+    /**
+     * Parse the rest of an opener tag, as it might contain
+     * attribute="value" data.
+     */
     _parseEndOpenTag: function(tagName) {
+      // FIXME: we probably don't need while() here, as the parser will
+      //        either cleanly terminate or throw a ParseError anyway?
       while (!this.stream.end()) {
-        if (this.stream.eatWhile(/[A-Za-z]/)) {
+        // we gobble anything that can be part of an attribute name,
+        // then try to parse it as an attribute to this opening tag
+        if (this.stream.eatWhile(/[A-Za-z\-]/)) {
           this._parseAttribute();
-        } else if (this.stream.eatSpace()) {
+        }
+        // silently gobble white space
+        else if (this.stream.eatSpace()) {
           this.stream.makeToken();
-        } else if (this.stream.peek() == '>') {
+        }
+        // if we find > then this tag can be finalised
+        else if (this.stream.peek() == '>') {
           this.stream.next();
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
 
-          if (tagName &&
-              (this.voidHtmlElements.indexOf(tagName.toLowerCase()) != -1))
+          // If this is a void element, there will not be a closing element,
+          // so we can move up a level in the dombuilder's DOM
+          if (tagName && (this.voidHtmlElements.indexOf(tagName.toLowerCase()) != -1))
             this.domBuilder.popElement();
           
-          // special handling for style elements: we need to parse the CSS code here
+          // Of course, we need special handling for style elements: we need
+          // to parse the CSS code contained inside <style> elements.
           if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
-            var token = this.cssParser.parse();
-            // FIXME: tokenizing inside the css parser seems to yield
-            //        an odd placement when resuming HTML parsing.
-            this.domBuilder.text(token.value, token.parseInfo);
+            var cssBlock = this.cssParser.parse();
+            this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
           }
 
           return;
@@ -614,6 +907,14 @@ var Slowparse = (function() {
           throw new ParseError("UNTERMINATED_OPEN_TAG", this);
       }
     },
+    /**
+     * The HTML master parse function works the same as the CSS
+     * parser: it takes the token stream and will try to parse
+     * the content as a sequence of HTML elements.
+     *
+     * Any parse errors along the way will result in the code
+     * throwing a ParseError.
+     */
     parse: function() {
       if (this.stream.match(this.html5Doctype, true, true))
         this.domBuilder.fragment.parseInfo = {
@@ -625,19 +926,28 @@ var Slowparse = (function() {
       
       while (!this.stream.end()) {
         if (this.stream.peek() == '<') {
+          // model all tokens that were gobbled as a text node
           this._buildTextNode();
+          // then, start the HTML run by initiating a start tag parse
           this._parseStartTag();
         } else
           this.stream.next();
       }
 
+      // finally, model all tokens that are left as text node
       this._buildTextNode();
 
+      // it's possible we're left with an open tag, so let's test:
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
         throw new ParseError("UNCLOSED_TAG", this);
     }
   };
 
+
+  /**
+   * In order to do "what we see" vs. "what we should see",
+   * we track the latter using a DOM builder.
+   */
   function DOMBuilder(document) {
     this.document = document;
     this.fragment = document.createDocumentFragment();
@@ -672,11 +982,20 @@ var Slowparse = (function() {
     }
   };
 
+  /**
+   * This is the main entry point when using slowparse.js
+   */
   var Slowparse = {
-    HTML_ELEMENT_NAMES: HTMLParser.prototype.htmlElements,
+    // these properties can be used by an editor that relies
+    // on slowparse for 'these things are supported' logic.
+    HTML_ELEMENT_NAMES: HTMLParser.prototype.voidHtmlElements.concat(
+                          HTMLParser.prototype.htmlElements.concat(
+                            HTMLParser.prototype.obsoleteHtmlElements)),
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
     replaceEntityRefs: replaceEntityRefs,
     Stream: Stream,
+
+    // run HTML code through the slowparser
     HTML: function(document, html) {
       var stream = new Stream(html),
           domBuilder = new DOMBuilder(document),
@@ -692,11 +1011,15 @@ var Slowparse = (function() {
           throw e;
       }
 
+      // we return our DOM interpretation of the
+      // HTML code, plus an error (if there were
+      // no errors found, error is null).
       return {
         document: domBuilder.fragment,
         error: error
       };
     },
+    // explicitly try to find errors in some HTML code
     findError: function(html) {
       return this.HTML(document, html).error;
     }

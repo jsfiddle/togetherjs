@@ -54,10 +54,55 @@
     CSS declaration never closes.</p>
 </div>
 <div class="error-msg INVALID_CSS_PROPERTY_NAME">
-  <p><em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">This</em>
-    CSS property does not exist.</p>
+  <p>CSS property <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>
+     does not exist.</p>
 </div>
 <div class="error-msg INVALID_CSS_RULE">
   <p><em data-highlight="{{cssRule.start}},{{cssRule.end}}">This</em>
     CSS rule is not legal CSS.</p>
+</div>
+
+
+<div class="error-msg MISSING_CSS_SELECTOR">
+  <p>Missing either a new CSS selector or the &lt;/style&gt; tag <em data-highlight="{{cssBlock.start}},{{cssBlock.end}}">here</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_SELECTOR">
+  <p>Selector <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>
+  still needs finalising with {
+  </p>
+</div>
+<div class="error-msg INVALID_CSS_PROPERTY_NAME">
+  <p><em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em> is not
+  a valid CSS property.</p>
+</div>
+<div class="error-msg MISSING_CSS_PROPERTY">
+  <p>Missing property for <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_PROPERTY">
+  <p>Property <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>
+  still needs finalising with :
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_VALUE">
+  <p>Missing value for <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_VALUE">
+  <p>Value <em data-highlight="{{cssValue.start}},{{cssValue.end}}">{{cssValue.value}}</em>
+  still needs finalising with ;
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_BLOCK_OPENER">
+  <p>Missing block opener after <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>.
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_BLOCK_CLOSER">
+  <p>Missing block closer or next property:value; pair following <em data-highlight="{{cssValue.start}},{{cssValue.end}}">{{cssValue.value}}</em>.
+  </p>
+</div>
+<div class="error-msg UNCAUGHT_CSS_PARSE_ERROR">
+  <p>A parse error occurred outside expected cases: <em data-highlight="{{error.start}},{{error.end}}">{{error.msg}}</em>
+  </p>
 </div>
