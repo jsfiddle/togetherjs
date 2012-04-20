@@ -418,7 +418,7 @@ var Slowparse = (function() {
     /**
      * The CSS master parse function takes the token stream,
      * assumed to have its pointer inside a CSS element, and
-     * will try to parse the content inside it as CSS untill
+     * will try to parse the content inside it as CSS until
      * it hits the end of the CSS element.
      * Any parse errors along the way will result in the code
      * throwing a ParseError.
@@ -434,7 +434,7 @@ var Slowparse = (function() {
 
       // parsing is based on finite states, and a call
       // to parseSelector will run through any number
-      // of states untill it either throws an error,
+      // of states until it either throws an error,
       // or terminates cleanly.
       var sliceStart = this.stream.pos;
       this.stream.markTokenStartAfterSpace();
@@ -739,7 +739,7 @@ var Slowparse = (function() {
                    "select", "small", "source", "spacer", "span", "strong", "style", "sub", "summary",
                    "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title",
                    "tr", "track", "u", "ul", "var", "video", "wbr"],
-    // lastly, there is also the list of HTLM elements that are now obsolete,
+    // lastly, there is also the list of HTML elements that are now obsolete,
     // but possibly still encountered in the wild on popular sites.
     obsoleteHtmlElements: ["acronym", "applet", "basefont", "big", "center", "dir", "font",
                            "isindex", "listing", "noframes", "plaintext", "s", "strike", "tt", 
