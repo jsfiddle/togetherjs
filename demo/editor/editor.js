@@ -21,14 +21,23 @@
 //   it's an image and not a web page. Relevant source code should
 //   be highlighted.
 
+// The CodeMirror2 editor instance.
 var editor;
+
+// A mapping from character indices in the editor to associated
+// context-sensitive help information.
 var helpIndex = [];
+
+// Keep track of CodeMirror2 mark objects corresponding to help
+// highlighting.
 var cursorHelpMarks = [];
 
+// Use mustache-style templating.
 _.templateSettings = {
   escape: /\{\{(.+?)\}\}/g
 };
 
+// Select the given {start,end} interval in the editor.
 function selectInterval(interval) {
   var start = editor.coordsFromIndex(interval.start);
   var end = editor.coordsFromIndex(interval.end);
@@ -36,6 +45,8 @@ function selectInterval(interval) {
   editor.focus();
 }
 
+// When the user moves over anything with a data-highlight attribute,
+// select the text in the editor that corresponds to the highlight.
 $(document).on("mouseover", "[data-highlight]", function(event) {
   var interval = $(this).attr("data-highlight").split(",");
   selectInterval({
@@ -44,6 +55,7 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
   });
 });
 
+// This is the reverse of CodeMirror2's editor.coordsFromIndex().
 function getIndexFromPos(editor, pos) {
   var index = pos.ch;
   for (var i = 0; i < pos.line; i++)
@@ -51,6 +63,8 @@ function getIndexFromPos(editor, pos) {
   return index;
 }
 
+// Recursively build the help index mapping editor character indices 
+// to context-sensitive help.
 function buildHelpIndex(element, index) {
   var i, child,
       html = editor.getValue(),
@@ -99,6 +113,8 @@ function buildHelpIndex(element, index) {
   }
 }
 
+// Return the context-sensitive help information for a particular position
+// in the editor, or undefined if no help is available.
 function getHelp(pos) {
   var index = getIndexFromPos(editor, pos),
       help = helpIndex[index];
@@ -126,6 +142,8 @@ function getHelp(pos) {
   }
 }
 
+// Create a list of suggested HTML tags/CSS properties for the given
+// input. Return the result as a jQuery selection.
 function createSuggestions(options) {
   // TODO: Substring matching isn't very useful; we should use something
   // better, like string distance, and/or hard-code particular suggestions
@@ -151,12 +169,15 @@ function createSuggestions(options) {
   return suggs;
 }
 
+// URLs for help on the Mozilla Developer Network.
 var MDN_URLS = {
   html: "https://developer.mozilla.org/en/HTML/Element/",
   css: "https://developer.mozilla.org/en/CSS/",
   cssSelectors: "https://developer.mozilla.org/en/CSS/Getting_Started/Selectors"
 };
 
+// Report the given Slowparse error, optionally providing suggestions to
+// the user.
 function reportError(error) {
   var template = $("#templates .error-msg." + error.type);
   $(".error").html(_.template(template.html(), error)).show()
@@ -178,6 +199,9 @@ function reportError(error) {
   }
 }
 
+// Assuming "this" is an element with a data-highlight attribute,
+// give the highlighted text interval in the editor a numbered error
+// highlight class.
 function setErrorHighlight(i) {
   var className = "highlight-" + (i+1);
   var interval = $(this).attr("data-highlight").split(",");
@@ -187,6 +211,7 @@ function setErrorHighlight(i) {
   $(this).addClass(className).data("mark", mark);
 }
 
+// Remove all highlights made by setErrorHighlight().
 function clearErrorHighlights() {
   $(".error").find("[data-highlight]").each(function() {
     // Odd, from the CodeMirror docs you'd think this would remove
@@ -198,6 +223,7 @@ function clearErrorHighlights() {
     $(".CodeMirror .highlight-" + i).removeClass("highlight-" + i);
 }
 
+// Update the preview area with the given HTML.
 function updatePreview(html) {
   $(".error").hide();
   var doc = $(".preview").contents()[0];
@@ -206,6 +232,7 @@ function updatePreview(html) {
   doc.close();
 }
 
+// Called whenever content of the editor area changes.
 function onChange() {
   var html = editor.getValue();
   var result = Slowparse.HTML(document, html);
@@ -224,6 +251,7 @@ function onChange() {
   onCursorActivity();
 }
 
+// Called whenever the user moves their cursor in the editor area.
 function onCursorActivity() {
   $(".CodeMirror .highlight").removeClass("cursor-help-highlight");
   cursorHelpMarks.forEach(function(mark) {
