@@ -620,8 +620,8 @@ var Slowparse = (function() {
       
       selector = this.stripComments(selector, selectorStart).trim();
       if (selector === '') {
-        throw new ParseError("MISSING_CSS_SELECTOR", this, this.stream.pos-1,
-                             this.stream.pos);
+        this._parseSelector();
+        return;
       }
 
       // Now we'll set up a ruleset object for this selector.

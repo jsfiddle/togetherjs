@@ -363,6 +363,12 @@ test("parsing of attr content w/ HTML entities", function() {
   });
 });
 
+test("MISSING_CSS_SELECTOR works after comment", function() {
+  var html = '<style>/* hello */ {</style>';
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "MISSING_CSS_SELECTOR");
+});
+
 test("UNTERMINATED_ATTR_VALUE works at end of stream", function() {
   var html = '<a href="';
   var error = Slowparse.HTML(document, html).error;
