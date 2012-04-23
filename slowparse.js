@@ -1,22 +1,28 @@
-/**
- * Slowparse is a token stream parser for HTML+CSS text,
- * recording regions of interest during the parse run and
- * signaling any errors detected accompanied by relevant
- * regions in the text stream, to make 'debugging' easy.
- *
- * Slowparse also builds a DOM as it goes, attaching metadata
- * to each node build that points to where it came from in
- * the original source.
- *
- * Slowparse is effectively a finite state machine for
- * HTML+CSS strings, and will switch between the HTML
- * and CSS parsers while maintaining a single token stream.
- *
- * Clean termination means the code is good, premature
- * termination means an error occurred, and will result
- * in a ParseError being thrown.
- */
+// Slowparse is a token stream parser for HTML and CSS text,
+// recording regions of interest during the parse run and
+// signaling any errors detected accompanied by relevant
+// regions in the text stream, to make debugging easy. Each
+// error type is documented in the [error specification][].
+//
+// Slowparse also builds a DOM as it goes, attaching metadata
+// to each node build that points to where it came from in
+// the original source.
+//
+// For more information on the rationale behind Slowparse, as
+// well as its design goals, see the [README][].
+//
+// ## Implementation
+//
+// Slowparse is effectively a finite state machine for
+// HTML and CSS strings, and will switch between the HTML
+// and CSS parsers while maintaining a single token stream.
+//
+//   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
+//   [README]: https://github.com/toolness/slowparse#readme
 var Slowparse = (function() {
+  // ### Character Entity Parsing
+  //
+  // We currently only parse the most common named character entities.
   var CHARACTER_ENTITY_REFS = {
     lt: "<",
     gt: ">",
@@ -24,14 +30,13 @@ var Slowparse = (function() {
     amp: "&"
   };
   
-  /**
-   * Replace named character entity references (e.g. '&lt;') in the given
-   * text string and return the result. If an entity name is unrecognized,
-   * don't replace it at all; this makes the function "forgiving".
-   *
-   * This function does not currently replace numeric character entity
-   * references (e.g., '&#160;').
-   */
+  // `replaceEntityRefs()` will replace named character entity references
+  // (e.g. `&lt;`) in the given text string and return the result. If an
+  // entity name is unrecognized, don't replace it at all. Writing HTML
+  // would be surprisingly painful without this forgiving behavior.
+  //
+  // This function does not currently replace numeric character entity
+  // references (e.g., `&#160;`).
   function replaceEntityRefs(text) {
     return text.replace(/&([A-Za-z]+);/g, function(ref, name) {
       name = name.toLowerCase();
@@ -41,18 +46,19 @@ var Slowparse = (function() {
     });
   }
   
-  /**
-   * Internal error class used to indicate a parsing error. This
-   * never gets seen by Slowparse clients, as parse errors are an
-   * expected occurrence. However, they are used internally to simplify
-   * flow control.
-   *
-   * The first argument is the name of an error type, followed by
-   * arbitrary positional arguments specific to that error type. Every
-   * ParseError has a property 'parseInfo' which contains the error
-   * object that will be exposed to Slowparse clients when parsing errors
-   * occur.
-   */
+  
+  // ### Errors
+  //
+  // `ParseError` is an internal error class used to indicate a parsing error. 
+  // It never gets seen by Slowparse clients, as parse errors are an
+  // expected occurrence. However, they are used internally to simplify
+  // flow control.
+  //
+  // The first argument is the name of an error type, followed by
+  // arbitrary positional arguments specific to that error type. Every
+  // instance has a `parseInfo` property which contains the error
+  // object that will be exposed to Slowparse clients when parsing errors
+  // occur.
   function ParseError(type) {
     this.name = "ParseError";
     if (!(type in ParseErrorBuilders))
@@ -62,9 +68,9 @@ var Slowparse = (function() {
       args.push(arguments[i]);
     var parseInfo = ParseErrorBuilders[type].apply(ParseErrorBuilders, args);
 
-    // This may seem a weird way of setting an attribute, but we want
-    // to make the JSON serialize so the 'type' appears first, as it
-    // makes our documentation read better.
+    /* This may seem a weird way of setting an attribute, but we want
+     * to make the JSON serialize so the 'type' appears first, as it
+     * makes our documentation read better. */
     parseInfo = ParseErrorBuilders._combine({
       type: type
     }, parseInfo);
@@ -74,19 +80,17 @@ var Slowparse = (function() {
 
   ParseError.prototype = Error.prototype;
 
-  /**
-   * Factory functions for all our types of parse errors, indexed by
-   * error type.
-   *
-   * Each public factory function returns a parseInfo object, sans the 
-   * 'type' property. For more information on each type of error,
-   * see the error specification document at demo/spec.html.
-   */
+  // `ParseErrorBuilders` contains Factory functions for all our types of
+  // parse errors, indexed by error type.
+  //
+  // Each public factory function returns a `parseInfo` object, sans the 
+  // `type` property. For more information on each type of error,
+  // see the [error specification][].
+  //
+  //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
   var ParseErrorBuilders = {
-    /**
-     * Create a new object that has the properties of both arguments
-     * and return it.
-     */
+    /* Create a new object that has the properties of both arguments
+     * and return it. */
     _combine: function(a, b) {
       var obj = {}, name;
       for (name in a) {
@@ -97,6 +101,7 @@ var Slowparse = (function() {
       }
       return obj;
     },
+    // These are HTML errors.
     UNCLOSED_TAG: function(parser) {
       return {
         openTag: this._combine({
@@ -179,7 +184,7 @@ var Slowparse = (function() {
         }
       };
     },
-    // CSS errors
+    // These are CSS errors.
     INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
       return {
         cssProperty: {
