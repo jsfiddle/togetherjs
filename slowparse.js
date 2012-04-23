@@ -468,10 +468,6 @@ var Slowparse = (function() {
       // * A list of comment blocks inside the CSS.
       this.comments = [];
 
-      // * Information about the current ruleset, cleared on
-      //   every new selector found.
-      this.currentRuleSet = [];
-
       // Parsing is based on finite states, and a call
       // to `_parseSelector()` will run through any number
       // of states until it either throws an error,
