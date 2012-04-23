@@ -12,9 +12,10 @@ Slowparse is intended to solve all of these problems. It parses HTML and uses a 
 
 For more information, see:
 
-  * The [annotated source code][].
-  * The [error reporting specification][] to get an idea of what kinds of errors can be reported, and what their human-friendly descriptions are.
   * A [live demo][] to see how Slowparse interprets your code in real-time.
+  * The [error reporting specification][] to get an idea of what kinds of errors can be reported, and what their human-friendly descriptions are.
+  * The [annotated source code][].
+  * The [test suite][].
 
   [lovebomb.me]: http://lovebomb.me
   [Storything]: http://storything.toolness.org/
@@ -24,3 +25,4 @@ For more information, see:
   [error reporting specification]: http://toolness.github.com/slowparse/demo/spec.html
   [live demo]: http://toolness.github.com/slowparse/demo/
   [annotated source code]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
+  [test suite]: http://toolness.github.com/slowparse/test/
