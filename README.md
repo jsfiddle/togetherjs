@@ -12,6 +12,7 @@ Slowparse is intended to solve all of these problems. It parses HTML and uses a 
 
 For more information, see:
 
+  * The [annotated source code][].
   * The [error reporting specification][] to get an idea of what kinds of errors can be reported, and what their human-friendly descriptions are.
   * A [live demo][] to see how Slowparse interprets your code in real-time.
 
@@ -22,4 +23,4 @@ For more information, see:
   [webmaker tutorials]: http://www.toolness.com/wp/2012/03/webmaker-tutorial-prototyping/
   [error reporting specification]: http://toolness.github.com/slowparse/demo/spec.html
   [live demo]: http://toolness.github.com/slowparse/demo/
-  
+  [annotated source code]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
