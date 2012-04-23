@@ -851,6 +851,43 @@ var Slowparse = (function() {
               this.htmlElements.indexOf(tagName) > -1 ||
               this.obsoleteHtmlElements.indexOf(tagName) > -1;
     },
+    // #### The HTML Master Parse Function
+    //
+    // The HTML master parse function works the same as the CSS
+    // parser: it takes the token stream and will try to parse
+    // the content as a sequence of HTML elements.
+    //
+    // Any parse errors along the way will result in the code
+    // throwing a `ParseError`.
+    parse: function() {
+      // First we check to see if the beginning of our stream is
+      // an HTML5 doctype tag. We're currently quite strict and don't
+      // parse XHTML or other doctypes.
+      if (this.stream.match(this.html5Doctype, true, true))
+        this.domBuilder.fragment.parseInfo = {
+          doctype: {
+            start: 0,
+            end: this.stream.pos
+          }
+        };
+      
+      // Next, we parse "tag soup", creating text nodes and diving into
+      // tags as we find them.
+      while (!this.stream.end()) {
+        if (this.stream.peek() == '<') {
+          this._buildTextNode();
+          this._parseStartTag();
+        } else
+          this.stream.next();
+      }
+
+      this._buildTextNode();
+
+      // At the end, it's possible we're left with an open tag, so
+      // we test for that.
+      if (this.domBuilder.currentNode != this.domBuilder.fragment)
+        throw new ParseError("UNCLOSED_TAG", this);
+    },
     // This is a helper to build a DOM text node.
     _buildTextNode: function() {
       var token = this.stream.makeToken();
@@ -858,23 +895,10 @@ var Slowparse = (function() {
         this.domBuilder.text(replaceEntityRefs(token.value), token.interval);
       }
     },
-    // This helper parses HTML comments. It assumes the stream has just
-    // passed the beginning `<!--` of an HTML comment.
-    _parseComment: function() {
-      var token;
-      while (!this.stream.end()) {
-        if (this.stream.match('-->', true)) {
-          token = this.stream.makeToken();
-          this.domBuilder.comment(token.value.slice(4, -3), token.interval);
-          return;
-        }
-        this.stream.next();
-      }
-      token = this.stream.makeToken();
-      throw new ParseError("UNTERMINATED_COMMENT", token);
-    },
-    // This helper parses the beginning of an HTML tag. It assumes the
-    // stream is on a `<` character.
+    // #### HTML Tag Parsing
+    //
+    // This is the entry point for parsing the beginning of an HTML tag.
+    // It assumes the stream is on a `<` character.
     _parseStartTag: function() {
       if (this.stream.next() != '<')
         throw new Error('assertion failed, expected to be on "<"');
@@ -918,6 +942,21 @@ var Slowparse = (function() {
           this._parseEndOpenTag(tagName);
       }
     },
+    // This helper parses HTML comments. It assumes the stream has just
+    // passed the beginning `<!--` of an HTML comment.
+    _parseComment: function() {
+      var token;
+      while (!this.stream.end()) {
+        if (this.stream.match('-->', true)) {
+          token = this.stream.makeToken();
+          this.domBuilder.comment(token.value.slice(4, -3), token.interval);
+          return;
+        }
+        this.stream.next();
+      }
+      token = this.stream.makeToken();
+      throw new ParseError("UNTERMINATED_COMMENT", token);
+    },
     // This helper function parses the end of a closing tag. It expects
     // the stream to be right after the end of the closing tag's tag
     // name.
@@ -928,38 +967,6 @@ var Slowparse = (function() {
       var end = this.stream.makeToken().interval.end;
       this.domBuilder.currentNode.parseInfo.closeTag.end = end;
       this.domBuilder.popElement();
-    },
-    // This helper function parses an HTML tag attribute. It expects
-    // the stream to be right after the end of an attribute name.
-    _parseAttribute: function() {
-      var nameTok = this.stream.makeToken();
-      this.stream.eatSpace();
-      // If the character after the attribute name is a `=`, then we
-      // look for an attribute value; otherwise, this is a boolean
-      // attribute.
-      if (this.stream.peek() == '=') {
-        this.stream.next();
-        // Currently, we only support quoted attribute values, even
-        // though the HTML5 standard allows them to sometimes go unquoted.
-        this.stream.eatSpace();
-        this.stream.makeToken();
-        if (this.stream.next() != '"')
-          throw new ParseError("UNQUOTED_ATTR_VALUE", this);
-        this.stream.eatWhile(/[^"]/);
-        if (this.stream.next() != '"')
-          throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
-        var valueTok = this.stream.makeToken();
-        var unquotedValue = replaceEntityRefs(valueTok.value.slice(1, -1));
-        this.domBuilder.attribute(nameTok.value, unquotedValue, {
-          name: nameTok.interval,
-          value: valueTok.interval
-        });
-      } else {
-        this.stream.makeToken();
-        this.domBuilder.attribute(nameTok.value, '', {
-          name: nameTok.interval
-        });
-      }
     },
     // This helper function parses the rest of an opening tag after
     // its tag name, looking for `attribute="value"` data until a
@@ -996,42 +1003,37 @@ var Slowparse = (function() {
           throw new ParseError("UNTERMINATED_OPEN_TAG", this);
       }
     },
-    // #### The HTML Master Parse Function
-    //
-    // The HTML master parse function works the same as the CSS
-    // parser: it takes the token stream and will try to parse
-    // the content as a sequence of HTML elements.
-    //
-    // Any parse errors along the way will result in the code
-    // throwing a `ParseError`.
-    parse: function() {
-      // First we check to see if the beginning of our stream is
-      // an HTML5 doctype tag. We're currently quite strict and don't
-      // parse XHTML or other doctypes.
-      if (this.stream.match(this.html5Doctype, true, true))
-        this.domBuilder.fragment.parseInfo = {
-          doctype: {
-            start: 0,
-            end: this.stream.pos
-          }
-        };
-      
-      // Next, we parse "tag soup", creating text nodes and diving into
-      // tags as we find them.
-      while (!this.stream.end()) {
-        if (this.stream.peek() == '<') {
-          this._buildTextNode();
-          this._parseStartTag();
-        } else
-          this.stream.next();
+    // This helper function parses an HTML tag attribute. It expects
+    // the stream to be right after the end of an attribute name.
+    _parseAttribute: function() {
+      var nameTok = this.stream.makeToken();
+      this.stream.eatSpace();
+      // If the character after the attribute name is a `=`, then we
+      // look for an attribute value; otherwise, this is a boolean
+      // attribute.
+      if (this.stream.peek() == '=') {
+        this.stream.next();
+        // Currently, we only support quoted attribute values, even
+        // though the HTML5 standard allows them to sometimes go unquoted.
+        this.stream.eatSpace();
+        this.stream.makeToken();
+        if (this.stream.next() != '"')
+          throw new ParseError("UNQUOTED_ATTR_VALUE", this);
+        this.stream.eatWhile(/[^"]/);
+        if (this.stream.next() != '"')
+          throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
+        var valueTok = this.stream.makeToken();
+        var unquotedValue = replaceEntityRefs(valueTok.value.slice(1, -1));
+        this.domBuilder.attribute(nameTok.value, unquotedValue, {
+          name: nameTok.interval,
+          value: valueTok.interval
+        });
+      } else {
+        this.stream.makeToken();
+        this.domBuilder.attribute(nameTok.value, '', {
+          name: nameTok.interval
+        });
       }
-
-      this._buildTextNode();
-
-      // At the end, it's possible we're left with an open tag, so
-      // we test for that.
-      if (this.domBuilder.currentNode != this.domBuilder.fragment)
-        throw new ParseError("UNCLOSED_TAG", this);
     }
   };
 
