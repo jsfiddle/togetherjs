@@ -539,7 +539,7 @@ var Slowparse = (function() {
           while(pos < last-1 && term.substr(pos-1,2) !== "*/") {
             pos++;
           }
-          commentEnd = startPos + pos;
+          commentEnd = startPos + pos + 1;
           this.comments.push({start: commentStart, end: commentEnd});
         } else {
           stripped += term[pos];
