@@ -739,15 +739,11 @@ var Slowparse = (function() {
   }
 
 
-  /**
-   * Set up the HTML token stream parser object.
-   * This object has references to the stream,
-   * as well as a dom builder that is used to
-   * track the DOM while we run through the 
-   * token stream, used for catching discrepancies
-   * between what the DOM says we "should" find
-   * vs. what we actually find in the token stream.
-   */
+  // ### HTML Parsing
+  //
+  // The HTML token stream parser object has references to the stream,
+  // as well as a DOM builder that is used to construct the DOM while we
+  // run through the token stream.
   function HTMLParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
@@ -756,10 +752,12 @@ var Slowparse = (function() {
 
   HTMLParser.prototype = {
     html5Doctype: '<!DOCTYPE html>',
+    // Void HTML elements are the ones that don't need to have a closing
+    // tag.
     voidHtmlElements: ["area", "base", "br", "col", "command", "embed", "hr",
                        "img", "input", "keygen", "link", "meta", "param",
                        "source", "track", "wbr"],
-    // but these elements should be:
+    // We keep a list of all valid HTML5 elements.
     htmlElements: ["a", "abbr", "address", "area", "article", "aside", "audio", "b", "base",
                    "bdi", "bdo", "bgsound", "blink", "blockquote", "body", "br", "button",
                    "canvas", "caption", "cite", "code", "col", "colgroup", "command", "datalist", "dd",
@@ -772,29 +770,28 @@ var Slowparse = (function() {
                    "select", "small", "source", "spacer", "span", "strong", "style", "sub", "summary",
                    "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title",
                    "tr", "track", "u", "ul", "var", "video", "wbr"],
-    // lastly, there is also the list of HTML elements that are now obsolete,
-    // but possibly still encountered in the wild on popular sites.
+    // We also keep a list of HTML elements that are now obsolete, but
+    // may still be encountered in the wild on popular sites.
     obsoleteHtmlElements: ["acronym", "applet", "basefont", "big", "center", "dir", "font",
                            "isindex", "listing", "noframes", "plaintext", "s", "strike", "tt", 
                            "xmp"],
-    /**
-     * Helper function to determine whether a given string
-     * is a legal HTML element tag.
-     */
+
+    // This is a helper function to determine whether a given string
+    // is a legal HTML element tag.
     _knownHTMLElement: function(tagName) {
       return this.voidHtmlElements.indexOf(tagName) > -1 || 
               this.htmlElements.indexOf(tagName) > -1 ||
               this.obsoleteHtmlElements.indexOf(tagName) > -1;
     },
-    /**
-     * Helper function to build a DOM text node
-     */
+    // This is a helper to build a DOM text node.
     _buildTextNode: function() {
       var token = this.stream.makeToken();
       if (token) {
         this.domBuilder.text(replaceEntityRefs(token.value), token.interval);
       }
     },
+    // This helper parses HTML comments. It assumes the stream has just
+    // passed the beginning `<!--` of an HTML comment.
     _parseComment: function() {
       var token;
       while (!this.stream.end()) {
@@ -808,6 +805,8 @@ var Slowparse = (function() {
       token = this.stream.makeToken();
       throw new ParseError("UNTERMINATED_COMMENT", token);
     },
+    // This helper parses the beginning of an HTML tag. It assumes the
+    // stream is on a `<` character.
     _parseStartTag: function() {
       if (this.stream.next() != '<')
         throw new Error('assertion failed, expected to be on "<"');
@@ -821,7 +820,9 @@ var Slowparse = (function() {
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
       
-      // is this actually a closing tag?
+      // If the character after the `<` is a `/`, we're on a closing tag.
+      // We want to report useful errors about whether the tag is unexpected
+      // or doesn't match with the most recent opening tag.
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
         if (!this.domBuilder.currentNode.parseInfo)
@@ -832,19 +833,14 @@ var Slowparse = (function() {
         var openTagName = this.domBuilder.currentNode.nodeName.toLowerCase();
         if (closeTagName != openTagName)
           throw new ParseError("MISMATCHED_CLOSE_TAG", this, openTagName, closeTagName, token);
-          
-        // if we get here, no errors were thrown, and we just
-        // keep parsing as a closing tag.
         this._parseEndCloseTag();
       }
       
       else {
-        // if this is an opening tag, but for something that isn't a
-        // legal HTML element, we throw a parse error
+        // We want to make sure that opening tags have valid tag names.
         if (!(tagName && this._knownHTMLElement(tagName)))
           throw new ParseError("INVALID_TAG_NAME", tagName, token);
 
-        // if we get here, let's keep parsing this tag!
         this.domBuilder.pushElement(tagName, {
           openTag: {
             start: token.interval.start
@@ -854,10 +850,9 @@ var Slowparse = (function() {
           this._parseEndOpenTag(tagName);
       }
     },
-    /**
-     * Parse the rest of an opener tag, as it might contain
-     * attribute="value" data.
-     */
+    // This helper function parses the quoted value of an attribute.
+    // Currently, Slowparse only supports quoted attribute values, even
+    // though the HTML5 standard allows them to sometimes go unquoted.
     _parseQuotedAttributeValue: function() {
       this.stream.eatSpace();
       this.stream.makeToken();
@@ -865,9 +860,9 @@ var Slowparse = (function() {
         throw new ParseError("UNQUOTED_ATTR_VALUE", this);
       this.stream.eatWhile(/[^"]/);
     },
-    /**
-     * Parse HTML element closing tag
-     */
+    // This helper function parses the end of a closing tag. It expects
+    // the stream to be right after the end of the closing tag's tag
+    // name.
     _parseEndCloseTag: function() {
       this.stream.eatSpace();
       if (this.stream.next() != '>')
@@ -876,12 +871,14 @@ var Slowparse = (function() {
       this.domBuilder.currentNode.parseInfo.closeTag.end = end;
       this.domBuilder.popElement();
     },
-    /**
-     * Parse an HTML tag attribute
-     */
+    // This helper function parses an HTML tag attribute. It expects
+    // the stream to be right after the end of an attribute name.
     _parseAttribute: function() {
       var nameTok = this.stream.makeToken();
       this.stream.eatSpace();
+      // If the character after the attribute name is a `=`, then we
+      // look for an attribute value; otherwise, this is a boolean
+      // attribute.
       if (this.stream.peek() == '=') {
         this.stream.next();
         this._parseQuotedAttributeValue();
@@ -900,36 +897,31 @@ var Slowparse = (function() {
         });
       }
     },
-    /**
-     * Parse the rest of an opener tag, as it might contain
-     * attribute="value" data.
-     */
+    // This helper function parses the rest of an opening tag after
+    // its tag name, looking for `attribute="value"` data until a
+    // `>` is encountered.
     _parseEndOpenTag: function(tagName) {
-      // FIXME: we probably don't need while() here, as the parser will
-      //        either cleanly terminate or throw a ParseError anyway?
+      /* FIXME: we probably don't need while() here, as the parser will
+       *        either cleanly terminate or throw a ParseError anyway? */
       while (!this.stream.end()) {
-        // we gobble anything that can be part of an attribute name,
-        // then try to parse it as an attribute to this opening tag
         if (this.stream.eatWhile(/[A-Za-z\-]/)) {
           this._parseAttribute();
         }
-        // silently gobble white space
         else if (this.stream.eatSpace()) {
           this.stream.makeToken();
         }
-        // if we find > then this tag can be finalised
         else if (this.stream.peek() == '>') {
           this.stream.next();
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
 
-          // If this is a void element, there will not be a closing element,
-          // so we can move up a level in the dombuilder's DOM
+          // If the opening tag represents a void element, there will not be
+          // a closing element, so we tell our DOM builder that we're done.
           if (tagName && (this.voidHtmlElements.indexOf(tagName.toLowerCase()) != -1))
             this.domBuilder.popElement();
           
-          // Of course, we need special handling for style elements: we need
-          // to parse the CSS code contained inside <style> elements.
+          // If the opening tag represents a `<style>` element, we hand
+          // off parsing to our CSS parser.
           if (!this.stream.end() && tagName && tagName.toLowerCase() === "style") {
             var cssBlock = this.cssParser.parse();
             this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
@@ -940,15 +932,18 @@ var Slowparse = (function() {
           throw new ParseError("UNTERMINATED_OPEN_TAG", this);
       }
     },
-    /**
-     * The HTML master parse function works the same as the CSS
-     * parser: it takes the token stream and will try to parse
-     * the content as a sequence of HTML elements.
-     *
-     * Any parse errors along the way will result in the code
-     * throwing a ParseError.
-     */
+    // #### The HTML Master Parse Function
+    //
+    // The HTML master parse function works the same as the CSS
+    // parser: it takes the token stream and will try to parse
+    // the content as a sequence of HTML elements.
+    //
+    // Any parse errors along the way will result in the code
+    // throwing a `ParseError`.
     parse: function() {
+      // First we check to see if the beginning of our stream is
+      // an HTML5 doctype tag. We're currently quite strict and don't
+      // parse XHTML or other doctypes.
       if (this.stream.match(this.html5Doctype, true, true))
         this.domBuilder.fragment.parseInfo = {
           doctype: {
@@ -957,30 +952,34 @@ var Slowparse = (function() {
           }
         };
       
+      // Next, we parse "tag soup", creating text nodes and diving into
+      // tags as we find them.
       while (!this.stream.end()) {
         if (this.stream.peek() == '<') {
-          // model all tokens that were gobbled as a text node
           this._buildTextNode();
-          // then, start the HTML run by initiating a start tag parse
           this._parseStartTag();
         } else
           this.stream.next();
       }
 
-      // finally, model all tokens that are left as text node
       this._buildTextNode();
 
-      // it's possible we're left with an open tag, so let's test:
+      // At the end, it's possible we're left with an open tag, so
+      // we test for that.
       if (this.domBuilder.currentNode != this.domBuilder.fragment)
         throw new ParseError("UNCLOSED_TAG", this);
     }
   };
 
-
-  /**
-   * In order to do "what we see" vs. "what we should see",
-   * we track the latter using a DOM builder.
-   */
+  // ### The DOM Builder
+  //
+  // The DOM builder is used to construct a DOM representation of the
+  // HTML/CSS being parsed. Each node contains a `parseInfo` expando
+  // property that contains information about the text extents of the
+  // original source code that the DOM element maps to.
+  //
+  // The DOM builder is given a single document DOM object that will
+  // be used to create all necessary DOM nodes.
   function DOMBuilder(document) {
     this.document = document;
     this.fragment = document.createDocumentFragment();
@@ -988,26 +987,35 @@ var Slowparse = (function() {
   }
 
   DOMBuilder.prototype = {
+    // This method pushes a new element onto the DOM builder's stack.
+    // The element is appended to the currently active element and is
+    // then made the new currently active element.
     pushElement: function(tagName, parseInfo) {
       var node = this.document.createElement(tagName);
       node.parseInfo = parseInfo;
       this.currentNode.appendChild(node);
       this.currentNode = node;
     },
+    // This method pops the current element off the DOM builder's stack,
+    // making its parent element the currently active element.
     popElement: function() {
       this.currentNode = this.currentNode.parentNode;
     },
+    // This method appends an HTML comment node to the currently active
+    // element.
     comment: function(data, parseInfo) {
       var comment = this.document.createComment(data);
       comment.parseInfo = parseInfo;
       this.currentNode.appendChild(comment);
     },
+    // This method appends an attribute to the currently active element.
     attribute: function(name, value, parseInfo) {
       var attrNode = this.document.createAttribute(name);
       attrNode.parseInfo = parseInfo;
       attrNode.nodeValue = value;
       this.currentNode.attributes.setNamedItem(attrNode);
     },
+    // This method appends a text node to the currently active element.
     text: function(text, parseInfo) {
       var textNode = this.document.createTextNode(text);
       textNode.parseInfo = parseInfo;
@@ -1015,20 +1023,38 @@ var Slowparse = (function() {
     }
   };
 
-  /**
-   * This is the main entry point when using slowparse.js
-   */
+  // ### Exported Symbols
+  // 
+  // `Slowparse` is the object that holds all exported symbols from
+  // this library.
   var Slowparse = {
-    // these properties can be used by an editor that relies
-    // on slowparse for 'these things are supported' logic.
+    // We export our list of recognized HTML elements and CSS properties
+    // for clients to use if needed.
     HTML_ELEMENT_NAMES: HTMLParser.prototype.voidHtmlElements.concat(
                           HTMLParser.prototype.htmlElements.concat(
                             HTMLParser.prototype.obsoleteHtmlElements)),
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
+    
+    // We also export a few internal symbols for use by Slowparse's
+    // testing suite.
     replaceEntityRefs: replaceEntityRefs,
     Stream: Stream,
 
-    // run HTML code through the slowparser
+    // `Slowparse.HTML()` is the primary function we export. Given
+    // a DOM document object and a string of HTML, we return an object
+    // with the following keys:
+    //
+    // * `document` is a DOM document fragment containing the DOM of
+    //   the parsed HTML. If an error occurred while parsing, this
+    //   document is incomplete, and represents what was built before
+    //   the error was encountered.
+    //
+    // * `error` is a JSON-serializable object representing any error
+    //   that occurred while parsing. If no errors occurred while parsing,
+    //   its value is `null`. For a list of the types of errors that
+    //   can be returned, see the [error specification][].
+    //
+    //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
     HTML: function(document, html) {
       var stream = new Stream(html),
           domBuilder = new DOMBuilder(document),
@@ -1044,15 +1070,13 @@ var Slowparse = (function() {
           throw e;
       }
 
-      // we return our DOM interpretation of the
-      // HTML code, plus an error (if there were
-      // no errors found, error is null).
       return {
         document: domBuilder.fragment,
         error: error
       };
     },
-    // explicitly try to find errors in some HTML code
+    // `Slowparse.findError()` just returns any error in the given HTML
+    // string, or `null` if the HTML contains no errors.
     findError: function(html) {
       return this.HTML(document, html).error;
     }
