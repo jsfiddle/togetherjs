@@ -262,9 +262,8 @@ testStyleSheet("parsing of empty CSS rule",
     });
 });
 
-testStyleSheet("parsing of CSS rule w/ funky whitespace/comments",
+testStyleSheet("parsing of CSS rule w/ funky whitespace",
                ["body\n { color: pink; }",
-                "body\n { /* Yay pink! */ color: pink; }",
                 "body\n {\n color: pink; }",
                 "body\n {\n color: \npink; }",
                 "body\n {\n color: \npink\n\n }",
