@@ -282,6 +282,11 @@ var Slowparse = (function() {
           msg: msg
         }
       };
+    },
+    UNTERMINATED_CSS_COMMENT: function(start) {
+      return {
+        start: start
+      };
     }
   };
   
@@ -560,6 +565,8 @@ var Slowparse = (function() {
           while(pos < last-1 && term.substr(pos-1,2) !== "*/") {
             pos++;
           }
+          if (pos >= last-1 && term.substr(pos-1,2) !== "*/")
+            throw new ParseError("UNTERMINATED_CSS_COMMENT", commentStart);
           commentEnd = startPos + pos + 1;
           this.comments.push({start: commentStart, end: commentEnd});
         } else {
