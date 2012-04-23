@@ -337,8 +337,8 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
-    // `Stream.eatCSSWhile()` is a shortcut for eating CSS block comments
-    // like `/* foo */`.
+    // `Stream.eatCSSWhile()` is like `eatWhile()`, but it
+    // automatically deals with eating block comments like `/* foo */`.
     eatCSSWhile: function(matcher) {
       var wereAnyEaten = false,
           chr = '',
@@ -524,8 +524,8 @@ var Slowparse = (function() {
     },
     // #### CSS Comment Parsing
     //
-    // Here we strip block comments, and record their position in the
-    // comments list.
+    // Here we record the position of comments in *term* in the instance's
+    // comment list, and return *term* with all its comments stripped.
     stripComments: function(term, startPos) {
       var pos,
           last = term.length,
