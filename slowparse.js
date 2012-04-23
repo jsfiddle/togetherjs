@@ -576,7 +576,7 @@ var Slowparse = (function() {
 
       // if we get here, we have a selector string.
       token.value = token.value.trim();
-      var selector = token.value;
+      var selector = token.value,
           selectorStart = token.interval.start,
           selectorEnd = selectorStart + selector.length;
       
