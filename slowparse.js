@@ -53,28 +53,35 @@ var Slowparse = (function() {
    * object that will be exposed to Slowparse clients when parsing errors
    * occur.
    */
-  function ParseError(parseInfo) {
+  function ParseError(type) {
     this.name = "ParseError";
-    if (typeof(parseInfo) == "string") {
-      var name = parseInfo;
-      var args = [];
-      for (var i = 1; i < arguments.length; i++)
-        args.push(arguments[i]);
-      parseInfo = ParseErrorBuilders[name].apply(ParseErrorBuilders, args);
+    if (!(type in ParseErrorBuilders))
+      throw new Error("Unknown ParseError type: " + type);
+    var args = [];
+    for (var i = 1; i < arguments.length; i++)
+      args.push(arguments[i]);
+    var parseInfo = ParseErrorBuilders[type].apply(ParseErrorBuilders, args);
 
-      // This may seem a weird way of setting an attribute, but we want
-      // to make the JSON serialize so the 'type' appears first, as it
-      // makes our documentation read better.
-      parseInfo = ParseErrorBuilders._combine({
-        type: name
-      }, parseInfo);
-    }
-    this.message = parseInfo.type;
+    // This may seem a weird way of setting an attribute, but we want
+    // to make the JSON serialize so the 'type' appears first, as it
+    // makes our documentation read better.
+    parseInfo = ParseErrorBuilders._combine({
+      type: type
+    }, parseInfo);
+    this.message = type;
     this.parseInfo = parseInfo;
   }
 
   ParseError.prototype = Error.prototype;
 
+  /**
+   * Factory functions for all our types of parse errors, indexed by
+   * error type.
+   *
+   * Each public factory function returns a parseInfo object, sans the 
+   * 'type' property. For more information on each type of error,
+   * see the error specification document at demo/spec.html.
+   */
   var ParseErrorBuilders = {
     /**
      * Create a new object that has the properties of both arguments
@@ -90,11 +97,6 @@ var Slowparse = (function() {
       }
       return obj;
     },
-    /**
-     * The following factory functions return a parseInfo object
-     * sans the 'type' property. For more information on each type of
-     * error, see the error specification document at demo/spec.html.
-     */
     UNCLOSED_TAG: function(parser) {
       return {
         openTag: this._combine({
