@@ -918,16 +918,6 @@ var Slowparse = (function() {
           this._parseEndOpenTag(tagName);
       }
     },
-    // This helper function parses the quoted value of an attribute.
-    // Currently, Slowparse only supports quoted attribute values, even
-    // though the HTML5 standard allows them to sometimes go unquoted.
-    _parseQuotedAttributeValue: function() {
-      this.stream.eatSpace();
-      this.stream.makeToken();
-      if (this.stream.next() != '"')
-        throw new ParseError("UNQUOTED_ATTR_VALUE", this);
-      this.stream.eatWhile(/[^"]/);
-    },
     // This helper function parses the end of a closing tag. It expects
     // the stream to be right after the end of the closing tag's tag
     // name.
@@ -949,7 +939,13 @@ var Slowparse = (function() {
       // attribute.
       if (this.stream.peek() == '=') {
         this.stream.next();
-        this._parseQuotedAttributeValue();
+        // Currently, we only support quoted attribute values, even
+        // though the HTML5 standard allows them to sometimes go unquoted.
+        this.stream.eatSpace();
+        this.stream.makeToken();
+        if (this.stream.next() != '"')
+          throw new ParseError("UNQUOTED_ATTR_VALUE", this);
+        this.stream.eatWhile(/[^"]/);
         if (this.stream.next() != '"')
           throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
         var valueTok = this.stream.makeToken();
