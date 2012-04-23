@@ -181,102 +181,102 @@ var Slowparse = (function() {
     },
     // CSS errors
     INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
-        return {
-            cssProperty: {
-                start: start,
-                end: end,
-                property: property
-            }
-        };
+      return {
+        cssProperty: {
+          start: start,
+          end: end,
+          property: property
+        }
+      };
     },
     MISSING_CSS_SELECTOR: function(parser, start, end) {
-        return {
-            cssBlock: {
-                start: start,
-                end: end
-            }
-        };
+      return {
+        cssBlock: {
+          start: start,
+          end: end
+        }
+      };
     },
     UNFINISHED_CSS_SELECTOR: function(parser, start, end, selector) {
-        return {
-            cssSelector: {
-                start: start,
-                end: end,
-                selector: selector
-            }
-        };
+      return {
+        cssSelector: {
+          start: start,
+          end: end,
+          selector: selector
+        }
+      };
     },
     MISSING_CSS_BLOCK_OPENER: function(parser, start, end, selector) {
-        return {
-            cssSelector: {
-                start: start,
-                end: end,
-                selector: selector
-            }
-        };
+      return {
+        cssSelector: {
+          start: start,
+          end: end,
+          selector: selector
+        }
+      };
     },
     INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
-        return {
-            cssProperty: {
-                start: start,
-                end: end,
-                property: property
-            }
-        };
+      return {
+        cssProperty: {
+          start: start,
+          end: end,
+          property: property
+        }
+      };
     },
     MISSING_CSS_PROPERTY: function(parser, start, end, selector) {
-        return {
-            cssSelector: {
-                start: start,
-                end: end,
-                selector: selector
-            }
-        };
+      return {
+        cssSelector: {
+          start: start,
+          end: end,
+          selector: selector
+        }
+      };
     },
     UNFINISHED_CSS_PROPERTY: function(parser, start, end, property) {
-        return {
-            cssProperty: {
-                start: start,
-                end: end,
-                property: property
-            }
-        };
+      return {
+        cssProperty: {
+          start: start,
+          end: end,
+          property: property
+        }
+      };
     },
     MISSING_CSS_VALUE: function(parser, start, end, property) {
-        return {
-            cssProperty: {
-                start: start,
-                end: end,
-                property: property
-            }
-        };
+      return {
+        cssProperty: {
+          start: start,
+          end: end,
+          property: property
+        }
+      };
     },
     UNFINISHED_CSS_VALUE: function(parser, start, end, value) {
-        return {
-            cssValue: {
-                start: start,
-                end: end,
-                value: value
-            }
-        };
+      return {
+        cssValue: {
+          start: start,
+          end: end,
+          value: value
+        }
+      };
     },
     MISSING_CSS_BLOCK_CLOSER: function(parser, start, end, value) {
-        return {
-            cssValue: {
-                start: start,
-                end: end,
-                value: value
-            }
-        };
+      return {
+        cssValue: {
+          start: start,
+          end: end,
+          value: value
+        }
+      };
     },
     UNCAUGHT_CSS_PARSE_ERROR: function(parser, start, end, msg) {
-        return {
-            error: {
-                start: start,
-                end: end,
-                msg: msg
-            }
-        };
+      return {
+        error: {
+          start: start,
+          end: end,
+          msg: msg
+        }
+      };
     }
   };
   
