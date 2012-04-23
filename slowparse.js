@@ -285,13 +285,12 @@ var Slowparse = (function() {
     }
   };
   
-  /**
-   * An internal stream class used for tokenization. 
-   *
-   * The interface for this class is inspired by CodeMirror's:
-   *
-   *   http://codemirror.net/doc/manual.html#modeapi
-   */
+  // ### Streams
+  //
+  // `Stream` is an internal class used for tokenization. The interface for
+  // this class is inspired by the analogous class in [CodeMirror][].
+  //
+  //   [CodeMirror]: http://codemirror.net/doc/manual.html#modeapi
   function Stream(text) {
     this.text = text;
     this.pos = 0;
@@ -299,30 +298,31 @@ var Slowparse = (function() {
   }
 
   Stream.prototype = {
-    // Returns the next character in the stream without advancing it.
-    // Will return undefined at the end of the text.
+    // `Stream.peek()` returns the next character in the stream without
+    // advancing it. It will return `undefined` at the end of the text.
     peek: function() {
       return this.text[this.pos];
     },
-    // Returns the next character in the stream and advances it.
-    // Also returns undefined when no more characters are available.
+    // `Stream.next()` returns the next character in the stream and advances
+    // it. It also returns `undefined` when no more characters are available.
     next: function() {
       if (!this.end())
         return this.text[this.pos++];
     },
-    // Returns true only if the stream is at the end of the text.
+    // `Stream.end()` returns true only if the stream is at the end of the
+    // text.
     end: function() {
       return (this.pos == this.text.length);
     },
-    // 'match' must be a regular expression. If the next character in the
-    // stream 'matches' the given argument, it is consumed and returned.
-    // Otherwise, undefined is returned.
+    // `Stream.eat()` takes a regular expression. If the next character in
+    // the stream matches the given argument, it is consumed and returned.
+    // Otherwise, `undefined` is returned.
     eat: function(match) {
       if (this.peek().match(match))
         return this.next();
     },
-    // Repeatedly calls eat with the given argument, until it fails.
-    // Returns true if any characters were eaten.
+    // `Stream.eatWhile()` repeatedly calls `eat()` with the given argument,
+    // until it fails. Returns `true` if any characters were eaten.
     eatWhile: function(matcher) {
       var wereAnyEaten = false;
       while (!this.end()) {
@@ -332,23 +332,25 @@ var Slowparse = (function() {
           return wereAnyEaten;
       }
     },
-    // Shortcut for eatWhile when matching white-space (including newlines).
+    // `Stream.eatSpace()` is a shortcut for `eatWhile()` when matching
+    // white-space (including newlines).
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
-    // Set the start for the next token to "where we are now".
+    // `Stream.markTokenStart()` will set the start for the next token to
+    // the current stream position (i.e., "where we are now").
     markTokenStart: function() {
       this.tokenStart = this.pos;
     },
-    // Wrapper function for eating up space, then marking the start for
-    // a new token.
+    // `Stream.markTokenStartAfterSpace()` is a wrapper function for eating
+    // up space, then marking the start for a new token.
     markTokenStartAfterSpace: function() {
       this.eatSpace();
       this.markTokenStart();
     },
-    // Generates a JSON-serializable token object representing the interval
-    // of text between the end of the last generated token and the current
-    // stream position.
+    // `Stream.makeToken()` generates a JSON-serializable token object
+    // representing the interval of text between the end of the last
+    // generated token and the current stream position.
     makeToken: function() {
       if (this.pos == this.tokenStart)
         return null;
@@ -362,10 +364,10 @@ var Slowparse = (function() {
       this.tokenStart = this.pos;
       return token;
     },
-    // Act like a multi-character eat—if consume is true or not given—or a
-    // look-ahead that doesn't update the stream position—if it is false.
-    // string must be a string. caseFold can be set to true to make the match
-    // case-insensitive.
+    // `Stream.match()` acts like a multi-character eat—if *consume* is `true`
+    // or not given—or a look-ahead that doesn't update the stream
+    // position—if it is `false`. *string* must be a string. *caseFold* can
+    // be set to `true` to make the match case-insensitive.
     match: function(string, consume, caseFold) {
       var substring = this.text.slice(this.pos, this.pos + string.length);
       if (caseFold) {
