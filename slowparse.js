@@ -4,6 +4,10 @@
  * signaling any errors detected accompanied by relevant
  * regions in the text stream, to make 'debugging' easy.
  *
+ * Slowparse also builds a DOM as it goes, attaching metadata
+ * to each node build that points to where it came from in
+ * the original source.
+ *
  * Slowparse is effectively a finite state machine for
  * HTML+CSS strings, and will switch between the HTML
  * and CSS parsers while maintaining a single token stream.
@@ -38,7 +42,16 @@ var Slowparse = (function() {
   }
   
   /**
-   * FIXME: document
+   * Internal error class used to indicate a parsing error. This
+   * never gets seen by Slowparse clients, as parse errors are an
+   * expected occurrence. However, they are used internally to simplify
+   * flow control.
+   *
+   * The first argument is the name of an error type, followed by
+   * arbitrary positional arguments specific to that error type. Every
+   * ParseError has a property 'parseInfo' which contains the error
+   * object that will be exposed to Slowparse clients when parsing errors
+   * occur.
    */
   function ParseError(parseInfo) {
     this.name = "ParseError";
@@ -63,6 +76,10 @@ var Slowparse = (function() {
   ParseError.prototype = Error.prototype;
 
   var ParseErrorBuilders = {
+    /**
+     * Create a new object that has the properties of both arguments
+     * and return it.
+     */
     _combine: function(a, b) {
       var obj = {}, name;
       for (name in a) {
@@ -73,6 +90,11 @@ var Slowparse = (function() {
       }
       return obj;
     },
+    /**
+     * The following factory functions return a parseInfo object
+     * sans the 'type' property. For more information on each type of
+     * error, see the error specification document at demo/spec.html.
+     */
     UNCLOSED_TAG: function(parser) {
       return {
         openTag: this._combine({
@@ -256,9 +278,13 @@ var Slowparse = (function() {
     }
   };
   
-  // The interface for this stream class is inspired by CodeMirror's:
-  //
-  // http://codemirror.net/doc/manual.html#modeapi
+  /**
+   * An internal stream class used for tokenization. 
+   *
+   * The interface for this class is inspired by CodeMirror's:
+   *
+   *   http://codemirror.net/doc/manual.html#modeapi
+   */
   function Stream(text) {
     this.text = text;
     this.pos = 0;
