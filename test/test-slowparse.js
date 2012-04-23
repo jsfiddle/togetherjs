@@ -283,6 +283,25 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace",
     });
 });
 
+testStyleSheet("parsing of CSS rule w/ comments",
+               "/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c8*; /***** c9 *****/}",
+               function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
+    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c8*; /***** c9 *****/}',
+      'parseInfo.rules[0].selector': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/',
+      'parseInfo.rules[0].declarations': '{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c8*; /***** c9 *****/}',
+      'parseInfo.rules[0].declarations.properties[0].name': '/* c4 */ co/*c5*/lor/*c6*/',
+      'parseInfo.rules[0].declarations.properties[0].value': '/*c7*/pi/*c8*/nk/*c8*; /***** c9 *****/'
+    });
+    
+    equal(styleContents.parseInfo.rules[0].selector.value, "body");
+    equal(styleContents.parseInfo.rules[0].declarations.properties[0].name.value, "color");
+    equal(styleContents.parseInfo.rules[0].declarations.properties[0].value.value, "pink");
+
+});
+
 test("replaceEntityRefs", function() {
   [
     ["&lt;", "<"],
@@ -347,3 +366,4 @@ test("Slowparse.HTML_ELEMENT_NAMES", function() {
 test("Slowparse.CSS_PROPERTY_NAMES", function() {
   ok(Slowparse.CSS_PROPERTY_NAMES.indexOf("color") != -1);
 });
+
