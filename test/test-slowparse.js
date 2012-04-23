@@ -262,8 +262,9 @@ testStyleSheet("parsing of empty CSS rule",
     });
 });
 
-testStyleSheet("parsing of CSS rule w/ funky whitespace",
+testStyleSheet("parsing of CSS rule w/ funky whitespace/comments",
                ["body\n { color: pink; }",
+                "body\n { /* Yay pink! */ color: pink; }",
                 "body\n {\n color: pink; }",
                 "body\n {\n color: \npink; }",
                 "body\n {\n color: \npink\n\n }",
@@ -278,6 +279,12 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace",
       'parseInfo.rules[0].declarations.properties[0].name': 'color',
       'parseInfo.rules[0].declarations.properties[0].value': 'pink'
     });
+});
+
+testStyleSheet("parsing of empty CSS rule w/ comment",
+               "p { /* nothing to see here. */ }",
+               function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
 });
 
 testStyleSheet("parsing of CSS rule w/ comments",
