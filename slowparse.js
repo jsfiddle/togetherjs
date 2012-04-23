@@ -331,6 +331,33 @@ var Slowparse = (function() {
     eatSpace: function() {
       return this.eatWhile(/[\s\n]/);
     },
+    // Shortcut for eating CSS block comments
+    eatCSSWhile: function(matcher) {
+      var wereAnyEaten = false,
+          chr = '',
+          peek = '',
+          next = '';
+      while (!this.end()) {
+        chr = this.eat(matcher);
+        if (chr)
+          wereAnyEaten = true;
+        else
+          return wereAnyEaten;
+        if (chr === '/') {
+          peek = this.peek();
+          if (peek === '*') {
+            // block comment found. gobble until resolved
+            while(next !== '/' && !this.end()) {
+              // eat until *, eat * see if next is /
+              this.eatWhile(/[^*]/);
+              this.next();
+              next = this.next();
+            }
+            next = '';
+          }
+        }
+      }
+    },
     // Set the start for the next token to "where we are now".
     markTokenStart: function() {
       this.tokenStart = this.pos;
@@ -488,6 +515,31 @@ var Slowparse = (function() {
       return cssBlock;
     },
     /**
+     * Strip block comments, and record their position in the comments list
+     */
+    stripComments: function(term, startPos) {
+      var pos,
+          last = term.length,
+          commentStart, commentEnd,
+          prev, next,
+          stripped = "";
+      for (pos=0; pos < last; pos++) {
+        if (term[pos] === '/' && pos<last-1 && term[pos+1] === '*') {
+          // comment found!
+          commentStart = startPos + pos;
+          pos += 3;
+          while(pos < last-1 && term.substr(pos-1,2) !== "*/") {
+            pos++;
+          }
+          commentEnd = startPos + pos;
+          this.comments.push({start: commentStart, end: commentEnd});
+        } else {
+          stripped += term[pos];
+        }
+      }
+      return stripped;
+    },
+    /**
      * Parse CSS selectors
      *
      * A selector is a string, and terminates on {, which signals
@@ -507,8 +559,8 @@ var Slowparse = (function() {
         this.currentRule = null;
       }
 
-      // gobbel all characters that could be part of the selector
-      this.stream.eatWhile(/[^\{;\}<]/);
+      // gobble all characters that could be part of the selector
+      this.stream.eatCSSWhile(/[^\{;\}<]/);
       var token = this.stream.makeToken(),
           peek = this.stream.peek();
       
@@ -524,9 +576,15 @@ var Slowparse = (function() {
 
       // if we get here, we have a selector string.
       token.value = token.value.trim();
-      var selector = token.value,
+      var selector = token.value;
           selectorStart = token.interval.start,
           selectorEnd = selectorStart + selector.length;
+      
+      // strip any CSS comments out of the selector
+      selector = this.stripComments(selector, selectorStart).trim();
+      if (selector === '') {
+        throw new ParseError("MISSING_CSS_SELECTOR", this, this.stream.pos-1, this.stream.pos);
+      }
 
       // set up a ruleset object for this selector
       this.currentRule = {
@@ -620,7 +678,7 @@ var Slowparse = (function() {
      *   <  End of <style> element, start of </style> (ERROR: missing value)
      */
     _parseProperty: function(selector, selectorStart) {
-      var property = this.stream.eatWhile(/[^\{\}<;:]/),
+      var property = this.stream.eatCSSWhile(/[^\{\}<;:]/),
           token = this.stream.makeToken();
 
       if (token === null) {
@@ -630,6 +688,13 @@ var Slowparse = (function() {
       var property = token.value.trim();
           propertyStart = token.interval.start,
           propertyEnd = propertyStart + property.length;
+
+      // strip any CSS comments out of the property
+      property = this.stripComments(property, propertyStart).trim();
+      if (property === '') {
+        throw new ParseError("MISSING_CSS_PROPERTY", this, this.stream.pos-1, this.stream.pos);
+      }
+
       var next = this.stream.next(),
           errorMsg = "[_parseProperty] Expected }, <, ; or :, instead found "+next;
 
@@ -678,7 +743,7 @@ var Slowparse = (function() {
      *   <  End of <style> element, start of </style> (ERROR: missing block closer)
      */
     _parseValue: function(selector, selectorStart, property, propertyStart) {
-      var rule = this.stream.eatWhile(/[^}<;]/),
+      var rule = this.stream.eatCSSWhile(/[^}<;]/),
           token = this.stream.makeToken();
           
       if(token === null) {
@@ -691,6 +756,12 @@ var Slowparse = (function() {
       var value = token.value,
           valueStart = token.interval.start,
           valueEnd = valueStart + value.length;
+
+      // strip any CSS comments out of the value
+      value = this.stripComments(value, valueStart).trim();
+      if (value === '') {
+        throw new ParseError("MISSING_CSS_VALUE", this, this.stream.pos-1, this.stream.pos);
+      }
 
       // at this point we can fill in the value part of the current
       // property:value; pair. However, we hold off binding it until
