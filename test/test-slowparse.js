@@ -280,6 +280,12 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace",
     });
 });
 
+testStyleSheet("parsing of empty CSS sheet w/ comment",
+               "/* nothing to see here. */",
+               function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 0);
+});
+
 testStyleSheet("parsing of empty CSS rule w/ comment",
                "p { /* nothing to see here. */ }",
                function(html, css, styleContents) {
