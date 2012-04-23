@@ -698,7 +698,8 @@ var Slowparse = (function() {
 
       property = this.stripComments(property, propertyStart).trim();
       if (property === '') {
-        throw new ParseError("MISSING_CSS_PROPERTY", this, this.stream.pos-1, this.stream.pos);
+        this._parseDeclaration(selector, selectorStart);
+        return;
       }
 
       var next = this.stream.next(),
