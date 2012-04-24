@@ -1,0 +1,233 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+iframe {
+  border: none;
+  height: 100%;
+  width: 100%;
+}
+
+#header {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+
+  background-color: rgb(160,120,220);
+  color: rgb(255,255,210);
+  text-align: center;
+
+  height: 4em;                    /* NOTE: this value MUST agree with [#html-editor, #live-render].margin-bottom */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+
+#footer {
+  position: fixed;
+  bottom: 0;
+
+  background-color: rgb(0,130,255);
+  color: white;
+
+  height: 2em;                    /* NOTE: this value MUST agree with [#split-page, #html-editor, #live-render].bottom */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#split-pane {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  top: 0px;
+  width: 100%;
+}
+
+#split-page, #html-editor, #live-render {
+  bottom: 2em;                    /* NOTE: this value MUST agree with [#footer].height */
+}
+
+#html-editor, #live-render {
+  display: inline-block;
+  position: fixed;
+  top: 0px;
+  margin-top: 4em;                /* NOTE: this value MUST agree with [#header].height */
+
+  width: 50%;
+  overflow: hidden;
+}
+
+#html-editor {
+  background-color: white;
+  overflow: auto;
+  background: url("codemirror-gutter.png") repeat-y, url("02original.gif") repeat;
+}
+
+#html-editor textarea,
+.CodeMirror-scroll.cm-s-jsbin {
+  height: 100%;
+  overflow: hidden;
+}
+
+#live-render {
+  border-left: 1px solid black;
+  margin-left: -1px;
+  background-color: white;
+  right: 0;
+}
+
+/* ------------------- */
+
+/*
+.error, .preview {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 50%;
+  height: 100%;
+  border: none;
+}
+
+.preview {
+  border-left: 1px solid black;
+}
+
+
+.error {
+  background: rgba(128, 0, 0, 0.75);
+  color: white;
+  padding: 10px;
+  overflow: auto;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*/
+
+.error em[data-highlight] {
+  font-style: normal;
+  cursor: pointer;
+}
+
+.error em.highlight-1, .CodeMirror span.highlight-1 {
+  color: black;
+  background: yellow;
+}
+
+.error em.highlight-2, .CodeMirror span.highlight-2 {
+  color: white;
+  background: gray;
+}
+
+.CodeMirror span.cursor-help-highlight {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.suggestions a {
+  color: inherit;
+}
+
+.suggestions li p {
+  font-size: smaller;
+}
+
+code {
+  font-family: Menlo, Monaco, consolas, monospace;
+  font-size: smaller;
+}
+
+.help a {
+  color: inherit;
+}
+
+.help a.learn-more {
+  display: inline-block;
+  text-decoration: none;
+  padding: 1px 2px 1px 2px;
+  margin: 0px 2px 0px 2px;
+  font-size: smaller;
+  background: lightgray;
+  color: #222222;
+}
+
+.help a.learn-more:hover {
+  background: white;
+  color: black;
+}
+
+#publish-box {
+  float: right;
+  position: relative;
+  top: 1em;
+  margin-right: 1em;
+}
+
+#publish, #publish-dialog {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#publish {
+  display: inline-block;
+  font-size: small;
+  padding: 4px 4px 2px 4px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  
+  margin-left: 4em;
+  font-family: 'Modern Antiqua', Verdana, sans-serif;
+}
+
+#publish-text {
+  display: inline-block;
+  font-family: 'Modern Antiqua', Georgia, sans-serif;
+}
+
+#publish:hover {
+  background: rgb(0,130,255);
+  color: white;
+}
+
+#publish-dialog {
+  position: absolute;
+  width: 600px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  margin-top: -150px;
+  margin-left: -300px;
+  padding: 10px;
+  z-index: 1000000;
+  background-color: rgba(0, 0, 100, 0.75);
+  color: white;
+  text-align: center;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+}
+
+#publish-dialog a {
+  color: inherit;
+}
+
+
+/* ------------------- */
+
+h1 {
+  display: inline-block;
+  position: relative;
+  top: -0.5em;
+  font-family: 'Mystery Quest', Verdana, sans-serif;
+  font-size: 220%;
+  font-weight: 400;
+  text-align: center;
+}

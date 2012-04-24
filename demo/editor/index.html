@@ -1,199 +1,112 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<base target="_blank">
-<title>Two-Paned Editor</title>
-<link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
-<link rel="stylesheet" href="../jsbin-codemirror-theme.css">
-<style>
-html, body {
-  height: 100%;
-  margin: 0px;
-  padding: 0px;
-}
+<html>
+    <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+    <title>Two-Paned Editor</title>
+    <link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
+    <link rel="stylesheet" href="../jsbin-codemirror-theme.css">
+    <link rel="stylesheet" href="editor.css">
+    
+    <link href='http://fonts.googleapis.com/css?family=Mystery+Quest' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Modern+Antiqua' rel='stylesheet' type='text/css'>
+  </html>
+  <body>
 
-.html {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  width: 50%;
-}
+    <!-- header -->
+    <div id="header">
+      <h1 class="title">Web Page Maker - remix the web!</h1>
+      <div id="publish-box">
+        <div id="publish">Publish</div>
+        <div id="publish-text">← Click here when you're done remixing!</div>
+      </div>  
+    </div>
+    
+    <!-- modal overlay -->
+    <div id="publish-dialog" style="display: none">
+      <h1>Hold on a sec.</h1>
+      <p>We are publishing your thing.</p>
+      <div class="done">
+        <p>Ok, we are done.</p>
+        <p>View your thing at <a class="view" href="" target="_blank"></a>.</p>
+        <p>Remix your thing at <a class="remix" href="" target="_blank"></a>.</p>
+        <p><a class="close" href="#">Go back to the editor</a>.</p>
+      </div>
+    </div> 
+    
+    <!-- our main content -->
+    <div id="split-pane">
+      <div id="html-editor">
+        <textarea class="html"></textarea> <!-- html editor part -->
+      </div>
+      
+      <div id="live-render">
+        <iframe src="blank.html" class="preview"></iframe> <!-- website view -->
+      </div>    
+    </div>
 
-.CodeMirror, .CodeMirror-scroll {
-  height: 100%;
-}
+    <!-- footer -->
+    <div id="footer">
+      <div class="error" class="hidden"></div>
+      <div class="help" class="hidden"></div>
+    </div>
 
-.error, .preview {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: 50%;
-  height: 100%;
-  border: none;
-}
+    <!-- (invisible) template for help -->
+    <div id="templates" style="display: none">
+      <div class="selector-help">This is a CSS selector.
+         It describes the kinds of HTML elements that a CSS
+         rule's style will be applied to.</div>
+      <a class="learn-more" href="">more…</a>
+      <div class="error-msgs"></div>
+      <div class="suggestions">
+        <p>Following are some suggestions that may help.
+           Click on one for more detailed information.</p>
+        <ul>
+          <li>
+            <code><a href=""></a></code>
+            <p></p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
 
-.preview {
-  border-left: 1px solid black;
-}
-
-.error {
-  background: rgba(128, 0, 0, 0.75);
-  color: white;
-  padding: 10px;
-  overflow: auto;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.error em[data-highlight] {
-  font-style: normal;
-  cursor: pointer;
-}
-
-.error em.highlight-1, .CodeMirror span.highlight-1 {
-  color: black;
-  background: yellow;
-}
-
-.error em.highlight-2, .CodeMirror span.highlight-2 {
-  color: white;
-  background: gray;
-}
-
-.CodeMirror span.cursor-help-highlight {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.suggestions a {
-  color: inherit;
-}
-
-.suggestions li p {
-  font-size: smaller;
-}
-
-code {
-  font-family: Menlo, Monaco, consolas, monospace;
-  font-size: smaller;
-}
-
-.help {
-  position: absolute;
-  right: 0px;
-  bottom: 0px;
-  max-width: 50%;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: small;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.help a {
-  color: inherit;
-}
-
-.help a.learn-more {
-  display: inline-block;
-  text-decoration: none;
-  padding: 1px 2px 1px 2px;
-  margin: 0px 2px 0px 2px;
-  font-size: smaller;
-  background: lightgray;
-  color: #222222;
-}
-
-.help a.learn-more:hover {
-  background: white;
-  color: black;
-}
-
-#publish, #publish-dialog {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-#publish {
-  font-size: small;
-  padding: 4px;
-  background: rgba(255, 255, 0, 0.5);
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  z-index: 100000;
-  cursor: pointer;
-}
-
-#publish:hover {
-  background: green;
-  color: white;
-}
-
-#publish-dialog {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  left: 0px;
-  bottom: 0px;
-  padding: 10px;
-  z-index: 1000000;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: white;
-}
-
-#publish-dialog a {
-  color: inherit;
-}
-</style>
-<textarea class="html"></textarea>
 <script type="text/html" id="initial-html">
 <style>
+  body {
+    background-color: white;
+    color: #333;
+    padding-top: 1em;
+  }
+  h1 {
+    color: #333;
+    font-family: Georgia;
+    text-align: center;
+    text-shadow: 2px 2px 3px #CCC;
+  }
   p {
-    color: blue;
+    text-align: justify;
+    text-shadow: 2px 2px 3px #999;
   }
 </style>
-<p>Tinker with me.</p>
+
+<h1>Let's remix the web! It's easy!</h1>
+
+<p>Remixing the web is easier than you think. A bit of styling
+   here, an image replacement there, and suddenly a page can
+   look completely different! Give it a try with some of our
+   templates, or load your favourite site and let's get mixin'.</p>
 </script>
-<div id="publish">Publish</div>
-<div id="publish-dialog" style="display: none">
-  <h1>Hold on a sec.</h1>
-  <p>We are publishing your thing.</p>
-  <div class="done">
-    <p>Ok, we are done.</p>
-    <p>View your thing at <a class="view" href="" target="_blank"></a>.</p>
-    <p>Remix your thing at <a class="remix" href="" target="_blank"></a>.</p>
-    <p><a class="close" href="#">Go back to the editor</a>.</p>
-  </div>
-</div>
-<iframe class="preview" src="blank.html"></iframe>
-<div class="error" style="display: none"></div>
-<div class="help" style="display: none"></div>
-<div id="templates" style="display: none">
-  <div class="selector-help">This is a CSS selector. It describes the kinds of HTML elements that a CSS rule's style will be applied to.</div>
-  <a class="learn-more" href="">more&hellip;</a>
-  <div class="error-msgs"></div>
-  <div class="suggestions">
-    <p>Following are some suggestions that may help. Click on one for more detailed information.</p>
-    <ul>
-      <li>
-        <code><a href=""></a></code>
-        <p></p>
-      </li>
-    </ul>
-  </div>
-</div>
-<script src="../jquery.min.js"></script>
-<script src="../underscore.min.js"></script>
-<script src="../codemirror2/lib/codemirror.js"></script>
-<script src="../codemirror2/mode/xml/xml.js"></script>
-<script src="../codemirror2/mode/javascript/javascript.js"></script>
-<script src="../codemirror2/mode/css/css.js"></script>
-<script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
-<script src="../../slowparse.js"></script>
-<script src="hacktionary-data.js"></script>
-<script src="editor.js"></script>
-<script src="publish.js"></script>
+
+  <script src="../jquery.min.js"></script>
+  <script src="../underscore.min.js"></script>
+  <script src="../codemirror2/lib/codemirror.js"></script>
+  <script src="../codemirror2/mode/xml/xml.js"></script>
+  <script src="../codemirror2/mode/javascript/javascript.js"></script>
+  <script src="../codemirror2/mode/css/css.js"></script>
+  <script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="../../slowparse.js"></script>
+  <script src="hacktionary-data.js"></script>
+  <script src="editor.js"></script>
+  <script src="publish.js"></script>
+</html>
