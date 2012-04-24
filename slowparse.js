@@ -443,7 +443,9 @@ var Slowparse = (function() {
                     "counter-increment","counter-reset","crop","cue","cue-after","cue-before","cursor","direction",
                     "display","dominant-baseline","drop-initial-after-adjust","drop-initial-after-align",
                     "drop-initial-before-adjust","drop-initial-before-align","drop-initial-size","drop-initial-value",
-                    "elevation","empty-cells","fit","fit-position","flex-align","flex-flow","flex-line-pack",
+                    "elevation","empty-cells",
+                    "filter", // IE css3-alikes
+                    "fit","fit-position","flex-align","flex-flow","flex-line-pack",
                     "flex-order","flex-pack","float","float-offset","font","font-family","font-size","font-size-adjust",
                     "font-stretch","font-style","font-variant","font-weight","grid-columns","grid-rows",
                     "hanging-punctuation","height","hyphenate-after","hyphenate-before","hyphenate-character",
