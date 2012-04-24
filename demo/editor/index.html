@@ -112,6 +112,42 @@ code {
   background: white;
   color: black;
 }
+
+#publish, #publish-dialog {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#publish {
+  font-size: small;
+  padding: 4px;
+  background: rgba(255, 255, 0, 0.5);
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  z-index: 100000;
+  cursor: pointer;
+}
+
+#publish:hover {
+  background: green;
+  color: white;
+}
+
+#publish-dialog {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  padding: 10px;
+  z-index: 1000000;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+}
+
+#publish-dialog a {
+  color: inherit;
+}
 </style>
 <textarea class="html"></textarea>
 <script type="text/html" id="initial-html">
@@ -122,6 +158,17 @@ code {
 </style>
 <p>Tinker with me.</p>
 </script>
+<div id="publish">Publish</div>
+<div id="publish-dialog" style="display: none">
+  <h1>Hold on a sec.</h1>
+  <p>We are publishing your thing.</p>
+  <div class="done">
+    <p>Ok, we are done.</p>
+    <p>View your thing at <a class="view" href="" target="_blank"></a>.</p>
+    <p>Remix your thing at <a class="remix" href="" target="_blank"></a>.</p>
+    <p><a class="close" href="#">Go back to the editor</a>.</p>
+  </div>
+</div>
 <iframe class="preview" src="blank.html"></iframe>
 <div class="error" style="display: none"></div>
 <div class="help" style="display: none"></div>
@@ -149,3 +196,4 @@ code {
 <script src="../../slowparse.js"></script>
 <script src="hacktionary-data.js"></script>
 <script src="editor.js"></script>
+<script src="publish.js"></script>
