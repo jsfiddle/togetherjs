@@ -21,6 +21,9 @@ $(window).bind("editorloaded", function() {
       url: BASE_URL + getQueryVariable('p'),
       crossDomain: true,
       dataType: 'text',
+      error: function() {
+        alert('Sorry, an error occurred while trying to get the page. :(');
+      },
       success: function(data) {
         editor.setValue(data);
       }
@@ -40,14 +43,12 @@ $(window).bind("editorloaded", function() {
       crossDomain: true,
       data: editor.getValue(),
       error: function() {
-        console.log("ERROR");
+        alert("Sorry, an error occurred while trying to publish. :(");
+        dlg.hide();
       },
       success: function(data) {
-        console.log("SUCCESS");
-      },
-      complete: function(data) {
-        var viewURL = BASE_URL + data.responseText;
-        var remixURL = MY_URL + '?p=' + escape(data.responseText);
+        var viewURL = BASE_URL + data;
+        var remixURL = MY_URL + '?p=' + escape(data);
         $(".done", dlg).fadeIn();
         $('a.view', dlg).attr('href', viewURL).text(viewURL);
         $('a.remix', dlg).attr('href', remixURL).text(remixURL);
