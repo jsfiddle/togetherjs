@@ -291,5 +291,6 @@ $(window).load(function() {
     editor.focus();
     onChange();
     onCursorActivity();
+    $(window).trigger("editorloaded");
   });
 });

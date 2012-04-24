@@ -262,9 +262,8 @@ testStyleSheet("parsing of empty CSS rule",
     });
 });
 
-testStyleSheet("parsing of CSS rule w/ funky whitespace/comments",
+testStyleSheet("parsing of CSS rule w/ funky whitespace",
                ["body\n { color: pink; }",
-                "body\n { /* Yay pink! */ color: pink; }",
                 "body\n {\n color: pink; }",
                 "body\n {\n color: \npink; }",
                 "body\n {\n color: \npink\n\n }",
@@ -279,6 +278,12 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace/comments",
       'parseInfo.rules[0].declarations.properties[0].name': 'color',
       'parseInfo.rules[0].declarations.properties[0].value': 'pink'
     });
+});
+
+testStyleSheet("parsing of empty CSS sheet w/ comment",
+               "/* nothing to see here. */",
+               function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 0);
 });
 
 testStyleSheet("parsing of empty CSS rule w/ comment",
@@ -356,6 +361,12 @@ test("parsing of attr content w/ HTML entities", function() {
   assertParseInfo(html, attrNode, "attr", {
     'parseInfo.value': '"1 &lt; 2 &LT; 3"',
   });
+});
+
+test("MISSING_CSS_SELECTOR works after comment", function() {
+  var html = '<style>/* hello */ {</style>';
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "MISSING_CSS_SELECTOR");
 });
 
 test("UNTERMINATED_ATTR_VALUE works at end of stream", function() {
