@@ -5,88 +5,87 @@ html, body {
   padding: 0px;
 }
 
-#content {
-  display: table;
-  width: 100%;
-  height: 100%;
-  margin: 0px;
-  padding: 0px;
-  border-collapse: collapse;
-}
-
-#html-editor, #live-render {
-  width: 50%;
-  height: 100%;
+iframe {
   border: none;
-  padding: 0px;
-  margin: 0px;
-  background-image: url('02original.gif');
-  vertical-align: top;
-  overflow: auto;
-}
-
-iframe { border: none; }
-
-#live-render {
-  border-left: 1px solid black;
-  background-color: white;
-  background-image: none;
-}
-
-.CodeMirror, .CodeMirror-scroll {
   height: 100%;
-}
-.CodeMirror-scroll.cm-s-jsbin {
-  height: 100%;
-}
-
-.CodeMirror span.cursor-help-highlight {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-code {
-  font-family: Menlo, Monaco, consolas, monospace;
-  font-size: smaller;
+  width: 100%;
 }
 
 #header {
-  text-align: center;
-  height: 2em;
-  background-color: #333;
+  position: fixed;
+  z-index: 2;
+  top: 0;
+
+
+  background-color: rgb(160,120,220);
+  color: rgb(255,255,210);
+
+  height: 4em;                    /* NOTE: this value MUST agree with [#html-editor, #live-render].margin-bottom */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
 }
 
-#header .title {
-  display: inline-block;
-  color: white;
-  font-size: 110%;
-  font-family: Verdana, sans-serif;
-}
-
-#header input[type=search] {
-  display: inline-block;
-  vertical-align: baseline;
-  width: 10em;
-  margin: 0px auto;
-}
 
 #footer {
-  padding-left: 1em;
-  height: 2em;
-  max-height: 150px;
-  background-color: rgb(0,120,255);
+  position: fixed;
+  bottom: 0;
+
+  background-color: rgb(0,130,255);
   color: white;
+
+  height: 2em;                    /* NOTE: this value MUST agree with [#split-page, #html-editor, #live-render].bottom */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
 }
 
-.suggest, .error {
-  max-height: 150px;
+#split-pane {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  top: 0px;
+  width: 100%;
+}
+
+#split-page, #html-editor, #live-render {
+  bottom: 2em;                    /* NOTE: this value MUST agree with [#footer].height */
+}
+
+#html-editor, #live-render {
+  display: inline-block;
+  position: fixed;
+  top: 0px;
+  margin-top: 4em;                /* NOTE: this value MUST agree with [#header].height */
+
+  width: 50%;
+  overflow: hidden;
+}
+
+#html-editor {
+  background-color: white;
   overflow: auto;
+  background: url("codemirror-gutter.png") repeat-y, url("02original.gif") repeat;
 }
 
-.highlight-1 {
-  background-color: rgba(255,0,0,0.3);
-  cursor: pointer;
+#html-editor textarea,
+.CodeMirror-scroll.cm-s-jsbin {
+  height: 100%;
+  overflow: hidden;
 }
 
-.hidden {
-  display: none;
+#live-render {
+  border-left: 1px solid black;
+  margin-left: -1px;
+  background-color: white;
+  right: 0;
+}
+
+/* ------------------- */
+
+h1 {
+  font-family: Verdana, sans-serif;
+  font-size: 150%;
+  font-weight: 400;
+  text-align: center;
 }

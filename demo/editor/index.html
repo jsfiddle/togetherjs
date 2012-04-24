@@ -9,27 +9,28 @@
     <link rel="stylesheet" href="editor.css">
   </html>
   <body>
-  
-    <table id="content">
-      <!-- header -->
-      <tr><td colspan="2" id="header">
-        <h1 class="title">Web Page Maker - remix the web</h1>
-        <input type="search" placeholder="hackahyrax"/>
-      </td></tr>
-      
-      <!-- our main content -->
-      <tr><td id="html-editor">
-        <textarea class="html"></textarea> <!-- html editor part -->
-      </td><td id="live-render">
-        <iframe src="blank.html" class="preview"></iframe> <!-- website view -->
-      </td></tr>    
 
-      <!-- footer -->
-      <tr><td colspan="2" id="footer">
-        <div class="error" class="hidden"></div>
-        <div class="help" class="hidden"></div>
-      </td></tr>
-    </table>
+    <!-- header -->
+    <div id="header">
+      <h1 class="title">Web Page Maker - remix the web</h1>
+    </div>
+    
+    <!-- our main content -->
+    <div id="split-pane">
+      <div id="html-editor">
+        <textarea class="html"></textarea> <!-- html editor part -->
+      </div>
+      
+      <div id="live-render">
+        <iframe src="blank.html" class="preview"></iframe> <!-- website view -->
+      </div>    
+    </div>
+
+    <!-- footer -->
+    <div id="footer">
+      <div class="error" class="hidden"></div>
+      <div class="help" class="hidden"></div>
+    </div>
 
     <!-- (invisible) template for help -->
     <div id="templates" style="display: none">
@@ -53,12 +54,30 @@
 
 <script type="text/html" id="initial-html">
 <style>
+  body {
+    background-color: white;
+    color: #333;
+    padding-top: 1em;
+  }
+  h1 {
+    color: #333;
+    font-family: Georgia;
+    text-align: center;
+    text-shadow: 2px 2px 3px #CCC;
+  }
   p {
-    color: blue;
-    font-family: fantasy;
+    text-align: justify;
+    text-shadow: 2px 2px 3px #999;
   }
 </style>
-<p>Tinker with me.</p></script>
+
+<h1>Let's remix the web! It's easy!</h1>
+
+<p>Remixing the web is easier than you think. A bit of styling
+   here, an image replacement there, and suddenly a page can
+   look completely different! Give it a try with some of our
+   templates, or load your favourite site and let's get mixin'.</p>
+</script>
 
   <script src="../jquery.min.js"></script>
   <script src="../underscore.min.js"></script>
