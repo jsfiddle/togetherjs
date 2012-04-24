@@ -1,0 +1,92 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#content {
+  display: table;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  border-collapse: collapse;
+}
+
+#html-editor, #live-render {
+  width: 50%;
+  height: 100%;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  background-image: url('02original.gif');
+  vertical-align: top;
+  overflow: auto;
+}
+
+iframe { border: none; }
+
+#live-render {
+  border-left: 1px solid black;
+  background-color: white;
+  background-image: none;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+  height: 100%;
+}
+.CodeMirror-scroll.cm-s-jsbin {
+  height: 100%;
+}
+
+.CodeMirror span.cursor-help-highlight {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+code {
+  font-family: Menlo, Monaco, consolas, monospace;
+  font-size: smaller;
+}
+
+#header {
+  text-align: center;
+  height: 2em;
+  background-color: #333;
+}
+
+#header .title {
+  display: inline-block;
+  color: white;
+  font-size: 110%;
+  font-family: Verdana, sans-serif;
+}
+
+#header input[type=search] {
+  display: inline-block;
+  vertical-align: baseline;
+  width: 10em;
+  margin: 0px auto;
+}
+
+#footer {
+  padding-left: 1em;
+  height: 2em;
+  max-height: 150px;
+  background-color: rgb(0,120,255);
+  color: white;
+}
+
+.suggest, .error {
+  max-height: 150px;
+  overflow: auto;
+}
+
+.highlight-1 {
+  background-color: rgba(255,0,0,0.3);
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}

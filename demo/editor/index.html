@@ -1,151 +1,73 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<base target="_blank">
-<title>Two-Paned Editor</title>
-<link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
-<link rel="stylesheet" href="../jsbin-codemirror-theme.css">
-<style>
-html, body {
-  height: 100%;
-  margin: 0px;
-  padding: 0px;
-}
+<html>
+    <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+    <title>Two-Paned Editor</title>
+    <link rel="stylesheet" href="../codemirror2/lib/codemirror.css">
+    <link rel="stylesheet" href="../jsbin-codemirror-theme.css">
+    <link rel="stylesheet" href="editor.css">
+  </html>
+  <body>
+  
+    <table id="content">
+      <!-- header -->
+      <tr><td colspan="2" id="header">
+        <h1 class="title">Web Page Maker - remix the web</h1>
+        <input type="search" placeholder="hackahyrax"/>
+      </td></tr>
+      
+      <!-- our main content -->
+      <tr><td id="html-editor">
+        <textarea class="html"></textarea> <!-- html editor part -->
+      </td><td id="live-render">
+        <iframe src="blank.html" class="preview"></iframe> <!-- website view -->
+      </td></tr>    
 
-.html {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  width: 50%;
-}
+      <!-- footer -->
+      <tr><td colspan="2" id="footer">
+        <div class="error" class="hidden"></div>
+        <div class="help" class="hidden"></div>
+      </td></tr>
+    </table>
 
-.CodeMirror, .CodeMirror-scroll {
-  height: 100%;
-}
+    <!-- (invisible) template for help -->
+    <div id="templates" style="display: none">
+      <div class="selector-help">This is a CSS selector.
+         It describes the kinds of HTML elements that a CSS
+         rule's style will be applied to.</div>
+      <a class="learn-more" href="">more…</a>
+      <div class="error-msgs"></div>
+      <div class="suggestions">
+        <p>Following are some suggestions that may help.
+           Click on one for more detailed information.</p>
+        <ul>
+          <li>
+            <code><a href=""></a></code>
+            <p></p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
 
-.error, .preview {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: 50%;
-  height: 100%;
-  border: none;
-}
-
-.preview {
-  border-left: 1px solid black;
-}
-
-.error {
-  background: rgba(128, 0, 0, 0.75);
-  color: white;
-  padding: 10px;
-  overflow: auto;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.error em[data-highlight] {
-  font-style: normal;
-  cursor: pointer;
-}
-
-.error em.highlight-1, .CodeMirror span.highlight-1 {
-  color: black;
-  background: yellow;
-}
-
-.error em.highlight-2, .CodeMirror span.highlight-2 {
-  color: white;
-  background: gray;
-}
-
-.CodeMirror span.cursor-help-highlight {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.suggestions a {
-  color: inherit;
-}
-
-.suggestions li p {
-  font-size: smaller;
-}
-
-code {
-  font-family: Menlo, Monaco, consolas, monospace;
-  font-size: smaller;
-}
-
-.help {
-  position: absolute;
-  right: 0px;
-  bottom: 0px;
-  max-width: 50%;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: small;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.help a {
-  color: inherit;
-}
-
-.help a.learn-more {
-  display: inline-block;
-  text-decoration: none;
-  padding: 1px 2px 1px 2px;
-  margin: 0px 2px 0px 2px;
-  font-size: smaller;
-  background: lightgray;
-  color: #222222;
-}
-
-.help a.learn-more:hover {
-  background: white;
-  color: black;
-}
-</style>
-<textarea class="html"></textarea>
 <script type="text/html" id="initial-html">
 <style>
   p {
     color: blue;
+    font-family: fantasy;
   }
 </style>
-<p>Tinker with me.</p>
-</script>
-<iframe class="preview" src="blank.html"></iframe>
-<div class="error" style="display: none"></div>
-<div class="help" style="display: none"></div>
-<div id="templates" style="display: none">
-  <div class="selector-help">This is a CSS selector. It describes the kinds of HTML elements that a CSS rule's style will be applied to.</div>
-  <a class="learn-more" href="">more&hellip;</a>
-  <div class="error-msgs"></div>
-  <div class="suggestions">
-    <p>Following are some suggestions that may help. Click on one for more detailed information.</p>
-    <ul>
-      <li>
-        <code><a href=""></a></code>
-        <p></p>
-      </li>
-    </ul>
-  </div>
-</div>
-<script src="../jquery.min.js"></script>
-<script src="../underscore.min.js"></script>
-<script src="../codemirror2/lib/codemirror.js"></script>
-<script src="../codemirror2/mode/xml/xml.js"></script>
-<script src="../codemirror2/mode/javascript/javascript.js"></script>
-<script src="../codemirror2/mode/css/css.js"></script>
-<script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
-<script src="../../slowparse.js"></script>
-<script src="hacktionary-data.js"></script>
-<script src="editor.js"></script>
+<p>Tinker with me.</p></script>
+
+  <script src="../jquery.min.js"></script>
+  <script src="../underscore.min.js"></script>
+  <script src="../codemirror2/lib/codemirror.js"></script>
+  <script src="../codemirror2/mode/xml/xml.js"></script>
+  <script src="../codemirror2/mode/javascript/javascript.js"></script>
+  <script src="../codemirror2/mode/css/css.js"></script>
+  <script src="../codemirror2/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="../../slowparse.js"></script>
+  <script src="hacktionary-data.js"></script>
+  <script src="editor.js"></script>
+</html>
