@@ -199,14 +199,20 @@ code {
 
 #publish-dialog {
   position: absolute;
-  top: 0px;
-  right: 0px;
-  left: 0px;
-  bottom: 0px;
+  width: 600px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  margin-top: -150px;
+  margin-left: -300px;
   padding: 10px;
   z-index: 1000000;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 100, 0.75);
   color: white;
+  text-align: center;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
 }
 
 #publish-dialog a {
