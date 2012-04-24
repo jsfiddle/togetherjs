@@ -17,7 +17,7 @@
     "optimist": ">= 0.2.4",
     "uglify-js": "~1",
     "request": ">= 2.1.1",
-    "coffee-script": "> 1.1.0",
+    "coffee-script": "= 1.1.0",
     "browserchannel": "*",
     "hat": "*"
   },
