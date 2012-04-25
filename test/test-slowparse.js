@@ -321,11 +321,30 @@ testStyleSheet("parsing of CSS rule w/ comments",
       'parseInfo.comments[7]': '/*c8*/',
       'parseInfo.comments[8]': '/*c9*; /***** c9 *****/'
     });
-    
-    
-    window.console.log(styleContents.parseInfo.comments);
-
 });
+
+testStyleSheet("parsing of CSS rule w/ vendor prefixes",
+               ".vendors { -o-border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px; }",
+               function(html, css, styleContents) {
+    equal(styleContents.parseInfo.rules.length, 1);
+    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 5);
+    assertParseInfo(html, styleContents, "style", {
+      'parseInfo': '.vendors { -o-border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px; }',
+      'parseInfo.rules[0].selector': '.vendors',
+      'parseInfo.rules[0].declarations': '{ -o-border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px; }',
+      'parseInfo.rules[0].declarations.properties[0].name': '-o-border-radius',
+      'parseInfo.rules[0].declarations.properties[0].value': '5px',
+      'parseInfo.rules[0].declarations.properties[1].name': '-moz-border-radius',
+      'parseInfo.rules[0].declarations.properties[1].value': '5px',
+      'parseInfo.rules[0].declarations.properties[2].name': '-webkit-border-radius',
+      'parseInfo.rules[0].declarations.properties[2].value': '5px',
+      'parseInfo.rules[0].declarations.properties[3].name': '-ms-border-radius',
+      'parseInfo.rules[0].declarations.properties[3].value': '5px',
+      'parseInfo.rules[0].declarations.properties[4].name': 'border-radius',
+      'parseInfo.rules[0].declarations.properties[4].value': '5px',
+    });
+});
+
 
 test("replaceEntityRefs", function() {
   [
