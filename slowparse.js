@@ -133,6 +133,13 @@ var Slowparse = (function() {
         }, token.interval)
       };
     },
+    CLOSE_TAG_FOR_VOID_ELEMENT: function(parser, closeTagName, token) {
+      return {
+        closeTag: this._combine({
+          name: closeTagName
+        }, token.interval)
+      };
+    },
     UNTERMINATED_COMMENT: function(token) {
       return {
         start: token.interval.start
@@ -982,6 +989,9 @@ var Slowparse = (function() {
       // or doesn't match with the most recent opening tag.
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
+        if (this._knownVoidHTMLElement(closeTagName))
+          throw new ParseError("CLOSE_TAG_FOR_VOID_ELEMENT", this,
+                               closeTagName, token);
         if (!this.domBuilder.currentNode.parseInfo)
           throw new ParseError("UNEXPECTED_CLOSE_TAG", this, closeTagName,
                                token);

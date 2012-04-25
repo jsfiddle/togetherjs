@@ -10,6 +10,12 @@
     doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
     <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.</p>
 </div>
+<div class="error-msg CLOSE_TAG_FOR_VOID_ELEMENT">
+  <p>The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+    is for a void element (that is, an element that doesn't need to be 
+    closed).</p>
+</div>
 <div class="error-msg UNCLOSED_TAG">
   <p>The <code>&lt;{{openTag.name}}&gt;</code> tag 
     <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 

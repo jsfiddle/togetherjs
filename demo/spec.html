@@ -140,6 +140,21 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    <br>hello</br>
+  </script>
+  <script type="application/json">
+  {
+    "type": "CLOSE_TAG_FOR_VOID_ELEMENT",
+    "closeTag": {
+      "name": "br",
+      "start": 9,
+      "end": 13
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     hello <em>there
   </script>
   <script type="application/json">
