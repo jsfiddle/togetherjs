@@ -514,8 +514,8 @@ var Slowparse = (function() {
       "voice-stress","voice-volume","volume","white-space","widows","width",
       "word-break","word-spacing","word-wrap","z-index"],
     // This helper verifies that a specific string is a known CSS property.
+    // We include vendor-prefixed known CSS properties, like `-o-transition`.
     _knownCSSProperty: function(propertyName) {
-      // strip vendor prefixes
       propertyName = propertyName.replace(/^-.+?-/,'');
       return this.cssProperties.indexOf(propertyName) > -1;
     },
