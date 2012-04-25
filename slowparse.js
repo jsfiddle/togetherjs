@@ -179,6 +179,13 @@ var Slowparse = (function() {
         }
       };
     },
+    SELF_CLOSING_NON_VOID_ELEMENT: function(parser, tagName) {
+      return {
+        name: tagName,
+        start: parser.domBuilder.currentNode.parseInfo.openTag.start,
+        end: parser.stream.makeToken().interval.end
+      };
+    },
     UNTERMINATED_CLOSE_TAG: function(parser) {
       var end = parser.stream.pos;
       if (!parser.stream.end())
@@ -980,7 +987,8 @@ var Slowparse = (function() {
         return;
       }
       
-      this.stream.eatWhile(/[\w\d\/]/);
+      this.stream.eat(/\//);
+      this.stream.eatWhile(/[\w\d]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1);
       
@@ -1058,8 +1066,13 @@ var Slowparse = (function() {
         else if (this.stream.eatSpace()) {
           this.stream.makeToken();
         }
-        else if (this.stream.peek() == '>') {
-          this.stream.next();
+        else if (this.stream.peek() == '>' || this.stream.match("/>")) {
+          if (this.stream.match("/>", true)) {
+            if (!this._knownVoidHTMLElement(tagName))
+              throw new ParseError("SELF_CLOSING_NON_VOID_ELEMENT", this, 
+                                   tagName);
+          } else
+            this.stream.next();
           var end = this.stream.makeToken().interval.end;
           this.domBuilder.currentNode.parseInfo.openTag.end = end;
 

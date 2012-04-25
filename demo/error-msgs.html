@@ -16,6 +16,13 @@
     is for a void element (that is, an element that doesn't need to be 
     closed).</p>
 </div>
+<div class="error-msg SELF_CLOSING_NON_VOID_ELEMENT">
+  <p>The <code>&lt;{{name}}&gt;</code> tag 
+    <em data-highlight="{{start}},{{end}}">here</em> 
+    can't be self-closed, because <code>&lt;{{name}}&gt;</code> is not
+    a void element; it must be closed with a separate 
+    <code>&lt;/{{name}}&gt;</code> tag.</p>
+</div>
 <div class="error-msg UNCLOSED_TAG">
   <p>The <code>&lt;{{openTag.name}}&gt;</code> tag 
     <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 

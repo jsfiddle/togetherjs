@@ -362,6 +362,22 @@ test("replaceEntityRefs", function() {
   });
 });
 
+test("parsing of self-closing void elements works", function() {
+  var html = 'hello<br/>';
+  var doc = parseWithoutErrors(html);
+  assertParseInfo(html, doc.childNodes[1], "brNode", {
+    'parseInfo.openTag': '<br/>',
+  });
+});
+
+test("parsing of self-closing void elements w/ spaces works", function() {
+  var html = 'hello<br />';
+  var doc = parseWithoutErrors(html);
+  assertParseInfo(html, doc.childNodes[1], "brNode", {
+    'parseInfo.openTag': '<br />',
+  });
+});
+
 test("parsing of text content w/ HTML entities", function() {
   var html = '<p>&lt;p&gt;</p>';
   var doc = parseWithoutErrors(html);

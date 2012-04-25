@@ -155,6 +155,19 @@ a {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    hello<p/>there
+  </script>
+  <script type="application/json">
+  {
+    "type": "SELF_CLOSING_NON_VOID_ELEMENT",
+    "name": "p",
+    "start": 5,
+    "end": 9
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     hello <em>there
   </script>
   <script type="application/json">
