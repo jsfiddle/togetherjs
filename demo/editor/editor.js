@@ -277,6 +277,11 @@ function onCursorActivity() {
 }
 
 $(window).load(function() {
+  // The number of milliseconds to wait before refreshing the preview
+  // content and checking the user's HTML for errors.
+  var ON_CHANGE_DELAY = 300;
+  var onChangeTimeout;
+  
   $(".html").val($("#initial-html").text().trim());
   $("#templates .error-msgs").load("../error-msgs.html", function() {
     editor = CodeMirror.fromTextArea($(".html")[0], {
@@ -285,7 +290,10 @@ $(window).load(function() {
       tabMode: "indent",
       lineWrapping: true,
       lineNumbers: true,
-      onChange: onChange,
+      onChange: function() {
+        clearTimeout(onChangeTimeout);
+        onChangeTimeout = setTimeout(onChange, ON_CHANGE_DELAY);
+      },
       onCursorActivity: onCursorActivity
     });
     editor.focus();
