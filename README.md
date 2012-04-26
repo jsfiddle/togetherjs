@@ -16,6 +16,7 @@ For more information, see:
   * The [error reporting specification][] to get an idea of what kinds of errors can be reported, and what their human-friendly descriptions are.
   * The [annotated source code][].
   * The [test suite][].
+  * The blog post [Learning and Grammatical Forgiveness][learning], which explains why Slowparse isn't an HTML/CSS validator.
 
   [lovebomb.me]: http://lovebomb.me
   [Storything]: http://storything.toolness.org/
@@ -26,3 +27,5 @@ For more information, see:
   [live demo]: http://toolness.github.com/slowparse/demo/
   [annotated source code]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
   [test suite]: http://toolness.github.com/slowparse/test/
+  [learning]: http://www.toolness.com/wp/2012/04/learning-and-grammatical-forgiveness/
+  
