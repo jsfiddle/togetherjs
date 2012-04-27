@@ -1,6 +1,6 @@
 $(window).bind("editorloaded", function() {
   var MY_URL = $('<a href="."></a>')[0].href
-  var BASE_URL = "http://webpagemakerapi.vcap.mozillalabs.com/";
+  var BASE_URL = "http://wpm.toolness.org";
   var dlg = $("#publish-dialog");
 
   function getQueryVariable(variable) {
@@ -39,7 +39,7 @@ $(window).bind("editorloaded", function() {
     $(".done", dlg).hide();
     $.ajax({
       type: 'POST',
-      url: BASE_URL + 'page',
+      url: BASE_URL + '/api/page',
       crossDomain: true,
       data: editor.getValue(),
       error: function() {
