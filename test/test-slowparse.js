@@ -11,7 +11,7 @@ function documentFragmentHTML(doc) {
 
 // Ensure that an object containing {start,end} keys correspond
 // to a particular substring of HTML source code.
-function assertParseInfo(html, node, name, map) {
+function assertParseIntervals(html, node, name, map) {
   function getDottedProperty(obj, property) {
     var parts = property.split('.');
     parts.forEach(function(part) {
@@ -93,7 +93,7 @@ test("Stream.match()", function() {
 test("parsing of valid DOCTYPE", function() {
   var html = '<!DOCTYPE html><p>hi</p>';
   var doc = parseWithoutErrors(html);
-  assertParseInfo(html, doc, "document", {
+  assertParseIntervals(html, doc, "document", {
     'parseInfo.doctype': '<!DOCTYPE html>'
   });
 });
@@ -114,7 +114,7 @@ test("parsing of misplaced DOCTYPE", function() {
 test("parsing of HTML comments", function() {
   var html = 'hi<!--testing-->there';
   var doc = parseWithoutErrors(html);
-  assertParseInfo(html, doc.childNodes[1], "comment", {
+  assertParseIntervals(html, doc.childNodes[1], "comment", {
     'parseInfo': '<!--testing-->'
   });
 });
@@ -131,7 +131,7 @@ test("parsing of elements with boolean attributes", function() {
   var attr = doc.childNodes[0].attributes[0];
   equal(attr.nodeName, 'href');
   equal(attr.nodeValue, '');
-  assertParseInfo(html, attr, "attr", {
+  assertParseIntervals(html, attr, "attr", {
     'parseInfo.name': 'href'
   });
   
@@ -146,11 +146,11 @@ test("parsing of elements with boolean attributes", function() {
   equal(attr1.nodeValue, '');
   equal(attr2.nodeName, 'class');
   equal(attr2.nodeValue, 'foo');
-  assertParseInfo(html, attr1, "attr1", {
+  assertParseIntervals(html, attr1, "attr1", {
     'parseInfo.name': 'href'
   });
   ok(attr1.parseInfo.value === undefined);
-  assertParseInfo(html, attr2, "attr2", {
+  assertParseIntervals(html, attr2, "attr2", {
     'parseInfo.name': 'class',
     'parseInfo.value': '"foo"'
   });
@@ -165,7 +165,7 @@ test("parsing of valid HTML", function() {
   var p = doc.childNodes[0];
 
   equal(p.nodeName, "P", "first child of generated DOM is <p>");
-  assertParseInfo(html, p, "p", {
+  assertParseIntervals(html, p, "p", {
     'parseInfo.openTag': '<p class="foo">',
     'parseInfo.closeTag': '</p>'
   });
@@ -175,10 +175,10 @@ test("parsing of valid HTML", function() {
   var textNode = p.childNodes[0];
 
   equal(textNode.nodeType, textNode.TEXT_NODE, "<p>'s child is a text node.");
-  assertParseInfo(html, textNode, "textNode", {
+  assertParseIntervals(html, textNode, "textNode", {
     'parseInfo': 'hello there',
   });
-  assertParseInfo(html, p.attributes[0], "attr", {
+  assertParseIntervals(html, p.attributes[0], "attr", {
     'parseInfo.name': 'class',
     'parseInfo.value': '"foo"'
   });
@@ -241,10 +241,10 @@ testManySnippets("parsing of valid HTML w/ whitespace", [
 ], function(html, doc) {
   var canonicalHTML = '<p class="foo">hello there</p><p>u</p>';
   var p = doc.childNodes[0];
-  assertParseInfo(html, p.childNodes[0], "textNode", {
+  assertParseIntervals(html, p.childNodes[0], "textNode", {
     'parseInfo': 'hello there'
   });
-  assertParseInfo(html, p.attributes[0], "attr", {
+  assertParseIntervals(html, p.attributes[0], "attr", {
     'parseInfo.name': 'class',
     'parseInfo.value': '"foo"'
   });
@@ -259,7 +259,7 @@ testStyleSheet("parsing of CSS rule w/ one decl, no semicolon",
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
     
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo': 'body { color: pink }',
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations': '{ color: pink }',
@@ -273,7 +273,7 @@ testStyleSheet("parsing of CSS rule w/ one decl and semicolon",
                function(html, css, styleContents) {
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo': 'body { color: pink; }',
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations': '{ color: pink; }',
@@ -287,7 +287,7 @@ testStyleSheet("parsing of empty CSS rule",
                function(html, css, styleContents) {
    equal(styleContents.parseInfo.rules.length, 1);
    equal(styleContents.parseInfo.rules[0].declarations.properties.length, 0);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo': 'body {}',
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations': '{}'
@@ -305,7 +305,7 @@ testStyleSheet("parsing of CSS rule w/ funky whitespace",
                function(html, css, styleContents) {
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo.rules[0].selector': 'body',
       'parseInfo.rules[0].declarations.properties[0].name': 'color',
       'parseInfo.rules[0].declarations.properties[0].value': 'pink'
@@ -329,7 +329,7 @@ testStyleSheet("parsing of CSS rule w/ comments",
                function(html, css, styleContents) {
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/}',
       'parseInfo.rules[0].selector': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/',
       'parseInfo.rules[0].declarations': '{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/}',
@@ -342,7 +342,7 @@ testStyleSheet("parsing of CSS rule w/ comments",
     equal(styleContents.parseInfo.rules[0].declarations.properties[0].value.value, "pink");
     
     equal(styleContents.parseInfo.comments.length, 9);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo.comments[0]': '/** comment 1 **/',
       'parseInfo.comments[1]': '/* comment 2 */',
       'parseInfo.comments[2]': '/*comment 3*/',
@@ -360,7 +360,7 @@ testStyleSheet("parsing of CSS rule w/ vendor prefixes",
                function(html, css, styleContents) {
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 5);
-    assertParseInfo(html, styleContents, "style", {
+    assertParseIntervals(html, styleContents, "style", {
       'parseInfo': '.vendors { -o-border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px; }',
       'parseInfo.rules[0].selector': '.vendors',
       'parseInfo.rules[0].declarations': '{ -o-border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px; }',
@@ -397,7 +397,7 @@ test("replaceEntityRefs", function() {
 test("parsing of self-closing void elements works", function() {
   var html = 'hello<br/>';
   var doc = parseWithoutErrors(html);
-  assertParseInfo(html, doc.childNodes[1], "brNode", {
+  assertParseIntervals(html, doc.childNodes[1], "brNode", {
     'parseInfo.openTag': '<br/>',
   });
 });
@@ -405,7 +405,7 @@ test("parsing of self-closing void elements works", function() {
 test("parsing of self-closing void elements w/ spaces works", function() {
   var html = 'hello<br />';
   var doc = parseWithoutErrors(html);
-  assertParseInfo(html, doc.childNodes[1], "brNode", {
+  assertParseIntervals(html, doc.childNodes[1], "brNode", {
     'parseInfo.openTag': '<br />',
   });
 });
@@ -415,7 +415,7 @@ test("parsing of text content w/ HTML entities", function() {
   var doc = parseWithoutErrors(html);
   var textNode = doc.childNodes[0].childNodes[0];
   equal(textNode.nodeValue, '<p>');
-  assertParseInfo(html, textNode, "textNode", {
+  assertParseIntervals(html, textNode, "textNode", {
     'parseInfo': '&lt;p&gt;',
   });
 });
@@ -425,7 +425,7 @@ test("parsing of attr content w/ HTML entities", function() {
   var doc = parseWithoutErrors(html);
   var attrNode = doc.childNodes[0].attributes[0];
   equal(attrNode.nodeValue, '1 < 2 < 3');
-  assertParseInfo(html, attrNode, "attr", {
+  assertParseIntervals(html, attrNode, "attr", {
     'parseInfo.value': '"1 &lt; 2 &LT; 3"',
   });
 });
