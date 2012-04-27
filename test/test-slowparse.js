@@ -344,6 +344,15 @@ test("parsing of text content w/ HTML entities", function() {
   });
 });
 
+asyncTest("parsing of <script> tags doesn't execute the code", function() {
+  var html = '<script>alert("PWNED"); window.PWNED = true;</script>';
+  var doc = parseWithoutErrors(html);
+  setTimeout(function() {
+    equal(window.PWNED, undefined);
+    start();
+  }, 100);
+});
+
 test("parsing of attr content w/ HTML entities", function() {
   var html = '<p class="1 &lt; 2 &LT; 3"></p>';
   var doc = parseWithoutErrors(html);
