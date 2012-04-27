@@ -497,7 +497,7 @@ var Slowparse = (function() {
       "presentation-level","punctuation-trim","quotes","rendering-intent",
       "resize","rest","rest-after","rest-before","richness","right",
       "rotation","rotation-point","ruby-align","ruby-overhang",
-      "ruby-position","ruby-span","size","speak","speak-header",
+      "ruby-position","ruby-span","src","size","speak","speak-header",
       "speak-numeral","speak-punctuation","speech-rate","stress","string-set",
       "tab-size","table-layout","target","target-name","target-new",
       "target-position","text-align","text-align-last","text-decoration",
