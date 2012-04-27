@@ -235,7 +235,8 @@ function updatePreview(html) {
 // Called whenever content of the editor area changes.
 function onChange() {
   var html = editor.getValue();
-  var result = Slowparse.HTML(document, html);
+  var builder = new Slowparse.NoscriptDOMBuilder(document);
+  var result = Slowparse.HTML(builder, html);
   helpIndex = [];  
   clearErrorHighlights();
   if (result.error) {
