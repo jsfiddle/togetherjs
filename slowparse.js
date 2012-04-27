@@ -1190,15 +1190,19 @@ var Slowparse = (function() {
                           HTMLParser.prototype.htmlElements.concat(
                             HTMLParser.prototype.obsoleteHtmlElements)),
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
-    
+
+    // We export our DOMBuilder class in case a client wants to subclass
+    // it.
+    DOMBuilder: DOMBuilder,
+
     // We also export a few internal symbols for use by Slowparse's
     // testing suite.
     replaceEntityRefs: replaceEntityRefs,
     Stream: Stream,
 
     // `Slowparse.HTML()` is the primary function we export. Given
-    // a DOM document object and a string of HTML, we return an object
-    // with the following keys:
+    // a DOM document object (or a DOMBuilder instance) and a string
+    // of HTML, we return an object with the following keys:
     //
     // * `document` is a DOM document fragment containing the DOM of
     //   the parsed HTML. If an error occurred while parsing, this
@@ -1213,9 +1217,15 @@ var Slowparse = (function() {
     //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
     HTML: function(document, html) {
       var stream = new Stream(html),
-          domBuilder = new DOMBuilder(document),
-          parser = new HTMLParser(stream, domBuilder),
+          domBuilder,
+          parser,
           error = null;
+
+      if (document.pushElement)
+        domBuilder = document;
+      else
+        domBuilder = new DOMBuilder(document);
+      parser = new HTMLParser(stream, domBuilder);
 
       try {
         parser.parse();

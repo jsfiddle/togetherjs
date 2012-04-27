@@ -14,7 +14,7 @@ For more information, see:
 
   * A [live demo][] to see how Slowparse interprets your code in real-time.
   * The [error reporting specification][] to get an idea of what kinds of errors can be reported, and what their human-friendly descriptions are.
-  * The [annotated source code][].
+  * The annotated source code for [slowparse.js][] and [noscript.slowparse.js][].
   * The [test suite][].
   * The blog post [Learning and Grammatical Forgiveness][learning], which explains why Slowparse isn't an HTML/CSS validator.
 
@@ -25,7 +25,8 @@ For more information, see:
   [webmaker tutorials]: http://www.toolness.com/wp/2012/03/webmaker-tutorial-prototyping/
   [error reporting specification]: http://toolness.github.com/slowparse/demo/spec.html
   [live demo]: http://toolness.github.com/slowparse/demo/
-  [annotated source code]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
+  [slowparse.js]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
+  [noscript.slowparse.js]: http://labs.toolness.com/temp/slowparse/docs/noscript.slowparse.html
   [test suite]: http://toolness.github.com/slowparse/test/
   [learning]: http://www.toolness.com/wp/2012/04/learning-and-grammatical-forgiveness/
   
