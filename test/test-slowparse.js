@@ -187,6 +187,38 @@ test("parsing of valid HTML", function() {
         "serialization of generated DOM matches original HTML");
 });
 
+testManySnippets("parsing of HTML is case-insensitive", [
+  '<P CLASS="FOO">hi</P>',
+  '<P class="FOO">hi</P>',
+  '<p class="FOO">hi</P>',
+  '<P class="FOO">hi</p>'
+], function(html, doc) {
+  equal(doc.childNodes[0].nodeName, 'P');
+  equal(doc.childNodes[0].getAttribute('class'), 'FOO');
+});
+
+test("DOMBuilder is called with lowercased element/attrs", function() {
+  var elements = [];
+  var attributes = [];
+  var fakeBuilder = {
+    currentNode: {},
+    pushElement: function(tagName, parseInfo) {
+      this.currentNode.parseInfo = parseInfo;
+      this.currentNode.nodeName = tagName.toUpperCase();
+      elements.push(tagName);
+    },
+    popElement: function() {},
+    attribute: function(name, value) {
+      attributes.push(name);
+    }
+  };
+  fakeBuilder.fragment = fakeBuilder.currentNode;
+  var result = Slowparse.HTML(fakeBuilder, '<P CLASS="FOO"></P>');
+  equal(result.error, null);
+  deepEqual(elements, ['p'], "tag names are lowercased");
+  deepEqual(attributes, ['class'], "attribute names are lowercased");
+});
+
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
   '<img src="http://www.mozilla.org/favicon.ico">'

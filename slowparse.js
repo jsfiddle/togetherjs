@@ -990,7 +990,7 @@ var Slowparse = (function() {
       this.stream.eat(/\//);
       this.stream.eatWhile(/[\w\d]/);
       var token = this.stream.makeToken();
-      var tagName = token.value.slice(1);
+      var tagName = token.value.slice(1).toLowerCase();
       
       // If the character after the `<` is a `/`, we're on a closing tag.
       // We want to report useful errors about whether the tag is unexpected
@@ -1097,6 +1097,7 @@ var Slowparse = (function() {
     // the stream to be right after the end of an attribute name.
     _parseAttribute: function() {
       var nameTok = this.stream.makeToken();
+      nameTok.value = nameTok.value.toLowerCase();
       this.stream.eatSpace();
       // If the character after the attribute name is a `=`, then we
       // look for an attribute value; otherwise, this is a boolean
