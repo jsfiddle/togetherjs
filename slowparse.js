@@ -1161,7 +1161,8 @@ var Slowparse = (function() {
     // This method appends an HTML comment node to the currently active
     // element.
     comment: function(data, parseInfo) {
-      var comment = this.document.createComment(data);
+      var comment = this.document.createComment('');
+      comment.nodeValue = data;
       comment.parseInfo = parseInfo;
       this.currentNode.appendChild(comment);
     },
