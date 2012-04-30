@@ -11,11 +11,10 @@ jQuery.fn.extend({
     var newSource = $("<div></div>"),
         slices = [],
         i = 0;
-    this.find("[data-highlight]").each(function(n) {
-      var parts = $(this).attr("data-highlight").split(",");
+    this.eachErrorHighlight(function(start, end, n) {
       slices.push({
-        start: parseInt(parts[0]),
-        end: parts[1] ? parseInt(parts[1]) : undefined,
+        start: start,
+        end: end,
         linkedNode: this
       });
       $(this).attr("class", "color-" + (n + 1));

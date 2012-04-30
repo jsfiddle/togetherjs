@@ -48,11 +48,7 @@ function selectInterval(interval) {
 // When the user moves over anything with a data-highlight attribute,
 // select the text in the editor that corresponds to the highlight.
 $(document).on("mouseover", "[data-highlight]", function(event) {
-  var interval = $(this).attr("data-highlight").split(",");
-  selectInterval({
-    start: parseInt(interval[0]),
-    end: parseInt(interval[1])
-  });
+  selectInterval($(this).errorHighlightInterval());
 });
 
 // This is the reverse of CodeMirror2's editor.coordsFromIndex().
@@ -179,7 +175,7 @@ var MDN_URLS = {
 // Report the given Slowparse error, optionally providing suggestions to
 // the user.
 function reportError(error) {
-  $(".error").fillError(error, setErrorHighlight);
+  $(".error").fillError(error).eachErrorHighlight(setErrorHighlight);
   $(".help").hide();
   if (error.type == "INVALID_TAG_NAME") {
     createSuggestions({
@@ -211,7 +207,7 @@ function setErrorHighlight(start, end, i) {
 
 // Remove all highlights made by setErrorHighlight().
 function clearErrorHighlights() {
-  $(".error").find("[data-highlight]").each(function() {
+  $(".error").eachErrorHighlight(function() {
     // Odd, from the CodeMirror docs you'd think this would remove
     // the class from the highlighted text, too, but it doesn't.
     // I guess we're just garbage collecting here.

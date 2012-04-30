@@ -161,11 +161,7 @@ function processHTML(html) {
 }
 
 $(document).on("mouseover", "[data-highlight]", function(event) {
-  var interval = $(this).attr("data-highlight").split(",");
-  selectInterval({
-    start: parseInt(interval[0]),
-    end: parseInt(interval[1])
-  });
+  selectInterval($(this).errorHighlightInterval());
 });
 
 $(window).ready(function() {

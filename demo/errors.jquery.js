@@ -12,14 +12,22 @@
   });
   
   jQuery.fn.extend({
-    fillError: function(error, highlighter) {
+    errorHighlightInterval: function() {
+      var interval = $(this).attr("data-highlight").split(",");
+      var start = parseInt(interval[0]);
+      var end = interval[1] ? parseInt(interval[1]) : undefined;
+      return {start: start, end: end};
+    },
+    eachErrorHighlight: function(cb) {
+      $("[data-highlight]", this).each(function(i) {
+        var interval = $(this).errorHighlightInterval();
+        cb.call(this, interval.start, interval.end, i);
+      });
+      return this;
+    },
+    fillError: function(error) {
       var template = $(".error-msg." + error.type, errors);
       this.html(_.template(template.html(), error)).show();
-      if (highlighter)
-        $("[data-highlight]", this).each(function(i) {
-          var interval = $(this).attr("data-highlight").split(",");
-          highlighter.call(this, interval[0], interval[1], i);
-        });
       return this;
     },
     // This is like jQuery.load(), but it loads the content of multiple
