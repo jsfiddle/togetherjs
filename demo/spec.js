@@ -60,7 +60,7 @@ $(window).ready(function() {
       
       var badHtml = badHtmlElement.text().trim();
       var t = $("#templates .report").clone();
-      var js = $('div.js', this).hide().text().trim();
+      var js = $('div.js', this).text().trim();
       var error;
 
       if (!js)
