@@ -1,7 +1,8 @@
 // `TreeInspectors` contains functions that inspect a document
 // fragment and report interesting things about it.
 //
-// This library has no dependencies.
+// This library has no required dependencies, though optional Slowparse
+// integration is included.
 var TreeInspectors = (function() {
   // ## Utility Functions
   var utils = {
@@ -61,6 +62,16 @@ var TreeInspectors = (function() {
       });
       
       return js;
+    },
+    // This is a Slowparse error detector that returns an error object
+    // if the given document fragment contains any JS.
+    forbidJS: function(html, doc) {
+      var js = TreeInspectors.findJS(doc);
+      if (!js.length)
+        return null;
+      var error = JSON.parse(JSON.stringify(js[0].node.parseInfo));
+      error.type = js[0].type + "_NOT_ALLOWED";
+      return error;
     }
   };
   

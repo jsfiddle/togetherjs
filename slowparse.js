@@ -1212,8 +1212,14 @@ var Slowparse = (function() {
     //   its value is `null`. For a list of the types of errors that
     //   can be returned, see the [error specification][].
     //
+    // An array of error detector functions can also be passed as a
+    // third argument to this function. An error detector function takes
+    // the HTML and generated document fragment as arguments and returns
+    // an error object if an error is detected, or `undefined` otherwise.
+    // This can be used for further error checking on the parsed document.
+    //
     //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
-    HTML: function(document, html) {
+    HTML: function(document, html, errorDetectors) {
       var stream = new Stream(html),
           domBuilder,
           parser,
@@ -1233,6 +1239,11 @@ var Slowparse = (function() {
         } else
           throw e;
       }
+      
+      (errorDetectors || []).forEach(function(detector) {
+        if (!error)
+          error = detector(html, domBuilder.fragment) || null;
+      });
 
       return {
         document: domBuilder.fragment,
@@ -1241,8 +1252,8 @@ var Slowparse = (function() {
     },
     // `Slowparse.findError()` just returns any error in the given HTML
     // string, or `null` if the HTML contains no errors.
-    findError: function(html) {
-      return this.HTML(document, html).error;
+    findError: function(html, errorDetectors) {
+      return this.HTML(document, html, errorDetectors).error;
     }
   };
 

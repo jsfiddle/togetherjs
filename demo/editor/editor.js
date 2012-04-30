@@ -233,28 +233,15 @@ function updatePreview(html) {
   doc.close();
 }
 
-// Ensure that no JavaScript is in the given document fragment.
-// Return true if this is the case; otherwise, display an error and
-// return false.
-function ensureNoJS(doc) {
-  var js = TreeInspectors.findJS(doc);
-  if (!js.length)
-    return true;
-  reportError(jQuery.extend(js[0].node.parseInfo, {
-    type: js[0].type
-  }));
-  return false;
-}
-
 // Called whenever content of the editor area changes.
 function onChange() {
   var html = editor.getValue();
-  var result = Slowparse.HTML(document, html);
+  var result = Slowparse.HTML(document, html, [TreeInspectors.forbidJS]);
   helpIndex = [];  
   clearErrorHighlights();
   if (result.error)
     reportError(result.error);
-  else if (ensureNoJS(result.document)) {
+  else {
     buildHelpIndex(result.document, helpIndex);
     updatePreview(html);
   }
