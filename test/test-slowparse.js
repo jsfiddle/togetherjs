@@ -111,6 +111,13 @@ test("parsing of valid HTML", function() {
         "serialization of generated DOM matches original HTML");
 });
 
+test("parsing of HTML comments with '--' in them", function() {
+  var html = '<!-- allow\n--\nin comments plz -->';
+  var doc = parseWithoutErrors(html);
+  equal(documentFragmentHTML(doc), html,
+        "serialization of generated DOM matches original HTML");
+});
+
 testManySnippets("parsing of HTML is case-insensitive", [
   '<P CLASS="FOO">hi</P>',
   '<P class="FOO">hi</P>',
