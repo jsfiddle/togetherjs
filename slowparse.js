@@ -1192,10 +1192,6 @@ var Slowparse = (function() {
                             HTMLParser.prototype.obsoleteHtmlElements)),
     CSS_PROPERTY_NAMES: CSSParser.prototype.cssProperties,
 
-    // We export our DOMBuilder class in case a client wants to subclass
-    // it.
-    DOMBuilder: DOMBuilder,
-
     // We also export a few internal symbols for use by Slowparse's
     // testing suite.
     replaceEntityRefs: replaceEntityRefs,
