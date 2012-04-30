@@ -56,7 +56,7 @@ function refreshAnchor() {
 }
 
 $(window).ready(function() {
-  $("#templates .error-msgs").load("error-msgs.html", function() {
+  $("#templates .error-msgs").load("errors.base.html", function() {
     $('div.test').each(function() {
       var badHtmlElement = $('script[type="text/x-bad-html"]', this);
       var badHtml = badHtmlElement.text().trim();

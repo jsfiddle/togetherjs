@@ -169,7 +169,7 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 });
 
 $(window).ready(function() {
-  $("#templates").load("error-msgs.html", function() {
+  $("#templates").load("errors.base.html", function() {
     function onChange() {
       processHTML(editor.getValue());
     }
