@@ -61,8 +61,14 @@ $(window).ready(function() {
       var badHtml = badHtmlElement.text().trim();
       var t = $("#templates .report").clone();
       var js = $('div.js', this).text().trim();
-      var error;
+      var expect = $('script[type="application/json"]', this).text();
+      var error, expectedError, expectedErrorType;
 
+      if (expect) {
+        expectedError = JSON.parse(expect);
+        expectedErrorType = expectedError.type;
+      }
+      
       if (!js)
         js = $(".js > div:first-child", t).text();
       js = js.replace("{{HTML}}", JSON.stringify(badHtml));
@@ -72,13 +78,14 @@ $(window).ready(function() {
         error = eval(js);
       } catch (e) {
         $(this).addClass("failed");
-        $("h2", t).text("");
+        $("h2", t).text(expectedErrorType || "UNKNOWN");
         $(".result", t).text(e.toString());
         badHtmlElement.replaceWith(t);
         return;
       }
       
-      $("h2", t).text(error.type).attr("id", error.type);
+      expectedErrorType = expectedErrorType || error.type;
+      $("h2", t).text(expectedErrorType).attr("id", expectedErrorType);
       $(".result", t).text(JSON.stringify(error, null, "  "));
 
       var errMsg = $(".error", t);
