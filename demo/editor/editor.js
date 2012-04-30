@@ -179,10 +179,8 @@ var MDN_URLS = {
 // Report the given Slowparse error, optionally providing suggestions to
 // the user.
 function reportError(error) {
-  var template = $("#templates .error-msg." + error.type);
+  $(".error").fillError(error, setErrorHighlight);
   $(".help").hide();
-  $(".error").html(_.template(template.html(), error)).show()
-    .find("[data-highlight]").each(setErrorHighlight);
   if (error.type == "INVALID_TAG_NAME") {
     createSuggestions({
       name: error.openTag.name,
@@ -203,11 +201,10 @@ function reportError(error) {
 // Assuming "this" is an element with a data-highlight attribute,
 // give the highlighted text interval in the editor a numbered error
 // highlight class.
-function setErrorHighlight(i) {
+function setErrorHighlight(start, end, i) {
   var className = "highlight-" + (i+1);
-  var interval = $(this).attr("data-highlight").split(",");
-  var start = editor.coordsFromIndex(interval[0]);
-  var end = editor.coordsFromIndex(interval[1]);
+  var start = editor.coordsFromIndex(start);
+  var end = editor.coordsFromIndex(end);
   var mark = editor.markText(start, end, className);
   $(this).addClass(className).data("mark", mark);
 }
@@ -283,10 +280,7 @@ $(window).load(function() {
   var onChangeTimeout;
   
   $(".html").val($("#initial-html").text().trim());
-  $("#templates .error-msgs").loadMany([
-    "../errors.base.html",
-    "../errors.forbidjs.html"
-  ], function() {
+  jQuery.loadErrors("../", ["base", "forbidjs"], function() {
     editor = CodeMirror.fromTextArea($(".html")[0], {
       mode: "text/html",
       theme: "jsbin",

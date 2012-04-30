@@ -56,10 +56,7 @@ function refreshAnchor() {
 }
 
 $(window).ready(function() {
-  $("#templates .error-msgs").loadMany([
-    "errors.base.html",
-    "errors.forbidjs.html"
-  ], function() {
+  jQuery.loadErrors("", ["base", "forbidjs"], function() {
     $('div.test').each(function() {
       var badHtmlElement = $('script[type="text/x-bad-html"]', this);
 
@@ -89,13 +86,13 @@ $(window).ready(function() {
       $("h2", t).text(error.type).attr("id", error.type);
       $(".result", t).text(JSON.stringify(error, null, "  "));
 
-      var errMsg = $("#templates .error-msg." + error.type);
-      if (errMsg.length) {
-        $(".error", t).html(_.template(errMsg.html(), error))
-          .showHighlights($(".html", t));
-      } else
-        $(".error", t).text("ERROR: No error message available.");
-
+      var errMsg = $(".error", t);
+      try {
+        errMsg.fillError(error);
+      } catch (e) {
+        errMsg.text("ERROR: No error message available.");
+      }
+      errMsg.showHighlights($(".html", t));
       badHtmlElement.replaceWith(t);
     });
     refreshAnchor();

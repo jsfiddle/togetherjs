@@ -67,7 +67,6 @@ textarea.html {
   <aside>If any errors occurred while parsing, they will be shown here. Also see the <a href="spec.html">spec</a>.</aside>
   <div class="error"></div>
 </div>
-<div id="templates" style="display: none"></div>
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
 <script src="codemirror2/lib/codemirror.js"></script>
@@ -79,6 +78,7 @@ textarea.html {
 <script src="utils.js"></script>
 <script src="tag-colors.js"></script>
 <script src="render-dom.js"></script>
+<script src="errors.jquery.js"></script>
 <script>
 var editor;
 
@@ -152,11 +152,11 @@ function processHTML(html) {
   $(".rendered-dom").append(rendered);
   linkRenderedDomToSource(rendered);
   if (result.error) {
-    var template = $("#templates .error-msg." + result.error.type);
-    if (template.length) {
-      $(".error").html(_.template(template.html(), result.error));
-    } else
+    try {
+      $(".error").fillError(result.error);
+    } catch (e) {
       $(".error").text(result.error.type);
+    }
   }
 }
 
@@ -169,7 +169,7 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 });
 
 $(window).ready(function() {
-  $("#templates").load("errors.base.html", function() {
+  jQuery.loadErrors("", ["base"], function() {
     function onChange() {
       processHTML(editor.getValue());
     }
