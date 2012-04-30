@@ -78,6 +78,11 @@ a {
 .test.failed div.console {
   background: darkred;
 }
+
+h1.error-category {
+  border-top: 1px dotted gray;
+  border-bottom: 1px dotted gray;
+}
 </style>
 <h1>Slowparse Error Reporting Specification</h1>
 <p>All of the following documentation is generated on-the-fly,
@@ -103,6 +108,7 @@ a {
   </div>
   <div class="error-msgs"></div>
 </div>
+<h1 class="error-category">HTML Errors</h1>
 <div class="test">
   <script type="text/x-bad-html">
     hi</i>
@@ -282,7 +288,7 @@ a {
   </script>
 </div>
 
-<!-- CSS errors -->
+<h1 class="error-category">CSS Errors</h1>
 <div class="test">
   <script type="text/x-bad-html">
     <style> a
@@ -414,7 +420,69 @@ a {
   </script>
 </div>
 
+<h1 class="error-category">FORBIDJS Errors</h1>
+<div class="test">
+  <div class="bad-html">
+    hi&lt;script&gt;alert('yo');&lt;/script&gt;
+  </div>
+  <div class="js">Slowparse.findError({{HTML}}, [TreeInspectors.forbidJS]);</div>
+  <script type="application/json">
+  {
+    "type": "SCRIPT_ELEMENT_NOT_ALLOWED",
+    "openTag": {
+      "start": 2,
+      "end": 10
+    },
+    "closeTag": {
+      "start": 22,
+      "end": 31
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <p onclick="alert('yo');">hi</p>
+  </script>
+  <div class="js">Slowparse.findError({{HTML}}, [TreeInspectors.forbidJS]);</div>
+  <script type="application/json">
+  {
+    "type": "EVENT_HANDLER_ATTR_NOT_ALLOWED",
+    "name": {
+      "start": 3,
+      "end": 10
+    },
+    "value": {
+      "start": 11,
+      "end": 25
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <a href="javascript:alert('yo');">hi</a>
+  </script>
+  <div class="js">Slowparse.findError({{HTML}}, [TreeInspectors.forbidJS]);</div>
+  <script type="application/json">
+  {
+    "type": "JAVASCRIPT_URL_NOT_ALLOWED",
+    "name": {
+      "start": 3,
+      "end": 7
+    },
+    "value": {
+      "start": 8,
+      "end": 33
+    }
+  }
+  </script>
+</div>
+
+
 <script src="jquery.min.js"></script>
 <script src="underscore.min.js"></script>
+<script src="load-many.jquery.js"></script>
 <script src="../slowparse.js"></script>
+<script src="../tree-inspectors.js"></script>
 <script src="spec.js"></script>

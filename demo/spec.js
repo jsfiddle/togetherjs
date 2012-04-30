@@ -56,19 +56,28 @@ function refreshAnchor() {
 }
 
 $(window).ready(function() {
-  $("#templates .error-msgs").load("errors.base.html", function() {
+  $("#templates .error-msgs").loadMany([
+    "errors.base.html",
+    "errors.forbidjs.html"
+  ], function() {
     $('div.test').each(function() {
       var badHtmlElement = $('script[type="text/x-bad-html"]', this);
+
+      if (badHtmlElement.length == 0)
+        badHtmlElement = $('div.bad-html', this);
+      
       var badHtml = badHtmlElement.text().trim();
       var t = $("#templates .report").clone();
-      var js = $(".js > div:first-child", t).text();
+      var js = $('div.js', this).hide().text().trim();
       var error;
 
+      if (!js)
+        js = $(".js > div:first-child", t).text();
       js = js.replace("{{HTML}}", JSON.stringify(badHtml));
       $(".js > div:first-child", t).text(js);
       $(".html", t).text(badHtml);
       try {
-        error = Slowparse.HTML(document, badHtml).error;
+        error = eval(js);
       } catch (e) {
         $(this).addClass("failed");
         $("h2", t).text("");
