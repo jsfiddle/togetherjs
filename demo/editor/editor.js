@@ -32,11 +32,6 @@ var helpIndex = [];
 // highlighting.
 var cursorHelpMarks = [];
 
-// Use mustache-style templating.
-_.templateSettings = {
-  escape: /\{\{(.+?)\}\}/g
-};
-
 // Select the given {start,end} interval in the editor.
 function selectInterval(interval) {
   var start = editor.coordsFromIndex(interval.start);

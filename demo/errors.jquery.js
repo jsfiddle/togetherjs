@@ -1,6 +1,9 @@
 (function(jQuery, _) {
   var $ = jQuery;
   var errors = $();
+  var mustacheSettings = {
+    escape: /\{\{(.+?)\}\}/g
+  };
   
   jQuery.extend({
     loadErrors: function(basePath, names, cb) {
@@ -27,7 +30,7 @@
     },
     fillError: function(error) {
       var template = $(".error-msg." + error.type, errors);
-      this.html(_.template(template.html(), error)).show();
+      this.html(_.template(template.html(), error, mustacheSettings)).show();
       return this;
     },
     // This is like jQuery.load(), but it loads the content of multiple

@@ -1,7 +1,3 @@
-_.templateSettings = {
-  escape: /\{\{(.+?)\}\}/g
-};
-
 jQuery.fn.extend({
   showHighlights: function(source) {
     function sourceText(interval) {

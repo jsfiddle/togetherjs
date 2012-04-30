@@ -82,10 +82,6 @@ textarea.html {
 <script>
 var editor;
 
-_.templateSettings = {
-  escape: /\{\{(.+?)\}\}/g
-};
-
 function selectInterval(interval) {
   var start = editor.coordsFromIndex(interval.start);
   var end = editor.coordsFromIndex(interval.end);
