@@ -1,4 +1,10 @@
 jQuery.fn.extend({
+  // Take the given element containing plain-text source code and
+  // rewrite it to highlight the spans mentioned in the data-highlight
+  // attributes of elements in the current selection (which is expected to
+  // be a human-readable error message). Also highlight said elements with
+  // the same color, so it's easy for a reader to visually identify what
+  // part of code something in the current selection is referring to.
   showHighlights: function(source) {
     function sourceText(interval) {
       return source.text().slice(interval.start, interval.end);
@@ -41,6 +47,9 @@ jQuery.fn.extend({
   }
 });
 
+// Because the contents of the page are only fully loaded after the
+// browser has processed the URL fragment, we need to "simulate" scrolling
+// to the fragment once we've really finished loading the page.
 function refreshAnchor() {
   var anchor = window.location.hash.slice(1);
   if (anchor) {
@@ -48,6 +57,46 @@ function refreshAnchor() {
     if (anchoredElement)
       anchoredElement.scrollIntoView();
   }
+}
+
+// This function is called by a same-origin parent window that is supposedly
+// running a test suite. It delegates the testing of the verification of
+// our spec to this window, and therefore must pass in a number of
+// QUnit globals.
+function runTests(module, test, ok, deepEqual, cb) {
+  function safeParse(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function testSpec() {
+    module("Specification correctness");
+    $('div.test').each(function() {
+      var isFailed = $(this).hasClass("failed");
+      var actualJson = $(".result", this).text();
+      var expectedJson = $('script[type="application/json"]', this).text();
+      test($("h2", this).attr("id") + " error type", function() {
+        ok(!isFailed, "error type specification did not fail to execute");
+        expectedJson = safeParse(expectedJson);
+        ok(expectedJson, "expectedJson is valid JSON");
+        actualJson = safeParse(actualJson);
+        ok(actualJson, "actualJson is valid JSON");
+        deepEqual(actualJson, expectedJson, "expectedJson == actualJson");
+      });
+    });
+  }
+  
+  var interval = setInterval(function() {
+    if ($("html").hasClass("done-loading")) {
+      ok(true, "<html> has done-loading class");
+      clearInterval(interval);
+      testSpec();
+      cb();
+    }
+  }, 100);
 }
 
 $(window).ready(function() {
