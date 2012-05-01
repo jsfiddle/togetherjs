@@ -1,10 +1,22 @@
+// This jQuery plugin adds functions that make it easy to display
+// friendly tips to a user based on Slowparse errors. For more information
+// on Slowparse errors, see the [error specification][spec].
+//
+//  [spec]: http://toolness.github.com/slowparse/demo/spec.html
+
 (function(jQuery) {
   var $ = jQuery;
+  
+  // This module variable contains all our error message templates.
   var errors = $();
+  
+  // We want to use "mustache"-style templating, e.g. `hello there {{name}}`.
   var mustacheSettings = {
     escape: /\{\{(.+?)\}\}/g
   };
   
+  // ## Underscore.js Templating
+  //
   // Here we define a subset of [underscore.js][] that includes only
   // `_.escape()` and `_.template()`. This is done to avoid the need for
   // including underscore as a dependency.
@@ -83,7 +95,20 @@
     return _;
   })();
 
+  // ## jQuery Extensions
+  
   jQuery.extend({
+    // `jQuery.loadErrors()` loads a set of error message templates.
+    //
+    // * *basePath* is the relative path containing the error message
+    //   template HTML files.
+    //
+    // * *names* is an array of template files to load. For each `name`
+    //   in this array, the file `errors.name.html` will be loaded from 
+    //   *basePath*.
+    //
+    // * *cb* is a function that will be called once all the templates
+    //   are loaded.
     loadErrors: function(basePath, names, cb) {
       var urls = names.map(function(name) {
         return basePath + "errors." + name + ".html";
@@ -93,12 +118,21 @@
   });
   
   jQuery.fn.extend({
+    // `jQuery.fn.errorHighlightInterval()` returns an object
+    // containing `{start, end}` keys that describe the integral start and
+    // end indexes of a `data-highlight` attribute on the first
+    // element of the current selection.
     errorHighlightInterval: function() {
       var interval = $(this).attr("data-highlight").split(",");
       var start = parseInt(interval[0]);
       var end = interval[1] ? parseInt(interval[1]) : undefined;
       return {start: start, end: end};
     },
+    // `jQuery.fn.eachErrorHighlight()` calls the given callback on
+    // every element with a `data-highlight` attribute in the current
+    // selection. The callback is passed `(start, end, i)` arguments
+    // which represent the integral start and end of the highlight, and
+    // the array index of the element.
     eachErrorHighlight: function(cb) {
       $("[data-highlight]", this).each(function(i) {
         var interval = $(this).errorHighlightInterval();
@@ -106,14 +140,19 @@
       });
       return this;
     },
+    // `jQuery.fn.fillError()` fills the current selection with the
+    // friendly error message for the given error object. For more
+    // information on error objects, see the [error specification][spec].
+    //
+    //   [spec]: http://toolness.github.com/slowparse/demo/spec.html
     fillError: function(error) {
       var template = $(".error-msg." + error.type, errors);
       this.html(_.template(template.html(), error, mustacheSettings)).show();
       return this;
     },
-    // This is like jQuery.load(), but it loads the content of multiple
-    // URLs into the selection, appending their contents in the order
-    // in which they are listed.
+    // `jQuery.fn.loadMany()` is like `jQuery.fn.load()`, but it loads the
+    // content of multiple URLs into the selection, appending their contents
+    // in the order in which they are listed.
     loadMany: function(urls, cb) {
       var self = $(this);
       var loadsLeft = 0;
