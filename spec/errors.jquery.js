@@ -2,7 +2,7 @@
 // friendly tips to a user based on Slowparse errors. For more information
 // on Slowparse errors, see the [error specification][spec].
 //
-//  [spec]: http://toolness.github.com/slowparse/demo/spec.html
+//  [spec]: http://toolness.github.com/slowparse/spec/
 
 (function(jQuery) {
   var $ = jQuery;
@@ -144,7 +144,7 @@
     // friendly error message for the given error object. For more
     // information on error objects, see the [error specification][spec].
     //
-    //   [spec]: http://toolness.github.com/slowparse/demo/spec.html
+    //   [spec]: http://toolness.github.com/slowparse/spec/
     fillError: function(error) {
       var template = $(".error-msg." + error.type, errors);
       this.html(_.template(template.html(), error, mustacheSettings)).show();

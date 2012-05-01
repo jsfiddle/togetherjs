@@ -17,7 +17,7 @@
 // HTML and CSS strings, and will switch between the HTML
 // and CSS parsers while maintaining a single token stream.
 //
-//   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
+//   [error specification]: http://toolness.github.com/slowparse/spec/
 //   [README]: https://github.com/toolness/slowparse#readme
 var Slowparse = (function() {
   // ### Character Entity Parsing
@@ -87,7 +87,7 @@ var Slowparse = (function() {
   // `type` property. For more information on each type of error,
   // see the [error specification][].
   //
-  //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
+  //   [error specification]: http://toolness.github.com/slowparse/spec/
   var ParseErrorBuilders = {
     /* Create a new object that has the properties of both arguments
      * and return it. */
@@ -1218,7 +1218,7 @@ var Slowparse = (function() {
     // an error object if an error is detected, or `undefined` otherwise.
     // This can be used for further error checking on the parsed document.
     //
-    //   [error specification]: http://toolness.github.com/slowparse/demo/spec.html
+    //   [error specification]: http://toolness.github.com/slowparse/spec/
     HTML: function(document, html, errorDetectors) {
       var stream = new Stream(html),
           domBuilder,

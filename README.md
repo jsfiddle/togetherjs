@@ -23,7 +23,7 @@ For more information, see:
   [X-Ray Goggles]: http://hackasaurus.org/goggles/
   [lovebomb mockups]: http://jessicaklein.blogspot.com/2012/03/iterating-on-bombs.html
   [webmaker tutorials]: http://www.toolness.com/wp/2012/03/webmaker-tutorial-prototyping/
-  [error reporting specification]: http://toolness.github.com/slowparse/demo/spec.html
+  [error reporting specification]: http://toolness.github.com/slowparse/spec/
   [live demo]: http://toolness.github.com/slowparse/demo/
   [slowparse.js]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
   [tree-inspectors.js]: http://labs.toolness.com/temp/slowparse/docs/tree-inspectors.html
