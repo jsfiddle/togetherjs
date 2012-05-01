@@ -17,7 +17,7 @@ function testSpec($, window) {
 
 asyncTest("frame loads", function() {
   var iframe = document.createElement("iframe");
-  iframe.setAttribute("src", "../demo/spec.html");
+  iframe.setAttribute("src", "../spec/index.html");
   document.body.appendChild(iframe);
   iframe.style.display = "none";
   iframe.addEventListener("load", function() {

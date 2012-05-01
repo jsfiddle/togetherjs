@@ -271,7 +271,7 @@ $(window).load(function() {
   var onChangeTimeout;
   
   $(".html").val($("#initial-html").text().trim());
-  jQuery.loadErrors("../", ["base", "forbidjs"], function() {
+  jQuery.loadErrors("../../spec/", ["base", "forbidjs"], function() {
     editor = CodeMirror.fromTextArea($(".html")[0], {
       mode: "text/html",
       theme: "jsbin",

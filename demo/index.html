@@ -67,7 +67,7 @@ textarea.html {
   <aside>If any errors occurred while parsing, they will be shown here. Also see the <a href="spec.html">spec</a>.</aside>
   <div class="error"></div>
 </div>
-<script src="jquery.min.js"></script>
+<script src="../spec/jquery.min.js"></script>
 <script src="codemirror2/lib/codemirror.js"></script>
 <script src="codemirror2/mode/xml/xml.js"></script>
 <script src="codemirror2/mode/javascript/javascript.js"></script>
@@ -77,7 +77,7 @@ textarea.html {
 <script src="utils.js"></script>
 <script src="tag-colors.js"></script>
 <script src="render-dom.js"></script>
-<script src="errors.jquery.js"></script>
+<script src="../spec/errors.jquery.js"></script>
 <script>
 var editor;
 
@@ -160,7 +160,7 @@ $(document).on("mouseover", "[data-highlight]", function(event) {
 });
 
 $(window).ready(function() {
-  jQuery.loadErrors("", ["base"], function() {
+  jQuery.loadErrors("../spec/", ["base"], function() {
     function onChange() {
       processHTML(editor.getValue());
     }
