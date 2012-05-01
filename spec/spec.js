@@ -86,16 +86,20 @@ $(window).ready(function() {
       
       expectedErrorType = expectedErrorType || error.type;
       $("h2", t).text(expectedErrorType).attr("id", expectedErrorType);
-      $(".result", t).text(JSON.stringify(error, null, "  "));
 
       var errMsg = $(".error", t);
       try {
         errMsg.fillError(error);
       } catch (e) {
+        $(this).addClass("failed");
         errMsg.text("ERROR: " + e.message);
       }
       errMsg.showHighlights($(".html", t));
       badHtmlElement.replaceWith(t);
+      
+      // Set the result last, as this effectively tells the test
+      // suite that this test didn't throw an exception.
+      $(".result", t).text(JSON.stringify(error, null, "  "));
     });
     refreshAnchor();
     $("html").addClass("done-loading");

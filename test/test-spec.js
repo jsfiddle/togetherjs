@@ -1,14 +1,24 @@
 module("Specification loading");
 
 function testSpec($, window) {
+  function safeParse(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
+
   module("Specification correctness");
   $('div.test').each(function() {
+    var isFailed = $(this).hasClass("failed");
     var actualJson = $(".result", this).text();
     var expectedJson = $('script[type="application/json"]', this).text();
     test($("h2", this).attr("id") + " error type", function() {
-      expectedJson = JSON.parse(expectedJson);
+      ok(!isFailed, "error type specification did not fail to execute");
+      expectedJson = safeParse(expectedJson);
       ok(expectedJson, "expectedJson is valid JSON");
-      actualJson = JSON.parse(actualJson);
+      actualJson = safeParse(actualJson);
       ok(actualJson, "actualJson is valid JSON");
       deepEqual(actualJson, expectedJson, "expectedJson matches actualJson");
     });
