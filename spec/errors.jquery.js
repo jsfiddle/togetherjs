@@ -2,7 +2,10 @@
 // friendly tips to a user based on Slowparse errors. For more information
 // on Slowparse errors, see the [error specification][spec].
 //
+// For examples of this plugin in use, consult its [test suite][].
+//
 //  [spec]: http://toolness.github.com/slowparse/spec/
+//  [test suite]: https://github.com/toolness/slowparse/blob/gh-pages/test/test-errors.jquery.js
 
 (function(jQuery) {
   var $ = jQuery;
@@ -95,11 +98,12 @@
   // ## jQuery Extensions
   
   jQuery.extend({
-    // `jQuery.errorTemplates` is a selection that contains all our error
+    // **jQuery.errorTemplates** is a selection that contains all our error
     // message templates.
     
     errorTemplates: $(),
-    // `jQuery.loadErrors()` loads a set of error message templates.
+    // **jQuery.loadErrors(*basePath*, *names*, *cb*)** loads a set of error
+    // message templates.
     //
     // * *basePath* is the relative path containing the error message
     //   template HTML files.
@@ -129,7 +133,7 @@
   });
   
   jQuery.fn.extend({
-    // `jQuery.fn.errorHighlightInterval()` returns an object
+    // **jQuery.fn.errorHighlightInterval()** returns an object
     // containing `{start, end}` keys that describe the integral start and
     // end indexes of a `data-highlight` attribute on the first
     // element of the current selection.
@@ -140,7 +144,7 @@
       return {start: start, end: end};
     },
     
-    // `jQuery.fn.eachErrorHighlight()` calls the given callback on
+    // **jQuery.fn.eachErrorHighlight(*cb*)** calls the given callback on
     // every element with a `data-highlight` attribute in the current
     // selection. The callback is passed `(start, end, i)` arguments
     // which represent the integral start and end of the highlight, and
@@ -153,7 +157,7 @@
       return this;
     },
     
-    // `jQuery.fn.fillError()` fills the current selection with the
+    // **jQuery.fn.fillError(*error* [, *templates*])** fills the current selection with the
     // friendly error message for the given error object. For more
     // information on error objects, see the [error specification][spec].
     //
