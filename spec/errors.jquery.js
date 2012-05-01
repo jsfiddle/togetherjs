@@ -7,9 +7,6 @@
 (function(jQuery) {
   var $ = jQuery;
   
-  // This module variable contains all our error message templates.
-  var errors = $();
-  
   // We want to use "mustache"-style templating, e.g. `hello there {{name}}`.
   var mustacheSettings = {
     escape: /\{\{(.+?)\}\}/g
@@ -98,6 +95,10 @@
   // ## jQuery Extensions
   
   jQuery.extend({
+    // `jQuery.errorTemplates` is a selection that contains all our error
+    // message templates.
+    
+    errorTemplates: $(),
     // `jQuery.loadErrors()` loads a set of error message templates.
     //
     // * *basePath* is the relative path containing the error message
@@ -108,12 +109,22 @@
     //   *basePath*.
     //
     // * *cb* is a function that will be called once all the templates
-    //   are loaded.
+    //   are loaded. Its first argument will be null only if no errors
+    //   occurred.
     loadErrors: function(basePath, names, cb) {
-      var urls = names.map(function(name) {
-        return basePath + "errors." + name + ".html";
+      var reqs = names.map(function(name) {
+        var url = basePath + "errors." + name + ".html";
+        return jQuery.get(url);
       });
-      errors = $('<div></div>').loadMany(urls, cb);
+      jQuery.when.apply(jQuery, reqs).then(function() {
+        reqs.forEach(function(req) {
+          var div = $('<div></div>').html(req.responseText);
+          $.errorTemplates = $.errorTemplates.add($(".error-msg", div));
+        });
+        cb(null);
+      }, function() {
+        cb("ERROR: At least one template file did not load.");
+      });
     }
   });
   
@@ -128,6 +139,7 @@
       var end = interval[1] ? parseInt(interval[1]) : undefined;
       return {start: start, end: end};
     },
+    
     // `jQuery.fn.eachErrorHighlight()` calls the given callback on
     // every element with a `data-highlight` attribute in the current
     // selection. The callback is passed `(start, end, i)` arguments
@@ -140,36 +152,23 @@
       });
       return this;
     },
+    
     // `jQuery.fn.fillError()` fills the current selection with the
     // friendly error message for the given error object. For more
     // information on error objects, see the [error specification][spec].
     //
+    // Optionally, a second argument containing a selection of all
+    // available error templates can be provided. If not present, the
+    // global selection of templates from `jQuery.errorTemplates` will
+    // be used.
+    //
     //   [spec]: http://toolness.github.com/slowparse/spec/
-    fillError: function(error) {
-      var template = $(".error-msg." + error.type, errors);
+    fillError: function(error, templates) {
+      var selector = ".error-msg." + error.type;
+      var template = (templates || $.errorTemplates).filter(selector);
       if (template.length == 0)
         throw new Error("Error template not found for " + error.type);
       this.html(_.template(template.html(), error, mustacheSettings)).show();
-      return this;
-    },
-    // `jQuery.fn.loadMany()` is like `jQuery.fn.load()`, but it loads the
-    // content of multiple URLs into the selection, appending their contents
-    // in the order in which they are listed.
-    loadMany: function(urls, cb) {
-      var self = $(this);
-      var loadsLeft = 0;
-      var divs = $();
-      urls.forEach(function(url) {
-        var div = $('<div></div>');
-        divs = divs.add(div);
-        div.load(url, function() {
-          if (--loadsLeft == 0) {
-            self.append(divs);
-            cb.apply(this, []);
-          }
-        });
-        loadsLeft++;
-      });
       return this;
     }
   });
