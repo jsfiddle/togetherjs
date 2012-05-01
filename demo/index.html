@@ -150,7 +150,7 @@ function processHTML(html) {
     try {
       $(".error").fillError(result.error);
     } catch (e) {
-      $(".error").text(result.error.type);
+      $(".error").text(e.message);
     }
   }
 }

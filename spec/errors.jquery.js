@@ -147,6 +147,8 @@
     //   [spec]: http://toolness.github.com/slowparse/spec/
     fillError: function(error) {
       var template = $(".error-msg." + error.type, errors);
+      if (template.length == 0)
+        throw new Error("Error template not found for " + error.type);
       this.html(_.template(template.html(), error, mustacheSettings)).show();
       return this;
     },

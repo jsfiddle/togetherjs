@@ -92,7 +92,7 @@ $(window).ready(function() {
       try {
         errMsg.fillError(error);
       } catch (e) {
-        errMsg.text("ERROR: No error message available.");
+        errMsg.text("ERROR: " + e.message);
       }
       errMsg.showHighlights($(".html", t));
       badHtmlElement.replaceWith(t);
