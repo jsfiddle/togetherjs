@@ -85,7 +85,7 @@ There are two ways to run a sharejs server:
           connect.static(__dirname + '/my_html_files')
         );
 
-    var options = {db: {type: 'memory'}}; // See docs for options. {type: 'redis'} to enable persistance.
+    var options = {db: {type: 'none'}}; // See docs for options. {type: 'redis'} to enable persistance.
 
     // Attach the sharejs REST and Socket.io interfaces to the server
     sharejs.attach(server, options);
