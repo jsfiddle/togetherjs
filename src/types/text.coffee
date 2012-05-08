@@ -127,7 +127,8 @@ transformPosition = (pos, c, insertAfter) ->
 #
 # Like transformPosition above, if c is an insert, insertAfter specifies whether the cursor position
 # is pushed after an insert (true) or before it (false).
-text.transformCursor = (position, op, insertAfter) ->
+text.transformCursor = (position, op, side) ->
+  insertAfter = side == 'right'
   position = transformPosition position, c, insertAfter for c in op
   position
 
@@ -135,12 +136,12 @@ text.transformCursor = (position, op, insertAfter) ->
 # The result will be appended to destination.
 #
 # exported for use in JSON type
-text._tc = transformComponent = (dest, c, otherC, type) ->
+text._tc = transformComponent = (dest, c, otherC, side) ->
   checkValidOp [c]
   checkValidOp [otherC]
 
   if c.i?
-    append dest, {i:c.i, p:transformPosition(c.p, otherC, type == 'right')}
+    append dest, {i:c.i, p:transformPosition(c.p, otherC, side == 'right')}
 
   else # Delete
     if otherC.i? # delete vs insert

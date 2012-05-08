@@ -112,27 +112,27 @@ genTests = (type) ->
 
   transformCursor:
     'sanity': (test) ->
-      test.strictEqual 0, type.transformCursor 0, [], true
-      test.strictEqual 0, type.transformCursor 0, [], false
+      test.strictEqual 0, type.transformCursor 0, [], 'right'
+      test.strictEqual 0, type.transformCursor 0, [], 'left'
       test.strictEqual 100, type.transformCursor 100, []
 
       test.done()
 
     'vs insert': (test) ->
-      test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], true
-      test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], false
+      test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], 'right'
+      test.strictEqual 0, type.transformCursor 0, [{i:'asdf', p:100}], 'left'
 
-      test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], true
-      test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], false
+      test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], 'right'
+      test.strictEqual 204, type.transformCursor 200, [{i:'asdf', p:100}], 'left'
 
-      test.strictEqual 104, type.transformCursor 100, [{i:'asdf', p:100}], true
-      test.strictEqual 100, type.transformCursor 100, [{i:'asdf', p:100}], false
+      test.strictEqual 104, type.transformCursor 100, [{i:'asdf', p:100}], 'right'
+      test.strictEqual 100, type.transformCursor 100, [{i:'asdf', p:100}], 'left'
       
       test.done()
 
     'vs delete': (test) ->
-      test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], true
-      test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], false
+      test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], 'right'
+      test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}], 'left'
       test.strictEqual 0, type.transformCursor 0, [{d:'asdf', p:100}]
 
       test.strictEqual 196, type.transformCursor 200, [{d:'asdf', p:100}]
