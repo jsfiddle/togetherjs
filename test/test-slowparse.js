@@ -14,6 +14,11 @@ test("Stream.match()", function() {
   equal(stream.pos, 7);
 });
 
+test("Stream.eat() works at EOF", function() {
+  var stream = new Slowparse.Stream("");
+  ok(!stream.eat(/blah/));
+});
+
 test("parsing of valid DOCTYPE", function() {
   var html = '<!DOCTYPE html><p>hi</p>';
   var doc = parseWithoutErrors(html);
@@ -368,6 +373,11 @@ test("parsing of attr content w/ HTML entities", function() {
   assertParseIntervals(html, attrNode, "attr", {
     'parseInfo.value': '"1 &lt; 2 &LT; 3"',
   });
+});
+
+test("INVALID_TAG_NAME raised by < at EOF", function() {
+  var error = Slowparse.HTML(document, '<').error;
+  equal(error.type, "INVALID_TAG_NAME");
 });
 
 test("MISSING_CSS_SELECTOR works after comment", function() {

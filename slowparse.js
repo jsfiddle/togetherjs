@@ -337,7 +337,7 @@ var Slowparse = (function() {
     // the stream matches the given argument, it is consumed and returned.
     // Otherwise, `undefined` is returned.
     eat: function(match) {
-      if (this.peek().match(match))
+      if (!this.end() && this.peek().match(match))
         return this.next();
     },
     // `Stream.eatWhile()` repeatedly calls `eat()` with the given argument,
