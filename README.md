@@ -1,6 +1,11 @@
 Tow Truck - Who you call when you get stuck
 ===========================================
 
+Introduction
+------------
+
+You can see a screencast of TowTruck in action here: https://vimeo.com/36754286
+
 Installation
 ------------
 
