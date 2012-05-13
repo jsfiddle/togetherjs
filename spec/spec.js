@@ -1,3 +1,5 @@
+"use strict";
+
 jQuery.fn.extend({
   // Take the given element containing plain-text source code and
   // rewrite it to highlight the spans mentioned in the data-highlight

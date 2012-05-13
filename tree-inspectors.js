@@ -1,3 +1,5 @@
+"use strict";
+
 // `TreeInspectors` contains functions that inspect a document
 // fragment and report interesting things about it.
 //

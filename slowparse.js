@@ -1,3 +1,5 @@
+"use strict";
+
 // Slowparse is a token stream parser for HTML and CSS text,
 // recording regions of interest during the parse run and
 // signaling any errors detected accompanied by relevant
@@ -199,15 +201,6 @@ var Slowparse = (function() {
       };
     },
     // These are CSS errors.
-    INVALID_CSS_PROPERTY_NAME: function(parser, start, end, property) {
-      return {
-        cssProperty: {
-          start: start,
-          end: end,
-          property: property
-        }
-      };
-    },
     MISSING_CSS_SELECTOR: function(parser, start, end) {
       return {
         cssBlock: {
@@ -746,7 +739,7 @@ var Slowparse = (function() {
                              selectorStart + selector.length, selector);
       }
 
-      var property = token.value.trim();
+      var property = token.value.trim(),
           propertyStart = token.interval.start,
           propertyEnd = propertyStart + property.length;
 

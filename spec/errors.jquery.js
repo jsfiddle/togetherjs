@@ -1,3 +1,5 @@
+"use strict";
+
 // This jQuery plugin adds functions that make it easy to display
 // friendly tips to a user based on Slowparse errors. For more information
 // on Slowparse errors, see the [error specification][spec].
