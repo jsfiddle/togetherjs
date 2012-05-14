@@ -281,6 +281,78 @@ h1.error-category {
 </div>
 <div class="test">
   <script type="text/x-bad-html">
+    hello <em class='foo>there</em>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNTERMINATED_ATTR_VALUE",
+    "openTag": {
+      "name": "em",
+      "start": 6
+    },
+    "attribute": {
+      "name": {
+        "value": "class",
+        "start": 10,
+        "end": 15
+      },
+      "value": {
+        "start": 16
+      }
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    hello <em class="foo'>there</em>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNTERMINATED_ATTR_VALUE",
+    "openTag": {
+      "name": "em",
+      "start": 6
+    },
+    "attribute": {
+      "name": {
+        "value": "class",
+        "start": 10,
+        "end": 15
+      },
+      "value": {
+        "start": 16
+      }
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    hello <em class='foo">there</em>
+  </script>
+  <script type="application/json">
+  {
+    "type": "UNTERMINATED_ATTR_VALUE",
+    "openTag": {
+      "name": "em",
+      "start": 6
+    },
+    "attribute": {
+      "name": {
+        "value": "class",
+        "start": 10,
+        "end": 15
+      },
+      "value": {
+        "start": 16
+      }
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
     hi<!--blah
   </script>
   <script type="application/json">

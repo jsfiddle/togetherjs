@@ -28,6 +28,7 @@ var Slowparse = (function() {
   var CHARACTER_ENTITY_REFS = {
     lt: "<",
     gt: ">",
+    apos: "'",
     quot: '"',
     amp: "&"
   };
@@ -1101,11 +1102,18 @@ var Slowparse = (function() {
         // though the HTML5 standard allows them to sometimes go unquoted.
         this.stream.eatSpace();
         this.stream.makeToken();
-        if (this.stream.next() != '"')
+        var quoteType = this.stream.next();
+        if (quoteType !== '"' && quoteType !== "'") {
           throw new ParseError("UNQUOTED_ATTR_VALUE", this);
-        this.stream.eatWhile(/[^"]/);
-        if (this.stream.next() != '"')
+        }
+        if (quoteType === '"') {
+          this.stream.eatWhile(/[^"]/);
+        } else {
+          this.stream.eatWhile(/[^']/);
+        }
+        if (this.stream.next() !== quoteType) {
           throw new ParseError("UNTERMINATED_ATTR_VALUE", this, nameTok);
+        }
         var valueTok = this.stream.makeToken();
         var unquotedValue = replaceEntityRefs(valueTok.value.slice(1, -1));
         this.domBuilder.attribute(nameTok.value, unquotedValue, {
