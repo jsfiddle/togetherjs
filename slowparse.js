@@ -751,8 +751,14 @@ var Slowparse = (function() {
       }
 
       var next = this.stream.next(),
-          errorMsg = "[_parseProperty] Expected }, <, ; or :, " +
+          errorMsg = "[_parseProperty] Expected }, {, <, ; or :, " +
                      "instead found " + next;
+
+      if (next === '{') {
+        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart,
+                             propertyStart, selector);
+      }
+
 
       if ((this.stream.end() && next !== ':') || next === '<' ||
           next === '}') {
@@ -788,10 +794,6 @@ var Slowparse = (function() {
       else if (next === ';') {
         throw new ParseError("MISSING_CSS_VALUE", this, propertyStart,
                              propertyEnd, property);
-      }
-      else if (next === '{') {
-        throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart,
-                             propertyStart, selector);
       }
       else {
         throw new ParseError("UNCAUGHT_CSS_PARSE_ERROR", this,
