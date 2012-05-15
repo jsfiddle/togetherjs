@@ -71,6 +71,12 @@ a {
   color: inherit;
 }
 
+.test {
+  margin-top: 3em;
+  border-left: 1px solid black;
+  padding-left: 0.5em;
+}
+
 .test.failed, .test.failed .html {
   background: firebrick;
 }
@@ -479,6 +485,21 @@ h1.error-category {
     "cssBlock": {
       "start": 24,
       "end": 25
+    }
+  }
+  </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <style> a { li {
+  </script>
+  <script type="application/json">
+  {
+    "type": "MISSING_CSS_BLOCK_CLOSER",
+    "cssValue": {
+      "start": 8,
+      "end": 12,
+      "value": "a"
     }
   }
   </script>
