@@ -8,6 +8,7 @@ createDb = require './db'
 rest = require './rest'
 socketio = require './socketio'
 browserChannel = require './browserchannel'
+sockjs = require './sockjs'
 
 # Create an HTTP server and attach whatever frontends are specified in the options.
 #
@@ -46,6 +47,9 @@ create.attach = attach = (server, options, model = createModel(options)) ->
 
   # Socketio frontend is now disabled by default.
   socketio.attach(server, createAgent, options.socketio or {}) if options.socketio?
+
+  # SockJS frontend is disabled by default
+  sockjs.attach(server, createAgent, options.sockjs or {}) if options.sockjs?
 
   if options.browserChannel != null
     options.browserChannel ?= {}

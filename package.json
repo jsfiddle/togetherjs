@@ -11,6 +11,7 @@
     "sharejs-exampleserver": "bin/exampleserver"
   },
   "dependencies": {
+    "sockjs": ">= 0.3.1",
     "socket.io": "~0.8",
     "socket.io-client": "~0.8",
     "connect": ">= 1.1.1 < 2.0.0",
