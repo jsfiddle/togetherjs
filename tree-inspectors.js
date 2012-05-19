@@ -5,6 +5,11 @@
 //
 // This library has no required dependencies, though optional Slowparse
 // integration is included.
+//
+// If [RequireJS] is detected, this file is defined as a module via
+// `define()`. Otherwise, a global called `TreeInspectors` is exposed.
+//
+//   [RequireJS]: http://requirejs.org/
 var TreeInspectors = (function() {
   // ## Utility Functions
   var utils = {
@@ -77,5 +82,8 @@ var TreeInspectors = (function() {
     }
   };
   
-  return TreeInspectors;
+  if (typeof(define) == "function") {
+    define(function() { return TreeInspectors; });
+  } else
+    return TreeInspectors;
 })();

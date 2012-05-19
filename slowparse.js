@@ -13,12 +13,16 @@
 // For more information on the rationale behind Slowparse, as
 // well as its design goals, see the [README][].
 //
+// If [RequireJS] is detected, this file is defined as a module via
+// `define()`. Otherwise, a global called `Slowparse` is exposed.
+//
 // ## Implementation
 //
 // Slowparse is effectively a finite state machine for
 // HTML and CSS strings, and will switch between the HTML
 // and CSS parsers while maintaining a single token stream.
 //
+//   [RequireJS]: http://requirejs.org/
 //   [error specification]: http://toolness.github.com/slowparse/spec/
 //   [README]: https://github.com/toolness/slowparse#readme
 var Slowparse = (function() {
@@ -1260,5 +1264,8 @@ var Slowparse = (function() {
     }
   };
 
-  return Slowparse;
+  if (typeof(define) == "function") {
+    define(function() { return Slowparse; });
+  } else
+    return Slowparse;
 })();
