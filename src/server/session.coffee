@@ -30,13 +30,12 @@ syncQueue = require './syncqueue'
 #   headers
 #   address
 #   abort()
-#   end()
+#   stop()
 #   ready()
 #   send(msg)
 #   removeListener()
 #   on(event, handler) - where event can be 'message' or 'closed'
-exports.handler = (session, createAgent) =>
-
+exports.handler = (session, createAgent) ->
     data =
       headers: session.headers
       remoteAddress: session.address
@@ -56,7 +55,6 @@ exports.handler = (session, createAgent) =>
 
     # We'll only handle one message from each client at a time.
     handleMessage = (query) ->
-      query = JSON.parse(query) if typeof query is 'string'
 
       error = null
       error = 'Invalid docName' unless query.doc is null or typeof query.doc is 'string' or (query.doc is undefined and lastReceivedDoc)
@@ -80,7 +78,7 @@ exports.handler = (session, createAgent) =>
         unless lastReceivedDoc
           console.warn "msg.doc missing in query #{query} from #{agent.sessionId}"
         # The disconnect handler will be called when we do this, which will clean up the open docs.
-          return con.close()
+          return session.abort()
 
         query.doc = lastReceivedDoc
 
@@ -124,6 +122,7 @@ exports.handler = (session, createAgent) =>
       else
         lastSentDoc = response.doc
 
+      
       # Its invalid to send a message to a closed session. We'll silently drop messages if the
       # session has closed.
       if session.ready()
@@ -160,7 +159,7 @@ exports.handler = (session, createAgent) =>
     # Close the named document.
     # callback([error])
     close = (docName, callback) ->
-                #p "Closing #{docName}"
+      #p "Closing #{docName}"
       return callback 'Session closed' unless docState
       listener = docState[docName].listener
       return callback 'Doc already closed' unless listener?
@@ -231,7 +230,7 @@ exports.handler = (session, createAgent) =>
                           #        if query.create or query.open or query.snapshot == null
                           #          msg.meta = docData.meta
 
-                          # Skip inserting a snapshot if the document was just created.
+        # Skip inserting a snapshot if the document was just created.
         if query.snapshot != null or msg.create == true
           step3Open()
           return
@@ -287,8 +286,8 @@ exports.handler = (session, createAgent) =>
 
     # We received an op from the socket
     handleOp = (query, callback) ->
-                   # ...
-                   #throw new Error 'No version specified' unless query.v?
+      # ...
+      #throw new Error 'No version specified' unless query.v?
 
       opData = {v:query.v, op:query.op, meta:query.meta, dupIfSource:query.dupIfSource}
 
@@ -306,15 +305,13 @@ exports.handler = (session, createAgent) =>
     # We don't process any messages from the agent until they've authorized. Instead,
     # they are stored in this buffer.
     buffer = []
-    bufferMsg = (msg) -> buffer.push msg
-
-    session.on 'message', bufferMsg
+    session.on 'message', bufferMsg = (msg) -> buffer.push msg
 
     createAgent data, (error, agent_) ->
       if error
-          # The client is not authorized, so they shouldn't try and reconnect.
+        # The client is not authorized, so they shouldn't try and reconnect.
         session.send {auth:null, error}
-        session.end()
+        session.stop()
       else
         agent = agent_
         session.send auth:agent.sessionId

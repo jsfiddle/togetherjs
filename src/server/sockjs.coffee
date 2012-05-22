@@ -5,6 +5,7 @@ sessionHandler = require('./session').handler
 
 wrapSession = (conn) ->
   conn.abort = -> @close()
+  conn.stop = -> @end()
   conn.send = (response) -> @write JSON.stringify(response)
   conn.ready = -> @readyState is 1
   conn.on 'data', (data) -> @emit 'message', JSON.parse(data) 
