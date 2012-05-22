@@ -33,15 +33,15 @@ defaultOptions =
 
 module.exports = PgDb = (options) ->
   return new Db if !(this instanceof PgDb)
-  
+
   options ?= {}
   options[k] ?= v for k, v of defaultOptions
-  
+
   client = new pg.Client options.uri
   client.connect()
 
-  snapshot_table = "#{options.schema}.#{options.snapshot_table}"
-  operations_table = "#{options.schema}.#{options.operations_table}"
+  snapshot_table = options.schema and "#{options.schema}.#{options.snapshot_table}" or options.snapshot_table
+  operations_table = options.schema and "#{options.schema}.#{options.operations_table}" or options.operations_table
 
   @close = ->
     client.end()
@@ -196,4 +196,3 @@ module.exports = PgDb = (options) ->
       @initialize() if error?.message.match "does not exist"
 
   this
-
