@@ -71,6 +71,18 @@ test("parsing of elements with boolean attributes", function() {
   doc = parseWithoutErrors(html);
   var attr1 = doc.childNodes[0].attributes[0];
   var attr2 = doc.childNodes[0].attributes[1];
+  
+  // Apparently NamedNodeMap entries are not in any particular order:
+  // https://developer.mozilla.org/en/DOM/NamedNodeMap
+  // 
+  // So, we'll swap these values if they're not in the order we expect
+  // them to be in, which is the case in IE9, at the very least.
+  if (attr1.nodeName == 'class') {
+    var temp = attr1;
+    attr1 = attr2;
+    attr2 = temp;
+  }
+  
   equal(attr1.nodeName, 'href');
   equal(attr1.nodeValue, '');
   equal(attr2.nodeName, 'class');
