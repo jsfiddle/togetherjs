@@ -23,7 +23,8 @@
     "hat": "*"
   },
   "devDependencies": {
-    "nodeunit": "*"
+    "nodeunit": "*",
+    "websocket": "*"
   },
   "engine": "node >= 0.4.4",
   "scripts": {

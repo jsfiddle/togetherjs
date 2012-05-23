@@ -8,7 +8,8 @@ wrapSession = (conn) ->
   conn.stop = -> @end()
   conn.send = (response) -> @write JSON.stringify(response)
   conn.ready = -> @readyState is 1
-  conn.on 'data', (data) -> @emit 'message', JSON.parse(data) 
+  conn.on 'data', (data) -> @emit 'message', JSON.parse(data)
+  conn.address = conn.remoteAddress
   conn
 
 
