@@ -20,7 +20,6 @@ else
   Doc = require('./doc').Doc
 
 class Connection
-
   constructor: (host) ->
     # Map of docname -> doc
     @docs = {}
@@ -53,31 +52,35 @@ class Connection
         return
 
       docName = msg.doc
+
       if docName isnt undefined
         @lastReceivedDoc = docName
       else
         msg.doc = docName = @lastReceivedDoc
 
       if @docs[docName]
-
         @docs[docName]._onMessage msg
       else
         console?.error 'Unhandled message', msg
 
     @connected = false
     @socket.onclose = (reason) =>
+      #console.warn 'onclose', reason
       @setState 'disconnected', reason
       if reason in ['Closed', 'Stopped by server']
         @setState 'stopped', @lastError or reason
 
     @socket.onerror = (e) =>
+      #console.warn 'onerror', e
       @emit 'error', e
 
     @socket.onopen = =>
+      #console.warn 'onopen'
       @lastError = @lastReceivedDoc = @lastSentDoc = null
       @setState 'handshaking'
 
     @socket.onconnecting = =>
+      #console.warn 'connecting'
       @setState 'connecting'
 
   setState: (state, data) ->
@@ -100,7 +103,7 @@ class Connection
     else
       @lastSentDoc = docName
 
-	#console.warn 'c->s', data
+    #console.warn 'c->s', data
     data = JSON.stringify(data) if useSockJS?
     @socket.send data
 
@@ -115,6 +118,7 @@ class Connection
     throw new Error("Doc #{name} already open") if @docs[name]
     doc = new Doc(@, name, data)
     @docs[name] = doc
+
     doc.open (error) =>
       delete @docs[name] if error
       callback error, (doc unless error)
@@ -132,7 +136,6 @@ class Connection
   # Types must be supported by the server.
   # callback(error, doc)
   open: (docName, type, callback) ->
-
     return callback 'connection closed' if @state is 'stopped'
 
     # Wait for the connection to open
