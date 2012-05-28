@@ -325,7 +325,6 @@ testStyleSheet("parsing of CSS rule w/ vendor prefixes",
     });
 });
 
-
 test("replaceEntityRefs", function() {
   [
     ["&lt;", "<"],

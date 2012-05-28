@@ -299,6 +299,14 @@ var Slowparse = (function() {
       return {
         start: start
       };
+    },
+    HTML_CODE_IN_CSS_BLOCK: function(parser, start, end) {
+      return {
+        html: {
+          start: start,
+          end: end
+        }
+      }
     }
   };
   
@@ -319,6 +327,11 @@ var Slowparse = (function() {
     // advancing it. It will return `undefined` at the end of the text.
     peek: function() {
       return this.text[this.pos];
+    },
+    // `Stream.substream(len)` returns a substream from the stream
+    // without advancing it, with length `len`.
+    substream: function(len) {
+      return this.text.substring(this.pos, this.pos + len);
     },
     // `Stream.next()` returns the next character in the stream and advances
     // it. It also returns `undefined` when no more characters are available.
@@ -620,6 +633,11 @@ var Slowparse = (function() {
       // or an error occurred.
       if (token === null) {
         if (!this.stream.end() && this.stream.peek() === '<') {
+          // if this is the start of <!-- make sure to throw an error
+          if (this.stream.substream(2) !== "</") {
+            throw new ParseError("HTML_CODE_IN_CSS_BLOCK", this, this.stream.pos-1,
+                                 this.stream.pos);
+          }
           return;
         }
         throw new ParseError("MISSING_CSS_SELECTOR", this, this.stream.pos-1,

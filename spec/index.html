@@ -504,6 +504,40 @@ h1.error-category {
   }
   </script>
 </div>
+
+<div class="test">
+  <script type="text/x-bad-html">
+    <style>
+      <!-- html comment in CSS block -->
+    </style>
+  </script>
+  <script type="application/json">
+  {
+    "type": "HTML_CODE_IN_CSS_BLOCK",
+    "html": {
+      "start": 13,
+      "end": 14
+    }
+  }
+    </script>
+</div>
+<div class="test">
+  <script type="text/x-bad-html">
+    <style>
+      <p>html code in CSS block</p>
+    </style>
+  </script>
+  <script type="application/json">
+  {
+    "type": "HTML_CODE_IN_CSS_BLOCK",
+    "html": {
+      "start": 13,
+      "end": 14
+    }
+  }
+  </script>
+</div>
+
 <div class="test">
   <script type="text/x-bad-html">
     <style> /* unterminated comment
