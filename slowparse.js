@@ -604,9 +604,9 @@ var Slowparse = (function() {
     },
     // #### CSS Comment Filtering
     //
-    // Here we filter a token so that its value has no CSS comments in it,
-    // and it's start/end points to the token's text with leading and trailing
-    // comments removed.
+    // Here we filter a token so that its start and end positions
+    // point to the content without leading and trailing comments,
+    // with comments in the token.value completely removed.
     filterComments: function(token) {
       var text = token.value,
           tsize = text.length,
@@ -679,8 +679,7 @@ var Slowparse = (function() {
       var selector = token.value,
           selectorStart = token.interval.start,
           selectorEnd = token.interval.end;
-      
-      //selector = this.stripComments(selector, selectorStart).trim();
+
       if (selector === '') {
         this._parseSelector();
         return;
@@ -797,7 +796,6 @@ var Slowparse = (function() {
           propertyStart = token.interval.start,
           propertyEnd = token.interval.end;
 
-      //property = this.stripComments(property, propertyStart).trim();
       if (property === '') {
         this._parseDeclaration(selector, selectorStart);
         return;
@@ -874,12 +872,10 @@ var Slowparse = (function() {
       
       
       this.filterComments(token);
-      //token.value = token.value.trim();
       var value = token.value,
           valueStart = token.interval.start,
           valueEnd = token.interval.end;
 
-      //value = this.stripComments(value, valueStart).trim();
       if (value === '') {
         throw new ParseError("MISSING_CSS_VALUE", this, this.stream.pos-1,
                              this.stream.pos);
