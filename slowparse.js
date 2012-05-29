@@ -600,7 +600,36 @@ var Slowparse = (function() {
           stripped += term[pos];
         }
       }
-      return stripped;
+      return stripped.trim();
+    },
+    // #### CSS Comment Filtering
+    //
+    // Here we filter a token so that its value has no CSS comments in it,
+    // and it's start/end points to the token's text with leading and trailing
+    // comments removed.
+    filterComments: function(token) {
+      var text = token.value,
+          tsize = text.length,
+          ntsize,
+          stripped = this.stripComments(text, token.interval.start);
+      // strip leading comments
+      text = text.replace(/^\s+/,"");
+      text = text.replace(/^\/\*[\w\W]*?\*\/\s*/,'');
+      ntsize = text.length;
+      token.interval.start += tsize - ntsize;
+      // strip trailing comments (=reverse and repeat previous)
+      tsize = ntsize;
+      text = text.split('').reverse().join('');
+      text = text.replace(/^\s+/,"");
+      text = text.replace(/^\/\*[\w\W]*?\*\/\s*/,'');
+      // FIXME: this still fails comments like this: /* ... /* ... */,
+      //        which is a single block. The problems is that in the
+      //        reversed string this looks like /* ... */ ... */ which
+      //        counts as one block plus left-over junk.
+      ntsize = text.length;
+      token.interval.end -= tsize - ntsize;
+      // commit text change
+      token.value = stripped;
     },
     // #### CSS Selector Parsing
     //
@@ -645,12 +674,13 @@ var Slowparse = (function() {
       }
 
       // If we get here, we have a selector string.
-      token.value = token.value.trim();
+      // Filter the token for comments before continueing.
+      this.filterComments(token);
       var selector = token.value,
           selectorStart = token.interval.start,
-          selectorEnd = selectorStart + selector.length;
+          selectorEnd = token.interval.end;
       
-      selector = this.stripComments(selector, selectorStart).trim();
+      //selector = this.stripComments(selector, selectorStart).trim();
       if (selector === '') {
         this._parseSelector();
         return;
@@ -762,11 +792,12 @@ var Slowparse = (function() {
                              selectorStart + selector.length, selector);
       }
 
-      var property = token.value.trim(),
+      this.filterComments(token)
+      var property = token.value,
           propertyStart = token.interval.start,
-          propertyEnd = propertyStart + property.length;
+          propertyEnd = token.interval.end;
 
-      property = this.stripComments(property, propertyStart).trim();
+      //property = this.stripComments(property, propertyStart).trim();
       if (property === '') {
         this._parseDeclaration(selector, selectorStart);
         return;
@@ -840,12 +871,15 @@ var Slowparse = (function() {
 
       var next = (!this.stream.end() ? this.stream.next() : "end of stream"),
           errorMsg = "[_parseValue] Expected }, <, or ;, instead found "+next;
-      token.value = token.value.trim();
+      
+      
+      this.filterComments(token);
+      //token.value = token.value.trim();
       var value = token.value,
           valueStart = token.interval.start,
-          valueEnd = valueStart + value.length;
+          valueEnd = token.interval.end;
 
-      value = this.stripComments(value, valueStart).trim();
+      //value = this.stripComments(value, valueStart).trim();
       if (value === '') {
         throw new ParseError("MISSING_CSS_VALUE", this, this.stream.pos-1,
                              this.stream.pos);
