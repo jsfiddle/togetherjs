@@ -42,6 +42,15 @@ module.exports = {
     // sharejs will automatically try and create the DB tables if they don't exist. You
     // can create the database tables manually using bin/setup_pg.
     //create_tables_automatically: true,
+
+    // To use amazon uncomment this section then run bin/setup_amazon
+    //type: 'amazon',
+    //amazon_region: 'us-east-1',
+    //amazon_access_key: '',
+    //amazon_secret_key: '',
+    //amazon_s3_snapshots_bucket_name: '',
+    //amazon_dynamo_snapshots_table_name: '',
+    //amazon_dynamo_operations_table_name: '',
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
