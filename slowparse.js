@@ -299,6 +299,14 @@ var Slowparse = (function() {
       return {
         start: start
       };
+    },
+    HTML_CODE_IN_CSS_BLOCK: function(parser, start, end) {
+      return {
+        html: {
+          start: start,
+          end: end
+        }
+      }
     }
   };
   
@@ -319,6 +327,11 @@ var Slowparse = (function() {
     // advancing it. It will return `undefined` at the end of the text.
     peek: function() {
       return this.text[this.pos];
+    },
+    // `Stream.substream(len)` returns a substream from the stream
+    // without advancing it, with length `len`.
+    substream: function(len) {
+      return this.text.substring(this.pos, this.pos + len);
     },
     // `Stream.next()` returns the next character in the stream and advances
     // it. It also returns `undefined` when no more characters are available.
@@ -587,7 +600,36 @@ var Slowparse = (function() {
           stripped += term[pos];
         }
       }
-      return stripped;
+      return stripped.trim();
+    },
+    // #### CSS Comment Filtering
+    //
+    // Here we filter a token so that its start and end positions
+    // point to the content without leading and trailing comments,
+    // with comments in the token.value completely removed.
+    filterComments: function(token) {
+      var text = token.value,
+          tsize = text.length,
+          ntsize,
+          stripped = this.stripComments(text, token.interval.start);
+      // strip leading comments
+      text = text.replace(/^\s+/,"");
+      text = text.replace(/^\/\*[\w\W]*?\*\/\s*/,'');
+      ntsize = text.length;
+      token.interval.start += tsize - ntsize;
+      // strip trailing comments (=reverse and repeat previous)
+      tsize = ntsize;
+      text = text.split('').reverse().join('');
+      text = text.replace(/^\s+/,"");
+      text = text.replace(/^\/\*[\w\W]*?\*\/\s*/,'');
+      // FIXME: this still fails comments like this: /* ... /* ... */,
+      //        which is a single block. The problems is that in the
+      //        reversed string this looks like /* ... */ ... */ which
+      //        counts as one block plus left-over junk.
+      ntsize = text.length;
+      token.interval.end -= tsize - ntsize;
+      // commit text change
+      token.value = stripped;
     },
     // #### CSS Selector Parsing
     //
@@ -620,6 +662,11 @@ var Slowparse = (function() {
       // or an error occurred.
       if (token === null) {
         if (!this.stream.end() && this.stream.peek() === '<') {
+          // if this is the start of <!-- make sure to throw an error
+          if (this.stream.substream(2) !== "</") {
+            throw new ParseError("HTML_CODE_IN_CSS_BLOCK", this, this.stream.pos-1,
+                                 this.stream.pos);
+          }
           return;
         }
         throw new ParseError("MISSING_CSS_SELECTOR", this, this.stream.pos-1,
@@ -627,12 +674,12 @@ var Slowparse = (function() {
       }
 
       // If we get here, we have a selector string.
-      token.value = token.value.trim();
+      // Filter the token for comments before continueing.
+      this.filterComments(token);
       var selector = token.value,
           selectorStart = token.interval.start,
-          selectorEnd = selectorStart + selector.length;
-      
-      selector = this.stripComments(selector, selectorStart).trim();
+          selectorEnd = token.interval.end;
+
       if (selector === '') {
         this._parseSelector();
         return;
@@ -744,11 +791,11 @@ var Slowparse = (function() {
                              selectorStart + selector.length, selector);
       }
 
-      var property = token.value.trim(),
+      this.filterComments(token)
+      var property = token.value,
           propertyStart = token.interval.start,
-          propertyEnd = propertyStart + property.length;
+          propertyEnd = token.interval.end;
 
-      property = this.stripComments(property, propertyStart).trim();
       if (property === '') {
         this._parseDeclaration(selector, selectorStart);
         return;
@@ -822,12 +869,13 @@ var Slowparse = (function() {
 
       var next = (!this.stream.end() ? this.stream.next() : "end of stream"),
           errorMsg = "[_parseValue] Expected }, <, or ;, instead found "+next;
-      token.value = token.value.trim();
+      
+      
+      this.filterComments(token);
       var value = token.value,
           valueStart = token.interval.start,
-          valueEnd = valueStart + value.length;
+          valueEnd = token.interval.end;
 
-      value = this.stripComments(value, valueStart).trim();
       if (value === '') {
         throw new ParseError("MISSING_CSS_VALUE", this, this.stream.pos-1,
                              this.stream.pos);

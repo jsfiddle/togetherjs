@@ -273,22 +273,22 @@ testStyleSheet("parsing of empty CSS rule w/ comment",
 });
 
 testStyleSheet("parsing of CSS rule w/ comments",
-               "/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/}",
+               "/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9****** c9 *****/}",
                function(html, css, styleContents) {
     equal(styleContents.parseInfo.rules.length, 1);
     equal(styleContents.parseInfo.rules[0].declarations.properties.length, 1);
     assertParseIntervals(html, styleContents, "style", {
-      'parseInfo': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/}',
-      'parseInfo.rules[0].selector': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/',
-      'parseInfo.rules[0].declarations': '{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/}',
-      'parseInfo.rules[0].declarations.properties[0].name': '/* c4 */ co/*c5*/lor/*c6*/',
-      'parseInfo.rules[0].declarations.properties[0].value': '/*c7*/pi/*c8*/nk/*c9*; /***** c9 *****/',
+      'parseInfo': '/** comment 1 **/ bo/* comment 2 */dy /*comment 3*/{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9****** c9 *****/}',
+      'parseInfo.rules[0].selector': 'bo/* comment 2 */dy',
+      'parseInfo.rules[0].declarations': '{ /* c4 */ co/*c5*/lor/*c6*/: /*c7*/pi/*c8*/nk/*c9****** c9 *****/}',
+      'parseInfo.rules[0].declarations.properties[0].name': 'co/*c5*/lor',
+      'parseInfo.rules[0].declarations.properties[0].value': 'pi/*c8*/nk',
     });
     
     equal(styleContents.parseInfo.rules[0].selector.value, "body");
     equal(styleContents.parseInfo.rules[0].declarations.properties[0].name.value, "color");
     equal(styleContents.parseInfo.rules[0].declarations.properties[0].value.value, "pink");
-    
+
     equal(styleContents.parseInfo.comments.length, 9);
     assertParseIntervals(html, styleContents, "style", {
       'parseInfo.comments[0]': '/** comment 1 **/',
@@ -299,7 +299,7 @@ testStyleSheet("parsing of CSS rule w/ comments",
       'parseInfo.comments[5]': '/*c6*/',
       'parseInfo.comments[6]': '/*c7*/',
       'parseInfo.comments[7]': '/*c8*/',
-      'parseInfo.comments[8]': '/*c9*; /***** c9 *****/'
+      'parseInfo.comments[8]': '/*c9****** c9 *****/'
     });
 });
 
@@ -324,7 +324,6 @@ testStyleSheet("parsing of CSS rule w/ vendor prefixes",
       'parseInfo.rules[0].declarations.properties[4].value': '5px',
     });
 });
-
 
 test("replaceEntityRefs", function() {
   [
