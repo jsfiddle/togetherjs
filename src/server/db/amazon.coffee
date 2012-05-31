@@ -92,10 +92,10 @@ module.exports = AmazonDb = (options) ->
         if error.message? and error.message.match 'The conditional request failed'
           callback?('Document already exists')
         else if results? and results.write_metadata?
-          console.log('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
+          console.error('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
           callback?('Failed to save snapshot to S3')
         else
-          console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
+          console.error('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
           callback?('Failed to save snapshot')
       else
         callback?()
@@ -197,7 +197,7 @@ module.exports = AmazonDb = (options) ->
         else if error == 'Document does not exist'
           callback?(error)
         else
-          console.log('Failed to delete snapshots or operations from Document('+docName+'): '+util.inspect(error))
+          console.error('Failed to delete snapshots or operations from Document('+docName+'): '+util.inspect(error))
           callback?('Failed to delete snapshots or operations')
       else
         callback?(null)
@@ -234,10 +234,10 @@ module.exports = AmazonDb = (options) ->
           callback?(error)
         else if results? and results.get_snapshot?
           item = results.get_snapshot.Items[0]
-          console.log('Failed to get snapshot data for Document('+item.doc.S+'-'+item.v.N+'): '+util.inspect(error))
+          console.error('Failed to get snapshot data for Document('+item.doc.S+'-'+item.v.N+'): '+util.inspect(error))
           callback?('Failed to get snapshot data')
         else
-          console.log('Failed to get snapshot metadata for Document('+docName+'): '+util.inspect(error))
+          console.error('Failed to get snapshot metadata for Document('+docName+'): '+util.inspect(error))
           callback?('Failed to get snapshot metadata')
       else
         item = results.get_snapshot.Items[0]
@@ -289,10 +289,10 @@ module.exports = AmazonDb = (options) ->
         if error.message? and error.message.match 'The conditional request failed'
           callback?('Document already exists')
         else if results? and results.write_metadata?
-          console.log('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
+          console.error('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
           callback?('Failed to save snapshot data')
         else
-          console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
+          console.error('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
           callback?('Failed to save snapshot metadata')
       else
         callback?()
@@ -329,7 +329,7 @@ module.exports = AmazonDb = (options) ->
 
     (error, results) ->
       if error?
-        console.log('Failed to fetch Operations('+docName+'-'+start+'..'+end+'): '+util.inspect(error))
+        console.error('Failed to fetch Operations('+docName+'-'+start+'..'+end+'): '+util.inspect(error))
         callback?('Failed to fetch operations')
       else
         data = []
@@ -371,7 +371,7 @@ module.exports = AmazonDb = (options) ->
 
     (error, results) ->
       if error?
-        console.log('Failed to save Operation('+docName+'-'+opData.v+'): '+util.inspect(error))
+        console.error('Failed to save Operation('+docName+'-'+opData.v+'): '+util.inspect(error))
         callback?('Failure')
       else
         callback?()
