@@ -67,7 +67,7 @@ module.exports = AmazonDb = (options) ->
   # success.
   @create = (docName, docData, callback) ->
     async.auto(
-      write_metadata: (callback) ->
+      write_metadata: (cb) ->
 
         request =
           TableName: snapshots_table,
@@ -81,15 +81,15 @@ module.exports = AmazonDb = (options) ->
             doc:
               Exists: false
 
-        db.putItem(request, callback)
+        db.putItem(request, cb)
 
-      write_data: (callback) ->
+      write_data: (cb) ->
         path = options.amazon_s3_snapshots_bucket_name+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
         data = JSON.stringify(docData.snapshot)
 
-        s3.put(path, headers, data, callback)
-    (error, result) ->
+        s3.put(path, headers, data, cb)
+    (error, results) ->
       if error? and error.message.match 'The conditional request failed'
         callback?('Document already exists')
       else if error?
@@ -108,7 +108,7 @@ module.exports = AmazonDb = (options) ->
   # deleted and the error message if something went wrong.
   @delete = (docName, dbMeta, callback) ->
     async.auto(
-      list_snapshots: (callback) ->
+      list_snapshots: (cb) ->
         request =
           TableName: snapshots_table
           HashKeyValue: { S: docName }
@@ -117,9 +117,9 @@ module.exports = AmazonDb = (options) ->
 
         # TODO: This will only return the latest 1 MB of results, so if there
         # are more keys additional requests must be made.
-        db.query(request, callback)
+        db.query(request, cb)
 
-      list_operations: (callback) ->
+      list_operations: (cb) ->
         request =
           TableName: operations_table
           HashKeyValue: { S: docName }
@@ -128,14 +128,14 @@ module.exports = AmazonDb = (options) ->
 
         # TODO: This will only return the latest 1 MB of results, so if there
         # are more keys additional requests must be made.
-        db.query(request, callback)
+        db.query(request, cb)
 
-      delete_snapshots: ['list_snapshots', (callback, results) ->
-        return callback("Document does not exist", null) if results.list_snapshots.Count == 0
+      delete_snapshots: ['list_snapshots', (cb, results) ->
+        return cb("Document does not exist", null) if results.list_snapshots.Count == 0
 
         async.mapSeries(results.list_snapshots.Items,
           (item, cb) ->
-            request = 
+            request =
               TableName: snapshots_table
               Key:
                 HashKeyElement: { S : item.doc.S }
@@ -146,32 +146,32 @@ module.exports = AmazonDb = (options) ->
             db.deleteItem(request, cb)
           (error, result)->
             if error?
-              callback(error, null)
+              cb(error, null)
             else
-              callback(null, true)
+              cb(null, true)
           )
       ]
 
-      delete_s3_snapshots: ['list_snapshots', (callback, results) ->
-        return callback(null, {}) if results.list_snapshots.Count == 0
+      delete_s3_snapshots: ['list_snapshots', (cb, results) ->
+        return cb(null, {}) if results.list_snapshots.Count == 0
 
         async.forEachSeries(results.list_snapshots.Items,
           (item, cb) ->
             s3.del('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', cb)
           (error)->
             if error?
-              callback(error, null)
+              cb(error, null)
             else
-              callback(null, true)
+              cb(null, true)
           )
       ]
 
-      delete_operations: ['list_operations', (callback, results) ->
-        return callback(null, {}) if results.list_operations.Count == 0
+      delete_operations: ['list_operations', (cb, results) ->
+        return cb(null, {}) if results.list_operations.Count == 0
 
         async.forEachSeries(results.list_operations.Items,
           (item, cb) ->
-            request = 
+            request =
               TableName: operations_table
               Key:
                 HashKeyElement: { S : item.doc.S }
@@ -182,9 +182,9 @@ module.exports = AmazonDb = (options) ->
             db.deleteItem(request, cb)
           (error)->
             if error?
-              callback(error, null)
+              cb(error, null)
             else
-              callback(null, true)
+              cb(null, true)
           )
       ]
     (error, result) ->
@@ -218,7 +218,7 @@ module.exports = AmazonDb = (options) ->
         db.query(request, cb)
 
       get_data: ['get_snapshot', (cb, results) ->
-        return callback('Document does not exist', null) unless results.get_snapshot.Count == 1
+        return cb('Document does not exist', null) unless results.get_snapshot.Count == 1
 
         item = results.get_snapshot.Items[0]
         s3.get('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', 'buffer', cb)
@@ -254,8 +254,7 @@ module.exports = AmazonDb = (options) ->
   # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
   @writeSnapshot = (docName, docData, dbMeta, callback) ->
     async.auto(
-      write_metadata: (callback) ->
-
+      write_metadata: (cb) ->
         request =
           TableName: snapshots_table,
           Item:
@@ -268,15 +267,15 @@ module.exports = AmazonDb = (options) ->
             doc:
               Exists: false
 
-        db.putItem(request, callback)
+        db.putItem(request, cb)
 
-      write_data: (callback) ->
+      write_data: (cb) ->
         path = options.amazon_s3_snapshots_bucket_name+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
         data = JSON.stringify(docData.snapshot)
 
-        s3.put(path, headers, data, callback)
     (error, result) ->
+        s3.put(path, headers, data, cb)
       if error? and error.message.match 'The conditional request failed'
         callback?('Document already exists')
       else if error?
