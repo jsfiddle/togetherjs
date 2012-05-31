@@ -131,7 +131,7 @@ module.exports = AmazonDb = (options) ->
         db.query(request, cb)
 
       delete_snapshots: ['list_snapshots', (cb, results) ->
-        return cb("Document does not exist", null) if results.list_snapshots.Count == 0
+        return cb('Document does not exist', null) if results.list_snapshots.Count == 0
 
         async.mapSeries(results.list_snapshots.Items,
           (item, cb) ->
@@ -298,7 +298,7 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(null, [{ op:string, meta:string }]) on success.
   @getOps = (docName, start, end, callback) ->
     end = 2147483648 unless end?
-    return callback("Start must be less than end", []) if start >= end
+    return callback('Start must be less than end', []) if start >= end
 
     end = end - 1
 
