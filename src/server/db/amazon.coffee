@@ -83,7 +83,7 @@ module.exports = AmazonDb = (options) ->
         db.putItem(request, cb)
 
       write_data: (cb) ->
-        path = options.amazon_s3_snapshots_bucket_name+'/'+docName+'-'+docData.v+'.snapshot'
+        path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
         data = JSON.stringify(docData.snapshot)
 
@@ -272,7 +272,7 @@ module.exports = AmazonDb = (options) ->
         db.putItem(request, cb)
 
       write_data: (cb) ->
-        path = options.amazon_s3_snapshots_bucket_name+'/'+docName+'-'+docData.v+'.snapshot'
+        path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
         data = JSON.stringify(docData.snapshot)
 
