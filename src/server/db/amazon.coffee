@@ -3,8 +3,8 @@
 # It uses Dynamo as the metadata store and it uses S3 for snapshot storage as
 # Dynamo objects are limited to 64KB in size.
 #
-# In order to use this backend you must require the 'aws2js' and the 'dynamo'
-# npm packages.
+# In order to use this backend you must require the 'aws2js', 'async' and the
+# 'dynamo' npm packages.
 #
 # Example usage:
 #
@@ -59,12 +59,11 @@ module.exports = AmazonDb = (options) ->
   # Public: Creates a new document.
   #
   # docName - The unique name of the new document.
-  # docData = {snapshot, type:typename, [meta]}
+  # docData - { snapshot:string, type:string, v:int, meta:string }
   #
-  # FIXME: What should happen if it fails to save?
-  #
-  # Calls callback(true) if the document already exists. Calls callback() on
-  # success.
+  # Calls callback('Document already exists') if the document already exists.
+  # Calls callback(error) on failure.
+  # Calls callback() on success.
   @create = (docName, docData, callback) ->
     async.auto(
       write_metadata: (cb) ->
@@ -102,10 +101,11 @@ module.exports = AmazonDb = (options) ->
   # Public: Permanently deletes a document.
   #
   # docName - The name of the document to delete.
-  # dbMeta - ?
+  # dbMeta  - This argument is unused as it's unused in other storage engines
   #
-  # Calls callback which takes a single argument which is null if something was
-  # deleted and the error message if something went wrong.
+  # Calls callback('Document does not exist') if no document exists.
+  # Calls callback(error) on failure.
+  # Calls callback(null) on success.
   @delete = (docName, dbMeta, callback) ->
     async.auto(
       list_snapshots: (cb) ->
@@ -202,9 +202,9 @@ module.exports = AmazonDb = (options) ->
   #
   # docName - The name of the document to retrieve.
   #
-  # data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
-  #
-  # Calls callback with (null, data) upon sucesss. Otherwise it calls callback with (error)
+  # Calls callback('Document does not exist') if no document exists.
+  # Calls callback(error) on failure.
+  # Calls callback(null, { v:int, snapshot:string, type:typename, meta:string }) on success.
   @getSnapshot = (docName, callback) ->
     async.auto(
       get_snapshot: (cb) ->
@@ -246,12 +246,14 @@ module.exports = AmazonDb = (options) ->
   # Public: Write new snapshot data to the database.
   #
   # docName - Name of document.
-  # docData - Document snapshot data. {snapshot:s, type:t, meta}
-  # dbMeta - ?
-  #
-  # The callback just takes an optional error.
+  # docData - { snapshot:string, type:typename, meta:string, v:int }
+  # dbMeta  - This argument is unused as it's unused in other storage engines
   #
   # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
+  #
+  # Calls callback('Document already exists') if the document already exists.
+  # Calls callback(error) on failure.
+  # Calls callback() on success.
   @writeSnapshot = (docName, docData, dbMeta, callback) ->
     async.auto(
       write_metadata: (cb) ->
@@ -285,20 +287,15 @@ module.exports = AmazonDb = (options) ->
         callback?()
     )
 
-  # Public: Get all ops with version = start to version = end. Noninclusive.
-  # end is trimmed to the size of the document.
-  #
-  # If any documents are passed to the callback, the first one has v = start
-  # end can be null. If so, returns all documents from start onwards.
-  #
-  # Each document returned is in the form {op:o, meta:m, v:version}.
+  # Public: Get all operations between start and end noninclusive.
   #
   # docName - Name of the document
-  # start   - The noninclusive starting version.
-  # end     - The noninclusive ending version.
+  # start   - The noninclusive starting version, must be less than end.
+  # end     - The noninclusive ending version, if null assumed to be maximum
+  #           value.
   #
-  # Calls callback(null, data) on success and otherwise calls the callback with
-  # just the error.
+  # Calls callback(error) on failure.
+  # Calls callback(null, [{ op:string, meta:string }]) on success.
   @getOps = (docName, start, end, callback) ->
     end = 2147483648 unless end?
     return callback("Start must be less than end", []) if start >= end
@@ -337,14 +334,17 @@ module.exports = AmazonDb = (options) ->
 
   # Public: Write an operation to a document.
   #
-  # opData = { op:the op to append, v:version, meta:optional }
-  # callback = callback when operation committed
+  # docName - Name of the document
+  # opData  - { op:string, v:int, meta:string }
   #
   # opData.v MUST be the subsequent version for the document.
   #
   # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
-  # (its either that, or I have _another_ check when you append an op that the document already exists
-  # ... and that would slow it down a bit.)
+  # (its either that, or I have _another_ check when you append an op that the
+  # document already exists ... and that would slow it down a bit.)
+  #
+  # Calls callback(error) on failure.
+  # Calls callback() on success.
   @writeOp = (docName, opData, callback) ->
     async.auto(
       write_metadata: (cb) ->
