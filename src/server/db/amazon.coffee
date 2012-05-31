@@ -67,7 +67,6 @@ module.exports = AmazonDb = (options) ->
   @create = (docName, docData, callback) ->
     async.auto(
       write_metadata: (cb) ->
-
         request =
           TableName: snapshots_table,
           Item:
@@ -89,11 +88,15 @@ module.exports = AmazonDb = (options) ->
 
         s3.put(path, headers, data, cb)
     (error, results) ->
-      if error? and error.message.match 'The conditional request failed'
-        callback?('Document already exists')
-      else if error?
-        console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
-        callback?('Failure')
+      if error?
+        if error.message? and error.message.match 'The conditional request failed'
+          callback?('Document already exists')
+        else if results? and results.write_metadata?
+          console.log('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
+          callback?('Failed to save snapshot to S3')
+        else
+          console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
+          callback?('Failed to save snapshot')
       else
         callback?()
     )
@@ -189,11 +192,13 @@ module.exports = AmazonDb = (options) ->
       ]
     (error, results) ->
       if error?
-        if error.toString().match "The conditional request failed"
-          error = "Document does not exist"
-        else if error != 'Document does not exist'
+        if error.toString().match 'The conditional request failed'
+          callback?('Document does not exist')
+        else if error == 'Document does not exist'
+          callback?(error)
+        else
           console.log('Failed to delete snapshots or operations from Document('+docName+'): '+util.inspect(error))
-        callback?(error)
+          callback?('Failed to delete snapshots or operations')
       else
         callback?(null)
     )
@@ -227,11 +232,13 @@ module.exports = AmazonDb = (options) ->
       if error?
         if error == 'Document does not exist'
           callback?(error)
-        if results.get_snapshot?
+        else if results? and results.get_snapshot?
           item = results.get_snapshot.Items[0]
-          callback?('Failed to get snapshot data for Document('+item.doc.S+'-'+item.v.N+'): '+util.inspect(error))
+          console.log('Failed to get snapshot data for Document('+item.doc.S+'-'+item.v.N+'): '+util.inspect(error))
+          callback?('Failed to get snapshot data')
         else
-          callback?('Failed to get snapshot metadata for Document('+docName+')')
+          console.log('Failed to get snapshot metadata for Document('+docName+'): '+util.inspect(error))
+          callback?('Failed to get snapshot metadata')
       else
         item = results.get_snapshot.Items[0]
         data =
@@ -278,11 +285,15 @@ module.exports = AmazonDb = (options) ->
 
         s3.put(path, headers, data, cb)
     (error, results) ->
-      if error? and error.message.match 'The conditional request failed'
-        callback?('Document already exists')
-      else if error?
-        console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
-        callback?('Failure')
+      if error?
+        if error.message? and error.message.match 'The conditional request failed'
+          callback?('Document already exists')
+        else if results? and results.write_metadata?
+          console.log('Failed to save Snapshot('+docName+'-'+docData.v+') to S3: '+util.inspect(error))
+          callback?('Failed to save snapshot data')
+        else
+          console.log('Failed to save Snapshot('+docName+'-'+docData.v+'): '+util.inspect(error))
+          callback?('Failed to save snapshot metadata')
       else
         callback?()
     )
@@ -319,7 +330,7 @@ module.exports = AmazonDb = (options) ->
     (error, results) ->
       if error?
         console.log('Failed to fetch Operations('+docName+'-'+start+'..'+end+'): '+util.inspect(error))
-        callback?('Failure')
+        callback?('Failed to fetch operations')
       else
         data = []
         for op in results.get_metadata.Items
