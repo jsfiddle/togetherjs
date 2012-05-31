@@ -187,7 +187,7 @@ module.exports = AmazonDb = (options) ->
               cb(null, true)
           )
       ]
-    (error, result) ->
+    (error, results) ->
       if error?
         if error.toString().match "The conditional request failed"
           error = "Document does not exist"
@@ -274,8 +274,8 @@ module.exports = AmazonDb = (options) ->
         headers = {}
         data = JSON.stringify(docData.snapshot)
 
-    (error, result) ->
         s3.put(path, headers, data, cb)
+    (error, results) ->
       if error? and error.message.match 'The conditional request failed'
         callback?('Document already exists')
       else if error?
@@ -319,13 +319,13 @@ module.exports = AmazonDb = (options) ->
         # handle getting more.
         db.query(request, cb)
 
-    (error, result) ->
+    (error, results) ->
       if error?
         console.log('Failed to fetch Operations('+docName+'-'+start+'..'+end+'): '+util.inspect(error))
         callback?('Failure')
       else
         data = []
-        for op in result.get_metadata.Items
+        for op in results.get_metadata.Items
           item = {
             op:   JSON.parse(op.op.S)
             meta: JSON.parse(op.meta.S)
@@ -358,7 +358,7 @@ module.exports = AmazonDb = (options) ->
 
         db.putItem(request, cb)
 
-    (error, result) ->
+    (error, results) ->
       if error?
         console.log('Failed to save Operation('+docName+'-'+opData.v+'): '+util.inspect(error))
         callback?('Failure')
