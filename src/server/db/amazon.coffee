@@ -30,6 +30,26 @@
 #
 # You can run bin/setup_amazon (after editing bin/options.js) to provision the
 # required resources.
+#
+# By default the concurrency of requests made to amazon are limited to being
+# serial. If you would like greater concurrency you can change the following
+# options from their defaults (1 is serialized, anything greater is
+# parallelized):
+#
+#  s3_rw_concurrency: 1
+#  s3_ro_concurrency: 1
+#  snapshots_ro_concurrency: 1
+#  snapshots_rw_concurrency: 1
+#  operations_ro_concurrency: 1
+#  operations_rw_concurrency: 1
+#
+#  If you would like more detailed information about the requests going to
+#  Amazon you can enabled timing information be setting the timing option to
+#  true.
+#
+#  Example output:
+#  Dynamo[<number of milliseconds>,<cost in throughput of operation>] <type of operation>
+#  S3[<number of milliseconds>] <type of operation>
 
 util = require('util')
 async = require('async')
@@ -37,6 +57,12 @@ async = require('async')
 defaultOptions =
   amazon_region: 'us-east-1'
   timing: false
+  s3_rw_concurrency: 1
+  s3_ro_concurrency: 1
+  snapshots_ro_concurrency: 1
+  snapshots_rw_concurrency: 1
+  operations_ro_concurrency: 1
+  operations_rw_concurrency: 1
 
 class DynamoQueue
   constructor: (@name, concurrency, @timing) ->
@@ -90,12 +116,12 @@ module.exports = AmazonDb = (options) ->
   snapshots_bucket = options.amazon_s3_snapshots_bucket_name
   operations_table = options.amazon_dynamo_operations_table_name
 
-  s3_ro_queue = new S3Queue('read', 1, options['timing'])
-  s3_rw_queue = new S3Queue('write', 1, options['timing'])
-  snapshots_ro_queue = new DynamoQueue('snapshots read', 1, options['timing'])
-  snapshots_rw_queue = new DynamoQueue('snapshots write', 1, options['timing'])
-  operations_ro_queue = new DynamoQueue('operations read', 1, options['timing'])
-  operations_rw_queue = new DynamoQueue('operations write', 1, options['timing'])
+  s3_ro_queue = new S3Queue('read', options['s3_ro_concurrency'], options['timing'])
+  s3_rw_queue = new S3Queue('write', options['s3_rw_concurrency'], options['timing'])
+  snapshots_ro_queue = new DynamoQueue('snapshots read', options['snapshots_ro_concurrency'], options['timing'])
+  snapshots_rw_queue = new DynamoQueue('snapshots write', options['snapshots_rw_concurrency'], options['timing'])
+  operations_ro_queue = new DynamoQueue('operations read', options['operations_ro_concurrency'], options['timing'])
+  operations_rw_queue = new DynamoQueue('operations write', options['operations_rw_concurrency'], options['timing'])
 
   # Public: Creates a new document.
   #
