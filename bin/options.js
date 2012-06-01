@@ -12,10 +12,10 @@ module.exports = {
     // all documents are deleted when the server restarts.
 
     // By default, sharejs tries to use the redis DB backend.
-		//type: 'redis',
-
+		type: 'redis',
+   
 		// The prefix for database entries
-		//prefix: 'ShareJS:',
+		prefix: 'ShareJS:',
 
 		// The hostname, port and options to pass to redis.
 		// null lets the database decide - redis by default connects to localhost port 6379.
@@ -32,7 +32,7 @@ module.exports = {
 
     // To use postgresql uncomment this section then run bin/setup_pg
     //type: 'pg',
-    //uri: 'tcp://binder:@localhost/postgres',
+    //uri: 'tcp://josephg:@localhost/postgres',
 
     // By default, sharejs will create its tables in a schema called 'sharejs'.
     //schema: 'sharejs',
@@ -44,13 +44,13 @@ module.exports = {
     //create_tables_automatically: true,
 
     // To use amazon uncomment this section then run bin/setup_amazon
-    type: 'amazon',
-    amazon_region: 'us-east-1',
-    amazon_access_key: 'AKIAIOLJX35Q66PHICQQ',
-    amazon_secret_key: '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',
-    amazon_s3_snapshots_bucket_name: 'easel-development-snapshots',
-    amazon_dynamo_snapshots_table_name: 'easel-development-snapshots',
-    amazon_dynamo_operations_table_name: 'easel-development-operations',
+    //type: 'amazon',
+    //amazon_region: 'us-east-1',
+    //amazon_access_key: '',
+    //amazon_secret_key: '',
+    //amazon_s3_snapshots_bucket_name: '',
+    //amazon_dynamo_snapshots_table_name: '',
+    //amazon_dynamo_operations_table_name: '',
 	},
 
 	// The server will statically host webclient/ directory at /share/*.
