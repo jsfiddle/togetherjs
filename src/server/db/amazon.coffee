@@ -70,13 +70,13 @@ class DynamoQueue
       task(callback)
     , concurrency)
 
-  push: (fn, callback) =>
+  push: (fn, description, callback) =>
     start = new Date().getTime()
     @queue.push(fn, (error, results) =>
       if @timing
         elapsed = new Date().getTime() - start
         capacity = results.ConsumedCapacityUnits if results?
-        console.log('Dynamo['+elapsed+'ms,'+capacity+'] '+@name)
+        console.log('Dynamo['+elapsed+'ms,'+capacity+'] '+@name+': '+description)
 
       callback(error, results)
     )
@@ -87,12 +87,12 @@ class S3Queue
       task(callback)
     , concurrency)
 
-  push: (fn, callback) =>
+  push: (fn, description, callback) =>
     start = new Date().getTime()
     @queue.push(fn, (error, results) =>
       if @timing
         elapsed = new Date().getTime() - start
-        console.log('S3['+elapsed+'ms] '+@name)
+        console.log('S3['+elapsed+'ms] '+@name+': '+description)
 
       callback(error, results)
     )
@@ -148,7 +148,7 @@ module.exports = AmazonDb = (options) ->
 
         snapshots_rw_queue.push((c) ->
           db.putItem(request, c)
-        , cb)
+        , 'write Snapshot('+docName+'-'+docData.v+')', cb)
 
       write_data: (cb) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
@@ -157,7 +157,7 @@ module.exports = AmazonDb = (options) ->
 
         s3_rw_queue.push((c) ->
           s3.put(path, headers, data, c)
-        , cb)
+        , 'write Snapshot('+docName+'-'+docData.v+')', cb)
     (error, results) ->
       if error?
         if error.message? and error.message.match 'The conditional request failed'
@@ -193,7 +193,7 @@ module.exports = AmazonDb = (options) ->
         # are more keys additional requests must be made.
         snapshots_ro_queue.push((c) ->
           db.query(request, c)
-        , cb)
+        , 'query Snapshots('+docName+')', cb)
 
       list_operations: (cb) ->
         request =
@@ -206,7 +206,7 @@ module.exports = AmazonDb = (options) ->
         # are more keys additional requests must be made.
         operations_ro_queue.push((c) ->
           db.query(request, c)
-        , cb)
+        , 'query Operations('+docName+')', cb)
 
       delete_snapshots: ['list_snapshots', (cb, results) ->
         return cb('Document does not exist', null) if results.list_snapshots.Count == 0
@@ -223,7 +223,7 @@ module.exports = AmazonDb = (options) ->
                   Value: { S: item.doc.S }
             snapshots_rw_queue.push((c) ->
               db.deleteItem(request, c)
-            , cb)
+            , 'delete Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
           (error, result)->
             if error?
               cb(error, null)
@@ -239,7 +239,7 @@ module.exports = AmazonDb = (options) ->
           (item, cb) ->
             s3_rw_queue.push((c) ->
               s3.del('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', c)
-            , cb)
+            , 'delete Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
           (error)->
             if error?
               cb(error, null)
@@ -263,7 +263,7 @@ module.exports = AmazonDb = (options) ->
                   Value: { S: item.doc.S }
             operations_rw_queue.push((c) ->
               db.deleteItem(request, c)
-            , cb)
+            , 'delete Operation('+item.doc.S+'-'+item.v.N+')', cb)
           (error)->
             if error?
               cb(error, null)
@@ -303,7 +303,7 @@ module.exports = AmazonDb = (options) ->
 
         snapshots_ro_queue.push((c) ->
           db.query(request, c)
-        , cb)
+        , 'query Snapshot('+docName+')', cb)
 
       get_data: ['get_snapshot', (cb, results) ->
         return cb('Document does not exist', null) unless results.get_snapshot.Count == 1
@@ -311,7 +311,7 @@ module.exports = AmazonDb = (options) ->
         item = results.get_snapshot.Items[0]
         s3_ro_queue.push((c) ->
           s3.get('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', 'buffer', c)
-        , cb)
+        , 'query Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
       ]
     (error, results) ->
       if error?
@@ -376,7 +376,7 @@ module.exports = AmazonDb = (options) ->
 
         snapshots_rw_queue.push((c) ->
           db.putItem(request, c)
-        , cb)
+        , 'write Snapshot('+docName+'-'+docData.v+')', cb)
 
       write_data: (cb) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
@@ -385,7 +385,7 @@ module.exports = AmazonDb = (options) ->
 
         s3_rw_queue.push((c) ->
           s3.put(path, headers, data, c)
-        , cb)
+        , 'write Snapshot('+docName+'-'+docData.v+')', cb)
     (error, results) ->
       if error?
         if error.message? and error.message.match 'The conditional request failed'
@@ -429,7 +429,7 @@ module.exports = AmazonDb = (options) ->
         # handle getting more.
         operations_ro_queue.push((c) ->
           db.query(request, c)
-        , cb)
+        , 'query Operations('+docName+'-'+start+':'+end+')', cb)
 
     (error, results) ->
       if error?
@@ -485,7 +485,7 @@ module.exports = AmazonDb = (options) ->
 
         operations_rw_queue.push((c) ->
           db.putItem(request, c)
-        , cb)
+        , 'write Operation('+docName+'-'+opData.v+')', cb)
 
     (error, results) ->
       if error?
