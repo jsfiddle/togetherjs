@@ -326,11 +326,24 @@ module.exports = AmazonDb = (options) ->
           callback?('Failed to get snapshot metadata')
       else
         item = results.get_snapshot.Items[0]
+
+        try
+          snapshot = JSON.parse(results.get_data.buffer.toString())
+        catch error
+          snapshot = {}
+          console.error('Failure: data was corrupt for Snapshot('+docName+'-'+item.v.N+')')
+
+        try
+          meta = JSON.parse(item.meta.S)
+        catch error
+          meta = {}
+          console.error('Failure: metadata was corrupt for Snapshot('+docName+'-'+item.v.N+')')
+
         data =
           v: parseInt(item.v.N)
-          snapshot: JSON.parse(results.get_data.buffer.toString())
+          snapshot: snapshot
           type: item.type.S
-          meta: JSON.parse(item.meta.S)
+          meta: meta
 
         callback?(null, data)
     )
@@ -424,10 +437,22 @@ module.exports = AmazonDb = (options) ->
         callback?('Failed to fetch operations')
       else
         data = []
-        for op in results.get_metadata.Items
+        for operation in results.get_metadata.Items
+          try
+            op = JSON.parse(operation.op.S)
+          catch error
+            op = {}
+            console.error('Failure: data was corrupt for Operation('+docName+'-'+operation.v.N+')')
+
+          try
+            meta = JSON.parse(operation.meta.S)
+          catch error
+            meta = {}
+            console.error('Failure: metadata was corrupt for Operation('+docName+'-'+operation.v.N+')')
+
           item = {
-            op:   JSON.parse(op.op.S)
-            meta: JSON.parse(op.meta.S)
+            op: op
+            meta: meta
           }
           data.push(item)
 
