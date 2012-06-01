@@ -403,8 +403,8 @@ module.exports = AmazonDb = (options) ->
   # Public: Get all operations between start and end noninclusive.
   #
   # docName - Name of the document
-  # start   - The noninclusive starting version, must be less than end.
-  # end     - The noninclusive ending version, if null assumed to be maximum
+  # start   - The inclusive starting version, must be less than end.
+  # end     - The noninclusive ending version. If null, assumed to be maximum
   #           value.
   #
   # Calls callback(error) on failure.
