@@ -43,20 +43,27 @@
 #  operations_ro_concurrency: 1
 #  operations_rw_concurrency: 1
 #
-#  If you would like more detailed information about the requests going to
-#  Amazon you can enabled timing information be setting the timing option to
-#  true.
+# If you would like more detailed information about the requests going to
+# Amazon you can enabled timing information be setting the timing option to
+# true.
 #
-#  Example output:
-#  Dynamo[<number of milliseconds>,<cost in throughput of operation>] <type of operation>
-#  S3[<number of milliseconds>] <type of operation>
+# Example output:
+# Dynamo[<number of milliseconds>,<cost in throughput of operation>] <type of operation>
+# S3[<number of milliseconds>] <type of operation>
+#
+# The 'compress' option controls whether the JSON blobs are stored using gzip
+# or not, it defaults to true. If this is disabled, there is a good chance that
+# your operations might be larger than the 64KB limit of dynamo, you have been
+# warned.
 
 util = require('util')
 async = require('async')
+zlib = require('zlib')
 
 defaultOptions =
   amazon_region: 'us-east-1'
   timing: false
+  compress: true
   s3_rw_concurrency: 1
   s3_ro_concurrency: 1
   snapshots_ro_concurrency: 1
@@ -97,6 +104,53 @@ class S3Queue
       callback(error, results)
     )
 
+class BlobHandler
+  constructor: (@name, @encodeFunction, @decodeFunction, @logging) ->
+
+  encode: (data, callback) =>
+    start = new Date().getTime()
+    @encodeFunction data, (error, result) =>
+      elapsed = new Date().getTime() - start
+      console.log(@name+'Blob:Compressed['+data.length+','+result.length+','+elapsed+'ms]') if @logging
+      callback?(error, result)
+
+  decode: (data, callback) =>
+    start = new Date().getTime()
+    @decodeFunction data, (error, result) =>
+      elapsed = new Date().getTime() - start
+      console.log(@name+'Blob:Decompressed['+data.length+','+result.length+','+elapsed+'ms]') if @logging
+      callback?(error, result)
+
+class Compressor
+  constructor: (@compression, logging) ->
+    @gzip = new BlobHandler 'Gzip',
+      (data, callback) ->
+        zlib.gzip(new Buffer(data), callback)
+      (data, callback) ->
+        zlib.gunzip(data, callback)
+      logging
+
+    @base64 = new BlobHandler 'Base64',
+      (data, callback) ->
+        callback?(null, new Buffer(data, 'binary').toString('base64'))
+      (data, callback) ->
+        callback?(null, new Buffer(data, 'base64'))
+      logging
+
+  encode: (data, callback) =>
+    if @compression
+      @gzip.encode data, (error, result) =>
+        @base64.encode(result, callback)
+    else
+      callback?(null, data)
+
+  decode: (data, callback) =>
+    if @compression
+      @base64.decode data, (error, result) =>
+        @gzip.decode(result, callback)
+    else
+      callback?(null, data)
+
 module.exports = AmazonDb = (options) ->
   return new Db if !(this instanceof AmazonDb)
 
@@ -132,32 +186,43 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @create = (docName, docData, callback) ->
+    compressor = new Compressor(options['compress'], options['timing'])
     async.auto(
-      write_metadata: (cb) ->
+      compress_meta: (cb) ->
+        compressor.encode(JSON.stringify(docData.meta), cb)
+
+      write_metadata: ['compress_meta', (cb, results) ->
         request =
           TableName: snapshots_table,
           Item:
             doc: { S: docName },
             v: { N: docData.v.toString() },
-            meta: { S: JSON.stringify(docData.meta) },
+            meta: { S: results.compress_meta },
             type: { S: docData.type },
             created_at: { N: new Date().getTime().toString() }
           Expected:
             doc:
               Exists: false
 
+        # Mark a snapshot as being compressed
+        request.Item['c'] = { S: 't' } if options['compress']
+
         snapshots_rw_queue.push((c) ->
           db.putItem(request, c)
         , 'write Snapshot('+docName+'-'+docData.v+')', cb)
+      ]
 
-      write_data: (cb) ->
+      compress_data: (cb) ->
+        compressor.encode(JSON.stringify(docData.snapshot), cb)
+
+      write_data: ['compress_data', (cb, results) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
-        data = JSON.stringify(docData.snapshot)
 
         s3_rw_queue.push((c) ->
-          s3.put(path, headers, data, c)
+          s3.put(path, headers, results.compress_data, c)
         , 'write Snapshot('+docName+'-'+docData.v+')', cb)
+      ]
     (error, results) ->
       if error?
         if error.message? and error.message.match 'The conditional request failed'
@@ -313,6 +378,18 @@ module.exports = AmazonDb = (options) ->
           s3.get('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', 'buffer', c)
         , 'query Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
       ]
+
+      compressor: ['get_snapshot', 'get_data', (cb, results) ->
+        cb(null, new Compressor(results.get_snapshot.Items[0].c, options['timing']))
+      ]
+
+      snapshot: ['compressor', (cb, results) ->
+        results.compressor.decode(results.get_data.buffer.toString(), cb)
+      ]
+
+      meta: ['compressor', (cb, results) ->
+        results.compressor.decode(results.get_snapshot.Items[0].meta.S, cb)
+      ]
     (error, results) ->
       if error?
         if error == 'Document does not exist'
@@ -328,13 +405,13 @@ module.exports = AmazonDb = (options) ->
         item = results.get_snapshot.Items[0]
 
         try
-          snapshot = JSON.parse(results.get_data.buffer.toString())
+          snapshot = JSON.parse(results.snapshot)
         catch error
           snapshot = {}
           console.error('Failure: data was corrupt for Snapshot('+docName+'-'+item.v.N+')')
 
         try
-          meta = JSON.parse(item.meta.S)
+          meta = JSON.parse(results.meta)
         catch error
           meta = {}
           console.error('Failure: metadata was corrupt for Snapshot('+docName+'-'+item.v.N+')')
@@ -360,32 +437,43 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @writeSnapshot = (docName, docData, dbMeta, callback) ->
+    compressor = new Compressor(options['compress'], options['timing'])
     async.auto(
-      write_metadata: (cb) ->
+      compress_meta: (cb) ->
+        compressor.encode(JSON.stringify(docData.meta), cb)
+
+      write_metadata: ['compress_meta', (cb, results) ->
         request =
           TableName: snapshots_table,
           Item:
             doc: { S: docName },
             v: { N: docData.v.toString() },
-            meta: { S: JSON.stringify(docData.meta) },
+            meta: { S: results.compress_meta },
             type: { S: docData.type },
             created_at: { N: new Date().getTime().toString() }
           Expected:
             doc:
               Exists: false
 
+        # Mark a snapshot as being compressed
+        request.Item['c'] = { S: 't' } if options['compress']
+
         snapshots_rw_queue.push((c) ->
           db.putItem(request, c)
         , 'write Snapshot('+docName+'-'+docData.v+')', cb)
+      ]
 
-      write_data: (cb) ->
+      compress_data: (cb) ->
+        compressor.encode(JSON.stringify(docData.snapshot), cb)
+
+      write_data: ['compress_data', (cb, results) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
         headers = {}
-        data = JSON.stringify(docData.snapshot)
 
         s3_rw_queue.push((c) ->
-          s3.put(path, headers, data, c)
+          s3.put(path, headers, results.compress_data, c)
         , 'write Snapshot('+docName+'-'+docData.v+')', cb)
+      ]
     (error, results) ->
       if error?
         if error.message? and error.message.match 'The conditional request failed'
@@ -437,26 +525,37 @@ module.exports = AmazonDb = (options) ->
         callback?('Failed to fetch operations')
       else
         data = []
-        for operation in results.get_metadata.Items
-          try
-            op = JSON.parse(operation.op.S)
-          catch error
-            op = {}
-            console.error('Failure: data was corrupt for Operation('+docName+'-'+operation.v.N+')')
+        async.map(results.get_metadata.Items, (operation, cb) ->
+          compressor = new Compressor(operation.c?, options['timing'])
+          async.auto(
+            snapshot: (c) ->
+              compressor.decode(operation.op.S, c)
 
-          try
-            meta = JSON.parse(operation.meta.S)
-          catch error
-            meta = {}
-            console.error('Failure: metadata was corrupt for Operation('+docName+'-'+operation.v.N+')')
+            meta: (c) ->
+              compressor.decode(operation.meta.S, c)
 
-          item = {
-            op: op
-            meta: meta
-          }
-          data.push(item)
+          (error, results) ->
+            try
+              op = JSON.parse(results.snapshot)
+            catch error
+              op = {}
+              console.error('Failure: data was corrupt for Operation('+docName+'-'+operation.v.N+')')
 
-        callback? null, data
+            try
+              meta = JSON.parse(results.meta)
+            catch error
+              meta = {}
+              console.error('Failure: metadata was corrupt for Operation('+docName+'-'+operation.v.N+')')
+
+            item = {
+              op: op
+              meta: meta
+            }
+            cb(null, item)
+          )
+        (error, results) ->
+          callback? null, results
+        )
     )
 
   # Public: Write an operation to a document.
@@ -473,20 +572,30 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @writeOp = (docName, opData, callback) ->
+    compressor = new Compressor(options['compress'], options['timing'])
     async.auto(
-      write_metadata: (cb) ->
+      compress_op: (cb) ->
+        compressor.encode(JSON.stringify(opData.op), cb)
+
+      compress_meta: (cb) ->
+        compressor.encode(JSON.stringify(opData.meta), cb)
+
+      write_metadata: ['compress_op', 'compress_meta', (cb, results) ->
         request =
           TableName: operations_table,
           Item:
             doc: { S: docName },
             v: { N: opData.v.toString() },
-            op: { S: JSON.stringify(opData.op) },
-            meta: { S: JSON.stringify(opData.meta) },
+            op: { S: results.compress_op },
+            meta: { S: results.compress_meta },
+
+        # Mark a snapshot as being compressed
+        request.Item['c'] = { S: 't' } if options['compress']
 
         operations_rw_queue.push((c) ->
           db.putItem(request, c)
         , 'write Operation('+docName+'-'+opData.v+')', cb)
-
+      ]
     (error, results) ->
       if error?
         console.error('Failed to save Operation('+docName+'-'+opData.v+'): '+util.inspect(error))
