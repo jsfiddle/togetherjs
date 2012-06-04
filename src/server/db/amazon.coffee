@@ -121,9 +121,9 @@ class BlobHandler
       console.log(@name+'Blob:Decompressed['+data.length+','+result.length+','+elapsed+'ms]') if @logging
       callback?(error, result)
 
-class Compressor
+class TextCompressor
   constructor: (@compression, logging) ->
-    @gzip = new BlobHandler 'Gzip',
+    @gzip = new BlobHandler 'Base64Gzip',
       (data, callback) ->
         zlib.gzip(new Buffer(data), callback)
       (data, callback) ->
@@ -148,6 +148,27 @@ class Compressor
     if @compression
       @base64.decode data, (error, result) =>
         @gzip.decode(result, callback)
+    else
+      callback?(null, data)
+
+class BinaryCompressor
+  constructor: (@compression, logging) ->
+    @gzip = new BlobHandler 'Gzip',
+      (data, callback) ->
+        zlib.gzip(new Buffer(data), callback)
+      (data, callback) ->
+        zlib.gunzip(data, callback)
+      logging
+
+  encode: (data, callback) =>
+    if @compression
+      @gzip.encode data, callback
+    else
+      callback?(null, data)
+
+  decode: (data, callback) =>
+    if @compression
+      @gzip.decode data, callback
     else
       callback?(null, data)
 
@@ -186,7 +207,8 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @create = (docName, docData, callback) ->
-    compressor = new Compressor(options['compress'], options['timing'])
+    compressor = new TextCompressor(options['compress'], options['timing'])
+    binaryCompressor = new BinaryCompressor(options['compress'], options['timing'])
     async.auto(
       compress_meta: (cb) ->
         compressor.encode(JSON.stringify(docData.meta), cb)
@@ -213,7 +235,7 @@ module.exports = AmazonDb = (options) ->
       ]
 
       compress_data: (cb) ->
-        compressor.encode(JSON.stringify(docData.snapshot), cb)
+        binaryCompressor.encode(JSON.stringify(docData.snapshot), cb)
 
       write_data: ['compress_data', (cb, results) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
@@ -380,15 +402,18 @@ module.exports = AmazonDb = (options) ->
       ]
 
       compressor: ['get_snapshot', 'get_data', (cb, results) ->
-        cb(null, new Compressor(results.get_snapshot.Items[0].c, options['timing']))
+        cb(null,
+          text: new TextCompressor(results.get_snapshot.Items[0].c, options['timing'])
+          binary: new BinaryCompressor(results.get_snapshot.Items[0].c, options['timing'])
+        )
       ]
 
       snapshot: ['compressor', (cb, results) ->
-        results.compressor.decode(results.get_data.buffer.toString(), cb)
+        results.compressor.binary.decode(results.get_data.buffer, cb)
       ]
 
       meta: ['compressor', (cb, results) ->
-        results.compressor.decode(results.get_snapshot.Items[0].meta.S, cb)
+        results.compressor.text.decode(results.get_snapshot.Items[0].meta.S, cb)
       ]
     (error, results) ->
       if error?
@@ -437,7 +462,8 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @writeSnapshot = (docName, docData, dbMeta, callback) ->
-    compressor = new Compressor(options['compress'], options['timing'])
+    compressor = new TextCompressor(options['compress'], options['timing'])
+    binaryCompressor = new BinaryCompressor(options['compress'], options['timing'])
     async.auto(
       compress_meta: (cb) ->
         compressor.encode(JSON.stringify(docData.meta), cb)
@@ -464,7 +490,7 @@ module.exports = AmazonDb = (options) ->
       ]
 
       compress_data: (cb) ->
-        compressor.encode(JSON.stringify(docData.snapshot), cb)
+        binaryCompressor.encode(JSON.stringify(docData.snapshot), cb)
 
       write_data: ['compress_data', (cb, results) ->
         path = snapshots_bucket+'/'+docName+'-'+docData.v+'.snapshot'
@@ -526,7 +552,7 @@ module.exports = AmazonDb = (options) ->
       else
         data = []
         async.map(results.get_metadata.Items, (operation, cb) ->
-          compressor = new Compressor(operation.c?, options['timing'])
+          compressor = new TextCompressor(operation.c?, options['timing'])
           async.auto(
             snapshot: (c) ->
               compressor.decode(operation.op.S, c)
@@ -572,7 +598,7 @@ module.exports = AmazonDb = (options) ->
   # Calls callback(error) on failure.
   # Calls callback() on success.
   @writeOp = (docName, opData, callback) ->
-    compressor = new Compressor(options['compress'], options['timing'])
+    compressor = new TextCompressor(options['compress'], options['timing'])
     async.auto(
       compress_op: (cb) ->
         compressor.encode(JSON.stringify(opData.op), cb)
