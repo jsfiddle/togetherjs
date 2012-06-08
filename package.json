@@ -28,7 +28,8 @@
   "engine": "node >= 0.4.4",
   "scripts": {
     "build": "cake build",
-    "test": "nodeunit tests.coffee"
+    "test": "nodeunit tests.coffee",
+    "postinstall": "cake build"
   },
   "licenses": [{
     "type": "BSD",
