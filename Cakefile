@@ -1,9 +1,12 @@
 {exec} = require 'child_process'
-fs = require 'fs'
-path = require 'path'
+fs     = require 'fs'
+path   = require 'path'
+os     = require 'os'
 
-# Path to the coffee executable
-coffee = './node_modules/.bin/coffee'
+# Gain access through PATH to all binaries added by `npm install`
+npm_bin  = path.resolve(path.join('node_modules', '.bin'))
+path_sep = if os.platform() == 'win32' then ";" else ":"
+process.env.PATH = "#{npm_bin}#{path_sep}#{process.env.PATH}"
 
 task 'test', 'Run all tests', ->
 	# run directly to get all the delicious output
@@ -13,7 +16,7 @@ task 'test', 'Run all tests', ->
 
 task 'build', 'Build the .js files', (options) ->
 	console.log('Compiling Coffee from src to lib')
-	exec "#{coffee} --compile --bare --output lib/ src/", (err, stdout, stderr) ->
+	exec "coffee --compile --bare --output lib/ src/", (err, stdout, stderr) ->
 		throw err if err
 		console.log stdout + stderr
 
@@ -71,7 +74,7 @@ expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 compile = (filenames, dest) ->
 	filenames = expandNames filenames
 	# I would really rather do this in pure JS.
-	e "#{coffee} -j #{dest}.uncompressed.js -c #{filenames}", ->
+	e "coffee -j #{dest}.uncompressed.js -c #{filenames}", ->
 		console.log "Uglifying #{dest}"
 		makeUgly "#{dest}.uncompressed.js", "#{dest}.js"
 
@@ -91,7 +94,7 @@ task 'webclient', 'Build the web client into one file', ->
 
 	# TODO: This should also be closure compiled.
 	extrafiles = expandNames extras
-	e "#{coffee} --compile --output webclient/ #{extrafiles}", ->
+	e "coffee --compile --output webclient/ #{extrafiles}", ->
 		# For backwards compatibility. (The ace.js file used to be called share-ace.js)
 		e "cp webclient/ace.js webclient/share-ace.js"
 
