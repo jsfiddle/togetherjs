@@ -19,7 +19,6 @@
     "request": ">= 2.1.1",
     "coffee-script": "= 1.1.0",
     "browserchannel": "*",
-    "redis": "0.7.x",
     "hat": "*"
   },
   "devDependencies": {
