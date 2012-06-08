@@ -82,7 +82,10 @@ class DynamoQueue
     @queue.push(fn, (error, results) =>
       if @timing
         elapsed = new Date().getTime() - start
-        capacity = results.ConsumedCapacityUnits if results?
+        if results?
+          capacity = results.ConsumedCapacityUnits
+        else
+          capacity = -1
         console.log('Dynamo['+elapsed+'ms,'+capacity+'] '+@name+': '+description)
 
       callback(error, results)
@@ -111,14 +114,22 @@ class BlobHandler
     start = new Date().getTime()
     @encodeFunction data, (error, result) =>
       elapsed = new Date().getTime() - start
-      console.log(@name+'Blob:Compressed['+data.length+','+result.length+','+elapsed+'ms]') if @logging
+      if result?
+        length = result.length
+      else
+        length = -1
+      console.log(@name+'Blob:Compressed['+data.length+','+length+','+elapsed+'ms]') if @logging
       callback?(error, result)
 
   decode: (data, callback) =>
     start = new Date().getTime()
     @decodeFunction data, (error, result) =>
       elapsed = new Date().getTime() - start
-      console.log(@name+'Blob:Decompressed['+data.length+','+result.length+','+elapsed+'ms]') if @logging
+      if result?
+        length = result.length
+      else
+        length = -1
+      console.log(@name+'Blob:Decompressed['+data.length+','+length+','+elapsed+'ms]') if @logging
       callback?(error, result)
 
 class TextCompressor
@@ -398,7 +409,7 @@ module.exports = AmazonDb = (options) ->
         item = results.get_snapshot.Items[0]
         s3_ro_queue.push((c) ->
           s3.get('/'+snapshots_bucket+'/'+item.doc.S+'-'+item.v.N+'.snapshot', 'buffer', c)
-        , 'query Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
+        , 'fetch Snapshot('+item.doc.S+'-'+item.v.N+')', cb)
       ]
 
       compressor: ['get_snapshot', 'get_data', (cb, results) ->
