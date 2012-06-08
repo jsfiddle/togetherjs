@@ -12,6 +12,7 @@ task 'test', 'Run all tests', ->
 		throw err if err
 
 task 'build', 'Build the .js files', (options) ->
+	console.log('Compiling Coffee from src to lib')
 	exec "#{coffee} --compile --bare --output lib/ src/", (err, stdout, stderr) ->
 		throw err if err
 		console.log stdout + stderr
