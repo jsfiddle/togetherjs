@@ -2,6 +2,9 @@
 fs = require 'fs'
 path = require 'path'
 
+# Path to the coffee executable
+coffee = './node_modules/.bin/coffee'
+
 task 'test', 'Run all tests', ->
 	# run directly to get all the delicious output
 	console.log 'Running tests...'
@@ -9,7 +12,7 @@ task 'test', 'Run all tests', ->
 		throw err if err
 
 task 'build', 'Build the .js files', (options) ->
-	exec "coffee --compile --bare --output lib/ src/", (err, stdout, stderr) ->
+	exec "#{coffee} --compile --bare --output lib/ src/", (err, stdout, stderr) ->
 		throw err if err
 		console.log stdout + stderr
 
@@ -67,7 +70,7 @@ expandNames = (names) -> ("src/#{c}.coffee" for c in names).join ' '
 compile = (filenames, dest) ->
 	filenames = expandNames filenames
 	# I would really rather do this in pure JS.
-	e "coffee -j #{dest}.uncompressed.js -c #{filenames}", ->
+	e "#{coffee} -j #{dest}.uncompressed.js -c #{filenames}", ->
 		console.log "Uglifying #{dest}"
 		makeUgly "#{dest}.uncompressed.js", "#{dest}.js"
 
@@ -87,7 +90,7 @@ task 'webclient', 'Build the web client into one file', ->
 
 	# TODO: This should also be closure compiled.
 	extrafiles = expandNames extras
-	e "coffee --compile --output webclient/ #{extrafiles}", ->
+	e "#{coffee} --compile --output webclient/ #{extrafiles}", ->
 		# For backwards compatibility. (The ace.js file used to be called share-ace.js)
 		e "cp webclient/ace.js webclient/share-ace.js"
 
