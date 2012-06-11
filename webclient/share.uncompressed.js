@@ -576,6 +576,7 @@
           }
           this.serverOps[this.version] = oldInflightOp;
           this.version++;
+          this.emit('acknowledge', oldInflightOp);
           _ref4 = this.inflightCallbacks;
           for (_j = 0, _len2 = _ref4.length; _j < _len2; _j++) {
             callback = _ref4[_j];
@@ -701,7 +702,7 @@
   exports.Doc = Doc;
 
   if (typeof WEB !== "undefined" && WEB !== null) {
-    types || (types = exports.types);
+    types = exports.types;
     if (!window.BCSocket) {
       throw new Error('Must load browserchannel before this library');
     }
