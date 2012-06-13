@@ -263,6 +263,17 @@ genTests = (client) -> testCase
       doc.submitOp sentOp, (error, v) ->
         passPart()
   
+  'doc fires acknowledge event when it recieves acknowledgement from server': (test) ->
+    passPart = makePassPart test, 1
+    @c.open @name, 'text', (error, doc) =>
+      test.fail error if error
+      sentOp = [{i:'asdf', p:0}]
+      doc.on 'acknowledge', (op) ->
+        test.deepEqual op, sentOp
+        passPart()
+
+      doc.submitOp sentOp
+
   'doc does not receive ops after close called': (test) ->
     @c.open @name, 'text', (error, doc) =>
       doc.on 'change', (op) ->

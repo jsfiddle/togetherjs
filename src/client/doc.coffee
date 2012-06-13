@@ -17,6 +17,7 @@ if WEB?
 # Events:
 #  - remoteop (op)
 #  - changed (op)
+#  - acknowledge (op)
 #  - error
 #  - open, closing, closed. 'closing' is not guaranteed to fire before closed.
 class Doc
@@ -195,6 +196,7 @@ class Doc
 
         @serverOps[@version] = oldInflightOp
         @version++
+        @emit 'acknowledge', oldInflightOp
         callback null, oldInflightOp for callback in @inflightCallbacks
 
       # Send the next op.
