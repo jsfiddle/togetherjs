@@ -25,4 +25,9 @@
   <script src="test-tree-inspectors.js"></script>
   <script src="test-spec.js"></script>
   <script src="test-errors.jquery.js"></script>
+  
+  <script>
+  if (location.search.match(/externalreporter=1/))
+    document.write('<script src="/externalreporter.js"></' + 'script>');
+  </script>
 </html>
