@@ -506,11 +506,11 @@ h1.error-category {
 </div>
 
 <div class="test">
-  <script type="text/x-bad-html">
-    <style>
-      <!-- html comment in CSS block -->
-    </style>
-  </script>
+  <div class="bad-html">
+    &lt;style&gt;
+      &lt;!-- html comment in CSS block --&gt;
+    &lt;/style&gt;
+  </div>
   <script type="application/json">
   {
     "type": "HTML_CODE_IN_CSS_BLOCK",
