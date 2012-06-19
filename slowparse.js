@@ -1034,7 +1034,7 @@ var Slowparse = (function() {
         this._parseComment();
         return;
       }
-      
+
       this.stream.eat(/\//);
       this.stream.eatWhile(/[\w\d]/);
       var token = this.stream.makeToken();
@@ -1090,6 +1090,23 @@ var Slowparse = (function() {
       token = this.stream.makeToken();
       throw new ParseError("UNTERMINATED_COMMENT", token);
     },
+    // This helper parses CDATA content. It assumes the stream has just
+    // passed the beginning `<tagname` of an HTML element.
+    _parseCDATA: function(tagname) {
+      var token, matchString = '</'+tagname+'>';
+      this.stream.makeToken();
+      while (!this.stream.end()) {
+        if (this.stream.match(matchString, true)) {
+          token = this.stream.makeToken();
+          this.domBuilder.text(token.value.slice(0, -matchString.length), token.interval);
+          // ADD TOKEN RANGE END TO DOMBUILDER.CURRENTNODE HERE
+          return;
+        }
+        this.stream.next();
+      }
+      token = this.stream.makeToken();
+      throw new ParseError("UNTERMINATED_COMMENT", token);
+    },
     // This helper function parses the end of a closing tag. It expects
     // the stream to be right after the end of the closing tag's tag
     // name.
@@ -1134,6 +1151,12 @@ var Slowparse = (function() {
           if (!this.stream.end() && tagName === "style") {
             var cssBlock = this.cssParser.parse();
             this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
+          }
+          
+          // If the opening tag represents a `<textarea>` element, we need
+          // to parse all its contents as CDATA (unparsed character data)
+          if (tagName && tagName === "textarea") {
+            this._parseCDATA("textarea");
           }
 
           return;
