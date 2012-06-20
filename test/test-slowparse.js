@@ -136,11 +136,16 @@ test("parsing of HTML comments with '--' in them", function() {
 });
 
 test("parsing of CDATA in <textarea> elements", function() {
-  var html = "<textarea readonly>\nThis is CDATA with <p>, <i> and"+
-             " <script> in it.\nThis should not trigger errors.</textarea>";
+  var text = "\nThis is CDATA with <p>, <i> and" +
+             " <script> in it.\nThis should not trigger errors.";
+  var html = "<textarea>" + text + "</textarea>";
   var doc = parseWithoutErrors(html);
-  equal(documentFragmentHTML(doc), html,
-        "serialization of generated DOM matches original HTML");
+
+  equal(doc.childNodes.length, 1, "doc has one child node");
+  equal(doc.childNodes[0].nodeName, "TEXTAREA", "child node is <textarea>");
+  equal(doc.childNodes[0].childNodes.length, 1, "textarea has one child");
+  equal(doc.childNodes[0].childNodes[0].nodeValue, text,
+        "textarea contents are ok");
 });
 
 testManySnippets("parsing of HTML is case-insensitive", [
