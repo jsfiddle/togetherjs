@@ -1034,7 +1034,7 @@ var Slowparse = (function() {
         this._parseComment();
         return;
       }
-      
+
       this.stream.eat(/\//);
       this.stream.eatWhile(/[\w\d]/);
       var token = this.stream.makeToken();
@@ -1090,6 +1090,37 @@ var Slowparse = (function() {
       token = this.stream.makeToken();
       throw new ParseError("UNTERMINATED_COMMENT", token);
     },
+    // This helper parses CDATA content, which should be treated as raw text,
+    // rather than being parsed for markup. It assumes the stream has just
+    // passed the beginning `<tagname` of an HTML element.
+    _parseCDATA: function(tagname) {
+      var token,
+           matchString = '</'+tagname+'>',
+           text,
+           textInterval = { start: 0, end: 0 },
+           openTagEnd = this.domBuilder.currentNode.parseInfo.openTag.end,
+           closeTagInterval;
+
+      this.stream.makeToken();
+      while (!this.stream.end()) {
+        if (this.stream.match(matchString, true)) {
+          token = this.stream.makeToken();
+          text = token.value.slice(0, -matchString.length);
+          closeTagInterval = {
+            start: openTagEnd + text.length,
+            end: token.interval.end
+          };
+          this.domBuilder.currentNode.parseInfo.closeTag = closeTagInterval;
+          textInterval.start = token.interval.start;
+          textInterval.end = token.interval.end - (closeTagInterval.end - closeTagInterval.start);
+          this.domBuilder.text(text, textInterval);
+          this.domBuilder.popElement();
+          return;
+        }
+        this.stream.next();
+      }
+      throw new ParseError("UNCLOSED_TAG", this);
+    },
     // This helper function parses the end of a closing tag. It expects
     // the stream to be right after the end of the closing tag's tag
     // name.
@@ -1134,6 +1165,12 @@ var Slowparse = (function() {
           if (!this.stream.end() && tagName === "style") {
             var cssBlock = this.cssParser.parse();
             this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
+          }
+          
+          // If the opening tag represents a `<textarea>` element, we need
+          // to parse all its contents as CDATA (unparsed character data)
+          if (tagName && tagName === "textarea") {
+            this._parseCDATA("textarea");
           }
 
           return;
