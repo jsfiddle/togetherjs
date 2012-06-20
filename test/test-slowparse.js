@@ -135,6 +135,14 @@ test("parsing of HTML comments with '--' in them", function() {
         "serialization of generated DOM matches original HTML");
 });
 
+test("parsing of CDATA in <textarea> elements", function() {
+  var html = "<textarea readonly>\nThis is CDATA with <p>, <i> and"+
+             " <script> in it.\nThis should not trigger errors.</textarea>";
+  var doc = parseWithoutErrors(html);
+  equal(documentFragmentHTML(doc), html,
+        "serialization of generated DOM matches original HTML");
+});
+
 testManySnippets("parsing of HTML is case-insensitive", [
   '<P CLASS="FOO">hi</P>',
   '<P class="FOO">hi</P>',

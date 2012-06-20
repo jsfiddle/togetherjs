@@ -1090,22 +1090,36 @@ var Slowparse = (function() {
       token = this.stream.makeToken();
       throw new ParseError("UNTERMINATED_COMMENT", token);
     },
-    // This helper parses CDATA content. It assumes the stream has just
+    // This helper parses CDATA content, which should be treated as raw text,
+    // rather than being parsed for markup. It assumes the stream has just
     // passed the beginning `<tagname` of an HTML element.
     _parseCDATA: function(tagname) {
-      var token, matchString = '</'+tagname+'>';
+      var token,
+           matchString = '</'+tagname+'>',
+           text,
+           textInterval = { start: 0, end: 0 },
+           openTagEnd = this.domBuilder.currentNode.parseInfo.openTag.end,
+           closeTagInterval;
+
       this.stream.makeToken();
       while (!this.stream.end()) {
         if (this.stream.match(matchString, true)) {
           token = this.stream.makeToken();
-          this.domBuilder.text(token.value.slice(0, -matchString.length), token.interval);
-          // ADD TOKEN RANGE END TO DOMBUILDER.CURRENTNODE HERE
+          text = token.value.slice(0, -matchString.length);
+          closeTagInterval = {
+            start: openTagEnd + text.length,
+            end: token.interval.end
+          };
+          this.domBuilder.currentNode.parseInfo.closeTag = closeTagInterval;
+          textInterval.start = token.interval.start;
+          textInterval.end = token.interval.end - (closeTagInterval.end - closeTagInterval.start);
+          this.domBuilder.text(text, textInterval);
+          this.domBuilder.popElement();
           return;
         }
         this.stream.next();
       }
-      token = this.stream.makeToken();
-      throw new ParseError("UNTERMINATED_COMMENT", token);
+      throw new ParseError("UNCLOSED_TAG", this);
     },
     // This helper function parses the end of a closing tag. It expects
     // the stream to be right after the end of the closing tag's tag
