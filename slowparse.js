@@ -996,7 +996,7 @@ var Slowparse = (function() {
                            "plaintext", "s", "strike", "tt", "xmp"],
 
     // This is a helper function to determine whether a given string
-    // is a legal HTML element tag.
+    // is a legal HTML5 element tag.
     _knownHTMLElement: function(tagName) {
       return this.voidHtmlElements.indexOf(tagName) > -1 ||
               this.htmlElements.indexOf(tagName) > -1 ||
