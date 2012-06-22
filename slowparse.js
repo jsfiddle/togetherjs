@@ -1103,10 +1103,8 @@ var Slowparse = (function() {
 
       else {
         // We want to make sure that opening tags have valid tag names.
-        if (tagName) {
-          if ((this.parseSVG && !this._knownSVGElement(tagName)) || !this._knownHTMLElement(tagName))
+        if (!tagName || (tagName && (!this._knownHTMLElement(tagName) || (this.parseSVG && !this._knownSVGElement(tagName)))))
             throw new ParseError("INVALID_TAG_NAME", tagName, token);
-        }
 
         var parseInfo = { openTag: { start: token.interval.start }};
         var nameSpace = (this.parseSVG ? this.svgNameSpace : undefined);
