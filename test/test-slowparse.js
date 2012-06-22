@@ -180,6 +180,25 @@ test("DOMBuilder is called with lowercased element/attrs", function() {
   deepEqual(attributes, ['class'], "attribute names are lowercased");
 });
 
+test("parsing of SVG elements", function() {
+  var d = "M 0 0 L 100 0 100 100 0 100\n"+ 
+              "           M 10 10 L 10 90 90 90 90 10\n"+
+              "           M 20 20 L 80 20 80 80 20 80\n"+
+              "           M 30 30 L 30 70 70 70 70 30\n"+
+              "           M 40 40 L 60 40 60 60 40 60\n"+
+              "           M 47 47 L 47 53 53 53 53 47 Z";
+  var html = "<svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg>";
+  var doc = parseWithoutErrors(html);
+
+  equal(doc.childNodes.length, 1, "doc has one child node");
+  equal(doc.childNodes[0].nodeName, "svg", "child node is <svg>");
+  equal(doc.childNodes[0].childNodes.length, 1, "svg element has one child");
+  equal(doc.childNodes[0].childNodes[0].nodeName, "path", "svg child node is <path>");
+  equal(doc.childNodes[0].childNodes[0].getAttribute('d'), d,
+        "path outline data is correct");
+});
+
+
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
   '<img src="http://www.mozilla.org/favicon.ico">'
