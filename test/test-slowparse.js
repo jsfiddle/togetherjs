@@ -198,6 +198,19 @@ test("parsing of SVG elements", function() {
         "path outline data is correct");
 });
 
+test("verifying SVG namespace", function() {
+  var d = "M 0 0 L 100 0 100 100 0 100 Z";
+  var html = "<html><body><svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg></body></html>";
+  var doc = parseWithoutErrors(html);
+
+  equal(doc.childNodes.length, 1, "doc has one child node");
+  equal(doc.childNodes[0].nodeName, "HTML", "top element is <html>");
+  equal(doc.childNodes[0].childNodes[0].nodeName, "BODY", "contained element is <body>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].nodeName, "svg", "first content node is <svg>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].namespaceURI.toLowerCase(), "http://www.w3.org/2000/svg", "svg element uses the correct namespace");
+});
+
+
 
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
