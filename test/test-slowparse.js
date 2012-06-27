@@ -181,12 +181,7 @@ test("DOMBuilder is called with lowercased element/attrs", function() {
 });
 
 test("parsing of SVG elements", function() {
-  var d = "M 0 0 L 100 0 100 100 0 100\n"+ 
-              "           M 10 10 L 10 90 90 90 90 10\n"+
-              "           M 20 20 L 80 20 80 80 20 80\n"+
-              "           M 30 30 L 30 70 70 70 70 30\n"+
-              "           M 40 40 L 60 40 60 60 40 60\n"+
-              "           M 47 47 L 47 53 53 53 53 47 Z";
+  var d = "M 0 0 L 100 0 L 100 100 L 0 100 Z";
   var html = "<svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg>";
   var doc = parseWithoutErrors(html);
 
@@ -194,23 +189,27 @@ test("parsing of SVG elements", function() {
   equal(doc.childNodes[0].nodeName, "svg", "child node is <svg>");
   equal(doc.childNodes[0].childNodes.length, 1, "svg element has one child");
   equal(doc.childNodes[0].childNodes[0].nodeName, "path", "svg child node is <path>");
-  equal(doc.childNodes[0].childNodes[0].getAttribute('d'), d,
-        "path outline data is correct");
+  equal(doc.childNodes[0].childNodes[0].getAttribute('d'), d, "path outline data is correct");
 });
 
 test("verifying SVG namespace", function() {
   var d = "M 0 0 L 100 0 100 100 0 100 Z";
-  var html = "<html><body><svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg></body></html>";
+  var html = "<html><body><p>test</p><svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg><p>test</p></body></html>";
   var doc = parseWithoutErrors(html);
+  
+  var htmlns = "http://www.w3.org/1999/xhtml",
+      svgns = "http://www.w3.org/2000/svg";
 
   equal(doc.childNodes.length, 1, "doc has one child node");
   equal(doc.childNodes[0].nodeName, "HTML", "top element is <html>");
   equal(doc.childNodes[0].childNodes[0].nodeName, "BODY", "contained element is <body>");
-  equal(doc.childNodes[0].childNodes[0].childNodes[0].nodeName, "svg", "first content node is <svg>");
-  equal(doc.childNodes[0].childNodes[0].childNodes[0].namespaceURI.toLowerCase(), "http://www.w3.org/2000/svg", "svg element uses the correct namespace");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].nodeName, "P", "first content node is <p>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].namespaceURI.toLowerCase(), htmlns, "p element uses the correct namespace");
+  equal(doc.childNodes[0].childNodes[0].childNodes[1].nodeName, "svg", "second content node is <svg>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[1].namespaceURI.toLowerCase(), svgns, "svg element uses the correct namespace");
+  equal(doc.childNodes[0].childNodes[0].childNodes[2].nodeName, "P", "third content node is <p>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[2].namespaceURI.toLowerCase(), htmlns, "p element uses the correct namespace");
 });
-
-
 
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
