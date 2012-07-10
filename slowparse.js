@@ -1005,7 +1005,6 @@ var Slowparse = (function() {
     // This is a helper function to determine whether a given string
     // is a legal SVG element tag.
     _knownSVGElement: function(tagName) {
-      window.console.log(tagName + " _knownSVGElement? (parsing svg: "+this.parsingSVG+")");
       return this.svgElements.indexOf(tagName) > -1;
     },
     // This is a helper function to determine whether a given string
