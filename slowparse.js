@@ -966,28 +966,28 @@ var Slowparse = (function() {
                    "optgroup", "option", "output", "p", "param", "pre",
                    "progress", "q", "rp", "rt", "ruby", "samp", "script",
                    "section", "select", "small", "source", "spacer", "span",
-                   "strong", "style", "sub", "summary", "sup", "table",
+                   "strong", "style", "sub", "summary", "sup", "svg", "table",
                    "tbody", "td", "textarea", "tfoot", "th", "thead", "time",
                    "title", "tr", "track", "u", "ul", "var", "video", "wbr"],
 
     // HTML5 allows SVG elements
-    svgElements:  ["a", "altGlyph", "altGlyphDef", "altGlyphItem", "animate",
-                   "animateColor", "animateMotion", "animateTransform", "circle",
-                   "clipPath", "color-profile", "cursor", "defs", "desc",
-                   "ellipse", "feBlend", "feColorMatrix", "feComponentTransfer",
-                   "feComposite", "feConvolveMatrix", "feDiffuseLighting",
-                   "feDisplacementMap", "feDistantLight", "feFlood", "feFuncA",
-                   "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage",
-                   "feMerge", "feMergeNode", "feMorphology", "feOffset",
-                   "fePointLight", "feSpecularLighting", "feSpotLight",
-                   "feTile", "feTurbulence", "filter", "font", "font-face",
+    svgElements:  ["a", "altglyph", "altglyphdef", "altglyphitem", "animate",
+                   "animatecolor", "animatemotion", "animatetransform", "circle",
+                   "clippath", "color-profile", "cursor", "defs", "desc",
+                   "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer",
+                   "fecomposite", "feconvolvematrix", "fediffuselighting",
+                   "fedisplacementmap", "fedistantlight", "feflood", "fefunca",
+                   "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage",
+                   "femerge", "femergenode", "femorphology", "feoffset",
+                   "fepointlight", "fespecularlighting", "fespotlight",
+                   "fetile", "feturbulence", "filter", "font", "font-face",
                    "font-face-format", "font-face-name", "font-face-src",
-                   "font-face-uri", "foreignObject", "g", "glyph", "glyphRef",
-                   "hkern", "image", "line", "linearGradient", "marker", "mask",
+                   "font-face-uri", "foreignobject", "g", "glyph", "glyphref",
+                   "hkern", "image", "line", "lineargradient", "marker", "mask",
                    "metadata", "missing-glyph", "mpath", "path", "pattern",
-                   "polygon", "polyline", "radialGradient", "rect", "script",
+                   "polygon", "polyline", "radialgradient", "rect", "script",
                    "set", "stop", "style", "svg", "switch", "symbol", "text",
-                   "textPath", "title", "tref", "tspan", "use", "view", "vkern"],
+                   "textpath", "title", "tref", "tspan", "use", "view", "vkern"],
 
     // We also keep a list of HTML elements that are now obsolete, but
     // may still be encountered in the wild on popular sites.
@@ -1000,12 +1000,12 @@ var Slowparse = (function() {
     _knownHTMLElement: function(tagName) {
       return this.voidHtmlElements.indexOf(tagName) > -1 ||
               this.htmlElements.indexOf(tagName) > -1 ||
-              this.svgElements.indexOf(tagName) > -1 ||
               this.obsoleteHtmlElements.indexOf(tagName) > -1;
     },
     // This is a helper function to determine whether a given string
     // is a legal SVG element tag.
     _knownSVGElement: function(tagName) {
+      window.console.log(tagName + " _knownSVGElement? (parsing svg: "+this.parsingSVG+")");
       return this.svgElements.indexOf(tagName) > -1;
     },
     // This is a helper function to determine whether a given string
@@ -1076,7 +1076,7 @@ var Slowparse = (function() {
       var tagName = token.value.slice(1).toLowerCase();
 
       if (tagName === "svg")
-        this.parseSVG = true;
+        this.parsingSVG = true;
 
       // If the character after the `<` is a `/`, we're on a closing tag.
       // We want to report useful errors about whether the tag is unexpected
@@ -1084,7 +1084,7 @@ var Slowparse = (function() {
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
         if (closeTagName === "svg")
-          this.parseSVG = false;
+          this.parsingSVG = false;
         if (this._knownVoidHTMLElement(closeTagName))
           throw new ParseError("CLOSE_TAG_FOR_VOID_ELEMENT", this,
                                closeTagName, token);
@@ -1102,12 +1102,11 @@ var Slowparse = (function() {
       }
 
       else {
-        // We want to make sure that opening tags have valid tag names.
-        if (!tagName || (tagName && (!this._knownHTMLElement(tagName) || (this.parseSVG && !this._knownSVGElement(tagName)))))
-            throw new ParseError("INVALID_TAG_NAME", tagName, token);
+        if (!tagName || (tagName && ((this.parsingSVG && !this._knownSVGElement(tagName)) || (!this.parsingSVG && !this._knownHTMLElement(tagName)))))
+          throw new ParseError("INVALID_TAG_NAME", tagName, token);
 
         var parseInfo = { openTag: { start: token.interval.start }};
-        var nameSpace = (this.parseSVG ? this.svgNameSpace : undefined);
+        var nameSpace = (this.parsingSVG ? this.svgNameSpace : undefined);
         this.domBuilder.pushElement(tagName, parseInfo, nameSpace);
 
         if (!this.stream.end())
@@ -1187,7 +1186,7 @@ var Slowparse = (function() {
         else if (this.stream.peek() == '>' || this.stream.match("/>")) {
           var selfClosing = this.stream.match("/>", true);
           if (selfClosing) {
-            if (!this.parseSVG && !this._knownVoidHTMLElement(tagName))
+            if (!this.parsingSVG && !this._knownVoidHTMLElement(tagName))
               throw new ParseError("SELF_CLOSING_NON_VOID_ELEMENT", this,
                                    tagName);
           } else

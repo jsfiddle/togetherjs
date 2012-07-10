@@ -211,6 +211,12 @@ test("verifying SVG namespace", function() {
   equal(doc.childNodes[0].childNodes[0].childNodes[2].namespaceURI.toLowerCase(), htmlns, "p element uses the correct namespace");
 });
 
+test("verifying out-of-svg error", function() {
+  var html = "<html><body><svg><rect/></svg><path>error</path></body></html>";
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "INVALID_TAG_NAME");
+});
+
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
   '<img src="http://www.mozilla.org/favicon.ico">'
