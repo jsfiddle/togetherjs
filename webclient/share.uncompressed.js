@@ -6,7 +6,7 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   window.sharejs = exports = {
-    'version': '0.5.0-pre'
+    'version': '0.5.0'
   };
 
   if (typeof WEB === 'undefined') {
