@@ -257,3 +257,7 @@ try
 try
 if options.db.type == 'pg'
   exports.pg = test require('../src/server/db/pg'), options.db
+
+try
+if options.db.type == 'amazon'
+  exports.amazon = test require('../src/server/db/amazon'), options.db

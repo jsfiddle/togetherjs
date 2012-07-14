@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+
+require('coffee-script');
+
+var options = require('./options');
+
+var dynamo = require("dynamo"),
+  client = dynamo.createClient({
+    accessKeyId: options.db.amazon_access_key,
+    secretAccessKey: options.db.amazon_secret_key
+  }),
+  db = client.get(options.db.amazon_region)
+
+db.createTable({
+  TableName: options.db.amazon_dynamo_operations_table_name,
+
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 20,
+    WriteCapacityUnits: 20
+  },
+
+  KeySchema: {
+    HashKeyElement: {
+      AttributeName: "doc",
+      AttributeType: "S"
+    },
+    RangeKeyElement: {
+      AttributeName: "v",
+      AttributeType: "N"
+    }
+  }
+}, function(error, result){
+  if (error != null) {
+    console.log("Error creating Dynamo operations table");
+    console.log(error);
+  }
+
+  db.createTable({
+    TableName: options.db.amazon_dynamo_snapshots_table_name,
+
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 20,
+      WriteCapacityUnits: 20
+    },
+
+    KeySchema: {
+      HashKeyElement: {
+        AttributeName: "doc",
+        AttributeType: "S"
+      },
+      RangeKeyElement: {
+        AttributeName: "v",
+        AttributeType: "N"
+      }
+    }
+  }, function(error, result){
+    if (error != null) {
+      console.log("Error creating Dynamo snapshots table");
+      console.log(error);
+    }
+  })
+})
+
+var s3 = require('aws2js').load('s3', options.db.amazon_access_key, options.db.amazon_secret_key);
+
+s3.createBucket(options.db.amazon_s3_snapshots_bucket_name, false, options.db.amazon_region, function (error, result) {
+  if (error != null) {
+    console.log("Error creating S3 snapshots bucket")
+    console.log(error);
+  }
+});
