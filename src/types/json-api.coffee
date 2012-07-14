@@ -2,6 +2,12 @@
 
 json = require './json' if typeof WEB is 'undefined'
 
+if WEB?
+  extendDoc = exports.extendDoc
+  exports.extendDoc = (name, fn) ->
+    SubDoc::[name] = fn
+    extendDoc name, fn
+
 depath = (path) ->
   if path.length == 1 and path[0].constructor == Array
     path[0]

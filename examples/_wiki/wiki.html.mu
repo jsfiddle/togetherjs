@@ -17,7 +17,7 @@
     <script src="/lib/markdown/showdown.js" type="text/javascript"></script>
     <script src="/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="/channel/bcsocket.js"></script>
-    <script src="/share/share.js"></script>
+    <script src="/share/share.uncompressed.js"></script>
     <script src="/share/ace.js"></script>
     <script>
 window.onload = function() {

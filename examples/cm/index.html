@@ -1,0 +1,58 @@
+<!doctype html>
+<meta charset=utf-8>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/lib/cm/lib/codemirror.css">
+
+<div id="header">
+  <div id="htext">
+    <b>Editing</b> <input type="text" value="cm" id='namefield'>
+  </div>
+</div>
+
+<div id="editor"></div>
+<script src="/lib/cm/lib/codemirror.js"></script>
+<script src="/lib/cm/mode/coffeescript/coffeescript.js"></script>
+<script src="/channel/bcsocket.js"></script>
+<script src="/share/share.uncompressed.js"></script>
+<script src="/share/cm.js"></script>
+<script>
+var doc = null, editor = null;
+
+function setDoc(docName) {
+  document.title = docName;
+
+  sharejs.open(docName, function(error, newDoc) {
+      if (doc !== null) {
+          doc.close();
+          doc.detach_ace();
+      }
+
+      doc = newDoc;
+
+      if (error) {
+          console.error(error);
+          return;
+      }
+      doc.attach_cm(editor);
+  });
+};
+
+window.onload = function() {
+  //var ed = document.getElementById('editor');
+  editor = CodeMirror(document.body, { mode: "coffeescript", tabSize: 2 });
+
+  setDoc('cm');  // Hooking ShareJS and CodeMirror for the first time.
+
+  var namefield = document.getElementById('namefield');
+  function fn() {
+      var docName = namefield.value;
+      if (docName) setDoc(docName);
+  }
+
+  if (namefield.addEventListener) {
+      namefield.addEventListener('input', fn, false);
+  } else {
+      namefield.attachEvent('oninput', fn);
+  }
+};
+</script>

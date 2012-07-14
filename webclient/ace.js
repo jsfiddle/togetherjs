@@ -36,7 +36,7 @@
     }
   };
 
-  window.sharejs.Doc.prototype.attach_ace = function(editor, keepEditorContents) {
+  window.sharejs.extendDoc('attach_ace', function(editor, keepEditorContents) {
     var check, doc, docListener, editorDoc, editorListener, offsetToPos, suppress;
     if (!this.provides['text']) {
       throw new Error('Only text documents can be attached to ace');
@@ -109,6 +109,6 @@
       editorDoc.removeListener('change', editorListener);
       return delete doc.detach_ace;
     };
-  };
+  });
 
 }).call(this);

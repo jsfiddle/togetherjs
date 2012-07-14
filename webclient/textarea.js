@@ -20,10 +20,10 @@
     }
   };
 
-  window.sharejs.Doc.prototype.attach_textarea = function(elem) {
+  window.sharejs.extendDoc('attach_textarea', function(elem) {
     var doc, event, genOp, prevvalue, replaceText, _i, _len, _ref, _results;
     doc = this;
-    elem.value = this.snapshot;
+    elem.value = this.getText();
     prevvalue = elem.value;
     replaceText = function(newText, transformCursor) {
       var newSelection, scrollTop;
@@ -80,6 +80,6 @@
       }
     }
     return _results;
-  };
+  });
 
 }).call(this);
