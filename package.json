@@ -24,7 +24,7 @@
   "devDependencies": {
     "nodeunit": "*"
   },
-  "engine": "node >= 0.4.4",
+  "engine": "node >= 0.6",
   "scripts": {
     "build": "cake build",
     "test": "nodeunit tests.coffee"
