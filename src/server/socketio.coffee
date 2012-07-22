@@ -79,7 +79,7 @@ exports.attach = (server, createClient, options) ->
         p "listener doc:#{docName} opdata:#{i opData} v:#{version}"
 
         # Skip the op if this socket sent it.
-        return if opData.meta?.source == client.id
+        return if opData.meta?.source == client.sessionId
 
         opMsg =
           doc: docName
