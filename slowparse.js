@@ -36,7 +36,7 @@ var Slowparse = (function() {
     quot: '"',
     amp: "&"
   };
-  
+
   // `replaceEntityRefs()` will replace named character entity references
   // (e.g. `&lt;`) in the given text string and return the result. If an
   // entity name is unrecognized, don't replace it at all. Writing HTML
@@ -52,11 +52,11 @@ var Slowparse = (function() {
       return ref;
     });
   }
-  
-  
+
+
   // ### Errors
   //
-  // `ParseError` is an internal error class used to indicate a parsing error. 
+  // `ParseError` is an internal error class used to indicate a parsing error.
   // It never gets seen by Slowparse clients, as parse errors are an
   // expected occurrence. However, they are used internally to simplify
   // flow control.
@@ -90,7 +90,7 @@ var Slowparse = (function() {
   // `ParseErrorBuilders` contains Factory functions for all our types of
   // parse errors, indexed by error type.
   //
-  // Each public factory function returns a `parseInfo` object, sans the 
+  // Each public factory function returns a `parseInfo` object, sans the
   // `type` property. For more information on each type of error,
   // see the [error specification][].
   //
@@ -309,7 +309,7 @@ var Slowparse = (function() {
       }
     }
   };
-  
+
   // ### Streams
   //
   // `Stream` is an internal class used for tokenization. The interface for
@@ -442,10 +442,10 @@ var Slowparse = (function() {
 
 
   // ### CSS Parsing
-  // 
+  //
   // `CSSParser` is our internal CSS token stream parser object. This object
   // has references to the stream, as well as the HTML DOM builder that is
-  // used by the HTML parser. 
+  // used by the HTML parser.
   function CSSParser(stream, domBuilder) {
     this.stream = stream;
     this.domBuilder = domBuilder;
@@ -544,7 +544,7 @@ var Slowparse = (function() {
 
       // * A list of the CSS rulesets for the CSS block.
       this.rules = [];
-      
+
       // * A list of comment blocks inside the CSS.
       this.comments = [];
 
@@ -657,7 +657,7 @@ var Slowparse = (function() {
       this.stream.eatCSSWhile(/[^\{;\}<]/);
       var token = this.stream.makeToken(),
           peek = this.stream.peek();
-      
+
       // If there was nothing to select, we're either done,
       // or an error occurred.
       if (token === null) {
@@ -762,7 +762,7 @@ var Slowparse = (function() {
         throw new ParseError("MISSING_CSS_BLOCK_CLOSER", this, selectorStart,
                              selectorStart+value.length, value);
       }
-      
+
       // If we're still in this function at this point, all is well
       // and we can move on to property parsing.
       else {
@@ -861,7 +861,7 @@ var Slowparse = (function() {
     _parseValue: function(selector, selectorStart, property, propertyStart) {
       var rule = this.stream.eatCSSWhile(/[^}<;]/),
           token = this.stream.makeToken();
-          
+
       if(token === null) {
         throw new ParseError("MISSING_CSS_VALUE", this, propertyStart,
                              propertyStart+property.length, property);
@@ -869,8 +869,8 @@ var Slowparse = (function() {
 
       var next = (!this.stream.end() ? this.stream.next() : "end of stream"),
           errorMsg = "[_parseValue] Expected }, <, or ;, instead found "+next;
-      
-      
+
+
       this.filterComments(token);
       var value = token.value,
           valueStart = token.interval.start,
@@ -916,7 +916,7 @@ var Slowparse = (function() {
       }
     },
     // This helper function binds the currrent `property: value` object
-    // in the current ruleset, and resets it for the next selector block. 
+    // in the current ruleset, and resets it for the next selector block.
     _bindCurrentRule: function() {
       this.currentRule.declarations.properties.push(this.currentProperty);
       this.currentProperty = null;
@@ -936,12 +936,21 @@ var Slowparse = (function() {
   }
 
   HTMLParser.prototype = {
-    html5Doctype: '<!DOCTYPE html>',
-    // Void HTML elements are the ones that don't need to have a closing
-    // tag.
+    // since SVG requires a slightly different code path,
+    // we need to track whether we're in HTML or SVG mode.
+    parsingSVG: false,
+
+    // For SVG DOM elements, we need to know the SVG namespace.
+    svgNameSpace: "http://www.w3.org/2000/svg",
+
+    // HTML5 documents have a special doctype that we must use
+    html5Doctype: "<!DOCTYPE html>",
+
+    // Void HTML elements are the ones that don't need to have a closing tag.
     voidHtmlElements: ["area", "base", "br", "col", "command", "embed", "hr",
                        "img", "input", "keygen", "link", "meta", "param",
                        "source", "track", "wbr"],
+
     // We keep a list of all valid HTML5 elements.
     htmlElements: ["a", "abbr", "address", "area", "article", "aside",
                    "audio", "b", "base", "bdi", "bdo", "bgsound", "blink",
@@ -957,9 +966,29 @@ var Slowparse = (function() {
                    "optgroup", "option", "output", "p", "param", "pre",
                    "progress", "q", "rp", "rt", "ruby", "samp", "script",
                    "section", "select", "small", "source", "spacer", "span",
-                   "strong", "style", "sub", "summary", "sup", "table",
+                   "strong", "style", "sub", "summary", "sup", "svg", "table",
                    "tbody", "td", "textarea", "tfoot", "th", "thead", "time",
                    "title", "tr", "track", "u", "ul", "var", "video", "wbr"],
+
+    // HTML5 allows SVG elements
+    svgElements:  ["a", "altglyph", "altglyphdef", "altglyphitem", "animate",
+                   "animatecolor", "animatemotion", "animatetransform", "circle",
+                   "clippath", "color-profile", "cursor", "defs", "desc",
+                   "ellipse", "feblend", "fecolormatrix", "fecomponenttransfer",
+                   "fecomposite", "feconvolvematrix", "fediffuselighting",
+                   "fedisplacementmap", "fedistantlight", "feflood", "fefunca",
+                   "fefuncb", "fefuncg", "fefuncr", "fegaussianblur", "feimage",
+                   "femerge", "femergenode", "femorphology", "feoffset",
+                   "fepointlight", "fespecularlighting", "fespotlight",
+                   "fetile", "feturbulence", "filter", "font", "font-face",
+                   "font-face-format", "font-face-name", "font-face-src",
+                   "font-face-uri", "foreignobject", "g", "glyph", "glyphref",
+                   "hkern", "image", "line", "lineargradient", "marker", "mask",
+                   "metadata", "missing-glyph", "mpath", "path", "pattern",
+                   "polygon", "polyline", "radialgradient", "rect", "script",
+                   "set", "stop", "style", "svg", "switch", "symbol", "text",
+                   "textpath", "title", "tref", "tspan", "use", "view", "vkern"],
+
     // We also keep a list of HTML elements that are now obsolete, but
     // may still be encountered in the wild on popular sites.
     obsoleteHtmlElements: ["acronym", "applet", "basefont", "big", "center",
@@ -967,11 +996,16 @@ var Slowparse = (function() {
                            "plaintext", "s", "strike", "tt", "xmp"],
 
     // This is a helper function to determine whether a given string
-    // is a legal HTML element tag.
+    // is a legal HTML5 element tag.
     _knownHTMLElement: function(tagName) {
-      return this.voidHtmlElements.indexOf(tagName) > -1 || 
+      return this.voidHtmlElements.indexOf(tagName) > -1 ||
               this.htmlElements.indexOf(tagName) > -1 ||
               this.obsoleteHtmlElements.indexOf(tagName) > -1;
+    },
+    // This is a helper function to determine whether a given string
+    // is a legal SVG element tag.
+    _knownSVGElement: function(tagName) {
+      return this.svgElements.indexOf(tagName) > -1;
     },
     // This is a helper function to determine whether a given string
     // is a void HTML element tag.
@@ -997,7 +1031,7 @@ var Slowparse = (function() {
             end: this.stream.pos
           }
         };
-      
+
       // Next, we parse "tag soup", creating text nodes and diving into
       // tags as we find them.
       while (!this.stream.end()) {
@@ -1039,12 +1073,17 @@ var Slowparse = (function() {
       this.stream.eatWhile(/[\w\d]/);
       var token = this.stream.makeToken();
       var tagName = token.value.slice(1).toLowerCase();
-      
+
+      if (tagName === "svg")
+        this.parsingSVG = true;
+
       // If the character after the `<` is a `/`, we're on a closing tag.
       // We want to report useful errors about whether the tag is unexpected
       // or doesn't match with the most recent opening tag.
       if (tagName[0] == '/') {
         var closeTagName = tagName.slice(1).toLowerCase();
+        if (closeTagName === "svg")
+          this.parsingSVG = false;
         if (this._knownVoidHTMLElement(closeTagName))
           throw new ParseError("CLOSE_TAG_FOR_VOID_ELEMENT", this,
                                closeTagName, token);
@@ -1060,17 +1099,15 @@ var Slowparse = (function() {
                                closeTagName, token);
         this._parseEndCloseTag();
       }
-      
+
       else {
-        // We want to make sure that opening tags have valid tag names.
-        if (!(tagName && this._knownHTMLElement(tagName)))
+        if (!tagName || (tagName && ((this.parsingSVG && !this._knownSVGElement(tagName)) || (!this.parsingSVG && !this._knownHTMLElement(tagName)))))
           throw new ParseError("INVALID_TAG_NAME", tagName, token);
 
-        this.domBuilder.pushElement(tagName, {
-          openTag: {
-            start: token.interval.start
-          }
-        });
+        var parseInfo = { openTag: { start: token.interval.start }};
+        var nameSpace = (this.parsingSVG ? this.svgNameSpace : undefined);
+        this.domBuilder.pushElement(tagName, parseInfo, nameSpace);
+
         if (!this.stream.end())
           this._parseEndOpenTag(tagName);
       }
@@ -1146,9 +1183,10 @@ var Slowparse = (function() {
           this.stream.makeToken();
         }
         else if (this.stream.peek() == '>' || this.stream.match("/>")) {
-          if (this.stream.match("/>", true)) {
-            if (!this._knownVoidHTMLElement(tagName))
-              throw new ParseError("SELF_CLOSING_NON_VOID_ELEMENT", this, 
+          var selfClosing = this.stream.match("/>", true);
+          if (selfClosing) {
+            if (!this.parsingSVG && !this._knownVoidHTMLElement(tagName))
+              throw new ParseError("SELF_CLOSING_NON_VOID_ELEMENT", this,
                                    tagName);
           } else
             this.stream.next();
@@ -1157,16 +1195,16 @@ var Slowparse = (function() {
 
           // If the opening tag represents a void element, there will not be
           // a closing element, so we tell our DOM builder that we're done.
-          if (tagName && this._knownVoidHTMLElement(tagName))
+          if (tagName && ((selfClosing && this._knownSVGElement(tagName)) || this._knownVoidHTMLElement(tagName)))
             this.domBuilder.popElement();
-          
+
           // If the opening tag represents a `<style>` element, we hand
           // off parsing to our CSS parser.
           if (!this.stream.end() && tagName === "style") {
             var cssBlock = this.cssParser.parse();
             this.domBuilder.text(cssBlock.value, cssBlock.parseInfo);
           }
-          
+
           // If the opening tag represents a `<textarea>` element, we need
           // to parse all its contents as CDATA (unparsed character data)
           if (tagName && tagName === "textarea") {
@@ -1239,8 +1277,9 @@ var Slowparse = (function() {
     // This method pushes a new element onto the DOM builder's stack.
     // The element is appended to the currently active element and is
     // then made the new currently active element.
-    pushElement: function(tagName, parseInfo) {
-      var node = this.document.createElement(tagName);
+    pushElement: function(tagName, parseInfo, nameSpace) {
+      var node = (nameSpace ? this.document.createElementNS(nameSpace,tagName)
+                            : this.document.createElement(tagName));
       node.parseInfo = parseInfo;
       this.currentNode.appendChild(node);
       this.currentNode = node;
@@ -1274,7 +1313,7 @@ var Slowparse = (function() {
   };
 
   // ### Exported Symbols
-  // 
+  //
   // `Slowparse` is the object that holds all exported symbols from
   // this library.
   var Slowparse = {
@@ -1331,7 +1370,7 @@ var Slowparse = (function() {
         } else
           throw e;
       }
-      
+
       (errorDetectors || []).forEach(function(detector) {
         if (!error)
           error = detector(html, domBuilder.fragment) || null;

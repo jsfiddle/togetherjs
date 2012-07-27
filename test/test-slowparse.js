@@ -180,6 +180,43 @@ test("DOMBuilder is called with lowercased element/attrs", function() {
   deepEqual(attributes, ['class'], "attribute names are lowercased");
 });
 
+test("parsing of SVG elements", function() {
+  var d = "M 0 0 L 100 0 L 100 100 L 0 100 Z";
+  var html = "<svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg>";
+  var doc = parseWithoutErrors(html);
+
+  equal(doc.childNodes.length, 1, "doc has one child node");
+  equal(doc.childNodes[0].nodeName, "svg", "child node is <svg>");
+  equal(doc.childNodes[0].childNodes.length, 1, "svg element has one child");
+  equal(doc.childNodes[0].childNodes[0].nodeName, "path", "svg child node is <path>");
+  equal(doc.childNodes[0].childNodes[0].getAttribute('d'), d, "path outline data is correct");
+});
+
+test("verifying SVG namespace", function() {
+  var d = "M 0 0 L 100 0 100 100 0 100 Z";
+  var html = "<html><body><p>test</p><svg width='100' height='100' viewbox='0 0 100 100'><path d='"+d+"'/></svg><p>test</p></body></html>";
+  var doc = parseWithoutErrors(html);
+  
+  var htmlns = "http://www.w3.org/1999/xhtml",
+      svgns = "http://www.w3.org/2000/svg";
+
+  equal(doc.childNodes.length, 1, "doc has one child node");
+  equal(doc.childNodes[0].nodeName, "HTML", "top element is <html>");
+  equal(doc.childNodes[0].childNodes[0].nodeName, "BODY", "contained element is <body>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].nodeName, "P", "first content node is <p>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[0].namespaceURI.toLowerCase(), htmlns, "p element uses the correct namespace");
+  equal(doc.childNodes[0].childNodes[0].childNodes[1].nodeName, "svg", "second content node is <svg>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[1].namespaceURI.toLowerCase(), svgns, "svg element uses the correct namespace");
+  equal(doc.childNodes[0].childNodes[0].childNodes[2].nodeName, "P", "third content node is <p>");
+  equal(doc.childNodes[0].childNodes[0].childNodes[2].namespaceURI.toLowerCase(), htmlns, "p element uses the correct namespace");
+});
+
+test("verifying out-of-svg error", function() {
+  var html = "<html><body><svg><rect/></svg><path>error</path></body></html>";
+  var error = Slowparse.HTML(document, html).error;
+  equal(error.type, "INVALID_TAG_NAME");
+});
+
 testManySnippets("parsing of HTML with void elements:", [
   '<br>',
   '<img src="http://www.mozilla.org/favicon.ico">'
