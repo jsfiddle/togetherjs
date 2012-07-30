@@ -261,3 +261,7 @@ if options.db.type == 'pg'
 try
 if options.db.type == 'amazon'
   exports.amazon = test require('../src/server/db/amazon'), options.db
+
+try
+  require 'mongodb'
+  exports.mongodb = test require('../src/server/db/mongo'), { db: "sharejs-test" }
