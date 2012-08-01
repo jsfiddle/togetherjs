@@ -11,7 +11,7 @@
 
 mongodb = require 'mongodb'
 
-defaultOptions = {
+defaultOptions =
   # Prefix for all database keys.
   db: 'sharejs'
 
@@ -19,7 +19,7 @@ defaultOptions = {
   hostname: '127.0.0.1'
   port: 27017
   mongoOptions: {auto_reconnect: true}
-}
+
 
 # Valid options as above.
 module.exports = MongoDb = (options) ->
@@ -46,7 +46,8 @@ module.exports = MongoDb = (options) ->
   # Creates a new document.
   # data = {snapshot, type:typename, [meta]}
   @create = (docName, data, callback) ->
-    checkIndex ->    
+    checkIndex (err) ->
+      return callback? err if err
       client.collection 'docs', (err, collection) ->
         return callback? err if err
       
@@ -69,7 +70,8 @@ module.exports = MongoDb = (options) ->
   # end can be null. If so, returns all documents from start onwards.
   # Each document returned is in the form {op:o, meta:m, v:version}.
   @getOps = (docName, start, end, callback) ->
-    checkIndex ->
+    checkIndex (err) ->
+      return callback? err if err
       if start == end
         callback null, []
         return
@@ -101,7 +103,8 @@ module.exports = MongoDb = (options) ->
   # ... and that would slow it down a bit.)
   @writeOp = (docName, opData, callback) ->
     # ****** NOT SAFE FOR MULTIPLE PROCESSES. Rewrite me using transactions or something.
-    checkIndex ->
+    checkIndex (err) ->
+      return callback? err if err
       client.collection 'ops', (err, collection) ->
         return callback? err if err
       
@@ -126,7 +129,8 @@ module.exports = MongoDb = (options) ->
   #
   # This function has UNDEFINED BEHAVIOUR if you call append before calling create().
   @writeSnapshot = (docName, data, dbMeta, callback) ->
-    checkIndex ->
+    checkIndex (err) ->
+      return callback? err if err
       client.collection 'docs', (err, collection) ->
         return callback? err if err
       
@@ -142,7 +146,8 @@ module.exports = MongoDb = (options) ->
       
   # Data = {v, snapshot, type}. Error if the document doesn't exist.
   @getSnapshot = (docName, callback) ->
-    checkIndex ->
+    checkIndex (err) ->
+      return callback? err if err
       client.collection 'docs', (err, collection) ->
         return callback? err if err
       
@@ -155,7 +160,8 @@ module.exports = MongoDb = (options) ->
         
   # Permanently deletes a document. There is no undo.
   @delete = (docName, dbMeta, callback) ->
-    checkIndex ->
+    checkIndex (err) ->
+      return callback? err if err
       client.collection 'ops', (err, collection) ->
         collection.remove { docName: docName }
 
