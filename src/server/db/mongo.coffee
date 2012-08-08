@@ -29,11 +29,14 @@ module.exports = MongoDb = (options) ->
 
   client = new mongodb.Db(options.db, new mongodb.Server(options.hostname, options.port, options.mongoOptions))
 
-  opsCollectionForDoc = (docName) -> 'ops.'+docName.replace /$/g, ''  # $ is reserved in collection names.
+  opsCollectionForDoc = (docName) -> 'ops.' + encodeURIComponent(docName).replace(/\./g, '%2E').replace(/-/g, '%2D')
 
   # Creates a new document.
   # data = {snapshot, type:typename, [meta]}
   @create = (docName, data, callback) ->
+    # docName too long? http://www.mongodb.org/display/DOCS/Collections#Collections-Overview
+    return callback? "Document name too long: #{docName}" if opsCollectionForDoc(docName).length > 90
+
     client.collection 'docs', (err, collection) ->
       return callback? err if err
       
