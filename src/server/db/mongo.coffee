@@ -29,8 +29,7 @@ module.exports = MongoDb = (options) ->
 
   client = new mongodb.Db(options.db, new mongodb.Server(options.hostname, options.port, options.mongoOptions))
 
-  client.ensureIndex 'ops', {docName: 1, v: 1}, {unique: true}, (err, name) ->
-    console.warn "failed to ensure mongo index on ops collection: #{err}\nperformance may suffer" if err
+  opsCollectionForDoc = (docName) -> 'ops.'+docName.replace /$/g, ''  # $ is reserved in collection names.
 
   # Creates a new document.
   # data = {snapshot, type:typename, [meta]}
@@ -61,16 +60,15 @@ module.exports = MongoDb = (options) ->
       callback null, []
       return
 
-    client.collection 'ops', (err, collection) ->
+    client.collection opsCollectionForDoc(docName), (err, collection) ->
       return callback? err if err
       
       query = 
-        docName: docName
-        v:
+        _id:
           $gte: start
-      query.v.$lt = end if end
+      query._id.$lt = end if end
       
-      collection.find(query).sort('v').toArray (err, docs) ->
+      collection.find(query).sort('_id').toArray (err, docs) ->
         console.warn "failed to get ops for #{docName}: #{err}" if err
         return callback? err if err
 
@@ -88,15 +86,14 @@ module.exports = MongoDb = (options) ->
   # ... and that would slow it down a bit.)
   @writeOp = (docName, opData, callback) ->
     # ****** NOT SAFE FOR MULTIPLE PROCESSES. Rewrite me using transactions or something.
-    client.collection 'ops', (err, collection) ->
+    client.collection opsCollectionForDoc(docName), (err, collection) ->
       return callback? err if err
       
       doc = 
-        docName: docName
+        _id: opData.v
         opData:
           op: opData.op
           meta: opData.meta
-        v: opData.v
       
       collection.insert doc, safe: true, (err, doc) ->
         console.warn "failed to save op #{opData} for #{docName}: #{err}" if err
@@ -139,8 +136,8 @@ module.exports = MongoDb = (options) ->
         
   # Permanently deletes a document. There is no undo.
   @delete = (docName, dbMeta, callback) ->
-    client.collection 'ops', (err, collection) ->
-      collection.remove { docName: docName }
+    client.collection opsCollectionForDoc(docName), (err, collection) ->
+      collection.drop()
 
     client.collection 'docs', (err, collection) ->
       return callback? err if err
