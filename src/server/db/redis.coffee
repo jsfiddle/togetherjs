@@ -109,7 +109,7 @@ module.exports = RedisDb = (options) ->
     client.set keyForDoc(docName), JSON.stringify(docData), (err, response) ->
       callback? err
 
-  # Data = {v, snapshot, type}. Snapshot == null and v = 0 if the document doesn't exist.
+  # Data = {v, snapshot, type}. Error if the document doesn't exist.
   @getSnapshot = (docName, callback) ->
     client.get keyForDoc(docName), (err, response) ->
       throw err if err?

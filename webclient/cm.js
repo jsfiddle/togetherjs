@@ -39,12 +39,12 @@
       return window.setTimeout(function() {
         var editorText, otText;
         editorText = editor.getValue();
-        otText = sharedoc.getValue();
+        otText = sharedoc.getText();
         if (editorText !== otText) {
           console.error("Text does not match!");
           console.error("editor: " + editorText);
           console.error("ot:     " + otText);
-          return editor.setValue(sharedoc.getValue());
+          return editor.setValue(sharedoc.getText());
         }
       }, 0);
     };
