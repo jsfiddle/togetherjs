@@ -964,7 +964,9 @@
     if (!(hasBCSocket || hasSockJS)) {
       throw new Error('Must load socks or browserchannel before this library');
     }
-    useSockJS = hasSockJS && !hasBCSocket;
+    if (hasSockJS && !hasBCSocket) {
+      useSockJS = true;
+    }
   } else {
     Connection = require('./connection').Connection;
   }

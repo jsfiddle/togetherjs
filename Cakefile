@@ -10,7 +10,7 @@ process.env.PATH = "#{npm_bin}#{path_sep}#{process.env.PATH}"
 
 task 'test', 'Run all tests', ->
 	# run directly to get all the delicious output
-	console.log 'Running tests...'
+	console.log 'Running tests... (is your webclient up-to-date?)'
 	exec 'nodeunit tests.coffee', (err, stdout, stderr) ->
 		throw err if err
 

@@ -15,7 +15,7 @@ if WEB?
   hasBCSocket = window.BCSocket isnt undefined
   hasSockJS = window.SockJS isnt undefined
   throw new Error 'Must load socks or browserchannel before this library' unless hasBCSocket or hasSockJS
-  useSockJS = hasSockJS and !hasBCSocket
+  useSockJS = true if hasSockJS and !hasBCSocket
 else
   Connection = require('./connection').Connection
 

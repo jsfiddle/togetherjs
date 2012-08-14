@@ -14,6 +14,7 @@ wrapSession = (conn) ->
 
 
 exports.attach = (server, createAgent, options) ->
+  options.prefix or= "/sockjs"
   sjsServer = sockjs.createServer options
   sjsServer.on 'connection', (conn) ->  sessionHandler wrapSession(conn), createAgent
-  sjsServer.installHandlers server, {prefix: "/sockjs"}
+  sjsServer.installHandlers server
