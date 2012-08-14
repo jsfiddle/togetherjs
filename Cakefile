@@ -14,6 +14,7 @@ task 'test', 'Run all tests', ->
 	exec 'nodeunit tests.coffee', (err, stdout, stderr) ->
 		throw err if err
 
+# This is only needed to be able to refer to the line numbers of crashes
 task 'build', 'Build the .js files', (options) ->
 	console.log('Compiling Coffee from src to lib')
 	exec "coffee --compile --bare --output lib/ src/", (err, stdout, stderr) ->
