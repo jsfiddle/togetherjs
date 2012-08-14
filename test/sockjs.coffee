@@ -34,8 +34,6 @@ expectData = (socket, expectedData, callback) ->
 
 class WSSocket
   
-  Fiber = require('fibers')
-  
   constructor: (url, callback)->
 
     # Open a new browserchannel session to the server
