@@ -20,8 +20,12 @@ isArray = (o) -> Object.prototype.toString.call(o) == '[object Array]'
 # - It calls out to the OT functions when necessary
 #
 # The model is an event emitter. It emits the following events:
-#
-# create(docName, data): A document has been created with the specified name & data
+# - create(docName, data): A document has been created with the specified name & data
+# - add(docName, data)
+# - load(docName, data)
+# - applyOp(docName, opData, snapshot, oldSnapshot)
+# - applyMetaOp(docName, path, value)
+
 module.exports = Model = (db, options) ->
   # db can be null if the user doesn't want persistance.
 

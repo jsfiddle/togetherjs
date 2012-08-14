@@ -29,7 +29,9 @@
   "engine": "node >= 0.6",
   "scripts": {
     "build": "cake build",
-    "test": "nodeunit tests.coffee"
+    "test": "nodeunit tests.coffee",
+    "postinstall": "cake build",
+    "prepublish": "cake build"
   },
   "licenses": [{
     "type": "BSD",
