@@ -23,6 +23,7 @@ modules = [
   'rest'
 #  'socketio'
   'browserchannel'
+  'sockjs'
 
   'microevent'
 

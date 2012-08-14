@@ -13,8 +13,7 @@
 
 if WEB?
   types = exports.types
-  throw new Error 'Must load browserchannel before this library' unless window.BCSocket
-  {BCSocket} = window
+  {BCSocket, SockJS} = window 
 else
   types = require '../types'
   {BCSocket} = require 'browserchannel'
@@ -32,9 +31,15 @@ class Connection
     # - 'disconnected': The connection is closed, but it will not reconnect automatically.
     # - 'stopped': The connection is closed, and will not reconnect.
     @state = 'connecting'
-    @socket = new BCSocket host, reconnect:true
 
+    @socket = 
+      if useSockJS?
+        new SockJS(host)    
+      else
+        new BCSocket(host, reconnect:true)
+    
     @socket.onmessage = (msg) =>
+      msg = JSON.parse(msg.data) if useSockJS?
       if msg.auth is null
         # Auth failed.
         @lastError = msg.error # 'forbidden'
@@ -99,6 +104,7 @@ class Connection
       @lastSentDoc = docName
 
     #console.warn 'c->s', data
+    data = JSON.stringify(data) if useSockJS?
     @socket.send data
 
   disconnect: ->
@@ -131,6 +137,11 @@ class Connection
   # callback(error, doc)
   open: (docName, type, callback) ->
     return callback 'connection closed' if @state is 'stopped'
+
+    # Wait for the connection to open
+    if @state is 'connecting'
+      @on 'handshaking', -> @open(docName, type, callback)
+      return
 
     if typeof type is 'function'
       callback = type

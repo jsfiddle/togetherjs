@@ -10,7 +10,13 @@
 # Note that anything declared in the global scope here is shared with other files
 # built by closure. Be careful what you put in this namespace.
 
-unless WEB?
+
+if WEB?
+  hasBCSocket = window.BCSocket isnt undefined
+  hasSockJS = window.SockJS isnt undefined
+  throw new Error 'Must load socks or browserchannel before this library' unless hasBCSocket or hasSockJS
+  useSockJS = hasSockJS and !hasBCSocket
+else
   Connection = require('./connection').Connection
 
 # Open a document with the given name. The connection is created implicitly and reused.
@@ -25,7 +31,9 @@ exports.open = do ->
   getConnection = (origin) ->
     if WEB?
       location = window.location
-      origin ?= "#{location.protocol}//#{location.host}/channel"
+      # default to browserchannel
+      path = if useSockJS then 'sockjs' else 'channel'
+      origin ?= "#{location.protocol}//#{location.host}/#{path}"
     
     unless connections[origin]
       c = new Connection origin
