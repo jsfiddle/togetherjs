@@ -66,8 +66,7 @@ exports.handler = (session, createAgent) ->
 
       if error
         console.warn "Invalid query #{query} from #{agent.sessionId}: #{error}"
-        session.abort()
-        return callback()
+        return session.abort()
 
       # The agent can specify null as the docName to get a random doc name.
       if query.doc is null
