@@ -34,7 +34,7 @@ exports.open = do ->
       # default to browserchannel
       path = if useSockJS then 'sockjs' else 'channel'
       origin ?= "#{location.protocol}//#{location.host}/#{path}"
-    
+
     unless connections[origin]
       c = new Connection origin
 
@@ -42,7 +42,7 @@ exports.open = do ->
       c.on 'disconnecting', del
       c.on 'connect failed', del
       connections[origin] = c
-    
+
     connections[origin]
 
   # If you're using the bare API, connections are cleaned up as soon as there's no
@@ -54,7 +54,7 @@ exports.open = do ->
 
     if numDocs == 0
       c.disconnect()
- 
+
   (docName, type, origin, callback) ->
     if typeof origin == 'function'
       callback = origin
@@ -68,9 +68,9 @@ exports.open = do ->
         maybeClose c
       else
         doc.on 'closed', -> maybeClose c
-       
+
         callback null, doc
-    
+
     c.on 'connect failed'
     return c
 
