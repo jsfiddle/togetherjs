@@ -459,6 +459,25 @@ genTests = (client) -> testCase
       doc.close ->
         test.done()
 
+  'Can open a document after closing a document': (test) ->
+    console.log "PORT: #{@port}"
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc1) =>
+      console.log "ERROR: #{error} DOC1: #{doc1}"
+      test.ifError error
+      test.ok doc1
+      doc1.close ->
+        console.log "PORT: #{@port}"
+        client.open @name + '2', 'text', "http://localhost:#{@port}/sjs", (error, doc2) =>
+          console.log "ERROR: #{error} DOC2: #{doc2}"
+          test.ifError error
+          test.ok doc2
+          doc2.close ->
+            test.done()
+        setTimeout ->
+          test.ok false
+          test.done()
+        , 1000
+
    # ** This is missing tests for submitOp receiving an error through its callback
 
 # This isn't working yet. I might have to rethink it.
