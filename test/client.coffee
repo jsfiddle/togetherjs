@@ -485,4 +485,4 @@ genTests = (client) -> testCase
 #      test.done()
 
 exports.native = genTests nativeclient
-# exports.webclient = genTests webclient
+exports.webclient = genTests webclient
