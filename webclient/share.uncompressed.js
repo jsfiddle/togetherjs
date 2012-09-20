@@ -988,7 +988,7 @@
         del = function() {
           return delete connections[origin];
         };
-        c.on('disconnecting', del);
+        c.on('disconnected', del);
         c.on('connect failed', del);
         connections[origin] = c;
       }
