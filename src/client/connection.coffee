@@ -20,7 +20,7 @@ else
   Doc = require('./doc').Doc
 
 class Connection
-  constructor: (host) ->
+  constructor: (host, authentication) ->
     # Map of docname -> doc
     @docs = {}
 
@@ -37,7 +37,12 @@ class Connection
         new SockJS(host)    
       else
         new BCSocket(host, reconnect:true)
-    
+
+    # Send authentication message
+    @socket.send({
+      "auth": if authentication then authentication else null
+    })
+
     @socket.onmessage = (msg) =>
       msg = JSON.parse(msg.data) if useSockJS?
       if msg.auth is null
