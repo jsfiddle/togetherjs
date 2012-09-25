@@ -60,6 +60,10 @@ exports.open = do ->
       callback = options
       options = {}
 
+    if typeof options == 'string'
+      options = {
+        'origin': options
+      }
 
     origin = options.origin
     authentication = options.authentication
