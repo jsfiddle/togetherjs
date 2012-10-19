@@ -32,7 +32,10 @@ module.exports = MongoDb = (options) ->
   client = options.client or new mongodb.Db(options.db, new mongodb.Server(options.hostname, options.port, options.mongoOptions))
   
   if options.user and options.password
-    client.auth(options.user, options.password)
+    client.open (err, db) -> 
+      if not err
+        client = db
+        client.authenticate(options.user, options.password)
 
   opsCollectionForDoc = (docName) -> 'ops.' + encodeURIComponent(docName).replace(/\./g, '%2E').replace(/-/g, '%2D')
 
