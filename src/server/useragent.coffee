@@ -51,14 +51,14 @@ module.exports = (model, options) ->
         when 'delete' then 'delete'
         else throw new Error "Invalid action name #{name}"
 
-      responded = false
+      action.responded = false
       action.reject = ->
-        throw new Error 'Multiple accept/reject calls made' if responded
-        responded = true
+        throw new Error 'Multiple accept/reject calls made' if @responded
+        @responded = true
         userCallback 'forbidden', null
       action.accept = ->
-        throw new Error 'Multiple accept/reject calls made' if responded
-        responded = true
+        throw new Error 'Multiple accept/reject calls made' if @responded
+        @responded = true
         acceptCallback()
 
       auth this, action
