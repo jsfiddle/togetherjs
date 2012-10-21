@@ -378,6 +378,13 @@ genTests = (client) -> testCase
 
       doc.insert 0, 'hi'
 
+  'error message passed to reject is the error passed to client': (test) ->
+    @auth = (client, action) -> action.reject('not allowed')
+
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
+      test.strictEqual error, 'not allowed'
+      test.done()
+
   'If auth rejects your op, other transforms work correctly': (test) ->
     # This should probably have a randomized tester as well.
     @auth = (client, action) ->
