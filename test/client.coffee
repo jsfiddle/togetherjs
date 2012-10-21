@@ -412,6 +412,24 @@ genTests = (client) -> testCase
         @model.applyOp @name, {op:[{i:'dD', p:3}], v:1, meta:{}}, =>
           @model.getSnapshot @name, e
 
+  'If operation is rejected, action.responded == true': (test) ->
+    @auth = (client, action) ->
+      test.strictEqual action.responded, false
+      action.reject()
+      test.strictEqual action.responded, true
+      test.done()
+
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
+
+  'If operation is accepted, action.responded == true': (test) ->
+    @auth = (client, action) ->
+      test.strictEqual action.responded, false
+      action.accept()
+      test.strictEqual action.responded, true
+      test.done()
+
+    client.open @name, 'text', "http://localhost:#{@port}/sjs", (error, doc) =>
+
   'Text API is advertised': (test) ->
     @c.open @name, 'text', (error, doc) ->
       test.strictEqual doc.provides?.text, true
