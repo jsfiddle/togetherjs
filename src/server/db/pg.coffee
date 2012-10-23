@@ -27,6 +27,8 @@ pg = require('pg').native
 
 defaultOptions =
   schema: 'sharejs'
+  client: null                      # An optional instance of pg.Client
+  uri: null                         # An optional uri for connection
   create_tables_automatically: true
   operations_table: 'ops'
   snapshot_table: 'snapshots'
@@ -37,7 +39,7 @@ module.exports = PgDb = (options) ->
   options ?= {}
   options[k] ?= v for k, v of defaultOptions
 
-  client = new pg.Client options.uri
+  client = options.client or new pg.Client options.uri
   client.connect()
 
   snapshot_table = options.schema and "#{options.schema}.#{options.snapshot_table}" or options.snapshot_table
