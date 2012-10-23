@@ -19,7 +19,9 @@ defaultOptions =
   hostname: '127.0.0.1'
   port: 27017
   mongoOptions: {auto_reconnect: true}
-
+  client: null    # an instance of mongodb.Db
+  user: null      # an optional username for authentication
+  password: null  # an optional password for authentication
 
 # Valid options as above.
 module.exports = MongoDb = (options) ->
@@ -27,7 +29,13 @@ module.exports = MongoDb = (options) ->
   options ?= {}
   options[k] ?= v for k, v of defaultOptions
 
-  client = new mongodb.Db(options.db, new mongodb.Server(options.hostname, options.port, options.mongoOptions))
+  client = options.client or new mongodb.Db(options.db, new mongodb.Server(options.hostname, options.port, options.mongoOptions))
+  
+  if options.user and options.password
+    client.open (err, db) -> 
+      if not err
+        client = db
+        client.authenticate(options.user, options.password)
 
   opsCollectionForDoc = (docName) -> 'ops.' + encodeURIComponent(docName).replace(/\./g, '%2E').replace(/-/g, '%2D')
 
