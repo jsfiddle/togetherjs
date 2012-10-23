@@ -790,12 +790,15 @@
 
   Connection = (function() {
 
-    function Connection(host) {
+    function Connection(host, authentication) {
       var _this = this;
       this.docs = {};
       this.state = 'connecting';
       this.socket = typeof useSockJS !== "undefined" && useSockJS !== null ? new SockJS(host) : new BCSocket(host, {
         reconnect: true
+      });
+      this.socket.send({
+        "auth": authentication ? authentication : null
       });
       this.socket.onmessage = function(msg) {
         var docName;
@@ -974,7 +977,7 @@
   exports.open = (function() {
     var connections, getConnection, maybeClose;
     connections = {};
-    getConnection = function(origin) {
+    getConnection = function(origin, authentication) {
       var c, del, location, path;
       if (typeof WEB !== "undefined" && WEB !== null) {
         location = window.location;
@@ -984,7 +987,7 @@
         }
       }
       if (!connections[origin]) {
-        c = new Connection(origin);
+        c = new Connection(origin, authentication);
         del = function() {
           return delete connections[origin];
         };
@@ -1008,13 +1011,20 @@
         return c.disconnect();
       }
     };
-    return function(docName, type, origin, callback) {
-      var c;
-      if (typeof origin === 'function') {
-        callback = origin;
-        origin = null;
+    return function(docName, type, options, callback) {
+      var authentication, c, origin;
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
       }
-      c = getConnection(origin);
+      if (typeof options === 'string') {
+        options = {
+          'origin': options
+        };
+      }
+      origin = options.origin;
+      authentication = options.authentication;
+      c = getConnection(origin, authentication);
       c.numDocs++;
       c.open(docName, type, function(error, doc) {
         if (error) {

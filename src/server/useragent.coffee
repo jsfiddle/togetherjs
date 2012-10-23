@@ -20,7 +20,8 @@ module.exports = (model, options) ->
       @connectTime = new Date
       @headers = data.headers
       @remoteAddress = data.remoteAddress
-
+      @authentication = data.authentication
+      
       # This is a map from docName -> listener function
       @listeners = {}
 
