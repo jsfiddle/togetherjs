@@ -97,6 +97,26 @@ test("parsing of elements with boolean attributes", function() {
   });
 });
 
+test("parsing of <script> tags", function() {
+  var html = '<script>x < 3;</script>';
+  var doc = parseWithoutErrors(html);
+  equal(doc.childNodes.length, 1, "document has one child");
+  
+  var script = doc.childNodes[0];
+  equal(script.nodeName, "SCRIPT",
+        "first child of generated DOM is <script>");
+  equal(script.childNodes.length, 1, "<script> has one child");
+  var textNode = script.childNodes[0];
+
+  equal(textNode.nodeType, textNode.TEXT_NODE,
+        "<script>'s child is a text node.");
+  assertParseIntervals(html, textNode, "textNode", {
+    'parseInfo': 'x < 3;',
+  });
+  equal(documentFragmentHTML(doc), html,
+        "serialization of generated DOM matches original HTML");
+});
+
 test("parsing of valid HTML", function() {
   var html = '<p class="foo">hello there</p>';
   var doc = parseWithoutErrors(html);

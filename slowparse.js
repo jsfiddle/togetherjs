@@ -1208,6 +1208,12 @@ var Slowparse = (function() {
 
           // If the opening tag represents a `<textarea>` element, we need
           // to parse all its contents as CDATA (unparsed character data)
+          if (tagName && tagName === "script") {
+            this._parseCDATA("script");
+          }
+
+          // If the opening tag represents a `<textarea>` element, we need
+          // to parse all its contents as CDATA (unparsed character data)
           if (tagName && tagName === "textarea") {
             this._parseCDATA("textarea");
           }
