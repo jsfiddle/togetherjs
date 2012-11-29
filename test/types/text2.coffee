@@ -85,18 +85,18 @@ text.generateRandomOp = (docStr) ->
     expectedDoc += word
 
   addDelete = ->
-    skip = randomInt Math.min docStr.length, 10
+    skip = randomInt Math.min docStr.length, 5
 
     op.push skip
     consume skip
 
-    length = randomInt Math.min docStr.length, 10
+    length = randomInt Math.min docStr.length, 4
     op.push {d:length}
     docStr = docStr[length..]
 
   while docStr.length > 0
     # If the document is long, we'll bias it toward deletes
-    chance = if initial.length > 1 then 3 else 2
+    chance = if initial.length > 100 then 3 else 2
     switch randomInt(chance)
       when 0 then addInsert()
       when 1, 2 then addDelete()
