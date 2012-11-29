@@ -9,6 +9,7 @@ register './simple'
 register './count'
 
 register './text'
+register './text2'
 register './text-composable'
 register './text-tp2'
 
