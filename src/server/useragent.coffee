@@ -20,7 +20,8 @@ module.exports = (model, options) ->
       @connectTime = new Date
       @headers = data.headers
       @remoteAddress = data.remoteAddress
-
+      @authentication = data.authentication
+      
       # This is a map from docName -> listener function
       @listeners = {}
 
@@ -52,10 +53,10 @@ module.exports = (model, options) ->
         else throw new Error "Invalid action name #{name}"
 
       action.responded = false
-      action.reject = ->
+      action.reject = (message='forbidden') ->
         throw new Error 'Multiple accept/reject calls made' if @responded
         @responded = true
-        userCallback 'forbidden', null
+        userCallback message, null
       action.accept = ->
         throw new Error 'Multiple accept/reject calls made' if @responded
         @responded = true

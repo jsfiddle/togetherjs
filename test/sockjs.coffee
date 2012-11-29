@@ -94,6 +94,7 @@ module.exports = testCase
             callback()
         
           socket.onerror = (e) -> console.warn 'eeee', e
+          socket.send({auth:null});
 
           @expect = (data, callback) =>
             expectData socket, data, callback
@@ -388,6 +389,7 @@ module.exports = testCase
         action.reject()
 
       new WSSocket "ws://localhost:#{@server.address().port}/sockjs/websocket", (socket) ->
+        socket.send({auth:null});
         expectData socket, {auth:null, error:'forbidden'}, ->
           socket.onclose = ->
             test.expect 7
@@ -440,3 +442,35 @@ module.exports = testCase
         @socket.send {doc:@name, v:0, op:{position:0, text:'hi'}, meta:{}}
         @expect {v:null, error:'forbidden'}, ->
           test.done()
+
+    'Authentication string available in auth function': (test) ->
+      @auth = (agent, action) ->
+        test.strictEqual agent.authentication, '1234'
+        test.strictEqual action.type, 'connect'
+        action.reject()
+
+      new WSSocket "ws://localhost:#{@server.address().port}/sockjs/websocket", (socket) ->
+        socket.send({auth:'1234'});
+        expectData socket, {auth:null, error:'forbidden'}, ->
+          socket.onclose = ->
+            test.done()
+
+    'Authentication object available in auth function': (test) ->
+      @auth = (agent, action) ->
+        test.strictEqual agent.authentication.a, 1234
+        test.strictEqual action.type, 'connect'
+        action.reject()
+
+      new WSSocket "ws://localhost:#{@server.address().port}/sockjs/websocket", (socket) ->
+        socket.send({auth:{a:1234}});
+        expectData socket, {auth:null, error:'forbidden'}, ->
+          socket.onclose = ->
+            test.done()
+
+  'Socket timeout if no auth message is sent': (test) ->
+    new WSSocket "ws://localhost:#{@server.address().port}/sockjs/websocket", (socket) ->
+      socket.onmessage = (data) ->
+        test.strictEqual data.auth, null
+        test.strictEqual data.error, 'Timeout waiting for client auth message'
+      socket.onclose = () ->
+        test.done()
