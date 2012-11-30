@@ -209,14 +209,14 @@ var EventAction = Class({
         if (attrs[i].name == attrName) {
           var data = undefined;
           try {
-            var data = JSON.parse(attrs[i].value);
+            data = JSON.parse(attrs[i].value);
           } catch (e) {
           }
           if (data === undefined) {
             try {
               // FIXME: For some reason an attribute like "{which: 13}" doesn't work
               // but "({which: 13})" does?
-              var data = eval(attrs[i].value);
+              data = eval(attrs[i].value);
             } catch (e) {
               console.warn("Bad attribute", attrs[i].name, JSON.stringify(attrs[i].value));
               continue;
@@ -226,7 +226,6 @@ var EventAction = Class({
             if (! data.hasOwnProperty(a)) {
               continue;
             }
-            console.log("setting", a, data[a]);
             event[a] = data[a];
           }
         }
