@@ -49,10 +49,13 @@ jQuery.fn.getAllEvents = function () {
   var els = $(this).find("*");
   els.push(this[0]);
   els.each(function () {
-    // This is jQuery 1.8 specific:
     if (! $(this).is(":visible")) {
       return;
     }
+    if ($(this).attr("data-walkabout-disable")) {
+      return;
+    }
+    // This is jQuery 1.8 specific:
     var e = $._data(this, "events");
     if (! e) {
       return;
@@ -90,6 +93,9 @@ jQuery.fn.findActions = function () {
   var actions = new Actions();
   var clickEls = [];
   this.find("a[href^=#]").each(function () {
+    if ($(this).attr("data-walkabout-disable")) {
+      return;
+    }
     clickEls.push(this);
     actions.push(LinkAction($(this)));
   });
@@ -159,7 +165,8 @@ jQuery.fn.runManyActions = function runManyActions(whileTrue, speed) {
     if ((! cancelled) && whileTrue()) {
       setTimeout(runOnce, speed);
     }
-    self.findActions().pick().run();
+    var actions = self.findActions();
+    actions.pick().run();
   }
   setTimeout(runOnce, speed);
   return cancel;
@@ -195,7 +202,40 @@ var EventAction = Class({
     if (this.event.handler.handler.runEvent) {
       this.event.handler.handler.runEvent();
     } else {
-      $(this.event.element).trigger(this.event.type);
+      var event = jQuery.Event(this.event.type);
+      var attrs = this.event.element.attributes;
+      var attrName = "data-walkabout-" + this.event.type;
+      for (var i=0; i<attrs.length; i++) {
+        if (attrs[i].name == attrName) {
+          var data = undefined;
+          try {
+            var data = JSON.parse(attrs[i].value);
+          } catch (e) {
+          }
+          if (data === undefined) {
+            try {
+              // FIXME: For some reason an attribute like "{which: 13}" doesn't work
+              // but "({which: 13})" does?
+              var data = eval(attrs[i].value);
+            } catch (e) {
+              console.warn("Bad attribute", attrs[i].name, JSON.stringify(attrs[i].value));
+              continue;
+            }
+          }
+          for (var a in data) {
+            if (! data.hasOwnProperty(a)) {
+              continue;
+            }
+            console.log("setting", a, data[a]);
+            event[a] = data[a];
+          }
+        }
+      }
+      if ((event.type == "keyup" || event.type == "keydown" || event.type == "keypress")
+          && (! event.which)) {
+        event.which = Math.floor(random() * 256);
+      }
+      $(this.event.element).trigger(event);
     }
   }
 });
