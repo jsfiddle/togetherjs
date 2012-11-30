@@ -1,13 +1,13 @@
 walkabout.js
 ============
 
-An automatic jQuery tester.
+An automatic jQuery app tester.
 
-This code figures out what your application is waiting for, and does
-it.  It fills in fields with random values.  It finds the events you
-listen for and fires those events.  It finds internal links (like `<a
-href="#foo">`) and clicks them.  It's a little like a fuzz tester for
-your app.
+This code figures out what your application is paying attention to,
+and does it.  It fills in fields with random values.  It finds the
+events you listen for and fires those events.  It finds internal links
+(like `<a href="#foo">`) and clicks them.  It's a little like a fuzz
+tester for your app.
 
 You can use it like so:
 
