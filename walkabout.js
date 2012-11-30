@@ -119,7 +119,7 @@ jQuery.fn.val.mock = function () {
   }
   var options = this.attr("data-mock-options");
   if (options) {
-    options = eval(options);
+    options = eval("(" + options + ")");
   } else {
     options = random.letters;
   }
@@ -214,9 +214,7 @@ var EventAction = Class({
           }
           if (data === undefined) {
             try {
-              // FIXME: For some reason an attribute like "{which: 13}" doesn't work
-              // but "({which: 13})" does?
-              data = eval(attrs[i].value);
+              data = eval("(" + attrs[i].value + ")");
             } catch (e) {
               console.warn("Bad attribute", attrs[i].name, JSON.stringify(attrs[i].value));
               continue;
