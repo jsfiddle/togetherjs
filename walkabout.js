@@ -1,3 +1,7 @@
+if (typeof Walkabout == "undefined") {
+  Walkabout = {};
+}
+
 jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
   var callback = arg3 || arg2 || arg1;
   function handler(event) {
@@ -25,7 +29,7 @@ jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
   handler.runEvent = function () {
     var key = this.matcher.which;
     if (typeof key == "object" && typeof key.length == "number") {
-      key = random.pick(key);
+      key = Walkabout.random.pick(key);
     }
     console.log("Doing", this.matcher.type, "with which:", key);
     var event = jQuery.Event(matcher.type);
@@ -46,17 +50,17 @@ jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
 jQuery.fn.getAllEvents = function () {
   var events = [];
   // FIXME: does this only get children, not the element itself?
-  var els = $(this).find("*");
+  var els = jQuery(this).find("*");
   els.push(this[0]);
   els.each(function () {
-    if (! $(this).is(":visible")) {
+    if (! jQuery(this).is(":visible")) {
       return;
     }
-    if ($(this).attr("data-walkabout-disable")) {
+    if (jQuery(this).attr("data-walkabout-disable")) {
       return;
     }
     // This is jQuery 1.8 specific:
-    var e = $._data(this, "events");
+    var e = jQuery._data(this, "events");
     if (! e) {
       return;
     }
@@ -67,7 +71,7 @@ jQuery.fn.getAllEvents = function () {
       for (var j=0; j<e[i].length; j++) {
         var event = e[i][j];
         if (event.selector) {
-          els = $(this).find(event.selector);
+          els = jQuery(this).find(event.selector);
         } else {
           els = [this];
         }
@@ -90,21 +94,21 @@ jQuery.fn.getAllEvents.ignoreEvents = {
 };
 
 jQuery.fn.findActions = function () {
-  var actions = new Actions();
+  var actions = new Walkabout.Actions();
   var clickEls = [];
   this.find("a[href^=#]").each(function () {
-    if ($(this).attr("data-walkabout-disable")) {
+    if (jQuery(this).attr("data-walkabout-disable")) {
       return;
     }
     clickEls.push(this);
-    actions.push(LinkAction($(this)));
+    actions.push(Walkabout.LinkAction(jQuery(this)));
   });
   this.getAllEvents().forEach(function (event) {
     if (event.type == "click" && clickEls.indexOf(event.element) != -1) {
       // We already have this action from above block
       return;
     }
-    actions.push(EventAction(event));
+    actions.push(Walkabout.EventAction(event));
   });
   return actions;
 };
@@ -121,14 +125,14 @@ jQuery.fn.val.mock = function () {
   if (options) {
     options = eval("(" + options + ")");
   } else {
-    options = random.letters;
+    options = Walkabout.random.letters;
   }
   if (Array.isArray(options)) {
-    return random.pick(options);
+    return Walkabout.random.pick(options);
   } else if (typeof options == "function") {
     return options(this);
   } else if (typeof options == "string") {
-    return random.string(options, parseInt(this.attr("size") || 10, 10));
+    return Walkabout.random.string(options, parseInt(this.attr("size") || 10, 10));
   } else {
     // FIXME: what then?  E.g., if it's an object
     return jQuery.fn.val.mock.orig.apply(this, arguments);
@@ -172,26 +176,26 @@ jQuery.fn.runManyActions = function runManyActions(whileTrue, speed) {
   return cancel;
 };
 
-function Actions() {
-}
-Actions.prototype = Object.create(Array.prototype);
-Actions.prototype.pick = function () {
-  return random.pick(this);
+Walkabout.Actions = function Actions() {
 };
-Actions.prototype.runAny = function () {
+Walkabout.Actions.prototype = Object.create(Array.prototype);
+Walkabout.Actions.prototype.pick = function () {
+  return Walkabout.random.pick(this);
+};
+Walkabout.Actions.prototype.runAny = function () {
   var item = this.pick();
   item.run.apply(item, arguments);
 };
 
-function Class(prototype) {
+Walkabout.Class = function Class(prototype) {
   return function () {
     var obj = Object.create(prototype);
     prototype.constructor.apply(obj, arguments);
     return obj;
   };
-}
+};
 
-var EventAction = Class({
+Walkabout.EventAction = Walkabout.Class({
   constructor: function (event) {
     this.event = event;
   },
@@ -207,7 +211,7 @@ var EventAction = Class({
       var attrName = "data-walkabout-" + this.event.type;
       for (var i=0; i<attrs.length; i++) {
         if (attrs[i].name == attrName) {
-          var data = undefined;
+          var data;
           try {
             data = JSON.parse(attrs[i].value);
           } catch (e) {
@@ -228,16 +232,16 @@ var EventAction = Class({
           }
         }
       }
-      if ((event.type == "keyup" || event.type == "keydown" || event.type == "keypress")
-          && (! event.which)) {
-        event.which = Math.floor(random() * 256);
+      if ((event.type == "keyup" || event.type == "keydown" || event.type == "keypress") &&
+          (! event.which)) {
+        event.which = Math.floor(Walkabout.random() * 256);
       }
-      $(this.event.element).trigger(event);
+      jQuery(this.event.element).trigger(event);
     }
   }
 });
 
-var LinkAction = Class({
+Walkabout.LinkAction = Walkabout.Class({
   constructor: function (element) {
     this.element = element;
   },
@@ -252,7 +256,7 @@ var LinkAction = Class({
 });
 
 // Based on Python's whrandom
-function RandomStream(newSeed) {
+Walkabout.RandomStream = function RandomStream(newSeed) {
   var seed, x, y, z;
   function setSeed(value) {
     if (! value) {
@@ -302,6 +306,6 @@ function RandomStream(newSeed) {
     return s;
   };
   return result;
-}
+};
 
-var random = RandomStream();
+Walkabout.random = Walkabout.RandomStream();

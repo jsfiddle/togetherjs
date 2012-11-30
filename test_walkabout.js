@@ -95,7 +95,7 @@ print(actions);
 
 */
 
-random.setSeed(100);
+Walkabout.random.setSeed(100);
 jQuery.fn.val.patch();
 
 actions.forEach(function (a) {
@@ -111,12 +111,11 @@ Clicked li: an item 2
 button click
 Entered text: EzsmOGsiee
 Hash changed: #1
-Hash changed: #1
 */
 
 // Here we demonstrate that the random numbers are repeatable
 // (and hopefully portable):
-var rand = RandomStream(1);
+var rand = Walkabout.RandomStream(1);
 for (var i=0; i<10; i++) {
   print(rand());
 }
