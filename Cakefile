@@ -92,6 +92,7 @@ task 'webclient', 'Build the web client into one file', ->
 	compile client, 'webclient/share'
 	buildtype 'json'
 	buildtype 'text-tp2'
+	buildtype 'text2'
 
 	# TODO: This should also be closure compiled.
 	extrafiles = expandNames extras

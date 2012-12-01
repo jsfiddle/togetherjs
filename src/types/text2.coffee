@@ -12,11 +12,11 @@
 #
 # Snapshots are strings.
 
-exports = if WEB? then {} else module.exports
+text2 = {}
 
-exports.name = 'text2'
+text2.name = 'text2'
 
-exports.create = -> ''
+text2.create = -> ''
 
 # -------- Utility methods
 
@@ -113,7 +113,7 @@ trim = (op) ->
 
 # Normalize an op, removing all empty skips and empty inserts / deletes. Concatenate
 # adjacent inserts and deletes.
-exports.normalize = (op) ->
+text2.normalize = (op) ->
   newOp = []
   append = makeAppend newOp
   append component for component in op
@@ -121,7 +121,7 @@ exports.normalize = (op) ->
   trim newOp
 
 # Apply the op to the string. Returns the new string.
-exports.apply = (str, op) ->
+text2.apply = (str, op) ->
   throw new Error('Snapshot should be a string') unless typeof(str) == 'string'
   checkOp op
 
@@ -143,7 +143,7 @@ exports.apply = (str, op) ->
 
 # transform op1 by op2. Return transformed version of op1.
 # op1 and op2 are unchanged by transform.
-exports.transform = (op, otherOp, side) ->
+text2.transform = (op, otherOp, side) ->
   throw new Error "side (#{side}) must be 'left' or 'right'" unless side in ['left', 'right']
 
   checkOp op
@@ -188,7 +188,7 @@ exports.transform = (op, otherOp, side) ->
 
 
 # Compose 2 ops into 1 op.
-exports.compose = (op1, op2) ->
+text2.compose = (op1, op2) ->
   checkOp op1
   checkOp op2
 
@@ -231,8 +231,8 @@ exports.compose = (op1, op2) ->
 
   trim result
   
-if window?
-  window.ot ||= {}
-  window.ot.types ||= {}
-  window.ot.types.text2 = exports
+if WEB?
+  exports.types.text2 = text2
+else
+  module.exports = text2
 
