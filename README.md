@@ -30,6 +30,35 @@ event that is created, such as `data-walkabout-keyup="{which: 13}"`
 You can use `data-mock-options="['a', 'b']"` to give the valid inputs
 for a field.
 
+Non-jQuery Support
+------------------
+
+There's some experimental support for working with code that doesn't
+use jQuery.  It *might* work with other frameworks, but is more
+intended to work with code that doesn't use a framework.
+
+This technique uses code rewriting to capture calls to
+`.addEventListener()` and `.value`.  The code can't use any tricks, it
+needs to actually use those literal names -- which is usually fine in
+"normal" code, but might not be in fancy or optimized code.  E.g.,
+`el["addEventListener"](...)` would not be found.
+
+You can use `Walkabout.rewriteListeners(code)` to rewrite the code.
+
+The code transformation looks like this:
+
+```javascript
+$("#el")[0].addEventListener("click", function () {}, true);
+var value = $("#textarea")[0].value;
+
+// Becomes:
+Walkabout.addEventListener($("#el")[0], "click", function () {}, true);
+var value = Walkabout.value($("#textarea")[0]);
+```
+
+And to find actions you use `Walkabout.findActions(element)`.  There
+is currently no equivalent to `$.runManyActions()`.
+
 To Do
 -----
 
@@ -40,8 +69,8 @@ Lots of stuff, of course.  But:
   progresses you through the site, disobeying them does some fuzz
   testing.
 
-- It's all very jQuery-specific, and really for good reasons.  But at
-  least it should be possible to integrate it into non-jQuery widgets.
+- Everything is terribly duplicated between the jQuery and non-jQuery
+  support.  Needs some refactoring.
 
 - Not all form controls get triggered, I think.  E.g., checkboxes
   don't get checked.
