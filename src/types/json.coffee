@@ -177,20 +177,22 @@ json.normalize = (op) ->
 # http://jsperf.com/cloning-an-object/12
 clone = (o) -> JSON.parse(JSON.stringify o)
 
-json.commonPath = (p1, p2) ->
-  p1 = p1.slice()
-  p2 = p2.slice()
-  p1.unshift('data')
-  p2.unshift('data')
-  p1 = p1[...p1.length-1]
-  p2 = p2[...p2.length-1]
-  return -1 if p2.length == 0
-  i = 0
-  while p1[i] == p2[i] && i < p1.length
-    i++
-    if i == p2.length
-      return i-1
-  return
+# Returns true if an op at otherPath may affect an op at path
+json.canOpAffectOp = (otherPath, path) ->
+  return true if otherPath.length == 0
+  return false if path.length == 0
+
+  path = path[...path.length-1]
+  otherPath = otherPath[...otherPath.length-1]
+
+  for p,i in otherPath
+    if i >= path.length
+      return false
+    if p != path[i]
+      return false
+
+  # Same
+  return true
 
 # transform c so it applies to a document with otherC applied.
 json.transformComponent = (dest, c, otherC, type) ->
@@ -198,8 +200,8 @@ json.transformComponent = (dest, c, otherC, type) ->
   c.p.push(0) if c.na != undefined
   otherC.p.push(0) if otherC.na != undefined
 
-  common = json.commonPath c.p, otherC.p
-  common2 = json.commonPath otherC.p, c.p
+  common = otherC.p.length - 1 if json.canOpAffectOp otherC.p, c.p
+  common2 = c.p.length - 1 if json.canOpAffectOp c.p, otherC.p
 
   cplength = c.p.length
   otherCplength = otherC.p.length
