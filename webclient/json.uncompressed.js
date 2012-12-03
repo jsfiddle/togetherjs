@@ -236,24 +236,26 @@ var WEB = true;
     return JSON.parse(JSON.stringify(o));
   };
 
-  json.commonPath = function(p1, p2) {
-    var i;
-    p1 = p1.slice();
-    p2 = p2.slice();
-    p1.unshift('data');
-    p2.unshift('data');
-    p1 = p1.slice(0, p1.length - 1);
-    p2 = p2.slice(0, p2.length - 1);
-    if (p2.length === 0) {
-      return -1;
+  json.canOpAffectOp = function(otherPath, path) {
+    var i, p, _i, _len;
+    if (otherPath.length === 0) {
+      return true;
     }
-    i = 0;
-    while (p1[i] === p2[i] && i < p1.length) {
-      i++;
-      if (i === p2.length) {
-        return i - 1;
+    if (path.length === 0) {
+      return false;
+    }
+    path = path.slice(0, path.length - 1);
+    otherPath = otherPath.slice(0, otherPath.length - 1);
+    for (i = _i = 0, _len = otherPath.length; _i < _len; i = ++_i) {
+      p = otherPath[i];
+      if (i >= path.length) {
+        return false;
+      }
+      if (p !== path[i]) {
+        return false;
       }
     }
+    return true;
   };
 
   json.transformComponent = function(dest, c, otherC, type) {
@@ -265,8 +267,12 @@ var WEB = true;
     if (otherC.na !== void 0) {
       otherC.p.push(0);
     }
-    common = json.commonPath(c.p, otherC.p);
-    common2 = json.commonPath(otherC.p, c.p);
+    if (json.canOpAffectOp(otherC.p, c.p)) {
+      common = otherC.p.length - 1;
+    }
+    if (json.canOpAffectOp(c.p, otherC.p)) {
+      common2 = c.p.length - 1;
+    }
     cplength = c.p.length;
     otherCplength = otherC.p.length;
     if (c.na !== void 0) {
@@ -813,13 +819,13 @@ var WEB = true;
         return _results;
       });
       return this.on('remoteop', function(op) {
-        var c, cb, child_path, common, event, match_path, path, _i, _len, _results;
+        var c, cb, child_path, event, match_path, path, _i, _len, _results;
         _results = [];
         for (_i = 0, _len = op.length; _i < _len; _i++) {
           c = op[_i];
           match_path = c.na === void 0 ? c.p.slice(0, c.p.length - 1) : c.p;
           _results.push((function() {
-            var _j, _len1, _ref, _ref1, _ref2, _results1;
+            var _j, _len1, _ref, _ref1, _results1;
             _ref = this._listeners;
             _results1 = [];
             for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
@@ -874,12 +880,9 @@ var WEB = true;
                   default:
                     _results1.push(void 0);
                 }
-              } else if ((common = this.type.commonPath(match_path, path)) != null) {
+              } else if (this.type.canOpAffectOp(path, match_path)) {
                 if (event === 'child op') {
-                  if ((match_path.length === (_ref2 = path.length) && _ref2 === common)) {
-                    throw new Error("paths match length and have commonality, but aren't equal?");
-                  }
-                  child_path = c.p.slice(common + 1);
+                  child_path = c.p.slice(path.length);
                   _results1.push(cb(child_path, c));
                 } else {
                   _results1.push(void 0);

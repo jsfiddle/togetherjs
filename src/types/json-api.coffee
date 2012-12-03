@@ -172,9 +172,7 @@ json.api =
               when 'add'
                 if c.na != undefined
                   cb(c.na)
-          else if (common = @type.commonPath match_path, path)?
+          else if @type.canOpAffectOp path, match_path
             if event == 'child op'
-              if match_path.length == path.length == common
-                throw new Error "paths match length and have commonality, but aren't equal?"
-              child_path = c.p[common+1..]
+              child_path = c.p[path.length..]
               cb(child_path, c)
