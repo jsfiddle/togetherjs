@@ -1027,13 +1027,14 @@ Walkabout.makeBookmarklet = function () {
     return "javascript:alert('Could not find script.')";
   }
   var s = [
+    "(function () {",
     "var _s = document.getElementById('walkabout_script');",
     "if (_s) _s.parentNode.removeChild(_s);",
     "_s = document.createElement('script');",
     "_s.src = '" + walkaboutSrc + "';",
     "_Walkabout_start_UI = true;",
     "document.head.appendChild(_s);",
-    "delete _s"
+    "})();void(0);"
   ];
   s = s.join("");
   s = "javascript:" + encodeURIComponent(s);

@@ -15,7 +15,7 @@ You can use it like so:
 // This makes something like $('#some-input').val() return random values:
 jQuery.fn.val.patch();
 
-// Now, fiddle around, do a 100 random things:
+// Now, fiddle around, do 100 random things:
 Walkabout.runManyActions({
   times: 100
 });
