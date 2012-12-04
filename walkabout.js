@@ -76,7 +76,10 @@ Walkabout.runManyActions = function runManyActions(options) {
       times--;
     }
     var actions = Walkabout.findActions(el);
-    actions.pick().run();
+    var action = actions.pick();
+    if (action) {
+      action.run();
+    }
   }
   setTimeout(runOnce, speed);
   return cancel;
@@ -824,6 +827,108 @@ Walkabout.rewriteListeners = function (code) {
 };
 
 /****************************************
+ * UI
+ */
+
+Walkabout.UI = Walkabout.Class({
+
+  constructor: function () {
+    this.panel = this.make("div", {
+      style: this.styles.panelStyle,
+      "data-walkabout-ignore": 1
+    }, [
+
+      this.closeButton = this.make(
+        "span",
+        {
+          style: this.styles.closeStyle
+        },
+        ["\xd7"]
+      ),
+
+      this.make("div", {style: this.styles.header}, ["Walkabout"]),
+
+      this.startButton = this.make(
+        "button",
+        {}, ["start"]
+      )
+
+    ]);
+    document.body.appendChild(this.panel);
+    this.close = this.close.bind(this);
+    this.start = this.start.bind(this);
+    this.closeButton.addEventListener("click", this.close, false);
+    this.startButton.addEventListener("click", this.start, false);
+  },
+
+  styles: {
+    panelStyle: "color: #000; background-color: #ffc; border: 3px outset #660; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%;",
+    closeStyle: "cursor: pointer; float: right;",
+    header: "font-size: 110%; font-weight: bold;"
+  },
+
+  make: function (name, attrs, children) {
+    var el = document.createElement(name);
+    if (attrs) {
+      for (var a in attrs) {
+        if (attrs.hasOwnProperty(a)) {
+          el.setAttribute(a, attrs[a]);
+        }
+      }
+    }
+    if (children) {
+      for (var i=0; i<children.length; i++) {
+        var child = children[i];
+        if (typeof child == "string") {
+          child = document.createTextNode(child);
+        }
+        el.appendChild(child);
+      }
+    }
+    return el;
+  },
+
+  close: function () {
+    if (this.canceler) {
+      this.canceler();
+    }
+    this.panel.parentNode.removeChild(this.panel);
+  },
+
+  start: function () {
+    this.canceler = Walkabout.runManyActions();
+  }
+
+});
+
+Walkabout.makeBookmarklet = function () {
+  var scripts = document.querySelectorAll("script");
+  var walkaboutSrc;
+  for (var i=0; i<scripts.length; i++) {
+    var src = scripts[i].src;
+    if (src.indexOf("walkabout.js") != -1) {
+      walkaboutSrc = src;
+      break;
+    }
+  }
+  if (! walkaboutSrc) {
+    return "javascript:alert('Could not find script.')";
+  }
+  var s = [
+    "var _s = document.getElementById('walkabout_script');",
+    "if (_s) _s.parentNode.removeChild(_s);",
+    "_s = document.createElement('script');",
+    "_s.src = '" + walkaboutSrc + "';",
+    "_Walkabout_start_UI = true;",
+    "document.head.appendChild(_s);",
+    "delete _s"
+  ];
+  s = s.join("");
+  s = "javascript:" + encodeURIComponent(s);
+  return s;
+};
+
+/****************************************
  * Mock APIs:
  */
 
@@ -911,4 +1016,8 @@ var mockCallGroup = {
 if (typeof exports != "undefined") {
   // Expect that we are in a node environment
   Walkabout._extend(exports, Walkabout);
+}
+
+if (typeof _Walkabout_start_UI != "undefined") {
+  Walkabout.UI();
 }
