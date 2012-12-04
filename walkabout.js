@@ -9,6 +9,10 @@ Walkabout.ignoreEvents = {
   hashchange: true
 };
 
+Walkabout.options = {
+  anyLocalLinks: false
+};
+
 Walkabout.actionFinders = [];
 
 Walkabout.findActions = function (el, actions) {
@@ -42,6 +46,7 @@ Walkabout.ignoreElement = function (el) {
 Walkabout.DEFAULT_TIMES = 100;
 
 Walkabout.runManyActions = function runManyActions(options) {
+  options = options || {};
   var el = options.element || document;
   var speed = options.speed || 0;
   var whileTrue = options.whileTrue || null;
@@ -52,13 +57,23 @@ Walkabout.runManyActions = function runManyActions(options) {
   }
   if ((! whileTrue) && ! times) {
     times = Walkabout.DEFAULT_TIMES;
-    whileTrue = function () {
-      return true;
-    };
+  }
+  if (! times) {
+    times = undefined;
   }
   function runOnce() {
-    if ((! cancelled) && whileTrue()) {
+    var doAgain = ! cancelled;
+    if (whileTrue && (! whileTrue())) {
+      doAgain = false;
+    }
+    if (times !== undefined && times <= 0) {
+      doAgain = false;
+    }
+    if (doAgain) {
       setTimeout(runOnce, speed);
+    }
+    if (times !== undefined) {
+      times--;
     }
     var actions = Walkabout.findActions(el);
     actions.pick().run();
@@ -75,16 +90,32 @@ Walkabout.actionFinders.push(function findAnchors(el, actions) {
         Walkabout.ignoreElement(anchor)) {
       continue;
     }
-    var href = anchor.getAttribute("href");
-    if (href.indexOf("#") === 0) {
-      if (actions.matchingAction("click", anchor)) {
+    if (actions.matchingAction("click", anchor)) {
+      continue;
+    }
+    var href;
+    if (Walkabout.options.anyLocalLinks) {
+      href = anchor.href;
+      var here = location.protocol + "//" + location.host;
+      if (typeof Walkabout.options.anyLocalLinks == "string") {
+        if (Walkabout.options.anyLocalLinks.indexOf("/") !== 0) {
+          here += "/";
+        }
+        here += Walkabout.options.anyLocalLinks;
+      }
+      if (href.indexOf(here) !== 0) {
         continue;
       }
-      actions.push(new Walkabout.LinkFollower({
-        element: anchor,
-        type: "click"
-      }));
+    } else {
+      href = anchor.getAttribute("href");
+      if (href.indexOf("#") !== 0) {
+        continue;
+      }
     }
+    actions.push(new Walkabout.LinkFollower({
+      element: anchor,
+      type: "click"
+    }));
   }
 });
 
@@ -514,8 +545,8 @@ Walkabout.LinkFollower = Walkabout.Class({
       );
       cancelled = this.element.dispatchEvent(event);
     }
-    if (! cancelled) {
-      location.hash = this.element.getAttribute("href");
+    if ((! cancelled) && ! (event.defaultPrevented)) {
+      location.href = this.element.getAttribute("href");
     }
   }
 });
@@ -559,7 +590,8 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
   };
   result.setSeed = setSeed;
   result.pick = function (array) {
-    return array[Math.floor(result() * array.length)];
+    var index = Math.floor(result() * array.length);
+    return array[index];
   };
   result.lowerLetters = "abcdefghijklmnopqrstuvwxyz";
   result.upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -609,7 +641,7 @@ Walkabout.Actions.prototype.matchingAction = function (eventName, element) {
   return null;
 };
 
-Walkabout.Actions.replaceAction = function (action, newAction) {
+Walkabout.Actions.prototype.replaceAction = function (action, newAction) {
   var found = false;
   for (var i=0; i<this.length; i++) {
     if (this[i] === action) {
@@ -623,6 +655,13 @@ Walkabout.Actions.replaceAction = function (action, newAction) {
   }
 };
 
+Walkabout.Actions.prototype.toSource = function () {
+  var items = [];
+  for (var i=0; i<this.length; i++) {
+    items.push(this[i].toSource().replace(/^\(/, "").replace(/\)$/, ""));
+  }
+  return "new Walkabout.Actions(" + items.join(", ") + ")";
+};
 
 
 /****************************************
@@ -738,6 +777,15 @@ Walkabout._getType = function (obj) {
   return value;
 };
 
+Walkabout.injectModules = function (modules) {
+  if (modules.esprima) {
+    esprima = modules.esprima;
+  }
+  if (modules.falafel) {
+    falafel = modules.falafel;
+  }
+};
+
 Walkabout.rewriteListeners = function (code) {
   if (typeof esprima == "undefined") {
     if (typeof require != "undefined") {
@@ -772,7 +820,7 @@ Walkabout.rewriteListeners = function (code) {
         "Walkabout.value(" + node.object.source() + ")");
     }
   });
-  return result;
+  return result.toString();
 };
 
 /****************************************
@@ -859,3 +907,8 @@ var mockCallGroup = {
   // Fires when the array in the 'calls' property changes.
   oncallschanged: null
 };
+
+if (typeof exports != "undefined") {
+  // Expect that we are in a node environment
+  Walkabout._extend(exports, Walkabout);
+}
