@@ -52,6 +52,7 @@ Walkabout.runManyActions = function runManyActions(options) {
   var whileTrue = options.whileTrue || null;
   var times = options.times;
   var ondone = options.ondone;
+  var onstatus = options.onstatus;
   var cancelled = false;
   function cancel() {
     cancelled = true;
@@ -62,6 +63,7 @@ Walkabout.runManyActions = function runManyActions(options) {
   if (! times) {
     times = undefined;
   }
+  var totalTimes = times;
   function runOnce() {
     var doAgain = ! cancelled;
     if (whileTrue && (! whileTrue())) {
@@ -77,6 +79,13 @@ Walkabout.runManyActions = function runManyActions(options) {
       times--;
     }
     var actions = Walkabout.findActions(el);
+    if (onstatus) {
+      onstatus({
+        actions: actions,
+        times: totalTimes,
+        remaining: times
+      });
+    }
     var action = actions.pick();
     if (action) {
       action.run();
@@ -115,7 +124,7 @@ Walkabout.actionFinders.push(function findAnchors(el, actions) {
       }
     } else {
       href = anchor.getAttribute("href");
-      if (href.indexOf("#") !== 0) {
+      if ((! href) || href.indexOf("#") !== 0) {
         continue;
       }
     }
@@ -450,6 +459,9 @@ Walkabout.EventAction = Walkabout.Class({
     var attrs = this.element.attributes;
     var attrName = "data-walkabout-" + this.type;
     var result = Object.create(this._eventPropsPrototype);
+    if (! attrs) {
+      return result;
+    }
     for (var i=0; i<attrs.length; i++) {
       if (attrs[i].name == attrName) {
         var data;
@@ -857,6 +869,28 @@ Walkabout.UI = Walkabout.Class({
 
       this.make("div", {style: this.styles.header}, ["Walkabout"]),
 
+      this.make(
+        "div",
+        {},
+        ["Actions: ",
+         this.actionsField = this.make(
+           "span",
+           {style: this.styles.actions},
+           ["?"]),
+         " Runs: ",
+         this.runField = this.make(
+           "span",
+           {style: this.styles.actions},
+           ["- / -"])
+        ]),
+
+      this.issues = this.make(
+        "div",
+        {style: this.styles.issues},
+        [
+          this.make("div", {style: this.styles.issuesHeader}, ["Issues:"])
+        ]),
+
       this.startButton = this.make(
         "button",
         {style: this.styles.start}, ["start"]
@@ -866,16 +900,24 @@ Walkabout.UI = Walkabout.Class({
     document.body.appendChild(this.panel);
     this.close = this.close.bind(this);
     this.start = this.start.bind(this);
+    this.updateActions = this.updateActions.bind(this);
+    this.addIssue = this.addIssue.bind(this);
     this.closeButton.addEventListener("click", this.close, false);
     this.startButton.addEventListener("click", this.start, false);
     this.startButton.disabled = false;
+    this.updateActionsId = setInterval(this.updateActions, 5000);
+    this.updateActions();
+    this.catchIssues();
   },
 
   styles: {
-    panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%;",
+    panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%; z-index: 10000;",
     start: "color: #000; background-color: #eee; border: 2px outset #999; border-radius: 2px; padding: 4px;",
     close: "cursor: pointer; float: right;",
-    header: "font-size: 110%; font-weight: bold;"
+    header: "font-size: 110%; font-weight: bold;",
+    actions: "border: 2px solid #000; padding: 0 0.5em 0 0.5em;",
+    issues: "max-height: 5em; overflow-y: auto; overflow: auto; border: 2px solid #000; margin: 4px 0 4px 0;",
+    issuesHeader: "font-weight: bold"
   },
 
   make: function (name, attrs, children) {
@@ -893,7 +935,11 @@ Walkabout.UI = Walkabout.Class({
         if (typeof child == "string") {
           child = document.createTextNode(child);
         }
-        el.appendChild(child);
+        try {
+            el.appendChild(child);
+        } catch (e) {
+          console.log("BBBBBBB", child);
+        }
       }
     }
     return el;
@@ -903,6 +949,8 @@ Walkabout.UI = Walkabout.Class({
     if (this.canceler) {
       this.canceler();
     }
+    clearTimeout(this.updateActionsId);
+    this.updateActionsId = null;
     this.panel.parentNode.removeChild(this.panel);
   },
 
@@ -912,13 +960,55 @@ Walkabout.UI = Walkabout.Class({
     if (Walkabout.jQueryAvailable) {
       jQuery.fn.val.patch();
     }
+    this._lastCount = -1;
     this.canceler = Walkabout.runManyActions({
       ondone: (function () {
         this.startButton.innerHTML = "start";
         this.startButton.disabled = false;
+        this.runField.innerHTML = "- / -";
         jQuery.fn.val.unpatch();
+      }).bind(this),
+      onstatus: (function (status) {
+        if (status.actions.length != this._lastCount) {
+          this._lastCount = status.actions.length;
+          this.updateActions(status.actions);
+        }
+        this.runField.textContent = (status.times - status.remaining) + " / " + status.times;
       }).bind(this)
     });
+  },
+
+  updateActions: function (actions) {
+    actions = actions || Walkabout.findActions();
+    this.actionsField.innerHTML = "";
+    this.actionsField.appendChild(document.createTextNode(actions.length));
+  },
+
+  addIssue: function () {
+    var div = this.make("div", {}, arguments);
+    this.issues.appendChild(div);
+  },
+
+  catchIssues: function () {
+    var oldOnError = window.onerror;
+    window.onerror = (function (errorMessage, url, lineNumber) {
+      this.addIssue(errorMessage + " in " + url + ":" + lineNumber);
+      if (oldOnError) {
+        return oldOnError(errorMessage, url, lineNumber);
+      }
+      return false;
+    }).bind(this);
+    function bind(context, obj, prop, message) {
+      var orig = obj[prop];
+      obj[prop] = function () {
+        var args = [message].concat(Array.prototype.slice.call(arguments, 0));
+        context.addIssue.apply(context, args);
+        orig.apply(obj, arguments);
+      };
+      obj[prop].orig = orig;
+    }
+    bind(this, console, "warn", "WARN: ");
+    bind(this, console, "error", "ERROR: ");
   }
 
 });
