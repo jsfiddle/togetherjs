@@ -51,6 +51,7 @@ Walkabout.runManyActions = function runManyActions(options) {
   var speed = options.speed || 0;
   var whileTrue = options.whileTrue || null;
   var times = options.times;
+  var ondone = options.ondone;
   var cancelled = false;
   function cancel() {
     cancelled = true;
@@ -79,6 +80,9 @@ Walkabout.runManyActions = function runManyActions(options) {
     var action = actions.pick();
     if (action) {
       action.run();
+    }
+    if ((! doAgain) && ondone) {
+      ondone();
     }
   }
   setTimeout(runOnce, speed);
@@ -307,7 +311,12 @@ Walkabout.EventAction = Walkabout.Class({
       Walkabout._extend(event, this.eventProperties());
       if ((this.type == "keyup" || this.type == "keydown" || this.type == "keypress") &&
           (! event.which)) {
-        event.which = Math.floor(Walkabout.random() * 256);
+        var normalKeys = [13, 9, 32];
+        if (Walkabout.random() > 0.4) {
+          event.which = Walkabout.random.pick(normalKeys);
+        } else {
+          event.which = Math.floor(Walkabout.random() * 256);
+        }
       }
       jQuery(this.element).trigger(event);
     } else {
@@ -834,14 +843,14 @@ Walkabout.UI = Walkabout.Class({
 
   constructor: function () {
     this.panel = this.make("div", {
-      style: this.styles.panelStyle,
+      style: this.styles.panel,
       "data-walkabout-ignore": 1
     }, [
 
       this.closeButton = this.make(
         "span",
         {
-          style: this.styles.closeStyle
+          style: this.styles.close
         },
         ["\xd7"]
       ),
@@ -850,7 +859,7 @@ Walkabout.UI = Walkabout.Class({
 
       this.startButton = this.make(
         "button",
-        {}, ["start"]
+        {style: this.styles.start}, ["start"]
       )
 
     ]);
@@ -859,11 +868,13 @@ Walkabout.UI = Walkabout.Class({
     this.start = this.start.bind(this);
     this.closeButton.addEventListener("click", this.close, false);
     this.startButton.addEventListener("click", this.start, false);
+    this.startButton.disabled = false;
   },
 
   styles: {
-    panelStyle: "color: #000; background-color: #ffc; border: 3px outset #660; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%;",
-    closeStyle: "cursor: pointer; float: right;",
+    panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%;",
+    start: "color: #000; background-color: #eee; border: 2px outset #999; border-radius: 2px; padding: 4px;",
+    close: "cursor: pointer; float: right;",
     header: "font-size: 110%; font-weight: bold;"
   },
 
@@ -896,7 +907,18 @@ Walkabout.UI = Walkabout.Class({
   },
 
   start: function () {
-    this.canceler = Walkabout.runManyActions();
+    this.startButton.innerHTML = "running";
+    this.startButton.disabled = true;
+    if (Walkabout.jQueryAvailable) {
+      jQuery.fn.val.patch();
+    }
+    this.canceler = Walkabout.runManyActions({
+      ondone: (function () {
+        this.startButton.innerHTML = "start";
+        this.startButton.disabled = false;
+        jQuery.fn.val.unpatch();
+      }).bind(this)
+    });
   }
 
 });
