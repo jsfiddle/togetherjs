@@ -66,34 +66,26 @@ print(actions);
 /* =>
 
 [
-  {element: <a href="#1" id="link">link</a>},
+  {element: <a href="#1" id="link">link</a>, options: {}, type: "click"},
   {
-    event: {
-      element: <li class="item">an item 1</li>,
-      handler: function ...,
-      type: "click"
-    }
+    element: <li class="item">an item 1</li>,
+    handler: function ...,
+    type: "click"
   },
   {
-    event: {
-      element: <li class="item">an item 2</li>,
-      handler: function ...,
-      type: "click"
-    }
+    element: <li class="item">an item 2</li>,
+    handler: function ...,
+    type: "click"
   },
   {
-    event: {
-      element: <button id="button">A button</button>,
-      handler: function ...,
-      type: "click"
-    }
+    element: <button id="button">A button</button>,
+    handler: function ...,
+    type: "click"
   },
   {
-    event: {
-      element: <input data-walkabout-keypress="{which: 13}" id="textinput" type="text" />,
-      handler: function ...,
-      type: "keypress"
-    }
+    element: <input data-walkabout-keypress="{which: 13}" id="textinput" type="text" />,
+    handler: function ...,
+    type: "keypress"
   }
 ]
 
@@ -113,11 +105,10 @@ Clicked li: an item 1
 Clicked li: an item 2
 button click
 Entered text: EzsmOGsiee
-Hash changed: #1
-Hash changed: #1
+Hash changed: #1...
 */
 
-getElement("textinput").setAttribute("data-mock-options", "['a', 'b']");
+getElement("textinput").setAttribute("data-walkabout-options", "['a', 'b']");
 print(Walkabout.findActions(getElement("textinput"))[0]);
 Walkabout.findActions(getElement("textinput"))[0].run();
 Walkabout.findActions(getElement("textinput"))[0].run();
@@ -131,11 +122,9 @@ Walkabout.findActions(getElement("textinput"))[0].run();
 /* =>
 
 {
-  event: {
-    element: <input data-mock-options="['a', 'b']" data-walkabout-keypress="{which: 13}" id="textinput" type="text" />,
-    handler: function ...,
-    type: "keypress"
-  }
+  element: <input data-walkabout-keypress="{which: 13}" data-walkabout-options="['a', 'b']" id="textinput" type="text" />,
+  handler: function ...,
+  type: "keypress"
 }
 Entered text: a
 Entered text: a

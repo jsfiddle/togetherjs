@@ -48,48 +48,34 @@ print(actions);
 /* =>
 
 [
-  {element: [<a href="#1" id="link">link</a>]},
+  {element: <a href="#1" id="link">link</a>, options: {}, type: "click"},
   {
-    event: {
-      element: <li class="item">an item 1</li>,
-      handler: {
-        ...
-        selector: ".item",
-        type: "click"
-      },
-      type: "click"
-    }
+    element: <li class="item">an item 1</li>,
+    handler: function ...,
+    jQuery: true,
+    options: {},
+    type: "click"
   },
   {
-    event: {
-      element: <li class="item">an item 2</li>,
-      handler: {
-        ...
-        selector: ".item",
-        type: "click"
-      },
-      type: "click"
-    }
+    element: <li class="item">an item 2</li>,
+    handler: function ...,
+    jQuery: true,
+    options: {},
+    type: "click"
   },
   {
-    event: {
-      element: <button id="button">A button</button>,
-      handler: {
-        ...
-        type: "click"
-      },
-      type: "click"
-    }
+    element: <button id="button">A button</button>,
+    handler: function ...,
+    jQuery: true,
+    options: {},
+    type: "click"
   },
   {
-    event: {
-      element: <input id="textinput" type="text" />,
-      handler: {
-        ...
-        type: "keypress"
-      },
-      type: "keypress"
-    }
+    element: <input id="textinput" type="text" />,
+    handler: function ...,
+    jQuery: true,
+    options: {},
+    type: "keypress"
   }
 ]
 
@@ -135,24 +121,23 @@ for (var i=0; i<10; i++) {
 
 */
 
-$("#textinput").attr("data-mock-options", '["a", "b"]');
-print($("#textinput").findActions()[0]);
+$("#textinput").attr("data-walkabout-options", "['a', 'b']");
+print($("#textinput").findActions());
 $("#textinput").findActions()[0].run();
 $("#textinput").findActions()[0].run();
 $("#textinput").findActions()[0].run();
 
 /* =>
 
-{
-  event: {
-    element: <input data-mock-options="[&quot;a", "b"]" id="textinput" type="text" />,
-    handler: {
-      ...
-      type: "keypress"
-    },
+[
+  {
+    element: <input data-walkabout-options="['a', 'b']" id="textinput" type="text" />,
+    handler: function ...,
+    jQuery: true,
+    options: {},
     type: "keypress"
   }
-}
+]
 Entered text: b
 Entered text: a
 Entered text: b

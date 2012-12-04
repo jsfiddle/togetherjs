@@ -16,18 +16,20 @@ You can use it like so:
 jQuery.fn.val.patch();
 
 // Now, fiddle around, do a 100 random things:
-$(document).runManyActions(100);
+Walkabout.runManyActions({
+  times: 100
+});
 ```
 
 You can hint about what's a valid input for something:
 
 You can add `data-walkabout-disable="1"` to any element to suppress
-activation of that element.
+activation of that element or any of its children.
 
 You can use `data-walkabout-eventname="..."` to set attributes on the
 event that is created, such as `data-walkabout-keyup="{which: 13}"`
 
-You can use `data-mock-options="['a', 'b']"` to give the valid inputs
+You can use `data-walkabout-options="['a', 'b']"` to give the valid inputs
 for a field.
 
 Non-jQuery Support
@@ -56,21 +58,17 @@ Walkabout.addEventListener($("#el")[0], "click", function () {}, true);
 var value = Walkabout.value($("#textarea")[0]);
 ```
 
-And to find actions you use `Walkabout.findActions(element)`.  There
-is currently no equivalent to `$.runManyActions()`.
+And to find actions you use `Walkabout.findActions(element)`.
 
 To Do
 -----
 
 Lots of stuff, of course.  But:
 
-- Sometimes the validation options (like `data-mock-options`) should
-  be obeyed, and sometimes they should be ignored.  Obeying them
-  progresses you through the site, disobeying them does some fuzz
+- Sometimes the validation options (like `data-walkabout-options`)
+  should be obeyed, and sometimes they should be ignored.  Obeying
+  them progresses you through the site, disobeying them does some fuzz
   testing.
-
-- Everything is terribly duplicated between the jQuery and non-jQuery
-  support.  Needs some refactoring.
 
 - Not all form controls get triggered, I think.  E.g., checkboxes
   don't get checked.

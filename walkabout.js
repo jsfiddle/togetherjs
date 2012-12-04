@@ -2,193 +2,103 @@ if (typeof Walkabout == "undefined") {
   Walkabout = {};
 }
 
-if (typeof jQuery == "undefined") {
-  // This is not so awesome...
-  jQuery = {fn: {val: {}}, fake: true};
-}
-
-jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
-  var callback = arg3 || arg2 || arg1;
-  function handler(event) {
-    if (matcher.which) {
-      if (typeof matcher.which == "number" && event.which != matcher.which) {
-        return;
-      }
-      if (typeof matcher.which == "object" && typeof matcher.which.length == "number") {
-        if (matcher.which.indexOf(event.which) == -1) {
-          return;
-        }
-      }
-    }
-    // FIXME: I think this only makes sense for keypress
-    if ((matcher.shiftKey && ! event.shiftKey) ||
-        (matcher.ctrlKey && ! event.ctrlKey) ||
-        (matcher.altKey && ! event.altKey)) {
-      return;
-    }
-    callback.call(this, event);
-  }
-  matcher.type = matcher.type || "keypress";
-  handler.matcher = matcher;
-  handler.element = this;
-  handler.runEvent = function () {
-    var key = this.matcher.which;
-    if (typeof key == "object" && typeof key.length == "number") {
-      key = Walkabout.random.pick(key);
-    }
-    var event = jQuery.Event(matcher.type);
-    event.which = key;
-    this.element.trigger(event);
-  };
-  var args = [matcher.type];
-  if (arg2) {
-    args.push(arg1);
-  }
-  if (arg3) {
-    args.push(arg2);
-  }
-  args.push(handler);
-  this.on.apply(this, args);
-};
-
-jQuery.fn.getAllEvents = function () {
-  var events = [];
-  // FIXME: does this only get children, not the element itself?
-  var els = jQuery(this).find("*");
-  els.push(this[0]);
-  els.each(function () {
-    if (! jQuery(this).is(":visible")) {
-      return;
-    }
-    if (jQuery(this).attr("data-walkabout-disable")) {
-      return;
-    }
-    // This is jQuery 1.8 specific:
-    var e = jQuery._data(this, "events");
-    if (! e) {
-      return;
-    }
-    for (var i in e) {
-      if ((! e.hasOwnProperty(i)) || jQuery.fn.getAllEvents.ignoreEvents[i]) {
-        continue;
-      }
-      for (var j=0; j<e[i].length; j++) {
-        var event = e[i][j];
-        if (event.selector) {
-          els = jQuery(this).find(event.selector);
-        } else {
-          els = [this];
-        }
-        for (var k=0; k<els.length; k++) {
-          events.push({
-            element: els[k],
-            type: i,
-            handler: e[i][j]
-          });
-        }
-      }
-    }
-  });
-  return events;
-};
+Walkabout.jQueryAvailable = (typeof jQuery !== "undefined");
 
 // These are events that we don't need to fire directly:
-jQuery.fn.getAllEvents.ignoreEvents = {
+Walkabout.ignoreEvents = {
   hashchange: true
 };
 
-jQuery.fn.findActions = function () {
-  var actions = new Walkabout.Actions();
-  var clickEls = [];
-  this.find("a[href^=#]").each(function () {
-    if (jQuery(this).attr("data-walkabout-disable")) {
-      return;
+Walkabout.actionFinders = [];
+
+Walkabout.findActions = function (el, actions) {
+  el = el || document;
+  actions = actions || new Walkabout.Actions();
+  if (! (Array.isArray(el) ||
+         (Walkabout.jQueryAvailable && el instanceof jQuery))) {
+    el = [el];
+  }
+  for (var i=0; i<el.length; i++) {
+    for (var j=0; j<Walkabout.actionFinders.length; j++) {
+      var finder = Walkabout.actionFinders[j];
+      finder(el[i], actions);
     }
-    clickEls.push(this);
-    actions.push(Walkabout.LinkAction(jQuery(this)));
-  });
-  this.getAllEvents().forEach(function (event) {
-    if (event.type == "click" && clickEls.indexOf(event.element) != -1) {
-      // We already have this action from above block
-      return;
-    }
-    actions.push(Walkabout.EventAction(event));
-  });
+  }
   return actions;
 };
 
-jQuery.fn.val.patch = function () {
-  jQuery.fn.val = jQuery.fn.val.mock;
+Walkabout.ignoreElement = function (el) {
+  // FIXME: should probably make this pluggable as well
+  // Also, I should unjQueryfy .is(":visible") and put it here
+  while (el) {
+    if (el.getAttribute && el.getAttribute("data-walkabout-disable")) {
+      return true;
+    }
+    el = el.parentNode;
+  }
+  return false;
 };
 
-jQuery.fn.val.mock = function () {
-  if (this.attr("type") == "hidden") {
-    return jQuery.fn.val.mock.orig.apply(this, arguments);
-  }
-  var options = this.attr("data-mock-options");
-  if (options) {
-    options = eval("(" + options + ")");
-  } else {
-    options = Walkabout.random.letters;
-  }
-  if (Array.isArray(options)) {
-    return Walkabout.random.pick(options);
-  } else if (typeof options == "function") {
-    return options(this);
-  } else if (typeof options == "string") {
-    return Walkabout.random.string(options, parseInt(this.attr("size") || 10, 10));
-  } else {
-    // FIXME: what then?  E.g., if it's an object
-    return jQuery.fn.val.mock.orig.apply(this, arguments);
-  }
-};
+Walkabout.DEFAULT_TIMES = 100;
 
-jQuery.fn.val.mock.patch = function () {
-  // Already patched
-};
-
-jQuery.fn.val.mock.unpatch = function () {
-  jQuery.fn.val = jQuery.fn.val.mock.orig;
-};
-
-jQuery.fn.val.mock.orig = jQuery.fn.val;
-jQuery.fn.val.mock.mock = jQuery.fn.val.mock;
-
-jQuery.fn.runManyActions = function runManyActions(whileTrue, speed) {
-  var count;
-  var self = this;
-  speed = speed || 0;
-  if (typeof whileTrue == "number") {
-    count = whileTrue;
-    whileTrue = function () {
-      count--;
-      return count >= 0;
-    };
-  }
+Walkabout.runManyActions = function runManyActions(options) {
+  var el = options.element || document;
+  var speed = options.speed || 0;
+  var whileTrue = options.whileTrue || null;
+  var times = options.times;
   var cancelled = false;
   function cancel() {
     cancelled = true;
+  }
+  if ((! whileTrue) && ! times) {
+    times = Walkabout.DEFAULT_TIMES;
+    whileTrue = function () {
+      return true;
+    };
   }
   function runOnce() {
     if ((! cancelled) && whileTrue()) {
       setTimeout(runOnce, speed);
     }
-    var actions = self.findActions();
+    var actions = Walkabout.findActions(el);
     actions.pick().run();
   }
   setTimeout(runOnce, speed);
   return cancel;
 };
 
-Walkabout.Actions = function Actions() {
-};
-Walkabout.Actions.prototype = Object.create(Array.prototype);
-Walkabout.Actions.prototype.pick = function () {
-  return Walkabout.random.pick(this);
-};
-Walkabout.Actions.prototype.runAny = function () {
-  var item = this.pick();
-  item.run.apply(item, arguments);
+Walkabout.actionFinders.push(function findAnchors(el, actions) {
+  var els = el.querySelectorAll("a");
+  for (var i=-1; i<els.length; i++) {
+    var anchor = i == -1 ? el : els[i];
+    if (anchor.tagName != "A" ||
+        Walkabout.ignoreElement(anchor)) {
+      continue;
+    }
+    var href = anchor.getAttribute("href");
+    if (href.indexOf("#") === 0) {
+      if (actions.matchingAction("click", anchor)) {
+        continue;
+      }
+      actions.push(new Walkabout.LinkFollower({
+        element: anchor,
+        type: "click"
+      }));
+    }
+  }
+});
+
+/****************************************
+ * Utility functions:
+ */
+
+Walkabout._extend = function (obj, props) {
+  for (var a in props) {
+    if (! props.hasOwnProperty(a)) {
+      continue;
+    }
+    obj[a] = props[a];
+  }
 };
 
 Walkabout.Class = function Class(prototype) {
@@ -199,37 +109,180 @@ Walkabout.Class = function Class(prototype) {
   };
 };
 
+
+/****************************************
+ * jQuery support:
+ */
+
+if (Walkabout.jQueryAvailable) {
+
+  jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
+    var callback = arg3 || arg2 || arg1;
+    function handler(event) {
+      if (matcher.which) {
+        if (typeof matcher.which == "number" && event.which != matcher.which) {
+          return;
+        }
+        if (typeof matcher.which == "object" && typeof matcher.which.length == "number") {
+          if (matcher.which.indexOf(event.which) == -1) {
+            return;
+          }
+        }
+      }
+      // FIXME: I think this only makes sense for keypress
+      if ((matcher.shiftKey && ! event.shiftKey) ||
+          (matcher.ctrlKey && ! event.ctrlKey) ||
+          (matcher.altKey && ! event.altKey)) {
+        return;
+      }
+      callback.call(this, event);
+    }
+    matcher.type = matcher.type || "keypress";
+    handler.matcher = matcher;
+    handler.element = this;
+    handler.runEvent = function () {
+      var key = this.matcher.which;
+      if (typeof key == "object" && typeof key.length == "number") {
+        key = Walkabout.random.pick(key);
+      }
+      var event = jQuery.Event(matcher.type);
+      event.which = key;
+      this.element.trigger(event);
+    };
+    var args = [matcher.type];
+    if (arg2) {
+      args.push(arg1);
+    }
+    if (arg3) {
+      args.push(arg2);
+    }
+    args.push(handler);
+    this.on.apply(this, args);
+  };
+
+  Walkabout.actionFinders.push(function jQueryHandlers(el, actions) {
+    var els = jQuery(el).find("*");
+    els.push(el);
+    els.each(function () {
+      if ((! jQuery(this).is(":visible")) ||
+          Walkabout.ignoreElement(this)) {
+        return;
+      }
+      var events = jQuery._data(this, "events");
+      if (! events) {
+        return;
+      }
+      for (var eventName in events) {
+        if ((! events.hasOwnProperty(eventName)) || Walkabout.ignoreEvents[eventName]) {
+          continue;
+        }
+        for (var i=0; i<events[eventName].length; i++) {
+          var event = events[eventName][i];
+          var els = [this];
+          if (event.selector) {
+            els = jQuery(this).find(event.selector);
+          }
+          for (var j=0; j<els.length; j++) {
+            var action = Walkabout.EventAction({
+              element: els[j],
+              type: eventName,
+              handler: event.handler,
+              jQuery: true
+            });
+            // Prefer the jQuery form of the action
+            var existing = actions.matchingAction(eventName, els[j]);
+            if (existing) {
+              actions.replaceAction(existing, action);
+            } else {
+              actions.push(action);
+            }
+          }
+        }
+      }
+    });
+  });
+
+  jQuery.fn.val.patch = function () {
+    jQuery.fn.val = jQuery.fn.val.mock;
+  };
+
+  jQuery.fn.val.mock = function () {
+    if (this.attr("type") == "hidden") {
+      return jQuery.fn.val.mock.orig.apply(this, arguments);
+    }
+    var options = this.attr("data-walkabout-options");
+    if (options) {
+      options = eval("(" + options + ")");
+    } else {
+      options = Walkabout.random.letters;
+    }
+    if (Array.isArray(options)) {
+      return Walkabout.random.pick(options);
+    } else if (typeof options == "function") {
+      return options(this);
+    } else if (typeof options == "string") {
+      return Walkabout.random.string(options, parseInt(this.attr("size") || 10, 10));
+    } else {
+      // FIXME: what then?  E.g., if it's an object
+      return jQuery.fn.val.mock.orig.apply(this, arguments);
+    }
+  };
+
+  jQuery.fn.val.mock.patch = function () {
+    // Already patched
+  };
+
+  jQuery.fn.val.mock.unpatch = function () {
+    jQuery.fn.val = jQuery.fn.val.mock.orig;
+  };
+
+  jQuery.fn.val.mock.orig = jQuery.fn.val;
+  jQuery.fn.val.mock.mock = jQuery.fn.val.mock;
+
+  jQuery.fn.findActions = function () {
+    return Walkabout.findActions(this);
+  };
+
+}
+
+
+/****************************************
+ * Action implementations:
+ */
+
 Walkabout.EventAction = Walkabout.Class({
 
   constructor: function (event) {
-    this.event = event;
+    this.element = event.element;
+    this.type = event.type;
+    this.handler = event.handler;
+    this.options = event.options || {};
+    this.jQuery = !! event.jQuery;
   },
 
   run: function () {
     var event;
     console.log(
-      "triggering", this.event.type, "on", this.event.element,
-      (this.event.handler.handler && this.event.handler.handler.runEvent) ?
+      "triggering", this.type, "on", this.element,
+      (this.handler.runEvent) ?
       "custom event" : "standard event");
-    if (this.event.handler.handler && this.event.handler.handler.runEvent) {
-      this.event.handler.handler.runEvent();
-    } else if (this.event.handler.runEvent) {
-      this.event.handler.runEvent();
-    } else if (! jQuery.fake) {
-      event = jQuery.Event(this.event.type);
+    if (this.handler && this.handler.runEvent) {
+      this.handler.runEvent();
+    } else if (Walkabout.jQueryAvailable) {
+      event = jQuery.Event(this.type);
       Walkabout._extend(event, this.eventProperties());
-      if ((event.type == "keyup" || event.type == "keydown" || event.type == "keypress") &&
+      if ((this.type == "keyup" || this.type == "keydown" || this.type == "keypress") &&
           (! event.which)) {
         event.which = Math.floor(Walkabout.random() * 256);
       }
-      jQuery(this.event.element).trigger(event);
+      jQuery(this.element).trigger(event);
     } else {
-      var module = Walkabout._getEventModule(this.event.type);
+      var module = Walkabout._getEventModule(this.type);
       event = document.createEvent(module);
       var props = this.eventProperties();
       if (module == "UIEvents") {
         event.initUIEvent(
-          this.event.type,
+          this.type,
           props.get("canBubble", true), // canBubble
           props.get("cancelable", true), // cancelable
           window, // view
@@ -237,7 +290,7 @@ Walkabout.EventAction = Walkabout.Class({
         );
       } else if (module == "MouseEvents" || module == "MouseEvent") {
         event.initMouseEvent(
-          this.event.type,
+          this.type,
           props.get("canBubble", true), // canBubble
           props.get("cancelable", true), // cancelable
           window, // view
@@ -255,7 +308,7 @@ Walkabout.EventAction = Walkabout.Class({
         );
       } else if (module == "HTMLEvents") {
         event.initEvent(
-          this.event.type,
+          this.type,
           props.get("canBubble", false), // canBubble
           props.get("cancelable", false) // cancelable
         );
@@ -274,7 +327,7 @@ Walkabout.EventAction = Walkabout.Class({
         }
         if (event.initKeyEvent) {
           event.initKeyEvent(
-            this.event.type,
+            this.type,
             props.get("canBubble", true), // canBubble
             props.get("cancelable", true), // cancelable
             window, // window
@@ -288,8 +341,8 @@ Walkabout.EventAction = Walkabout.Class({
         } else {
           // initKeyboardEvent seems pretty broken
           event = {
-            type: this.event.type,
-            target: this.event.element,
+            type: this.type,
+            target: this.element,
             altKey: props.get("altKey", false),
             "char": charCode,
             ctrlKey: props.get("ctrlKey", false),
@@ -308,7 +361,7 @@ Walkabout.EventAction = Walkabout.Class({
               // FIXME: not sure what to do here
             }
           };
-          this.event.handler(event);
+          this.handler(event);
           // FIXME: pay attention to isDefaultPrevented?
           // FIXME: do default?
           return;
@@ -343,16 +396,16 @@ Walkabout.EventAction = Walkabout.Class({
           */
         }
       } else {
-        console.warn("Unknown method type/module:", module, this.event.type);
+        console.warn("Unknown method type/module:", module, this.type);
       }
       Walkabout._extend(event, props);
-      this.event.element.dispatchEvent(event);
+      this.element.dispatchEvent(event);
     }
   },
 
   eventProperties: function () {
-    var attrs = this.event.element.attributes;
-    var attrName = "data-walkabout-" + this.event.type;
+    var attrs = this.element.attributes;
+    var attrName = "data-walkabout-" + this.type;
     var result = Object.create(this._eventPropsPrototype);
     for (var i=0; i<attrs.length; i++) {
       if (attrs[i].name == attrName) {
@@ -369,12 +422,7 @@ Walkabout.EventAction = Walkabout.Class({
             continue;
           }
         }
-        for (var a in data) {
-          if (! data.hasOwnProperty(a)) {
-            continue;
-          }
-          result[a] = data[a];
-        }
+        Walkabout._extend(result, data);
       }
     }
     return result;
@@ -391,15 +439,6 @@ Walkabout.EventAction = Walkabout.Class({
   }
 
 });
-
-Walkabout._extend = function (obj, props) {
-  for (var a in props) {
-    if (! props.hasOwnProperty(a)) {
-      continue;
-    }
-    obj[a] = props[a];
-  }
-};
 
 Walkabout._getEventModule = function (type) {
   var modules = {
@@ -438,16 +477,21 @@ Walkabout._getEventModule = function (type) {
   return modules[type] || "UIEvents";
 };
 
-Walkabout.LinkAction = Walkabout.Class({
-  constructor: function (element) {
-    this.element = element;
+Walkabout.LinkFollower = Walkabout.Class({
+  constructor: function (event) {
+    this.element = event.element;
+    this.type = event.type;
+    if (this.type != "click") {
+      throw "Unexpected event type: " + this.type;
+    }
+    this.options = event.options || {};
   },
   run: function () {
     var event;
     var cancelled;
-    if (! jQuery.fake) {
+    if (Walkabout.jQueryAvailable) {
       event = jQuery.Event("click");
-      this.element.trigger(event);
+      $(this.element).trigger(event);
       cancelled = event.isDefaultPrevented();
     } else {
       event = document.createEvent("MouseEvents");
@@ -471,15 +515,15 @@ Walkabout.LinkAction = Walkabout.Class({
       cancelled = this.element.dispatchEvent(event);
     }
     if (! cancelled) {
-      var el = this.element;
-      if (! jQuery.fake) {
-        el = el[0];
-      }
-      location.hash = el.getAttribute("href");
+      location.hash = this.element.getAttribute("href");
     }
   }
 });
 
+
+/****************************************
+ * Random numbers:
+ */
 
 
 // Based on Python's whrandom
@@ -537,6 +581,54 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
 
 Walkabout.random = Walkabout.RandomStream();
 
+/****************************************
+ * Action container:
+ */
+
+Walkabout.Actions = function Actions() {
+};
+
+Walkabout.Actions.prototype = Object.create(Array.prototype);
+
+Walkabout.Actions.prototype.pick = function () {
+  return Walkabout.random.pick(this);
+};
+
+Walkabout.Actions.prototype.runAny = function () {
+  var item = this.pick();
+  item.run.apply(item, arguments);
+};
+
+Walkabout.Actions.prototype.matchingAction = function (eventName, element) {
+  for (var i=0; i<this.length; i++) {
+    var action = this[i];
+    if (action.type == eventName && action.element == element) {
+      return action;
+    }
+  }
+  return null;
+};
+
+Walkabout.Actions.replaceAction = function (action, newAction) {
+  var found = false;
+  for (var i=0; i<this.length; i++) {
+    if (this[i] === action) {
+      this[i] = newAction;
+      found = true;
+      break;
+    }
+  }
+  if (! found) {
+    throw "Action not found: " + action;
+  }
+};
+
+
+
+/****************************************
+ * Replacements for standard methods, to track or mock values:
+ */
+
 Walkabout.addEventListener = function (obj, type, handler, bubbles, options) {
   obj.addEventListener(type, handler, bubbles || false);
   if (! obj._Walkabout_handlers) {
@@ -553,6 +645,37 @@ Walkabout.addEventListener = function (obj, type, handler, bubbles, options) {
   });
 };
 
+Walkabout.actionFinders.push(function customEvents(el, actions) {
+  var els = el.getElementsByTagName("*");
+  for (var i=-1; i<els.length; i++) {
+    var o = i == -1 ? el : els[i];
+    var handlers = o._Walkabout_handlers;
+    if (Walkabout.ignoreElement(o) || ! handlers) {
+      continue;
+    }
+    for (var eventName in handlers) {
+      if (! handlers.hasOwnProperty(eventName)) {
+        continue;
+      }
+      for (var j=0; j<handlers[eventName].length; j++) {
+        var handler = handlers[eventName][j];
+        var specific = [o];
+        if (handler.options && handler.options.selector) {
+          specific = o.querySelectorAll(handler.options.selector);
+        }
+        for (var k=0; k<specific.length; k++) {
+          actions.push(Walkabout.EventAction({
+            element: specific[k],
+            type: eventName,
+            handler: handler.handler,
+            options: handler.options
+          }));
+        }
+      }
+    }
+  }
+});
+
 Walkabout.value = function (obj) {
   var curValue = obj.value;
   if (! obj || (! obj.tagName)) {
@@ -568,7 +691,7 @@ Walkabout.value = function (obj) {
   if (obj.tagName == "INPUT" && Walkabout._getType(obj) == "hidden") {
     return curValue;
   }
-  var options = obj.getAttribute("data-mock-options");
+  var options = obj.getAttribute("data-walkabout-options");
   if (options) {
     options = eval("(" + options + ")");
   }
@@ -615,60 +738,6 @@ Walkabout._getType = function (obj) {
   return value;
 };
 
-Walkabout.findActions = function (el) {
-  var actions = new Walkabout.Actions();
-  var clickEls = [];
-  var els = el.querySelectorAll('a[href^="#"]');
-  for (var i=0; i<els.length; i++) {
-    if (els[i].getAttribute("data-walkabout-disable")) {
-      continue;
-    }
-    clickEls.push(els[i]);
-    actions.push(Walkabout.LinkAction(els[i]));
-  }
-  var events = Walkabout.getAllEvents(el);
-  for (i=0; i<events.length; i++) {
-    var event = events[i];
-    if (event.type == "click" && clickEls.indexOf(event.element) != -1) {
-      continue;
-    }
-    actions.push(Walkabout.EventAction(event));
-  }
-  return actions;
-};
-
-Walkabout.getAllEvents = function (element) {
-  var sub = element.getElementsByTagName("*");
-  var events = [];
-  for (var i=-1; i<sub.length; i++) {
-    var e = (i == -1) ? element : sub[i];
-    var handlers = e._Walkabout_handlers;
-    if (! handlers) {
-      continue;
-    }
-    for (var type in handlers) {
-      if ((! handlers.hasOwnProperty(type)) || jQuery.fn.getAllEvents.ignoreEvents[i]) {
-        continue;
-      }
-      for (var j=0; j<handlers[type].length; j++) {
-        var event = handlers[type][j];
-        var subels = [e];
-        if (event.options && event.options.selector) {
-          subels = e.querySelectorAll(event.options.selector);
-        }
-        for (var k=0; k<subels.length; k++) {
-          events.push({
-            element: subels[k],
-            type: type,
-            handler: event.handler
-          });
-        }
-      }
-    }
-  }
-  return events;
-};
-
 Walkabout.rewriteListeners = function (code) {
   if (typeof esprima == "undefined") {
     if (typeof require != "undefined") {
@@ -704,4 +773,89 @@ Walkabout.rewriteListeners = function (code) {
     }
   });
   return result;
+};
+
+/****************************************
+ * Mock APIs:
+ */
+
+var mockTelephony = {
+
+  muted: false,
+  speakerEnabled: true,
+  active: null,
+  calls: [],
+  conferenceGroup: null,
+  startTone: function (tone) {
+  },
+  stopTone: function () {
+  },
+  onincoming: null,
+  oncallschanged: null
+
+};
+
+var mockCall = {
+  number: null, // string
+  // "dialing", "alerting", "busy", "connecting", "connected", "disconnecting",
+  // "disconnected", "incoming", "holding", "held", "resuming"
+  state: null,
+  group: null,
+  answer: function () {
+  },
+  hangUp: function () {
+  },
+  hold: function () {
+  },
+  resume: function () {
+  },
+  onstatechange: null,
+  onalerting: null,
+  onbusy: null,
+  onconnecting: null,
+  onconnected: null,
+  ondisconnecting: null,
+  ondisconnected: null,
+  onincoming: null,
+  onholding: null,
+  onheld: null,
+  onresuming: null,
+  ongroupchange: null
+};
+
+var mockCallGroup = {
+  // Array of all calls that are currently in this group. The length
+  // of this array is never 1.
+  calls: [],
+
+  // Add a call to the callgroup. call2 must not be specified if the
+  // callgroup isn't empty.
+  // If the callgroup is empty both call and call2 must be specified,
+  // and one of them must be in 'held' state and the other in
+  // 'connected' state.
+  // Neither call or call2 can be in 'disconnected' state.
+  add: function (call, call2) {
+  },
+
+  // Removes a call from the callgroup. If this leaves the callgroup with
+  // just one call, then that last call is also removed from the callgroup.
+  remove: function (call) {
+  },
+
+  hold: function () {
+  },
+  // Resuming a group automatically holds any other groups/calls
+  resume: function () {
+  },
+
+  // When this changes, the state of all contained calls changes at the same time
+  state: null,
+
+  onstatechange: null,
+  onconnected: null,
+  onholding: null,
+  onheld: null,
+  onresuming: null,
+  // Fires when the array in the 'calls' property changes.
+  oncallschanged: null
 };
