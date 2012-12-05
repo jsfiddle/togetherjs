@@ -268,7 +268,9 @@ if (Walkabout.jQueryAvailable) {
     } else if (typeof options == "function") {
       return options(this);
     } else if (typeof options == "string") {
-      return Walkabout.random.string(options, parseInt(this.attr("size") || 10, 10));
+      var size = parseInt(this.attr("size") || 10, 10);
+      size = Math.floor(Walkabout.random() * size);
+      return Walkabout.random.string(options, size);
     } else {
       // FIXME: what then?  E.g., if it's an object
       return jQuery.fn.val.mock.orig.apply(this, arguments);
@@ -309,10 +311,6 @@ Walkabout.EventAction = Walkabout.Class({
 
   run: function () {
     var event;
-    console.log(
-      "triggering", this.type, "on", this.element,
-      (this.handler.runEvent) ?
-      "custom event" : "standard event");
     if (this.handler && this.handler.runEvent) {
       this.handler.runEvent();
     } else if (Walkabout.jQueryAvailable) {
@@ -936,11 +934,7 @@ Walkabout.UI = Walkabout.Class({
         if (typeof child == "string") {
           child = document.createTextNode(child);
         }
-        try {
-            el.appendChild(child);
-        } catch (e) {
-          console.log("BBBBBBB", child);
-        }
+        el.appendChild(child);
       }
     }
     return el;
