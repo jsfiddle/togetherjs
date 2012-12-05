@@ -987,6 +987,7 @@ Walkabout.UI = Walkabout.Class({
   addIssue: function () {
     var div = this.make("div", {}, arguments);
     this.issues.appendChild(div);
+    this.issues.childNodes[this.issues.childNodes.length - 1].scrollIntoView();
   },
 
   catchIssues: function () {
