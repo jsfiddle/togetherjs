@@ -4,31 +4,7 @@ Tow Truck - Who you call when you get stuck
 Introduction
 ------------
 
-You can see a screencast of TowTruck in action here: https://vimeo.com/36754286
-
-Installation
-------------
-
-### Pre-requisites:
-
-1. [Node JS](http://nodejs.org/)
-2. [npm](http://npmjs.org/)
-3. [Redis](http://redis.io/)
-4. [Etherpad Lite](http://etherpad.org/download/)
-
-### Sync submodule (Twitter bootstrap)
-
-$ git submodule update --init --recursive
-
-Running the Server
-------------------
-
-./app.js
-
-Data Keys
----------
-
-global:last_bundle_id - Used to keep track of total docs in the system in order to get the next short url
+You can see a screencast of the TowTruck prototype (found in "prototype" branch) in action here: https://vimeo.com/36754286
 
 
 ### License
