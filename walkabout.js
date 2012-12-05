@@ -1056,7 +1056,7 @@ Walkabout.hashHistory = [location.hash];
 window.addEventListener("hashchange", function () {
   var hash = location.hash;
   if (Walkabout.hashHistory.length > 1 &&
-      Walkabout.hashHistory[walkabout.hashHistory.length - 2] == hash) {
+      Walkabout.hashHistory[Walkabout.hashHistory.length - 2] == hash) {
     // Someone just hit back (or at least that's what we'll pretend it is)
     Walkabout.hashHistory.splice(Walkabout.hashHistory.length - 1, 1);
   } else {
