@@ -1062,7 +1062,7 @@ window.addEventListener("hashchange", function () {
   } else {
     Walkabout.hashHistory.push(hash);
   }
-});
+}, false);
 
 Walkabout.actionFinders.push(function backFromHash(el, actions) {
   if (el !== document && el !== window) {

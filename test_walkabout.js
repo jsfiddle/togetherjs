@@ -154,4 +154,4 @@ print(last.constructor.name, location.hash);
 last.run();
 print(location.hash);
 
-// #1
+// => #1
