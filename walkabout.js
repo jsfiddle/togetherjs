@@ -215,7 +215,13 @@ if (Walkabout.jQueryAvailable) {
           Walkabout.ignoreElement(this)) {
         return;
       }
-      var events = jQuery._data(this, "events");
+      if (jQuery._data) {
+        // This is for jQuery 1.8+
+        var events = jQuery._data(this, "events");
+      } else {
+        // For older versions
+        jQuery(this).data("events");
+      }
       if (! events) {
         return;
       }
@@ -588,10 +594,13 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
       value = Date.now();
     }
     if (typeof value != "number") {
+      if (value.getTime) {
+        value = value.getTime();
+      }
       value = parseInt(value, 10);
     }
     if ((! value) || isNaN(value)) {
-      throw "Bad seed";
+      throw "Bad seed: " + value;
     }
     seed = value;
     x = (seed % 30268) + 1;
