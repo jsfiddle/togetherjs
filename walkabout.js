@@ -128,7 +128,7 @@ Walkabout.actionFinders.push(function findAnchors(el, actions) {
         continue;
       }
     }
-    actions.push(new Walkabout.LinkFollower({
+    actions.push(Walkabout.LinkFollower({
       element: anchor,
       type: "click"
     }));
@@ -299,7 +299,7 @@ if (Walkabout.jQueryAvailable) {
 
 Walkabout.EventAction = Walkabout.Class({
 
-  constructor: function (event) {
+  constructor: function EventAction(event) {
     this.element = event.element;
     this.type = event.type;
     this.handler = event.handler;
@@ -534,7 +534,7 @@ Walkabout._getEventModule = function (type) {
 };
 
 Walkabout.LinkFollower = Walkabout.Class({
-  constructor: function (event) {
+  constructor: function LinkFollower(event) {
     this.element = event.element;
     this.type = event.type;
     if (this.type != "click") {
@@ -854,7 +854,7 @@ Walkabout.rewriteListeners = function (code) {
 
 Walkabout.UI = Walkabout.Class({
 
-  constructor: function () {
+  constructor: function UI() {
     this.panel = this.make("div", {
       style: this.styles.panel,
       "data-walkabout-ignore": 1
@@ -1046,6 +1046,40 @@ Walkabout.makeBookmarklet = function () {
   s = "javascript:" + encodeURIComponent(s);
   return s;
 };
+
+/****************************************
+ * History handling
+ */
+
+Walkabout.hashHistory = [location.hash];
+
+window.addEventListener("hashchange", function () {
+  var hash = location.hash;
+  if (Walkabout.hashHistory.length > 1 &&
+      Walkabout.hashHistory[walkabout.hashHistory.length - 2] == hash) {
+    // Someone just hit back (or at least that's what we'll pretend it is)
+    Walkabout.hashHistory.splice(Walkabout.hashHistory.length - 1, 1);
+  } else {
+    Walkabout.hashHistory.push(hash);
+  }
+});
+
+Walkabout.actionFinders.push(function backFromHash(el, actions) {
+  if (el !== document && el !== window) {
+    return;
+  }
+  if (Walkabout.hashHistory.length > 1) {
+    actions.push(Walkabout.Back());
+  }
+});
+
+Walkabout.Back = Walkabout.Class({
+  constructor: function Back() {
+  },
+  run: function () {
+    window.history.back();
+  }
+});
 
 /****************************************
  * Mock APIs:

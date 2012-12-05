@@ -1,4 +1,4 @@
-jshint("walkabout.js", {evil: true});
+jshint("walkabout.js", {evil: true, scripturl: true});
 // => Script passed: .../walkabout.js
 
 function log(text) {
@@ -96,7 +96,7 @@ Clicked li: an item 1
 Clicked li: an item 2
 button click
 Entered text: EzsmOGsiee
-Hash changed: #1
+Hash changed: #1...
 */
 
 // Here we demonstrate that the random numbers are repeatable
@@ -143,3 +143,15 @@ Entered text: a
 Entered text: b
 
 */
+
+location.hash = "#2";
+actions = $(document).findActions();
+var last = actions[actions.length - 1];
+print(last.constructor.name, location.hash);
+
+// => Back #2
+
+last.run();
+print(location.hash);
+
+// #1
