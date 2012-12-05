@@ -326,6 +326,7 @@ Walkabout.EventAction = Walkabout.Class({
         } else {
           event.which = Math.floor(Walkabout.random() * 256);
         }
+        event.keyCode = event.which;
       }
       jQuery(this.element).trigger(event);
     } else {
