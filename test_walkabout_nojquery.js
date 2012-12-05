@@ -1,4 +1,4 @@
-jshint("walkabout.js", {evil: true});
+jshint("walkabout.js", {evil: true, scripturl: true});
 // => Script passed: .../walkabout.js
 
 function getElement(id) {
@@ -63,6 +63,7 @@ Walkabout.addEventListener(getElement("fixture"), "click", function (event) {
 var actions = Walkabout.findActions(document);
 print(actions);
 
+// FIXME: sometimes there's a Back action, sometimes not
 /* =>
 
 [
@@ -86,7 +87,7 @@ print(actions);
     element: <input data-walkabout-keypress="{which: 13}" id="textinput" type="text" />,
     handler: function ...,
     type: "keypress"
-  }
+  }...
 ]
 
 */
@@ -96,7 +97,7 @@ Walkabout.random.setSeed(100);
 actions.forEach(function (a) {
   a.run();
 });
-wait();
+wait(100);
 
 // I don't understand why "Hash change: #1" happens twice
 /* =>

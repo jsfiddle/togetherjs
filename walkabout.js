@@ -215,12 +215,13 @@ if (Walkabout.jQueryAvailable) {
           Walkabout.ignoreElement(this)) {
         return;
       }
+      var events;
       if (jQuery._data) {
         // This is for jQuery 1.8+
-        var events = jQuery._data(this, "events");
+        events = jQuery._data(this, "events");
       } else {
         // For older versions
-        jQuery(this).data("events");
+        events = jQuery(this).data("events");
       }
       if (! events) {
         return;

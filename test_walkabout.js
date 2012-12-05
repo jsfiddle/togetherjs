@@ -95,7 +95,7 @@ wait();
 Clicked li: an item 1
 Clicked li: an item 2
 button click
-Entered text: EzsmOGsiee
+Entered text: zsmOG
 Hash changed: #1...
 */
 
@@ -138,7 +138,7 @@ $("#textinput").findActions()[0].run();
     type: "keypress"
   }
 ]
-Entered text: b
+Entered text: a
 Entered text: a
 Entered text: b
 
