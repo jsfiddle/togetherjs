@@ -961,12 +961,17 @@ Walkabout.UI = Walkabout.Class({
       jQuery.fn.val.patch();
     }
     this._lastCount = -1;
+    var seed = Date.now();
+    Walkabout.random.setSeed(seed);
+    this.addIssue("Starting run with seed: " + seed);
     this.canceler = Walkabout.runManyActions({
       ondone: (function () {
         this.startButton.innerHTML = "start";
         this.startButton.disabled = false;
         this.runField.innerHTML = "- / -";
-        jQuery.fn.val.unpatch();
+        if (Walkabout.jQueryAvailable) {
+          jQuery.fn.val.unpatch();
+        }
       }).bind(this),
       onstatus: (function (status) {
         if (status.actions.length != this._lastCount) {
