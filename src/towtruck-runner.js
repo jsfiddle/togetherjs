@@ -42,7 +42,10 @@
       send({type: "hello-back"});
     }
     if (msg.type == "chat") {
-      TowTruck.addChat(msg.text);
+      TowTruck.addChat(msg.text, "other person");
+    }
+    if (msg.type == "bye") {
+      TowTruck.addChat("left session", "other person");
     }
   };
 
@@ -89,14 +92,16 @@
           return;
         }
         send({type: "chat", text: val});
+        TowTruck.addChat(val, "me");
         TowTruck.chatInput.val("");
       }
     });
   };
 
-  TowTruck.addChat = function (text) {
+  TowTruck.addChat = function (text, person) {
     var chat = $('<div class="towtruck-chat-message">');
-    chat.text(text);
+    chat.append($('<span class="towtruck-chat-name">').text(person + ": "));
+    chat.append($('<span class="towtruck-chat-content">').text(text));
     TowTruck.chatContainer.append(chat);
   };
 
