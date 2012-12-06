@@ -33,7 +33,15 @@
 
   var send = TowTruck.send = function (msg) {
     console.log("Sending message:", msg);
+    msg.clientId = TowTruck.clientId;
     TowTruck.channel.send(msg);
+  };
+
+  TowTruck.peers = {
+    system: {
+      clientId: "system",
+      nickname: "system"
+    }
   };
 
   TowTruck.onmessage = function (msg) {
@@ -41,11 +49,15 @@
     if (msg.type == "hello") {
       send({type: "hello-back"});
     }
+    if (msg.type == "hello" || msg.type == "hello-back") {
+      var peer = {clientId: msg.clientId};
+      TowTruck.peers[peer.clientId] = peer;
+    }
     if (msg.type == "chat") {
-      TowTruck.addChat(msg.text, "other person");
+      TowTruck.addChat(msg.text, msg.clientId);
     }
     if (msg.type == "bye") {
-      TowTruck.addChat("left session", "other person");
+      TowTruck.addChat("left session", msg.clientId);
     }
   };
 
@@ -92,17 +104,46 @@
           return;
         }
         send({type: "chat", text: val});
-        TowTruck.addChat(val, "me");
+        TowTruck.localChatMessage(val);
         TowTruck.chatInput.val("");
       }
     });
   };
 
-  TowTruck.addChat = function (text, person) {
+  TowTruck.addChat = function (text, personId) {
     var chat = $('<div class="towtruck-chat-message">');
-    chat.append($('<span class="towtruck-chat-name">').text(person + ": "));
+    var nickname = TowTruck.peers[personId].nickname || "?";
+    chat.append(
+      $('<span class="towtruck-chat-name">')
+        .addClass("towtruck-chat-person-" + personId)
+        .text(nickname + ": "));
     chat.append($('<span class="towtruck-chat-content">').text(text));
     TowTruck.chatContainer.append(chat);
+  };
+
+  TowTruck.setPeerNickname = function (personId, name) {
+    $(".towtruck-chat-person-" + personId).text(name + ": ");
+  };
+
+  TowTruck.localChatMessage = function (text) {
+    if (text.indexOf("/tab") == 0) {
+      TowTruck.settings("tabIndependent", ! TowTruck.settings("tabIndependent"));
+      TowTruck.addChat(
+        (TowTruck.settings("tabIndependent") ? "Tab independence turned on" : "Tab independence turned off") +
+        " reload needed", "system");
+      return;
+    }
+    if (text.indexOf("/help") == 0) {
+      var msg = (
+        "\n" +
+        "/help : this message\n" +
+        "/tab : turn tab independence on/off (allows two tabs to have different identities)\n" +
+        "  " + (TowTruck.settings("tabIndependent") ? "tab independence on" : "tab independence off (the default)")
+      );
+      TowTruck.addChat(msg, "system");
+      return;
+    }
+    TowTruck.addChat(text, TowTruck.clientId);
   };
 
   TowTruck.hubUrl = function () {
@@ -125,6 +166,54 @@
       s += letters.charAt(Math.floor(Math.random() * letters.length));
     }
     return s;
+  };
+
+  TowTruck.settings = function settings(name, value) {
+    var curSettings = localStorage.getItem("TowTruck.settings");
+    if (curSettings) {
+      curSettings = JSON.parse(curSettings);
+    } else {
+      curSettings = {};
+    }
+    for (var a in settings.defaults) {
+      if (! curSettings.hasOwnProperty(a)) {
+        curSettings[a] = settings.defaults[a];
+      }
+    }
+    if (name === undefined) {
+      return curSettings;
+    }
+    if (! curSettings.hasOwnProperty(name)) {
+      throw "Unknown setting: " + name;
+    }
+    if (arguments.length < 2) {
+      return curSettings[name];
+    } else {
+      curSettings[name] = value;
+      localStorage.setItem("TowTruck.settings", JSON.stringify(curSettings));
+      return value;
+    }
+  };
+
+  TowTruck.settings.defaults = {
+    tabIndependent: false
+  };
+
+  if (TowTruck.settings("tabIndependent")) {
+    TowTruck.clientId = window.name;
+    if (! TowTruck.clientId) {
+      TowTruck.clientId = window.name = TowTruck.generateId();
+    }
+  } else {
+    TowTruck.clientId = localStorage.getItem("TowTruck.clientId");
+    if (! TowTruck.clientId) {
+      TowTruck.clientId = TowTruck.generateId();
+      localStorage.setItem("TowTruck.clientId", TowTruck.clientId);
+    }
+  }
+  TowTruck.peers[TowTruck.clientId] = {
+    clientId: TowTruck.clientId,
+    nickname: "me"
   };
 
   if (window._startTowTruckImmediately) {
