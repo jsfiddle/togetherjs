@@ -6,6 +6,7 @@ var parseUrl = require('url').parse;
 var fs = require('fs');
 var path = require('path');
 var less = require('less');
+var coffeeCompile = require("coffee-script").compile;
 
 var staticRoot = new static.Server(__dirname);
 
@@ -18,6 +19,10 @@ var server = http.createServer(function(request, response) {
   var protocol = request.headers["porwarded-proto"] || "http:";
   var host = request.headers["host"];
   var base = protocol + "//" + host;
+  var strippedPath = url.pathname.replace(/^\/*/, "");
+  console.log('paths', url.pathname, strippedPath);
+  // FIXME: this probably isn't secure against some attacks:
+
   if (url.pathname == "/towtruck.js") {
     fs.readFile(path.join(__dirname, "towtruck.js"), "UTF-8", function (error, code) {
       if (error) {
@@ -30,6 +35,7 @@ var server = http.createServer(function(request, response) {
     });
     return;
   }
+
   if (url.pathname == "/towtruck.css") {
     fs.readFile(path.join(__dirname, "towtruck.less"), "UTF-8", function (error, code) {
       if (error) {
@@ -47,13 +53,36 @@ var server = http.createServer(function(request, response) {
     });
     return;
   }
-  fs.exists(staticRoot.resolve(url.pathname), function (exists) {
-    if (exists) {
-      staticRoot.serve(request, response);
-    } else {
-      write404(response);
+
+  var coffeeName = path.join(
+    __dirname,
+    path.dirname(strippedPath),
+    path.basename(strippedPath, ".js") + ".coffee");
+  console.log('testing', coffeeName);
+  fs.exists(
+    coffeeName,
+    function (exists) {
+      if (exists) {
+        fs.readFile(coffeeName, "UTF-8", function (error, code) {
+          if (error) {
+            write500(error, response);
+            return;
+          }
+          var js = coffeeCompile(code, {filename: coffeeName});
+          response.setHeader("Content-Type", "application/javascript");
+          response.end(js);
+        });
+      } else {
+        fs.exists(staticRoot.resolve(url.pathname), function (exists) {
+          if (exists) {
+            staticRoot.serve(request, response);
+          } else {
+            write404(response);
+          }
+        });
+      }
     }
-  });
+  );
 });
 
 function write500(error, response) {

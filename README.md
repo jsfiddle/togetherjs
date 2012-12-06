@@ -9,7 +9,7 @@ You can see a screencast of the TowTruck prototype (found in "prototype" branch)
 Setup
 -----
 
-The server is in `src/server.js`.  To run it you should install Node.js, and `npm install node-static websocket less`.  Then run `node src/server.js` and use `http://localhost:8080/towtruck.js` to include the setup code.
+The server is in `src/server.js`.  To run it you should install Node.js, and `npm install node-static websocket less coffee-script`.  Then run `node src/server.js` and use `http://localhost:8080/towtruck.js` to include the setup code.
 
 There are examples in `examples/` - you should serve these up yourself (they aren't servered through `server.js`).
 
