@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bookmarklet</title>
+    <script src="towtruck.js"></script>
+    <script>
+window.addEventListener("load", function () {
+  var el = document.getElementById("bookmarklet");
+  el.href = startTowTruck.bookmarklet();
+}, false);
+    </script>
+  </head>
+  <body>
+
+    <h1>TowTruck bookmarklet</h1>
+
+    <p>Use this bookmarklet for your TowTrucking pleasure:</p>
+
+    <p style="text-align: center">
+      <a style="padding: 1em; font-size: 200%; border: 2px solid #000; border-radius: 0.5em;" id="bookmarklet" href="">TowTruck</a>
+    </p>
+
+  </body>
+</html>
