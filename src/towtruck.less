@@ -61,12 +61,7 @@
     }
 }
 
-.towtruck-close {
-    float: right;
-    cursor: pointer;
-}
-
-.towtruck-intro {
+.towtruck-container.towtruck-intro {
     position: absolute;
     width: 80%;
     height: 80%;
@@ -80,7 +75,7 @@
     background-color: #fff;
 }
 
-.towtruck-chat {
+.towtruck-container.towtruck-chat {
     position: absolute;
     width: 10em;
     height: 20em;
@@ -93,7 +88,25 @@
     background-color: #fff;
 }
 
-.towtruck-chat-name {
-    /* FIXME: Not sure why this is not working? */
-    font-weight: bold;
+.towtruck-container {
+
+    .towtruck-close {
+        float: right;
+        cursor: pointer;
+    }
+
+    .towtruck-chat-name {
+        /* FIXME: Not sure why this is not working? */
+        font-weight: bold;
+    }
+
+    .towtruck-chat-message {
+        font-size: 80%;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .towtruck-chat-content {
+        white-space: pre-wrap;
+    }
+
 }
