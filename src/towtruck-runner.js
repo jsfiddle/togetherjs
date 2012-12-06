@@ -84,7 +84,7 @@
     var closer;
     TowTruck.chat = $('<div class="towtruck-container towtruck-chat">');
     TowTruck.chat.append(
-      closer = $('<div class="towtruck-close">&times;</div>'),
+      closer = $('<div class="towtruck-close" data-walkabout-disable="1">&times;</div>'),
       $('<div class="towtruck-header">Chat</div>'),
       TowTruck.chatContainer = $('<div class="towtruck-chat-container"></div>'),
       TowTruck.chatInput = $('<input type="text" class="towtruck-chat-input">')
