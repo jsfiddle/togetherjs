@@ -20,7 +20,6 @@ var server = http.createServer(function(request, response) {
   var host = request.headers["host"];
   var base = protocol + "//" + host;
   var strippedPath = url.pathname.replace(/^\/*/, "");
-  console.log('paths', url.pathname, strippedPath);
   // FIXME: this probably isn't secure against some attacks:
 
   if (url.pathname == "/towtruck.js") {
@@ -58,7 +57,6 @@ var server = http.createServer(function(request, response) {
     __dirname,
     path.dirname(strippedPath),
     path.basename(strippedPath, ".js") + ".coffee");
-  console.log('testing', coffeeName);
   fs.exists(
     coffeeName,
     function (exists) {
