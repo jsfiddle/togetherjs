@@ -22,6 +22,11 @@ The actual implementation uses:
 - `towtruck.less`: compiled to CSS when you load `towtruck.css`
 - jQuery; used in noConflict mode
 
+Bookmarklet
+-----------
+
+Go to `http://localhost:8080/bookmarklet.html` for a bookmarklet that you can use to start TowTruck.  This of course excludes the possibility of the page cooperating with TowTruck, but it can do some stuff on its own anyway.
+
 License
 -------
 

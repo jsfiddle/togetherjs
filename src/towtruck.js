@@ -58,6 +58,23 @@
 
   startTowTruck.hubBase = "http://localhost:8080";
 
+  startTowTruck.bookmarklet = function () {
+    var s = "window._startTowTruckImmediately=true;";
+    styles.forEach(function (url) {
+      s += "var link=document.createElement('link');";
+      s += "link.setAttribute('rel', 'stylesheet');";
+      s += "link.href='" + url + "';";
+      s += "document.head.appendChild(link);";
+    });
+    scripts.forEach(function (url) {
+      s += "var script=document.createElement('script');";
+      s += "script.src='" + url + "';";
+      s += "document.head.appendChild(script);";
+    });
+    s = "(function () {" + s + "})();void(0)";
+    return "javascript:" + encodeURIComponent(s);
+  };
+
   window.addEventListener("load", function () {
     var hash = location.hash.replace(/^#/, "");
     if (hash.search(/^towtruck-/) === 0) {
