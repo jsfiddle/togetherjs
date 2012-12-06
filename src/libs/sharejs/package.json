@@ -1,0 +1,43 @@
+{
+  "name": "share",
+  "version": "0.5.0",
+  "description": "A database for concurrent document editing",
+  "keywords": ["operational transformation", "ot", "concurrent", "collaborative", "database", "server"],
+  "homepage": "",
+  "author": "Joseph Gentle <josephg@gmail.com>",
+  "main": "index.js",
+  "bin": {
+    "sharejs": "bin/sharejs",
+    "sharejs-exampleserver": "bin/exampleserver"
+  },
+  "dependencies": {
+    "sockjs": ">= 0.3.1",
+    "socket.io": "~0.8",
+    "socket.io-client": "~0.8",
+    "connect": "~1",
+    "optimist": ">= 0.2.4",
+    "uglify-js": "~1",
+    "request": ">= 2.1.1",
+    "coffee-script": "*",
+    "browserchannel": "*",
+    "hat": "*"
+  },
+  "devDependencies": {
+    "nodeunit": "*",
+    "websocket": "*"
+  },
+  "engine": "node >= 0.6",
+  "scripts": {
+    "build": "cake build",
+    "test": "nodeunit tests.coffee",
+    "prepublish": "cake webclient"
+  },
+  "licenses": [{
+    "type": "BSD",
+    "url": "http://www.freebsd.org/copyright/freebsd-license.html"
+  }],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/josephg/sharejs.git"
+  }
+}

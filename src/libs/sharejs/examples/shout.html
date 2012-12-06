@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+		<title>Shout</title>
+	</head>
+
+	<body>
+		<div id="container">
+      <div>Tell others to connect to <a href="">here</a> and shout at each other via ShareJS.</div>
+      <p>
+      <input type="text" id="input" placeholder="Shout something&hellip;"/>
+      <input type="button" id="shout" value="shout"/>
+      <p>
+			<ul id='shouts' class='content'></div>
+		</div>
+
+    <script src="/channel/bcsocket.js"></script>
+		<script src="/share/share.uncompressed.js"></script>
+
+		<script>
+sharejs.open('hello', 'text', function(error, doc) {
+  var input = document.getElementById('input'),
+    shout = document.getElementById('shout'),
+    shouts = document.getElementById('shouts');
+
+  function addShout(txt) {
+    li = document.createElement('li');
+    li.innerText = txt;
+    shouts.appendChild(li);
+  }
+ 
+  function shoutOut() {
+    var s = input.value;
+    input.value = '';
+    doc.shout(s);
+    addShout('You shouted "' + s + '"');
+  }
+
+  input.focus();
+
+  shout.onclick = input.onchange = shoutOut;
+
+	doc.on('shout', function (msg) {
+    addShout('You hear "' + msg + '"');
+	});
+
+  addShout('Connected');
+});
+		</script>
+	</body>
+</html>	
+

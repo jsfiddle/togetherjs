@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+		<title>Read only</title>
+	</head>
+
+	<body>
+		<div id="container">
+			<div id='text' class='content'></div>
+		</div>
+
+    <script src="/channel/bcsocket.js"></script>
+		<script src="/share/share.uncompressed.js"></script>
+
+		<script>
+var elem = document.getElementById('text');
+
+sharejs.open('hello', 'text', function(error, doc) {
+	elem.innerText = doc.snapshot;
+	doc.on('change', function() {
+		elem.innerText = doc.snapshot;
+	});
+});
+		</script>
+	</body>
+</html>	
+

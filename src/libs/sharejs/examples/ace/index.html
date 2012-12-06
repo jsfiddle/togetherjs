@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="style.css" rel="stylesheet" type="text/css">
+	</head>
+
+	<body>
+		<div id="header">
+			<div id="htext">
+				<b>Editing</b> <input type="text" value="ace" id='namefield'></input>
+			</div>
+		</div>
+
+		<div id="editor">Connecting...</div>
+		<script src="/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/lib/ace/mode-coffee.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/channel/bcsocket.js"></script>
+		<script src="/share/share.uncompressed.js"></script>
+		<script src="/share/ace.js"></script>
+		<script>
+	var doc = null;
+	var editor;
+
+	var setDoc = function(docName) {
+
+		editor.setReadOnly(true);
+		document.title = docName;
+
+		sharejs.open(docName, function(error, newDoc) {
+			
+			if (doc != null) {
+				doc.close();
+				doc.detach_ace();
+			}
+
+			doc = newDoc;
+
+			if (error) {
+				console.error(error);
+				return;
+			}
+			doc.attach_ace(editor);
+			editor.setReadOnly(false);
+		});
+	};
+
+	window.onload = function() {
+		editor = ace.edit("editor");
+		editor.session.setUseWrapMode(true);
+
+		// For fun, we'll go into coffeescript syntax mode.
+		var CoffeeScriptMode = require("ace/mode/coffee").Mode;
+		var session = editor.getSession();
+		session.setMode(new CoffeeScriptMode());
+		session.setTabSize(2);
+		session.setUseSoftTabs(true);
+
+		setDoc('ace');
+
+		var namefield = document.getElementById('namefield');
+		var fn = function() {
+			var docName = namefield.value;
+			
+			if (docName) {
+				setDoc(docName);
+			}
+		}
+
+		if (namefield.addEventListener) {
+			namefield.addEventListener('input', fn, false);
+		} else {
+			namefield.attachEvent('oninput', fn);
+		}
+	};
+		</script>
+	</body>
+</html>	
+

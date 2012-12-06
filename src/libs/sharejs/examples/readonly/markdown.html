@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<div id="container">
+			<div id='text' class='content'></div>
+		</div>
+    <script src="/channel/bcsocket.js"></script>
+		<script src="../lib/markdown/showdown.js" type="text/javascript"></script>
+		<script src="/share/share.uncompressed.js" type="text/javascript"></script>
+		<script type="text/javascript">
+
+	var elem = document.getElementById('text');
+
+	// To convert markdown -> HTML
+	var converter = new Showdown.converter();
+
+	sharejs.open('markdown', 'text', function(error, doc) {
+		if (error) {
+			console.error(error);
+		} else {
+			if (window.console) {
+				console.log("Document open");
+			}
+			document.title = doc.name
+
+			var update = function() {
+				elem.innerHTML = converter.makeHtml(doc.snapshot);
+			}
+
+			update();
+			doc.on('change', update);
+
+			if (doc.created) {
+				doc.submitOp([{i:"A heading\n=========\n\nLets talk about code:\n\n    codey(codey).code;\n", p:0}]);
+			}
+		}
+	});
+		</script>
+	</body>
+</html>

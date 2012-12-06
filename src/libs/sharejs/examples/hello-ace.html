@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="ace/style.css" rel="stylesheet" type="text/css">
+		<title>Hello World</title>
+	</head>
+
+	<body>
+		<div id="header">
+			<div id="htext">
+				Editing <b>hello</b></input>
+			</div>
+		</div>
+
+		<div id="editor"></div>
+
+		<script src="/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/channel/bcsocket.js"></script>
+		<script src="/share/share.uncompressed.js"></script>
+		<script src="/share/ace.js"></script>
+
+		<script>
+var editor = ace.edit("editor");
+
+sharejs.open('hello', 'text', function(error, doc) {
+	doc.attach_ace(editor);
+});
+		</script>
+	</body>
+</html>	
+

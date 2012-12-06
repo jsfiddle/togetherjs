@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <link href="ace/style.css" rel="stylesheet" type="text/css">
+    <title>Code editor</title>
+  </head>
+
+  <body>
+    <div id="header">
+      <div id="htext">
+        Editing <b id='docname'>...</b>
+        <a style="padding-left: 50px;" href="/code.html">New</a>
+      </div>
+        
+    </div>
+
+    <div id="editor">Loading...</div>
+    <script src="/lib/ace/ace.js"></script>
+    <script src="/lib/ace/mode-coffee.js"></script>
+    <script src="/lib/ace/theme-idle_fingers.js"></script>
+    <script src="/channel/bcsocket.js"></script>
+    <script src="/share/share.uncompressed.js"></script>
+    <script src="/share/ace.js"></script>
+    <script>
+var randomDocName = function(length) {
+  var chars, x;
+  if (length == null) {
+    length = 10;
+  }
+  chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=";
+  var name = [];
+  for (x = 0; x < length; x++) {
+    name.push(chars[Math.floor(Math.random() * chars.length)]);
+  }
+  return name.join('');
+};
+
+window.onload = function() {
+  var editor = ace.edit("editor");
+
+  editor.setReadOnly(true);
+  editor.getSession().setUseSoftTabs(true);
+  editor.getSession().setTabSize(2);
+  editor.getSession().setMode(new (require("ace/mode/coffee").Mode));
+  editor.setTheme("ace/theme/idle_fingers");
+
+  if (!document.location.hash) {
+    document.location.hash = '#' + randomDocName();
+  }
+  var docName = "code:" + document.location.hash.slice(1);
+
+  var span = document.getElementById('docname').innerText = docName;
+
+  sharejs.open(docName, 'text', function(error, doc) {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (doc.created) {
+      doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
+    }
+
+    doc.attach_ace(editor);
+    editor.setReadOnly(false);
+  });
+};
+    </script>
+  </body>
+</html>  
+

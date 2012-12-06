@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="lib/bootstrap.min.css">
+		<link rel="stylesheet" href="lib/prettify.css">
+	<style type="text/css">
+
+	body {
+  	padding-top: 60px;
+	}
+
+p {
+  word-spacing: 1.5px;
+  font-size: 16px;
+  line-height: 1.625em;
+  padding:0 0 0.8125em 0;
+}
+
+.wide li {
+  margin: 0 0 0.8125em 0;
+  font-size: 16px;
+  line-height: 1.625em;
+}
+
+section {
+  padding-top: 30px;
+}
+
+#pad {
+  width: 90%;
+}
+
+.prettyprint {
+  background-color: #fefbf3;
+  padding: 9px;
+  border: 1px solid rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.1);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.1);
+          box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+
+#trains {
+  list-style-type: none;
+  margin: 0;
+  width: 100%;
+}
+
+#trains li {
+  margin: 0 3px 3px 3px;
+  padding: 0.4em;
+  padding-left: 1.5em;
+  font-size: 1.4em;
+  height: 18px;
+  border: 1px solid #CCC;
+  outline: none;
+  
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.1);
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+
+#trains li:hover {
+  background-color: #fff9bd;
+}
+
+.footer {
+  background-color: #EEE;
+  min-width: 940px;
+  padding: 30px 0;
+  text-shadow: 0 1px 0 white;
+  border-top: 1px solid #E5E5E5;
+  -webkit-box-shadow: inset 0 5px 15px rgba(0,0,0,.025);
+  -moz-box-shadow: inset 0 5px 15px rgba(0,0,0,.025);
+}
+
+	</style>
+		<title></title>
+	</head>
+	<body onload="prettyPrint()">
+	
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">ShareJS</a>
+          <ul class="nav">
+<!--            <li class="active"><a href="#">Intro</a></li>-->
+          </ul>
+          <ul class="nav secondary-nav">
+            <li><a><span class="label warning" id="status">Loading...</span></a></li>
+            <li><a href="demos.html">Demos</a></li>
+            <li><a href="https://github.com/josephg/ShareJS/wiki">Documentation</a></li>
+            <li><a href="https://github.com/josephg/ShareJS">Github</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+<div class="container">
+
+<section id="intro">
+<div class="page-header"><h1>ShareJS – Live concurrent editing in your app.</h1></div>
+
+<p>ShareJS is an Operational Transform library for NodeJS &amp; browsers. It lets you easily do live concurrent editing
+in your app.</p>
+
+<div class="row">
+
+<div class="row">
+<div class="span6 offset1">
+  <h3>Here’s etherpad in 4 lines.</h3>  
+  <textarea id="pad" rows="8" disabled>Loading. (Or its probably broken and you should come back later.)</textarea>
+  <span class="help-block">Everyone viewing this page can see your edits live. Open this in another browser window for maximum wow.</span>
+</div>
+<div class="span8">
+  <h3>Code</h3>
+  <pre class="prettyprint">
+sharejs.open('blag', 'text', function(error, doc) {
+  var elem = document.getElementById('pad');
+  doc.attach_textarea(elem);
+});
+</pre></div>
+</div>
+</div>
+</section>
+<section id="body">
+<p>
+You’re writing a web app. Your app contains data that users edit. Your users should be able to user your app from multiple computers if they need to. Sometimes you want multiple users to view &amp; edit the same data.</p>
+
+<p>How do you make that work, without the data going out of sync and without losing anything?</p>
+
+<p>One option is to have Submit buttons everywhere. <a href="http://stackexchange.com/">Stackexchange</a>, <a href="http://reddit.com/">Reddit</a> and <a href="http://news.ycombinator.com/">Hacker News</a> work like this. You can’t write half a HN comment from your laptop and half from your phone. Most wikis have a ‘save’ button and do locking. Its like the ghostly hand of <a href="http://www.codinghorror.com/blog/2006/08/source-control-anything-but-sourcesafe.html">visual sourcesafe</a> has somehow infected the web with sloppy engineering and a terrible user experience. If your wiki lock expires while you’re doing a big edit, you're in a world of hurt.</p>
+
+<p>The solution is <strong><a href="http://en.wikipedia.org/wiki/Operational_transformation">Operational Transformation</a></strong> (OT). If you haven’t heard of it, OT is a class of algorithms that do <i>multi-site realtime concurrency</i>. OT is like realtime git. It works with any amount of lag (from zero to an extended holiday). It lets users make live, concurrent edits with low bandwidth. OT gives you eventual consistency between multiple users without retries, without errors and without any data being overwritten.</p>
+
+<p>Unfortunately, implementing OT sucks. There's a million algorithms with different tradeoffs, mostly trapped in academic papers. The algorithms are really hard and time consuming to implement correctly. We need some good libraries, so any project can just plug in OT if they need it.</p>
+
+<p>I am an ex <a href="http://wave.google.com">Google Wave</a> engineer. Wave took 2 years to write and if we rewrote it today, it would take almost as long to write a second time. (What??)</p>
+
+<p>Enter <strong><a href="https://github.com/josephg/ShareJS">ShareJS</a></strong>. ShareJS is a simple (~4k LOC) coffeescript server &amp; web client library for OT. With ShareJS, your website can let your users collaboratively edit text documents and arbitrary JSON data in realtime. (Like this one.)</p>
+
+</section>
+<section id="worky">
+<div class="page-header"><h3>How it works</h3></div>
+<p>As you edit the text area at the top of this page, ShareJS generates <i>operations</i>. Operations are like mini commits to the document. (Eg, <code>insert:'hi', position:50</code>.)</p>
+
+<p>Like <a href="http://subversion.tigris.org/">subversion</a>, the server has a version number. If multiple users submit an operation at the same version, one of the edits is applied directly and the other user’s edit is automatically transformed by the server and then applied. Transforming is a bit like a <a href="http://book.git-scm.com/4_rebasing.html">git rebase operation</a>.</p>
+
+<p>In your browser, your edits are visible immediately. Edits from other people get transformed on top of yours. Unlike normal SCM systems, the algorithm is very careful to make sure that everyone ends up with the same document, no matter what order the operations are actually applied in. This allows the whole update &amp; commit stuff to happen completely automatically, in realtime. There are no conflict markers or any of that jazz.</p>
+
+</section>
+<section id="examples">
+<div class="page-header"><h3>Here’s some more examples</h3></div>
+
+<ul class="wide">
+<li><a href="/wiki/Main">A live editable wiki.</a> The wiki renders the page contents live using a <a href="http://daringfireball.net/projects/markdown/">markdown</a> library called <a href="http://softwaremaniacs.org/playground/showdown-highlight/">showdown</a>. You can change the last part of the URL to see different wiki pages. <i>(They get created on the fly when you open them.)</i></li>
+
+<li><a href="/code.html">A collaborative code editor.</a> When you open this URL, you’ll create a new document with a random ID. Share the URL around and you can pair program.</li>
+
+<li><a href="https://gist.github.com/1341527">This nodejs script</a> will watch a ShareJS document and re-save a copy on disk whenever it gets edited. You can use it with the code editor, or with the wiki, or any ShareJS document.</li>
+</ul>
+
+<p>Browse through the <a href="/demos.html">demo gallery</a> for more.</p>
+
+<p>As well as plain text, ShareJS has OT functions defined for arbitrary JSON objects. Here’s a list of all the trains in Thomas the Tank Engine. Anyone viewing this webpage can concurrently reorder the list.</p>
+
+<div class="row">
+<div class="span5 offset3">
+<ul id="trains">
+</ul>
+<span class="help-block">Drag the trains around, <i>collaboratively</i>.</span>
+</div>
+</div>
+<br />
+
+<p>Jeremy (who implemented the JSON OT code) wrote <a href="/hex.html">this multiplayer game</a> using ShareJS. Share the URL to play with someone at a different computer.</p>
+
+<p>There’s currently nothing stopping you playing as the other team, or cheating and writing a script which moves the other player’s pieces around. You can also use the game board as a low res 3 color display and write rude messages with it. Jeremy’s game is <i>cool</i>.</p>
+
+<p>ShareJS is <i>mostly</i> working, but it’s still a bit shit. The next version will fix some connection flakiness and tell you who’s editing the document with you. I want to add rich text support as well, though I can’t find any good HTML rich text editors.</p>
+
+<p>If you’re making the next <a href="https://trello.com/">Trello</a> or Google Spreadsheets, check out <a href="https://github.com/josephg/ShareJS">ShareJS</a>. Make your web apps realtime and collaborative. Its the one true way ;)</p>
+</section>
+</div>
+<footer class="footer">
+<div class="container">
+<p class="pull-right">With love, <a href="http://josephg.com">Joseph Gentle</a>, 6 Nov 2011</p>
+</div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"></script>
+<script src="/channel/bcsocket.js"></script>
+<script src="/share/share.uncompressed.js"></script>
+<script src="/share/textarea.js"></script>
+<script src="/lib/prettify.js"></script>
+<script src="/share/json.js"></script>
+<script>
+$(function() {
+  // *** Editor window
+  var elem = document.getElementById('pad');
+  
+  var connection = sharejs.open('blag', 'text', function(error, doc) {
+  	if (error) {
+  		console.log(error);
+  	} else {
+  		elem.disabled = false;
+  		doc.attach_textarea(elem);
+  	}
+  });
+
+  // *** Connection status display
+  var status = document.getElementById('status');
+  var register = function(state, klass, text) {
+    connection.on(state, function() {
+      status.className = 'label ' + klass;
+      status.innerHTML = text;
+    });
+  };
+
+  register('ok', 'success', 'Online');
+  register('connecting', 'warning', 'Connecting...');
+  register('disconnected', 'important', 'Offline');
+  register('stopped', 'important', 'Error');
+  
+  // *** Draggable trains example
+  sharejs.open('thomas', 'json', function(error, doc) {
+    if (error) {
+      if (console) {
+        console.error(error);
+      }
+      return;
+    }
+    
+    if (doc.created) {
+      doc.set(["Thomas the Tank Engine",
+        "Edward the Blue Engine",
+        "Henry the Green Engine",
+        "Gordon the Big Engine",
+        "James the Red Engine",
+        "Percy the Small Engine",
+        "The Fat Controller"
+      ]);
+    }
+    
+    var trains = doc.get();
+    $.each(trains, function(i, train) {
+      $('#trains').append($('<li>').text(trains[i])); //.attr('data-id', i)
+    });
+
+    var dragFrom = null;
+    
+    doc.at().on('move', function(from, to) {
+      //console.log('move', from, to);
+      if (dragFrom === from) {
+        dragFrom = to;
+      } else {
+        //console.log('#trains :nth-child(' + (from + 1) + ')');
+        //console.log($('#trains :nth-child(' + 1 + ')'));
+        //console.log($('#trains :nth-child(' + 2 + ')'));
+
+        if (to === 0) {
+          $('#trains :nth-child(' + (from + 1) + ')')
+            .remove()
+            .insertBefore($('#trains :nth-child(' + (to + 1) + ')'));
+        } else {
+          $('#trains :nth-child(' + (from + 1) + ')')
+            .remove()
+            .insertAfter($('#trains :nth-child(' + to + ')'));
+        }
+      }
+    });    
+    
+    $("#trains").sortable({
+      helper: 'clone',
+      start: function(event, ui) {
+        dragFrom = ui.item.index();
+        ui.item.remove();
+      },
+      update: function(event, ui) {
+        //console.log('update', ui.item.index());
+        dragFrom = null;
+      },
+      change: function(event, ui) {
+        var newPos = ui.placeholder.index();
+        //console.log('sending move', dragFrom, newPos);
+        doc.at().move(dragFrom, newPos);
+        dragFrom = newPos;
+      },
+      beforeStop: function(event, ui) {
+        //console.log(ui.item);
+        ui.placeholder.before(ui.item);
+      },
+      axis: 'y'
+    });
+    
+    $("#trains").disableSelection();
+  });
+});
+
+</script>
+	</body>
+</html>

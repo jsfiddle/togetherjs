@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+require('coffee-script');
+
+var createdb = require('../src/server/db');
+var options = require('./options');
+
+if (options.db.type !== 'pg') {
+  throw new Error('You must configure your server to use postgresql before using this script');
+}
+
+var db = createdb(options.db);
+db.initialize(function(error) {
+  if(error) {
+    throw new Error(error.toString());
+  } else {
+    console.log("DB initialized successfully");
+  }
+  db.close();
+});
+
