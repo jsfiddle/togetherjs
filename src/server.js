@@ -85,6 +85,9 @@ var server = http.createServer(function(request, response) {
 
 function write500(error, response) {
   response.writeHead(500, {"Content-Type": "text/plain"});
+  if (typeof error != "string") {
+    error = "\n" + JSON.stringify(error, null, "  ");
+  }
   response.end("Error: " + error);
 }
 
