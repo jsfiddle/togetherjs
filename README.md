@@ -23,11 +23,11 @@ For more information, see:
   [X-Ray Goggles]: http://hackasaurus.org/goggles/
   [lovebomb mockups]: http://jessicaklein.blogspot.com/2012/03/iterating-on-bombs.html
   [webmaker tutorials]: http://www.toolness.com/wp/2012/03/webmaker-tutorial-prototyping/
-  [error reporting specification]: http://toolness.github.com/slowparse/spec/
-  [live demo]: http://toolness.github.com/slowparse/demo/
-  [slowparse.js]: http://labs.toolness.com/temp/slowparse/docs/slowparse.html
-  [tree-inspectors.js]: http://labs.toolness.com/temp/slowparse/docs/tree-inspectors.html
-  [spec/errors.jquery.js]: http://labs.toolness.com/temp/slowparse/docs/errors.jquery.html
-  [test suite]: http://toolness.github.com/slowparse/test/
+  [error reporting specification]: http://mozilla.github.com/slowparse/spec/
+  [live demo]: http://mozilla.github.com/slowparse/demo/
+  [slowparse.js]: http://mozilla.github.com/slowparse/
+  [tree-inspectors.js]: http://mozilla.github.com/slowparse/?tree-inspectors.js
+  [spec/errors.jquery.js]: http://mozilla.github.com/slowparse/?errors.jquery.js
+  [test suite]: http://mozilla.github.com/slowparse/test/
   [learning]: http://www.toolness.com/wp/2012/04/learning-and-grammatical-forgiveness/
   

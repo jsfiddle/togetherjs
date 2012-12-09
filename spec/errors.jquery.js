@@ -6,8 +6,8 @@
 //
 // For examples of this plugin in use, consult its [test suite][].
 //
-//  [spec]: http://toolness.github.com/slowparse/spec/
-//  [test suite]: https://github.com/toolness/slowparse/blob/gh-pages/test/test-errors.jquery.js
+//  [spec]: spec/
+//  [test suite]: https://github.com/mozilla/slowparse/blob/gh-pages/test/test-errors.jquery.js
 
 (function(jQuery) {
   var $ = jQuery;
@@ -83,7 +83,7 @@
     // global selection of templates from `jQuery.errorTemplates` will
     // be used.
     //
-    //   [spec]: http://toolness.github.com/slowparse/spec/
+    //   [spec]: spec/
     fillError: function(error, templates) {
       var selector = ".error-msg." + error.type;
       var template = (templates || $.errorTemplates).filter(selector);
