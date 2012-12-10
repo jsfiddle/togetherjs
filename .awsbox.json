@@ -1,0 +1,3 @@
+{
+  "processes": ["src/server.js"]
+}

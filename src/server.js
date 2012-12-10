@@ -96,8 +96,8 @@ function write404(response) {
   response.end("Resource not found");
 }
 
-function startServer(port) {
-  server.listen(port, '0.0.0.0', function() {
+function startServer(port, host) {
+  server.listen(port, host, function() {
     console.log((new Date()) + ' Server is listening on port ' + port);
   });
 }
@@ -172,7 +172,7 @@ wsServer.on('request', function(request) {
 });
 
 if (require.main == module) {
-  startServer(8080);
+  startServer(process.env.PORT || 8080, process.env.HOST || '127.0.0.1');
 }
 
 exports.startServer = startServer;

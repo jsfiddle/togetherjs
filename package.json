@@ -1,0 +1,20 @@
+{
+  "name": "towtruck",
+  "version": "0.0",
+  "main": "src/server.js",
+  "description": "Collaborative help system",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mozilla/towtruck.git"
+  },
+  "dependencies": {
+    "coffee-script",
+    "less",
+    "node-static",
+    "websocket"
+  },
+  "devDependencies": {
+    "awsbox": "*"
+  }
+}
