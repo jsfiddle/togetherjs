@@ -1,6 +1,6 @@
 {
   "name": "towtruck",
-  "version": "0.1",
+  "version": "0.1.0",
   "main": "src/server.js",
   "description": "Collaborative help system",
   "keywords": [],
