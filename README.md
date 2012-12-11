@@ -32,6 +32,17 @@ event that is created, such as `data-walkabout-keyup="{which: 13}"`
 You can use `data-walkabout-options="['a', 'b']"` to give the valid inputs
 for a field.
 
+
+Bookmarklet
+-----------
+
+If you want to try walkabout.js on some random jQuery site, you can
+use the [bookmarklet](http://ianb.github.com/walkabout.js).  This will
+load Walkabout and also start a simple UI to start the runs.  In
+addition to starting a run it'll also track any uncaught errors and
+any calls to `console.warn()` or `console.error()`.
+
+
 Non-jQuery Support
 ------------------
 
@@ -50,15 +61,50 @@ You can use `Walkabout.rewriteListeners(code)` to rewrite the code.
 The code transformation looks like this:
 
 ```javascript
-$("#el")[0].addEventListener("click", function () {}, true);
-var value = $("#textarea")[0].value;
+document.getElementById("el").addEventListener("click", function () {}, true);
+var value = document.getElementById("textarea").value;
 
 // Becomes:
-Walkabout.addEventListener($("#el")[0], "click", function () {}, true);
-var value = Walkabout.value($("#textarea")[0]);
+Walkabout.addEventListener(document.getElementById("el"), "click", function () {}, true);
+var value = Walkabout.value(document.getElementById("textarea"));
 ```
 
 And to find actions you use `Walkabout.findActions(element)`.
+
+
+Proxy Server
+------------
+
+An application could include `walkabout.js` on its own, and if it
+doesn't use jQuery it could also run `Walkabout.rewriteListeners()` on
+all its code.  But maybe you don't feel like doing that, maybe you
+want to try it out without all that work.
+
+There is a proxy server `node-proxy.js` that makes this easier.  As
+you might guess, you have to install Node.js to use it.
+
+The server expects to receive requests for the website you want to
+actually access.  To do this you have to edit `/etc/hosts` to point
+the request locally, e.g.:
+
+```
+127.0.0.1 site-to-test.com
+```
+
+Then when you access `http://site-to-test.com` it will connect
+locally, and the proxy server in turn will forward the request to the
+actual server (note though that site-to-test.com must be an actual
+domain name, not another entry in `/etc/hosts`).  Any HTML responses
+will have the Walkabout Javascript added, and Javascript will be
+rewritten.
+
+Note that it binds to port 80, and so you must run it as root.  This
+isn't awesome, pull requests to drop root welcome.  A tool like
+[authbind](http://en.wikipedia.org/wiki/Authbind) also could help.
+
+When you are done you should definitely stop the server, and undo the
+`/etc/hosts` entry.
+
 
 To Do
 -----

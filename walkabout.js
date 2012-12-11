@@ -1187,3 +1187,7 @@ if (typeof _Walkabout_start_UI != "undefined") {
     window.addEventListener("load", Walkabout.UI, false);
   }
 }
+
+if (typeof _Walkabout_sitewide != "undefined") {
+  Walkabout.options.anyLocalLinks = true;
+}
