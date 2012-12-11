@@ -1056,18 +1056,22 @@ Walkabout.makeBookmarklet = function () {
  * History handling
  */
 
-Walkabout.hashHistory = [location.hash];
+if (typeof location != "undefined") {
+  Walkabout.hashHistory = [location.hash];
+}
 
-window.addEventListener("hashchange", function () {
-  var hash = location.hash;
-  if (Walkabout.hashHistory.length > 1 &&
-      Walkabout.hashHistory[Walkabout.hashHistory.length - 2] == hash) {
-    // Someone just hit back (or at least that's what we'll pretend it is)
-    Walkabout.hashHistory.splice(Walkabout.hashHistory.length - 1, 1);
-  } else {
-    Walkabout.hashHistory.push(hash);
-  }
-}, false);
+if (typeof window != "undefined") {
+  window.addEventListener("hashchange", function () {
+    var hash = location.hash;
+    if (Walkabout.hashHistory.length > 1 &&
+        Walkabout.hashHistory[Walkabout.hashHistory.length - 2] == hash) {
+      // Someone just hit back (or at least that's what we'll pretend it is)
+      Walkabout.hashHistory.splice(Walkabout.hashHistory.length - 1, 1);
+    } else {
+      Walkabout.hashHistory.push(hash);
+    }
+  }, false);
+}
 
 Walkabout.actionFinders.push(function backFromHash(el, actions) {
   if (el !== document && el !== window) {
@@ -1177,5 +1181,9 @@ if (typeof exports != "undefined") {
 }
 
 if (typeof _Walkabout_start_UI != "undefined") {
-  Walkabout.UI();
+  if (document.readyState == "complete") {
+    Walkabout.UI();
+  } else {
+    window.addEventListener("load", Walkabout.UI, false);
+  }
 }
