@@ -105,6 +105,10 @@ isn't awesome, pull requests to drop root welcome.  A tool like
 When you are done you should definitely stop the server, and undo the
 `/etc/hosts` entry.
 
+Note many live sites seem to notice the proxy, though I don't know
+how.  I seem to be blocked from news.ycombinator.com now after using
+it in my own testing.  Any ideas welcome.
+
 
 To Do
 -----
@@ -135,3 +139,7 @@ Lots of stuff, of course.  But:
 - Something more Gaussian with the values generated.  Like, sometimes
   you should make a 100 character input.  But maybe not as often as a
   10 character input.  And sometimes a 1 character input.
+
+- z-index effects whether some actions can happen - e.g., an element
+  might be visible but not clickable because of overlays.  We should
+  test for that.
