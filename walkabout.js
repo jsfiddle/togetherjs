@@ -10,7 +10,8 @@ Walkabout.ignoreEvents = {
 };
 
 Walkabout.options = {
-  anyLocalLinks: false
+  anyLocalLinks: false,
+  loadPersistent: false
 };
 
 Walkabout.actionFinders = [];
@@ -48,54 +49,76 @@ Walkabout.DEFAULT_TIMES = 100;
 Walkabout.runManyActions = function runManyActions(options) {
   options = options || {};
   var el = options.element || document;
-  var speed = options.speed || 0;
+  var speed = options.speed || 100;
   var whileTrue = options.whileTrue || null;
-  var times = options.times;
   var ondone = options.ondone;
   var onstatus = options.onstatus;
   var cancelled = false;
+  var totalTimes = options.times;
+  var remaining;
   function cancel() {
     cancelled = true;
   }
-  if ((! whileTrue) && ! times) {
-    times = Walkabout.DEFAULT_TIMES;
+  if ((! whileTrue) && ! totalTimes) {
+    totalTimes = Walkabout.DEFAULT_TIMES;
   }
-  if (! times) {
-    times = undefined;
+  if (options.startAtRemaining) {
+    remaining = options.startAtRemaining;
+  } else {
+    remaining = totalTimes;
   }
-  var totalTimes = times;
   function runOnce() {
     var doAgain = ! cancelled;
     if (whileTrue && (! whileTrue())) {
       doAgain = false;
     }
-    if (times !== undefined && times <= 0) {
+    if (totalTimes !== undefined && remaining <= 0) {
       doAgain = false;
     }
     if (doAgain) {
       setTimeout(runOnce, speed);
     }
-    if (times !== undefined) {
-      times--;
+    if (totalTimes !== undefined) {
+      remaining--;
     }
     var actions = Walkabout.findActions(el);
     if (onstatus) {
       onstatus({
         actions: actions,
         times: totalTimes,
-        remaining: times
+        remaining: remaining
       });
+    }
+    if ((! doAgain) && ondone) {
+      ondone();
+      return;
     }
     var action = actions.pick();
     if (action) {
       action.run();
     }
-    if ((! doAgain) && ondone) {
-      ondone();
-    }
   }
   setTimeout(runOnce, speed);
   return cancel;
+};
+
+Walkabout.persistentData = function (value) {
+  var key = "walkabout.runstate";
+  if (value === undefined) {
+    value = localStorage.getItem(key);
+    if (value) {
+      value = JSON.parse(value);
+    } else {
+      value = {};
+    }
+    return value;
+  }
+  if (value === null) {
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+  return value;
 };
 
 Walkabout.actionFinders.push(function findAnchors(el, actions) {
@@ -619,8 +642,12 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
     if (random.logState) {
       console.log('x', x, 'y', y, 'z', z);
     }
+    if (random.storeState) {
+      localStorage.setItem(random.storeState, JSON.stringify([x, y, z]));
+    }
     return (x / 30269.0 + y / 30307.0 + z / 30323.0) % 1.0;
   };
+  result.storeState = null;
   result.setSeed = setSeed;
   result.pick = function (array) {
     var index = Math.floor(result() * array.length);
@@ -640,6 +667,28 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
       s += result.pick(letters);
     }
     return s;
+  };
+  result.loadState = function (state) {
+    if (state === undefined && ! result.storeState) {
+      return;
+    }
+    if (state === undefined) {
+      state = localStorage.getItem(result.storeState);
+      if (state) {
+        state = JSON.parse(state);
+      } else {
+        return;
+      }
+    }
+    x = state[0];
+    y = state[1];
+    z = state[2];
+  };
+  result.clearState = function () {
+    if (! result.storeState) {
+      return;
+    }
+    localStorage.removeItem(result.storeState);
   };
   return result;
 };
@@ -897,7 +946,7 @@ Walkabout.UI = Walkabout.Class({
         "div",
         {style: this.styles.issues},
         [
-          this.make("div", {style: this.styles.issuesHeader}, ["Issues:"])
+          this.make("div", {"data-issues-header": 1, style: this.styles.issuesHeader}, ["Issues:"])
         ]),
 
       this.startButton = this.make(
@@ -917,15 +966,31 @@ Walkabout.UI = Walkabout.Class({
     this.updateActionsId = setInterval(this.updateActions, 5000);
     this.updateActions();
     this.catchIssues();
+    if (Walkabout.options.loadPersistent) {
+      var data = Walkabout.persistentData();
+      // Ignore data older than 30 minutes:
+      // FIXME: should probably still load up the console even if it's old
+      if (data.startAtRemaining) {
+        if ((Date.now() - data.savedAt) < 30*60*1000 ) {
+          this.start();
+        } else if (data.console) {
+          this.issueSerialization(data.console);
+          this.addIssue("Not continuing (out of date session)");
+        }
+      } else if (data.console) {
+        this.issueSerialization(data.console);
+        this.addIssue("done.");
+      }
+    }
   },
 
   styles: {
-    panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%; z-index: 10000;",
+    panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; border-radius: 4px; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%; z-index: 10000; font-family: sans-serif;",
     start: "color: #000; background-color: #eee; border: 2px outset #999; border-radius: 2px; padding: 4px;",
     close: "cursor: pointer; float: right;",
-    header: "font-size: 110%; font-weight: bold;",
+    header: "font-size: 110%; font-weight: bold; border-bottom: 1px solid #aa9; margin-bottom: 6px;",
     actions: "border: 2px solid #000; padding: 0 0.5em 0 0.5em;",
-    issues: "max-height: 5em; overflow-y: auto; overflow: auto; border: 2px solid #000; margin: 4px 0 4px 0;",
+    issues: "max-height: 5em; overflow-y: auto; overflow: auto; border: 2px solid #000; margin: 4px 0 4px 0; font-size: 80%; padding-bottom: 8px;",
     issuesHeader: "font-weight: bold"
   },
 
@@ -957,6 +1022,9 @@ Walkabout.UI = Walkabout.Class({
     clearTimeout(this.updateActionsId);
     this.updateActionsId = null;
     this.panel.parentNode.removeChild(this.panel);
+    if (Walkabout.options.loadPersistent) {
+      Walkabout.persistentData(null);
+    }
   },
 
   start: function () {
@@ -966,9 +1034,25 @@ Walkabout.UI = Walkabout.Class({
       jQuery.fn.val.patch();
     }
     this._lastCount = -1;
-    var seed = Date.now();
-    Walkabout.random.setSeed(seed);
-    this.addIssue("Starting run with seed: " + seed);
+    var startAtRemaining = undefined;
+    var persist = Walkabout.options.loadPersistent;
+    var seeded = false;
+    if (persist) {
+      var data = Walkabout.persistentData();
+      startAtRemaining = data.startAtRemaining;
+      if (data.console) {
+        this.issueSerialization(data.console);
+      }
+      if (data.seeded) {
+        seeded = true;
+      }
+      Walkabout.random.storeState = "walkabout.randomstate";
+    }
+    if (! seeded) {
+      var seed = Date.now();
+      Walkabout.random.setSeed(seed);
+      this.addIssue("Starting run with seed: " + seed);
+    }
     this.canceler = Walkabout.runManyActions({
       ondone: (function () {
         this.startButton.innerHTML = "start";
@@ -977,6 +1061,12 @@ Walkabout.UI = Walkabout.Class({
         if (Walkabout.jQueryAvailable) {
           jQuery.fn.val.unpatch();
         }
+        if (persist) {
+          Walkabout.persistentData({
+            console: this.issueSerialization(),
+            savedAt: Date.now()
+          });
+        }
       }).bind(this),
       onstatus: (function (status) {
         if (status.actions.length != this._lastCount) {
@@ -984,7 +1074,17 @@ Walkabout.UI = Walkabout.Class({
           this.updateActions(status.actions);
         }
         this.runField.textContent = (status.times - status.remaining) + " / " + status.times;
-      }).bind(this)
+        if (persist) {
+          var data = {
+            startAtRemaining: status.remaining,
+            console: this.issueSerialization(),
+            savedAt: Date.now(),
+            seeded: true
+          };
+          Walkabout.persistentData(data);
+        }
+      }).bind(this),
+      startAtRemaining: startAtRemaining
     });
   },
 
@@ -998,6 +1098,26 @@ Walkabout.UI = Walkabout.Class({
     var div = this.make("div", {}, arguments);
     this.issues.appendChild(div);
     this.issues.childNodes[this.issues.childNodes.length - 1].scrollIntoView();
+  },
+
+  issueSerialization: function (value) {
+    if (value === undefined) {
+      var result = [];
+      for (var i=0; i<this.issues.childNodes.length; i++) {
+        var child = this.issues.childNodes[i];
+        if (child.getAttribute("data-issues-header")) {
+          continue;
+        }
+        result.push(this.issues.childNodes[i].textContent);
+      }
+      return result;
+    } else {
+      for (var i=0; i<value.length; i++) {
+        if (value[i] == "Issues:") throw "Issues in serialization :(";
+        this.addIssue(value[i]);
+      }
+      return value;
+    }
   },
 
   catchIssues: function () {
@@ -1037,12 +1157,16 @@ Walkabout.makeBookmarklet = function () {
   if (! walkaboutSrc) {
     return "javascript:alert('Could not find script.')";
   }
+  // Cache bust on localhost
+  var cacheBust = walkaboutSrc.indexOf("localhost") != -1;
   var s = [
     "(function () {",
     "var _s = document.getElementById('walkabout_script');",
     "if (_s) _s.parentNode.removeChild(_s);",
     "_s = document.createElement('script');",
-    "_s.src = '" + walkaboutSrc + "';",
+    "_s.src = '" + walkaboutSrc + "'",
+    (cacheBust ? " + '?cachebust=' + Date.now()" : ""),
+    ";",
     "_Walkabout_start_UI = true;",
     "document.head.appendChild(_s);",
     "})();void(0);"
@@ -1189,5 +1313,6 @@ if (typeof _Walkabout_start_UI != "undefined") {
 }
 
 if (typeof _Walkabout_sitewide != "undefined") {
-  Walkabout.options.anyLocalLinks = true;
+  Walkabout.options.anyLocalLinks = location.pathname.replace(/\/[^\/]*$/, "/");
+  Walkabout.options.loadPersistent = true;
 }
