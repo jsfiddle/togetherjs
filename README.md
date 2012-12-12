@@ -72,13 +72,33 @@ var value = Walkabout.value(document.getElementById("textarea"));
 And to find actions you use `Walkabout.findActions(element)`.
 
 
+Options
+-------
+
+By default Walkabout will only go to links on the current page (i.e.,
+`href="#something"`).  This is because it will lose its context and
+potentially not load on the next page.  But if you want Walkabout to
+move to other pages you can use `Walkabout.options.anyLocalLinks =
+true`
+
+Or set it to something like `"/dir/"` which will only follow links
+under `/dir/`.
+
+If you use `Walkabout.options.loadPersistent = true` then it will save
+the state in localStorage and continue where it left of when another
+page is loaded.
+
+
 Proxy Server
 ------------
 
 An application could include `walkabout.js` on its own, and if it
 doesn't use jQuery it could also run `Walkabout.rewriteListeners()` on
 all its code.  But maybe you don't feel like doing that, maybe you
-want to try it out without all that work.
+want to try it out without all that work.  Also, by default Walkabout
+will try to stay on the current page, but in the proxy mode because it
+knows Walkabout will load on each page, it will freely move about the
+site.
 
 There is a proxy server `node-proxy.js` that makes this easier.  As
 you might guess, you have to install Node.js to use it.
@@ -93,10 +113,8 @@ the request locally, e.g.:
 
 Then when you access `http://site-to-test.com` it will connect
 locally, and the proxy server in turn will forward the request to the
-actual server (note though that site-to-test.com must be an actual
-domain name, not another entry in `/etc/hosts`).  Any HTML responses
-will have the Walkabout Javascript added, and Javascript will be
-rewritten.
+actual server.  Any HTML responses will have the Walkabout Javascript
+added, and Javascript will be rewritten.
 
 Note that it binds to port 80, and so you must run it as root.  This
 isn't awesome, pull requests to drop root welcome.  A tool like
@@ -108,6 +126,13 @@ When you are done you should definitely stop the server, and undo the
 Note many live sites seem to notice the proxy, though I don't know
 how.  I seem to be blocked from news.ycombinator.com now after using
 it in my own testing.  Any ideas welcome.
+
+You can control the proxy with environmental variables: `$PORT` for
+the port to bind to (default 80), `$BIND` for the interface to bind to
+(default 127.0.0.1; 0.0.0.0 means all interfaces), and `$PORT_ALIASES`
+which looks like `domain1:8088;domain2:8080` which lets you proxy from
+one port to another (helpful sometimes when you need to proxy to a
+server running locally).
 
 
 To Do
