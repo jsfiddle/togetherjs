@@ -17,6 +17,10 @@
 
   var $ = window.jQuery;
   $.noConflict();
+  TowTruck.$ = $;
+  var _ = window._;
+  _.noConflict();
+  TowTruck._ = _;
 
   TowTruck.init = function () {
     if (! TowTruck.shareId) {
@@ -62,67 +66,57 @@
   };
 
   TowTruck.start = function () {
-    var closer;
-    TowTruck.intro = $('<div class="towtruck-container towtruck-intro">');
-    TowTruck.intro.append(
-      closer = $('<div class="towtruck-close">&times;</div>'),
-      $('<div class="towtruck-header">TowTruck</div>'),
-      TowTruck.shareLink = $('<div class="towtruck-link"></div>')
-    );
-    closer.click(function () {
+    var tmpl = $(TowTruck.templates.intro({}));
+    tmpl.find(".towtruck-close").click(function () {
       if (! TowTruck.chat) {
         TowTruck.createChat();
       }
-      TowTruck.intro.remove();
-      TowTruck.intro = TowTruck.shareLink = null;
+      tmpl.remove();
     });
-    TowTruck.shareLink.text(TowTruck.shareUrl());
-    $("body").append(TowTruck.intro);
+    tmpl.find(".towtruck-link").text(TowTruck.shareUrl());
+    $("body").append(tmpl);
   };
 
   TowTruck.createChat = function () {
-    var closer;
-    TowTruck.chat = $('<div class="towtruck-container towtruck-chat">');
-    TowTruck.chat.append(
-      closer = $('<div class="towtruck-close" data-walkabout-disable="1">&times;</div>'),
-      $('<div class="towtruck-header">Chat</div>'),
-      TowTruck.chatContainer = $('<div class="towtruck-chat-container"></div>'),
-      TowTruck.chatInput = $('<input type="text" class="towtruck-chat-input">')
-    );
-    $("body").append(TowTruck.chat);
-    closer.click(function () {
-      TowTruck.chat.remove();
-      TowTruck.chat = TowTruck.chatContainer = null;
+    var tmpl = $(TowTruck.templates.chat({}));
+    console.log("result:", tmpl[0].outerHTML);
+    tmpl.find(".towtruck-close").click(function () {
+      tmpl.remove();
       send({type: "bye"});
+      TowTruck.chat = null;
       TowTruck.channel.close();
       TowTruck.channel = null;
     });
-    TowTruck.chatInput.bind("keyup", function (event) {
+    TowTruck.chat = tmpl;
+    $("body").append(TowTruck.chat);
+    TowTruck.chat.find(".towtruck-chat-input").bind("keyup", function (event) {
+      var input = TowTruck.chat.find(".towtruck-chat-input");
       if (event.which == 13) {
-        var val = TowTruck.chatInput.val();
+        var val = input.val();
         if (! val) {
-          return;
+          return false;
         }
         send({type: "chat", text: val});
         TowTruck.localChatMessage(val);
-        TowTruck.chatInput.val("");
+        input.val("");
       }
+      return false;
     });
   };
 
   TowTruck.addChat = function (text, personId) {
-    var chat = $('<div class="towtruck-chat-message">');
-    var nickname = TowTruck.peers[personId].nickname || "?";
-    chat.append(
-      $('<span class="towtruck-chat-name">')
-        .addClass("towtruck-chat-person-" + personId)
-        .text(nickname + ": "));
-    chat.append($('<span class="towtruck-chat-content">').text(text));
-    TowTruck.chatContainer.append(chat);
+    var chat = $(TowTruck.templates.chat_message({
+      nickname: TowTruck.peers[personId].nickname,
+      personId: personId,
+      personClass: "towtruck-chat-person-" + safeClassName(personId),
+      message: text,
+      remote: (personId != TowTruck.clientId)
+    }));
+    TowTruck.chat.find(".towtruck-chat-container").append(chat);
   };
 
   TowTruck.setPeerNickname = function (personId, name) {
-    $(".towtruck-chat-person-" + personId).text(name + ": ");
+    $(".towtruck-chat-person-" + safeClassName(personId)).text(name);
   };
 
   TowTruck.localChatMessage = function (text) {
@@ -134,12 +128,9 @@
       return;
     }
     if (text.indexOf("/help") == 0) {
-      var msg = (
-        "\n" +
-        "/help : this message\n" +
-        "/tab : turn tab independence on/off (allows two tabs to have different identities)\n" +
-        "  " + (TowTruck.settings("tabIndependent") ? "tab independence on" : "tab independence off (the default)")
-      );
+      var msg = trim(TowTruck.templates.help({
+        tabIndependent: TowTruck.settings("tabIndependent")
+      }));
       TowTruck.addChat(msg, "system");
       return;
     }
@@ -199,6 +190,14 @@
     tabIndependent: false
   };
 
+  function safeClassName(name) {
+    return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
+  }
+
+  function trim(s) {
+    return s.replace(/^\s+/, "").replace(/\s+$/, "");
+  }
+
   if (TowTruck.settings("tabIndependent")) {
     TowTruck.clientId = window.name;
     if (! TowTruck.clientId) {
@@ -216,6 +215,34 @@
     nickname: "me"
   };
 
+  function makeTemplate(name, source) {
+    var tmpl;
+    try {
+      tmpl = _.template(source);
+    } catch (e) {
+      console.warn("Error compiling", name, ":", e, "\n", source);
+      tmpl = function (vars) {
+        var s = $("<div>");
+        s.append($("<span>Error:</span>"), $("<span>").text(e));
+        s.append($("<pre>").text(source));
+        return s[0].outerHTML;
+      };
+    }
+    return tmpl;
+  }
+
+  TowTruck.templates = {
+    intro: makeTemplate("intro", INCLUDE("intro.tmpl")),
+    chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
+    chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
+    help: makeTemplate("help", INCLUDE("help.tmpl"))
+  };
+
+  // For ShareJS setup:
+  window.WEB = true;
+
+  window.sharejs = {};
+
   if (window._startTowTruckImmediately) {
     if (typeof window._startTowTruckImmediately == "string") {
       TowTruck.shareId = window._startTowTruckImmediately;
@@ -231,3 +258,7 @@
   }
 
 })();
+
+var tmpl = INCLUDE("intro.tmpl");
+
+WEB = true;

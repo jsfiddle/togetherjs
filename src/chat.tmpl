@@ -1,0 +1,15 @@
+<% /*
+  This is used for the chat interface.
+
+  * .towtruck-close is used to close the chat *and* stop the sharing session.
+  * .towtruck-chat-input is used for the input, and catches Enter as a submit
+  * chat_message.tmpl is appended to .towtruck-chat-container
+
+  This is used in TowTruck.createChat().  No variables are provided.
+*/ %>
+<div class="towtruck-container towtruck-chat">
+  <div class="towtruck-close" data-walkabout-disable="1">&times;</div>
+  <div class="towtruck-header">Chat</div>
+  <div class="towtruck-chat-container"></div>
+  <input type="text" class="towtruck-chat-input">
+</div>
