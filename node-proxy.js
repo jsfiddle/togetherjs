@@ -28,7 +28,8 @@ function loadEtcHosts(callback) {
         return;
       }
       var parts = l.split(/\s+/g);
-      if (parts[0] == "255.255.255.255" || parts[0].indexOf(":") != -1) {
+      if (parts[0] == "255.255.255.255" || parts[0].indexOf(":") != -1 ||
+          parts[0] == "127.0.0.1") {
         return;
       }
       for (var i=1; i<parts.length; i++) {
@@ -77,7 +78,7 @@ var server = http.createServer(function(request, response) {
   if (! IPs[host]) {
     request.pause();
     dns.resolve4(host, function (error, addresses) {
-      console.log("Resolved host", host, "to", addresses, error);
+      console.log("Resolved host", host, "to", addresses);
       if (error) {
         write500(error, response);
         return;
@@ -136,7 +137,7 @@ function forwardRequest(addresses, port, request, response) {
         clientResponse.headers["content-length"] = contentLength + "";
       }
     } else if (isJavascript) {
-      delete clientResponse.ResponseHeaders["content-length"];
+      delete clientResponse.headers["content-length"];
     }
     response.writeHead(clientResponse.statusCode, clientResponse.headers);
     var s;
@@ -152,7 +153,12 @@ function forwardRequest(addresses, port, request, response) {
     }
     clientResponse.on("end", function () {
       if (isHtml) {
-        response.write(translateHtml(s));
+        if (s.search(/^</) == -1) {
+          // Doesn't really look like HTML
+          response.write(s);
+        } else {
+          response.write(translateHtml(s));
+        }
       } else if (isJavascript) {
         response.write(translateJavascript(s));
       }
@@ -190,6 +196,7 @@ function translateJavascript(s) {
 }
 
 function write500(error, response) {
+  console.warn("Error:", error);
   response.writeHead(500, {"Content-Type": "text/plain"});
   if (typeof error != "string") {
     error = "\n" + JSON.stringify(error, null, "  ");
