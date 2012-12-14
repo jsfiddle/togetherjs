@@ -4,7 +4,13 @@
 
 # Add transform and transformX functions for an OT type which has transformComponent defined.
 # transformComponent(destination array, component, other component, side)
-exports['_bt'] = bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
+
+if WEB?
+  root = window.sharejs
+else
+  root = exports
+
+root['_bt'] = bootstrapTransform = (type, transformComponent, checkValidOp, append) ->
   transformComponentX = (left, right, destLeft, destRight) ->
     transformComponent destLeft, left, right, 'left'
     transformComponent destRight, right, left, 'right'
@@ -39,10 +45,10 @@ exports['_bt'] = bootstrapTransform = (type, transformComponent, checkValidOp, a
           append newRightOp, r for r in r_
           rightComponent = null
           break
-    
+
       append newRightOp, rightComponent if rightComponent?
       leftOp = newLeftOp
-    
+
     [leftOp, newRightOp]
 
   # Transforms op with specified type ('left' or 'right') by otherOp.
@@ -61,5 +67,4 @@ exports['_bt'] = bootstrapTransform = (type, transformComponent, checkValidOp, a
       [_, right] = transformX otherOp, op
       right
 
-if typeof WEB is 'undefined'
-  exports.bootstrapTransform = bootstrapTransform
+root.bootstrapTransform = bootstrapTransform

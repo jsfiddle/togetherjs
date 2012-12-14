@@ -1,6 +1,8 @@
 # Text document API for text
 
-text = require './text' if typeof WEB is 'undefined'
+text = require './text' if not WEB?
+if WEB?
+  text = sharejs.types.text
 
 text.api =
   provides: {text:true}
@@ -13,16 +15,16 @@ text.api =
 
   insert: (pos, text, callback) ->
     op = [{p:pos, i:text}]
-    
+
     @submitOp op, callback
     op
-  
+
   del: (pos, length, callback) ->
     op = [{p:pos, d:@snapshot[pos...(pos + length)]}]
 
     @submitOp op, callback
     op
-  
+
   _register: ->
     @on 'remoteop', (op) ->
       for component in op

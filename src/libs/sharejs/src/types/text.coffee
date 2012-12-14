@@ -48,7 +48,7 @@ text.apply = (snapshot, op) ->
       deleted = snapshot[component.p...(component.p + component.d.length)]
       throw new Error "Delete component '#{component.d}' does not match deleted text '#{deleted}'" unless component.d == deleted
       snapshot = snapshot[...component.p] + snapshot[(component.p + component.d.length)..]
-  
+
   snapshot
 
 
@@ -86,7 +86,7 @@ text.compress = (op) -> text.compose [], op
 
 text.normalize = (op) ->
   newOp = []
-  
+
   # Normalize should allow ops which are a single (unwrapped) component:
   # {i:'asdf', p:23}.
   # There's no good way to test if something is an array:
@@ -97,7 +97,7 @@ text.normalize = (op) ->
   for c in op
     c.p ?= 0
     append newOp, c
-  
+
   newOp
 
 # This helper method transforms a position by an op component.
@@ -177,7 +177,7 @@ text._tc = transformComponent = (dest, c, otherC, side) ->
           # This could be rewritten similarly to insert v delete, above.
           newC.p = transformPosition newC.p, otherC
           append dest, newC
-  
+
   dest
 
 invertComponent = (c) ->
@@ -190,15 +190,14 @@ invertComponent = (c) ->
 # cancel with one another.
 text.invert = (op) -> (invertComponent c for c in op.slice().reverse())
 
-
 if WEB?
-  exports.types ||= {}
+  sharejs.types ||= {}
 
   # This is kind of awful - come up with a better way to hook this helper code up.
-  bootstrapTransform(text, transformComponent, checkValidOp, append)
+  sharejs.bootstrapTransform(text, transformComponent, checkValidOp, append)
 
   # [] is used to prevent closure from renaming types.text
-  exports.types.text = text
+  sharejs.types.text = text
 else
   module.exports = text
 
@@ -206,4 +205,3 @@ else
   # an efficient transform function by making a sort of transform map and passing each
   # op component through it.
   require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append)
-

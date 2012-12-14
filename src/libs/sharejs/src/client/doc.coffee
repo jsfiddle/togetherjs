@@ -1,8 +1,8 @@
-unless WEB?
-  types = require '../types'
+#unless WEB?
+#  types = require '../types'
 
 if WEB?
-  exports.extendDoc = (name, fn) ->
+  sharejs.extendDoc = (name, fn) ->
     Doc::[name] = fn
 
 # A Doc is a client's view on a sharejs document.
@@ -63,7 +63,7 @@ class Doc
       client_ = @type.transform client, server, 'left'
       server_ = @type.transform server, client, 'right'
       return [client_, server_]
-  
+
   _otApply: (docOp, isRemote) ->
     oldSnapshot = @snapshot
     @snapshot = @type.apply(@snapshot, docOp)
@@ -73,7 +73,7 @@ class Doc
     # determine information about the received op.
     @emit 'change', docOp, oldSnapshot
     @emit 'remoteop', docOp, oldSnapshot if isRemote
-  
+
   _connectionStateChanged: (state, data) ->
     switch state
       when 'disconnected'
@@ -136,9 +136,9 @@ class Doc
         @flush()
 
       @emit 'open'
-      
+
       @_openCallback? null
- 
+
     else if msg.open == false
       # The document has either been closed, or an open request has failed.
       if msg.error
@@ -180,7 +180,7 @@ class Doc
             [@pendingOp, undo] = @_xf @pendingOp, undo
 
           # ... and apply it locally, reverting the changes.
-          # 
+          #
           # This call will also call @emit 'remoteop'. I'm still not 100% sure about this
           # functionality, because its really a local op. Basically, the problem is that
           # if the client's op is rejected by the server, the editor window should update
@@ -224,7 +224,7 @@ class Doc
         [@inflightOp, docOp] = @_xf @inflightOp, docOp
       if @pendingOp != null
         [@pendingOp, docOp] = @_xf @pendingOp, docOp
-        
+
       @version++
       # Finally, apply the op to @snapshot and trigger any event listeners
       @_otApply docOp, true
@@ -278,11 +278,11 @@ class Doc
     # A timeout is used so if the user sends multiple ops at the same time, they'll be composed
     # & sent together.
     setTimeout @flush, 0
-  
+
   shout: (msg) =>
     # Meta ops don't have to queue, they can go direct. Good/bad idea?
     @connection.send {doc:@name, meta: { path: ['shout'], value: msg } }
-  
+
   # Open a document. The document starts closed.
   open: (callback) ->
     @autoOpen = true
@@ -317,11 +317,15 @@ class Doc
 
     @emit 'closing'
     @_closeCallback = callback
- 
+
 # Make documents event emitters
 unless WEB?
   MicroEvent = require './microevent'
+  MicroEvent.mixin Doc
+else
+  window.MicroEvent.mixin Doc
 
-MicroEvent.mixin Doc
-
-exports.Doc = Doc
+if WEB?
+  sharejs.Doc = Doc
+else
+  exports.Doc = Doc

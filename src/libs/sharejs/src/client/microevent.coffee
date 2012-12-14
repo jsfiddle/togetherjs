@@ -16,7 +16,7 @@ class MicroEvent
   removeListener: (event, fct) ->
     @_events ||= {}
     listeners = (@_events[event] ||= [])
-    
+
     # Sadly, there's no IE8- support for indexOf.
     i = 0
     while i < listeners.length
@@ -43,4 +43,5 @@ MicroEvent.mixin = (obj) ->
   obj
 
 module.exports = MicroEvent unless WEB?
-
+if WEB?
+  window.MicroEvent = MicroEvent
