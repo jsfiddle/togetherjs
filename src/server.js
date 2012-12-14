@@ -53,35 +53,84 @@ var server = http.createServer(function(request, response) {
     return;
   }
 
-  var coffeeName = path.join(
-    __dirname,
-    path.dirname(strippedPath),
-    path.basename(strippedPath, ".js") + ".coffee");
-  fs.exists(
-    coffeeName,
-    function (exists) {
+  var isJavascript = strippedPath.search(/\.js$/) != -1;
+  if (! isJavascript) {
+    fs.exists(staticRoot.resolve(url.pathname), function (exists) {
       if (exists) {
-        fs.readFile(coffeeName, "UTF-8", function (error, code) {
-          if (error) {
-            write500(error, response);
-            return;
-          }
-          var js = coffeeCompile(code, {filename: coffeeName});
-          response.setHeader("Content-Type", "application/javascript");
-          response.end(js);
-        });
+        console.log("serve static", url.pathname);
+        staticRoot.serve(request, response);
       } else {
-        fs.exists(staticRoot.resolve(url.pathname), function (exists) {
-          if (exists) {
-            staticRoot.serve(request, response);
-          } else {
-            write404(response);
-          }
-        });
+        write404(response);
       }
-    }
-  );
+    });
+  } else {
+
+    var basename = path.basename(strippedPath, ".js");
+    var coffeeName = path.join(
+      __dirname,
+      path.dirname(strippedPath),
+      basename + ".coffee");
+    fs.exists(
+      coffeeName,
+      function (exists) {
+        if (exists) {
+          fs.readFile(coffeeName, "UTF-8", function (error, code) {
+            if (error) {
+              write500(error, response);
+              return;
+            }
+            var js = coffeeCompile(code, {filename: coffeeName});
+            serveJavascript(basename, js, response);
+          });
+        } else {
+          fs.exists(staticRoot.resolve(url.pathname), function (exists) {
+            if (exists) {
+              fs.readFile(staticRoot.resolve(url.pathname), "UTF-8", function (error, code) {
+                if (error) {
+                  write500(error, response);
+                  return;
+                }
+                serveJavascript(basename, code, response);
+              });
+            } else {
+              write404(response);
+            }
+          });
+        }
+      }
+    );
+  }
 });
+
+var JS_SYNC_TEMPLATE = "\n" + [
+  "// Synchronous support:",
+  "window._TowTruck_notify_script && _TowTruck_notify_script(__NAME__);"
+].join("\n");
+
+function serveJavascript(name, code, response) {
+  response.setHeader("Content-Type", "application/javascript");
+  var tmpl = JS_SYNC_TEMPLATE.replace(/__NAME__/g, JSON.stringify(name));
+  code += tmpl;
+  function sub() {
+    var match = (/INCLUDE\(['"]([^\)]+)['"]\)/).exec(code);
+    if (! match) {
+      response.end(code);
+      return;
+    }
+    var filename = match[1];
+    var before = code.substr(0, match.index);
+    var after = code.substr(match.index + match[0].length);
+    fs.readFile(path.join(__dirname, filename), "UTF-8", function (error, text) {
+      if (error) {
+        write500(error, response);
+        return;
+      }
+      code = before + "(" + JSON.stringify(text) + ")" + after;
+      sub();
+    });
+  }
+  sub();
+}
 
 function write500(error, response) {
   response.writeHead(500, {"Content-Type": "text/plain"});
