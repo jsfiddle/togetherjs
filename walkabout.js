@@ -132,6 +132,9 @@ Walkabout.actionFinders.push(function findAnchors(el, actions) {
     if (actions.matchingAction("click", anchor)) {
       continue;
     }
+    if (! Walkabout.clickable(anchor)) {
+      continue;
+    }
     var href;
     if (Walkabout.options.anyLocalLinks) {
       href = anchor.href;
@@ -234,8 +237,11 @@ if (Walkabout.jQueryAvailable) {
     var els = jQuery(el).find("*");
     els.push(el);
     els.each(function () {
-      if ((! jQuery(this).is(":visible")) ||
-          Walkabout.ignoreElement(this)) {
+      if (Walkabout.ignoreElement(this)) {
+        return;
+      }
+      if (! Walkabout.clickable(this)) {
+        // FIXME: not sure if this is right for all kinds of events, or just click?
         return;
       }
       var events;
@@ -604,6 +610,69 @@ Walkabout.LinkFollower = Walkabout.Class({
   }
 });
 
+Walkabout.hidden = function (el) {
+  return (el.offsetWidth === 0 &&
+          el.offsetHeight === 0);
+  // FIXME: jQuery also uses a display: none test on some browsers,
+  // but this seems to be the only check for modern browsers?
+};
+
+Walkabout.visible = function (el) {
+  return ! Walkabout.hidden(el);
+};
+
+Walkabout.clickable = function (el) {
+  if (Walkabout.hidden(el)) {
+    return false;
+  }
+  if (Walkabout.anyOverlap(el)) {
+    return false;
+  }
+  return true;
+};
+
+Walkabout.anyOverlap = function (overElement) {
+  var overStyle = getComputedStyle(overElement);
+  if (! overStyle) {
+    return false;
+  }
+  var overZIndex = parseInt(overStyle.getPropertyValue("z-index"), 10);
+  var overBox = overElement.getBoundingClientRect();
+  var overHeight = overElement.offsetHeight;
+  var overWidth = overElement.offsetWidth;
+  var els = document.getElementsByTagName("*");
+  var len = els.length;
+  var result = [];
+  var parents = [];
+  var parent = overElement.parentNode;
+  while (parent) {
+    parents.push(parent);
+    parent = parent.parentNode;
+  }
+  for (var i=0; i<len; i++) {
+    var el = els[i];
+    if (el == overElement || parents.indexOf(el) != -1) {
+      continue;
+    }
+    var style = getComputedStyle(el);
+    var position = style.getPropertyValue("position");
+    if (position != "relative" && position != "fixed" && position != "absolute") {
+      continue;
+    }
+    var zIndex = parseInt(style.getPropertyValue("z-index"), 10);
+    if (zIndex <= overZIndex) {
+      continue;
+    }
+    var box = el.getBoundingClientRect();
+    if (box.left <= overBox.left &&
+        box.right >= overBox.right &&
+        box.top <= overBox.top &&
+        box.bottom >= overBox.bottom) {
+      return true;
+    }
+  }
+  return false;
+};
 
 /****************************************
  * Random numbers:
@@ -774,6 +843,10 @@ Walkabout.actionFinders.push(function customEvents(el, actions) {
     if (Walkabout.ignoreElement(o) || ! handlers) {
       continue;
     }
+    if (! Walkabout.clickable(o)) {
+      // FIXME: not sure if this is a good general rule
+      continue;
+    }
     for (var eventName in handlers) {
       if (! handlers.hasOwnProperty(eventName)) {
         continue;
@@ -914,7 +987,7 @@ Walkabout.UI = Walkabout.Class({
   constructor: function UI() {
     this.panel = this.make("div", {
       style: this.styles.panel,
-      "data-walkabout-ignore": 1
+      "data-walkabout-disable": 1
     }, [
 
       this.closeButton = this.make(
@@ -1034,7 +1107,7 @@ Walkabout.UI = Walkabout.Class({
       jQuery.fn.val.patch();
     }
     this._lastCount = -1;
-    var startAtRemaining = undefined;
+    var startAtRemaining;
     var persist = Walkabout.options.loadPersistent;
     var seeded = false;
     if (persist) {
@@ -1101,9 +1174,10 @@ Walkabout.UI = Walkabout.Class({
   },
 
   issueSerialization: function (value) {
+    var i;
     if (value === undefined) {
       var result = [];
-      for (var i=0; i<this.issues.childNodes.length; i++) {
+      for (i=0; i<this.issues.childNodes.length; i++) {
         var child = this.issues.childNodes[i];
         if (child.getAttribute("data-issues-header")) {
           continue;
@@ -1112,7 +1186,7 @@ Walkabout.UI = Walkabout.Class({
       }
       return result;
     } else {
-      for (var i=0; i<value.length; i++) {
+      for (i=0; i<value.length; i++) {
         if (value[i] == "Issues:") throw "Issues in serialization :(";
         this.addIssue(value[i]);
       }
