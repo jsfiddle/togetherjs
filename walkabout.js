@@ -335,6 +335,108 @@ if (Walkabout.jQueryAvailable) {
  * Action implementations:
  */
 
+Walkabout.Highlighter = Walkabout.Class({
+  constructor: function (element, text) {
+    this.element = element;
+    this.text = text;
+    this.show();
+  },
+
+  OUTER: 8,
+
+  sizeOffsets: [-2, 0, 2],
+  sizeOffsetIndex: 0,
+
+  show: function () {
+    var box = this.element.getBoundingClientRect();
+    var middleX = Math.floor((box.left + box.right) / 2);
+    var middleY = Math.floor((box.top + box.bottom) / 2);
+    var h = document.createElement("div");
+    // This is an attempt to make
+    outer = this.OUTER + this.sizeOffsets[this.sizeOffsetIndex];
+    var newSize = this.sizeOffsetIndex++;
+    if (newSize >= this.sizeOffsets.length) {
+      newSize = 0;
+    }
+    Walkabout.Highlighter.prototype.sizeOffsetIndex = newSize;
+    var outer = this.OUTER + Math.floor(Math.random() * 4);
+    h.style.position = "absolute";
+    h.style.zIndex = 1000;
+    h.style.border = "2px dotted #f00";
+    h.style.borderRadius = outer + "px";
+    h.style.left = middleX + "px";
+    h.style.top = middleY + "px";
+    h.style.marginTop = (-box.height/2 - (outer/2)) + "px";
+    h.style.marginLeft = (-box.width/2 - (outer/2)) + "px";
+    h.style.width = (box.width + outer) + "px";
+    h.style.height = (box.height + outer) + "px";
+    h.style.textAlign = "center";
+    //h.style.verticalAlign = "center";
+    h.setAttribute("data-walkabout-disable", "1");
+    h.appendChild(document.createTextNode(this.text));
+    h.addEventListener("click", this.remove.bind(this), false);
+    document.body.appendChild(h);
+    this.highlightElement = h;
+  },
+
+  remove: function () {
+    var h = this.highlightElement;
+    if (h) {
+      h.parentNode.removeChild(h);
+      this.highlightElement = null;
+    }
+  }
+
+});
+
+Walkabout.Notifier = Walkabout.Class({
+
+  constructor: function (message) {
+    this.message = message;
+    this.show();
+  },
+
+  container: function () {
+    var id = "walkabout-notifier-container";
+    var el = document.getElementById(id);
+    if (el) {
+      return el;
+    }
+    el = document.createElement("div");
+    el.id = id;
+    el.setAttribute("style", Walkabout.UI.prototype.styles.panel);
+    el.style.right = "";
+    el.style.left = "10px";
+    el.setAttribute("data-walkabout-disable", "1");
+    document.body.append(el);
+    return el;
+  },
+
+  show: function () {
+    var c = this.container();
+    var el = document.createElement("div");
+    el.appendChild(document.createTextNode(this.message));
+    el.addEventListener("click", (function () {
+      this.remove();
+    }).bind(this));
+    c.appendChild(el);
+    this._element = el;
+  },
+
+  remove: function () {
+    var el = this._element;
+    if (! el) {
+      return;
+    }
+    var parent = el.parentNode;
+    parent.removeChild(el);
+    if (! parent.childNodes.length) {
+      parent.parentNode.removeChild(parent);
+    }
+  }
+
+});
+
 Walkabout.EventAction = Walkabout.Class({
 
   constructor: function EventAction(event) {
@@ -343,6 +445,14 @@ Walkabout.EventAction = Walkabout.Class({
     this.handler = event.handler;
     this.options = event.options || {};
     this.jQuery = !! event.jQuery;
+  },
+
+  show: function () {
+    var name = this.type;
+    if (this.jQuery) {
+      name = '$.' + this.type + '()';
+    }
+    return Walkabout.Highlighter(this.element, name);
   },
 
   run: function () {
@@ -576,6 +686,11 @@ Walkabout.LinkFollower = Walkabout.Class({
     }
     this.options = event.options || {};
   },
+
+  show: function () {
+    return Walkabout.Highlighter(this.element, "follow");
+  },
+
   run: function () {
     var event;
     var cancelled;
@@ -835,6 +950,23 @@ Walkabout.addEventListener = function (obj, type, handler, bubbles, options) {
   });
 };
 
+Walkabout.removeEventListener = function (obj, type, handler, bubbles) {
+  obj.removeEventListener(type, handler, bubbles || false);
+  var handlers = obj._Walkabout_handlers;
+  if ((! handlers) || ! handlers[type]) {
+    return;
+  }
+  handlers = handlers[type];
+  for (var i=0; i<handlers.length; i++) {
+    if (handlers[i].handler === handler &&
+        handlers[i].type === type &&
+        handlers[i].bubbles === bubbles) {
+      handlers.splice(i, 1);
+      break;
+    }
+  }
+};
+
 Walkabout.actionFinders.push(function customEvents(el, actions) {
   var els = el.getElementsByTagName("*");
   for (var i=-1; i<els.length; i++) {
@@ -959,13 +1091,19 @@ Walkabout.rewriteListeners = function (code) {
   var result = falafel(code, function (node) {
     if (node.type == "CallExpression" &&
         node.callee && node.callee.property &&
-        node.callee.property.name == "addEventListener") {
+        (node.callee.property.name == "addEventListener" ||
+         node.callee.property.name == "removeEventListener")) {
+      if (node.callee.object.source() == "Walkabout") {
+        // Already fixed source
+        return;
+      }
       var args = [];
       node["arguments"].forEach(function (n) {
         args.push(n.source());
       });
       node.update(
-        "Walkabout.addEventListener(" + node.callee.object.source() +
+        "Walkabout." + node.callee.property.name +
+        "(" + node.callee.object.source() +
         ", " + args.join(", ") + ")");
     }
     if (node.type == "MemberExpression" &&
@@ -976,6 +1114,24 @@ Walkabout.rewriteListeners = function (code) {
     }
   });
   return result.toString();
+};
+
+Walkabout.rewriteHtml = function (code, scriptLocation) {
+  if (scriptLocation.search(/[<>"]/) != -1) {
+    throw "Bad scriptLocation: " + scriptLocation;
+  }
+  var header = '<script src="' + scriptLocation + '"></script>';
+  if (code.indexOf(header) == -1) {
+    return code;
+  }
+  var match = (/<head[^>]*>/i).exec(code);
+  if (! match) {
+    return code;
+  }
+  var endPos = match.index + match[0].length;
+  var start = code.substr(0, endPos);
+  var rest = code.substr(endPos);
+  return start + header + rest;
 };
 
 /****************************************
@@ -1025,17 +1181,33 @@ Walkabout.UI = Walkabout.Class({
       this.startButton = this.make(
         "button",
         {style: this.styles.start}, ["start"]
+      ),
+
+      this.onceButton = this.make(
+        "button",
+        {style: this.styles.start}, ["run once"]
+      ),
+
+      this.showButton = this.make(
+        "button",
+        {style: this.styles.start}, ["show"]
       )
 
     ]);
     document.body.appendChild(this.panel);
     this.close = this.close.bind(this);
     this.start = this.start.bind(this);
+    this.show = this.show.bind(this);
     this.updateActions = this.updateActions.bind(this);
     this.addIssue = this.addIssue.bind(this);
     this.closeButton.addEventListener("click", this.close, false);
     this.startButton.addEventListener("click", this.start, false);
     this.startButton.disabled = false;
+    this.onceButton.addEventListener("click", (function (event) {
+      this.start(event, 1);
+    }).bind(this), false);
+    this.showButton.addEventListener("click", this.show, false);
+    this.onceButton.disabled = false;
     this.updateActionsId = setInterval(this.updateActions, 5000);
     this.updateActions();
     this.catchIssues();
@@ -1059,7 +1231,7 @@ Walkabout.UI = Walkabout.Class({
 
   styles: {
     panel: "color: #000; background-color: #ffc; border: 3px outset #aa9; border-radius: 4px; position: fixed; top: 0.3em; right: 0.3em; padding: 0.7em; width: 20%; z-index: 10000; font-family: sans-serif;",
-    start: "color: #000; background-color: #eee; border: 2px outset #999; border-radius: 2px; padding: 4px;",
+    start: "color: #000; background-color: #eee; border: 2px outset #999; border-radius: 2px; padding: 4px; margin-right: 2px;",
     close: "cursor: pointer; float: right;",
     header: "font-size: 110%; font-weight: bold; border-bottom: 1px solid #aa9; margin-bottom: 6px;",
     actions: "border: 2px solid #000; padding: 0 0.5em 0 0.5em;",
@@ -1100,7 +1272,7 @@ Walkabout.UI = Walkabout.Class({
     }
   },
 
-  start: function () {
+  start: function (event, times) {
     this.startButton.innerHTML = "running";
     this.startButton.disabled = true;
     if (Walkabout.jQueryAvailable) {
@@ -1121,7 +1293,7 @@ Walkabout.UI = Walkabout.Class({
       }
       Walkabout.random.storeState = "walkabout.randomstate";
     }
-    if (! seeded) {
+    if ((! seeded) && times > 1) {
       var seed = Date.now();
       Walkabout.random.setSeed(seed);
       this.addIssue("Starting run with seed: " + seed);
@@ -1157,7 +1329,27 @@ Walkabout.UI = Walkabout.Class({
           Walkabout.persistentData(data);
         }
       }).bind(this),
+      times: times,
       startAtRemaining: startAtRemaining
+    });
+  },
+
+  show: function () {
+    if (this._showing) {
+      this.showButton.innerHTML = "show";
+      this._showing.forEach(function (item) {
+        if (item) {
+          item.remove();
+        }
+      });
+      this._showing = null;
+      return;
+    }
+    this.showButton.innerHTML = "hide";
+    var showing = this._showing = [];
+    var actions = Walkabout.findActions();
+    actions.forEach(function (a) {
+      showing.push(a.show());
     });
   },
 
@@ -1283,6 +1475,11 @@ Walkabout.actionFinders.push(function backFromHash(el, actions) {
 Walkabout.Back = Walkabout.Class({
   constructor: function Back() {
   },
+
+  show: function () {
+    return Walkabout.Notifier("Go back");
+  },
+
   run: function () {
     window.history.back();
   }

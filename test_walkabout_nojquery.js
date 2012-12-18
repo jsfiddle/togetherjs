@@ -27,9 +27,10 @@ function logger(name) {
   };
 }
 
-Walkabout.addEventListener(getElement("button"), "click", function () {
+var clickAction = function () {
   log("button click");
-});
+};
+Walkabout.addEventListener(getElement("button"), "click", clickAction);
 
 Walkabout.addEventListener(getElement("textinput"), "keypress", function (event) {
   console.log("got keypress", event.charCode, event.keyCode);
@@ -136,20 +137,25 @@ Entered text: b
 
 */
 
-print(Walkabout.rewriteListeners("function foobar() {el.addEventListener('click', function (foo) {}, false);}"));
+print(Walkabout.findActions().length);
+// => 6
 
-/* =>
-function foobar() {Walkabout.addEventListener(el, 'click', function (foo) {}, false);}
-*/
+Walkabout.removeEventListener(getElement("button"), "click", clickAction);
+print(Walkabout.findActions().length);
+// => 5
+
+
+print(Walkabout.rewriteListeners("function foobar() {el.addEventListener('click', function (foo) {}, false);}"));
+// => function foobar() {Walkabout.addEventListener(el, 'click', function (foo) {}, false);}
 
 print(Walkabout.rewriteListeners("$('#test')[0].addEventListener('click', function (foo) {}, false);"));
-
-/* =>
-Walkabout.addEventListener($('#test')[0], 'click', function (foo) {}, false);
-*/
+// => Walkabout.addEventListener($('#test')[0], 'click', function (foo) {}, false);
 
 print(Walkabout.rewriteListeners("foo().bar.value"));
+// => Walkabout.value(foo().bar)
 
-/* =>
-Walkabout.value(foo().bar)
-*/
+print(Walkabout.rewriteListeners("obj.removeEventListener('click', function foo() {})"));
+// => Walkabout.removeEventListener(obj, 'click', function foo() {})
+
+print(Walkabout.rewriteListeners("Walkabout.removeEventListener(obj, 'click', function foo() {})"));
+// => Walkabout.removeEventListener(obj, 'click', function foo() {})
