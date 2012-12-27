@@ -18,7 +18,6 @@ Methods:
   onmessage: set to function (jsonData)
   rawdata: set to true if you want onmessage to receive raw string data
   onclose: set to function ()
-  onopen: set to function ()
   send: function (string or jsonData)
   close: function ()
 
@@ -33,9 +32,6 @@ is not fully established yet.
 
 (function () {
 
-function AbstractChannel() {
-  this.constructor.apply(this, arguments);
-}
 /* Subclasses must define:
 
 - ._send(string)
@@ -47,28 +43,16 @@ And must call:
 
 - ._flush() on open
 - ._incoming(string) on incoming message
-- onclose()/onopen() (not onmessage - instead _incoming)
+- onclose() (not onmessage - instead _incoming)
+- emit("close")
 */
 
-AbstractChannel.subclass = function (overrides) {
-  var C = function () {
-    this.constructor.apply(this, arguments);
-    this.baseConstructor.apply(this, arguments);
-  };
-  C.prototype = new AbstractChannel();
-  for (var i in overrides) {
-    if (overrides.hasOwnProperty(i)) {
-      C.prototype[i] = overrides[i];
-    }
-  }
-  return C;
-};
+var TowTruck = window.TowTruck;
 
-AbstractChannel.prototype = {
+var AbstractChannel = TowTruck.mixinEvents({
   onmessage: null,
   rawdata: false,
   onclose: null,
-  onopen: null,
   closed: false,
 
   baseConstructor: function () {
@@ -109,12 +93,13 @@ AbstractChannel.prototype = {
     if (this.onmessage) {
       this.onmessage(data);
     }
+    this.emit("message", data);
   }
 
-};
+});
 
 
-var WebSocketChannel = AbstractChannel.subclass({
+var WebSocketChannel = TowTruck.Class(AbstractChannel, {
 
   constructor: function (address) {
     if (address.search(/^https?:/i) === 0) {
@@ -123,6 +108,7 @@ var WebSocketChannel = AbstractChannel.subclass({
     this.address = address;
     this.socket = null;
     this._reopening = false;
+    this.baseConstructor();
   },
 
   toString: function () {
@@ -147,6 +133,7 @@ var WebSocketChannel = AbstractChannel.subclass({
       if (this.onclose) {
         this.onclose();
       }
+      this.emit("close");
     }
   },
 
@@ -165,9 +152,6 @@ var WebSocketChannel = AbstractChannel.subclass({
     this.socket = new WebSocket(this.address);
     this.socket.onopen = (function () {
       this._flush();
-      if ((! this._reopening) && this.onopen) {
-        this.onopen();
-      }
       this._reopening = false;
     }).bind(this);
     this.socket.onclose = (function (event) {
@@ -183,6 +167,7 @@ var WebSocketChannel = AbstractChannel.subclass({
       this._incoming(event.data);
     }).bind(this);
     this.socket.onerror = (function (event) {
+      alert("Error:" + JSON.stringify(event.data));
       console.error('WebSocket error:', event.data);
     }).bind(this);
   }
@@ -191,7 +176,7 @@ var WebSocketChannel = AbstractChannel.subclass({
 
 
 /* Sends TO a window or iframe */
-var PostMessageChannel = AbstractChannel.subclass({
+var PostMessageChannel = TowTruck.Class(AbstractChannel, {
   _pingPollPeriod: 100, // milliseconds
   _pingPollIncrease: 100, // +100 milliseconds for each failure
   _pingMax: 2000, // up to a max of 2000 milliseconds
@@ -204,6 +189,7 @@ var PostMessageChannel = AbstractChannel.subclass({
       this.bindWindow(win, true);
     }
     this._pingFailures = 0;
+    this.baseConstructor();
   },
 
   toString: function () {
@@ -282,9 +268,6 @@ var PostMessageChannel = AbstractChannel.subclass({
         clearTimeout(this._pingTimeout);
         this._pingTimeout = null;
       }
-      if (this.onopen) {
-        this.onopen();
-      }
       this._flush();
       return;
     }
@@ -301,19 +284,21 @@ var PostMessageChannel = AbstractChannel.subclass({
     if (this.onclose) {
       this.onclose();
     }
+    this.emit("close");
   }
 
 });
 
 
 /* Handles message FROM an exterior window/parent */
-var PostMessageIncomingChannel = AbstractChannel.subclass({
+var PostMessageIncomingChannel = TowTruck.Class(AbstractChannel, {
 
   constructor: function (expectedOrigin) {
     this.source = null;
     this.expectedOrigin = expectedOrigin;
     this._receiveMessage = this._receiveMessage.bind(this);
     window.addEventListener("message", this._receiveMessage, false);
+    this.baseConstructor();
   },
 
   toString: function () {
@@ -368,20 +353,102 @@ var PostMessageIncomingChannel = AbstractChannel.subclass({
     if (this.onclose) {
       this.onclose();
     }
+    this.emit("close");
   }
 
 });
 
-var TowTruck;
+var Router = TowTruck.Class(TowTruck.mixinEvents({
 
-if (window.TowTruck) {
-  TowTruck = window.TowTruck;
-} else {
-  TowTruck = window.TowTruck = {};
-}
+  constructor: function (channel) {
+    this._channelMessage = this._channelMessage.bind(this);
+    this._channelClosed = this._channelClosed.bind(this);
+    this._routes = Object.create(null);
+    if (channel) {
+      this.bindChannel(channel);
+    }
+  },
+
+  bindChannel: function (channel) {
+    if (this.channel) {
+      this.channel.removeListener("message", this._channelMessage);
+      this.channel.removeListener("close", this._channelClosed);
+    }
+    this.channel = channel;
+    this.channel.on("message", this._channelMessage.bind(this));
+    this.channel.on("close", this._channelClosed.bind(this));
+  },
+
+  _channelMessage: function (msg) {
+    if (msg.type == "route") {
+      var id = msg.routerId;
+      var route = this._routes[id];
+      if (! route) {
+        console.warn("No route with the id", id);
+        return;
+      }
+      if (msg.close) {
+        this._closeRoute(route.id);
+      } else {
+        if (route.onmessage) {
+          route.onmessage(msg.message);
+        }
+        route.emit("message", msg.message);
+      }
+    }
+  },
+
+  _channelClosed: function () {
+    for (var id in this._routes) {
+      this._closeRoute(id);
+    }
+  },
+
+  _closeRoute: function (id) {
+    var route = this._routes[id];
+    if (route.onclose) {
+      route.onclose();
+    }
+    route.emit("close");
+    delete this._routes[id];
+  },
+
+  makeRoute: function (id) {
+    id = id || TowTruck.generateId();
+    var route = Route(this, id);
+    this._routes[id] = route;
+    return route;
+  }
+}));
+
+var Route = TowTruck.Class(TowTruck.mixinEvents({
+  constructor: function (router, id) {
+    this.router = router;
+    this.id = id;
+  },
+
+  send: function (msg) {
+    this.router.channel.send({
+      type: "route",
+      routeId: this.id,
+      message: msg
+    });
+  },
+
+  close: function () {
+    this.router.channel.send({
+      type: "route",
+      routeId: this.id,
+      close: true
+    });
+    delete this.router._routes[this.id];
+  }
+
+}));
 
 TowTruck.WebSocketChannel = WebSocketChannel;
 TowTruck.PostMessageChannel = PostMessageChannel;
 TowTruck.PostMessageIncomingChannel = PostMessageIncomingChannel;
+TowTruck.Router = Router;
 
 })();

@@ -1,70 +1,90 @@
-(function TowTruckModule() {
+(function () {
+  var TowTruck = window.TowTruck;
+  var $ = TowTruck.$;
+  var _ = TowTruck._;
 
-  if (window.jQuery === undefined ||
-      ((! window.TowTruck) || (! window.TowTruck.WebSocketChannel))) {
-    // Not everything has loaded yet...
-    setTimeout(TowTruckModule, 100);
-    return;
-  }
+  /* This is used for dynamic components that want to get access to a stream, such
+     as individual textareas */
+  TowTruck.router = TowTruck.Router();
 
-  var TowTruck;
-
-  if (window.TowTruck) {
-    TowTruck = window.TowTruck;
-  } else {
-    window.TowTruck = TowTruck = {};
-  }
-
-  var $ = window.jQuery;
-  $.noConflict();
-  TowTruck.$ = $;
-  var _ = window._;
-  _.noConflict();
-  TowTruck._ = _;
-
+  /* This initializes TowTruck generally, setting up the ID if necessary,
+     and opening the channel */
   TowTruck.init = function () {
     if (! TowTruck.shareId) {
       TowTruck.shareId = TowTruck.generateId();
+      // FIXME: this could wipe someone else's hash
       location.hash = "towtruck-" + TowTruck.shareId;
     }
     if (! TowTruck.channel) {
       console.log("connecting to", TowTruck.hubUrl());
       TowTruck.channel = new TowTruck.WebSocketChannel(TowTruck.hubUrl());
-      TowTruck.channel.onmessage = TowTruck.onmessage;
-      send({type: "hello"});
+      TowTruck.channel.onmessage = TowTruck.messageHandler.onmessage.bind(TowTruck.messageHandler);
+      TowTruck.router.bindChannel(TowTruck.channel);
+      send({type: "hello", nickname: TowTruck.settings("nickname")});
     }
   };
 
+  /* Sends a message to all peers.  Sets the clientId so everyone knows where the
+     message comes from */
   var send = TowTruck.send = function (msg) {
     console.log("Sending message:", msg);
     msg.clientId = TowTruck.clientId;
     TowTruck.channel.send(msg);
   };
 
-  TowTruck.peers = {
-    system: {
-      clientId: "system",
-      nickname: "system"
+  /* This of all peers.  The "system" peer is for internal messages. */
+  TowTruck.peers = TowTruck.mixinEvents({
+    _peers: Object.create(null),
+    get: function (id) {
+      return this._peers[id];
+    },
+    add: function (peer) {
+      var event = "add";
+      if (peer.clientId in this._peers) {
+        event = "update";
+      }
+      this._peers[peer.clientId] = peer;
+      this.emit(event, peer);
     }
-  };
+  });
 
-  TowTruck.onmessage = function (msg) {
-    console.log("Incoming message:", msg);
+  TowTruck.peers.add({
+    clientId: "system",
+    nickname: "system"
+  });
+
+  /* Handles all incoming messages.  Consumers who want to listen for certain
+     kinds of messages should do:
+
+       TowTruck.messagesHandler.on("message-type", handler);
+
+     The message "self-bye" is sent when closing down, as a kind of
+     fake message.
+  */
+  TowTruck.messageHandler = TowTruck.mixinEvents({
+    onmessage: function (msg) {
+      console.log("Incoming message:", msg);
+      this.emit(msg.type, msg);
+    }
+  });
+
+  /* Always say hello back, and keep track of peers: */
+  TowTruck.messageHandler.on("hello hello-back", function (msg) {
     if (msg.type == "hello") {
-      send({type: "hello-back"});
+      send({type: "hello-back", nickname: TowTruck.settings("nickname")});
     }
-    if (msg.type == "hello" || msg.type == "hello-back") {
-      var peer = {clientId: msg.clientId};
-      TowTruck.peers[peer.clientId] = peer;
-    }
-    if (msg.type == "chat") {
-      TowTruck.addChat(msg.text, msg.clientId);
-    }
-    if (msg.type == "bye") {
-      TowTruck.addChat("left session", msg.clientId);
-    }
-  };
+    var peer = {clientId: msg.clientId, nickname: msg.nickname};
+    TowTruck.peers.add(peer);
+  });
 
+  /* Updates to the nickname of peers: */
+  TowTruck.messageHandler.on("nickname-update", function (msg) {
+    var peer = TowTruck.peers.get(msg.clientId);
+    peer.nickname = msg.nickname;
+    TowTruck.peers.add(peer);
+  });
+
+  /* Starts TowTruck, when initiated by the user, showing the share link etc. */
   TowTruck.start = function () {
     var tmpl = $(TowTruck.templates.intro({}));
     tmpl.find(".towtruck-close").click(function () {
@@ -73,68 +93,48 @@
       }
       tmpl.remove();
     });
-    tmpl.find(".towtruck-link").text(TowTruck.shareUrl());
+    var link = tmpl.find("#towtruck-link");
+    link.val(TowTruck.shareUrl());
+    link.click(function () {
+      link.select();
+      return false;
+    });
+    var name = tmpl.find("#towtruck-name");
+    name.val(TowTruck.settings("nickname"));
+    name.on("keyup", function () {
+      var val = name.val();
+      TowTruck.settings("nickname", val);
+      $("#towtruck-name-confirmation").hide();
+      $("#towtruck-name-waiting").show();
+      // Fake timed saving, to make it look like we're doing work:
+      setTimeout(function () {
+        $("#towtruck-name-waiting").hide();
+        $("#towtruck-name-confirmation").show();
+      }, 300);
+      send({type: "nickname-update", nickname: val});
+    });
     $("body").append(tmpl);
   };
 
-  TowTruck.createChat = function () {
-    var tmpl = $(TowTruck.templates.chat({}));
-    console.log("result:", tmpl[0].outerHTML);
-    tmpl.find(".towtruck-close").click(function () {
-      tmpl.remove();
-      send({type: "bye"});
-      TowTruck.chat = null;
-      TowTruck.channel.close();
-      TowTruck.channel = null;
-    });
-    TowTruck.chat = tmpl;
-    $("body").append(TowTruck.chat);
-    TowTruck.chat.find(".towtruck-chat-input").bind("keyup", function (event) {
-      var input = TowTruck.chat.find(".towtruck-chat-input");
-      if (event.which == 13) {
-        var val = input.val();
-        if (! val) {
-          return false;
-        }
-        send({type: "chat", text: val});
-        TowTruck.localChatMessage(val);
-        input.val("");
+  TowTruck.messageHandler.on("self-bye", function () {
+    if (TowTruck.intro) {
+      TowTruck.intro.remove();
+      TowTruck.intro = null;
+    }
+    var hash = location.hash.replace(/^#*/, "");
+    if (hash) {
+      if (hash.search(/^towtruck-/) === 0) {
+        location.hash = "";
       }
-      return false;
-    });
-  };
-
-  TowTruck.addChat = function (text, personId) {
-    var chat = $(TowTruck.templates.chat_message({
-      nickname: TowTruck.peers[personId].nickname,
-      personId: personId,
-      personClass: "towtruck-chat-person-" + safeClassName(personId),
-      message: text,
-      remote: (personId != TowTruck.clientId)
-    }));
-    TowTruck.chat.find(".towtruck-chat-container").append(chat);
-  };
-
-  TowTruck.setPeerNickname = function (personId, name) {
-    $(".towtruck-chat-person-" + safeClassName(personId)).text(name);
-  };
-
-  TowTruck.localChatMessage = function (text) {
-    if (text.indexOf("/tab") == 0) {
-      TowTruck.settings("tabIndependent", ! TowTruck.settings("tabIndependent"));
-      TowTruck.addChat(
-        (TowTruck.settings("tabIndependent") ? "Tab independence turned on" : "Tab independence turned off") +
-        " reload needed", "system");
-      return;
     }
-    if (text.indexOf("/help") == 0) {
-      var msg = trim(TowTruck.templates.help({
-        tabIndependent: TowTruck.settings("tabIndependent")
-      }));
-      TowTruck.addChat(msg, "system");
-      return;
-    }
-    TowTruck.addChat(text, TowTruck.clientId);
+  });
+
+  TowTruck.stop = function () {
+    send({type: "bye"});
+    // FIXME: should emit this on something else:
+    TowTruck.messageHandler.emit("self-bye");
+    TowTruck.channel.close();
+    TowTruck.channel = null;
   };
 
   TowTruck.hubUrl = function () {
@@ -149,26 +149,16 @@
            "#towtruck-" + TowTruck.shareId;
   };
 
-  TowTruck.generateId = function (length) {
-    length = length || 10;
-    var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
-    var s = '';
-    for (var i=0; i<length; i++) {
-      s += letters.charAt(Math.floor(Math.random() * letters.length));
-    }
-    return s;
-  };
-
-  TowTruck.settings = function settings(name, value) {
-    var curSettings = localStorage.getItem("TowTruck.settings");
+  TowTruck.settings = TowTruck.mixinEvents(function (name, value) {
+    var curSettings = localStorage.getItem(TowTruck.settings.localStorageName);
     if (curSettings) {
       curSettings = JSON.parse(curSettings);
     } else {
       curSettings = {};
     }
-    for (var a in settings.defaults) {
+    for (var a in TowTruck.settings.defaults) {
       if (! curSettings.hasOwnProperty(a)) {
-        curSettings[a] = settings.defaults[a];
+        curSettings[a] = TowTruck.settings.defaults[a];
       }
     }
     if (name === undefined) {
@@ -181,24 +171,24 @@
       return curSettings[name];
     } else {
       curSettings[name] = value;
-      localStorage.setItem("TowTruck.settings", JSON.stringify(curSettings));
+      localStorage.setItem(TowTruck.settings.localStorageName, JSON.stringify(curSettings));
+      TowTruck.settings.emit("change", name, value);
       return value;
     }
-  };
+  });
+  // FIXME: watch for "storage" event to track changes in another tab
+  // cache?
 
   TowTruck.settings.defaults = {
-    tabIndependent: false
+    tabIndependent: false,
+    nickname: ""
   };
 
-  function safeClassName(name) {
-    return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
-  }
-
-  function trim(s) {
-    return s.replace(/^\s+/, "").replace(/\s+$/, "");
-  }
+  TowTruck.settings.localStorageName = "TowTruck.settings";
 
   if (TowTruck.settings("tabIndependent")) {
+    // FIXME: find some way when tab independent to use a local set of settings
+    // (gets tricky because the tabIndependent name shouldn't be local)
     TowTruck.clientId = window.name;
     if (! TowTruck.clientId) {
       TowTruck.clientId = window.name = TowTruck.generateId();
@@ -210,10 +200,10 @@
       localStorage.setItem("TowTruck.clientId", TowTruck.clientId);
     }
   }
-  TowTruck.peers[TowTruck.clientId] = {
+  TowTruck.peers.add({
     clientId: TowTruck.clientId,
     nickname: "me"
-  };
+  });
 
   function makeTemplate(name, source) {
     var tmpl;
@@ -240,25 +230,29 @@
 
   // For ShareJS setup:
   window.WEB = true;
-
   window.sharejs = {};
 
-  if (window._startTowTruckImmediately) {
-    if (typeof window._startTowTruckImmediately == "string") {
-      TowTruck.shareId = window._startTowTruckImmediately;
-      TowTruck.isClient = true;
-      TowTruck.init();
-      TowTruck.createChat();
-    } else {
-      TowTruck.isClient = false;
-      TowTruck.init();
-      TowTruck.start();
+  function boot() {
+    /* Bootstrapping code, for use with startTowTruck: */
+    if (window._startTowTruckImmediately) {
+      if (typeof window._startTowTruckImmediately == "string") {
+        TowTruck.shareId = window._startTowTruckImmediately;
+        TowTruck.isClient = true;
+        TowTruck.init();
+        TowTruck.createChat();
+      } else {
+        TowTruck.isClient = false;
+        TowTruck.init();
+        TowTruck.start();
+      }
+      delete window._startTowTruckImmediately;
     }
-    delete window._startTowTruckImmediately;
+  }
+
+  if (window._TowTruckOnLoad) {
+    window._TowTruckOnLoad(boot);
+  } else {
+    boot();
   }
 
 })();
-
-var tmpl = INCLUDE("intro.tmpl");
-
-WEB = true;

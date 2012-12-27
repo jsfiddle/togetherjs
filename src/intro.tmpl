@@ -3,12 +3,30 @@
   the link to invite another person.  Bindings:
 
   * .towtruck-close closes the page
-  * .towtruck-link is where the share link is displayed
+  * .towtruck-link is where the share link is displayed.  It is
+    automatically selected on focus
+  * #towtruck-name is updated and automatically saved with the person's name
+  * #towtruck-name-waiting is shown (and #towtruck-name-confirmation
+    is hidden) when an update is made; the update is immediate but we
+    swap these to show that the value is saved without submission.
 
   This is used in TowTruck.start().  No variables are provided.
 */ %>
 <div class="towtruck-container towtruck-intro">
   <div class="towtruck-close">&times;</div>
   <div class="towtruck-header">TowTruck</div>
-  <div class="towtruck-link"></div>
+  <div>
+    <label for="towtruck-name">
+      Your name:
+      <input id="towtruck-name" type="text">
+      <span id="towtruck-name-waiting" style="display: none">...</span>
+      <span id="towtruck-name-confirmation">&#x2713;</span>
+    </label>
+  </div>
+  <div>
+    <label for="towtruck-link">
+      Share this link:
+      <input id="towtruck-link" type="text">
+    </label>
+  </div>
 </div>
