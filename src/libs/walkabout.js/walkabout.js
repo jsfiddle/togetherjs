@@ -484,7 +484,7 @@ Walkabout.elementDescription = function (el, isJQuery) {
     var name = el.tagName.toLowerCase() + "#" + el.id;
   } else {
     var name = el.tagName.toLowerCase();
-    var all = document.getElementByTagName(name);
+    var all = document.getElementsByTagName(name);
     for (var i=0; i<all.length; i++) {
       if (all[i] == el) {
         name += "[" + i + "]";
