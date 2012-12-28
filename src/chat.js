@@ -122,12 +122,14 @@
           });
         }
       }
-      if (args[0] == "display") {
+      if (args[0] == "describe") {
         Walkabout.findActions().forEach(function (action) {
-          TowTruck.addChat(action.desciption(), "system");
+          TowTruck.addChat(action.description(), "system");
         });
         return;
       }
+      TowTruck.addChat("Did not understand: " + text, "system");
+      return;
     }
     if (text.indexOf("/clear") === 0) {
       TowTruck.chat.find(".towtruck-chat-container").empty();
