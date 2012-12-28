@@ -12,8 +12,8 @@
   TowTruck.init = function () {
     if (! TowTruck.shareId) {
       TowTruck.shareId = TowTruck.generateId();
-      // FIXME: this could wipe someone else's hash
-      location.hash = "towtruck-" + TowTruck.shareId;
+      // FIXME: this could wipe the app's hash state
+      location.hash = "towtruck-head-" + TowTruck.shareId;
     }
     if (! TowTruck.channel) {
       console.log("connecting to", TowTruck.hubUrl());
@@ -233,10 +233,16 @@
   window.sharejs = {};
 
   function boot() {
+    var start = window._startTowTruckImmediately;
     /* Bootstrapping code, for use with startTowTruck: */
-    if (window._startTowTruckImmediately) {
-      if (typeof window._startTowTruckImmediately == "string") {
-        TowTruck.shareId = window._startTowTruckImmediately;
+    if (start) {
+      if (typeof start == "string" && start.indexOf("head-") === 0) {
+        TowTruck.shareId = start.substr(5);
+        TowTruck.isClient = false;
+        TowTruck.init();
+        TowTruck.createChat();
+      } else if (typeof start == "string") {
+        TowTruck.shareId = start;
         TowTruck.isClient = true;
         TowTruck.init();
         TowTruck.createChat();
