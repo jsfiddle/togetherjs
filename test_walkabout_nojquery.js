@@ -159,3 +159,6 @@ print(Walkabout.rewriteListeners("obj.removeEventListener('click', function foo(
 
 print(Walkabout.rewriteListeners("Walkabout.removeEventListener(obj, 'click', function foo() {})"));
 // => Walkabout.removeEventListener(obj, 'click', function foo() {})
+
+print(Walkabout.rewriteListeners("obj.value = 'foo'"));
+// => obj.value = 'foo'
