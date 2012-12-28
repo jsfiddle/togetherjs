@@ -1,8 +1,17 @@
 if (typeof Walkabout == "undefined") {
-  Walkabout = {};
+  if (typeof window == "undefined") {
+    Walkabout = {};
+  } else {
+    window.Walkabout = {};
+  }
 }
 
+// FIXME: this shouldn't be established so early, in case jquery
+// is loaded after walkabout.js
 Walkabout.jQueryAvailable = (typeof jQuery !== "undefined");
+
+// Actions must turn this on in order to patch .value/.val():
+Walkabout.inTesting = false;
 
 // These are events that we don't need to fire directly:
 Walkabout.ignoreEvents = {
@@ -82,9 +91,11 @@ Walkabout.runManyActions = function runManyActions(options) {
       remaining--;
     }
     var actions = Walkabout.findActions(el);
+    var action = actions.pick();
     if (onstatus) {
       onstatus({
         actions: actions,
+        action: action,
         times: totalTimes,
         remaining: remaining
       });
@@ -93,7 +104,6 @@ Walkabout.runManyActions = function runManyActions(options) {
       ondone();
       return;
     }
-    var action = actions.pick();
     if (action) {
       action.run();
     }
@@ -290,7 +300,7 @@ if (Walkabout.jQueryAvailable) {
   };
 
   jQuery.fn.val.mock = function () {
-    if (this.attr("type") == "hidden") {
+    if ((! Walkabout.inTesting) || this.attr("type") == "hidden") {
       return jQuery.fn.val.mock.orig.apply(this, arguments);
     }
     var options = this.attr("data-walkabout-options");
@@ -437,6 +447,60 @@ Walkabout.Notifier = Walkabout.Class({
 
 });
 
+
+
+Walkabout.setInTesting = function setInTesting(func, time) {
+  return function run() {
+    time = time || 0;
+    var id = setInTesting.count++;
+    Walkabout.inTesting = id;
+    try {
+      var result = func.apply(this, arguments);
+    } catch (e) {
+      if (Walkabout.inTesting == id) {
+        Walkabout.inTesting = false;
+      }
+      throw e;
+    }
+    if (time == -1) {
+      if (Walkabout.inTesting == id) {
+        Walkabout.inTesting = false;
+      }
+    } else {
+      setTimeout(function () {
+        if (Walkabout.inTesting == id) {
+          Walkabout.inTesting = false;
+        }
+      }, time);
+    }
+    return result;
+  };
+};
+
+Walkabout.setInTesting.count = 1;
+
+Walkabout.elementDescription = function (el, isJQuery) {
+  if (el.id) {
+    var name = el.tagName.toLowerCase() + "#" + el.id;
+  } else {
+    var name = el.tagName.toLowerCase();
+    var all = document.getElementByTagName(name);
+    for (var i=0; i<all.length; i++) {
+      if (all[i] == el) {
+        name += "[" + i + "]";
+        break;
+      }
+    }
+    if (el.className) {
+      name += "." + el.className.replace(/\s+/, ".");
+    }
+  }
+  if (isJQuery) {
+    name = '$("' + name + '")';
+  }
+  return name;
+};
+
 Walkabout.EventAction = Walkabout.Class({
 
   constructor: function EventAction(event) {
@@ -455,7 +519,18 @@ Walkabout.EventAction = Walkabout.Class({
     return Walkabout.Highlighter(this.element, name);
   },
 
-  run: function () {
+  description: function () {
+    var s;
+    var elName = Walkabout.elementDescription(this.element, this.jQuery);
+    if (this.jQuery) {
+      s = elName + "." + this.type + "()";
+    } else {
+      s = "Fire " + this.type + " on " + elName;
+    }
+    return s;
+  },
+
+  run: Walkabout.setInTesting(function run() {
     var event;
     if (this.handler && this.handler.runEvent) {
       this.handler.runEvent();
@@ -598,7 +673,7 @@ Walkabout.EventAction = Walkabout.Class({
       Walkabout._extend(event, props);
       this.element.dispatchEvent(event);
     }
-  },
+  }),
 
   eventProperties: function () {
     var attrs = this.element.attributes;
@@ -691,7 +766,7 @@ Walkabout.LinkFollower = Walkabout.Class({
     return Walkabout.Highlighter(this.element, "follow");
   },
 
-  run: function () {
+  run: Walkabout.setInTesting(function () {
     var event;
     var cancelled;
     if (Walkabout.jQueryAvailable) {
@@ -722,7 +797,7 @@ Walkabout.LinkFollower = Walkabout.Class({
     if ((! cancelled) && ! (event.defaultPrevented)) {
       location.href = this.element.getAttribute("href");
     }
-  }
+  })
 });
 
 Walkabout.hidden = function (el) {
@@ -1004,6 +1079,9 @@ Walkabout.actionFinders.push(function customEvents(el, actions) {
 
 Walkabout.value = function (obj) {
   var curValue = obj.value;
+  if (! Walkabout.inTesting) {
+    return curValue;
+  }
   if (! obj || (! obj.tagName)) {
     return curValue;
   }
@@ -1108,7 +1186,12 @@ Walkabout.rewriteListeners = function (code) {
     }
     if (node.type == "MemberExpression" &&
         (! node.computed) &&
-        node.property && node.property.name == "value") {
+        node.property && node.property.name == "value" &&
+        node.parent && node.parent.type != "AssignmentExpression") {
+      if (node.object.source() == "Walkabout") {
+        // Already fixed
+        return;
+      }
       node.update(
         "Walkabout.value(" + node.object.source() + ")");
     }
@@ -1116,21 +1199,27 @@ Walkabout.rewriteListeners = function (code) {
   return result.toString();
 };
 
-Walkabout.rewriteHtml = function (code, scriptLocation) {
+Walkabout.rewriteHtml = function (code, scriptLocation, extra) {
+  var start, rest;
+  extra = extra || "";
   if (scriptLocation.search(/[<>"]/) != -1) {
     throw "Bad scriptLocation: " + scriptLocation;
   }
-  var header = '<script src="' + scriptLocation + '"></script>';
-  if (code.indexOf(header) == -1) {
-    return code;
+  var header = '<!--WALKABOUT--><scr' + 'ipt src="' + scriptLocation + '"></scr' + 'ipt>' +
+    extra + '<!--/WALKABOUT-->';
+  var match = (/<!--WALKABOUT-->[^]*<!--\/WALKABOUT-->/).exec(code);
+  if (match) {
+    start = code.substr(0, match.index);
+    rest = code.substr(match.index + match[0].length);
+    code = start + rest;
   }
   var match = (/<head[^>]*>/i).exec(code);
   if (! match) {
     return code;
   }
   var endPos = match.index + match[0].length;
-  var start = code.substr(0, endPos);
-  var rest = code.substr(endPos);
+  start = code.substr(0, endPos);
+  rest = code.substr(endPos);
   return start + header + rest;
 };
 
@@ -1480,10 +1569,42 @@ Walkabout.Back = Walkabout.Class({
     return Walkabout.Notifier("Go back");
   },
 
-  run: function () {
+  description: function () {
+    return "Go back";
+  },
+
+  run: Walkabout.setInTesting(function () {
     window.history.back();
-  }
+  })
 });
+
+/****************************************
+ * Secret activation!
+ */
+
+Walkabout.activationSequence = "walkabout";
+
+Walkabout.activationSequenceIndex = 0;
+
+if (typeof document != "undefined") {
+  document.addEventListener("keypress", function (event) {
+    var index = Walkabout.activationSequenceIndex;
+    var seq = Walkabout.activationSequence;
+    var expected = seq.charCodeAt(index);
+    if (event.keyCode == expected) {
+      index++;
+    } else if (event.keyCode == seq.charCodeAt(0)) {
+      index = 1;
+    } else {
+      index = 0;
+    }
+    if (index >= seq.length) {
+      index = 0;
+      Walkabout.UI();
+    }
+    Walkabout.activationSequenceIndex = index;
+  }, false);
+}
 
 /****************************************
  * Mock APIs:
@@ -1587,3 +1708,5 @@ if (typeof _Walkabout_sitewide != "undefined") {
   Walkabout.options.anyLocalLinks = location.pathname.replace(/\/[^\/]*$/, "/");
   Walkabout.options.loadPersistent = true;
 }
+
+console.log("Walkabout enabled!");
