@@ -221,17 +221,6 @@
     return tmpl;
   }
 
-  TowTruck.templates = {
-    intro: makeTemplate("intro", INCLUDE("intro.tmpl")),
-    chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
-    chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
-    help: makeTemplate("help", INCLUDE("help.tmpl"))
-  };
-
-  // For ShareJS setup:
-  window.WEB = true;
-  window.sharejs = {};
-
   function boot() {
     var start = window._startTowTruckImmediately;
     /* Bootstrapping code, for use with startTowTruck: */
@@ -254,6 +243,20 @@
       delete window._startTowTruckImmediately;
     }
   }
+
+  // Note that INCLUDE() isn't actually a function, it's something that is
+  // substituted by the server into an actual string.
+  TowTruck.templates = {
+    intro: makeTemplate("intro", INCLUDE("intro.tmpl")),
+    chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
+    chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
+    help: makeTemplate("help", INCLUDE("help.tmpl")),
+    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl"))
+  };
+
+  // For ShareJS setup:
+  window.WEB = true;
+  window.sharejs = {};
 
   if (window._TowTruckOnLoad) {
     window._TowTruckOnLoad(boot);

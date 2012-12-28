@@ -54,6 +54,9 @@
     $(".towtruck-chat-person-" + TowTruck.safeClassName(peer.clientId)).text(peer.nickname);
   });
 
+  TowTruck._testCancel = null;
+  TowTruck._testShow = [];
+
   TowTruck.localChatMessage = function (text) {
     if (text.indexOf("/tab") == 0) {
       TowTruck.settings("tabIndependent", ! TowTruck.settings("tabIndependent"));
@@ -67,6 +70,67 @@
         tabIndependent: TowTruck.settings("tabIndependent")
       }));
       TowTruck.addChat(msg, "system");
+      return;
+    }
+    if (text.indexOf("/test") == 0) {
+      var args = TowTruck.trim(text.substr(5)).split(/\s+/g);
+      if (! args.length) {
+        if (TowTruck._testCancel) {
+          args = ["cancel"];
+        } else {
+          args = ["start"];
+        }
+      }
+      if (args[0] == "cancel") {
+        TowTruck.addChat("Aborting test", "system");
+        TowTruck._testCancel();
+        TowTruck._testCancel = null;
+        return;
+      }
+      if (args[0] == "start") {
+        TowTruck.addChat("Testing with walkabout.js", "system");
+        var tmpl = $(TowTruck.templates.walkabout({}));
+        var container = TowTruck.chat.find(".towtruck-test-container");
+        container.empty();
+        container.append(tmpl);
+        container.show();
+        TowTruck._testCancel = Walkabout.runManyActions({
+          ondone: function () {
+            tmpl.find(".towtruck-status").text("done");
+            TowTruck._testCancel = null;
+          },
+          onstatus: function (status) {
+            var note = "actions: " + status.actions.length + " running: " +
+              (status.times - status.remaining) + " / " + status.times;
+            tmpl.find(".towtruck-status").text(note);
+          }
+        });
+        return;
+      }
+      if (args[0] == "show") {
+        if (TowTruck._testShow.length) {
+          TowTruck._testShow.forEach(function (item) {
+            if (item) {
+              item.remove();
+            }
+          });
+          TowTruck._testShow = [];
+        } else {
+          var actions = Walkabout.findActions();
+          actions.forEach(function (action) {
+            TowTruck._testShow.push(action.show());
+          });
+        }
+      }
+      if (args[0] == "display") {
+        Walkabout.findActions().forEach(function (action) {
+          TowTruck.addChat(action.desciption(), "system");
+        });
+        return;
+      }
+    }
+    if (text.indexOf("/clear") === 0) {
+      TowTruck.chat.find(".towtruck-chat-container").empty();
       return;
     }
     TowTruck.addChat(text, TowTruck.clientId);
