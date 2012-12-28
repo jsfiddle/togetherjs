@@ -381,7 +381,7 @@ var Router = TowTruck.Class(TowTruck.mixinEvents({
 
   _channelMessage: function (msg) {
     if (msg.type == "route") {
-      var id = msg.routerId;
+      var id = msg.routeId;
       var route = this._routes[id];
       if (! route) {
         console.warn("No route with the id", id);
