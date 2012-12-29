@@ -23,6 +23,62 @@ Walkabout.options = {
   loadPersistent: false
 };
 
+Walkabout.setInTesting = function setInTesting(func, time) {
+  return function run() {
+    time = time || 0;
+    var id = setInTesting.count++;
+    Walkabout.inTesting = id;
+    var result;
+    try {
+      result = func.apply(this, arguments);
+    } catch (e) {
+      if (Walkabout.inTesting == id) {
+        Walkabout.inTesting = false;
+      }
+      throw e;
+    }
+    if (time == -1) {
+      if (Walkabout.inTesting == id) {
+        Walkabout.inTesting = false;
+      }
+    } else {
+      setTimeout(function () {
+        if (Walkabout.inTesting == id) {
+          Walkabout.inTesting = false;
+        }
+      }, time);
+    }
+    return result;
+  };
+};
+
+Walkabout.setInTesting.count = 1;
+
+/****************************************
+ * Utility functions:
+ */
+
+Walkabout._extend = function (obj, props) {
+  for (var a in props) {
+    if (! props.hasOwnProperty(a)) {
+      continue;
+    }
+    obj[a] = props[a];
+  }
+};
+
+Walkabout.Class = function Class(prototype) {
+  return function () {
+    var obj = Object.create(prototype);
+    prototype.constructor.apply(obj, arguments);
+    return obj;
+  };
+};
+
+/****************************************
+ * Actions
+ */
+
 Walkabout.actionFinders = [];
 
 Walkabout.findActions = function (el, actions) {
@@ -171,26 +227,159 @@ Walkabout.actionFinders.push(function findAnchors(el, actions) {
   }
 });
 
-/****************************************
- * Utility functions:
- */
-
-Walkabout._extend = function (obj, props) {
-  for (var a in props) {
-    if (! props.hasOwnProperty(a)) {
-      continue;
+Walkabout.actionFinders.push(function findEdits(el, actions) {
+  var children = el.getElementsByTagName("*");
+  for (var i=-1; i<children.length; i++) {
+    var e = i == -1 ? el : children[i];
+    var attr = e.getAttribute && e.getAttribute("data-walkabout-edit-value");
+    console.log("checking", e, attr);
+    if (attr) {
+      var types = attr.split(/ /g);
+      for (var j=0; j<types.length; j++) {
+        var type = types[j];
+        if (type == "type") {
+          actions.push(Walkabout.Typer(e, "type"));
+        } else if (type == "paste") {
+          actions.push(Walkabout.Typer(e, "paste"));
+        } else if (type == "delete") {
+          if (e.value) {
+            actions.push(Walkabout.Deleter(e));
+          }
+        } else if (type == "move") {
+          if (e.value) {
+            actions.push(Walkabout.Mover(e));
+          }
+        //} else if (type == "change") {
+        //  actions.push(Walkabout.Changer(e));
+        } else if (type) {
+          console.warn('Unexpected data-walkabout-edit-value="' + type + '"');
+        }
+      }
     }
-    obj[a] = props[a];
   }
-};
+});
 
-Walkabout.Class = function Class(prototype) {
-  return function () {
-    var obj = Object.create(prototype);
-    prototype.constructor.apply(obj, arguments);
-    return obj;
-  };
-};
+Walkabout.Typer = Walkabout.Class({
+  constructor: function Typer(element, kind) {
+    this.element = element;
+    this.kind = kind;
+  },
+
+  show: function () {
+    return Walkabout.Highlighter(this.element, "type");
+  },
+
+  description: function () {
+    return (this.kind == "type" ? "Type" : "Paste") +
+      " into " + Walkabout.elementDescription(this.element);
+  },
+
+  run: Walkabout.setInTesting(function () {
+    var e = this.element;
+    var value = e.value;
+    // First we save the location of the cursor:
+    e.focus();
+    var startPos = e.selectionStart;
+    var endPos = e.selectionEnd;
+    var r = Walkabout.random;
+    var length = 1;
+    if (this.kind == "paste") {
+      length = Math.floor(r() * 20);
+    }
+    var key = r.string(r.letters + r.numbers + r.punctuation + r.whitespace, length);
+    var start = value.substr(0, startPos);
+    var end = value.substr(endPos);
+    e.value = start + key + end;
+    // If we had a selection, we lost when typing:
+    e.selectionStart = e.selectionEnd = startPos + key.length;
+    // FIXME: should probably also do keydown, keypress, in sequence
+    // FIXME: should set the right keyCode/etc value
+    var keyup = Walkabout.EventAction({
+      element: e,
+      type: this.kind == "type" ? "keyup" : "paste",
+      handler: null, // FIXME: figure out if there's a handler?
+      jQuery: Walkabout.jQueryAvailable
+    });
+    keyup.run();
+  })
+
+});
+
+Walkabout.Deleter = Walkabout.Class({
+  constructor: function Deleter(element) {
+    this.element = element;
+  },
+
+  show: function () {
+    return Walkabout.Highlighter(this.element, "delete from");
+  },
+
+  description: function () {
+    return "Delete from " + Walkabout.elementDescription(this.element);
+  },
+
+  run: Walkabout.setInTesting(function () {
+    var length;
+    var e = this.element;
+    var value = e.value;
+    e.focus();
+    var startPos = e.selectionStart;
+    var endPos = e.selectionEnd;
+    if (startPos != endPos) {
+      // If there's a selection, delete that...
+      e.value = value.substr(0, startPos) + value.substr(endPos);
+      e.selectionStart = e.selectionEnd = startPos;
+    } else {
+      // We can delete after or before...
+      var canStart = startPos > 0;
+      // FIXME: I'm off by one here I think:
+      var canEnd = startPos < value.length;
+      if (canStart && canEnd && Walkabout.random() < 0.5) {
+        canStart = false;
+      }
+      if (canStart) {
+        length = Math.floor(Walkabout.random() * startPos);
+        e.value = value.substr(0, startPos - length) + value.substr(startPos);
+        e.selectionStart = e.selectionEnd = startPos - length;
+      } else {
+        length = Math.floor(Walkabout.random() * (value.length - startPos));
+        e.value = value.substr(0, startPos) + value.substr(startPos + length);
+        e.selectionStart = e.selectionEnd = startPos;
+      }
+    }
+    // FIXME: should set the right keyCode/etc value:
+    // FIXME: also keydown?  Or keypress?
+    var keyup = Walkabout.EventAction({
+      element: e,
+      type: "keyup",
+      handler: null, // FIXME: figure out if there's a handler?
+      jQuery: Walkabout.jQuerySupported
+    });
+    keyup.run();
+  })
+});
+
+Walkabout.Mover = Walkabout.Class({
+  constructor: function Mover(element) {
+    this.element = element;
+  },
+
+  show: function () {
+    return Walkabout.Highlighter(this.element, "move cursor");
+  },
+
+  description: function () {
+    return "Move cursor in " + Walkabout.elementDescription(this.element);
+  },
+
+  run: Walkabout.setInTesting(function () {
+    var e = this.element;
+    var value = e.value;
+    e.focus();
+    var pos = Math.floor(Walkabout.random() * value.length);
+    e.selectionStart = e.selectionEnd = pos;
+  })
+});
 
 
 /****************************************
@@ -447,43 +636,12 @@ Walkabout.Notifier = Walkabout.Class({
 
 });
 
-
-
-Walkabout.setInTesting = function setInTesting(func, time) {
-  return function run() {
-    time = time || 0;
-    var id = setInTesting.count++;
-    Walkabout.inTesting = id;
-    try {
-      var result = func.apply(this, arguments);
-    } catch (e) {
-      if (Walkabout.inTesting == id) {
-        Walkabout.inTesting = false;
-      }
-      throw e;
-    }
-    if (time == -1) {
-      if (Walkabout.inTesting == id) {
-        Walkabout.inTesting = false;
-      }
-    } else {
-      setTimeout(function () {
-        if (Walkabout.inTesting == id) {
-          Walkabout.inTesting = false;
-        }
-      }, time);
-    }
-    return result;
-  };
-};
-
-Walkabout.setInTesting.count = 1;
-
 Walkabout.elementDescription = function (el, isJQuery) {
+  var name;
   if (el.id) {
-    var name = el.tagName.toLowerCase() + "#" + el.id;
+    name = el.tagName.toLowerCase() + "#" + el.id;
   } else {
-    var name = el.tagName.toLowerCase();
+    name = el.tagName.toLowerCase();
     var all = document.getElementsByTagName(name);
     for (var i=0; i<all.length; i++) {
       if (all[i] == el) {
@@ -532,11 +690,19 @@ Walkabout.EventAction = Walkabout.Class({
 
   run: Walkabout.setInTesting(function run() {
     var event;
+    var props = this.eventProperties();
+    if (props.before == "randomValue") {
+      if (Walkabout.jQueryAvailable) {
+        jQuery(this.element).val(Walkabout.value(this.element));
+      } else {
+        this.element.value = Walkabout.value(this.element);
+      }
+    }
     if (this.handler && this.handler.runEvent) {
       this.handler.runEvent();
     } else if (Walkabout.jQueryAvailable) {
       event = jQuery.Event(this.type);
-      Walkabout._extend(event, this.eventProperties());
+      Walkabout._extend(event, props);
       if ((this.type == "keyup" || this.type == "keydown" || this.type == "keypress") &&
           (! event.which)) {
         var normalKeys = [13, 9, 32];
@@ -551,7 +717,6 @@ Walkabout.EventAction = Walkabout.Class({
     } else {
       var module = Walkabout._getEventModule(this.type);
       event = document.createEvent(module);
-      var props = this.eventProperties();
       if (module == "UIEvents") {
         event.initUIEvent(
           this.type,
@@ -918,6 +1083,8 @@ Walkabout.RandomStream = function RandomStream(newSeed) {
   result.numbers = "0123456789";
   result.simplePunctuation = " _-+,./";
   result.extraPunctuation = "!@#$%^&*()=`~[]{};:'\"\\|<>?";
+  result.punctuation = result.simplePunctuation + result.extraPunctuation;
+  result.whitespace = " \n";
   result.string = function string(letters, length) {
     letters = letters || result.letters;
     length = length || 10;
@@ -1213,7 +1380,7 @@ Walkabout.rewriteHtml = function (code, scriptLocation, extra) {
     rest = code.substr(match.index + match[0].length);
     code = start + rest;
   }
-  var match = (/<head[^>]*>/i).exec(code);
+  match = (/<head[^>]*>/i).exec(code);
   if (! match) {
     return code;
   }
@@ -1708,5 +1875,3 @@ if (typeof _Walkabout_sitewide != "undefined") {
   Walkabout.options.anyLocalLinks = location.pathname.replace(/\/[^\/]*$/, "/");
   Walkabout.options.loadPersistent = true;
 }
-
-console.log("Walkabout enabled!");

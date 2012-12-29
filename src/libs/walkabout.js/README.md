@@ -32,6 +32,13 @@ event that is created, such as `data-walkabout-keyup="{which: 13}"`
 You can use `data-walkabout-options="['a', 'b']"` to give the valid inputs
 for a field.
 
+You can use `data-walkabout-edit-value="type paste delete move"` to
+have Walkabout do edit operations inside a `textarea` or `input
+type=text`.  You give a space-separated list of the things to do: type
+a key at the cursor (and fire keyup), paste at the cursor (and fire
+paste), delete the selection or delete before or after the cursor, or
+move the cursor around.
+
 
 Bookmarklet
 -----------

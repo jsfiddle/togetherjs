@@ -42,7 +42,7 @@ $("#fixture").on("click", ".item", function () {
 
 // =>
 
-var actions = $(document).findActions();
+var actions = $("#fixture").findActions();
 print(actions);
 
 /* =>
@@ -145,7 +145,7 @@ Entered text: b
 */
 
 location.hash = "#2";
-actions = $(document).findActions();
+actions = $("#fixture").findActions();
 var last = actions[actions.length - 1];
 print(last.constructor.name, location.hash);
 
@@ -155,3 +155,64 @@ last.run();
 print(location.hash);
 
 // => #1
+
+actions = $("#textarea-fixture").findActions();
+print(actions);
+
+/* =>
+[
+  {
+    element: <textarea data-walkabout-edit-value="type paste delete move".../>,
+    kind: "type"
+  },
+  {
+    element: <textarea data-walkabout-edit-value="type paste delete move".../>,
+    kind: "paste"
+  }
+]
+
+*/
+
+actions[0].run();
+actions[0].run();
+var t = $("#textarea")[0];
+print(repr($("#textarea").val()));
+
+// => "AKQk"
+
+actions = $("#textarea-fixture").findActions();
+actions.forEach(function (a) {print(a.description());});
+
+/* =>
+Type into textarea#textarea
+Paste into textarea#textarea
+Delete from textarea#textarea
+Move cursor in textarea#textarea
+*/
+
+print(t.selectionStart, t.selectionEnd);
+actions[3].run();
+print(t.selectionStart, t.selectionEnd);
+actions[3].run();
+print(t.selectionStart, t.selectionEnd);
+
+/* =>
+2 2
+0 0
+1 1
+*/
+
+print(repr(t.value));
+actions[0].run(); // type
+print(repr(t.value));
+actions[1].run(); // paste
+print(repr(t.value));
+actions[2].run(); // delete
+print(repr(t.value));
+
+/* =>
+"\nQ"
+"\n7Q"
+"\n7 N|`KX)vVSyQ"
+"\n7 N|`KXQ"
+*/
