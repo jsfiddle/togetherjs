@@ -61,29 +61,8 @@
     },
 
     applyChange: function (value) {
-      // FIXME: maybe find some intelligent way to keep the selection value?
-      // especially when the position is after the changed position (e.g.,
-      // delete or insert earlier in the doc)
       this.element.val(value);
       this.curState = value;
-      return;
-      var cur = this.textarea.val();
-      if (cur == value) {
-        return;
-      }
-      var commonStart = 0;
-      while (commonStart < cur.length &&
-             cur.charAt(commonStart) == value.charAt(commonStart)) {
-        commonStart++;
-      }
-      var commonEnd = 0;
-      while (commonEnd < (cur.length - commonStart) &&
-             cur.charAt(cur.length - commonEnd - 1) ==
-             value.charAt(value.length - commonEnd - 1)) {
-        commonEnd++;
-      }
-      var posStart = this.textarea[0].selectionStart;
-      var posEnd = this.textarea[0].selectionEnd;
     },
 
     introduce: function () {
@@ -168,7 +147,25 @@
           throw "New value mismatch";
         }
         this.curState = newValue;
+        var startPos = this.element[0].selectionStart;
+        var endPos = this.element[0].selectionEnd;
         this.applyChange(newValue);
+        if (startPos > msg.start) {
+          if (startPos < msg.end) {
+            // it was in a deleted/changed portion:
+            this.element[0].selectionStart = msg.start;
+          } else {
+            // it was after the change:
+            this.element[0].selectionStart = startPos + (msg.text.length - removed.length);
+          }
+        }
+        if (endPos > msg.start) {
+          if (endPos < msg.end) {
+            this.element[0].selectionEnd = msg.start;
+          } else {
+            this.element[0].selectionEnd = endPos + (msg.text.length - removed.length);
+          }
+        }
         return;
       }
     }
