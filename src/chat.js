@@ -16,7 +16,6 @@
         if (! val) {
           return false;
         }
-        TowTruck.send({type: "chat", text: val});
         TowTruck.localChatMessage(val);
         input.val("");
       }
@@ -74,7 +73,7 @@
     }
     if (text.indexOf("/test") == 0) {
       var args = TowTruck.trim(text.substr(5)).split(/\s+/g);
-      if (! args.length) {
+      if (args[0] === "" || ! args.length) {
         if (TowTruck._testCancel) {
           args = ["cancel"];
         } else {
@@ -88,21 +87,30 @@
         return;
       }
       if (args[0] == "start") {
+        var times = parseInt(args[1], 10);
+        if (isNaN(times) || ! times) {
+          times = 100;
+        }
         TowTruck.addChat("Testing with walkabout.js", "system");
         var tmpl = $(TowTruck.templates.walkabout({}));
         var container = TowTruck.chat.find(".towtruck-test-container");
         container.empty();
         container.append(tmpl);
         container.show();
+        var statusContainer = container.find(".towtruck-status");
+        statusContainer.text("starting...");
         TowTruck._testCancel = Walkabout.runManyActions({
           ondone: function () {
-            tmpl.find(".towtruck-status").text("done");
+            statusContainer.text("done");
+            statusContainer.one("click", function () {
+              container.hide();
+            });
             TowTruck._testCancel = null;
           },
           onstatus: function (status) {
             var note = "actions: " + status.actions.length + " running: " +
               (status.times - status.remaining) + " / " + status.times;
-            tmpl.find(".towtruck-status").text(note);
+            statusContainer.text(note);
           }
         });
         return;
@@ -135,6 +143,7 @@
       TowTruck.chat.find(".towtruck-chat-container").empty();
       return;
     }
+    TowTruck.send({type: "chat", text: text});
     TowTruck.addChat(text, TowTruck.clientId);
   };
 
