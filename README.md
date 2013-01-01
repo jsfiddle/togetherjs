@@ -11,7 +11,7 @@ Setup
 
 The server is in `src/server.js`.  To run it you should install Node.js, and `npm install node-static websocket less coffee-script`.  Then run `node src/server.js` and use `http://localhost:8080/towtruck.js` to include the setup code.
 
-There are examples in `examples/` - you should serve these up yourself (they aren't servered through `server.js`).
+There are examples in `examples/` - you should serve these up yourself (they aren't served through `server.js`).
 
 `towtruck.js` is just a small piece of code to allow the startup of TowTruck.  You can either include an element `<div id="towtruck-starter"></div>` in your page, and a TowTruck button will be added to that, or you can call `startTowTruck()` yourself.
 
