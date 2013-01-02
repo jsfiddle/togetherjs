@@ -1,0 +1,132 @@
+<!-- HTML ERRORS -->
+<div class="error-msg UNEXPECTED_CLOSE_TAG">
+  <p>The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+    doesn't pair with anything, because there are no opening tags that need to
+    be closed.</p>
+</div>
+<div class="error-msg MISMATCHED_CLOSE_TAG">
+  <p>The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+    doesn't pair with the opening <code>&lt;{{openTag.name}}&gt;</code> tag
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>.</p>
+</div>
+<div class="error-msg CLOSE_TAG_FOR_VOID_ELEMENT">
+  <p>The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em> 
+    is for a void element (that is, an element that doesn't need to be 
+    closed).</p>
+</div>
+<div class="error-msg SELF_CLOSING_NON_VOID_ELEMENT">
+  <p>The <code>&lt;{{name}}&gt;</code> tag 
+    <em data-highlight="{{start}},{{end}}">here</em> 
+    can't be self-closed, because <code>&lt;{{name}}&gt;</code> is not
+    a void element; it must be closed with a separate 
+    <code>&lt;/{{name}}&gt;</code> tag.</p>
+</div>
+<div class="error-msg UNCLOSED_TAG">
+  <p>The <code>&lt;{{openTag.name}}&gt;</code> tag 
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> 
+    never closes.</p>
+</div>
+<div class="error-msg INVALID_TAG_NAME">
+  <p>The <code>&lt;</code> character
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em> appears
+    to be the beginning of a tag, but is not followed by a valid tag name.</p>
+
+  <p>If you just want a <code>&lt;</code> to appear on your Web
+    page, try using <code>&amp;lt;</code> instead.</p>
+    
+  <p>Or, see a <a href="http://joshduck.com/periodic-table.html">list of
+    HTML5 tags</a>.</p>
+</div>
+<div class="error-msg UNTERMINATED_ATTR_VALUE">
+  <p>The <code>&lt;{{openTag.name}}&gt;</code> tag's 
+    <code>{{attribute.name.value}}</code> attribute has a value
+    <em data-highlight="{{attribute.value.start}}">here</em> that
+    doesn't end with a closing double quote.</p>
+</div>
+<div class="error-msg UNQUOTED_ATTR_VALUE">
+  <p>The Attribute value <em data-highlight="{{start}}">here</em>
+    should start with an opening double quote.</p>
+</div>
+<div class="error-msg UNTERMINATED_CLOSE_TAG">
+  <p>The closing <code>&lt;/{{closeTag.name}}&gt;</code> tag 
+    <em data-highlight="{{closeTag.start}},{{closeTag.end}}">here</em>
+    doesn't end with a <code>&gt;</code>.</p>
+</div>
+<div class="error-msg UNTERMINATED_OPEN_TAG">
+  <p>The opening <code>&lt;{{openTag.name}}&gt;</code> tag
+    <em data-highlight="{{openTag.start}},{{openTag.end}}">here</em>
+    doesn't end with a <code>&gt;</code>.</p>
+</div>
+<div class="error-msg UNTERMINATED_COMMENT">
+  <p>The comment <em data-highlight="{{start}}">here</em>
+    doesn't end with a <code>--&gt;</code>.</p>
+</div>
+
+<!-- CSS ERRORS -->
+<div class="error-msg INVALID_CSS_DECLARATION">
+  <p><em data-highlight="{{cssDeclaration.start}},{{cssDeclaration.end}}">This</em>
+    CSS declaration never closes.</p>
+</div>
+<div class="error-msg INVALID_CSS_PROPERTY_NAME">
+  <p>CSS property <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>
+     does not exist. You may want to see a
+     <a href="https://developer.mozilla.org/en/CSS/CSS_Reference">list
+       of CSS properties</a>.</p>
+</div>
+<div class="error-msg INVALID_CSS_RULE">
+  <p><em data-highlight="{{cssRule.start}},{{cssRule.end}}">This</em>
+    CSS rule is not legal CSS.</p>
+</div>
+<div class="error-msg MISSING_CSS_SELECTOR">
+  <p>Missing either a new CSS selector or the &lt;/style&gt; tag <em data-highlight="{{cssBlock.start}},{{cssBlock.end}}">here</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_SELECTOR">
+  <p>Selector <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>
+  still needs finalising with {
+  </p>
+</div>
+<div class="error-msg INVALID_CSS_PROPERTY_NAME">
+  <p><em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em> is not
+  a valid CSS property.</p>
+</div>
+<div class="error-msg MISSING_CSS_PROPERTY">
+  <p>Missing property for <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_PROPERTY">
+  <p>Property <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>
+  still needs finalising with :
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_VALUE">
+  <p>Missing value for <em data-highlight="{{cssProperty.start}},{{cssProperty.end}}">{{cssProperty.property}}</em>.
+  </p>
+</div>
+<div class="error-msg UNFINISHED_CSS_VALUE">
+  <p>Value <em data-highlight="{{cssValue.start}},{{cssValue.end}}">{{cssValue.value}}</em>
+  still needs finalising with ;
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_BLOCK_OPENER">
+  <p>Missing block opener after <em data-highlight="{{cssSelector.start}},{{cssSelector.end}}">{{cssSelector.selector}}</em>.
+  </p>
+</div>
+<div class="error-msg MISSING_CSS_BLOCK_CLOSER">
+  <p>Missing block closer or next property:value; pair following <em data-highlight="{{cssValue.start}},{{cssValue.end}}">{{cssValue.value}}</em>.
+  </p>
+</div>
+<div class="error-msg UNCAUGHT_CSS_PARSE_ERROR">
+  <p>A parse error occurred outside expected cases: <em data-highlight="{{error.start}},{{error.end}}">{{error.msg}}</em>
+  </p>
+</div>
+<div class="error-msg UNTERMINATED_CSS_COMMENT">
+  <p>The CSS comment <em data-highlight="{{start}}">here</em>
+    doesn't end with a <code>*/</code>.</p>
+</div>
+<div class="error-msg HTML_CODE_IN_CSS_BLOCK">
+  <p>HTML code was detected in CSS context starting <em data-highlight="{{html.start}},{{html.end}}">here</em>
+</div>
