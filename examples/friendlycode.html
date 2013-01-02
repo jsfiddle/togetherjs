@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html class="deployment-type-development">
+  <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+
+    <title>Barebones Friendlycode Editor</title>
+    <link rel="stylesheet" href="friendlycode/css/friendlycode.css">
+  </head>
+  <body style="margin: 0">
+    <div id="bare-fc-holder" class="friendlycode-loading"></div>
+
+    <script src="friendlycode/js/require-config.js"></script>
+    <script src="friendlycode/js/require.min.js"></script>
+    <script>
+    require.baseUrl = "friendlycode/js";
+    require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
+      var result = FriendlycodeEditor({
+        publishURL: "https://webpagemaker-dev.allizom.org",
+        container: $("#bare-fc-holder")
+      });
+      result.ready.then(function () {
+        var el = $(".publish-button");
+        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">T</div>');
+        newButton.click(startTowTruck);
+        el.before(newButton);
+      });
+      return result;
+    });
+    </script>
+    <script src="http://localhost:8080/towtruck.js"></script>
+  </body>
+</html>
