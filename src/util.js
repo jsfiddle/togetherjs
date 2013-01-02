@@ -34,11 +34,16 @@
       }
       prototype = newPrototype;
     }
-    return function () {
+    var ClassObject = function () {
       var obj = Object.create(prototype);
       obj.constructor.apply(obj, arguments);
       return obj;
     };
+    ClassObject.prototype = prototype;
+    if (prototype.constructor.name) {
+      ClassObject.className = prototype.constructor.name;
+    }
+    return ClassObject;
   };
 
   /* Trim whitespace from a string */
@@ -51,6 +56,14 @@
     return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
   };
 
+  TowTruck.assert = function (cond) {
+    if (! cond) {
+      var args = ["Assertion error:"].concat(Array.prototype.slice.call(arguments, 1));
+      console.error.apply(console, args);
+      throw "Assertion error: " + (arguments[1] || "?");
+    }
+  };
+  
   /* Generates a random ID */
   TowTruck.generateId = function (length) {
     length = length || 10;
