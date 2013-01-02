@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html class="deployment-type-development">
+  <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+
+    <title>Optimized Barebones Friendlycode Editor</title>
+    <link rel="stylesheet" href="../css/friendlycode-built.css">
+  </head>
+  <body style="margin: 0">
+    <div id="bare-fc-holder" class="friendlycode-loading"></div>
+
+    <script src="../js/require.min.js"></script>
+    <script src="../js/friendlycode-built.js"
+            onerror="alert('please run build-require.js!');"></script>
+    <script>
+    require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
+      return FriendlycodeEditor({
+        publishURL: "https://webpagemaker-dev.allizom.org",
+        container: $("#bare-fc-holder")
+      });
+    });
+    </script>
+  </body>
+</html>

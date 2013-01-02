@@ -1,0 +1,18 @@
+/* 
+  Crop of the Symbol set of the "OpenSymbol" font,
+  from the LibreOffice project, which is licensed
+  under LGPLv3+/GPLv3+/MPL1.1+
+
+  Consequently, these files are licensed under the
+  same terms.
+
+*/
+@font-face {
+    font-family: 'OpenSymbolCropped';
+    src: url('opensymbolcropped.eot');
+    src: url('opensymbolcropped.eot?#iefix') format('embedded-opentype'),
+         url('opensymbolcropped.woff') format('woff'),
+         url('opensymbolcropped.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

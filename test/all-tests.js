@@ -1,0 +1,17 @@
+defineTests.combine([
+  "test/test-app",
+  "test/test-help",
+  "test/test-templates",
+  "test/test-indexable-codemirror",
+  "test/test-parsing-codemirror",
+  "test/test-mark-tracker",
+  "test/test-live-preview",
+  "test/test-slowparse-errors",
+  "test/publisher/test-publisher",
+  "test/codemirror-577/test-codemirror-577",
+  "test/preview-to-editor-mapping/test-preview-to-editor-mapping",
+  "test/test-current-page-manager",
+  "test/test-editor-toolbar",
+  "test/test-prefs",
+  "test/test-gutter-pointer"
+]);

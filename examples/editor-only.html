@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+
+    <title>Editor Only</title>
+    <link rel="stylesheet" href="../css/friendlycode.css">
+  </head>
+  <body style="margin: 0">
+    <div id="editor" class="friendlycode-loading"></div>
+
+    <script src="../js/require-config.js"></script>
+    <script src="../js/require.min.js"></script>
+    <script>
+    require([
+      "jquery",
+      "fc/ui/editor"
+    ], function($, Editor) {
+      var editor = Editor({
+        container: $("#editor"),
+        value: "<p>Just an editor widget, no publishing.</p>"
+      });
+      editor.panes.codeMirror.focus();
+    });
+    </script>
+  </body>
+</html>

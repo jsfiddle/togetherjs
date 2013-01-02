@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>App Test Frame</title>
+<!-- For faster loading times, don't load our CSS. -->
+<!-- <link rel="stylesheet" href="../css/friendlycode.css"> -->
+<div id="fc" class="friendlycode-loading"></div>
+<script src="../js/require-config.js"></script>
+<script src="../js/require.min.js"></script>
+<script>
+var publishURL = "https://webpagemaker-dev.allizom.org";
+
+define('main', ["jquery", "friendlycode"], function($, FriendlycodeEditor) {
+  return FriendlycodeEditor({
+    publishURL: publishURL,
+    container: $("#fc")
+  });
+});
+
+require(['main'], function () {});
+</script>
