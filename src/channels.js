@@ -436,11 +436,17 @@ var Route = TowTruck.Class(TowTruck.mixinEvents({
   },
 
   close: function () {
-    this.router.channel.send({
+    if (this.router._routes[this.id] !== this) {
+      // We've just been overwritten, so ignore
+      return;
+    }
+    // FIXME: not sure if this remote close is a good idea
+    // in practice, it seems to not be?
+    /*this.router.channel.send({
       type: "route",
       routeId: this.id,
       close: true
-    });
+    });*/
     delete this.router._routes[this.id];
   }
 
