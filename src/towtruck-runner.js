@@ -13,7 +13,9 @@
     if (! TowTruck.shareId) {
       TowTruck.shareId = TowTruck.generateId();
       // FIXME: this could wipe the app's hash state
-      location.hash = "towtruck-head-" + TowTruck.shareId;
+      var hash = location.hash;
+      hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
+      location.hash = "&towtruck-head-" + TowTruck.shareId;
     }
     if (! TowTruck.channel) {
       console.log("connecting to", TowTruck.hubUrl());
@@ -135,6 +137,11 @@
     TowTruck.messageHandler.emit("self-bye");
     TowTruck.channel.close();
     TowTruck.channel = null;
+    var hash = location.hash;
+    hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
+    if (hash != location.hash) {
+      location.hash = hash;
+    }
   };
 
   TowTruck.hubUrl = function () {
@@ -145,8 +152,11 @@
   };
 
   TowTruck.shareUrl = function () {
+    var hash = location.hash;
+    hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
+    hash = hash || "#";
     return location.protocol + "//" + location.host + location.pathname +
-           "#towtruck-" + TowTruck.shareId;
+           hash + "&towtruck-" + TowTruck.shareId;
   };
 
   TowTruck.settings = TowTruck.mixinEvents(function (name, value) {

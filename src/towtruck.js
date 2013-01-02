@@ -106,17 +106,26 @@
     return "javascript:" + encodeURIComponent(s);
   };
 
-  window.addEventListener("load", function () {
+  function onload() {
     var hash = location.hash.replace(/^#/, "");
-    if (hash.search(/^towtruck-/) === 0) {
-      var shareId = hash.substr(("towtruck-").length);
+    if (hash.search(/&towtruck-/) === 0) {
+      var shareId = hash.substr(hash.search(/&towtruck-/));
+      shareId = shareId.substr(("&towtruck-").length);
+      shareId = shareId.replace(/&.*/, "");
       window._startTowTruckImmediately = shareId;
+      console.log("starting", shareId);
       startTowTruck();
     }
     if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
       startTowTruck();
     }
-  }, false);
+  }
+
+  if (document.readyState == "complete") {
+    onload();
+  } else {
+    window.addEventListener("load", onload, false);
+  }
 
 })();
