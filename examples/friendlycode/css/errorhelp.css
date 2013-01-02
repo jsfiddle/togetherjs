@@ -1,0 +1,227 @@
+/* ------ ERRORS AND HELP MESSAGE STYLING ------ */
+
+html .flipped {
+  margin-top: -180px;
+}
+
+html .help:not(.flipped) .up-arrow,
+html .error:not(.flipped) .up-arrow {
+  display: block;
+}
+
+html .flipped .down-arrow {
+  display: block;
+}
+
+.error,
+.help {
+  display: block;
+  position: absolute;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Force the left side of the message to be on the left side of the
+   * editing area. CodeMirror.addWidget() will set the left side on the
+   * style attribute of the widget to be where the relevant character is,
+   * and we want to override that. */
+  left: 0 !important;
+
+  width: 97%;
+  height: 140px;
+  background-color: #FDFDFD;
+  margin: 10px;
+  margin-top: 20px;
+  padding: 4px;
+  white-space: normal;
+
+  border: 1px solid rgb(193,193,193);
+  -webkit-box-shadow: 0 0 5px 1px #C1C1C1;
+  box-shadow: 0 0 5px 1px #C1C1C1;
+
+  z-index: 1000;
+
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.error p {
+  display: inline;
+}
+
+.error .icon,
+.help .icon {
+  display: inline-block;
+  width: 20%;
+  height: 100%;
+  border-right: 1px solid #C0C0C0;
+  text-align: center;
+  vertical-align: middle;
+
+  background-position: center center;
+  background-repeat: no-repeat;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.error .content,
+.help .content {
+  display: inline-block;
+  width: 78%;
+  height: 90%;
+  vertical-align: top;
+  overflow: auto;
+  padding: 5px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.error .icon {
+  background-image: url("../img/error.png");
+}
+.help .icon {
+  background-image: url("../img/help.png");
+}
+
+.CodeMirror-gutter-text .gutter-highlight-error {
+  color: white;
+  background: #FF2A04;
+}
+
+.error a,
+.error strong,
+.error code,
+.error em[data-highlight] {
+  color: #FF2A04;
+}
+
+.CodeMirror-gutter-text .gutter-highlight-help {
+  color: white;
+  background: #FF9933;
+}
+
+.help a,
+.help strong,
+.help code,
+.help em[data-highlight] {
+  color: #FF9933;
+}
+
+.error a,
+.help a  {
+  font-weight: bold;
+}
+
+.error strong,
+.help strong {
+  font-weight: bold;
+  font-size: 110%;
+}
+
+.error code,
+.help code {
+  font-weight: bold;
+  font-size: 110%;
+}
+
+.error em.highlight-1 {
+  font-style: normal;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.CodeMirror span.highlight-1,
+.CodeMirror span.highlight-2 {
+  background: rgba(255, 0, 0, 0.05) !important;
+}
+
+.CodeMirror span.cursor-help-highlight,
+.cursor-help-highlight {
+  background-color: rgba(255, 160, 0, 0.2);
+}
+
+.error em.highlight-2 {
+  text-decoration: underline;
+  cursor: pointer;
+  font-style: normal;
+}
+
+.CodeMirror .cursor-pointer {
+  display: absolute;
+  font-size: 40px;
+  padding-top: 0px;
+  font-weight: bold;
+  z-index: 2000;
+  color: #FF2A04;
+  text-shadow:
+    -2px -2px 0 white,
+    2px -2px 0 white,
+    -2px 2px 0 white,
+    2px 2px 0 white;
+}
+
+.cursor-pointer:before {
+  content: '▲';
+}
+
+.error .down-arrow,
+.help .down-arrow,
+.error .up-arrow,
+.help .up-arrow {
+  position: absolute;
+  display: none;
+  width: 40px;
+  height: 23px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  padding-left: 20px;
+}
+
+.error .down-arrow,
+.help .down-arrow {
+  top: 138px;
+  background-image: url("../img/hint-down-arrow.png");
+}
+
+.error .up-arrow,
+.help .up-arrow {
+  top: -22px;
+  background-image: url("../img/hint-up-arrow.png");
+}
+
+.hint-marker-positioning {
+  left: auto !important; /* CodeMirror will set this value, but we don't want it set! */
+  right: 1em;
+  background-color: transparent;
+
+  margin: 0px;
+  padding: 0px;
+  cursor: pointer;
+
+  width: 1.4em;
+  height: 1.4em;
+  margin-top: -1.3em;
+
+  background-size: 100% 100%;
+}
+
+.hint-marker-help {
+  background-image: url("../img/questionmark.png");
+}
+
+.hint-marker-error {
+  background-image: url("../img/explanationpt.png");
+}
+
+svg.gutter-pointer {
+  z-index: 100;
+}
+
+svg.gutter-pointer.gutter-highlight-error polygon {
+  fill: #FF2A04;
+}
+
+svg.gutter-pointer.gutter-highlight-help polygon {
+  fill: #FF9933;
+}
