@@ -11,6 +11,9 @@
     swap these to show that the value is saved without submission.
   * .towtruck-continue closes the intro and starts the chat
   * .towtruck-cancel stops towtruck, with no confirmation
+  * On the first call everything with .towtruck-from-info is hidden.
+    If you get to this screen from the "i" button then everything with
+    .towtruck-first-run is hidden.
 
   This is used in TowTruck.start().  No variables are provided.
 */ %>
@@ -33,6 +36,9 @@
   </div>
   <div>
     <p><button class="towtruck-continue">Continue &gt;&gt;&gt;</button></p>
-    <p><button class="towtruck-cancel">Cancel</button></p>
+    <p>
+      <button class="towtruck-cancel towtruck-first-run">Cancel</button>
+      <button class="towtruck-cancel towtruck-from-info">Stop TowTruck</button>
+    </p>
   </div>
 </div>

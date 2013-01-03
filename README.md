@@ -39,6 +39,8 @@ A basic overview of the code:
 
 - `element-finder.js`: when you want to talk about a particular element with another browser/client, this creates a description and finds elements based on that description.  `#id` is the easiest description of course, but this handles elements that lack ids.
 
+- `intro.js`: the intro screen, and what you get when you hit *i*
+
 - `towtruck-runner.js`: this is where most of the setup work is done.  It establishes the channels, routes messages to different components, and handles persistence.
 
 - `towtruck.js`: this is the bootstrap code.  It doesn't do anything, but when asked it knows how to load up all the other modules and get things started.  It also detects if TowTruck should be started immediately (like when someone opens the "share" link).

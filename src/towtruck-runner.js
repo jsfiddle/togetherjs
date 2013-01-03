@@ -88,40 +88,9 @@
 
   /* Starts TowTruck, when initiated by the user, showing the share link etc. */
   TowTruck.start = function () {
-    var tmpl = $(TowTruck.templates.intro({}));
-    tmpl.find(".towtruck-close, .towtruck-continue").click(function () {
-      if (! TowTruck.chat) {
-        TowTruck.createChat();
-      }
-      tmpl.remove();
-    });
-    tmpl.find(".towtruck-cancel").click(function () {
-      TowTruck.stop();
-      tmpl.remove();
-    });
-    var link = tmpl.find("#towtruck-link");
-    link.val(TowTruck.shareUrl());
-    link.click(function () {
-      link.select();
-      return false;
-    });
-    var name = tmpl.find("#towtruck-name");
-    name.val(TowTruck.settings("nickname"));
-    name.on("keyup", function () {
-      var val = name.val();
-      TowTruck.settings("nickname", val);
-      $("#towtruck-name-confirmation").hide();
-      $("#towtruck-name-waiting").show();
-      // Fake timed saving, to make it look like we're doing work:
-      setTimeout(function () {
-        $("#towtruck-name-waiting").hide();
-        $("#towtruck-name-confirmation").show();
-      }, 300);
-      send({type: "nickname-update", nickname: val});
-    });
-    $("body").append(tmpl);
+    TowTruck.showIntro(false);
   };
-
+  
   TowTruck.messageHandler.on("self-bye", function () {
     if (TowTruck.intro) {
       TowTruck.intro.remove();

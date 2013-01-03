@@ -61,7 +61,7 @@
     }
 }
 
-.towtruck-container.towtruck-intro {
+.towtruck-intro {
     position: absolute;
     width: 80%;
     height: 80%;
@@ -73,18 +73,18 @@
     border-radius: 0.7em;
     z-index: 10000;
     background-color: #fff;
+
     .towtruck-header {
         font-weight: bold;
         border-bottom: 1px solid #777;
         margin: 0 -1em 1em -1em;
         padding: 0 1em 0.2em 1em;
     }
+
     p {
       text-align: center;
     }
-}
 
-.towtruck-intro {
     #towtruck-name-confirmation {
         color: #090;
     }
@@ -92,11 +92,31 @@
 
 .towtruck-container {
 
-    .towtruck-close {
+    .towtruck-close, .towtruck-info {
         float: right;
         cursor: pointer;
+        background-color: #999;
+        color: #fff;
+        border-radius: 0.55em;
+        width: 1.1em;
+        height: 1.1em;
+        padding: 0;
+        vertical-align: center;
+        text-align: center;
+        margin-left: 0.2em;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        &:hover {
+            background-color: #000;
+        }
     }
 
+    .towtruck-info {
+        font-family: Times, serif;
+        font-style: italic;
+    }
 }
 
 .towtruck-chat {
@@ -113,7 +133,7 @@
     background-color: #fff;
 
     .towtruck-chat-name {
-        /* FIXME: Not sure why this is not working? */
+        // FIXME: Not sure why this is not working?
         font-weight: bold;
     }
 

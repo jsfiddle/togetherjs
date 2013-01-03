@@ -7,6 +7,9 @@
   TowTruck.createChat = function () {
     var tmpl = $(TowTruck.templates.chat({}));
     tmpl.find(".towtruck-close").click(TowTruck.chatStop.bind(TowTruck));
+    tmpl.find(".towtruck-info").click(function () {
+      TowTruck.showIntro(true);
+    });
     TowTruck.chat = tmpl;
     $("body").append(TowTruck.chat);
     TowTruck.chat.find(".towtruck-chat-input").bind("keyup", function (event) {
