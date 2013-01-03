@@ -11,6 +11,7 @@
     "http://localhost:8080/libs/jquery-1.8.3.min.js",
     "http://localhost:8080/libs/underscore-1.4.3.min.js",
     "http://localhost:8080/util.js",
+    "http://localhost:8080/element-finder.js",
     "http://localhost:8080/channels.js",
     "http://localhost:8080/towtruck-runner.js",
     "http://localhost:8080/chat.js",

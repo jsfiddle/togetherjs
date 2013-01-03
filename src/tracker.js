@@ -92,7 +92,6 @@
 
     constructor: function TextTracker(options) {
       this.element = $(options.element);
-      this.id = this.element.attr("id");
       this.isClient = options.isClient;
       this.channel = options.channel;
       this.curState = this.getState();
@@ -133,7 +132,8 @@
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id,
-        elementId: this.id
+        elementLocation: TowTruck.elementLocation(this.element),
+        value: this.element.val()
       });
     },
 
@@ -241,12 +241,12 @@
     // (as opposed to fields that we just overwrite, like type=checkbox)
     assert(! TowTruck.isClient);
     var els = $(
-      'textarea:visible[id], ' +
-        'input:visible[id][type="text"], ' +
-        'input:visible[id][type="search"], ' +
-        'input:visible[id][type="url"]');
+      'textarea:visible, ' +
+        'input:visible[type="text"], ' +
+        'input:visible[type="search"], ' +
+        'input:visible[type="url"]');
     els.each(function () {
-      var routeId = "tracker-textarea-" + TowTruck.safeClassName(this.id);
+      var routeId = "tracker-textarea-" + TowTruck.safeClassName(this.id || TowTruck.generateId());
       var route = TowTruck.router.makeRoute(routeId);
       var t = TowTruck.TextTracker({
         element: this,
@@ -261,12 +261,7 @@
     if (! TowTruck.isClient) {
       throw "fromConnect should only be called by the client";
     }
-    var id = msg.elementId;
-    var el = $("#" + id);
-    if (! el.length) {
-      console.warn("Cannot find local element with id #" + id);
-      return;
-    }
+    var el = TowTruck.findElement(msg.elementLocation);
     var route = TowTruck.router.makeRoute(msg.routeId);
     var t = TowTruck.TextTracker({
       element: el,
@@ -274,6 +269,9 @@
       isClient: true
     });
     TowTruck.trackers.active.push(t);
+    if (msg.value) {
+      t.onmessage({op: "init", text: msg.value});
+    }
   };
 
   TowTruck.trackers.register(TowTruck.TextTracker);
@@ -298,6 +296,7 @@
       selectors.push("select");
       this._selector = selectors.join(", ");
       $(document).on("change", this._selector, this.change);
+      // FIXME: should send all form states as an init
     },
 
     destroy: function () {
@@ -322,16 +321,12 @@
     
     change: function (event) {
       var el = $(event.target);
-      // FIXME: we should allow elements that have names or other
-      // identifying information besides ids
-      if (! el.attr("id")) {
-        return;
-      }
+      var loc = TowTruck.elementLocation(el);
       // FIXME: should check for case issues:
       var isChecked = this._checkedFields.indexOf(el.attr("type")) != -1;
       var msg = {
         op: "change",
-        elementId: el.attr("id"),
+        elementLocation: loc,
         value: el.val()
       };
       if (isChecked) {
@@ -342,12 +337,7 @@
 
     onmessage: function (msg) {
       assert(msg.op == "change", msg);
-      var element = $("#" + msg.elementId);
-      if (! element.length) {
-        console.warn("Got form field change op for ID", msg.elementId,
-                     "but that element does not exist");
-        return;
-      }
+      var element = $(TowTruck.findElement(msg.elementLocation));
       element.val(msg.value);
       if (msg.checked !== undefined) {
         element[0].checked = msg.checked;
@@ -376,5 +366,134 @@
   };
 
   TowTruck.trackers.register(TowTruck.FormFieldTracker);
+
+  TowTruck.CodeMirrorTracker = TowTruck.Class({
+    constructor: function CodeMirrorTracker(options) {
+      this.editor = options.editor;
+      this.channel = options.channel;
+      this.isClient = options.isClient;
+      this.change = this.change.bind(this);
+      this.onmessage = this.onmessage.bind(this);
+      //this.editor.on("change", this.change);
+      var oldOnChange = this.editor.getOption("onChange");
+      this.editor.setOption("onChange", (function (instance, delta) {
+        this.change(instance, delta);
+        if (oldOnChange) {
+          oldOnChange(instance, delta);
+        }
+      }).bind(this));
+      console.log("added change on", this.editor);
+      this.channel.on("message", this.onmessage);
+      if (! this.isClient) {
+        this.channel.send({
+          op: "init",
+          value: this.editor.getValue()
+        });
+      }
+      // CodeMirror emits events for our own updates, so we set this
+      // to true when we expect to ignore those events:
+      this.ignoreEvents = false;
+    },
+    
+    introduce: function () {
+      assert(! this.isClient);
+      TowTruck.send({
+        type: "connect-tracker",
+        trackerType: this.constructor.name,
+        routeId: this.channel.id,
+        elementLocation: TowTruck.elementLocation(this.editor.getWrapperElement()),
+        value: this.editor.getValue()
+      });
+    },
+    
+    destroy: function () {
+      var index = TowTruck.trackers.active.indexOf(this);
+      if (index != -1) {
+        TowTruck.trackers.active.splice(index, 1);
+      }
+      this.channel.close();
+    },
+
+    change: function (editor, delta) {
+      if (this._ignoreEvents) {
+        return;
+      }
+      console.log("change", editor, delta, arguments.length);
+      var fullText = this.editor.getValue();
+      if (fullText != this._lastValue) {
+        this.channel.send({
+          op: "replace",
+          delta: delta,
+          fullText: fullText
+        });
+        this._lastValue = fullText;
+      }
+    },
+
+    onmessage: function (msg) {
+      if (msg.op == "replace") {
+        // Note: text will be a list of strings, not a single string
+        this._ignoreEvents = true;
+        try {
+          var delta = msg.delta;
+          while (delta) {
+            var text = delta.text;
+            if (Array.isArray(text)) {
+              text = text.join("\n");
+            }
+            this.editor.replaceRange(text, delta.from, delta.to);
+            delta = delta.next;
+          }
+        } finally {
+          this._ignoreEvents = false;
+        }
+      } else if (msg.op == "init") {
+        this.editor.setValue(msg.value);
+      } else {
+        console.warn("Bad op:", msg);
+      }
+    }
+  });
+  
+  TowTruck.CodeMirrorTracker.createAll = function () {
+    assert(! TowTruck.isClient);
+    var els = document.getElementsByTagName("*");
+    var len = els.length;
+    for (var i=0; i<len; i++) {
+      var el = els[i];
+      var editor = el.CodeMirror;
+      if (! editor) {
+        continue;
+      }
+      var route = TowTruck.router.makeRoute("tracker-codemirror-" + TowTruck.safeClassName(el.id || TowTruck.generateId()));
+      var t = TowTruck.CodeMirrorTracker({
+        editor: editor,
+        channel: route,
+        isClient: false
+      });
+      TowTruck.trackers.active.push(t);
+    }
+  };
+  
+  TowTruck.CodeMirrorTracker.fromConnect = function (msg) {
+    var route = TowTruck.router.makeRoute(msg.routeId);
+    var el = TowTruck.findElement(msg.elementLocation);
+    var editor = el.CodeMirror;
+    if (! editor) {
+      console.warn("CodeMirror has not been activated on element", el);
+      return;
+    }
+    var t = TowTruck.CodeMirrorTracker({
+      editor: editor,
+      channel: route,
+      isClient: true
+    });
+    TowTruck.trackers.active.push(t);
+    if (msg.value) {
+      t.onmessage({op: "init", value: msg.value});
+    }
+  };
+  
+  TowTruck.trackers.register(TowTruck.CodeMirrorTracker);
   
 })();
