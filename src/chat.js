@@ -6,7 +6,7 @@
 
   TowTruck.createChat = function () {
     var tmpl = $(TowTruck.templates.chat({}));
-    tmpl.find(".towtruck-close").click(TowTruck.stop.bind(TowTruck));
+    tmpl.find(".towtruck-close").click(TowTruck.chatStop.bind(TowTruck));
     TowTruck.chat = tmpl;
     $("body").append(TowTruck.chat);
     TowTruck.chat.find(".towtruck-chat-input").bind("keyup", function (event) {
@@ -23,6 +23,18 @@
     });
   };
 
+  TowTruck.chatStop = function () {
+    var confirm = $(TowTruck.templates.end({}));
+    confirm.find(".towtruck-yes").click(function () {
+      confirm.remove();
+      TowTruck.stop();
+    });
+    confirm.find(".towtruck-no").click(function () {
+      confirm.remove();
+    });
+    TowTruck.chat.prepend(confirm);
+  };
+  
   TowTruck.messageHandler.on("chat", function (msg) {
     TowTruck.addChat(msg.text, msg.clientId);
   });

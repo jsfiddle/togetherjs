@@ -9,6 +9,8 @@
   * #towtruck-name-waiting is shown (and #towtruck-name-confirmation
     is hidden) when an update is made; the update is immediate but we
     swap these to show that the value is saved without submission.
+  * .towtruck-continue closes the intro and starts the chat
+  * .towtruck-cancel stops towtruck, with no confirmation
 
   This is used in TowTruck.start().  No variables are provided.
 */ %>
@@ -17,7 +19,7 @@
   <div class="towtruck-header">TowTruck</div>
   <div>
     <label for="towtruck-name">
-      Your name:
+      Your name is:
       <input id="towtruck-name" type="text">
       <span id="towtruck-name-waiting" style="display: none">...</span>
       <span id="towtruck-name-confirmation">&#x2713;</span>
@@ -26,7 +28,11 @@
   <div>
     <label for="towtruck-link">
       Share this link:
-      <input id="towtruck-link" type="text">
+      <input id="towtruck-link" type="text" style="width: 15em">
     </label>
+  </div>
+  <div>
+    <p><button class="towtruck-continue">Continue &gt;&gt;&gt;</button></p>
+    <p><button class="towtruck-cancel">Cancel</button></p>
   </div>
 </div>

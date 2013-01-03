@@ -89,10 +89,14 @@
   /* Starts TowTruck, when initiated by the user, showing the share link etc. */
   TowTruck.start = function () {
     var tmpl = $(TowTruck.templates.intro({}));
-    tmpl.find(".towtruck-close").click(function () {
+    tmpl.find(".towtruck-close, .towtruck-continue").click(function () {
       if (! TowTruck.chat) {
         TowTruck.createChat();
       }
+      tmpl.remove();
+    });
+    tmpl.find(".towtruck-cancel").click(function () {
+      TowTruck.stop();
       tmpl.remove();
     });
     var link = tmpl.find("#towtruck-link");
@@ -142,6 +146,7 @@
     if (hash != location.hash) {
       location.hash = hash;
     }
+    TowTruck.shareId = null;
   };
 
   TowTruck.hubUrl = function () {
@@ -261,7 +266,8 @@
     chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
     chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
     help: makeTemplate("help", INCLUDE("help.tmpl")),
-    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl"))
+    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl")),
+    end: makeTemplate("end", INCLUDE("end.tmpl"))
   };
 
   // For ShareJS setup:
