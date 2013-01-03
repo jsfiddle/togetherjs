@@ -58,6 +58,8 @@
 
   var startTowTruck = window.startTowTruck = function () {
     if (typeof TowTruck !== "undefined") {
+      TowTruck.isClient = false;
+      TowTruck.init();
       TowTruck.start();
       return;
     }
