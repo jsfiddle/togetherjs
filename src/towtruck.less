@@ -61,6 +61,22 @@
     }
 }
 
+// The chat window is more cramped than the intro window, so the padding
+// values are different; hence the rule:
+.header-rule (@sidePadding, @bottomPadding, @bottomMargin) {
+    font-weight: bold;
+    border-bottom: 1px solid #777;
+    margin: 0 -@sidePadding @bottomMargin -@sidePadding;
+    padding: 0 @sidePadding @bottomPadding @sidePadding;
+}
+
+.user-select (@value) {
+    -moz-user-select: @value;
+    -webkit-user-select: @value;
+    -ms-user-select: @value;
+    user-select: @value;
+}
+
 .towtruck-intro {
     position: absolute;
     width: 80%;
@@ -74,13 +90,6 @@
     z-index: 10000;
     background-color: #fff;
 
-    .towtruck-header {
-        font-weight: bold;
-        border-bottom: 1px solid #777;
-        margin: 0 -1em 1em -1em;
-        padding: 0 1em 0.2em 1em;
-    }
-
     p {
       text-align: center;
     }
@@ -88,6 +97,11 @@
     #towtruck-name-confirmation {
         color: #090;
     }
+
+    .towtruck-header {
+        .header-rule(1em, 0.2em, 1em);
+    }
+
 }
 
 .towtruck-container {
@@ -104,10 +118,10 @@
         vertical-align: center;
         text-align: center;
         margin-left: 0.2em;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        // FIXME: this is just an arbitrary number that seems to put
+        // the buttons in a more appropriate place:
+        margin-top: -0.4em;
+        .user-select(none);
         &:hover {
             background-color: #000;
         }
@@ -117,13 +131,16 @@
         font-family: Times, serif;
         font-style: italic;
     }
+
 }
 
 .towtruck-chat {
 
+    @chat-height: 20em;
+
     position: absolute;
     width: 10em;
-    height: 20em;
+    height: @chat-height;
     top: 10px;
     right: 10px;
     padding: 0.7em;
@@ -137,9 +154,23 @@
         font-weight: bold;
     }
 
+    .towtruck-chat-container {
+      // This is calculated to be exactly the extra height
+      // the first subtraction is the header, the second the input field
+      height: @chat-height - (0.2em + 0.2em + 1em) - 1em;
+      overflow-y: auto;
+    }
+
+    .towtruck-chat-input {
+      width: 100%;
+    }
+
     .towtruck-chat-message {
         font-size: 80%;
-        border-bottom: 1px solid #ddd;
+    }
+
+    .towtruck-chat-new-message {
+        border-top: 1px solid #ddd;
     }
 
     .towtruck-chat-content {
@@ -157,6 +188,10 @@
         p {
             text-align: center;
         }
+    }
+
+    .towtruck-header {
+        .header-rule(0.7em, 0.2em, 0.2em);
     }
 
 }

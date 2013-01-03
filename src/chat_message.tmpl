@@ -12,11 +12,19 @@
   * remote: true if the chat message came from another user, false if it was written
     by the local user.
   * message: the text message sent.
+  * date: a date timestamp
+  * combine: if true this message should be visually combined with the
+    previous message.
 
 */ %>
-<div class="towtruck-chat-message">
-  <span class="towtruck-chat-name <%- personClass %>">
-    <%- nickname || "?" %>
-  </span>:
+<div class="towtruck-chat-message" 
+ data-person="<%- personId %>" data-date="<%- date %>">
+  <% if (combine) { %>
+    &nbsp;
+  <% } else { %>
+    <span class="towtruck-chat-name <%- personClass %>">
+      <%- nickname || "?" %>
+    </span>:
+  <% } %>
   <span class="towtruck-chat-content"><%- message %></span>
 </div>

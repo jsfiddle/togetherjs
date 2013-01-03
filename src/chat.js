@@ -53,15 +53,41 @@
     }
   });
 
+  // The number of milliseconds after which to put a break in the conversation
+  // (if messages come faster than this, they will be kind of combined)
+  var MESSAGE_BREAK_TIME = 20000;
+  
   TowTruck.addChat = function (text, personId) {
+    var nick = TowTruck.peers.get(personId).nickname;
+    if (personId == TowTruck.clientId) {
+      nick = "me";
+    }
+    var container = TowTruck.chat.find(".towtruck-chat-container");
+    var lastChat = container.find(".towtruck-chat-message");
+    if (lastChat.length) {
+      lastChat = $(lastChat[lastChat.length-1]);
+    } else {
+      lastChat = null;
+    }
+    var combine = false;
+    if (lastChat && lastChat.attr("data-person") == personId &&
+        Date.now() - parseInt(lastChat.attr("data-date"), 10) < MESSAGE_BREAK_TIME) {
+      combine = true;
+    }
     var chat = $(TowTruck.templates.chat_message({
-      nickname: TowTruck.peers.get(personId).nickname,
+      nickname: nick,
+      date: Date.now(),
       personId: personId,
       personClass: "towtruck-chat-person-" + TowTruck.safeClassName(personId),
       message: text,
-      remote: (personId != TowTruck.clientId)
+      remote: (personId != TowTruck.clientId),
+      combine: combine
     }));
-    TowTruck.chat.find(".towtruck-chat-container").append(chat);
+    if (lastChat && ! combine) {
+      chat.addClass("towtruck-chat-new-message");
+    }
+    container.append(chat);
+    chat[0].scrollIntoView();
   };
 
   TowTruck.peers.on("update", function (peer) {
