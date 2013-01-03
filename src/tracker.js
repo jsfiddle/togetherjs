@@ -421,6 +421,8 @@
       console.log("change", editor, delta, arguments.length);
       var fullText = this.editor.getValue();
       if (fullText != this._lastValue) {
+        // FIXME: I should be sending a lot more confirmation stuff
+        // to check everything went well.
         this.channel.send({
           op: "replace",
           delta: delta,
@@ -446,6 +448,9 @@
           }
         } finally {
           this._ignoreEvents = false;
+        }
+        if (msg.fullText && this.editor.getValue() != msg.fullText) {
+          console.warn("Text mismatch after applying message", msg);
         }
       } else if (msg.op == "init") {
         this.editor.setValue(msg.value);
