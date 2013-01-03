@@ -156,8 +156,12 @@ var WebSocketChannel = TowTruck.Class(AbstractChannel, {
     }).bind(this);
     this.socket.onclose = (function (event) {
       this.socket = null;
-      console.error('WebSocket close', event.wasClean ? 'clean' : 'unclean',
-                    'code:', event.code, 'reason:', event.reason || 'none');
+      var method = "error";
+      if (event.wasClean) {
+        var method = "log";
+      }
+      console[method]('WebSocket close', event.wasClean ? 'clean' : 'unclean',
+                      'code:', event.code, 'reason:', event.reason || 'none');
       if (! this.closed) {
         this._reopening = true;
         this._setupConnection();
