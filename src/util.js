@@ -46,6 +46,20 @@
     return ClassObject;
   };
 
+  /* Extends obj with other, or copies obj if no other is given. */
+  TowTruck.extend = function (obj, other) {
+    if (other === undefined) {
+      other = obj;
+      obj = {};
+    }
+    for (var a in other) {
+      if (other.hasOwnAttribute(a)) {
+        obj[a] = other[a];
+      }
+    }
+    return obj;
+  };
+
   /* Trim whitespace from a string */
   TowTruck.trim = function trim(s) {
     return s.replace(/^\s+/, "").replace(/\s+$/, "");
@@ -63,7 +77,7 @@
       throw "Assertion error: " + (arguments[1] || "?");
     }
   };
-  
+
   /* Generates a random ID */
   TowTruck.generateId = function (length) {
     length = length || 10;
