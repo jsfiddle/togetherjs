@@ -1,7 +1,7 @@
 (function () {
   var TowTruck = window.TowTruck;
   var assert = TowTruck.assert;
-  
+
   TowTruck.elementLocation = function (el) {
     if (el[0]) {
       // a jQuery element
@@ -56,6 +56,9 @@
   });
 
   TowTruck.findElement = function (loc, container) {
+    // FIXME: should this all just be done with document.querySelector()?
+    // But no!  We can't ignore towtruck elements with querySelector.
+    // But maybe!  We *could* make towtruck elements less obtrusive?
     container = container || document;
     var el, rest;
     if (loc.indexOf("body") === 0) {
