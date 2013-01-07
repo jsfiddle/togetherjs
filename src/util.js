@@ -53,7 +53,7 @@
       obj = {};
     }
     for (var a in other) {
-      if (other.hasOwnAttribute(a)) {
+      if (other.hasOwnProperty(a)) {
         obj[a] = other[a];
       }
     }

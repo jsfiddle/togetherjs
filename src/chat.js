@@ -37,7 +37,7 @@
     });
     TowTruck.chat.prepend(confirm);
   };
-  
+
   TowTruck.messageHandler.on("chat", function (msg) {
     TowTruck.addChat(msg.text, msg.clientId);
   });
@@ -56,7 +56,7 @@
   // The number of milliseconds after which to put a break in the conversation
   // (if messages come faster than this, they will be kind of combined)
   var MESSAGE_BREAK_TIME = 20000;
-  
+
   TowTruck.addChat = function (text, personId) {
     var nick = TowTruck.peers.get(personId).nickname;
     if (personId == TowTruck.clientId) {
@@ -90,8 +90,31 @@
     chat[0].scrollIntoView();
   };
 
+  TowTruck.addChatElement = function (element) {
+    // FIXME: this method should be combined with addChat, where that method
+    // takes structured updates, not just text
+    var container = TowTruck.chat.find(".towtruck-chat-container");
+    container.append(element);
+    $(element)[0].scrollIntoView();
+  };
+
   TowTruck.peers.on("update", function (peer) {
-    $(".towtruck-chat-person-" + TowTruck.safeClassName(peer.clientId)).text(peer.nickname);
+    if (peer.nickname) {
+      $(".towtruck-chat-person-" + TowTruck.safeClassName(peer.clientId)).text(peer.nickname);
+    }
+  });
+
+  TowTruck.peers.on("add update", function (peer, old) {
+    if (peer.clientId == TowTruck.clientId) {
+      return;
+    }
+    if (peer.avatar && peer.avatar != old.avatar) {
+      var id = "towtuck-avatar-" + TowTruck.safeClassName(peer.clientId);
+      var img = $("<img>").attr("src", peer.avatar).css({width: "8em"});
+      $("#" + id).remove();
+      img.attr("id", id);
+      TowTruck.addChatElement(img);
+    }
   });
 
   TowTruck._testCancel = null;

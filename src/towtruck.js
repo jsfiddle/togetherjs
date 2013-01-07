@@ -16,6 +16,7 @@
     "http://localhost:8080/towtruck-runner.js",
     "http://localhost:8080/chat.js",
     "http://localhost:8080/intro.js",
+    "http://localhost:8080/webrtc.js",
     "http://localhost:8080/tracker.js",
     "http://localhost:8080/libs/walkabout.js/walkabout.js"
     //"http://localhost:8080/libs/sharejs/src/client/microevent.js",

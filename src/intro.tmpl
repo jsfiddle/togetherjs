@@ -26,6 +26,8 @@
       <input id="towtruck-name" type="text">
       <span id="towtruck-name-waiting" style="display: none">...</span>
       <span id="towtruck-name-confirmation">&#x2713;</span>
+      <span id="towtruck-avatar-view-container" style="display: none"><img id="towtruck-avatar-view" style="height: 1em"></span>
+      <button id="towtruck-open-pic" style="display: none">Take Picture</button>
     </label>
   </div>
   <div>
@@ -33,6 +35,15 @@
       Share this link:
       <input id="towtruck-link" type="text" style="width: 15em">
     </label>
+  </div>
+  <div id="towtruck-pic-container" style="display: none">
+    <div>
+      <video id="towtruck-pic-preview" style="height: 200px"></video>
+      <img style="display: none" id="towtruck-pic-viewer">
+    </div>
+    <button id="towtruck-take-pic">Take Picture</button>
+    <button style="display: none" id="towtruck-accept-pic">Accept</button>
+    <button id="towtruck-pic-cancel">Cancel</button>
   </div>
   <div>
     <p><button class="towtruck-continue">Continue &gt;&gt;&gt;</button></p>

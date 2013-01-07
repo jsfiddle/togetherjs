@@ -13,7 +13,7 @@
     }
     document.removeEventListener("click", captureClick, true);
   }
-  
+
   function close() {
     if (! TowTruck.chat) {
       TowTruck.createChat();
@@ -39,7 +39,7 @@
     event.stopPropagation();
     close();
   }
-  
+
   TowTruck.showIntro = function (fromChat) {
     var tmpl = TowTruck.intro = $(TowTruck.templates.intro({}));
     if (fromChat) {
@@ -76,6 +76,9 @@
       TowTruck.chat.hide();
     }
     $("body").append(tmpl);
+    if (TowTruck.startPicPreview) {
+      TowTruck.startPicPreview();
+    }
   };
-  
+
 })();

@@ -4,6 +4,16 @@
   var $ = TowTruck.$;
   var assert = TowTruck.assert;
 
+  TowTruck.ignoreElement = function (el) {
+    while (el) {
+      if (el.className && el.className.indexOf("towtruck") != -1) {
+        return true;
+      }
+      el = el.parentNode;
+    }
+    return false;
+  };
+
   TowTruck.initTrackers = function initTrackers() {
     if (! initTrackers.done) {
       TowTruck.trackers.createAll();
@@ -22,7 +32,7 @@
   TowTruck.messageHandler.on("reset-trackers", function () {
     TowTruck.trackers.reset();
   });
-  
+
   TowTruck.messageHandler.on("connect-tracker", function (msg) {
     TowTruck.trackers.connect(msg);
   });
@@ -30,11 +40,11 @@
   // This is a kind of registry for trackers.
   // Each item here is a class, with the following methods:
   // * .createAll(): a class method, that finds and instantiates
-  //   all trackers.  This will only be called on the master browser, not 
+  //   all trackers.  This will only be called on the master browser, not
   //   the client.
   // * All trackers classes have a .className property (if you give the
   //    constructor a name that will be used)
-  // * On instantiation all trackers get added to TowTruck.trackers.active 
+  // * On instantiation all trackers get added to TowTruck.trackers.active
   //   array
   // * Trackers have a .introduce() method.  This should send an introduction
   //   message, with type: "connect-tracker", and trackerType: Tracker.name
@@ -133,7 +143,8 @@
         trackerType: this.constructor.name,
         routeId: this.channel.id,
         elementLocation: TowTruck.elementLocation(this.element),
-        value: this.element.val()
+        value: this.element.val(),
+        html: this.element[0].outerHTML
       });
     },
 
@@ -246,6 +257,9 @@
         'input:visible[type="search"], ' +
         'input:visible[type="url"]');
     els.each(function () {
+      if (TowTruck.ignoreElement(this)) {
+        return;
+      }
       var routeId = "tracker-textarea-" + TowTruck.safeClassName(this.id || TowTruck.generateId());
       var route = TowTruck.router.makeRoute(routeId);
       var t = TowTruck.TextTracker({
@@ -307,7 +321,7 @@
       }
       this.channel.close();
     },
-    
+
     introduce: function () {
       assert(! this.isClient);
       TowTruck.send({
@@ -318,7 +332,7 @@
     },
 
     _checkedFields: ["radio", "checkbox"],
-    
+
     change: function (event) {
       var el = $(event.target);
       var loc = TowTruck.elementLocation(el);
@@ -382,7 +396,6 @@
           oldOnChange(instance, delta);
         }
       }).bind(this));
-      console.log("added change on", this.editor);
       this.channel.on("message", this.onmessage);
       if (! this.isClient) {
         this.channel.send({
@@ -394,7 +407,7 @@
       // to true when we expect to ignore those events:
       this.ignoreEvents = false;
     },
-    
+
     introduce: function () {
       assert(! this.isClient);
       TowTruck.send({
@@ -405,7 +418,7 @@
         value: this.editor.getValue()
       });
     },
-    
+
     destroy: function () {
       var index = TowTruck.trackers.active.indexOf(this);
       if (index != -1) {
@@ -418,7 +431,6 @@
       if (this._ignoreEvents) {
         return;
       }
-      console.log("change", editor, delta, arguments.length);
       var fullText = this.editor.getValue();
       if (fullText != this._lastValue) {
         // FIXME: I should be sending a lot more confirmation stuff
@@ -459,13 +471,16 @@
       }
     }
   });
-  
+
   TowTruck.CodeMirrorTracker.createAll = function () {
     assert(! TowTruck.isClient);
     var els = document.getElementsByTagName("*");
     var len = els.length;
     for (var i=0; i<len; i++) {
       var el = els[i];
+      if (TowTruck.ignoreElement(el)) {
+        continue;
+      }
       var editor = el.CodeMirror;
       if (! editor) {
         continue;
@@ -479,7 +494,7 @@
       TowTruck.trackers.active.push(t);
     }
   };
-  
+
   TowTruck.CodeMirrorTracker.fromConnect = function (msg) {
     var route = TowTruck.router.makeRoute(msg.routeId);
     var el = TowTruck.findElement(msg.elementLocation);
@@ -498,7 +513,7 @@
       t.onmessage({op: "init", value: msg.value});
     }
   };
-  
+
   TowTruck.trackers.register(TowTruck.CodeMirrorTracker);
-  
+
 })();

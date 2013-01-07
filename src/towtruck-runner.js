@@ -38,15 +38,16 @@
   TowTruck.peers = TowTruck.mixinEvents({
     _peers: Object.create(null),
     get: function (id) {
-      return this._peers[id];
+      return TowTruck.extend(this._peers[id]);
     },
     add: function (peer) {
       var event = "add";
       if (peer.clientId in this._peers) {
         event = "update";
       }
+      var old = this._peers[peer.clientId];
       this._peers[peer.clientId] = peer;
-      this.emit(event, peer);
+      this.emit(event, peer, old);
     }
   });
 
@@ -82,7 +83,12 @@
   /* Updates to the nickname of peers: */
   TowTruck.messageHandler.on("nickname-update", function (msg) {
     var peer = TowTruck.peers.get(msg.clientId);
-    peer.nickname = msg.nickname;
+    if (msg.nickname) {
+      peer.nickname = msg.nickname;
+    }
+    if (msg.avatar) {
+      peer.avatar = msg.avatar;
+    }
     TowTruck.peers.add(peer);
   });
 
@@ -90,7 +96,7 @@
   TowTruck.start = function () {
     TowTruck.showIntro(false);
   };
-  
+
   TowTruck.messageHandler.on("self-bye", function () {
     if (TowTruck.intro) {
       TowTruck.intro.remove();
@@ -165,7 +171,8 @@
 
   TowTruck.settings.defaults = {
     tabIndependent: false,
-    nickname: ""
+    nickname: "",
+    avatar: null
   };
 
   TowTruck.settings.localStorageName = "TowTruck.settings";
