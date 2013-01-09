@@ -4,7 +4,7 @@
     <title>Bookmarklet</title>
     <script src="towtruck.js"></script>
 	<link rel="stylesheet/less" type="text/css" href="towtruck.less">
-	
+
 	<style type="text/css" media="screen">
 		.button {
 			/*padding:10px;*/
@@ -28,7 +28,7 @@
 			font-family: 'Open Sans',sans-serif;
 			transition: all 0.25s linear 0s;
 		}
-		
+
 		.button:link {
 			display: inline-block;
 			border-radius: 0.25em 0.25em 0.25em 0.25em;
@@ -49,7 +49,7 @@
 			font-family: 'Open Sans',sans-serif;
 			transition: all 0.25s linear 0s;
 		}
-		
+
 		.button:active {
 			display: inline-block;
 			border-radius: 0.25em 0.25em 0.25em 0.25em;
@@ -70,12 +70,12 @@
 			font-family: 'Open Sans',sans-serif;
 			transition: all 0.25s linear 0s;
 		}
-		
+
 	</style>
-	
+
     <script>
 window.addEventListener("load", function () {
-  var el = document.getElementById("bookmarklet");
+  var el = document.getElementById("towtruck-bookmarklet");
   el.href = startTowTruck.bookmarklet();
 }, false);
     </script>
@@ -84,7 +84,7 @@ window.addEventListener("load", function () {
 
     <h1>Thimble</h1>
 
-    <a id="bookmarklet" class="button fade-half" href="">Call TowTruck</a>
+    <a id="towtruck-bookmarklet" class="button fade-half" href="">Call TowTruck</a>
 
   </body>
 </html>
