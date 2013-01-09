@@ -23,13 +23,28 @@
     });
     TowTruck.on("shareId", updateShareLink);
     updateShareLink();
+    var name = container.find(".towtruck-input-name");
+    name.val(TowTruck.settings("nickname"));
+    name.on("keyup", function () {
+      var val = name.val();
+      TowTruck.settings("nickname", val);
+      container.find("#towtruck-name-confirmation").hide();
+      container.find("#towtruck-name-waiting").show();
+      // Fake timed saving, to make it look like we're doing work:
+      setTimeout(function () {
+        container.find("#towtruck-name-waiting").hide();
+        container.find("#towtruck-name-confirmation").show();
+      }, 300);
+      TowTruck.send({type: "nickname-update", nickname: val});
+    });
+
   };
 
   function updateShareLink() {
     $(".towtruck-input-link").val(TowTruck.shareUrl());
   }
 
-  TowTruck.messageHandler.on("self-bye", function () {
+  TowTruck.on("close", function () {
     if (TowTruck.container) {
       TowTruck.container.remove();
       TowTruck.container = null;

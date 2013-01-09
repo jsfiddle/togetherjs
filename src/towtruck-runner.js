@@ -74,9 +74,6 @@
      kinds of messages should do:
 
        TowTruck.messagesHandler.on("message-type", handler);
-
-     The message "self-bye" is sent when closing down, as a kind of
-     fake message.
   */
   TowTruck.messageHandler = TowTruck.mixinEvents({
     onmessage: function (msg) {
@@ -120,11 +117,7 @@
     TowTruck.activateUI();
   };
 
-  TowTruck.messageHandler.on("self-bye", function () {
-    if (TowTruck.intro) {
-      TowTruck.intro.remove();
-      TowTruck.intro = null;
-    }
+  TowTruck.on("close", function () {
     var hash = location.hash.replace(/^#*/, "");
     if (hash) {
       if (hash.search(/^towtruck-/) === 0) {
@@ -136,7 +129,7 @@
   TowTruck.stop = function () {
     send({type: "bye"});
     // FIXME: should emit this on something else:
-    TowTruck.messageHandler.emit("self-bye");
+    TowTruck.emit("close");
     TowTruck.channel.close();
     TowTruck.channel = null;
     var hash = location.hash;
@@ -263,7 +256,6 @@
   // Note that INCLUDE() isn't actually a function, it's something that is
   // substituted by the server into an actual string.
   TowTruck.templates = {
-    intro: makeTemplate("intro", INCLUDE("intro.tmpl")),
     chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
     chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
     help: makeTemplate("help", INCLUDE("help.tmpl")),

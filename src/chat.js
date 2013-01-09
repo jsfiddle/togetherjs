@@ -24,6 +24,9 @@
       }
       return false;
     });
+    if (TowTruck.setupChatInterface) {
+      TowTruck.setupChatInterface();
+    }
   };
 
   TowTruck.chatStop = function () {
@@ -44,13 +47,6 @@
 
   TowTruck.messageHandler.on("bye", function (msg) {
     TowTruck.addChat("left session", msg.clientId);
-  });
-
-  TowTruck.messageHandler.on("self-bye", function (msg) {
-    if (TowTruck.chat) {
-      TowTruck.chat.remove();
-      TowTruck.chat = null;
-    }
   });
 
   // The number of milliseconds after which to put a break in the conversation
