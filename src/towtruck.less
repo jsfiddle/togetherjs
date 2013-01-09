@@ -1,11 +1,8 @@
 /*Fonts*/
-@font-face
-{
-font-family: openSansRegular;
-src: url('fonts/OpenSans-Regular.ttf');
+@font-face {
+    font-family: openSansRegular;
+    src: url('fonts/OpenSans-Regular.ttf');
 }
-
-
 
 /* Reset: */
 .towtruck-container {
@@ -266,6 +263,7 @@ src: url('fonts/OpenSans-Regular.ttf');
     line-height: 33px;
 }
 
+// FIXME: what specific towtruck-* element is this intended for?
 input:focus {
     outline: none;
 }
@@ -304,6 +302,11 @@ input:focus {
     background: linear-gradient(to bottom,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#f1f1f1',GradientType=0 ); /* IE6-9 */
     border: 1px solid rgba(0,0,0,.3);
+}
+
+.towtruck-chat-container {
+    height: 100%;
+    overflow-y: auto;
 }
 
 .towtruck-chat input.towtruck-chat-input {
