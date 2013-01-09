@@ -10,10 +10,38 @@
   This is used in TowTruck.createChat().  No variables are provided.
 */ %>
 <div class="towtruck-container towtruck-chat">
-  <div class="towtruck-close" data-walkabout-disable="1">&times;</div>
-  <div class="towtruck-info">i</div>
-  <div class="towtruck-header">Chat</div>
-  <div class="towtruck-test-container" style="display: none"></div>
-  <div class="towtruck-chat-container"></div>
-  <input type="text" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
+	<div id="towtruck-topbar"><div class="arrow-up"></div>
+	    <div class="towtruck-header">Chat</div>
+	    <div class="towtruck-close towtruck-fade" data-walkabout-disable="1"><img src="http://localhost:8080/images/btn-close.png"></div>
+	    <div class="towtruck-minimize towtruck-fade"><img src="http://localhost:8080/images/btn-minimize.png"></div>
+	</div>
+	
+	<div id="towtruck-leftnavbar">
+	    <div id="towtruck-nav-btns">
+	      <ul>
+	        <li>
+	          <a href="#" class="left-nav-btn info towtruck-fade towtruck-info"><img src="http://localhost:8080/images/icn-info.png"></a>
+	        </li>
+	        <li>
+	          <a href="#" class="left-nav-btn communicate towtruck-fade"><img src="http://localhost:8080/images/icn-communicate-active.png"></a><img src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
+	        </li>
+	      <ul>
+	    </div>
+	    <div id="towtruck-pop-btns">
+	      <a href="#" class="popout towtruck-fade"><img src="http://localhost:8080/images/icn-popout.png"></a>
+	    </div>
+	</div>
+	
+	
+	<div id="towtruck-body">
+	    <div class="upper-box">
+	      <div class="towtruck-test-container" style="display: none"></div>
+		  <div class="towtruck-chat-container"></div>
+	    </div>
+	    <div class="lower-box">
+	      <input type="text" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
+	    <div>
+	</div>
+
+
 </div>

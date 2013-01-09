@@ -156,7 +156,7 @@ src: url('fonts/OpenSans-Regular.ttf');
     /*padding: 20px 30px 20px 10px;*/
 }
 
-#towtruck-leftnavbar #nav-btns {
+#towtruck-nav-btns {
     width: 20px;
     height: 100px;
     padding-top: 10px;
@@ -164,7 +164,7 @@ src: url('fonts/OpenSans-Regular.ttf');
 }
 
 /*BOTTOM POPOUT BTN*/
-#towtruck-leftnavbar #pop-btns {
+#towtruck-pop-btns {
     width: 49px;
     height: 40px;
     position: absolute;
@@ -195,18 +195,63 @@ src: url('fonts/OpenSans-Regular.ttf');
 }
 
 #towtruck-body p {
-    font-size: 12px;
+    font-size: 14px;
     color: #343639;
     font-family: openSansRegular;
     padding-bottom: 20px;
 }
 
-#towtruck-body input {
+#towtruck-body input.towtruck-input-link {
+	background-image: url(http://localhost:8080/images/icn-link.png);
+  	background-position: 10px 9px;
+	background-repeat: no-repeat;
     border-radius: 0.25em;
     height: 30px;
-    width: 232px;
+    width: 210px;
     border: 1px solid #d0d0d0;
-    padding-left: 5px;
+    padding-left: 28px;
+    font-size: 14px;
+    color: #343639;
+    -moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+}
+
+#towtruck-body input.towtruck-input-link:focus {
+	background-image: url(http://localhost:8080/images/icn-link.png);
+  	background-position: 10px 9px;
+	background-repeat: no-repeat;
+    border-radius: 0.25em;
+    height: 30px;
+    width: 210px;
+    border: 1px solid #267cc3;
+    padding-left: 28px;
+    font-size: 14px;
+    color: #343639;
+    -moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+}
+
+#towtruck-body input.towtruck-input-name {
+    border-radius: 0.25em;
+    height: 30px;
+    width: 231px;
+    border: 1px solid #d0d0d0;
+    padding-left: 8px;
+    font-size: 14px;
+    color: #343639;
+    -moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+}
+
+#towtruck-body input.towtruck-input-name:focus {
+    border-radius: 0.25em;
+    height: 30px;
+    width: 231px;
+    border: 1px solid #267cc3;
+    padding-left: 8px;
     font-size: 14px;
     color: #343639;
     -moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
@@ -229,15 +274,51 @@ input:focus {
 /*CHAT INTERFACE*/
 .towtruck-container.towtruck-chat {
     position: absolute;
-    width: 10em;
-    height: 20em;
-    top: 10px;
-    right: 10px;
-    padding: 0.7em;
-    border: 2px solid #000;
-    border-radius: 0.7em;
+    width: 420px;
+    height: 440px;
+    bottom: 0px;
+    left:50%;
+    /*margin-left: -40%;*/
+    padding: 0px;
+    /*border: 1px solid #aaaaaa;*/
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
     z-index: 10000;
-    background-color: #fff;
+    background: #f1f1f1;
+    .box-dropshadow;
+}
+
+.towtruck-chat .upper-box {
+	height:85%;
+	background:#fff;
+}
+
+.towtruck-chat .lower-box {
+	padding:10px;
+	height:10%;
+	background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#f1f1f1), color-stop(3%,#ffffff), color-stop(5%,#f1f1f1), color-stop(100%,#f1f1f1)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#f1f1f1',GradientType=0 ); /* IE6-9 */
+    border: 1px solid rgba(0,0,0,.3);
+}
+
+.towtruck-chat input.towtruck-chat-input {
+	background-position: 10px 9px;
+	background-repeat: no-repeat;
+    border-radius: 0.25em;
+    height: 30px;
+    width: 325px;
+    border: 1px solid #d0d0d0;
+    padding-left: 8px;
+    font-size: 14px;
+    color: #343639;
+    -moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
 }
 
 .towtruck-container {
@@ -265,13 +346,10 @@ input:focus {
 
 /*RANDOM styles and transitions*/
 
-.arrow-up {
-    width: 10;
-    height: 10;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-
-    border-bottom: 5px solid black;
+#towtruck-nav-btns img.triangle {
+    position:relative;
+	top:-30px;
+	left:40px;
 }
 
 .towtruck-fade {
