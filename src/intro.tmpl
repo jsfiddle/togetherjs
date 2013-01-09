@@ -18,38 +18,36 @@
   This is used in TowTruck.start().  No variables are provided.
 */ %>
 <div class="towtruck-container towtruck-intro">
-  <div class="towtruck-close">&times;</div>
-  <div class="towtruck-header">TowTruck</div>
-  <div>
-    <label for="towtruck-name">
-      Your name is:
-      <input id="towtruck-name" type="text">
-      <span id="towtruck-name-waiting" style="display: none">...</span>
-      <span id="towtruck-name-confirmation">&#x2713;</span>
-      <span id="towtruck-avatar-view-container" style="display: none"><img id="towtruck-avatar-view" style="height: 1em"></span>
-      <button id="towtruck-open-pic" style="display: none">Take Picture</button>
-    </label>
-  </div>
-  <div>
-    <label for="towtruck-link">
-      Share this link:
-      <input id="towtruck-link" type="text" style="width: 15em">
-    </label>
-  </div>
-  <div id="towtruck-pic-container" style="display: none">
-    <div>
-      <video id="towtruck-pic-preview" style="height: 200px"></video>
-      <img style="display: none" id="towtruck-pic-viewer">
-    </div>
-    <button id="towtruck-take-pic">Take Picture</button>
-    <button style="display: none" id="towtruck-accept-pic">Accept</button>
-    <button id="towtruck-pic-cancel">Cancel</button>
-  </div>
-  <div>
-    <p><button class="towtruck-continue">Continue &gt;&gt;&gt;</button></p>
-    <p>
-      <button class="towtruck-cancel towtruck-first-run">Cancel</button>
-      <button class="towtruck-cancel towtruck-from-info">Stop TowTruck</button>
-    </p>
-  </div>
+	<div id="towtruck-topbar"><div class="arrow-up"></div>
+		<div class="towtruck-header">TowTruck</div>
+		<div class="towtruck-close fade"><img src="images/btn-close.png"></div>
+		<div class="towtruck-minimize fade"><img src="images/btn-minimize.png"></div>
+  	</div>
+	<div id="towtruck-leftnavbar">
+
+		<div id="nav-btns">
+			<ul>
+				<li><a href="#" class="left-nav-btn info fade"><img src="images/icn-info-active.png"></a>
+					</li>
+				<li><a href="#" class="left-nav-btn communicate fade"><img src="images/icn-communicate.png"></a></li>
+			<ul>
+		</div>
+		<div id="pop-btns">
+			<a href="#" class="popout fade"><img src="images/icn-popout.png"></a>
+		</div>
+	</div>
+	<div id="towtruck-body">
+		<div class="box">
+			<p>Simply send this link to a friend to get started!</p>
+			<input type="text" value="http://twtrk.html/1RtGRqQRLm"><a class="button fade-half" href="#">Copy</a>
+		</div>
+		<!-- FIX ME -- THIS IS THE REAL LINK, NEEDS TO BE in the VALUE attr in the input field -->
+		<!-- also, the value should be auto-highlighted. -->
+		<!-- <div class="towtruck-link"></div> -->
+
+		<div class="box">
+			<p>Your name:</p>
+			<input type="text" value="Your name">
+		<div>
+	</div>
 </div>
