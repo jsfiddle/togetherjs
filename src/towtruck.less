@@ -270,7 +270,7 @@ input:focus {
 /*END INTRO*/
 
 /*CHAT INTERFACE*/
-.towtruck-container.towtruck-chat {
+.towtruck-container {
     position: absolute;
     width: 420px;
     height: 440px;
@@ -286,17 +286,17 @@ input:focus {
     .box-dropshadow;
 }
 
-.towtruck-chat a.communicate img {
+.towtruck-container a.communicate img {
 	padding-top:18px;
 }
 
 
-.towtruck-chat .upper-box {
+.towtruck-container .upper-box {
 	height:85%;
 	background:#fff;
 }
 
-.towtruck-chat .lower-box {
+.towtruck-container .lower-box {
 	padding:10px;
 	height:10%;
 	background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
@@ -314,7 +314,7 @@ input:focus {
     overflow-y: auto;
 }
 
-.towtruck-chat input.towtruck-chat-input {
+.towtruck-container input.towtruck-chat-input {
 	background-position: 10px 9px;
 	background-repeat: no-repeat;
     border-radius: 0.25em;
@@ -348,6 +348,22 @@ input:focus {
 
     .towtruck-chat-content {
         white-space: pre-wrap;
+    }
+
+    button {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        overflow: visible;
+        vertical-align: middle;
+        font-size: 1em;
+        width: auto;
+        &::-moz-focus-inner {
+            border: 0;
+            padding: 0;
+        }
     }
 
 }

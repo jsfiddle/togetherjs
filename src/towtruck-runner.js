@@ -12,6 +12,7 @@
   TowTruck.init = function () {
     if (! TowTruck.shareId) {
       TowTruck.shareId = TowTruck.generateId();
+      TowTruck.emit("shareId");
       // FIXME: this could wipe the app's hash state
       var hash = location.hash;
       hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
@@ -22,7 +23,12 @@
       TowTruck.channel = new TowTruck.WebSocketChannel(TowTruck.hubUrl());
       TowTruck.channel.onmessage = TowTruck.messageHandler.onmessage.bind(TowTruck.messageHandler);
       TowTruck.router.bindChannel(TowTruck.channel);
-      send({type: "hello", nickname: TowTruck.settings("nickname")});
+      send({
+        type: "hello",
+        nickname: TowTruck.settings("nickname"),
+        avatar: TowTruck.settings("avatar"),
+        rtcSupported: TowTruck.RTCSupported
+      });
     }
   };
 
@@ -36,7 +42,7 @@
 
   /* This of all peers.  The "system" peer is for internal messages. */
   TowTruck.peers = TowTruck.mixinEvents({
-    _peers: Object.create(null),
+    _peers: {},
     get: function (id) {
       return TowTruck.extend(this._peers[id]);
     },
@@ -48,6 +54,14 @@
       var old = this._peers[peer.clientId];
       this._peers[peer.clientId] = peer;
       this.emit(event, peer, old);
+    },
+    forEach: function (callback, context) {
+      for (var id in this._peers) {
+        if (! this._peers.hasOwnProperty(id)) {
+          continue;
+        }
+        callback.call(context || null, this._peers[id]);
+      }
     }
   });
 
@@ -74,9 +88,18 @@
   /* Always say hello back, and keep track of peers: */
   TowTruck.messageHandler.on("hello hello-back", function (msg) {
     if (msg.type == "hello") {
-      send({type: "hello-back", nickname: TowTruck.settings("nickname")});
+      send({
+        type: "hello-back",
+        nickname: TowTruck.settings("nickname"),
+        avatar: TowTruck.setting("avatar"),
+        rtcSupported: TowTruck.RTCSupported
+      });
     }
-    var peer = {clientId: msg.clientId, nickname: msg.nickname};
+    var peer = {
+      clientId: msg.clientId,
+      nickname: msg.nickname,
+      rtcSupported: msg.rtcSupported
+    };
     TowTruck.peers.add(peer);
   });
 
@@ -94,7 +117,7 @@
 
   /* Starts TowTruck, when initiated by the user, showing the share link etc. */
   TowTruck.start = function () {
-    TowTruck.showIntro(false);
+    TowTruck.activateUI();
   };
 
   TowTruck.messageHandler.on("self-bye", function () {
@@ -122,6 +145,7 @@
       location.hash = hash;
     }
     TowTruck.shareId = null;
+    TowTruck.emit("shareId");
   };
 
   TowTruck.hubUrl = function () {
@@ -216,21 +240,22 @@
     var start = window._startTowTruckImmediately;
     /* Bootstrapping code, for use with startTowTruck: */
     if (start) {
+      var activateOnStart = "towtruck-chat";
       if (typeof start == "string" && start.indexOf("head-") === 0) {
         TowTruck.shareId = start.substr(5);
+        TowTruck.emit("shareId");
         TowTruck.isClient = false;
-        TowTruck.init();
-        TowTruck.createChat();
       } else if (typeof start == "string") {
         TowTruck.shareId = start;
+        TowTruck.emit("shareId");
         TowTruck.isClient = true;
-        TowTruck.init();
-        TowTruck.createChat();
       } else {
         TowTruck.isClient = false;
-        TowTruck.init();
-        TowTruck.start();
+        activateOnStart = "towtruck-intro";
       }
+      TowTruck.init();
+      TowTruck.start();
+      TowTruck.activateTab(activateOnStart);
       delete window._startTowTruckImmediately;
     }
   }

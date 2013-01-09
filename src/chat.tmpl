@@ -10,8 +10,14 @@
   This is used in TowTruck.createChat().  No variables are provided.
 */ %>
 <div class="towtruck-container towtruck-chat">
+  <div id="towtruck-templates" style="display: none">
+    <img id="towtruck-template-triangle" src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
+  </div>
   <div id="towtruck-topbar"><div class="arrow-up"></div>
-    <div class="towtruck-header">Chat</div>
+    <div class="towtruck-header">
+      <div class="towtruck-chat towtruck-screen">Chat</div>
+      <div class="towtruck-info towtruck-screen">Intro</div>
+    </div>
     <div class="towtruck-close towtruck-fade" data-walkabout-disable="1"><img src="http://localhost:8080/images/btn-close.png"></div>
     <div class="towtruck-minimize towtruck-fade"><img src="http://localhost:8080/images/btn-minimize.png"></div>
   </div>
@@ -20,10 +26,11 @@
     <div id="towtruck-nav-btns">
       <ul>
       <li>
-        <a href="#" class="left-nav-btn info towtruck-fade towtruck-info"><img src="http://localhost:8080/images/icn-info.png"></a>
+        <button class="left-nav-btn info towtruck-fade towtruck-info" data-activate="towtruck-info"><img src="http://localhost:8080/images/icn-info.png"></button>
       </li>
       <li>
-        <a href="#" class="left-nav-btn communicate towtruck-fade"><img src="http://localhost:8080/images/icn-communicate-active.png"></a><img src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
+        <button class="left-nav-btn communicate towtruck-fade" data-activate="towtruck-chat"><img src="http://localhost:8080/images/icn-communicate-active.png"></button>
+        <img src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
       </li>
       <ul>
     </div>
@@ -34,13 +41,33 @@
 
 
   <div id="towtruck-body">
-    <div class="upper-box">
-      <div class="towtruck-test-container" style="display: none"></div>
-      <div class="towtruck-chat-container"></div>
+
+    <div class="towtruck-info towtruck-screen">
+
+      <div class="box">
+        <p>Simply send this link to a friend to get started!</p>
+        <input type="text" value="http://twtrk.html/1RtGRqQRLm" class="towtruck-input-link"><a class="button" href="#">Copy</a>
+      </div>
+      <!-- FIX ME -- THIS IS THE REAL LINK, NEEDS TO BE in the VALUE attr in the input field -->
+      <!-- also, the value should be auto-highlighted. -->
+      <!-- <div class="towtruck-link"></div> -->
+
+      <div class="box">
+        <p>Your name:</p>
+        <input type="text" placeholder="Type your name" class="towtruck-input-name">
+      </div>
+
     </div>
-    <div class="lower-box">
-      <input type="text" placeholder="Write your message" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
-    <div>
+
+    <div class="towtruck-chat towtruck-screen">
+      <div class="upper-box">
+        <div class="towtruck-test-container" style="display: none"></div>
+        <div class="towtruck-chat-container"></div>
+      </div>
+      <div class="lower-box">
+        <input type="text" placeholder="Write your message" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
+      </div>
+    </div>
   </div>
 
 </div>
