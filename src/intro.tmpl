@@ -8,27 +8,37 @@
   This is used in TowTruck.start().  No variables are provided.
 */ %>
 <div class="towtruck-container towtruck-intro">
-	<div id="towtruck-topbar">
+	
+	<div id="towtruck-topbar"><div class="arrow-up"></div>
 		<div class="towtruck-header">TowTruck</div>
-		<div class="towtruck-minimize">&#175;</div>
-		<div class="towtruck-inset">crarr</div>
-  		<div class="towtruck-close">&times;</div>
+		<div class="towtruck-close fade"><img src="images/btn-close.png"></div>
+		<div class="towtruck-minimize fade"><img src="images/btn-minimize.png"></div>
   	</div>
+	<div id="towtruck-leftnavbar">
+		
+		<div id="nav-btns">
+			<ul>
+				<li><a href="#" class="left-nav-btn info fade"><img src="images/icn-info-active.png"></a>
+					</li>
+				<li><a href="#" class="left-nav-btn communicate fade"><img src="images/icn-communicate.png"></a></li>
+			<ul>
+		</div>
+		<div id="pop-btns">
+			<a href="#" class="popout fade"><img src="images/icn-popout.png"></a>
+		</div>	
+	</div>
 	<div id="towtruck-body">
-		<div class="towtruck-link"></div>
+		<div class="box">
+			<p>Simply send this link to a friend to get started!</p>
+			<input type="text" value="http://twtrk.html/1RtGRqQRLm"><a class="button fade-half" href="#">Copy</a>
+		</div>
+		<!-- FIX ME -- THIS IS THE REAL LINK, NEEDS TO BE in the VALUE attr in the input field -->
+		<!-- also, the value should be auto-highlighted. -->
+		<!-- <div class="towtruck-link"></div> -->
 		
+		<div class="box">
+			<p>Your name:</p>
+			<input type="text" value="Your name">
+		<div>
 	</div>
-	<div id="towtruck-videochat">
-		
-	</div>
-	<div id="towtruck-username">
-		
-	</div>
-	<div id="towtruck-chatbox">
-		
-	</div>
-	<div id="towtruck-go">
-		
-	</div>
-
 </div>
