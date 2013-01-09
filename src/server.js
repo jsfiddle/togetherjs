@@ -9,7 +9,6 @@ var less = require('less');
 var coffeeCompile = require("coffee-script").compile;
 
 var staticRoot = new static.Server(__dirname);
-ocalhost
 // FIXME: use express for all this?
 
 // FIXME: it would be nice if this served up examples/
