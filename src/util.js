@@ -70,11 +70,18 @@
     return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
   };
 
+  TowTruck.AssertionError = function (msg) {
+    this.message = msg;
+    this.toString = function () {
+      return "Assertion error: " + (this.message || "?");
+    };
+  };
+
   TowTruck.assert = function (cond) {
     if (! cond) {
       var args = ["Assertion error:"].concat(Array.prototype.slice.call(arguments, 1));
       console.error.apply(console, args);
-      throw "Assertion error: " + (arguments[1] || "?");
+      throw new TowTruck.AssertionError(arguments[1]);
     }
   };
 
@@ -138,5 +145,6 @@
     return proto;
   };
 
+  TowTruck.mixinEvents(TowTruck);
 
 })();
