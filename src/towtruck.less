@@ -201,12 +201,27 @@ src: url('fonts/OpenSans-Regular.ttf');
 	padding-bottom:20px;
 }
 
-#towtruck-body input {
+#towtruck-body input.link-input {
+	background: url("images/icn-chain.png") no-repeat;
+	background-position: 10px 9px;
 	border-radius:0.25em;
 	height:30px;
-	width:232px;
-	border:1px solid #d0d0d0;
-	padding-left:5px;
+	width:202px;
+	border:1px solid #ccc;
+	padding-left:28px;
+	font-size:14px;
+	color:#343639;
+	-moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+	-webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+	box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
+}
+
+#towtruck-body input.name-input {
+	border-radius:0.25em;
+	height:30px;
+	width:304px;
+	border:1px solid #ccc;
+	padding-left:8px;
 	font-size:14px;
 	color:#343639;
 	-moz-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
@@ -222,8 +237,11 @@ src: url('fonts/OpenSans-Regular.ttf');
 }
 
 input:focus {
-    outline: none;
+	outline:none;
+	border:1px solid red;
 }
+
+
 /*END INTRO*/
 
 /*CHAT INTERFACE*/
@@ -265,13 +283,10 @@ input:focus {
 
 /*RANDOM styles and transitions*/
 
-.arrow-up {
-	width: 10; 
-	height: 10; 
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	
-	border-bottom: 5px solid black;
+.left-arrow {
+	position:relative;
+	left:39px;
+	top:-30px;
 }
 
 .fade {
@@ -283,17 +298,6 @@ input:focus {
 
    .fade:hover {
       opacity: 0.5;
-      }
-
-.fade-half {
-   opacity: 1;
-   transition: opacity .25s ease-in-out;
-   -moz-transition: opacity .25s ease-in-out;
-   -webkit-transition: opacity .25s ease-in-out;
-   }
-
-   .fade-half:hover {
-      opacity: 0.9;
       }
 
 .rounded-corners (@radius: 5px) {
