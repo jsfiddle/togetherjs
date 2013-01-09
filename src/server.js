@@ -9,7 +9,7 @@ var less = require('less');
 var coffeeCompile = require("coffee-script").compile;
 
 var staticRoot = new static.Server(__dirname);
-
+ocalhost
 // FIXME: use express for all this?
 
 // FIXME: it would be nice if this served up examples/
@@ -53,7 +53,7 @@ var server = http.createServer(function(request, response) {
               return;
             }
             var js = coffeeCompile(code, {filename: coffeeName});
-            serveJavascript(basename, js, response);
+            serveJavascript(basename, js, base, response);
           });
         } else {
           fs.exists(staticRoot.resolve(url.pathname), function (exists) {
@@ -63,7 +63,7 @@ var server = http.createServer(function(request, response) {
                   write500(error, response);
                   return;
                 }
-                serveJavascript(basename, code, response);
+                serveJavascript(basename, code, base, response);
               });
             } else {
               write404(response);
@@ -121,13 +121,14 @@ var JS_SYNC_TEMPLATE = "\n" + [
   "window._TowTruck_notify_script && _TowTruck_notify_script(__NAME__);"
 ].join("\n");
 
-function serveJavascript(name, code, response) {
+function serveJavascript(name, code, base, response) {
   response.setHeader("Content-Type", "application/javascript");
   var tmpl = JS_SYNC_TEMPLATE.replace(/__NAME__/g, JSON.stringify(name));
   code += tmpl;
   function sub() {
     var match = (/INCLUDE\(['"]([^\)]+)['"]\)/).exec(code);
     if (! match) {
+      code = code.replace(/http:\/\/localhost:8080/g, base);
       response.end(code);
       return;
     }
