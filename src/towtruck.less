@@ -124,6 +124,11 @@
     float: left;
     width: 300px;
     padding-left: 60px;
+    .user-select(none);
+    cursor: default;
+    &.towtruck-dragging {
+        cursor: move;
+    }
 }
 
 
@@ -406,6 +411,13 @@ input:focus {
     -ms-border-radius: @radius;
     -o-border-radius: @radius;
     border-radius: @radius;
+}
+
+.user-select (@value) {
+    -moz-user-select: @value;
+    -webkit-user-select: @value;
+    -ms-user-select: @value;
+    user-select: @value;
 }
 
 #towtruck-bookmarklet {

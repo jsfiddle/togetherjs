@@ -58,6 +58,7 @@
       return false;
     });
 
+    // Close button and confirmation of close:
     container.find(".towtruck-close").click(function () {
       TowTruck.activateTab("towtruck-end-confirm");
     });
@@ -66,6 +67,31 @@
     });
     container.find("#towtruck-cancel-end").click(function () {
       TowTruck.activateTab("towtruck-chat");
+    });
+
+    // Moving the window:
+    var header = container.find(".towtruck-header");
+    header.mousedown(function (event) {
+      header.addClass("towtruck-dragging");
+      var start = container.position();
+      function selectoff() {
+        return false;
+      }
+      function mousemove(event2) {
+        container.css({
+          top: start.top + (event2.screenY - event.screenY),
+          left: start.left + (event2.screenX - event.screenX)
+        });
+      }
+      $(document).bind("mousemove", mousemove);
+      // If you don't turn selection off it will still select text, and show a
+      // text selection cursor:
+      $(document).bind("selectstart", selectoff);
+      $(document).one("mouseup", function () {
+        $(document).unbind("mousemove", mousemove);
+        $(document).unbind("selectstart", selectoff);
+        header.removeClass("towtruck-dragging");
+      });
     });
 
   };
