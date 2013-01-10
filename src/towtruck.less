@@ -167,12 +167,29 @@
     float: right;
     padding-right: 15px;
     padding-top: 15px;
+	opacity:.5;
+}
+
+#towtruck-topbar .towtruck-minimize:hover {
+    float: right;
+    padding-right: 15px;
+    padding-top: 15px;
+	opacity:1;
+	cursor:pointer;
 }
 
 #towtruck-topbar .towtruck-close {
     float: right;
     padding-right: 15px;
     padding-top: 15px;
+	opacity:.5;
+}
+
+#towtruck-topbar .towtruck-close:hover {
+    float: right;
+    padding-right: 15px;
+    padding-top: 15px;
+	opacity:1;
 }
 /*END TOP HEADER BAR*/
 
@@ -196,6 +213,22 @@
     padding-left: 10px;
 }
 
+#towtruck-nav-btns .info img{
+    opacity:0.5;
+}
+
+#towtruck-nav-btns .info img:hover{
+    opacity:1;
+}
+
+#towtruck-nav-btns .communicate img{
+    opacity:0.5;
+}
+
+#towtruck-nav-btns .communicate img:hover{
+    opacity:1;
+}
+
 #towtruck-nav-btns li {
     height:43px;
 	padding-top:10px;
@@ -214,6 +247,13 @@
 #towtruck-pop-btns img {
     width:40px;
 	height:40px;
+	opacity:0.5;
+}
+
+#towtruck-pop-btns img:hover {
+    width:40px;
+	height:40px;
+	opacity:1;
 }
 
 /*END LEFT SIDE NAV*/
@@ -348,13 +388,13 @@
 }
 
 
-.towtruck-container .upper-box {
+.towtruck-container .towtruck-upper-box {
 	height:349px;
 	overflow-y:hidden;
 	background:#fff;
 }
 
-.towtruck-container .lower-box {
+.towtruck-container .towtruck-lower-box {
 	padding:10px;
 	height:35px;
     border-top: 1px solid rgba(0,0,0,.3);
@@ -456,7 +496,7 @@
 	height:40px;
 }
 
-.towtruck-fade {
+/*.towtruck-fade {
     opacity: 1;
     .transition(opacity .25s ease-in-out);
     &:hover {
@@ -470,7 +510,7 @@
     &:hover {
         opacity: 0.9;
     }
-}
+}*/
 
 .transition (...) {
     transition: @arguments;
@@ -561,9 +601,45 @@
     }
 }
 
-.towtruck-end-confirm {
+/*#towtruck-topbar .towtruck-end-confirm {
+	background:red;
+	position:relative;
+	z-index:9999;
+	
     p {
         text-align: center;
         margin-bottom: 2em;
     }
+}*/
+
+#towtruck-body .towtruck-end-confirm {
+	background: rgba(0, 0, 0, 0.5);
+	position: relative;
+	z-index: 9999;
+	left: -60px;
+	height: 100%;
+	width: 117%;
+	border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    margin: 0 auto;
+	
+    p {
+		padding-top:150px;
+		color:#fff;
+		font-size:14px;
+		font-family: openSansRegular,helvetica, sans-serif;
+        text-align: center;
+		text-shadow: 0px 1px #000;
+    }
+
+	.towtruck-button-end-confirmation {
+		padding-top:10px;
+		padding-left:77px;
+	}
+	
+	.towtruck-button-end-confirmation button {
+		float:left;
+		margin-left:20px;
+	}
+	
 }

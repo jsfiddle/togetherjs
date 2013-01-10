@@ -30,7 +30,7 @@
     <div class="towtruck-header">
       <div class="towtruck-chat towtruck-screen">Chat</div>
       <div class="towtruck-info towtruck-screen">TowTruck</div>
-      <div class="towtruck-end-confirm towtruck-screen">End?</div>
+      <div class="towtruck-end-confirm towtruck-screen">End TowTruck session?</div>
     </div>
     <div class="towtruck-close towtruck-fade" data-walkabout-disable="1"><img src="http://localhost:8080/images/btn-close.png"></div>
     <div class="towtruck-minimize towtruck-fade"><img src="http://localhost:8080/images/btn-minimize.png"></div>
@@ -59,14 +59,6 @@
 
     <div class="towtruck-info towtruck-screen">
 
-		<script type="text/javascript" charset="utf-8">
-			window.onload = function(){
-			  var text_input = document.getElementById('copy-input');
-			  text_input.focus();
-			  text_input.select();
-			}
-		</script>
-
       <div class="box">
         <p>Simply send this link to a friend to get started!</p>
         <input type="text" value="http://twtrk.html/1RtGRqQRLm" class="towtruck-input-link">
@@ -86,20 +78,19 @@
     </div>
 
     <div class="towtruck-chat towtruck-screen">
-      <div class="upper-box">
+      <div class="towtruck-upper-box">
         <div class="towtruck-test-container" style="display: none"></div>
         <div class="towtruck-chat-container"></div>
       </div>
-      <div class="lower-box">
+      <div class="towtruck-lower-box">
         <input type="text" placeholder="Write your message" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
       </div>
     </div>
 
-    <div class="towtruck-end-confirm towtruck-screen">
-      <p>Are you sure you want to end your TowTruck session?</p>
-      <p><button class="button" id="towtruck-end-session">End</button></p>
-      <p><button class="button" id="towtruck-cancel-end">Keep TowTruck Open</button></p>
-    </div>
+	  <div class="towtruck-end-confirm towtruck-screen">
+	     <p>Would you like to end your TowTruck session?</p>
+		 <div class="towtruck-button-end-confirmation"><button class="button" id="towtruck-cancel-end">No</button><button class="button" id="towtruck-end-session">Yes</button></div>
+	  </div>
 
   </div>
 
