@@ -58,6 +58,16 @@
       return false;
     });
 
+    container.find(".towtruck-close").click(function () {
+      TowTruck.activateTab("towtruck-end-confirm");
+    });
+    container.find("#towtruck-end-session").click(function () {
+      TowTruck.stop();
+    });
+    container.find("#towtruck-cancel-end").click(function () {
+      TowTruck.activateTab("towtruck-chat");
+    });
+
   };
 
   function updateShareLink() {
@@ -77,12 +87,13 @@
     } else if (! name) {
       name = button.attr("data-activate");
     }
-    assert(button.length, "No screen with name", name);
     $("#towtruck-nav-btns").find("img.triangle").remove();
     var triangle = cloneTemplate("triangle");
     button.closest("li").append(triangle);
     $(".towtruck-screen").hide();
-    $(".towtruck-screen." + name).show();
+    var els = $(".towtruck-screen." + name).show();
+    assert(els.length, "No screen with name:", name);
+    els.show();
   };
 
   TowTruck.addChat = function (msg) {

@@ -28,6 +28,7 @@
     <div class="towtruck-header">
       <div class="towtruck-chat towtruck-screen">Chat</div>
       <div class="towtruck-info towtruck-screen">Intro</div>
+      <div class="towtruck-end-confirm towtruck-screen">End?</div>
     </div>
     <div class="towtruck-close towtruck-fade" data-walkabout-disable="1"><img src="http://localhost:8080/images/btn-close.png"></div>
     <div class="towtruck-minimize towtruck-fade"><img src="http://localhost:8080/images/btn-minimize.png"></div>
@@ -81,6 +82,13 @@
         <input type="text" placeholder="Write your message" class="towtruck-chat-input" data-walkabout-keyup="{which: 13, before: 'randomValue'}">
       </div>
     </div>
+
+    <div class="towtruck-end-confirm towtruck-screen">
+      <p>Are you sure you want to end your TowTruck session?</p>
+      <p><button class="button" id="towtruck-end-session">End</button></p>
+      <p><button class="button" id="towtruck-cancel-end">Keep TowTruck Open</button></p>
+    </div>
+
   </div>
 
 </div>

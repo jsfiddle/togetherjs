@@ -244,7 +244,7 @@
         TowTruck.isClient = true;
       } else {
         TowTruck.isClient = false;
-        activateOnStart = "towtruck-intro";
+        activateOnStart = "towtruck-info";
       }
       TowTruck.init();
       TowTruck.start();
@@ -258,8 +258,7 @@
   TowTruck.templates = {
     chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
     help: makeTemplate("help", INCLUDE("help.tmpl")),
-    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl")),
-    end: makeTemplate("end", INCLUDE("end.tmpl"))
+    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl"))
   };
 
   // For ShareJS setup:
