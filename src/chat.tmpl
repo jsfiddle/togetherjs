@@ -3,7 +3,26 @@
 */ %>
 <div class="towtruck-container towtruck-chat">
   <div id="towtruck-templates" style="display: none">
+
+    <!-- These elements are cloned to create UI; the ID identifies the template
+         (the id is erased from the cloned element) and everything else is set via
+         ad hoc classes and jQuery: -->
+
     <img id="towtruck-template-triangle" src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
+
+    <div id="towtruck-template-chat-message" class="towtruck-chat-message">
+      <span class="towtruck-person"></span>:
+      <span class="towtruck-chat-content"></span>
+    </div>
+
+    <div id="towtruck-template-chat-left" class="towtruck-chat-message">
+      <span class="towtruck-person"></span> left the session.
+    </div>
+
+    <div id="towtruck-template-chat-system" class="towtruck-chat-message">
+      <span class="towtruck-chat-content"></span>
+    </div>
+
   </div>
   <div id="towtruck-topbar"><div class="arrow-up"></div>
     <div class="towtruck-header">

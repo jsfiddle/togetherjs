@@ -292,13 +292,13 @@ input:focus {
 
 
 .towtruck-container .upper-box {
-	height:85%;
-	background:#fff;
+	height: 85%;
+	background: #fff;
 }
 
 .towtruck-container .lower-box {
-	padding:10px;
-	height:10%;
+	padding: 10px;
+	height: 10%;
 	background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#f1f1f1), color-stop(3%,#ffffff), color-stop(5%,#f1f1f1), color-stop(100%,#f1f1f1)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Chrome10+,Safari5.1+ */
@@ -310,7 +310,9 @@ input:focus {
 }
 
 .towtruck-chat-container {
-    height: 100%;
+    // FIXME: this is the height of #towtruck-leftnavbar times 85%, which seems to be
+    // right, but ideally it would size to its container?
+    height: 400px * 0.85;
     overflow-y: auto;
 }
 
