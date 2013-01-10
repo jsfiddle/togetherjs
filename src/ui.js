@@ -135,7 +135,7 @@
       setPerson(el, msg.clientId);
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
-        .attr("data-date", Date.now());
+        .attr("data-date", msg.date || Date.now());
       container.append(el);
       el[0].scrollIntoView();
     } else if (msg.type == "left-session") {
@@ -156,6 +156,14 @@
     } else {
       console.warn("Did not understand message type:", msg.type, "in message", msg);
     }
+  };
+
+  TowTruck.isChatEmpty = function () {
+    var container = TowTruck.container.find(".towtruck-chat-container");
+    // We find if there's any chat messages with people who aren't ourself:
+    return ! container.find(
+      ".towtruck-chat-message .towtruck-person:not(.towtruck-person-" +
+      TowTruck.safeClassName(TowTruck.clientId) + ")").length;
   };
 
   /* Given a template with a .towtruck-person element, puts the appropriate

@@ -1,6 +1,7 @@
 (function () {
   var TowTruck = window.TowTruck;
   var $ = TowTruck.$;
+  var assert = TowTruck.assert;
 
   TowTruck.messageHandler.on("chat", function (msg) {
     TowTruck.addChat({
@@ -8,6 +9,14 @@
       clientId: msg.clientId,
       text: msg.text
     });
+    if (! TowTruck.isClient) {
+      TowTruck.Chat.addChat({
+        type: "text",
+        text: msg.text,
+        clientId: msg.clientId,
+        date: Date.now()
+      });
+    }
   });
 
   TowTruck.messageHandler.on("bye", function (msg) {
@@ -15,6 +24,33 @@
       type: "left-session",
       clientId: msg.clientId
     });
+  });
+
+  TowTruck.messageHandler.on("hello", function () {
+    if (! TowTruck.isClient) {
+      var log = TowTruck.Chat.loadChat();
+      TowTruck.send({
+        type: "chat-catchup",
+        log: log
+      });
+    }
+  });
+
+  TowTruck.messageHandler.on("chat-catchup", function (msg) {
+    assert(TowTruck.isClient);
+    console.log("catchup", TowTruck.isChatEmpty(), msg);
+    if (TowTruck.isChatEmpty()) {
+      TowTruck.addChat({type: "clear"});
+      for (var i=0; i<msg.log.length; i++) {
+        var l = msg.log[i];
+        TowTruck.addChat({
+          type: "text",
+          text: l.text,
+          date: l.date,
+          clientId: l.clientId
+        });
+      }
+    }
   });
 
   // The number of milliseconds after which to put a break in the conversation
@@ -61,6 +97,14 @@
         text: message,
         clientId: TowTruck.clientId
       });
+      if (! TowTruck.isClient) {
+        this.addChat({
+          type: "text",
+          text: message,
+          clientId: TowTruck.clientId,
+          date: Date.now()
+        });
+      }
     },
 
     command_tab: function () {
@@ -170,6 +214,42 @@
       TowTruck.addChat({
         type: "clear"
       });
+    },
+
+    storageKey: "towtruck.chatlog",
+    messageExpireTime: 1000 * 60 * 60 * 6, // 6 hours in milliseconds
+    maxLogMessages: 100,
+
+    addChat: function (obj) {
+      assert(! TowTruck.isClient);
+      var log = this.loadChat();
+      log.push(obj);
+      // Cull old entries:
+      var earlies = -1;
+      var now = Date.now();
+      for (var i=0; i<log.length; i++) {
+        if (now - log.date > this.messageExpireTime) {
+          break;
+        }
+        earlies = i;
+      }
+      if (earlies > -1) {
+        Array.splice(0, earlies + 1);
+      }
+      if (log.length > this.maxLogMessages) {
+        Array.splice(0, log.length - this.maxLogMessages);
+      }
+      localStorage.setItem(this.storageKey, JSON.stringify(log));
+    },
+
+    loadChat: function () {
+      var log = localStorage.getItem(this.storageKey);
+      if (! log) {
+        log = [];
+      } else {
+        log = JSON.parse(log);
+      }
+      return log;
     }
 
   };
