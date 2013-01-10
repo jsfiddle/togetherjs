@@ -380,9 +380,7 @@ input:focus {
 
 .towtruck-fade {
     opacity: 1;
-    transition: opacity .25s ease-in-out;
-    -moz-transition: opacity .25s ease-in-out;
-    -webkit-transition: opacity .25s ease-in-out;
+    .transition(opacity .25s ease-in-out);
     &:hover {
         opacity: 0.5;
     }
@@ -390,12 +388,16 @@ input:focus {
 
 .towtruck-fade-half {
     opacity: 1;
-    transition: opacity .25s ease-in-out;
-    -moz-transition: opacity .25s ease-in-out;
-    -webkit-transition: opacity .25s ease-in-out;
+    .transition(opacity .25s ease-in-out);
     &:hover {
         opacity: 0.9;
     }
+}
+
+.transition (...) {
+    transition: @arguments;
+    -moz-transition: @arguments;
+    -webkit-transition: @arguments;
 }
 
 .rounded-corners (@radius: 5px) {
@@ -431,7 +433,7 @@ input:focus {
     border: 0px none;
     text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
     font-family: 'Open Sans',sans-serif;
-    transition: all 0.25s linear 0s;
+    .transition(all 0.25s linear 0s);
     &:link {
         display: inline-block;
         border-radius: 0.25em 0.25em 0.25em 0.25em;
@@ -450,7 +452,7 @@ input:focus {
         border: 0px none;
         text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
         font-family: 'Open Sans',sans-serif;
-        transition: all 0.25s linear 0s;
+        .transition(all 0.25s linear 0s);
     }
     &:active {
         display: inline-block;
@@ -470,7 +472,7 @@ input:focus {
         border: 0px none;
         text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
         font-family: 'Open Sans',sans-serif;
-        transition: all 0.25s linear 0s;
+        .transition(all 0.25s linear 0s);
     }
 }
 
