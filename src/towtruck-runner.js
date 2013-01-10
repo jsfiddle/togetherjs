@@ -88,7 +88,7 @@
       send({
         type: "hello-back",
         nickname: TowTruck.settings("nickname"),
-        avatar: TowTruck.setting("avatar"),
+        avatar: TowTruck.settings("avatar"),
         rtcSupported: TowTruck.RTCSupported
       });
     }
