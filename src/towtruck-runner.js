@@ -257,7 +257,6 @@
   // substituted by the server into an actual string.
   TowTruck.templates = {
     chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
-    chat_message: makeTemplate("chat_message", INCLUDE("chat_message.tmpl")),
     help: makeTemplate("help", INCLUDE("help.tmpl")),
     walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl")),
     end: makeTemplate("end", INCLUDE("end.tmpl"))
