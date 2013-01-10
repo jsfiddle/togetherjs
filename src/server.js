@@ -86,14 +86,19 @@ var server = http.createServer(function(request, response) {
               write500(error, response);
               return;
             }
-            less.render(code, function (error, css) {
-              if (error) {
-                write500(error, response);
-                return;
-              }
-              response.setHeader("Content-Type", "text/css");
-              response.end(css);
-            });
+            try {
+              less.render(code, function (error, css) {
+                if (error) {
+                  write500(error, response);
+                  return;
+                }
+                response.setHeader("Content-Type", "text/css");
+                response.end(css);
+              });
+            } catch (e) {
+              write500("Error in less.render: " + JSON.stringify(e, null, "  "), response);
+              return;
+            }
           });
         } else {
           serveStatic(request, response);
