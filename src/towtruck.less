@@ -4,6 +4,11 @@
     src: url('fonts/OpenSans-Regular.ttf');
 }
 
+@font-face {
+    font-family: openSansLight;
+    src: url('fonts/OpenSans-Light.ttf');
+}
+
 /* Reset: */
 .towtruck-container {
     /* http://meyerweb.com/eric/tools/css/reset/
@@ -160,6 +165,11 @@
     padding-left: 10px;
 }
 
+#towtruck-nav-btns button.communicate {
+/*	position:relative;
+	top:60px;*/
+}
+
 /*BOTTOM POPOUT BTN*/
 #towtruck-pop-btns {
     width: 49px;
@@ -256,6 +266,18 @@
     box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
 }
 
+#towtruck-body span#towtruck-name-confirmation {
+	padding-left:10px;
+	color:#ccc;
+	/*^^^ FIX ME -- need to change this to green #27935f, when the user has type in their name*/
+}
+
+
+
+#towtruck-body span#towtruck-name-waiting {
+	padding-left:10px;
+}
+
 #towtruck-body a.button {
     padding: 0px;
     min-width: 60px;
@@ -263,8 +285,7 @@
     line-height: 33px;
 }
 
-// FIXME: what specific towtruck-* element is this intended for?
-input:focus {
+.towtruck-container input:focus {
     outline: none;
 }
 /*END INTRO*/
@@ -292,13 +313,15 @@ input:focus {
 
 
 .towtruck-container .upper-box {
-	height:85%;
 	background:#fff;
+	height:80%;
+	overflow-y:hidden;
 }
 
 .towtruck-container .lower-box {
+	margin-top:28px;
 	padding:10px;
-	height:10%;
+	height:8%;
 	background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#f1f1f1), color-stop(3%,#ffffff), color-stop(5%,#f1f1f1), color-stop(100%,#f1f1f1)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Chrome10+,Safari5.1+ */
@@ -309,9 +332,8 @@ input:focus {
     border-top: 1px solid rgba(0,0,0,.3);
 }
 
-.towtruck-chat-container {
-    height: 100%;
-    overflow-y: auto;
+.towtruck-container .towtruck-chat {
+	height:100%;
 }
 
 .towtruck-container input.towtruck-chat-input {
@@ -328,6 +350,19 @@ input:focus {
     -webkit-box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
     box-shadow: inset 0 0 1px 1px rgba(0,0,0,0.1);
 }
+
+/*::-webkit-input-placeholder {
+	color:#f00; 
+	font-family: openSansLight; 
+	}
+::-moz-placeholder {
+	color:#fff; 
+	font-family: openSansLight;
+	}
+input:-moz-placeholder {
+	color:#fff; 
+	font-family: openSansLight;
+	}*/
 
 .towtruck-container {
 
@@ -374,6 +409,11 @@ input:focus {
     position:relative;
 	top:-30px;
 	left:40px;
+}
+
+#towtruck-nav-btns img {
+	width:40px;
+	height:40px;
 }
 
 .towtruck-fade {

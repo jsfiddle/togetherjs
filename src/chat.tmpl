@@ -19,10 +19,10 @@
       <ul>
       <li>
         <button class="left-nav-btn info towtruck-fade towtruck-info" data-activate="towtruck-info"><img src="http://localhost:8080/images/icn-info.png"></button>
+        <img src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
       </li>
       <li>
-        <button class="left-nav-btn communicate towtruck-fade" data-activate="towtruck-chat"><img src="http://localhost:8080/images/icn-communicate-active.png"></button>
-        <img src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
+        <button class="left-nav-btn communicate towtruck-fade" data-activate="towtruck-chat"><img src="http://localhost:8080/images/icn-communicate.png"></button>
       </li>
       <ul>
     </div>
@@ -36,12 +36,19 @@
 
     <div class="towtruck-info towtruck-screen">
 
+		<script type="text/javascript" charset="utf-8">
+			window.onload = function(){
+			  var text_input = document.getElementById('copy-input');
+			  text_input.focus();
+			  text_input.select();
+			}
+		</script>
+
       <div class="box">
         <p>Simply send this link to a friend to get started!</p>
-        <input type="text" value="http://twtrk.html/1RtGRqQRLm" class="towtruck-input-link"><a class="button" href="#">Copy</a>
+        <input id="copy-input" type="text" class="towtruck-input-link" onclick="this.select()"><a class="button" href="#">Copy</a>
       </div>
-      <!-- FIX ME -- THIS IS THE REAL LINK, NEEDS TO BE in the VALUE attr in the input field -->
-      <!-- also, the value should be auto-highlighted. -->
+      <!-- FIX ME -- the value in the input needs to be auto-highlighted onLoad -->
       <!-- <div class="towtruck-link"></div> -->
 
       <div class="box">
@@ -49,6 +56,7 @@
         <input type="text" placeholder="Type your name" class="towtruck-input-name">
         <span id="towtruck-name-waiting" style="display: none">...</span>
         <span id="towtruck-name-confirmation">&#x2713;</span>
+		<!-- FIX ME -- checkmark should turn green when name is entered -->
       </div>
 
     </div>
