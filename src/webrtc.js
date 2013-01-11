@@ -8,8 +8,8 @@
 
   var PeerConnection = TowTruck.PeerConnection =
     window.mozRTCPeerConnection ||
-    window.RTCPeerConnection ||
-    window.webkitRTCPeerConnection;
+    window.webkitRTCPeerConnection ||
+    window.RTCPeerConnection;
 
   navigator.getUserMedia = navigator.getUserMedia ||
     navigator.mozGetUserMedia ||
@@ -196,7 +196,8 @@
       callback(TowTruck.rtc.connection);
       return;
     }
-    var conn = PeerConnection();
+    // FIXME: Chrome demands a configuration parameter here:
+    var conn = new PeerConnection();
     conn.onaddstream = function (event) {
       console.log("onaddstream", event);
       console.log("streams", conn.remoteStreams, conn.remoteStreams.length);
