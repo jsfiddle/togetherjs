@@ -37,7 +37,7 @@
       container.find("#towtruck-name-confirmation").hide();
       container.find("#towtruck-name-waiting").show();
       // Fake timed saving, to make it look like we're doing work:
-	
+
 	  // can we have the checkmark go to a greencheckmark once the name is confirmed?
       setTimeout(function () {
         container.find("#towtruck-name-waiting").hide();
@@ -96,6 +96,8 @@
       });
     });
 
+    TowTruck.emit("ui-ready");
+
   };
 
   function updateShareLink() {
@@ -111,7 +113,7 @@
 
   TowTruck.activateTab = function (name, button) {
     if (! button) {
-      button = $('[data-activate="' + name + '"]');	  
+      button = $('[data-activate="' + name + '"]');
     } else if (! name) {
       name = button.attr("data-activate");
     }

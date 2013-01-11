@@ -259,4 +259,26 @@
 
   };
 
+  TowTruck.on("ui-ready", function () {
+    if (TowTruck.isClient) {
+      // If we're a client, the master will send the messages
+      return;
+    }
+    if (! TowTruck.isChatEmpty()) {
+      return;
+    }
+    var log = TowTruck.Chat.loadChat();
+    for (var i=0; i<log.length; i++) {
+      var l = log[i];
+      // FIXME: duplicated from chat-catchup
+      TowTruck.addChat({
+        type: "text",
+        text: l.text,
+        date: l.date,
+        clientId: l.clientId,
+        messageId: l.messageId
+      });
+    }
+  });
+
 })();
