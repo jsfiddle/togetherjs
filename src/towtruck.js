@@ -121,8 +121,7 @@
       window._startTowTruckImmediately = shareId;
       console.log("starting", shareId);
       startTowTruck();
-    }
-    if (window._TowTruckBookmarklet) {
+    } else if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
       startTowTruck();
     }
