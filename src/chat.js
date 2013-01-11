@@ -128,7 +128,7 @@
     },
 
     command_test: function (args) {
-      args = TowTruck.trim(args).split(/\s+/g);
+      args = TowTruck.trim(args || "").split(/\s+/g);
       if (args[0] === "" || ! args.length) {
         if (this._testCancel) {
           args = ["cancel"];
@@ -183,14 +183,15 @@
             if (item) {
               item.remove();
             }
-          });
+          }, this);
           this._testShow = [];
         } else {
           var actions = Walkabout.findActions();
           actions.forEach(function (action) {
             this._testShow.push(action.show());
-          });
+          }, this);
         }
+        return;
       }
       if (args[0] == "describe") {
         Walkabout.findActions().forEach(function (action) {
@@ -198,7 +199,7 @@
             type: "system",
             text: action.description()
           });
-        });
+        }, this);
         return;
       }
       TowTruck.addChat({
