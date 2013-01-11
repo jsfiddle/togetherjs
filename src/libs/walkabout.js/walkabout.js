@@ -987,7 +987,13 @@ Walkabout.clickable = function (el) {
 };
 
 Walkabout.anyOverlap = function (overElement) {
-  var overStyle = getComputedStyle(overElement);
+  try {
+    var overStyle = getComputedStyle(overElement);
+  } catch (e) {
+    // FIXME: this is being called for the HTMLDocument element and other
+    // things that can't be used with getComputedStyle
+    return false;
+  }
   if (! overStyle) {
     return false;
   }
