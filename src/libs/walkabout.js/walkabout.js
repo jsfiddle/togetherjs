@@ -9,6 +9,7 @@ if (typeof Walkabout == "undefined") {
 // FIXME: this shouldn't be established so early, in case jquery
 // is loaded after walkabout.js
 Walkabout.jQueryAvailable = (typeof jQuery !== "undefined");
+Walkabout.$ = window.jQuery;
 
 // Actions must turn this on in order to patch .value/.val():
 Walkabout.inTesting = false;
@@ -85,7 +86,7 @@ Walkabout.findActions = function (el, actions) {
   el = el || document;
   actions = actions || new Walkabout.Actions();
   if (! (Array.isArray(el) ||
-         (Walkabout.jQueryAvailable && el instanceof jQuery))) {
+         (Walkabout.jQueryAvailable && el instanceof Walkabout.$))) {
     el = [el];
   }
   for (var i=0; i<el.length; i++) {
@@ -232,7 +233,6 @@ Walkabout.actionFinders.push(function findEdits(el, actions) {
   for (var i=-1; i<children.length; i++) {
     var e = i == -1 ? el : children[i];
     var attr = e.getAttribute && e.getAttribute("data-walkabout-edit-value");
-    console.log("checking", e, attr);
     if (attr) {
       var types = attr.split(/ /g);
       for (var j=0; j<types.length; j++) {
@@ -388,7 +388,7 @@ Walkabout.Mover = Walkabout.Class({
 
 if (Walkabout.jQueryAvailable) {
 
-  jQuery.fn.bindKey = function (matcher, arg1, arg2, arg3) {
+  Walkabout.$.fn.bindKey = function (matcher, arg1, arg2, arg3) {
     var callback = arg3 || arg2 || arg1;
     function handler(event) {
       if (matcher.which) {
@@ -417,7 +417,7 @@ if (Walkabout.jQueryAvailable) {
       if (typeof key == "object" && typeof key.length == "number") {
         key = Walkabout.random.pick(key);
       }
-      var event = jQuery.Event(matcher.type);
+      var event = Walkabout.$.Event(matcher.type);
       event.which = key;
       this.element.trigger(event);
     };
@@ -433,7 +433,7 @@ if (Walkabout.jQueryAvailable) {
   };
 
   Walkabout.actionFinders.push(function jQueryHandlers(el, actions) {
-    var els = jQuery(el).find("*");
+    var els = Walkabout.$(el).find("*");
     els.push(el);
     els.each(function () {
       if (Walkabout.ignoreElement(this)) {
@@ -444,12 +444,12 @@ if (Walkabout.jQueryAvailable) {
         return;
       }
       var events;
-      if (jQuery._data) {
+      if (Walkabout.$._data) {
         // This is for jQuery 1.8+
-        events = jQuery._data(this, "events");
+        events = Walkabout.$._data(this, "events");
       } else {
         // For older versions
-        events = jQuery(this).data("events");
+        events = Walkabout.$(this).data("events");
       }
       if (! events) {
         return;
@@ -462,7 +462,7 @@ if (Walkabout.jQueryAvailable) {
           var event = events[eventName][i];
           var els = [this];
           if (event.selector) {
-            els = jQuery(this).find(event.selector);
+            els = Walkabout.$(this).find(event.selector);
           }
           for (var j=0; j<els.length; j++) {
             var action = Walkabout.EventAction({
@@ -484,13 +484,13 @@ if (Walkabout.jQueryAvailable) {
     });
   });
 
-  jQuery.fn.val.patch = function () {
-    jQuery.fn.val = jQuery.fn.val.mock;
+  Walkabout.$.fn.val.patch = function () {
+    Walkabout.$.fn.val = Walkabout.$.fn.val.mock;
   };
 
-  jQuery.fn.val.mock = function () {
+  Walkabout.$.fn.val.mock = function () {
     if ((! Walkabout.inTesting) || this.attr("type") == "hidden") {
-      return jQuery.fn.val.mock.orig.apply(this, arguments);
+      return Walkabout.$.fn.val.mock.orig.apply(this, arguments);
     }
     var options = this.attr("data-walkabout-options");
     if (options) {
@@ -508,22 +508,22 @@ if (Walkabout.jQueryAvailable) {
       return Walkabout.random.string(options, size);
     } else {
       // FIXME: what then?  E.g., if it's an object
-      return jQuery.fn.val.mock.orig.apply(this, arguments);
+      return Walkabout.$.fn.val.mock.orig.apply(this, arguments);
     }
   };
 
-  jQuery.fn.val.mock.patch = function () {
+  Walkabout.$.fn.val.mock.patch = function () {
     // Already patched
   };
 
-  jQuery.fn.val.mock.unpatch = function () {
-    jQuery.fn.val = jQuery.fn.val.mock.orig;
+  Walkabout.$.fn.val.mock.unpatch = function () {
+    Walkabout.$.fn.val = jQuery.fn.val.mock.orig;
   };
 
-  jQuery.fn.val.mock.orig = jQuery.fn.val;
-  jQuery.fn.val.mock.mock = jQuery.fn.val.mock;
+  Walkabout.$.fn.val.mock.orig = Walkabout.$.fn.val;
+  Walkabout.$.fn.val.mock.mock = Walkabout.$.fn.val.mock;
 
-  jQuery.fn.findActions = function () {
+  Walkabout.$.fn.findActions = function () {
     return Walkabout.findActions(this);
   };
 
@@ -693,7 +693,7 @@ Walkabout.EventAction = Walkabout.Class({
     var props = this.eventProperties();
     if (props.before == "randomValue") {
       if (Walkabout.jQueryAvailable) {
-        jQuery(this.element).val(Walkabout.value(this.element));
+        Walkabout.$(this.element).val(Walkabout.value(this.element));
       } else {
         this.element.value = Walkabout.value(this.element);
       }
@@ -701,7 +701,7 @@ Walkabout.EventAction = Walkabout.Class({
     if (this.handler && this.handler.runEvent) {
       this.handler.runEvent();
     } else if (Walkabout.jQueryAvailable) {
-      event = jQuery.Event(this.type);
+      event = Walkabout.$.Event(this.type);
       Walkabout._extend(event, props);
       if ((this.type == "keyup" || this.type == "keydown" || this.type == "keypress") &&
           (! event.which)) {
@@ -713,7 +713,7 @@ Walkabout.EventAction = Walkabout.Class({
         }
         event.keyCode = event.which;
       }
-      jQuery(this.element).trigger(event);
+      Walkabout.$(this.element).trigger(event);
     } else {
       var module = Walkabout._getEventModule(this.type);
       event = document.createEvent(module);
@@ -935,8 +935,8 @@ Walkabout.LinkFollower = Walkabout.Class({
     var event;
     var cancelled;
     if (Walkabout.jQueryAvailable) {
-      event = jQuery.Event("click");
-      $(this.element).trigger(event);
+      event = Walkabout.$.Event("click");
+      Walkabout.$(this.element).trigger(event);
       cancelled = event.isDefaultPrevented();
     } else {
       event = document.createEvent("MouseEvents");
@@ -1532,7 +1532,7 @@ Walkabout.UI = Walkabout.Class({
     this.startButton.innerHTML = "running";
     this.startButton.disabled = true;
     if (Walkabout.jQueryAvailable) {
-      jQuery.fn.val.patch();
+      Walkabout.$.fn.val.patch();
     }
     this._lastCount = -1;
     var startAtRemaining;
@@ -1560,7 +1560,7 @@ Walkabout.UI = Walkabout.Class({
         this.startButton.disabled = false;
         this.runField.innerHTML = "- / -";
         if (Walkabout.jQueryAvailable) {
-          jQuery.fn.val.unpatch();
+          Walkabout.$.fn.val.unpatch();
         }
         if (persist) {
           Walkabout.persistentData({
@@ -1724,6 +1724,7 @@ Walkabout.actionFinders.push(function backFromHash(el, actions) {
     return;
   }
   if (Walkabout.hashHistory.length > 1) {
+    // FIXME: there should be a way to suppress this from happening
     actions.push(Walkabout.Back());
   }
 });
