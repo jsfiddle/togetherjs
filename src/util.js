@@ -81,6 +81,9 @@
     if (! cond) {
       var args = ["Assertion error:"].concat(Array.prototype.slice.call(arguments, 1));
       console.error.apply(console, args);
+      if (console.trace) {
+        console.trace();
+      }
       throw new TowTruck.AssertionError(args.join(" "));
     }
   };
