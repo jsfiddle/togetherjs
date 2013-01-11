@@ -7,14 +7,16 @@
     TowTruck.addChat({
       type: "text",
       clientId: msg.clientId,
-      text: msg.text
+      text: msg.text,
+      messageId: msg.messageId
     });
     if (! TowTruck.isClient) {
       TowTruck.Chat.addChat({
         type: "text",
         text: msg.text,
         clientId: msg.clientId,
-        date: Date.now()
+        date: Date.now(),
+        messageId: msg.messageId
       });
     }
   });
