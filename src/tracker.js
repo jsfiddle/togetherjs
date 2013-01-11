@@ -6,7 +6,7 @@
 
   TowTruck.ignoreElement = function (el) {
     while (el) {
-      if (el.className && el.className.indexOf("towtruck") != -1) {
+      if (el.className && (""+el.className).indexOf("towtruck") != -1) {
         return true;
       }
       el = el.parentNode;
