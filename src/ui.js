@@ -124,6 +124,7 @@
     var els = $(".towtruck-screen." + name).show();
     assert(els.length, "No screen with name:", name);
     els.show();
+    TowTruck.emit("ui-showing-" + name);
   };
 
   TowTruck.addChat = function (msg) {

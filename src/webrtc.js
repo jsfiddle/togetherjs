@@ -6,8 +6,9 @@
   var $ = TowTruck.$;
   var assert = TowTruck.assert;
 
-  var PeerConnection = window.RTCPeerConnection ||
+  var PeerConnection = TowTruck.PeerConnection =
     window.mozRTCPeerConnection ||
+    window.RTCPeerConnection ||
     window.webkitRTCPeerConnection;
 
   navigator.getUserMedia = navigator.getUserMedia ||
@@ -17,11 +18,21 @@
 
   TowTruck.RTCSupported = !! PeerConnection;
 
-  if (! PeerConnection) {
-    // WebRTC not supported
-    // FIXME: could getUserMedia sometimes be availble when RTC is not?
-    return;
-  }
+  TowTruck.on("ui-ready", function () {
+    if (! TowTruck.RTCSupported) {
+      $(".towtruck-rtc, [data-activate='towtruck-rtc']").hide();
+      return;
+    }
+    $("#towtruck-mute").click(function () {
+      var video = $("#towtruck-video")[0];
+      video.muted = ! video.muted;
+      if (video.muted) {
+        $("#towtruck-mute").text("Unmute");
+      } else {
+        $("#towtruck-mute").text("Mute");
+      }
+    });
+  });
 
   TowTruck.startPicPreview = function () {
     $("#towtruck-open-pic").show();
@@ -115,6 +126,16 @@
     TowTruck.setupChatInterface();
   });
 
+  function addStream(video, stream) {
+    video = $(video)[0];
+    if (navigator.mozGetUserMedia) {
+      video.mozSrcObject = stream;
+    } else {
+      var vendorURL = window.URL || window.webkitURL;
+      video.src = vendorURL.createObjectURL(stream);
+    }
+  }
+
   TowTruck.setupChatInterface = function setupChatInterface() {
     if (! TowTruck.chat) {
       return;
@@ -143,12 +164,17 @@
     myOffer: null,
     answer: null,
     myAnswer: null,
-    videoWanted: false
+    videoWanted: true
   };
+
+  TowTruck.on("ui-showing-towtruck-rtc", function () {
+    TowTruck.setupRTC();
+  });
 
   TowTruck.messageHandler.on("rtc-offer", function (msg) {
     TowTruck.rtc.offer = msg.offer;
     TowTruck.setDescription(msg.offer, function () {
+      TowTruck.activateTab("towtruck-rtc");
       TowTruck.setupRTC();
     });
   });
@@ -170,11 +196,27 @@
       callback(TowTruck.rtc.connection);
       return;
     }
-    var conn = new PeerConnection();
+    var conn = PeerConnection();
+    conn.onaddstream = function (event) {
+      console.log("onaddstream", event);
+      console.log("streams", conn.remoteStreams, conn.remoteStreams.length);
+      var video = $("#towtruck-video");
+      for (var i=0; i<conn.remoteStreams.length; i++) {
+        var s = conn.remoteStreams[i];
+        addStream(video, s);
+      }
+      video[0].play();
+    };
+    var video = $("#towtruck-video-me");
+    assert(video.length);
+    // FIXME: temporary hack for demo!
+    var useVideo = ! TowTruck.isClient;
     navigator.mozGetUserMedia(
-      {audio: true, video: true},
+      {audio: true, video: useVideo},
       function (stream) {
-        TowTruck.rtc.stream = stream;
+        addStream(video, stream);
+        video[0].play();
+        TowTruck.rtc.localStream = stream;
         TowTruck.rtc.connection = conn;
         conn.addStream(stream);
         callback(conn);
@@ -190,7 +232,7 @@
     assert(conn);
     assert(TowTruck.rtc.offer);
     conn.createAnswer(
-      TowTruck.rtc.offer,
+      //TowTruck.rtc.offer,
       function (answer) {
         conn.setLocalDescription(
           answer,
@@ -266,8 +308,11 @@
       return;
     }
     if (rtc.videoWanted && rtc.offer && ! rtc.myAnswer) {
+    console.log("sending answer");
       TowTruck.makeConnection(function () {
+      console.log("connection created");
         TowTruck.createAnswer(function (answer) {
+        console.log("answer created");
           TowTruck.send({
             type: "rtc-answer",
             answer: answer

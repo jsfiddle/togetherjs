@@ -19,8 +19,8 @@
       <span class="towtruck-arrow-control" style="display: none">
         <input type="checkbox" class="towtruck-arrow-checkbox">
       </span>
-      <span class="towtruck-person"></span>
-      <span class="towtruck-chat-content"></span>
+      <div class="towtruck-person"></div>
+      <div class="towtruck-chat-content"></div>
     </div>
 
     <div id="towtruck-template-chat-left" class="towtruck-chat-message">
@@ -54,6 +54,9 @@
       </li>
       <li>
         <button class="left-nav-btn communicate towtruck-fade" data-activate="towtruck-chat"><img src="http://localhost:8080/images/icn-communicate.png"></button>
+      </li>
+      <li>
+        <button class="left-nav-btn communicate towtruck-fade" data-activate="towtruck-rtc">v</button>
       </li>
       <ul>
     </div>
@@ -105,6 +108,16 @@
 	     <p>Would you like to end your TowTruck session?</p>
 		 <div class="towtruck-button-end-confirmation"><button class="button cancel" id="towtruck-cancel-end">No</button><button class="button confirm" id="towtruck-end-session">Yes</button></div>
 	  </div>
+
+    <div class="towtruck-rtc towtruck-screen">
+      <!-- This is the video of yourself: -->
+      <video id="towtruck-video-me" style="height: 20%; width: 20%;" muted></video>
+      <!-- This is the video of the other person: -->
+      <video id="towtruck-video" style="height: 60%; width: 100%;"></video>
+      <div style="text-align: center">
+        <button id="towtruck-mute" class="button" style="float: none">Mute</button>
+      </div>
+    </div>
 
   </div>
 
