@@ -6,11 +6,18 @@
 
   $(document).on("mousedown", ".towtruck-chat-real", function (event) {
     var el = $(event.target).closest(".towtruck-chat-real"); // or $(this)?
+    if (el.attr("id") == "towtruck-template-chat-message") {
+      // FIXME: this shouldn't happen, but Walkabout is sometimes catching
+      // these
+      return;
+    }
     el.addClass("towtruck-arrow-message");
     //el.find(".towtruck-arrow-control").show().bind("click", arrowCheck);
     el.find(".towtruck-arrow-checkbox").attr("checked", true);
     var messageId = el.attr("id");
-    assert(messageId.indexOf("towtruck-chat-") === 0);
+    assert(messageId.indexOf("towtruck-chat-") === 0,
+           "Bad ID, should be towtruck-chat-*:",
+           messageId);
     messageId = messageId.replace(/^towtruck-chat-/, "");
     var arrowId = "towtruck-chat-arrow-" + messageId;
     var arrow = $("#" + arrowId);
