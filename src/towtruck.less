@@ -104,6 +104,59 @@
 
 /*blue button active*/
 
+/*cancel btn*/
+.cancel-btn() {
+	display: inline-block;
+	border-radius: 0.25em 0.25em 0.25em 0.25em;
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #ffffff 0%,#e5e5e5 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+	color: rgb(0, 0, 0);
+	text-align: center;
+	font-size: 14px;
+	padding: 0px 20px;
+	height: 40px;
+	line-height: 40px;
+	text-decoration: none;
+	min-width: 100px;
+	border: 0px none;
+	text-shadow: 0px 1px 0px rgba(255, 255, 255, 1);
+	font-family: 'Open Sans',sans-serif;
+	transition: all 0.25s linear 0s;
+}
+
+/*confirm btn*/
+.confirm-btn() {
+	display: inline-block;
+	border-radius: 0.25em 0.25em 0.25em 0.25em;
+	background: #3c88cc; /* Old browsers */
+	background: -moz-linear-gradient(top,  #3c88cc 0%, #276195 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3c88cc), color-stop(100%,#276195)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #3c88cc 0%,#276195 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c88cc', endColorstr='#276195',GradientType=0 ); /* IE6-9 */
+	color: rgb(255, 255, 255);
+	text-align: center;
+	font-size: 14px;
+	padding: 0px 20px;
+	height: 40px;
+	line-height: 40px;
+	text-decoration: none;
+	min-width: 100px;
+	border: 0px none;
+	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
+	font-family: 'Open Sans',sans-serif;
+	transition: all 0.25s linear 0s;
+}
+
+
 /*TowTruck intro screen*/
 .towtruck-container.towtruck-intro {
     position: absolute;
@@ -290,7 +343,7 @@
 	background-repeat: no-repeat;
     border-radius: 0.25em;
     height: 30px;
-    width: 280px;
+    width: 210px;
     border: 1px solid #d0d0d0;
     padding-left: 28px;
     font-size: 14px;
@@ -306,7 +359,7 @@
 	background-repeat: no-repeat;
     border-radius: 0.25em;
     height: 30px;
-    width: 280px;
+    width: 210px;
     border: 1px solid #267cc3;
     padding-left: 28px;
     font-size: 14px;
@@ -348,6 +401,9 @@
 	/*^^^ FIX ME -- need to change this to green #27935f, when the user has type in their name*/
 }
 
+#towtruck-body .box .towtruck-avatar img:hover {
+	opacity:0.5;
+}
 
 
 #towtruck-body span#towtruck-name-waiting {
@@ -445,19 +501,37 @@
         cursor: pointer;
     }
 
+	.towtruck-avatar {
+		float:left;
+		width:42px;
+		height:42px;
+	}
+	
+	.towtruck-timestamp {
+		float:right;
+		font-size:10px;
+		opacity:0.5;
+	}
+
     .towtruck-person {
+		font-size:14px;
 		font-family:openSansBold;
+		padding-left:60px;
     }
 
     .towtruck-chat-message {
-		padding:20px;
-        font-size: 80%;
+		padding:15px;
         border-bottom: 1px solid #ddd;
-		font-family:openSansRegular;
+		font-family:openSansLight;
+		font-size:14px;
     }
 
     .towtruck-chat-content {
         white-space: pre-wrap;
+		padding-left:60px;
+		padding-top:10px;
+		font-family:openSansLight;
+		
     }
 
     button {
@@ -616,11 +690,11 @@
 	background: rgba(0, 0, 0, 0.5);
 	position: relative;
 	z-index: 9999;
+	top:-46px;
 	left: -60px;
-	height: 100%;
+	height: 451px;
 	width: 117%;
-	border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
+	border-radius: 3px;
     margin: 0 auto;
 	
     p {
@@ -637,9 +711,16 @@
 		padding-left:77px;
 	}
 	
-	.towtruck-button-end-confirmation button {
+	.towtruck-button-end-confirmation button.cancel {
 		float:left;
 		margin-left:20px;
+		.cancel-btn;
+	}
+	
+	.towtruck-button-end-confirmation button.confirm {
+		float:left;
+		margin-left:20px;
+		.confirm-btn;
 	}
 	
 }

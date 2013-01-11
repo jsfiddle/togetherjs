@@ -11,8 +11,10 @@
     <img id="towtruck-template-triangle" src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
 
     <div id="towtruck-template-chat-message" class="towtruck-chat-message">
-      <span class="towtruck-person"></span>:
-      <span class="towtruck-chat-content"></span>
+      <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
+	  <div class="towtruck-timestamp">12:23 <span class="ampm">PM</span></div>
+	  <div class="towtruck-person">Name</div>
+      <div class="towtruck-chat-content"></div>
     </div>
 
     <div id="towtruck-template-chat-left" class="towtruck-chat-message">
@@ -68,11 +70,17 @@
       <!-- <div class="towtruck-link"></div> -->
 
       <div class="box">
-        <p>Your name:</p>
+        <p>My name:</p>
         <input type="text" placeholder="Type your name" class="towtruck-input-name">
         <span id="towtruck-name-waiting" style="display: none">...</span>
         <span id="towtruck-name-confirmation">&#x2713;</span>
 		<!-- FIX ME -- checkmark should turn green when name is entered -->
+      </div>
+
+	<div class="box">
+        <p>My picture:</p>
+		<span class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></span>
+		<!-- FIX ME - when user hovers over the picture, there should be some text that says to "change" their picture -->
       </div>
 
     </div>
@@ -89,7 +97,7 @@
 
 	  <div class="towtruck-end-confirm towtruck-screen">
 	     <p>Would you like to end your TowTruck session?</p>
-		 <div class="towtruck-button-end-confirmation"><button class="button" id="towtruck-cancel-end">No</button><button class="button" id="towtruck-end-session">Yes</button></div>
+		 <div class="towtruck-button-end-confirmation"><button class="button cancel" id="towtruck-cancel-end">No</button><button class="button confirm" id="towtruck-end-session">Yes</button></div>
 	  </div>
 
   </div>
