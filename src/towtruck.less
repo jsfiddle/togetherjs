@@ -14,6 +14,8 @@
     src: url('fonts/OpenSans-Bold.ttf');
 }
 
+@default-font: openSansRegular, Helvetica, sans-serif;
+
 /* Reset: */
 .towtruck-container {
     /* http://meyerweb.com/eric/tools/css/reset/
@@ -126,7 +128,7 @@
 	min-width: 100px;
 	border: 0px none;
 	text-shadow: 0px 1px 0px rgba(255, 255, 255, 1);
-	font-family: 'Open Sans',sans-serif;
+	font-family: @default-font;
 	transition: all 0.25s linear 0s;
 }
 
@@ -152,7 +154,7 @@
 	min-width: 100px;
 	border: 0px none;
 	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
-	font-family: 'Open Sans',sans-serif;
+	font-family: @default-font;
 	transition: all 0.25s linear 0s;
 }
 
@@ -197,7 +199,7 @@
     text-align: center;
     font-size: 14px;
     font-weight: 600;
-    font-family: helvetica neue;
+    font-family: @default-font;
     color: #343639;
     text-shadow: 0px 1px rgba(255,255,255,1);
     padding-top: 15px;
@@ -333,7 +335,7 @@
 #towtruck-body p {
     font-size: 14px;
     color: #343639;
-    font-family: openSansRegular;
+    font-family: @default-font;
     padding-bottom: 20px;
 }
 
@@ -515,14 +517,15 @@
 
     .towtruck-person {
 		font-size:14px;
-		font-family:openSansBold;
-		padding-left:60px;
+		font-family: openSansBold, sans-serif;
+        font-weight: bold;
+		padding-left: 60px;
     }
 
     .towtruck-chat-message {
 		padding:15px;
         border-bottom: 1px solid #ddd;
-		font-family:openSansLight;
+		font-family: openSansLight, sans-serif;
 		font-size:14px;
     }
 
@@ -530,8 +533,7 @@
         white-space: pre-wrap;
 		padding-left:60px;
 		padding-top:10px;
-		font-family:openSansLight;
-
+		font-family: openSansLight, sans-serif;
     }
 
     button {
@@ -631,7 +633,7 @@
     min-width: 100px;
     border: 0px none;
     text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
-    font-family: 'Open Sans',sans-serif;
+    font-family: @default-font;
     .transition(all 0.25s linear 0s);
     &:link {
         display: inline-block;
@@ -650,7 +652,7 @@
         min-width: 100px;
         border: 0px none;
         text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
-        font-family: 'Open Sans',sans-serif;
+        font-family: @default-font;
         .transition(all 0.25s linear 0s);
     }
     &:active {
@@ -670,7 +672,7 @@
         min-width: 100px;
         border: 0px none;
         text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
-        font-family: 'Open Sans',sans-serif;
+        font-family: @default-font;
         .transition(all 0.25s linear 0s);
     }
 }
@@ -701,7 +703,7 @@
 		padding-top:150px;
 		color:#fff;
 		font-size:14px;
-		font-family: openSansRegular,helvetica, sans-serif;
+		font-family: @default-font;
         text-align: center;
 		text-shadow: 0px 1px #000;
     }
