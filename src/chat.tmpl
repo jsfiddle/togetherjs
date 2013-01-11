@@ -10,11 +10,14 @@
 
     <img id="towtruck-template-triangle" src="http://localhost:8080/images/box-arrow-left.png" class="triangle">
 
-    <div id="towtruck-template-chat-message" class="towtruck-chat-message">
+    <div id="towtruck-template-chat-message" class="towtruck-chat-message towtruck-chat-real">
       <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
 	  <div class="towtruck-timestamp">12:23 <span class="ampm">PM</span></div>
-	  <div class="towtruck-person">Name</div>
-      <div class="towtruck-chat-content"></div>
+      <span class="towtruck-arrow-control" style="display: none">
+        <input type="checkbox" class="towtruck-arrow-checkbox">
+      </span>
+      <span class="towtruck-person"></span>
+      <span class="towtruck-chat-content"></span>
     </div>
 
     <div id="towtruck-template-chat-left" class="towtruck-chat-message">

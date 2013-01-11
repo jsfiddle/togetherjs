@@ -29,16 +29,17 @@
   TowTruck.messageHandler.on("hello", function () {
     if (! TowTruck.isClient) {
       var log = TowTruck.Chat.loadChat();
-      TowTruck.send({
-        type: "chat-catchup",
-        log: log
-      });
+      if (log.length) {
+        TowTruck.send({
+          type: "chat-catchup",
+          log: log
+        });
+      }
     }
   });
 
   TowTruck.messageHandler.on("chat-catchup", function (msg) {
     assert(TowTruck.isClient);
-    console.log("catchup", TowTruck.isChatEmpty(), msg);
     if (TowTruck.isChatEmpty()) {
       TowTruck.addChat({type: "clear"});
       for (var i=0; i<msg.log.length; i++) {
@@ -47,7 +48,8 @@
           type: "text",
           text: l.text,
           date: l.date,
-          clientId: l.clientId
+          clientId: l.clientId,
+          messageId: l.messageId
         });
       }
     }
@@ -58,7 +60,6 @@
   var MESSAGE_BREAK_TIME = 20000;
 
   TowTruck.peers.on("update", function (peer) {
-  console.log("got update", peer);
     TowTruck.updatePerson(peer.clientId);
   });
 
@@ -88,22 +89,21 @@
         }
         return;
       }
-      TowTruck.send({
-        type: "chat",
-        text: message
-      });
-      TowTruck.addChat({
+      var msg = {
         type: "text",
         text: message,
-        clientId: TowTruck.clientId
+        clientId: TowTruck.clientId,
+        messageId: TowTruck.clientId + "-" + Date.now(),
+        date: Date.now()
+      };
+      TowTruck.send({
+        type: "chat",
+        text: message,
+        messageId: msg.messageId
       });
+      TowTruck.addChat(msg);
       if (! TowTruck.isClient) {
-        this.addChat({
-          type: "text",
-          text: message,
-          clientId: TowTruck.clientId,
-          date: Date.now()
-        });
+        this.addChat(msg);
       }
     },
 
@@ -214,6 +214,7 @@
       TowTruck.addChat({
         type: "clear"
       });
+      this.clearHistory();
     },
 
     storageKey: "towtruck.chatlog",
@@ -228,16 +229,16 @@
       var earlies = -1;
       var now = Date.now();
       for (var i=0; i<log.length; i++) {
-        if (now - log.date > this.messageExpireTime) {
+        if (now - log[i].date < this.messageExpireTime) {
           break;
         }
         earlies = i;
       }
       if (earlies > -1) {
-        Array.splice(0, earlies + 1);
+        log.splice(0, earlies + 1);
       }
       if (log.length > this.maxLogMessages) {
-        Array.splice(0, log.length - this.maxLogMessages);
+        log.splice(0, log.length - this.maxLogMessages);
       }
       localStorage.setItem(this.storageKey, JSON.stringify(log));
     },
@@ -250,6 +251,10 @@
         log = JSON.parse(log);
       }
       return log;
+    },
+
+    clearHistory: function () {
+      localStorage.removeItem(this.storageKey);
     }
 
   };

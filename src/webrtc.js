@@ -109,4 +109,172 @@
 
   };
 
+  TowTruck.chatSetup = false;
+
+  TowTruck.peers.on("add update", function (peer) {
+    TowTruck.setupChatInterface();
+  });
+
+  TowTruck.setupChatInterface = function setupChatInterface() {
+    if (! TowTruck.chat) {
+      return;
+    }
+    var supported = false;
+    TowTruck.peers.forEach(function (p) {
+      if (p.rtcSupported) {
+        supported = true;
+      }
+    });
+    if (supported) {
+      TowTruck.chat.find(".towtruck-start-video").show();
+    } else {
+      TowTruck.chat.find(".towtruck-start-video").hide();
+      $("#towtruck-video").hide();
+    }
+    if (! setupChatInterface.bound) {
+      $(".towtruck-start-video").click(TowTruck.startVideo);
+      setupChatInterface.bound = true;
+    }
+  };
+
+  TowTruck.rtc = {
+    connection: null,
+    offer: null,
+    myOffer: null,
+    answer: null,
+    myAnswer: null,
+    videoWanted: false
+  };
+
+  TowTruck.messageHandler.on("rtc-offer", function (msg) {
+    TowTruck.rtc.offer = msg.offer;
+    TowTruck.setDescription(msg.offer, function () {
+      TowTruck.setupRTC();
+    });
+  });
+
+  TowTruck.messageHandler.on("rtc-answer", function (msg) {
+    TowTruck.rtc.answer = msg.answer;
+    TowTruck.setDescription(msg.answer, function () {
+      TowTruck.setupRTC();
+    });
+  });
+
+  TowTruck.startVideo = function startVideo() {
+    TowTruck.rtc.videoWanted = true;
+    TowTruck.setupRTC();
+  };
+
+  TowTruck.makeConnection = function (callback) {
+    if (TowTruck.rtc.connection) {
+      callback(TowTruck.rtc.connection);
+      return;
+    }
+    var conn = new PeerConnection();
+    navigator.mozGetUserMedia(
+      {audio: true, video: true},
+      function (stream) {
+        TowTruck.rtc.stream = stream;
+        TowTruck.rtc.connection = conn;
+        conn.addStream(stream);
+        callback(conn);
+      },
+      function (error) {
+        console.warn("Error in RTC getUserMedia:", error);
+      }
+    );
+  };
+
+  TowTruck.createAnswer = function (callback) {
+    var conn = TowTruck.rtc.connection;
+    assert(conn);
+    assert(TowTruck.rtc.offer);
+    conn.createAnswer(
+      TowTruck.rtc.offer,
+      function (answer) {
+        conn.setLocalDescription(
+          answer,
+          function () {
+            callback(answer);
+          },
+          function (error) {
+            console.warn("Error doing RTC setLocalDescription:", error);
+          }
+        );
+      },
+      function (error) {
+        console.warn("Error doing RTC createAnswer:", error);
+      }
+    );
+  };
+
+  TowTruck.createOffer = function (callback) {
+    var conn = TowTruck.rtc.connection;
+    assert(conn);
+    conn.createOffer(
+      function (offer) {
+        TowTruck.rtc.myOffer = offer;
+        conn.setLocalDescription(
+          offer,
+          function () {
+            callback(offer);
+          },
+          function (error) {
+            console.warn("Error doing RTC setLocalDescription:", error);
+          }
+        );
+      },
+      function (error) {
+        console.warn("Error doing RTC createOffer:", error);
+      }
+    );
+  };
+
+  TowTruck.setDescription = function (desc, callback) {
+    TowTruck.makeConnection(function (conn) {
+      conn.setRemoteDescription(
+        desc,
+        function () {
+          if (callback) {
+            callback();
+          }
+        },
+        function (error) {
+          console.warn("Error doing RTC setRemoteDescription:", error);
+        }
+      );
+    });
+  };
+
+  TowTruck.setupRTC = function () {
+    var rtc = TowTruck.rtc;
+    if (! rtc.videoWanted) {
+      if (rtc.offer) {
+        TowTruck.addChat("Do you want to talk?  Press (v) to start video", "system");
+      }
+      return;
+    }
+    if (rtc.videoWanted && ! rtc.offer) {
+      TowTruck.makeConnection(function () {
+        TowTruck.createOffer(function (offer) {
+          TowTruck.send({
+            type: "rtc-offer",
+            offer: offer
+          });
+        });
+      });
+      return;
+    }
+    if (rtc.videoWanted && rtc.offer && ! rtc.myAnswer) {
+      TowTruck.makeConnection(function () {
+        TowTruck.createAnswer(function (answer) {
+          TowTruck.send({
+            type: "rtc-answer",
+            answer: answer
+          });
+        });
+      });
+    }
+  };
+
 })();

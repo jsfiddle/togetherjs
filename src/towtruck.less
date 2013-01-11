@@ -506,7 +506,7 @@
 		width:42px;
 		height:42px;
 	}
-	
+
 	.towtruck-timestamp {
 		float:right;
 		font-size:10px;
@@ -531,7 +531,7 @@
 		padding-left:60px;
 		padding-top:10px;
 		font-family:openSansLight;
-		
+
     }
 
     button {
@@ -560,9 +560,9 @@
 	top:-28px;
 	height:16px;
 	width:16px;
-	
+
 	/*if safari, move it left to 37px*/
-	
+
 }
 
 #towtruck-nav-btns img {
@@ -679,7 +679,7 @@
 	background:red;
 	position:relative;
 	z-index:9999;
-	
+
     p {
         text-align: center;
         margin-bottom: 2em;
@@ -696,7 +696,7 @@
 	width: 117%;
 	border-radius: 3px;
     margin: 0 auto;
-	
+
     p {
 		padding-top:150px;
 		color:#fff;
@@ -710,17 +710,45 @@
 		padding-top:10px;
 		padding-left:77px;
 	}
-	
+
 	.towtruck-button-end-confirmation button.cancel {
 		float:left;
 		margin-left:20px;
 		.cancel-btn;
 	}
-	
+
 	.towtruck-button-end-confirmation button.confirm {
 		float:left;
 		margin-left:20px;
 		.confirm-btn;
 	}
-	
+
+}
+
+/* Arrows for pointing */
+
+.towtruck-arrow {
+    position: absolute;
+    border: 2px solid #f00;
+    z-index: 10010;
+    padding: 0;
+    margin: 0;
+    -moz-transform-origin: top left;
+    -webkit-transform-origin: top left;
+    -ms-transform-origin: top left;
+    -o-transform-origin: top left;
+    .transform-origin(top left);
+}
+
+.transform-origin (...) {
+    -moz-transform-origin: @arguments;
+    -webkit-transform-origin: @arguments;
+    -ms-transform-origin: @arguments;
+    -o-transform-origin: @arguments;
+    transform-origin: @arguments;
+}
+
+
+.towtruck-chat-message.towtruck-arrow-message {
+    border: 2px solid #f00;
 }

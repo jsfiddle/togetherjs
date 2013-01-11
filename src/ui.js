@@ -128,6 +128,13 @@
     var nick, el;
     var container = TowTruck.container.find(".towtruck-chat-container");
     assert(container.length);
+    function addEl(el, id) {
+      if (id) {
+        el.attr("id", "towtruck-chat-" + TowTruck.safeClassName(id));
+      }
+      container.append(el);
+      el[0].scrollIntoView();
+    }
     if (msg.type == "text") {
       // FIXME: this should not show the name if the last chat was fairly
       // recent
@@ -138,21 +145,19 @@
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
         .attr("data-date", msg.date || Date.now());
-      container.append(el);
-      el[0].scrollIntoView();
+      assert(msg.messageId);
+      addEl(el, msg.messageId);
     } else if (msg.type == "left-session") {
       nick = TowTruck.peers.get(msg.clientId).nickname;
       el = cloneTemplate("chat-left");
       setPerson(el, msg.clientId);
-      container.append(el);
-      el[0].scrollIntoView();
+      addEl(el, msg.messageId);
     } else if (msg.type == "system") {
       assert(! msg.clientId);
       assert(typeof msg.text == "string");
       el = cloneTemplate("chat-system");
       el.find(".towtruck-chat-content").text(msg.text);
-      container.append(el);
-      el[0].scrollIntoView();
+      addEl(el, msg.clientId);
     } else if (msg.type == "clear") {
       container.empty();
     } else {
@@ -164,7 +169,7 @@
     var container = TowTruck.container.find(".towtruck-chat-container");
     // We find if there's any chat messages with people who aren't ourself:
     return ! container.find(
-      ".towtruck-chat-message .towtruck-person:not(.towtruck-person-" +
+      ".towtruck-chat-real .towtruck-person:not(.towtruck-person-" +
       TowTruck.safeClassName(TowTruck.clientId) + ")").length;
   };
 
