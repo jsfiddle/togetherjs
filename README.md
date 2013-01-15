@@ -9,7 +9,13 @@ You can see a screencast of the TowTruck prototype (found in "prototype" branch)
 Setup
 -----
 
-The server is in `src/server.js`.  To run it you should install Node.js, and `npm install node-static websocket less coffee-script`.  Then run `node src/server.js` and use `http://localhost:8080/towtruck.js` to include the setup code.
+It's recommended that you use Foreman to run your development servers. "Why?", you ask. Here's a great intro: <a href="http://blog.daviddollar.org/2011/05/06/introducing-foreman.html">Introducing Foreman</a>.
+
+```
+cp .env.sample .env
+```
+
+The hub server is in `app/hub/server.js`. To run it, you should have fore To run it you should install Node.js, and run `npm install` in the root of this project.  Then run `node src/server.js` and use `http://localhost:8080/towtruck.js` to include the setup code.
 
 There are examples in `examples/` - you should serve these up yourself (they aren't served through `server.js`).  `examples/textarea.html` is an example of sharing the content of a textarea and some other form controls.  `examples/friendlycode.html` is an example of a [CodeMirror](http://codemirror.net/) editor, embedded in [FriendlyCode](https://github.com/mozilla/friendlycode) (which in turn is the basis of [Thimble](https://thimble.webmaker.org/en-US/)).
 
