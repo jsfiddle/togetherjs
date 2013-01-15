@@ -77,7 +77,8 @@ var server = http.createServer(function(request, response) {
       __dirname,
       path.dirname(strippedPath),
       basename + ".less");
-    fs.exists(
+
+    require('fs').exists(
       lessName,
       function (exists) {
         if (exists) {
