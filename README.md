@@ -63,7 +63,7 @@ A basic overview of the code:
 - `*.tmpl`: these are Underscore templates for the UI bits.  These are automatically inlined into `towtruck-runner.js`.
 
 
-### Examples
+### Examples Server
 
 There are some examples in `app/examples/`. These are served up on `EXAMPLE_SERVER_PORT` which defaults to [http://localhost:8081](http://localhost:8081)
 
