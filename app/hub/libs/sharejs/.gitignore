@@ -1,6 +1,0 @@
-*.swp
-.DS_Store
-lib/*
-test/*.js
-test/**/*.js
-node_modules
