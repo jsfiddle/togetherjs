@@ -14,4 +14,4 @@ app.configure(function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
-app.listen(process.env['EXAMPLE_SERVER_PORT']);
+app.listen(process.env.EXAMPLE_SERVER_PORT);

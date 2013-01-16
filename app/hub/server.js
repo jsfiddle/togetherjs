@@ -8,11 +8,6 @@ var path = require('path');
 var less = require('less');
 var coffeeCompile = require("coffee-script").compile;
 
-var staticRoot = new static.Server(__dirname);
-// FIXME: use express for all this?
-
-// FIXME: it would be nice if this served up examples/
-// (though keeping that on a different origin is also helpful)
 var server = http.createServer(function(request, response) {
   var url = parseUrl(request.url);
   var protocol = request.headers["porwarded-proto"] || "http:";
@@ -241,7 +236,7 @@ wsServer.on('request', function(request) {
 });
 
 if (require.main == module) {
-  startServer(process.env.PORT || 8080, process.env.HOST || '127.0.0.1');
+  startServer(process.env.HUB_SERVER_PORT || 8080, process.env.HOST || '127.0.0.1');
 }
 
 exports.startServer = startServer;
