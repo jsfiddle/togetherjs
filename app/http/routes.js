@@ -4,11 +4,12 @@
 
 routes = {
   site: require('./controllers/site'),
-  javascripts: require('./controllers/site')
+  towtruck: require('./controllers/towtruck')
 };
 
-
 module.exports = function(http){
-  http.get('/', routes.site.index)
-  http.get('/javascripts/towtruck.js', routes.site.index)
+  http.get('/', routes.site.index);
+
+  http.get('/towtruck.js', routes.towtruck.index);
+  http.get('/towtruck/*.js', routes.towtruck.js);
 }

@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 (function () {
   if (! window.TowTruck) {
     window.TowTruck = {};

@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 /* WebRTC support for TowTruck.
    Note that this relies on parts of the interface located in chat.js and intro.js
    */

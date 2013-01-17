@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 (function () {
   var TowTruck = window.TowTruck;
   var assert = TowTruck.assert;

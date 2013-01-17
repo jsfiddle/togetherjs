@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 /* Channel abstraction.  Supported channels:
 
 - WebSocket to an address

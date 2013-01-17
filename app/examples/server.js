@@ -4,9 +4,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var express = require('express');
-
-var app = express();
+var
+express = require('express'),
+app     = express(),
+logger  = require('../../lib/logger');
  
 // Configuration
 app.configure(function(){
@@ -15,3 +16,5 @@ app.configure(function(){
 });
 
 app.listen(process.env.EXAMPLE_SERVER_PORT);
+
+logger.info("Example server listening at http://localhost:" + process.env.EXAMPLE_SERVER_PORT + "/ .");

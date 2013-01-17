@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 (function () {
   var TowTruck = window.TowTruck;
   var $ = TowTruck.$;
@@ -253,12 +254,10 @@
     }
   }
 
-  // Note that INCLUDE() isn't actually a function, it's something that is
-  // substituted by the server into an actual string.
   TowTruck.templates = {
-    chat: makeTemplate("chat", INCLUDE("chat.tmpl")),
-    help: makeTemplate("help", INCLUDE("help.tmpl")),
-    walkabout: makeTemplate("walkabout", INCLUDE("walkabout.tmpl"))
+    chat: makeTemplate("chat", "<%- read('chat.tmpl')%>"),
+    help: makeTemplate("help", "<%- read('help.tmpl')%>"),
+    walkabout: makeTemplate("walkabout", "<%- read('walkabout.tmpl')%>")
   };
 
   // For ShareJS setup:

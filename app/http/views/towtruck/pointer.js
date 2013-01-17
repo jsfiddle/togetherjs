@@ -1,3 +1,4 @@
+<% layout('layout') -%>
 /* Implements the pointing part of the UI */
 (function () {
   var TowTruck = window.TowTruck;

@@ -3,32 +3,24 @@
   var button;
 
   var styles = [
-    "http://localhost:8080/towtruck.css"
+    "/towtruck.css"
   ];
 
   // FIXME: these should all get combined for a production release:
   var scripts = [
-    "http://localhost:8080/libs/jquery-1.8.3.min.js",
-    "http://localhost:8080/libs/underscore-1.4.3.min.js",
-    "http://localhost:8080/util.js",
-    "http://localhost:8080/element-finder.js",
-    "http://localhost:8080/channels.js",
-    "http://localhost:8080/towtruck-runner.js",
-    "http://localhost:8080/chat.js",
-    "http://localhost:8080/webrtc.js",
-    "http://localhost:8080/tracker.js",
-    "http://localhost:8080/ui.js",
-    "http://localhost:8080/pointer.js",
-    "http://localhost:8080/libs/walkabout.js/walkabout.js"
-    //"http://localhost:8080/libs/sharejs/src/client/microevent.js",
-    //"http://localhost:8080/libs/sharejs/src/types/helpers.js",
-    //"http://localhost:8080/libs/sharejs/src/client/textarea.js",
-    //"http://localhost:8080/libs/sharejs/src/client/cm.js",
-    //"http://localhost:8080/libs/sharejs/src/types/text.js",
-    //"http://localhost:8080/libs/sharejs/src/types/text-api.js"
+    "/towtruck/libs.js",
+    "/towtruck/util.js",
+    "/towtruck/element-finder.js",
+    "/towtruck/channels.js",
+    "/towtruck/runner.js",
+    "/towtruck/chat.js",
+    "/towtruck/webrtc.js",
+    "/towtruck/tracker.js",
+    "/towtruck/ui.js",
+    "/towtruck/pointer.js"
   ];
 
-  var selfScript = "http://localhost:8080/towtruck.js";
+  var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
 
   // FIXME: I think there's an event that would be called before load?
   window.addEventListener("load", function () {
@@ -48,14 +40,14 @@
     var link = document.createElement("link");
     link.setAttribute("rel", "stylesheet");
     // FIXME: remove cache buster:
-    link.href = url + "?" + Date.now();
+    link.href = baseUrl + url + "?" + Date.now();
     document.head.appendChild(link);
   }
 
   function addScript(url) {
     var script = document.createElement("script");
     // FIXME: remove cache buster:
-    script.src = url + "?" + Date.now();
+    script.src = "<%= process.env.PUBLIC_BASE_URL%>" + url + "?" + Date.now();
     document.head.appendChild(script);
   }
 
@@ -76,16 +68,10 @@
     window._TowTruckOnLoad = function (callback) {
       callbacks.push(callback);
     };
-    var start = window._TowTruck_notify_script = function (name) {
-      var index = 0;
-      if (name) {
-        for (var i=0; i<scripts.length; i++) {
-          if (scripts[i].replace(/.*\//, "") == name + ".js") {
-            index = i + 1;
-            break;
-          }
-        }
-      }
+    var start = window._TowTruck_notify_script = function(name) {
+      console.log("_TowTruck_notify_script called: " + name);
+      var index = scripts.indexOf(name) + 1;
+      
       if (index >= scripts.length) {
         delete window._TowTruck_notify_script;
         callbacks.forEach(function (c) {
@@ -94,19 +80,20 @@
         delete window._TowTruckOnLoad;
       } else {
         var tag = document.createElement("script");
-        tag.src = scripts[index] + "?cache=" + Date.now();
+        tag.src = baseUrl + scripts[index] + "?cache=" + Date.now();
+        console.log({"appending": tag.src});
         document.head.appendChild(tag);
       }
     };
     start();
   };
 
-  startTowTruck.hubBase = "http://localhost:8080";
+  startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";
 
   startTowTruck.bookmarklet = function () {
     var s = "window._TowTruckBookmarklet = true;";
     s += "s=document.createElement('script');";
-    s += "s.src=" + JSON.stringify(selfScript) + ";";
+    s += "s.src=" + JSON.stringify(baseUrl + "/towtruck.js") + ";";
     s += "document.head.appendChild(s);";
     s = "(function () {" + s + "})();void(0)";
     return "javascript:" + encodeURIComponent(s);

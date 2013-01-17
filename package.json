@@ -21,7 +21,8 @@
     "connect": "~2.7.2",
     "ejs": "~0.8.3",
     "ejs-locals": "~1.0.2",
-    "express-persona": "0.0.7"
+    "express-persona": "0.0.7",
+    "less-middleware": "~0.1.9"
   },
   "devDependencies": {
     "awsbox": "*"

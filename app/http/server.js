@@ -6,8 +6,11 @@
 
 require('../../lib/extensions/number');
 
+process.env.PUBLIC_BASE_URL = process.env.PERSONA_AUDIENCE;
+
 const 
 env         = require('../../lib/environment'),
+textEngine  = require('../../lib/text-engine'),
 express     = require('express'),
 logger      = require('../../lib/logger'),
 util        = require('util'),
@@ -16,6 +19,7 @@ connect     = require('connect'),
 RedisStore  = require('connect-redis')(connect),
 engine      = require('ejs-locals'),
 route       = require('./routes'),
+less        = require('less-middleware'),
 application = require('./controllers/application');
 
 var http = express();
@@ -32,13 +36,24 @@ http.configure(function(){
   http.set('views', __dirname + '/views');
   http.set('view engine', 'ejs');
   http.engine('ejs', engine);
+  http.engine('js',  engine);
+  http.engine('tmpl', textEngine);
+
+  http.use(less({
+    src: __dirname + '/public'
+  }));
+
+  http.on('view_locals', function(locals) {
+    extend(locals, require(''));
+  });
 
   http.use(express.logger());
   http.use(express.static(__dirname + '/public'));
   http.use(express.cookieParser());
   http.use(express.bodyParser());
   http.use(express.methodOverride());
-  
+
+
   http.use(connect.session({
     secret: env.get("SESSION_SECRET"),
     store: sessionStore,
@@ -76,4 +91,4 @@ process.on('uncaughtException', function(err) {
 var port = env.get("PORT");
 http.listen(port);
 
-logger.info("HTTP server listening on port " + port + ".");
+logger.info("HTTP server listening on port " + port + " (" + process.env.PUBLIC_BASE_URL + ").");
