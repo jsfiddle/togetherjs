@@ -10,7 +10,6 @@ process.env.PUBLIC_BASE_URL = process.env.PERSONA_AUDIENCE;
 
 const 
 env         = require('../../lib/environment'),
-textEngine  = require('../../lib/text-engine'),
 express     = require('express'),
 logger      = require('../../lib/logger'),
 util        = require('util'),
@@ -37,7 +36,6 @@ http.configure(function(){
   http.set('view engine', 'ejs');
   http.engine('ejs', engine);
   http.engine('js',  engine);
-  http.engine('tmpl', textEngine);
 
   http.use(less({
     src: __dirname + '/public'
