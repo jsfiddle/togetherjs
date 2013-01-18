@@ -1,10 +1,6 @@
-if (typeof Walkabout == "undefined") {
-  if (typeof window == "undefined") {
-    Walkabout = {};
-  } else {
-    window.Walkabout = {};
-  }
-}
+(function () {function init(Walkabout) {
+
+Walkabout = Walkabout || {};
 
 // FIXME: this shouldn't be established so early, in case jquery
 // is loaded after walkabout.js
@@ -1882,3 +1878,22 @@ if (typeof _Walkabout_sitewide != "undefined") {
   Walkabout.options.anyLocalLinks = location.pathname.replace(/\/[^\/]*$/, "/");
   Walkabout.options.loadPersistent = true;
 }
+
+return Walkabout;
+
+}
+
+// Wherein we support a variety of module systems:
+//   exports for CommonJS/Node
+//   define for RequireJS
+//   nothing to export Walkabout
+if (typeof exports != "undefined") {
+  init(exports);
+} else if (typeof define != "undefined") {
+  define(init);
+} else {
+  Walkabout = {};
+  init(Walkabout);
+}
+
+})();
