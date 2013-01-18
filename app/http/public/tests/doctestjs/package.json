@@ -1,0 +1,18 @@
+{
+  "name": "doctest",
+  "version": "0.3",
+  "main": "doctest",
+  "description": "Example-based testing framework",
+  "keywords": [],
+  "author": {
+    "name": "Ian Bicking",
+    "email": "ian@ianbicking.org",
+    "web": "http://ianbicking.org",
+    "twitter": "ianbicking"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ianb/doctestjs.git"
+  }
+}

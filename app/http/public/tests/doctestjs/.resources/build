@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -ex
+
+mv .resources/CNAME CNAME
+mv .resources resources
+
+echo "Updating files with template..."
+
+files="index.html tutorial.html reference.html try.html"
+
+python resources/retemplate.py $files
+for file in $files ; do
+    sed -i '' 's/\.resources/resources/g' $file
+done
