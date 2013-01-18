@@ -1,9 +1,8 @@
-<% layout('layout') -%>
-(function () {
-  var TowTruck = window.TowTruck;
-  var assert = TowTruck.assert;
+define(["util"], function (util) {
+  var elementFinder = util.Module("element-finder");
+  var assert = util.assert;
 
-  TowTruck.elementLocation = function (el) {
+  elementFinder.elementLocation = function elementLocation(el) {
     if (el[0]) {
       // a jQuery element
       el = el[0];
@@ -18,7 +17,7 @@
       return "head";
     }
     var parent = el.parentNode;
-    var parentLocation = TowTruck.elementLocation(parent);
+    var parentLocation = elementLocation(parent);
     if (! parent) {
       throw "No locatable parent found";
     }
@@ -40,7 +39,7 @@
     return parentLocation + ":nth-child(" + (index+1) + ")";
   };
 
-  TowTruck.CannotFind = TowTruck.Class({
+  elementFinder.CannotFind = util.Class({
     constructor: function CannotFind(location, reason, context) {
       this.prefix = "";
       this.location = location;
@@ -52,11 +51,11 @@
         "[CannotFind " + this.prefix +
           "(" + this.location + "): " +
           this.reason + " in " +
-          TowTruck.elementLocation(this.context) + "]");
+          elementFinder.elementLocation(this.context) + "]");
     }
   });
 
-  TowTruck.findElement = function (loc, container) {
+  elementFinder.findElement = function findElement(loc, container) {
     // FIXME: should this all just be done with document.querySelector()?
     // But no!  We can't ignore towtruck elements with querySelector.
     // But maybe!  We *could* make towtruck elements less obtrusive?
@@ -65,9 +64,9 @@
     if (loc.indexOf("body") === 0) {
       el = document.body;
       try {
-        return TowTruck.findElement(loc.substr(("body").length), el);
+        return findElement(loc.substr(("body").length), el);
       } catch (e) {
-        if (e instanceof TowTruck.CannotFind) {
+        if (e instanceof elementFinder.CannotFind) {
           e.prefix = "body" + e.prefix;
         }
         throw e;
@@ -75,9 +74,9 @@
     } else if (loc.indexOf("head") === 0) {
       el = document.head;
       try {
-        return TowTruck.findElement(loc.substr(("head").length), el);
+        return findElement(loc.substr(("head").length), el);
       } catch (e) {
-        if (e instanceof TowTruck.CannotFind) {
+        if (e instanceof elementFinder.CannotFind) {
           e.prefix = "head" + e.prefix;
         }
         throw e;
@@ -94,13 +93,13 @@
       }
       el = document.getElementById(id);
       if (! el) {
-        throw TowTruck.CannotFind("#" + id, "No element by that id", container);
+        throw elementFinder.CannotFind("#" + id, "No element by that id", container);
       }
       if (rest) {
         try {
-          return TowTruck.findElement(rest, el);
+          return findElement(rest, el);
         } catch (e) {
-          if (e instanceof TowTruck.CannotFind) {
+          if (e instanceof elementFinder.CannotFind) {
             e.prefix = "#" + id + e.prefix;
           }
           throw e;
@@ -134,13 +133,13 @@
         }
       }
       if (! el) {
-        throw TowTruck.CannotFind(":nth-child(" + num + ")", "container only has " + (num - count) + " elements", container);
+        throw elementFinder.CannotFind(":nth-child(" + num + ")", "container only has " + (num - count) + " elements", container);
       }
       if (loc) {
         try {
-          return TowTruck.findElement(loc, el);
+          return elementFinder.findElement(loc, el);
         } catch (e) {
-          if (e instanceof TowTruck.CannotFind) {
+          if (e instanceof elementFinder.CannotFind) {
             e.prefix = ":nth-child(" + num + ")" + e.prefix;
           }
           throw e;
@@ -149,8 +148,10 @@
         return el;
       }
     } else {
-      throw TowTruck.CannotFind(loc, "Malformed location", container);
+      throw elementFinder.CannotFind(loc, "Malformed location", container);
     }
   };
 
-})();
+  return elementFinder;
+
+});

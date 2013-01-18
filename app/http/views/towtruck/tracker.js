@@ -1,11 +1,9 @@
-<% layout('layout') -%>
-(function () {
+define(["jquery", "util", "runner", "element-finder"], function ($, util, runner, elementFinder) {
 
-  var TowTruck = window.TowTruck;
-  var $ = TowTruck.$;
-  var assert = TowTruck.assert;
+  var tracker = util.Module("tracker");
+  var assert = util.assert;
 
-  TowTruck.ignoreElement = function (el) {
+  function ignoreElement(el) {
     while (el) {
       if (el.className && (""+el.className).indexOf("towtruck") != -1) {
         return true;
@@ -13,29 +11,29 @@
       el = el.parentNode;
     }
     return false;
-  };
+  }
 
-  TowTruck.initTrackers = function initTrackers() {
+  function initTrackers() {
     if (! initTrackers.done) {
-      TowTruck.trackers.createAll();
+      tracker.trackers.createAll();
       initTrackers.done = true;
     }
-    TowTruck.send({type: "reset-trackers"});
-    TowTruck.trackers.introduceAll();
-  };
+    runner.send({type: "reset-trackers"});
+    tracker.trackers.introduceAll();
+  }
 
-  TowTruck.messageHandler.on("hello hello-back", function () {
-    if (! TowTruck.isClient) {
-      TowTruck.initTrackers();
+  runner.messageHandler.on("hello hello-back", function () {
+    if (! runner.isClient) {
+      initTrackers();
     }
   });
 
-  TowTruck.messageHandler.on("reset-trackers", function () {
-    TowTruck.trackers.reset();
+  runner.messageHandler.on("reset-trackers", function () {
+    tracker.trackers.reset();
   });
 
-  TowTruck.messageHandler.on("connect-tracker", function (msg) {
-    TowTruck.trackers.connect(msg);
+  runner.messageHandler.on("connect-tracker", function (msg) {
+    tracker.trackers.connect(msg);
   });
 
   // This is a kind of registry for trackers.
@@ -45,13 +43,13 @@
   //   the client.
   // * All trackers classes have a .className property (if you give the
   //    constructor a name that will be used)
-  // * On instantiation all trackers get added to TowTruck.trackers.active
+  // * On instantiation all trackers get added to tracker.trackers.active
   //   array
   // * Trackers have a .introduce() method.  This should send an introduction
   //   message, with type: "connect-tracker", and trackerType: Tracker.name
   // * Tracker.fromConnect(msg) creates a tracker, using the message sent
   //   from .introduce()
-  TowTruck.trackers = {
+  tracker.trackers = {
     _trackers: Object.create(null),
     active: [],
     get: function (name) {
@@ -83,7 +81,7 @@
       }
     },
     reset: function () {
-      assert(TowTruck.isClient);
+      assert(runner.isClient);
       while (this.active.length) {
         this.active[0].destroy();
       }
@@ -99,7 +97,7 @@
     }
   };
 
-  TowTruck.TextTracker = TowTruck.Class({
+  tracker.TextTracker = util.Class({
 
     constructor: function TextTracker(options) {
       this.element = $(options.element);
@@ -139,11 +137,11 @@
     },
 
     introduce: function () {
-      TowTruck.send({
+      runner.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id,
-        elementLocation: TowTruck.elementLocation(this.element),
+        elementLocation: elementFinder.elementLocation(this.element),
         value: this.element.val(),
         html: this.element[0].outerHTML
       });
@@ -151,9 +149,9 @@
 
     destroy: function () {
       this.unbindChange();
-      var index = TowTruck.trackers.active.indexOf(this);
+      var index = tracker.trackers.active.indexOf(this);
       if (index != -1) {
-        TowTruck.trackers.active.splice(index, 1);
+        tracker.trackers.active.splice(index, 1);
       }
       this.channel.close();
     },
@@ -248,50 +246,50 @@
 
   });
 
-  TowTruck.TextTracker.createAll = function () {
+  tracker.TextTracker.createAll = function () {
     // These are all the text-like inputs we control in a granular manner
     // (as opposed to fields that we just overwrite, like type=checkbox)
-    assert(! TowTruck.isClient);
+    assert(! runner.isClient);
     var els = $(
       'textarea:visible, ' +
         'input:visible[type="text"], ' +
         'input:visible[type="search"], ' +
         'input:visible[type="url"]');
     els.each(function () {
-      if (TowTruck.ignoreElement(this)) {
+      if (ignoreElement(this)) {
         return;
       }
-      var routeId = "tracker-textarea-" + TowTruck.safeClassName(this.id || TowTruck.generateId());
-      var route = TowTruck.router.makeRoute(routeId);
-      var t = TowTruck.TextTracker({
+      var routeId = "tracker-textarea-" + util.safeClassName(this.id || util.generateId());
+      var route = runner.router.makeRoute(routeId);
+      var t = tracker.TextTracker({
         element: this,
         channel: route,
         isClient: false
       });
-      TowTruck.trackers.active.push(t);
+      tracker.trackers.active.push(t);
     });
   };
 
-  TowTruck.TextTracker.fromConnect = function (msg) {
-    if (! TowTruck.isClient) {
+  tracker.TextTracker.fromConnect = function (msg) {
+    if (! runner.isClient) {
       throw "fromConnect should only be called by the client";
     }
-    var el = TowTruck.findElement(msg.elementLocation);
-    var route = TowTruck.router.makeRoute(msg.routeId);
-    var t = TowTruck.TextTracker({
+    var el = elementFinder.findElement(msg.elementLocation);
+    var route = runner.router.makeRoute(msg.routeId);
+    var t = tracker.TextTracker({
       element: el,
       channel: route,
       isClient: true
     });
-    TowTruck.trackers.active.push(t);
+    tracker.trackers.active.push(t);
     if (msg.value) {
       t.onmessage({op: "init", text: msg.value});
     }
   };
 
-  TowTruck.trackers.register(TowTruck.TextTracker);
+  tracker.trackers.register(tracker.TextTracker);
 
-  TowTruck.FormFieldTracker = TowTruck.Class({
+  tracker.FormFieldTracker = util.Class({
     constructor: function FormFieldTracker(options) {
       this.channel = options.channel;
       this.isClient = options.isClient;
@@ -316,16 +314,16 @@
 
     destroy: function () {
       $(document).off("change", this._selector, this.change);
-      var index = TowTruck.trackers.active.indexOf(this);
+      var index = tracker.trackers.active.indexOf(this);
       if (index != -1) {
-        TowTruck.trackers.active.splice(index, 1);
+        tracker.trackers.active.splice(index, 1);
       }
       this.channel.close();
     },
 
     introduce: function () {
       assert(! this.isClient);
-      TowTruck.send({
+      runner.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id
@@ -336,7 +334,7 @@
 
     change: function (event) {
       var el = $(event.target);
-      var loc = TowTruck.elementLocation(el);
+      var loc = elementFinder.elementLocation(el);
       // FIXME: should check for case issues:
       var isChecked = this._checkedFields.indexOf(el.attr("type")) != -1;
       var msg = {
@@ -352,7 +350,7 @@
 
     onmessage: function (msg) {
       assert(msg.op == "change", msg);
-      var element = $(TowTruck.findElement(msg.elementLocation));
+      var element = $(elementFinder.findElement(msg.elementLocation));
       element.val(msg.value);
       if (msg.checked !== undefined) {
         element[0].checked = msg.checked;
@@ -360,29 +358,29 @@
     }
   });
 
-  TowTruck.FormFieldTracker.createAll = function () {
-    assert(! TowTruck.isClient, "shouldn't be client");
-    var route = TowTruck.router.makeRoute("tracker-formfield");
-    var t = TowTruck.FormFieldTracker({
+  tracker.FormFieldTracker.createAll = function () {
+    assert(! runner.isClient, "shouldn't be client");
+    var route = runner.router.makeRoute("tracker-formfield");
+    var t = tracker.FormFieldTracker({
       channel: route,
       isClient: false
     });
-    TowTruck.trackers.active.push(t);
+    tracker.trackers.active.push(t);
   };
 
-  TowTruck.FormFieldTracker.fromConnect = function (msg) {
-    assert(TowTruck.isClient, "should be client");
-    var route = TowTruck.router.makeRoute(msg.routeId);
-    var t = TowTruck.FormFieldTracker({
+  tracker.FormFieldTracker.fromConnect = function (msg) {
+    assert(runner.isClient, "should be client");
+    var route = runner.router.makeRoute(msg.routeId);
+    var t = tracker.FormFieldTracker({
       channel: route,
       isClient: true
     });
-    TowTruck.trackers.active.push(t);
+    tracker.trackers.active.push(t);
   };
 
-  TowTruck.trackers.register(TowTruck.FormFieldTracker);
+  tracker.trackers.register(tracker.FormFieldTracker);
 
-  TowTruck.CodeMirrorTracker = TowTruck.Class({
+  tracker.CodeMirrorTracker = util.Class({
     constructor: function CodeMirrorTracker(options) {
       this.editor = options.editor;
       this.channel = options.channel;
@@ -411,19 +409,19 @@
 
     introduce: function () {
       assert(! this.isClient);
-      TowTruck.send({
+      runner.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id,
-        elementLocation: TowTruck.elementLocation(this.editor.getWrapperElement()),
+        elementLocation: elementFinder.elementLocation(this.editor.getWrapperElement()),
         value: this.editor.getValue()
       });
     },
 
     destroy: function () {
-      var index = TowTruck.trackers.active.indexOf(this);
+      var index = tracker.trackers.active.indexOf(this);
       if (index != -1) {
-        TowTruck.trackers.active.splice(index, 1);
+        tracker.trackers.active.splice(index, 1);
       }
       this.channel.close();
     },
@@ -473,48 +471,50 @@
     }
   });
 
-  TowTruck.CodeMirrorTracker.createAll = function () {
-    assert(! TowTruck.isClient);
+  tracker.CodeMirrorTracker.createAll = function () {
+    assert(! runner.isClient);
     var els = document.getElementsByTagName("*");
     var len = els.length;
     for (var i=0; i<len; i++) {
       var el = els[i];
-      if (TowTruck.ignoreElement(el)) {
+      if (ignoreElement(el)) {
         continue;
       }
       var editor = el.CodeMirror;
       if (! editor) {
         continue;
       }
-      var route = TowTruck.router.makeRoute("tracker-codemirror-" + TowTruck.safeClassName(el.id || TowTruck.generateId()));
-      var t = TowTruck.CodeMirrorTracker({
+      var route = runner.router.makeRoute("tracker-codemirror-" + util.safeClassName(el.id || util.generateId()));
+      var t = tracker.CodeMirrorTracker({
         editor: editor,
         channel: route,
         isClient: false
       });
-      TowTruck.trackers.active.push(t);
+      tracker.trackers.active.push(t);
     }
   };
 
-  TowTruck.CodeMirrorTracker.fromConnect = function (msg) {
-    var route = TowTruck.router.makeRoute(msg.routeId);
-    var el = TowTruck.findElement(msg.elementLocation);
+  tracker.CodeMirrorTracker.fromConnect = function (msg) {
+    var route = runner.router.makeRoute(msg.routeId);
+    var el = elementFinder.findElement(msg.elementLocation);
     var editor = el.CodeMirror;
     if (! editor) {
       console.warn("CodeMirror has not been activated on element", el);
       return;
     }
-    var t = TowTruck.CodeMirrorTracker({
+    var t = tracker.CodeMirrorTracker({
       editor: editor,
       channel: route,
       isClient: true
     });
-    TowTruck.trackers.active.push(t);
+    tracker.trackers.active.push(t);
     if (msg.value) {
       t.onmessage({op: "init", value: msg.value});
     }
   };
 
-  TowTruck.trackers.register(TowTruck.CodeMirrorTracker);
+  tracker.trackers.register(tracker.CodeMirrorTracker);
 
-})();
+  return tracker;
+
+});

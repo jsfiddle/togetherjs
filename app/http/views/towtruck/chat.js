@@ -1,18 +1,16 @@
-<% layout('layout') -%>
-(function () {
-  var TowTruck = window.TowTruck;
-  var $ = TowTruck.$;
-  var assert = TowTruck.assert;
+define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
+  var chat = util.Module("chat");
+  var assert = util.assert;
 
-  TowTruck.messageHandler.on("chat", function (msg) {
-    TowTruck.addChat({
+  runner.messageHandler.on("chat", function (msg) {
+    ui.addChat({
       type: "text",
       clientId: msg.clientId,
       text: msg.text,
       messageId: msg.messageId
     });
-    if (! TowTruck.isClient) {
-      TowTruck.Chat.addChat({
+    if (! runner.isClient) {
+      chat.Chat.addChat({
         type: "text",
         text: msg.text,
         clientId: msg.clientId,
@@ -22,18 +20,18 @@
     }
   });
 
-  TowTruck.messageHandler.on("bye", function (msg) {
-    TowTruck.addChat({
+  runner.messageHandler.on("bye", function (msg) {
+    chat.addChat({
       type: "left-session",
       clientId: msg.clientId
     });
   });
 
-  TowTruck.messageHandler.on("hello", function () {
-    if (! TowTruck.isClient) {
-      var log = TowTruck.Chat.loadChat();
+  runner.messageHandler.on("hello", function () {
+    if (! runner.isClient) {
+      var log = chat.Chat.loadChat();
       if (log.length) {
-        TowTruck.send({
+        runner.send({
           type: "chat-catchup",
           log: log
         });
@@ -41,13 +39,13 @@
     }
   });
 
-  TowTruck.messageHandler.on("chat-catchup", function (msg) {
-    assert(TowTruck.isClient);
-    if (TowTruck.isChatEmpty()) {
-      TowTruck.addChat({type: "clear"});
+  runner.messageHandler.on("chat-catchup", function (msg) {
+    assert(runner.isClient);
+    if (ui.isChatEmpty()) {
+      chat.addChat({type: "clear"});
       for (var i=0; i<msg.log.length; i++) {
         var l = msg.log[i];
-        TowTruck.addChat({
+        chat.addChat({
           type: "text",
           text: l.text,
           date: l.date,
@@ -62,26 +60,26 @@
   // (if messages come faster than this, they will be kind of combined)
   var MESSAGE_BREAK_TIME = 20000;
 
-  TowTruck.peers.on("update", function (peer) {
-    TowTruck.updatePerson(peer.clientId);
+  runner.peers.on("update", function (peer) {
+    runner.updatePerson(peer.clientId);
   });
 
   // FIXME: this doesn't make sense any more, but I'm not sure what if anything
   // should be done on an avatar update
-  TowTruck.peers.on("add update", function (peer, old) {
-    if (peer.clientId == TowTruck.clientId) {
+  runner.peers.on("add update", function (peer, old) {
+    if (peer.clientId == runner.clientId) {
       return;
     }
     if (peer.avatar && peer.avatar != old.avatar) {
-      var id = "towtuck-avatar-" + TowTruck.safeClassName(peer.clientId);
+      var id = "towtuck-avatar-" + util.safeClassName(peer.clientId);
       var img = $("<img>").attr("src", peer.avatar).css({width: "8em"});
       $("#" + id).remove();
       img.attr("id", id);
-      //TowTruck.addChatElement(img);
+      //ui.addChatElement(img);
     }
   });
 
-  TowTruck.Chat = {
+  chat.Chat = {
     submit: function (message) {
       var parts = message.split(/ /);
       if (parts[0].charAt(0) == "/") {
@@ -95,25 +93,25 @@
       var msg = {
         type: "text",
         text: message,
-        clientId: TowTruck.clientId,
-        messageId: TowTruck.clientId + "-" + Date.now(),
+        clientId: runner.clientId,
+        messageId: runner.clientId + "-" + Date.now(),
         date: Date.now()
       };
-      TowTruck.send({
+      runner.send({
         type: "chat",
         text: message,
         messageId: msg.messageId
       });
-      TowTruck.addChat(msg);
-      if (! TowTruck.isClient) {
+      ui.addChat(msg);
+      if (! runner.isClient) {
         this.addChat(msg);
       }
     },
 
     command_tab: function () {
-      var newSetting = TowTruck.settings("tabIndependent");
-      TowTruck.settings("tabIndependent", newSetting);
-      TowTruck.addChat({
+      var newSetting = runner.settings("tabIndependent");
+      runner.settings("tabIndependent", newSetting);
+      chat.addChat({
         type: "system",
         text: (newSetting ? "Tab independence turned on" : "Tab independence turned off") +
           " reload needed"
@@ -121,17 +119,19 @@
     },
 
     command_help: function () {
-      var msg = TowTruck.trim(TowTruck.templates.help({
-        tabIndependent: TowTruck.settings("tabIndependent")
+      var msg = util.trim(runner.templates.help({
+        tabIndependent: runner.settings("tabIndependent")
       }));
-      TowTruck.addChat({
+      chat.addChat({
         type: "system",
         text: msg
       });
     },
 
     command_test: function (args) {
-      args = TowTruck.trim(args || "").split(/\s+/g);
+      // FIXME: I don't think this really works?  Need some deferred call
+      var Walkabout = require("libs/walkabout.js/walkabout.js");
+      args = util.trim(args || "").split(/\s+/g);
       if (args[0] === "" || ! args.length) {
         if (this._testCancel) {
           args = ["cancel"];
@@ -140,7 +140,7 @@
         }
       }
       if (args[0] == "cancel") {
-        TowTruck.addChat({
+        chat.addChat({
           type: "system",
           text: "Aborting test"
         });
@@ -153,12 +153,12 @@
         if (isNaN(times) || ! times) {
           times = 100;
         }
-        TowTruck.addChat({
+        chat.addChat({
           type: "system",
           text: "Testing with walkabout.js"
         });
-        var tmpl = $(TowTruck.templates.walkabout({}));
-        var container = TowTruck.container.find(".towtruck-test-container");
+        var tmpl = $(runner.templates.walkabout({}));
+        var container = ui.container.find(".towtruck-test-container");
         container.empty();
         container.append(tmpl);
         container.show();
@@ -198,14 +198,14 @@
       }
       if (args[0] == "describe") {
         Walkabout.findActions().forEach(function (action) {
-          TowTruck.addChat({
+          chat.addChat({
             type: "system",
             text: action.description()
           });
         }, this);
         return;
       }
-      TowTruck.addChat({
+      chat.addChat({
         type: "system",
         text: "Did not understand: " + args.join(" ")
       });
@@ -215,7 +215,7 @@
     _testShow: [],
 
     command_clear: function () {
-      TowTruck.addChat({
+      chat.addChat({
         type: "clear"
       });
       this.clearHistory();
@@ -226,7 +226,7 @@
     maxLogMessages: 100,
 
     addChat: function (obj) {
-      assert(! TowTruck.isClient);
+      assert(! runner.isClient);
       var log = this.loadChat();
       log.push(obj);
       // Cull old entries:
@@ -263,19 +263,19 @@
 
   };
 
-  TowTruck.on("ui-ready", function () {
-    if (TowTruck.isClient) {
+  util.on("ui-ready", function () {
+    if (runner.isClient) {
       // If we're a client, the master will send the messages
       return;
     }
-    if (! TowTruck.isChatEmpty()) {
+    if (! ui.isChatEmpty()) {
       return;
     }
-    var log = TowTruck.Chat.loadChat();
+    var log = chat.Chat.loadChat();
     for (var i=0; i<log.length; i++) {
       var l = log[i];
       // FIXME: duplicated from chat-catchup
-      TowTruck.addChat({
+      chat.addChat({
         type: "text",
         text: l.text,
         date: l.date,
@@ -285,4 +285,6 @@
     }
   });
 
-})();
+  return chat;
+
+});

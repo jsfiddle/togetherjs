@@ -1,51 +1,47 @@
-<% layout('layout') -%>
-(function () {
-  var TowTruck = window.TowTruck;
-  var $ = TowTruck.$;
-  var _ = TowTruck._;
-
+define(["jquery", "util", "channels"], function ($, util, channels) {
+  var runner = util.Module("runner");
   /* This is used for dynamic components that want to get access to a stream, such
      as individual textareas */
-  TowTruck.router = TowTruck.Router();
+  runner.router = channels.Router();
 
   /* This initializes TowTruck generally, setting up the ID if necessary,
      and opening the channel */
-  TowTruck.init = function () {
-    if (! TowTruck.shareId) {
-      TowTruck.shareId = TowTruck.generateId();
-      TowTruck.emit("shareId");
+  runner.init = function () {
+    if (! runner.shareId) {
+      runner.shareId = util.generateId();
+      util.emit("shareId");
       // FIXME: this could wipe the app's hash state
       var hash = location.hash;
       hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
-      location.hash = "&towtruck-head-" + TowTruck.shareId;
+      location.hash = "&towtruck-head-" + runner.shareId;
     }
-    if (! TowTruck.channel) {
-      console.log("connecting to", TowTruck.hubUrl());
-      TowTruck.channel = new TowTruck.WebSocketChannel(TowTruck.hubUrl());
-      TowTruck.channel.onmessage = TowTruck.messageHandler.onmessage.bind(TowTruck.messageHandler);
-      TowTruck.router.bindChannel(TowTruck.channel);
+    if (! runner.channel) {
+      console.log("connecting to", runner.hubUrl());
+      runner.channel = new channels.WebSocketChannel(runner.hubUrl());
+      runner.channel.onmessage = runner.messageHandler.onmessage.bind(runner.messageHandler);
+      runner.router.bindChannel(runner.channel);
       send({
         type: "hello",
-        nickname: TowTruck.settings("nickname"),
-        avatar: TowTruck.settings("avatar"),
-        rtcSupported: TowTruck.RTCSupported
+        nickname: runner.settings("nickname"),
+        avatar: runner.settings("avatar"),
+        rtcSupported: runner.RTCSupported
       });
     }
   };
 
   /* Sends a message to all peers.  Sets the clientId so everyone knows where the
      message comes from */
-  var send = TowTruck.send = function (msg) {
+  var send = runner.send = function (msg) {
     console.log("Sending message:", msg);
-    msg.clientId = TowTruck.clientId;
-    TowTruck.channel.send(msg);
+    msg.clientId = runner.clientId;
+    runner.channel.send(msg);
   };
 
   /* This of all peers.  The "system" peer is for internal messages. */
-  TowTruck.peers = TowTruck.mixinEvents({
+  runner.peers = util.mixinEvents({
     _peers: {},
     get: function (id) {
-      return TowTruck.extend(this._peers[id]);
+      return util.extend(this._peers[id]);
     },
     add: function (peer) {
       var event = "add";
@@ -66,7 +62,7 @@
     }
   });
 
-  TowTruck.peers.add({
+  runner.peers.add({
     clientId: "system",
     nickname: "system"
   });
@@ -74,9 +70,9 @@
   /* Handles all incoming messages.  Consumers who want to listen for certain
      kinds of messages should do:
 
-       TowTruck.messagesHandler.on("message-type", handler);
+       runner.messagesHandler.on("message-type", handler);
   */
-  TowTruck.messageHandler = TowTruck.mixinEvents({
+  runner.messageHandler = util.mixinEvents({
     onmessage: function (msg) {
       console.log("Incoming message:", msg);
       this.emit(msg.type, msg);
@@ -84,13 +80,13 @@
   });
 
   /* Always say hello back, and keep track of peers: */
-  TowTruck.messageHandler.on("hello hello-back", function (msg) {
+  runner.messageHandler.on("hello hello-back", function (msg) {
     if (msg.type == "hello") {
       send({
         type: "hello-back",
-        nickname: TowTruck.settings("nickname"),
-        avatar: TowTruck.settings("avatar"),
-        rtcSupported: TowTruck.RTCSupported
+        nickname: runner.settings("nickname"),
+        avatar: runner.settings("avatar"),
+        rtcSupported: runner.RTCSupported
       });
     }
     var peer = {
@@ -98,27 +94,29 @@
       nickname: msg.nickname,
       rtcSupported: msg.rtcSupported
     };
-    TowTruck.peers.add(peer);
+    runner.peers.add(peer);
   });
 
   /* Updates to the nickname of peers: */
-  TowTruck.messageHandler.on("nickname-update", function (msg) {
-    var peer = TowTruck.peers.get(msg.clientId);
+  runner.messageHandler.on("nickname-update", function (msg) {
+    var peer = runner.peers.get(msg.clientId);
     if (msg.nickname) {
       peer.nickname = msg.nickname;
     }
     if (msg.avatar) {
       peer.avatar = msg.avatar;
     }
-    TowTruck.peers.add(peer);
+    runner.peers.add(peer);
   });
 
   /* Starts TowTruck, when initiated by the user, showing the share link etc. */
-  TowTruck.start = function () {
-    TowTruck.activateUI();
+  runner.start = function () {
+    require(["ui"], function (ui) {
+      ui.activateUI();
+    });
   };
 
-  TowTruck.on("close", function () {
+  util.on("close", function () {
     var hash = location.hash.replace(/^#*/, "");
     if (hash) {
       if (hash.search(/^towtruck-/) === 0) {
@@ -127,46 +125,46 @@
     }
   });
 
-  TowTruck.stop = function () {
+  runner.stop = function () {
     send({type: "bye"});
     // FIXME: should emit this on something else:
-    TowTruck.emit("close");
-    TowTruck.channel.close();
-    TowTruck.channel = null;
+    util.emit("close");
+    runner.channel.close();
+    runner.channel = null;
     var hash = location.hash;
     hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
     if (hash != location.hash) {
       location.hash = hash;
     }
-    TowTruck.shareId = null;
-    TowTruck.emit("shareId");
+    runner.shareId = null;
+    util.emit("shareId");
   };
 
-  TowTruck.hubUrl = function () {
-    if (! TowTruck.shareId) {
+  runner.hubUrl = function () {
+    if (! runner.shareId) {
       throw "URL cannot be resolved before TowTruck.shareId has been initialized";
     }
-    return startTowTruck.hubBase + "/hub/" + TowTruck.shareId;
+    return startTowTruck.hubBase + "/hub/" + runner.shareId;
   };
 
-  TowTruck.shareUrl = function () {
+  runner.shareUrl = function () {
     var hash = location.hash;
     hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
     hash = hash || "#";
     return location.protocol + "//" + location.host + location.pathname +
-           hash + "&towtruck-" + TowTruck.shareId;
+           hash + "&towtruck-" + runner.shareId;
   };
 
-  TowTruck.settings = TowTruck.mixinEvents(function (name, value) {
-    var curSettings = localStorage.getItem(TowTruck.settings.localStorageName);
+  runner.settings = util.mixinEvents(function (name, value) {
+    var curSettings = localStorage.getItem(runner.settings.localStorageName);
     if (curSettings) {
       curSettings = JSON.parse(curSettings);
     } else {
       curSettings = {};
     }
-    for (var a in TowTruck.settings.defaults) {
+    for (var a in runner.settings.defaults) {
       if (! curSettings.hasOwnProperty(a)) {
-        curSettings[a] = TowTruck.settings.defaults[a];
+        curSettings[a] = runner.settings.defaults[a];
       }
     }
     if (name === undefined) {
@@ -179,55 +177,49 @@
       return curSettings[name];
     } else {
       curSettings[name] = value;
-      localStorage.setItem(TowTruck.settings.localStorageName, JSON.stringify(curSettings));
-      TowTruck.settings.emit("change", name, value);
+      localStorage.setItem(runner.settings.localStorageName, JSON.stringify(curSettings));
+      runner.settings.emit("change", name, value);
       return value;
     }
   });
   // FIXME: watch for "storage" event to track changes in another tab
   // cache?
 
-  TowTruck.settings.defaults = {
+  runner.settings.defaults = {
     tabIndependent: false,
     nickname: "",
     avatar: null
   };
 
-  TowTruck.settings.localStorageName = "TowTruck.settings";
+  runner.settings.localStorageName = "TowTruck.settings";
 
-  if (TowTruck.settings("tabIndependent")) {
+  if (runner.settings("tabIndependent")) {
     // FIXME: find some way when tab independent to use a local set of settings
     // (gets tricky because the tabIndependent name shouldn't be local)
-    TowTruck.clientId = window.name;
-    if (! TowTruck.clientId) {
-      TowTruck.clientId = window.name = TowTruck.generateId();
+    runner.clientId = window.name;
+    if (! runner.clientId) {
+      runner.clientId = window.name = runner.generateId();
     }
   } else {
-    TowTruck.clientId = localStorage.getItem("TowTruck.clientId");
-    if (! TowTruck.clientId) {
-      TowTruck.clientId = TowTruck.generateId();
-      localStorage.setItem("TowTruck.clientId", TowTruck.clientId);
+    runner.clientId = localStorage.getItem("TowTruck.clientId");
+    if (! runner.clientId) {
+      runner.clientId = runner.generateId();
+      localStorage.setItem("TowTruck.clientId", runner.clientId);
     }
   }
-  TowTruck.peers.add({
-    clientId: TowTruck.clientId,
+
+  runner.peers.add({
+    clientId: runner.clientId,
     nickname: "me"
   });
 
+  // FIXME: this is a fake version of a template, since we don't care about
+  // _.template anymore:
   function makeTemplate(name, source) {
     var tmpl;
-    try {
-      tmpl = _.template(source);
-    } catch (e) {
-      console.warn("Error compiling", name, ":", e, "\n", source);
-      tmpl = function (vars) {
-        var s = $("<div>");
-        s.append($("<span>Error:</span>"), $("<span>").text(e));
-        s.append($("<pre>").text(source));
-        return s[0].outerHTML;
-      };
-    }
-    return tmpl;
+    return function () {
+      return source;
+    };
   }
 
   function boot() {
@@ -236,33 +228,31 @@
     if (start) {
       var activateOnStart = "towtruck-chat";
       if (typeof start == "string" && start.indexOf("head-") === 0) {
-        TowTruck.shareId = start.substr(5);
-        TowTruck.emit("shareId");
-        TowTruck.isClient = false;
+        runner.shareId = start.substr(5);
+        util.emit("shareId");
+        runner.isClient = false;
       } else if (typeof start == "string") {
-        TowTruck.shareId = start;
-        TowTruck.emit("shareId");
-        TowTruck.isClient = true;
+        runner.shareId = start;
+        util.emit("shareId");
+        runner.isClient = true;
       } else {
-        TowTruck.isClient = false;
+        runner.isClient = false;
         activateOnStart = "towtruck-info";
       }
-      TowTruck.init();
-      TowTruck.start();
-      TowTruck.activateTab(activateOnStart);
+      runner.init();
+      runner.start();
+      require(["ui"], function (ui) {
+        ui.activateTab(activateOnStart);
+      });
       delete window._startTowTruckImmediately;
     }
   }
 
-  TowTruck.templates = {
+  runner.templates = {
     chat: makeTemplate("chat", "<%- read('chat.tmpl')%>"),
     help: makeTemplate("help", "<%- read('help.tmpl')%>"),
     walkabout: makeTemplate("walkabout", "<%- read('walkabout.tmpl')%>")
   };
-
-  // For ShareJS setup:
-  window.WEB = true;
-  window.sharejs = {};
 
   if (window._TowTruckOnLoad) {
     window._TowTruckOnLoad(boot);
@@ -270,4 +260,9 @@
     boot();
   }
 
-})();
+  // These inject extra features just during loading:
+  require(["ui", "chat", "pointer", "tracker", "webrtc"]);
+
+  return runner;
+
+});

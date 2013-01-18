@@ -1,4 +1,3 @@
-<% layout('layout') -%>
 /* Channel abstraction.  Supported channels:
 
 - WebSocket to an address
@@ -31,8 +30,9 @@ is not fully established yet.
 
 */
 
-(function () {
+define(["util"], function (util) {
 
+var channels = util.Module("channels");
 /* Subclasses must define:
 
 - ._send(string)
@@ -48,9 +48,7 @@ And must call:
 - emit("close")
 */
 
-var TowTruck = window.TowTruck;
-
-var AbstractChannel = TowTruck.mixinEvents({
+var AbstractChannel = util.mixinEvents({
   onmessage: null,
   rawdata: false,
   onclose: null,
@@ -100,7 +98,7 @@ var AbstractChannel = TowTruck.mixinEvents({
 });
 
 
-var WebSocketChannel = TowTruck.Class(AbstractChannel, {
+channels.WebSocketChannel = util.Class(AbstractChannel, {
 
   constructor: function (address) {
     if (address.search(/^https?:/i) === 0) {
@@ -159,7 +157,7 @@ var WebSocketChannel = TowTruck.Class(AbstractChannel, {
       this.socket = null;
       var method = "error";
       if (event.wasClean) {
-        var method = "log";
+        method = "log";
       }
       console[method]('WebSocket close', event.wasClean ? 'clean' : 'unclean',
                       'code:', event.code, 'reason:', event.reason || 'none');
@@ -181,7 +179,7 @@ var WebSocketChannel = TowTruck.Class(AbstractChannel, {
 
 
 /* Sends TO a window or iframe */
-var PostMessageChannel = TowTruck.Class(AbstractChannel, {
+channels.PostMessageChannel = util.Class(AbstractChannel, {
   _pingPollPeriod: 100, // milliseconds
   _pingPollIncrease: 100, // +100 milliseconds for each failure
   _pingMax: 2000, // up to a max of 2000 milliseconds
@@ -296,7 +294,7 @@ var PostMessageChannel = TowTruck.Class(AbstractChannel, {
 
 
 /* Handles message FROM an exterior window/parent */
-var PostMessageIncomingChannel = TowTruck.Class(AbstractChannel, {
+channels.PostMessageIncomingChannel = util.Class(AbstractChannel, {
 
   constructor: function (expectedOrigin) {
     this.source = null;
@@ -363,7 +361,7 @@ var PostMessageIncomingChannel = TowTruck.Class(AbstractChannel, {
 
 });
 
-var Router = TowTruck.Class(TowTruck.mixinEvents({
+channels.Router = util.Class(util.mixinEvents({
 
   constructor: function (channel) {
     this._channelMessage = this._channelMessage.bind(this);
@@ -419,14 +417,14 @@ var Router = TowTruck.Class(TowTruck.mixinEvents({
   },
 
   makeRoute: function (id) {
-    id = id || TowTruck.generateId();
+    id = id || util.generateId();
     var route = Route(this, id);
     this._routes[id] = route;
     return route;
   }
 }));
 
-var Route = TowTruck.Class(TowTruck.mixinEvents({
+var Route = util.Class(util.mixinEvents({
   constructor: function (router, id) {
     this.router = router;
     this.id = id;
@@ -457,9 +455,6 @@ var Route = TowTruck.Class(TowTruck.mixinEvents({
 
 }));
 
-TowTruck.WebSocketChannel = WebSocketChannel;
-TowTruck.PostMessageChannel = PostMessageChannel;
-TowTruck.PostMessageIncomingChannel = PostMessageIncomingChannel;
-TowTruck.Router = Router;
+return channels;
 
-})();
+});

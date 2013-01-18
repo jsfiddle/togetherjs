@@ -1,9 +1,7 @@
-<% layout('layout') -%>
 /* Implements the pointing part of the UI */
-(function () {
-  var TowTruck = window.TowTruck;
-  var $ = TowTruck.$;
-  var assert = TowTruck.assert;
+define(["jquery", "util", "runner"], function ($, util, runner) {
+  var pointer = util.Module("pointer");
+  var assert = util.assert;
 
   $(document).on("mousedown", ".towtruck-chat-real", function (event) {
     var el = $(event.target).closest(".towtruck-chat-real"); // or $(this)?
@@ -62,7 +60,7 @@
         el.find(".towtruck-arrow-control").hide();
         el.find(".towtruck-arrow-control").show().unbind("click", arrowCheck);
       } else if (endX !== undefined) {
-        TowTruck.send({
+        runner.send({
           type: "pointer",
           messageId: messageId,
           top: endY,
@@ -72,7 +70,7 @@
     });
   });
 
-  TowTruck.messageHandler.on("pointer", function (msg) {
+  runner.messageHandler.on("pointer", function (msg) {
     var arrowId = "towtruck-chat-arrow-" + msg.messageId;
     var arrow = $("#" + arrowId);
     if (! arrow.length) {
@@ -147,4 +145,6 @@
     return false;
   }
 
-})();
+  return pointer;
+
+});

@@ -1,19 +1,8 @@
-<% layout('layout') -%>
-(function () {
-  if (! window.TowTruck) {
-    window.TowTruck = {};
-  }
-  var TowTruck = window.TowTruck;
-  var $ = window.jQuery;
-  $.noConflict();
-  TowTruck.$ = $;
-  var _ = window._;
-  _.noConflict();
-  TowTruck._ = _;
-
+define([], function () {
+  var util = {};
   /* A simple class pattern, use like:
 
-    var Foo = TowTruck.Class({
+    var Foo = util.Class({
       constructor: function (a, b) {
         init the class
       },
@@ -25,7 +14,7 @@
   Instantiation does not require "new"
 
   */
-  TowTruck.Class = function (superClass, prototype) {
+  util.Class = function (superClass, prototype) {
     if (prototype === undefined) {
       prototype = superClass;
     } else {
@@ -48,7 +37,7 @@
   };
 
   /* Extends obj with other, or copies obj if no other is given. */
-  TowTruck.extend = function (obj, other) {
+  util.extend = function (obj, other) {
     if (other === undefined) {
       other = obj;
       obj = {};
@@ -62,35 +51,35 @@
   };
 
   /* Trim whitespace from a string */
-  TowTruck.trim = function trim(s) {
+  util.trim = function trim(s) {
     return s.replace(/^\s+/, "").replace(/\s+$/, "");
   };
 
   /* Convert a string into something safe to use as an HTML class name */
-  TowTruck.safeClassName = function safeClassName(name) {
+  util.safeClassName = function safeClassName(name) {
     return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
   };
 
-  TowTruck.AssertionError = function (msg) {
+  util.AssertionError = function (msg) {
     this.message = msg;
     this.toString = function () {
       return "Assertion error: " + (this.message || "?");
     };
   };
 
-  TowTruck.assert = function (cond) {
+  util.assert = function (cond) {
     if (! cond) {
       var args = ["Assertion error:"].concat(Array.prototype.slice.call(arguments, 1));
       console.error.apply(console, args);
       if (console.trace) {
         console.trace();
       }
-      throw new TowTruck.AssertionError(args.join(" "));
+      throw new util.AssertionError(args.join(" "));
     }
   };
 
   /* Generates a random ID */
-  TowTruck.generateId = function (length) {
+  util.generateId = function (length) {
     length = length || 10;
     var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
     var s = '';
@@ -100,7 +89,7 @@
     return s;
   };
 
-  TowTruck.mixinEvents = function (proto) {
+  util.mixinEvents = function (proto) {
     proto.on = function on(name, callback) {
       if (name.search(" ") != -1) {
         var names = name.split(/ +/g);
@@ -149,6 +138,16 @@
     return proto;
   };
 
-  TowTruck.mixinEvents(TowTruck);
+  util.mixinEvents(util);
 
-})();
+  util.Module = util.Class({
+    constructor: function (name) {
+      this._name = name;
+    },
+    toString: function () {
+      return '[Module ' + this._name + ']';
+    }
+  });
+
+  return util;
+});

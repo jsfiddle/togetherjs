@@ -21,6 +21,9 @@
   ];
 
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
+  // FIXME: we could/should use a version from the checkout, at least
+  // for production
+  var cacheBust = Date.now();
 
   // FIXME: I think there's an event that would be called before load?
   window.addEventListener("load", function () {
@@ -52,10 +55,11 @@
   }
 
   var startTowTruck = window.startTowTruck = function () {
-    if (typeof TowTruck !== "undefined") {
-      TowTruck.isClient = false;
-      TowTruck.init();
-      TowTruck.start();
+    if (startTowTruck.loaded) {
+      var runner = startTowTruck.require("runner");
+      runner.isClient = false;
+      runner.init();
+      runner.start();
       return;
     }
     // A sort of signal to towtruck-runner.js to tell it to actually
@@ -68,24 +72,28 @@
     window._TowTruckOnLoad = function (callback) {
       callbacks.push(callback);
     };
-    var start = window._TowTruck_notify_script = function(name) {
-      console.log("_TowTruck_notify_script called: " + name);
-      var index = scripts.indexOf(name) + 1;
-      
-      if (index >= scripts.length) {
-        delete window._TowTruck_notify_script;
+    var oldRequire = window.require;
+    var oldDefine = window.define;
+    require = {
+      baseUrl: baseUrl + "/towtruck",
+      urlArgs: "bust=" + cacheBust,
+      deps: ["runner"],
+      callback: function () {
+        startTowTruck.loaded = true;
+        startTowTruck.require = require;
+        startTowTruck.define = define;
+        var runner = require("runner");
+        runner.isClient = false;
+        runner.init();
+        runner.start();
+        //require = oldRequire;
+        //define = oldDefine;
         callbacks.forEach(function (c) {
           c();
         });
-        delete window._TowTruckOnLoad;
-      } else {
-        var tag = document.createElement("script");
-        tag.src = baseUrl + scripts[index] + "?cache=" + Date.now();
-        console.log({"appending": tag.src});
-        document.head.appendChild(tag);
       }
     };
-    start();
+    addScript("/towtruck/require.js");
   };
 
   startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";
