@@ -21,7 +21,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
   });
 
   runner.messageHandler.on("bye", function (msg) {
-    chat.addChat({
+    ui.addChat({
       type: "left-session",
       clientId: msg.clientId
     });
@@ -40,12 +40,12 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
   });
 
   runner.messageHandler.on("chat-catchup", function (msg) {
-    assert(runner.isClient);
+    assert(runner.isClient, "Master received chat-catchup", runner.isClient);
     if (ui.isChatEmpty()) {
-      chat.addChat({type: "clear"});
+      ui.addChat({type: "clear"});
       for (var i=0; i<msg.log.length; i++) {
         var l = msg.log[i];
-        chat.addChat({
+        ui.addChat({
           type: "text",
           text: l.text,
           date: l.date,
@@ -61,7 +61,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
   var MESSAGE_BREAK_TIME = 20000;
 
   runner.peers.on("update", function (peer) {
-    runner.updatePerson(peer.clientId);
+    ui.updatePerson(peer.clientId);
   });
 
   // FIXME: this doesn't make sense any more, but I'm not sure what if anything
@@ -111,7 +111,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     command_tab: function () {
       var newSetting = runner.settings("tabIndependent");
       runner.settings("tabIndependent", newSetting);
-      chat.addChat({
+      ui.addChat({
         type: "system",
         text: (newSetting ? "Tab independence turned on" : "Tab independence turned off") +
           " reload needed"
@@ -122,7 +122,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       var msg = util.trim(runner.templates.help({
         tabIndependent: runner.settings("tabIndependent")
       }));
-      chat.addChat({
+      ui.addChat({
         type: "system",
         text: msg
       });
@@ -140,7 +140,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
         }
       }
       if (args[0] == "cancel") {
-        chat.addChat({
+        ui.addChat({
           type: "system",
           text: "Aborting test"
         });
@@ -153,7 +153,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
         if (isNaN(times) || ! times) {
           times = 100;
         }
-        chat.addChat({
+        ui.addChat({
           type: "system",
           text: "Testing with walkabout.js"
         });
@@ -198,14 +198,14 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       }
       if (args[0] == "describe") {
         Walkabout.findActions().forEach(function (action) {
-          chat.addChat({
+          ui.addChat({
             type: "system",
             text: action.description()
           });
         }, this);
         return;
       }
-      chat.addChat({
+      ui.addChat({
         type: "system",
         text: "Did not understand: " + args.join(" ")
       });
@@ -215,10 +215,30 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     _testShow: [],
 
     command_clear: function () {
-      chat.addChat({
+      ui.addChat({
         type: "clear"
       });
       this.clearHistory();
+    },
+
+    command_exec: function () {
+      var expr = Array.prototype.slice.call(arguments).join(" ");
+      var result;
+      var e = eval;
+      try {
+        result = eval(expr);
+      } catch (e) {
+        ui.addChat({
+          type: "system",
+          text: "Error: " + e
+        });
+      }
+      if (result !== undefined) {
+        ui.addChat({
+          type: "system",
+          text: "" + result
+        });
+      }
     },
 
     storageKey: "towtruck.chatlog",
@@ -275,7 +295,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     for (var i=0; i<log.length; i++) {
       var l = log[i];
       // FIXME: duplicated from chat-catchup
-      chat.addChat({
+      ui.addChat({
         type: "text",
         text: l.text,
         date: l.date,
