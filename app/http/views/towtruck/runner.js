@@ -3,10 +3,12 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
   /* This is used for dynamic components that want to get access to a stream, such
      as individual textareas */
   runner.router = channels.Router();
+  var assert = util.assert;
 
   /* This initializes TowTruck generally, setting up the ID if necessary,
      and opening the channel */
   runner.init = function () {
+    assert(! runner.init.started, "Called init twice");
     if (! runner.shareId) {
       runner.shareId = util.generateId();
       util.emit("shareId");
@@ -16,8 +18,8 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
       location.hash = "&towtruck-head-" + runner.shareId;
     }
     if (! runner.channel) {
-      console.log("connecting to", runner.hubUrl());
-      runner.channel = new channels.WebSocketChannel(runner.hubUrl());
+      console.log("connecting to", runner.hubUrl(), 'client:', runner.isClient);
+      runner.channel = channels.WebSocketChannel(runner.hubUrl());
       runner.channel.onmessage = runner.messageHandler.onmessage.bind(runner.messageHandler);
       runner.router.bindChannel(runner.channel);
       send({
@@ -27,6 +29,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
         rtcSupported: runner.RTCSupported
       });
     }
+    runner.init.started = true;
   };
 
   /* Sends a message to all peers.  Sets the clientId so everyone knows where the
@@ -138,6 +141,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
     }
     runner.shareId = null;
     util.emit("shareId");
+    runner.init.started = false;
   };
 
   runner.hubUrl = function () {
@@ -149,9 +153,14 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
 
   runner.shareUrl = function () {
     var hash = location.hash;
+    var m = /\?[^#]*/.exec(location.href);
+    var query = "";
+    if (m) {
+      query = m[0];
+    }
     hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
     hash = hash || "#";
-    return location.protocol + "//" + location.host + location.pathname +
+    return location.protocol + "//" + location.host + location.pathname + query +
            hash + "&towtruck-" + runner.shareId;
   };
 
@@ -226,6 +235,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
     var start = window._startTowTruckImmediately;
     /* Bootstrapping code, for use with startTowTruck: */
     if (start) {
+      console.log("starting with", start);
       var activateOnStart = "towtruck-chat";
       if (typeof start == "string" && start.indexOf("head-") === 0) {
         runner.shareId = start.substr(5);
@@ -239,11 +249,13 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
         runner.isClient = false;
         activateOnStart = "towtruck-info";
       }
+      util.on("ui-ready", function () {
+        require(["ui"], function (ui) {
+          ui.activateTab(activateOnStart);
+        });
+      });
       runner.init();
       runner.start();
-      require(["ui"], function (ui) {
-        ui.activateTab(activateOnStart);
-      });
       delete window._startTowTruckImmediately;
     }
   }
