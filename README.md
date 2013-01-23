@@ -11,6 +11,8 @@ Setup
 
 It's recommended that you use Foreman to run your development servers. "Why?", you ask. Here's a great intro: [Introducing Foreman](http://blog.daviddollar.org/2011/05/06/introducing-foreman.html).
 
+Foreman is a [Ruby](http://www.ruby-lang.org/) project the easiest way to get it running locally is to be using a relatively recent version of Ruby and Gem and execute: `gem install foreman`. You may need administrator access to do this, in which case you should run it with sudo.
+
 ### Configuration for Foreman
 
 Copy and edit your .env file. -- This should never be committed to the repo.
