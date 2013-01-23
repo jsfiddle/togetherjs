@@ -32,6 +32,9 @@ define([], function () {
     ClassObject.prototype = prototype;
     if (prototype.constructor.name) {
       ClassObject.className = prototype.constructor.name;
+      ClassObject.toString = function () {
+        return '[Class ' + this.className + ']';
+      };
     }
     return ClassObject;
   };
