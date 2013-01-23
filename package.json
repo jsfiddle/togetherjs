@@ -25,7 +25,7 @@
     "less-middleware": "~0.1.9"
   },
   "devDependencies": {
-    "awsbox": "*"
+    "awsbox": "git://github.com/simonwex/awsbox.git#master"
   },
   "engine": "node >= 0.8"
 }
