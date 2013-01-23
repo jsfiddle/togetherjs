@@ -457,9 +457,11 @@
 
 
 .towtruck-container .towtruck-upper-box {
-	height:349px;
+	height:149px;
 	overflow-y:hidden;
 	background:#fff;
+	position:relative;
+	z-index:7;
 }
 
 .towtruck-container .towtruck-lower-box {
@@ -472,6 +474,25 @@
 
 .towtruck-container .towtruck-chat {
 	height:100%;
+}
+
+
+.towtruck-container .towtruck-chat .video-box {
+	height:270px;
+	position:relative;
+	z-index:999;
+}
+
+.towtruck-container .towtruck-chat .video-screen {
+	background:#6b7b88 url(http://localhost:8080/images/icn-link.png);
+	height:100%;
+}
+
+.towtruck-container .towtruck-chat .video-toolbox {
+	background:rgba(0,0,0,0.5);
+	height:20%;
+	position:relative;
+	top:-20%;
 }
 
 .towtruck-container input.towtruck-chat-input {
