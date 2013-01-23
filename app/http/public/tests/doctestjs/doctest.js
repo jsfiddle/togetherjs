@@ -1194,18 +1194,19 @@ HTMLParser.prototype = {
           h3.appendChild(document.createTextNode(texts[0].header));
           el.parentNode.insertBefore(h3, el);
         }
-        // Ignore first header I guess
+        var last = el;
         for (var i=1; i<texts.length; i++) {
           var pre = document.createElement('pre');
           pre.className = el.className;
           pre.appendChild(document.createTextNode(texts[i].body));
-          el.parentNode.insertBefore(pre, el.nextSibling);
+          last.parentNode.insertBefore(pre, last.nextSibling);
           if (texts[i].header) {
             var h3 = document.createElement('h3');
             h3.className = 'doctest-section-header';
             h3.appendChild(document.createTextNode(texts[i].header));
-            el.parentNode.insertBefore(h3, el.nextSibling);
+            pre.parentNode.insertBefore(h3, pre);
           }
+          last = pre;
         }
       }
     }
@@ -1532,7 +1533,11 @@ var Spy = exports.Spy = function (name, options, extraOptions) {
     self.selfList.push(this);
     // It might be possible to get the caller?
     if (self.writes) {
-      writeln(self.formatCall());
+      if (typeof writeln == "undefined") {
+        console.warn("Spy writing outside of test:", self.formatCall());
+      } else {
+        writeln(self.formatCall());
+      }
     }
     if (self.throwError) {
       var throwError = self.throwError;
@@ -1545,7 +1550,7 @@ var Spy = exports.Spy = function (name, options, extraOptions) {
       try {
         return self.applies.apply(this, arguments);
       } catch (e) {
-        console.error('Error in ' + this.repr() + '.applies:', e);
+        console.error('Error in ' + self.repr() + '.applies:', e);
         throw e;
       }
     }
