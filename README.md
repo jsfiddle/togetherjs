@@ -1,5 +1,10 @@
-Tow Truck - Who you call when you get stuck
+TowTruck - Who you call when you get stuck
 ===========================================
+
+What is TowTruck?
+-----------------
+TowTruck is a simple, easy-to-use collaboration add-on for web applications. 
+
 
 Introduction
 ------------
@@ -89,11 +94,11 @@ Bookmarklet
 Go to `http://localhost:8080/bookmarklet.html` for a bookmarklet that you can use to start TowTruck.  This of course excludes the possibility of the page cooperating with TowTruck, but much of what it does is automatic anyway.
 
 
-
 Testing
 -------
 
 There isn't much right now.  [Walkabout.js](https://github.com/ianb/walkabout.js) is included in the code, which is a tool to do random things on a page.  The plan is to combine this with lots of santiy checks in the code itself.  You can activate Walkabout with `/test` in the chat (`/help` to see more options).
+
 
 License
 -------
