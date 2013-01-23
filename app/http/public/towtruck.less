@@ -240,6 +240,11 @@
 	opacity:.5;
 }
 
+#towtruck-topbar .towtruck-close img {
+	height:12px;
+	width:12px;
+}
+
 #towtruck-topbar .towtruck-close:hover {
     float: right;
     padding-right: 15px;
@@ -287,6 +292,10 @@
 #towtruck-nav-btns li {
     height:43px;
 	padding-top:10px;
+}
+
+.opaque {
+	opacity: 1;
 }
 
 
@@ -343,6 +352,7 @@
 	background-image: url(http://localhost:8080/images/icn-link.png);
   	background-position: 10px 9px;
 	background-repeat: no-repeat;
+	background-size:13px 17px;
     border-radius: 0.25em;
     height: 30px;
     width: 210px;
@@ -447,9 +457,11 @@
 
 
 .towtruck-container .towtruck-upper-box {
-	height:349px;
+	height:149px;
 	overflow-y:hidden;
 	background:#fff;
+	position:relative;
+	z-index:7;
 }
 
 .towtruck-container .towtruck-lower-box {
@@ -462,6 +474,25 @@
 
 .towtruck-container .towtruck-chat {
 	height:100%;
+}
+
+
+.towtruck-container .towtruck-chat .video-box {
+	height:270px;
+	position:relative;
+	z-index:999;
+}
+
+.towtruck-container .towtruck-chat .video-screen {
+	background:#6b7b88 url(http://localhost:8080/images/icn-link.png);
+	height:100%;
+}
+
+.towtruck-container .towtruck-chat .video-toolbox {
+	background:rgba(0,0,0,0.5);
+	height:20%;
+	position:relative;
+	top:-20%;
 }
 
 .towtruck-container input.towtruck-chat-input {
@@ -503,7 +534,7 @@
         cursor: pointer;
     }
 
-	.towtruck-avatar {
+	.towtruck-avatar img {
 		float:left;
 		width:42px;
 		height:42px;

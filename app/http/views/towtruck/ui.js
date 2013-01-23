@@ -117,9 +117,10 @@ define(["jquery", "util", "runner"], function ($, util, runner) {
 
   ui.activateTab = function (name, button) {
     if (! button) {
-      button = $('[data-activate="' + name + '"]');
+      button = $('[data-activate="' + name + '"]');	  
     } else if (! name) {
       name = button.attr("data-activate");
+	  $('[data-activate="' + name + '"] img').css("opacity", "1");
     }
     $("#towtruck-nav-btns").find("img.triangle").remove();
     var triangle = cloneTemplate("triangle");
