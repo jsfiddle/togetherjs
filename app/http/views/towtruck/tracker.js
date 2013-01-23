@@ -50,7 +50,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   // * Tracker.fromConnect(msg) creates a tracker, using the message sent
   //   from .introduce()
   tracker.trackers = {
-    _trackers: Object.create(null),
+    _trackers: {},
     active: [],
     get: function (name) {
       return this._trackers[name];
@@ -104,16 +104,17 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
       this.isClient = options.isClient;
       this.channel = options.channel;
       this.curState = this.getState();
-      if (! this.isClient) {
-        this.sendInit();
-      }
       this.change = this.change.bind(this);
       this.onmessage = this.onmessage.bind(this);
       this.channel.on("message", this.onmessage);
       this.bindChange();
     },
 
-    textareaEvents: ["textInput", "keydown", "keyup", "select", "cut", "paste"],
+    repr: function () {
+      return '[TextTracker channel: ' + repr(this.channel.id) + ' element: ' + elementFinder.elementLocation(this.element) + ']';
+    },
+
+    textareaEvents: ["textInput", "keydown", "keyup", "select", "cut", "paste", "change"],
 
     bindChange: function () {
       this.textareaEvents.forEach(function (e) {
@@ -133,6 +134,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
 
     applyChange: function (value) {
       this.element.val(value);
+      assert(typeof value == "string");
       this.curState = value;
     },
 
@@ -142,9 +144,11 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         trackerType: this.constructor.name,
         routeId: this.channel.id,
         elementLocation: elementFinder.elementLocation(this.element),
-        value: this.element.val(),
-        html: this.element[0].outerHTML
+        value: this.element.val()
       });
+      if (! this.isClient) {
+        this.sendInit();
+      }
     },
 
     destroy: function () {
@@ -186,15 +190,17 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         oldText: old,
         fullText: newValue
       });
+      assert(typeof newValue == "string");
       this.curState = newValue;
     },
 
     sendInit: function () {
-      this.channel.send({op: "init", value: this.curState});
+      this.channel.send({op: "init", text: this.curState});
     },
 
     onmessage: function (msg) {
       if (msg.op == "init") {
+        assert(typeof msg.text == "string");
         this.curState = msg.text;
         this.applyChange(msg.text);
         return;
@@ -220,6 +226,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         if (msg.newText && newValue != msg.newText) {
           throw "New value mismatch";
         }
+        assert(typeof newValue == "string");
         this.curState = newValue;
         var startPos = this.element[0].selectionStart;
         var endPos = this.element[0].selectionEnd;
@@ -271,9 +278,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   };
 
   tracker.TextTracker.fromConnect = function (msg) {
-    if (! runner.isClient) {
-      throw "fromConnect should only be called by the client";
-    }
+    assert(runner.isClient, "fromConnect should only be called by the client");
     var el = elementFinder.findElement(msg.elementLocation);
     var route = runner.router.makeRoute(msg.routeId);
     var t = tracker.TextTracker({
@@ -309,7 +314,10 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
       selectors.push("select");
       this._selector = selectors.join(", ");
       $(document).on("change", this._selector, this.change);
-      // FIXME: should send all form states as an init
+    },
+
+    repr: function() {
+      return '[FormFieldTracker channel: ' + repr(this.channel.id) + ']';
     },
 
     destroy: function () {
@@ -328,6 +336,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         trackerType: this.constructor.name,
         routeId: this.channel.id
       });
+      // FIXME: should send all form states as an init
     },
 
     _checkedFields: ["radio", "checkbox"],
@@ -396,15 +405,13 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         }
       }).bind(this));
       this.channel.on("message", this.onmessage);
-      if (! this.isClient) {
-        this.channel.send({
-          op: "init",
-          value: this.editor.getValue()
-        });
-      }
       // CodeMirror emits events for our own updates, so we set this
       // to true when we expect to ignore those events:
       this.ignoreEvents = false;
+    },
+
+    repr: function () {
+      return '[CodeMirrorTracker channel: ' + repr(this.channel.id) + 'element: ' + elementFinder.elementLocation(this.editor.getWrapperElement()) + ']';
     },
 
     introduce: function () {
@@ -416,6 +423,12 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         elementLocation: elementFinder.elementLocation(this.editor.getWrapperElement()),
         value: this.editor.getValue()
       });
+      if (! this.isClient) {
+        this.channel.send({
+          op: "init",
+          value: this.editor.getValue()
+        });
+      }
     },
 
     destroy: function () {
