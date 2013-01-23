@@ -260,6 +260,8 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
     }
   }
 
+  runner.boot = boot;
+
   runner.templates = {
     chat: makeTemplate("chat", "<%- read('chat.tmpl')%>"),
     help: makeTemplate("help", "<%- read('help.tmpl')%>"),

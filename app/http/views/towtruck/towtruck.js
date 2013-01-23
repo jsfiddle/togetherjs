@@ -1,3 +1,4 @@
+/*jshint scripturl:true */
 (function () {
 
   var button;
@@ -57,9 +58,7 @@
   var startTowTruck = window.startTowTruck = function () {
     if (startTowTruck.loaded) {
       var runner = startTowTruck.require("runner");
-      runner.isClient = false;
-      runner.init();
-      runner.start();
+      runner.boot();
       return;
     }
     // A sort of signal to towtruck-runner.js to tell it to actually
@@ -77,17 +76,11 @@
     require = {
       baseUrl: baseUrl + "/towtruck",
       urlArgs: "bust=" + cacheBust,
-      deps: ["runner"],
+      deps: ["runner", "ui", "chat", "pointer", "tracker", "webrtc"],
       callback: function () {
         startTowTruck.loaded = true;
         startTowTruck.require = require;
         startTowTruck.define = define;
-        var runner = require("runner");
-        runner.isClient = false;
-        runner.init();
-        runner.start();
-        //require = oldRequire;
-        //define = oldDefine;
         callbacks.forEach(function (c) {
           c();
         });
