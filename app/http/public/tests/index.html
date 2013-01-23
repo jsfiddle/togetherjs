@@ -2,11 +2,24 @@
 <html>
   <head>
     <title>TowTruck tests</title>
+    <script>
+      if (location.hash.indexOf("towtruck-head-") != -1) {
+        location.hash = "";
+      }
+    </script>
     <script src="./doctestjs/doctest.js"></script>
     <script src="../towtruck.js"></script>
+    <script src="../towtruck/jquery.js"></script>
     <link rel="stylesheet" href="doctestjs/doctest.css">
   </head>
   <body class="autodoctest">
+
+    <script>
+      if (location.hash.indexOf("towtruck-") != -1) {
+        // This is the client loaded by the other page
+        document.body.className = "";
+      }
+    </script>
 
     <div id="doctest-output"></div>
 
@@ -18,10 +31,73 @@
     </div>
 
 <pre class="commenttest">
-// A basic test should go here, maybe using jshint
+if (location.hash.indexOf("towtruck-") != -1) {
+  // This is the client and we don't want to run any tests
+  Abort();
+}
 </pre>
 
 <pre class="commenttest" data-href-pattern="./{name:[a-zA-Z0-9_-]+\.js}">
 </pre>
+
+<div id="fixture">
+  <textarea id="textarea" style="width: 10em; height: 3em; whitespace: wrap"></textarea>
+  <br>
+
+  <label for="yes"><input type="radio" name="answer" id="yes"> Yes</label>
+  <label for="no"><input type="radio" name="answer" id="no"> No</label>
+  <br>
+
+</div>
+
+<div id="other">
+  This iframe contains the "other" client:
+  <br>
+
+  <iframe id="other-client" style="height: 40em; width: 100%"></iframe>
+</div>
+
+<div id="output-container" style="display: none">
+  Console:
+<pre id="output" style="white-space: pre-wrap; overflow: auto; overflow-y: auto; max-height: 20em; border: 1px solid #00f"></pre>
+</div>
+
+<style>
+  .console-warn {
+    color: #a00;
+  }
+  .console-error {
+    color: #f00;
+  }
+  .console-debug {
+    color: #666;
+  }
+</style>
+<script>
+if (! document.body.className) {
+  (function () {
+    $("iframe, .commenttest, #contents, #doctest-output").remove();
+    $("#output-container").show();
+    var output = $("#output");
+    ["debug", "log", "info", "warn", "error"].forEach(function (n) {
+      var orig = console[n];
+      console[n] = function () {
+        var s = [];
+        Array.prototype.slice.call(arguments).forEach(function (a) {
+          if (typeof a == "string") {
+            s.push(a);
+          } else {
+            s.push(doctest.repr(a));
+          }
+        });
+        s = s.join(" ") + "\n";
+        var el = $("<span>").addClass("console-" + n).text(s);
+        output.append(el);
+        orig.apply(console, arguments);
+      };
+    });
+  })();
+}
+</script>
 
 </body></html>
