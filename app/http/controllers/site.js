@@ -8,3 +8,16 @@
 exports.index = function(req, resp){
   resp.render('site/index', { user: {email: req.session.email}});
 };
+
+exports.catchall = function(req, resp){
+  //TODO: Security Review
+  // We only care if we get A-z 0-9 "-", "/" and _
+  var matches = req.path.match(/^\/([\w\-\_\/]+)$/);
+
+  if (matches){
+    resp.render("site/" + matches[1], { user: {email: req.session.email}});
+  }
+  else{
+    resp.send("404 - Not Found", 404);
+  }
+}
