@@ -212,7 +212,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
   } else {
     runner.clientId = localStorage.getItem("TowTruck.clientId");
     if (! runner.clientId) {
-      runner.clientId = runner.generateId();
+      runner.clientId = util.generateId();
       localStorage.setItem("TowTruck.clientId", runner.clientId);
     }
   }
@@ -226,6 +226,8 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
   // _.template anymore:
   function makeTemplate(name, source) {
     var tmpl;
+    var base = startTowTruck.baseUrl;
+    source = source.replace(/http:\/\/localhost:8080/g, base);
     return function () {
       return source;
     };

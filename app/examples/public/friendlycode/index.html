@@ -13,6 +13,12 @@
     <script src="js/require-config.js"></script>
     <script src="js/require.min.js"></script>
     <script>
+      var towtruck = location.protocol + "//" + location.hostname + ":8080/towtruck.js";
+      var script = document.createElement("script");
+      script.src = towtruck;
+      document.head.appendChild(script);
+    </script>
+    <script>
     require.baseUrl = "js";
     // We don't want TowTruck to try to load until after FriendlyCode is started
     // up:
@@ -37,6 +43,5 @@
       return result;
     });
     </script>
-    <script src="http://localhost:8080/towtruck.js"></script>
   </body>
 </html>

@@ -8,13 +8,13 @@ var
 express = require('express'),
 app     = express(),
 logger  = require('../../lib/logger');
- 
+
 // Configuration
 app.configure(function(){
   app.use(express.static(__dirname + '/public'));
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-app.listen(process.env.EXAMPLE_SERVER_PORT);
+app.listen(process.env.EXAMPLE_SERVER_PORT, process.env.HOST || "127.0.0.1");
 
 logger.info("Example server listening at http://localhost:" + process.env.EXAMPLE_SERVER_PORT + "/ .");

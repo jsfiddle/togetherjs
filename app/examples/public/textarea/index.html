@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title>A textarea example</title>
-    <script src="http://localhost:8080/towtruck.js"></script>
+    <script>
+      var towtruck = location.protocol + "//" + location.hostname + ":8080/towtruck.js";
+      var script = document.createElement("script");
+      script.src = towtruck;
+      document.head.appendChild(script);
+    </script>
+    <!--<script src="http://localhost:8080/towtruck.js"></script>-->
   </head>
   <body>
 

@@ -7,26 +7,13 @@
     "/towtruck.css"
   ];
 
-  // FIXME: these should all get combined for a production release:
-  var scripts = [
-    "/towtruck/libs.js",
-    "/towtruck/util.js",
-    "/towtruck/element-finder.js",
-    "/towtruck/channels.js",
-    "/towtruck/runner.js",
-    "/towtruck/chat.js",
-    "/towtruck/webrtc.js",
-    "/towtruck/tracker.js",
-    "/towtruck/ui.js",
-    "/towtruck/pointer.js"
-  ];
-
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
   var cacheBust = Date.now();
 
   // FIXME: I think there's an event that would be called before load?
+  // DOMReady?
   window.addEventListener("load", function () {
     var control = document.getElementById("towtruck-starter");
     // FIXME: not sure where to put the control if the page doesn't have
@@ -43,15 +30,13 @@
   function addStyle(url) {
     var link = document.createElement("link");
     link.setAttribute("rel", "stylesheet");
-    // FIXME: remove cache buster:
-    link.href = baseUrl + url + "?" + Date.now();
+    link.href = baseUrl + url + "?bust=" + cacheBust;
     document.head.appendChild(link);
   }
 
   function addScript(url) {
     var script = document.createElement("script");
-    // FIXME: remove cache buster:
-    script.src = "<%= process.env.PUBLIC_BASE_URL%>" + url + "?" + Date.now();
+    script.src = baseUrl + url + "?bust=" + cacheBust;
     document.head.appendChild(script);
   }
 
@@ -90,6 +75,7 @@
   };
 
   startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";
+  startTowTruck.baseUrl = baseUrl;
 
   startTowTruck.bookmarklet = function () {
     var s = "window._TowTruckBookmarklet = true;";
