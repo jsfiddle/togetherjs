@@ -2,11 +2,6 @@
 <html>
   <head>
     <title>TowTruck tests</title>
-    <script>
-      if (location.hash.indexOf("towtruck-head-") != -1) {
-        location.hash = "";
-      }
-    </script>
     <script src="./doctestjs/doctest.js"></script>
     <script src="../towtruck.js"></script>
     <script src="../towtruck/jquery.js"></script>
@@ -15,7 +10,7 @@
   <body class="autodoctest">
 
     <script>
-      if (location.hash.indexOf("towtruck-") != -1) {
+      if (startTowTruck._shareId) {
         // This is the client loaded by the other page
         document.body.className = "";
       }
@@ -96,6 +91,11 @@ if (! document.body.className) {
         orig.apply(console, arguments);
       };
     });
+    window.onerror = function (message, filename, lineno) {
+      message += " " + filename + ":" + lineno;
+      var el = $("<span>").addClass("console-error").text(message);
+      output.append(el);
+    };
   })();
 }
 </script>

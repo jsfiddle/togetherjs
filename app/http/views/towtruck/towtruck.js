@@ -42,11 +42,11 @@
 
   var startTowTruck = window.startTowTruck = function () {
     if (startTowTruck.loaded) {
-      var runner = startTowTruck.require("runner");
-      runner.boot();
+      var session = startTowTruck.require("session");
+      session.start();
       return;
     }
-    // A sort of signal to towtruck-runner.js to tell it to actually
+    // A sort of signal to session.js to tell it to actually
     // start itself (i.e., put up a UI and try to activate)
     if (! window._startTowTruckImmediately) {
       window._startTowTruckImmediately = true;
@@ -58,19 +58,32 @@
     };
     var oldRequire = window.require;
     var oldDefine = window.define;
-    require = {
+    var config = {
       baseUrl: baseUrl + "/towtruck",
-      urlArgs: "bust=" + cacheBust,
-      deps: ["runner", "ui", "chat", "pointer", "tracker", "webrtc"],
-      callback: function () {
-        startTowTruck.loaded = true;
-        startTowTruck.require = require;
-        startTowTruck.define = define;
-        callbacks.forEach(function (c) {
-          c();
-        });
-      }
+      urlArgs: "bust=" + cacheBust
     };
+    var deps = ["session"];
+    function callback() {
+      startTowTruck.loaded = true;
+      startTowTruck.require = require;
+      startTowTruck.define = define;
+      callbacks.forEach(function (c) {
+        c();
+      });
+    }
+    if (typeof require == "function") {
+      // FIXME: we should really be worried about overwriting config options
+      // of the app itself
+      require.config = config;
+      require(deps, callback);
+    } else {
+      config.deps = deps;
+      config.callback = callback;
+      require = config;
+    }
+    // FIXME: we should namespace require.js to avoid conflicts.  See:
+    //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
+    //   http://requirejs.org/docs/faq-advanced.html#rename
     addScript("/towtruck/require.js");
   };
 
@@ -86,18 +99,33 @@
     return "javascript:" + encodeURIComponent(s);
   };
 
+  // It's nice to replace this early, before the load event fires, so we conflict
+  // as little as possible with the app we are embedded in:
+  var hash = location.hash.replace(/^#/, "");
+  var m = /&?towtruck=([^&]*)/.exec(hash);
+  if (m) {
+    startTowTruck._shareId = m[1];
+    var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+    location.hash = newHash;
+  }
+
   function onload() {
-    var hash = location.hash.replace(/^#/, "");
-    if (hash.search(/&towtruck-/) === 0) {
-      var shareId = hash.substr(hash.search(/&towtruck-/));
-      shareId = shareId.substr(("&towtruck-").length);
-      shareId = shareId.replace(/&.*/, "");
-      window._startTowTruckImmediately = shareId;
-      console.log("starting", shareId);
+    if (startTowTruck._shareId) {
+      window._startTowTruckImmediately = true;
       startTowTruck();
     } else if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
       startTowTruck();
+    } else {
+      var name = window.name;
+      var key = "towtruck.status." + name;
+      var value = localStorage.getItem(key);
+      if (value) {
+        value = JSON.parse(value);
+        if (value && value.running) {
+          startTowTruck();
+        }
+      }
     }
   }
 

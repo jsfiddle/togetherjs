@@ -1,4 +1,4 @@
-define(["jquery", "util", "runner", "element-finder"], function ($, util, runner, elementFinder) {
+define(["jquery", "util", "session", "element-finder"], function ($, util, session, elementFinder) {
 
   var tracker = util.Module("tracker");
   var assert = util.assert;
@@ -18,21 +18,21 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
       tracker.trackers.createAll();
       initTrackers.done = true;
     }
-    runner.send({type: "reset-trackers"});
+    session.send({type: "reset-trackers"});
     tracker.trackers.introduceAll();
   }
 
-  runner.messageHandler.on("hello hello-back", function () {
-    if (! runner.isClient) {
+  session.hub.on("hello hello-back", function () {
+    if (! session.isClient) {
       initTrackers();
     }
   });
 
-  runner.messageHandler.on("reset-trackers", function () {
+  session.hub.on("reset-trackers", function () {
     tracker.trackers.reset();
   });
 
-  runner.messageHandler.on("connect-tracker", function (msg) {
+  session.hub.on("connect-tracker", function (msg) {
     tracker.trackers.connect(msg);
   });
 
@@ -81,7 +81,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
       }
     },
     reset: function () {
-      assert(runner.isClient);
+      assert(session.isClient);
       while (this.active.length) {
         this.active[0].destroy();
       }
@@ -139,7 +139,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
     },
 
     introduce: function () {
-      runner.send({
+      session.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id,
@@ -256,7 +256,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   tracker.TextTracker.createAll = function () {
     // These are all the text-like inputs we control in a granular manner
     // (as opposed to fields that we just overwrite, like type=checkbox)
-    assert(! runner.isClient);
+    assert(! session.isClient);
     var els = $(
       'textarea:visible, ' +
         'input:visible[type="text"], ' +
@@ -267,7 +267,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
         return;
       }
       var routeId = "tracker-textarea-" + util.safeClassName(this.id || util.generateId());
-      var route = runner.router.makeRoute(routeId);
+      var route = session.router.makeRoute(routeId);
       var t = tracker.TextTracker({
         element: this,
         channel: route,
@@ -278,9 +278,9 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   };
 
   tracker.TextTracker.fromConnect = function (msg) {
-    assert(runner.isClient, "fromConnect should only be called by the client");
+    assert(session.isClient, "fromConnect should only be called by the client");
     var el = elementFinder.findElement(msg.elementLocation);
-    var route = runner.router.makeRoute(msg.routeId);
+    var route = session.router.makeRoute(msg.routeId);
     var t = tracker.TextTracker({
       element: el,
       channel: route,
@@ -331,7 +331,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
 
     introduce: function () {
       assert(! this.isClient);
-      runner.send({
+      session.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id
@@ -368,8 +368,8 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   });
 
   tracker.FormFieldTracker.createAll = function () {
-    assert(! runner.isClient, "shouldn't be client");
-    var route = runner.router.makeRoute("tracker-formfield");
+    assert(! session.isClient, "shouldn't be client");
+    var route = session.router.makeRoute("tracker-formfield");
     var t = tracker.FormFieldTracker({
       channel: route,
       isClient: false
@@ -378,8 +378,8 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   };
 
   tracker.FormFieldTracker.fromConnect = function (msg) {
-    assert(runner.isClient, "should be client");
-    var route = runner.router.makeRoute(msg.routeId);
+    assert(session.isClient, "should be client");
+    var route = session.router.makeRoute(msg.routeId);
     var t = tracker.FormFieldTracker({
       channel: route,
       isClient: true
@@ -416,7 +416,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
 
     introduce: function () {
       assert(! this.isClient);
-      runner.send({
+      session.send({
         type: "connect-tracker",
         trackerType: this.constructor.name,
         routeId: this.channel.id,
@@ -485,7 +485,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   });
 
   tracker.CodeMirrorTracker.createAll = function () {
-    assert(! runner.isClient);
+    assert(! session.isClient);
     var els = document.getElementsByTagName("*");
     var len = els.length;
     for (var i=0; i<len; i++) {
@@ -497,7 +497,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
       if (! editor) {
         continue;
       }
-      var route = runner.router.makeRoute("tracker-codemirror-" + util.safeClassName(el.id || util.generateId()));
+      var route = session.router.makeRoute("tracker-codemirror-" + util.safeClassName(el.id || util.generateId()));
       var t = tracker.CodeMirrorTracker({
         editor: editor,
         channel: route,
@@ -508,7 +508,7 @@ define(["jquery", "util", "runner", "element-finder"], function ($, util, runner
   };
 
   tracker.CodeMirrorTracker.fromConnect = function (msg) {
-    var route = runner.router.makeRoute(msg.routeId);
+    var route = session.router.makeRoute(msg.routeId);
     var el = elementFinder.findElement(msg.elementLocation);
     var editor = el.CodeMirror;
     if (! editor) {

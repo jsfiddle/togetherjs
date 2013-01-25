@@ -1,15 +1,15 @@
-define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
+define(["jquery", "util", "session", "ui", "templates"], function ($, util, session, ui, templates) {
   var chat = util.Module("chat");
   var assert = util.assert;
 
-  runner.messageHandler.on("chat", function (msg) {
+  session.hub.on("chat", function (msg) {
     ui.addChat({
       type: "text",
       clientId: msg.clientId,
       text: msg.text,
       messageId: msg.messageId
     });
-    if (! runner.isClient) {
+    if (! session.isClient) {
       chat.Chat.addChat({
         type: "text",
         text: msg.text,
@@ -20,18 +20,18 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     }
   });
 
-  runner.messageHandler.on("bye", function (msg) {
+  session.hub.on("bye", function (msg) {
     ui.addChat({
       type: "left-session",
       clientId: msg.clientId
     });
   });
 
-  runner.messageHandler.on("hello", function () {
-    if (! runner.isClient) {
+  session.hub.on("hello", function () {
+    if (! session.isClient) {
       var log = chat.Chat.loadChat();
       if (log.length) {
-        runner.send({
+        session.send({
           type: "chat-catchup",
           log: log
         });
@@ -39,8 +39,8 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     }
   });
 
-  runner.messageHandler.on("chat-catchup", function (msg) {
-    assert(runner.isClient, "Master received chat-catchup", runner.isClient);
+  session.hub.on("chat-catchup", function (msg) {
+    assert(session.isClient, "Master received chat-catchup", session.isClient);
     if (ui.isChatEmpty()) {
       ui.addChat({type: "clear"});
       for (var i=0; i<msg.log.length; i++) {
@@ -60,14 +60,14 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
   // (if messages come faster than this, they will be kind of combined)
   var MESSAGE_BREAK_TIME = 20000;
 
-  runner.peers.on("update", function (peer) {
+  session.peers.on("update", function (peer) {
     ui.updatePerson(peer.clientId);
   });
 
   // FIXME: this doesn't make sense any more, but I'm not sure what if anything
   // should be done on an avatar update
-  runner.peers.on("add update", function (peer, old) {
-    if (peer.clientId == runner.clientId) {
+  session.peers.on("add update", function (peer, old) {
+    if (peer.clientId == session.clientId) {
       return;
     }
     if (peer.avatar && peer.avatar != old.avatar) {
@@ -93,24 +93,24 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       var msg = {
         type: "text",
         text: message,
-        clientId: runner.clientId,
-        messageId: runner.clientId + "-" + Date.now(),
+        clientId: session.clientId,
+        messageId: session.clientId + "-" + Date.now(),
         date: Date.now()
       };
-      runner.send({
+      session.send({
         type: "chat",
         text: message,
         messageId: msg.messageId
       });
       ui.addChat(msg);
-      if (! runner.isClient) {
+      if (! session.isClient) {
         this.addChat(msg);
       }
     },
 
     command_tab: function () {
-      var newSetting = runner.settings("tabIndependent");
-      runner.settings("tabIndependent", newSetting);
+      var newSetting = session.settings("tabIndependent");
+      session.settings("tabIndependent", newSetting);
       ui.addChat({
         type: "system",
         text: (newSetting ? "Tab independence turned on" : "Tab independence turned off") +
@@ -119,9 +119,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     },
 
     command_help: function () {
-      var msg = util.trim(runner.templates.help({
-        tabIndependent: runner.settings("tabIndependent")
-      }));
+      var msg = util.trim(templates.help);
       ui.addChat({
         type: "system",
         text: msg
@@ -157,7 +155,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
           type: "system",
           text: "Testing with walkabout.js"
         });
-        var tmpl = $(runner.templates.walkabout({}));
+        var tmpl = $(templates.walkabout);
         var container = ui.container.find(".towtruck-test-container");
         container.empty();
         container.append(tmpl);
@@ -246,7 +244,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     maxLogMessages: 100,
 
     addChat: function (obj) {
-      assert(! runner.isClient);
+      assert(! session.isClient);
       var log = this.loadChat();
       log.push(obj);
       // Cull old entries:
@@ -283,8 +281,8 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
 
   };
 
-  util.on("ui-ready", function () {
-    if (runner.isClient) {
+  session.on("ui-ready", function () {
+    if (session.isClient) {
       // If we're a client, the master will send the messages
       return;
     }
