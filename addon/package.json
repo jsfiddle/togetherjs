@@ -1,0 +1,18 @@
+{
+    "preferences": [
+        {
+            "description": "This is where to find the script to inject",
+            "type": "string",
+            "name": "towtruckJs",
+            "value": "http://localhost:8080/towtruck.js",
+            "title": "towtruck.js location"
+        }
+    ],
+    "name": "towtruck",
+    "license": "MPL 2.0",
+    "author": "",
+    "version": "0.1",
+    "fullName": "TowTruck",
+    "id": "jid1-3K7ww1AkqsvtBw",
+    "description": "Runs TowTruck"
+}
