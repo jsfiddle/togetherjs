@@ -4,15 +4,21 @@
     <title>TowTruck tests</title>
     <script src="./doctestjs/doctest.js"></script>
     <script src="../towtruck.js"></script>
-    <script src="../towtruck/jquery.js"></script>
+    <script src="../towtruck/libs/jquery-1.8.3.min.js"></script>
     <link rel="stylesheet" href="doctestjs/doctest.css">
+    <style>
+      body.client {
+        background-color: #ffd;
+      }
+    </style>
   </head>
   <body class="autodoctest">
 
     <script>
       if (startTowTruck._shareId) {
         // This is the client loaded by the other page
-        document.body.className = "";
+        document.body.className = "client";
+        location.hash += "&client";
       }
     </script>
 
@@ -69,9 +75,9 @@ if (location.hash.indexOf("towtruck-") != -1) {
   }
 </style>
 <script>
-if (! document.body.className) {
+if (document.body.className.indexOf("autodoctest") == -1) {
   (function () {
-    $("iframe, .commenttest, #contents, #doctest-output").remove();
+    $("#other, .commenttest, #contents, #doctest-output").remove();
     $("#output-container").show();
     var output = $("#output");
     ["debug", "log", "info", "warn", "error"].forEach(function (n) {

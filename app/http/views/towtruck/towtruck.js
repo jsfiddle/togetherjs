@@ -40,10 +40,13 @@
     document.head.appendChild(script);
   }
 
-  var startTowTruck = window.startTowTruck = function () {
+  var startTowTruck = window.startTowTruck = function (doneCallback) {
     if (startTowTruck.loaded) {
       var session = startTowTruck.require("session");
       session.start();
+      if (doneCallback) {
+        doneCallback();
+      }
       return;
     }
     // A sort of signal to session.js to tell it to actually
@@ -60,7 +63,11 @@
     var oldDefine = window.define;
     var config = {
       baseUrl: baseUrl + "/towtruck",
-      urlArgs: "bust=" + cacheBust
+      urlArgs: "bust=" + cacheBust,
+      paths: {
+        jquery: "libs/jquery-1.8.3.min",
+        walkabout: "libs/walkabout.js/walkabout"
+      }
     };
     var deps = ["session"];
     function callback() {
@@ -70,11 +77,14 @@
       callbacks.forEach(function (c) {
         c();
       });
+      if (doneCallback) {
+        doneCallback();
+      }
     }
     if (typeof require == "function") {
       // FIXME: we should really be worried about overwriting config options
       // of the app itself
-      require.config = config;
+      require.config(config);
       require(deps, callback);
     } else {
       config.deps = deps;
@@ -84,7 +94,7 @@
     // FIXME: we should namespace require.js to avoid conflicts.  See:
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
-    addScript("/towtruck/require.js");
+    addScript("/towtruck/libs/require.js");
   };
 
   startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";

@@ -127,6 +127,7 @@ define(["util", "channels"], function (util, channels) {
 
   function openChannel() {
     assert(! channel);
+    console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {
       if (DEBUG) {

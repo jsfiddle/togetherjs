@@ -45,7 +45,8 @@ http.configure(function(){
     extend(locals, require(''));
   });
 
-  http.use(express.logger());
+  // FIXME: this outputs more than I'm interested in, but maybe there's a better way of suppressing those via Foreman?
+  //http.use(express.logger());
   http.use(express.static(__dirname + '/public'));
   http.use(express.cookieParser());
   http.use(express.bodyParser());
