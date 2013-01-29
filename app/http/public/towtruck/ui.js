@@ -238,6 +238,13 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       addEl(el, msg.clientId);
     } else if (msg.type == "clear") {
       container.empty();
+    } else if (msg.type == "url-change") {
+      assert(msg.clientId);
+      assert(typeof msg.url == "string");
+      el = cloneTemplate("url-change");
+      setPerson(el, msg.clientId);
+      el.find(".towtruck-url").attr("href", msg.url).text(msg.url);
+      addEl(el, msg.clientId);
     } else {
       console.warn("Did not understand message type:", msg.type, "in message", msg);
     }

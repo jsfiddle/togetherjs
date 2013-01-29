@@ -1,6 +1,6 @@
 /* Cursor viewing support
    */
-define(["jquery", "util", "session", "ui", "element-finder"], function ($, util, session, ui, elementFinder) {
+define(["jquery", "util", "session", "element-finder"], function ($, util, session, elementFinder) {
   var cursor = util.Module("cursor");
   var assert = util.assert;
 
@@ -17,6 +17,8 @@ define(["jquery", "util", "session", "ui", "element-finder"], function ($, util,
     }
     c.updatePosition(msg);
   });
+
+  // FIXME: should check for a peer leaving and remove the cursor object
 
   var Cursor = util.Class({
     constructor: function (clientId) {

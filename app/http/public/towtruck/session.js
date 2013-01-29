@@ -42,6 +42,11 @@ define(["util", "channels"], function (util, channels) {
            hash + "&towtruck=" + session.shareId;
   };
 
+  /* location.href without the hash */
+  session.currentUrl = function () {
+    return location.href.replace(/#.*/, "");
+  };
+
   /****************************************
    * Storage
    */
@@ -94,6 +99,7 @@ define(["util", "channels"], function (util, channels) {
    * Peer tracking (names/avatars/etc)
    */
 
+  // FIXME: should also remove peers on bye
   session.peers = util.mixinEvents({
     _peers: {},
     get: function (id) {
@@ -154,7 +160,7 @@ define(["util", "channels"], function (util, channels) {
   /* Always say hello back, and keep track of peers: */
   session.hub.on("hello hello-back", function (msg) {
     if (msg.type == "hello") {
-      sendHello();
+      sendHello(true);
     }
     var peer = {
       clientId: msg.clientId,
@@ -164,11 +170,14 @@ define(["util", "channels"], function (util, channels) {
     session.peers.add(peer);
   });
 
-  function sendHello() {
+  function sendHello(helloBack) {
+    var t = helloBack ? "hello-back" : "hello";
     session.send({
-      type: "hello-back",
+      type: t,
       nickname: session.settings.get("nickname"),
       avatar: session.settings.get("avatar"),
+      url: session.currentUrl(),
+      urlHash: location.hash,
       rtcSupported: session.RTCSupported
     });
   }
@@ -192,7 +201,7 @@ define(["util", "channels"], function (util, channels) {
   // These are Javascript files that implement features, and so must
   // be injected at runtime because they aren't pulled in naturally
   // via define().
-  var features = ["ui", "chat", "pointer", "tracker", "webrtc", "cursor"];
+  var features = ["ui", "chat", "pointer", "tracker", "webrtc", "cursor", "cobrowse"];
 
   // FIXME: should this be run at load time, instead of in start()?
   function initClientId() {
@@ -269,7 +278,7 @@ define(["util", "channels"], function (util, channels) {
       var ui = require("ui");
       ui.activateUI();
       ui.activateTab("towtruck-chat");
-      sendHello();
+      sendHello(false);
     });
   };
 
