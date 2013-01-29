@@ -170,7 +170,6 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
       this._incoming(event.data);
     }).bind(this);
     this.socket.onerror = (function (event) {
-      alert("Error:" + JSON.stringify(event.data));
       console.error('WebSocket error:', event.data);
     }).bind(this);
   }
