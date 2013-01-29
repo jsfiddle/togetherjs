@@ -74,7 +74,8 @@ define(["util", "channels"], function (util, channels) {
     defaults: {
       tabIndependent: false,
       nickname: "",
-      avatar: null
+      avatar: null,
+      stickyShare: null
     },
 
     get: function (name) {
@@ -136,7 +137,7 @@ define(["util", "channels"], function (util, channels) {
     console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {
-      if (DEBUG) {
+      if (DEBUG && msg.type != "cursor-update") {
         console.log("In:", msg);
       }
       session.hub.emit(msg.type, msg);
@@ -146,7 +147,7 @@ define(["util", "channels"], function (util, channels) {
   }
 
   session.send = function (msg) {
-    if (DEBUG) {
+    if (DEBUG && msg.type != "cursor-update") {
       console.log("Send:", msg);
     }
     msg.clientId = session.clientId;
@@ -249,7 +250,10 @@ define(["util", "channels"], function (util, channels) {
         "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
       if ((! saved) && window._startTowTruckImmediately) {
         isClient = false;
-        shareId = util.generateId();
+        shareId = session.settings.get("stickyShare");
+        if (! shareId) {
+          shareId = util.generateId();
+        }
       } else {
         isClient = saved.isClient;
         shareId = saved.shareId;

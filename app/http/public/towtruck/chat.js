@@ -83,7 +83,7 @@ define(["jquery", "util", "session", "ui", "templates"], function ($, util, sess
     submit: function (message) {
       var parts = message.split(/ /);
       if (parts[0].charAt(0) == "/") {
-        var name = parts[0].substr(1);
+        var name = parts[0].substr(1).toLowerCase();
         var method = this["command_" + name];
         if (method) {
           method.call(this, parts[1]);
@@ -235,6 +235,22 @@ define(["jquery", "util", "session", "ui", "templates"], function ($, util, sess
         ui.addChat({
           type: "system",
           text: "" + result
+        });
+      }
+    },
+
+    command_stickyshare: function (id) {
+      id = id || null;
+      session.settings.set("stickyShare", id);
+      if (id) {
+        ui.addChat({
+          type: "system",
+          text: "Set shareId to " + id + " (restart to use)"
+        });
+      } else {
+        ui.addChat({
+          type: "system",
+          text: "Removed sticky shareId"
         });
       }
     },
