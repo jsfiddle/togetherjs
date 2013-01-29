@@ -74,11 +74,73 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       ui.activateTab("towtruck-chat");
     });
 
+    ui.docking = false;
+    ui.undockedPos = {};
+    // Docking:
+    if (! $(".towtruck-undocked").length) {
+      // FIXME: this is static, but doesn't allow the doc location to be created
+      // dynamically or added or removed later
+      container.find(".towtruck-dock").hide();
+    }
+    container.find(".towtruck-dock").click(function () {
+      ui.docking = ! ui.docking;
+      if (ui.docking) {
+        ui.undockedPos = container.offset();
+      }
+      var dockData = $("body").data();
+      var prefix = "towtruckDock";
+      var styles = {};
+      for (var a in dockData) {
+        if (! dockData.hasOwnProperty(a)) {
+          continue;
+        }
+        if (a.indexOf(prefix) === 0) {
+          var name = a.charAt(prefix.length).toLowerCase() + a.substr(prefix.length + 1);
+          styles[name] = ui.docking ? dockData[a] : "";
+        }
+      }
+      if (ui.docking) {
+        if (! (styles.top || styles.bottom)) {
+          styles.bottom = 0;
+        }
+        if (! (styles.left || styles.right)) {
+          styles.right = 0;
+        }
+        if (styles.bottom !== undefined) {
+          // FIXME: not sure if or when I might need to factor in margin-top:
+          //   parseInt($(document.body).css("margin-top"), 10);
+          styles.top =
+              Math.max($(document.body).height() -
+                       parseInt(styles.bottom, 10) -
+                       container.height(), 0);
+          delete styles.bottom;
+        }
+        if (styles.right !== undefined) {
+          styles.left =
+              $(document.body).width() -
+              parseInt(styles.right, 10) -
+              container.width() +
+              parseInt($(document.body).css("margin-left"), 10);
+          delete styles.right;
+        }
+      } else {
+        styles.left = ui.undockedPos.left + "px";
+        styles.top = ui.undockedPos.top + "px";
+        ui.undockedPos = null;
+      }
+      container.css(styles);
+      if (ui.docking) {
+        $(".towtruck-undocked").removeClass("towtruck-undocked").addClass("towtruck-docked");
+      } else {
+        $(".towtruck-docked").removeClass("towtruck-docked").addClass("towtruck-undocked");
+      }
+    });
+
     // Moving the window:
     var header = container.find(".towtruck-header");
     header.mousedown(function (event) {
       header.addClass("towtruck-dragging");
-      console.log("container", container[0]);
+      // FIXME: switch to .offset() and pageX/Y
       var start = container.position();
       function selectoff() {
         return false;

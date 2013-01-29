@@ -9,17 +9,21 @@
       script.src = towtruck;
       document.head.appendChild(script);
     </script>
+    <style>
+      #content.towtruck-docked {
+        margin-right: 425px;
+      }
+    </style>
     <!--<script src="http://localhost:8080/towtruck.js"></script>-->
   </head>
   <body>
 
     <h1>Textarea example:</h1>
 
-    <div>
-      Edit this textarea: <div id="towtruck-starter"></div>
-    </div>
-
-    <div>
+    <div id="content" class="towtruck-undocked">
+      <p>
+        Edit this textarea: <div id="towtruck-starter"></div>
+      </p>
       <textarea
        id="textarea" style="width: 60%; height: 10em" data-walkabout-edit-value="type paste move"></textarea>
 
