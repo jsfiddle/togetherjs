@@ -44,7 +44,9 @@
     if (startTowTruck.loaded) {
       var session = startTowTruck.require("session");
       session.start();
-      if (doneCallback) {
+      // Note if this is an event handler, doneCallback will be an
+      // event object and not a function
+      if (typeof doneCallback == "function") {
         doneCallback();
       }
       return;

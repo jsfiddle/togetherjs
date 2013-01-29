@@ -70,8 +70,8 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     session.send({
       type: "cursor-update",
       element: elementFinder.elementLocation(target),
-      offsetX: offsetX,
-      offsetY: offsetY
+      offsetX: Math.floor(offsetX),
+      offsetY: Math.floor(offsetY)
     });
   });
 
