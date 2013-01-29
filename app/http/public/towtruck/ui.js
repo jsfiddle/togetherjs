@@ -85,6 +85,11 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
     container.find(".towtruck-dock").click(function () {
       ui.docking = ! ui.docking;
       if (ui.docking) {
+        container.addClass("towtruck-container-docked");
+      } else {
+        container.removeClass("towtruck-container-docked");
+      }
+      if (ui.docking) {
         ui.undockedPos = container.offset();
       }
       var dockData = $("body").data();
@@ -139,6 +144,9 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
     // Moving the window:
     var header = container.find(".towtruck-header");
     header.mousedown(function (event) {
+      if (ui.docking) {
+        return;
+      }
       header.addClass("towtruck-dragging");
       // FIXME: switch to .offset() and pageX/Y
       var start = container.position();
