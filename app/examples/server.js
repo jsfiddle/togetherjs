@@ -15,6 +15,7 @@ app.configure(function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-app.listen(process.env.EXAMPLE_SERVER_PORT, process.env.HOST || "127.0.0.1");
+var host = process.env.HOST || "127.0.0.1";
+app.listen(process.env.EXAMPLE_SERVER_PORT, host);
 
-logger.info("Example server listening at http://localhost:" + process.env.EXAMPLE_SERVER_PORT + "/ .");
+logger.info("Example server listening at http://" + host + ":" + process.env.EXAMPLE_SERVER_PORT + "/ .");
