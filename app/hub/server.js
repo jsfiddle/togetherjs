@@ -62,7 +62,7 @@ wsServer.on('request', function(request) {
   if (!originIsAllowed(request.origin)) {
     // Make sure we only accept requests from an allowed origin
     request.reject();
-    console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+    logger.info((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
     return;
   }
 
@@ -77,10 +77,10 @@ wsServer.on('request', function(request) {
     allConnections[id] = [];
   }
   allConnections[id].push(connection);
-  console.log((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
+  logger.info((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
   connection.on('message', function(message) {
     var parsed = JSON.parse(message.utf8Data);
-    console.log('Message on ' + id + ' bytes: '
+    logger.debug('Message on ' + id + ' bytes: '
                 + (message.utf8Data && message.utf8Data.length)
                 + ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20)
                 + ' connections: ' + allConnections[id].length);
@@ -101,7 +101,7 @@ wsServer.on('request', function(request) {
     if (index != -1) {
       allConnections[id].splice(index, 1);
     }
-    console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
+    logger.info((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
 

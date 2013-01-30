@@ -1,5 +1,5 @@
 /* Implements the pointing part of the UI */
-define(["jquery", "util", "runner"], function ($, util, runner) {
+define(["jquery", "util", "session"], function ($, util, session) {
   var pointer = util.Module("pointer");
   var assert = util.assert;
 
@@ -60,7 +60,7 @@ define(["jquery", "util", "runner"], function ($, util, runner) {
         el.find(".towtruck-arrow-control").hide();
         el.find(".towtruck-arrow-control").show().unbind("click", arrowCheck);
       } else if (endX !== undefined) {
-        runner.send({
+        session.send({
           type: "pointer",
           messageId: messageId,
           top: endY,
@@ -70,7 +70,7 @@ define(["jquery", "util", "runner"], function ($, util, runner) {
     });
   });
 
-  runner.messageHandler.on("pointer", function (msg) {
+  session.hub.on("pointer", function (msg) {
     var arrowId = "towtruck-chat-arrow-" + msg.messageId;
     var arrow = $("#" + arrowId);
     if (! arrow.length) {

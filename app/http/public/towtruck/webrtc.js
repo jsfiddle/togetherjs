@@ -1,7 +1,8 @@
 /* WebRTC support
-   Note that this relies on parts of the interface located in chat.js and intro.js
+   Note that this relies on parts of the interface code that usually goes in ui.js
    */
-define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
+define(["jquery", "util", "session", "ui"], function ($, util, session, ui) {
+  var webrtc = util.Module("webrtc");
   var assert = util.assert;
 
   var PeerConnection =
@@ -14,10 +15,10 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     navigator.webkitGetUserMedia ||
     navigator.msGetUserMedia;
 
-  runner.RTCSupported = !! PeerConnection;
+  session.RTCSupported = !! PeerConnection;
 
-  util.on("ui-ready", function () {
-    if (! runner.RTCSupported) {
+  session.on("ui-ready", function () {
+    if (! session.RTCSupported) {
       $(".towtruck-rtc, [data-activate='towtruck-rtc']").hide();
       return;
     }
@@ -56,6 +57,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     assert(video.length);
 
     function startStreaming() {
+      console.log("calling getUserMedia");
       navigator.getUserMedia({
           video: true,
           audio: false
@@ -75,6 +77,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
           console.error("getUserMedia error:", err);
         }
       );
+      console.log("done getUserMedia");
     }
 
     video.on("canplay", function () {
@@ -98,14 +101,14 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
 
     $("#towtruck-accept-pic").click(function () {
       var imgData = pic.attr("src");
-      runner.settings("avatar", imgData);
-      runner.send({type: "nickname-update", avatar: imgData});
+      session.settings.set("avatar", imgData);
+      session.send({type: "nickname-update", avatar: imgData});
       close();
       updatePreview();
     });
 
     function updatePreview() {
-      var avatar = runner.settings("avatar");
+      var avatar = session.settings.get("avatar");
       if (avatar) {
         $("#towtruck-avatar-view-container").show();
         $("#towtruck-avatar-view").attr("src", avatar);
@@ -118,7 +121,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
 
   }
 
-  runner.peers.on("add update", function (peer) {
+  session.peers.on("add update", function (peer) {
     setupChatInterface();
   });
 
@@ -126,10 +129,11 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     video = $(video)[0];
     if (navigator.mozGetUserMedia) {
       video.mozSrcObject = stream;
-    } else {
+      console.log("Added stream", stream, "to", video, video.id);
+    } //else {
       var vendorURL = window.URL || window.webkitURL;
       video.src = vendorURL.createObjectURL(stream);
-    }
+    //}
   }
 
   function setupChatInterface() {
@@ -137,7 +141,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       return;
     }
     var supported = false;
-    runner.peers.forEach(function (p) {
+    session.peers.forEach(function (p) {
       if (p.rtcSupported) {
         supported = true;
       }
@@ -154,7 +158,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     }
   }
 
-  var rtc = {
+  var rtc = webrtc.rtc = {
     connection: null,
     offer: null,
     myOffer: null,
@@ -163,11 +167,11 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     videoWanted: true
   };
 
-  util.on("ui-showing-towtruck-rtc", function () {
+  session.on("ui-showing-towtruck-rtc", function () {
     setupRTC();
   });
 
-  runner.messageHandler.on("rtc-offer", function (msg) {
+  session.hub.on("rtc-offer", function (msg) {
     rtc.offer = msg.offer;
     setDescription(msg.offer, function () {
       ui.activateTab("towtruck-rtc");
@@ -175,7 +179,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
     });
   });
 
-  runner.messageHandler.on("rtc-answer", function (msg) {
+  session.hub.on("rtc-answer", function (msg) {
     rtc.answer = msg.answer;
     setDescription(msg.answer, function () {
       setupRTC();
@@ -193,23 +197,32 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       return;
     }
     // FIXME: Chrome demands a configuration parameter here:
-    var conn = new PeerConnection();
+    console.log("creating PeerConnection", PeerConnection);
+    var conn;
+    try {
+      conn = new PeerConnection();
+    } catch (e) {
+      // FIXME: should warn about Firefox and the about:config
+      // media.peerconnection.enabled pref
+      console.error("Error creating PeerConnection:", e);
+      throw e;
+    }
+    console.log("PeerConnection created");
     conn.onaddstream = function (event) {
       console.log("onaddstream", event);
       console.log("streams", conn.remoteStreams, conn.remoteStreams.length);
       var video = $("#towtruck-video");
       for (var i=0; i<conn.remoteStreams.length; i++) {
         var s = conn.remoteStreams[i];
-        addStream(video, s);
+        //addStream(video, s);
       }
+      addStream(video, event.stream);
       video[0].play();
     };
     var video = $("#towtruck-video-me");
     assert(video.length);
-    // FIXME: temporary hack for demo!
-    var useVideo = ! runner.isClient;
     navigator.mozGetUserMedia(
-      {audio: true, video: useVideo},
+      {audio: true, video: true},
       function (stream) {
         addStream(video, stream);
         video[0].play();
@@ -287,6 +300,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
 
   function setupRTC() {
     var chat = require("chat");
+    console.log("setupRTC started");
     if (! rtc.videoWanted) {
       if (rtc.offer) {
         chat.addChat("Do you want to talk?  Press (v) to start video", "system");
@@ -294,9 +308,12 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       return;
     }
     if (rtc.videoWanted && ! rtc.offer) {
+      console.log("making connection & offer");
       makeConnection(function () {
+        console.log("created connection");
         createOffer(function (offer) {
-          runner.send({
+          console.log("created offer");
+          session.send({
             type: "rtc-offer",
             offer: offer
           });
@@ -305,12 +322,12 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       return;
     }
     if (rtc.videoWanted && rtc.offer && ! rtc.myAnswer) {
-    console.log("sending answer");
+      console.log("sending answer");
       makeConnection(function () {
-      console.log("connection created");
+        console.log("connection created");
         createAnswer(function (answer) {
-        console.log("answer created");
-          runner.send({
+          console.log("answer created");
+          session.send({
             type: "rtc-answer",
             answer: answer
           });
@@ -318,5 +335,7 @@ define(["jquery", "util", "runner", "ui"], function ($, util, runner, ui) {
       });
     }
   }
+
+  return webrtc;
 
 });

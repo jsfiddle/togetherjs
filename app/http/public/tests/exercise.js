@@ -7,14 +7,14 @@ wait(500);
 
 // =>
 
-var ui, chat, util, runner, tracker, $;
+var ui, chat, util, session, tracker, $;
 require(
-  ["ui", "chat", "util", "runner", "tracker", "jquery"],
-  Spy("loader", function (uiMod, chatMod, utilMod, runnerMod, trackerMod, $mod) {
+  ["ui", "chat", "util", "session", "tracker", "jquery"],
+  Spy("loader", function (uiMod, chatMod, utilMod, sessionMod, trackerMod, $mod) {
     ui = uiMod;
     chat = chatMod;
     util = utilMod;
-    runner = runnerMod;
+    session = sessionMod;
     tracker = trackerMod;
     $ = $mod;
     print("loaded");
@@ -22,24 +22,27 @@ require(
 
 // => loaded
 
-var oldSend = runner.channel.send;
-runner.channel.send = Spy("send", function () {
-  oldSend.apply(runner.channel, arguments);
+var channel = session._getChannel();
+var oldSend = channel.send;
+channel.send = Spy("send", function () {
+  oldSend.apply(channel, arguments);
 }, {ignoreThis: true});
-var oldOnMessage = runner.channel.onmessage;
-runner.channel.onmessage = Spy("onmessage", function () {
-  oldOnMessage.apply(runner.channel, arguments);
+var oldOnMessage = channel.onmessage;
+channel.onmessage = Spy("onmessage", function () {
+  oldOnMessage.apply(channel, arguments);
 }, {ignoreThis: true});
+
+// =>
 
 // Clear chat so we don't have old chat logs from previous tests:
 chat.Chat.submit("/clear");
 
-$("#other-client").attr("src", runner.shareUrl());
-print(runner.shareUrl());
+$("#other-client").attr("src", session.shareUrl());
+print(session.shareUrl());
 wait(1000);
 
 /* =>
-.../tests/?name=exercise.js#&towtruck-?
+.../tests/?name=exercise.js#&towtruck=?
 ...
 */
 
@@ -48,7 +51,7 @@ wait(1000);
 
 chat.Chat.submit("hey you");
 print(ui.isChatEmpty());
-runner.messageHandler.emit("chat", {
+session.hub.emit("chat", {
   type: "chat",
   clientId: "foo",
   text: "from other",

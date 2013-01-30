@@ -2,7 +2,6 @@
 <html class="deployment-type-development">
   <head>
     <meta charset="utf-8">
-    <base target="_blank">
 
     <title>Barebones Friendlycode Editor</title>
     <link rel="stylesheet" href="css/friendlycode.css">
@@ -12,6 +11,12 @@
 
     <script src="js/require-config.js"></script>
     <script src="js/require.min.js"></script>
+    <script>
+      var towtruck = location.protocol + "//" + location.hostname + ":8080/towtruck.js";
+      var script = document.createElement("script");
+      script.src = towtruck;
+      document.head.appendChild(script);
+    </script>
     <script>
     require.baseUrl = "js";
     // We don't want TowTruck to try to load until after FriendlyCode is started
@@ -37,6 +42,5 @@
       return result;
     });
     </script>
-    <script src="http://localhost:8080/towtruck.js"></script>
   </body>
 </html>

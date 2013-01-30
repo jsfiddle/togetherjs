@@ -141,8 +141,6 @@ define([], function () {
     return proto;
   };
 
-  util.mixinEvents(util);
-
   util.Module = util.Class({
     constructor: function (name) {
       this._name = name;

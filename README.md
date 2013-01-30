@@ -3,7 +3,7 @@ TowTruck - Who you call when you get stuck
 
 What is TowTruck?
 -----------------
-TowTruck is a simple, easy-to-use collaboration add-on for web applications. 
+TowTruck is a simple, easy-to-use collaboration add-on for web applications.
 
 
 Introduction
@@ -59,7 +59,7 @@ A basic overview of the code:
 
 - `intro.js`: the intro screen, and what you get when you hit *i*
 
-- `towtruck-runner.js`: this is where most of the setup work is done.  It establishes the channels, routes messages to different components, and handles persistence.
+- `towtruck-runner.js`: this is where most of the setup work is done. It establishes the channels, routes messages to different components, and handles persistence.
 
 - `towtruck.js`: this is the bootstrap code.  It doesn't do anything, but when asked it knows how to load up all the other modules and get things started.  It also detects if TowTruck should be started immediately (like when someone opens the "share" link).
 
@@ -88,6 +88,20 @@ TowTruck is meant to be an unintrusive bit of Javascript you add to your page to
 
 You can enter `/help` into the chat window to see some developer-oriented features.
 
+### Docking
+
+In order to enable docking, you must have at least one element in your page with the class `towtruck-undocked`.  When the chat interface is "docked" this class is swapped for `towtruck-docked`.  You can also put `data-towtruck-doc-*` attributes on your body element, which are additional CSS rules applied to the chat window when docked.
+
+You may generally find it sufficient to do:
+
+```css
+#container.towtruck-docked {
+  margin-right: 420px;
+}
+```
+
+The idea being that you clear a 420px area on the left side of the screen when the interface is docked.  Of course 420px is a very specific number, and it likely to change, so please test docking if you use it.
+
 Bookmarklet
 -----------
 
@@ -97,8 +111,9 @@ Go to `http://localhost:8080/bookmarklet.html` for a bookmarklet that you can us
 Testing
 -------
 
-There isn't much right now.  [Walkabout.js](https://github.com/ianb/walkabout.js) is included in the code, which is a tool to do random things on a page.  The plan is to combine this with lots of santiy checks in the code itself.  You can activate Walkabout with `/test` in the chat (`/help` to see more options).
+There isn't much right now. [Walkabout.js](https://github.com/ianb/walkabout.js) is included in the code, which is a tool to do random things on a page.  The plan is to combine this with lots of santiy checks in the code itself.  You can activate Walkabout with `/test` in the chat (`/help` to see more options).
 
+You can also go to `http://localhost:8080/tests/?name=exercise.js` for some other simple tests.
 
 License
 -------

@@ -170,7 +170,6 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
       this._incoming(event.data);
     }).bind(this);
     this.socket.onerror = (function (event) {
-      alert("Error:" + JSON.stringify(event.data));
       console.error('WebSocket error:', event.data);
     }).bind(this);
   }
@@ -440,16 +439,9 @@ var Route = util.Class(util.mixinEvents({
 
   close: function () {
     if (this.router._routes[this.id] !== this) {
-      // We've just been overwritten, so ignore
+      // This route instance has been overwritten, so ignore
       return;
     }
-    // FIXME: not sure if this remote close is a good idea
-    // in practice, it seems to not be?
-    /*this.router.channel.send({
-      type: "route",
-      routeId: this.id,
-      close: true
-    });*/
     delete this.router._routes[this.id];
   }
 

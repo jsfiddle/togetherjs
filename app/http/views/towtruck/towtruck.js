@@ -7,26 +7,13 @@
     "/towtruck.css"
   ];
 
-  // FIXME: these should all get combined for a production release:
-  var scripts = [
-    "/towtruck/libs.js",
-    "/towtruck/util.js",
-    "/towtruck/element-finder.js",
-    "/towtruck/channels.js",
-    "/towtruck/runner.js",
-    "/towtruck/chat.js",
-    "/towtruck/webrtc.js",
-    "/towtruck/tracker.js",
-    "/towtruck/ui.js",
-    "/towtruck/pointer.js"
-  ];
-
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
   var cacheBust = Date.now();
 
   // FIXME: I think there's an event that would be called before load?
+  // DOMReady?
   window.addEventListener("load", function () {
     var control = document.getElementById("towtruck-starter");
     // FIXME: not sure where to put the control if the page doesn't have
@@ -43,25 +30,28 @@
   function addStyle(url) {
     var link = document.createElement("link");
     link.setAttribute("rel", "stylesheet");
-    // FIXME: remove cache buster:
-    link.href = baseUrl + url + "?" + Date.now();
+    link.href = baseUrl + url + "?bust=" + cacheBust;
     document.head.appendChild(link);
   }
 
   function addScript(url) {
     var script = document.createElement("script");
-    // FIXME: remove cache buster:
-    script.src = "<%= process.env.PUBLIC_BASE_URL%>" + url + "?" + Date.now();
+    script.src = baseUrl + url + "?bust=" + cacheBust;
     document.head.appendChild(script);
   }
 
-  var startTowTruck = window.startTowTruck = function () {
+  var startTowTruck = window.startTowTruck = function (doneCallback) {
     if (startTowTruck.loaded) {
-      var runner = startTowTruck.require("runner");
-      runner.boot();
+      var session = startTowTruck.require("session");
+      session.start();
+      // Note if this is an event handler, doneCallback will be an
+      // event object and not a function
+      if (typeof doneCallback == "function") {
+        doneCallback();
+      }
       return;
     }
-    // A sort of signal to towtruck-runner.js to tell it to actually
+    // A sort of signal to session.js to tell it to actually
     // start itself (i.e., put up a UI and try to activate)
     if (! window._startTowTruckImmediately) {
       window._startTowTruckImmediately = true;
@@ -73,23 +63,44 @@
     };
     var oldRequire = window.require;
     var oldDefine = window.define;
-    require = {
+    var config = {
       baseUrl: baseUrl + "/towtruck",
       urlArgs: "bust=" + cacheBust,
-      deps: ["runner", "ui", "chat", "pointer", "tracker", "webrtc"],
-      callback: function () {
-        startTowTruck.loaded = true;
-        startTowTruck.require = require;
-        startTowTruck.define = define;
-        callbacks.forEach(function (c) {
-          c();
-        });
+      paths: {
+        jquery: "libs/jquery-1.8.3.min",
+        walkabout: "libs/walkabout.js/walkabout"
       }
     };
-    addScript("/towtruck/require.js");
+    var deps = ["session"];
+    function callback() {
+      startTowTruck.loaded = true;
+      startTowTruck.require = require;
+      startTowTruck.define = define;
+      callbacks.forEach(function (c) {
+        c();
+      });
+      if (doneCallback) {
+        doneCallback();
+      }
+    }
+    if (typeof require == "function") {
+      // FIXME: we should really be worried about overwriting config options
+      // of the app itself
+      require.config(config);
+      require(deps, callback);
+    } else {
+      config.deps = deps;
+      config.callback = callback;
+      require = config;
+    }
+    // FIXME: we should namespace require.js to avoid conflicts.  See:
+    //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
+    //   http://requirejs.org/docs/faq-advanced.html#rename
+    addScript("/towtruck/libs/require.js");
   };
 
   startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";
+  startTowTruck.baseUrl = baseUrl;
 
   startTowTruck.bookmarklet = function () {
     var s = "window._TowTruckBookmarklet = true;";
@@ -100,18 +111,33 @@
     return "javascript:" + encodeURIComponent(s);
   };
 
+  // It's nice to replace this early, before the load event fires, so we conflict
+  // as little as possible with the app we are embedded in:
+  var hash = location.hash.replace(/^#/, "");
+  var m = /&?towtruck=([^&]*)/.exec(hash);
+  if (m) {
+    startTowTruck._shareId = m[1];
+    var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+    location.hash = newHash;
+  }
+
   function onload() {
-    var hash = location.hash.replace(/^#/, "");
-    if (hash.search(/&towtruck-/) === 0) {
-      var shareId = hash.substr(hash.search(/&towtruck-/));
-      shareId = shareId.substr(("&towtruck-").length);
-      shareId = shareId.replace(/&.*/, "");
-      window._startTowTruckImmediately = shareId;
-      console.log("starting", shareId);
+    if (startTowTruck._shareId) {
+      window._startTowTruckImmediately = true;
       startTowTruck();
     } else if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
       startTowTruck();
+    } else {
+      var name = window.name;
+      var key = "towtruck.status." + name;
+      var value = localStorage.getItem(key);
+      if (value) {
+        value = JSON.parse(value);
+        if (value && value.running) {
+          startTowTruck();
+        }
+      }
     }
   }
 

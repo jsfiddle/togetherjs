@@ -8,7 +8,7 @@ require('../../lib/extensions/number');
 
 process.env.PUBLIC_BASE_URL = process.env.PERSONA_AUDIENCE;
 
-const 
+const
 env         = require('../../lib/environment'),
 express     = require('express'),
 logger      = require('../../lib/logger'),
@@ -45,7 +45,8 @@ http.configure(function(){
     extend(locals, require(''));
   });
 
-  http.use(express.logger());
+  // FIXME: this outputs more than I'm interested in, but maybe there's a better way of suppressing those via Foreman?
+  //http.use(express.logger());
   http.use(express.static(__dirname + '/public'));
   http.use(express.cookieParser());
   http.use(express.bodyParser());
@@ -87,6 +88,7 @@ process.on('uncaughtException', function(err) {
 });
 
 var port = env.get("PORT");
-http.listen(port);
+var host = env.get("HOST") || "127.0.0.1";
+http.listen(port, host);
 
 logger.info("HTTP server listening on port " + port + " (" + process.env.PUBLIC_BASE_URL + ").");

@@ -91,6 +91,7 @@
     border-radius: 0.25em;
 }
 
+// FIXME: maybe use something like this? http://stackoverflow.com/questions/7874507/a-linear-gradient-with-variable-number-of-stops-in-less-or-sass
 /*headerbar style*/
 .header-chrome(){
 	background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
@@ -160,7 +161,8 @@
 
 
 /*TowTruck intro screen*/
-.towtruck-container.towtruck-intro {
+// FIXME: I think this is no longer used?
+/*.towtruck-container.towtruck-intro {
     position: absolute;
     width: 80%;
     height: 100%;
@@ -173,7 +175,7 @@
     z-index: 10000;
     background: #f1f1f1;
     .box-dropshadow;
-}
+}*/
 
 /*TOP HEADER BAR*/
 #towtruck-topbar {
@@ -193,6 +195,9 @@
 
 #towtruck-topbar:hover {
 	cursor: move;
+    .towtruck-container-docked & {
+        cursor: default;
+    }
 }
 
 #towtruck-topbar .towtruck-header {
@@ -204,7 +209,9 @@
     text-shadow: 0px 1px rgba(255,255,255,1);
     padding-top: 15px;
     float: left;
-    width: 300px;
+    // FIXME: should be calculated somehow based on the number of buttons
+    // like 340 - (@numberOfButtons * @buttonWidth)
+    width: 280px;
     padding-left: 60px;
     .user-select(none);
     cursor: default;
@@ -215,42 +222,32 @@
 
 #towtruck-topbar .towtruck-header:hover {
 	cursor: move;
+    .towtruck-container-docked & {
+        cursor: default;
+    }
 }
 
 
-#towtruck-topbar .towtruck-minimize {
-    float: right;
-    padding-right: 15px;
-    padding-top: 15px;
-	opacity:.5;
+#towtruck-topbar {
+    .towtruck-close, .towtruck-minimize, .towtruck-dock {
+        float: right;
+        padding-right: 15px;
+        padding-top: 15px;
+	    opacity:.5;
+        cursor:pointer;
+        img {
+            height:12px;
+            width:12px;
+        }
+        &:hover {
+            float: right;
+            padding-right: 15px;
+            padding-top: 15px;
+	        opacity:1;
+        }
+    }
 }
 
-#towtruck-topbar .towtruck-minimize:hover {
-    float: right;
-    padding-right: 15px;
-    padding-top: 15px;
-	opacity:1;
-	cursor:pointer;
-}
-
-#towtruck-topbar .towtruck-close {
-    float: right;
-    padding-right: 15px;
-    padding-top: 15px;
-	opacity:.5;
-}
-
-#towtruck-topbar .towtruck-close img {
-	height:12px;
-	width:12px;
-}
-
-#towtruck-topbar .towtruck-close:hover {
-    float: right;
-    padding-right: 15px;
-    padding-top: 15px;
-	opacity:1;
-}
 /*END TOP HEADER BAR*/
 
 
@@ -349,7 +346,7 @@
 }
 
 #towtruck-body input.towtruck-input-link {
-	background-image: url(http://localhost:8080/images/icn-link.png);
+	background-image: url(/images/icn-link.png);
   	background-position: 10px 9px;
 	background-repeat: no-repeat;
 	background-size:13px 17px;
@@ -366,7 +363,7 @@
 }
 
 #towtruck-body input.towtruck-input-link:focus {
-	background-image: url(http://localhost:8080/images/icn-link.png);
+	background-image: url(/images/icn-link.png);
   	background-position: 10px 9px;
 	background-repeat: no-repeat;
     border-radius: 0.25em;
@@ -436,7 +433,8 @@
 
 /*Main container*/
 .towtruck-container {
-    position: absolute;
+    //position: absolute;
+    position: fixed;
     width: 420px;
     height: 528px;
     bottom: 0px;
@@ -484,7 +482,7 @@
 }
 
 .towtruck-container .towtruck-chat .video-screen {
-	background:#6b7b88 url(http://localhost:8080/images/avatar-default-bg.png);
+	background:#6b7b88 url(/images/avatar-default-bg.png);
 	background-repeat: no-repeat;
 	background-position: 50px 30px;
 	height:100%;
@@ -799,4 +797,31 @@ p.towtruck-chat-toolbox-icons a{
 
 .towtruck-chat-message.towtruck-arrow-message {
     border: 2px solid #f00;
+}
+
+/* Shared cursors */
+
+.towtruck-cursor {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 7px;
+    z-index: 999;
+    margin-left: -5px;
+    margin-top: -5px;
+    &.towtruck-cursor-0 {
+        border: 2px solid #f00;
+    }
+    &.towtruck-cursor-1 {
+        border: 2px solid #0f0;
+    }
+    &.towtruck-cursor-2 {
+        border: 2px solid #00f;
+    }
+    &.towtruck-cursor-3 {
+        border: 2px solid #dd0;
+    }
+    &.towtruck-cursor-4 {
+        border: 2px solid #d0d;
+    }
 }

@@ -2,7 +2,12 @@
 <html class="deployment-type-development">
   <head>
     <meta charset="utf-8">
-    <base target="_blank">
+    <script>
+      var towtruck = location.protocol + "//" + location.hostname + ":8080/towtruck.js";
+      var script = document.createElement("script");
+      script.src = towtruck;
+      document.head.appendChild(script);
+    </script>
 
     <title>Welcome to the Examples</title>
   </head>
