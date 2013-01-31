@@ -192,9 +192,9 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       name = button.attr("data-activate");
       $('[data-activate="' + name + '"] img').css("opacity", "1");
     }
-    $("#towtruck-nav-btns").find("img.triangle").remove();
-    var triangle = cloneTemplate("triangle");
-    button.closest("li").append(triangle);
+    // $("#towtruck-nav-btns").find("img.triangle").remove();
+    // var triangle = cloneTemplate("triangle");
+    // button.closest("li").append(triangle);
     $(".towtruck-screen").hide();
     var els = $(".towtruck-screen." + name).show();
     assert(els.length, "No screen with name:", name);
