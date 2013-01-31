@@ -209,7 +209,7 @@ body {
   font-size: 14px;
   line-height: 20px;
   color: #333333;
-  background-color: #000000;
+  background-color: #ffffff;
 }
 a {
   color: #0088cc;
@@ -957,7 +957,7 @@ table {
   border-top: 2px solid #dddddd;
 }
 .table .table {
-  background-color: #000000;
+  background-color: #ffffff;
 }
 .table-condensed th,
 .table-condensed td {
@@ -3137,7 +3137,7 @@ input[type="submit"].btn.btn-mini {
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover {
   color: #555555;
-  background-color: #000000;
+  background-color: #ffffff;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
   cursor: default;
