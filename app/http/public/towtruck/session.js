@@ -25,7 +25,7 @@ define(["util", "channels"], function (util, channels) {
 
   session.hubUrl = function () {
     assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return startTowTruck.hubBase + "/hub/" + session.shareId;
+    return TowTruck.hubBase + "/hub/" + session.shareId;
   };
 
   session.shareUrl = function () {
@@ -227,8 +227,8 @@ define(["util", "channels"], function (util, channels) {
       name = window.name = "towtruck-" + util.generateId();
     }
     if (! shareId) {
-      if (startTowTruck._shareId) {
-        shareId = startTowTruck._shareId;
+      if (TowTruck._shareId) {
+        shareId = TowTruck._shareId;
       }
     }
     if (! shareId) {
@@ -246,9 +246,9 @@ define(["util", "channels"], function (util, channels) {
     if (! shareId) {
       var saved = session.getStorage("status." + name);
       assert(
-        saved || window._startTowTruckImmediately,
+        saved || TowTruck.startTowTruckImmediately,
         "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
-      if ((! saved) && window._startTowTruckImmediately) {
+      if ((! saved) && TowTruck.startTowTruckImmediately) {
         isClient = false;
         shareId = session.settings.get("stickyShare");
         if (! shareId) {
@@ -305,7 +305,7 @@ define(["util", "channels"], function (util, channels) {
     session.emit("shareId");
   };
 
-  if (window._startTowTruckImmediately) {
+  if (TowTruck.startTowTruckImmediately) {
     setTimeout(session.start);
   }
 

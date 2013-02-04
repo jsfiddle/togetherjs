@@ -23,7 +23,7 @@
     }
     button = document.createElement("button");
     button.innerHTML = "Start TowTruck";
-    button.addEventListener("click", startTowTruck, false);
+    button.addEventListener("click", TowTruck, false);
     control.appendChild(button);
   }, false);
 
@@ -40,27 +40,21 @@
     document.head.appendChild(script);
   }
 
-  var startTowTruck = window.startTowTruck = function (doneCallback) {
-    if (startTowTruck.loaded) {
-      var session = startTowTruck.require("session");
+  var TowTruck = window.TowTruck = function (doneCallback) {
+    if (TowTruck._loaded) {
+      var session = TowTruck.require("session");
       session.start();
       // Note if this is an event handler, doneCallback will be an
       // event object and not a function
-      if (typeof doneCallback == "function") {
+      if (doneCallback && typeof doneCallback == "function") {
         doneCallback();
       }
       return;
     }
     // A sort of signal to session.js to tell it to actually
     // start itself (i.e., put up a UI and try to activate)
-    if (! window._startTowTruckImmediately) {
-      window._startTowTruckImmediately = true;
-    }
+    TowTruck.startTowTruckImmediately = true;
     styles.forEach(addStyle);
-    var callbacks = [];
-    window._TowTruckOnLoad = function (callback) {
-      callbacks.push(callback);
-    };
     var oldRequire = window.require;
     var oldDefine = window.define;
     var config = {
@@ -73,13 +67,10 @@
     };
     var deps = ["session"];
     function callback() {
-      startTowTruck.loaded = true;
-      startTowTruck.require = require;
-      startTowTruck.define = define;
-      callbacks.forEach(function (c) {
-        c();
-      });
-      if (doneCallback) {
+      TowTruck._loaded = true;
+      TowTruck.require = require;
+      TowTruck.define = define;
+      if (doneCallback && typeof doneCallback == "function") {
         doneCallback();
       }
     }
@@ -99,10 +90,10 @@
     addScript("/towtruck/libs/require.js");
   };
 
-  startTowTruck.hubBase = "<%= process.env.HUB_BASE %>";
-  startTowTruck.baseUrl = baseUrl;
+  TowTruck.hubBase = "<%= process.env.HUB_BASE %>";
+  TowTruck.baseUrl = baseUrl;
 
-  startTowTruck.bookmarklet = function () {
+  TowTruck.bookmarklet = function () {
     var s = "window._TowTruckBookmarklet = true;";
     s += "s=document.createElement('script');";
     s += "s.src=" + JSON.stringify(baseUrl + "/towtruck.js") + ";";
@@ -116,18 +107,27 @@
   var hash = location.hash.replace(/^#/, "");
   var m = /&?towtruck=([^&]*)/.exec(hash);
   if (m) {
-    startTowTruck._shareId = m[1];
+    TowTruck._shareId = m[1];
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }
 
+  function conditionalOnload() {
+    // A page can define this function to defer TowTruck from starting
+    if (window._TowTruckCallToStart) {
+      window._TowTruckCallToStart(onload);
+    } else {
+      onload();
+    }
+  }
+
   function onload() {
-    if (startTowTruck._shareId) {
-      window._startTowTruckImmediately = true;
-      startTowTruck();
+    if (TowTruck._shareId) {
+      TowTruck.startTowTruckImmediately = true;
+      TowTruck();
     } else if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
-      startTowTruck();
+      TowTruck();
     } else {
       var name = window.name;
       var key = "towtruck.status." + name;
@@ -135,16 +135,16 @@
       if (value) {
         value = JSON.parse(value);
         if (value && value.running) {
-          startTowTruck();
+          TowTruck();
         }
       }
     }
   }
 
   if (document.readyState == "complete") {
-    onload();
+    conditionalOnload();
   } else {
-    window.addEventListener("load", onload, false);
+    window.addEventListener("load", conditionalOnload, false);
   }
 
 })();

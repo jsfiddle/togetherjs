@@ -214,7 +214,7 @@ define(["jquery", "util", "session", "ui"], function ($, util, session, ui) {
       var video = $("#towtruck-video");
       for (var i=0; i<conn.remoteStreams.length; i++) {
         var s = conn.remoteStreams[i];
-        //addStream(video, s);
+        addStream(video, s);
       }
       addStream(video, event.stream);
       video[0].play();

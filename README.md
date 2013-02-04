@@ -84,7 +84,7 @@ Integration
 
 TowTruck is meant to be an unintrusive bit of Javascript you add to your page to enable these collaborative features.  It inspects the page to determine what fields can be synchronized between the two browsers, and adds its own interface on top of the content.
 
-`towtruck.js` itself is just a small piece of code to start up TowTruck, it should not cause overhead in your code.  You can either include an element on your page `<div id="towtruck-starter"></div>`, and a TowTruck button will be added to that, or you can call `startTowTruck()` yourself.
+`towtruck.js` itself is just a small piece of code to start up TowTruck, it should not cause overhead in your code.  You can either include an element on your page `<div id="towtruck-starter"></div>`, and a TowTruck button will be added to that, or you can call `TowTruck()` yourself.
 
 You can enter `/help` into the chat window to see some developer-oriented features.
 

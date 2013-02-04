@@ -19,11 +19,13 @@
     </script>
     <script>
     require.baseUrl = "js";
-    // We don't want TowTruck to try to load until after FriendlyCode is started
-    // up:
-    window._TowTruckLoads = [];
-    window._TowTruckOnLoad = function (callback) {
-      window._TowTruckLoads.push(callback);
+    var TowTruckCallback = null;
+    window._TowTruckCallToStart = function (callback) {
+      if (TowTruckCallback) {
+        callback();
+      } else {
+        TowTruckCallback = callback;
+      }
     };
     require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
       var result = FriendlycodeEditor({
@@ -33,11 +35,12 @@
       result.ready.then(function () {
         var el = $(".publish-button");
         var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">T</div>');
-        newButton.click(startTowTruck);
+        newButton.click(TowTruck);
         el.before(newButton);
-        window._TowTruckLoads.forEach(function (callback) {
-          callback();
-        });
+        if (TowTruckCallback) {
+          TowTruckCallback();
+        }
+        TowTruckCallback = true;
       });
       return result;
     });

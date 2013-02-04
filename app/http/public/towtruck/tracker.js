@@ -161,6 +161,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     },
 
     change: function () {
+      console.log("Got change in element", this.element);
       var newValue = this.getState();
       var old = this.curState;
       if (newValue == old) {

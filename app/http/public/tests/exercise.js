@@ -2,7 +2,7 @@
 
 // First we test that we can load modules
 
-startTowTruck();
+TowTruck();
 wait(500);
 
 // =>
@@ -28,9 +28,12 @@ channel.send = Spy("send", function () {
   oldSend.apply(channel, arguments);
 }, {ignoreThis: true});
 var oldOnMessage = channel.onmessage;
-channel.onmessage = Spy("onmessage", function () {
+channel.onmessage = function (msg) {
   oldOnMessage.apply(channel, arguments);
-}, {ignoreThis: true});
+  if (msg.type != "cursor-update") {
+    print("onmessage(" + repr(msg) + ")");
+  }
+};
 
 // =>
 
