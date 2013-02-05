@@ -77,7 +77,7 @@ if (location.hash.indexOf("towtruck-") != -1) {
 <script>
 if (document.body.className.indexOf("autodoctest") == -1) {
   (function () {
-    $("#other, .commenttest, #contents, #doctest-output").remove();
+    $("#other, .commenttest, #contents, #doctest-output").hide();
     $("#output-container").show();
     var output = $("#output");
     ["debug", "log", "info", "warn", "error"].forEach(function (n) {

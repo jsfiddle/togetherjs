@@ -1,7 +1,7 @@
 /* WebRTC support
    Note that this relies on parts of the interface code that usually goes in ui.js
    */
-define(["jquery", "util", "session", "ui"], function ($, util, session, ui) {
+define(["require", "jquery", "util", "session", "ui"], function (require, $, util, session, ui) {
   var webrtc = util.Module("webrtc");
   var assert = util.assert;
 

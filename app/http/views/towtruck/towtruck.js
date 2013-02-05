@@ -40,6 +40,8 @@
     document.head.appendChild(script);
   }
 
+  var oldTowTruck = window.TowTruck;
+
   var TowTruck = window.TowTruck = function (doneCallback) {
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
@@ -55,9 +57,8 @@
     // start itself (i.e., put up a UI and try to activate)
     TowTruck.startTowTruckImmediately = true;
     styles.forEach(addStyle);
-    var oldRequire = window.require;
-    var oldDefine = window.define;
     var config = {
+      context: "towtruck",
       baseUrl: baseUrl + "/towtruck",
       urlArgs: "bust=" + cacheBust,
       paths: {
@@ -68,27 +69,37 @@
     var deps = ["session"];
     function callback() {
       TowTruck._loaded = true;
-      TowTruck.require = require;
-      TowTruck.define = define;
+      TowTruck.require = require.config({context: "towtruck"});
       if (doneCallback && typeof doneCallback == "function") {
         doneCallback();
       }
     }
     if (typeof require == "function") {
-      // FIXME: we should really be worried about overwriting config options
-      // of the app itself
-      require.config(config);
-      require(deps, callback);
+      TowTruck.require = require.config(config);
+    }
+    if (typeof TowTruck.require == "function") {
+      // This is an already-configured version of require
+      TowTruck.require(deps, callback);
     } else {
       config.deps = deps;
       config.callback = callback;
-      require = config;
+      window.require = config;
     }
     // FIXME: we should namespace require.js to avoid conflicts.  See:
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
     addScript("/towtruck/libs/require.js");
   };
+
+  // If TowTruck previously existed, copy all its properties over to our new
+  // TowTruck function:
+  if (oldTowTruck !== undefined) {
+    for (var a in oldTowTruck) {
+      if (oldTowTruck.hasOwnProperty(a)) {
+        TowTruck[a] = oldTowTruck[a];
+      }
+    }
+  }
 
   TowTruck.hubBase = "<%= process.env.HUB_BASE %>";
   TowTruck.baseUrl = baseUrl;

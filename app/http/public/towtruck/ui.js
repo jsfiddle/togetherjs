@@ -1,4 +1,4 @@
-define(["jquery", "util", "session", "templates"], function ($, util, session, templates) {
+define(["require", "jquery", "util", "session", "templates"], function (require, $, util, session, templates) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var chat;
@@ -175,7 +175,12 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
   };
 
   function updateShareLink() {
-    $(".towtruck-input-link").val(session.shareUrl());
+    var el = $(".towtruck-input-link");
+    if (! session.shareId) {
+      el.val("");
+    } else {
+      el.val(session.shareUrl());
+    }
   }
 
   session.on("close", function () {

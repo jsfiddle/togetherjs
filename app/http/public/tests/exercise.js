@@ -8,7 +8,7 @@ wait(500);
 // =>
 
 var ui, chat, util, session, tracker, $;
-require(
+TowTruck.require(
   ["ui", "chat", "util", "session", "tracker", "jquery"],
   Spy("loader", function (uiMod, chatMod, utilMod, sessionMod, trackerMod, $mod) {
     ui = uiMod;
@@ -24,9 +24,12 @@ require(
 
 var channel = session._getChannel();
 var oldSend = channel.send;
-channel.send = Spy("send", function () {
+channel.send = function (msg) {
   oldSend.apply(channel, arguments);
-}, {ignoreThis: true});
+  if (msg.type != "cursor-update") {
+    print("send(" + repr(msg) + ")");
+  }
+};
 var oldOnMessage = channel.onmessage;
 channel.onmessage = function (msg) {
   oldOnMessage.apply(channel, arguments);

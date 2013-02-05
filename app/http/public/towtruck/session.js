@@ -1,4 +1,4 @@
-define(["util", "channels"], function (util, channels) {
+define(["require", "util", "channels"], function (require, util, channels) {
 
   var DEBUG = true;
   var session = util.mixinEvents(util.Module("session"));
@@ -274,9 +274,6 @@ define(["util", "channels"], function (util, channels) {
     initClientId();
     initShareId();
     openChannel();
-    if (typeof require != "function") {
-      console.warn("Odd require:", require);
-    }
     require(features, function () {
       // FIXME: should be the overview screen sometimes:
       var ui = require("ui");

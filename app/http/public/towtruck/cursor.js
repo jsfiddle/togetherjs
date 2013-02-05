@@ -46,6 +46,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     }
   });
 
+  // FIXME: need to enable this more lazily, and disable on close:
   var lastTime = 0;
   var MIN_TIME = 100;
   $(document).mousemove(function (event) {
