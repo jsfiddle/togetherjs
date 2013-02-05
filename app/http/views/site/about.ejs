@@ -1,119 +1,79 @@
 <% layout('../layout.ejs') -%>
 
-<div id="home" class="masthead">
-        <ul class="nav nav-pills pull-right">
-          <li class="active"><a href="#home">Home</a></li>
-          <li><a href="#getting-started">Get Started</a></li>
-          <li><a href="#about">About</a></li>
-		  <li><a href="#resources">Resources</a></li>
-          <li><a href="#contact">Contact</a></li>
-		  <li>
-            <% if (user.email){ %>
-              <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
-            <% } else { %>
-              <a id="login" href="#"><img src="/persona-sign_in.png"></a>
-            <% } %>
-          </li>
-        </ul>
-        <h3 class="muted">TowTruck</h3>
-		<div id="tagline">Towtruck is a collaborative service tool for web applications, powered by Mozilla Labs</div>
-      </div>
-
-      <hr>
-
       <div class="jumbotron">
-        <iframe src="http://player.vimeo.com/video/57992755" width="700" height="393" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/57992755">Tow Truck - Proof of Concept in Progress</a> from <a href="http://vimeo.com/simonwex">Simon</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+        <iframe src="http://player.vimeo.com/video/57992755" width="700" height="393" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
       </div>
 
       <hr>
 
       <div id="getting-started" class="row-fluid marketing">
-        <div class="span6">
+        <div class="span12">
 	
 		  <h1>Get Started</h1>
-          <h4>1. Download</h4>
-          <p>Copy and paste <code>&lt;script='https://towtruck.mozillalabs.com/towtruck.js'&gt;&lt;/script&gt;</code> into your <code>&lt;head&gt;&lt;/head&gt;</code> in your index.</p>
+          <h4>1. Add this script inside your &lt;head&gt; tag</h4>
 
-          <h4>2. Copy and Paste</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+          <p><pre>&lt;script src='https://towtruck.mozillalabs.com/towtruck.js'&gt;&lt;/script&gt;</pre></p>
 
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
+          <h4>2. Add this button to your site</h4>
+          <p><pre>&lt;button id='towtruck-starter'&gt;Start TowTruck&lt;/button&gt;</pre></p>
 
-        <div class="span6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+          <h4>3. Style the TowTruck button</h4>
+          <p>Feel free to add any styles or wording to the TowTruck button.  This is what your users will see.</p>
 
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+          <h4>4. Sit back and relax</h4>
+          <p>Users will press the TowTruck button on your site and use it to get help.</p>
 
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
         </div>
       </div>
 
       <hr>
 
 	<div id="about" class="row-fluid marketing">
-        <div class="span6">
+        <div class="span12">
 		
-		  <h1>About TowTruck</h1>
-		  
+		  <h1>Why use TowTruck?</h1>
 		
-          <h4>Do you have users on your site who could use help collaborating?</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+          <h4>Easy setup</h4>
+          <p>Just copy and paste the TowTruck.js script into your site, and your site is instantly TowTruck enabled.</p>
 
-          <h4>And this</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+		  <h4>Cross-platform collaboration</h4>
+          <p>TowTruck optimizes the web, and allows users to collaborate for free across any device.</p>
 
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+          <h4>HTML5 optimized</h4>
+          <p>TowTruck enables easier, seamless collaboration using HTML5 video and audio.</p>
+
+          <h4>Let Mozilla be the trusted middle-man</h4>
+          <p>Mozilla will handle and respect user-privacy.</p>
         </div>
 
-        <div class="span6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
       </div>
 
       <hr>
 
 	<div id="resources" class="row-fluid marketing">
-        <div class="span6">
+        <div class="span12">
 
 		  <h1>Resources</h1>
+          <h4>Just for you</h4>
+			<ul>	
+				<li><a href="https://github.com/mozilla/towtruck" target="_blank">Github repo</a></li>
+				<li><a href="http://vimeo.com/57992755" target="_blank">Demo video</a></li>
+				<li><a href="https://mozillalabs.com/en-US/" target="_blank">Mozilla Labs</a></li>
+			</ul>
 
-          <h4>Do this</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>And this</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
         </div>
 
-        <div class="span6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
       </div>
 
       <hr>
 
+	  <script type="text/javascript">
+		  var currentYear = (new Date).getFullYear();
+		  $(document).ready(function() {
+		  $("#year").text( (new Date).getFullYear() );
+		  });
+		</script>
+
       <div id="contact" class="footer">
-        <p>&copy; Mozilla Labs 2012</p>
+        <p>Crafted by <a href="https://mozillalabs.com/en-US/" target="_blank">Mozilla Labs</a> in <span id="year">TEXT</span></p>
       </div>

@@ -77,6 +77,80 @@
   </head>
   
   <body>
+	<style type="text/css" media="screen">
+	
+		/*Custom styles  ////////// */
+		#masthead-bg {
+			background-color: rgb(40, 49, 55);
+			background-image: -moz-linear-gradient(center top , rgb(20, 24, 28), rgb(60, 74, 83));
+			box-shadow: 0px -5px 20px rgba(255, 255, 255, 0.1) inset;
+			height:490px;
+			width:100%;
+			margin-top:-30px;
+			padding-top:30px;
+			margin-bottom:-200px;
+		}
+		
+		#home {
+			margin:0 auto;
+			width: 700px;
+		}
+		
+		.logo {
+			color:#fff;
+			font-weight: 300;
+			line-height: 20px;
+			text-rendering: optimizelegibility;
+			font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+			font-size: 18px;
+			line-height: 20px;
+			padding-left:7px;
+		}
+		
+		#masthead-bg .jumbotron {
+			margin: 0 auto;
+			width:700px;
+		}
+		
+		.jumbotron iframe{
+			box-shadow: 0px 0px 2px #000;
+		}
+		
+		#masthead-bg .jumbotron h2 {
+			color:#fff;
+		}
+		/*end Custom styles //////////*/
+		
+	</style>
+
+
+	<div id="masthead-bg">
+		
+		<div id="home" class="masthead">
+		        <ul class="nav nav-pills pull-right">
+		          <li class="active"><a href="#home">Home</a></li>
+		          <li><a href="#getting-started">Get Started</a></li>
+		          <li><a href="#about">About</a></li>
+				  <li><a href="#resources">Resources</a></li>
+		          <li><a href="#contact">Contact</a></li>
+				  <li>
+		            <% if (user.email){ %>
+		              <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
+		            <% } else { %>
+		              <a id="login" href="#"><img src="/persona-sign_in.png"></a>
+		            <% } %>
+		          </li>
+		        </ul>
+				<img src="images/icn-logo.png"><span class="logo">TowTruck</span>
+		</div>	
+
+		<div class="jumbotron">
+			<h2>Towtruck is a collaborative service tool for web applications</h2><p>powered by <a href="https://mozillalabs.com/en-US/" target="_blank">Mozilla Labs</a></p>
+		</div>		
+		
+	</div>
+	
+	
     <div class="container-narrow">
       <%- body %>
     </div>
