@@ -5,7 +5,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
 
   function ignoreElement(el) {
     while (el) {
-      if (el.className && (""+el.className).indexOf("towtruck") != -1) {
+      if (el.className && (""+el.className).indexOf("towtruck-container") != -1) {
         return true;
       }
       el = el.parentNode;
