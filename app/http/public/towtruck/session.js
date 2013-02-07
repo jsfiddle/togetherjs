@@ -72,7 +72,6 @@ define(["require", "util", "channels"], function (require, util, channels) {
 
   session.settings = {
     defaults: {
-      tabIndependent: false,
       nickname: "",
       avatar: null,
       stickyShare: null

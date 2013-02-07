@@ -108,16 +108,6 @@ define(["require", "jquery", "util", "session", "ui", "templates"], function (re
       }
     },
 
-    command_tab: function () {
-      var newSetting = session.settings("tabIndependent");
-      session.settings("tabIndependent", newSetting);
-      ui.addChat({
-        type: "system",
-        text: (newSetting ? "Tab independence turned on" : "Tab independence turned off") +
-          " reload needed"
-      });
-    },
-
     command_help: function () {
       var msg = util.trim(templates.help);
       ui.addChat({
