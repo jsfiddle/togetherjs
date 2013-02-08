@@ -7,6 +7,7 @@ base="$(dirname $(cd "$(dirname $0)"; pwd))"
 dest="$1"
 host="$2"
 hub="$3"
+version="$(cd $base ; git describe --always --dirty)"
 
 if [ -z "$dest" ] || [ "$dest" = "-h" ] || [ -z "$host" ] ; then
     echo "Usage: $(basename $0) DEST_DIR DEST_HOST [HUB]"
@@ -26,6 +27,7 @@ cp -r $base/app/http/public/towtruck $dest/towtruck
 lessc $base/app/http/public/towtruck.css $dest/towtruck.css
 sed -e 's!<%= process\.env\.PUBLIC_BASE_URL %>!'"$host!g" \
     -e 's!<%= process\.env\.HUB_BASE %>!'"$hub!g" \
+    -e 's!TowTruck\.version = "unknown"!TowTruck.version = '"\"$version\"!g" \
     < $base/app/http/views/towtruck/towtruck.js \
     > $dest/towtruck.js
 python -c '

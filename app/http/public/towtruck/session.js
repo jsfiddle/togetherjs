@@ -171,15 +171,20 @@ define(["require", "util", "channels"], function (require, util, channels) {
   });
 
   function sendHello(helloBack) {
-    var t = helloBack ? "hello-back" : "hello";
-    session.send({
-      type: t,
+    var msg = {
       nickname: session.settings.get("nickname"),
       avatar: session.settings.get("avatar"),
       url: session.currentUrl(),
       urlHash: location.hash,
       rtcSupported: session.RTCSupported
-    });
+    };
+    if (helloBack) {
+      msg.type = "hello-back";
+    } else {
+      msg.type = "hello";
+      msg.clientVersion = TowTruck.version;
+    }
+    session.send(msg);
   }
 
   /* Updates to the nickname of peers: */

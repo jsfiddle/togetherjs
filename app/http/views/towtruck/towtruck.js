@@ -101,7 +101,12 @@
     }
   }
 
-  TowTruck.hubBase = "<%= process.env.HUB_BASE %>";
+  // This should contain the output of "git describe --always --dirty"
+  // FIXME: substitute this on the server (and update make-static-client)
+  TowTruck.version = "unknown";
+  if (! TowTruck.hubBase) {
+    TowTruck.hubBase = "<%= process.env.HUB_BASE %>";
+  }
   TowTruck.baseUrl = baseUrl;
 
   TowTruck.bookmarklet = function () {
