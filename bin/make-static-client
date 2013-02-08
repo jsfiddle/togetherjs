@@ -24,6 +24,8 @@ fi
 
 mkdir -p $dest
 cp -r $base/app/http/public/towtruck $dest/towtruck
+cp -r $base/app/http/public/images $dest/images
+cp -r $base/app/http/public/fonts $dest/fonts
 lessc $base/app/http/public/towtruck.css $dest/towtruck.css
 sed -e 's!<%= process\.env\.PUBLIC_BASE_URL %>!'"$host!g" \
     -e 's!<%= process\.env\.HUB_BASE %>!'"$hub!g" \

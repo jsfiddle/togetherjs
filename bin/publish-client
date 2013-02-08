@@ -32,11 +32,6 @@ if [ ! -e "$repository" ] || [ -z "$dir" ] || [ "$dir" = "-h" ] ; then
     exit 2
 fi
 
-if [ -e "$repository/$dir" ] ; then
-    echo "Error: the directory $repository/$dir already exists"
-    exit 4
-fi
-
 cp -r $base/app/examples/public $repository/$dir
 $base/bin/make-static-client "$repository/$dir" "$publish_url/$dir" "$hub"
 for example_name in index.html friendlycode/index.html textarea/index.html ; do
