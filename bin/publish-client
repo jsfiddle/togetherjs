@@ -40,8 +40,8 @@ fi
 cp -r $base/app/examples/public $repository/$dir
 $base/bin/make-static-client "$repository/$dir" "$publish_url/$dir" "$hub"
 for example_name in index.html friendlycode/index.html textarea/index.html ; do
-    sed -e 's!var\s+towtruck\s*=\s*[^;]+;!var towtruck = '"\"$publish_url/$dir/towtruck.js\"!g" \
-        -e 's!<\!--\s*STATIC_HEADER\s*-->!'"<p>This is a copy of the TowTruck client made at $date by $email.  It is a checkout of <a href=\"$commit_url/$plain_version\">$version</a>.</p>!g" \
+    sed -e 's!var towtruck =.*!var towtruck = '"\"$publish_url/$dir/towtruck.js\"!g" \
+        -e 's!<\!-- STATIC_HEADER -->!'"<p>This is a copy of the TowTruck client made at $date by $email.  It is a checkout of <a href=\"$commit_url/$plain_version\">$version</a>.</p>!g" \
         < $base/app/examples/public/$example_name \
         > $repository/$dir/$example_name
 done
