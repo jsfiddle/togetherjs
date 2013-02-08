@@ -44,7 +44,7 @@ done
 cd $repository
 git add $dir
 python -c '
-import json, sys
+import json, sys, os
 with open("published.json") as fp:
     data = json.load(fp)
 data.append({
@@ -54,6 +54,14 @@ data.append({
   "baseUrl": sys.argv[4],
   "commitUrl": sys.argv[5],
 })
+active = {}
+for item in list(data):
+    if not os.path.exists(item["dir"]):
+        data.remove(item)
+        continue
+    if item["dir"] in active:
+        data.remove(active[item["dir"]])
+    active[item["dir"]] = item
 with open("published.json", "w") as fp:
     json.dump(data, fp, indent=2)
 ' \
