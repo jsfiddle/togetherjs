@@ -90,7 +90,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   ui.container = null;
 
   ui.activateUI = function () {
-    var container = ui.container = $(templates.chat);
+    var container = ui.container = $(templates.interface);
     assert(container.length);
     $("body").append(container);
 

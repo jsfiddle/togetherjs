@@ -6,8 +6,8 @@ define(["util"], function (util) {
     return t;
   }
   return {
-    chat: clean("<%- read('chat.tmpl')%>"),
-    help: clean("<%- read('help.tmpl')%>"),
-    walkabout: clean("<%- read('walkabout.tmpl')%>")
+    interface: clean("<%- read('interface.html')%>"),
+    help: clean("<%- read('help.txt')%>"),
+    walkabout: clean("<%- read('walkabout.html')%>")
   };
 });
