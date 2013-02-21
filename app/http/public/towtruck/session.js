@@ -70,11 +70,12 @@ define(["require", "util", "channels"], function (require, util, channels) {
     }
   };
 
-  session.settings = {
+  session.settings = util.mixinEvents({
     defaults: {
       nickname: "",
       avatar: null,
-      stickyShare: null
+      stickyShare: null,
+      color: null
     },
 
     get: function (name) {
@@ -89,11 +90,19 @@ define(["require", "util", "channels"], function (require, util, channels) {
     set: function (name, value) {
       assert(this.defaults.hasOwnProperty(name), "Unknown setting:", name);
       var s = session.getStorage("settings") || {};
+      var oldValue = s[name];
       s[name] = value;
       session.setStorage("settings", s);
+      this.emit("change", name, oldValue, value);
     }
-  };
+  });
 
+  if (! session.settings.get("color")) {
+    // FIXME: this isn't a great way to create a random color; it
+    // might be better to pick a random hue, and make sure it is
+    // saturated.
+    session.settings.set("color", "#" + Math.floor(Math.random() * 0xffffff).toString(16));
+  }
 
   /****************************************
    * Peer tracking (names/avatars/etc)
@@ -165,6 +174,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
     var peer = {
       clientId: msg.clientId,
       nickname: msg.nickname,
+      color: msg.color,
       rtcSupported: msg.rtcSupported
     };
     session.peers.add(peer);
@@ -174,6 +184,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
     var msg = {
       nickname: session.settings.get("nickname"),
       avatar: session.settings.get("avatar"),
+      color: session.settings.get("color"),
       url: session.currentUrl(),
       urlHash: location.hash,
       rtcSupported: session.RTCSupported
@@ -195,6 +206,9 @@ define(["require", "util", "channels"], function (require, util, channels) {
     }
     if (msg.avatar) {
       peer.avatar = msg.avatar;
+    }
+    if (msg.color) {
+      peer.color = msg.color;
     }
     session.peers.add(peer);
   });
@@ -282,7 +296,6 @@ define(["require", "util", "channels"], function (require, util, channels) {
       // FIXME: should be the overview screen sometimes:
       var ui = require("ui");
       ui.activateUI();
-      ui.activateTab("towtruck-chat");
       sendHello(false);
     });
   };
