@@ -150,5 +150,16 @@ define([], function () {
     }
   });
 
+  util.blobToBase64 = function (blob) {
+    // Oh this is just terrible
+    var binary = '';
+    var bytes = new Uint8Array(blob);
+    var len = bytes.byteLength;
+    for (var i=0; i<len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  };
+
   return util;
 });
