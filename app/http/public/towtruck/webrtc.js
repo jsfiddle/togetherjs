@@ -239,6 +239,10 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         },
         function (err) {
           // FIXME: handle cancel case
+          if (err && err.code == 1) {
+            // User cancel
+            return;
+          }
           error("getUserMedia error:", err);
         }
       );
