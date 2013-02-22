@@ -10,12 +10,13 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     chat = c;
   });
 
-  function cloneTemplate(id) {
+  ui.cloneTemplate = function (id) {
     id = "towtruck-template-" + id;
     var el = $("#" + id).clone();
+    assert(el.length, "No element found with id", id);
     el.attr("id", null);
     return el;
-  }
+  };
 
   ui.displayToggle = function (el) {
     el = $(el);
@@ -264,7 +265,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       // recent
       assert(msg.clientId);
       assert(typeof msg.text == "string");
-      el = cloneTemplate("chat-message");
+      el = ui.cloneTemplate("chat-message");
       setPerson(el, msg.clientId);
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
@@ -273,13 +274,13 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       addEl(el, msg.messageId);
     } else if (msg.type == "left-session") {
       nick = session.peers.get(msg.clientId).nickname;
-      el = cloneTemplate("chat-left");
+      el = ui.cloneTemplate("chat-left");
       setPerson(el, msg.clientId);
       addEl(el, msg.messageId);
     } else if (msg.type == "system") {
       assert(! msg.clientId);
       assert(typeof msg.text == "string");
-      el = cloneTemplate("chat-system");
+      el = ui.cloneTemplate("chat-system");
       el.find(".towtruck-chat-content").text(msg.text);
       addEl(el, msg.clientId);
     } else if (msg.type == "clear") {
@@ -287,7 +288,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     } else if (msg.type == "url-change") {
       assert(msg.clientId);
       assert(typeof msg.url == "string");
-      el = cloneTemplate("url-change");
+      el = ui.cloneTemplate("url-change");
       setPerson(el, msg.clientId);
       el.find(".towtruck-url").attr("href", msg.url).text(msg.url);
       addEl(el, msg.clientId);
@@ -326,7 +327,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     var id = "towtruck-participant-" + util.safeClassName(peer.clientId);
     var el = $("#" + id);
     if (! el.length) {
-      el = cloneTemplate("participant");
+      el = ui.cloneTemplate("participant");
       el.attr("id", id);
       $("#towtruck-participants-list").append(el);
     }

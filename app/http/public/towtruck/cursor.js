@@ -1,14 +1,13 @@
 /* Cursor viewing support
    */
-define(["jquery", "util", "session", "element-finder"], function ($, util, session, elementFinder) {
+define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], function ($, ui, util, session, elementFinder, tinycolor) {
   var cursor = util.Module("cursor");
   var assert = util.assert;
+  var AssertionError = util.AssertionError;
 
   var cursors = {};
-  var colorWheel = 0;
-  // This is the number of colors defined in towtruck.less:
-  var COLOR_COUNT = 5;
   var CURSOR_SIZE = {height: 10, width: 10};
+  var FOREGROUND_COLORS = ["#111", "#eee"];
 
   session.hub.on("cursor-update", function (msg) {
     var c = cursors[msg.clientId];
@@ -23,9 +22,19 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   var Cursor = util.Class({
     constructor: function (clientId) {
       this.clientId = clientId;
-      this.colorIndex = (colorWheel++) % COLOR_COUNT;
-      this.element = $('<div class="towtruck-cursor">');
-      this.element.addClass("towtruck-cursor-" + this.colorIndex);
+      // FIXME: should track updates:
+      this.peer = session.peers.get(clientId);
+      this.element = ui.cloneTemplate("cursor");
+      this.element.css({color: this.peer.color});
+      var name = this.element.find(".towtruck-cursor-name");
+      assert(name.length);
+      name.text(this.peer.nickname);
+      name.css({
+        backgroundColor: this.peer.color,
+        color: tinycolor.mostReadable(this.peer.color, FOREGROUND_COLORS)
+      });
+      console.log(this.element[0].outerHTML);
+      //console.log("inserted", this.element[0].outerHTML);
       $(document.body).append(this.element);
     },
     updatePosition: function (pos) {

@@ -63,7 +63,8 @@
       urlArgs: "bust=" + cacheBust,
       paths: {
         jquery: "libs/jquery-1.8.3.min",
-        walkabout: "libs/walkabout.js/walkabout"
+        walkabout: "libs/walkabout.js/walkabout",
+        tinycolor: "libs/tinycolor"
       }
     };
     var deps = ["session"];

@@ -483,25 +483,20 @@
 
 .towtruck-cursor {
     position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 7px;
-    z-index: 999;
-    margin-left: -5px;
-    margin-top: -5px;
-    &.towtruck-cursor-0 {
-        border: 2px solid #f00;
-    }
-    &.towtruck-cursor-1 {
-        border: 2px solid #0f0;
-    }
-    &.towtruck-cursor-2 {
-        border: 2px solid #00f;
-    }
-    &.towtruck-cursor-3 {
-        border: 2px solid #dd0;
-    }
-    &.towtruck-cursor-4 {
-        border: 2px solid #d0d;
+    z-index: @z-index - 1;
+    font-size: 25px;
+    font-weight: bolder;
+    /* This magic CSS rule makes this element basically invisible to clicks/etc:
+       (good on all but IE: http://caniuse.com/pointer-events */
+    pointer-events: none;
+
+    .towtruck-cursor-name {
+	    font-family: @default-font;
+        font-size: 40%;
+        position: relative;
+        top: -20px;
+        left: 25px;
+        padding: 2px;
+        border-radius: 2px;
     }
 }
