@@ -1,7 +1,6 @@
 /* Cursor viewing support
    */
 define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], function ($, ui, util, session, elementFinder, tinycolor) {
-  var cursor = util.Module("cursor");
   var assert = util.assert;
   var AssertionError = util.AssertionError;
 
@@ -56,6 +55,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
         top = pos.top;
         left = pos.left;
       }
+      // These are saved for use by .refresh():
       this.lastTop = top;
       this.lastLeft = left;
       this.setPosition(top, left);
@@ -193,6 +193,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
 
   session.on("ui-ready", function () {
     $(document).mousemove(mousemove);
+    document.addEventListener("click", documentClick, true);
     $(window).scroll(scroll);
   });
 
@@ -201,6 +202,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       Cursor.destroy(clientId);
     });
     $(document).unbind("mousemove", mousemove);
+    document.removeEventListener("click", documentClick, true);
     $(window).unbind("scroll", scroll);
   });
 
@@ -211,5 +213,49 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     }
   });
 
-  return cursor;
+
+  function documentClick(event) {
+    // FIXME: this might just be my imagination, but somehow I just
+    // really don't want to do anything at this stage of the event
+    // handling (since I'm catching every click), and I'll just do
+    // something real soon:
+    setTimeout(function () {
+      var location = elementFinder.elementLocation(event.target);
+      var offset = $(event.target).offset();
+      var offsetX = event.pageX - offset.left;
+      var offsetY = event.pageY - offset.top;
+      session.send({
+        type: "cursor-click",
+        element: location,
+        offsetX: offsetX,
+        offsetY: offsetY
+      });
+    });
+  }
+
+  var CLICK_TRANSITION_TIME = 3000;
+
+  session.hub.on("cursor-click", function (pos) {
+    // When the click is calculated isn't always the same as how the
+    // last cursor update was calculated, so we force the cursor to
+    // the last location during a click:
+    Cursor.getClient(pos.clientId).updatePosition(pos);
+    var element = ui.cloneTemplate("click");
+    var target = $(elementFinder.findElement(pos.element));
+    var offset = target.offset();
+    var top = offset.top + pos.offsetY;
+    var left = offset.left + pos.offsetX;
+    $(document.body).append(element);
+    element.css({
+      top: top,
+      left: left
+    });
+    setTimeout(function () {
+      element.addClass("towtruck-clicking");
+    });
+    setTimeout(function () {
+      element.remove();
+    }, CLICK_TRANSITION_TIME);
+  });
+
 });

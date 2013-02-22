@@ -177,10 +177,12 @@
 	transition: all 0.25s linear 0s;
 }
 
-.transition (...) {
-    transition: @arguments;
-    -moz-transition: @arguments;
-    -webkit-transition: @arguments;
+.transition (@val) {
+    // Note, you must call this like:
+    // .transition(~"value, value, value")
+    transition: @val;
+    -moz-transition: @val;
+    -webkit-transition: @val;
 }
 
 .rounded-corners (@radius: 5px) {
@@ -516,5 +518,25 @@
         left: 25px;
         padding: 2px;
         border-radius: 2px;
+    }
+}
+
+.towtruck-click {
+    position: absolute;
+    z-index: @z-index - 2;
+    pointer-events: none;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 20px;
+    border: 3px solid rgba(0, 0, 0, 1);
+    .transition(~"width 2s, height 2s, margin 2s, border 2s");
+
+    // This class is immediately applied for the purpose of transitioning:
+    &.towtruck-clicking {
+        width: 10px;
+        height: 10px;
+        margin: -5px 0 0 -5px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
     }
 }
