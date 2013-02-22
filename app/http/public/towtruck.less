@@ -490,6 +490,24 @@
        (good on all but IE: http://caniuse.com/pointer-events */
     pointer-events: none;
 
+    &.towtruck-scrolled-above {
+        .towtruck-cursor-normal, .towtruck-cursor-down {
+            display: none;
+        }
+    }
+
+    &.towtruck-scrolled-below {
+        .towtruck-cursor-normal, .towtruck-cursor-up {
+            display: none;
+        }
+    }
+
+    &.towtruck-scrolled-normal {
+        .towtruck-cursor-up, .towtruck-cursor-down {
+            display: none;
+        }
+    }
+
     .towtruck-cursor-name {
 	    font-family: @default-font;
         font-size: 40%;
