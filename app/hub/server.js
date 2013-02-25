@@ -14,12 +14,12 @@ var server = http.createServer(function(request, response) {
   var protocol = request.headers["porwarded-proto"] || "http:";
   var host = request.headers["host"];
   var base = protocol + "//" + host;
-}
+  
   if (url.path == '/status'){
     response.end("OK");
     return;
   }
-);
+});
 
 
 function write500(error, response) {
