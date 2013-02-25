@@ -1,2 +1,119 @@
 <% layout('../layout.ejs') -%>
-<h1>Hello, world!</h1>
+
+<div id="home" class="masthead">
+  <ul class="nav nav-pills pull-right">
+    <li class="active"><a href="#home">Home</a></li>
+    <li><a href="#getting-started">Get Started</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li>
+      <% if (user.email){ %>
+        <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
+      <% } else { %>
+        <a id="login" href="#"><img src="/persona-sign_in.png"></a>
+      <% } %>
+    </li>
+  </ul>
+  <h3 class="muted">TowTruck</h3>
+  <div id="tagline">Towtruck is a collaborative service tool for web applications, powered by Mozilla Labs</div>
+</div>
+
+<hr>
+
+<div class="jumbotron">
+  <iframe src="http://player.vimeo.com/video/57992755" width="700" height="393" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/57992755">Tow Truck - Proof of Concept in Progress</a> from <a href="http://vimeo.com/simonwex">Simon</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+</div>
+
+<hr>
+
+<div id="getting-started" class="row-fluid marketing">
+  <div class="span6">
+
+    <h1>Get Started</h1>
+    <h4>1. Download</h4>
+    <p>Copy and paste <code>&lt;script='https://towtruck.mozillalabs.com/towtruck.js'&gt;&lt;/script&gt;</code> into your <code>&lt;head&gt;&lt;/head&gt;</code> in your index.</p>
+
+    <h4>2. Copy and Paste</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+  <div class="span6">
+
+    <h4>Subheading</h4>
+    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+    <h4>Subheading</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+</div>
+
+<hr>
+
+<div id="about" class="row-fluid marketing">
+  <div class="span6">
+
+    <h1>About TowTruck</h1>
+
+
+    <h4>Do you have users on your site who could use help collaborating?</h4>
+    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+    <h4>And this</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+
+  <div class="span6">
+    <h4>Subheading</h4>
+    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+    <h4>Subheading</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+</div>
+
+<hr>
+
+<div id="resources" class="row-fluid marketing">
+  <div class="span6">
+
+    <h1>Resources</h1>
+
+    <h4>Do this</h4>
+    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+    <h4>And this</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+
+  <div class="span6">
+    <h4>Subheading</h4>
+    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+    <h4>Subheading</h4>
+    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+    <h4>Subheading</h4>
+    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+  </div>
+</div>
+
+<hr>
+
+<div id="contact" class="footer">
+  <p>&copy; Mozilla Labs 2012</p>
+</div>

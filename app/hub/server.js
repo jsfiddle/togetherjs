@@ -14,7 +14,12 @@ var server = http.createServer(function(request, response) {
   var protocol = request.headers["porwarded-proto"] || "http:";
   var host = request.headers["host"];
   var base = protocol + "//" + host;
-});
+}
+  if (url.path == '/status'){
+    response.end("OK");
+    return;
+  }
+);
 
 
 function write500(error, response) {
@@ -32,7 +37,7 @@ function write404(response) {
 
 function startServer(port, host) {
   server.listen(port, host, function() {
-    logger.info('HUB Server listening on port ' + port);
+    logger.info('HUB Server listening on port ' + port + " (Should be " + process.env.HUB_BASE + ")");
   });
 }
 
