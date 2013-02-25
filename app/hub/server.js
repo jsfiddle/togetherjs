@@ -17,7 +17,9 @@ var server = http.createServer(function(request, response) {
   
   if (url.path == '/status'){
     response.end("OK");
-    return;
+  }
+  else{
+    write404(response);
   }
 });
 
