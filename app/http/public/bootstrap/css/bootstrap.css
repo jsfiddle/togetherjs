@@ -208,7 +208,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
-  color: #333333;
+  color: #7c8895;
   background-color: #ffffff;
 }
 a {
@@ -216,7 +216,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #005580;
+  color: #333333;
   text-decoration: underline;
 }
 .img-rounded {
@@ -603,7 +603,7 @@ h5,
 h6 {
   margin: 10px 0;
   font-family: inherit;
-  font-weight: bold;
+  font-weight: 300;
   line-height: 20px;
   color: inherit;
   text-rendering: optimizelegibility;
@@ -1672,7 +1672,7 @@ select:focus:invalid:focus {
 }
 .help-block,
 .help-inline {
-  color: #595959;
+  color: #a6aeb7;
 }
 .help-block {
   display: block;
@@ -1753,8 +1753,8 @@ select:focus:invalid:focus {
 }
 .input-append .active,
 .input-prepend .active {
-  background-color: #a9dba9;
-  border-color: #46a546;
+  background-color: #c5e6c5;
+  border-color: #5bb75b;
 }
 .input-prepend .add-on,
 .input-prepend .btn {
@@ -2352,7 +2352,7 @@ input[type="submit"].btn.btn-mini {
   border-radius: 0;
 }
 .btn-link:hover {
-  color: #005580;
+  color: #333333;
   text-decoration: underline;
   background-color: transparent;
 }
@@ -3213,8 +3213,8 @@ input[type="submit"].btn.btn-mini {
   margin-top: 6px;
 }
 .nav .dropdown-toggle:hover .caret {
-  border-top-color: #005580;
-  border-bottom-color: #005580;
+  border-top-color: #333333;
+  border-bottom-color: #333333;
 }
 /* move down carets for tabs */
 .nav-tabs .dropdown-toggle .caret {

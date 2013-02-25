@@ -1,4 +1,4 @@
-define(["jquery", "util", "session", "ui", "templates"], function ($, util, session, ui, templates) {
+define(["require", "jquery", "util", "session", "ui", "templates"], function (require, $, util, session, ui, templates) {
   var chat = util.Module("chat");
   var assert = util.assert;
 
@@ -108,16 +108,6 @@ define(["jquery", "util", "session", "ui", "templates"], function ($, util, sess
       }
     },
 
-    command_tab: function () {
-      var newSetting = session.settings("tabIndependent");
-      session.settings("tabIndependent", newSetting);
-      ui.addChat({
-        type: "system",
-        text: (newSetting ? "Tab independence turned on" : "Tab independence turned off") +
-          " reload needed"
-      });
-    },
-
     command_help: function () {
       var msg = util.trim(templates.help);
       ui.addChat({
@@ -128,7 +118,7 @@ define(["jquery", "util", "session", "ui", "templates"], function ($, util, sess
 
     command_test: function (args) {
       // FIXME: I don't think this really works?  Need some deferred call
-      var Walkabout = require("libs/walkabout.js/walkabout.js");
+      var Walkabout = require("walkabout");
       args = util.trim(args || "").split(/\s+/g);
       if (args[0] === "" || ! args.length) {
         if (this._testCancel) {

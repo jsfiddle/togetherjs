@@ -1,0 +1,219 @@
+<div id="towtruck-container" class="towtruck">
+
+  <!-- This is the main set of buttons: -->
+  <div id="towtruck-interface" class="towtruck-interface-right">
+    <div id="towtruck-anchor">
+      <!-- FIXME: replace this with dots: -->
+      <span id="towtruck-anchor-horizontal">
+        &#183;&#183;&#183;
+      </span>
+      <span id="towtruck-anchor-vertical">
+        <!-- FIXME: probably an image would be feasible here -->
+        &#183;
+      </span>
+    </div>
+    <div id="towtruck-buttons">
+      <button id="towtruck-about-button" class="towtruck-button">
+        <img src="http://localhost:8080/images/icn-logo.png">
+      </button>
+      <button id="towtruck-share-button" class="towtruck-button">
+        <!-- FIXME: replace with share arrow -->
+        <img src="http://localhost:8080/images/icn-popout.png">
+      </button>
+      <button id="towtruck-audio-button" class="towtruck-button">
+        <div id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
+          <!-- FIXME: replace with audio unavailable icon -->
+          <img src="http://localhost:8080/images/icn-mic-on.png">
+        </div>
+        <div id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          A(?) <!-- FIXME: replace with audio available but not active icon -->
+        </div>
+        <div id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          ... <!-- FIXME: replace with outgoing call icon -->
+        </div>
+        <div id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          call <!-- FIXME: replace with incoming call icon -->
+        </div>
+        <div id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          A <!-- FIXME: replace with audio active icon -->
+        </div>
+        <div id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          A(m) <!-- FIXME: repace with audio active but muted icon -->
+        </div>
+        <div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+          error <!-- FIXME: repace with audio error (!) icon -->
+        </div>
+      </button>
+      <button id="towtruck-chat-button" class="towtruck-button">
+        <!-- FIXME: replace with chat icon -->
+        <img src="http://localhost:8080/images/icn-communicate.png">
+      </button>
+      <button id="towtruck-participants-button" class="towtruck-button">
+        <!-- FIXME: replace with person icon -->
+        <img src="http://localhost:8080/images/icn-info.png">
+      </button>
+    </div>
+  </div>
+
+  <!-- The window that shows the share link: -->
+  <div id="towtruck-share" class="towtruck-window" data-bound-to="towtruck-share-button"
+       style="display: none">
+    <header class="towtruck-title">
+      This is TowTruck session: <span id="towtruck-session-id"></span>
+    </header>
+    <section>
+      <header>Welcome to TowTruck!</header>
+      <p>
+        Send this link to your friend to get started!
+      </p>
+      <p>
+        <input type="text" id="towtruck-share-link">
+      </p>
+    </section>
+  </div>
+
+  <!-- The chat screen: -->
+  <div id="towtruck-chat" class="towtruck-window" data-bound-to="towtruck-chat-button"
+       style="display: none">
+    <header class="towtruck-title">
+      Chat
+    </header>
+
+    <div style="display: none">
+
+      <!-- Template for one message: -->
+      <div id="towtruck-template-chat-message" class="towtruck-chat-message towtruck-chat-real">
+        <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
+	    <div class="towtruck-timestamp">HH:MM <span class="ampm">AM/PM</span></div>
+        <div class="towtruck-person">Aaron</div>
+        <div class="towtruck-chat-content"></div>
+      </div>
+
+      <!-- Template for when a person leaves: -->
+      <div id="towtruck-template-chat-left" class="towtruck-chat-message">
+        <span class="towtruck-person"></span> left the session.
+      </div>
+
+      <!-- Template for system-derived messages: -->
+      <div id="towtruck-template-chat-system" class="towtruck-chat-message">
+        <span class="towtruck-chat-content"></span>
+      </div>
+
+      <!-- Template for when someone goes to a new URL: -->
+      <div id="towtruck-template-url-change" class="towtruck-chat-message">
+        <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
+        <div class="towtruck-timestamp">12:23 <span class="ampm">PM</span></div>
+        <div class="towtruck-person"></div>
+        <div class="towtruck-chat-content">
+          I've gone to: <a href="#" class="towtruck-url" target="_self"></a>
+        </div>
+      </div>
+
+    </div>
+
+    <section id="towtruck-chat-messages">
+    </section>
+    <section>
+      <input type="text" id="towtruck-chat-input">
+    </section>
+  </div>
+
+  <!-- The list of participants: -->
+  <div id="towtruck-participants" class="towtruck-window"
+       data-bound-to="towtruck-participants-button"
+       style="display: none">
+    <header class="towtruck-title">
+      TowTruck Participants
+    </header>
+    <section id="towtruck-participants-self">
+      <header>
+        <span id="towtruck-participants-is-owner"
+              data-toggles="#towtruck-participants-is-following">
+          Owner:
+        </span>
+        <span id="towtruck-participants-is-following"
+              data-toggles="#towtruck-participants-is-owner"
+              style="display: none">
+          Following:
+        </span>
+      </header>
+      <div id="towtruck-no-avatar-edit" data-toggles="#towtruck-avatar-edit">
+        <span id="towtruck-self-color" class="towtruck-color"></span>
+        <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+             id="towtruck-self-avatar">
+        <input type="text" id="towtruck-self-name">
+        <span>
+          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">saved</span>
+          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">saving</span>
+        </span>
+      </div>
+      <div style="display: none" id="towtruck-avatar-edit" data-toggles="#towtruck-no-avatar-edit, #towtruck-participants-other">
+        <div>
+          <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+               id="towtruck-self-avatar-preview">
+          <button id="towtruck-self-avatar-accept" disabled="1">Save</button>
+          <button id="towtruck-self-avatar-cancel">Cancel</button>
+        </div>
+        <!-- This is hidden when RTC is not supported: -->
+        <fieldset>
+          <legend>Upload a picture</legend>
+          <input type="file" accept="image/jpeg,image/png" placeholder="upload file"
+                 id="towtruck-avatar-upload">
+        </fieldset>
+        <fieldset id="towtruck-avatar-edit-rtc">
+          <legend>Take a picture</legend>
+          <video id="towtruck-avatar-video"></video>
+          <button id="towtruck-avatar-use-camera">Take picture</button>
+        </fieldset>
+      </div>
+    </section>
+
+    <!-- Template for one participant: -->
+    <div style="display: none">
+      <div id="towtruck-template-participant" class="towtruck-participant">
+        <span class="towtruck-participant-color towtruck-color"></span>
+        <span class="towtruck-participant-name"></span>
+      </div>
+    </div>
+
+    <section id="towtruck-participants-other">
+      <header>Participants:</header>
+      <div id="towtruck-participants-list">
+      </div>
+      <p id="towtruck-participants-none">
+        There is no one else currently participating in the session.
+      </p>
+    </section>
+  </div>
+
+
+  <audio id="towtruck-audio-element"></audio>
+
+  <!-- Some miscellaneous templates -->
+  <div style="display: none">
+
+    <!-- This is the cursor: -->
+    <div id="towtruck-template-cursor"
+         class="towtruck-cursor towtruck">
+      <!-- this is an upward-left arrow: -->
+      <span class="towtruck-cursor-normal">
+        &#8598;
+      </span>
+      <!-- down arrow: -->
+      <span class="towtruck-cursor-down">
+        &#8595;
+      </span>
+      <span class="towtruck-cursor-up">
+        &#8593;
+      </span>
+      <div class="towtruck-cursor-name"></div>
+    </div>
+
+    <!-- This is a click: -->
+    <div id="towtruck-template-click"
+         class="towtruck-click towtruck">
+    </div>
+
+  </div>
+
+</div>

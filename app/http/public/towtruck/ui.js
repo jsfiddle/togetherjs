@@ -1,56 +1,124 @@
-define(["jquery", "util", "session", "templates"], function ($, util, session, templates) {
+define(["require", "jquery", "util", "session", "templates"], function (require, $, util, session, templates) {
+  TowTruck.$ = $;
   var ui = util.Module('ui');
   var assert = util.assert;
+  var AssertionError = util.AssertionError;
   var chat;
+  // This would be a circular import, but we just need the chat module sometime
+  // after everything is loaded:
   require(["chat"], function (c) {
     chat = c;
   });
 
-  function cloneTemplate(id) {
+  ui.cloneTemplate = function (id) {
     id = "towtruck-template-" + id;
-    var el = $("#towtruck-templates #" + id).clone();
+    var el = $("#" + id).clone();
+    assert(el.length, "No element found with id", id);
     el.attr("id", null);
     return el;
+  };
+
+  ui.displayToggle = function (el) {
+    el = $(el);
+    var other = $(el.attr("data-toggles"));
+    assert(other.length);
+    other.hide();
+    el.show();
+  };
+
+  function panelPosition() {
+    var iface = $("#towtruck-interface");
+    if (iface.hasClass("towtruck-interface-right")) {
+      return "right";
+    } else if (iface.hasClass("towtruck-interface-left")) {
+      return "left";
+    } else if (iface.hasClass("towtruck-interface-bottom")) {
+      return "bottom";
+    } else {
+      throw AssertionError("#towtruck-interface doesn't have positioning class");
+    }
+  }
+
+  function displayWindow(el) {
+    el = $(el);
+    assert(el.length);
+    $(".towtruck-window").hide();
+    var bound = $("#" + el.attr("data-bound-to"));
+    assert(bound.length, bound.selector, el.selector);
+    var ifacePos = panelPosition();
+    var boundPos = bound.offset();
+    boundPos.height = bound.height();
+    boundPos.width = bound.width();
+    var windowHeight = $(window).height();
+    var windowWidth = $(window).width();
+    el.show();
+    // FIXME: I appear to have to add the padding to the width to get a "true"
+    // width.  But it's still not entirely consistent.
+    var height = el.height() + 5;
+    var width = el.width() + 20;
+    var left, top;
+    if (ifacePos == "right") {
+      left = boundPos.left - 10 - width;
+      top = boundPos.top + (boundPos.height / 2) - (height / 2);
+    } else if (ifacePos == "left") {
+      left = boundPos.left + boundPos.width + 10;
+      top = boundPos.top + (boundPos.height / 2) - (height / 2);
+    } else if (ifacePos == "bottom") {
+      left = (boundPos.left + boundPos.width / 2) - (width / 2);
+      top = boundPos.top - 10 - height;
+    }
+    top = Math.min(windowHeight - 10 - height, Math.max(10, top));
+    el.css({
+      top: top + "px",
+      left: left + "px"
+    });
+  }
+
+  function hideWindow(el) {
+    el = $(el);
+    el.hide();
+  }
+
+  function toggleWindow(el) {
+    el = $(el);
+    if (el.is(":visible")) {
+      hideWindow(el);
+    } else {
+      displayWindow(el);
+    }
   }
 
   ui.container = null;
 
   ui.activateUI = function () {
-    var container = ui.container = $(templates.chat);
+    var container = ui.container = $(templates.interface);
     assert(container.length);
     $("body").append(container);
 
-    // Tabs:
-    container.find("*[data-activate]").click(function () {
-      ui.activateTab(null, $(this));
-    });
-
     // The share link:
-    container.find(".towtruck-input-link").click(function () {
+    container.find("#towtruck-share-link").click(function () {
       $(this).select();
     });
     session.on("shareId", updateShareLink);
     updateShareLink();
 
     // Setting your name:
-    var name = container.find(".towtruck-input-name");
+    var name = container.find("#towtruck-self-name");
     name.val(session.settings.get("nickname"));
     name.on("keyup", function () {
       var val = name.val();
       session.settings.set("nickname", val);
-      container.find("#towtruck-name-confirmation").hide();
-      container.find("#towtruck-name-waiting").show();
+      ui.displayToggle("#towtruck-self-name-saving");
       // Fake timed saving, to make it look like we're doing work:
       // can we have the checkmark go to a greencheckmark once the name is confirmed?
       setTimeout(function () {
-        container.find("#towtruck-name-waiting").hide();
-        container.find("#towtruck-name-confirmation").css("color","#279a2c").show();
+        ui.displayToggle("#towtruck-self-name-saved");
       }, 300);
       session.send({type: "nickname-update", nickname: val});
     });
 
     // The chat input element:
-    var input = container.find(".towtruck-chat-input");
+    var input = container.find("#towtruck-chat-input");
     input.bind("keyup", function (event) {
       if (event.which == 13) {
         var val = input.val();
@@ -63,6 +131,7 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       return false;
     });
 
+    // FIXME: these aren't bound to anything:
     // Close button and confirmation of close:
     container.find(".towtruck-close").click(function () {
       ui.activateTab("towtruck-end-confirm");
@@ -74,108 +143,99 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       ui.activateTab("towtruck-chat");
     });
 
-    ui.docking = false;
-    ui.undockedPos = {};
-    // Docking:
-    if (! $(".towtruck-undocked").length) {
-      // FIXME: this is static, but doesn't allow the doc location to be created
-      // dynamically or added or removed later
-      container.find(".towtruck-dock").hide();
-    }
-    container.find(".towtruck-dock").click(function () {
-      ui.docking = ! ui.docking;
-      if (ui.docking) {
-        container.addClass("towtruck-container-docked");
-      } else {
-        container.removeClass("towtruck-container-docked");
-      }
-      if (ui.docking) {
-        ui.undockedPos = container.offset();
-      }
-      var dockData = $("body").data();
-      var prefix = "towtruckDock";
-      var styles = {};
-      for (var a in dockData) {
-        if (! dockData.hasOwnProperty(a)) {
-          continue;
-        }
-        if (a.indexOf(prefix) === 0) {
-          var name = a.charAt(prefix.length).toLowerCase() + a.substr(prefix.length + 1);
-          styles[name] = ui.docking ? dockData[a] : "";
-        }
-      }
-      if (ui.docking) {
-        if (! (styles.top || styles.bottom)) {
-          styles.bottom = 0;
-        }
-        if (! (styles.left || styles.right)) {
-          styles.right = 0;
-        }
-        if (styles.bottom !== undefined) {
-          // FIXME: not sure if or when I might need to factor in margin-top:
-          //   parseInt($(document.body).css("margin-top"), 10);
-          styles.top =
-              Math.max($(document.body).height() -
-                       parseInt(styles.bottom, 10) -
-                       container.height(), 0);
-          delete styles.bottom;
-        }
-        if (styles.right !== undefined) {
-          styles.left =
-              $(document.body).width() -
-              parseInt(styles.right, 10) -
-              container.width() +
-              parseInt($(document.body).css("margin-left"), 10);
-          delete styles.right;
-        }
-      } else {
-        styles.left = ui.undockedPos.left + "px";
-        styles.top = ui.undockedPos.top + "px";
-        ui.undockedPos = null;
-      }
-      container.css(styles);
-      if (ui.docking) {
-        $(".towtruck-undocked").removeClass("towtruck-undocked").addClass("towtruck-docked");
-      } else {
-        $(".towtruck-docked").removeClass("towtruck-docked").addClass("towtruck-undocked");
-      }
-    });
-
     // Moving the window:
-    var header = container.find(".towtruck-header");
-    header.mousedown(function (event) {
-      if (ui.docking) {
-        return;
-      }
-      header.addClass("towtruck-dragging");
+    // FIXME: this should probably be stickier, and not just move the window around
+    // so abruptly
+    var anchor = container.find("#towtruck-anchor");
+    assert(anchor.length);
+    anchor.mousedown(function (event) {
+      var iface = $("#towtruck-interface");
       // FIXME: switch to .offset() and pageX/Y
-      var start = container.position();
       function selectoff() {
         return false;
       }
       function mousemove(event2) {
-        container.css({
-          top: start.top + (event2.screenY - event.screenY),
-          left: start.left + (event2.screenX - event.screenX)
-        });
+        var fromRight = $(window).width() - event2.pageX;
+        var fromLeft = event2.pageX;
+        var fromBottom = $(window).height() - event2.pageY;
+        var pos;
+        if (fromLeft < fromRight && fromLeft < fromBottom) {
+          pos = "left";
+        } else if (fromRight < fromLeft && fromRight < fromBottom) {
+          pos = "right";
+        } else {
+          pos = "bottom";
+        }
+        iface.removeClass("towtruck-interface-left");
+        iface.removeClass("towtruck-interface-right");
+        iface.removeClass("towtruck-interface-bottom");
+        iface.addClass("towtruck-interface-" + pos);
       }
       $(document).bind("mousemove", mousemove);
       // If you don't turn selection off it will still select text, and show a
       // text selection cursor:
       $(document).bind("selectstart", selectoff);
+      // FIXME: it seems like sometimes we lose the mouseup event, and it's as though
+      // the mouse is stuck down:
       $(document).one("mouseup", function () {
         $(document).unbind("mousemove", mousemove);
         $(document).unbind("selectstart", selectoff);
-        header.removeClass("towtruck-dragging");
       });
+      return false;
     });
+
+    $("#towtruck-share-button").click(function () {
+      toggleWindow("#towtruck-share");
+    });
+
+    $("#towtruck-chat-button").click(function () {
+      toggleWindow("#towtruck-chat");
+    });
+
+    $("#towtruck-participants-button").click(function () {
+      toggleWindow("#towtruck-participants");
+    });
+
+    if (session.isClient) {
+      ui.displayToggle("#towtruck-participants-is-following");
+    } else {
+      ui.displayToggle("#towtruck-participants-is-owner");
+    }
+
+    $(".towtruck header.towtruck-title").each(function (index, item) {
+      var button = $('<button class="towtruck-minimize">_</button>');
+      button.click(function (event) {
+        var window = button.closest(".towtruck-window");
+        hideWindow(window);
+      });
+      $(item).append(button);
+    });
+
+    $("#towtruck-avatar-done").click(function () {
+      ui.displayToggle("#towtruck-no-avatar-edit");
+    });
+
+    $("#towtruck-self-color").css({backgroundColor: session.settings.get("color")});
+
+    var avatar = session.settings.get("avatar");
+    if (avatar) {
+      $("#towtruck-self-avatar").attr("src", avatar);
+    }
 
     session.emit("ui-ready");
 
   };
 
   function updateShareLink() {
-    $(".towtruck-input-link").val(session.shareUrl());
+    var el = $("#towtruck-share-link");
+    var display = $("#towtruck-session-id");
+    if (! session.shareId) {
+      el.val("");
+      display.text("(none)");
+    } else {
+      el.val(session.shareUrl());
+      display.text(session.shareId);
+    }
   }
 
   session.on("close", function () {
@@ -183,28 +243,15 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       ui.container.remove();
       ui.container = null;
     }
+    // Clear out any other spurious elements:
+    $(".towtruck").remove();
   });
 
-  ui.activateTab = function (name, button) {
-    if (! button) {
-      button = $('[data-activate="' + name + '"]');
-    } else if (! name) {
-      name = button.attr("data-activate");
-      $('[data-activate="' + name + '"] img').css("opacity", "1");
-    }
-    // $("#towtruck-nav-btns").find("img.triangle").remove();
-    // var triangle = cloneTemplate("triangle");
-    // button.closest("li").append(triangle);
-    $(".towtruck-screen").hide();
-    var els = $(".towtruck-screen." + name).show();
-    assert(els.length, "No screen with name:", name);
-    els.show();
-    session.emit("ui-showing-" + name);
-  };
-
+  // FIXME: this should be a series of methods, not one big method with
+  // different msg.type
   ui.addChat = function (msg) {
     var nick, el;
-    var container = ui.container.find(".towtruck-chat-container");
+    var container = ui.container.find("#towtruck-chat-messages");
     assert(container.length);
     function addEl(el, id) {
       if (id) {
@@ -218,7 +265,7 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       // recent
       assert(msg.clientId);
       assert(typeof msg.text == "string");
-      el = cloneTemplate("chat-message");
+      el = ui.cloneTemplate("chat-message");
       setPerson(el, msg.clientId);
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
@@ -227,13 +274,13 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
       addEl(el, msg.messageId);
     } else if (msg.type == "left-session") {
       nick = session.peers.get(msg.clientId).nickname;
-      el = cloneTemplate("chat-left");
+      el = ui.cloneTemplate("chat-left");
       setPerson(el, msg.clientId);
       addEl(el, msg.messageId);
     } else if (msg.type == "system") {
       assert(! msg.clientId);
       assert(typeof msg.text == "string");
-      el = cloneTemplate("chat-system");
+      el = ui.cloneTemplate("chat-system");
       el.find(".towtruck-chat-content").text(msg.text);
       addEl(el, msg.clientId);
     } else if (msg.type == "clear") {
@@ -241,7 +288,7 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
     } else if (msg.type == "url-change") {
       assert(msg.clientId);
       assert(typeof msg.url == "string");
-      el = cloneTemplate("url-change");
+      el = ui.cloneTemplate("url-change");
       setPerson(el, msg.clientId);
       el.find(".towtruck-url").attr("href", msg.url).text(msg.url);
       addEl(el, msg.clientId);
@@ -250,6 +297,7 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
     }
   };
 
+  // FIXME: this is crude:
   ui.isChatEmpty = function () {
     var container = ui.container.find(".towtruck-chat-container");
     // We find if there's any chat messages with people who aren't ourself:
@@ -274,7 +322,36 @@ define(["jquery", "util", "session", "templates"], function ($, util, session, t
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
   };
 
-  return ui;
+  session.peers.on("add update", function (peer) {
+    console.log("got new peer", peer);
+    var id = "towtruck-participant-" + util.safeClassName(peer.clientId);
+    var el = $("#" + id);
+    if (! el.length) {
+      el = ui.cloneTemplate("participant");
+      el.attr("id", id);
+      $("#towtruck-participants-list").append(el);
+    }
+    $("#towtruck-participants-none").hide();
+    if (peer.color) {
+      el.find(".towtruck-color").css({
+        backgroundColor: peer.color
+      });
+      console.log("setting color", el[0].outerHTML);
+    }
+    if (peer.nickname !== undefined) {
+      el.find(".towtruck-participant-name").text(peer.nickname || "???");
+    }
+  });
 
+  session.settings.on("change", function (name, oldValue, newValue) {
+    if (name == "color") {
+      $("#towtruck-self-color").css({backgroundColor: newValue});
+    } else if (name == "avatar") {
+      // FIXME: should fixup any other places where the avatar is set:
+      $("#towtruck-self-avatar").attr("src", newValue);
+    }
+  });
+
+  return ui;
 
 });

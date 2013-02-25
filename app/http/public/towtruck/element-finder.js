@@ -61,7 +61,11 @@ define(["util"], function (util) {
     // But maybe!  We *could* make towtruck elements less obtrusive?
     container = container || document;
     var el, rest;
-    if (loc.indexOf("body") === 0) {
+    if (loc === "body") {
+      return document.body;
+    } else if (loc === "head") {
+      return document.head;
+    } else if (loc.indexOf("body") === 0) {
       el = document.body;
       try {
         return findElement(loc.substr(("body").length), el);

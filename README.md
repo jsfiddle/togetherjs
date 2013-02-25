@@ -45,11 +45,12 @@ Servers
 
 This exists in app/hub/server.js. By default in dev mode, it serves the setup code here: [http://localhost:8080/towtruck.js](http://localhost:8080/towtruck.js).
 
-Third-party libraries in `app/hub/libs/`.
-
-A basic overview of the code:
-
 - `server.js`: the Node.js server, just one file.  It's pretty dumb, just passing messages back and forth between clients.  It is a goal to keep it dumb, and leave the important logic in the client.  Most of the code you'll see in there is to make development easier, handling the sequential loading of modules, compiling LESS, inserting templates, etc.
+
+Third-party libraries in `app/http/public/towtruck/libs/`.
+
+A basic overview of the code, which is in `app/http/public/towtruck`:
+
 
 - `channels.js`: abstraction over WebSockets and other communication methods.  Buffers output while the connection is opening, handles JSON encoding/decoding.
 
@@ -57,9 +58,7 @@ A basic overview of the code:
 
 - `element-finder.js`: when you want to talk about a particular element with another browser/client, this creates a description and finds elements based on that description.  `#id` is the easiest description of course, but this handles elements that lack ids.
 
-- `intro.js`: the intro screen, and what you get when you hit *i*
-
-- `towtruck-runner.js`: this is where most of the setup work is done. It establishes the channels, routes messages to different components, and handles persistence.
+- `session.js`: this is where most of the setup work is done. It establishes the channels, routes messages to different components, and handles persistence.
 
 - `towtruck.js`: this is the bootstrap code.  It doesn't do anything, but when asked it knows how to load up all the other modules and get things started.  It also detects if TowTruck should be started immediately (like when someone opens the "share" link).
 
@@ -67,7 +66,7 @@ A basic overview of the code:
 
 - `util.js`: several bits of abstract support code are in here.  It's also the file that must be loaded first, it sets up jQuery and Underscore as noConflict, creates the TowTruck object.  It also includes a pattern for creating classes, assertions, events.
 
-- `*.tmpl`: these are Underscore templates for the UI bits.  These are automatically inlined into `towtruck-runner.js`.
+- `app/http/views/towtruck/*.tmpl`: these are Underscore templates for the UI bits.  These are automatically inlined into `towtruck-runner.js`.
 
 
 ### Examples Server
@@ -84,7 +83,7 @@ Integration
 
 TowTruck is meant to be an unintrusive bit of Javascript you add to your page to enable these collaborative features.  It inspects the page to determine what fields can be synchronized between the two browsers, and adds its own interface on top of the content.
 
-`towtruck.js` itself is just a small piece of code to start up TowTruck, it should not cause overhead in your code.  You can either include an element on your page `<div id="towtruck-starter"></div>`, and a TowTruck button will be added to that, or you can call `startTowTruck()` yourself.
+`towtruck.js` itself is just a small piece of code to start up TowTruck, it should not cause overhead in your code.  You can either include an element on your page `<div id="towtruck-starter"></div>`, and a TowTruck button will be added to that, or you can call `TowTruck()` yourself.
 
 You can enter `/help` into the chat window to see some developer-oriented features.
 

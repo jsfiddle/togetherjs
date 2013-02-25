@@ -1,4 +1,4 @@
-define(["util", "channels"], function (util, channels) {
+define(["require", "util", "channels"], function (require, util, channels) {
 
   var DEBUG = true;
   var session = util.mixinEvents(util.Module("session"));
@@ -25,7 +25,7 @@ define(["util", "channels"], function (util, channels) {
 
   session.hubUrl = function () {
     assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return startTowTruck.hubBase + "/hub/" + session.shareId;
+    return TowTruck.hubBase + "/hub/" + session.shareId;
   };
 
   session.shareUrl = function () {
@@ -70,12 +70,12 @@ define(["util", "channels"], function (util, channels) {
     }
   };
 
-  session.settings = {
+  session.settings = util.mixinEvents({
     defaults: {
-      tabIndependent: false,
       nickname: "",
       avatar: null,
-      stickyShare: null
+      stickyShare: null,
+      color: null
     },
 
     get: function (name) {
@@ -90,11 +90,19 @@ define(["util", "channels"], function (util, channels) {
     set: function (name, value) {
       assert(this.defaults.hasOwnProperty(name), "Unknown setting:", name);
       var s = session.getStorage("settings") || {};
+      var oldValue = s[name];
       s[name] = value;
       session.setStorage("settings", s);
+      this.emit("change", name, oldValue, value);
     }
-  };
+  });
 
+  if (! session.settings.get("color")) {
+    // FIXME: this isn't a great way to create a random color; it
+    // might be better to pick a random hue, and make sure it is
+    // saturated.
+    session.settings.set("color", "#" + Math.floor(Math.random() * 0xffffff).toString(16));
+  }
 
   /****************************************
    * Peer tracking (names/avatars/etc)
@@ -166,21 +174,28 @@ define(["util", "channels"], function (util, channels) {
     var peer = {
       clientId: msg.clientId,
       nickname: msg.nickname,
+      color: msg.color,
       rtcSupported: msg.rtcSupported
     };
     session.peers.add(peer);
   });
 
   function sendHello(helloBack) {
-    var t = helloBack ? "hello-back" : "hello";
-    session.send({
-      type: t,
+    var msg = {
       nickname: session.settings.get("nickname"),
       avatar: session.settings.get("avatar"),
+      color: session.settings.get("color"),
       url: session.currentUrl(),
       urlHash: location.hash,
       rtcSupported: session.RTCSupported
-    });
+    };
+    if (helloBack) {
+      msg.type = "hello-back";
+    } else {
+      msg.type = "hello";
+      msg.clientVersion = TowTruck.version;
+    }
+    session.send(msg);
   }
 
   /* Updates to the nickname of peers: */
@@ -191,6 +206,9 @@ define(["util", "channels"], function (util, channels) {
     }
     if (msg.avatar) {
       peer.avatar = msg.avatar;
+    }
+    if (msg.color) {
+      peer.color = msg.color;
     }
     session.peers.add(peer);
   });
@@ -227,8 +245,8 @@ define(["util", "channels"], function (util, channels) {
       name = window.name = "towtruck-" + util.generateId();
     }
     if (! shareId) {
-      if (startTowTruck._shareId) {
-        shareId = startTowTruck._shareId;
+      if (TowTruck._shareId) {
+        shareId = TowTruck._shareId;
       }
     }
     if (! shareId) {
@@ -246,9 +264,9 @@ define(["util", "channels"], function (util, channels) {
     if (! shareId) {
       var saved = session.getStorage("status." + name);
       assert(
-        saved || window._startTowTruckImmediately,
+        saved || TowTruck.startTowTruckImmediately,
         "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
-      if ((! saved) && window._startTowTruckImmediately) {
+      if ((! saved) && TowTruck.startTowTruckImmediately) {
         isClient = false;
         shareId = session.settings.get("stickyShare");
         if (! shareId) {
@@ -274,14 +292,10 @@ define(["util", "channels"], function (util, channels) {
     initClientId();
     initShareId();
     openChannel();
-    if (typeof require != "function") {
-      console.warn("Odd require:", require);
-    }
     require(features, function () {
       // FIXME: should be the overview screen sometimes:
       var ui = require("ui");
       ui.activateUI();
-      ui.activateTab("towtruck-chat");
       sendHello(false);
     });
   };
@@ -305,7 +319,7 @@ define(["util", "channels"], function (util, channels) {
     session.emit("shareId");
   };
 
-  if (window._startTowTruckImmediately) {
+  if (TowTruck.startTowTruckImmediately) {
     setTimeout(session.start);
   }
 
