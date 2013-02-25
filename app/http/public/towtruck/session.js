@@ -1,6 +1,12 @@
 define(["require", "util", "channels"], function (require, util, channels) {
 
   var DEBUG = true;
+
+  var DEFAULT_NICKNAMES = [
+    "Friend",
+    "Comrade"
+  ];
+
   var session = util.mixinEvents(util.Module("session"));
   var assert = util.assert;
 
@@ -73,6 +79,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
   session.settings = util.mixinEvents({
     defaults: {
       nickname: "",
+      defaultNickname: "",
       avatar: null,
       stickyShare: null,
       color: null
@@ -102,6 +109,10 @@ define(["require", "util", "channels"], function (require, util, channels) {
     // might be better to pick a random hue, and make sure it is
     // saturated.
     session.settings.set("color", "#" + Math.floor(Math.random() * 0xffffff).toString(16));
+  }
+
+  if (! session.settings.get("defaultNickname")) {
+    session.settings.set("defaultNickname", DEFAULT_NICKNAMES[Math.floor(Math.random() * DEFAULT_NICKNAMES.length)]);
   }
 
   /****************************************
@@ -182,7 +193,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
 
   function sendHello(helloBack) {
     var msg = {
-      nickname: session.settings.get("nickname"),
+      nickname: session.settings.get("nickname") || session.settings.get("defaultNickname"),
       avatar: session.settings.get("avatar"),
       color: session.settings.get("color"),
       url: session.currentUrl(),
