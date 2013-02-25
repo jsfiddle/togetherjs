@@ -4,6 +4,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   var assert = util.assert;
   var AssertionError = util.AssertionError;
   var chat;
+  var $window = $(window);
+
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
   require(["chat"], function (c) {
@@ -49,8 +51,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     var boundPos = bound.offset();
     boundPos.height = bound.height();
     boundPos.width = bound.width();
-    var windowHeight = $(window).height();
-    var windowWidth = $(window).width();
+    var windowHeight = $window.height();
+    var windowWidth = $window.width();
     el.show();
     // FIXME: I appear to have to add the padding to the width to get a "true"
     // width.  But it's still not entirely consistent.
@@ -156,9 +158,9 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         return false;
       }
       function mousemove(event2) {
-        var fromRight = $(window).width() - event2.pageX;
-        var fromLeft = event2.pageX;
-        var fromBottom = $(window).height() - event2.pageY;
+        var fromRight = $window.width() + window.pageXOffset - event2.pageX;
+        var fromLeft = event2.pageX - window.pageXOffset;
+        var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
         var pos;
         if (fromLeft < fromRight && fromLeft < fromBottom) {
           pos = "left";
