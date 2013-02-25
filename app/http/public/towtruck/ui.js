@@ -72,6 +72,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       top: top + "px",
       left: left + "px"
     });
+    session.emit("display-window", el.attr("id"), el);
   }
 
   function hideWindow(el) {
@@ -120,13 +121,16 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     // The chat input element:
     var input = container.find("#towtruck-chat-input");
     input.bind("keyup", function (event) {
-      if (event.which == 13) {
+      if (event.which == 13) { // Enter
         var val = input.val();
         if (! val) {
           return false;
         }
         chat.Chat.submit(val);
         input.val("");
+      }
+      if (event.which == 27) { // Escape
+        hideWindow("#towtruck-chat");
       }
       return false;
     });
@@ -138,9 +142,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     });
     container.find("#towtruck-end-session").click(function () {
       session.close();
-    });
-    container.find("#towtruck-cancel-end").click(function () {
-      ui.activateTab("towtruck-chat");
     });
 
     // Moving the window:
@@ -190,6 +191,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
     $("#towtruck-chat-button").click(function () {
       toggleWindow("#towtruck-chat");
+    });
+
+    session.on("display-window", function (id, element) {
+      if (id == "towtruck-chat") {
+        $("#towtruck-chat-input").focus();
+      }
     });
 
     $("#towtruck-participants-button").click(function () {
