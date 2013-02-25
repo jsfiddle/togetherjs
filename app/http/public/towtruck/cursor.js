@@ -220,6 +220,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
     setTimeout(function () {
+      if (elementFinder.ignoreElement(event.target)) {
+        return;
+      }
       var location = elementFinder.elementLocation(event.target);
       var offset = $(event.target).offset();
       var offsetX = event.pageX - offset.left;

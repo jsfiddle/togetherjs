@@ -157,6 +157,7 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
       this.socket = null;
       var method = "error";
       if (event.wasClean) {
+        // FIXME: should I even log clean closes?
         method = "log";
       }
       console[method]('WebSocket close', event.wasClean ? 'clean' : 'unclean',
