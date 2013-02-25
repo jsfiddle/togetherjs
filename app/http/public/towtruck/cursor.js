@@ -255,7 +255,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     });
     setTimeout(function () {
       element.addClass("towtruck-clicking");
-    });
+    }, 100);
     setTimeout(function () {
       element.remove();
     }, CLICK_TRANSITION_TIME);
