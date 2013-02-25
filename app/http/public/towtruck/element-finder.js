@@ -2,10 +2,23 @@ define(["util"], function (util) {
   var elementFinder = util.Module("element-finder");
   var assert = util.assert;
 
+  elementFinder.ignoreElement = function ignoreElement(el) {
+    if (el.get) {
+      el = el.get(0);
+    }
+    while (el) {
+      if (el.className && el.className.indexOf("towtruck") != -1) {
+        return true;
+      }
+      el = el.parentNode;
+    }
+    return false;
+  };
+
   elementFinder.elementLocation = function elementLocation(el) {
-    if (el[0]) {
+    if (el.get) {
       // a jQuery element
-      el = el[0];
+      el = el.get(0);
     }
     if (el.id) {
       return "#" + el.id;

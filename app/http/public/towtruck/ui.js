@@ -4,6 +4,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   var assert = util.assert;
   var AssertionError = util.AssertionError;
   var chat;
+  var $window = $(window);
+
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
   require(["chat"], function (c) {
@@ -49,8 +51,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     var boundPos = bound.offset();
     boundPos.height = bound.height();
     boundPos.width = bound.width();
-    var windowHeight = $(window).height();
-    var windowWidth = $(window).width();
+    var windowHeight = $window.height();
+    var windowWidth = $window.width();
     el.show();
     // FIXME: I appear to have to add the padding to the width to get a "true"
     // width.  But it's still not entirely consistent.
@@ -72,6 +74,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       top: top + "px",
       left: left + "px"
     });
+    session.emit("display-window", el.attr("id"), el);
   }
 
   function hideWindow(el) {
@@ -120,13 +123,16 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     // The chat input element:
     var input = container.find("#towtruck-chat-input");
     input.bind("keyup", function (event) {
-      if (event.which == 13) {
+      if (event.which == 13) { // Enter
         var val = input.val();
         if (! val) {
           return false;
         }
         chat.Chat.submit(val);
         input.val("");
+      }
+      if (event.which == 27) { // Escape
+        hideWindow("#towtruck-chat");
       }
       return false;
     });
@@ -138,9 +144,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     });
     container.find("#towtruck-end-session").click(function () {
       session.close();
-    });
-    container.find("#towtruck-cancel-end").click(function () {
-      ui.activateTab("towtruck-chat");
     });
 
     // Moving the window:
@@ -155,9 +158,9 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         return false;
       }
       function mousemove(event2) {
-        var fromRight = $(window).width() - event2.pageX;
-        var fromLeft = event2.pageX;
-        var fromBottom = $(window).height() - event2.pageY;
+        var fromRight = $window.width() + window.pageXOffset - event2.pageX;
+        var fromLeft = event2.pageX - window.pageXOffset;
+        var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
         var pos;
         if (fromLeft < fromRight && fromLeft < fromBottom) {
           pos = "left";
@@ -190,6 +193,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
     $("#towtruck-chat-button").click(function () {
       toggleWindow("#towtruck-chat");
+    });
+
+    session.on("display-window", function (id, element) {
+      if (id == "towtruck-chat") {
+        $("#towtruck-chat-input").focus();
+      }
     });
 
     $("#towtruck-participants-button").click(function () {
