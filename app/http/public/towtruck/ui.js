@@ -137,12 +137,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       return false;
     });
 
-    // FIXME: these aren't bound to anything:
-    // Close button and confirmation of close:
-    container.find("#towtruck-end-session").click(function () {
-      session.close();
-    });
-
     // Moving the window:
     // FIXME: this should probably be stickier, and not just move the window around
     // so abruptly
@@ -182,6 +176,18 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         $(document).unbind("selectstart", selectoff);
       });
       return false;
+    });
+
+    $("#towtruck-about-button").click(function () {
+      toggleWindow("#towtruck-about");
+    });
+
+    $("#towtruck-end-session").click(function () {
+      session.close();
+    });
+
+    $("#towtruck-cancel-end-session").click(function () {
+      hideWindow("#towtruck-about");
     });
 
     $("#towtruck-share-button").click(function () {
