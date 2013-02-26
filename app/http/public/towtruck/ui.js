@@ -117,7 +117,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       setTimeout(function () {
         ui.displayToggle("#towtruck-self-name-saved");
       }, 300);
-      session.send({type: "nickname-update", nickname: val});
+      session.send({type: "nickname-update", nickname: val || session.settings.get("defaultNickname")});
     });
 
     // The chat input element:
