@@ -25,7 +25,7 @@
 // Extra padding on the edge of the screen:
 @side-padding: 5px;
 // Background color of most elements:
-@background-color: #999;
+@background-color: #fff;
 @window-background-color: #f1f1f1;
 @window-color: #000;
 
@@ -106,7 +106,7 @@
 }
 
 .box-dropshadow() {
-    .box-shadow(0px -1px 3px rgba(0,0,0,0.3));
+    .box-shadow(0px 1px 3px rgba(0,0,0,0.3));
 }
 
 .rounded-corners() {
@@ -243,8 +243,10 @@
 
     #towtruck-buttons .towtruck-button {
         .button-reset;
+		padding:10px;
         width: @button-width;
         height: @button-height;
+		border-bottom:1px solid #ebebeb;
         img {
             width: @button-width;
             height: @button-height;
@@ -253,6 +255,10 @@
             background-color: darken(@background-color, 10%);
         }
     }
+
+	#towtruck-buttons #towtruck-about-button {
+		background:#0694d5;
+	}
 
     #towtruck-anchor {
         height: @anchor-height;
@@ -401,10 +407,11 @@
     z-index: @z-index;
     background-color: @background-color;
     .box-dropshadow;
-    @border-radius: 4px;
+    @border-radius: 2px;
     // FIXME: why do I need these extra 14ish pixels?
     @long-side: @button-width * 5 + @anchor-height + 14px;
     @short-side: @button-width + 2px + @side-padding;
+	border:1px solid #d9d9d9;
 
     &.towtruck-interface-right {
         padding: 0px (@side-padding + 1px) 0px 1px;
@@ -418,6 +425,7 @@
         }
         #towtruck-anchor-horizontal {
             display: inline;
+			background:#0694d5;
         }
     }
 
