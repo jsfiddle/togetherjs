@@ -14,7 +14,7 @@
     src: url('fonts/OpenSans-Bold.ttf');
 }
 
-@default-font: openSansRegular, Helvetica, sans-serif;
+@default-font: openSansLight, Helvetica, 'Helvetica Neue', Arial, sans-serif;
 
 // Width of the buttons:
 @button-width: 40px;
@@ -23,9 +23,9 @@
 // Height of the draggable anchor at the top:
 @anchor-height: @button-width * 0.5;
 // Extra padding on the edge of the screen:
-@side-padding: 5px;
+@side-padding: 0px;
 // Background color of most elements:
-@background-color: #999;
+@background-color: #fff;
 @window-background-color: #f1f1f1;
 @window-color: #000;
 
@@ -45,8 +45,8 @@
     font-size: 100%;
     font: inherit;
     vertical-align: baseline;
-    line-height: 1;
-    font-family: sans-serif;
+	line-height: 20px;
+    font-family: @default-font;
 
     div, span, applet, object, iframe,
     h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -69,6 +69,65 @@
         vertical-align: baseline;
         line-height: 1;
     }
+
+	a {
+	  color: #0088cc;
+	  text-decoration: none;
+	}
+
+	a:hover {
+	  color: #005580;
+	  text-decoration: underline;
+	}
+
+	.body {
+	  font-size: 14px;
+	  line-height: 20px;
+	}
+
+	.large {
+	  font-size: 72px;
+	  letter-spacing: -3px;
+	  line-height: 100%;
+	}
+
+	p {
+		font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 300;
+		height: 96px;
+		line-height: 24px;
+	}
+
+	h1 {
+	  font-size: 48px;
+	  letter-spacing: -2px;
+	  line-height: 100%;
+	}
+	h2 {
+	  font-size: 32px;
+	  letter-spacing: -1px;
+	  line-height: 100%;
+	  font-style: normal;
+	  font-variant: normal;
+	  font-weight: 100;
+	}
+	h3 {
+	  font-size: 28px;
+	  letter-spacing: -0.5px;
+	  line-height: 100%;
+	}
+	h4 {
+	  font-size: 24px;
+	  letter-spacing: -0.25px;
+	  line-height: 100%;
+	}
+	.small, small {
+	  font-size: 12px;
+	  line-height: 100%;
+	}
 
     article, aside, details, figcaption, figure,
     footer, header, hgroup, menu, nav, section {
@@ -106,7 +165,7 @@
 }
 
 .box-dropshadow() {
-    .box-shadow(0px -1px 3px rgba(0,0,0,0.3));
+    .box-shadow(0px 1px 3px rgba(0,0,0,0.3));
 }
 
 .rounded-corners() {
@@ -243,23 +302,116 @@
 
     #towtruck-buttons .towtruck-button {
         .button-reset;
-        width: @button-width;
-        height: @button-height;
+        width: @button-width+10;
+        height: @button-height+8;
+		border-bottom:1px solid #ebebeb;
         img {
             width: @button-width;
             height: @button-height;
         }
         &:hover {
-            background-color: darken(@background-color, 10%);
+            /*background-color: darken(@background-color, 10%);*/
         }
     }
+
+	#towtruck-buttons #towtruck-about-button {
+		background:#0694d5;
+		border-top:1px solid #28a8e3;
+		border-bottom:1px solid #0481bb;
+		border-right:1px solid #0481bb;
+		border-left:1px solid #0481bb;
+		box-shadow:0px 1px 2px rgba(0,0,0,0.3);
+	}
+
+	#towtruck-buttons #towtruck-share-button{
+		background-image:url('/images/icn-share.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-share-button:hover {
+		background-image:url('/images/icn-share-active.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-audio-button{
+		background-image:url('/images/icn-mic.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-audio-button:hover {
+		background-image:url('/images/icn-mic-active.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-chat-button{
+		background-image:url('/images/icn-chat.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-chat-button:hover {
+		background-image:url('/images/icn-chat-active.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
+
+	#towtruck-buttons #towtruck-participants-button{
+		background-image:url('/images/icn-participants.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+		border:0px;
+	}
+
+	#towtruck-buttons #towtruck-participants-button:hover {
+		background-image:url('/images/icn-participants-active.png');
+		background-size:40px 40px;
+		background-repeat:no-repeat;
+		background-position:center;
+	}
 
     #towtruck-anchor {
         height: @anchor-height;
         text-align: center;
         cursor: move;
         .user-select(none);
+		width:97%;
+		background:#0692d3;
+		border-bottom:1px solid #00628f;
+		border-right:1px solid #0481bb;
+		border-left:1px solid #0481bb;
+		border-top:1px solid #0481bb;
+		border-top-left-radius: 2px;
+		border-top-right-radius: 2px;
+		box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
     }
+
+	#towtruck-buttons #towtruck-expand-button {
+		background:#0694d5;
+		height:17px;
+		border-bottom-left-radius: 2px;
+		border-bottom-right-radius: 2px;
+		background:#0692d3;
+		border:1px solid #0481bb;
+		cursor:pointer;
+		box-shadow:0px -1px 2px rgba(0,0,0,0.3);
+		box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
+	}
+
+	#towtruck-buttons #towtruck-expand-button img {
+		height:7px;
+		width:14px;
+	}
 
     input:focus {
         outline: none;
@@ -391,6 +543,18 @@
             }
         }
 
+        .towtruck-close {
+            float: right;
+            cursor: pointer;
+            .user-select(none);
+        }
+
+    }
+
+    .towtruck-popup {
+        .towtruck-window;
+        width: 340px;
+        height: 170px;
     }
 
 }
@@ -401,14 +565,15 @@
     z-index: @z-index;
     background-color: @background-color;
     .box-dropshadow;
-    @border-radius: 4px;
+    @border-radius: 2px;
     // FIXME: why do I need these extra 14ish pixels?
-    @long-side: @button-width * 5 + @anchor-height + 14px;
-    @short-side: @button-width + 2px + @side-padding;
+    @long-side: @button-width * 5 + @anchor-height + 56px;
+    @short-side: @button-width + 10px;
+	border:0px solid #d9d9d9;
 
     &.towtruck-interface-right {
-        padding: 0px (@side-padding + 1px) 0px 1px;
-        bottom: 20px;
+        padding: 0px 0px 0px 0px;
+        bottom: 60px;
         right: 0px;
         border-radius: @border-radius 0 0 @border-radius;
         height: @long-side;
@@ -419,11 +584,17 @@
         #towtruck-anchor-horizontal {
             display: inline;
         }
+
+		#towtruck-anchor-horizontal img {
+			width:6px;
+			height:6px;
+			padding:2px;
+		}
     }
 
     &.towtruck-interface-left {
-        padding: 0px 1px 0px (@side-padding + 1px);
-        bottom: 20px;
+        padding: 0px 0px 0px 0px;
+        bottom: 60px;
         left: 0px;
         border-radius: 0 @border-radius @border-radius 0;
         height: @long-side;
@@ -434,6 +605,12 @@
         #towtruck-anchor-horizontal {
             display: inline;
         }
+
+		#towtruck-anchor-horizontal img {
+			width:6px;
+			height:6px;
+			padding:2px;
+		}
     }
 
     &.towtruck-interface-bottom {

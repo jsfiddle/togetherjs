@@ -16,7 +16,8 @@ define(["util"], function (util) {
   };
 
   elementFinder.elementLocation = function elementLocation(el) {
-    if (el.get) {
+    assert(el !== null, "Got null element");
+    if (el && el.get) {
       // a jQuery element
       el = el.get(0);
     }
@@ -29,11 +30,15 @@ define(["util"], function (util) {
     if (el.tagName == "HEAD") {
       return "head";
     }
+    if (el === document) {
+      return "document";
+    }
     var parent = el.parentNode;
-    var parentLocation = elementLocation(parent);
     if (! parent) {
+      console.warn("elementLocation(", el, ") has null parent");
       throw "No locatable parent found";
     }
+    var parentLocation = elementLocation(parent);
     var children = parent.childNodes;
     var index = 0;
     for (var i=0; i<children.length; i++) {
@@ -60,11 +65,17 @@ define(["util"], function (util) {
       this.context = context;
     },
     toString: function () {
+      var loc;
+      try {
+        loc = elementFinder.elementLocation(this.context);
+      } catch (e) {
+        loc = this.context;
+      }
       return (
         "[CannotFind " + this.prefix +
           "(" + this.location + "): " +
           this.reason + " in " +
-          elementFinder.elementLocation(this.context) + "]");
+          loc + "]");
     }
   });
 
@@ -78,6 +89,8 @@ define(["util"], function (util) {
       return document.body;
     } else if (loc === "head") {
       return document.head;
+    } else if (loc === "document") {
+      return document;
     } else if (loc.indexOf("body") === 0) {
       el = document.body;
       try {

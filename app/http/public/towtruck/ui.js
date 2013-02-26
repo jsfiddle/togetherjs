@@ -44,7 +44,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   function displayWindow(el) {
     el = $(el);
     assert(el.length);
-    $(".towtruck-window").hide();
+    $(".towtruck-window, .towtruck-popup").hide();
     var bound = $("#" + el.attr("data-bound-to"));
     assert(bound.length, bound.selector, el.selector);
     var ifacePos = panelPosition();
@@ -137,15 +137,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       return false;
     });
 
-    // FIXME: these aren't bound to anything:
-    // Close button and confirmation of close:
-    container.find(".towtruck-close").click(function () {
-      ui.activateTab("towtruck-end-confirm");
-    });
-    container.find("#towtruck-end-session").click(function () {
-      session.close();
-    });
-
     // Moving the window:
     // FIXME: this should probably be stickier, and not just move the window around
     // so abruptly
@@ -187,6 +178,18 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       return false;
     });
 
+    $("#towtruck-about-button").click(function () {
+      toggleWindow("#towtruck-about");
+    });
+
+    $("#towtruck-end-session").click(function () {
+      session.close();
+    });
+
+    $("#towtruck-cancel-end-session").click(function () {
+      hideWindow("#towtruck-about");
+    });
+
     $("#towtruck-share-button").click(function () {
       toggleWindow("#towtruck-share");
     });
@@ -199,6 +202,17 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       if (id == "towtruck-chat") {
         $("#towtruck-chat-input").focus();
       }
+    });
+
+    container.find(".towtruck-close").click(function (event) {
+      var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
+      hideWindow(w);
+      event.stopPropagation();
+      return false;
+    });
+
+    container.find("#towtruck-chat-notifier").click(function () {
+      displayWindow("#towtruck-chat");
     });
 
     $("#towtruck-participants-button").click(function () {
@@ -261,13 +275,24 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   ui.addChat = function (msg) {
     var nick, el;
     var container = ui.container.find("#towtruck-chat-messages");
+    var popup = ui.container.find("#towtruck-chat-notifier");
     assert(container.length);
     function addEl(el, id) {
       if (id) {
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
       container.append(el);
-      el[0].scrollIntoView();
+      var bottom = el.find(".towtruck-chat-content");
+      if (! bottom.length) {
+        bottom = el;
+      }
+      bottom[0].scrollIntoView();
+      if (! container.is(":visible")) {
+        var section = popup.find("#towtruck-chat-notifier-message");
+        section.empty();
+        section.append(el.clone());
+        displayWindow(popup);
+      }
     }
     if (msg.type == "text") {
       // FIXME: this should not show the name if the last chat was fairly
@@ -279,6 +304,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
         .attr("data-date", msg.date || Date.now());
+      setDate(el, msg.date || Date.now());
       assert(msg.messageId);
       addEl(el, msg.messageId);
     } else if (msg.type == "left-session") {
@@ -319,20 +345,63 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
      name into the element and sets the class name so it can be updated with
      updatePerson() later */
   function setPerson(templateElement, clientId) {
-    var nick = session.peers.get(clientId).nickname;
+    var nick, avatar;
+    if (clientId == session.clientId) {
+      nick = "me";
+      avatar = session.settings.get("avatar");
+    } else {
+      var peer = session.peers.get(clientId);
+      nick = peer.nickname;
+      avatar = peer.avatar;
+    }
     templateElement.find(".towtruck-person")
       .text(nick)
       .addClass("towtruck-person-" + util.safeClassName(clientId));
+    if (avatar) {
+      templateElement.find(".towtruck-avatar img")
+        .attr("src", avatar)
+        .addClass("towtruck-avatar-" + util.safeClassName(clientId));
+    }
+  }
+
+  function setDate(templateElement, date) {
+    if (typeof date == "number") {
+      date = new Date(date);
+    }
+    var ampm = "AM";
+    var hour = date.getHours();
+    if (hour > 12) {
+      hour -= 12;
+      ampm = "PM";
+    }
+    var minute = date.getMinutes();
+    var t = hour + ":";
+    if (minute < 10) {
+      t += "0";
+    }
+    t += minute;
+    templateElement.find(".towtruck-time").text(t);
+    templateElement.find(".towtruck-ampm").text(ampm);
   }
 
   /* Called when a person's nickname is updated */
   ui.updatePerson = function (clientId) {
-    var nick = session.peers.get(clientId).nickname;
+    var nick, avatar;
+    if (clientId == session.clientId) {
+      nick = "me";
+      avatar = session.settings.get("avatar");
+    } else {
+      var peer = session.peers.get(clientId);
+      nick = peer.nick;
+      avatar = peer.avatar;
+    }
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
+    if (avatar) {
+      ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId)).attr("src", avatar);
+    }
   };
 
   session.peers.on("add update", function (peer) {
-    console.log("got new peer", peer);
     var id = "towtruck-participant-" + util.safeClassName(peer.clientId);
     var el = $("#" + id);
     if (! el.length) {
@@ -345,7 +414,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       el.find(".towtruck-color").css({
         backgroundColor: peer.color
       });
-      console.log("setting color", el[0].outerHTML);
     }
     if (peer.nickname !== undefined) {
       el.find(".towtruck-participant-name").text(peer.nickname || "???");
@@ -359,6 +427,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       // FIXME: should fixup any other places where the avatar is set:
       $("#towtruck-self-avatar").attr("src", newValue);
     }
+    ui.updatePerson(session.clientId);
   });
 
   return ui;
