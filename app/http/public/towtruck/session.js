@@ -25,6 +25,9 @@ define(["require", "util", "channels"], function (require, util, channels) {
     return channel;
   };
 
+  // Setting, essentially global:
+  session.AVATAR_SIZE = 90;
+
   /****************************************
    * URLs
    */
@@ -113,6 +116,14 @@ define(["require", "util", "channels"], function (require, util, channels) {
 
   if (! session.settings.get("defaultNickname")) {
     session.settings.set("defaultNickname", DEFAULT_NICKNAMES[Math.floor(Math.random() * DEFAULT_NICKNAMES.length)]);
+  }
+
+  if (! session.settings.get("avatar")) {
+    require(["alien-avatar-generator"], function (Alien) {
+      var c = new Alien({width: session.AVATAR_SIZE, height: session.AVATAR_SIZE});
+      c.newAvatar();
+      session.settings.set("avatar", c.toImgSrc());
+    });
   }
 
   /****************************************

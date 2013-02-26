@@ -64,7 +64,8 @@
       paths: {
         jquery: "libs/jquery-1.8.3.min",
         walkabout: "libs/walkabout.js/walkabout",
-        tinycolor: "libs/tinycolor"
+        tinycolor: "libs/tinycolor",
+        "alien-avatar-generator": "libs/alien-avatar-generator"
       }
     };
     var deps = ["session"];

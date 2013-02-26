@@ -7,7 +7,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
   var AssertionError = util.AssertionError;
 
   // Size of the avatar:
-  var AVATAR_HEIGHT = 100;
+  var AVATAR_HEIGHT = session.AVATAR_SIZE;
 
   session.RTCSupported = !!(window.mozRTCPeerConnection ||
                             window.webkitRTCPeerConnection ||
