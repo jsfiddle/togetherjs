@@ -139,9 +139,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
     // FIXME: these aren't bound to anything:
     // Close button and confirmation of close:
-    container.find(".towtruck-close").click(function () {
-      ui.activateTab("towtruck-end-confirm");
-    });
     container.find("#towtruck-end-session").click(function () {
       session.close();
     });
@@ -204,6 +201,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     container.find(".towtruck-close").click(function (event) {
       var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
       hideWindow(w);
+      event.stopPropagation();
+      return false;
     });
 
     container.find("#towtruck-chat-notifier").click(function () {

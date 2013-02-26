@@ -160,6 +160,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     lastPosX = pageX;
     lastPosY = pageY;
     var target = event.target;
+    var parent = $(target).closest(".towtruck-window, .towtruck-popup, #towtruck-interface");
+    if (parent.length) {
+      target = parent[0];
+    }
     if (target == document.documentElement || target == document.body) {
       lastMessage = {
         type: "cursor-update",
