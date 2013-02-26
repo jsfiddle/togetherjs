@@ -276,7 +276,11 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
       container.append(el);
-      el[0].scrollIntoView();
+      var bottom = el.find(".towtruck-chat-content");
+      if (! bottom.length) {
+        bottom = el;
+      }
+      bottom[0].scrollIntoView();
       if (! container.is(":visible")) {
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
