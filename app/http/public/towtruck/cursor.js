@@ -23,7 +23,13 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       this.updatePeer(session.peers.get(clientId));
       this.lastTop = this.lastLeft = null;
       $(document.body).append(this.element);
+      this.keydownTimeout = null;
+      this.clearKeydown = this.clearKeydown.bind(this);
     },
+
+    // How long after receiving a setKeydown call that we should show the
+    // user typing.  This should be more than MIN_KEYDOWN_TIME:
+    KEYDOWN_WAIT_TIME: 2000,
 
     updatePeer: function (peer) {
       this.element.css({color: peer.color});
@@ -83,6 +89,20 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       if (this.lastTop !== null) {
         this.setPosition(this.lastTop, this.lastLeft);
       }
+    },
+
+    setKeydown: function () {
+      if (this.keydownTimeout) {
+        clearTimeout(this.keydownTimeout);
+      } else {
+        this.element.find(".towtruck-cursor-typing").show();
+      }
+      this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
+    },
+
+    clearKeydown: function () {
+      this.keydownTimeout = null;
+      this.element.find(".towtruck-cursor-typing").hide();
     },
 
     _destroy: function () {
@@ -194,6 +214,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
   session.on("ui-ready", function () {
     $(document).mousemove(mousemove);
     document.addEventListener("click", documentClick, true);
+    document.addEventListener("keydown", documentKeydown, true);
     $(window).scroll(scroll);
   });
 
@@ -203,6 +224,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     });
     $(document).unbind("mousemove", mousemove);
     document.removeEventListener("click", documentClick, true);
+    document.removeEventListener("keydown", documentKeydown, true);
     $(window).unbind("scroll", scroll);
   });
 
@@ -259,6 +281,30 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     setTimeout(function () {
       element.remove();
     }, CLICK_TRANSITION_TIME);
+  });
+
+  var lastKeydown = 0;
+  var MIN_KEYDOWN_TIME = 500;
+
+  function documentKeydown(event) {
+    setTimeout(function () {
+      var now = Date.now();
+      if (now - lastKeydown < MIN_KEYDOWN_TIME) {
+        return;
+      }
+      lastKeydown = now;
+      // FIXME: is event.target interesting here?  That is, *what* the
+      // user is typing into, not just that the user is typing?  Also
+      // I'm assuming we don't care if the user it typing into a
+      // towtruck-related field, since chat activity is as interesting
+      // as any other activity.
+      session.send({type: "keydown"});
+    });
+  }
+
+  session.hub.on("keydown", function (msg) {
+    var cursor = Cursor.getClient(msg.clientId);
+    cursor.setKeydown();
   });
 
 });
