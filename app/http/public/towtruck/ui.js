@@ -335,15 +335,23 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
      name into the element and sets the class name so it can be updated with
      updatePerson() later */
   function setPerson(templateElement, clientId) {
-    var nick;
+    var nick, avatar;
     if (clientId == session.clientId) {
       nick = "me";
+      avatar = session.settings.get("avatar");
     } else {
-      nick = session.peers.get(clientId).nickname;
+      var peer = session.peers.get(clientId);
+      nick = peer.nickname;
+      avatar = peer.avatar;
     }
     templateElement.find(".towtruck-person")
       .text(nick)
       .addClass("towtruck-person-" + util.safeClassName(clientId));
+    if (avatar) {
+      templateElement.find(".towtruck-avatar img")
+        .attr("src", avatar)
+        .addClass("towtruck-avatar-" + util.safeClassName(clientId));
+    }
   }
 
   function setDate(templateElement, date) {
@@ -368,17 +376,22 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
   /* Called when a person's nickname is updated */
   ui.updatePerson = function (clientId) {
-    var nick;
+    var nick, avatar;
     if (clientId == session.clientId) {
       nick = "me";
+      avatar = session.settings.get("avatar");
     } else {
-      nick = session.peers.get(clientId).nickname;
+      var peer = session.peers.get(clientId);
+      nick = peer.nick;
+      avatar = peer.avatar;
     }
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
+    if (avatar) {
+      ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId)).attr("src", avatar);
+    }
   };
 
   session.peers.on("add update", function (peer) {
-    console.log("got new peer", peer);
     var id = "towtruck-participant-" + util.safeClassName(peer.clientId);
     var el = $("#" + id);
     if (! el.length) {
@@ -391,7 +404,6 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       el.find(".towtruck-color").css({
         backgroundColor: peer.color
       });
-      console.log("setting color", el[0].outerHTML);
     }
     if (peer.nickname !== undefined) {
       el.find(".towtruck-participant-name").text(peer.nickname || "???");
@@ -405,6 +417,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       // FIXME: should fixup any other places where the avatar is set:
       $("#towtruck-self-avatar").attr("src", newValue);
     }
+    ui.updatePerson(session.clientId);
   });
 
   return ui;
