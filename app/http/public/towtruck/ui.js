@@ -334,7 +334,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
      name into the element and sets the class name so it can be updated with
      updatePerson() later */
   function setPerson(templateElement, clientId) {
-    var nick = session.peers.get(clientId).nickname;
+    var nick;
+    if (clientId == session.clientId) {
+      nick = "me";
+    } else {
+      nick = session.peers.get(clientId).nickname;
+    }
     templateElement.find(".towtruck-person")
       .text(nick)
       .addClass("towtruck-person-" + util.safeClassName(clientId));
@@ -342,7 +347,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
   /* Called when a person's nickname is updated */
   ui.updatePerson = function (clientId) {
-    var nick = session.peers.get(clientId).nickname;
+    var nick;
+    if (clientId == session.clientId) {
+      nick = "me";
+    } else {
+      nick = session.peers.get(clientId).nickname;
+    }
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
   };
 
