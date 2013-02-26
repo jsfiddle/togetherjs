@@ -118,6 +118,15 @@
     </section>
   </div>
 
+  <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
+  <div id="towtruck-chat-notifier" class="towtruck-popup"
+       data-bound-to="towtruck-participants-button"
+       style="display: none">
+    <div class="towtruck-close">&times;</div>
+    <section id="towtruck-chat-notifier-message">
+    </section>
+  </div>
+
   <!-- The list of participants: -->
   <div id="towtruck-participants" class="towtruck-window"
        data-bound-to="towtruck-participants-button"

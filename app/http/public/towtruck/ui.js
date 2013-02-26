@@ -44,7 +44,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   function displayWindow(el) {
     el = $(el);
     assert(el.length);
-    $(".towtruck-window").hide();
+    $(".towtruck-window, .towtruck-popup").hide();
     var bound = $("#" + el.attr("data-bound-to"));
     assert(bound.length, bound.selector, el.selector);
     var ifacePos = panelPosition();
@@ -201,6 +201,15 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       }
     });
 
+    container.find(".towtruck-close").click(function (event) {
+      var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
+      hideWindow(w);
+    });
+
+    container.find("#towtruck-chat-notifier").click(function () {
+      displayWindow("#towtruck-chat");
+    });
+
     $("#towtruck-participants-button").click(function () {
       toggleWindow("#towtruck-participants");
     });
@@ -261,6 +270,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   ui.addChat = function (msg) {
     var nick, el;
     var container = ui.container.find("#towtruck-chat-messages");
+    var popup = ui.container.find("#towtruck-chat-notifier");
     assert(container.length);
     function addEl(el, id) {
       if (id) {
@@ -268,6 +278,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       }
       container.append(el);
       el[0].scrollIntoView();
+      if (! container.is(":visible")) {
+        var section = popup.find("#towtruck-chat-notifier-message");
+        section.empty();
+        section.append(el.clone());
+        displayWindow(popup);
+      }
     }
     if (msg.type == "text") {
       // FIXME: this should not show the name if the last chat was fairly
