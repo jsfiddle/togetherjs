@@ -4,7 +4,18 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Editor</title>
-  <script type="text/javascript" src="http://towtruck.mozillalabs.com/towtruck.js"></script>
+  <script>
+    var port = '';
+
+    if (['127.0.0.1', 'localhost'].indexOf(location.hostname)){
+      port = ":8080";
+    }
+
+    var towtruck = location.protocol + "//" + location.hostname + port + "/towtruck.js";
+    var script = document.createElement("script");
+    script.src = towtruck;
+    document.head.appendChild(script);
+  </script>
 
   <style type="text/css" media="screen">
     body {
@@ -28,7 +39,6 @@
   </style>
 </head>
 <body>
-  
   <div id="container">
     <div id="intro">
       <h1>Ace Editor Demo</h1>
@@ -52,9 +62,6 @@
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/textmate");
     editor.getSession().setMode("ace/mode/javascript");
-
-
   </script>
-
 </body>
 </html>

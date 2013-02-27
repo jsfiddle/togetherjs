@@ -260,10 +260,17 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     assert(! session.isClient);
     var els = $(
       'textarea:visible, ' +
-        'input:visible[type="text"], ' +
-        'input:visible[type="search"], ' +
-        'input:visible[type="url"]');
+      'input:visible[type="text"], ' +
+      'input:visible[type="search"], ' +
+      'input:visible[type="url"]'
+    );
+
     els.each(function () {
+      // TODO: Allow trackers to remove elements from the "pool"
+      // Ignore ACE editors specifically.
+      if ($(this).hasClass('ace_text-input')){
+        return;
+      }
       if (ignoreElement(this)) {
         return;
       }
@@ -528,6 +535,127 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   };
 
   tracker.trackers.register(tracker.CodeMirrorTracker);
+
+  tracker.AceTracker = util.Class({
+    constructor: function AceTracker(options) {
+      this.ace = options.ace;
+      this.channel = options.channel;
+      this.isClient = options.isClient;
+      this.onmessage = this.onmessage.bind(this);
+      this.channel.on("message", this.onmessage);
+      this.change = this.change.bind(this);
+      this.ace.document.on('change', this.change);
+      this.ignoreEvents = false;
+    },
+
+    repr: function () {
+      return '[AceTracker channel: ' + repr(this.channel.id) + 'element: ' + elementFinder.elementLocation(this.ace.editor.container) + ']';
+    },
+
+    introduce: function () {
+      assert(! this.isClient);
+      session.send({
+        type: "connect-tracker",
+        trackerType: this.constructor.name,
+        routeId: this.channel.id,
+        elementLocation: elementFinder.elementLocation(this.ace.editor.container),
+        value: this.ace.document.getValue()
+      });
+      if (! this.isClient) {
+        this.channel.send({
+          op: "init",
+          value: this.ace.document.getValue()
+        });
+      }
+    },
+
+    destroy: function () {
+      var index = tracker.trackers.active.indexOf(this);
+      if (index != -1) {
+        tracker.trackers.active.splice(index, 1);
+      }
+      this.channel.close();
+    },
+
+    change: function (e) {
+      if (this._ignoreEvents) {
+        return;
+      }
+
+      var fullText = this.ace.document.getValue();
+
+      this.channel.send({
+        op: "change",
+        delta: e.data,
+        fullText: fullText
+      });
+    },
+
+    onmessage: function (msg) {
+      if (msg.op == "change") {
+        this._ignoreEvents = true;
+        try {
+          this.ace.document.doc.applyDeltas([msg.delta]);
+        }
+        finally {
+          this._ignoreEvents = false;
+        }
+
+        if (msg.fullText && this.ace.document.getValue() != msg.fullText) {
+          console.warn("Text mismatch after applying message", msg);
+        }
+      }
+      else if (msg.op == "init") {
+        this.ace.editor.setValue(msg.value);
+      }
+      else {
+        console.warn("Bad op:", msg);
+      }
+    }
+  });
+
+  tracker.AceTracker.createAll = function () {
+    assert(! session.isClient);
+
+    var elements = $('.ace_editor');
+    $.each(elements, function(i, element){
+      if (ignoreElement(element)){
+        return;
+      }
+
+      var ace = element.env;
+      var route = session.router.makeRoute("tracker-ace-" + util.safeClassName(element.id || util.generateId()));
+
+      var t = tracker.AceTracker({
+        ace: ace,
+        channel: route,
+        isClient: false
+      });
+
+      tracker.trackers.active.push(t);
+    });
+  };
+
+  tracker.AceTracker.fromConnect = function (msg) {
+    var route = session.router.makeRoute(msg.routeId);
+    var element = elementFinder.findElement(msg.elementLocation);
+    var ace = element.env;
+    if (! editor) {
+      console.warn("AceTracker has not been activated on element", element);
+      return;
+    }
+    var t = tracker.AceTracker({
+      ace: ace,
+      channel: route,
+      isClient: true
+    });
+    tracker.trackers.active.push(t);
+    if (msg.value) {
+      t.onmessage({op: "init", value: msg.value});
+    }
+  };
+
+  tracker.trackers.register(tracker.AceTracker);
 
   return tracker;
 
