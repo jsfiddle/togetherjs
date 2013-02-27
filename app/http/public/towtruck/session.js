@@ -260,6 +260,8 @@ define(["require", "util", "channels"], function (require, util, channels) {
     session.clientId = clientId;
   }
 
+  var autoOpenShare = false;
+
   function initShareId() {
     var hash = location.hash;
     var shareId = session.shareId;
@@ -292,6 +294,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
         saved || TowTruck.startTowTruckImmediately,
         "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
       if ((! saved) && TowTruck.startTowTruckImmediately) {
+        autoOpenShare = true;
         isClient = false;
         shareId = session.settings.get("stickyShare");
         if (! shareId) {
@@ -322,6 +325,9 @@ define(["require", "util", "channels"], function (require, util, channels) {
       var ui = require("ui");
       ui.activateUI();
       sendHello(false);
+      if (autoOpenShare) {
+        ui.displayWindow("#towtruck-share");
+      }
     });
   };
 
