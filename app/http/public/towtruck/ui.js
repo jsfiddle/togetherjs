@@ -152,6 +152,9 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         var fromRight = $window.width() + window.pageXOffset - event2.pageX;
         var fromLeft = event2.pageX - window.pageXOffset;
         var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
+        // FIXME: this is to temporarily disable the bottom view:
+        fromBottom = 10000;
+
         var pos;
         if (fromLeft < fromRight && fromLeft < fromBottom) {
           pos = "left";
@@ -292,7 +295,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     var container = ui.container.find("#towtruck-chat-messages");
     var popup = ui.container.find("#towtruck-chat-notifier");
     assert(container.length);
-    function addEl(el, id) {
+    function addEl(el, id, self) {
       if (id) {
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
@@ -302,7 +305,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         bottom = el;
       }
       bottom[0].scrollIntoView();
-      if (! container.is(":visible")) {
+      if ((! self) && ! container.is(":visible")) {
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
         section.append(el.clone());
@@ -321,18 +324,20 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         .attr("data-date", msg.date || Date.now());
       setDate(el, msg.date || Date.now());
       assert(msg.messageId);
-      addEl(el, msg.messageId);
+      addEl(el, msg.messageId, msg.clientId == session.clientId);
     } else if (msg.type == "left-session") {
       nick = session.peers.get(msg.clientId).nickname;
       el = ui.cloneTemplate("chat-left");
       setPerson(el, msg.clientId);
-      addEl(el, msg.messageId);
+      setDate(el, msg.date || Date.now());
+      addEl(el, msg.messageId, false);
     } else if (msg.type == "system") {
       assert(! msg.clientId);
       assert(typeof msg.text == "string");
       el = ui.cloneTemplate("chat-system");
       el.find(".towtruck-chat-content").text(msg.text);
-      addEl(el, msg.clientId);
+      setDate(el, msg.date || Date.now());
+      addEl(el, msg.clientId, false);
     } else if (msg.type == "clear") {
       container.empty();
     } else if (msg.type == "url-change") {
@@ -340,8 +345,9 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       assert(typeof msg.url == "string");
       el = ui.cloneTemplate("url-change");
       setPerson(el, msg.clientId);
+      setDate(el, msg.date || Date.now());
       el.find(".towtruck-url").attr("href", msg.url).text(msg.url);
-      addEl(el, msg.clientId);
+      addEl(el, msg.clientId, msg.clientId == session.clientId);
     } else {
       console.warn("Did not understand message type:", msg.type, "in message", msg);
     }
