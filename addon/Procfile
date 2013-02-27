@@ -1,0 +1,2 @@
+profilea: cfx run --binary /Applications/FirefoxNightly.app -p ProfileA 
+profileb: sleep 1; cfx run --binary /Applications/FirefoxNightly.app -p ProfileB 
