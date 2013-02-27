@@ -26,7 +26,7 @@
 @side-padding: 0px;
 // Background color of most elements:
 @background-color: #fff;
-@window-background-color: #fff;
+@window-background-color: #f2f4f5;
 @window-color: #000;
 
 // This is the base z-index of the buttons; items you want below or above
@@ -97,8 +97,20 @@
 		font-style: normal;
 		font-variant: normal;
 		font-weight: 300;
-		line-height: 18px;
+		line-height: 20px;
 		color:rgb(51, 51, 51);
+		margin: 0px 0px 10px;
+	}
+	
+	.regular {
+		font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 300;
+		line-height: 20px;
+		color:rgb(51, 51, 51);
+		margin: 0px 0px 10px;
 	}
 
 	h1 {
@@ -125,10 +137,22 @@
 		font-style: normal;
 		font-variant: normal;
 		font-weight: 300;
-		line-height: 38px;
-		padding-bottom:7px;
+		line-height: 40px;
 		color:rgb(51, 51, 51);
 	}
+	
+	.strong {
+	  	font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 300;
+		line-height: 20px;
+		color:rgb(51, 51, 51);
+		margin: 0px 0px 10px;
+	}
+	
+	
 	.small, small {
 	  font-size: 10px;
 	  line-height: 24px;
@@ -423,19 +447,28 @@
     }
 
     input#towtruck-chat-input {
-        border-radius: 0.25em;
-        height: 30px;
-        width: 327px;
-        border: 1px solid #d0d0d0;
-        padding-left: 8px;
-        font-size: 14px;
-        color: #343639;
-        .box-shadow(inset 0 0 1px 1px rgba(0,0,0,0.1));
+        width: 305px;
+        font-size: 12px;
+        padding: 6px;
+		border-radius:2px;
+		border:1px solid #cccccc;
+		box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
     }
 
     input#towtruck-chat-input:focus {
         border: 1px solid #267cc3;
     }
+
+
+    .towtruck-chat-message {
+		padding:15px;
+		font-family: @default-font;
+		font-size:14px;	
+    }
+
+	.towtruck-avatar {
+		float:left;
+	}
 
 	.towtruck-timestamp {
 		float: right;
@@ -445,24 +478,25 @@
 
     .towtruck-person {
 		font-size: 14px;
-		font-family: @default-font;
-        font-weight: bold;
-		padding-left: 60px;
-    }
-
-    .towtruck-chat-message {
-		padding:15px;
-        border-bottom: 1px solid #ddd;
-		font-family: @default-font;
-		font-size:14px;
+    	font-family: openSansBold;
+		float:left;
+		padding:10px;
+		width:100%;
     }
 
     .towtruck-chat-content {
         white-space: pre-wrap;
-		padding: 10px 10px 10px 60px;
 		line-height:20px;
 		font-family: @default-font;
+		float:left;
+		padding:10px;
     }
+
+	.towtruck-hr-line {
+		clear:both;
+		padding:10px 0px;
+		border-bottom:1px solid rgba(0,0,0,0.1);
+	}
 
 	.towtruck-window:after {
 		content: '';
@@ -472,7 +506,7 @@
 		right:-6px;
 		width: 10px;
 		height: 10px; 
-		background: #FFFFFF;
+		background: #f2f4f5;
 		border-right:1px solid #ccc;
 		border-bottom:1px solid #ccc;
 		-moz-transform:rotate(-45deg);
@@ -503,7 +537,7 @@
         }
 
         header.towtruck-title {
-			font-size: 12px;
+			font-size: 13px;
 			font-style: bold;
 			font-variant: normal;
             text-align: left;
@@ -533,7 +567,7 @@
 		}
 
         input#towtruck-share-link {
-            width: 287px;
+            width: 305px;
             font-size: 12px;
             padding: 6px;
 			border-radius:2px;
@@ -595,6 +629,15 @@
 		&#towtruck-about button#towtruck-cancel-end-session:hover {
 			background-color: rgba(150,212,44,1);
 		}
+		
+		#towtruck-participants-self {
+			padding:10px;
+		}
+		
+		#towtruck-participants-self span#towtruck-participants-is-owner{
+
+		}
+		
 
         p {
             margin: 0.5em 0 0.5em 0;

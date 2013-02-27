@@ -74,15 +74,16 @@
     </header>
     <section>
       <h4>
-		Hi and welcome to TowTruck!
+		Hi, welcome to TowTruck!
 	  </h4>
-	  <p>This is session: <span id="towtruck-session-id"></span></p>
       <p>
         Send this link below to a friend to connect.
       </p>
       <p>
         <input type="text" id="towtruck-share-link">
       </p>
+	  <p class="small">This is session: <span id="towtruck-session-id"></span></p>
+	
     </section>
   </div>
 
@@ -101,6 +102,7 @@
 	    <div class="towtruck-timestamp"><span class="towtruck-time">HH:MM</span> <span class="towtruck-ampm">AM/PM</span></div>
         <div class="towtruck-person">Aaron</div>
         <div class="towtruck-chat-content"></div>
+		<div class="towtruck-hr-line"></div>
       </div>
 
       <!-- Template for when a person leaves: -->
@@ -128,7 +130,7 @@
     <section id="towtruck-chat-messages">
     </section>
     <section>
-      <input type="text" id="towtruck-chat-input" placeholder="type your message here">
+      <input type="text" id="towtruck-chat-input" placeholder="Type your message here">
     </section>
   </div>
 
@@ -152,9 +154,9 @@
       <header>
         <span id="towtruck-participants-is-owner"
               data-toggles="#towtruck-participants-is-following">
-          Owner:
+			Owner:
         </span>
-        <span id="towtruck-participants-is-following"
+        <span id="towtruck-participants-is-following" class="strong"
               data-toggles="#towtruck-participants-is-owner"
               style="display: none">
           Following:
@@ -200,9 +202,9 @@
       </div>
     </div>
 
-    <section id="towtruck-participants-other">
+    <section id="towtruck-participants-other" class="strong">
       <header>Participants:</header>
-      <div id="towtruck-participants-list">
+      <div id="towtruck-participants-list" class="regular">
       </div>
       <p id="towtruck-participants-none">
         There is no one else currently participating in the session.
