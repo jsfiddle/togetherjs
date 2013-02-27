@@ -121,6 +121,9 @@ define(["require", "util", "channels"], function (require, util, channels) {
   if (! session.settings.get("avatar")) {
     require(["alien-avatar-generator"], function (Alien) {
       var c = new Alien({width: session.AVATAR_SIZE, height: session.AVATAR_SIZE});
+      c.ctx.arc(session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, 0, Math.PI*2);
+      c.ctx.closePath();
+      c.ctx.clip();
       c.newAvatar();
       session.settings.set("avatar", c.toImgSrc());
     });

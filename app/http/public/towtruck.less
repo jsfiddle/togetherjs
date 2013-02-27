@@ -669,14 +669,17 @@
        (good on all but IE: http://caniuse.com/pointer-events */
     pointer-events: none;
 
+    // FIXME: maybe these should use position: fixed so the cursor
+    // stays stuck to the top of the screen until the appropriate time
+    // (when .towtruck-scrolled-above/below is removed)?
     &.towtruck-scrolled-above {
-        .towtruck-cursor-normal, .towtruck-cursor-down {
+        .towtruck-cursor-down {
             display: none;
         }
     }
 
     &.towtruck-scrolled-below {
-        .towtruck-cursor-normal, .towtruck-cursor-up {
+        .towtruck-cursor-up {
             display: none;
         }
     }
@@ -692,7 +695,7 @@
         font-size: 40%;
         position: relative;
         top: -20px;
-        left: 25px;
+        left: 0px;
         padding: 2px;
         border-radius: 2px;
     }

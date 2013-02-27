@@ -6,9 +6,6 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
   var assert = util.assert;
   var AssertionError = util.AssertionError;
 
-  // Size of the avatar:
-  var AVATAR_HEIGHT = session.AVATAR_SIZE;
-
   session.RTCSupported = !!(window.mozRTCPeerConnection ||
                             window.webkitRTCPeerConnection ||
                             window.RTCPeerConnection);
@@ -116,14 +113,17 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       assert(streaming);
       var height = $video[0].videoHeight;
       var width = $video[0].videoWidth;
-      width = width * (AVATAR_HEIGHT / height);
-      height = AVATAR_HEIGHT;
+      width = width * (session.AVATAR_SIZE / height);
+      height = session.AVATAR_SIZE;
       var $canvas = $("<canvas>");
-      $canvas.css({height: AVATAR_HEIGHT + "px", width: AVATAR_HEIGHT + "px"});
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
       var context = $canvas[0].getContext("2d");
-      // FIXME: is not centered, instead just truncated:
-      context.drawImage($video[0], 0, 0, width, height);
-      savePicture($canvas[0].toDataURL("image/jpeg"));
+      context.arc(session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, 0, Math.PI*2);
+      context.closePath();
+      context.clip();
+      context.drawImage($video[0], (session.AVATAR_SIZE - width) / 2, 0, width, height);
+      savePicture($canvas[0].toDataURL("image/png"));
     }
 
     $upload.on("change", function () {
@@ -144,7 +144,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
 
     function convertImage(imageUrl, callback) {
       var $canvas = $("<canvas>");
-      $canvas.css({height: AVATAR_HEIGHT + "px", width: AVATAR_HEIGHT + "px"});
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
       var context = $canvas[0].getContext("2d");
       var img = new Image();
       img.src = imageUrl;
@@ -154,8 +155,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       setTimeout(function () {
         var width = img.naturalWidth || img.width;
         var height = img.naturalHeight || img.height;
-        width = width * (AVATAR_HEIGHT / height);
-        height = AVATAR_HEIGHT;
+        width = width * (session.AVATAR_SIZE / height);
+        height = session.AVATAR_SIZE;
         context.drawImage(img, 0, 0, width, height);
         callback($canvas[0].toDataURL("image/png"));
       });
