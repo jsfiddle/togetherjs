@@ -291,8 +291,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
             offerDescription = true;
             connect();
           },
-          function (error) {
-            error("Error doing RTC setRemoteDescription:", error);
+          function (err) {
+            error("Error doing RTC setRemoteDescription:", err);
           }
         );
         return;
@@ -309,12 +309,12 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
               offerSent = offer;
               ui.displayToggle("#towtruck-audio-outgoing");
             },
-            function (error) {
-              error("Error doing RTC setLocalDescription:", error);
+            function (err) {
+              error("Error doing RTC setLocalDescription:", err);
             }
           );
-        }, function (error) {
-          error("Error doing RTC createOffer:", error);
+        }, function (err) {
+          error("Error doing RTC createOffer:", err);
         });
       } else if (! (answerSent || answerReceived)) {
         // FIXME: I might have only needed this due to my own bugs, this might
@@ -335,13 +335,13 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
               });
               answerSent = answer;
             },
-            function (error) {
+            function (err) {
               clearTimeout(timeout);
-              error("Error doing RTC setLocalDescription:", error);
+              error("Error doing RTC setLocalDescription:", err);
             }
           );
-        }, function (error) {
-          error("Error doing RTC createAnswer:", error);
+        }, function (err) {
+          error("Error doing RTC createAnswer:", err);
         });
       }
     }
@@ -372,8 +372,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
             offerDescription = true;
             connect();
           },
-          function (error) {
-            error("Error doing RTC setRemoteDescription:", error);
+          function (err) {
+            error("Error doing RTC setRemoteDescription:", err);
           }
         );
       }
@@ -406,8 +406,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           // FIXME: I don't think this connect is ever needed?
           connect();
         },
-        function (error) {
-          error("Error doing RTC setRemoteDescription:", error);
+        function (err) {
+          error("Error doing RTC setRemoteDescription:", err);
         }
       );
     });
