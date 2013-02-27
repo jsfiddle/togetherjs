@@ -5,7 +5,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
   var AssertionError = util.AssertionError;
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
-  var CURSOR_HEIGHT = 25;
+  var CURSOR_HEIGHT = 50;
+  var CURSOR_ANGLE = (35 / 180) * Math.PI;
+  var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
 
   session.hub.on("cursor-update", function (msg) {
     Cursor.getClient(msg.clientId).updatePosition(msg);
@@ -33,6 +35,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
 
     updatePeer: function (peer) {
       this.element.css({color: peer.color});
+      var img = this.element.find("img.towtruck-cursor-img");
+      img.attr("src", makeCursor(peer.color));
       var name = this.element.find(".towtruck-cursor-name");
       assert(name.length);
       name.text(peer.nickname);
@@ -184,6 +188,24 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       offsetY: Math.floor(offsetY)
     };
     session.send(lastMessage);
+  }
+
+  function makeCursor(color) {
+    var canvas = $("<canvas></canvas>");
+    canvas.attr("height", CURSOR_HEIGHT);
+    canvas.attr("width", CURSOR_WIDTH);
+    var context = canvas[0].getContext('2d');
+    context.fillStyle = color;
+    context.moveTo(0, 0);
+    context.beginPath();
+    context.lineTo(0, CURSOR_HEIGHT/1.2);
+    context.lineTo(Math.sin(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5,
+                   Math.cos(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5);
+    context.lineTo(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2,
+                   Math.cos(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2);
+    context.lineTo(0, 0);
+    context.fill();
+    return canvas[0].toDataURL("image/png");
   }
 
   var scrollTimeout = null;

@@ -180,7 +180,8 @@
         </fieldset>
         <fieldset id="towtruck-avatar-edit-rtc">
           <legend>Take a picture</legend>
-          <video id="towtruck-avatar-video"></video>
+          <!-- the 90 pixel measurement should match session.AVATAR_HEIGHT: -->
+          <video id="towtruck-avatar-video" width=90 height=90></video>
           <button id="towtruck-avatar-use-camera">Take picture</button>
         </fieldset>
       </div>
@@ -213,18 +214,15 @@
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor"
          class="towtruck-cursor towtruck">
-      <!-- this is an upward-left arrow: -->
-      <span class="towtruck-cursor-normal">
-        &#8598;
-      </span>
-      <!-- down arrow: -->
+      <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png">
+      <!-- Displayed when the cursor is below the screen: -->
       <span class="towtruck-cursor-down">
         &#8595;
       </span>
+      <!-- Displayed when the cursor is above the screen: -->
       <span class="towtruck-cursor-up">
         &#8593;
       </span>
-      <div>
       <span class="towtruck-cursor-name"></span>
       <span style="display: none" class="towtruck-cursor-typing">...</span>
     </div>
