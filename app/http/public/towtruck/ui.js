@@ -245,6 +245,15 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       $("#towtruck-self-avatar").attr("src", avatar);
     }
 
+    var starterButton = $("#towtruck-starter button");
+    starterButton.click(function () {
+      ui.displayWindow("#towtruck-about");
+    }).addClass("towtruck-running");
+    if (starterButton.text() == "Start TowTruck") {
+      starterButton.attr("data-start-text", starterButton.text());
+      starterButton.text("End TowTruck Session");
+    }
+
     session.emit("ui-ready");
 
   };
@@ -268,6 +277,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
     // Clear out any other spurious elements:
     $(".towtruck").remove();
+    var starterButton = $("#towtruck-starter button");
+    starterButton.removeClass("towtruck-running");
+    if (starterButton.attr("data-start-text")) {
+      starterButton.text(starterButton.attr("data-start-text"));
+      starterButton.attr("data-start-text", "");
+    }
   });
 
   // FIXME: this should be a series of methods, not one big method with
