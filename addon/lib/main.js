@@ -20,7 +20,6 @@ StartupPanel({
 });
 
 function startTowTruck() {
-  console.log("clicked!");
   var tab = tabs.activeTab;
   if (tab.towtruckCloser) {
     tab.towtruckCloser();
@@ -41,13 +40,27 @@ function startTowTruck() {
     worker.port.on("Close", function () {
       tab.towtruckCloser();
     });
-    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs});
+    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs, hubBase: simplePrefs.prefs.hubBase});
   }
   button.port.emit("TowTruckOn");
   tab.on("ready", attachWorker);
   attachWorker();
 }
 // Need poll for back button code
+
+tabs.on("open", watchTab);
+
+function watchTab(tab) {
+  tab.on("ready", function () {
+    if (tabs.activeTab == tab && tab.url.indexOf("#&towtruck") != -1) {
+      startTowTruck();
+    }
+  });
+}
+
+for (var i=0; i<tabs.length; i++) {
+  watchTab(tabs[i]);
+}
 
 tabs.on("activate", function () {
   if (tabs.activeTab.towtruckCloser) {

@@ -41,7 +41,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
   }
 
-  function displayWindow(el) {
+  ui.displayWindow = function (el) {
     el = $(el);
     assert(el.length);
     $(".towtruck-window, .towtruck-popup").hide();
@@ -87,7 +87,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     if (el.is(":visible")) {
       hideWindow(el);
     } else {
-      displayWindow(el);
+      ui.displayWindow(el);
     }
   }
 
@@ -212,7 +212,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     });
 
     container.find("#towtruck-chat-notifier").click(function () {
-      displayWindow("#towtruck-chat");
+      ui.displayWindow("#towtruck-chat");
     });
 
     $("#towtruck-participants-button").click(function () {
@@ -245,6 +245,15 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       $("#towtruck-self-avatar").attr("src", avatar);
     }
 
+    var starterButton = $("#towtruck-starter button");
+    starterButton.click(function () {
+      ui.displayWindow("#towtruck-about");
+    }).addClass("towtruck-running");
+    if (starterButton.text() == "Start TowTruck") {
+      starterButton.attr("data-start-text", starterButton.text());
+      starterButton.text("End TowTruck Session");
+    }
+
     session.emit("ui-ready");
 
   };
@@ -268,6 +277,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
     // Clear out any other spurious elements:
     $(".towtruck").remove();
+    var starterButton = $("#towtruck-starter button");
+    starterButton.removeClass("towtruck-running");
+    if (starterButton.attr("data-start-text")) {
+      starterButton.text(starterButton.attr("data-start-text"));
+      starterButton.attr("data-start-text", "");
+    }
   });
 
   // FIXME: this should be a series of methods, not one big method with
@@ -291,7 +306,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
         section.append(el.clone());
-        displayWindow(popup);
+        ui.displayWindow(popup);
       }
     }
     if (msg.type == "text") {

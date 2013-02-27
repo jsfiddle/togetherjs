@@ -68,8 +68,9 @@
         "alien-avatar-generator": "libs/alien-avatar-generator"
       }
     };
-    var deps = ["session"];
-    function callback() {
+    var deps = ["session", "jquery"];
+    function callback(session, jquery) {
+      jquery.noConflict();
       TowTruck._loaded = true;
       TowTruck.require = require.config({context: "towtruck"});
       if (doneCallback && typeof doneCallback == "function") {
