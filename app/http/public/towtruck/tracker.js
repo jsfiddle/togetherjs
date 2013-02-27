@@ -582,12 +582,12 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
         return;
       }
 
-      var fullText = this.ace.document.getValue();
+      // var fullText = this.ace.document.getValue();
 
       this.channel.send({
         op: "change",
-        delta: e.data,
-        fullText: fullText
+        delta: e.data
+        // fullText: fullText // TODO: We should be sending MD5sum of fullText around instead
       });
     },
 
@@ -601,9 +601,10 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
           this._ignoreEvents = false;
         }
 
-        if (msg.fullText && this.ace.document.getValue() != msg.fullText) {
-          console.warn("Text mismatch after applying message", msg);
-        }
+        // TODO: We should be sending MD5sum of fullText around instead
+        // if (msg.fullText && this.ace.document.getValue() != msg.fullText) {
+        //   console.warn("Text mismatch after applying message", msg);
+        // }
       }
       else if (msg.op == "init") {
         this.ace.editor.setValue(msg.value);
