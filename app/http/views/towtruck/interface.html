@@ -8,8 +8,7 @@
         <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
       </span>
       <span id="towtruck-anchor-vertical">
-        <!-- FIXME: probably an image would be feasible here -->
-        &#183;
+        <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
       </span>
     </div>
     <div id="towtruck-buttons">
@@ -48,32 +47,38 @@
   <div id="towtruck-about" class="towtruck-window" data-bound-to="towtruck-about-button"
        style="display: none">
     <header class="towtruck-title">
-      TowTruck
+      End TowTruck?
     </header>
     <section>
+	  <h4>
+        Would you like to end your current session?
+      </h4>
       <p>
+		<button id="towtruck-end-session">End session</button>
+        <button id="towtruck-cancel-end-session">Continue session</button>
+      </p>
+      <p class="small">
         TowTruck is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.
-        For more see <a href="https://towtruck.mozillalabs.com" target="_blank">towtruck.mozillalabs.com</a>.
-      </p>
-      <p>
-        Do you want to end your TowTruck session?
-      </p>
-      <p><button id="towtruck-end-session">Yes</button>
-        <button id="towtruck-cancel-end-session">Continue Using TowTruck</button>
+        For more info see <a href="https://towtruck.mozillalabs.com" target="_blank">towtruck.mozillalabs.com</a>.
       </p>
     </section>
+	<div id="triangle-left"></div>
+	
   </div>
 
   <!-- The window that shows the share link: -->
   <div id="towtruck-share" class="towtruck-window" data-bound-to="towtruck-share-button"
        style="display: none">
     <header class="towtruck-title">
-      This is TowTruck session: <span id="towtruck-session-id"></span>
+      Connect
     </header>
     <section>
-      <h2>Welcome to TowTruck!</h2>
+      <h4>
+		Hi and welcome to TowTruck!
+	  </h4>
+	  <p>This is session: <span id="towtruck-session-id"></span></p>
       <p>
-        Send this link to your friend to get started!
+        Send this link below to a friend to connect.
       </p>
       <p>
         <input type="text" id="towtruck-share-link">
@@ -141,7 +146,7 @@
        data-bound-to="towtruck-participants-button"
        style="display: none">
     <header class="towtruck-title">
-      TowTruck Participants
+      Participants
     </header>
     <section id="towtruck-participants-self">
       <header>
