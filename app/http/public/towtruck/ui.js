@@ -214,7 +214,10 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       return false;
     });
 
-    container.find("#towtruck-chat-notifier").click(function () {
+    container.find("#towtruck-chat-notifier").click(function (event) {
+      if ($(event.target).is("a") || container.is(".towtruck-close")) {
+        return;
+      }
       ui.displayWindow("#towtruck-chat");
     });
 
