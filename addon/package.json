@@ -6,6 +6,13 @@
             "name": "towtruckJs",
             "value": "http://localhost:8080/towtruck.js",
             "title": "towtruck.js location"
+        },
+        {
+            "description": "Override the location of the hub",
+            "type": "string",
+            "name": "hubBase",
+            "value": "https://hub.towtruck.mozillalabs.com",
+            "title": "Hub URL"
         }
     ],
     "name": "towtruck",

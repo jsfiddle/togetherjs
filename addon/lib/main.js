@@ -41,7 +41,7 @@ function startTowTruck() {
     worker.port.on("Close", function () {
       tab.towtruckCloser();
     });
-    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs});
+    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs, hubBase: simplePrefs.prefs.hubBase});
   }
   button.port.emit("TowTruckOn");
   tab.on("ready", attachWorker);
