@@ -151,24 +151,22 @@
     </header>
     <section id="towtruck-participants-self">
       <header>
-        <span id="towtruck-participants-is-owner"
-              data-toggles="#towtruck-participants-is-following">
-			Owner:
+        <span class="strong" id="towtruck-participants-is-owner"
+              data-toggles="#towtruck-participants-is-following">Owner:
         </span>
         <span id="towtruck-participants-is-following" class="strong"
               data-toggles="#towtruck-participants-is-owner"
-              style="display: none">
-          Following:
+              style="display: none">Following:
         </span>
       </header>
       <div id="towtruck-no-avatar-edit" data-toggles="#towtruck-avatar-edit">
-        <span id="towtruck-self-color" class="towtruck-color"></span>
-        <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+	    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
              id="towtruck-self-avatar">
+        <span id="towtruck-self-color" class="towtruck-color"></span>
         <input type="text" id="towtruck-self-name" placeholder="Enter your name">
         <span>
-          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">saved</span>
-          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">saving</span>
+          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
+          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
         </span>
       </div>
       <div style="display: none" id="towtruck-avatar-edit" data-toggles="#towtruck-no-avatar-edit, #towtruck-participants-other">

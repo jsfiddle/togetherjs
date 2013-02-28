@@ -301,15 +301,33 @@
 .towtruck {
 
     #towtruck-self-name {
-        border-radius: 0.25em;
-        height: 30px;
-        width: 231px;
-        border: 1px solid #d0d0d0;
-        padding-left: 8px;
-        font-size: 14px;
-        color: #343639;
-        .box-shadow(inset 0 0 1px 1px rgba(0,0,0,0.1));
+        width: 100px;
+        font-size: 12px;
+        padding: 6px;
+		border-radius:2px;
+		border:1px solid #cccccc;
+		box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
+		margin:-20px 0px;
     }
+
+	span#towtruck-self-color {
+		background:blue;
+		margin:20px 10px;
+	}
+
+	#towtruck-self-avatar {
+		width:45px;
+		height:45px;
+		margin:5px 0px 0px -5px !important;
+		padding:5px 0px 25px 15px;
+		
+	}
+	
+	#towtruck-no-avatar-edit {
+		background:#fff;
+		border-radius:2px;
+		border-bottom:1px solid rgba(0,0,0,0.1);
+	}
 
     #towtruck-self-name:focus {
         border: 1px solid #267cc3;
@@ -328,6 +346,43 @@
     .towtruck-avatar img:hover {
 	    opacity:0.5;
     }
+
+	#towtruck-participants-self {
+	}
+	
+	#towtruck-participants-other header{
+		margin-left:-300px !important;
+	}
+	
+	#towtruck-participants-none {
+		background:#fff;
+		padding:10px;
+		border-radius:2px;
+		border-bottom:1px solid rgba(0,0,0,0.1);
+	}
+	
+	span#towtruck-participants-is-owner {
+		font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 300;
+		line-height: 40px;
+		color:rgb(51, 51, 51);
+		padding:0px 0px 0px 8px;
+		
+	}
+	
+	#towtruck-participants-other header{
+		font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 300;
+		line-height: 40px;
+		color:rgb(51, 51, 51);
+		padding:0px 0px 0px 8px;
+	}
 
     #towtruck-buttons .towtruck-button {
         .button-reset;
@@ -459,44 +514,50 @@
         border: 1px solid #267cc3;
     }
 
+	#towtruck-chat.towtruck-window section {
+		margin:10px !important;
+	}
 
     .towtruck-chat-message {
-		padding:15px;
+		padding:0px 0px 20px 0px;
 		font-family: @default-font;
 		font-size:14px;
+		background:#fff;
+		border-radius: 2px;
+		margin-bottom:20px;
+		border-bottom:1px solid rgba(0,0,0,0.1);	
     }
 
 	.towtruck-avatar {
-        background-color: #f00;
 		float:left;
-        margin-right: 10px;
+        margin:10px;
+	}
+	
+	.towtruck-avatar img{
+		width:45px;
+		height:45px;
 	}
 
 	.towtruck-timestamp {
 		float: right;
 		font-size: 10px;
 		opacity: 0.5;
+		padding:10px 15px 10px 10px;
 	}
 
     .towtruck-person {
 		font-size: 14px;
     	font-family: openSansBold;
 		padding:10px;
-		width:100%;
+		margin-top:0px;
     }
 
     .towtruck-chat-content {
         white-space: pre-wrap;
 		line-height:20px;
 		font-family: @default-font;
-		padding:10px;
+		padding-left:65px;
     }
-
-	.towtruck-hr-line {
-		clear:both;
-		padding:10px 0px;
-		border-bottom:1px solid rgba(0,0,0,0.1);
-	}
 
 	.towtruck-window:after {
 		content: '';
@@ -620,7 +681,7 @@
 			font-size: 12px;
 			text-transform: none;
 			vertical-align: middle;
-			width: 120px;
+			width: 130px;
 			word-spacing: 0px;
 			padding:10px;
 			margin:10px 0px 10px 5px;
@@ -629,15 +690,6 @@
 		&#towtruck-about button#towtruck-cancel-end-session:hover {
 			background-color: rgba(150,212,44,1);
 		}
-
-		#towtruck-participants-self {
-			padding:10px;
-		}
-
-		#towtruck-participants-self span#towtruck-participants-is-owner{
-
-		}
-
 
         p {
             margin: 0.5em 0 0.5em 0;
@@ -656,14 +708,13 @@
 		}
 
         .towtruck-color {
-            width: 1em;
-            height: 1em;
-            // FIXME: I don't think this is widely supported:
-            display: inline-block;
-            // FIXME: it would look prettier if the border was a darkened version
-            // of the background color, instead of a single color:
             border: 1px solid #000;
             border-radius: 2px;
+			-moz-border-radius: 50px/50px;
+			-webkit-border-radius: 50px 50px;
+			border-radius: 50px/50px;
+			width:50px;
+			height:50px;
         }
 
         #towtruck-chat-messages {
