@@ -2,7 +2,7 @@
 
 set -e
 
-default_hub="https://towtruck.mozillalabs.com/"
+default_hub="https://hub.towtruck.mozillalabs.com/"
 base="$(dirname $(cd "$(dirname $0)"; pwd))"
 dest="$1"
 host="$2"
