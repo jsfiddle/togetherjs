@@ -3,16 +3,53 @@ TowTruck - Who you call when you get stuck
 
 What is TowTruck?
 -----------------
-TowTruck is a simple, easy-to-use collaboration add-on for web applications.
 
+TowTruck is a real-time collaboration service for web sites and applications.  Using TowTruck two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TowTruck service is included by the web site owner, and a web site can customize and configure aspects of TowTruck's behavior on the site.
 
-Introduction
+Using TowTruck On Your Site
+---------------------------
+
+To use our hosted version of towtruck you should add the `towtruck.js` file to your website:
+
+```html
+<script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
+```
+
+Then you can call `TowTruck()` to start TowTruck, or include this HTML to have TowTruck insert a *Start TowTruck* button:
+
+```html
+<div id="towtruck-starter"></div>
+```
+
+That's it!  TowTruck works pretty well without any customization at all.
+
+Setup/Development
+-----------------
+
+TowTruck has two main pieces:
+
+* The [server](https://github.com/mozilla/towtruck/blob/master/app/http/server.js), which echos messages back and forth between users.  The server is dumb.
+
+* The [client](https://github.com/mozilla/towtruck/tree/master/app/http/public/towtruck), which does all the real work.
+
+There is a TowTruck server deployed at `https://hub.towtruck.mozillalabs.com` - and there's little need for other server deployments.  If you want to try TowTruck out we recommend you use our server, because it's easiest and the server is boring.
+
+The static files do contain some configuration parameters, and so you need to "build" them to make them usable.  TowTruck uses [LESS](http://lesscss.org/), so you need the LESS compiler (`lessc`) installed:
+
+```sh
+$ npm install -g less
+$ git clone git://github.com/mozilla/towtruck.git
+$ cd towtruck
+$ ./bin/make-static-client STATIC_FILES http://url.where/you/will/publish
+$ scp -r STATIC_FILES/* url.where:/www/public/you/will/publish/
+```
+
+Now you have your own static copy of the client, potentially with your own modifications and customizations of the code.
+
+Local Server
 ------------
 
-You can see a screencast of the TowTruck prototype (found in "prototype" branch) in action here: [https://vimeo.com/36754286](https://vimeo.com/36754286)
-
-Setup
------
+If you do want to use the server (which conveniently updates those files on demand, so you don't have to rebuild after edits):
 
 It's recommended that you use Foreman to run your development servers. "Why?", you ask. Here's a great intro: [Introducing Foreman](http://blog.daviddollar.org/2011/05/06/introducing-foreman.html).
 
@@ -66,7 +103,14 @@ A basic overview of the code, which is in `app/http/public/towtruck`:
 
 - `util.js`: several bits of abstract support code are in here.  It's also the file that must be loaded first, it sets up jQuery and Underscore as noConflict, creates the TowTruck object.  It also includes a pattern for creating classes, assertions, events.
 
+- `cursor.js`: handles the shared cursors and clicks
+
+- `webrtc.js`: handles the audio and avatar editing
+
+- `cobrowse.js`: handles cases when the users are at different URLs
+
 - `app/http/views/towtruck/*.tmpl`: these are Underscore templates for the UI bits.  These are automatically inlined into `towtruck-runner.js`.
+
 
 
 ### Examples Server

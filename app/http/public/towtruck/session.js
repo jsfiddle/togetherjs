@@ -245,7 +245,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
   // These are Javascript files that implement features, and so must
   // be injected at runtime because they aren't pulled in naturally
   // via define().
-  var features = ["ui", "chat", "pointer", "tracker", "webrtc", "cursor", "cobrowse"];
+  var features = ["ui", "chat", "tracker", "webrtc", "cursor", "cobrowse"];
 
   // FIXME: should this be run at load time, instead of in start()?
   function initClientId() {
