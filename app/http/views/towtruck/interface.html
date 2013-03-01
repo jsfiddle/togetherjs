@@ -151,10 +151,10 @@
     </header>
     <section id="towtruck-participants-self">
       <header>
-        <span class="strong" id="towtruck-participants-is-owner"
+        <span id="towtruck-participants-is-owner"
               data-toggles="#towtruck-participants-is-following">Owner:
         </span>
-        <span id="towtruck-participants-is-following" class="strong"
+        <span id="towtruck-participants-is-following"
               data-toggles="#towtruck-participants-is-owner"
               style="display: none">Following:
         </span>
@@ -164,7 +164,7 @@
              id="towtruck-self-avatar">
         <span id="towtruck-self-color" class="towtruck-color"></span>
         <input type="text" id="towtruck-self-name" placeholder="Enter your name">
-        <span>
+        <span id="towtruck-checkmark">
           <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
           <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
         </span>
@@ -190,6 +190,7 @@
         </fieldset>
       </div>
     </section>
+	<div class="towtruck-clear"></div>
 
     <!-- Template for one participant: -->
     <div style="display: none">
@@ -199,7 +200,7 @@
       </div>
     </div>
 
-    <section id="towtruck-participants-other" class="strong">
+    <section id="towtruck-participants-other">
       <header>Participants:</header>
       <div id="towtruck-participants-list" class="regular">
       </div>

@@ -90,6 +90,10 @@
 	  letter-spacing: -3px;
 	  line-height: 100%;
 	}
+	
+	.towtruck-clear {
+		clear:both;
+	}
 
 	p {
 		font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
@@ -142,7 +146,7 @@
 	}
 
 	.strong {
-	  	font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
+	  	font-family: openSansRegular, Helvetica, 'Helvetica Neue', Arial;
 		font-size: 14px;
 		font-style: normal;
 		font-variant: normal;
@@ -266,8 +270,8 @@
 }
 
 .transition (@val) {
-    // Note, you must call this like:
-    // .transition(~"value, value, value")
+/*    Note, you must call this like:
+    .transition(~"value, value, value")*/
     transition: @val;
     -moz-transition: @val;
     -webkit-transition: @val;
@@ -300,46 +304,83 @@
 
 .towtruck {
 
-    #towtruck-self-name {
-        width: 100px;
-        font-size: 12px;
-        padding: 6px;
-		border-radius:2px;
-		border:1px solid #cccccc;
-		box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
-		margin:-20px 0px;
-    }
-
-	span#towtruck-self-color {
-		background:blue;
-		margin:20px 10px;
+	/*Participants window*/
+	section#towtruck-participants-self {
+		margin:10px;
 	}
+	
+	#towtruck-participants-self header {
+		padding-top:10px;
+		font-size:14px;
+		padding-bottom:10px;
+	}
+	
+	#towtruck-participants-other header {
+		padding-top:20px;
+		font-size:14px;
+		padding-bottom:10px;
+	}
+	
+	span#towtruck-participants-is-owner {
 
-	#towtruck-self-avatar {
-		width:45px;
-		height:45px;
-		margin:5px 0px 0px -5px !important;
-		padding:5px 0px 25px 15px;
-		
 	}
 	
 	#towtruck-no-avatar-edit {
 		background:#fff;
 		border-radius:2px;
+		height:70px;
 		border-bottom:1px solid rgba(0,0,0,0.1);
 	}
+	
+	#towtruck-no-avatar-edit img#towtruck-self-avatar {
+		
+	}
+	
+	#towtruck-self-avatar {
+		width:45px;
+		height:45px;		
+	}
+	
+	span#towtruck-self-color {
+		margin:24px 0px 20px 0px;
+		width:10px;
+		float:left;
+	}
+	
+	.towtruck-color {
+        border: 1px solid #000;
+        border-radius: 2px;
+		width:10px;
+		height:10px;
+		padding:4px 4px;
+    }
 
-    #towtruck-self-name:focus {
+	input#towtruck-self-name {
+        width: 175px;
+        font-size: 12px;
+        padding: 6px;
+		border-radius:2px;
+		border:1px solid #cccccc;
+		box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
+		margin:20px 10px;
+		float:left;
+    }
+
+	span#towtruck-checkmark {
+		float:right;
+		padding-top:25px;
+		padding-right:12px;
+	}
+
+    input#towtruck-self-name:focus {
         border: 1px solid #267cc3;
     }
 
     #towtruck-self-name-saved {
-	    padding-left: 10px;
 	    color: #393;
     }
 
     #towtruck-self-name-saving {
-        padding-left: 10px;
         color: #333;
     }
 
@@ -347,42 +388,40 @@
 	    opacity:0.5;
     }
 
-	#towtruck-participants-self {
+	section#towtruck-participants-other {
+		margin:10px;
 	}
 	
-	#towtruck-participants-other header{
-		margin-left:-300px !important;
-	}
-	
-	#towtruck-participants-none {
-		background:#fff;
+	p#towtruck-participants-none {
 		padding:10px;
+		background:#fff;
 		border-radius:2px;
 		border-bottom:1px solid rgba(0,0,0,0.1);
 	}
 	
-	span#towtruck-participants-is-owner {
-		font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
-		font-size: 14px;
-		font-style: normal;
-		font-variant: normal;
-		font-weight: 300;
-		line-height: 40px;
-		color:rgb(51, 51, 51);
-		padding:0px 0px 0px 8px;
+	#towtruck-participants-list {
+		padding:10px;
+		background:#fff;
+		border-radius:2px;
+		border-bottom:1px solid rgba(0,0,0,0.1);
+	}
+	
+	.towtruck-participant {
+		padding:10px;
 		
 	}
 	
-	#towtruck-participants-other header{
-		font-family: openSansBold, Helvetica, 'Helvetica Neue', Arial;
-		font-size: 14px;
-		font-style: normal;
-		font-variant: normal;
-		font-weight: 300;
-		line-height: 40px;
-		color:rgb(51, 51, 51);
-		padding:0px 0px 0px 8px;
+	span.towtruck-participant-color{
+		padding:4px;
+		float:left;
+		margin-top:-2px;
 	}
+	
+	span.towtruck-participant-name {
+		margin:10px 10px 10px 10px;
+	}
+	
+	
 
     #towtruck-buttons .towtruck-button {
         .button-reset;
@@ -502,7 +541,7 @@
     }
 
     input#towtruck-chat-input {
-        width: 305px;
+        width: 307px;
         font-size: 12px;
         padding: 6px;
 		border-radius:2px;
@@ -594,7 +633,7 @@
         }
 
         section header {
-            margin-left: -0.4em;
+            margin-left: 0em;
         }
 
         header.towtruck-title {
@@ -707,19 +746,11 @@
 			height:3px;
 		}
 
-        .towtruck-color {
-            border: 1px solid #000;
-            border-radius: 2px;
-			-moz-border-radius: 50px/50px;
-			-webkit-border-radius: 50px 50px;
-			border-radius: 50px/50px;
-			width:50px;
-			height:50px;
-        }
+
 
         #towtruck-chat-messages {
             overflow-y: auto;
-            // FIXME: I'm just pulling numbers out of thin air here:
+            /*FIXME: I'm just pulling numbers out of thin air here:*/
             height: 210px;
         }
 
@@ -759,7 +790,7 @@
     background-color: @background-color;
     .box-dropshadow;
     @border-radius: 2px;
-    // FIXME: why do I need these extra 14ish pixels?
+    /*// FIXME: why do I need these extra 14ish pixels?*/
     @long-side: @button-width * 5 + @anchor-height + 56px;
     @short-side: @button-width + 10px;
 	border:0px solid #d9d9d9;
@@ -862,6 +893,10 @@
 
 /* Shared cursors */
 
+.towtruck-cursor img {
+	width:13px;
+}
+
 .towtruck-cursor {
     position: absolute;
     z-index: @z-index - 1;
@@ -871,9 +906,9 @@
        (good on all but IE: http://caniuse.com/pointer-events */
     pointer-events: none;
 
-    // FIXME: maybe these should use position: fixed so the cursor
-    // stays stuck to the top of the screen until the appropriate time
-    // (when .towtruck-scrolled-above/below is removed)?
+    /*FIXME: maybe these should use position: fixed so the cursor
+        stays stuck to the top of the screen until the appropriate time
+        (when .towtruck-scrolled-above/below is removed)?*/
     &.towtruck-scrolled-above {
         .towtruck-cursor-down {
             display: none;
@@ -898,7 +933,7 @@
         position: relative;
         top: -20px;
         left: 0px;
-        padding: 2px;
+        padding: 4px;
         border-radius: 2px;
     }
 }
@@ -928,5 +963,5 @@
     color: #fff;
     border-radius: 4px;
     border: 3px outset #d00;
-    // FIXME: add gradient
+    /*FIXME: add gradient*/
 }
