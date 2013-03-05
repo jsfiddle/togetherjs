@@ -130,6 +130,10 @@
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }
+  if (window._TowTruckShareId) {
+    TowTruck._shareId = window._TowTruckShareId;
+    delete window._TowTruckShareId;
+  }
 
   function conditionalOnload() {
     // A page can define this function to defer TowTruck from starting

@@ -19,7 +19,29 @@ StartupPanel({
   contentURL: data.url("startup-help.html")
 });
 
-function startTowTruck() {
+var autoDomains = [];
+function updateAutoDomains() {
+  var domains = simplePrefs.prefs.autoDomains;
+  domains = domains.split(/,/g);
+  autoDomains = [];
+  domains.forEach(function (item) {
+    item = item.replace(/^\s+/, "").replace(/\s+$/, "");
+    item = item.split(/;/);
+    var domain = item[0];
+    var shareId = item[1] || null;
+    if (domain.indexOf("//") == -1) {
+      // Just a plain domain
+      domain = "^https?:\\/\\/" + domain;
+    }
+    domain = new RegExp(domain, "i");
+    autoDomains.push({domain: domain, shareId: shareId});
+  });
+}
+simplePrefs.on("autoDomains", updateAutoDomains);
+updateAutoDomains();
+
+
+function startTowTruck(shareId) {
   var tab = tabs.activeTab;
   if (tab.towtruckCloser) {
     tab.towtruckCloser();
@@ -40,7 +62,7 @@ function startTowTruck() {
     worker.port.on("Close", function () {
       tab.towtruckCloser();
     });
-    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs, hubBase: simplePrefs.prefs.hubBase});
+    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs, hubBase: simplePrefs.prefs.hubBase, shareId: shareId || null});
   }
   button.port.emit("TowTruckOn");
   tab.on("ready", attachWorker);
@@ -54,6 +76,15 @@ function watchTab(tab) {
   tab.on("ready", function () {
     if (tabs.activeTab == tab && tab.url.indexOf("#&towtruck") != -1) {
       startTowTruck();
+    }
+    if (tabs.activeTab == tab && ! tab.towtruckCloser) {
+      var started = false;
+      autoDomains.forEach(function (matcher) {
+        if ((! started) && tab.url.search(matcher.domain) != -1) {
+          startTowTruck(matcher.shareId);
+          started = true;
+        }
+      });
     }
   });
 }
