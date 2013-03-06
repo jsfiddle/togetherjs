@@ -214,6 +214,8 @@ define(["require", "util", "channels"], function (require, util, channels) {
       color: session.settings.get("color"),
       url: session.currentUrl(),
       urlHash: location.hash,
+      // FIXME: titles update, we should track those changes:
+      title: document.title,
       rtcSupported: session.RTCSupported
     };
     if (helloBack) {

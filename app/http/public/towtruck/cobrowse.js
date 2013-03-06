@@ -13,7 +13,8 @@ define(["jquery", "util", "session", "ui"], function ($, util, session, ui) {
       ui.addChat({
         type: "url-change",
         clientId: msg.clientId,
-        url: url
+        url: url,
+        title: msg.title
       });
     }
   });

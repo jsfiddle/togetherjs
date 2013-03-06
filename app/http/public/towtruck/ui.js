@@ -349,7 +349,17 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       el = ui.cloneTemplate("url-change");
       setPerson(el, msg.clientId);
       setDate(el, msg.date || Date.now());
-      el.find(".towtruck-url").attr("href", msg.url).text(msg.url);
+      var title;
+      // FIXME: strip off common domain from msg.url?  E.g., if I'm on
+      // http://example.com/foobar, and someone goes to http://example.com/baz then
+      // show only /baz
+      // FIXME: truncate long titles
+      if (msg.title) {
+        title = msg.title + " (" + msg.url + ")";
+      } else {
+        title = msg.url;
+      }
+      el.find(".towtruck-url").attr("href", msg.url).text(title);
       addEl(el, msg.clientId, msg.clientId == session.clientId);
     } else {
       console.warn("Did not understand message type:", msg.type, "in message", msg);
