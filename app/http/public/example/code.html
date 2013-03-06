@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Code Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/images/icn-logo.png">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+
+      #ace-editor {
+        margin: 0;
+        top: 0;
+        position: absolute;
+        width: 80%;
+        height: 25em;
+        right: 0;
+      }
+      #ace-container {
+        height: 25em;
+      }
+      #codemirror-container {
+        border: 1px solid #000;
+      }
+    </style>
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <!-- Fav and touch icons -->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="./">TowTruck Examples</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="./">Home</a></li>
+              <li class="active"><a href="code.html">Code Editor</a></li>
+              <li><a href="form.html">Form</a></li>
+              <li><a href="docs.html">Docs</a></li>
+              <li><a id="start-towtruck" href="#" title="Start TowTruck; work on this page with a friend!"><img src="/images/icn-logo.png" style="height: 25px;"></a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <h1>Code Example</h1>
+
+      <p>TowTruck requires specific support for editors.  There is active support for
+        <a href="http://codemirror.net/">CodeMirror</a> (used for
+        example by Thimble),
+        and <a href="http://ace.ajax.org/">ACE</a> (used by Github,
+        Cloud9).</p>
+
+      <h2>ACE</h2>
+
+      <div id="ace-container">
+
+<pre id="ace-editor">function foo(items) {
+  var i;
+  for (i = 0; i &lt; items.length; i++) {
+    alert("Ace Rocks " + items[i]);
+  }
+}
+</pre>
+
+      </div>
+
+      <h2>CodeMirror</h2>
+
+      <div id="codemirror-container"></div>
+
+      <hr>
+
+      <p>And that's all folks!</p>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="bootstrap/js/jquery.min.js"></script>
+    <!--<script src="bootstrap/js/bootstrap-transition.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-alert.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-modal.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-dropdown.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-scrollspy.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-tab.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-tooltip.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-popover.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-button.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-collapse.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-carousel.js"></script>-->
+    <!--<script src="bootstrap/js/bootstrap-typeahead.js"></script>-->
+
+    <!-- ACE editor: -->
+    <script src="http://ajaxorg.github.com/ace-builds/src-noconflict/ace.js"></script>
+    <script>
+      var editor = ace.edit("ace-editor");
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setMode("ace/mode/javascript");
+      var container = $("#ace-container");
+      $("#ace-editor").css({
+        top: container.offset().top + "px",
+        left: container.offset().left + "px",
+        height: (container.height()-20) + "px",
+        width: container.width() + "px"
+      });
+    </script>
+
+    <!-- CodeMirror editor: -->
+    <script src="codemirror/codemirror.js"></script>
+    <link rel="stylesheet" href="codemirror/codemirror.css">
+    <script src="codemirror/javascript.js"></script>
+    <script>
+      $.ajax({
+        url: "/towtruck.js"
+      }).then(function (data) {
+        var cmEditor = CodeMirror($("#codemirror-container")[0], {
+          value: data,
+          mode: "javascript"
+        });
+      });
+    </script>
+
+    <script src="/towtruck.js"></script>
+    <script>
+      $(function () {
+        $("#start-towtruck").click(function () {
+          TowTruck();
+          return false;
+        });
+      });
+    </script>
+  </body>
+</html>

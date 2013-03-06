@@ -7,7 +7,7 @@ self.port.on("Config", function (config) {
   }
   var script = doc.createElement("script");
   script.src = config.url;
-  console.log("got attachment, adding", script.outerHTML);
+  console.log("Attaching:", script.outerHTML, "to:", window.location.href);
   doc.head.appendChild(script);
 });
 
