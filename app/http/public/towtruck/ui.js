@@ -433,6 +433,9 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       el.attr("id", id);
       $("#towtruck-participants-list").append(el);
     }
+    // FIXME: need to hide this when all participants leave, but right now
+    // we aren't tracking anyone leaving:
+    $("#towtruck-participants-list").show();
     $("#towtruck-participants-none").hide();
     if (peer.color) {
       el.find(".towtruck-color").css({
