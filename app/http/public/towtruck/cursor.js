@@ -281,6 +281,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
         offsetX: offsetX,
         offsetY: offsetY
       });
+      displayClick({top: event.pageY, left: event.pageX});
     });
   }
 
@@ -296,10 +297,15 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
+    displayClick({top: top, left: left});
+  });
+
+  function displayClick(pos) {
+    var element = ui.cloneTemplate("click");
     $(document.body).append(element);
     element.css({
-      top: top,
-      left: left
+      top: pos.top,
+      left: pos.left
     });
     setTimeout(function () {
       element.addClass("towtruck-clicking");
@@ -307,7 +313,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     setTimeout(function () {
       element.remove();
     }, CLICK_TRANSITION_TIME);
-  });
+  }
 
   var lastKeydown = 0;
   var MIN_KEYDOWN_TIME = 500;
