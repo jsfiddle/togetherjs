@@ -232,7 +232,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
 
     $(".towtruck header.towtruck-title").each(function (index, item) {
-      var button = $('<button class="towtruck-minimize"><img src="http://localhost:8080/images/icn-minimize.png"></button>');
+      var button = $('<button class="towtruck-minimize"><img src="' + TowTruck.baseUrl + '/images/icn-minimize.png"></button>');
       button.click(function (event) {
         var window = button.closest(".towtruck-window");
         hideWindow(window);
