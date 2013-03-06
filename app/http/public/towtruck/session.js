@@ -38,7 +38,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
   };
 
   session.shareUrl = function () {
-    assert(session.shareId);
+    assert(session.shareId, "Attempted to access shareUrl() before shareId is set");
     var hash = location.hash;
     var m = /\?[^#]*/.exec(location.href);
     var query = "";
