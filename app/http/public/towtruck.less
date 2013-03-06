@@ -90,7 +90,7 @@
 	  letter-spacing: -3px;
 	  line-height: 100%;
 	}
-	
+
 	.towtruck-clear {
 		clear:both;
 	}
@@ -308,45 +308,45 @@
 	section#towtruck-participants-self {
 		margin:10px;
 	}
-	
+
 	#towtruck-participants-self header {
 		padding-top:10px;
 		font-size:14px;
 		padding-bottom:10px;
 	}
-	
+
 	#towtruck-participants-other header {
 		padding-top:20px;
 		font-size:14px;
 		padding-bottom:10px;
 	}
-	
+
 	span#towtruck-participants-is-owner {
 
 	}
-	
+
 	#towtruck-no-avatar-edit {
 		background:#fff;
 		border-radius:2px;
 		height:70px;
 		border-bottom:1px solid rgba(0,0,0,0.1);
 	}
-	
+
 	#towtruck-no-avatar-edit img#towtruck-self-avatar {
-		
+
 	}
-	
+
 	#towtruck-self-avatar {
 		width:45px;
-		height:45px;		
+		height:45px;
 	}
-	
+
 	span#towtruck-self-color {
 		margin:24px 0px 20px 0px;
 		width:10px;
 		float:left;
 	}
-	
+
 	.towtruck-color {
         border: 1px solid #000;
         border-radius: 2px;
@@ -391,37 +391,37 @@
 	section#towtruck-participants-other {
 		margin:10px;
 	}
-	
+
 	p#towtruck-participants-none {
 		padding:10px;
 		background:#fff;
 		border-radius:2px;
 		border-bottom:1px solid rgba(0,0,0,0.1);
 	}
-	
+
 	#towtruck-participants-list {
 		padding:10px;
 		background:#fff;
 		border-radius:2px;
 		border-bottom:1px solid rgba(0,0,0,0.1);
 	}
-	
+
 	.towtruck-participant {
 		padding:10px;
-		
+
 	}
-	
+
 	span.towtruck-participant-color{
 		padding:4px;
 		float:left;
 		margin-top:-2px;
 	}
-	
+
 	span.towtruck-participant-name {
 		margin:10px 10px 10px 10px;
 	}
-	
-	
+
+
 
     #towtruck-buttons .towtruck-button {
         .button-reset;
@@ -564,14 +564,14 @@
 		background:#fff;
 		border-radius: 2px;
 		margin-bottom:20px;
-		border-bottom:1px solid rgba(0,0,0,0.1);	
+		border-bottom:1px solid rgba(0,0,0,0.1);
     }
 
 	.towtruck-avatar {
 		float:left;
         margin:10px;
 	}
-	
+
 	.towtruck-avatar img{
 		width:45px;
 		height:45px;
@@ -938,23 +938,27 @@
     }
 }
 
+@start-click: 10px;
+@end-click: 40px;
+
 .towtruck-click {
     position: absolute;
     z-index: @z-index - 2;
     pointer-events: none;
-    width: 40px;
-    height: 40px;
-    margin: -20px 0 0 -20px;
-    border-radius: 20px;
+    width: @start-click;
+    height: @start-click;
+    margin: (-@start-click/2) 0 0 (-@start-click/2);
+    border-radius: @start-click/2;
     border: 3px solid rgba(0, 0, 0, 1);
     .transition(~"width 2s, height 2s, margin 2s, border 2s");
 
     // This class is immediately applied for the purpose of transitioning:
     &.towtruck-clicking {
-        width: 10px;
-        height: 10px;
-        margin: -5px 0 0 -5px;
-        border: 3px solid rgba(0, 0, 0, 0.1);
+        width: @end-click;
+        height: @end-click;
+        margin: (-@end-click/2) 0 0 (-@end-click/2);
+        border-radius: @end-click/2;
+        border: 3px solid rgba(0, 0, 0, 0);
     }
 }
 
