@@ -381,11 +381,11 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     templateElement.find(".towtruck-person")
       .text(nick)
       .addClass("towtruck-person-" + util.safeClassName(clientId));
+    var avatarEl = templateElement.find(".towtruck-avatar img");
     if (avatar) {
-      templateElement.find(".towtruck-avatar img")
-        .attr("src", avatar)
-        .addClass("towtruck-avatar-" + util.safeClassName(clientId));
+      avatarEl.attr("src", avatar);
     }
+    avatarEl.addClass("towtruck-avatar-" + util.safeClassName(clientId));
   }
 
   function setDate(templateElement, date) {
@@ -416,7 +416,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       avatar = session.settings.get("avatar");
     } else {
       var peer = session.peers.get(clientId);
-      nick = peer.nick;
+      nick = peer.nickname;
       avatar = peer.avatar;
     }
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);

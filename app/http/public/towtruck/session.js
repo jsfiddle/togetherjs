@@ -140,6 +140,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
       return util.extend(this._peers[id]);
     },
     add: function (peer) {
+      assert(peer);
       var event = "add";
       if (peer.clientId in this._peers) {
         event = "update";
@@ -199,6 +200,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
     var peer = {
       clientId: msg.clientId,
       nickname: msg.nickname,
+      avatar: msg.avatar,
       color: msg.color,
       rtcSupported: msg.rtcSupported
     };

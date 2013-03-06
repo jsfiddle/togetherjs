@@ -60,23 +60,8 @@ define(["require", "jquery", "util", "session", "ui", "templates"], function (re
   // (if messages come faster than this, they will be kind of combined)
   var MESSAGE_BREAK_TIME = 20000;
 
-  session.peers.on("update", function (peer) {
+  session.peers.on("add update", function (peer) {
     ui.updatePerson(peer.clientId);
-  });
-
-  // FIXME: this doesn't make sense any more, but I'm not sure what if anything
-  // should be done on an avatar update
-  session.peers.on("add update", function (peer, old) {
-    if (peer.clientId == session.clientId) {
-      return;
-    }
-    if (peer.avatar && peer.avatar != old.avatar) {
-      var id = "towtuck-avatar-" + util.safeClassName(peer.clientId);
-      var img = $("<img>").attr("src", peer.avatar).css({width: "8em"});
-      $("#" + id).remove();
-      img.attr("id", id);
-      //ui.addChatElement(img);
-    }
   });
 
   chat.Chat = {
