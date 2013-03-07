@@ -23,17 +23,28 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     tracker.trackers.introduceAll();
   }
 
-  session.hub.on("hello hello-back", function () {
-    if (! session.isClient) {
+  session.hub.on("hello hello-back", function (msg) {
+    if ((! session.isClient) && msg.sameUrl) {
       initTrackers();
     }
   });
 
   session.hub.on("reset-trackers", function () {
+    // FIXME: this neither does nor doesn't make sense when sameUrl is
+    // false Mostly we need to make trackers peer-to-peer instead of
+    // based on isClient and then this will matter again (but
+    // reset-trackers will be gone anyway once that is implemented).
     tracker.trackers.reset();
   });
 
   session.hub.on("connect-tracker", function (msg) {
+    // FIXME: we're relying on connect-tracker/etc to keep bad routes from
+    // being setup between different URLs.  Routed messages don't get the
+    // href/sameUrl annotation that top-level messages get.  So once we
+    // make this P2P we need to get rid of routing to do all this right.
+    if (! msg.sameUrl) {
+      return;
+    }
     tracker.trackers.connect(msg);
   });
 

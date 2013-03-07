@@ -10,7 +10,11 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
   var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
 
   session.hub.on("cursor-update", function (msg) {
-    Cursor.getClient(msg.clientId).updatePosition(msg);
+    if (msg.sameUrl) {
+      Cursor.getClient(msg.clientId).updatePosition(msg);
+    } else {
+      Cursor.getClient(msg.clientId).hideOtherUrl(msg);
+    }
   });
 
   // FIXME: should check for a peer leaving and remove the cursor object
@@ -27,6 +31,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       $(document.body).append(this.element);
       this.keydownTimeout = null;
       this.clearKeydown = this.clearKeydown.bind(this);
+      this.atOtherUrl = false;
     },
 
     // How long after receiving a setKeydown call that we should show the
@@ -55,6 +60,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
 
     updatePosition: function (pos) {
       var top, left;
+      if (this.atOtherUrl) {
+        this.element.show();
+        this.atOtherUrl = false;
+      }
       if (pos.element) {
         var target = $(elementFinder.findElement(pos.element));
         var offset = target.offset();
@@ -69,6 +78,15 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       this.lastTop = top;
       this.lastLeft = left;
       this.setPosition(top, left);
+    },
+
+    hideOtherUrl: function (msg) {
+      if (this.atOtherUrl) {
+        return;
+      }
+      this.atOtherUrl = true;
+      // FIXME: should show away status better:
+      this.element.hide();
     },
 
     setPosition: function (top, left) {
@@ -291,6 +309,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     // When the click is calculated isn't always the same as how the
     // last cursor update was calculated, so we force the cursor to
     // the last location during a click:
+    if (! pos.sameUrl) {
+      return;
+    }
     Cursor.getClient(pos.clientId).updatePosition(pos);
     var element = ui.cloneTemplate("click");
     var target = $(elementFinder.findElement(pos.element));
@@ -301,6 +322,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
   });
 
   function displayClick(pos) {
+    // FIXME: should we hide the local click if no one else is going to see it?
+    // That means tracking who might be able to see our screen.
     var element = ui.cloneTemplate("click");
     $(document.body).append(element);
     element.css({
@@ -335,6 +358,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
   }
 
   session.hub.on("keydown", function (msg) {
+    // FIXME: when the cursor is hidden there's nothing to show with setKeydown().
     var cursor = Cursor.getClient(msg.clientId);
     cursor.setKeydown();
   });

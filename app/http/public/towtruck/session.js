@@ -139,13 +139,23 @@ define(["require", "util", "channels"], function (require, util, channels) {
     get: function (id) {
       return util.extend(this._peers[id]);
     },
+    getStatus: function (id) {
+      // Unlike .get() we don't want or need to make a copy
+      var peer = this._peers[id];
+      if (! peer) {
+        peer = this._peers[id] = {clientId: id, status: {}};
+      }
+      assert(peer, "No peer found with id:", id);
+      return peer.status;
+    },
     add: function (peer) {
-      assert(peer);
+      assert(peer && peer.clientId);
       var event = "add";
       if (peer.clientId in this._peers) {
         event = "update";
       }
       var old = this._peers[peer.clientId];
+      peer.status = peer.status || (old ? old.status : {});
       this._peers[peer.clientId] = peer;
       this.emit(event, peer, old);
     },
@@ -154,7 +164,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
         if (! this._peers.hasOwnProperty(id)) {
           continue;
         }
-        callback.call(context || null, this._peers[id]);
+        callback.call(context || null, this.get(id));
       }
     }
   });
@@ -174,11 +184,23 @@ define(["require", "util", "channels"], function (require, util, channels) {
       if (DEBUG && msg.type != "cursor-update") {
         console.log("In:", msg);
       }
+      var status = session.peers.getStatus(msg.clientId);
+      if (msg.type == "hello" || msg.type == "hello-back") {
+        // FIXME: I might want to emit a message here about the URL change
+        status.url = msg.url;
+      } else {
+        msg.url = status.url;
+      }
+      msg.sameUrl = msg.url == currentUrl;
+      status.lastMessage = Date.now();
       session.hub.emit(msg.type, msg);
     };
     channel = c;
     session.router.bindChannel(channel);
   }
+
+  // FIXME: once we start looking at window.history we need to update this:
+  var currentUrl = (location.href + "").replace(/\#.*$/, "");
 
   session.send = function (msg) {
     if (DEBUG && msg.type != "cursor-update") {
