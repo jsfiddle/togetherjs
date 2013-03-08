@@ -19,6 +19,7 @@
 // Width of the buttons:
 @button-width: 40px;
 // Height of the buttons:
+// Note: this is also in ui.js, BUTTON_HEIGHT
 @button-height: @button-width;
 // Height of the draggable anchor at the top:
 @anchor-height: @button-width * 0.5;
@@ -536,6 +537,11 @@
 		width:14px;
 	}
 
+    .towtruck-dock-person img.towtruck-avatar {
+        height: 40px;
+        width: 40px;
+    }
+
     input:focus {
         outline: none;
     }
@@ -770,7 +776,12 @@
         .towtruck-close {
             float: right;
             cursor: pointer;
+            color: darken(@window-background-color, 50%);
+            padding-top: 7px;
             .user-select(none);
+            &:hover {
+                color: #000;
+            }
         }
 
     }
@@ -779,6 +790,16 @@
         .towtruck-window;
         width: 340px;
         height: 170px;
+    }
+
+    .towtruck-url-change-popup {
+        .towtruck-follow {
+            background-color: #0f0;
+            &.towtruck-nudge {
+                // FIXME: add some animation/transition here:
+                font-weight: bold;
+            }
+        }
     }
 
 }

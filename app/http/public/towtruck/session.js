@@ -1,4 +1,4 @@
-define(["require", "util", "channels"], function (require, util, channels) {
+define(["require", "util", "channels", "jquery"], function (require, util, channels, $) {
 
   var DEBUG = true;
 
@@ -136,17 +136,20 @@ define(["require", "util", "channels"], function (require, util, channels) {
   // FIXME: should also remove peers on bye
   session.peers = util.mixinEvents({
     _peers: {},
+    _statuses: {},
     get: function (id) {
       return util.extend(this._peers[id]);
     },
     getStatus: function (id) {
       // Unlike .get() we don't want or need to make a copy
-      var peer = this._peers[id];
-      if (! peer) {
-        peer = this._peers[id] = {clientId: id, status: {}};
+      var status = this._statuses[id];
+      if (! status) {
+        status = this._statuses[id] = {};
+        if (this._peers[id]) {
+          this._peers[id].status = status;
+        }
       }
-      assert(peer, "No peer found with id:", id);
-      return peer.status;
+      return status;
     },
     add: function (peer) {
       assert(peer && peer.clientId);
@@ -155,7 +158,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
         event = "update";
       }
       var old = this._peers[peer.clientId];
-      peer.status = peer.status || (old ? old.status : {});
+      peer.status = this.getStatus(peer.clientId);
       this._peers[peer.clientId] = peer;
       this.emit(event, peer, old);
     },
@@ -181,19 +184,36 @@ define(["require", "util", "channels"], function (require, util, channels) {
     console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {
-      if (DEBUG && msg.type != "cursor-update") {
-        console.log("In:", msg);
+      if (DEBUG && msg.type != "cursor-update" && msg.type != "keydown") {
+        console.info("In:", msg);
       }
       var status = session.peers.getStatus(msg.clientId);
+      var peerMessage;
       if (msg.type == "hello" || msg.type == "hello-back") {
         // FIXME: I might want to emit a message here about the URL change
+        var oldUrl = status.url;
+        var oldTitle = status.title;
         status.url = msg.url;
+        status.title = msg.title;
+        if (status.url != oldUrl || status.title != oldTitle) {
+          peerMessage = {
+            clientId: msg.clientId,
+            url: status.url,
+            title: status.title,
+            myUrl: currentUrl,
+            oldUrl: oldUrl,
+            oldTitle: oldTitle
+          };
+        }
       } else {
         msg.url = status.url;
       }
       msg.sameUrl = msg.url == currentUrl;
       status.lastMessage = Date.now();
       session.hub.emit(msg.type, msg);
+      if (peerMessage) {
+        session.peers.emit("peer-url-change", peerMessage);
+      }
     };
     channel = c;
     session.router.bindChannel(channel);
@@ -203,8 +223,8 @@ define(["require", "util", "channels"], function (require, util, channels) {
   var currentUrl = (location.href + "").replace(/\#.*$/, "");
 
   session.send = function (msg) {
-    if (DEBUG && msg.type != "cursor-update") {
-      console.log("Send:", msg);
+    if (DEBUG && msg.type != "cursor-update" && msg.type != "keydown") {
+      console.info("Send:", msg);
     }
     msg.clientId = session.clientId;
     channel.send(msg);
@@ -271,6 +291,7 @@ define(["require", "util", "channels"], function (require, util, channels) {
   // These are Javascript files that implement features, and so must
   // be injected at runtime because they aren't pulled in naturally
   // via define().
+  // ui must be the first item:
   var features = ["ui", "chat", "tracker", "webrtc", "cursor", "cobrowse"];
 
   // FIXME: should this be run at load time, instead of in start()?
@@ -346,14 +367,19 @@ define(["require", "util", "channels"], function (require, util, channels) {
     initClientId();
     initShareId();
     openChannel();
-    require(features, function () {
+    require(["ui"], function (ui) {
+      ui.prepareUI();
+      require(features, function () {
       // FIXME: should be the overview screen sometimes:
-      var ui = require("ui");
-      ui.activateUI();
-      sendHello(false);
-      if (autoOpenShare) {
-        ui.displayWindow("#towtruck-share");
-      }
+        $(function () {
+          var ui = require("ui");
+          ui.activateUI();
+          sendHello(false);
+          if (autoOpenShare) {
+            ui.displayWindow("#towtruck-share");
+          }
+        });
+      });
     });
   };
 

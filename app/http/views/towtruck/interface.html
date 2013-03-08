@@ -12,6 +12,12 @@
       </span>
     </div>
     <div id="towtruck-buttons">
+      <div style="display: none">
+        <button id="towtruck-template-dock-person"
+                class="towtruck-button towtruck-dock-person">
+          <img src="" class="towtruck-avatar">
+        </button>
+      </div>
       <button id="towtruck-about-button" class="towtruck-button">
         <img src="http://localhost:8080/images/icn-logo.png">
       </button>
@@ -37,6 +43,8 @@
       </button>
       <button id="towtruck-participants-button" class="towtruck-button">
       </button>
+      <div id="towtruck-dock-participants">
+      </div>
 	  <button id="towtruck-expand-button" class="towtruck-button">
         <img src="http://localhost:8080/images/hr-line.png">
       </button>
@@ -140,6 +148,23 @@
     <div class="towtruck-close">&times;</div>
     <section id="towtruck-chat-notifier-message">
     </section>
+  </div>
+
+  <div style="display: none">
+    <div id="towtruck-template-url-change-popup" class="towtruck-popup towtruck-url-change-popup">
+      <div class="towtruck-close">&times;</div>
+      <p>
+        <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
+        <span class="towtruck-person">foo</span>
+        is at
+        <a href="#" class="towtruck-url" target="_self"></a>
+      </p>
+      <p>
+        <button class="towtruck-follow">Follow</button>
+        <button class="towtruck-nudge">Come back!</button>
+        <a href="#" class="towtruck-ignore">Not now</a>
+      </p>
+    </div>
   </div>
 
   <!-- The list of participants: -->
