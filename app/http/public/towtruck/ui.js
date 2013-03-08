@@ -562,6 +562,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
     urlNudge: function () {
       if (this._urlChangeElement) {
+        this._urlChangeElement.show();
         this._urlChangeElement.find(".towtruck-follow").addClass("towtruck-nudge");
       }
     }
