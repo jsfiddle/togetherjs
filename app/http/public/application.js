@@ -41,4 +41,7 @@ $(function(){
     navigator.id.logout();
     return false;
   });
+
+  $("#year").text((new Date).getFullYear());
+
 });
