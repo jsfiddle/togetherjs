@@ -549,9 +549,17 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
     },
 
     updateUrl: function (url, title, force) {
-      console.log("hey", this);
       var c = this.urlChangeElement();
-      c.find("a.towtruck-url").attr("href", url).text(title);
+      var fullTitle = title;
+      if (title) {
+        fullTitle += " (";
+      }
+      // FIXME: should truncate this if possible (remove domain):
+      fullTitle += util.truncateCommonDomain(url, location.href);
+      if (title) {
+        fullTitle += ")";
+      }
+      c.find("a.towtruck-url").attr("href", url).text(fullTitle);
       if (force) {
         c.show();
       }
