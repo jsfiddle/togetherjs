@@ -1,4 +1,4 @@
-define(["require", "jquery", "util", "session", "templates"], function (require, $, util, session, templates) {
+define(["require", "jquery", "util", "session", "templates", "element-finder"], function (require, $, util, session, templates, elementFinder) {
   TowTruck.$ = $;
   var ui = util.Module('ui');
   var assert = util.assert;
@@ -504,6 +504,8 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       this.element = ui.cloneTemplate("dock-person");
       ui.setPerson(this.element, this.clientId);
       ui.container.find("#towtruck-dock-participants").append(this.element);
+      this.click = this.click.bind(this);
+      this.element.click(this.click);
       var iface = $("#towtruck-interface");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"
@@ -527,7 +529,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
           var url = c.find("a.towtruck-url").attr("href");
           location.href = url;
         });
-        c.find(".towtruck-ignore").click((function () {
+        c.find(".towtruck-ignore, .towtruck-close").click((function () {
           c.hide();
           return false;
         }).bind(this));
@@ -556,8 +558,10 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     },
 
     removeUrl: function () {
-      this._urlChangeElement.remove();
-      this._urlChangeElement = null;
+      if (this._urlChangeElement) {
+        this._urlChangeElement.remove();
+        this._urlChangeElement = null;
+      }
     },
 
     urlNudge: function () {
@@ -565,6 +569,25 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         this._urlChangeElement.show();
         this._urlChangeElement.find(".towtruck-follow").addClass("towtruck-nudge");
       }
+    },
+
+    click: function () {
+      if (this._urlChangeElement) {
+        this._urlChangeElement.show();
+        return;
+      }
+      var status = session.peers.getStatus(this.clientId);
+      if (! status.scrollPosition) {
+        console.warn("No status.scrollPosition for peer", this.clientId);
+        // FIXME: maybe this should be an assertion, but I'm not sure that the
+        // updates will always happen in the order to make this work
+        return;
+      }
+      assert(status.url == location.href.replace(/\#.*$/, ""));
+      var height = elementFinder.pixelForPosition(status.scrollPosition);
+      // FIXME: this should animate the scrolling
+      console.log("scroll to", status.scrollPosition, height);
+      $window.scrollTop(height);
     }
 
   });
