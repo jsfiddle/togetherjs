@@ -1,5 +1,24 @@
 <% layout('../layout.ejs') -%>
 
+<div id="myCarousel" class="carousel slide" style="margin-bottom:0px;">
+  <div class="carousel-inner">
+    <div class="item active">
+      <img src="http://twitter.github.com/bootstrap/assets/img/examples/slide-01.jpg" alt="">
+      <div class="container">
+        <div class="carousel-promo-image" style="background:red;margin-top:150px;width:600px;height:500px;position:absolute;z-index:1;left:500px;">
+          <img src="#">
+        </div>
+        <div class="carousel-caption" style="position:relative;z-index:2;">
+          <h1>Collaboration made easy.</h1>
+          <p class="lead">This is a service for your website that makes it surprisingly easy to collaborate in real-time.</p>
+          <a class="btn btn-large btn-primary" href="#">Get Started</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+
 <div id="installation" class="horz-row" style="background:blue; margin:0px; padding:100px 0px">
   <div class="row container" style="margin:0 auto;">
     <h1 style="text-align:center;">Installation</h1>
@@ -8,20 +27,20 @@
       <h2>1. Add the Javascript</h2>
       <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
+    </div>
     <div class="span4">
       <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
       <h2>2. Add the button</h2>
       <p>code code code</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
+    </div>
     <div class="span4">
-      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/iges/8/82/140x140-redhat.gif">
       <h2>3. Relax</h2>
       <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
-  </div><!-- /.row -->
+    </div>
+  </div>
 </div>
 
 
@@ -31,8 +50,7 @@
     <h1 class="featurette-heading">Get <span class="muted">started</span></h1>
     <h2>1. Add the Javascript</h2>
       <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
-I've got to talk to this guy, he's a real dick.
-    <h2>2. Copy and paste</h2>
+      <h2>2. Copy and paste</h2>
       <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
 
     <h2>3. Send the link to a friend</h2>
@@ -62,38 +80,20 @@ I've got to talk to this guy, he's a real dick.
       <h2>Cursor mirroring</h2>
       <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
+    </div>
     <div class="span4">
       <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
       <h2>Real-time chat</h2>
       <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
+    </div>
     <div class="span4">
       <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
       <h2>Real-time voice-chat</h2>
       <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div><!-- /.span4 -->
-  </div><!-- /.row -->
+    </div>
+  </div>
 </div>
 
 <!-- /END THE FEATURETTES -->
-
-
-<!-- FOOTER -->
-<div id="contact" class="horz-row" style="background:white; margin:0px; padding:100px 0px">
-  <footer class="row container" style="margin:0 auto;">
-    <p class="pull-right"><a href="#">Back to top</a></p>
-    <p>&copy; <span id="year">TEXT</span> Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
-    <p>Designed and built with love by <a href="#">Mozilla Labs</a>.</p>
-    <p><a href="#">Blog</a> &middot; <a href="#">Git</a></p>
-  </footer>
-</div>
-
-<script type="text/javascript">
-  var currentYear = (new Date).getFullYear();
-  $(document).ready(function() {
-  $("#year").text( (new Date).getFullYear() );
-  });
-</script>
