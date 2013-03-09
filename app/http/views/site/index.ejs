@@ -1,27 +1,23 @@
 <% layout('../layout.ejs') -%>
 
-<div id="myCarousel" class="carousel slide" style="margin-bottom:0px;">
-  <div class="carousel-inner">
-    <div class="item active">
-      <img src="http://twitter.github.com/bootstrap/assets/img/examples/slide-01.jpg" alt="">
-      <div class="container">
-        <div class="carousel-promo-image" style="background:red;margin-top:150px;width:600px;height:500px;position:absolute;z-index:1;left:500px;">
-          <img src="#">
-        </div>
-        <div class="carousel-caption" style="position:relative;z-index:2;">
-          <h1>Collaboration made easy.</h1>
-          <p class="lead">This is a service for your website that makes it surprisingly easy to collaborate in real-time.</p>
-          <a class="btn btn-large btn-primary" href="#">Get Started</a>
-        </div>
-      </div>
+<div id="hero">
+  <div class="container">
+    <div class="span5">
+      <h1>TowTruck</h1>
+      <p class="lead">This is a <em>service</em> for your <em>website</em> that makes it surprisingly easy to collaborate in real-time.</p>
+      <button class="btn btn-primary btn-large ">Get Started</button>
     </div>
+    <div class="span4">
+      <!-- TODO: Figure out responsive sizing or hide iframe on smaller viewports -->
+      <iframe height="380" width="640" src="http://player.vimeo.com/video/57992755" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+    </div>
+  </div>
 </div>
-</div>
-
 
 <div id="installation" class="horz-row" style="background:blue; margin:0px; padding:100px 0px">
   <div class="row container" style="margin:0 auto;">
     <h1 style="text-align:center;">Installation</h1>
+    <script src="https://gist.github.com/simonwex/5122388.js"></script>
     <div class="span4"  style="margin:0 auto;">
       <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
       <h2>1. Add the Javascript</h2>
@@ -42,7 +38,6 @@
     </div>
   </div>
 </div>
-
 
 <div id="getstarted" class="horz-row" style="background:purple; margin:0px; padding:100px 0px">
   <div class="featurette container" style="margin:0 auto;">

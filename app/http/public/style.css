@@ -47,7 +47,13 @@ body {
   margin-top: 10px;
 }
 
+/* Homepage stuff */
+#hero {
+  background: url('/images/trucks.jpg') no-repeat;
+  margin-top: 90px;
+}
 
+/* /Homepage stuff */
 
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
