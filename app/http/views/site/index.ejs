@@ -1,119 +1,99 @@
 <% layout('../layout.ejs') -%>
 
-<div id="home" class="masthead">
-  <ul class="nav nav-pills pull-right">
-    <li class="active"><a href="#home">Home</a></li>
-    <li><a href="#getting-started">Get Started</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#resources">Resources</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li>
-      <% if (user.email){ %>
-        <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
-      <% } else { %>
-        <a id="login" href="#"><img src="/persona-sign_in.png"></a>
-      <% } %>
-    </li>
-  </ul>
-  <h3 class="muted">TowTruck</h3>
-  <div id="tagline">Towtruck is a collaborative service tool for web applications, powered by Mozilla Labs</div>
+<div id="myCarousel" class="carousel slide" style="margin-bottom:0px;">
+  <div class="carousel-inner">
+    <div class="item active">
+      <img src="http://twitter.github.com/bootstrap/assets/img/examples/slide-01.jpg" alt="">
+      <div class="container">
+        <div class="carousel-promo-image" style="background:red;margin-top:150px;width:600px;height:500px;position:absolute;z-index:1;left:500px;">
+          <img src="#">
+        </div>
+        <div class="carousel-caption" style="position:relative;z-index:2;">
+          <h1>Collaboration made easy.</h1>
+          <p class="lead">This is a service for your website that makes it surprisingly easy to collaborate in real-time.</p>
+          <a class="btn btn-large btn-primary" href="#">Get Started</a>
+        </div>
+      </div>
+    </div>
+</div>
 </div>
 
-<hr>
 
-<div class="jumbotron">
-  <iframe src="http://player.vimeo.com/video/57992755" width="700" height="393" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/57992755">Tow Truck - Proof of Concept in Progress</a> from <a href="http://vimeo.com/simonwex">Simon</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
-</div>
-
-<hr>
-
-<div id="getting-started" class="row-fluid marketing">
-  <div class="span6">
-
-    <h1>Get Started</h1>
-    <h4>1. Download</h4>
-    <p>Copy and paste <code>&lt;script='https://towtruck.mozillalabs.com/towtruck.js'&gt;&lt;/script&gt;</code> into your <code>&lt;head&gt;&lt;/head&gt;</code> in your index.</p>
-
-    <h4>2. Copy and Paste</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-  </div>
-  <div class="span6">
-
-    <h4>Subheading</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>Subheading</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+<div id="installation" class="horz-row" style="background:blue; margin:0px; padding:100px 0px">
+  <div class="row container" style="margin:0 auto;">
+    <h1 style="text-align:center;">Installation</h1>
+    <div class="span4"  style="margin:0 auto;">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <h2>1. Add the Javascript</h2>
+      <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+    <div class="span4">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <h2>2. Add the button</h2>
+      <p>code code code</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+    <div class="span4">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/iges/8/82/140x140-redhat.gif">
+      <h2>3. Relax</h2>
+      <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
   </div>
 </div>
 
-<hr>
 
-<div id="about" class="row-fluid marketing">
-  <div class="span6">
+<div id="getstarted" class="horz-row" style="background:purple; margin:0px; padding:100px 0px">
+  <div class="featurette container" style="margin:0 auto;">
+    <img class="featurette-image pull-right" src="http://twitter.github.com/bootstrap/assets/img/examples/browser-icon-chrome.png">
+    <h1 class="featurette-heading">Get <span class="muted">started</span></h1>
+    <h2>1. Add the Javascript</h2>
+      <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
+      <h2>2. Copy and paste</h2>
+      <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
 
-    <h1>About TowTruck</h1>
+    <h2>3. Send the link to a friend</h2>
+      <p>Jsut copy and paste this code into your head: CODE CODE CODE</p>
+
+    <p class="lead">Just click the TowTruck button on any TowTruck enabled-site (like this one!).</p>
 
 
-    <h4>Do you have users on your site who could use help collaborating?</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+    <p class="lead">Just click the TowTruck button on any TowTruck enabled-site (like this one!).</p>
 
-    <h4>And this</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-  </div>
-
-  <div class="span6">
-    <h4>Subheading</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>Subheading</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
   </div>
 </div>
 
-<hr>
-
-<div id="resources" class="row-fluid marketing">
-  <div class="span6">
-
-    <h1>Resources</h1>
-
-    <h4>Do this</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>And this</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-  </div>
-
-  <div class="span6">
-    <h4>Subheading</h4>
-    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-    <h4>Subheading</h4>
-    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-    <h4>Subheading</h4>
-    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+<div id="demo" class="horz-row" style="background:green; margin:0px; padding:100px 0px">
+  <div class="featurette container" style="margin:0 auto;">
+    <iframe class="featurette-image pull-left" src="http://player.vimeo.com/video/57992755" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+    <h2 class="featurette-heading">Watch <span class="muted">how it works.</span></h2>
+    <p class="lead">This is a unique TowTruck session ID.</p>
   </div>
 </div>
 
-<hr>
-
-<div id="contact" class="footer">
-  <p>&copy; Mozilla Labs 2012</p>
+<div id="tools" class="horz-row" style="background:red; margin:0px; padding:100px 0px">
+  <div class="row container" style="margin:0 auto;">
+    <h1 style="text-align:center;">Helpful tools</h1>
+    <div class="span4"  style="margin:0 auto;">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <h2>Cursor mirroring</h2>
+      <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+    <div class="span4">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <h2>Real-time chat</h2>
+      <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+    <div class="span4">
+      <img class="img-circle" src="https://wiki.gogrid.com/wiki/images/8/82/140x140-redhat.gif">
+      <h2>Real-time voice-chat</h2>
+      <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+      <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+  </div>
 </div>
+
+<!-- /END THE FEATURETTES -->
