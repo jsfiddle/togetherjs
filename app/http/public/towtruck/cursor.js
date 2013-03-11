@@ -253,7 +253,16 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     Cursor.forEach(function (c) {
       c.refresh();
     });
+    session.send({
+      type: "scroll-update",
+      position: elementFinder.elementByPixel($(window).scrollTop())
+    });
   }
+
+  session.hub.on("scroll-update", function (msg) {
+    var status = session.peers.getStatus(msg.clientId);
+    status.scrollPosition = msg.position;
+  });
 
   session.on("ui-ready", function () {
     $(document).mousemove(mousemove);
