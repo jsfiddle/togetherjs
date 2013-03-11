@@ -325,11 +325,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
       container.append(el);
-      var bottom = el.find(".towtruck-chat-content");
-      if (! bottom.length) {
-        bottom = el;
-      }
-      bottom[0].scrollIntoView();
+      scrollChat();
       if ((! self) && ! container.is(":visible")) {
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
@@ -387,6 +383,23 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
       console.warn("Did not understand message type:", msg.type, "in message", msg);
     }
   };
+
+  function scrollChat() {
+    var container = ui.container.find("#towtruck-chat-messages");
+    var content = container.find(".towtruck-chat-content:last")[0];
+    if (! content) {
+      content = container.find(".towtruck-chat-message:last")[0];
+    }
+    if (content) {
+      content.scrollIntoView();
+    }
+  }
+
+  session.on("display-window", function (id, win) {
+    if (id == "towtruck-chat") {
+      scrollChat();
+    }
+  });
 
   // FIXME: this is crude:
   ui.isChatEmpty = function () {
