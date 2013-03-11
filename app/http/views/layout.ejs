@@ -3,8 +3,7 @@
   
   <head>
     <meta charset="utf-8">
-    <title>Mozilla Labs TowTruck
-    </title>
+    <title>Mozilla Labs : TowTruck</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -278,6 +277,23 @@
       }
 
     }
+
+	/*Fonts*/
+	@font-face {
+	    font-family: openSansRegular;
+	    src: url('fonts/OpenSans-Regular.ttf');
+	}
+
+	@font-face {
+	    font-family: openSansLight;
+	    src: url('fonts/OpenSans-Light.ttf');
+	}
+
+	@font-face {
+	    font-family: openSansBold;
+	    src: url('fonts/OpenSans-Bold.ttf');
+	}
+
 	</style>
 
 
@@ -286,30 +302,27 @@
     <div class="navbar-wrapper">
       <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
       <div class="container">
+		
+		<div style="float:left;padding:15px;background:black;border-top-left-radius:2px;border-bottom-left-radius:2px;">
+			<a class="brand" href="#" style="letter-spacing:0px;font-weight:300;font-family:openSansRegular;color:#fff;font-size:14px;"><img src="images/site-icn-logo.png" style="height:20px;padding-right:10px;position:relative;top:-2px;">TowTruck</a>
+		</div>
 
         <div class="navbar navbar-inverse">
-          <div class="navbar-inner">
+          <div class="navbar-inner" style="background:black;border-top-right-radius:2px;border-bottom-right-radius:2px;box-shadow:0px 0px 0px;">
             <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="#">TowTruck</a>
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
                 <li class="active"><a href="#">Home</a></li>
-                <li><a href="#installation">Installation</a></li>
+                <li><a href="#installation">Install</a></li>
                 <li><a href="#getstarted">Get Started</a></li>
-				<li><a href="#demo">Demo</a></li>
                 <li><a href="#tools">Tools</a></li>
                 <li><a href="#contact">Contact</a></li>
-				<li><% if (user.email){ %>
-	              <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
-	            <% } else { %>
-	              <a id="login" href="#"><img src="/persona-sign_in.png"></a>
-	            <% } %></li>
               </ul>
             </div><!--/.nav-collapse -->
           </div><!-- /.navbar-inner -->
@@ -325,15 +338,13 @@
     <div id="myCarousel" class="carousel slide" style="margin-bottom:0px;">
       <div class="carousel-inner">
         <div class="item active">
-          <img src="http://twitter.github.com/bootstrap/assets/img/examples/slide-01.jpg" alt="">
+          <img src="/images/site-carousel-bg.png" alt="">
           <div class="container">
-			<div class="carousel-promo-image" style="background:red;margin-top:150px;width:600px;height:500px;position:absolute;z-index:1;left:500px;">
-				<img src="#">
-            </div>
+				<iframe class="carousel-promo-image" style="background:#fff;margin-top:150px;width:500px;height:420px;padding:0px;position:absolute;z-index:1;left:600px;box-shadow:0px -1px rgba(0,0,0,0.3);border:1px solid rgba(0,0,0,0.4);" src="http://player.vimeo.com/video/57992755" width="500" height="281" frameborder="1" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
             <div class="carousel-caption" style="position:relative;z-index:2;">
-              <h1>Collaboration made easy.</h1>
-              <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-              <a class="btn btn-large btn-primary" href="#">Get Started</a>
+              <h1 style="font-size:50px;font-weight:300;line-height:1;letter-spacing:-1px;text-shadow:0px 1px 0px rgba(0,0,0,0.3);">Collaboration made easy.</h1>
+              <p class="lead" style="padding:5px 0px;text-shadow:0px 1px 0px rgba(0,0,0,0.3);">Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>
+              <a class="btn btn-large btn-primary" href="#" style="background:#e34623;border-radius:2px;">Get Started</a>
             </div>
           </div>
         </div>
