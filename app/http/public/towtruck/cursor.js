@@ -93,10 +93,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       var wTop = $(window).scrollTop();
       var height = $(window).height();
       if (top < wTop) {
-        top = wTop + 5;
+        top = 5;
         this.setClass("towtruck-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
-        top = wTop + height - CURSOR_HEIGHT - 5;
+        top = height - CURSOR_HEIGHT - 5;
         this.setClass("towtruck-scrolled-below");
       } else {
         this.setClass("towtruck-scrolled-normal");

@@ -931,12 +931,14 @@
         stays stuck to the top of the screen until the appropriate time
         (when .towtruck-scrolled-above/below is removed)?*/
     &.towtruck-scrolled-above {
+        position: fixed;
         .towtruck-cursor-down {
             display: none;
         }
     }
 
     &.towtruck-scrolled-below {
+        position: fixed;
         .towtruck-cursor-up {
             display: none;
         }
