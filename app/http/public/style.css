@@ -48,9 +48,27 @@ body {
 }
 
 /* Homepage stuff */
-#hero {
+#introduction {
   background: url('/images/trucks.jpg') no-repeat;
+  background-size: 100% auto;
   margin-top: 90px;
+  padding-bottom: 1em;
+}
+#introduction h1 {
+  font-weight: 200;
+  line-height: 1.2em;
+}
+#introduction h1 strong {
+  font-style:normal;
+  font-weight: 700;
+}
+#introduction h1 .towtruck {
+  font-weight: 900;
+}
+#introduction iframe {
+  height: 380px;
+  width: 640px;
+  border: 0;
 }
 
 /* /Homepage stuff */
