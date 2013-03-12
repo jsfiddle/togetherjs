@@ -3,35 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 $(function(){
-  navigator.id.watch({
-    loggedInUser: currentUser,
-    onlogin: function(assertion) {
-      $.ajax({
-        type: 'POST',
-        url: '/persona/verify',
-        data: {assertion: assertion},
-        success: function(res, status, xhr) {
-          window.location.reload();
-        },
-        error: function(xhr, status, err) { alert("Login failure: " + err); }
-      });
-    },
-    onlogout: function() {
-      // A user has logged out! Here you need to:
-      // Tear down the user's session by redirecting the user or making a call to your backend.
-      // Also, make sure loggedInUser will get set to null on the next page load.
-      // (That's a literal JavaScript null. Not false, 0, or undefined. null.)
-      $.ajax({
-        type: 'POST',
-        url: '/persona/logout',
-        success: function(res, status, xhr) { 
-          window.location.reload();
-        },
-        error: function(xhr, status, err) { alert("Logout failure: " + err); }
-      });
-    }
-  });
-  
   $("#login").click(function(){
     navigator.id.request();
     return false;
@@ -44,4 +15,29 @@ $(function(){
 
   $("#year").text((new Date).getFullYear());
 
+  $('.carousel').carousel({
+    interval: 0
+  });
+
+  var cursorPositions = [
+    {top: 150, left: 50},
+    {top: 340, left: 160},
+    {top: 220, left: 190},
+    {top: 90, left: 80}
+  ];
+
+  var animateCursor = function(){
+    var cursor = $('#towtruck_demo_cursor');
+    var position = cursorPositions.pop();
+    cursorPositions.unshift(position);
+    cursor.animate(position, 'slow', function(){
+      setTimeout(animateCursor, 900);
+    });
+  };
+
+  animateCursor();
+
+  $('.copy-input').click(function(){
+    $(this).select();
+  });
 });
