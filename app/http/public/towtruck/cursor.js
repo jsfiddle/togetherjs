@@ -1,6 +1,6 @@
 /* Cursor viewing support
    */
-define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], function ($, ui, util, session, elementFinder, tinycolor) {
+define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker) {
   var assert = util.assert;
   var AssertionError = util.AssertionError;
 
@@ -293,12 +293,15 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     }
   });
 
-
   function documentClick(event) {
     // FIXME: this might just be my imagination, but somehow I just
     // really don't want to do anything at this stage of the event
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
+    if (event.towtruckInternal) {
+      // This is an artificial internal event
+      return;
+    }
     setTimeout(function () {
       if (elementFinder.ignoreElement(event.target)) {
         return;
@@ -324,6 +327,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     // last cursor update was calculated, so we force the cursor to
     // the last location during a click:
     if (! pos.sameUrl) {
+      // FIXME: if we *could have* done a local click, but we follow along
+      // later, we'll be in different states if that click was important.
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
@@ -333,6 +338,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
     displayClick({top: top, left: left});
+    if (TowTruck.cloneClicks && target.is(TowTruck.cloneClicks)) {
+      eventMaker.performClick(target);
+    }
   });
 
   function displayClick(pos) {
