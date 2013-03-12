@@ -45,10 +45,18 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     if (m) {
       query = m[0];
     }
+    // FIXME: The "head-" part here is obsolete:
     hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
     hash = hash || "#";
     return location.protocol + "//" + location.host + location.pathname + query +
            hash + "&towtruck=" + session.shareId;
+  };
+
+  session.recordUrl = function () {
+    assert(session.shareId);
+    var url = TowTruck.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+    url += "#&towtruck=" + session.shareId + "&hubBase=" + TowTruck.hubBase;
+    return url;
   };
 
   /* location.href without the hash */

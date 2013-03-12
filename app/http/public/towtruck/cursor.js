@@ -247,16 +247,18 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     }
   }
 
+  var lastScrollMessage = null;
   function _scrollRefresh() {
     scrollTimeout = null;
     scrollTimeoutSet = 0;
     Cursor.forEach(function (c) {
       c.refresh();
     });
-    session.send({
+    lastScrollMessage = {
       type: "scroll-update",
       position: elementFinder.elementByPixel($(window).scrollTop())
-    });
+    };
+    session.send(lastScrollMessage);
   }
 
   session.hub.on("scroll-update", function (msg) {
@@ -285,6 +287,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     // Immediately get our cursor onto this new person's screen:
     if (lastMessage) {
       session.send(lastMessage);
+    }
+    if (lastScrollMessage) {
+      session.send(lastScrollMessage);
     }
   });
 
