@@ -7,6 +7,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
   var $window = $(window);
   // This is also in towtruck.less, as @button-height:
   var BUTTON_HEIGHT = 40;
+  // This is also in towtruck.less, under .towtruck-animated
+  var ANIMATION_DURATION = 1000;
 
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
@@ -93,6 +95,15 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
   function hideWindow(el) {
     el = $(el);
     el.hide();
+    if (el.attr("data-bound-to")) {
+      var bound = $("#" + el.attr("data-bound-to"));
+      assert(bound.length);
+      console.log("adding pulse", bound[0]);
+      bound.addClass("towtruck-animated").addClass("towtruck-pulse");
+      setTimeout(function () {
+        bound.removeClass("towtruck-pulse").removeClass("towtruck-animated");
+      }, ANIMATION_DURATION+10);
+    }
   }
 
   function toggleWindow(el) {

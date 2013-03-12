@@ -992,3 +992,46 @@
     border: 3px outset #d00;
     /*FIXME: add gradient*/
 }
+
+
+/* Animations */
+
+/* Inspired by https://github.com/daneden/animate.css */
+
+@-webkit-keyframes towtruck-pulse {
+    0% { -webkit-transform: scale(1); }
+	50% { -webkit-transform: scale(1.1); }
+    100% { -webkit-transform: scale(1); }
+}
+@-moz-keyframes towtruck-pulse {
+    0% { -moz-transform: scale(1); }
+	50% { -moz-transform: scale(1.1); }
+    100% { -moz-transform: scale(1); }
+}
+@-o-keyframes towtruck-pulse {
+    0% { -o-transform: scale(1); }
+	50% { -o-transform: scale(1.1); }
+    100% { -o-transform: scale(1); }
+}
+@keyframes towtruck-pulse {
+    0% { transform: scale(1); }
+	50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+.towtruck-pulse {
+	-webkit-animation-name: towtruck-pulse;
+	-moz-animation-name: towtruck-pulse;
+	-o-animation-name: towtruck-pulse;
+	animation-name: towtruck-pulse;
+}
+// Note: the 1s is also present in ui.js (ANIMATION_DURATION)
+.towtruck-animated {
+	-webkit-animation-duration: 1s;
+	   -moz-animation-duration: 1s;
+	     -o-animation-duration: 1s;
+	        animation-duration: 1s;
+	-webkit-animation-fill-mode: both;
+	   -moz-animation-fill-mode: both;
+	     -o-animation-fill-mode: both;
+	        animation-fill-mode: both;
+}
