@@ -1,27 +1,18 @@
 body {
-  padding-bottom: 40px;
-  color: #fff;
+  padding-bottom: 0px;
   background-color: #1baefc;
+}
+
+p {
+
 }
 
 
 /* CUSTOMIZE THE NAVBAR
 -------------------------------------------------- */
-
-/* Special class on .container surrounding .navbar, used for positioning it into place. */
-.navbar-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  margin-top: 20px;
-  margin-bottom: -90px; /* Negative margin to pull up carousel. 90px is roughly margins and height of navbar. */
+.navbar {
+  margin-top: 1em;
 }
-.navbar-wrapper .navbar {
-
-}
-
 /* Remove border and change up box shadow for more contrast */
 .navbar .navbar-inner {
   border: 0;
@@ -38,7 +29,13 @@ body {
   text-shadow: 0 -1px 0 rgba(0,0,0,.5);
 }
 
-/* Navbar links: increase padding for taller navbar */
+.navbar .brand img {
+  height:20px;
+  padding-right:10px;
+  position:relative;
+  top:-2px;"
+}
+
 .navbar .nav > li > a {
   padding: 15px 20px;
 }
@@ -48,16 +45,46 @@ body {
   margin-top: 10px;
 }
 
-/* Homepage stuff */
-#introduction {
-  padding-bottom: 0;
-  margin-top: 90px;
+/* Homepage Sections */
+.section {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 4em;
 }
-#introduction h1 {
-  font-weight: 200;
+
+.section h1 {
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.3);
+  font-weight: 300;
   line-height: 1.2em;
   letter-spacing: -1px;
-  text-shadow: 0px 1px 0px rgba(0,0,0,0.3);
+  text-align: center;
+  margin-top: 2em;
+}
+
+.section .number-circle {
+   -webkit-border-radius: 999px;
+      -moz-border-radius: 999px;
+           border-radius: 999px;
+  position: absolute;
+  left: 1em;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  padding: 8px;
+  border: 2px solid;
+  text-align: center;
+}
+
+
+#introduction {
+  color: #fff;
+  padding-left: 2em;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1em;
+}
+
+#introduction h1 {
+  text-align: left;
 }
 #introduction h1 strong {
   font-style:normal;
@@ -66,13 +93,72 @@ body {
 #introduction h1 .towtruck {
   font-weight: 600;
 }
-#introduction iframe {
+#introduction iframe { /*TODO: Make iframe responsive */
   width: 640px;
   height: 380px;
   border: 0;
 }
 
-/*TODO: Make iframe responsive */
+#how_it_works {
+  background-color: white;
+  counter-reset: how-it-works-counter;
+}
+
+#how_it_works h1 {
+  margin-bottom: 2em;
+}
+
+#how_it_works ol{
+  list-style-type: none;
+}
+#how_it_works li {
+  margin-left: 1em;
+}
+#how_it_works li h2 {
+  line-height: 1.6em;
+}
+#how_it_works #how_it_works_carousel{
+  -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+     -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+          box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+#how_it_works #towtruck_demo_cursor {
+  position: absolute;
+}
+
+#selector {
+  display: none;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 1em;
+}
+#selector .container {
+  text-align: center;
+}
+
+#features {
+  color: #fff;
+  background-color: #75a734;
+}
+
+#how_to_install {
+  color: #fff;
+  background-color: #e34623;
+  text-align: center;
+}
+#how_to_install h2 {
+  margin-left: 1.2em;
+  line-height: 1.6em;
+}
+
+
+footer {
+  background-color: white;
+  padding: 48px 0;
+  margin: 0;
+  font-size: 1em;
+  line-height: 1.2em;
+}
 
 /* MARKETING CONTENT
 -------------------------------------------------- */
@@ -127,13 +213,16 @@ body {
 
 @media (max-width: 979px) {
 
+  .navbar {
+    margin-top: 0;
+  }
+
   .container.navbar-wrapper {
     margin-bottom: 0;
     width: auto;
   }
   .navbar-inner {
     border-radius: 0;
-    margin: -20px 0;
   }
 
   .carousel .item {
@@ -159,39 +248,8 @@ body {
 
 
 @media (max-width: 767px) {
-
-  .navbar-inner {
-    margin: -20px;
-  }
-
-  .carousel {
-    margin-left: -20px;
-    margin-right: -20px;
-  }
-  .carousel .container {
-
-  }
-  .carousel .item {
-    height: 300px;
-  }
-  .carousel img {
-    height: 300px;
-  }
-  .carousel-caption {
-    width: 65%;
-    padding: 0 70px;
-    margin-top: 100px;
-  }
-  .carousel-caption h1 {
-    font-size: 30px;
-  }
-  .carousel-caption .lead,
-  .carousel-caption .btn {
-    font-size: 18px;
-  }
-
-  .marketing .span4 + .span4 {
-    margin-top: 40px;
+  .navbar {
+    margin-top: 0;
   }
 
   .featurette-heading {
