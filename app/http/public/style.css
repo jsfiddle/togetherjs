@@ -1,6 +1,7 @@
 body {
   padding-bottom: 40px;
-  color: #5a5a5a;
+  color: #fff;
+  background-color: #1baefc;
 }
 
 
@@ -49,83 +50,29 @@ body {
 
 /* Homepage stuff */
 #introduction {
-  background: url('/images/trucks.jpg') no-repeat;
-  background-size: 100% auto;
+  padding-bottom: 0;
   margin-top: 90px;
-  padding-bottom: 1em;
 }
 #introduction h1 {
   font-weight: 200;
   line-height: 1.2em;
+  letter-spacing: -1px;
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.3);
 }
 #introduction h1 strong {
   font-style:normal;
-  font-weight: 700;
+  font-weight: 500;
 }
 #introduction h1 .towtruck {
-  font-weight: 900;
+  font-weight: 600;
 }
 #introduction iframe {
-  height: 380px;
   width: 640px;
+  height: 380px;
   border: 0;
 }
 
-/* /Homepage stuff */
-
-/* CUSTOMIZE THE CAROUSEL
--------------------------------------------------- */
-
-/* Carousel base class */
-.carousel {
-  margin-bottom: 60px;
-}
-
-.carousel .container {
-  position: relative;
-  z-index: 9;
-}
-
-.carousel-control {
-  height: 80px;
-  margin-top: 0;
-  font-size: 120px;
-  text-shadow: 0 1px 1px rgba(0,0,0,.4);
-  background-color: transparent;
-  border: 0;
-  z-index: 10;
-}
-
-.carousel .item {
-  height: 500px;
-}
-.carousel img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  min-width: 100%;
-  height: 500px;
-}
-
-.carousel-caption {
-  background-color: transparent;
-  position: static;
-  max-width: 550px;
-  padding: 0 20px;
-  margin-top: 200px;
-}
-.carousel-caption h1,
-.carousel-caption .lead {
-  margin: 0;
-  line-height: 1.25;
-  color: #fff;
-  text-shadow: 0 1px 1px rgba(0,0,0,.4);
-}
-.carousel-caption .btn {
-  margin-top: 10px;
-}
-
-
+/*TODO: Make iframe responsive */
 
 /* MARKETING CONTENT
 -------------------------------------------------- */

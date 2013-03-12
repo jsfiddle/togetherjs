@@ -51,28 +51,23 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="#">TowTruck</a>
+            <a class="brand" href="/"><img src="/images/site-icn-logo.png" style="height:20px;padding-right:10px;position:relative;top:-2px;">TowTruck</a>
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <li class="active"><a href="#">Home</a></li>
+                <li class="active"><a href="/">Home</a></li>
                 <li><a href="#installation">Installation</a></li>
                 <li><a href="#getstarted">Get Started</a></li>
   			        <li><a href="#demo">Demo</a></li>
                 <li><a href="#tools">Tools</a></li>
                 <li><a href="#contact">Contact</a></li>
-  			        <li>
-                  <% if (user.email){ %>
-                    <a id="logout" href="/">Sign Out (<%= user.email %>)</a>
-                  <% } else { %>
-                    <a id="login" href="#"><img src="/persona-sign_in.png"></a>
-                  <% } %></li>
               </ul>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <%- body %>
 
     <div id="contact" class="horz-row" style="background:white; margin:0px; padding:100px 0px">
