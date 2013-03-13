@@ -1,6 +1,9 @@
-/* WebRTC support
-   Note that this relies on parts of the interface code that usually goes in ui.js
-   */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
+
 define(["require", "jquery", "util", "session", "ui"], function (require, $, util, session, ui) {
   var webrtc = util.Module("webrtc");
   var assert = util.assert;

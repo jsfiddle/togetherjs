@@ -1,5 +1,9 @@
-/* Cursor viewing support
-   */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// Cursor viewing support
+
 define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker) {
   var assert = util.assert;
   var AssertionError = util.AssertionError;
