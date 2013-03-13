@@ -3,7 +3,7 @@
   
   <head>
     <meta charset="utf-8">
-    <title>Mozilla Labs TowTruck
+    <title>Mozilla Labs : TowTruck
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
@@ -36,6 +36,27 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
+	<style type="text/css" media="screen">
+		/*Fonts*/
+		@font-face {
+		    font-family: openSansRegular;
+		    src: url('fonts/OpenSans-Regular.ttf');
+		}
+
+		@font-face {
+		    font-family: openSansLight;
+		    src: url('fonts/OpenSans-Light.ttf');
+		}
+
+		@font-face {
+		    font-family: openSansBold;
+		    src: url('fonts/OpenSans-Bold.ttf');
+		}
+
+		</style>
+	</style>
+
   </head>
   <body>
 
@@ -43,17 +64,17 @@
       <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
       <div class="container">
         <div class="navbar navbar-inverse">
-          <div class="navbar-inner">
+          <div class="navbar-inner" style="background:black;border-top-right-radius:2px;border-bottom-right-radius:2px;box-shadow:0px 0px 0px;">
             <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
+            <a class="brand" href="/" style="letter-spacing:0px;font-weight:300;font-family:openSansRegular;color:#fff;font-size:16px;"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
-              <ul class="nav">
+              <ul class="nav" style="font-family:openSansLight;">
                 <li class="active"><a href="/">Home</a></li>
                 <li><a href="/example" target="examples">Examples</a></li>
                 <!--li><a href="#">API Docs</a></li>
@@ -70,27 +91,10 @@
 
     <footer>
       <div class="container">
-        <div class="row ">
-          <div class="span3">
-            <a href="https://mozillalabs.com/" class="footer-logo"><img src="/images/footer-mozilla-labs.png" alt="mozilla"></a>
-          </div>
-          <nav class="span3">
-            <ul>
-              <li>
-                <a href="https://twitter.com/#!/mozlabs">Contact Us</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/privacy-policy.html">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/about/legal.html">Legal Notices</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html">Report Trademark Abuse</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
+	      <p class="pull-right" style="font-family:openSansLight;"><a href="#">Back to top</a></p>
+				        <p><a href="https://mozillalabs.com/en-US/" style="font-family:metaPro;font-size:28px;font-weight:bold;letter-spacing:0px;">mozilla <span style="font-weight:normal;letter-spacing:0px;">labs</span></a></p>
+						<p style="font-family:openSansLight;">Built with love in <span id="year">TEXT</span>.</p>
+						<p style="font-family:openSansLight;"><a href="https://github.com/mozilla/towtruck/">Github</a> &middot; <a href="https://twitter.com/#!/mozlabs">Contact</a> &middot; <a href="https://www.mozilla.org/en-US/privacy-policy.html">Privacy</a> &middot; <a href="https://www.mozilla.org/en-US/about/legal.html">Legal</a> &middot; <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html">Trademark Abuse</a></p>
       </div>
     </footer>
   </body>
