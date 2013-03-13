@@ -1,10 +1,14 @@
-define(["require", "jquery", "util", "session", "templates"], function (require, $, util, session, templates) {
+define(["require", "jquery", "util", "session", "templates", "element-finder"], function (require, $, util, session, templates, elementFinder) {
   TowTruck.$ = $;
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
   var chat;
   var $window = $(window);
+  // This is also in towtruck.less, as @button-height:
+  var BUTTON_HEIGHT = 40;
+  // This is also in towtruck.less, under .towtruck-animated
+  var ANIMATION_DURATION = 1000;
 
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
@@ -45,19 +49,31 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     el = $(el);
     assert(el.length);
     $(".towtruck-window, .towtruck-popup").hide();
-    var bound = $("#" + el.attr("data-bound-to"));
-    assert(bound.length, bound.selector, el.selector);
+    el.show();
+    ui.bindWindow(el);
+    session.emit("display-window", el.attr("id"), el);
+  };
+
+  ui.bindWindow = function (win, bound) {
+    win = $(win);
+    if (! bound) {
+      bound = $("#" + win.attr("data-bound-to"));
+    } else {
+      bound = $(bound);
+    }
+    assert(bound.length, bound.selector, win.selector);
     var ifacePos = panelPosition();
     var boundPos = bound.offset();
     boundPos.height = bound.height();
     boundPos.width = bound.width();
     var windowHeight = $window.height();
     var windowWidth = $window.width();
-    el.show();
+    boundPos.top -= $window.scrollTop();
+    boundPos.left -= $window.scrollLeft();
     // FIXME: I appear to have to add the padding to the width to get a "true"
     // width.  But it's still not entirely consistent.
-    var height = el.height() + 5;
-    var width = el.width() + 20;
+    var height = win.height() + 5;
+    var width = win.width() + 20;
     var left, top;
     if (ifacePos == "right") {
       left = boundPos.left - 10 - width;
@@ -70,16 +86,24 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       top = boundPos.top - 10 - height;
     }
     top = Math.min(windowHeight - 10 - height, Math.max(10, top));
-    el.css({
+    win.css({
       top: top + "px",
       left: left + "px"
     });
-    session.emit("display-window", el.attr("id"), el);
-  }
+  };
 
   function hideWindow(el) {
     el = $(el);
     el.hide();
+    if (el.attr("data-bound-to")) {
+      var bound = $("#" + el.attr("data-bound-to"));
+      assert(bound.length);
+      console.log("adding pulse", bound[0]);
+      bound.addClass("towtruck-animated").addClass("towtruck-pulse");
+      setTimeout(function () {
+        bound.removeClass("towtruck-pulse").removeClass("towtruck-animated");
+      }, ANIMATION_DURATION+10);
+    }
   }
 
   function toggleWindow(el) {
@@ -93,10 +117,19 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
 
   ui.container = null;
 
-  ui.activateUI = function () {
+  // This is called before activateUI; it doesn't bind anything, but does display
+  // the dock
+  ui.prepareUI = function () {
     var container = ui.container = $(templates.interface);
     assert(container.length);
     $("body").append(container);
+  };
+
+  ui.activateUI = function () {
+    if (! ui.container) {
+      ui.prepareUI();
+    }
+    var container = ui.container;
 
     // The share link:
     container.find("#towtruck-share-link").click(function () {
@@ -303,11 +336,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
       container.append(el);
-      var bottom = el.find(".towtruck-chat-content");
-      if (! bottom.length) {
-        bottom = el;
-      }
-      bottom[0].scrollIntoView();
+      scrollChat();
       if ((! self) && ! container.is(":visible")) {
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
@@ -321,7 +350,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       assert(msg.clientId);
       assert(typeof msg.text == "string");
       el = ui.cloneTemplate("chat-message");
-      setPerson(el, msg.clientId);
+      ui.setPerson(el, msg.clientId);
       el.find(".towtruck-chat-content").text(msg.text);
       el.attr("data-person", msg.clientId)
         .attr("data-date", msg.date || Date.now());
@@ -331,7 +360,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     } else if (msg.type == "left-session") {
       nick = session.peers.get(msg.clientId).nickname;
       el = ui.cloneTemplate("chat-left");
-      setPerson(el, msg.clientId);
+      ui.setPerson(el, msg.clientId);
       setDate(el, msg.date || Date.now());
       addEl(el, msg.messageId, false);
     } else if (msg.type == "system") {
@@ -347,7 +376,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
       assert(msg.clientId);
       assert(typeof msg.url == "string");
       el = ui.cloneTemplate("url-change");
-      setPerson(el, msg.clientId);
+      ui.setPerson(el, msg.clientId);
       setDate(el, msg.date || Date.now());
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
@@ -366,6 +395,23 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
   };
 
+  function scrollChat() {
+    var container = ui.container.find("#towtruck-chat-messages");
+    var content = container.find(".towtruck-chat-content:last")[0];
+    if (! content) {
+      content = container.find(".towtruck-chat-message:last")[0];
+    }
+    if (content) {
+      content.scrollIntoView();
+    }
+  }
+
+  session.on("display-window", function (id, win) {
+    if (id == "towtruck-chat") {
+      scrollChat();
+    }
+  });
+
   // FIXME: this is crude:
   ui.isChatEmpty = function () {
     var container = ui.container.find(".towtruck-chat-container");
@@ -378,7 +424,7 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
   /* Given a template with a .towtruck-person element, puts the appropriate
      name into the element and sets the class name so it can be updated with
      updatePerson() later */
-  function setPerson(templateElement, clientId) {
+  ui.setPerson = function (templateElement, clientId) {
     var nick, avatar;
     if (clientId == session.clientId) {
       nick = "me";
@@ -391,12 +437,12 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     templateElement.find(".towtruck-person")
       .text(nick)
       .addClass("towtruck-person-" + util.safeClassName(clientId));
-    var avatarEl = templateElement.find(".towtruck-avatar img");
+    var avatarEl = templateElement.find(".towtruck-avatar img, img.towtruck-avatar");
     if (avatar) {
       avatarEl.attr("src", avatar);
     }
     avatarEl.addClass("towtruck-avatar-" + util.safeClassName(clientId));
-  }
+  };
 
   function setDate(templateElement, date) {
     if (typeof date == "number") {
@@ -457,6 +503,10 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
   });
 
+  session.peers.on("add", function (peer) {
+    var newPeer = ui.Peer(peer.clientId);
+  });
+
   session.settings.on("change", function (name, oldValue, newValue) {
     if (name == "color") {
       $("#towtruck-self-color").css({backgroundColor: newValue});
@@ -466,6 +516,127 @@ define(["require", "jquery", "util", "session", "templates"], function (require,
     }
     ui.updatePerson(session.clientId);
   });
+
+  /****************************************
+   * Dock peers
+   */
+
+  ui.Peer = util.Class({
+
+    constructor: function (clientId) {
+      this.clientId = clientId;
+      this.element = ui.cloneTemplate("dock-person");
+      ui.setPerson(this.element, this.clientId);
+      ui.container.find("#towtruck-dock-participants").append(this.element);
+      this.click = this.click.bind(this);
+      this.element.click(this.click);
+      var iface = $("#towtruck-interface");
+      iface.css({
+        height: iface.height() + BUTTON_HEIGHT + "px"
+      });
+      ui.Peer._peers[this.clientId] = this;
+    },
+
+    destroy: function () {
+      this.element.remove();
+      if (this._urlChangeElement) {
+        this._urlChangeElement.remove();
+      }
+      delete ui.Peer._peers[this.clientId];
+    },
+
+    urlChangeElement: function () {
+      if (! this._urlChangeElement) {
+        var c = this._urlChangeElement = ui.cloneTemplate("url-change-popup");
+        ui.setPerson(c, this.clientId);
+        c.find(".towtruck-follow").click(function () {
+          var url = c.find("a.towtruck-url").attr("href");
+          location.href = url;
+        });
+        c.find(".towtruck-ignore, .towtruck-close").click((function () {
+          c.hide();
+          return false;
+        }).bind(this));
+        c.find(".towtruck-nudge").click((function () {
+          // FIXME: the .send() is here, but the receive is in cobrowse.js,
+          // kind of messy
+          session.send({
+            type: "url-change-nudge",
+            url: location.href,
+            to: this.clientId
+          });
+        }).bind(this));
+        ui.container.append(c);
+        ui.bindWindow(c, this.element);
+      }
+      return this._urlChangeElement;
+    },
+
+    updateUrl: function (url, title, force) {
+      var c = this.urlChangeElement();
+      var fullTitle = title;
+      if (title) {
+        fullTitle += " (";
+      }
+      // FIXME: should truncate this if possible (remove domain):
+      fullTitle += util.truncateCommonDomain(url, location.href);
+      if (title) {
+        fullTitle += ")";
+      }
+      c.find("a.towtruck-url").attr("href", url).text(fullTitle);
+      if (force) {
+        c.show();
+      }
+    },
+
+    removeUrl: function () {
+      if (this._urlChangeElement) {
+        this._urlChangeElement.remove();
+        this._urlChangeElement = null;
+      }
+    },
+
+    urlNudge: function () {
+      if (this._urlChangeElement) {
+        this._urlChangeElement.show();
+        this._urlChangeElement.find(".towtruck-follow").addClass("towtruck-nudge");
+      }
+    },
+
+    click: function () {
+      if (this._urlChangeElement) {
+        this._urlChangeElement.show();
+        return;
+      }
+      var status = session.peers.getStatus(this.clientId);
+      if (! status.scrollPosition) {
+        console.warn("No status.scrollPosition for peer", this.clientId);
+        // FIXME: maybe this should be an assertion, but I'm not sure that the
+        // updates will always happen in the order to make this work
+        return;
+      }
+      assert(status.url == location.href.replace(/\#.*$/, ""));
+      var height = elementFinder.pixelForPosition(status.scrollPosition);
+      // FIXME: this should animate the scrolling
+      console.log("scroll to", status.scrollPosition, height);
+      $window.scrollTop(height);
+    }
+
+  });
+
+  ui.Peer._peers = {};
+  ui.Peer.get = function (id) {
+    var peer = ui.Peer._peers[id];
+    assert(peer);
+    return peer;
+  };
+
+  ui.urlNudge = function (clientId) {
+    var c = "towtruck-url-change-" + util.safeClassName(clientId);
+    var changer = $("." + c);
+    changer.show();
+    changer.find(".towtruck-follow").addClass("towtruck-nudge");
+  };
 
   return ui;
 

@@ -1,6 +1,6 @@
 /* Cursor viewing support
    */
-define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], function ($, ui, util, session, elementFinder, tinycolor) {
+define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker) {
   var assert = util.assert;
   var AssertionError = util.AssertionError;
 
@@ -93,10 +93,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
       var wTop = $(window).scrollTop();
       var height = $(window).height();
       if (top < wTop) {
-        top = wTop + 5;
+        top = 5;
         this.setClass("towtruck-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
-        top = wTop + height - CURSOR_HEIGHT - 5;
+        top = height - CURSOR_HEIGHT - 5;
         this.setClass("towtruck-scrolled-below");
       } else {
         this.setClass("towtruck-scrolled-normal");
@@ -247,13 +247,24 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     }
   }
 
+  var lastScrollMessage = null;
   function _scrollRefresh() {
     scrollTimeout = null;
     scrollTimeoutSet = 0;
     Cursor.forEach(function (c) {
       c.refresh();
     });
+    lastScrollMessage = {
+      type: "scroll-update",
+      position: elementFinder.elementByPixel($(window).scrollTop())
+    };
+    session.send(lastScrollMessage);
   }
+
+  session.hub.on("scroll-update", function (msg) {
+    var status = session.peers.getStatus(msg.clientId);
+    status.scrollPosition = msg.position;
+  });
 
   session.on("ui-ready", function () {
     $(document).mousemove(mousemove);
@@ -277,14 +288,20 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     if (lastMessage) {
       session.send(lastMessage);
     }
+    if (lastScrollMessage) {
+      session.send(lastScrollMessage);
+    }
   });
-
 
   function documentClick(event) {
     // FIXME: this might just be my imagination, but somehow I just
     // really don't want to do anything at this stage of the event
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
+    if (event.towtruckInternal) {
+      // This is an artificial internal event
+      return;
+    }
     setTimeout(function () {
       if (elementFinder.ignoreElement(event.target)) {
         return;
@@ -310,6 +327,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     // last cursor update was calculated, so we force the cursor to
     // the last location during a click:
     if (! pos.sameUrl) {
+      // FIXME: if we *could have* done a local click, but we follow along
+      // later, we'll be in different states if that click was important.
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
@@ -319,6 +338,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor"], funct
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
     displayClick({top: top, left: left});
+    if (TowTruck.cloneClicks && target.is(TowTruck.cloneClicks)) {
+      eventMaker.performClick(target);
+    }
   });
 
   function displayClick(pos) {

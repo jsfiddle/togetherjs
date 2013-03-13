@@ -161,5 +161,21 @@ define([], function () {
     return btoa(binary);
   };
 
+  util.truncateCommonDomain = function (url, base) {
+    /* Remove the scheme and domain from url, if it matches the scheme and domain
+       of base */
+    if (! base) {
+      return url;
+    }
+    var regex = /^https?:\/\/[^\/]*/i;
+    var match = regex.exec(url);
+    var matchBase = regex.exec(base);
+    if (match && matchBase && match[0] == matchBase[0]) {
+      // There is a common scheme and domain
+      return url.substr(match[0].length);
+    }
+    return url;
+  };
+
   return util;
 });

@@ -3,28 +3,28 @@
   
   <head>
     <meta charset="utf-8">
-    <title>Mozilla Labs : TowTruck</title>
+    <title>Mozilla Labs TowTruck
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <!--
     <script type="text/javascript">
       currentUser = "<%= user.email%>";
-
       if (currentUser == "" || currentUser == "null"){
         currentUser = null;
       }
-
     </script>
-    <script src="/application.js"></script>
+    <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+    -->
+    <script type="text/javascript" src="/application.js"></script>
 
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
     <link href="/style.css"                       rel="stylesheet" type="text/css" media="all">
     
-    <script src="https://login.persona.org/include.js"></script>
-
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
@@ -36,332 +36,62 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
-    <style type="text/css">
-	      
-	   /* GLOBAL STYLES
-    -------------------------------------------------- */
-    /* Padding below the footer and lighter body text */
+  </head>
+  <body>
 
-    body {
-      padding-bottom: 40px;
-      color: #5a5a5a;
-    }
-
-
-
-    /* CUSTOMIZE THE NAVBAR
-    -------------------------------------------------- */
-
-    /* Special class on .container surrounding .navbar, used for positioning it into place. */
-    .navbar-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      margin-top: 20px;
-      margin-bottom: -90px; /* Negative margin to pull up carousel. 90px is roughly margins and height of navbar. */
-    }
-    .navbar-wrapper .navbar {
-
-    }
-
-    /* Remove border and change up box shadow for more contrast */
-    .navbar .navbar-inner {
-      border: 0;
-      -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-         -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-              box-shadow: 0 2px 10px rgba(0,0,0,.25);
-    }
-
-    /* Downsize the brand/project name a bit */
-    .navbar .brand {
-      padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
-      font-size: 16px;
-      font-weight: bold;
-      text-shadow: 0 -1px 0 rgba(0,0,0,.5);
-    }
-
-    /* Navbar links: increase padding for taller navbar */
-    .navbar .nav > li > a {
-      padding: 15px 20px;
-    }
-
-    /* Offset the responsive button for proper vertical alignment */
-    .navbar .btn-navbar {
-      margin-top: 10px;
-    }
-
-
-
-    /* CUSTOMIZE THE CAROUSEL
-    -------------------------------------------------- */
-
-    /* Carousel base class */
-    .carousel {
-      margin-bottom: 60px;
-    }
-
-    .carousel .container {
-      position: relative;
-      z-index: 9;
-    }
-
-    .carousel-control {
-      height: 80px;
-      margin-top: 0;
-      font-size: 120px;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-      background-color: transparent;
-      border: 0;
-      z-index: 10;
-    }
-
-    .carousel .item {
-      height: 500px;
-    }
-    .carousel img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      height: 500px;
-    }
-
-    .carousel-caption {
-      background-color: transparent;
-      position: static;
-      max-width: 550px;
-      padding: 0 20px;
-      margin-top: 200px;
-    }
-    .carousel-caption h1,
-    .carousel-caption .lead {
-      margin: 0;
-      line-height: 1.25;
-      color: #fff;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-    }
-    .carousel-caption .btn {
-      margin-top: 10px;
-    }
-
-
-
-    /* MARKETING CONTENT
-    -------------------------------------------------- */
-
-    /* Center align the text within the three columns below the carousel */
-    .marketing .span4 {
-      text-align: center;
-    }
-    .marketing h2 {
-      font-weight: normal;
-    }
-    .marketing .span4 p {
-      margin-left: 10px;
-      margin-right: 10px;
-    }
-
-
-    /* Featurettes
-    ------------------------- */
-
-    .featurette-divider {
-      margin: 80px 0; /* Space out the Bootstrap <hr> more */
-    }
-    .featurette {
-      padding-top: 120px; /* Vertically center images part 1: add padding above and below text. */
-      overflow: hidden; /* Vertically center images part 2: clear their floats. */
-    }
-    .featurette-image {
-      margin-top: -120px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
-    }
-
-    /* Give some space on the sides of the floated elements so text doesn't run right into it. */
-    .featurette-image.pull-left {
-      margin-right: 40px;
-    }
-    .featurette-image.pull-right {
-      margin-left: 40px;
-    }
-
-    /* Thin out the marketing headings */
-    .featurette-heading {
-      font-size: 50px;
-      font-weight: 300;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-
-
-
-    /* RESPONSIVE CSS
-    -------------------------------------------------- */
-
-    @media (max-width: 979px) {
-
-      .container.navbar-wrapper {
-        margin-bottom: 0;
-        width: auto;
-      }
-      .navbar-inner {
-        border-radius: 0;
-        margin: -20px 0;
-      }
-
-      .carousel .item {
-        height: 500px;
-      }
-      .carousel img {
-        width: auto;
-        height: 500px;
-      }
-
-      .featurette {
-        height: auto;
-        padding: 0;
-      }
-      .featurette-image.pull-left,
-      .featurette-image.pull-right {
-        display: block;
-        float: none;
-        max-width: 40%;
-        margin: 0 auto 20px;
-      }
-    }
-
-
-    @media (max-width: 767px) {
-
-      .navbar-inner {
-        margin: -20px;
-      }
-
-      .carousel {
-        margin-left: -20px;
-        margin-right: -20px;
-      }
-      .carousel .container {
-
-      }
-      .carousel .item {
-        height: 300px;
-      }
-      .carousel img {
-        height: 300px;
-      }
-      .carousel-caption {
-        width: 65%;
-        padding: 0 70px;
-        margin-top: 100px;
-      }
-      .carousel-caption h1 {
-        font-size: 30px;
-      }
-      .carousel-caption .lead,
-      .carousel-caption .btn {
-        font-size: 18px;
-      }
-
-      .marketing .span4 + .span4 {
-        margin-top: 40px;
-      }
-
-      .featurette-heading {
-        font-size: 30px;
-      }
-      .featurette .lead {
-        font-size: 18px;
-        line-height: 1.5;
-      }
-
-    }
-
-	/*Fonts*/
-	@font-face {
-	    font-family: openSansRegular;
-	    src: url('fonts/OpenSans-Regular.ttf');
-	}
-
-	@font-face {
-	    font-family: openSansLight;
-	    src: url('fonts/OpenSans-Light.ttf');
-	}
-
-	@font-face {
-	    font-family: openSansBold;
-	    src: url('fonts/OpenSans-Bold.ttf');
-	}
-
-	</style>
-
-
-    <!-- NAVBAR
-    ================================================== -->
     <div class="navbar-wrapper">
       <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
       <div class="container">
-		
-		<div style="float:left;padding:15px;background:black;border-top-left-radius:2px;border-bottom-left-radius:2px;">
-			<a class="brand" href="#" style="letter-spacing:0px;font-weight:300;font-family:openSansRegular;color:#fff;font-size:14px;"><img src="images/site-icn-logo.png" style="height:20px;padding-right:10px;position:relative;top:-2px;">TowTruck</a>
-		</div>
-
         <div class="navbar navbar-inverse">
-          <div class="navbar-inner" style="background:black;border-top-right-radius:2px;border-bottom-right-radius:2px;box-shadow:0px 0px 0px;">
+          <div class="navbar-inner">
             <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
+            <a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#installation">Install</a></li>
-                <li><a href="#getstarted">Get Started</a></li>
-                <li><a href="#tools">Tools</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/example" target="examples">Examples</a></li>
+                <!--li><a href="#">API Docs</a></li>
+                <li><a href="#">Extending TowTruck</a></li-->
+                <li><a href="https://twitter.com/#!/mozlabs">Contact Us</a></li>
               </ul>
-            </div><!--/.nav-collapse -->
-          </div><!-- /.navbar-inner -->
-        </div><!-- /.navbar -->
-
-      </div> <!-- /.container -->
-    </div><!-- /.navbar-wrapper -->
-
-
-
-    <!-- Carousel
-    ================================================== -->
-    <div id="myCarousel" class="carousel slide" style="margin-bottom:0px;">
-      <div class="carousel-inner">
-        <div class="item active">
-          <img src="/images/site-carousel-bg.png" alt="">
-          <div class="container">
-				<iframe class="carousel-promo-image" style="background:#fff;margin-top:150px;width:500px;height:420px;padding:0px;position:absolute;z-index:1;left:600px;box-shadow:0px -1px rgba(0,0,0,0.3);border:1px solid rgba(0,0,0,0.4);" src="http://player.vimeo.com/video/57992755" width="500" height="281" frameborder="1" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-            <div class="carousel-caption" style="position:relative;z-index:2;">
-              <h1 style="font-size:50px;font-weight:300;line-height:1;letter-spacing:-1px;text-shadow:0px 1px 0px rgba(0,0,0,0.3);">Collaboration made easy.</h1>
-              <p class="lead" style="padding:5px 0px;text-shadow:0px 1px 0px rgba(0,0,0,0.3);">Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>
-              <a class="btn btn-large btn-primary" href="#" style="background:#e34623;border-radius:2px;">Get Started</a>
             </div>
           </div>
         </div>
-	</div>
-      <!-- <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a> -->
-    </div><!-- /.carousel -->
-
-
-
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-	
-	
-    <div class="marketing">
-      <%- body %>
+      </div>
     </div>
+
+    <%- body %>
+
+    <footer>
+      <div class="container">
+        <div class="row ">
+          <div class="span3">
+            <a href="https://mozillalabs.com/" class="footer-logo"><img src="/images/footer-mozilla-labs.png" alt="mozilla"></a>
+          </div>
+          <nav class="span3">
+            <ul>
+              <li>
+                <a href="https://twitter.com/#!/mozlabs">Contact Us</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/privacy-policy.html">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/about/legal.html">Legal Notices</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html">Report Trademark Abuse</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

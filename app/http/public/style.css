@@ -1,4 +1,263 @@
-  body {
-    /* 60px to make the container go all the way to the bottom of the topbar */ 
-    padding-top: 0px; 
+body {
+  padding-bottom: 0px;
+  background-color: #1baefc;
+}
+
+p {
+
+}
+
+
+/* CUSTOMIZE THE NAVBAR
+-------------------------------------------------- */
+.navbar {
+  margin-top: 1em;
+}
+/* Remove border and change up box shadow for more contrast */
+.navbar .navbar-inner {
+  border: 0;
+  -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+     -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+          box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+
+/* Downsize the brand/project name a bit */
+.navbar .brand {
+  padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+}
+
+.navbar .brand img {
+  height:20px;
+  padding-right:10px;
+  position:relative;
+  top:-2px;"
+}
+
+.navbar .nav > li > a {
+  padding: 15px 20px;
+}
+
+/* Offset the responsive button for proper vertical alignment */
+.navbar .btn-navbar {
+  margin-top: 10px;
+}
+
+/* Homepage Sections */
+.section {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 4em;
+}
+
+.section h1 {
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.3);
+  font-weight: 300;
+  line-height: 1.2em;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-top: 2em;
+}
+
+.section .number-circle {
+   -webkit-border-radius: 999px;
+      -moz-border-radius: 999px;
+           border-radius: 999px;
+  position: absolute;
+  left: 1em;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  padding: 8px;
+  border: 2px solid;
+  text-align: center;
+}
+
+
+#introduction {
+  color: #fff;
+  padding-left: 2em;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1em;
+}
+
+#introduction h1 {
+  text-align: left;
+}
+#introduction h1 strong {
+  font-style:normal;
+  font-weight: 500;
+}
+#introduction h1 .towtruck {
+  font-weight: 600;
+}
+#introduction iframe { /*TODO: Make iframe responsive */
+  width: 640px;
+  height: 380px;
+  border: 0;
+}
+
+#how_it_works {
+  background-color: white;
+  counter-reset: how-it-works-counter;
+}
+
+#how_it_works h1 {
+  margin-bottom: 2em;
+}
+
+#how_it_works ol{
+  list-style-type: none;
+}
+#how_it_works li {
+  margin-left: 1em;
+}
+#how_it_works li h2 {
+  line-height: 1.6em;
+}
+#how_it_works #how_it_works_carousel{
+  -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+     -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+          box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+#how_it_works #towtruck_demo_cursor {
+  position: absolute;
+}
+
+#selector {
+  display: none;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 1em;
+}
+#selector .container {
+  text-align: center;
+}
+
+#features {
+  color: #fff;
+  background-color: #75a734;
+}
+
+#how_to_install {
+  color: #fff;
+  background-color: #e34623;
+  text-align: center;
+}
+#how_to_install h2 {
+  margin-left: 1.2em;
+  line-height: 1.6em;
+}
+
+
+footer {
+  background-color: white;
+  padding: 48px 0;
+  margin: 0;
+  font-size: 1em;
+  line-height: 1.2em;
+}
+
+/* MARKETING CONTENT
+-------------------------------------------------- */
+
+/* Center align the text within the three columns below the carousel */
+.marketing .span4 {
+  text-align: center;
+}
+.marketing h2 {
+  font-weight: normal;
+}
+.marketing .span4 p {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+
+/* Featurettes
+------------------------- */
+
+.featurette-divider {
+  margin: 80px 0; /* Space out the Bootstrap <hr> more */
+}
+.featurette {
+  padding-top: 120px; /* Vertically center images part 1: add padding above and below text. */
+  overflow: hidden; /* Vertically center images part 2: clear their floats. */
+}
+.featurette-image {
+  margin-top: -120px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
+}
+
+/* Give some space on the sides of the floated elements so text doesn't run right into it. */
+.featurette-image.pull-left {
+  margin-right: 40px;
+}
+.featurette-image.pull-right {
+  margin-left: 40px;
+}
+
+/* Thin out the marketing headings */
+.featurette-heading {
+  font-size: 50px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+
+
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+@media (max-width: 979px) {
+
+  .navbar {
+    margin-top: 0;
   }
+
+  .container.navbar-wrapper {
+    margin-bottom: 0;
+    width: auto;
+  }
+  .navbar-inner {
+    border-radius: 0;
+  }
+
+  .carousel .item {
+    height: 500px;
+  }
+  .carousel img {
+    width: auto;
+    height: 500px;
+  }
+
+  .featurette {
+    height: auto;
+    padding: 0;
+  }
+  .featurette-image.pull-left,
+  .featurette-image.pull-right {
+    display: block;
+    float: none;
+    max-width: 40%;
+    margin: 0 auto 20px;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .navbar {
+    margin-top: 0;
+  }
+
+  .featurette-heading {
+    font-size: 30px;
+  }
+  .featurette .lead {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+}

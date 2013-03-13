@@ -74,11 +74,14 @@
 
 
         <div>
-          <label for="about">
-            The Cat In The Hat, or the Cat In The Hat Comes Back: which is
-            better, in essay form:
-          </label>
-          <textarea style="width: 100%; height: 10em" placeholder="There's no wrong answer! Except you must choose one."></textarea>
+          <button id="about-toggle" type="button">Essay (+)</button>
+          <div id="about-group" style="display: none">
+            <label for="about">
+              The Cat In The Hat, or the Cat In The Hat Comes Back: which is
+              better, in essay form:
+            </label>
+            <textarea style="width: 100%; height: 10em" placeholder="There's no wrong answer! Except you must choose one."></textarea>
+          </div>
         </div>
 
         <div>
@@ -117,7 +120,11 @@
     <!--<script src="bootstrap/js/bootstrap-carousel.js"></script>-->
     <!--<script src="bootstrap/js/bootstrap-typeahead.js"></script>-->
 
+    <script>
+      TowTruck = {cloneClicks: "#about-toggle"};
+    </script>
     <script src="/towtruck.js"></script>
     <script src="startup.js"></script>
+    <script src="form.js"></script>
   </body>
 </html>

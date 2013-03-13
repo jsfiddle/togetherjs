@@ -1,4 +1,4 @@
-define(["require", "jquery", "util", "session", "ui", "templates"], function (require, $, util, session, ui, templates) {
+define(["require", "jquery", "util", "session", "ui", "templates", "playback"], function (require, $, util, session, ui, templates, playback) {
   var chat = util.Module("chat");
   var assert = util.assert;
 
@@ -230,6 +230,54 @@ define(["require", "jquery", "util", "session", "ui", "templates"], function (re
       }
     },
 
+    command_record: function () {
+      ui.addChat({
+        type: "system",
+        text: "When you see the robot appear, the recording will have started"
+      });
+      window.open(
+        session.recordUrl(), "_blank",
+        "left,width=" + ($(window).width() / 2));
+    },
+
+    playing: null,
+
+    command_playback: function (url) {
+      if (this.playing) {
+        this.playing.cancel();
+        this.playing.unload();
+        this.playing = null;
+        ui.addChat({
+          type: "system",
+          text: "playback cancelled"
+        });
+        return;
+      }
+      if (! url) {
+        ui.addChat({
+          type: "system",
+          text: "Nothing is playing"
+        });
+        return;
+      }
+      var logLoader = playback.getLogs(url);
+      logLoader.then(
+        (function (logs) {
+          logs.save();
+          this.playing = logs;
+          logs.play();
+        }).bind(this),
+        function (error) {
+          ui.addChat({
+            type: "system",
+            text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
+          });
+        });
+      // FIXME: I shouldn't be doing this directly here, I should
+      // call some ui.* function:
+      $("#towtruck-chat").hide();
+    },
+
     storageKey: "towtruck.chatlog",
     messageExpireTime: 1000 * 60 * 60 * 6, // 6 hours in milliseconds
     maxLogMessages: 100,
@@ -291,6 +339,12 @@ define(["require", "jquery", "util", "session", "ui", "templates"], function (re
         clientId: l.clientId,
         messageId: l.messageId
       });
+    }
+    // Re-load a partial playback:
+    var logs = playback.getRunningLogs();
+    if (logs) {
+      chat.Chat.playing = logs;
+      logs.play();
     }
   });
 

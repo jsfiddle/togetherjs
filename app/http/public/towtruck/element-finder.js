@@ -1,4 +1,4 @@
-define(["util"], function (util) {
+define(["util", "jquery"], function (util, $) {
   var elementFinder = util.Module("element-finder");
   var assert = util.assert;
 
@@ -180,6 +180,52 @@ define(["util"], function (util) {
     } else {
       throw elementFinder.CannotFind(loc, "Malformed location", container);
     }
+  };
+
+  elementFinder.elementByPixel = function (height) {
+    /* Returns {location: "...", offset: pixels}
+
+       To get the pixel position back, you'd do:
+         $(location).offset().top + offset
+     */
+    function search(start, height) {
+      var last = null;
+      var children = start.children();
+      children.each(function () {
+        var el = $(this);
+        if (el.hasClass("towtruck") || el.css("position") == "fixed" || ! el.is(":visible")) {
+          return;
+        }
+        if (el.offset().top > height) {
+          return false;
+        }
+        last = el;
+      });
+      if ((! children.length) || (! last)) {
+        // There are no children, or only inapplicable children
+        return {
+          location: elementFinder.elementLocation(start[0]),
+          offset: height - start.offset().top
+        };
+      }
+      return search(last, height);
+    }
+    return search($(document.body), height);
+  };
+
+
+
+  elementFinder.pixelForPosition = function (position) {
+    /* Inverse of elementFinder.elementByPixel */
+    // FIXME: there should probably also be an absolute position, so we can
+    // check for sanity (like if responsive design hides an element), or as
+    // a fallback
+    if (position.location == "body") {
+      return position.offset;
+    }
+    var el = elementFinder.findElement(position.location);
+    var top = $(el).offset().top;
+    return top + position.offset;
   };
 
   return elementFinder;
