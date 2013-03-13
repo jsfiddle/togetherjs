@@ -12,11 +12,17 @@
       </span>
     </div>
     <div id="towtruck-buttons">
+      <div style="display: none">
+        <button id="towtruck-template-dock-person"
+                class="towtruck-button towtruck-dock-person">
+          <img src="" class="towtruck-avatar">
+        </button>
+      </div>
       <button id="towtruck-about-button" class="towtruck-button">
-        <img src="http://localhost:8080/images/icn-logo.png">
+        
       </button>
-      <button id="towtruck-share-button" class="towtruck-button">
-      </button>
+      <!-- <button id="towtruck-share-button" class="towtruck-button">
+      </button> -->
       <button id="towtruck-audio-button" class="towtruck-button">
         <div id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
         </div>
@@ -35,8 +41,10 @@
       </button>
       <button id="towtruck-chat-button" class="towtruck-button">
       </button>
-      <button id="towtruck-participants-button" class="towtruck-button">
-      </button>
+      <!-- <button id="towtruck-participants-button" class="towtruck-button">
+      </button> -->
+      <div id="towtruck-dock-participants">
+      </div>
 	  <button id="towtruck-expand-button" class="towtruck-button">
         <img src="http://localhost:8080/images/hr-line.png">
       </button>
@@ -47,20 +55,41 @@
   <div id="towtruck-about" class="towtruck-window" data-bound-to="towtruck-about-button"
        style="display: none">
     <header class="towtruck-title">
-      End TowTruck?
+      SETTINGS
     </header>
     <section>
-	  <h4>
-        Would you like to end your current session?
-      </h4>
-      <p>
-		<button id="towtruck-end-session">End session</button>
-        <button id="towtruck-cancel-end-session">Continue session</button>
-      </p>
-      <p class="small">
-        TowTruck is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.
-        For more info see <a href="https://towtruck.mozillalabs.com" target="_blank">towtruck.mozillalabs.com</a>.
-      </p>
+	      <p>
+	        SEND THIS LINK TO A FRIEND TO CONNECT
+	      </p>
+		<div id="towtruck-share-link-box">
+	      <p>
+	        <input type="text" id="towtruck-share-link">
+	      </p>
+		</div>
+	      <p>
+	        SET UP YOUR PROFILE
+	      </p>
+		<div id="towtruck-setup-profile-box" data-toggles="#towtruck-avatar-edit">
+		    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+	             id="towtruck-self-avatar">
+	        <input type="text" id="towtruck-self-name" placeholder="Enter your name">
+	        <span id="towtruck-checkmark">
+	          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
+	          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
+	        </span>
+			<span id="towtruck-self-color" class="towtruck-color"></span>
+	      </div>
+
+		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
+		<div class="towtruck-bottom-panel">
+	      <p>
+			<button id="towtruck-end-session">END TOWTRUCK</button>
+	        <!-- <button id="towtruck-cancel-end-session">Continue session</button> -->
+	      </p>
+		  <p class="small">
+	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.
+	      </p>
+		</div>
     </section>
 	<div id="triangle-left"></div>
 
@@ -83,7 +112,10 @@
         <input type="text" id="towtruck-share-link">
       </p>
 	  <p class="small">This is session: <span id="towtruck-session-id"></span></p>
-
+	  <p class="small">
+        TowTruck is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.
+        For more info see <a href="https://towtruck.mozillalabs.com" target="_blank">towtruck.mozillalabs.com</a>.
+      </p>
     </section>
   </div>
 
@@ -127,8 +159,9 @@
     </div>
 
     <section id="towtruck-chat-messages">
+	<!-- FIX ME// need to have some dialogue that says something like - There are no chats yet! -->
     </section>
-    <section>
+    <section id="towtruck-chat-messages-box">
       <input type="text" id="towtruck-chat-input" placeholder="Type your message here">
     </section>
   </div>
@@ -142,6 +175,23 @@
     </section>
   </div>
 
+  <div style="display: none">
+    <div id="towtruck-template-url-change-popup" class="towtruck-popup towtruck-url-change-popup">
+      <div class="towtruck-close">&times;</div>
+      <p>
+        <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
+        <span class="towtruck-person">foo</span>
+        is at
+        <a href="#" class="towtruck-url" target="_self"></a>
+      </p>
+      <p>
+        <button class="towtruck-follow">Follow</button>
+        <button class="towtruck-nudge">Come back!</button>
+        <a href="#" class="towtruck-ignore">Not now</a>
+      </p>
+    </div>
+  </div>
+
   <!-- The list of participants: -->
   <div id="towtruck-participants" class="towtruck-window"
        data-bound-to="towtruck-participants-button"
@@ -150,46 +200,44 @@
       Participants
     </header>
     <section id="towtruck-participants-self">
-      <header>
-        <span id="towtruck-participants-is-owner"
-              data-toggles="#towtruck-participants-is-following">Owner:
-        </span>
-        <span id="towtruck-participants-is-following"
-              data-toggles="#towtruck-participants-is-owner"
-              style="display: none">Following:
-        </span>
-      </header>
-      <div id="towtruck-no-avatar-edit" data-toggles="#towtruck-avatar-edit">
-	    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
-             id="towtruck-self-avatar">
-        <span id="towtruck-self-color" class="towtruck-color"></span>
-        <input type="text" id="towtruck-self-name" placeholder="Enter your name">
-        <span id="towtruck-checkmark">
-          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
-          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
-        </span>
-      </div>
-      <div style="display: none" id="towtruck-avatar-edit" data-toggles="#towtruck-no-avatar-edit, #towtruck-participants-other">
-        <div>
-          <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
-               id="towtruck-self-avatar-preview">
-          <button id="towtruck-self-avatar-accept" disabled="1">Save</button>
-          <button id="towtruck-self-avatar-cancel">Cancel</button>
+        <header>
+          <span id="towtruck-participants-is-owner"
+                        data-toggles="#towtruck-participants-is-following">OWNER
+                  </span>
+          <span id="towtruck-participants-is-following"
+                data-toggles="#towtruck-participants-is-owner"
+                style="display: none">Following:
+          </span>
+        </header>
+        <div id="towtruck-no-avatar-edit" data-toggles="#towtruck-avatar-edit">
+        	    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+                     id="towtruck-self-avatar">
+                <span id="towtruck-self-color" class="towtruck-color"></span>
+                <input type="text" id="towtruck-self-name" placeholder="Enter your name">
+                <span id="towtruck-checkmark">
+                  <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
+                  <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
+                </span>
+              </div>
+        <div style="display: none" id="towtruck-avatar-edit" data-toggles="#towtruck-no-avatar-edit, #towtruck-participants-other">
+          <div>
+            <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
+                 id="towtruck-self-avatar-preview">
+            <button id="towtruck-self-avatar-accept" disabled="1">Save</button>
+            <button id="towtruck-self-avatar-cancel">Cancel</button>
+          </div>
+          <fieldset>
+            <legend>Upload a picture</legend>
+            <input type="file" accept="image/jpeg,image/png" placeholder="upload file"
+                   id="towtruck-avatar-upload">
+          </fieldset>
+          <fieldset id="towtruck-avatar-edit-rtc">
+            <legend>Take a picture</legend>
+            <video id="towtruck-avatar-video" width=90 height=90></video>
+            <button id="towtruck-avatar-use-camera">Take picture</button>
+          </fieldset>
         </div>
-        <!-- This is hidden when RTC is not supported: -->
-        <fieldset>
-          <legend>Upload a picture</legend>
-          <input type="file" accept="image/jpeg,image/png" placeholder="upload file"
-                 id="towtruck-avatar-upload">
-        </fieldset>
-        <fieldset id="towtruck-avatar-edit-rtc">
-          <legend>Take a picture</legend>
-          <!-- the 90 pixel measurement should match session.AVATAR_HEIGHT: -->
-          <video id="towtruck-avatar-video" width=90 height=90></video>
-          <button id="towtruck-avatar-use-camera">Take picture</button>
-        </fieldset>
-      </div>
-    </section>
+      </section>
 	<div class="towtruck-clear"></div>
 
     <!-- Template for one participant: -->
@@ -201,11 +249,10 @@
     </div>
 
     <section id="towtruck-participants-other">
-      <header>Participants:</header>
       <div id="towtruck-participants-list" class="regular" style="display: none">
       </div>
       <p id="towtruck-participants-none">
-        There is no one else currently participating in the session.
+        No one is here!  Invite a friend by sending them the TowTruck link!
       </p>
     </section>
   </div>
@@ -229,7 +276,7 @@
         &#8593;
       </span>
       <span class="towtruck-cursor-name"></span>
-      <span style="display: none" class="towtruck-cursor-typing">...</span>
+      <span style="display:none" class="towtruck-cursor-typing">...</span>
     </div>
 
     <!-- This is a click: -->
