@@ -308,6 +308,7 @@
 /* General interface rules: */
 
 .towtruck {
+	
 
 	/*Participants window*/
 	section#towtruck-participants-self {
@@ -936,10 +937,42 @@
 
     }
 
+	#towtruck-chat-notifier.towtruck-popup {
+		background:rgba(242,244,245,0.5);
+		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.5)), from(rgba(255,255,255,255.5))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,244,245,0.5),rgba(242,244,245,0.5)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.5),rgba(242,244,245,0.5));
+		border-radius:2px;
+		border:1px solid rgba(0,0,0,0.1);
+		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
+		width:300px;
+	}
+	
+	#towtruck-chat-notifier .towtruck-chat-message {
+		border-bottom: 0px solid rgba(0, 0, 0, 0.1);
+	}
+	
+	#towtruck-chat-notifier section {
+		margin:0px;
+	}
+	
+	#towtruck-chat-notifier span.towtruck-time,span.towtruck-ampm {
+		display:none;
+	}
+	
+	#towtruck-chat-notifier .towtruck-close img{
+		width:13px;
+		height:13px;
+	}
+	
+	
+	
+	#towtruck-chat-notifier-message {
+		box-shadow:0px 0px 0px;
+	}
+	
+
     .towtruck-popup {
         .towtruck-window;
         width: 340px;
-        height: 170px;
     }
 
     .towtruck-url-change-popup {
