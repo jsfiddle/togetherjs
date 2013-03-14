@@ -230,10 +230,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
       hideWindow("#towtruck-about");
     });
 
-    $("#towtruck-share-button").click(function () {
-      toggleWindow("#towtruck-share");
-    });
-
     $("#towtruck-chat-button").click(function () {
       toggleWindow("#towtruck-chat");
     });

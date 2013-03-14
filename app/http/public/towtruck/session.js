@@ -395,7 +395,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
           ui.activateUI();
           sendHello(false);
           if (autoOpenShare) {
-            ui.displayWindow("#towtruck-share");
+            ui.displayWindow("#towtruck-about");
           }
         });
       });
