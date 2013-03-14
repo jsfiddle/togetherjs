@@ -7,8 +7,15 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   var DEBUG = true;
 
   var DEFAULT_NICKNAMES = [
-    "Friend",
-    "Comrade"
+    "Friendly Fox",
+    "Brilliant Beaver",
+	"Observant Owl",
+	"Gregarious Giraffe",
+	"Wild Wolf",
+	"Silent Seal",
+	"Wacky Whale",
+	"Curious Cat",
+	"Intelligent Iguana"
   ];
 
   var session = util.mixinEvents(util.Module("session"));
