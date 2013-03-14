@@ -103,6 +103,12 @@ body {
 
 #introduction h1 {
   text-align: left;
+  font-size:85px;
+  line-height:1;
+  letter-spacing:-5px;
+  font-weight:normal;
+  font-family:openSansLight;
+  margin-top:80px;
 }
 #introduction h1 strong {
   font-style:normal;
@@ -116,6 +122,17 @@ body {
   height: 380px;
   border: 0;
 }
+
+#introduction .lead {
+	font-size:17px;
+	font-weight:normal;
+	line-height:1.5;
+	padding:5px 0px;
+	font-family:
+	openSansLight;
+	letter-spacing:-0.01px;
+}
+
 
 #how_it_works {
   background-color: white;
