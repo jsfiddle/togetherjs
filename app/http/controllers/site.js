@@ -6,7 +6,7 @@
  * GET home page.
  */
 exports.index = function(req, resp){
-  resp.render('site/index', { user: {email: req.session.email}});
+  resp.render('site/index');
 };
 
 exports.catchall = function(req, resp){
@@ -15,7 +15,7 @@ exports.catchall = function(req, resp){
   var matches = req.path.match(/^\/([\w\-\_\/]+)$/);
 
   if (matches){
-    resp.render("site/" + matches[1], { user: {email: req.session.email}});
+    resp.render("site/" + matches[1]);
   }
   else{
     resp.send("404 - Not Found", 404);

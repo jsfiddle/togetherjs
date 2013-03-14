@@ -13,5 +13,4 @@ module.exports = function(http){
   http.get('/towtruck.js', routes.towtruck.index);
   http.get('/towtruck/*.js', routes.towtruck.js);
   http.get('/*', routes.site.catchall);
-
 }

@@ -13,20 +13,12 @@ env         = require('../../lib/environment'),
 express     = require('express'),
 logger      = require('../../lib/logger'),
 util        = require('util'),
-redisUrl    = require('redis-url'),
-connect     = require('connect'),
-RedisStore  = require('connect-redis')(connect),
 engine      = require('ejs-locals'),
 route       = require('./routes'),
 less        = require('less-middleware'),
 application = require('./controllers/application');
 
 var http = express();
-
-var sessionStore = new RedisStore({
-  client: redisUrl.connect(),
-  maxAge: (30).days
-});
 
 // Express Configuration
 http.configure(function(){
@@ -52,13 +44,6 @@ http.configure(function(){
   http.use(express.bodyParser());
   http.use(express.methodOverride());
 
-
-  http.use(connect.session({
-    secret: env.get("SESSION_SECRET"),
-    store: sessionStore,
-    cookie: {maxAge: (365).days()}
-  }));
-
   // Remove the HTTP Server Header, in case of security issues.
   http.use(function (req, res, next) {
     res.removeHeader("X-Powered-By");
@@ -66,10 +51,6 @@ http.configure(function(){
   });
 
   http.use(http.router);
-  require("express-persona")(http, {
-    audience: env.get("PERSONA_AUDIENCE")
-  });
-
 });
 
 http.configure('development', function(){
