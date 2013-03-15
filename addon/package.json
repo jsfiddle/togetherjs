@@ -4,7 +4,7 @@
             "description": "This is where to find the script to inject",
             "type": "string",
             "name": "towtruckJs",
-            "value": "https://towtruck.mozilla.com/towtruck.js",
+            "value": "https://towtruck.mozillalabs.com/towtruck.js",
             "title": "towtruck.js location"
         },
         {
