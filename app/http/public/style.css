@@ -33,6 +33,13 @@ body {
   margin-top: 1em;
 }
 
+.towtruck-nav {
+	background:black !important;
+	border-top-right-radius:2px !important;
+	border-bottom-right-radius:2px !important;
+	box-shadow:0px 0px 0px !important;
+}
+
 .navbar .navbar-inner {
   border: 0;
   -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
@@ -44,8 +51,12 @@ body {
 .navbar .brand {
   padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
   font-size: 16px;
-  font-weight: bold;
   text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+  letter-spacing:0px;font-weight:300;font-family:openSansRegular;color:#fff;font-size:16px;
+}
+
+ul.nav {
+	font-family:openSansLight;
 }
 
 .navbar .brand img {
@@ -217,6 +228,15 @@ p.main-text {
   background:rgba(27,174,252,1); margin:0px; padding:100px 0px 140px;
 }
 
+#features .far-left {
+	margin:0 auto;
+	text-align:center;
+}
+
+#features .textcenter {
+	text-align:center;
+}
+
 #features p {
   margin-top:10px;
 }
@@ -242,6 +262,18 @@ p.main-text {
 }
 #how_to_install img.install-img {
 	border-radius:2px;box-shadow:0px 1px 1px rgba(0,0,0,0.2);
+}
+#how_to_install h2 img {
+	position:relative;top:-3px;left:0px;
+}
+
+input.copy-input {
+	border:1px solid rgba(8,145,222,1);
+	font-family:openSansRegular;
+	letter-spacing:0px;
+	text-align:center;
+	border-radius:2px;
+	padding:6px;
 }
 
 footer {
