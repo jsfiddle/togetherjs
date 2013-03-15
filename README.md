@@ -150,6 +150,21 @@ Bookmarklet
 
 Go to `http://localhost:8080/bookmarklet.html` for a bookmarklet that you can use to start TowTruck.  This of course excludes the possibility of the page cooperating with TowTruck, but much of what it does is automatic anyway.
 
+Firefox Add-on
+--------------------
+
+There's a Firefox Add-on that enables testing on sites that don't include towtruck.js on their own. 
+
+You can downlod the add-on here: https://towtruck.mozillalabs.com/towtruck.xpi
+
+It adds a link into the status bar:
+
+![TowTruck Add-on Link](https://towtruck.mozillalabs.com/images/readme/add-on-link.jpg)
+
+Clicking it enables TowTruck on any site, such as http://github.com/ 
+
+![TowTruck Enabled on Github](https://towtruck.mozillalabs.com/images/readme/add-on-enabled.jpg)
+
 
 Testing
 -------
