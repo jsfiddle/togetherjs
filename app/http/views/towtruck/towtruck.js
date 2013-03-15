@@ -46,12 +46,27 @@
 
   var oldTowTruck = window.TowTruck;
 
-  var TowTruck = window.TowTruck = function (doneCallback) {
+  var TowTruck = window.TowTruck = function (event, doneCallback) {
+    if (typeof event == "function") {
+      if (doneCallback) {
+        console.warn("TowTruck() first argument *and* second argument is a function");
+      } else {
+        doneCallback = event;
+      }
+    }
+    if (window.TowTruckConfig && (! window.TowTruckConfig.loaded)) {
+      TowTruck.config(window.TowTruckConfig);
+      window.TowTruckConfig.loaded = true;
+    }
+    for (var attr in window) {
+      if (attr.indexOf("TowTruckConfig_") === 0) {
+        var attrName = attr.substr(("TowTruckConfig_").length);
+        TowTruck.config(attrName, window[attr]);
+      }
+    }
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
       session.start();
-      // Note if this is an event handler, doneCallback will be an
-      // event object and not a function
       if (doneCallback && typeof doneCallback == "function") {
         doneCallback();
       }
@@ -61,7 +76,7 @@
     // start itself (i.e., put up a UI and try to activate)
     TowTruck.startTowTruckImmediately = true;
     styles.forEach(addStyle);
-    var config = {
+    var requireConfig = {
       context: "towtruck",
       baseUrl: baseUrl + "/towtruck",
       urlArgs: "bust=" + cacheBust,
@@ -82,20 +97,72 @@
       }
     }
     if (typeof require == "function") {
-      TowTruck.require = require.config(config);
+      TowTruck.require = require.config(requireConfig);
     }
     if (typeof TowTruck.require == "function") {
       // This is an already-configured version of require
       TowTruck.require(deps, callback);
     } else {
-      config.deps = deps;
-      config.callback = callback;
-      window.require = config;
+      requireConfig.deps = deps;
+      requireConfig.callback = callback;
+      window.require = requireConfig;
     }
     // FIXME: we should namespace require.js to avoid conflicts.  See:
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
     addScript("/towtruck/libs/require.js");
+  };
+
+  var defaultHubBase = "<%= process.env.HUB_BASE %>";
+  if (defaultHubBase.indexOf("<%=") === 0) {
+    // Substitution wasn't made
+    defaultHubBase = "https://hub.towtruck.mozillalabs.com";
+  }
+
+  TowTruck._configuration = {};
+  TowTruck._defaultConfiguration = {
+    cloneClicks: false,
+    hubBase: defaultHubBase
+  };
+
+  TowTruck.getConfig = function (name) {
+    var value = TowTruck._configuration[name];
+    if (value === undefined) {
+      if (! TowTruck._defaultConfiguration.hasOwnProperty(name)) {
+        console.error("Tried to load unknown configuration value:", name);
+      }
+      value = TowTruck._defaultConfiguration[name];
+    }
+    return value;
+  };
+
+  /* TowTruck.config(configuration)
+     or: TowTruck.config(configName, value)
+
+     Adds configuration to TowTruck.  You may also set the global variable TowTruckConfig
+     and when TowTruck is started that configuration will be loaded.
+
+     Unknown configuration values will lead to console error messages.
+     */
+  TowTruck.config = function (name, value) {
+    var settings;
+    if (arguments.length == 1) {
+      if (typeof name != "object") {
+        throw 'TowTruck.config(value) must have an object value (not: ' + name + ')';
+      }
+      settings = name;
+    } else {
+      settings = {name: value};
+    }
+    for (var attr in settings) {
+      if (attr == "loaded" || ! settings.hasOwnProperty(attr)) {
+        continue;
+      }
+      if (! TowTruck._defaultConfiguration.hasOwnProperty(attr)) {
+        console.warn("Unknown configuration value passed to TowTruck.config():", attr);
+      }
+      TowTruck._configuration[attr] = settings[attr];
+    }
   };
 
   // If TowTruck previously existed, copy all its properties over to our new
@@ -111,11 +178,9 @@
   // This should contain the output of "git describe --always --dirty"
   // FIXME: substitute this on the server (and update make-static-client)
   TowTruck.version = "unknown";
-  if (! TowTruck.hubBase) {
-    TowTruck.hubBase = "<%= process.env.HUB_BASE %>";
-  }
   TowTruck.baseUrl = baseUrl;
 
+  // FIXME: this really doesn't need to be in this file:
   TowTruck.bookmarklet = function () {
     var s = "window._TowTruckBookmarklet = true;";
     s += "s=document.createElement('script');";

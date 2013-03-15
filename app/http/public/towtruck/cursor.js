@@ -342,7 +342,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
     displayClick({top: top, left: left});
-    if (TowTruck.cloneClicks && target.is(TowTruck.cloneClicks)) {
+    var cloneClicks = TowTruck.getConfig("cloneClicks");
+    if (cloneClicks && target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
   });

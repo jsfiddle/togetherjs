@@ -23,6 +23,29 @@ Then you can call `TowTruck()` to start TowTruck, or include this HTML to have T
 
 That's it!  TowTruck works pretty well without any customization at all.
 
+Configuring TowTruck
+--------------------
+
+There are a few configurable parameters for TowTruck.  To configure these you have three options:
+
+```javascript
+// If you have your configuration after <script src="towtruck.js"> loaded:
+TowTruck.config({configName: value});
+
+// If you aren't sure if towtruck.js is loaded:
+TowTruckConfig = {configName: value};
+
+// And if you want to be even more vague about the order in which configuration
+// has to be defined:
+TowTruckConfig_configName = value;
+```
+
+There are a couple configuration parameters:
+
+* `hubBase`: this is the location of the [WebSocket hub server](https://github.com/mozilla/towtruck/blob/master/app/hub/server.js).  It defaults to `https://hub.towtruck.mozillalabs.com` which is an open usable hub.  If you want to host your own hub you'd change this.
+
+* `cloneClicks`: this is a jQuery selector (string) of all the elements whose clicks you'd like to automatically clone across clients.  That means that if you give something like `"#submit"` then if one person clicks on `<input type="submit" id="submit">` that button will be clicked on all clients.  This is experimental, and is actually quite likely to be removed (see issue [#75](https://github.com/mozilla/towtruck/issues/75) and [#160](https://github.com/mozilla/towtruck/issues/160)).
+
 Setup/Development
 -----------------
 
@@ -153,7 +176,7 @@ Go to `http://localhost:8080/bookmarklet.html` for a bookmarklet that you can us
 Firefox Add-on
 --------------------
 
-There's a Firefox Add-on that enables testing on sites that don't include towtruck.js on their own. 
+There's a Firefox Add-on that enables testing on sites that don't include towtruck.js on their own.
 
 You can downlod the add-on here: https://towtruck.mozillalabs.com/towtruck.xpi
 
@@ -161,7 +184,7 @@ It adds a link into the status bar:
 
 ![TowTruck Add-on Link](https://towtruck.mozillalabs.com/images/readme/add-on-link.jpg)
 
-Clicking it enables TowTruck on any site, such as http://github.com/ 
+Clicking it enables TowTruck on any site, such as http://github.com/
 
 ![TowTruck Enabled on Github](https://towtruck.mozillalabs.com/images/readme/add-on-enabled.jpg)
 

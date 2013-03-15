@@ -45,7 +45,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
 
   session.hubUrl = function () {
     assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return TowTruck.hubBase + "/hub/" + session.shareId;
+    return TowTruck.getConfig("hubBase") + "/hub/" + session.shareId;
   };
 
   session.shareUrl = function () {
@@ -66,7 +66,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   session.recordUrl = function () {
     assert(session.shareId);
     var url = TowTruck.baseUrl.replace(/\/*$/, "") + "/recorder.html";
-    url += "#&towtruck=" + session.shareId + "&hubBase=" + TowTruck.hubBase;
+    url += "#&towtruck=" + session.shareId + "&hubBase=" + TowTruck.getConfig("hubBase");
     return url;
   };
 
