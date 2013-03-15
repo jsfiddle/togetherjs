@@ -265,6 +265,7 @@ p.main-text {
 }
 #how_to_install h2 img {
 	position:relative;top:-3px;left:0px;
+	height:30px;
 }
 
 input.copy-input {
@@ -285,6 +286,9 @@ footer {
 }
 footer ul {
   list-style-type: none;
+}
+footer img {
+	height:24px;
 }
 
 /* MARKETING CONTENT
