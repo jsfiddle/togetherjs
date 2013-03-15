@@ -236,6 +236,7 @@ p.main-text {
 
 #how_it_works p {
 	color:rgb(72, 72, 72);
+	padding-left:40px;
 	font-size:14px;line-height:1.5;font-family:openSansLight;letter-spacing:0px;
 }
 
