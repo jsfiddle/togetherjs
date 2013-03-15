@@ -104,7 +104,8 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       defaultNickname: "",
       avatar: null,
       stickyShare: null,
-      color: null
+      color: null,
+      seenModal: false
     },
 
     get: function (name) {

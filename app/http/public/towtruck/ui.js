@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "element-finder"], function (require, $, util, session, templates, elementFinder) {
+define(["require", "jquery", "util", "session", "templates", "element-finder", "modal"], function (require, $, util, session, templates, elementFinder, modal) {
   TowTruck.$ = $;
   var ui = util.Module('ui');
   var assert = util.assert;
@@ -123,10 +123,18 @@ define(["require", "jquery", "util", "session", "templates", "element-finder"], 
 
   // This is called before activateUI; it doesn't bind anything, but does display
   // the dock
+  // FIXME: because this module has lots of requirements we can't do
+  // this before those requirements are loaded.  Maybe worth splitting
+  // this out?  OTOH, in production we should have all the files
+  // combined so there's not much problem loading those modules.
   ui.prepareUI = function () {
     var container = ui.container = $(templates.interface);
     assert(container.length);
     $("body").append(container);
+    if (session.isClient && (! session.settings.get("seenModal"))) {
+      session.settings.set("seenModal", true);
+      modal.showModal("#towtruck-intro");
+    }
   };
 
   ui.activateUI = function () {

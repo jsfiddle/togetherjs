@@ -1028,7 +1028,7 @@
 			margin:10px 5px 20px 0px;
 		}
 
-		
+
 		a.towtruck-ignore {
 			color:#0095DD;
 			font-size:12px;
@@ -1245,6 +1245,40 @@
     /*FIXME: add gradient*/
 }
 
+/* Modals */
+
+#towtruck-modal-background {
+    position: fixed;
+    background-color: #000;
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: @z-index + 2;
+}
+
+.towtruck {
+
+    .towtruck-modal {
+        @height: 20em;
+        @width: 20em;
+        .towtruck.towtruck-window;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-left: -(@width/2);
+        width: @width;
+        margin-top: -(@height/2);
+        height: @height;
+        z-index: @z-index+3;
+        background-color: #fff;
+        .towtruck-close {
+            .towtruck.towtruck-window.towtruck-close;
+        }
+    }
+
+}
 
 /* Animations */
 
