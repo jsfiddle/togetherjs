@@ -31,14 +31,18 @@ body {
 
 .navbar {
   margin-top: 1em;
+  margin:20px 0px 40px;
 }
 
 li.active a{
-	background:rgba(0,0,0,0.2	) !important;
+	background:none !important;
+	box-shadow:0px 0px 0px !important;
+	border-bottom:1px solid #fff;
+	padding:0px !important;
 }
 
 .towtruck-nav {
-	background:rgb(72,72,72) !important;
+	background:none !important;
 	border-top-right-radius:2px !important;
 	border-bottom-right-radius:2px !important;
 	box-shadow:0px 0px 0px !important;
@@ -46,26 +50,37 @@ li.active a{
 
 .navbar .navbar-inner {
   border: 0;
-  -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-     -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
-          box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 
 /* Downsize the brand/project name a bit */
 .navbar .brand {
-  padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
+  padding: 20px 0px 16px 10px; /* Increase vertical padding to match navbar links */
   font-size: 16px;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.5);
   letter-spacing:0px;font-weight:300;font-family:openSansRegular;color:#fff;font-size:16px;
+  text-shadow:0px 0px 0px rgb(0,0,0) !important;
+  float:left !important;
 }
 
 ul.nav {
+	float:right !important;
+	margin:0px !important;
+}
+
+ul.nav a{
 	font-family:openSansLight;
+	color:#fff !important;	
+	text-shadow:0px 0px 0px rgb(0,0,0) !important;	
+	padding:0px !important;
+	margin:20px;
+}
+
+ul.nav a:hover{
+	border-bottom:1px solid #fff;
 }
 
 .navbar .brand img {
   height:20px;
-  padding-right:10px;
+  padding-right:5px;
   position:relative;
   top:-2px;"
 }
@@ -124,8 +139,9 @@ p.main-text {
 #introduction {
   color: rgb(255, 255, 255);
   padding-left: 2em;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 0px solid #ccc;
   padding-bottom: 1em;
+  margin-bottom:20px;
 }
 
 #introduction h1 {
@@ -135,7 +151,7 @@ p.main-text {
   letter-spacing:-5px;
   font-weight:normal;
   font-family:openSansLight;
-  margin-top:80px;
+  margin-top:50px;
 }
 #introduction h1 strong {
   font-style:normal;
@@ -160,7 +176,7 @@ p.main-text {
 	letter-spacing:-0.01px;
 }
 
-#introduction a {
+#introduction .span5 a {
 	background:#e34623;border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansLight;letter-spacing:-0.01px;
 }
 
@@ -296,7 +312,7 @@ input.copy-input {
 }
 
 footer {
-  background-color: rgb(72,72,72);
+  background-color: #1baefc;
   padding: 48px;
   margin: 0;
   font-size: 1em;
