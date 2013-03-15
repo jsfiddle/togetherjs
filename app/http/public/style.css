@@ -33,8 +33,12 @@ body {
   margin-top: 1em;
 }
 
+li.active a{
+	background:rgba(0,0,0,0.2	) !important;
+}
+
 .towtruck-nav {
-	background:black !important;
+	background:rgb(72,72,72) !important;
 	border-top-right-radius:2px !important;
 	border-bottom-right-radius:2px !important;
 	box-shadow:0px 0px 0px !important;
@@ -118,7 +122,7 @@ p.main-text {
 }
 
 #introduction {
-  color: #fff;
+  color: rgb(255, 255, 255);
   padding-left: 2em;
   border-bottom: 1px solid #ccc;
   padding-bottom: 1em;
@@ -166,14 +170,15 @@ p.main-text {
 
 
 #how_it_works {
-  background-color: white;
+  background-color: #fff;
   counter-reset: how-it-works-counter;
   margin:0px; padding:95px 0px 150px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
 }
 
 #how_it_works h1 {
   margin-bottom: 2em;
-  color:rgb(72, 72, 72);font-size:50px;font-weight:300;line-height:1;letter-spacing:-2.3px;margin:50px 0px;font-family:openSansLight;
+  color:rgb(72,72,72);font-size:50px;font-weight:300;line-height:1;letter-spacing:-2.3px;margin:50px 0px;font-family:openSansLight;
 }
 
 #how_it_works h2 {
@@ -224,8 +229,10 @@ p.main-text {
 }
 
 #features {
-  color: #fff;
-  background:rgba(27,174,252,1); margin:0px; padding:100px 0px 140px;
+  color: rgba(72,72,72,1);
+  background:rgba(255,255,255,1); margin:0px; padding:100px 0px 140px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+
 }
 
 #features .far-left {
@@ -250,11 +257,13 @@ p.main-text {
 }
 
 #how_to_install {
-  color: #fff;
-  background:#1baefc;
+  color: rgb(72,72,72);
+  background:#fff;
   text-align: center;
   margin:0px;
   padding:90px 0px 130px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+
 }
 #how_to_install h2 {
   margin-left: 1.2em;
@@ -267,18 +276,27 @@ p.main-text {
 	position:relative;top:-3px;left:0px;
 	height:30px;
 }
+#how_to_install .subheader {
+	margin:10px;
+	height:45px;
+}
+
+#how_to_install .main-text {
+	margin:10px 40px;
+}
 
 input.copy-input {
-	border:1px solid rgba(8,145,222,1);
+	border:1px solid rgba(72,72,72,1);
 	font-family:openSansRegular;
 	letter-spacing:0px;
 	text-align:center;
 	border-radius:2px;
 	padding:6px;
+	width:450px;
 }
 
 footer {
-  background-color: white;
+  background-color: rgb(72,72,72);
   padding: 48px;
   margin: 0;
   font-size: 1em;
@@ -289,6 +307,13 @@ footer ul {
 }
 footer img {
 	height:24px;
+}
+footer a{
+	color:#fff;
+}
+footer a:hover{
+	color:rgba(255,255,255,0.8);
+	text-decoration:underline;
 }
 
 /* MARKETING CONTENT
