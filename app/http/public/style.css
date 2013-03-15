@@ -24,7 +24,7 @@
 
 body {
   padding-bottom: 0px;
-  background-color: #1baefc;
+  background-color: #fff;
 }
 
 /* The rest of most pages, starting at the top: */
@@ -76,6 +76,10 @@ ul.nav a{
 
 ul.nav a:hover{
 	border-bottom:1px solid #fff;
+}
+
+.navbar-wrapper {
+	background:#1baefc;
 }
 
 .navbar .brand img {
@@ -137,11 +141,12 @@ p.main-text {
 }
 
 #introduction {
-  color: rgb(255, 255, 255);
+  color: rgb(72, 72, 72);
   padding-left: 2em;
   border-bottom: 0px solid #ccc;
-  padding-bottom: 1em;
-  margin-bottom:20px;
+  padding-bottom: 50px;
+  margin-bottom:0px;
+  background:#1baefc;
 }
 
 #introduction .modal {
@@ -212,8 +217,8 @@ p.main-text {
 #how_it_works {
   background-color: #fff;
   counter-reset: how-it-works-counter;
-  margin:0px; padding:95px 0px 150px;
-  border-bottom:1px solid rgba(0,0,0,0.1);
+  margin:0px;
+  padding:50px 0px 0px;
 }
 
 #how_it_works h1 {
@@ -270,9 +275,9 @@ p.main-text {
 
 #features {
   color: rgba(72,72,72,1);
-  background:rgba(255,255,255,1); margin:0px; padding:100px 0px 140px;
-  border-bottom:1px solid rgba(0,0,0,0.1);
-
+  background:rgba(255,255,255,1);
+  margin:0px;
+  padding:0px 0px 0px;
 }
 
 #features .far-left {
@@ -301,9 +306,7 @@ p.main-text {
   background:#fff;
   text-align: center;
   margin:0px;
-  padding:90px 0px 130px;
-  border-bottom:1px solid rgba(0,0,0,0.1);
-
+  padding:0px 0px 100px;
 }
 #how_to_install h2 {
   margin-left: 1.2em;
@@ -326,13 +329,15 @@ p.main-text {
 }
 
 input.copy-input {
-	border:1px solid rgba(72,72,72,1);
+	border:1px solid rgba(0,0,0,1);
 	font-family:openSansRegular;
 	letter-spacing:0px;
 	text-align:center;
 	border-radius:2px;
 	padding:6px;
 	width:450px;
+	background:rgba(72,72,72,1);
+	color:#fff;
 }
 
 footer {
