@@ -149,6 +149,10 @@ p.main-text {
   background:#1baefc;
 }
 
+#introduction a:focus {
+	outline:none !important;
+}
+
 #introduction .modal {
 	left:45%;
 }
@@ -256,6 +260,12 @@ p.main-text {
      -moz-box-shadow: 0px 1px 1px rgba(0,0,0,0.2);
           box-shadow: 0px 1px 1px rgba(0,0,0,0.2);
 }
+
+#how_it_works .carousel-nav-pagination a:hover{
+	color:rgba(27,174,252,1);
+	text-decoration:none;
+}
+
 #how_it_works #towtruck_demo_cursor {
   position: absolute;
 }
