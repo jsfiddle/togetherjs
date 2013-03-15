@@ -131,8 +131,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     var container = ui.container = $(templates.interface);
     assert(container.length);
     $("body").append(container);
-    if (session.isClient && (! session.settings.get("seenModal"))) {
-      session.settings.set("seenModal", true);
+    var seenDialog = session.settings.get("seenIntroDialog");
+    if (seenDialog == "force" || (session.isClient && ! seenDialog)) {
+      if (! seenDialog) {
+        session.settings.set("seenIntroDialog", true);
+      }
       modal.showModal("#towtruck-intro");
     }
   };
