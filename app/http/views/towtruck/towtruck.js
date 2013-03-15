@@ -114,7 +114,7 @@
   };
 
   var defaultHubBase = "<%= process.env.HUB_BASE %>";
-  if (defaultHubBase.indexOf("<%=") === 0) {
+  if (defaultHubBase.indexOf("<" + "%=") === 0) {
     // Substitution wasn't made
     defaultHubBase = "https://hub.towtruck.mozillalabs.com";
   }
@@ -124,6 +124,10 @@
     cloneClicks: false,
     hubBase: defaultHubBase
   };
+  // FIXME: there's a point at which configuration can't be updated
+  // (e.g., hubBase after the TowTruck has loaded).  We should keep
+  // track of these and signal an error if someone attempts to
+  // reconfigure too late
 
   TowTruck.getConfig = function (name) {
     var value = TowTruck._configuration[name];
@@ -207,12 +211,15 @@
   function conditionalOnload() {
     // A page can define this function to defer TowTruck from starting
     if (window._TowTruckCallToStart) {
+      // FIXME: need to document this:
       window._TowTruckCallToStart(onload);
     } else {
       onload();
     }
   }
 
+  // FIXME: can we push this up before the load event?
+  // Do we need to wait at all?
   function onload() {
     if (TowTruck._shareId) {
       TowTruck.startTowTruckImmediately = true;
