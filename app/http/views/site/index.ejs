@@ -7,22 +7,23 @@
         <h1>
           TowTruck
         </h1>
-          <p class="lead">A service for your website that makes it surprisingly easy to collaborate in real-time.
-		  </p>
-		<p class="lead"><a class="btn btn-large btn-primary" href="/example">Try it out here</a></p>
+        <p class="lead">A service for your website that makes it surprisingly easy to collaborate in real-time.</p>
+		    <p class="lead"><a class="btn btn-large btn-primary" href="/example">Try it out here</a></p>
       </div>
       <div class="span7">
-        <a href="#myModal" role="button" data-toggle="modal"><img src="images/site-product-shot.png" alt="Product shot"></a>
+        <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
+          <img src="images/site-product-shot.png" alt="Product shot">
+        </a>
       </div>	
-			<!-- Modal -->
-		<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><img src="/images/icn-close-btn-wht.png" alt="close button"></button>
-			<div class="modal-body">
-			<iframe src="http://player.vimeo.com/video/57992755?autoplay=true" width="400" height="300" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-			</div>
+		  <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
+			  <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
+          <img src="/images/icn-close-btn-wht.png" alt="close button">
+        </button>
+        <div class="modal-body">
+          <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/57992755?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
+        </div>
+      </div>
 		</div>
-		
-    </div>
   </div>
 </div>
 

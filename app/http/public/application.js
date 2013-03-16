@@ -35,9 +35,36 @@ $(function(){
     });
   };
 
-  animateCursor();
+  // animateCursor();
 
   $('.copy-input').click(function(){
     $(this).select();
   });
+
+  /* Vimeo player on index.ejs */
+  if ($('#modal_vimeo_iframe')){
+    var player = $f($('#modal_vimeo_iframe')[0]);
+
+    var playOnLoad = false;
+
+    $('a#show_video_modal').click(function(){
+      // This won't play if the player isn't ready
+      player.api('play');
+      playOnLoad = true;
+    });
+
+    player.addEvent('ready', function() {
+      // We play if we already tried to open, but the player wasn't ready
+      if (playOnLoad){
+        player.api('play');
+      }
+
+      //TODO: Possibly close modal when video is finished and scroll to example
+      // player.addEvent('finish', onFinish);
+    });
+
+    $('#close_vimeo_modal').click(function() {
+      player.api('pause');
+    });
+  }
 });
