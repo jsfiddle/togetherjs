@@ -35,7 +35,7 @@ $(function(){
     });
   };
 
-  animateCursor();
+  // animateCursor();
 
   $('.copy-input').click(function(){
     $(this).select();
