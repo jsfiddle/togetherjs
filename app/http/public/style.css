@@ -154,25 +154,25 @@ p.main-text {
 }
 
 #introduction .modal {
-	left:45%;
+	left: 45%;
 }
 
-#introduction #myModal button {
-	width:20px;
-	height:20px;
-	position:relative;
-	left:-10px;
-	top:-10px;
+#introduction #video_modal button {
+	width: 20px;
+	height: 20px;
+	position: relative;
+	left: -10px;
+	top: -10px;
 }
 
-#introduction #myModal {
+#introduction #video_modal {
 	width:690px;
 	background:none;
 	box-shadow:0px 0px 0px;
 	border:0px;
 }
 
-#introduction #myModal .modal-header {
+#introduction #video_modal .modal-header {
 	border-bottom:0px;
 	border-radius:2px;
 }
