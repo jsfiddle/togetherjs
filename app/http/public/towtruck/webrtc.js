@@ -172,6 +172,14 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
    */
 
   session.on("ui-ready", function () {
+    $("#towtruck-audio-button").click(function () {
+      if (session.RTCSupported) {
+        enableAudio();
+      } else {
+        ui.displayWindow("#towtruck-rtc-not-supported");
+      }
+    });
+
     if (! session.RTCSupported) {
       ui.displayToggle("#towtruck-audio-unavailable");
       return;
@@ -190,8 +198,11 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     var answerDescription = false;
     var _connection = null;
 
-    $("#towtruck-audio-button").click(function () {
+    function enableAudio() {
       accepted = true;
+      if (! session.settings.get("dontShowRtcInfo")) {
+        ui.displayWindow("#towtruck-rtc-info");
+      }
       if (! audioStream) {
         startStreaming(connect);
         return;
@@ -200,6 +211,10 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         connect();
       }
       toggleMute();
+    }
+
+    ui.container.find("#towtruck-rtc-info .towtruck-dont-show-again").change(function () {
+      session.settings.set("dontShowRtcInfo", this.checked);
     });
 
     function error() {

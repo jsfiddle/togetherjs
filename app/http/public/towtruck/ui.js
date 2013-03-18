@@ -252,7 +252,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       }
     });
 
-    container.find(".towtruck-close").click(function (event) {
+    container.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
       var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
       hideWindow(w);
       event.stopPropagation();

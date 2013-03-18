@@ -137,6 +137,43 @@
     </section>
   </div>
 
+  <!-- this is a kind of warning popped up when you (successfully) start RTC: -->
+  <div id="towtruck-rtc-info" class="towtruck-window"
+       data-bound-to="towtruck-audio-button"
+       style="display: none">
+    <header class="towtruck-title">Audio activated</header>
+
+    <p>The live audio chat feature is based on an experimental browser feature.
+      <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">Read more about this technology (opens in a new window)</a>
+    </p>
+
+    <div>
+      <button class="towtruck-dismiss" type="button">OK</button>
+      <label for="towtruck-rtc-info-dismiss" style="display: inline">
+        <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
+        don't show again
+      </label>
+    </div>
+
+  </div>
+
+  <!-- this is popped up when you hit the audio button, but RTC isn't
+  supported: -->
+  <div id="towtruck-rtc-not-supported" class="towtruck-window"
+       data-bound-to="towtruck-audio-button"
+       style="display: none">
+    <header class="towtruck-title">Audio requires newer browser</header>
+
+    <p>Live audio chat requires a newer (or different) browser than
+      you are
+      using.  <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC"
+      target="_blank">See this page for more information and a list of
+      supported browsers (opens in new window)</a>
+    </p>
+
+    <button class="towtruck-dismiss" type="button">OK</button>
+  </div>
+
   <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
   <div id="towtruck-chat-notifier" class="towtruck-popup"
        data-bound-to="towtruck-chat-button"
