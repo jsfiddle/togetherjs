@@ -693,21 +693,26 @@
 		padding-left:65px;
     }
 
-	.towtruck-window:after {
-		content: '';
-		display: block;
+    #towtruck-window-pointer-right, #towtruck-window-pointer-left {
 		position: absolute;
-		top: 145px;
-		right:-6px;
 		width: 10px;
 		height: 10px;
+        margin-right: -5px;
+        margin-top: -5px;
 		background: #f2f4f5;
-		border-right:1px solid #ccc;
-		border-bottom:1px solid #ccc;
-		-moz-transform:rotate(-45deg);
-		-webkit-transform:rotate(-45deg);
-		box-shadow:1px 1px 1px rgba(0,0,0,0.1);
-	}
+		border-right: 1px solid #ccc;
+		border-bottom: 1px solid #ccc;
+        z-index: @z-index + 1;
+		box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    }
+    #towtruck-window-pointer-right {
+		-moz-transform: rotate(-45deg);
+		-webkit-transform: rotate(-45deg);
+    }
+    #towtruck-window-pointer-left {
+		-moz-transform: rotate(135deg);
+		-webkit-transform: rotate(135deg);
+    }
 
     .towtruck-window {
         position: fixed;

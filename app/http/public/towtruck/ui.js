@@ -98,6 +98,21 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       top: top + "px",
       left: left + "px"
     });
+    var panelPos = panelPosition();
+    $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
+    var pointer = $("#towtruck-window-pointer-" + panelPos);
+    pointer.show();
+    if (panelPos == "right") {
+      pointer.css({
+        top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
+        left: left + win.width() + 16 + "px"
+      });
+    } else {
+      pointer.css({
+        top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
+        left: (left - 5) + "px"
+      });
+    }
   };
 
   function hideWindow(el) {
@@ -112,6 +127,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         bound.removeClass("towtruck-pulse").removeClass("towtruck-animated");
       }, ANIMATION_DURATION+10);
     }
+    $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
   }
 
   function toggleWindow(el) {
