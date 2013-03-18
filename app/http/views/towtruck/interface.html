@@ -225,16 +225,18 @@
     <div id="towtruck-template-cursor"
          class="towtruck-cursor towtruck">
       <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png">
-      <!-- Displayed when the cursor is below the screen: -->
-      <span class="towtruck-cursor-down">
-        &#8595;
+      <span class="towtruck-cursor-container">
+        <span class="towtruck-cursor-name"></span>
+        <span style="display:none" class="towtruck-cursor-typing">...</span>
+        <!-- Displayed when the cursor is below the screen: -->
+        <span class="towtruck-cursor-down">
+          &#8595;
+        </span>
+        <!-- Displayed when the cursor is above the screen: -->
+        <span class="towtruck-cursor-up">
+          &#8593;
+        </span>
       </span>
-      <!-- Displayed when the cursor is above the screen: -->
-      <span class="towtruck-cursor-up">
-        &#8593;
-      </span>
-      <span class="towtruck-cursor-name"></span>
-      <span style="display:none" class="towtruck-cursor-typing">...</span>
     </div>
 
     <!-- This is a click: -->

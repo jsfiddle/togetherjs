@@ -47,9 +47,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
       var img = this.element.find("img.towtruck-cursor-img");
       img.attr("src", makeCursor(peer.color));
       var name = this.element.find(".towtruck-cursor-name");
+      var nameContainer = this.element.find(".towtruck-cursor-container");
       assert(name.length);
       name.text(peer.nickname);
-      name.css({
+      nameContainer.css({
         backgroundColor: peer.color,
         color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
       });
@@ -97,7 +98,9 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
       var wTop = $(window).scrollTop();
       var height = $(window).height();
       if (top < wTop) {
-        top = 5;
+        // FIXME: this is a totally arbitrary number, but is meant to be big enough
+        // to keep the cursor name from being off the top of the screen.
+        top = 25;
         this.setClass("towtruck-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
         top = height - CURSOR_HEIGHT - 5;
