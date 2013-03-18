@@ -38,8 +38,6 @@
       </button>
       <button id="towtruck-chat-button" class="towtruck-button">
       </button>
-      <!-- <button id="towtruck-participants-button" class="towtruck-button">
-      </button> -->
       <div id="towtruck-dock-participants">
       </div>
 	  <button id="towtruck-expand-button" class="towtruck-button">
@@ -141,7 +139,7 @@
 
   <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
   <div id="towtruck-chat-notifier" class="towtruck-popup"
-       data-bound-to="towtruck-participants-button"
+       data-bound-to="towtruck-chat-button"
        style="display: none">
     <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
     <section id="towtruck-chat-notifier-message">
@@ -162,72 +160,6 @@
       </p>
     </div>
   </div>
-
-  <!-- The list of participants: -->
-  <div id="towtruck-participants" class="towtruck-window"
-       data-bound-to="towtruck-participants-button"
-       style="display: none">
-    <header class="towtruck-title">
-      Participants
-    </header>
-    <section id="towtruck-participants-self">
-        <header>
-          <span id="towtruck-participants-is-owner"
-                        data-toggles="#towtruck-participants-is-following">OWNER
-                  </span>
-          <span id="towtruck-participants-is-following"
-                data-toggles="#towtruck-participants-is-owner"
-                style="display: none">Following:
-          </span>
-        </header>
-        <div id="towtruck-no-avatar-edit" data-toggles="#towtruck-avatar-edit">
-        	    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
-                     id="towtruck-self-avatar">
-                <span id="towtruck-self-color" class="towtruck-color"></span>
-                <input type="text" id="towtruck-self-name" placeholder="Enter your name">
-                <span id="towtruck-checkmark">
-                  <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
-                  <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
-                </span>
-              </div>
-        <div style="display: none" id="towtruck-avatar-edit" data-toggles="#towtruck-no-avatar-edit, #towtruck-participants-other">
-          <div>
-            <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar"
-                 id="towtruck-self-avatar-preview">
-            <button id="towtruck-self-avatar-accept" disabled="1">Save</button>
-            <button id="towtruck-self-avatar-cancel">Cancel</button>
-          </div>
-          <fieldset>
-            <legend>Upload a picture</legend>
-            <input type="file" accept="image/jpeg,image/png" placeholder="upload file"
-                   id="towtruck-avatar-upload">
-          </fieldset>
-          <fieldset id="towtruck-avatar-edit-rtc">
-            <legend>Take a picture</legend>
-            <video id="towtruck-avatar-video" width=90 height=90></video>
-            <button id="towtruck-avatar-use-camera">Take picture</button>
-          </fieldset>
-        </div>
-      </section>
-	<div class="towtruck-clear"></div>
-
-    <!-- Template for one participant: -->
-    <div style="display: none">
-      <div id="towtruck-template-participant" class="towtruck-participant">
-        <span class="towtruck-participant-color towtruck-color"></span>
-        <span class="towtruck-participant-name"></span>
-      </div>
-    </div>
-
-    <section id="towtruck-participants-other">
-      <div id="towtruck-participants-list" class="regular" style="display: none">
-      </div>
-      <p id="towtruck-participants-none">
-        No one is here!  Invite a friend by sending them the TowTruck link!
-      </p>
-    </section>
-  </div>
-
 
   <audio id="towtruck-audio-element"></audio>
 

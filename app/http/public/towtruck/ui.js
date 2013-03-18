@@ -30,8 +30,9 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
 
   ui.displayToggle = function (el) {
     el = $(el);
+    assert(el.length, "No element", arguments[0]);
     var other = $(el.attr("data-toggles"));
-    assert(other.length);
+    assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
     other.hide();
     el.show();
   };
@@ -265,16 +266,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       ui.displayWindow("#towtruck-chat");
     });
 
-    $("#towtruck-participants-button").click(function () {
-      toggleWindow("#towtruck-participants");
-    });
-
-    if (session.isClient) {
-      ui.displayToggle("#towtruck-participants-is-following");
-    } else {
-      ui.displayToggle("#towtruck-participants-is-owner");
-    }
-
     $(".towtruck header.towtruck-title").each(function (index, item) {
       var button = $('<button class="towtruck-minimize"><img src="' + TowTruck.baseUrl + '/images/icn-minimize.png"></button>');
       button.click(function (event) {
@@ -491,28 +482,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId)).attr("src", avatar);
     }
   };
-
-  session.peers.on("add update", function (peer) {
-    var id = "towtruck-participant-" + util.safeClassName(peer.clientId);
-    var el = $("#" + id);
-    if (! el.length) {
-      el = ui.cloneTemplate("participant");
-      el.attr("id", id);
-      $("#towtruck-participants-list").append(el);
-    }
-    // FIXME: need to hide this when all participants leave, but right now
-    // we aren't tracking anyone leaving:
-    $("#towtruck-participants-list").show();
-    $("#towtruck-participants-none").hide();
-    if (peer.color) {
-      el.find(".towtruck-color").css({
-        backgroundColor: peer.color
-      });
-    }
-    if (peer.nickname !== undefined) {
-      el.find(".towtruck-participant-name").text(peer.nickname || "???");
-    }
-  });
 
   session.peers.on("add", function (peer) {
     var newPeer = ui.Peer(peer.clientId);
