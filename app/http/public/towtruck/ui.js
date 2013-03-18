@@ -589,14 +589,13 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         return;
       }
       var status = session.peers.getStatus(this.clientId);
+      var height = 0;
       if (! status.scrollPosition) {
         console.warn("No status.scrollPosition for peer", this.clientId);
-        // FIXME: maybe this should be an assertion, but I'm not sure that the
-        // updates will always happen in the order to make this work
-        return;
+      } else {
+        assert(status.url == location.href.replace(/\#.*$/, ""));
+        height = elementFinder.pixelForPosition(status.scrollPosition);
       }
-      assert(status.url == location.href.replace(/\#.*$/, ""));
-      var height = elementFinder.pixelForPosition(status.scrollPosition);
       // FIXME: this should animate the scrolling
       console.log("scroll to", status.scrollPosition, height);
       $window.scrollTop(height);

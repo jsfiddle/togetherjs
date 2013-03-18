@@ -275,6 +275,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     document.addEventListener("click", documentClick, true);
     document.addEventListener("keydown", documentKeydown, true);
     $(window).scroll(scroll);
+    scroll();
   });
 
   session.on("close", function () {
