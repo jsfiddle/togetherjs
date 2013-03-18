@@ -394,11 +394,13 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       // FIXME: should be the overview screen sometimes:
         $(function () {
           var ui = require("ui");
+          if (autoOpenShare) {
+            session.once("ui-ready", function () {
+              ui.displayWindow("#towtruck-about");
+            });
+          }
           ui.activateUI();
           sendHello(false);
-          if (autoOpenShare) {
-            ui.displayWindow("#towtruck-about");
-          }
         });
       });
     });

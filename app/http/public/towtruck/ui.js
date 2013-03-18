@@ -13,6 +13,9 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   var BUTTON_HEIGHT = 40;
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
+  // This is set when an animation will keep the UI from being ready
+  // (until this time):
+  var finishedAt = null;
 
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
@@ -66,7 +69,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     } else {
       bound = $(bound);
     }
-    assert(bound.length, bound.selector, win.selector);
+    assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
     var ifacePos = panelPosition();
     var boundPos = bound.offset();
     boundPos.height = bound.height();
@@ -138,6 +141,46 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         session.settings.set("seenIntroDialog", true);
       }
       modal.showModal("#towtruck-intro");
+    }
+    if (TowTruck.startTarget) {
+      // Time at which the UI will be fully ready:
+      // (We have to do this because the offset won't be quite right
+      // until the animation finishes - attempts to calculate the
+      // offset without taking into account CSS transforms have so far
+      // failed.)
+      finishedAt = Date.now() + 550;
+      setTimeout(function () {
+        finishedAt = Date.now() + 540;
+        var iface = container.find("#towtruck-interface");
+        var start = iface.offset();
+        var pos = $(TowTruck.startTarget).offset();
+        pos.top = Math.floor(pos.top - start.top);
+        pos.left = Math.floor(pos.left - start.left);
+        var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
+        iface.css({
+          MozTransform: translate,
+          WebkitTransform: translate,
+          transform: translate
+        });
+        console.log("style", iface.attr("style"));
+        setTimeout(function () {
+          // We keep recalculating because the setTimeout times aren't always so accurate:
+          finishedAt = Date.now() + 520;
+          iface.css({
+            MozTransition: "-moz-transform 0.5s ease-out",
+            MozTransform: "translate(0, 0)",
+            WebkitTransition: "-webkit-transform 0.5s ease-out",
+            WebkitTransform: "translate(0, 0)",
+            transition: "transform 0.5s ease-out",
+            transform: "translate(0, 0)"
+          });
+          console.log("style2", iface.attr("style"));
+          setTimeout(function () {
+            finishedAt = null;
+            iface.attr("style", "");
+          }, 510);
+        }, 5);
+      }, 5);
     }
   };
 
@@ -295,7 +338,14 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       starterButton.text("End TowTruck Session");
     }
 
-    session.emit("ui-ready");
+    if (finishedAt && finishedAt > Date.now()) {
+      setTimeout(function () {
+        finishedAt = null;
+        session.emit("ui-ready");
+      }, finishedAt - Date.now());
+    } else {
+      session.emit("ui-ready");
+    }
 
   };
 

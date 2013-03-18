@@ -4,7 +4,7 @@
 
 $(function () {
   $("#start-towtruck").click(function () {
-    TowTruck(function () {
+    TowTruck(this, function () {
       var session = require({context: "towtruck"})("session");
       session.on("shareId", function () {
         var other;

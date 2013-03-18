@@ -54,6 +54,17 @@
         doneCallback = event;
       }
     }
+    TowTruck.startTarget = null;
+    if (event && typeof event == "object") {
+      if (event.target && typeof event) {
+        TowTruck.startTarget = event.target;
+      } else if (event.nodeType == 1) {
+        TowTruck.startTarget = event;
+      } else if (event[0] && event[0].nodeType == 1) {
+        // Probably a jQuery element
+        TowTruck.startTarget = event[0];
+      }
+    }
     if (window.TowTruckConfig && (! window.TowTruckConfig.loaded)) {
       TowTruck.config(window.TowTruckConfig);
       window.TowTruckConfig.loaded = true;
