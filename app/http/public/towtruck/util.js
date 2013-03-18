@@ -67,12 +67,15 @@ define([], function () {
     return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
   };
 
-  util.AssertionError = function (msg) {
-    this.message = msg;
-    this.toString = function () {
+  util.AssertionError = util.Class({
+    constructor: function (msg) {
+      this.message = msg;
+    },
+
+    toString: function () {
       return "Assertion error: " + (this.message || "?");
-    };
-  };
+    }
+  });
 
   util.assert = function (cond) {
     if (! cond) {
@@ -112,6 +115,13 @@ define([], function () {
         this._listeners[name] = [];
       }
       this._listeners[name].push(callback);
+    };
+    proto.once = function once(name, callback) {
+      function onceCallback() {
+        callback.apply(this, arguments);
+        this.off(name, onceCallback);
+      }
+      this.on(name, onceCallback);
     };
     proto.off = proto.removeListener = function off(name, callback) {
       if (name.search(" ") != -1) {
