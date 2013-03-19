@@ -13,6 +13,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   var BUTTON_HEIGHT = 48;
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
+  // Time the new user window sticks around until it fades away:
+  var NEW_USER_FADE_TIMEOUT = 5000;
   // This is set when an animation will keep the UI from being ready
   // (until this time):
   var finishedAt = null;
@@ -649,6 +651,27 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       }
     },
 
+    notifyNewUser: function () {
+      var el = ui.cloneTemplate("new-user");
+      ui.setPerson(el, this.clientId);
+      el.find(".towtruck-dismiss").click(function () {
+        el.remove();
+      });
+      ui.container.append(el);
+      ui.bindWindow(el, this.element);
+      setTimeout(function () {
+        el.css({
+          MozTransition: "opacity 1s",
+          WebkitTransition: "opacity 1s",
+          transition: "opacity 1s",
+          opacity: "0"
+        });
+        setTimeout(function () {
+          el.remove();
+        }, 1000);
+      }, NEW_USER_FADE_TIMEOUT);
+    },
+
     click: function () {
       if (this._urlChangeElement) {
         this._urlChangeElement.show();
@@ -667,6 +690,14 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       $window.scrollTop(height);
     }
 
+  });
+
+  session.hub.on("hello", function (msg) {
+    console.log("Got hello", msg.starting, ui.Peer.get(msg.clientId));
+    if (msg.starting) {
+      var uiPeer = ui.Peer.get(msg.clientId);
+      uiPeer.notifyNewUser();
+    }
   });
 
   ui.Peer._peers = {};

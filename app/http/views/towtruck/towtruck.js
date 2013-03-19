@@ -211,6 +211,7 @@
   var m = /&?towtruck=([^&]*)/.exec(hash);
   if (m) {
     TowTruck._shareId = m[1];
+    TowTruck._sessionStarting = true;
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }

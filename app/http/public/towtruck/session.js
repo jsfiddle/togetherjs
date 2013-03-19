@@ -287,6 +287,9 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
     }
+    if (TowTruck._sessionStarting) {
+      msg.starting = true;
+    }
     session.send(msg);
   }
 

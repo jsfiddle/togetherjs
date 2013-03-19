@@ -183,6 +183,8 @@
   </div>
 
   <div style="display: none">
+
+    <!-- User went to new URL: -->
     <div id="towtruck-template-url-change-popup" class="towtruck-popup towtruck-url-change-popup">
       <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
       <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
@@ -195,13 +197,26 @@
         <a href="#" class="towtruck-ignore">Not now</a>
       </p>
     </div>
+
+    <!-- New user notification: -->
+    <div id="towtruck-template-new-user"
+         class="towtruck-popup">
+      <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
+	  <p class="towtruck-snippet">
+        <span class="towtruck-person" style="padding:0px"></span> has joined!
+      </p>
+      <p class="towtruck-notify-btns">
+        <button class="towtruck-dismiss">OK</button>
+      </p>
+    </div>
+
   </div>
 
   <audio id="towtruck-audio-element"></audio>
 
   <!-- The intro screen for someone who joins a session the first time: -->
   <div id="towtruck-intro" class="towtruck-modal" style="display: none">
-    <header>Welcome to TowTruck!</header>
+    <header class="towtruck-title">Welcome to TowTruck!</header>
 
     <p>Your friend has just asked you to join their browser session.</p>
 
