@@ -10,7 +10,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   var chat;
   var $window = $(window);
   // This is also in towtruck.less, as @button-height:
-  var BUTTON_HEIGHT = 40;
+  var BUTTON_HEIGHT = 48;
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
   // This is set when an animation will keep the UI from being ready
