@@ -126,9 +126,9 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     if (el.attr("data-bound-to")) {
       var bound = $("#" + el.attr("data-bound-to"));
       assert(bound.length);
-      bound.addClass("towtruck-animated").addClass("towtruck-pulse");
+      bound.addClass("towtruck-animated").addClass("towtruck-color-pulse");
       setTimeout(function () {
-        bound.removeClass("towtruck-pulse").removeClass("towtruck-animated");
+        bound.removeClass("towtruck-color-pulse").removeClass("towtruck-animated");
       }, ANIMATION_DURATION+10);
     }
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();

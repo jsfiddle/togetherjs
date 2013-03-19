@@ -742,7 +742,7 @@
 
         header.towtruck-title {
 			font-size: 13px;
-			font-style: bold;
+			font-weight: bold;
 			font-variant: normal;
             text-align: center;
 			text-transform:uppercase;
@@ -984,7 +984,7 @@
 		}
 
 		.towtruck-avatar {
-			 float:left:
+			 float:left;
 			 padding:10px 10px 10px;
 			 margin:32px 3px 10px 23px;
 		}
@@ -1326,4 +1326,31 @@
 	   -moz-animation-fill-mode: both;
 	     -o-animation-fill-mode: both;
 	        animation-fill-mode: both;
+}
+
+@-webkit-keyframes towtruck-color-pulse {
+    0% {box-shadow: none;}
+    50% {box-shadow: 0 0 10px #0095dd;}
+    100% {box-shadow: none;}
+}
+@-moz-keyframes towtruck-color-pulse {
+    0% {box-shadow: none;}
+    50% {box-shadow: 0 0 10px #0095dd;}
+    100% {box-shadow: none;}
+}
+@-o-keyframes towtruck-color-pulse {
+    0% {box-shadow: none;}
+    50% {box-shadow: 0 0 10px #0095dd;}
+    100% {box-shadow: none;}
+}
+@keyframes towtruck-color-pulse {
+    0% {box-shadow: none;}
+    50% {box-shadow: 0 0 10px #0095dd;}
+    100% {box-shadow: none;}
+}
+.towtruck-color-pulse {
+    -webkit-animation-name: towtruck-color-pulse;
+    -moz-animation-name: towtruck-color-pulse;
+    -o-animation-name: towtruck-color-pulse;
+    animation-name: towtruck-color-pulse;
 }
