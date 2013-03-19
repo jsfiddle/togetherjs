@@ -54,7 +54,8 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
           text: l.text,
           date: l.date,
           clientId: l.clientId,
-          messageId: l.messageId
+          messageId: l.messageId,
+          catchup: true
         });
       }
     }
@@ -341,7 +342,8 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
         text: l.text,
         date: l.date,
         clientId: l.clientId,
-        messageId: l.messageId
+        messageId: l.messageId,
+        catchup: true
       });
     }
     // Re-load a partial playback:

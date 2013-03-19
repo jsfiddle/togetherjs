@@ -424,7 +424,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         .attr("data-date", msg.date || Date.now());
       setDate(el, msg.date || Date.now());
       assert(msg.messageId);
-      addEl(el, msg.messageId, msg.clientId == session.clientId);
+      addEl(el, msg.messageId, msg.clientId == session.clientId || msg.catchup);
     } else if (msg.type == "left-session") {
       nick = session.peers.get(msg.clientId).nickname;
       el = ui.cloneTemplate("chat-left");
