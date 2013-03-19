@@ -58,7 +58,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   ui.displayWindow = function (el) {
     el = $(el);
     assert(el.length);
-    $(".towtruck-window, .towtruck-popup").hide();
+    hideWindow(".towtruck-window, .towtruck-popup");
     el.show();
     ui.bindWindow(el);
     session.emit("display-window", el.attr("id"), el);
@@ -118,12 +118,14 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   };
 
   function hideWindow(el) {
-    el = $(el);
+    if (! el) {
+      el = ".towtruck-window, .towtruck-popup";
+    }
+    el = $(el).filter(":visible");
     el.hide();
     if (el.attr("data-bound-to")) {
       var bound = $("#" + el.attr("data-bound-to"));
       assert(bound.length);
-      console.log("adding pulse", bound[0]);
       bound.addClass("towtruck-animated").addClass("towtruck-pulse");
       setTimeout(function () {
         bound.removeClass("towtruck-pulse").removeClass("towtruck-animated");
@@ -141,6 +143,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   }
 
+  /* Finds any links in the text of an element (or its children) and turns them
+     into anchors (with target=_blank) */
   function linkify(el) {
     if (el.jquery) {
       el = el[0];
@@ -172,7 +176,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
               break;
             }
             var leadingNode = document.createTextNode(text.substr(0, match.index));
-            console.log("replacing", item, leadingNode);
             node.replaceChild(leadingNode, item);
             var anchor = document.createElement("a");
             anchor.setAttribute("target", "_blank");
@@ -228,7 +231,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
           WebkitTransform: translate,
           transform: translate
         });
-        console.log("style", iface.attr("style"));
         setTimeout(function () {
           // We keep recalculating because the setTimeout times aren't always so accurate:
           finishedAt = Date.now() + 520;
@@ -240,7 +242,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
             transition: "transform 0.5s ease-out",
             transform: "translate(0, 0)"
           });
-          console.log("style2", iface.attr("style"));
           setTimeout(function () {
             finishedAt = null;
             iface.attr("style", "");
@@ -701,14 +702,16 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     },
 
     notifyNewUser: function () {
+      hideWindow();
       var el = ui.cloneTemplate("new-user");
       ui.setPerson(el, this.clientId);
       el.find(".towtruck-dismiss").click(function () {
-        el.remove();
+        hideWindow(el);
       });
       ui.container.append(el);
       ui.bindWindow(el, this.element);
       setTimeout(function () {
+        // FIXME: also set opacity of towtruck-window-pointer-left/right?
         el.css({
           MozTransition: "opacity 1s",
           WebkitTransition: "opacity 1s",
@@ -716,7 +719,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
           opacity: "0"
         });
         setTimeout(function () {
-          el.remove();
+          hideWindow(el);
         }, 1000);
       }, NEW_USER_FADE_TIMEOUT);
     },
@@ -735,14 +738,12 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         height = elementFinder.pixelForPosition(status.scrollPosition);
       }
       // FIXME: this should animate the scrolling
-      console.log("scroll to", status.scrollPosition, height);
       $window.scrollTop(height);
     }
 
   });
 
   session.hub.on("hello", function (msg) {
-    console.log("Got hello", msg.starting, ui.Peer.get(msg.clientId));
     if (msg.starting) {
       var uiPeer = ui.Peer.get(msg.clientId);
       uiPeer.notifyNewUser();
