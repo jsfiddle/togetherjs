@@ -141,6 +141,54 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   }
 
+  function linkify(el) {
+    if (el.jquery) {
+      el = el[0];
+    }
+    el.normalize();
+    function linkifyNode(node) {
+      var _len = node.childNodes.length;
+      for (var i=0; i<_len; i++) {
+        if (node.childNodes[i].nodeType == document.ELEMENT_NODE) {
+          linkifyNode(node.childNodes[i]);
+        }
+      }
+      var texts = [];
+      for (i=0; i<_len; i++) {
+        if (node.childNodes[i].nodeType == document.TEXT_NODE) {
+          texts.push(node.childNodes[i]);
+        }
+      }
+      texts.forEach(function (item) {
+        if (item.nodeType == document.ELEMENT_NODE) {
+          linkifyNode(item);
+        } else if (item.nodeType == document.TEXT_NODE) {
+          while (true) {
+            var text = item.nodeValue;
+            // FIXME: should we
+            var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^<>()\[\]]*/i;
+            var match = regex.exec(text);
+            if (! match) {
+              break;
+            }
+            var leadingNode = document.createTextNode(text.substr(0, match.index));
+            console.log("replacing", item, leadingNode);
+            node.replaceChild(leadingNode, item);
+            var anchor = document.createElement("a");
+            anchor.setAttribute("target", "_blank");
+            anchor.href = match[0];
+            anchor.appendChild(document.createTextNode(match[0]));
+            node.insertBefore(anchor, leadingNode.nextSibling);
+            var trailing = document.createTextNode(text.substr(match.index + match[0].length));
+            node.insertBefore(trailing, anchor.nextSibling);
+            item = trailing;
+          }
+        }
+      });
+    }
+    linkifyNode(el);
+  }
+
   ui.container = null;
 
   // This is called before activateUI; it doesn't bind anything, but does display
@@ -422,6 +470,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       el = ui.cloneTemplate("chat-message");
       ui.setPerson(el, msg.clientId);
       el.find(".towtruck-chat-content").text(msg.text);
+      linkify(el.find(".towtruck-chat-content"));
       el.attr("data-person", msg.clientId)
         .attr("data-date", msg.date || Date.now());
       setDate(el, msg.date || Date.now());
