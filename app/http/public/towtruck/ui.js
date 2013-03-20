@@ -58,7 +58,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   ui.displayWindow = function (el) {
     el = $(el);
     assert(el.length);
-    hideWindow(".towtruck-window, .towtruck-popup");
+    ui.hideWindow(".towtruck-window, .towtruck-popup");
     el.show();
     ui.bindWindow(el);
     session.emit("display-window", el.attr("id"), el);
@@ -117,7 +117,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   };
 
-  function hideWindow(el) {
+  ui.hideWindow = function (el) {
     if (! el) {
       el = ".towtruck-window, .towtruck-popup";
     }
@@ -132,12 +132,12 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       }, ANIMATION_DURATION+10);
     }
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-  }
+  };
 
   function toggleWindow(el) {
     el = $(el);
     if (el.is(":visible")) {
-      hideWindow(el);
+      ui.hideWindow(el);
     } else {
       ui.displayWindow(el);
     }
@@ -297,7 +297,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         input.val("");
       }
       if (event.which == 27) { // Escape
-        hideWindow("#towtruck-chat");
+        ui.hideWindow("#towtruck-chat");
       }
       return false;
     });
@@ -355,7 +355,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     });
 
     $("#towtruck-cancel-end-session").click(function () {
-      hideWindow("#towtruck-about");
+      ui.hideWindow("#towtruck-about");
     });
 
     $("#towtruck-chat-button").click(function () {
@@ -370,7 +370,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
 
     container.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
       var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
-      hideWindow(w);
+      ui.hideWindow(w);
       event.stopPropagation();
       return false;
     });
@@ -386,7 +386,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       var button = $('<button class="towtruck-minimize"></button>');
       button.click(function (event) {
         var window = button.closest(".towtruck-window");
-        hideWindow(window);
+        ui.hideWindow(window);
       });
       $(item).append(button);
     });
@@ -401,6 +401,13 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     if (avatar) {
       $("#towtruck-self-avatar").attr("src", avatar);
     }
+
+    $("#towtruck-help").click(function () {
+      require(["walkthrough"], function (walkthrough) {
+        ui.hideWindow();
+        walkthrough.start();
+      });
+    });
 
     var starterButton = $("#towtruck-starter button");
     starterButton.click(function () {
@@ -708,11 +715,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     },
 
     notifyNewUser: function () {
-      hideWindow();
+      ui.hideWindow();
       var el = ui.cloneTemplate("new-user");
       ui.setPerson(el, this.clientId);
       el.find(".towtruck-dismiss").click(function () {
-        hideWindow(el);
+        ui.hideWindow(el);
       });
       ui.container.append(el);
       ui.bindWindow(el, this.element);
@@ -725,7 +732,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
           opacity: "0"
         });
         setTimeout(function () {
-          hideWindow(el);
+          ui.hideWindow(el);
         }, 1000);
       }, NEW_USER_FADE_TIMEOUT);
     },
