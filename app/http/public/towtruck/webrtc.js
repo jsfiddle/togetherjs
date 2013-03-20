@@ -13,7 +13,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
                             window.webkitRTCPeerConnection ||
                             window.RTCPeerConnection);
 
-  var URL = window.URL || window.webkitURL;
+  var URL = window.webkitURL || window.URL;
   var RTCSessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
 
   function makePeerConnection() {
@@ -28,7 +28,10 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     if (window.mozRTCPeerConnection) {
       return new mozRTCPeerConnection({
         "iceServers": [{"url": "stun:23.21.150.121"}]
-      }, {"optional": []});
+      }, {
+        "optional": [],
+        'mandatory': {'MozDontOfferDataChannel':true}
+      });
     }
     throw AssertionError("Called makePeerConnection() without supported connection");
   }
@@ -288,6 +291,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       };
       _connection.onstatechange = function () {
         // FIXME: this doesn't seem to work:
+        // Actually just doesn't work on Firefox
         console.log("state change", _connection.readyState);
         if (_connection.readyState == "closed") {
           ui.displayToggle("#towtruck-audio-ready");
