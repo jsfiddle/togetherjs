@@ -205,7 +205,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     assert(container.length);
     $("body").append(container);
     var seenDialog = session.settings.get("seenIntroDialog");
-    if (seenDialog == "force" || (session.isClient && ! seenDialog)) {
+    var seenAlpha = session.settings.get("seenAlphaIntro");
+    if (! seenAlpha) {
+      session.settings.set("seenAlphaIntro", true);
+      modal.showModal("#towtruck-alpha-intro");
+    } else if (seenDialog == "force" || (session.isClient && ! seenDialog)) {
       if (! seenDialog) {
         session.settings.set("seenIntroDialog", true);
       }
