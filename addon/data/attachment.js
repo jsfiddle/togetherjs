@@ -5,7 +5,7 @@
 self.port.on("Config", function (config) {
   var doc = unsafeWindow.document;
   unsafeWindow._TowTruckBookmarklet = true;
-  unsafeWindow.TowTruck = {hubBase: config.hubBase || null};
+  unsafeWindow.TowTruckConfig_hubBase = config.hubBase;
   if (config.shareId) {
     unsafeWindow._TowTruckShareId = config.shareId;
   }
