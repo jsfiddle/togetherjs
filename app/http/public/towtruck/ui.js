@@ -260,6 +260,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     // The share link:
     container.find("#towtruck-share-link").click(function () {
       $(this).select();
+    }).change(function () {
+      updateShareLink();
     });
     session.on("shareId", updateShareLink);
     updateShareLink();
