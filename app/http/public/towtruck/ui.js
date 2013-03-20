@@ -382,6 +382,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         var window = button.closest(".towtruck-window");
         hideWindow(window);
       });
+	  button.hover(function(){
+		// FIX ME Create a hover effect on the minimize button
+		// button.replaceWith('<button class="towtruck-minimize"><img src="' + TowTruck.baseUrl + '/images/icn-minimize-active.png"></button>');
+	  });
       $(item).append(button);
     });
 

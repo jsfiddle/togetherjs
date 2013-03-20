@@ -129,15 +129,17 @@ ul.nav a:hover{
 
 
 h1.main-header {
-	font-size:50px;font-weight:300;line-height:1;letter-spacing:-2.3px;margin:50px 0px;font-family:openSansLight;
+	color: rgb(72, 72, 72);
+	font-size:48px;font-weight:100;line-height:1;letter-spacing:-2.3px;margin:50px 0px;font-family:openSansLight;
 }
 
 h2.subheader {
-	padding-top:20px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-0.25px;line-height:100%;
+	padding-top:20px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-1px;
+	color:rgb(72, 72, 72);
 }
 
 p.main-text {
-	font-size:14px;line-height:1.5;font-family:openSansLight;letter-spacing:0px;
+	font-size:14px;line-height:1.5;font-family:openSansRegular;letter-spacing:-0.5px;color:rgb(72, 72, 72); padding:10px;
 }
 
 #introduction {
@@ -225,23 +227,8 @@ p.main-text {
   padding:50px 0px 0px;
 }
 
-#how_it_works h1 {
-  margin-bottom: 2em;
-  color:rgb(72,72,72);font-size:50px;font-weight:300;line-height:1;letter-spacing:-2.3px;margin:50px 0px;font-family:openSansLight;
-}
-
-#how_it_works h2 {
-	color:rgb(72, 72, 72);padding-top:20px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-0.25px;line-height:100%;
-}
-
 #how_it_works .carousel-indicators img {
 	position:relative;top:-3px;left:0px;height:30px;
-}
-
-#how_it_works p {
-	color:rgb(72, 72, 72);
-	padding-left:40px;
-	font-size:14px;line-height:1.5;font-family:openSansLight;letter-spacing:0px;
 }
 
 #how_it_works ol{
@@ -309,10 +296,6 @@ p.main-text {
 	text-align:center;
 }
 
-#features p {
-  margin-top:10px;
-}
-
 #features img.main-img {
   width:360px;
 }
@@ -330,7 +313,6 @@ p.main-text {
 }
 #how_to_install h2 {
   margin-left: 1.2em;
-  line-height: 1.6em;
 }
 #how_to_install img.install-img {
 	border-radius:2px;box-shadow:0px 1px 1px rgba(0,0,0,0.2);
@@ -340,7 +322,7 @@ p.main-text {
 	height:30px;
 }
 #how_to_install .subheader {
-	margin:10px;
+	margin:0px 10px 0px 10px;
 	height:45px;
 }
 
@@ -358,6 +340,7 @@ input.copy-input {
 	width:450px;
 	background:rgba(72,72,72,1);
 	color:#fff;
+	font-size:12px;
 }
 
 footer {

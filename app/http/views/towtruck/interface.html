@@ -53,7 +53,7 @@
       SETTINGS
     </header>
     <section>
-	      <p>
+	      <p class="towtruck-about-txt">
 	        Send this link to a friend
 	      </p>
 		<div id="towtruck-share-link-box">
@@ -61,7 +61,7 @@
 	        <input type="text" id="towtruck-share-link">
 	      </p>
 		</div>
-	      <p>
+	      <p class="towtruck-about-txt-bottom">
 	        Set up your profile
 	      </p>
 		<div id="towtruck-setup-profile-box" data-toggles="#towtruck-avatar-edit">
@@ -78,11 +78,11 @@
 		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
 		<div class="towtruck-bottom-panel">
 	      <p>
-			<button id="towtruck-end-session">END TOWTRUCK</button>
+			<button id="towtruck-end-session">End TowTruck</button>
 	        <!-- <button id="towtruck-cancel-end-session">Continue session</button> -->
 	      </p>
 		  <p class="small">
-	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.
+	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.  Please give us feedback <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">here</a>, thanks!
 	      </p>
 		</div>
     </section>
@@ -140,17 +140,17 @@
   <div id="towtruck-rtc-info" class="towtruck-window"
        data-bound-to="towtruck-audio-button"
        style="display: none">
-    <header class="towtruck-title">Audio activated</header>
-
-    <p>The live audio chat feature is based on an experimental browser feature.
-      <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">Read more about this technology (opens in a new window)</a>
+    <header class="towtruck-title">Audio Chat</header>
+	<p>Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up"></p>
+    <p>Talking on your microphone through your web browser is an experimental feature.</p>
+	<p>Read more about Audio Chat <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
     </p>
 
-    <div>
-      <button class="towtruck-dismiss" type="button">OK</button>
+    <div id="towtruck-rtc-dialog-btn">
+      <button class="towtruck-dismiss" type="button">Close</button>
       <label for="towtruck-rtc-info-dismiss" style="display: inline">
         <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
-        don't show again
+        Don't show again.
       </label>
     </div>
 
