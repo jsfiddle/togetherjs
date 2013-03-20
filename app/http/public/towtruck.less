@@ -203,7 +203,7 @@
 }
 
 .box-dropshadow() {
-    .box-shadow(0px 1px 2px rgba(0,0,0,0.3));
+    .box-shadow(0px 1px 2px rgba(0,0,0,0.5));
 }
 
 .rounded-corners() {
@@ -455,6 +455,7 @@
     #towtruck-buttons .towtruck-button {
         .button-reset;
 		position:relative;
+		-webkit-padding-start: 2px;
 		left:-1px;
         width: @button-width+12;
         height: @button-height+8;
@@ -515,6 +516,7 @@
 		background-size:40px 40px;
 		background-repeat:no-repeat;
 		background-position:center;
+		width:52px;
 	}
 
 	#towtruck-buttons #towtruck-chat-button:hover {
@@ -655,7 +657,7 @@
 		width:320px;
 		position:relative;
 		left:-10px;
-		background:#fff;
+		background:#f2f4f5;
 	}
 
     .towtruck-chat-message {
@@ -895,12 +897,25 @@
             font-weight: bold;
 			margin-right:-5px;
 			cursor:pointer;
+			background-image:url('/images/icn-close-btn.png');
+			background-size:13px 13px;
+			width:13px;
+			height:13px;
+			margin-top:1px;
         }
 
-		.towtruck-minimize img {
+		button.towtruck-minimize:hover {
+            .button-reset;
+            float: right;
+            font-weight: bold;
+			margin-right:-5px;
+			cursor:pointer;
+			background-image:url('/images/icn-close-btn-active.png');
+			background-size:13px 13px;
 			width:13px;
-			height:3px;
-		}
+			height:13px;
+			margin-top:1px;
+        }
 
         #towtruck-chat-messages {
             overflow-y: auto;
@@ -1377,22 +1392,22 @@
 
 @-webkit-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @-moz-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @-o-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 .towtruck-color-pulse {

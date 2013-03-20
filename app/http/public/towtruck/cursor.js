@@ -229,6 +229,12 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     context.lineTo(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2,
                    Math.cos(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2);
     context.lineTo(0, 0);
+    context.shadowColor = 'rgba(0,0,0,0.3)';
+    context.shadowBlur = 2;
+    context.shadowOffsetX = 1;
+    context.shadowOffsetY = 2;
+	context.strokeStyle = "#ffffff";
+	context.stroke();
     context.fill();
     return canvas[0].toDataURL("image/png");
   }
