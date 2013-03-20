@@ -315,7 +315,8 @@ p.main-text {
   margin-left: 1.2em;
 }
 #how_to_install img.install-img {
-	border-radius:2px;box-shadow:0px 1px 1px rgba(0,0,0,0.2);
+	height:250px;
+	/*border-radius:2px;box-shadow:0px 1px 1px rgba(0,0,0,0.2);*/
 }
 #how_to_install h2 img {
 	position:relative;top:-3px;left:0px;
