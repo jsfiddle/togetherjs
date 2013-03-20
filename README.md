@@ -4,7 +4,11 @@ TowTruck - Who you call when you get stuck
 What is TowTruck?
 -----------------
 
-TowTruck is a real-time collaboration service for web sites and applications.  Using TowTruck two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TowTruck service is included by the web site owner, and a web site can customize and configure aspects of TowTruck's behavior on the site.
+TowTruck is a service for your website that makes it surprisingly easy to collaborate in real-time. 
+
+Using TowTruck two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TowTruck service is included by the web site owner, and a web site can customize and configure aspects of TowTruck's behavior on the site.
+
+For more information and to see TowTruck in action, visit http://towtruck.mozillalabs.com/
 
 Using TowTruck On Your Site
 ---------------------------
