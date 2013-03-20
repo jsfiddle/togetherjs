@@ -379,15 +379,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     });
 
     $(".towtruck header.towtruck-title").each(function (index, item) {
-      var button = $('<button class="towtruck-minimize"><img src="' + TowTruck.baseUrl + '/images/icn-minimize.png"></button>');
+      var button = $('<button class="towtruck-minimize"></button>');
       button.click(function (event) {
         var window = button.closest(".towtruck-window");
         hideWindow(window);
       });
-	  button.hover(function(){
-		// FIX ME Create a hover effect on the minimize button
-		// button.replaceWith('<button class="towtruck-minimize"><img src="' + TowTruck.baseUrl + '/images/icn-minimize-active.png"></button>');
-	  });
       $(item).append(button);
     });
 
