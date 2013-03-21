@@ -9,13 +9,14 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
-    buttons: [{name: "Back"}, {name: "Next"}, {name: "Close"}],
+    buttons: [{name: "Back"}, {name: "Next"}, {name: "Okay, I get it!"}],
     // This is assigned to the first item.buttons in the guide:
-    firstButtons: [{name: "Next"}, {name: "Close"}],
+    firstButtons: [{name: "Next"}, {name: "Okay, I get it!"}],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Back"}, {name: "Close"}],
+    lastButtons: [{name: "Cool, let's get started!"}],
     position: 9,
-    xButton: true,
+	overlay: true,
+	width:300,
     closeOnEscape: true
   };
 
@@ -23,41 +24,24 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   //   https://github.com/jeff-optimizely/Guiders-JS
   var guide = [
 	{
-	  attachTo: "#towtruck-about",
-	  overlay: true,
-      title: "Settings",
-      description: "In this panel, you can 1) Send a link to a friend to start the session 2) Set up your profile 3) End the TowTruck session",
-	    onShow: function () {
-	      ui.displayWindow("#towtruck-about");
-	    },
-	    onHide: function () {
-	      ui.hideWindow();
-	    }
+	  attachTo: "#towtruck-about-button",
+      title: "Set up TowTruck",
+      description: "Click here to <ol><li>Send a link to your friend to start the TowTruck session</li><li>Set up your profile</li><li>End the TowTruck session</li></ol>"
     },
     {
       attachTo: "#towtruck-audio-button",
-      title: "Audio",
-	  overlay: true,
-      description: "If your browser supports it, you can live audio chat with your friend over the browser!  Magic!"
+      title: "Talk in real-time",
+      description: "If your browser supports it, you can audio chat live with your friend over the browser just like...magic!"
     },
     {
-	  attachTo: "#towtruck-chat",
-      title: "Chat",
-	  overlay: true,
-      description: "You know how this works :)",
-	    onShow: function () {
-	      ui.displayWindow("#towtruck-chat");
-	    },
-	    onHide: function () {
-	      ui.hideWindow();
-	    }
+      attachTo: "#towtruck-chat-button",
+      title: "Chat with friends",
+      description: "You know how this works :)"
     },
 	{
       attachTo: "#towtruck-anchor",
-      title: "Move",
-	  overlay: true,
-	  position:1,
-      description: "You can move the dock"
+      title: "Move the dock",
+      description: "You can move the dock to the right or left side of the browser.<p>Ready to start?</p>"
     }
   ];
 
