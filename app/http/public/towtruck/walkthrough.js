@@ -22,26 +22,42 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // See here for information about the options for Guiders:
   //   https://github.com/jeff-optimizely/Guiders-JS
   var guide = [
-    {
-      attachTo: "#towtruck-about-button",
-      title: "The big button",
-      description: "Open this button to see some options"
+	{
+	  attachTo: "#towtruck-about",
+	  overlay: true,
+      title: "Settings",
+      description: "In this panel, you can 1) Send a link to a friend to start the session 2) Set up your profile 3) End the TowTruck session",
+	    onShow: function () {
+	      ui.displayWindow("#towtruck-about");
+	    },
+	    onHide: function () {
+	      ui.hideWindow();
+	    }
     },
     {
       attachTo: "#towtruck-audio-button",
       title: "Audio",
-      description: "If your browser supports it, you can live chat with the other person"
+	  overlay: true,
+      description: "If your browser supports it, you can live audio chat with your friend over the browser!  Magic!"
     },
     {
-      attachTo: "#towtruck-about",
-      title: "Settings",
-      description: "Here you can set your name and stuff",
-      onShow: function () {
-        ui.displayWindow("#towtruck-about");
-      },
-      onHide: function () {
-        ui.hideWindow();
-      }
+	  attachTo: "#towtruck-chat",
+      title: "Chat",
+	  overlay: true,
+      description: "You know how this works :)",
+	    onShow: function () {
+	      ui.displayWindow("#towtruck-chat");
+	    },
+	    onHide: function () {
+	      ui.hideWindow();
+	    }
+    },
+	{
+      attachTo: "#towtruck-anchor",
+      title: "Move",
+	  overlay: true,
+	  position:1,
+      description: "You can move the dock"
     }
   ];
 
