@@ -5,10 +5,10 @@
     <div id="towtruck-anchor">
       <!-- FIXME: replace this with dots: -->
       <span id="towtruck-anchor-horizontal">
-        <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
+        <img src="http://localhost:8080/images/icn-handle-circle.png" alt="drag"><img src="http://localhost:8080/images/icn-handle-circle.png" alt=""><img src="http://localhost:8080/images/icn-handle-circle.png" alt="">
       </span>
       <span id="towtruck-anchor-vertical">
-        <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
+        <img src="http://localhost:8080/images/icn-handle-circle.png" alt="drag"><img src="http://localhost:8080/images/icn-handle-circle.png" alt=""><img src="http://localhost:8080/images/icn-handle-circle.png" alt="">
       </span>
     </div>
     <div id="towtruck-buttons">
@@ -21,23 +21,22 @@
       <button id="towtruck-about-button" class="towtruck-button">
       </button>
       <button id="towtruck-audio-button" class="towtruck-button">
-        <div id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
-        </div>
-        <div id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
+        <span id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
+        </span>
+        <span id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
       </button>
-      <button id="towtruck-chat-button" class="towtruck-button"><div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-      </div>
+      <button id="towtruck-chat-button" class="towtruck-button">
       </button>
       <div id="towtruck-dock-participants">
       </div>
@@ -78,7 +77,7 @@
 
 		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
 		<div class="towtruck-bottom-panel">
-		  <p><hr></p>
+		  <hr>
 	      <p>
 			<button id="towtruck-end-session">End TowTruck</button>
 	        <!-- <button id="towtruck-cancel-end-session">Continue session</button> -->
@@ -142,13 +141,20 @@
   <div id="towtruck-rtc-info" class="towtruck-window"
        data-bound-to="towtruck-audio-button"
        style="display: none">
-    <header class="towtruck-title">Audio Chat</header>
-	<p>Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up"></p>
-    <p>Talking on your microphone through your web browser is an experimental feature.</p>
-	<p>Read more about Audio Chat <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
+    <header class="towtruck-title">
+      Audio Chat
+    </header>
+	<p>
+      Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+    </p>
+    <p>
+      Talking on your microphone through your web browser is an experimental feature.
+    </p>
+	<p>
+      Read more about Audio Chat <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
     </p>
 
-    <div id="towtruck-rtc-dialog-btn">
+    <div class="towtruck-rtc-dialog-btn">
       <button class="towtruck-dismiss" type="button">Close</button>
       <label for="towtruck-rtc-info-dismiss" style="display: inline">
         <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
@@ -175,7 +181,7 @@
       target="_blank">page</a> for more information and a list of supported browsers.
     </p>
 
-    <div id="towtruck-rtc-dialog-btn">
+    <div class="towtruck-rtc-dialog-btn">
       <button class="towtruck-dismiss" type="button">Close</button>
     </div>
   </div>
@@ -184,7 +190,7 @@
   <div id="towtruck-chat-notifier" class="towtruck-popup"
        data-bound-to="towtruck-chat-button"
        style="display: none">
-    <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
+    <div class="towtruck-close"><img src="/images/icn-close-btn.png" alt="close"></div>
     <section id="towtruck-chat-notifier-message">
     </section>
   </div>
@@ -241,7 +247,7 @@
 	<p class="towtruck-img-alpha"><img src="/images/img-logo-alpha.png" alt="Alpha Logo"></p>
 
 	<p>Thanks for checking out the <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a> Alpha Preview!  We'd very much appreciate feedback* <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">here</a>.</p>
-		
+
 	<p class="towtruck-small-feedback-txt">*You can also find the <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">feedback</a> link in "Settings."</p>
 
 	<p><button class="towtruck-modal-close">Continue</button></p>
@@ -261,7 +267,7 @@
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor"
          class="towtruck-cursor towtruck">
-      <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png">
+      <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png" alt="cursor">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
         <span style="display:none" class="towtruck-cursor-typing">...</span>
