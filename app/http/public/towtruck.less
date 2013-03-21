@@ -1074,6 +1074,11 @@
 	#towtruck-rtc-info p{
 		padding:10px 10px 0px 10px;
 	}
+	
+	#towtruck-rtc-info input#towtruck-rtc-info-dismiss {
+		margin-top:-2px;
+		background:red;
+	}
 
 	#towtruck-rtc-info img.towtruck-arrow-up {
 		width:13px;
@@ -1116,6 +1121,12 @@
 		border:1px solid rgba(0,0,0,0.1);
 		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
 		width:300px;
+		padding-left:5px;
+	}
+	
+	#towtruck-chat-notifier .towtruck-avatar {
+		margin-top:10px;
+		padding:0px;
 	}
 
 	#towtruck-chat-notifier .towtruck-chat-message {
@@ -1138,16 +1149,30 @@
 	#towtruck-chat-notifier-message {
 		box-shadow:0px 0px 0px;
 	}
+	
+	#towtruck-template-new-user {
+		background:rgba(242,244,245,0.9);
+		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
+		border-radius:2px;
+		border:1px solid rgba(0,0,0,0.1);
+		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
+		width:300px;
+	}
+	
 
     .towtruck-popup {
         .towtruck-window;
         width: 340px;
+		background:rgba(242,244,245,0.9);
+		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
+		border-radius:2px;
+		border:1px solid rgba(0,0,0,0.1);
+		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
     }
 
 
     .towtruck-url-change-popup {
 		background:rgba(242,244,245,0.9);
-		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,244,245,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
 		border-radius:2px;
 		border:1px solid rgba(0,0,0,0.1);
 		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -1160,7 +1185,8 @@
 		}
 
 		p.towtruck-snippet {
-			padding-top:28px;
+			padding-top:10px;
+			padding-right:13px;
 		}
 
 		.towtruck-person {
@@ -1170,7 +1196,7 @@
 		.towtruck-avatar {
 			 float:left;
 			 padding:10px 10px 10px;
-			 margin:32px 3px 10px 23px;
+			 margin:10px 3px 10px 10px;
 		}
 
 		.towtruck-close img{
@@ -1195,9 +1221,9 @@
 			display: inline-block;
 			font-size: 12px;
 			vertical-align: middle;
-			width: 25%;
+			width: 27%;
 			padding:8px;
-			margin:10px 5px 20px 12px;
+			margin:0px 5px 20px 12px;
 		}
 		
 		button.towtruck-follow:hover {
@@ -1214,9 +1240,9 @@
 			display: inline-block;
 			font-size: 12px;
 			vertical-align: middle;
-			width: 30%;
+			width: 27%;
 			padding:8px;
-			margin:10px 5px 20px 0px;
+			margin:0px 5px 20px 0px;
 		}
 		
 		button.towtruck-nudge:hover {
@@ -1234,16 +1260,20 @@
 			display: inline-block;
 			text-transform:none;
 			vertical-align: middle;
-			width: 13%;
+			width: 20%;
 			padding:8px;
-			margin:10px 5px 20px 0px;
+			margin:0px 5px 20px 0px;
 		}
 
         .towtruck-follow {
             background-color: #0f0;
             &.towtruck-nudge {
                 // FIXME: add some animation/transition here:
-                font-weight: bold;
+                background-color: #73a729;
+            }
+
+			&.towtruck-nudge:hover {
+                background:#61921b;
             }
         }
     }
