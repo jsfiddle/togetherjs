@@ -13,7 +13,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     // This is assigned to the first item.buttons in the guide:
     firstButtons: [{name: "Next"}, {name: "Okay, I get it!"}],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Cool, let's get started!"}],
+    lastButtons: [{name: "Okay, I get it!"}],
     position: 9,
 	overlay: true,
 	width:300,
@@ -41,7 +41,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
 	{
       attachTo: "#towtruck-anchor",
       title: "Move the dock",
-      description: "You can move the dock to the right or left side of the browser.<p>Ready to start?</p>"
+      description: "Grab here to move the dock to the right or left side of the browser.<br><p>Ready to start?</p>"
     }
   ];
 
