@@ -14,7 +14,9 @@ var button = widgets.Widget({
   label: "Start TowTruck",
   contentURL: data.url("button.html"),
   contentScriptFile: data.url("button.js"),
-  onClick: startTowTruck,
+  onClick: function () {
+    startTowTruck();
+  },
   width: 48
 });
 

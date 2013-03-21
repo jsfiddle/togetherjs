@@ -134,7 +134,7 @@ h1.main-header {
 }
 
 h2.subheader {
-	padding-top:20px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-1px;
+	padding-top:0px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-1px;
 	color:rgb(72, 72, 72);
 }
 
@@ -227,8 +227,13 @@ p.main-text {
   padding:50px 0px 0px;
 }
 
+#how_it_works .span5 {
+	padding-top:50px;
+}
+
 #how_it_works .carousel-indicators img {
-	position:relative;top:-3px;left:0px;height:30px;
+	height:30px;
+	padding-top:5px;
 }
 
 #how_it_works ol{
@@ -238,10 +243,30 @@ p.main-text {
   margin-left: 1em;
 }
 #how_it_works li h2 {
-  line-height: 1.6em;
+  margin:0px;
 }
-#how_it_works #how_it_works_carousel{
+#how_it_works .how_it_works_list_box img{
+	
+}
 
+#how_it_works .how_it_works_list_box p{
+	padding:10px 10px 10px 0px;
+}
+
+.clear {
+	clear:both;
+}
+
+.col-left {
+	float:left;
+	margin:0px 0px 0px 0px;
+}
+
+.col-right {
+	width:90%;
+	margin:0px 0px 0px 10px;
+	padding:0px;
+	float:left;
 }
 
 #how_it_works .towtruck-cursor-img {
@@ -315,11 +340,11 @@ p.main-text {
   margin-left: 1.2em;
 }
 #how_to_install img.install-img {
-	border-radius:2px;box-shadow:0px 1px 1px rgba(0,0,0,0.2);
+	height:250px;
+	padding-bottom:10px;
 }
 #how_to_install h2 img {
 	position:relative;top:-3px;left:0px;
-	height:30px;
 }
 #how_to_install .subheader {
 	margin:0px 10px 0px 10px;
@@ -327,7 +352,7 @@ p.main-text {
 }
 
 #how_to_install .main-text {
-	margin:10px 40px;
+	margin:0px 40px;
 }
 
 input.copy-input {

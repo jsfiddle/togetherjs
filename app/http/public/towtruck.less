@@ -203,7 +203,7 @@
 }
 
 .box-dropshadow() {
-    .box-shadow(0px 1px 2px rgba(0,0,0,0.3));
+    .box-shadow(0px 1px 2px rgba(0,0,0,0.5));
 }
 
 .rounded-corners() {
@@ -455,6 +455,7 @@
     #towtruck-buttons .towtruck-button {
         .button-reset;
 		position:relative;
+		-webkit-padding-start: 2px;
 		left:-1px;
         width: @button-width+12;
         height: @button-height+8;
@@ -488,7 +489,7 @@
 		background-repeat:no-repeat;
 		background-position:center;
 	}
-	
+
 	#towtruck-buttons #towtruck-about-button:active {
 		background-image:url('/images/icn-logo-press.png');
 		background-size:40px 40px;
@@ -515,6 +516,7 @@
 		background-size:40px 40px;
 		background-repeat:no-repeat;
 		background-position:center;
+		width:52px;
 	}
 
 	#towtruck-buttons #towtruck-chat-button:hover {
@@ -586,11 +588,12 @@
     }
 
 	#towtruck-dock-participants {
-		
+
 	}
 
 	#towtruck-dock-participants .towtruck-dock-person {
 		padding-top:10px !important;
+		padding-left:2px;
 	}
 
     .towtruck-dock-person img.towtruck-avatar {
@@ -655,7 +658,7 @@
 		width:320px;
 		position:relative;
 		left:-10px;
-		background:#fff;
+		background:#f2f4f5;
 	}
 
     .towtruck-chat-message {
@@ -806,10 +809,10 @@
 			font-family:openSansRegular;
 			text-align:left;
 		}
-		
+
 		&#towtruck-about .towtruck-about-txt-bottom {
 			padding-top:10px;
-			
+
 		}
 
 		&#towtruck-about #towtruck-setup-profile-box {
@@ -895,12 +898,25 @@
             font-weight: bold;
 			margin-right:-5px;
 			cursor:pointer;
+			background-image:url('/images/icn-close-btn.png');
+			background-size:13px 13px;
+			width:13px;
+			height:13px;
+			margin-top:1px;
         }
 
-		.towtruck-minimize img {
+		button.towtruck-minimize:hover {
+            .button-reset;
+            float: right;
+            font-weight: bold;
+			margin-right:-5px;
+			cursor:pointer;
+			background-image:url('/images/icn-close-btn-active.png');
+			background-size:13px 13px;
 			width:13px;
-			height:3px;
-		}
+			height:13px;
+			margin-top:1px;
+        }
 
         #towtruck-chat-messages {
             overflow-y: auto;
@@ -934,21 +950,37 @@
 
     }
 
-	#towtruck-rtc-info p{
-		padding:10px 10px 0px 10px;
-	}
-	
-	#towtruck-rtc-info img.towtruck-arrow-up {
-		width:13px;
-		height:13px;
+	#towtruck-intro .towtruck-modal .towtruck-title{
+		left:-2px;
+		width:282px;
 	}
 
-	#towtruck-rtc-info #towtruck-rtc-dialog-btn {
-		text-align:center;
-		padding:10px;
+	#towtruck-intro button.towtruck-minimize{
+		display:none !important;
 	}
-	
-	#towtruck-rtc-info #towtruck-rtc-dialog-btn button.towtruck-dismiss{
+
+	#towtruck-intro .towtruck-modal-close {
+		background-color: #73a729;
+		background-repeat: repeat-x;
+		border-radius: 2px;
+		border:0px;
+		color: rgb(255, 255, 255);
+		cursor: pointer;
+		display: inline-block;
+		font-size: 12px;
+		text-transform: none;
+		vertical-align: middle;
+		width: 100%;
+		padding:10px 0px 10px 0px;
+		margin:0px 0px 0px 0px;
+	}
+
+	#towtruck-intro .towtruck-modal-close:hover {
+
+	}
+
+
+	#towtruck-intro .towtruck-modal-dont-join {
 		background-color: rgba(233,59,40,1);
 		background-repeat: repeat-x;
 		border-radius: 2px;
@@ -964,7 +996,42 @@
 		margin:0px 0px 10px 0px;
 	}
 
-	#towtruck-rtc-info #towtruck-rtc-dialog-btn button.towtruck-dismiss:hover {
+	#towtruck-intro .towtruck-modal-dont-join:hover {
+		background-color: rgba(212,6,6,1);
+	}
+
+
+	#towtruck-rtc-info, #towtruck-rtc-not-supported, #towtruck-intro p{
+		padding:10px 10px 0px 10px;
+	}
+
+	#towtruck-rtc-info, #towtruck-rtc-not-supported img.towtruck-arrow-up {
+		width:13px;
+		height:13px;
+	}
+
+	#towtruck-rtc-info, #towtruck-rtc-not-supported #towtruck-rtc-dialog-btn {
+		text-align:center;
+		padding:10px;
+	}
+
+	#towtruck-rtc-info, #towtruck-rtc-not-supported #towtruck-rtc-dialog-btn button.towtruck-dismiss{
+		background-color: rgba(233,59,40,1);
+		background-repeat: repeat-x;
+		border-radius: 2px;
+		border:0px;
+		color: rgb(255, 255, 255);
+		cursor: pointer;
+		display: inline-block;
+		font-size: 12px;
+		text-transform: none;
+		vertical-align: middle;
+		width: 100%;
+		padding:10px 0px 10px 0px;
+		margin:0px 0px 10px 0px;
+	}
+
+	#towtruck-rtc-info, #towtruck-rtc-not-supported #towtruck-rtc-dialog-btn button.towtruck-dismiss:hover {
 		background-color: rgba(212,6,6,1);
 	}
 
@@ -974,7 +1041,7 @@
 
 	#towtruck-chat-notifier.towtruck-popup {
 		background:rgba(242,244,245,0.9);
-		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,244,245,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
+		/* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
 		border-radius:2px;
 		border:1px solid rgba(0,0,0,0.1);
 		box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -1056,8 +1123,7 @@
 			color: rgb(255, 255, 255);
 			cursor: pointer;
 			display: inline-block;
-			font-size: 10px;
-			text-transform:uppercase;
+			font-size: 12px;
 			vertical-align: middle;
 			width: 25%;
 			padding:8px;
@@ -1072,8 +1138,7 @@
 			color: rgb(255, 255, 255);
 			cursor: pointer;
 			display: inline-block;
-			font-size: 10px;
-			text-transform:uppercase;
+			font-size: 12px;
 			vertical-align: middle;
 			width: 30%;
 			padding:8px;
@@ -1217,6 +1282,11 @@
 
 /* Shared cursors */
 
+.towtruck-cursor-img {
+	position:relative;
+	top:0px;
+}
+
 .towtruck-cursor img {
 	width:13px;
 }
@@ -1258,8 +1328,8 @@
 	    font-family: @default-font;
         font-size: 40%;
         position: relative;
-        top: -25px;
-        left: 0px;
+        top: 0px;
+        left: 5px;
         padding: 8px;
         border-radius: 2px;
 		box-shadow:0px 1px 1px rgba(0,0,0,0.2);
@@ -1303,7 +1373,7 @@
 #towtruck-modal-background {
     position: fixed;
     background-color: #000;
-    opacity: 0.5;
+    opacity: 0.8;
     width: 100%;
     height: 100%;
     top: 0;
@@ -1325,9 +1395,12 @@
         margin-top: -(@height/2);
         height: @height;
         z-index: @z-index+3;
-        background-color: #fff;
         .towtruck-close {
             .towtruck.towtruck-window.towtruck-close;
+        }
+        &.towtruck-modal-wide {
+            width: 70%;
+            margin-left: -35%;
         }
     }
 
@@ -1377,22 +1450,22 @@
 
 @-webkit-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @-moz-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @-o-keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 @keyframes towtruck-color-pulse {
     0% {box-shadow: none;}
-    50% {box-shadow: 0 0 10px #0095dd;}
+    50% {box-shadow: inset 0px 0px 2px #0095dd;}
     100% {box-shadow: none;}
 }
 .towtruck-color-pulse {

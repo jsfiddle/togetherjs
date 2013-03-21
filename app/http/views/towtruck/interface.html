@@ -36,7 +36,8 @@
         <div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
         </div>
       </button>
-      <button id="towtruck-chat-button" class="towtruck-button">
+      <button id="towtruck-chat-button" class="towtruck-button"><div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+      </div>
       </button>
       <div id="towtruck-dock-participants">
       </div>
@@ -53,6 +54,7 @@
       SETTINGS
     </header>
     <section>
+      <p><a href="#" id="towtruck-help">Help!</a></p>
 	      <p class="towtruck-about-txt">
 	        Send this link to a friend
 	      </p>
@@ -161,16 +163,21 @@
   <div id="towtruck-rtc-not-supported" class="towtruck-window"
        data-bound-to="towtruck-audio-button"
        style="display: none">
-    <header class="towtruck-title">Audio requires newer browser</header>
+    <header class="towtruck-title">Audio Chat</header>
+
+	<p>Audio chat requires a newer browser!</p>
+
 
     <p>Live audio chat requires a newer (or different) browser than
       you are
-      using.  <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC"
-      target="_blank">See this page for more information and a list of
-      supported browsers (opens in new window)</a>
+      using.</p>
+	<p>See this <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC"
+      target="_blank">page</a> for more information and a list of supported browsers.
     </p>
 
-    <button class="towtruck-dismiss" type="button">OK</button>
+    <div id="towtruck-rtc-dialog-btn">
+      <button class="towtruck-dismiss" type="button">Close</button>
+    </div>
   </div>
 
   <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
@@ -218,16 +225,31 @@
   <div id="towtruck-intro" class="towtruck-modal" style="display: none">
     <header class="towtruck-title">Welcome to TowTruck!</header>
 
-    <p>Your friend has just asked you to join their browser session.</p>
+    <p>Your friend has asked you to join their <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a> browser session to collaborate in real-time!</p>
 
-    <p>Both of you will be able to see what each other is doing, and
-      if you click on
-      the <img src="http://localhost:8080/images/icn-mic.png"
-      alt="mic" style="height: 1em"> you can talk with each other (or
-      click <img src="http://localhost:8080/images/icn-chat.png"
-      alt="chat" style="height: 1em"> to send a text message.</p>
+	<p>Would you like to join their session?</p>
+
+    <p><button class="towtruck-modal-close">Yes, join session</button></p>
+	<p><button class="towtruck-modal-dont-join">No, don't join</button></p>
+  </div>
+
+  <!-- Our alpha intro: -->
+  <div id="towtruck-alpha-intro" class="towtruck-modal towtruck-modal-wide" style="display: none">
+    <!-- FIXME: the header doesn't render well at a wide width, but we have more
+         text than fits into the small box -->
+    <!--<header class="towtruck-title">Thanks for checking out TowTruck!</header>-->
+
+    <p>Thanks for checking out
+      <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a>!
+      This is an <strong>alpha preview</strong> so we apologize for the rough edges.
+      Since this is an alpha we'd very much appreciate feedback, and you can be
+      assured we'll be paying attention to it.  After trying this out some, please
+      submit feedback via the link you can find by clicking the TowTruck button
+      (<img src="http://localhost:8080/images/icn-logo-blk.png" style="height: 2em; vertical-align: middle">).
+    </p>
 
     <p><button class="towtruck-modal-close">OK</button></p>
+
   </div>
 
   <!-- The pointer at the side of a window: -->

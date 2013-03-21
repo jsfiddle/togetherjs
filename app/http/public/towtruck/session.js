@@ -106,6 +106,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       stickyShare: null,
       color: null,
       seenIntroDialog: false,
+      seenAlphaIntro: false,
       dontShowRtcInfo: false
     },
 

@@ -95,7 +95,8 @@
         jquery: "libs/jquery-1.8.3.min",
         walkabout: "libs/walkabout.js/walkabout",
         tinycolor: "libs/tinycolor",
-        "alien-avatar-generator": "libs/alien-avatar-generator"
+        "alien-avatar-generator": "libs/alien-avatar-generator",
+        guiders: "libs/Guider-JS/guiders-1.3.0"
       }
     };
     var deps = ["session", "jquery"];
