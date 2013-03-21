@@ -42,7 +42,7 @@
       <div id="towtruck-dock-participants">
       </div>
 	  <button id="towtruck-expand-button" class="towtruck-button">
-        <img src="http://localhost:8080/images/hr-line.png">
+        <!-- <img src="http://localhost:8080/images/hr-line.png"> -->
       </button>
     </div>
   </div>
@@ -51,10 +51,9 @@
   <div id="towtruck-about" class="towtruck-window" data-bound-to="towtruck-about-button"
        style="display: none">
     <header class="towtruck-title">
-      SETTINGS
+      Settings
     </header>
     <section>
-      <p><a href="#" id="towtruck-help">Help!</a></p>
 	      <p class="towtruck-about-txt">
 	        Send this link to a friend
 	      </p>
@@ -79,12 +78,13 @@
 
 		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
 		<div class="towtruck-bottom-panel">
+		  <p><hr></p>
 	      <p>
 			<button id="towtruck-end-session">End TowTruck</button>
 	        <!-- <button id="towtruck-cancel-end-session">Continue session</button> -->
 	      </p>
 		  <p class="small">
-	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.  Please give us feedback <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">here</a>, thanks!
+	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> created by <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> &bull; <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">Feedback</a> &bull; <a href="#" id="towtruck-help">Help</a>
 	      </p>
 		</div>
     </section>
@@ -213,7 +213,7 @@
         <span class="towtruck-person" style="padding:0px"></span> has joined!
       </p>
       <p class="towtruck-notify-btns">
-        <button class="towtruck-dismiss">OK</button>
+        <button class="towtruck-dismiss">Okay</button>
       </p>
     </div>
 
@@ -234,21 +234,18 @@
   </div>
 
   <!-- Our alpha intro: -->
-  <div id="towtruck-alpha-intro" class="towtruck-modal towtruck-modal-wide" style="display: none">
+  <div id="towtruck-alpha-intro" class="towtruck-modal" style="display: none">
     <!-- FIXME: the header doesn't render well at a wide width, but we have more
          text than fits into the small box -->
-    <!--<header class="towtruck-title">Thanks for checking out TowTruck!</header>-->
+    <header class="towtruck-title">TowTruck Alpha Preview</header>
 
-    <p>Thanks for checking out
-      <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a>!
-      This is an <strong>alpha preview</strong> so we apologize for the rough edges.
-      Since this is an alpha we'd very much appreciate feedback, and you can be
-      assured we'll be paying attention to it.  After trying this out some, please
-      submit feedback via the link you can find by clicking the TowTruck button
-      (<img src="http://localhost:8080/images/icn-logo-blk.png" style="height: 2em; vertical-align: middle">).
-    </p>
+	<p class="towtruck-img-alpha"><img src="/images/img-logo-alpha.png" alt="Alpha Logo"></p>
 
-    <p><button class="towtruck-modal-close">OK</button></p>
+	<p>Thanks for checking out the <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a> Alpha Preview!  We'd very much appreciate feedback* <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">here</a>.</p>
+		
+	<p class="towtruck-small-feedback-txt">*You can also find the <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&usp=sharing" target="_blank">feedback</a> link in "Settings."</p>
+
+	<p><button class="towtruck-modal-close">Continue</button></p>
 
   </div>
 
