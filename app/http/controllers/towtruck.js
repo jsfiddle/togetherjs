@@ -4,6 +4,7 @@
 
 var read = require('fs').readFileSync;
 var path = require('path');
+var ua = require('universal-analytics');
 
 var dirname = path.resolve(__dirname, "../views/towtruck/");
 
@@ -28,6 +29,13 @@ function readInclude(name, options) {
 exports.index = function(req, resp){
   resp.set('Content-Type', 'application/javascript');
   resp.render('towtruck/towtruck.js');
+
+  var visitor = ua(process.env.GA_ACCOUNT);
+  visitor.pageview({
+    dp: '/towtruck.js', // doc page
+    dt: 'TowTruck Include', // doc title
+    dr: req.headers.referer
+  }).send();
 };
 
 
