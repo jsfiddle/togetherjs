@@ -8,7 +8,7 @@
   var button;
 
   var styles = [
-    "/towtruck.css"
+    "/towtruck.min.css"
   ];
 
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
