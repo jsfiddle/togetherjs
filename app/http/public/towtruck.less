@@ -465,75 +465,48 @@
   }
 
   #towtruck-buttons #towtruck-about-button {
-    background:#0095DD;
+    background:#0095DD center no-repeat;
     background-image:url('/images/icn-logo.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
+    background-size: @button-size @button-size;
+    border:1px solid #00539F;
     border-top:1px solid rgba(255,255,255,0.3);
-    border-bottom:1px solid #00539F;
-    border-right:1px solid #00539F;
-    border-left:1px solid #00539F;
     padding-top:2px;
     box-shadow:0px 1px 2px rgba(0,0,0,0.3);
   }
-
   #towtruck-buttons #towtruck-about-button:hover {
     background-image:url('/images/icn-logo-hover.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
   }
-
   #towtruck-buttons #towtruck-about-button:active {
     background-image:url('/images/icn-logo-press.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
   }
 
   #towtruck-buttons #towtruck-audio-button{
     background-image:url('/images/icn-mic.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
   }
-
   #towtruck-buttons #towtruck-audio-button:hover {
     background-image:url('/images/icn-mic-active.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
   }
 
   #towtruck-buttons #towtruck-chat-button{
     background-image:url('/images/icn-chat.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
-    width:52px;
   }
-
   #towtruck-buttons #towtruck-chat-button:hover {
     background-image:url('/images/icn-chat-active.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
+  }
+
+  #towtruck-buttons #towtruck-ui-help-button{
+    background-image:url('/images/icn-help.png');
+  }
+  #towtruck-buttons #towtruck-ui-help-button:hover {
+    background-image:url('/images/icn-help-active.png');
   }
 
   #towtruck-buttons #towtruck-participants-button{
     background-image:url('/images/icn-participants.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
     border:0px;
   }
-
   #towtruck-buttons #towtruck-participants-button:hover {
     background-image:url('/images/icn-participants-active.png');
-    background-size:40px 40px;
-    background-repeat:no-repeat;
-    background-position:center;
   }
 
   #towtruck-anchor {
@@ -1282,7 +1255,7 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  @long-side: (@button-size + 12) * 3 + 20px; // actual button-size * number of buttons + expand thingy
+  @long-side: (@button-size + 12) * 4 + 20px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
