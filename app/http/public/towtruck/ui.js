@@ -100,20 +100,23 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       top: top + "px",
       left: left + "px"
     });
-    var panelPos = panelPosition();
-    $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-    var pointer = $("#towtruck-window-pointer-" + panelPos);
-    pointer.show();
-    if (panelPos == "right") {
-      pointer.css({
-        top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-        left: left + win.width() + 16 + "px"
-      });
-    } else {
-      pointer.css({
-        top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-        left: (left - 5) + "px"
-      });
+    if (win.hasClass("towtruck-window")) {
+      $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
+      var pointer = $("#towtruck-window-pointer-" + ifacePos);
+      pointer.show();
+      if (ifacePos == "right") {
+        pointer.css({
+          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
+          left: left + win.width() + 16 + "px"
+        });
+      } else if (ifacePos == "left") {
+        pointer.css({
+          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
+          left: (left - 5) + "px"
+        });
+      } else {
+        console.warn("don't know how to deal with position:", ifacePos);
+      }
     }
   };
 
