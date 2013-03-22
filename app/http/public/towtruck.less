@@ -20,13 +20,11 @@
 
 @default-font: openSansLight, Helvetica, 'Helvetica Neue', Arial, sans-serif;
 
-// Width of the buttons:
-@button-width: 40px;
-// Height of the buttons:
+// Size of the buttons (they're square):
+@button-size: 40px;
 // Note: this is also in ui.js, BUTTON_HEIGHT
-@button-height: @button-width;
 // Height of the draggable anchor at the top:
-@anchor-height: @button-width * 0.5;
+@anchor-height: @button-size * 0.5;
 // Extra padding on the edge of the screen:
 @side-padding: 0px;
 // Background color of most elements:
@@ -457,8 +455,8 @@
     height: @button-height+8;
     border-bottom:1px solid #ebebeb;
     img {
-      width: @button-width;
-      height: @button-height;
+      width: @button-size;
+      height: @button-size;
     }
     &:hover {
       /*background-color: darken(@background-color, 10%);*/
@@ -1283,9 +1281,8 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  /*// FIXME: why do I need these extra 14ish pixels?*/
-  @long-side: @button-width * 5 + @anchor-height - 37px;
-  @short-side: @button-width + 10px;
+  @long-side: (@button-size + 12) * 3 + 20px; // actual button-size * number of buttons + expand thingy
+  @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
   &.towtruck-interface-right {
