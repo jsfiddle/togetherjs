@@ -19,13 +19,12 @@
 
 @default-font: openSansLight, Helvetica, 'Helvetica Neue', Arial, sans-serif;
 
-// Width of the buttons:
-@button-width: 40px;
-// Height of the buttons:
+// Size of the square buttons:
 // Note: this is also in ui.js, BUTTON_HEIGHT
-@button-height: @button-width;
+@button-size: 40px;
+
 // Height of the draggable anchor at the top:
-@anchor-height: @button-width * 0.5;
+@anchor-height: @button-size * 0.5;
 // Extra padding on the edge of the screen:
 @side-padding: 0px;
 // Background color of most elements:
@@ -39,9 +38,10 @@
 
 /* Reset: */
 .towtruck {
-  /* http://meyerweb.com/eric/tools/css/reset/
-     v2.0 | 20110126
-     License: none (public domain)
+  /*
+  http://meyerweb.com/eric/tools/css/reset/
+  v2.0 | 20110126
+  License: none (public domain)
   */
   margin: 0;
   padding: 0;
@@ -448,17 +448,17 @@
     position:relative;
     -webkit-padding-start: 2px;
     left:-1px;
-    width: @button-width+12;
-    height: @button-height+8;
+    width: @button-size+12;
+    height: @button-size+8;
     border-bottom:1px solid #ebebeb;
     img {
-      width: @button-width;
-      height: @button-height;
+      width: @button-size;
+      height: @button-size;
     }
     &:hover {
       /*background-color: darken(@background-color, 10%);*/
     }
-    background-size: @button-width @button-height;
+    background-size: @button-size @button-size;
     background-repeat:no-repeat;
     background-position:center;
   }
@@ -470,7 +470,7 @@
     border-top:1px solid rgba(255,255,255,0.3);
     padding-top:2px;
     box-shadow:0px 1px 2px rgba(0,0,0,0.3);
-    background-size:@button-width @button-height;
+    background-size:@button-size @button-size;
     background-repeat:no-repeat;
     background-position:center;
   }
@@ -1120,9 +1120,8 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  /*// FIXME: why do I need these extra 14ish pixels?*/
-  @long-side: @button-width * 5 + @anchor-height - 37px;
-  @short-side: @button-width + 10px;
+  @long-side: (@button-size + 12) * 3 + 20px; // actual button-size * number of buttons + expand thingy
+  @short-side: @button-size + 10px;
   // border:1px solid #000;
 
   &.towtruck-interface-right {
