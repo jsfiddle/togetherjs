@@ -4,67 +4,51 @@ TowTruck - Who you call when you get stuck
 What is TowTruck?
 -----------------
 
-TowTruck is a service for your website that makes it surprisingly easy to collaborate in real-time. 
+TowTruck is a service for your website that makes it surprisingly easy to collaborate in real-time.
 
 Using TowTruck two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TowTruck service is included by the web site owner, and a web site can customize and configure aspects of TowTruck's behavior on the site.
 
-For more information and to see TowTruck in action, visit http://towtruck.mozillalabs.com/
+For more information and to see TowTruck in action, visit [towtruck.mozillalabs.com](https://towtruck.mozillalabs.com/)
 
-Using TowTruck On Your Site
----------------------------
+If you want to integrate TowTruck onto your site also visit [towtruck.mozillalabs.com](https://towtruck.mozillalabs.com).
 
-To use our hosted version of towtruck you should add the `towtruck.js` file to your website:
+Contributing
+============
 
-```html
-<script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
-```
+The remainder of this document is about contributing to TowTruck - but reports, fixes, features, etc.  Look back at those other links if you are looking for something else.
 
-Then you can call `TowTruck()` to start TowTruck, or include this HTML to have TowTruck insert a *Start TowTruck* button:
+Bug Reports
+-----------
 
-```html
-<div id="towtruck-starter"></div>
-```
+Please submit bug reports as [github issues](https://github.com/mozilla/towtruck/issues/new).  Don't worry about labels.  If you use the in-app feedback to give us a bug report that's fine too.
 
-That's it!  TowTruck works pretty well without any customization at all.
+Roadmap & Plans
+---------------
 
-Configuring TowTruck
---------------------
+To see what we're planning or at least considering to do with TowTruck, look at [all bugs marked "enhancement"](https://github.com/mozilla/towtruck/issues?labels=enhancement&state=open).  (Or at least that report will be what we intend once [#260](https://github.com/mozilla/towtruck/issues/260) is fixed.)
 
-There are a few configurable parameters for TowTruck.  To configure these you have three options:
-
-```javascript
-// If you have your configuration after <script src="towtruck.js"> loaded:
-TowTruck.config({configName: value});
-
-// If you aren't sure if towtruck.js is loaded:
-TowTruckConfig = {configName: value};
-
-// And if you want to be even more vague about the order in which configuration
-// has to be defined:
-TowTruckConfig_configName = value;
-```
-
-There are a couple configuration parameters:
-
-* `hubBase`: this is the location of the [WebSocket hub server](https://github.com/mozilla/towtruck/blob/master/app/hub/server.js).  It defaults to `https://hub.towtruck.mozillalabs.com` which is an open usable hub.  If you want to host your own hub you'd change this.
-
-* `cloneClicks`: this is a jQuery selector (string) of all the elements whose clicks you'd like to automatically clone across clients.  That means that if you give something like `"#submit"` then if one person clicks on `<input type="submit" id="submit">` that button will be clicked on all clients.  This is experimental, and is actually quite likely to be removed (see issue [#75](https://github.com/mozilla/towtruck/issues/75) and [#160](https://github.com/mozilla/towtruck/issues/160)).
-
-Setup/Development
------------------
+Setting up a development environment
+------------------------------------
 
 TowTruck has two main pieces:
 
-* The [server](https://github.com/mozilla/towtruck/blob/master/app/http/server.js), which echos messages back and forth between users.  The server is dumb.
+* The [server](https://github.com/mozilla/towtruck/blob/master/app/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon it's incredibly boring [history](https://github.com/mozilla/towtruck/commits/master/app/hub/server.js).  The nice part of this
 
-* The [client](https://github.com/mozilla/towtruck/tree/master/app/http/public/towtruck), which does all the real work.
+* The client in [`app/https/public/towtruck`](https://github.com/mozilla/towtruck/tree/master/app/http/public/towtruck) and [`app/https/views/towtruck`](https://github.com/mozilla/towtruck/tree/master/app/http/views/towtruck), which does all the real work.
 
-There is a TowTruck server deployed at `https://hub.towtruck.mozillalabs.com` - and there's little need for other server deployments.  If you want to try TowTruck out we recommend you use our server, because it's easiest and the server is boring.
+There is a TowTruck hub server deployed at `https://hub.towtruck.mozillalabs.com` - and there's little need for other server deployments.  If you want to try TowTruck out we recommend you use our hub server.  Note if you include TowTruck on an https site, you must use an https hub server.
 
-The static files do contain some configuration parameters, and so you need to "build" them to make them usable.  TowTruck uses [LESS](http://lesscss.org/), so you need the LESS compiler (`lessc`) installed:
+Some of the static files contain configuration parameters (hopefully with [#277](https://github.com/mozilla/towtruck/issues/277) we'll be able to simplify this).  So to develop you either need to run the server or make a static copy.  Running the server is better when trying to commit your work.
+
+First you'll need [LESS](http://lesscss.org/) to compile the [main CSS/.less file](https://github.com/mozilla/towtruck/blob/develop/app/http/public/towtruck.less):
 
 ```sh
 $ npm install -g less
+```
+
+If you want to create a static copy of TowTruck (not as great for development), do:
+
+```sh
 $ git clone git://github.com/mozilla/towtruck.git
 $ cd towtruck
 $ ./bin/make-static-client STATIC_FILES http://url.where/you/will/publish
@@ -73,8 +57,8 @@ $ scp -r STATIC_FILES/* url.where:/www/public/you/will/publish/
 
 Now you have your own static copy of the client, potentially with your own modifications and customizations of the code.
 
-Local Server
-------------
+Running a Local Server
+----------------------
 
 If you do want to use the server (which conveniently updates those files on demand, so you don't have to rebuild after edits):
 
@@ -107,16 +91,18 @@ Servers
 
 ### Hub Server
 
-This exists in app/hub/server.js. By default in dev mode, it serves the setup code here: [http://localhost:8080/towtruck.js](http://localhost:8080/towtruck.js).
+This exists in app/hub/server.js.
 
-- `server.js`: the Node.js server, just one file.  It's pretty dumb, just passing messages back and forth between clients.  It is a goal to keep it dumb, and leave the important logic in the client.  Most of the code you'll see in there is to make development easier, handling the sequential loading of modules, compiling LESS, inserting templates, etc.
+- `server.js`: the Node.js server, just one file.  It's pretty dumb, just passing messages back and forth between clients.  It is a goal to keep it dumb, and leave the important logic in the client.
 
-Third-party libraries in `app/http/public/towtruck/libs/`.
+Third-party libraries are in `app/http/public/towtruck/libs/`.
+
+To see an overview of the client code [read the TowTruck README](https://github.com/mozilla/towtruck/tree/develop/app/http/public/README.md)
 
 A basic overview of the code, which is in `app/http/public/towtruck`:
 
 
-- `channels.js`: abstraction over WebSockets and other communication methods.  Buffers output while the connection is opening, handles JSON encoding/decoding.
+- `channels.js`: abstraction over WebSockets and other communication methods (like `postMessage`).  Buffers output while the connection is opening, handles JSON encoding/decoding.
 
 - `chat.js`: the chat widget
 
@@ -142,35 +128,7 @@ A basic overview of the code, which is in `app/http/public/towtruck`:
 
 ### Examples Server
 
-There are some examples in `app/examples/`. These are served up on `EXAMPLE_SERVER_PORT` which defaults to [http://localhost:8081](http://localhost:8081)
-
-[http://localhost:8081/friendlycode.html](http://localhost:8081/friendlycode.html) is an example of a [CodeMirror](http://codemirror.net/) editor, embedded in [FriendlyCode](https://github.com/mozilla/friendlycode) (which in turn is the basis of [Thimble](https://thimble.webmaker.org/en-US/)).
-
-
-
-
-Integration
------------
-
-TowTruck is meant to be an unintrusive bit of Javascript you add to your page to enable these collaborative features.  It inspects the page to determine what fields can be synchronized between the two browsers, and adds its own interface on top of the content.
-
-`towtruck.js` itself is just a small piece of code to start up TowTruck, it should not cause overhead in your code.  You can either include an element on your page `<div id="towtruck-starter"></div>`, and a TowTruck button will be added to that, or you can call `TowTruck()` yourself.
-
-You can enter `/help` into the chat window to see some developer-oriented features.
-
-### Docking
-
-In order to enable docking, you must have at least one element in your page with the class `towtruck-undocked`.  When the chat interface is "docked" this class is swapped for `towtruck-docked`.  You can also put `data-towtruck-doc-*` attributes on your body element, which are additional CSS rules applied to the chat window when docked.
-
-You may generally find it sufficient to do:
-
-```css
-#container.towtruck-docked {
-  margin-right: 420px;
-}
-```
-
-The idea being that you clear a 420px area on the left side of the screen when the interface is docked.  Of course 420px is a very specific number, and it likely to change, so please test docking if you use it.
+There are some examples in `app/http/public/example/`.
 
 Bookmarklet
 -----------
