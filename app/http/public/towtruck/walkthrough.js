@@ -13,7 +13,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     // This is assigned to the first item.buttons in the guide:
     firstButtons: [{name: "Next"}, {name: "Okay, I get it!", onclick: guiders.hideAll}],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Okay, I get it!", onclick: guiders.hideAll}],
+    lastButtons: [{name: "Let's get started!", onclick: guiders.hideAll}],
     position: 9,
 	  overlay: true,
 	  width:400,
@@ -42,6 +42,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
                     </p>\
 					<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>",
 	    onHide: hideWindow,
+	    onShow: showSettings
     },
     {
       overlay: true,
@@ -53,7 +54,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-audio-button",
       title: "Talk with friends",
-      description: "If your browser supports it, you can audio chat live with your friend over the browser just like...magic!"
+      description: "If your browser supports it, you can audio chat live with your friend over the browser just like magic!"
     },
     {
       overlay: true,
@@ -72,7 +73,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-interface",
       title: "Get Started!",
-      description: "Now let's get started!"
+      description: "Ready to start TowTruckin'?"
     }
   ];
 
