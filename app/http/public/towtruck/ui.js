@@ -402,7 +402,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       $("#towtruck-self-avatar").attr("src", avatar);
     }
 
-    $("#towtruck-help").click(function () {
+    $(".towtruck-help").click(function () {
       require(["walkthrough"], function (walkthrough) {
         ui.hideWindow();
         walkthrough.start();
