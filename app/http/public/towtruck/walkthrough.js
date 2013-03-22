@@ -17,7 +17,8 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     position: 9,
 	  overlay: true,
 	  width:400,
-    closeOnEscape: true
+    closeOnEscape: true,
+    onHide: hideWindow
   };
 
   function showSettings(){
@@ -40,7 +41,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
                     </iframe>\
                     </p>\
 					<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>",
-	  // onHide: showSettings
+	    onHide: hideWindow,
     },
     {
       overlay: true,
