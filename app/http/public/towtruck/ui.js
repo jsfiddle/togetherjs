@@ -354,6 +354,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       session.close();
     });
 
+    $("#towtruck-feedback-button").click(function(){
+      modal.showModal("#towtruck-feedback-form");
+    });
+
     $("#towtruck-cancel-end-session").click(function () {
       ui.hideWindow("#towtruck-about");
     });
