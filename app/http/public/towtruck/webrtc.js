@@ -174,6 +174,15 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
    * RTC support
    */
 
+  function audioButton(selector) {
+    ui.displayToggle(selector);
+    if (selector == "#towtruck-audio-incoming") {
+      $("#towtruck-audio-button").addClass("towtruck-animated").addClass("towtruck-color-alert");
+    } else {
+      $("#towtruck-audio-button").removeClass("towtruck-animated").removeClass("towtruck-color-alert");
+    }
+  }
+
   session.on("ui-ready", function () {
     $("#towtruck-audio-button").click(function () {
       if (session.RTCSupported) {
@@ -184,10 +193,10 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     });
 
     if (! session.RTCSupported) {
-      ui.displayToggle("#towtruck-audio-unavailable");
+      audioButton("#towtruck-audio-unavailable");
       return;
     }
-    ui.displayToggle("#towtruck-audio-ready");
+    audioButton("#towtruck-audio-ready");
 
     var audioStream = null;
     var accepted = false;
@@ -242,7 +251,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           s += repl;
         }
       }
-      ui.displayToggle("#towtruck-audio-error");
+      audioButton("#towtruck-audio-error");
       // FIXME: this title doesn't seem to display?
       $("#towtruck-audio-error").attr("title", s);
     }
@@ -286,7 +295,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           var stream = _connection.remoteStreams[i];
           $audio[0].src = URL.createObjectURL(stream);
           $audio[0].play();
-          ui.displayToggle("#towtruck-audio-active");
+          audioButton("#towtruck-audio-active");
         }
       };
       _connection.onstatechange = function () {
@@ -294,7 +303,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         // Actually just doesn't work on Firefox
         console.log("state change", _connection.readyState);
         if (_connection.readyState == "closed") {
-          ui.displayToggle("#towtruck-audio-ready");
+          audioButton("#towtruck-audio-ready");
         }
       };
       _connection.addStream(audioStream);
@@ -329,7 +338,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
                 offer: offer.sdp
               });
               offerSent = offer;
-              ui.displayToggle("#towtruck-audio-outgoing");
+              audioButton("#towtruck-audio-outgoing");
             },
             function (err) {
               error("Error doing RTC setLocalDescription:", err);
@@ -380,7 +389,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       }
       offerReceived = msg.offer;
       if (! accepted) {
-        ui.displayToggle("#towtruck-audio-incoming");
+        audioButton("#towtruck-audio-incoming");
         return;
       }
       function run() {
@@ -452,7 +461,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       // FIXME: displayToggle should be set due to
       // _connection.onstatechange, but that's not working, so
       // instead:
-      ui.displayToggle("#towtruck-audio-ready");
+      audioButton("#towtruck-audio-ready");
       if (accepted && (offerSent || answerSent)) {
         abort();
         connect();

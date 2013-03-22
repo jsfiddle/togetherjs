@@ -89,7 +89,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       left = boundPos.left - 15 - width;
       top = boundPos.top + (boundPos.height / 2) - (height / 2);
     } else if (ifacePos == "left") {
-      left = boundPos.left + boundPos.width + 10;
+      left = boundPos.left + boundPos.width + 15;
       top = boundPos.top + (boundPos.height / 2) - (height / 2);
     } else if (ifacePos == "bottom") {
       left = (boundPos.left + boundPos.width / 2) - (width / 2);

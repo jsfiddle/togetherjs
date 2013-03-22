@@ -1,7 +1,7 @@
 .guider {
-  background: #FFF;
+  background: #f2f4f5;
   border: 1px solid #666;
-  font-family: arial;
+  font-family: openSansRegular;
   position: absolute;
   outline: none;
   padding: 4px 12px;
@@ -9,15 +9,15 @@
   z-index: 100000005 !important;
   
   /* Shadow */
-  -moz-box-shadow: 0 0px 8px #111;
-  -webkit-box-shadow: 0 0px 8px #111;
-  box-shadow: 0 0px 8px #111;
+  -moz-box-shadow(0px 1px 2px rgba(0,0,0,0.5));
+  -webkit-box-shadow(0px 1px 2px rgba(0,0,0,0.5));
+  box-shadow(0px 1px 2px rgba(0,0,0,0.5));
   /* End shadow */
   
   /* Rounded corners */
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
   /* End rounded corners */
 }
 
@@ -99,15 +99,26 @@
 }
 
 .guiders_content h1 {
-  color: #1054AA;
+  color: rgb(0, 149, 221);
   float: left;
-  font-size: 21px;
+  font-size: 18px;
+  letter-spacing: -1px;
+  line-height: 100%;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 100;
+  margin:0 auto;
 }
 
 .guiders_content p {
   clear: both;
-  color: #333;
-  font-size: 13px;
+  font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 300;
+  line-height: 20px;
+  color: #333333;
 }
 
 .guiders_highlight {

@@ -5,10 +5,10 @@
     <div id="towtruck-anchor">
       <!-- FIXME: replace this with dots: -->
       <span id="towtruck-anchor-horizontal">
-        <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
+        <img src="http://localhost:8080/images/icn-handle-circle.png" alt="drag"><img src="http://localhost:8080/images/icn-handle-circle.png" alt=""><img src="http://localhost:8080/images/icn-handle-circle.png" alt="">
       </span>
       <span id="towtruck-anchor-vertical">
-        <img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png"><img src="http://localhost:8080/images/icn-handle-circle.png">
+        <img src="http://localhost:8080/images/icn-handle-circle.png" alt="drag"><img src="http://localhost:8080/images/icn-handle-circle.png" alt=""><img src="http://localhost:8080/images/icn-handle-circle.png" alt="">
       </span>
     </div>
     <div id="towtruck-buttons">
@@ -20,20 +20,20 @@
       <button id="towtruck-about-button" class="towtruck-button">
       </button>
       <button id="towtruck-audio-button" class="towtruck-button">
-        <div id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
-        </div>
-        <div id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
-        <div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
-        </div>
+        <span id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
+        </span>
+        <span id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
+        <span id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        </span>
       </button>
       <button id="towtruck-chat-button" class="towtruck-button"><div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
       </button>
@@ -48,35 +48,35 @@
   <!-- The window for closing the session: -->
   <div id="towtruck-about" class="towtruck-window" data-bound-to="towtruck-about-button" style="display: none">
     <header class="towtruck-title">
-      SETTINGS
+      Settings
     </header>
     <section>
       <p class="towtruck-about-txt">
         Send this link to a friend
       </p>
-		  <div id="towtruck-share-link-box">
-	      <p>
-	        <input type="text" id="towtruck-share-link">
-	      </p>
-		  </div>
-	    <p class="towtruck-about-txt-bottom">
-	      Set up your profile
-	    </p>
-		  <div id="towtruck-setup-profile-box" data-toggles="#towtruck-avatar-edit">
-		    <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar" id="towtruck-self-avatar">
+      <div id="towtruck-share-link-box">
+        <p>
+          <input type="text" id="towtruck-share-link">
+        </p>
+      </div>
+      <p class="towtruck-about-txt-bottom">
+        Set up your profile
+      </p>
+      <div id="towtruck-setup-profile-box" data-toggles="#towtruck-avatar-edit">
+        <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar" id="towtruck-self-avatar">
         <input type="text" id="towtruck-self-name" placeholder="Enter your name">
         <span id="towtruck-checkmark">
-  	      <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
-	        <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
-	      </span>
+          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
+          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
+        </span>
         <span id="towtruck-self-color" class="towtruck-color"></span>
       </div>
 
-		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
-		  <div class="towtruck-bottom-panel">
+      <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
+      <div class="towtruck-bottom-panel">
         <button id="towtruck-end-session">End TowTruck Session</button>
         <p class="small">
-	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a>
+          <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a>
           is a
           <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a>
           project.  Please give us your feedback, thanks!
@@ -101,7 +101,7 @@
         <div class="towtruck-timestamp"><span class="towtruck-time">HH:MM</span> <span class="towtruck-ampm">AM/PM</span></div>
         <div class="towtruck-person">Aaron</div>
         <div class="towtruck-chat-content"></div>
-		    <div class="towtruck-hr-line"></div>
+        <div class="towtruck-hr-line"></div>
       </div>
 
       <!-- Template for when a person leaves: -->
@@ -136,15 +136,21 @@
   <div id="towtruck-rtc-info" class="towtruck-window"
        data-bound-to="towtruck-audio-button"
        style="display: none">
-    <header class="towtruck-title">Audio Chat</header>
-  	<p>Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up"></p>
-    <p>Talking on your microphone through your web browser is an experimental feature.</p>
-  	<p>
-      Read more about Audio Chat 
-      <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
+
+    <header class="towtruck-title">
+      Audio Chat
+    </header>
+    <p>
+      Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+    </p>
+    <p>
+      Talking on your microphone through your web browser is an experimental feature.
+    </p>
+    <p>
+      Read more about Audio Chat <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
     </p>
 
-    <div id="towtruck-rtc-dialog-btn">
+    <div class="towtruck-rtc-dialog-btn">
       <button class="towtruck-dismiss" type="button">Close</button>
       <label for="towtruck-rtc-info-dismiss" style="display: inline">
       <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
@@ -172,7 +178,7 @@
       for more information and a list of supported browsers.
     </p>
 
-    <div id="towtruck-rtc-dialog-btn">
+    <div class="towtruck-rtc-dialog-btn">
       <button class="towtruck-dismiss" type="button">Close</button>
     </div>
   </div>
@@ -181,7 +187,7 @@
   <div id="towtruck-chat-notifier" class="towtruck-popup"
        data-bound-to="towtruck-chat-button"
        style="display: none">
-    <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
+    <div class="towtruck-close"><img src="/images/icn-close-btn.png" alt="close"></div>
     <section id="towtruck-chat-notifier-message">
     </section>
   </div>
@@ -189,7 +195,7 @@
   <div style="display: none">
     <!-- User went to new URL: -->
     <div id="towtruck-template-url-change-popup" class="towtruck-popup towtruck-url-change-popup">
-      <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
+      <!-- <div class="towtruck-close"></div> -->
       <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
       <p class="towtruck-snippet">
         <span class="towtruck-person" style="padding:0px"></span> is at <a href="#" class="towtruck-url" target="_self"></a>
@@ -202,14 +208,13 @@
     </div>
 
     <!-- New user notification: -->
-    <div id="towtruck-template-new-user"
-         class="towtruck-popup">
-      <div class="towtruck-close"><img src="/images/icn-close-btn.png"></div>
+    <div id="towtruck-template-new-user" class="towtruck-popup">
+      <div class="towtruck-close"></div>
       <p class="towtruck-snippet">
         <span class="towtruck-person" style="padding:0px"></span> has joined!
       </p>
       <p class="towtruck-notify-btns">
-        <button class="towtruck-dismiss">OK</button>
+        <button class="towtruck-dismiss">Okay</button>
       </p>
     </div>
   </div>
@@ -245,8 +250,7 @@
   <div style="display: none">
 
     <!-- This is the cursor: -->
-    <div id="towtruck-template-cursor"
-         class="towtruck-cursor towtruck">
+    <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
       <img class="towtruck-cursor-img" src="/images/cursor-white.png">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
@@ -263,8 +267,7 @@
     </div>
 
     <!-- This is a click: -->
-    <div id="towtruck-template-click"
-         class="towtruck-click towtruck">
+    <div id="towtruck-template-click" class="towtruck-click towtruck">
     </div>
   </div>
 </div>

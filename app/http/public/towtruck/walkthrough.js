@@ -9,13 +9,14 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
-    buttons: [{name: "Back"}, {name: "Next"}, {name: "Close"}],
+    buttons: [{name: "Back"}, {name: "Next"}, {name: "Okay, I get it!", onclick: guiders.hideAll}],
     // This is assigned to the first item.buttons in the guide:
-    firstButtons: [{name: "Next"}, {name: "Close"}],
+    firstButtons: [{name: "Next"}, {name: "Okay, I get it!", onclick: guiders.hideAll}],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Back"}, {name: "Close"}],
+    lastButtons: [{name: "Okay, I get it!", onclick: guiders.hideAll}],
     position: 9,
-    xButton: true,
+	overlay: true,
+	width:300,
     closeOnEscape: true
   };
 
@@ -103,7 +104,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     {
       overlay: true,
       attachTo: "#towtruck-audio-button",
-      title: "Audio",
+      title: "Talk in real-time",
       description: "<p> \
                       If your browser supports it, you can live chat with one other collaborator. \
                     </p> \
@@ -119,7 +120,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-chat-button",
       onHide: hideWindow,
-      title: "Chat",
+      title: "Chat with friends",
       description: "<p> \
                       This is the Chat button. Click it to text chat with your collaborators.\
                     </p>"
@@ -136,6 +137,12 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
                       Type message here and hit enter. All of your collaborators will be able to see \
                       what you typed. \
                     </p>"
+    },
+    {
+      overlay: true,
+      attachTo: "#towtruck-anchor",
+      title: "Move the dock",
+      description: "Grab here to move the dock to the right or left side of the browser.<br><p>Ready to start?</p>"
     }
   ];
 
