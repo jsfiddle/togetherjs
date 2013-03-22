@@ -37,11 +37,12 @@
       </button>
       <button id="towtruck-chat-button" class="towtruck-button"><div id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
       </button>
+      <button id="towtruck-ui-help-button" class="towtruck-button towtruck-help"><div id="towtruck-audio-error" class="towtruck-audio-set">
+      </button>
       <div id="towtruck-dock-participants"></div>
+      <button id="towtruck-expand-button">
+      </button>
     </div>
-	  <button id="towtruck-expand-button" class="towtruck-button">
-      <img src="http://localhost:8080/images/hr-line.png">
-    </button>
   </div>
 
   <!-- The window for closing the session: -->
@@ -50,9 +51,6 @@
       SETTINGS
     </header>
     <section>
-      <p>
-        <a href="#" class="towtruck-help">Help!</a>
-      </p>
       <p class="towtruck-about-txt">
         Send this link to a friend
       </p>
@@ -76,10 +74,14 @@
 
 		  <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
 		  <div class="towtruck-bottom-panel">
-        <button id="towtruck-end-session">End TowTruck</button>
-	 		  <p class="small">
-	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a> is a <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a> project.  Please give us feedback <a href="https://docs.google.com/spreadsheet/ccc?key=0AhaY9YfKCqi_dElDNjhkRjBhWndYNkFyZnlLd3p4Nnc&amp;usp=sharing" target="_blank">here</a>, thanks!
+        <button id="towtruck-end-session">End TowTruck Session</button>
+        <p class="small">
+	        <a href="https://towtruck.mozillalabs.com" target="_blank">TowTruck</a>
+          is a
+          <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a>
+          project.  Please give us your feedback, thanks!
         </p>
+        <button id="towtruck-feedback-button">Give us Feedback</button>
       </div>
     </section>
   </div>
@@ -226,24 +228,10 @@
     <p><button class="towtruck-modal-dont-join">No, don't join</button></p>
   </div>
 
-  <!-- Our alpha intro: -->
-  <div id="towtruck-alpha-intro" class="towtruck-modal towtruck-modal-wide" style="display: none">
-    <!-- FIXME: the header doesn't render well at a wide width, but we have more
-         text than fits into the small box -->
-    <!--<header class="towtruck-title">Thanks for checking out TowTruck!</header>-->
-
-    <p>
-      Thanks for checking out
-      <a href="https://towtruck.mozillalabs.com/" target="_blank">TowTruck</a>!
-      This is an <strong>alpha preview</strong> so we apologize for the rough edges.
-      Since this is an alpha we'd very much appreciate feedback, and you can be
-      assured we'll be paying attention to it.  After trying this out some, please
-      submit feedback via the link you can find by clicking the TowTruck button
-      (<img src="/images/icn-logo-blk.png" style="height: 2em; vertical-align: middle">).
-    </p>
-
-    <p><button class="towtruck-modal-close">OK</button></p>
-
+  <div id="towtruck-feedback-form" class="towtruck-modal" style="display: none;">
+    <header class="towtruck-title">Feedback! &mdash; Yay!</header>
+    <iframe src="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true" width="500" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+    <p><button class="towtruck-modal-close">Close</button></p>
   </div>
 
   <!-- The pointer at the side of a window: -->

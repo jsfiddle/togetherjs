@@ -205,10 +205,12 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     assert(container.length);
     $("body").append(container);
     var seenDialog = session.settings.get("seenIntroDialog");
-    var seenAlpha = session.settings.get("seenAlphaIntro");
-    if (! seenAlpha) {
-      session.settings.set("seenAlphaIntro", true);
-      modal.showModal("#towtruck-alpha-intro");
+    var seenWalkthrough = session.settings.get("seenWalkthrough");
+    if (! seenWalkthrough) {
+      session.settings.set("seenWalkthrough", true);
+      require(["walkthrough"], function (walkthrough) {
+        walkthrough.start();
+      });
     } else if (seenDialog == "force" || (session.isClient && ! seenDialog)) {
       if (! seenDialog) {
         session.settings.set("seenIntroDialog", true);
@@ -352,6 +354,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
 
     $("#towtruck-end-session").click(function () {
       session.close();
+    });
+
+    $("#towtruck-feedback-button").click(function(){
+      modal.showModal("#towtruck-feedback-form");
     });
 
     $("#towtruck-cancel-end-session").click(function () {
