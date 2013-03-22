@@ -66,7 +66,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       attachTo: "#towtruck-anchor",
       title: "Move the dock",
       description: "Grab here to move the dock to the right or left side of the browser."
-    } ,
+    },
     {
       overlay: true,
       attachTo: "#towtruck-interface",
