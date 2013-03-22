@@ -224,7 +224,7 @@
 /*cancel btn*/
 .cancel-btn() {
   display: inline-block;
-  border-radius: 0.25em 0.25em 0.25em 0.25em;
+  border-radius: 0.25em;
   background: #ffffff; /* Old browsers */
   background: -moz-linear-gradient(top,  #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
@@ -250,7 +250,7 @@
 /*confirm btn*/
 .confirm-btn() {
   display: inline-block;
-  border-radius: 0.25em 0.25em 0.25em 0.25em;
+  border-radius: 0.25em;
   background: #3c88cc; /* Old browsers */
   background: -moz-linear-gradient(top,  #3c88cc 0%, #276195 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3c88cc), color-stop(100%,#276195)); /* Chrome,Safari4+ */
@@ -259,7 +259,7 @@
   background: -ms-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* IE10+ */
   background: linear-gradient(to bottom,  #3c88cc 0%,#276195 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c88cc', endColorstr='#276195',GradientType=0 ); /* IE6-9 */
-  color: rgb(255, 255, 255);
+  color: #fff;
   text-align: center;
   font-size: 14px;
   padding: 0px 20px;
@@ -441,19 +441,20 @@
   }
 
   span.towtruck-participant-name {
-    margin:10px 10px 10px 10px;
+    margin:10px;
   }
-
-
 
   #towtruck-buttons .towtruck-button {
     .button-reset;
     position:relative;
     -webkit-padding-start: 2px;
     left:-1px;
-    width: @button-width+12;
-    height: @button-height+8;
-    border-bottom:1px solid #ebebeb;
+    width: @button-size + 12;
+    height: @button-size + 8;
+    background-size: @button-size @button-size;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-bottom: 1px solid #ebebeb;
     img {
       width: @button-size;
       height: @button-size;
