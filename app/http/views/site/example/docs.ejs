@@ -1,49 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Documentation Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link rel="shortcut icon" href="/images/fav-icon.png">
-    <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-    </style>
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <!-- Fav and touch icons -->
-  </head>
+<% layout('../../layout.ejs') -%>
+<% block("enableExample", true) %>
+<% block("title", "Mozilla Labs : TowTruck example of a long page") %>
 
-  <body>
-
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="./">TowTruck Examples</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li><a href="./">Home</a></li>
-              <li><a href="code.html">Code Editor</a></li>
-              <li><a href="form.html">Form</a></li>
-              <li class="active"><a href="docs.html">Docs</a></li>
-              <li><a id="start-towtruck" href="#" title="Start TowTruck; work on this page with a friend!"><img src="/images/icn-logo.png" style="height: 25px;"></a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
+<div class="container">
 
       <h1>Documentation Example</h1>
 
-      <p>This is all about co-browsing some documentation.</p>
+      <p><strong>This is an example!</strong>  This isn't documentation of TowTruck itself.</p>
+
+      <p>This is intended to show what it's like to co-browse a large page using TowTruck.</p>
 
 <ul>
   <li><a href="#Root_element">Root element</a></li>
@@ -620,25 +585,3 @@
 
 
     </div> <!-- /container -->
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="bootstrap/js/jquery.min.js"></script>
-    <!--<script src="bootstrap/js/bootstrap-transition.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-alert.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-modal.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-dropdown.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-scrollspy.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-tab.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-tooltip.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-popover.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-button.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-collapse.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-carousel.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-typeahead.js"></script>-->
-
-    <script src="/towtruck.js"></script>
-    <script src="startup.js"></script>
-  </body>
-</html>

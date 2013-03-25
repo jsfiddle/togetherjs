@@ -1,53 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>TowTruck Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link rel="shortcut icon" href="/images/fav-icon.png">
-    <style>
-      body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-      }
-      #main {
-        max-width: 900px;
-      }
+<% layout('../../layout.ejs') -%>
+<% block("enableExample", true) %>
+<% block("title", "Mozilla Labs : TowTruck example pages") %>
 
-    </style>
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <!-- Fav and touch icons -->
-  </head>
-
-  <body>
-
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="./">TowTruck Examples</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a href="./">Home</a></li>
-              <li><a href="code.html">Code Editor</a></li>
-              <li><a href="form.html">Form</a></li>
-              <li><a href="docs.html">Docs</a></li>
-              <li><button class="btn btn-info btn-small" id="start-towtruck" href="#" title="Start TowTruck; work on this page with a friend!"><img src="/images/icn-logo.png" style="height: 25px;">Call for Help</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
-    <div class="container" id="main">
+<div class="container">
 
       <h1>TowTruck example pages</h1>
 
       <p>Poke around and collaborate on these pages using TowTruck.  This is just a sample of what you can do with TowTruck.</p>
+
+      <p>There are several kinds of pages for you to try out:
+
+        <ul>
+          <li><a href="./code">A code-editing example</a></li>
+          <li><a href="./docs">A long documentation page</a></li>
+          <li><a href="./form">A form</a></li>
+        </ul>
+
+      </p>
+
+      <p>
+        To start TowTruck click "Start TowTruck" at the top of the page, or
+        hit this button:
+
+        <button onclick="TowTruck(this); return false">Start TowTruck</button>
+
+      </p>
+
+      <p><br></p>
+      <p><br></p>
+      <p><br></p>
+      <p><br></p>
+
+
+<!--
 
       <hr>
 
@@ -86,26 +71,6 @@
       <p>It was all very well to say ‘Drink me,’ but the wise little Alice was not going to do that in a hurry. ‘No, I’ll look first,’ she said, ‘and see whether it’s marked “poison” or not’; for she had read several nice little histories about children who had got burnt, and eaten up by wild beasts and other unpleasant things, all because they would not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that if you cut your finger very deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked ‘poison,’ it is almost certain to disagree with you, sooner or later.</p>
 
       <p>However, this bottle was not marked ‘poison,’ so Alice ventured to taste it, and finding it very nice, (it had, in fact, a sort of mixed flavour of cherry-tart, custard, pine-apple, roast turkey, toffee, and hot buttered toast,) she very soon finished it off.</p>
+-->
 
-    </div> <!-- /container -->
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="bootstrap/js/jquery.min.js"></script>
-    <!--<script src="bootstrap/js/bootstrap-transition.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-alert.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-modal.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-dropdown.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-scrollspy.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-tab.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-tooltip.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-popover.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-button.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-collapse.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-carousel.js"></script>-->
-    <!--<script src="bootstrap/js/bootstrap-typeahead.js"></script>-->
-    <script src="/towtruck.js"></script>
-    <script src="startup.js"></script>
-  </body>
-</html>
+</div>

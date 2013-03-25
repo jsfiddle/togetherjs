@@ -25,6 +25,7 @@
 body {
   padding-bottom: 0px;
   background-color: #fff;
+  color: rgb(72, 72, 72);
 }
 
 /* The rest of most pages, starting at the top: */
@@ -68,8 +69,8 @@ ul.nav {
 
 ul.nav a{
 	font-family:openSansLight;
-	color:#fff !important;	
-	text-shadow:0px 0px 0px rgb(0,0,0) !important;	
+	color:#fff !important;
+	text-shadow:0px 0px 0px rgb(0,0,0) !important;
 	padding:0px !important;
 	margin:20px;
 }
@@ -86,7 +87,7 @@ ul.nav a:hover{
   height:20px;
   padding-right:5px;
   position:relative;
-  top:-2px;"
+  top:-2px;
 }
 
 .navbar .nav > li > a {
@@ -246,7 +247,7 @@ p.main-text {
   margin:0px;
 }
 #how_it_works .how_it_works_list_box img{
-	
+
 }
 
 #how_it_works .how_it_works_list_box p{
