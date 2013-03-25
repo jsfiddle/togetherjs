@@ -23,9 +23,9 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
        name: "Next",
        classString: "towtruck-walkthru-next-button"
        }],
-    
-    
-    
+
+
+
     // buttons: [{name: "Get started", onclick: guiders.hideAll},{name: "Back"}, {name: "Next"}],
     // This is assigned to the first item.buttons in the guide:
     firstButtons:
@@ -39,15 +39,15 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
        classString: "towtruck-walkthru-next-button"
        }],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: 
+    lastButtons:
       [{
         name: "Get started",
         classString: "towtruck-walkthru-getstarted-button",
         onclick: guiders.hideAll
        }],
     position: 9,
-	  overlay: true,
-	  width:400,
+    overlay: true,
+    width:400,
     closeOnEscape: true,
     onHide: hideWindow,
     xButton: true
@@ -66,14 +66,16 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     {
       overlay: true,
       title: "Welcome to TowTruck!",
-      description: "<p>\
-                    <iframe \
-                      src=\"http://player.vimeo.com/video/57992755?byline=0&amp;portrait=0&amp;api=1&amp;player_id=modal_vimeo_iframe\" \
-                      width=\"400\" height=\"300\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen>\
-                    </iframe>\
-                    </p>\
-					<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>",
-	    onHide: hideWindow
+      description: (
+        "<p>\n" +
+            "<iframe " +
+            "src=\"http://player.vimeo.com/video/57992755?byline=0&amp;portrait=0&amp;api=1&amp;player_id=modal_vimeo_iframe\" " +
+            "width=\"400\" height=\"300\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen>" +
+            "</iframe>" +
+            "</p>\n" +
+			"<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>"
+        ),
+      onHide: hideWindow
     },
     {
       overlay: true,
@@ -104,7 +106,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-interface",
       title: "Start TowTruck!",
-      description: "Alright, you're ready to use TowTruck! Now get collaboratin :)"
+      description: "Alright, you're ready to use TowTruck! Now get collaboratin' :)"
     }
   ];
 
