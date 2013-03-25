@@ -9,11 +9,11 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
-    buttons: [{name: "Back"}, {name: "Next"}, {name: "Okay, I get it!", onclick: guiders.hideAll}],
+    buttons: [{name: "Get started", onclick: guiders.hideAll},{name: "Back"}, {name: "Next"}],
     // This is assigned to the first item.buttons in the guide:
-    firstButtons: [{name: "Next"}, {name: "Okay, I get it!", onclick: guiders.hideAll}],
+    firstButtons: [{name: "Get started", onclick: guiders.hideAll},{name: "Next"}],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Let's get started!", onclick: guiders.hideAll}],
+    lastButtons: [{name: "Get started", onclick: guiders.hideAll}],
     position: 9,
 	  overlay: true,
 	  width:400,
@@ -33,7 +33,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   var guide = [
     {
       overlay: true,
-      title: "Welcome to TowTruck",
+      title: "Welcome to TowTruck!",
       description: "<p>\
                     <iframe \
                       src=\"http://player.vimeo.com/video/57992755?byline=0&amp;portrait=0&amp;api=1&amp;player_id=modal_vimeo_iframe\" \
@@ -48,7 +48,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-about-button",
       title: "Connect with friends",
-      description: "Click here to <ol><li>Send a link to your friend to start the TowTruck session</li><li>Set up your profile</li><li>End the TowTruck session</li></ol>"
+      description: "Click here to start your TowTruck session.  Just copy and paste the TowTruck link, and send it to your friend!"
     },
     {
       overlay: true,
@@ -72,8 +72,8 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     {
       overlay: true,
       attachTo: "#towtruck-interface",
-      title: "Get Started!",
-      description: "Ready to start TowTruckin'?"
+      title: "TowTruck it up!",
+      description: "You're ready to use TowTruck!  Remember, to "
     }
   ];
 

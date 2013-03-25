@@ -244,11 +244,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
           // We keep recalculating because the setTimeout times aren't always so accurate:
           finishedAt = Date.now() + 520;
           iface.css({
-            MozTransition: "-moz-transform 0.5s ease-out",
+            MozTransition: "-moz-transform 0.3s ease-out",
             MozTransform: "translate(0, 0)",
-            WebkitTransition: "-webkit-transform 0.5s ease-out",
+            WebkitTransition: "-webkit-transform 0.3s ease-out",
             WebkitTransform: "translate(0, 0)",
-            transition: "transform 0.5s ease-out",
+            transition: "transform 0.3s ease-out",
             transform: "translate(0, 0)"
           });
           setTimeout(function () {
