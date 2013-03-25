@@ -71,10 +71,9 @@
   font-size: 12px;
   text-transform: none;
   vertical-align: middle;
-  width: 80px;
+  width: 96px;
   padding:10px 10px 10px 10px;
-  margin:10px;
-  background-color: #73a729;  
+  margin:10px 0px;
   color: rgb(255, 255, 255);
   cursor: pointer;
   display: inline-block;
@@ -90,12 +89,54 @@
 
 .guiders_button:hover {
   color:#fff;
-  background-color:#61921b;
   text-decoration:none;
 }
 
+.guiders_button.towtruck-walkthru-getstarted-button {
+  background-color: #73a729;  
+  float:right;
+  margin:10px 10px;
+}
+
+.guiders_button.towtruck-walkthru-getstarted-button:hover {
+  background-color:#61921b; 
+}
+
+.guiders_button.towtruck-walkthru-next-button {
+  background-image:url('/images/walkthru-arrow-next.png');
+  background-repeat:no-repeat;
+  background-size:20px 20px;
+  float:right;
+  background-position:80px 10px;
+  margin-left:10px;
+  opacity:0.5;
+  color:#0093e0;
+  border:1px solid #ccc;
+}
+
+.guiders_button.towtruck-walkthru-next-button:hover {
+  opacity:1;
+}
+
+.guiders_button.towtruck-walkthru-back-button {
+  float:right;
+  margin-right:10px;
+  background-image:url('/images/walkthru-arrow-prev.png');
+  background-repeat:no-repeat;
+  background-size:20px 20px;
+  background-position:20px 10px;
+  opacity:0.5;
+  color:#0093e0;
+  border:1px solid #ccc;
+}
+
+.guiders_button.towtruck-walkthru-back-button:hover {
+  opacity:1;
+}
+
+
 .guiders_buttons_container {
-  height: 36px;
+  height: 56px;
   position: relative;
   width: 100%;
 }

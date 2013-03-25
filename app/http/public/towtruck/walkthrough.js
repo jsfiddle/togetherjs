@@ -9,16 +9,48 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
-    buttons: [{name: "Get started", onclick: guiders.hideAll},{name: "Back"}, {name: "Next"}],
+    buttons:
+      [{
+       name: "Back",
+       classString: "towtruck-walkthru-back-button"
+       },
+       {
+         name: "Get started",
+         classString: "towtruck-walkthru-getstarted-button",
+         onclick: guiders.hideAll
+        },
+      {
+       name: "Next",
+       classString: "towtruck-walkthru-next-button"
+       }],
+    
+    
+    
+    // buttons: [{name: "Get started", onclick: guiders.hideAll},{name: "Back"}, {name: "Next"}],
     // This is assigned to the first item.buttons in the guide:
-    firstButtons: [{name: "Get started", onclick: guiders.hideAll},{name: "Next"}],
+    firstButtons:
+      [{
+        name: "Get started",
+        classString: "towtruck-walkthru-getstarted-button",
+        onclick: guiders.hideAll
+       },
+      {
+       name: "Next",
+       classString: "towtruck-walkthru-next-button"
+       }],
     // This is assigned to the last item.buttons in the guide:
-    lastButtons: [{name: "Get started", onclick: guiders.hideAll}],
+    lastButtons: 
+      [{
+        name: "Get started",
+        classString: "towtruck-walkthru-getstarted-button",
+        onclick: guiders.hideAll
+       }],
     position: 9,
 	  overlay: true,
 	  width:400,
     closeOnEscape: true,
-    onHide: hideWindow
+    onHide: hideWindow,
+    xButton: true
   };
 
   function showSettings(){
@@ -41,8 +73,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
                     </iframe>\
                     </p>\
 					<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>",
-	    onHide: hideWindow,
-	    onShow: showSettings
+	    onHide: hideWindow
     },
     {
       overlay: true,
@@ -72,8 +103,8 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     {
       overlay: true,
       attachTo: "#towtruck-interface",
-      title: "TowTruck it up!",
-      description: "You're ready to use TowTruck!  Remember, to "
+      title: "Start TowTruck!",
+      description: "Alright, you're ready to use TowTruck! Now get collaboratin :)"
     }
   ];
 
