@@ -79,7 +79,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-about-button",
       title: "Connect with friends",
-      description: "Click here to start your TowTruck session.  Just copy and paste the TowTruck link, and send it to your friend!"
+      description: "<p>Click here to start your TowTruck session.  Just copy and paste the TowTruck link, and send it to your friend!</p><p>lorem ipsum</p><p>lorem ipsum</p><p>lorem ipsum</p>"
     },
     {
       overlay: true,

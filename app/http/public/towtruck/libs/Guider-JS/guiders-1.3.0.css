@@ -71,7 +71,7 @@
   font-size: 12px;
   text-transform: none;
   vertical-align: middle;
-  width: 96px;
+  width: 100px;
   padding:10px 10px 10px 10px;
   margin:10px 0px;
   color: rgb(255, 255, 255);
@@ -107,31 +107,34 @@
   background-repeat:no-repeat;
   background-size:20px 20px;
   float:right;
-  background-position:80px 10px;
-  margin-left:10px;
+  background-position:39px 10px;
+  margin-left:70px;
   opacity:0.5;
-  color:#0093e0;
-  border:1px solid #ccc;
+  color:#f2f4f5;
+  width:10px;
 }
 
 .guiders_button.towtruck-walkthru-next-button:hover {
   opacity:1;
+  color:#f2f4f5;
+  
 }
 
 .guiders_button.towtruck-walkthru-back-button {
   float:right;
-  margin-right:10px;
+  margin-right:70px;
   background-image:url('/images/walkthru-arrow-prev.png');
   background-repeat:no-repeat;
   background-size:20px 20px;
-  background-position:20px 10px;
+  background-position:0px 10px;
   opacity:0.5;
-  color:#0093e0;
-  border:1px solid #ccc;
+  color:#f2f4f5;
+  width:10px;
 }
 
 .guiders_button.towtruck-walkthru-back-button:hover {
   opacity:1;
+  color:#f2f4f5;
 }
 
 
@@ -144,6 +147,8 @@
 .guiders_close {
   float: right;
   padding: 10px 0 0;
+  position:relative;
+  top:-35px;
 }
 
 .guiders_content {
