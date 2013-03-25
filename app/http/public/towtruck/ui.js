@@ -18,6 +18,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   // This is set when an animation will keep the UI from being ready
   // (until this time):
   var finishedAt = null;
+  // Time in milliseconds for the dock to animate out:
+  var DOCK_ANIMATION_TIME = 300;
 
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded:
@@ -226,9 +228,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       // until the animation finishes - attempts to calculate the
       // offset without taking into account CSS transforms have so far
       // failed.)
-      finishedAt = Date.now() + 550;
+      var timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
+      finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
       setTimeout(function () {
-        finishedAt = Date.now() + 540;
+        finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
         var iface = container.find("#towtruck-interface");
         var start = iface.offset();
         var pos = $(TowTruck.startTarget).offset();
@@ -238,17 +241,21 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         iface.css({
           MozTransform: translate,
           WebkitTransform: translate,
-          transform: translate
+          transform: translate,
+          opacity: "0.0"
         });
         setTimeout(function () {
           // We keep recalculating because the setTimeout times aren't always so accurate:
-          finishedAt = Date.now() + 520;
+          finishedAt = Date.now() + DOCK_ANIMATION_TIME + 20;
+          var transition = "transform " + timeoutSeconds + "s ease-out, ";
+          transition += "opacity " + timeoutSeconds + "s ease-out";
           iface.css({
-            MozTransition: "-moz-transform 0.3s ease-out",
+            opacity: "1.0",
+            MozTransition: "-moz-" + transition,
             MozTransform: "translate(0, 0)",
-            WebkitTransition: "-webkit-transform 0.3s ease-out",
+            WebkitTransition: "-webkit-" + transition,
             WebkitTransform: "translate(0, 0)",
-            transition: "transform 0.3s ease-out",
+            transition: transition,
             transform: "translate(0, 0)"
           });
           setTimeout(function () {
