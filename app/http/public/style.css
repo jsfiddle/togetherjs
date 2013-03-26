@@ -356,17 +356,20 @@ p.main-text {
 	margin:0px 40px;
 }
 
-input.copy-input {
+input.copy-input, textarea.copy-input {
 	border:1px solid rgba(0,0,0,1);
 	font-family:openSansRegular;
 	letter-spacing:0px;
-	text-align:center;
 	border-radius:2px;
 	padding:6px;
 	width:450px;
 	background:rgba(72,72,72,1);
 	color:#fff;
 	font-size:12px;
+}
+
+input.copy-input {
+	text-align:center;
 }
 
 footer {
@@ -400,13 +403,13 @@ footer a:hover{
 }
 
 .container.examples button{
-  background: 
+  background:
   #e34623;
   border-radius: 2px;
   font-size: 17px;
   font-weight: normal;
   line-height: 1.5;
-  text-shadow: 0px 1px 0px 
+  text-shadow: 0px 1px 0px
   rgba(0,0,0,0.3);
   font-family: openSansLight;
   letter-spacing: -0.01px;

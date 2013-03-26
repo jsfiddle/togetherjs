@@ -395,7 +395,6 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     require(["ui"], function (ui) {
       ui.prepareUI();
       require(features, function () {
-      // FIXME: should be the overview screen sometimes:
         $(function () {
           var ui = require("ui");
           if (autoOpenShare) {
@@ -404,6 +403,11 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
             });
           }
           ui.activateUI();
+          if (TowTruck.getConfig("enableAnalytics")) {
+            require(["analytics"], function (analytics) {
+              analytics.activate();
+            });
+          }
           sendHello(false);
         });
       });

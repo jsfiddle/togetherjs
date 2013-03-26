@@ -14,7 +14,7 @@
         <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
           <img src="images/site-product-shot.png" alt="Product shot">
         </a>
-      </div>	
+      </div>
 		  <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
 			  <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
           <img src="/images/icn-close-btn-wht.png" alt="close button">
@@ -35,8 +35,8 @@
         <ol class="carousel-indicators">
           <li data-target="#how_it_works_carousel" data-slide-to="0" class="active">
 			<div class="how_it_works_list_box">
-				<div class="col-left">				
-					<img src="images/site-howitworks-01.png" alt="Step 1"> 
+				<div class="col-left">
+					<img src="images/site-howitworks-01.png" alt="Step 1">
             	</div>
 				<div class="col-right">
 					<h2 class="subheader">Click the TowTruck button</h2>
@@ -47,10 +47,10 @@
           </li>
           <li data-target="#how_it_works_carousel" data-slide-to="1">
 			<div class="how_it_works_list_box">
-				<div class="col-left">				
-					<img src="images/site-howitworks-02.png" alt="Step 2"> 
+				<div class="col-left">
+					<img src="images/site-howitworks-02.png" alt="Step 2">
 	            </div>
-				<div class="col-right">	
+				<div class="col-right">
 					<h2 class="subheader">Share the TowTruck link</h2>
 	            	<p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
 				</div>
@@ -60,7 +60,7 @@
           <li data-target="#how_it_works_carousel" data-slide-to="2">
 			<div class="how_it_works_list_box">
 				<div class="col-left">
-					<img src="images/site-howitworks-03.png" alt="Step 3"> 
+					<img src="images/site-howitworks-03.png" alt="Step 3">
 	            </div>
 				<div class="col-right">
 					<h2 class="subheader">Wait for your friend to join</h2>
@@ -148,7 +148,11 @@
         <p class="main-text">Simply copy and paste the TowTruck JavaScript snippet below into your site.</p>
         <form>
           <fieldset>
-            <input type="text" class="span6 copy-input" value="<script src=&quot;https://towtruck.mozillalabs.com/towtruck.js&quot;></script>">
+            <textarea class="span6 copy-input" style="height: 9em">&lt;script&gt;
+  // Set to false or delete to disable analytics/tracking:
+  TowTruckConfig_enableAnalytics = true;
+&lt;/script&gt;
+&lt;script src="https://towtruck.mozillalabs.com/towtruck.js"&gt;&lt;/script&gt;</textarea>
           </fieldset>
         </form>
       </div>

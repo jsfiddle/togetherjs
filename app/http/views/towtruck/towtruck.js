@@ -46,7 +46,7 @@
 
   var oldTowTruck = window.TowTruck;
 
-  var TowTruck = window.TowTruck = function (event, doneCallback) {
+  var TowTruck = window.TowTruck = function TowTruck(event, doneCallback) {
     if (typeof event == "function") {
       if (doneCallback) {
         console.warn("TowTruck() first argument *and* second argument is a function");
@@ -133,7 +133,13 @@
 
   TowTruck._configuration = {};
   TowTruck._defaultConfiguration = {
+    // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
+    // Enable Mozilla or Google analytics on the page when TowTruck is activated:
+    enableAnalytics: false,
+    // The code to enable (this is defaulting to a Mozilla code):
+    analyticsCode: "UA-35433268-28",
+    // The base URL of the hub
     hubBase: defaultHubBase
   };
   // FIXME: there's a point at which configuration can't be updated
@@ -168,7 +174,8 @@
       }
       settings = name;
     } else {
-      settings = {name: value};
+      settings = {};
+      settings[name] = value;
     }
     for (var attr in settings) {
       if (attr == "loaded" || ! settings.hasOwnProperty(attr)) {
