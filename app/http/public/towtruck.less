@@ -385,7 +385,7 @@
 
   span#towtruck-checkmark {
     position:relative;
-    left:-30px;
+    left:-18px;
     top:18px;
   }
 
@@ -531,7 +531,7 @@
 
   #towtruck-buttons #towtruck-expand-button {
     background:#0095DD;
-    height:20px;
+    height:40px;
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
     border:1px solid #00539F;
@@ -542,13 +542,18 @@
     position:relative;
     left:-1px;
     top:-3px;
+    background-image:url('/images/icn-info.png');
+    background-position:4px 0px;
+    background-size:40px 40px;
+    cursor:pointer;
   }
 
-  #towtruck-buttons #towtruck-expand-button img {
-    height:7px;
-    width:14px;
-    position:relative;
-    top:-2px;
+  #towtruck-buttons #towtruck-expand-button:hover {
+    background-image:url('/images/icn-info-hover.png');
+  }
+
+  #towtruck-buttons #towtruck-expand-button:active {
+    background-image:url('/images/icn-info-active.png');
   }
 
   .towtruck-dock-person img.towtruck-avatar {
@@ -924,6 +929,15 @@
     }
   }
   
+  #towtruck-feedbackbtn-box {
+    width:100px;
+    height:20px;
+    background:#ccc;
+    position:absolute;
+    left:-20px;
+    top:40px;
+  }
+  
   #towtruck-feedback-form .towtruck-title{
     width:361px;
     left:8px;
@@ -1288,7 +1302,7 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  @long-side: (@button-size + 12) * 4 + 20px; // actual button-size * number of buttons + expand thingy
+  @long-side: (@button-size + 12) * 4 + 44px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
@@ -1309,7 +1323,7 @@
     #towtruck-anchor-horizontal img {
       width:6px;
       height:6px;
-      padding:2px;
+      padding:7px 2px 2px 2px
     }
   }
 
@@ -1330,7 +1344,7 @@
     #towtruck-anchor-horizontal img {
       width:6px;
       height:6px;
-      padding:2px;
+      padding:7px 2px 2px 2px
     }
   }
 
