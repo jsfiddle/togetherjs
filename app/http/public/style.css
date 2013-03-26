@@ -395,6 +395,10 @@ footer a:hover{
   font-family:openSansRegular;
 }
 
+.container.examples h1 {
+  margin-top:60px;
+}
+
 .container.examples button{
   background: 
   #e34623;
