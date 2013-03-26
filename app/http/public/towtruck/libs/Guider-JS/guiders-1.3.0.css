@@ -49,7 +49,7 @@
 .guiders_arrow_right {
   display: block;
   background-position: 0px 15px;
-  right: -40px;
+  right: -39px;
 }
 .guiders_arrow_down {
   display: block;
@@ -151,6 +151,7 @@
 
 .guiders_content {
   position: relative;
+  text-align:center;
 }
 
 .guiders_content h1 {

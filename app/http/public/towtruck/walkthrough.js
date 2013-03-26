@@ -84,32 +84,32 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-about-button",
       title: "Connect with friends",
-      description: "<p>Click here to start your TowTruck session.  Just copy and paste the TowTruck link, and send it to your friend!</p><p>lorem ipsum</p><p>lorem ipsum</p><p>lorem ipsum</p>"
+      description: "<img src=\"/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to start your TowTruck session.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-share-link",
       title: "Share this link",
-      description: "<p>To start a TowTruck session, just copy and paste this link and send it to a friend!</p>",
+      description: "<img src=\"/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To start your TowTruck session, just copy and paste this link and send it to a friend!</p>",
       onShow: showSettings,
     },
     {
       overlay: true,
       attachTo: "#towtruck-audio-button",
       title: "Talk in real-time",
-      description: "<p>If your browser supports it, you can live chat with your friends.</p><p>This is an experimental feature.  To learn more, go <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
+      description: "<img src=\"/images/walkthru-img-03.png\" alt=\"Walkthrough image 3\"><p>If your browser supports it, you can live chat with your friends.</p><p>Since this is an experimental feature, you can learn more <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-chat-button",
       onHide: hideWindow,
       title: "Chat with friends",
-      description: "Easily chat with your friends and collaborators."
+      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily chat with your friends and collaborators.</p>"
     },
     {
       overlay: true,
       title: "Start TowTruck!",
-      description: "Alright, you're ready to use TowTruck! Now get collaboratin' :)"
+      description: "<img src=\"/images/walkthru-img-05.png\" alt=\"Walkthrough image 5\"><p>Alright, you're ready to use TowTruck! Now get collaborating!</p>"
     }
   ];
 
