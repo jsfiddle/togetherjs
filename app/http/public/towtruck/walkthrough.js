@@ -44,7 +44,10 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
         name: "Get started",
         classString: "towtruck-walkthru-getstarted-button",
         onclick: guiders.hideAll
-       }],
+       },{
+         name: "Back",
+         classString: "towtruck-walkthru-back-button"
+      }],
     position: 9,
     overlay: true,
     width:400,
@@ -88,7 +91,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       attachTo: "#towtruck-share-link",
       title: "Share this link",
       description: "<p>To start a TowTruck session, just copy and paste this link and send it to a friend!</p>",
-      onShow: showSettings
+      onShow: showSettings,
     },
     {
       overlay: true,
@@ -105,7 +108,6 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     },
     {
       overlay: true,
-      attachTo: "#towtruck-interface",
       title: "Start TowTruck!",
       description: "Alright, you're ready to use TowTruck! Now get collaboratin' :)"
     }

@@ -236,3 +236,11 @@
 #help-6 {
   margin-left:20px !important;
 }
+
+#help-6 .guiders_button.towtruck-walkthru-back-button{
+  float:left;
+}
+
+#help-6 .towtruck-walkthru-getstarted-button{
+  float:left;
+}
