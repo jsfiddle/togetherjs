@@ -85,22 +85,23 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     },
     {
       overlay: true,
+      attachTo: "#towtruck-share-link",
+      title: "Share this link",
+      description: "<p>To start a TowTruck session, just copy and paste this link and send it to a friend!</p>",
+      onShow: showSettings
+    },
+    {
+      overlay: true,
       attachTo: "#towtruck-audio-button",
-      title: "Talk with friends",
-      description: "If your browser supports it, you can audio chat live with your friend over the browser just like magic!"
+      title: "Talk in real-time",
+      description: "<p>If your browser supports it, you can live chat with your friends.</p><p>This is an experimental feature.  To learn more, go <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-chat-button",
       onHide: hideWindow,
       title: "Chat with friends",
-      description: "You know how this works :)"
-    },
-    {
-      overlay: true,
-      attachTo: "#towtruck-anchor",
-      title: "Move the dock",
-      description: "Grab here to move the dock to the right or left side of the browser."
+      description: "Easily chat with your friends and collaborators."
     },
     {
       overlay: true,
