@@ -192,8 +192,10 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     var parent = $(target).closest(".towtruck-window, .towtruck-popup, #towtruck-interface");
     if (parent.length) {
       target = parent[0];
+    } else if (elementFinder.ignoreElement(target)) {
+      target = null;
     }
-    if (target == document.documentElement || target == document.body) {
+    if ((! target) || target == document.documentElement || target == document.body) {
       lastMessage = {
         type: "cursor-update",
         top: pageY,
