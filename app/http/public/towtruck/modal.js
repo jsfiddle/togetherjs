@@ -23,7 +23,7 @@ define(["util", "jquery", "session"], function (util, $, session) {
     if (! el.find(".towtruck-close").length) {
       el.prepend($('<div class="towtruck-close">&times;</div>'));
     }
-    el.find(".towtruck-close, .towtruck-modal-close").click(modal.stopModal);
+    el.find(".towtruck-close, .towtruck-modal-close, .towtruck-minimize").click(modal.stopModal);
     getBackground().show();
     el.show();
     bindEscape();
