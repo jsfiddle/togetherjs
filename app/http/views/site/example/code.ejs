@@ -4,37 +4,50 @@
 <% block("styles", "<style>pre {/* Override bootrap pre padding */ padding: 0;}  #ace-editor {margin: 0; top: 0; position: absolute; width: 80%; height: 25em; right: 0;}  #ace-container {height: 25em;}  #codemirror-container {border: 1px solid #000;}</style>") %>
 
 
-    <div class="container">
+<div class="container examples">
+    <div class="span3">
+       <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">Examples</li>
+          <li><a href="./code">Code editor</a></li>
+          <li><a href="./longpage">A long page</a></li>
+          <li><a href="./form">A form</a></li>
+        </ul>
+      </div><!--/.well -->
+    </div>
+    
+    <div class="span8">
 
-      <h1>Code Example</h1>
+        <h1>Code editor</h1>
 
-      <p>TowTruck requires specific support for editors.  There is active support for
-        <a href="http://codemirror.net/">CodeMirror</a> (used for
-        example by Thimble),
-        and <a href="http://ace.ajax.org/">ACE</a> (used by Github,
-        Cloud9).</p>
+        <p>TowTruck requires specific support for editors.  There is active support for
+          <a href="http://codemirror.net/">CodeMirror</a> (used for
+          example by Thimble),
+          and <a href="http://ace.ajax.org/">ACE</a> (used by Github,
+          Cloud9).</p>
 
-      <h2>ACE</h2>
+        <h2>ACE</h2>
 
-      <div id="ace-container">
+        <div id="ace-container">
 
-<pre id="ace-editor">function foo(items) {
-  var i;
-  for (i = 0; i &lt; items.length; i++) {
-    alert("Ace Rocks " + items[i]);
+  <pre id="ace-editor">function foo(items) {
+    var i;
+    for (i = 0; i &lt; items.length; i++) {
+      alert("Ace Rocks " + items[i]);
+    }
   }
-}
-</pre>
+  </pre>
 
+        </div>
+
+        <h2>CodeMirror</h2>
+
+        <div id="codemirror-container"></div>
+
+        <hr>
+
+        <p>And that's all folks!</p>
       </div>
-
-      <h2>CodeMirror</h2>
-
-      <div id="codemirror-container"></div>
-
-      <hr>
-
-      <p>And that's all folks!</p>
 
     </div> <!-- /container -->
 
