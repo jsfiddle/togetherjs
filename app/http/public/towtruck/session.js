@@ -400,7 +400,9 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
           var ui = require("ui");
           ui.activateUI();
           var startup = require("startup");
-          startup.start();
+          session.once("ui-ready", function () {
+            startup.start();
+          });
           if (TowTruck.getConfig("enableAnalytics")) {
             require(["analytics"], function (analytics) {
               analytics.activate();

@@ -355,6 +355,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     });
 
     $("#towtruck-feedback-button").click(function(){
+      ui.hideWindow();
       modal.showModal("#towtruck-feedback-form");
     });
 
