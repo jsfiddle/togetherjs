@@ -113,7 +113,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       attachTo: "#towtruck-chat-button",
       onHide: hideWindow,
       title: "Chat with friends",
-      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily chat with your friends and collaborators.</p>"
+      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily text chat with your friends and collaborators.</p>"
     },
     {
       overlay: true,
