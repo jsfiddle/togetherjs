@@ -57,8 +57,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   // * .createAll(): a class method, that finds and instantiates
   //   all trackers.  This will only be called on the master browser, not
   //   the client.
-  // * All trackers classes have a .className property (if you give the
-  //    constructor a name that will be used)
+  // * All trackers classes have a .name property
   // * On instantiation all trackers get added to tracker.trackers.active
   //   array
   // * Trackers have a .introduce() method.  This should send an introduction
@@ -72,7 +71,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       return this._trackers[name];
     },
     register: function (Tracker) {
-      var name = Tracker.className;
+      var name = Tracker.prototype.name;
       if (! name) {
         throw 'Bad Tracker, has no name: ' + Tracker;
       }
@@ -115,7 +114,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
 
   tracker.TextTracker = util.Class({
 
-    constructor: function TextTracker(options) {
+    name: "TextTracker",
+
+    constructor: function (options) {
       this.element = $(options.element);
       this.isClient = options.isClient;
       this.channel = options.channel;
@@ -157,7 +158,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     introduce: function () {
       session.send({
         type: "connect-tracker",
-        trackerType: this.constructor.name,
+        trackerType: this.name,
         routeId: this.channel.id,
         elementLocation: elementFinder.elementLocation(this.element),
         value: this.element.val()
@@ -319,7 +320,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   tracker.trackers.register(tracker.TextTracker);
 
   tracker.FormFieldTracker = util.Class({
-    constructor: function FormFieldTracker(options) {
+    name: "FormFieldTracker",
+
+    constructor: function (options) {
       this.channel = options.channel;
       this.isClient = options.isClient;
       this.change = this.change.bind(this);
@@ -357,7 +360,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       assert(! this.isClient);
       session.send({
         type: "connect-tracker",
-        trackerType: this.constructor.name,
+        trackerType: this.name,
         routeId: this.channel.id
       });
       // FIXME: should send all form states as an init
@@ -414,7 +417,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   tracker.trackers.register(tracker.FormFieldTracker);
 
   tracker.CodeMirrorTracker = util.Class({
-    constructor: function CodeMirrorTracker(options) {
+    name: "CodeMirrorTracker",
+
+    constructor: function (options) {
       this.editor = options.editor;
       this.channel = options.channel;
       this.isClient = options.isClient;
@@ -442,7 +447,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       assert(! this.isClient);
       session.send({
         type: "connect-tracker",
-        trackerType: this.constructor.name,
+        trackerType: this.name,
         routeId: this.channel.id,
         elementLocation: elementFinder.elementLocation(this.editor.getWrapperElement()),
         value: this.editor.getValue()
@@ -553,7 +558,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   tracker.trackers.register(tracker.CodeMirrorTracker);
 
   tracker.AceTracker = util.Class({
-    constructor: function AceTracker(options) {
+    name: "AceTracker",
+
+    constructor: function (options) {
       this.ace = options.ace;
       this.channel = options.channel;
       this.isClient = options.isClient;
@@ -572,7 +579,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       assert(! this.isClient);
       session.send({
         type: "connect-tracker",
-        trackerType: this.constructor.name,
+        trackerType: this.name,
         routeId: this.channel.id,
         elementLocation: elementFinder.elementLocation(this.ace.editor.container),
         value: this.ace.document.getValue()
