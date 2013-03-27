@@ -14,7 +14,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
   // Time the new user window sticks around until it fades away:
-  var NEW_USER_FADE_TIMEOUT = 20000000000000000000000000000000005000;
+  var NEW_USER_FADE_TIMEOUT = 5000;
   // This is set when an animation will keep the UI from being ready
   // (until this time):
   var finishedAt = null;
@@ -739,18 +739,18 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       });
       ui.container.append(el);
       ui.bindWindow(el, this.element);
-      // setTimeout(function () {
-      //         // FIXME: also set opacity of towtruck-window-pointer-left/right?
-      //         el.css({
-      //           MozTransition: "opacity 1s",
-      //           WebkitTransition: "opacity 1s",
-      //           transition: "opacity 1s",
-      //           opacity: "0"
-      //         });
-      //         setTimeout(function () {
-      //           ui.hideWindow(el);
-      //         }, 1000);
-      //       }, NEW_USER_FADE_TIMEOUT);
+      setTimeout(function () {
+        // FIXME: also set opacity of towtruck-window-pointer-left/right?
+        el.css({
+          MozTransition: "opacity 1s",
+          WebkitTransition: "opacity 1s",
+          transition: "opacity 1s",
+          opacity: "0"
+        });
+        setTimeout(function () {
+          ui.hideWindow(el);
+        }, 1000);
+      }, NEW_USER_FADE_TIMEOUT);
     },
 
     click: function () {
