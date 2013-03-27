@@ -6,6 +6,15 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   var link = $('<link rel="stylesheet">').attr("href", TowTruck.baseUrl + "/towtruck/libs/Guider-JS/guiders-1.3.0.css");
   $("head").append(link);
 
+  walkthrough.stop = function () {
+    console.log("hey, stopped");
+    guiders.hideAll();
+    if (onHideAll) {
+      onHideAll();
+      onHideAll = null;
+    }
+  };
+
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
@@ -17,37 +26,37 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
        {
          name: "Get started",
          classString: "towtruck-walkthru-getstarted-button",
-         onclick: guiders.hideAll
+         onclick: walkthrough.stop
         },
       {
        name: "Next",
        classString: "towtruck-walkthru-next-button"
        }],
 
-
-
-    // buttons: [{name: "Get started", onclick: guiders.hideAll},{name: "Back"}, {name: "Next"}],
+    // buttons: [{name: "Get started", onclick: walkthrough.stop},{name: "Back"}, {name: "Next"}],
     // This is assigned to the first item.buttons in the guide:
     firstButtons:
       [{
         name: "Get started",
         classString: "towtruck-walkthru-getstarted-button",
-        onclick: guiders.hideAll
+        onclick: walkthrough.stop
        },
       {
        name: "Next",
        classString: "towtruck-walkthru-next-button"
        }],
+
     // This is assigned to the last item.buttons in the guide:
     lastButtons:
       [{
         name: "Get started",
         classString: "towtruck-walkthru-getstarted-button",
-        onclick: guiders.hideAll
+        onclick: walkthrough.stop
        },{
          name: "Back",
          classString: "towtruck-walkthru-back-button"
       }],
+
     position: 9,
     overlay: true,
     width:400,
@@ -91,7 +100,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       attachTo: "#towtruck-share-link",
       title: "Share this link",
       description: "<img src=\"/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To start your TowTruck session, just copy and paste this link and send it to a friend!</p>",
-      onShow: showSettings,
+      onShow: showSettings
     },
     {
       overlay: true,
@@ -117,7 +126,10 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
 
   var idCount = 1;
 
-  walkthrough.start = function () {
+  var onHideAll = null;
+
+  walkthrough.start = function (doneCallback) {
+    onHideAll = doneCallback;
     if (! builtGuiders) {
       builtGuiders = [];
       guide.forEach(function (item) {
@@ -136,11 +148,9 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
         if (index === guide.length-1 && options.buttons === defaultGuideOptions.buttons) {
           options.buttons = options.lastButtons;
         }
-        console.log("creating", JSON.stringify(options, null, "  "));
         guiders.createGuider(options);
       });
     }
-    console.log("starting", builtGuiders[0]);
     guiders.show("help-1");
   };
 

@@ -1,6 +1,7 @@
 define(["util", "jquery", "session"], function (util, $, session) {
   var assert = util.assert;
   var modal = util.Module("modal");
+  var onClose = null;
 
   function getBackground() {
     if (getBackground.element) {
@@ -15,7 +16,8 @@ define(["util", "jquery", "session"], function (util, $, session) {
     return background;
   }
 
-  modal.showModal = function (el) {
+  modal.showModal = function (el, onCloseCallback) {
+    onClose = onCloseCallback;
     el = $(el);
     assert(el.hasClass("towtruck-modal"));
     if (! el.find(".towtruck-close").length) {
@@ -51,6 +53,10 @@ define(["util", "jquery", "session"], function (util, $, session) {
     active.find(".towtruck-close, .towtruck-modal-close").unbind("close", modal.stopModal);
     active.hide();
     unbindEscape();
+    if (onClose) {
+      onClose();
+      onClose = null;
+    }
   };
 
   return modal;

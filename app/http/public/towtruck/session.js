@@ -26,6 +26,8 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   // This is the ID that identifies this client:
   session.clientId = null;
   session.router = channels.Router();
+  // Indicates if TowTruck has just started (not continuing from a saved session):
+  session.firstRun = false;
 
   // This is the key we use for localStorage:
   var localStoragePrefix = "towtruck.";
@@ -317,7 +319,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["ui", "chat", "tracker", "webrtc", "cursor", "cobrowse"];
+  var features = ["ui", "chat", "tracker", "webrtc", "cursor", "cobrowse", "startup"];
 
   // FIXME: should this be run at load time, instead of in start()?
   function initClientId() {
@@ -331,8 +333,6 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     }
     session.clientId = clientId;
   }
-
-  var autoOpenShare = false;
 
   function initShareId() {
     var hash = location.hash;
@@ -351,6 +351,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     if (! shareId) {
       var m = /&?towtruck(-head)?=([^&]*)/.exec(hash);
       if (m) {
+        session.firstRun = true;
         isClient = ! m[1];
         shareId = m[2];
         var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
@@ -366,7 +367,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
         saved || TowTruck.startTowTruckImmediately,
         "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
       if ((! saved) && TowTruck.startTowTruckImmediately) {
-        autoOpenShare = true;
+        session.firstRun = true;
         isClient = false;
         shareId = session.settings.get("stickyShare");
         if (! shareId) {
@@ -397,12 +398,9 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       require(features, function () {
         $(function () {
           var ui = require("ui");
-          if (autoOpenShare) {
-            session.once("ui-ready", function () {
-              ui.displayWindow("#towtruck-about");
-            });
-          }
           ui.activateUI();
+          var startup = require("startup");
+          startup.start();
           if (TowTruck.getConfig("enableAnalytics")) {
             require(["analytics"], function (analytics) {
               analytics.activate();

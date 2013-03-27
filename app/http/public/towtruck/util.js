@@ -2,8 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define([], function () {
+define(["jquery"], function ($) {
   var util = {};
+
+  util.Deferred = $.Deferred;
+
   /* A simple class pattern, use like:
 
     var Foo = util.Class({

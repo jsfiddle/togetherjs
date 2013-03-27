@@ -210,18 +210,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     assert(container.length);
     $("body").append(container);
     var seenDialog = session.settings.get("seenIntroDialog");
-    var seenWalkthrough = session.settings.get("seenWalkthrough");
-    if (! seenWalkthrough) {
-      session.settings.set("seenWalkthrough", true);
-      require(["walkthrough"], function (walkthrough) {
-        walkthrough.start();
-      });
-    } else if (seenDialog == "force" || (session.isClient && ! seenDialog)) {
-      if (! seenDialog) {
-        session.settings.set("seenIntroDialog", true);
-      }
-      modal.showModal("#towtruck-intro");
-    }
     if (TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
