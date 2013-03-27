@@ -24,7 +24,7 @@
 
 body {
   padding-bottom: 0px;
-  background-color: #fff;
+  background-color: #1baefc;
   color: rgb(72, 72, 72);
 }
 
@@ -394,11 +394,17 @@ footer a:hover{
 }
 
 /*EXAMPLES PAGE*/
+
+.containerbg {
+  background:#fff;
+}
+
 .container.examples {
   font-family:openSansRegular;
   height:100%;
-  margin-top:40px;
-  margin-bottom:40px;
+  padding-top:40px;
+  padding-bottom:40px;
+  background:#fff;
 }
 
 .container.examples h1 {

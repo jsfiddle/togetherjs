@@ -1,172 +1,173 @@
 <% layout('../layout.ejs') -%>
-
-<div id="introduction" class="section">
-  <div class="container">
-    <div class="row">
-      <div class="span5">
-        <h1>
-          TowTruck
-        </h1>
-        <p class="lead">A service for your website that makes it surprisingly easy to collaborate in real-time.</p>
-		    <p class="lead"><a class="btn btn-large btn-primary" href="/example">Try it out here</a></p>
-      </div>
-      <div class="span7">
-        <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
-          <img src="images/site-product-shot.png" alt="Product shot">
-        </a>
-      </div>
-		  <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
-			  <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
-          <img src="/images/icn-close-btn-wht.png" alt="close button">
-        </button>
-        <div class="modal-body">
-          <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/57992755?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
+<div class="containerbg">
+  <div id="introduction" class="section">
+    <div class="container">
+      <div class="row">
+        <div class="span5">
+          <h1>
+            TowTruck
+          </h1>
+          <p class="lead">A service for your website that makes it surprisingly easy to collaborate in real-time.</p>
+  		    <p class="lead"><a class="btn btn-large btn-primary" href="/example">Try it out here</a></p>
         </div>
-      </div>
-		</div>
-  </div>
-</div>
-
-<div id="how_it_works" class="section">
-  <div class="container">
-    <h1 class="main-header">How it Works</h1>
-    <div class="row">
-      <div class="span5">
-        <ol class="carousel-indicators">
-          <li data-target="#how_it_works_carousel" data-slide-to="0" class="active">
-			<div class="how_it_works_list_box">
-				<div class="col-left">
-					<img src="images/site-howitworks-01.png" alt="Step 1">
-            	</div>
-				<div class="col-right">
-					<h2 class="subheader">Click the TowTruck button</h2>
-            		<p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
-				</div>
-				<div class="clear"></div>
-			</div>
-          </li>
-          <li data-target="#how_it_works_carousel" data-slide-to="1">
-			<div class="how_it_works_list_box">
-				<div class="col-left">
-					<img src="images/site-howitworks-02.png" alt="Step 2">
-	            </div>
-				<div class="col-right">
-					<h2 class="subheader">Share the TowTruck link</h2>
-	            	<p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
-				</div>
-				<div class="clear"></div>
-			</div>
-          </li>
-          <li data-target="#how_it_works_carousel" data-slide-to="2">
-			<div class="how_it_works_list_box">
-				<div class="col-left">
-					<img src="images/site-howitworks-03.png" alt="Step 3">
-	            </div>
-				<div class="col-right">
-					<h2 class="subheader">Wait for your friend to join</h2>
-		            <p class="main-text">
-		              You'll see a notification when your friend joins your session, and you can then collaborate in real-time!
-		            </p>
-				</div>
-				<div class="clear"></div>
-			</div>
-          </li>
-        </ol>
-      </div>
-      <div class="span7">
-        <div id="how_it_works_carousel" class="carousel slide">
-          <!-- Carousel items -->
-          <div class="carousel-inner">
-            <div class="a active item">
-              <img src="/images/sections/how_it_works/carousel-a.png" alt="Click the TowTruck Button" />
-            </div>
-            <div class="b item">
-              <img src="/images/sections/how_it_works/carousel-b.png" alt="Click the TowTruck Button" />
-            </div>
-            <div class="c item">
-              <div id="towtruck_demo_cursor" style="color: rgb(190, 24, 14); top: 146px; left: 188px;">
-                <img class="towtruck-cursor-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAyCAYAAACgadDsAAABq0lEQVRYR+3YQVLCMBQG4PfYqgwblZ0cgd6goReQI3gDvAnewCNwAS1H4Ai4a3VTW5xhmKHPEGDGalrS9iULh2666cyX95L+TYrhzdW9eM9m4PDCl9tu0sHNUETrpSsXX/tdAqD5KMqEY1SyBI9BnE5dwIdK9xRut574+FrYhgsoECxGceq5RaVGlD8F8WpiEy5WepAQciGi1dwWrEUltsR16okEEhtwGSrbTLMgzsZOUbWacxrbSKvSSlWFBAnixuNOq2p0L7OnlQHKn1ZGKHdaGaOcaWWOMqZVLVS1mSGtaqMcadUEbZ1WjdC2adUYbZNWzdEWadUSbZZWrdEmacWC1k0rHrRmWrGhddKKFTVNK27UKK3YUZO0MkblKesNAe6Mdocn9lZGKAE9BFH2vAPD/qWfAw7kR26AQD6pu24w5Xurk+hPsKpK3WDk+zvVnQQrUVOwbDBhD3q6U4IWlWfVT0CaHFtqNI81HvqD7sBOvvVtnlMLqAtQvVL7fw7qE2W9wuMMKNQlqCpVv3Qsz+HvNYbh9cXQ5qLRLWoZJu6vM2q15+f2/r/2fgOsvURCcTEEjAAAAABJRU5ErkJggg==" alt="Demo Cursor that moves around.">
-                <span class="towtruck-cursor-name">Comrade</span>
-              </div>
-              <img src="/images/sections/how_it_works/carousel-c.png" alt="Click the TowTruck Button" />
-            </div>
+        <div class="span7">
+          <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
+            <img src="images/site-product-shot.png" alt="Product shot">
+          </a>
+        </div>
+  		  <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
+  			  <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
+            <img src="/images/icn-close-btn-wht.png" alt="close button">
+          </button>
+          <div class="modal-body">
+            <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/57992755?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
           </div>
-          <!-- Carousel nav -->
-          <!-- <a class="carousel-control left" href="#how_it_works_carousel" data-slide="prev">&lsaquo;</a>
-          <a class="carousel-control right" href="#how_it_works_carousel" data-slide="next">&rsaquo;</a> -->
         </div>
-		<div class="carousel-nav-pagination"><a href="#how_it_works_carousel" data-slide="prev">&#8226;</a> <span style="font-size:30px;color:rgba(27,174,252,0.4);"><a href="#how_it_works_carousel" data-slide="next">&#8226;</a> &#8226;</span></div>
-      </div>
+  		</div>
     </div>
   </div>
-	<hr style="width:50%;margin:100px auto 50px;">
-</div>
 
-<div id="selector">
-  <div class="container">
-      I want to
-      <div class="btn-group" data-toggle="buttons-radio">
-        <button class="btn" type="button" name="rating" value="0"><i class="icon-user"></i>Use</button>
-        <button class="btn" type="button" name="rating" value="1"><i class="icon-wrench"></i>Implement</button>
+  <div id="how_it_works" class="section">
+    <div class="container">
+      <h1 class="main-header">How it Works</h1>
+      <div class="row">
+        <div class="span5">
+          <ol class="carousel-indicators">
+            <li data-target="#how_it_works_carousel" data-slide-to="0" class="active">
+  			<div class="how_it_works_list_box">
+  				<div class="col-left">
+  					<img src="images/site-howitworks-01.png" alt="Step 1">
+              	</div>
+  				<div class="col-right">
+  					<h2 class="subheader">Click the TowTruck button</h2>
+              		<p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
+  				</div>
+  				<div class="clear"></div>
+  			</div>
+            </li>
+            <li data-target="#how_it_works_carousel" data-slide-to="1">
+  			<div class="how_it_works_list_box">
+  				<div class="col-left">
+  					<img src="images/site-howitworks-02.png" alt="Step 2">
+  	            </div>
+  				<div class="col-right">
+  					<h2 class="subheader">Share the TowTruck link</h2>
+  	            	<p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
+  				</div>
+  				<div class="clear"></div>
+  			</div>
+            </li>
+            <li data-target="#how_it_works_carousel" data-slide-to="2">
+  			<div class="how_it_works_list_box">
+  				<div class="col-left">
+  					<img src="images/site-howitworks-03.png" alt="Step 3">
+  	            </div>
+  				<div class="col-right">
+  					<h2 class="subheader">Wait for your friend to join</h2>
+  		            <p class="main-text">
+  		              You'll see a notification when your friend joins your session, and you can then collaborate in real-time!
+  		            </p>
+  				</div>
+  				<div class="clear"></div>
+  			</div>
+            </li>
+          </ol>
+        </div>
+        <div class="span7">
+          <div id="how_it_works_carousel" class="carousel slide">
+            <!-- Carousel items -->
+            <div class="carousel-inner">
+              <div class="a active item">
+                <img src="/images/sections/how_it_works/carousel-a.png" alt="Click the TowTruck Button" />
+              </div>
+              <div class="b item">
+                <img src="/images/sections/how_it_works/carousel-b.png" alt="Click the TowTruck Button" />
+              </div>
+              <div class="c item">
+                <div id="towtruck_demo_cursor" style="color: rgb(190, 24, 14); top: 146px; left: 188px;">
+                  <img class="towtruck-cursor-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAyCAYAAACgadDsAAABq0lEQVRYR+3YQVLCMBQG4PfYqgwblZ0cgd6goReQI3gDvAnewCNwAS1H4Ai4a3VTW5xhmKHPEGDGalrS9iULh2666cyX95L+TYrhzdW9eM9m4PDCl9tu0sHNUETrpSsXX/tdAqD5KMqEY1SyBI9BnE5dwIdK9xRut574+FrYhgsoECxGceq5RaVGlD8F8WpiEy5WepAQciGi1dwWrEUltsR16okEEhtwGSrbTLMgzsZOUbWacxrbSKvSSlWFBAnixuNOq2p0L7OnlQHKn1ZGKHdaGaOcaWWOMqZVLVS1mSGtaqMcadUEbZ1WjdC2adUYbZNWzdEWadUSbZZWrdEmacWC1k0rHrRmWrGhddKKFTVNK27UKK3YUZO0MkblKesNAe6Mdocn9lZGKAE9BFH2vAPD/qWfAw7kR26AQD6pu24w5Xurk+hPsKpK3WDk+zvVnQQrUVOwbDBhD3q6U4IWlWfVT0CaHFtqNI81HvqD7sBOvvVtnlMLqAtQvVL7fw7qE2W9wuMMKNQlqCpVv3Qsz+HvNYbh9cXQ5qLRLWoZJu6vM2q15+f2/r/2fgOsvURCcTEEjAAAAABJRU5ErkJggg==" alt="Demo Cursor that moves around.">
+                  <span class="towtruck-cursor-name">Comrade</span>
+                </div>
+                <img src="/images/sections/how_it_works/carousel-c.png" alt="Click the TowTruck Button" />
+              </div>
+            </div>
+            <!-- Carousel nav -->
+            <!-- <a class="carousel-control left" href="#how_it_works_carousel" data-slide="prev">&lsaquo;</a>
+            <a class="carousel-control right" href="#how_it_works_carousel" data-slide="next">&rsaquo;</a> -->
+          </div>
+  		<div class="carousel-nav-pagination"><a href="#how_it_works_carousel" data-slide="prev">&#8226;</a> <span style="font-size:30px;color:rgba(27,174,252,0.4);"><a href="#how_it_works_carousel" data-slide="next">&#8226;</a> &#8226;</span></div>
+        </div>
       </div>
-      <img src="/images/site-icn-logo.png" alt="logo">TowTruck
+    </div>
+  	<hr style="width:50%;margin:100px auto 50px;">
   </div>
-</div>
 
-<div id="features" class="section">
-  <div class="container">
-        <h1 class="main-header">Helpful Tools and Features</h1>
-	<div class="span4 far-left">
-      <img class="main-img" src="images/site-features-01.png" alt="Browser Header Shared Image">
-      <h2 class="subheader">Cursor-mirroring</h2>
-      <p class="main-text">See your friend's cursors in real-time to help point to areas on the page.</p>
-      <p></p>
-    </div><!-- /.span4 -->
-    <div class="span4 textcenter">
-      <img class="main-img" src="images/site-features-02.png" alt="Browser Header Shared Image">
-      <h2 class="subheader">Real-time chat</h2>
-      <p class="main-text">Talk to your friends over chat, so you can share resources and links.</p>
-      <p></p>
-    </div><!-- /.span4 -->
-    <div class="span4 textcenter">
-      <img class="main-img" src="images/site-features-03.png" alt="Browser Header Shared Image">
-      <h2 class="subheader">Real-time voice chat</h2>
-      <p class="main-text">Using Web Real-Time Communication, you can talk with your friends over the microphone in the browser.</p>
-      <p></p>
-    </div><!-- /.span4 -->
+  <div id="selector">
+    <div class="container">
+        I want to
+        <div class="btn-group" data-toggle="buttons-radio">
+          <button class="btn" type="button" name="rating" value="0"><i class="icon-user"></i>Use</button>
+          <button class="btn" type="button" name="rating" value="1"><i class="icon-wrench"></i>Implement</button>
+        </div>
+        <img src="/images/site-icn-logo.png" alt="logo">TowTruck
+    </div>
   </div>
-	<hr style="width:50%;margin:100px auto 50px;">
-</div>
 
-<div id="how_to_install" class="section">
-  <div class="container">
-    <h1 class="main-header">How to Install TowTruck</h1>
-    <div class="row">
-      <div class="span6">
-        <img class="install-img" src="/images/sections/how_to_install/site-install-01.png" alt="The JavaScript Include" />
-        <h2 class="subheader">Add the JavaScript snippet</h2>
-        <p class="main-text">Simply copy and paste the TowTruck JavaScript snippet below into your site.</p>
-        <form>
-          <fieldset>
-            <textarea class="span6 copy-input" style="height: 9em">&lt;script&gt;
-  // Set to false or delete to disable analytics/tracking:
-  TowTruckConfig_enableAnalytics = true;
-&lt;/script&gt;
-&lt;script src="https://towtruck.mozillalabs.com/towtruck.js"&gt;&lt;/script&gt;</textarea>
-          </fieldset>
-        </form>
-      </div>
-      <div class="span6">
-        <img class="install-img" src="/images/sections/how_to_install/site-install-02.png" alt="Code view showing the TowTruck button" />
-        <h2 class="subheader">Add the Button</h2>
-        <p class="main-text">After you've included the TowTruck JavaScript snippet, copy and paste this button anywhere onto your site!</p>
-        <form>
-          <fieldset>
-            <textarea type="text" class="span6 copy-input" style="height: 9em">// Add the TowTruck button anywhere on your site
+  <div id="features" class="section">
+    <div class="container">
+          <h1 class="main-header">Helpful Tools and Features</h1>
+  	<div class="span4 far-left">
+        <img class="main-img" src="images/site-features-01.png" alt="Browser Header Shared Image">
+        <h2 class="subheader">Cursor-mirroring</h2>
+        <p class="main-text">See your friend's cursors in real-time to help point to areas on the page.</p>
+        <p></p>
+      </div><!-- /.span4 -->
+      <div class="span4 textcenter">
+        <img class="main-img" src="images/site-features-02.png" alt="Browser Header Shared Image">
+        <h2 class="subheader">Real-time chat</h2>
+        <p class="main-text">Talk to your friends over chat, so you can share resources and links.</p>
+        <p></p>
+      </div><!-- /.span4 -->
+      <div class="span4 textcenter">
+        <img class="main-img" src="images/site-features-03.png" alt="Browser Header Shared Image">
+        <h2 class="subheader">Real-time voice chat</h2>
+        <p class="main-text">Using Web Real-Time Communication, you can talk with your friends over the microphone in the browser.</p>
+        <p></p>
+      </div><!-- /.span4 -->
+    </div>
+  	<hr style="width:50%;margin:100px auto 50px;">
+  </div>
+
+  <div id="how_to_install" class="section">
+    <div class="container">
+      <h1 class="main-header">How to Install TowTruck</h1>
+      <div class="row">
+        <div class="span6">
+          <img class="install-img" src="/images/sections/how_to_install/site-install-01.png" alt="The JavaScript Include" />
+          <h2 class="subheader">Add the JavaScript snippet</h2>
+          <p class="main-text">Simply copy and paste the TowTruck JavaScript snippet below into your site.</p>
+          <form>
+            <fieldset>
+              <textarea class="span6 copy-input" style="height: 9em">&lt;script&gt;
+    // Set to false or delete to disable analytics/tracking:
+    TowTruckConfig_enableAnalytics = true;
+  &lt;/script&gt;
+  &lt;script src="https://towtruck.mozillalabs.com/towtruck.js"&gt;&lt;/script&gt;</textarea>
+            </fieldset>
+          </form>
+        </div>
+        <div class="span6">
+          <img class="install-img" src="/images/sections/how_to_install/site-install-02.png" alt="Code view showing the TowTruck button" />
+          <h2 class="subheader">Add the Button</h2>
+          <p class="main-text">After you've included the TowTruck JavaScript snippet, copy and paste this button anywhere onto your site!</p>
+          <form>
+            <fieldset>
+              <textarea type="text" class="span6 copy-input" style="height: 9em">// Add the TowTruck button anywhere on your site
               
-<button onclick=&quot;TowTruck(this); return false;&quot;>Start TowTruck</button></textarea>
-          </fieldset>
-        </form>
+  <button onclick=&quot;TowTruck(this); return false;&quot;>Start TowTruck</button></textarea>
+            </fieldset>
+          </form>
+        </div>
       </div>
     </div>
   </div>
