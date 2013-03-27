@@ -310,6 +310,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     anchor.mousedown(function (event) {
       var iface = $("#towtruck-interface");
       // FIXME: switch to .offset() and pageX/Y
+      var startPos = panelPosition();
       function selectoff() {
         return false;
       }
@@ -332,6 +333,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         iface.removeClass("towtruck-interface-right");
         iface.removeClass("towtruck-interface-bottom");
         iface.addClass("towtruck-interface-" + pos);
+        if (startPos && pos != startPos) {
+          ui.hideWindow();
+          startPos = null;
+        }
       }
       $(document).bind("mousemove", mousemove);
       // If you don't turn selection off it will still select text, and show a
