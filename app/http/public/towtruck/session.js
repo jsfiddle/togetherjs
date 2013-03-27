@@ -345,6 +345,9 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     }
     if (! shareId) {
       if (TowTruck._shareId) {
+        // Like, below, this *also* means we got the shareId from the hash
+        // (in towtruck.js):
+        session.firstRun = true;
         shareId = TowTruck._shareId;
       }
     }
@@ -397,12 +400,12 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       ui.prepareUI();
       require(features, function () {
         $(function () {
-          var ui = require("ui");
-          ui.activateUI();
           var startup = require("startup");
           session.once("ui-ready", function () {
             startup.start();
           });
+          var ui = require("ui");
+          ui.activateUI();
           if (TowTruck.getConfig("enableAnalytics")) {
             require(["analytics"], function (analytics) {
               analytics.activate();
