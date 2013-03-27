@@ -93,13 +93,13 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-about-button",
       title: "Connect with friends",
-      description: "<img src=\"/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to start your TowTruck session.</p>"
+      description: "<img src=\"/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to collaborate with friends.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-share-link",
       title: "Share this link",
-      description: "<img src=\"/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To start your TowTruck session, just copy and paste this link and send it to a friend!</p>",
+      description: "<img src=\"/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To collaborate using TowTruck, just copy and paste this link and send it to a friend!</p>",
       onShow: showSettings
     },
     {
