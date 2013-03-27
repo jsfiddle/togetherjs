@@ -35,7 +35,7 @@ body {
   margin:20px 0px 40px;
 }
 
-li.active a{
+.towtruckula li.active a{
 	background:none !important;
 	box-shadow:0px 0px 0px !important;
 	border-bottom:1px solid #fff;
@@ -67,7 +67,7 @@ ul.nav {
 	margin:0px !important;
 }
 
-ul.nav a{
+.towtruckula ul.nav a{
 	font-family:openSansLight;
 	color:#fff !important;
 	text-shadow:0px 0px 0px rgb(0,0,0) !important;
@@ -75,7 +75,7 @@ ul.nav a{
 	margin:20px;
 }
 
-ul.nav a:hover{
+.towtruckula ul.nav a:hover{
 	border-bottom:1px solid #fff;
 }
 
@@ -90,7 +90,7 @@ ul.nav a:hover{
   top:-2px;
 }
 
-.navbar .nav > li > a {
+.towtruckula .navbar .nav > li > a {
   padding: 15px 20px;
 }
 
@@ -358,7 +358,7 @@ p.main-text {
 
 input.copy-input, textarea.copy-input {
 	border:1px solid rgba(0,0,0,1);
-	font-family:openSansRegular;
+	font-family:Monaco;
 	letter-spacing:0px;
 	border-radius:2px;
 	padding:6px;
@@ -396,10 +396,13 @@ footer a:hover{
 /*EXAMPLES PAGE*/
 .container.examples {
   font-family:openSansRegular;
+  height:100%;
+  margin-top:40px;
+  margin-bottom:40px;
 }
 
 .container.examples h1 {
-  margin-top:60px;
+  margin-top:0px;
 }
 
 .container.examples button{
@@ -415,7 +418,13 @@ footer a:hover{
   letter-spacing: -0.01px;
 }
 
+.sidebar-nav {
+  padding: 9px 0;
+}
 
+.sidebar-nav ul.nav {
+  float:none !important;
+}
 
 /* MARKETING CONTENT
 -------------------------------------------------- */
