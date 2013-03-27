@@ -1,29 +1,34 @@
 <% layout('../../layout.ejs') -%>
 <% block("enableExample", true) %>
-<% block("title", "Mozilla Labs : TowTruck example pages") %>
+<% block("title", "Mozilla Labs : TowTruck examples") %>
 
 <div class="container examples">
+    <div class="span3">
+       <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">Examples</li>
+          <li><a href="./code">Code editor</a></li>
+          <li><a href="./longpage">A long page</a></li>
+          <li><a href="./form">A form</a></li>
+        </ul>
+      </div><!--/.well -->
+    </div>
+    
+    <div class="span8">
 
       <h1>Examples</h1>
 
-      <p>Poke around and collaborate on these pages using TowTruck.  This is just a sample of what you can do with TowTruck.</p>
+      <p>Poke around and collaborate using TowTruck.</p>
 
-      <p>There are several kinds of pages for you to try out:
-
-        <ul>
-          <li><a href="./code">A code-editing example</a></li>
-          <li><a href="./longpage">A long documentation page</a></li>
-          <li><a href="./form">A form</a></li>
-        </ul>
-
-      </p>
-
+      <p>There are several kinds of pages for you to try out on the left sidebar.</p>
       <p>
-        Click here to try out TowTruck!
+        But first, click below to start TowTruck!
       </p>
       
       <p><button onclick="TowTruck(this); return false" class="btn btn-large btn-primary">Start TowTruck</button>
       </p>
+      
+    </div>
 
       <p><br></p>
       <p><br></p>
