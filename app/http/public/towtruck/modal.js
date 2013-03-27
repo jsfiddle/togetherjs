@@ -19,7 +19,7 @@ define(["util", "jquery", "session"], function (util, $, session) {
   modal.showModal = function (el, onCloseCallback) {
     onClose = onCloseCallback;
     el = $(el);
-    assert(el.hasClass("towtruck-modal"));
+    assert(el.hasClass("towtruck-modal"), "no modal class");
     if (! el.find(".towtruck-close").length) {
       el.prepend($('<div class="towtruck-close">&times;</div>'));
     }

@@ -174,7 +174,7 @@
       Live audio chat requires a newer (or different) browser than you're using.
     </p>
     <p>
-      See 
+      See
       <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
         this page
       </a>
@@ -234,6 +234,44 @@
 
     <p><button class="towtruck-modal-close">Yes, join session</button></p>
     <p><button class="towtruck-modal-dont-join">No, don't join</button></p>
+  </div>
+
+  <!-- Shown when a web browser is completely incapable of running TowTruck: -->
+  <div id="towtruck-browser-broken" class="towtruck-modal" style="display: none">
+    <header class="towtruck-title">Sorry</header>
+
+    <p>We're sorry, TowTruck doesn't work with this browser.  Please
+      <a href="https://github.com/mozilla/towtruck/wiki/Supported-Browsers#supported-browsers">upgrade
+      to a supported browser</a> to try TowTruck.
+    </p>
+
+    <p id="towtruck-browser-broken-is-ie" style="display: none">
+      Internet
+      Explorer <a href="https://github.com/mozilla/towtruck/wiki/Supported-Browsers#internet-explorer">is
+      not supported</a> and won't be supported in the near term,
+      please use Firefox or Chrome.
+    </p>
+
+    <p><button class="towtruck-modal-close">End TowTruck</button></p>
+
+  </div>
+
+  <!-- Shown when the browser has WebSockets, but is IE (i.e., IE10) -->
+  <div id="towtruck-browser-unsupported" class="towtruck-modal" style="display: none">
+    <header class="towtruck-title">Unsupported Browser</header>
+
+    <p>We're sorry, Internet Explorer [is not
+    supported](https://github.com/mozilla/towtruck/wiki/Supported-Browsers#internet-explorer)
+    at this time.  While we may add support later, adding support is
+    not currently on our roadmap.  Please use Firefox or Chrome.
+    </p>
+
+    <p>You can continue to try to use TowTruck, but you are likely to hit
+      lots of bugs.  So be warned.</p>
+
+    <p><button class="towtruck-modal-close">End TowTruck</button></p>
+    <p><button class="towtruck-modal-close towtruck-browser-unsupported-anyway">Try TowTruck Anyway</button></p>
+
   </div>
 
   <div id="towtruck-feedback-form" class="towtruck-modal" style="display: none;">

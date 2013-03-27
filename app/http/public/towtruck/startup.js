@@ -57,6 +57,9 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
       modal.showModal("#towtruck-browser-broken", function () {
         session.close();
       });
+      if ($.browser.msie) {
+        $("#towtruck-browser-broken-is-ie").show();
+      }
     },
 
     browserUnsupported: function (next) {
@@ -64,8 +67,16 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
         next();
         return;
       }
+      var cancel = true;
       modal.showModal("#towtruck-browser-unsupported", function () {
-        next();
+        if (cancel) {
+          session.close();
+        } else {
+          next();
+        }
+      });
+      $("#towtruck-browser-unsupported-anyway").click(function () {
+        cancel = false;
       });
     },
 
