@@ -188,6 +188,12 @@
     }
   };
 
+  TowTruck.reinitialize = function () {
+    require({context: "towtruck"})(["session"], function (session) {
+      session.emit("reinitialize");
+    });
+  };
+
   // If TowTruck previously existed, copy all its properties over to our new
   // TowTruck function:
   if (oldTowTruck !== undefined) {

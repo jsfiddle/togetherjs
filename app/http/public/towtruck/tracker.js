@@ -18,14 +18,21 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     return false;
   }
 
-  function initTrackers() {
-    if (! initTrackers.done) {
+  function initTrackers(force) {
+    if (force || ! initTrackers.done) {
+      if (initTrackers.done) {
+        tracker.trackers.reset();
+      }
       tracker.trackers.createAll();
       initTrackers.done = true;
     }
     session.send({type: "reset-trackers"});
     tracker.trackers.introduceAll();
   }
+
+  session.on("reinitialize", function () {
+    initTrackers(true);
+  });
 
   session.hub.on("hello hello-back", function (msg) {
     if ((! session.isClient) && msg.sameUrl) {
