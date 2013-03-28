@@ -189,9 +189,12 @@
   };
 
   TowTruck.reinitialize = function () {
-    require({context: "towtruck"})(["session"], function (session) {
-      session.emit("reinitialize");
-    });
+    if (typeof TowTruck.require == "function") {
+      TowTruck.require(["session"], function (session) {
+        session.emit("reinitialize");
+      });
+    }
+    // If it's not set, TowTruck has not been loaded, and reinitialization is not needed
   };
 
   // If TowTruck previously existed, copy all its properties over to our new
