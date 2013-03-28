@@ -135,7 +135,7 @@ h1.main-header {
 }
 
 h2.subheader {
-	padding-top:0px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-1px;
+	padding-top:0px;margin-bottom:0px;font-size:30px;font-family:openSansLight;letter-spacing:-1px;margin-top:0px;
 	color:rgb(72, 72, 72);
 }
 
@@ -247,7 +247,8 @@ p.main-text {
   margin:0px;
 }
 #how_it_works .how_it_works_list_box img{
-
+  height:30px;
+  padding-top:5px;
 }
 
 #how_it_works .how_it_works_list_box p{
@@ -287,6 +288,25 @@ p.main-text {
 	text-decoration:none;
 	outline:none;
 }
+
+#how_it_works .carousel-indicators {
+  list-style:none;
+  margin-left:46%;
+  }
+#how_it_works .carousel-indicators li{
+  display:block;
+  float:left;
+  width:10px;
+  height:10px;
+  margin-left:10px;
+  background-color:#ccc;
+  background-color:rgba(27,174,252,0.2);
+  border-radius:5px;
+  }
+
+#how_it_works .carousel-indicators .active{
+  background-color:rgba(27,174,252,1)
+  }
 
 #how_it_works #towtruck_demo_cursor {
   position: absolute;

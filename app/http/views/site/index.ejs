@@ -32,46 +32,37 @@
       <h1 class="main-header">How it Works</h1>
       <div class="row">
         <div class="span5">
-          <ol class="carousel-indicators">
-            <li data-target="#how_it_works_carousel" data-slide-to="0" class="active">
   			<div class="how_it_works_list_box">
   				<div class="col-left">
-  					<img src="images/site-howitworks-01.png" alt="Step 1">
-              	</div>
+  				  <img src="images/site-howitworks-01.png" alt="Step 1">
+          </div>
   				<div class="col-right">
   					<h2 class="subheader">Click the TowTruck button</h2>
-              		<p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
+            <p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
   				</div>
   				<div class="clear"></div>
-  			</div>
-            </li>
-            <li data-target="#how_it_works_carousel" data-slide-to="1">
+  			</div> 
   			<div class="how_it_works_list_box">
   				<div class="col-left">
-  					<img src="images/site-howitworks-02.png" alt="Step 2">
-  	            </div>
+  				  <img src="images/site-howitworks-02.png" alt="Step 2">
+  	      </div>
   				<div class="col-right">
   					<h2 class="subheader">Share the TowTruck link</h2>
-  	            	<p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
+  	        <p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
   				</div>
   				<div class="clear"></div>
   			</div>
-            </li>
-            <li data-target="#how_it_works_carousel" data-slide-to="2">
   			<div class="how_it_works_list_box">
   				<div class="col-left">
   					<img src="images/site-howitworks-03.png" alt="Step 3">
-  	            </div>
+  	      </div>
   				<div class="col-right">
   					<h2 class="subheader">Wait for your friend to join</h2>
-  		            <p class="main-text">
-  		              You'll see a notification when your friend joins your session, and you can then collaborate in real-time!
-  		            </p>
+  		      <p class="main-text">
+  		        You'll see a notification when your friend joins your session, and you can then collaborate in real-time!</p>
   				</div>
   				<div class="clear"></div>
   			</div>
-            </li>
-          </ol>
         </div>
         <div class="span7">
           <div id="how_it_works_carousel" class="carousel slide">
@@ -91,12 +82,16 @@
                 <img src="/images/sections/how_it_works/carousel-c.png" alt="Click the TowTruck Button" />
               </div>
             </div>
-            <!-- Carousel nav -->
-            <!-- <a class="carousel-control left" href="#how_it_works_carousel" data-slide="prev">&lsaquo;</a>
-            <a class="carousel-control right" href="#how_it_works_carousel" data-slide="next">&rsaquo;</a> -->
+            <ol class="carousel-indicators">
+                <li data-target="#how_it_works_carousel" data-slide-to="0" class="active"></li>
+                <li data-target="#how_it_works_carousel" data-slide-to="1"></li>
+                <li data-target="#how_it_works_carousel" data-slide-to="2"></li>
+            </ol>
           </div>
-  		<div class="carousel-nav-pagination"><a href="#how_it_works_carousel" data-slide="prev">&#8226;</a> <span style="font-size:30px;color:rgba(27,174,252,0.4);"><a href="#how_it_works_carousel" data-slide="next">&#8226;</a> &#8226;</span></div>
         </div>
+        <script>
+        $('.carousel').carousel('cycle');
+        </script>
       </div>
     </div>
   	<hr style="width:50%;margin:100px auto 50px;">
