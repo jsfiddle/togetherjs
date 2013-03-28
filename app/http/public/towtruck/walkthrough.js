@@ -65,6 +65,10 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     xButton: true
   };
 
+  function showChat(){
+    ui.displayWindow('#towtruck-chat');
+  }
+
   function showSettings(){
     ui.displayWindow('#towtruck-about');
   }
@@ -106,14 +110,15 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       overlay: true,
       attachTo: "#towtruck-audio-button",
       title: "Talk in real-time",
-      description: "<img src=\"/images/walkthru-img-03.png\" alt=\"Walkthrough image 3\"><p>If your browser supports it, you can live chat with your friends.</p><p>Since this is an experimental feature, you can learn more <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
+      description: "<img src=\"/images/walkthru-img-03.png\" alt=\"Walkthrough image 3\"><p>If your browser supports it, click here to begin a live audio chat.</p><p>Since this is an experimental feature, you can learn more <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
     },
     {
       overlay: true,
-      attachTo: "#towtruck-chat-button",
+      attachTo: "#towtruck-chat",
       onHide: hideWindow,
       title: "Chat with friends",
-      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily text chat with your friends and collaborators.</p>"
+      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily text chat with your friends.</p>",
+      onShow: showChat
     },
     {
       overlay: true,
