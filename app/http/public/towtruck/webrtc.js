@@ -13,8 +13,19 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
                             window.webkitRTCPeerConnection ||
                             window.RTCPeerConnection);
 
+  var mediaConstraints = {
+    mandatory: {
+      OfferToReceiveAudio: true,
+      OfferToReceiveVideo: false
+    }
+  };
+  if (window.mozRTCPeerConnection) {
+    mediaConstraints.mandatory.MozDontOfferDataChannel = true;
+  }
+
   var URL = window.webkitURL || window.URL;
-  var RTCSessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
+  var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+  var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
 
   function makePeerConnection() {
     // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
@@ -27,13 +38,33 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     }
     if (window.mozRTCPeerConnection) {
       return new mozRTCPeerConnection({
+        // Or stun:124.124.124..2 ?
         "iceServers": [{"url": "stun:23.21.150.121"}]
       }, {
-        "optional": [],
-        'mandatory': {'MozDontOfferDataChannel':true}
+        "optional": []
       });
     }
     throw AssertionError("Called makePeerConnection() without supported connection");
+  }
+
+  function ensureCryptoLine(sdp) {
+    if (! window.mozRTCPeerConnection) {
+      return sdp;
+    }
+
+    var sdpLinesIn = sdp.split('\r\n');
+    var sdpLinesOut = [];
+
+    // Search for m line.
+    for (var i = 0; i < sdpLinesIn.length; i++) {
+      sdpLinesOut.push(sdpLinesIn[i]);
+      if (sdpLinesIn[i].search('m=') !== -1) {
+        sdpLinesOut.push("a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      }
+    }
+
+    sdp = sdpLinesOut.join('\r\n');
+    return sdp;
   }
 
   // FIXME: maybe shouldn't patch navigator
@@ -209,6 +240,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     var answerReceived = null;
     var answerDescription = false;
     var _connection = null;
+    var iceCandidate = null;
 
     function enableAudio() {
       accepted = true;
@@ -264,6 +296,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         },
         function (stream) {
           audioStream = stream;
+          attachMedia("#towtruck-local-audio", stream);
           if (callback) {
             callback();
           }
@@ -279,6 +312,18 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       );
     }
 
+    function attachMedia(element, media) {
+      element = $(element)[0];
+      console.log("Attaching", media, "to", element);
+      if (window.mozRTCPeerConnection) {
+        element.mozSrcObject = media;
+        element.play();
+      } else {
+        element.autoplay = true;
+        element.src = URL.createObjectURL(media);
+      }
+    }
+
     function getConnection() {
       assert(audioStream);
       if (_connection) {
@@ -291,12 +336,9 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         throw e;
       }
       _connection.onaddstream = function (event) {
-        for (var i=0; i<_connection.remoteStreams.length; i++) {
-          var stream = _connection.remoteStreams[i];
-          $audio[0].src = URL.createObjectURL(stream);
-          $audio[0].play();
-          audioButton("#towtruck-audio-active");
-        }
+        console.log("got event", event, event.type);
+        attachMedia($audio, event.stream);
+        audioButton("#towtruck-audio-active");
       };
       _connection.onstatechange = function () {
         // FIXME: this doesn't seem to work:
@@ -306,8 +348,27 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           audioButton("#towtruck-audio-ready");
         }
       };
+      _connection.onicecandidate = function (event) {
+        if (event.candidate) {
+          session.send({
+            type: "rtc-ice-candidate",
+            candidate: {
+              sdpMLineIndex: event.candidate.sdpMLineIndex,
+              sdpMid: event.candidate.sdpMid,
+              candidate: event.candidate.candidate
+            }
+          });
+        }
+      };
       _connection.addStream(audioStream);
       return _connection;
+    }
+
+    function addIceCandidate() {
+      if (iceCandidate) {
+        console.log("adding ice", iceCandidate);
+        _connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+      }
     }
 
     function connect() {
@@ -320,6 +381,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           }),
           function () {
             offerDescription = true;
+            addIceCandidate();
             connect();
           },
           function (err) {
@@ -330,6 +392,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
       }
       if (! (offerSent || offerReceived)) {
         connection.createOffer(function (offer) {
+          console.log("made offer", offer);
+          offer.sdp = ensureCryptoLine(offer.sdp);
           connection.setLocalDescription(
             offer,
             function () {
@@ -342,7 +406,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
             },
             function (err) {
               error("Error doing RTC setLocalDescription:", err);
-            }
+            },
+            mediaConstraints
           );
         }, function (err) {
           error("Error doing RTC createOffer:", err);
@@ -356,6 +421,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           }
         }, 2000);
         connection.createAnswer(function (answer) {
+          answer.sdp = ensureCryptoLine(answer.sdp);
           clearTimeout(timeout);
           connection.setLocalDescription(
             answer,
@@ -369,7 +435,8 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
             function (err) {
               clearTimeout(timeout);
               error("Error doing RTC setLocalDescription:", err);
-            }
+            },
+            mediaConstraints
           );
         }, function (err) {
           error("Error doing RTC createAnswer:", err);
@@ -401,6 +468,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           }),
           function () {
             offerDescription = true;
+            addIceCandidate();
             connect();
           },
           function (err) {
@@ -441,6 +509,13 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
           error("Error doing RTC setRemoteDescription:", err);
         }
       );
+    });
+
+    session.hub.on("rtc-ice-candidate", function (msg) {
+      iceCandidate = msg.candidate;
+      if (offerDescription || answerDescription) {
+        addIceCandidate();
+      }
     });
 
     session.hub.on("rtc-abort", function (msg) {
