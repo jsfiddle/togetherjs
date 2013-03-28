@@ -302,6 +302,7 @@ p.main-text {
   background-color:#ccc;
   background-color:rgba(27,174,252,0.2);
   border-radius:5px;
+  cursor:pointer;
   }
 
 #how_it_works .carousel-indicators .active{
