@@ -62,7 +62,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     assert(el.length);
     ui.hideWindow(".towtruck-window, .towtruck-popup");
     el.show();
-    //el.fadeIn()animate({"width": "70%"}, "slow").show();
     ui.bindWindow(el);
     session.emit("display-window", el.attr("id"), el);
   };
