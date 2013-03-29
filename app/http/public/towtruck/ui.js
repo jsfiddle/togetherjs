@@ -583,6 +583,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     var avatarEl = templateElement.find(".towtruck-avatar img, img.towtruck-avatar");
     if (avatar) {
       avatarEl.attr("src", avatar);
+      avatarEl.attr("title", nick);
     }
     avatarEl.addClass("towtruck-avatar-" + util.safeClassName(clientId));
   };
@@ -619,8 +620,12 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       avatar = peer.avatar;
     }
     ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
+    var avatarEl = ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId));
     if (avatar) {
-      ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId)).attr("src", avatar);
+      avatarEl.attr("src", avatar);
+    }
+    if (nick) {
+      avatarEl.attr("title", nick);
     }
   };
 
