@@ -453,6 +453,21 @@ footer a:hover{
   float:none !important;
 }
 
+
+/*Error pages*/
+
+#error {
+  text-align:center;
+}
+
+#error h1 {
+  font-family:openSansLight;
+}
+
+#error img {
+  width:354px;
+}
+
 /* MARKETING CONTENT
 -------------------------------------------------- */
 
