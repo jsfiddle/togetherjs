@@ -116,6 +116,23 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
         return;
       }
       Tracker.fromConnect(msg);
+    },
+    suppressTracking: function (el, byTrackerType) {
+      /* Returns true if a field shouldn't be tracked, according to other trackers.
+         Typically this is because code editors contain textarea elements */
+      for (var name in this._trackers) {
+        if (! this._trackers.hasOwnProperty(name)) {
+          continue;
+        }
+        var trackerType = this._trackers[name];
+        if (trackerType === byTrackerType) {
+          continue;
+        }
+        if (trackerType.suppressTracking && trackerType.suppressTracking(el)) {
+          return true;
+        }
+      }
+      return false;
     }
   };
 
@@ -292,10 +309,10 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     els.each(function () {
       // TODO: Allow trackers to remove elements from the "pool"
       // Ignore ACE editors specifically.
-      if ($(this).hasClass('ace_text-input')){
+      if ($(this).hasClass('ace_text-input')) {
         return;
       }
-      if (ignoreElement(this)) {
+      if (ignoreElement(this) || tracker.trackers.suppressTracking(this, tracker.TextTracker)) {
         return;
       }
       var routeId = "tracker-textarea-" + util.safeClassName(this.id || util.generateId());
@@ -377,6 +394,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
 
     change: function (event) {
       var el = $(event.target);
+      if (tracker.trackers.suppressTracking(el, tracker.FormFieldTracker)) {
+        return;
+      }
       var loc = elementFinder.elementLocation(el);
       // FIXME: should check for case issues:
       var isChecked = this._checkedFields.indexOf(el.attr("type")) != -1;
@@ -433,13 +453,12 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       this.change = this.change.bind(this);
       this.onmessage = this.onmessage.bind(this);
       //this.editor.on("change", this.change);
-      var oldOnChange = this.editor.getOption("onChange");
-      this.editor.setOption("onChange", (function (instance, delta) {
-        this.change(instance, delta);
-        if (oldOnChange) {
-          oldOnChange(instance, delta);
-        }
-      }).bind(this));
+      this.oldOnChange = this.editor.getOption("onChange");
+      var self = this;
+      this._boundChange = function (editor, delta) {
+        self.change(editor, delta, this);
+      };
+      this.editor.setOption("onChange", this._boundChange);
       this.channel.on("message", this.onmessage);
       // CodeMirror emits events for our own updates, so we set this
       // to true when we expect to ignore those events:
@@ -472,10 +491,11 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       if (index != -1) {
         tracker.trackers.active.splice(index, 1);
       }
+      this.editor.setOption("onChange", this.oldOnChange);
       this.channel.close();
     },
 
-    change: function (editor, delta) {
+    change: function (editor, delta, origContext) {
       if (this._ignoreEvents) {
         return;
       }
@@ -489,6 +509,9 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
           fullText: fullText
         });
         this._lastValue = fullText;
+      }
+      if (this.oldOnChange) {
+        this.oldOnChange.call(origContext, editor, delta);
       }
     },
 
@@ -526,7 +549,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     var len = els.length;
     for (var i=0; i<len; i++) {
       var el = els[i];
-      if (ignoreElement(el)) {
+      if (ignoreElement(el) || tracker.trackers.suppressTracking(el, tracker.CodeMirrorTracker)) {
         continue;
       }
       var editor = el.CodeMirror;
@@ -541,6 +564,17 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
       });
       tracker.trackers.active.push(t);
     }
+  };
+
+  tracker.CodeMirrorTracker.suppressTracking = function (el) {
+    el = $(el)[0];
+    while (el) {
+      if (el.CodeMirror) {
+        return true;
+      }
+      el = el.parentNode;
+    }
+    return false;
   };
 
   tracker.CodeMirrorTracker.fromConnect = function (msg) {
@@ -605,6 +639,8 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
         tracker.trackers.active.splice(index, 1);
       }
       this.channel.close();
+      this.ace.document.removeListener("change", this.change);
+      this.channel.close();
     },
 
     change: function (e) {
@@ -626,8 +662,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
         this._ignoreEvents = true;
         try {
           this.ace.document.doc.applyDeltas([msg.delta]);
-        }
-        finally {
+        } finally {
           this._ignoreEvents = false;
         }
 
@@ -635,9 +670,13 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
         // if (msg.fullText && this.ace.document.getValue() != msg.fullText) {
         //   console.warn("Text mismatch after applying message", msg);
         // }
-      }
-      else if (msg.op == "init") {
-        this.ace.editor.setValue(msg.value);
+      } else if (msg.op == "init") {
+        this._ignoreEvents = true;
+        try {
+          this.ace.editor.setValue(msg.value);
+        } finally {
+          this._ignoreEvents = false;
+        }
       }
       else {
         console.warn("Bad op:", msg);
@@ -649,8 +688,8 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     assert(! session.isClient);
 
     var elements = $('.ace_editor');
-    $.each(elements, function(i, element){
-      if (ignoreElement(element)){
+    $.each(elements, function(i, element) {
+      if (ignoreElement(element) || tracker.trackers.suppressTracking(element, tracker.AceTracker)) {
         return;
       }
 
@@ -667,11 +706,19 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
     });
   };
 
+  tracker.AceTracker.suppressTracking = function (el) {
+    // If any parent element has the ace_editor class, or this element itself, then
+    // only this tracker should handle it:
+    el = $(el);
+    var parent = el.closest(".ace_editor");
+    return el.hasClass("ace_editor") || parent.length || el.hasClass("ace_text-input");
+  };
+
   tracker.AceTracker.fromConnect = function (msg) {
     var route = session.router.makeRoute(msg.routeId);
     var element = elementFinder.findElement(msg.elementLocation);
     var ace = element.env;
-    if (! editor) {
+    if (! ace) {
       console.warn("AceTracker has not been activated on element", element);
       return;
     }
