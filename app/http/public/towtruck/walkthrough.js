@@ -89,7 +89,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
             "width=\"400\" height=\"300\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen>" +
             "</iframe>" +
             "</p>\n" +
-			"<p><a href='https://towtruck.mozillalabs.com/' target='_blank'>TowTruck</a> is a service for your website that makes it easy to collaborate in real-time.</p>"
+			"<p>TowTruck is a service for your website that makes it easy to collaborate in real-time.</p>"
         ),
       onHide: hideWindow
     },
