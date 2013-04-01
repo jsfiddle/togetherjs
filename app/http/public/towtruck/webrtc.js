@@ -13,6 +13,20 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
                             window.webkitRTCPeerConnection ||
                             window.RTCPeerConnection);
 
+  if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
+    // In a few versions of Firefox (18 and 19) these APIs are present but
+    // not actually usable
+    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
+    // Because they could be pref'd on we'll do a quick check:
+    try {
+      (function () {
+        var conn = new window.mozRTCPeerConnection();
+      })();
+    } catch (e) {
+      session.RTCSupported = false;
+    }
+  }
+
   var mediaConstraints = {
     mandatory: {
       OfferToReceiveAudio: true,
