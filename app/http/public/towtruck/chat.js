@@ -5,6 +5,7 @@
 define(["require", "jquery", "util", "session", "ui", "templates", "playback"], function (require, $, util, session, ui, templates, playback) {
   var chat = util.Module("chat");
   var assert = util.assert;
+  var Walkabout;
 
   session.hub.on("chat", function (msg) {
     ui.addChat({
@@ -107,8 +108,13 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
     },
 
     command_test: function (args) {
-      // FIXME: I don't think this really works?  Need some deferred call
-      var Walkabout = require("walkabout");
+      if (! Walkabout) {
+        require(["walkabout"], (function (WalkaboutModule) {
+          Walkabout = WalkaboutModule;
+          this.command_test(args);
+        }).bind(this));
+        return;
+      }
       args = util.trim(args || "").split(/\s+/g);
       if (args[0] === "" || ! args.length) {
         if (this._testCancel) {

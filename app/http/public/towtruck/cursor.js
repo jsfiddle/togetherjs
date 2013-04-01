@@ -206,6 +206,12 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     }
     target = $(target);
     var offset = target.offset();
+    if (! offset) {
+      // FIXME: this really is walkabout.js's problem to fire events on the
+      // document instead of a specific element
+      console.warn("Could not get offset of element:", target[0]);
+      return;
+    }
     var offsetX = pageX - offset.left;
     var offsetY = pageY - offset.top;
     lastMessage = {
