@@ -26,12 +26,12 @@ echo "Merging develop"
 git merge develop
 
 echo
-echo "Setting commit config"
-heroku config:add GIT_LAST_COMMIT="$(git rev-parse HEAD)"
-
-echo
 echo "Pushing to heroku"
 git push heroku
+
+echo
+echo "Setting commit config"
+heroku config:add GIT_LAST_COMMIT="$(git rev-parse HEAD)"
 
 echo "Changing to develop"
 git checkout develop
