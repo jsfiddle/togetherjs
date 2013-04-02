@@ -14,7 +14,7 @@
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
-  var cacheBust = "<%= process.env.COMMIT_HASH || '' %>" || Date.now();
+  var cacheBust = "<%= process.env.HEROKU_SLUG || '' %>" || Date.now();
 
   // FIXME: I think there's an event that would be called before load?
   // DOMReady?
