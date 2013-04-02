@@ -7,6 +7,11 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
   var assert = util.assert;
   var Walkabout;
 
+  // FIXME: this is used to turn off the chat history, restore, and
+  // replay.  This replay has caused problems, and may simply be
+  // redesigned, or may be reformed.
+  var DISABLE_LOG = true;
+
   session.hub.on("chat", function (msg) {
     ui.addChat({
       type: "text",
@@ -14,7 +19,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
       text: msg.text,
       messageId: msg.messageId
     });
-    if (! session.isClient) {
+    if ((! session.isClient) && (! DISABLE_LOG)) {
       chat.Chat.addChat({
         type: "text",
         text: msg.text,
@@ -33,7 +38,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
   });
 
   session.hub.on("hello", function () {
-    if (! session.isClient) {
+    if ((! session.isClient) && (! DISABLE_LOG)) {
       var log = chat.Chat.loadChat();
       if (log.length) {
         session.send({
@@ -44,23 +49,25 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
     }
   });
 
-  session.hub.on("chat-catchup", function (msg) {
-    assert(session.isClient, "Master received chat-catchup", session.isClient);
-    if (ui.isChatEmpty()) {
-      ui.addChat({type: "clear"});
-      for (var i=0; i<msg.log.length; i++) {
-        var l = msg.log[i];
-        ui.addChat({
-          type: "text",
-          text: l.text,
-          date: l.date,
-          clientId: l.clientId,
-          messageId: l.messageId,
-          catchup: true
-        });
+  if (! DISABLE_LOG) {
+    session.hub.on("chat-catchup", function (msg) {
+      assert(session.isClient, "Master received chat-catchup", session.isClient);
+      if (ui.isChatEmpty()) {
+        ui.addChat({type: "clear"});
+        for (var i=0; i<msg.log.length; i++) {
+          var l = msg.log[i];
+          ui.addChat({
+            type: "text",
+            text: l.text,
+            date: l.date,
+            clientId: l.clientId,
+            messageId: l.messageId,
+            catchup: true
+          });
+        }
       }
-    }
-  });
+    });
+  }
 
   // The number of milliseconds after which to put a break in the conversation
   // (if messages come faster than this, they will be kind of combined)
@@ -332,7 +339,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
   };
 
   session.on("ui-ready", function () {
-    if (session.isClient) {
+    if (session.isClient || DISABLE_LOG) {
       // If we're a client, the master will send the messages
       return;
     }
