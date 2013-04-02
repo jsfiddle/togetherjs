@@ -85,7 +85,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
       description: (
         "<p>\n" +
             "<iframe " +
-            "src=\"http://player.vimeo.com/video/57992755?byline=0&amp;portrait=0&amp;api=1&amp;player_id=modal_vimeo_iframe\" " +
+            "src=\"//player.vimeo.com/video/57992755?byline=0&amp;portrait=0&amp;api=1&amp;player_id=modal_vimeo_iframe\" " +
             "width=\"400\" height=\"300\" frameborder=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen>" +
             "</iframe>" +
             "</p>\n" +
