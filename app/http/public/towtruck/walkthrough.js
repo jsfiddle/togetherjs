@@ -18,6 +18,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   // These are options that are added to the individual guides if the guides don't
   // have these options themselves:
   var defaultGuideOptions = {
+    onClose: walkthrough.stop,
     buttons:
       [{
        name: "Back",
