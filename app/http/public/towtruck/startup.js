@@ -104,8 +104,8 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
         return;
       }
       require(["walkthrough"], function (walkthrough) {
+        session.settings.set("seenIntroDialog", true);
         walkthrough.start(function () {
-          session.settings.set("seenIntroDialog", true);
           next();
         });
       });
