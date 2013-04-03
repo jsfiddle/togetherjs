@@ -6,8 +6,6 @@
 
 require('../../lib/extensions/number');
 
-process.env.PUBLIC_BASE_URL = process.env.PERSONA_AUDIENCE;
-
 const STATIC_EXPIRATION = 60*60*24; // 24 hours
 const TOWTRUCK_EXPIRATION = 60*60; // 1 hour
 
@@ -87,4 +85,4 @@ var port = env.get("PORT");
 var host = env.get("HOST") || "127.0.0.1";
 http.listen(port, host);
 
-logger.info("HTTP server listening on port " + port + " (" + process.env.PUBLIC_BASE_URL + ").");
+logger.info("HTTP server listening on port " + port + " (http://" + process.env.PUBLIC_BASE_URL + ").");
