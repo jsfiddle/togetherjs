@@ -64,6 +64,15 @@ http.configure(function(){
   });
 
   http.use(http.router);
+
+  http.use(function(err, req, res, next){
+    if (err.message.indexOf("Failed to lookup view") === 0){
+      res.render('site/errors/404', { status: 404, url: req.url });
+    }
+    else{
+      res.render('site/errors/500', { status: 500, url: req.url });
+    }
+  });
 });
 
 http.configure('development', function(){
