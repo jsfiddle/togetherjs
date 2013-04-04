@@ -202,6 +202,7 @@ p.main-text {
   font-weight:normal;
   font-family:openSansLight;
   margin-top:50px;
+  color:#fff;
 }
 #introduction h1 strong {
   font-style:normal;
@@ -224,6 +225,7 @@ p.main-text {
 	font-family:
 	openSansLight;
 	letter-spacing:-0.01px;
+	color:#fff;
 }
 
 #introduction .span5 a {
