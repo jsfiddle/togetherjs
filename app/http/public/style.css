@@ -217,6 +217,11 @@ p.main-text {
   border: 0;
 }
 
+#introduction .span5 h1 img {
+  width:117px;
+  padding-bottom:15px;
+}
+
 #introduction .lead {
 	font-size:20px;
 	font-weight:normal;
