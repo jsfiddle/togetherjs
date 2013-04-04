@@ -241,7 +241,7 @@ a#btn-tryitout {
   background-color: #fff;
   counter-reset: how-it-works-counter;
   margin:0px;
-  padding:50px 0px 0px;
+  padding:0px 0px 0px;
 }
 
 #how_it_works .span5 {
@@ -372,7 +372,7 @@ a#btn-tryitout {
   background:#fff;
   text-align: center;
   margin:0px;
-  padding:0px 0px 100px;
+  padding:0px 0px 0px;
 }
 #how_to_install h2 {
   margin-left: 1.2em;
@@ -409,12 +409,11 @@ input.copy-input {
 	text-align:center;
 }
 
-
 #tryitout {
   color: rgba(72,72,72,1);
   background:rgba(255,255,255,1);
   margin:0 auto;
-  padding:0px 0px 0px;
+  padding:0px 0px 30px;
   text-align:center;
 }
 
