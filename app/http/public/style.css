@@ -228,7 +228,7 @@ p.main-text {
 	color:#fff;
 }
 
-#introduction .span5 a {
+a#btn-tryitout {
 	background:rgb(101, 147, 36);border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansLight;letter-spacing:-0.01px;
 }
 
@@ -407,6 +407,15 @@ input.copy-input, textarea.copy-input {
 
 input.copy-input {
 	text-align:center;
+}
+
+
+#tryitout {
+  color: rgba(72,72,72,1);
+  background:rgba(255,255,255,1);
+  margin:0 auto;
+  padding:0px 0px 0px;
+  text-align:center;
 }
 
 footer {
