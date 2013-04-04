@@ -355,9 +355,15 @@ a#btn-tryitout {
   padding:0px 0px 0px;
 }
 
+
+
 #features .far-left {
 	margin:0 auto;
 	text-align:center;
+}
+
+#features .span4 {
+  margin-top:-60px;
 }
 
 #features .textcenter {
@@ -392,6 +398,14 @@ a#btn-tryitout {
 #how_to_install .subheader {
 	margin:0px 10px 0px 10px;
 	height:45px;
+}
+
+#how_to_install #steps {
+  margin-top:-20px;
+}
+
+#how_to_install #disclaimer {
+
 }
 
 #how_to_install .main-text {
