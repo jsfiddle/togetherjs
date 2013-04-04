@@ -229,7 +229,7 @@ p.main-text {
 }
 
 #introduction .span5 a {
-	background:#e34623;border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansLight;letter-spacing:-0.01px;
+	background:rgb(101, 147, 36);border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansLight;letter-spacing:-0.01px;
 }
 
 #introduction iframe {
