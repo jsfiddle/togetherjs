@@ -3,7 +3,6 @@
   <!-- This is the main set of buttons: -->
   <div id="towtruck-interface" class="towtruck-interface-right">
     <div id="towtruck-anchor">
-      <!-- FIXME: replace this with dots: -->
       <span id="towtruck-anchor-horizontal">
         <img src="http://localhost:8080/images/icn-handle-circle.png" alt="drag"><img src="http://localhost:8080/images/icn-handle-circle.png" alt=""><img src="http://localhost:8080/images/icn-handle-circle.png" alt="">
       </span>
@@ -17,8 +16,12 @@
           <img src="" class="towtruck-avatar" alt="Avatar Placeholder">
         </button>
       </div>
-      <button id="towtruck-about-button" class="towtruck-button">
-      </button>
+      <div id="towtruck-button-bg">
+        <button id="towtruck-end-button" class="towtruck-button">
+        </button>
+        <button id="towtruck-about-button" class="towtruck-button">
+        </button>
+      </div>
       <button id="towtruck-audio-button" class="towtruck-button">
         <span id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
         </span>
@@ -53,14 +56,6 @@
       Settings
     </header>
     <section>
-      <p class="towtruck-about-txt">
-        Send this link to a friend
-      </p>
-      <div id="towtruck-share-link-box">
-        <p>
-          <input type="text" id="towtruck-share-link">
-        </p>
-      </div>
       <p class="towtruck-about-txt-bottom">
         Set up your profile
       </p>
@@ -72,6 +67,14 @@
           <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
         </span>
         <span id="towtruck-self-color" class="towtruck-color"></span>
+      </div>
+      <p class="towtruck-about-txt">
+        Send this link to a friend
+      </p>
+      <div id="towtruck-share-link-box">
+        <p>
+          <input type="text" id="towtruck-share-link">
+        </p>
       </div>
 
       <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
