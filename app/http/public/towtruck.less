@@ -569,16 +569,22 @@
   }
 
   #towtruck-buttons #towtruck-expand-button {
-    background:#0095DD;
-    height:40px;
+    background:none;
+    height:48px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border:1px solid #00539F;
+    cursor:default;
+    box-shadow: none;
     width:52px;
     position:relative;
     left:-1px;
-    top:-3px;
     background-image:url('/images/icn-info.png');
-    background-position:4px 0px;
+    background-repeat:no-repeat;
+    background-position:4px 3px;
     background-size:40px 40px;
     cursor:pointer;
+    margin-top:0px;
   }
 
   #towtruck-buttons #towtruck-expand-button:hover {
@@ -809,7 +815,7 @@
     &#towtruck-about section {
       text-align:left;
       margin:0px;
-      padding:10px 10px 0px 10px;
+      padding:0px 10px 0px 10px;
       // background:#fff;
     }
 
@@ -817,6 +823,7 @@
       font-size:14px;
       font-family:openSansRegular;
       text-align:left;
+      clear:left;
     }
 
     &#towtruck-about .towtruck-about-txt-bottom {
@@ -856,8 +863,7 @@
     }
 
     &#towtruck-about .towtruck-bottom-panel {
-      border-top:1px solid rgba(0,0,0,0);
-      margin-top:30px !important;
+      margin-top:10px;
     }
 
     &#towtruck-about button#towtruck-end-session {
@@ -1363,7 +1369,7 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  @long-side: (@button-size + 12) * 4 + 44px; // actual button-size * number of buttons + expand thingy
+  @long-side: (@button-size + 12) * 4 + 53px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
