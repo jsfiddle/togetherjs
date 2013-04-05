@@ -240,7 +240,7 @@ p.main-text {
 }
 
 a#btn-tryitout {
-	background:rgb(101, 147, 36);border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansLight;letter-spacing:-0.01px;
+	background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansRegular;letter-spacing:-0.01px;
 }
 
 #introduction iframe {
