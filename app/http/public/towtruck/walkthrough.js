@@ -25,7 +25,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
        classString: "towtruck-walkthru-back-button"
        },
        {
-         name: "Get started",
+         name: "Use TowTruck",
          classString: "towtruck-walkthru-getstarted-button",
          onclick: walkthrough.stop
         },
@@ -38,7 +38,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     // This is assigned to the first item.buttons in the guide:
     firstButtons:
       [{
-        name: "Get started",
+        name: "Use TowTruck",
         classString: "towtruck-walkthru-getstarted-button",
         onclick: walkthrough.stop
        },
@@ -50,7 +50,7 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
     // This is assigned to the last item.buttons in the guide:
     lastButtons:
       [{
-        name: "Get started",
+        name: "Use TowTruck",
         classString: "towtruck-walkthru-getstarted-button",
         onclick: walkthrough.stop
        },{
