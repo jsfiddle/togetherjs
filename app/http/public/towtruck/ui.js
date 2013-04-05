@@ -355,7 +355,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       toggleWindow("#towtruck-about");
     });
 
-    $("#towtruck-end-session").click(function () {
+    $("#towtruck-end-button").click(function () {
       session.close();
     });
 
