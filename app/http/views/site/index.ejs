@@ -10,66 +10,64 @@
             <img src="/images/towtruck-logo-lrg.png" alt="Logo">
             TowTruck
           </h1>
-          <p class="lead">A service for your website that makes it surprisingly easy to collaborate in real-time.</p>
-  		    <p class="lead"><a class="btn btn-large btn-primary" href="/example" id="btn-tryitout">Try it out here</a></p>
+          <p class="lead">A <strong>service</strong> for your <strong>website</strong> that makes it surprisingly easy to <strong>collaborate</strong> in <strong>real-time</strong>.</p>
+          <p class="lead"><a class="btn btn-large btn-primary" href="/example" id="btn-tryitout">Try it out here</a></p>
         </div>
         <div class="span7">
           <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
             <img src="images/site-product-shot.png" alt="Product shot">
           </a>
         </div>
-  		  <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
-  			  <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
+        <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
+          <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
             <img src="/images/icn-close-btn-wht.png" alt="close button">
           </button>
           <div class="modal-body">
             <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/57992755?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
           </div>
         </div>
-  		</div>
+      </div>
     </div>
   </div>
-
   <div id="how_it_works" class="section">
     <div class="container">
       <h1 class="main-header">How it Works</h1>
       <div class="row">
-        <div class="span5">
-  			<div class="how_it_works_list_box">
-  				<div class="col-left">
-  				  <img src="images/site-howitworks-01.png" alt="Step 1">
-          </div>
-  				<div class="col-right">
-  					<h2 class="subheader">Click the TowTruck button</h2>
-            <p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
-  				</div>
-  				<div class="clear"></div>
-  			</div>
-  			<div class="how_it_works_list_box">
-  				<div class="col-left">
-  				  <img src="images/site-howitworks-02.png" alt="Step 2">
-  	      </div>
-  				<div class="col-right">
-  					<h2 class="subheader">Share the TowTruck link</h2>
-  	        <p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
-  				</div>
-  				<div class="clear"></div>
-  			</div>
-  			<div class="how_it_works_list_box">
-  				<div class="col-left">
-  					<img src="images/site-howitworks-03.png" alt="Step 3">
-  	      </div>
-  				<div class="col-right">
-  					<h2 class="subheader">Wait for your friend to join</h2>
-  		      <p class="main-text">
-  		        You'll see a notification when your friend joins your session, and you can then collaborate in real-time!</p>
-  				</div>
-  				<div class="clear"></div>
-  			</div>
-        </div>
+        <ol class="span5" id="how_it_works_indicators">
+          <li data-slide-index="0" class="active">
+            <div class="col-left">
+              <img src="images/site-howitworks-01.png" alt="Step 1">
+            </div>
+            <div class="col-right">
+              <h2 class="subheader">Click the TowTruck button</h2>
+              <p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
+            </div>
+            <div class="clear"></div>
+          </li>
+          <li  data-slide-index="1">
+            <div class="col-left">
+              <img src="images/site-howitworks-02.png" alt="Step 2">
+            </div>
+            <div class="col-right">
+              <h2 class="subheader">Share the TowTruck link</h2>
+              <p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
+            </div>
+            <div class="clear"></div>
+          </li>
+          <li data-slide-index="2">
+            <div class="col-left">
+              <img src="images/site-howitworks-03.png" alt="Step 3">
+            </div>
+            <div class="col-right">
+              <h2 class="subheader">Wait for your friend to join</h2>
+              <p class="main-text">
+                You'll see a notification when your friend joins your session, and you can then collaborate in real-time!</p>
+            </div>
+            <div class="clear"></div>
+          </li>
+        </ol>
         <div class="span7">
           <div id="how_it_works_carousel" class="carousel slide">
-            <!-- Carousel items -->
             <div class="carousel-inner">
               <div class="a active item">
                 <img src="/images/sections/how_it_works/carousel-a.png" alt="Click the TowTruck Button" />
@@ -85,19 +83,11 @@
                 <img src="/images/sections/how_it_works/carousel-c.png" alt="Click the TowTruck Button" />
               </div>
             </div>
-            <ol class="carousel-indicators">
-                <li data-target="#how_it_works_carousel" data-slide-to="0" class="active"></li>
-                <li data-target="#how_it_works_carousel" data-slide-to="1"></li>
-                <li data-target="#how_it_works_carousel" data-slide-to="2"></li>
-            </ol>
           </div>
         </div>
-        <script>
-        $('.carousel').carousel('cycle');
-        </script>
       </div>
     </div>
-  	<hr style="width:50%;margin:50px auto 0px;">
+    <hr style="width:50%;margin:50px auto 0px;">
   </div>
 
   <div id="selector">
@@ -113,8 +103,8 @@
 
   <div id="features" class="section">
     <div class="container">
-          <h1 class="main-header">Features</h1>
-  	<div class="span4 far-left">
+      <h1 class="main-header">Features</h1>
+        <div class="span4 far-left">
         <img class="main-img" src="images/site-features-01.png" alt="Browser Header Shared Image">
         <h2 class="subheader">Cursor-mirroring</h2>
         <p class="main-text">See your friend's cursors in real-time to help point to areas on the page.</p>
@@ -133,7 +123,7 @@
         <p></p>
       </div><!-- /.span4 -->
     </div>
-  	<hr style="width:50%;margin:20px auto 0px;">
+    <hr style="width:50%;margin:20px auto 0px;">
   </div>
 
   <div id="how_to_install" class="section">
@@ -154,7 +144,7 @@
           <form>
             <fieldset>
               <textarea class="span6 copy-input"><button onclick=&quot;TowTruck(this); return false;&quot;>Start TowTruck</button></textarea>
-</fieldset>
+            </fieldset>
           </form>
         </div>
       </div>
@@ -169,10 +159,8 @@
   
   <div id="tryitout" class="section">
     <div class="container">
-          <h1 class="main-header">Try out TowTruck today!</h1>
-          <p class="lead"><a class="btn btn-large btn-primary" id="btn-tryitout" href="/example">Try it out here</a></p>
+      <h1 class="main-header">Try out TowTruck today!</h1>
+      <p class="lead"><a class="btn btn-large btn-primary" id="btn-tryitout" href="/example">Try it out here</a></p>
     </div>
   </div>
-  
-  
 </div>

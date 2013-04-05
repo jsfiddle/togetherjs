@@ -15,8 +15,14 @@ $(function(){
 
   $("#year").text((new Date).getFullYear());
 
-  $('.carousel').carousel({
-    interval: 0
+  var carousel = $('.carousel').carousel({
+    interval: false
+  });
+
+  $('ol#how_it_works_indicators li').click(function(a,b,c){
+    carousel.carousel(parseInt($(this).attr('data-slide-index')));
+    $('ol#how_it_works_indicators li').removeClass('active');
+    $(this).addClass('active');
   });
 
   var cursorPositions = [

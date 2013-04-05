@@ -204,6 +204,7 @@ p.main-text {
   margin-top:50px;
   color:#fff;
 }
+
 #introduction h1 strong {
   font-style:normal;
   font-weight: 500;
@@ -227,10 +228,15 @@ p.main-text {
 	font-weight:normal;
 	line-height:1.5;
 	padding:5px 0px;
-	font-family:
-	openSansLight;
+	font-family: openSansLight;
 	letter-spacing:-0.01px;
 	color:#fff;
+}
+#introduction .lead strong {
+  font-family: openSans;
+  font-weight: normal;
+  font-size: 22px;
+  letter-spacing: +0.01;
 }
 
 a#btn-tryitout {
@@ -267,12 +273,20 @@ a#btn-tryitout {
 #how_it_works li h2 {
   margin:0px;
 }
-#how_it_works .how_it_works_list_box img{
+#how_it_works ol#how_it_works_indicators {
+  cursor: pointer;
+}
+
+#how_it_works ol#how_it_works_indicators .active{
+  border: 1px solid red;
+}
+
+#how_it_works ol#how_it_works_indicators img{
   height:30px;
   padding-top:5px;
 }
 
-#how_it_works .how_it_works_list_box p{
+#how_it_works ol#how_it_works_indicators p{
 	padding:10px 10px 10px 0px;
 }
 
