@@ -8,10 +8,31 @@
 
 
  /* Large desktop */
- @media (min-width: 1200px) { ... }
+ @media (min-width: 1200px) {
+   #introduction .span5 h1 img {
+     width:80px !important;
+     padding-bottom:15px;
+     background:blue;
+   }
+ }
+ 
+ /* Large desktop */
+ @media (min-width: 980px) {
+   #introduction .span5 h1 img {
+     width:80px !important;
+     padding-bottom:15px;
+     background:red;
+   }
+ }
 
  /* Portrait tablet to landscape and desktop */
- @media (min-width: 768px) and (max-width: 979px) { ... }
+ @media (min-width: 768px) and (max-width: 979px) {
+   #introduction .span5 h1 img {
+     width:80px !important;
+     padding-bottom:15px;
+     background:green;
+   }
+ }
 
  /* Landscape phone to portrait tablet */
  @media (max-width: 767px) {
