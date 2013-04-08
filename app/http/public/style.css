@@ -367,6 +367,16 @@ a#btn-tryitout {
 	outline:none;
 }
 
+#how_it_works .carousel .carousel-control {
+  opacity: 0;
+  }
+#how_it_works .carousel:hover .carousel-control {
+  opacity: 0.5;
+  transition: opacity .25s ease-in-out;
+  -moz-transition: opacity .25s ease-in-out;
+  -webkit-transition: opacity .25s ease-in-out;
+  }
+
 #how_it_works .carousel-indicators {
   list-style:none;
   margin-left:46%;
