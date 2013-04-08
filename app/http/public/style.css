@@ -3,22 +3,29 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
+
+ /*Responsive fixes - hackjobs*/
+
+ @media (max-width: 767px) {
+   body {
+     padding-left: 0px;
+     padding-right: 0px;
+   }
+
+   .span5 {
+     padding-left:20px;
+     padding-right:20px;
+   }
+
+   #introduction .span5 h1 img {
+     width:60px !important;
+     padding-bottom:15px;
+   }
+
+ }
+
+
 /* Global things like fonts go here */
-
-@media (max-width: 767px) {
-  body {
-    padding-left: 0px;
-    padding-right: 0px;
-  }
-  
-  .span5 {
-    padding-left:20px;
-    padding-right:20px;
-  }
-}
-
-
-
 @font-face {
   font-family: openSansRegular;
   src: url('fonts/OpenSans-Regular.ttf');
