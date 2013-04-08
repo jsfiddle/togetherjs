@@ -6,24 +6,35 @@
 
  /*Responsive fixes - hackjobs*/
 
+
+ /* Large desktop */
+ @media (min-width: 1200px) { ... }
+
+ /* Portrait tablet to landscape and desktop */
+ @media (min-width: 768px) and (max-width: 979px) { ... }
+
+ /* Landscape phone to portrait tablet */
  @media (max-width: 767px) {
-   body {
-     padding-left: 0px;
-     padding-right: 0px;
-   }
+    body {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
 
-   .span5 {
-     padding-left:20px;
-     padding-right:20px;
-   }
+    .span5 {
+      padding-left:20px;
+      padding-right:20px;
+    }
 
-   #introduction .span5 h1 img {
-     width:60px !important;
-     padding-bottom:15px;
-   }
+    #introduction .span5 h1 img {
+      width:60px !important;
+      padding-bottom:15px;
+    }
 
- }
+  }
 
+ /* Landscape phones and down */
+ @media (max-width: 480px) { ... }
+ 
 
 /* Global things like fonts go here */
 @font-face {
