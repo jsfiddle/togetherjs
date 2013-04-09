@@ -739,17 +739,18 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
    #how_to_install .copy-input {
      width: 300px !important;
    }
-   
+      
  }
 
  /* Landscape phone to portrait tablet */
  @media (max-width: 767px) {
+   
     body {
       padding-left: 0px;
       padding-right: 0px;
     }
     
-    .containerbg {
+    .containerbg .container.examples{
       padding:20px !important;
     }
     
@@ -794,6 +795,14 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
     #how_it_works .carousel-indicators {
       list-style: none;
       margin-left: 47% !important;
+    }
+    
+    #features h2.subheader {
+      margin-top:-20px !important;
+    }
+    
+    #features img.main-img {
+      margin-top:30px !important;
     }
      
     .span6 {
