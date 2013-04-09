@@ -37,6 +37,7 @@
    .navbar .btn-navbar {
      float:left !important;
      background: rgb(72,72,72) !important;
+     margin-left:-10px !important;
    }
    
  }
