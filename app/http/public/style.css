@@ -668,6 +668,10 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
  /* Portrait tablet to landscape and desktop */
  @media (min-width: 768px) and (max-width: 979px) {
+      
+   .navbar a.brand {
+     display:none !important;
+   }
    
    #introduction .span5 h1 img {
      width:40px !important;
@@ -743,6 +747,14 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
     body {
       padding-left: 0px;
       padding-right: 0px;
+    }
+    
+    .containerbg {
+      padding:20px !important;
+    }
+    
+    .navbar a.brand {
+      display:none !important;
     }
 
     .span5 {
