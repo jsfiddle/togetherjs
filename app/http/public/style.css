@@ -12,7 +12,6 @@
    #introduction .span5 h1 img {
      width:80px !important;
      padding-bottom:15px;
-     background:blue;
    }
  }
  
@@ -21,17 +20,25 @@
    #introduction .span5 h1 img {
      width:80px !important;
      padding-bottom:15px;
-     background:red;
    }
  }
 
  /* Portrait tablet to landscape and desktop */
  @media (min-width: 768px) and (max-width: 979px) {
    #introduction .span5 h1 img {
-     width:80px !important;
+     width:40px !important;
      padding-bottom:15px;
-     background:green;
    }
+   
+   #introduction h1 {
+     font-size:62px !important;
+   }
+   
+   .navbar .btn-navbar {
+     float:left !important;
+     background: rgb(72,72,72) !important;
+   }
+   
  }
 
  /* Landscape phone to portrait tablet */
