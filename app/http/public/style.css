@@ -2,69 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
-
- /*Responsive fixes - hackjobs*/
-
-
- /* Large desktop */
- @media (min-width: 1200px) {
-   #introduction .span5 h1 img {
-     width:80px !important;
-     padding-bottom:15px;
-   }
- }
- 
- /* Large desktop */
- @media (min-width: 980px) {
-   #introduction .span5 h1 img {
-     width:80px !important;
-     padding-bottom:15px;
-   }
- }
-
- /* Portrait tablet to landscape and desktop */
- @media (min-width: 768px) and (max-width: 979px) {
-   #introduction .span5 h1 img {
-     width:40px !important;
-     padding-bottom:15px;
-   }
-   
-   #introduction h1 {
-     font-size:62px !important;
-   }
-   
-   .navbar .btn-navbar {
-     float:left !important;
-     background: rgb(72,72,72) !important;
-     margin-left:-10px !important;
-   }
-   
- }
-
- /* Landscape phone to portrait tablet */
- @media (max-width: 767px) {
-    body {
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-
-    .span5 {
-      padding-left:20px;
-      padding-right:20px;
-    }
-
-    #introduction .span5 h1 img {
-      width:60px !important;
-      padding-bottom:15px;
-    }
-
-  }
-
- /* Landscape phones and down */
- @media (max-width: 480px) { ... }
- 
-
 /* Global things like fonts go here */
 @font-face {
   font-family: openSansRegular;
@@ -213,6 +150,10 @@ p.main-text {
   background:#1baefc;
 }
 
+#introduction .span7 {
+  padding-top:20px;
+}
+
 #introduction a:focus {
 	outline:none !important;
 }
@@ -248,7 +189,7 @@ p.main-text {
   letter-spacing:-5px;
   font-weight:normal;
   font-family:openSansLight;
-  margin-top:50px;
+  margin-top:20px;
   color:#fff;
 }
 
@@ -266,7 +207,7 @@ p.main-text {
 }
 
 #introduction .span5 h1 img {
-  width:117px;
+  width:80px;
   padding-bottom:15px;
 }
 
@@ -346,7 +287,7 @@ a#btn-tryitout {
 }
 
 #how_it_works .span5 {
-	padding-top:50px;
+	padding-top:0px;
 }
 
 #how_it_works .carousel-indicators img {
@@ -373,7 +314,7 @@ a#btn-tryitout {
 }
 
 #how_it_works li {
-  opacity:0.5;
+  opacity:0.3;
 }
 
 #how_it_works ol#how_it_works_indicators img{
@@ -531,7 +472,7 @@ input.copy-input, textarea.copy-input {
 	letter-spacing:0px;
 	border-radius:2px;
 	padding:6px;
-	width:450px;
+	width:400px;
 	background:rgba(72,72,72,1);
 	color:#fff;
 	font-size:12px;
@@ -670,6 +611,150 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
 /* RESPONSIVE CSS
 -------------------------------------------------- */
+
+ /* Large desktop */
+ @media (min-width: 1200px) {
+   
+   #introduction h1 {
+     text-align: left;
+     font-size:85px;
+     line-height:1;
+     letter-spacing:-5px;
+     font-weight:normal;
+     font-family:openSansLight;
+     margin-top:50px;
+     color:#fff;
+   }
+   
+   #introduction .span5 h1 img {
+     width:80px !important;
+     padding-bottom:15px;
+     margin-top:0px;
+   }
+   
+   input.copy-input, textarea.copy-input {
+   	border:1px solid rgba(0,0,0,1);
+   	font-family:Monaco;
+   	letter-spacing:0px;
+   	border-radius:2px;
+   	padding:6px;
+   	width:460px !important;
+   	background:rgba(72,72,72,1);
+   	color:#fff;
+   	font-size:12px;
+   }
+
+ }
+ 
+ /* Medium desktop */
+/* @media (max-width: 979px) {
+   #introduction .span5 h1 img {
+     width:80px !important;
+     padding-bottom:15px;
+   }
+   
+   #how_it_works h2.subheader {
+     font-size:10px !important;
+   }
+   
+ }*/
+
+ /* Portrait tablet to landscape and desktop */
+ @media (min-width: 768px) and (max-width: 979px) {
+   
+   #introduction .span5 h1 img {
+     width:40px !important;
+     padding-bottom:15px;
+   }
+   
+   #introduction h1 {
+     font-size:60px !important;
+   }
+   
+   #introduction .span7 {
+     padding-top:-40px !important;
+   }
+   
+   .navbar .btn-navbar {
+     float:left !important;
+     background: rgb(72,72,72) !important;
+     margin-left:-10px !important;
+   }
+   
+   .nav-collapse .nav {
+     float:left !important;
+     margin-left:-20px !important;
+   }
+
+   #introduction .span7 {
+     padding-top:40px;
+   }
+   
+   #introducing-towtruck h2.sub-header {
+     padding-bottom:20px !important;
+   }
+   
+   #how_it_works ol.span5 {
+     padding-top:0px !important;
+   }
+   
+   #how_it_works h2 {
+     line-height:20px !important;
+   }
+   
+   #how_it_works .span7 {
+     padding-top:20px !important;
+     height:0px !important;
+   }
+    
+   #how_it_works #how_it_works_carousel {
+     height: 280px !important;
+   }
+    
+   #how_it_works .carousel-inner {
+     height:500px !important;
+     margin-bottom:-230px !important;
+   }
+    
+   #how_it_works .carousel-indicators {
+    list-style: none;
+    margin-left: 43% !important;
+   }
+   
+   #how_it_works h2 {
+     font-size:20px !important;
+   }
+   
+   #how_to_install .copy-input {
+     width: 300px !important;
+   }
+   
+ }
+
+ /* Landscape phone to portrait tablet */
+ @media (max-width: 767px) {
+    body {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+
+    .span5 {
+      padding-left:20px;
+      padding-right:20px;
+    }
+
+    #introduction .span5 h1 img {
+      width:60px !important;
+      padding-bottom:15px;
+    }
+
+  }
+
+ /* Landscape phones and down */
+ @media (max-width: 480px) { ... }
+
+
+
 
 @media (max-width: 979px) {
 
