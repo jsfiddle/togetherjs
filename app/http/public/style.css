@@ -363,12 +363,17 @@ a#btn-tryitout {
 #how_it_works li h2 {
   margin:0px;
 }
+
 #how_it_works ol#how_it_works_indicators {
   cursor: pointer;
 }
 
 #how_it_works ol#how_it_works_indicators .active{
-  border: 1px solid red;
+  opacity:1; 
+}
+
+#how_it_works li {
+  opacity:0.5;
 }
 
 #how_it_works ol#how_it_works_indicators img{
