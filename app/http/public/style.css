@@ -60,6 +60,12 @@ body {
   float:left !important;
 }
 
+.nav-collapse .nav > li > a, .nav-collapse .dropdown-menu a {
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+
 ul.nav {
 	float:right !important;
 	margin:0px !important;
@@ -75,6 +81,7 @@ ul.nav {
 
 .towtruckula ul.nav a:hover{
 	border-bottom:1px solid #fff;
+	background:none !important;
 }
 
 .navbar-wrapper {
@@ -680,7 +687,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
      background: rgb(72,72,72) !important;
      margin-left:-10px !important;
    }
-   
+      
    .nav-collapse .nav {
      float:left !important;
      margin-left:-20px !important;
@@ -742,16 +749,88 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
       padding-left:20px;
       padding-right:20px;
     }
+    
+    #introduction {
+      padding-left:0px;
+    }
 
     #introduction .span5 h1 img {
       width:60px !important;
       padding-bottom:15px;
     }
+    
+    #introducing-towtruck h2.subheader {
+      margin-top:-40px !important;
+    }
+    
+    .navbar .btn-navbar {
+      float:left !important;
+      background: rgb(72,72,72) !important;
+      margin-left:0px !important;
+    }
 
+    .nav-collapse .nav {
+      float:left !important;
+      margin-left:0px !important;
+    }
+     
+    #how_it_works .carousel-inner {
+      height:500px !important;
+      margin-bottom:-50px !important;
+    }
+
+    #how_it_works .carousel-indicators {
+      list-style: none;
+      margin-left: 47% !important;
+    }
+     
+    .span6 {
+      margin:0 auto !important;
+    }
+    
+    footer img {
+      padding-left:24px;
+      padding-bottom:20px;
+    }
+    
   }
 
  /* Landscape phones and down */
- @media (max-width: 480px) { ... }
+ @media (max-width: 480px) {
+   
+   #how_it_works h2 {
+     line-height:20px !important;
+     font-size:24px;
+   }
+   
+   #how_it_works .carousel-inner {
+     height:300px !important;
+     margin-bottom:-50px !important;
+   }
+
+   #how_it_works .carousel-indicators {
+     list-style: none;
+     margin-left: 43% !important;
+   }
+   
+   input.copy-input, textarea.copy-input {
+   	border:1px solid rgba(0,0,0,1);
+   	font-family:Monaco;
+   	letter-spacing:0px;
+   	border-radius:2px;
+   	padding:6px;
+   	width:300px;
+   	background:rgba(72,72,72,1);
+   	color:#fff;
+   	font-size:12px;
+   }
+   
+   footer img {
+     padding-left:24px;
+     padding-bottom:20px;
+   }
+   
+ }
 
 
 
