@@ -325,6 +325,11 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
       return;
     }
     setTimeout(function () {
+      if (! session.running) {
+        // This can end up running right after TowTruck has been closed, often
+        // because TowTruck was closed with a click...
+        return;
+      }
       if (elementFinder.ignoreElement(event.target)) {
         return;
       }

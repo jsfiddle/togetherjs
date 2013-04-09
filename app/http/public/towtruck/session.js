@@ -40,6 +40,8 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
 
   // Setting, essentially global:
   session.AVATAR_SIZE = 90;
+  // True while TowTruck is running:
+  session.running = false;
 
   /****************************************
    * URLs
@@ -392,10 +394,28 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     session.emit("shareId");
   }
 
+  function initStartTarget() {
+    var id;
+    if (TowTruck.startTarget) {
+      id = TowTruck.startTarget.id;
+      if (id) {
+        session.setStorage("startTarget", id);
+      }
+      return;
+    }
+    id = session.getStorage("startTarget", null);
+    var el = document.getElementById(id);
+    if (el) {
+      TowTruck.startTarget = el;
+    }
+  }
+
   session.start = function () {
+    session.running = true;
     initClientId();
     initShareId();
     openChannel();
+    initStartTarget();
     require(["ui"], function (ui) {
       ui.prepareUI();
       require(features, function () {
@@ -418,6 +438,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   };
 
   session.close = function () {
+    session.running = false;
     session.send({type: "bye"});
     session.emit("close");
     var name = window.name;

@@ -210,7 +210,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     assert(container.length);
     $("body").append(container);
     var seenDialog = session.settings.get("seenIntroDialog");
-    if (TowTruck.startTarget) {
+    if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
       // until the animation finishes - attempts to calculate the
@@ -252,6 +252,19 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
           }, 510);
         }, 5);
       }, 5);
+    }
+    if (TowTruck.startTarget) {
+      var el = $(TowTruck.startTarget);
+      var text = el.text().toLowerCase().replace(/\s+/g, " ");
+      text = text.replace(/^\s*/, "").replace(/\s*$/, "");
+      if (text == "start towtruck") {
+        el.attr("data-end-towtruck-html", "End TowTruck");
+      }
+      if (el.attr("data-end-towtruck-html")) {
+        el.attr("data-start-towtruck-html", el.html());
+        el.html(el.attr("data-end-towtruck-html"));
+      }
+      el.addClass("towtruck-started");
     }
   };
 
@@ -463,6 +476,13 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     if (starterButton.attr("data-start-text")) {
       starterButton.text(starterButton.attr("data-start-text"));
       starterButton.attr("data-start-text", "");
+    }
+    if (TowTruck.startTarget) {
+      var el = $(TowTruck.startTarget);
+      if (el.attr("data-start-towtruck-html")) {
+        el.html(el.attr("data-start-towtruck-html"));
+      }
+      el.removeClass("towtruck-started");
     }
   });
 

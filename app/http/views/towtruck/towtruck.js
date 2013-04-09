@@ -77,7 +77,11 @@
     }
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
-      session.start();
+      if (session.running) {
+        session.close();
+      } else {
+        session.start();
+      }
       if (doneCallback && typeof doneCallback == "function") {
         doneCallback();
       }

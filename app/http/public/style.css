@@ -238,6 +238,10 @@ a#btn-tryitout {
 	background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-height:1.5;text-shadow:0px 1px 0px rgba(0,0,0,0.3);font-family:openSansRegular;letter-spacing:-0.01px;
 }
 
+button#btn-tryitout.towtruck-started {
+    background:#f00;
+}
+
 #introduction iframe {
 	box-shadow:0px 1px 1px rgba(0,0,0,0.5);border-radius:2px;
 }
@@ -317,7 +321,7 @@ a#btn-tryitout {
 }
 
 #how_it_works ol#how_it_works_indicators .active{
-  opacity:1; 
+  opacity:1;
 }
 
 #how_it_works li {
@@ -621,7 +625,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
  /* Large desktop */
  @media (min-width: 1200px) {
-   
+
    #introduction h1 {
      text-align: left;
      font-size:85px;
@@ -632,13 +636,13 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
      margin-top:50px;
      color:#fff;
    }
-   
+
    #introduction .span5 h1 img {
      width:80px !important;
      padding-bottom:15px;
      margin-top:0px;
    }
-   
+
    input.copy-input, textarea.copy-input {
    	border:1px solid rgba(0,0,0,1);
    	font-family:Monaco;
@@ -652,46 +656,46 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
    }
 
  }
- 
+
  /* Medium desktop */
 /* @media (max-width: 979px) {
    #introduction .span5 h1 img {
      width:80px !important;
      padding-bottom:15px;
    }
-   
+
    #how_it_works h2.subheader {
      font-size:10px !important;
    }
-   
+
  }*/
 
  /* Portrait tablet to landscape and desktop */
  @media (min-width: 768px) and (max-width: 979px) {
-      
+
    .navbar a.brand {
      display:none !important;
    }
-   
+
    #introduction .span5 h1 img {
      width:40px !important;
      padding-bottom:15px;
    }
-   
+
    #introduction h1 {
      font-size:60px !important;
    }
-   
+
    #introduction .span7 {
      padding-top:-40px !important;
    }
-   
+
    .navbar .btn-navbar {
      float:left !important;
      background: rgb(72,72,72) !important;
      margin-left:-10px !important;
    }
-      
+
    .nav-collapse .nav {
      float:left !important;
      margin-left:-20px !important;
@@ -700,60 +704,60 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
    #introduction .span7 {
      padding-top:40px;
    }
-   
+
    #introducing-towtruck h2.sub-header {
      padding-bottom:20px !important;
    }
-   
+
    #how_it_works ol.span5 {
      padding-top:0px !important;
    }
-   
+
    #how_it_works h2 {
      line-height:20px !important;
    }
-   
+
    #how_it_works .span7 {
      padding-top:20px !important;
      height:0px !important;
    }
-    
+
    #how_it_works #how_it_works_carousel {
      height: 280px !important;
    }
-    
+
    #how_it_works .carousel-inner {
      height:500px !important;
      margin-bottom:-230px !important;
    }
-    
+
    #how_it_works .carousel-indicators {
     list-style: none;
     margin-left: 43% !important;
    }
-   
+
    #how_it_works h2 {
      font-size:20px !important;
    }
-   
+
    #how_to_install .copy-input {
      width: 300px !important;
    }
-      
+
  }
 
  /* Landscape phone to portrait tablet */
  @media (max-width: 767px) {
-   
+
     body {
       padding-left: 0px;
       padding-right: 0px;
     }
-    
+
     .containerbg .container.examples{
       padding:20px !important;
     }
-    
+
     .navbar a.brand {
       display:none !important;
     }
@@ -762,7 +766,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
       padding-left:20px;
       padding-right:20px;
     }
-    
+
     #introduction {
       padding-left:0px;
     }
@@ -771,11 +775,11 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
       width:60px !important;
       padding-bottom:15px;
     }
-    
+
     #introducing-towtruck h2.subheader {
       margin-top:-40px !important;
     }
-    
+
     .navbar .btn-navbar {
       float:left !important;
       background: rgb(72,72,72) !important;
@@ -786,7 +790,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
       float:left !important;
       margin-left:0px !important;
     }
-     
+
     #how_it_works .carousel-inner {
       height:500px !important;
       margin-bottom:-50px !important;
@@ -796,34 +800,34 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
       list-style: none;
       margin-left: 47% !important;
     }
-    
+
     #features h2.subheader {
       margin-top:-20px !important;
     }
-    
+
     #features img.main-img {
       margin-top:30px !important;
     }
-     
+
     .span6 {
       margin:0 auto !important;
     }
-    
+
     footer img {
       padding-left:24px;
       padding-bottom:20px;
     }
-    
+
   }
 
  /* Landscape phones and down */
  @media (max-width: 480px) {
-   
+
    #how_it_works h2 {
      line-height:20px !important;
      font-size:24px;
    }
-   
+
    #how_it_works .carousel-inner {
      height:300px !important;
      margin-bottom:-50px !important;
@@ -833,7 +837,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
      list-style: none;
      margin-left: 43% !important;
    }
-   
+
    input.copy-input, textarea.copy-input {
    	border:1px solid rgba(0,0,0,1);
    	font-family:Monaco;
@@ -845,12 +849,12 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
    	color:#fff;
    	font-size:12px;
    }
-   
+
    footer img {
      padding-left:24px;
      padding-bottom:20px;
    }
-   
+
  }
 
 
