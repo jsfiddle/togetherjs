@@ -27,7 +27,7 @@ git merge develop
 
 echo
 echo "Pushing to heroku"
-git push heroku
+git push heroku master
 
 echo
 echo "Setting commit config"
