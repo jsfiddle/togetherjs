@@ -10,7 +10,7 @@ define(["util"], function (util) {
     return t;
   }
   return {
-    interface: clean("<%- read('interface.html')%>"),
+    "interface": clean("<%- read('interface.html')%>"),
     help: clean("<%- read('help.txt')%>"),
     walkabout: clean("<%- read('walkabout.html')%>")
   };

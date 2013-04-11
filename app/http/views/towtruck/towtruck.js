@@ -11,10 +11,31 @@
     "/towtruck.min.css"
   ];
 
-  var baseUrl = "<%= process.env.PUBLIC_BASE_URL %>";
+  var baseUrl = "<%= process.env.PUBLIC_BASE_URL || '' %>";
+  if (baseUrl && typeof baseUrl == "string" && baseUrl.indexOf("<" + "%") === 0) {
+    // Reset the variable if it doesn't get substituted
+    baseUrl = "";
+  }
   // FIXME: we could/should use a version from the checkout, at least
   // for production
-  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>" || Date.now();
+  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>" || (Date.now() + "");
+  if (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0) {
+    cacheBust = Date.now() + "";
+  }
+
+  if (! baseUrl) {
+    var scripts = document.getElementsByTagName("script");
+    for (var i=0; i<scripts.length; i++) {
+      var src = scripts[i].src;
+      if (src && src.search(/towtruck.js(\?.*)?$/) !== -1) {
+        baseUrl = src.replace(/towtruck.js(\?.*)?$/, "");
+        break;
+      }
+    }
+  }
+  if ((! baseUrl) && console.warn) {
+    console.warn("Could not determine TowTruck's baseUrl (looked for a <script> with towtruck.js)");
+  }
 
   // FIXME: I think there's an event that would be called before load?
   // DOMReady?
@@ -132,7 +153,7 @@
   };
 
   var defaultHubBase = "<%= process.env.HUB_BASE %>";
-  if (defaultHubBase.indexOf("<" + "%=") === 0) {
+  if (defaultHubBase.indexOf("<" + "%") === 0) {
     // Substitution wasn't made
     defaultHubBase = "https://hub.towtruck.mozillalabs.com";
   }
