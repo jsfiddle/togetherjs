@@ -43,6 +43,8 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
   // True while TowTruck is running:
   session.running = false;
 
+  var MAX_SESSION_AGE = 30*24*60*60*1000; // 30 days
+
   /****************************************
    * URLs
    */
@@ -60,8 +62,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     if (m) {
       query = m[0];
     }
-    // FIXME: The "head-" part here is obsolete:
-    hash = hash.replace(/&?towtruck-(head-)?[a-zA-Z0-9]+/, "");
+    hash = hash.replace(/&?towtruck-[a-zA-Z0-9]+/, "");
     hash = hash || "#";
     return location.protocol + "//" + location.host + location.pathname + query +
            hash + "&towtruck=" + session.shareId;
@@ -100,6 +101,20 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     } else {
       localStorage.setItem(key, JSON.stringify(value));
     }
+  };
+
+  session.getStorageKeys = function (prefix) {
+    // Returns a list of keys, potentially with the given prefix
+    prefix = prefix || "";
+    var result = [];
+    for (var i=0; i<localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.indexOf(localStoragePrefix + prefix) === 0) {
+        key = key.substr(localStoragePrefix.length);
+        result.push(key);
+      }
+    }
+    return result;
   };
 
   session.settings = util.mixinEvents({
@@ -387,7 +402,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
       }
     }
     if (set) {
-      session.setStorage("status." + name, {isClient: isClient, shareId: shareId, running: true});
+      session.setStorage("status." + name, {isClient: isClient, shareId: shareId, running: true, date: Date.now()});
     }
     session.isClient = isClient;
     session.shareId = shareId;
@@ -435,6 +450,9 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
         });
       });
     });
+    // The sessions require localStorage access, which can be blocking;
+    // we'll wait for a while just to
+    setTimeout(cleanOldSessions, 3000);
   };
 
   session.close = function () {
@@ -448,7 +466,6 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     } else {
       saved.running = false;
       saved.date = Date.now();
-      // FIXME: these should be cleaned up sometime:
       session.setStorage("status." + name);
     }
     channel.close();
@@ -456,6 +473,17 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     session.shareId = null;
     session.emit("shareId");
   };
+
+  function cleanOldSessions() {
+    var keys = session.getStorageKeys("status.");
+    var expire = Date.now() - MAX_SESSION_AGE;
+    keys.forEach(function (key) {
+      var value = session.getStorage(key);
+      if (value && value.date && value.date < expire) {
+        session.setStorage(key, undefined);
+      }
+    });
+  }
 
   if (TowTruck.startTowTruckImmediately) {
     setTimeout(session.start);
