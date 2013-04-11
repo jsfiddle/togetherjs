@@ -42,7 +42,8 @@ define(["jquery", "util"], function ($, util) {
         return;
       }
     }
-    // FIXME: should do button clicks
+    // FIXME: should do button clicks (like a form submit)
+    // FIXME: should run .onclick() as well
   };
 
   eventMaker.inEvent = false;

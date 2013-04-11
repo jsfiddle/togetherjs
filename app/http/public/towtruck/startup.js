@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* This module handles all the different UI that happens (sometimes in order) when
    TowTruck is started:
 
@@ -20,7 +24,7 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
     "browserUnsupported",
     "sessionIntro",
     "walkthrough",
-    // FIXME: see about() later if you add anything after here:
+    // Look in the about() below if you add anything after here:
     "about"
     ];
 
@@ -119,6 +123,7 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
       require(["ui"], function (ui) {
         ui.displayWindow("#towtruck-about");
         // FIXME: no way to detect when the window is closed
+        // If there was a next() step then it would not work
       });
     }
 

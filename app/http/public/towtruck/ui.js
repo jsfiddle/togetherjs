@@ -174,7 +174,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         } else if (item.nodeType == document.TEXT_NODE) {
           while (true) {
             var text = item.nodeValue;
-            // FIXME: should we
             var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^<>()\[\]]*/i;
             var match = regex.exec(text);
             if (! match) {
@@ -206,7 +205,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   // this out?  OTOH, in production we should have all the files
   // combined so there's not much problem loading those modules.
   ui.prepareUI = function () {
-    var container = ui.container = $(templates.interface);
+    var container = ui.container = $(templates["interface"]);
     assert(container.length);
     $("body").append(container);
     var seenDialog = session.settings.get("seenIntroDialog");
@@ -724,7 +723,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       if (title) {
         fullTitle += " (";
       }
-      // FIXME: should truncate this if possible (remove domain):
       fullTitle += util.truncateCommonDomain(url, location.href);
       if (title) {
         fullTitle += ")";

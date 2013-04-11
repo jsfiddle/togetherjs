@@ -1,8 +1,13 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   var assert = util.assert;
   var walkthrough = util.Module("walkthrough");
 
-  // FIXME: not sure I should do this so aggressively.
+  // FIXME: not sure I should do this so aggressively, maybe only when
+  // the walkthrough is started.
   var link = $('<link rel="stylesheet">').attr("href", TowTruck.baseUrl + "/towtruck/libs/Guider-JS/guiders-1.3.0.css");
   $("head").append(link);
 

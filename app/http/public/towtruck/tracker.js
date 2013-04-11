@@ -8,6 +8,7 @@ define(["jquery", "util", "session", "element-finder"], function ($, util, sessi
   var assert = util.assert;
 
   function ignoreElement(el) {
+    // FIXME: use elementFinder.ignoreElement?
     while (el) {
       // FIXME: doesn't ignore things like cursors. Currently doesn't matter though.
       if (el.id == "towtruck-container") {

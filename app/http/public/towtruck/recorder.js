@@ -64,7 +64,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
       type: helloBack ? "hello-back" : "hello",
       nickname: "Recorder 'bot",
       // FIXME: replace with robot:
-      avatar: "/images/trucks.jpg",
+      avatar: TowTruck.baseUrl + "/images/trucks.jpg",
       color: "#888888",
       rtcSupported: false,
       clientId: clientId
