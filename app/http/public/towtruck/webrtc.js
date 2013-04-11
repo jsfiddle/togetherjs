@@ -81,11 +81,15 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     return sdp;
   }
 
-  // FIXME: maybe shouldn't patch navigator
-  navigator.getUserMedia = navigator.getUserMedia ||
-    navigator.mozGetUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.msGetUserMedia;
+  function getUserMedia(options, success, failure) {
+    failure = failure || function (error) {
+      console.error("Error in getUserMedia:", error);
+    };
+    (navigator.getUserMedia ||
+     navigator.mozGetUserMedia ||
+     navigator.webkitGetUserMedia ||
+     navigator.msGetUserMedia).call(navigator, options, success, failure);
+  }
 
   /****************************************
    * getUserMedia Avatar support
@@ -143,7 +147,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
 
     var streaming = false;
     function startStreaming() {
-      navigator.getUserMedia({
+      getUserMedia({
           video: true,
           audio: false
         },
@@ -303,7 +307,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     }
 
     function startStreaming(callback) {
-      navigator.getUserMedia(
+      getUserMedia(
         {
           video: false,
           audio: true
