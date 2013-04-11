@@ -316,14 +316,14 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
   });
 
   function documentClick(event) {
-    // FIXME: this might just be my imagination, but somehow I just
-    // really don't want to do anything at this stage of the event
-    // handling (since I'm catching every click), and I'll just do
-    // something real soon:
     if (event.towtruckInternal) {
       // This is an artificial internal event
       return;
     }
+    // FIXME: this might just be my imagination, but somehow I just
+    // really don't want to do anything at this stage of the event
+    // handling (since I'm catching every click), and I'll just do
+    // something real soon:
     setTimeout(function () {
       if (! session.running) {
         // This can end up running right after TowTruck has been closed, often
@@ -356,6 +356,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     if (! pos.sameUrl) {
       // FIXME: if we *could have* done a local click, but we follow along
       // later, we'll be in different states if that click was important.
+      // Mostly click cloning just won't work.
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
