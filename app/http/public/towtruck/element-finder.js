@@ -209,7 +209,9 @@ define(["util", "jquery"], function (util, $) {
         // There are no children, or only inapplicable children
         return {
           location: elementFinder.elementLocation(start[0]),
-          offset: height - start.offset().top
+          offset: height - start.offset().top,
+          absoluteTop: height,
+          documentHeight: $(document).height()
         };
       }
       return search(last, height);
@@ -217,18 +219,28 @@ define(["util", "jquery"], function (util, $) {
     return search($(document.body), height);
   };
 
-
-
   elementFinder.pixelForPosition = function (position) {
     /* Inverse of elementFinder.elementByPixel */
-    // FIXME: there should probably also be an absolute position, so we can
-    // check for sanity (like if responsive design hides an element), or as
-    // a fallback
     if (position.location == "body") {
       return position.offset;
     }
-    var el = elementFinder.findElement(position.location);
+    var el;
+    try {
+      el = elementFinder.findElement(position.location);
+    } catch (e) {
+      if (e instanceof elementFinder.CannotFind && position.absoluteTop) {
+        // We don't trust absoluteTop to be quite right locally, so we adjust
+        // for the total document height differences:
+        var percent = position.absoluteTop / position.documentHeight;
+        return $(document).height() * percent;
+      }
+      throw e;
+    }
     var top = $(el).offset().top;
+    // FIXME: maybe here we should test for sanity, like if an element is
+    // hidden.  We can use position.absoluteTop to get a sense of where the
+    // element roughly should be.  If the sanity check failed we'd use
+    // absoluteTop
     return top + position.offset;
   };
 
