@@ -291,9 +291,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
             text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
           });
         });
-      // FIXME: I shouldn't be doing this directly here, I should
-      // call some ui.* function:
-      $("#towtruck-chat").hide();
+      ui.hideWindow("#towtruck-chat");
     },
 
     storageKey: "towtruck.chatlog",
