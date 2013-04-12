@@ -228,8 +228,8 @@ p.main-text {
 	color:#fff;
 }
 #introduction .lead strong {
-  font-family: openSans;
-  font-weight: normal;
+  font-family: openSansRegular;
+  font-weight: bold;
   font-size: 22px;
   letter-spacing: +0.01;
 }
