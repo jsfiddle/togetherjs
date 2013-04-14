@@ -1,7 +1,7 @@
 div.element {
   position: relative;
   white-space: pre-wrap;
-  font-family: Monaco;
+  font-family: Monaco, Consolas, "Lucida Console", monospace;
   font-size: 9pt;
   color: rgba(0,0,0,0.75);
   border: 1px dotted black;
