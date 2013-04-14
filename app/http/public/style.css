@@ -479,7 +479,7 @@ button#btn-tryitout.towtruck-started {
 
 input.copy-input, textarea.copy-input {
 	border:1px solid rgba(0,0,0,1);
-	font-family:Monaco;
+	font-family:Monaco, Consolas, "Lucida Console", monospace;
 	letter-spacing:0px;
 	border-radius:2px;
 	padding:6px;
@@ -645,7 +645,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
    input.copy-input, textarea.copy-input {
    	border:1px solid rgba(0,0,0,1);
-   	font-family:Monaco;
+   	font-family:Monaco, Consolas, "Lucida Console", monospace;
    	letter-spacing:0px;
    	border-radius:2px;
    	padding:6px;
@@ -840,7 +840,7 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
    input.copy-input, textarea.copy-input {
    	border:1px solid rgba(0,0,0,1);
-   	font-family:Monaco;
+   	font-family:Monaco, Consolas, "Lucida Console", monospace;
    	letter-spacing:0px;
    	border-radius:2px;
    	padding:6px;
