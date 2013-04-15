@@ -19,7 +19,7 @@
 .cm-s-jsbin span.cm-attribute {color: #994500;}
 
 .CodeMirror {
-  font-family: Menlo, Monaco, consolas, monospace;
+  font-family: Menlo, Monaco, consolas, "Lucida Console", monospace;
   font-size: 12px;
   line-height: 1.2em;
 }
