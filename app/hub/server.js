@@ -15,7 +15,7 @@ var logger = require('../../lib/logger');
 
 var server = http.createServer(function(request, response) {
   var url = parseUrl(request.url);
-  var protocol = request.headers["porwarded-proto"] || "http:";
+  var protocol = request.headers["forwarded-proto"] || "http:";
   var host = request.headers["host"];
   var base = protocol + "//" + host;
   
