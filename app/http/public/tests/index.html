@@ -5,6 +5,7 @@
     <script src="./doctestjs/doctest.js"></script>
     <script src="../towtruck.js"></script>
     <script src="../towtruck/libs/jquery-1.8.3.min.js"></script>
+    <script src="testutils.js"></script>
     <link rel="stylesheet" href="doctestjs/doctest.css">
     <style>
       body.client {
@@ -28,17 +29,18 @@
       Tests:
       <ol>
         <li><a href="?name=exercise.js">exercise</a></li>
+        <li><a href="?name=test_storage.js">test_storage</a></li>
       </ol>
     </div>
 
-<pre class="commenttest">
+<pre class="test">
 if (location.hash.indexOf("towtruck-") != -1) {
   // This is the client and we don't want to run any tests
   Abort();
 }
 </pre>
 
-<pre class="commenttest" data-href-pattern="./{name:[a-zA-Z0-9_-]+\.js}">
+<pre class="test" data-href-pattern="./{name:[a-zA-Z0-9_-]+\.js}">xxx
 </pre>
 
 <div id="fixture">

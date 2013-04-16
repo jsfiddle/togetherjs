@@ -759,16 +759,16 @@ Runner.prototype = {
         value.then(
           (function () {
             var values = Array.prototype.slice.call(arguments);
-            if (! values.length) {
-              values.push("(resolved)");
+            if ((! values.length) || (values.length === 1 && values[0] === undefined)) {
+              values = ["(resolved)"];
             }
             fullValues[index] = values;
             check(1);
           }).bind(this),
           (function () {
             var errs = Array.prototype.slice.call(arguments);
-            if (! errs.length) {
-              errs.push("(error)");
+            if ((! errs.length) || (errs.length === 1 && errs[0] === undefined)) {
+              errs = ["(error)"];
             }
             errs = ["Error:"].concat(errs);
             fullValues[index] = errs;
@@ -1196,10 +1196,11 @@ HTMLParser.prototype = {
   },
 
   loadRemotes: function (callback, selector) {
+    var els;
     if (! selector) {
-      var els = this.findEls();
+      els = this.findEls();
     } else {
-      var els = document.querySelectorAll(selector);
+      els = document.querySelectorAll(selector);
     }
     var pending = 0;
     argsToArray(els).forEach(function (el) {
@@ -1236,7 +1237,7 @@ HTMLParser.prototype = {
         if (req.readyState != 4) {
           return;
         }
-        if (req.status != 200 && !(req.status == 0 && document.location.protocol == "file:")) {
+        if (req.status != 200 && !(req.status === 0 && document.location.protocol == "file:")) {
           el.appendChild(doc.createTextNode('\n// Error fetching ' + href + ' status: ' + req.status));
         } else {
           this.fillElement(el, req.responseText);
@@ -1291,36 +1292,31 @@ HTMLParser.prototype = {
     el.innerHTML = '';
     if (hasClass(el, 'commenttest') || hasClass(el, 'test')) {
       var texts = this.splitText(text);
-      if (texts && texts.length) {
-        text = texts[0].body;
-        if (texts[0].header) {
-          h3 = document.createElement('h3');
-          h3.className = 'doctest-section-header';
-          h3.appendChild(document.createTextNode(texts[0].header));
-          el.parentNode.insertBefore(h3, el);
-        }
-        var last = el;
-        for (var i=1; i<texts.length; i++) {
-          var pre = document.createElement('pre');
-          pre.className = el.className;
-          pre.appendChild(document.createTextNode(texts[i].body));
-          last.parentNode.insertBefore(pre, last.nextSibling);
+      console.log("filling in tests", texts, el);
+      if (texts && texts.length == 1 && ! texts[0].header) {
+        el.appendChild(document.createTextNode(texts[0].body));
+      } else if (texts && texts.length) {
+        for (var i=0; i<texts.length; i++) {
           if (texts[i].header) {
             var h3 = document.createElement('h3');
             h3.className = 'doctest-section-header';
             h3.appendChild(document.createTextNode(texts[i].header));
-            pre.parentNode.insertBefore(h3, pre);
+            el.parentNode.insertBefore(h3, null);
           }
-          last = pre;
+          var pre = document.createElement('pre');
+          pre.className = el.className;
+          pre.appendChild(document.createTextNode(texts[i].body));
+          el.parentNode.insertBefore(pre, null);
         }
+        el.parentNode.removeChild(el);
       }
     }
-    el.parentNode.removeChild(el);
   },
 
   splitText: function (text) {
+    var ast;
     try {
-      var ast = esprima.parse(text, {
+      ast = esprima.parse(text, {
         range: true,
         comment: true
       });

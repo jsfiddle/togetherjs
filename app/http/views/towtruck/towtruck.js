@@ -112,20 +112,7 @@
     // start itself (i.e., put up a UI and try to activate)
     TowTruck.startTowTruckImmediately = true;
     styles.forEach(addStyle);
-    var requireConfig = {
-      context: "towtruck",
-      baseUrl: baseUrl + "/towtruck",
-      urlArgs: "bust=" + cacheBust,
-      paths: {
-        jquery: "libs/jquery-1.8.3.min",
-        walkabout: "libs/walkabout.js/walkabout",
-        esprima: "libs/walkabout.js/lib/esprima",
-        falafel: "libs/walkabout.js/lib/falafel",
-        tinycolor: "libs/tinycolor",
-        "alien-avatar-generator": "libs/alien-avatar-generator",
-        guiders: "libs/Guider-JS/guiders-1.3.0"
-      }
-    };
+    var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
       jquery.noConflict();
@@ -150,6 +137,34 @@
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
     addScript("/towtruck/libs/require.js");
+  };
+
+  TowTruck.requireConfig = {
+    context: "towtruck",
+    baseUrl: baseUrl + "/towtruck",
+    urlArgs: "bust=" + cacheBust,
+    paths: {
+      jquery: "libs/jquery-1.8.3.min",
+      walkabout: "libs/walkabout.js/walkabout",
+      esprima: "libs/walkabout.js/lib/esprima",
+      falafel: "libs/walkabout.js/lib/falafel",
+      tinycolor: "libs/tinycolor",
+      "alien-avatar-generator": "libs/alien-avatar-generator",
+      guiders: "libs/Guider-JS/guiders-1.3.0"
+    }
+  };
+
+  TowTruck._extend = function (base, extensions) {
+    if (! extensions) {
+      extensions = base;
+      base = {};
+    }
+    for (var a in extensions) {
+      if (extensions.hasOwnProperty(a)) {
+        base[a] = extensions[a];
+      }
+    }
+    return base;
   };
 
   var defaultHubBase = "<%= process.env.HUB_BASE %>";

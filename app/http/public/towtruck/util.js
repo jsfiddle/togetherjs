@@ -194,5 +194,30 @@ define(["jquery"], function ($) {
     return url;
   };
 
+  util.resolver = function (deferred, func) {
+    return function () {
+      var result;
+      try {
+        result = func.apply(this, arguments);
+      } catch (e) {
+        deferred.reject(e);
+        throw e;
+      }
+      if (result instanceof util.Deferred) {
+        result.then(function () {
+          deferred.resolveWith(this, arguments);
+        }, function () {
+          deferred.rejectWith(this, arguments);
+        });
+        // FIXME: doesn't pass progress through
+      } else if (result === undefined) {
+        deferred.resolve();
+      } else {
+        deferred.resolve(result);
+      }
+      return result;
+    };
+  };
+
   return util;
 });
