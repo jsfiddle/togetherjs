@@ -85,7 +85,7 @@ I'm going to get right into how the test code looks, but to actually <em>use</em
 
 The structure looks like something you've probably seen before.  We add one new function, <code>print()</code>, that works a lot like <code>console.log()</code>.  Then we have a comment that shows what we expect to be output.  A really simple example:
 
-    <pre class="commenttest">
+    <pre class="test">
 function factorial(n) {
   if (typeof n != "number") {
     throw "You must give a number";
@@ -141,14 +141,14 @@ Let's look at what we did there: <code>print(factorial(4))</code> and <code>// =
 
 You can also test errors:
 
-<pre class="commenttest">
+<pre class="test">
 print(factorial(null));
 // => Error: You must give a number
 </pre>
 
 When an exception is thrown it will print out <code>Error: (error text)</code> which you can match against. This way you can test for error conditions just like you test how "correct" invocations work.  Note that the <code>print()</code> isn't really necessary here, you could do this just as well:
 
-<pre class="commenttest">
+<pre class="test">
 factorial(null);
 // => Error: You must give a number
 </pre>
@@ -170,7 +170,7 @@ factorial(null);
 
 <code>print()</code> pretty-prints things.  This is important, because you have to "expect" the same output that <code>print()</code> produces.  You can give multiple arguments, like with <code>console.log</code>.
 
-<pre class="commenttest">
+<pre class="test">
 print({someProperty: 123, something: {a: 1, b: 2}, "foo": 123.1032, "another-property": [1,2,3,4]});
 /* =>
 {
@@ -184,7 +184,7 @@ print({someProperty: 123, something: {a: 1, b: 2}, "foo": 123.1032, "another-pro
 
 You might notice that the attributes are alphabetized and are quoted only when necessary.  If it's a small object it stays on one line:
 
-<pre class="commenttest">
+<pre class="test">
 print({someProperty: 123});
 // => {someProperty: 123}
 </pre>
@@ -195,7 +195,7 @@ print({someProperty: 123});
 
 But sometimes the output is unpredictable; or rather you can predict it will change.  When that's the case you can basically put a wildcard in the expected output: <code>...</code> &mdash; that will match anything, including multiple lines.  In addition you can use <code>?</code> to match one word-like-thing (a number, symbol, etc; not <code>&quot;</code> or whitespace or other symbols).  You can use it like this:
 
-<pre class="commenttest">
+<pre class="test">
 print({
   date: new Date(),
   timestamp: Date.now()
@@ -210,7 +210,7 @@ print({
 
 You might notice that it <em>passes</em>, but you still get to see the actual output.  This is a great way to show information that you can review, without actually testing.  For instance, you might be testing something that connects to a server, in that case you might want to do this:
 
-<pre class="commenttest">
+<pre class="test">
 var server = {url: "http://localhost:8000"} // or some calculated value
 print(server.url);
 // => ...
@@ -224,7 +224,7 @@ Now if everything seems breaky you can be 100% sure of what server you are conne
 
 If you have a variable that is dynamic but you still care about the value, you should do something like this:
 
-<pre class="commenttest">
+<pre class="test">
 var date = Date.now();
 print(date == date, date);
 // => true ...
@@ -259,7 +259,7 @@ For our example we'll use <code>XMLHttpRequest</code>, a common source of asynch
 
 <p>
 
-To do this we'll use <code>wait()</code> &mdash; when this function is calls the test runner will wait at the point where it sees <code>// =></code>, for a certain amount of time or until a certain condition is met. Only then will it compare all the output that has happened to what was expected, and run the next chunk of test.
+To do this we'll use <code>wait()</code> &mdash; when this function is called the test runner will wait at the point where it sees <code>// =></code>, for a certain amount of time or until a certain condition is met. Only then will it compare all the output that has happened to what was expected, and run the next chunk of test.
 
 </p>
 
@@ -267,7 +267,7 @@ To do this we'll use <code>wait()</code> &mdash; when this function is calls the
 
 You can use this like: <code>wait(function () {return true when done})</code> or <code>wait(millisecondsToWait)</code>.  We'll use the first form, which is almost always better, since it allows the test to continue more quickly.  Tests also always time out eventually (by default the timeout is 5000 milliseconds, i.e., 5 seconds &mdash; by convention everything in Javascript is in milliseconds).
 
-<pre class="commenttest">
+<pre class="test">
 var endpoint = location.href;
 print(endpoint);
 // => ...
@@ -324,7 +324,7 @@ Note: the next example will use some jQuery, just for the heck of it, though the
 
 If you use these tools you might end up writing code like this quite a lot:
 
-<pre class="commenttest">
+<pre class="test">
 // We've embedded a button just below this element
 var button = $('#example-button');
 // Just to highlight what we're working with:
@@ -352,7 +352,7 @@ But maybe we are curious about the arguments passed to that handler &mdash; even
 
 An example:
 
-<pre class="commenttest">
+<pre class="test">
 var button = $('#example-button2');
 button.css({border: '1px dotted #00f'});
 button.click(Spy('button.click'));
@@ -387,7 +387,7 @@ The second value (in <span style="color: #0a0">green</span>) is the name we gave
 
 Next of course is all the arguments.  There's a lot of arguments there.  They are... interesting.  You'll notice some references to <code>...recursive...</code> which is what you get when you have self-referencing data structures.  But maybe you want to test just a little of that structure without testing all of it.  You might do something like this:
 
-<pre class="commenttest">
+<pre class="test">
 // Spy('button.click') fetches the same Spy we were using before, which still has all its call information
 // .formatCall() shows the way the Spy was last called.
 print(Spy('button.click').formatCall());
@@ -480,7 +480,7 @@ This isn't a feature you have to <em>do</em> anything about, it's just there for
 
 When you use <code>console.log</code> (or any of its friends, like <code>console.warn</code>) those messages will be captured (in addition to going to the log as normal), and the output will be shown in the specific test where they happened.  A quick example:
 
-<pre class="commenttest">
+<pre class="test">
 function enumProps(object) {
   console.log('obj', object);
   var result = {}
@@ -556,7 +556,7 @@ I wanted to show you all the cool features of doctest first, but you can't actua
 
   A test:
 
-&lt;pre class="commenttest">
+&lt;pre class="test">
 test goes here
 &lt;/pre>
 
@@ -573,10 +573,10 @@ Mostly it's just boilerplate: you have to include <code>doctest.js</code> and <c
 
 <p>
 
-Each test then is in a <code>&lt;pre class="commenttest"></code>.  You might not want to actully write your tests <em>inside</em> the HTML, and instead put them in a separate Javascript file.  To do that use:
+Each test then is in a <code>&lt;pre class="test"></code>.  You might not want to actully write your tests <em>inside</em> the HTML, and instead put them in a separate Javascript file.  To do that use:
 
 <pre>
-&lt;pre class="commenttest" href="./my_tests.js">&lt;/pre>
+&lt;pre class="test" href="./my_tests.js">&lt;/pre>
 </pre>
 
 This will load the test code from <code>./my_tests.js</code> and inline it into the element.  This is how I personally write most of my tests, though when moving between a narrative and tests (as I am doing in this tutorial) it is nice to keep the tests together with the descriptions.
@@ -585,7 +585,7 @@ This will load the test code from <code>./my_tests.js</code> and inline it into 
 
 <p>
 
-Note that specifically when you use <code>href="URL.js"</code> you can include the comment <code><b>// == SECTION</b> Section header</code>, and the <code>&lt;pre</code> element will turn into multiple elements with headers.
+Note that specifically when you use <code>href="URL.js"</code> you can split the tests into sections by including the comment <code><b>// == SECTION</b> Your Section Header Name</code> in the included file, and you'll get multiple elements with headers automatically.
 
 </p>
 

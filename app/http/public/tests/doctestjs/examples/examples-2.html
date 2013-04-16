@@ -6,7 +6,7 @@
     <script src="../doctest.js"></script>
     <script type="text/javascript" src="../.resources/toc.js"></script>
     <link rel="stylesheet" type="text/css" href="../.resources/doc.css" />
-    <script src="../esprima/esprima.js"></script>
+    <script src="../.resources/esprima/esprima.js"></script>
     <link rel="stylesheet" href="../doctest.css" type="text/css">
   </head>
   <body class="autodoctest">
@@ -28,7 +28,7 @@ $ function foo() {
 Error: whatever
 </pre>
 
-<pre class="commenttest">
+<pre class="test">
 print(1+2)
 /* =>
    3
@@ -44,9 +44,9 @@ wait(200);
 /* => hey you! */
 </pre>
 
-<pre class="commenttest" href="./examples-2.js"></pre>
+<pre class="test" href="./examples-2.js"></pre>
 
-<pre class="commenttest">
+<pre class="test">
 function stop() {
   throw Abort();
 }

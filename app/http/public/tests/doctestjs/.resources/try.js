@@ -14,7 +14,7 @@ window.addEventListener('load', function () {
       $('#editor').focus();
       $('#doctest-output').hide();
     });
-    $('#test-location').addClass('commenttest').text($('#editor').val());
+    $('#test-location').addClass('test').text($('#editor').val());
     console.log($('#test-location').text());
     var runner = new doctest.Runner();
     var parser = new doctest.HTMLParser(runner, $('#display')[0], 'pre#test-location');

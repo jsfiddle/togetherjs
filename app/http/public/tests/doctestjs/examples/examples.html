@@ -116,27 +116,52 @@ success({
   What we do for JSON, we can also do for XML; in this case
   it's just fetching a static XML Atom document.
 
-<pre class="doctest">
-$ $.ajax({
->   url: './.resources/example.xml',
->   dataType: 'xml',
->   success: function (doc) {
->     gdoc = doc;
->     writeln(repr(doc));
->   },
->   error: Spy('error')
-> });
-$ wait(0.5);
+<pre class="test">
+$.ajax({
+  url: './.resources/example.xml',
+  dataType: 'xml',
+  success: function (doc) {
+    gdoc = doc;
+    writeln(repr(doc));
+  },
+  error: Spy('error')
+});
+wait(0.5);
+/* =>
 &lt;feed xmlns="http://www.w3.org/2005/Atom">
   &lt;title>Example Feed&lt;/title>
   ...
 &lt;/feed>
+*/
 
 </pre>
 
 </div>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<h3>Deferred/Promise</h3>
+
+<div class="test">
+
+  You can also
+  print <a href="http://api.jquery.com/category/deferred-object/">jquery.Deferred</a>
+  (promise) objects once they've resolved, using
+  the <code>printResolved()</code> function.  This also implicitly
+  calls <code>wait()</code> with the condition that all the promises
+  be resolved.  Both errors and resolved values are printed.
+
+  <pre class="test">
+var def1 = $.Deferred();
+var def2 = $.Deferred();
+def1.resolve("Value 1!", "Value2!");
+setTimeout(function () {
+  def2.reject("sucka");
+}, 500);
+printResolved("def1", def1, "def2", def2);
+// => def1 Value 1! Value2! def2 Error: sucka
+  </pre>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 <!-- FOOTER --></div>
 

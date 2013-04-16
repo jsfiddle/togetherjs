@@ -10,23 +10,23 @@ pre {
 
 /* Test block formatting: */
 
-pre.doctest, pre.commenttest {
+pre.doctest, pre.commenttest, pre.test {
     border: 1px solid #999;
     border-radius: 4px;
 }
 
-pre.doctest.doctest-some-failure, pre.commenttest.doctest-some-failure {
+pre.doctest.doctest-some-failure, pre.commenttest.doctest-some-failure, pre.test.doctest-some-failure {
     border: 1px solid #f00;
 }
 
 /* FIXME: it would be nice if this was more obviously styled to show that there
    was more content */
-pre.commenttest.expand-on-failure, pre.doctest.expand-on-failure {
+pre.doctest.expand-on-failure, pre.commenttest.expand-on-failure, pre.test.expand-on-failure {
     max-height: 3em;
     overflow-y: auto;
 }
 
-pre.commenttest.expand-on-failure.doctest-some-failure, pre.doctest.expand-on-failure.doctest-some-failure {
+pre.doctest.expand-on-failure.doctest-some-failure, pre.commenttest.expand-on-failure.doctest-some-failure, pre.test.expand-on-failure.doctest-some-failure {
     max-height: none;
 }
 
