@@ -97,7 +97,7 @@ This exists in app/hub/server.js.
 
 Third-party libraries are in `app/http/public/towtruck/libs/`.
 
-To see an overview of the client code [read the TowTruck README](https://github.com/mozilla/towtruck/tree/develop/app/http/public/README.md)
+To see an overview of the client code [read the TowTruck README](https://github.com/mozilla/towtruck/tree/develop/app/http/public/towtruck/README.md)
 
 A basic overview of the code, which is in `app/http/public/towtruck`:
 
