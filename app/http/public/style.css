@@ -493,6 +493,10 @@ input.copy-input {
 	text-align:center;
 }
 
+#how_to_install #disclaimer {
+  font-family: openSansLight;
+}
+
 #tryitout {
   color: rgba(72,72,72,1);
   background:rgba(255,255,255,1);
@@ -822,6 +826,14 @@ background:#05A44F;border-radius:2px;font-size:17px;font-weight:normal;line-heig
 
  /* Landscape phones and down */
  @media (max-width: 480px) {
+   
+   #tryitout h1.main-header {
+     padding:10px;
+   }
+   
+   #how_to_install #disclaimer {
+     padding:10px;
+   }
 
    #how_it_works h2 {
      line-height:20px !important;

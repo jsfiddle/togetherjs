@@ -13,7 +13,7 @@
           <p class="lead">A <strong>service</strong> for your <strong>website</strong> that makes it surprisingly easy to <strong>collaborate</strong> in <strong>real-time</strong>.</p>
           <p class="lead"><a class="btn btn-large btn-primary" href="/example" id="btn-tryitout">Try it out here</a></p>
         </div>
-        <div class="span7">
+        <div class="span7" id="towtruck-product-video">
           <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
             <img src="images/site-product-shot.png" alt="Product shot">
           </a>
@@ -23,12 +23,29 @@
             <img src="/images/icn-close-btn-wht.png" alt="close button">
           </button>
           <div class="modal-body">
-            <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/57992755?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
+            <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/64117317?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
           </div>
         </div>
       </div>
     </div>
   </div>
+      
+  <script type="text/javascript" charset="utf-8">
+		//check if mobile device, and play Vimeo with no modal
+		var isiPhone = navigator.userAgent.toLowerCase().indexOf("iphone");
+		var isiPad = navigator.userAgent.toLowerCase().indexOf("ipad");
+		var isAndroid = navigator.userAgent.toLowerCase().indexOf("android");
+
+				if(isiPhone > -1)
+				{
+				    //Redirect to iPhone video player
+            $("#towtruck-product-video").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-product-shot.png" alt="Product shot"></a>');
+				}
+				if(isAndroid > -1)
+				{
+
+				}
+	</script>
 
   <div id="introducing-towtruck" class="section">
     <div class="container">
