@@ -51,7 +51,7 @@
 
 <p>An example (note: these are live examples &mdash; you can also try your own via the <a href="try.html">live demo</a>):
 
-<pre class="commenttest">
+<pre class="test">
 function capitalize(words) {
   return words.replace(/\b[a-z]/g, function (m) {
     return m[0].toUpperCase();
@@ -68,7 +68,7 @@ print(capitalize('some 4ward words'));
 
 <p>This is similar to something like <code>assertEqual(capitalize('some words'), 'Some Words')</code> &mdash; there's a kind of "equal" check every time you print something.  Instead of doing stuff then testing every detail of what happened or what was returned, testing almost happens for you &mdash; you print out what you are interested in, and you can even punt: you can start by simply exercising everything that matters, and then inspecting that what happens is what you expect, and copying those results into the test.  For instance:
 
-<pre class="commenttest">
+<pre class="test">
 function getProperties(obj) {
   var result = [];
   for (i in obj) {
@@ -89,7 +89,7 @@ print(getProperties("a"));
 
 <p>Look: the first example worked great, <code>["a", "b"]</code>.  The second example though wasn't right at all.  <code>"0"</code>?  Once we have a better idea we can adjust those tests:
 
-<pre class="commenttest">
+<pre class="test">
 function getProperties(obj) {
   var result = [];
   for (i in obj) {
@@ -120,7 +120,7 @@ Well, that wasn't quite enough, but this kind of incremental development is exac
 
 <p>The core feature here is <code>wait()</code> &mdash; this lets you register a callback that will tell the test runner when this block of code is fully finished.  An example:
 
-<pre class="commenttest">
+<pre class="test">
 var now = Date.now();
 var done = false;
 
@@ -143,7 +143,7 @@ wait(function () {return done;});
 
 <p>In addition there's a simply mocking framework in doctest with Spy. This lets you create a function that records over time it is called &mdash; and each time it is called it prints out how it is called. It also makes it easy to wait on the Spy to be called:
 
-<pre class="commenttest">
+<pre class="test">
 var button = $('&lt;button>&lt;/button>');
 $('body').append(button);
 button.click(Spy('button.click'));

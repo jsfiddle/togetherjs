@@ -59,7 +59,7 @@ Author: Ian Bicking,
  &lt;/head>
  &lt;body class="autodoctest">
 
-  &lt;pre class="commenttest / doctest">
+  &lt;pre class="test / doctest">
     test
   &lt;/pre>
  &lt;/body>
@@ -72,12 +72,12 @@ Author: Ian Bicking,
 
 <h4 id="external">External code</h4>
 
-<p>Often you won't want to write your test code inside the test itself.  Instead you'll want to put it in its own <code>.js</code> file.  Especially with <a href="#format-commenttest"><code>commenttest</code></a> the code is valid Javascript, and you will probably want syntax highlighting and all that.</p>
+<p>Often you won't want to write your test code inside the test itself.  Instead you'll want to put it in its own <code>.js</code> file.  Especially with <a href="#format-test"><code>test</code></a> the code is valid Javascript, and you will probably want syntax highlighting and all that.</p>
 
 <p>To do this, use an <code>href</code> attribtue on your <code>&lt;pre></code> element, like:
 
 <pre>
-&lt;pre class="commenttest" href="./tests.js">&lt;/pre>
+&lt;pre class="test" href="./tests.js">&lt;/pre>
 </pre>
 
 The contents of the element don't matter.  The test will be loaded from that location (which could be a full URL but you'll probably have <a href="http://www.w3.org/TR/cors/">cross-origin</a> errors if you tried that &mdash; this doesn't use <code>&lt;script></code> tags to load those scripts, it uses XMLHttpRequest).  Note that the class is still required!</p>
@@ -85,7 +85,7 @@ The contents of the element don't matter.  The test will be loaded from that loc
 <p>You can also load it from a variable location, using query string parameters to find the file.  The most common pattern would be like this:
 
 <pre>
-&lt;pre class="commenttest" data-href-pattern="./{test-name|default.js}">&lt;/pre>
+&lt;pre class="test" data-href-pattern="./{test-name|default.js}">&lt;/pre>
 </pre>
 
 Any URL parameters (like <code>{test-name}</code>) get filled in by the query string (<code>?test-name=example.js</code>).  By default these values can only contain letters, numbers, <code>_</code>, <code>-</code> and <code>.</code> &mdash; this is to protect against loading scripts from unexpected locations via an implicitly unsafe parameters in the query string.</p>
@@ -98,7 +98,7 @@ Any URL parameters (like <code>{test-name}</code>) get filled in by the query st
 
 <h3 id="format">Format of test</h3>
 
-<p>There are two formats that a doctest can take.  You've probably seen the <code>commenttest</code> format, there is also the more traditional <code>doctest</code> format.</p>
+<p>There are two formats that a doctest can take.  You've probably seen the <code>test</code> format, there is also the more traditional <code>doctest</code> format.</p>
 
 <h4 id="format-doctest"><code>doctest</code> format</h4>
 
@@ -118,12 +118,12 @@ output
 
 <p>Note you can still have multiple statements using a continuation line.  The only difference between two lines with <code>$</code> and one with a <code>$</code> followed by <code>></code> is that in the latter case the two lines are executed <em>together</em> and the output from both is combined into what is expected.</p>
 
-<h4 id="format-commenttest"><code>commenttest</code> format</h4>
+<h4 id="format-test"><code>test</code> format</h4>
 
 <p>In this format the expected output is in a comment, like:
 
 <pre>
-&lt;pre class="commenttest">
+&lt;pre class="test">
 statement_1();
 statement_2();
 // Some other comment
@@ -142,7 +142,7 @@ expected output
 
 <h4 id="sections">Test sections</h4>
 
-<p><em>If</em> you are using <a href="#external">external test code</a> (and <code>commenttest</code>) you can include <em>section headers</em> like:
+<p><em>If</em> you are using <a href="#external">external test code</a> (and <code>test</code>) you can include <em>section headers</em> like:
 
 <pre>
 // == SECTION A section header
@@ -157,7 +157,7 @@ expected output
 <p>Sometimes you'll have boilerplate code that sets up the test environment, and you'll be uninterested in that code (unless it fails).  This might define helper functions, or run some really routine sanity tests.  You can use this to make those test blocks small:
 
 <pre>
-&lt;pre class="commenttest expand-on-failure">
+&lt;pre class="test expand-on-failure">
   ...
 &lt;/pre>
 </pre>
@@ -217,6 +217,35 @@ The first function is a <em>test</em> that is applied to objects.  If it returns
 <p><code>console.log()</code> works a lot like <code>print()</code>. But unlike <code>print()</code> it doesn't make a test pass or fail, it's purely informative.</p>
 
 <p>All the methods on console should work, like <code>console.warn()</code>.  The underlying normal console function is called, but in addition on a test-by-test basis these are collected and displayed.</p>
+
+<h4 id="printResolved"><code>printResolved()</code> for Deferred and Promises</h4>
+
+<p>There's special support for the jQuery <a href="http://api.jquery.com/category/deferred-object/">Deferred</a> object, and generally <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A</a>.</p>
+
+<p>This support is through the <code>printResolved()</code> function, which is basically equivalent to <code>print()</code> except any promise arguments will be waited on to resolve (proper resolution or an error).  You can use it like this:</p>
+
+<pre class="test">
+var def = $.Deferred();
+setTimeout(function () {
+  def.resolve("Resolved!");
+});
+printResolved(def);
+// => Resolved!
+</pre>
+
+<p>Errors are printed out with <code>Error:</code> before the value, and multiple arguments are printed out with spaces between them, or a placeholder if there's no arguments.  For instance:</p>
+
+<pre class="test">
+var def = $.Deferred();
+def.reject({code: 1}, "a message");
+printResolved(def);
+// => Error: {code: 1} a message
+// Or you might not have any value at all:
+def = $.Deferred();
+def.resolve();
+printResolved(def);
+// => (resolved)
+</pre>
 
 <h3 id="matching">Output matching</h3>
 
@@ -303,7 +332,7 @@ Now you practically know how to write doctest yourself!
 
 <p>The basic use is like this:
 
-<pre class="commenttest">
+<pre class="test">
 func = Spy('func');
 func(1, 2, 3);
 
@@ -481,7 +510,29 @@ XMLHttpRequest = NosyXMLHttpRequest.factory("request");
 <p>The name will be used when showing output (e.g., <code>request.setRequestHeader('X-Something', 'value')</code>).</p>
 
 
+<h3 id="node">Node.js</h3>
+
+<p>Doctest.js has some Node support.  You must use the <a href="#format-test">comment-based test format</a> in stand-alone Javascript files.  Then:</p>
+
+<pre>
+$ npm install -g doctestjs
+$ doctest test.js
+</pre>
+
+<p>This will print a success or failure message, and will exit with a code (the number of failures) if the test does not pass.</p>
+
+<p>If you do not wish to install the package globally, do:</p>
+
+<pre>
+$ npm install doctestjs
+$ node_modules/.bin/doctest test.js
+</pre>
+
+
+
 <div style="display: none">
+  <!-- This is where the summary goes, which we basically want to hide
+       on this page: -->
   <div id="doctest-output"></div>
 </div>
 

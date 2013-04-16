@@ -78,3 +78,12 @@ h1.title a:link, h1.title a:visited {
 h1.title a:hover {
     text-decoration: underline;
 }
+
+
+dd p {
+    margin-top: 0;
+}
+
+dd p:last-child {
+    margin-bottom: 0;
+}

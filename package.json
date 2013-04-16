@@ -1,7 +1,10 @@
 {
-  "name": "doctest",
-  "version": "0.3",
+  "name": "doctestjs",
+  "version": "0.3.0",
   "main": "doctest",
+  "bin": {
+    "doctest": "./bin/doctest"
+  },
   "description": "Example-based testing framework",
   "keywords": [],
   "author": {

@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var fs = require('fs');
+var root = path.join(path.dirname(fs.realpathSync(__filename)), '..');
+
+// FIXME: Not sure this is the best way to go about this, or if we should
+// just require("doctest")?
+var doctest = require(root + '/doctest');
+
+function main(filename) {
+  var runner = new doctest.Runner({Reporter: doctest.ConsoleReporter});
+  runner.globs = runner.evalInit();
+  var parser = new doctest.TextParser.fromFile(runner, process.argv[2]);
+  parser.parse();
+  runner.run();
+
+  var reporter = runner.reporter;
+  return reporter;
+}
+
+function showReport(reporter) {
+  console.log('Successes:', reporter.successes);
+  console.log('Failures:', reporter.failures);
+  if ((! reporter.successes) || reporter.failures) {
+    // Set exit code to number of failures (if any). It gives a nice failures
+    // summary when running under make. E.g.: `make: *** [doctest] Error 2`
+    process.exit(reporter.failures || 1);
+  }
+}
+
+var filename = process.argv[2];
+if (! filename) {
+  console.log("Error: you did not give a filename");
+  console.log("Usage:", process.argv[1], "FILENAME");
+  process.exit(500);
+}
+showReport(main(filename));

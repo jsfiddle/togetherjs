@@ -51,14 +51,14 @@ Example.prototype = {
     this.consoleOutput = [];
     var globs = this.runner.evalInit();
     try {
-      this.result = this.runner.evaller(this.expr, globs);
+      this.result = this.runner.evaller(this.expr, globs, this.filename);
     } catch (e) {
-      if (e['doctest.abort']) {
+      if (e && e['doctest.abort']) {
         return;
       }
       this.write('Error: ' + e + '\n');
       // FIXME: doesn't format nicely:
-      if (e.stack) {
+      if (e && e.stack) {
         console.log('Exception Stack:');
         console.log(e.stack);
       }
@@ -209,9 +209,9 @@ var HTMLReporter = exports.HTMLReporter = function (runner, containerEl) {
 HTMLReporter.prototype = {
 
   logSuccess: function (example, got) {
-    var num = parseInt(this.successEl.innerHTML, 10);
+    var num = parseInt(this.successEl.innerHTML.split('/')[0], 10);
     num++;
-    this.successEl.innerHTML = num+'';
+    this.successEl.innerHTML = num+' / '+this.runner.examples.length;
     addClass(this.successEl, 'doctest-nonzero');
     if (example.htmlSpan) {
       addClass(example.htmlSpan, 'doctest-success');
@@ -360,7 +360,7 @@ repr.ReprClass = function (indentString, maxLen) {
 repr.ReprClass.prototype = {
   defaultMaxLen: 80,
 
-  repr: function (o, indentString) {
+  repr: function reprFunc(o, indentString) {
     if (indentString === undefined) {
       indentString = this.indentString;
     }
@@ -375,7 +375,7 @@ repr.ReprClass.prototype = {
     try {
       if (typeof o.__repr__ == 'function') {
         return o.__repr__(indentString, this.maxLen);
-      } else if (typeof o.repr == 'function' && o.repr != arguments.callee &&
+      } else if (typeof o.repr == 'function' && o.repr != reprFunc &&
                  o.repr != repr) {
         return o.repr(indentString, this.maxLen);
       }
@@ -614,7 +614,8 @@ repr.ReprClass.prototype = {
      "arrayRepr"
     ],
     [function (o) {
-       return o instanceof XMLHttpRequest;
+       return typeof XMLHttpRequest !== 'undefined' && o instanceof XMLHttpRequest;
+
      },
      'xhrRepr'
     ]
@@ -664,12 +665,15 @@ Runner.prototype = {
   },
 
   evalInit: function () {
-    var self = this;
+    if (typeof this.globs != "undefined") {
+      return this.globs;
+    }
     this.logGrouped = false;
     this._abortCalled = false;
     var globs = {
       write: this.write.bind(this),
       writeln: this.writeln.bind(this),
+      printResolved: this.printResolved.bind(this),
       wait: this.wait.bind(this),
       Abort: this.Abort.bind(this),
       repr: repr,
@@ -695,7 +699,9 @@ Runner.prototype = {
           }
         }
       }
-      return globs;
+      var context = require('vm').Script.createContext();
+      extend(context, globs);
+      return context;
     } else {
       extend(console, consoleOverwrites);
       window.onerror = this.windowOnerror;
@@ -720,6 +726,65 @@ Runner.prototype = {
       }
     }
     this.write('\n');
+  },
+
+  printResolved: function () {
+    // We used finished to signal that nothing should be printed, even when
+    // waiting is 0, as there are more arguments still to collect:
+    var finished = false;
+    var waiting = 0;
+    var fullValues = [];
+    var args = Array.prototype.slice.call(arguments);
+
+    // This function is called as each promise is resolved, to see if it
+    // was the last promise:
+    var check = (function (dec) {
+      waiting -= dec;
+      if (waiting || ! finished) {
+        return;
+      }
+      var flattened = [];
+      fullValues.forEach(function (items) {
+        items.forEach(function (item) {
+          flattened.push(item);
+        });
+      });
+      this.writeln.apply(this, flattened);
+    }).bind(this);
+
+    args.forEach(function (value, index) {
+      if (value.then) {
+        // It's a promise
+        waiting++;
+        value.then(
+          (function () {
+            var values = Array.prototype.slice.call(arguments);
+            if (! values.length) {
+              values.push("(resolved)");
+            }
+            fullValues[index] = values;
+            check(1);
+          }).bind(this),
+          (function () {
+            var errs = Array.prototype.slice.call(arguments);
+            if (! errs.length) {
+              errs.push("(error)");
+            }
+            errs = ["Error:"].concat(errs);
+            fullValues[index] = errs;
+            check(1);
+          }).bind(this));
+      } else {
+        fullValues[index] = [value];
+      }
+    }, this);
+    finished = true;
+    if (waiting) {
+      this.wait(function () {
+        return ! waiting;
+      });
+    }
+    check(0);
   },
 
   wait: function (conditionOrTime, hardTimeout) {
@@ -806,6 +871,7 @@ Runner.prototype = {
     if (typeof window != 'undefined') {
       window.write = undefined;
       window.writeln = undefined;
+      window.printResolved = undefined;
       window.print = undefined;
       window.wait = undefined;
       window.onerror = undefined;
@@ -817,14 +883,45 @@ Runner.prototype = {
     }
   },
 
-  evaller: function (expr, context) {
+  evaller: function (expr, context, filename) {
     var e = eval;
     var result;
     if (context) {
-      if (typeof global != "undefined") {
-        extend(global, context);
+      if (typeof window == "undefined") {
         var vm = require('vm');
-        vm.runInThisContext(expr);
+
+        if (! (context instanceof vm.Script.createContext().constructor)) {
+            throw "context must be created with vm.Script.createContext()";
+        }
+
+        // Prepare context to evaluate `expr` in. Mostly follows CoffeeScript
+        // [eval function](http://git.io/coffee-script-eval).
+        context.global = context.root = context.GLOBAL = context;
+        context.__filename = typeof filename != "undefined" ? filename : __filename;
+        context.__dirname = require('path').dirname(context.__filename);
+        context.module = module;
+        context.require = require;
+
+        // Set `module.filename` to script file name and evaluate the script.
+        // Now, if the script executes `require('./something')`, it will look
+        // up `'./something'` relative to script path.
+        //
+        // We restore `module.filename` afterwards, because `module` object
+        // is reused. The other approach is to create a new `module` instance.
+        // CoffeeScript [eval][1] [works this way][2]. Unfortunately it
+        // [uses private Node API][3] to do it.
+        //
+        // [1]: http://git.io/coffee-script-eval
+        // [2]: https://github.com/jashkenas/coffee-script/pull/1487
+        // [3]: http://git.io/coffee-script-eval-comment
+        var prevfilename = module.filename;
+        module.filename = context.__filename;
+        try {
+          vm.runInContext(expr, context, context.__filename);
+        } finally {
+            module.filename = prevfilename;
+        }
+
       } else {
         with (context) {
           result = eval(expr);
@@ -932,8 +1029,10 @@ Runner.prototype = {
   examples: null,
   Example: Example,
   exampleOptions: null,
-  makeExample: function (text, expected) {
-    return new this.Example(this, text, expected, this.exampleOptions);
+  makeExample: function (text, expected, filename) {
+    var options = {filename: filename};
+    extend(options, this.exampleOptions);
+    return new this.Example(this, text, expected, options);
   },
   matcher: null,
   Matcher: Matcher,
@@ -960,7 +1059,7 @@ var HTMLParser = exports.HTMLParser = function (runner, containerEl, selector) {
     throw 'Bad/null/missing containerEl';
   }
   this.containerEl = containerEl;
-  this.selector = selector || 'pre.doctest, pre.commenttest';
+  this.selector = selector || 'pre.doctest, pre.commenttest, pre.test';
 };
 
 HTMLParser.prototype = {
@@ -987,7 +1086,7 @@ HTMLParser.prototype = {
     var examples;
     if (hasClass(el, 'doctest')) {
       examples = this.parseDoctestEl(el);
-    } else if (hasClass(el, 'commenttest')) {
+    } else if (hasClass(el, 'commenttest') || hasClass(el, 'test')) {
       examples = this.parseCommentEl(el);
     } else {
       throw 'Unknown element class/type';
@@ -1003,8 +1102,8 @@ HTMLParser.prototype = {
       ex.blockEl = el;
       ex.htmlID = genID('example');
       var span = makeElement('span', {id: ex.htmlID, className: 'doctest-example'}, [
-        makeElement('span', {className: 'doctest-expr'}, [rawExample + '\n']),
-            makeElement('span', {className: 'doctest-output'}, [rawOutput + '\n'])
+        makeElement('div', {className: 'doctest-expr'}, [rawExample]),
+        makeElement('div', {className: 'doctest-output'}, [rawOutput])
         ]);
       ex.htmlSpan = span;
       newChildren.push(span);
@@ -1080,7 +1179,13 @@ HTMLParser.prototype = {
       var example = contents.substr(pos, start-pos);
       var output = comment.value.replace(/^\s*=> ?/, '');
       var orig = comment.type == 'Block' ? '/*' + comment.value + '*/' : '//' + comment.value;
-      result.push([example, output, example, orig]);
+      if (example === '') {
+          result[result.length-1][1] += '\n'+output;
+          result[result.length-1][3] += '\n'+orig;
+      }
+      else {
+        result.push([example, output, example, orig]);
+      }
       pos = end;
     }
     var last = contents.substr(pos, contents.length-pos);
@@ -1160,7 +1265,7 @@ HTMLParser.prototype = {
       result += pattern.substr(0, match.index);
       pattern = pattern.substr(match.index + match[0].length);
       var name = match[1];
-      var restriction = "^[\\w_\\-\\.]+$";;
+      var restriction = "^[\\w_\\-\\.]+$";
       var defaultValue = '';
       if (name.lastIndexOf('|') != -1) {
         defaultValue = name.substr(name.lastIndexOf('|')+1);
@@ -1184,32 +1289,24 @@ HTMLParser.prototype = {
 
   fillElement: function (el, text) {
     el.innerHTML = '';
-    if (hasClass(el, 'commenttest')) {
+    if (hasClass(el, 'commenttest') || hasClass(el, 'test')) {
       var texts = this.splitText(text);
       if (texts && texts.length) {
-        text = texts[0].body;
-        if (texts[0].header) {
-          h3 = document.createElement('h3');
-          h3.className = 'doctest-section-header';
-          h3.appendChild(document.createTextNode(texts[0].header));
-          el.parentNode.insertBefore(h3, el);
-        }
-        // Ignore first header I guess
-        for (var i=1; i<texts.length; i++) {
+        for (var i=0; i<texts.length; i++) {
+            if (texts[i].header) {
+                var h3 = document.createElement('h3');
+                h3.className = 'doctest-section-header';
+                h3.appendChild(document.createTextNode(texts[i].header));
+                el.parentNode.insertBefore(h3, null);
+            }
           var pre = document.createElement('pre');
           pre.className = el.className;
           pre.appendChild(document.createTextNode(texts[i].body));
-          el.parentNode.insertBefore(pre, el.nextSibling);
-          if (texts[i].header) {
-            var h3 = document.createElement('h3');
-            h3.className = 'doctest-section-header';
-            h3.appendChild(document.createTextNode(texts[i].header));
-            el.parentNode.insertBefore(h3, el.nextSibling);
-          }
+          el.parentNode.insertBefore(pre, null);
         }
       }
     }
-    el.appendChild(doc.createTextNode(text));
+    el.parentNode.removeChild(el);
   },
 
   splitText: function (text) {
@@ -1247,7 +1344,7 @@ HTMLParser.prototype = {
     }
     if (! result.length) {
       // No sections
-      return null;
+      return [{header: '', body: text}];
     }
     var last = text.substr(pos, text.length-pos);
     result[result.length-1].body = last;
@@ -1256,7 +1353,7 @@ HTMLParser.prototype = {
 
 };
 
-var TextParser = exports.TextParser = function (runner, text) {
+var TextParser = exports.TextParser = function (runner, text, filename) {
   if (typeof esprima == "undefined") {
     if (typeof require != "undefined") {
       esprima = require("./esprima/esprima.js");
@@ -1266,18 +1363,19 @@ var TextParser = exports.TextParser = function (runner, text) {
   }
   this.runner = runner;
   this.text = text;
+  this.filename = filename;
 };
 
 TextParser.fromFile = function (runner, filename) {
   if (typeof filename != "string") {
-    throw "You did you give a filename for the second argument: " + filename;
+    throw "You did not give a filename for the second argument: " + filename;
   }
   if (typeof require == "undefined") {
     throw "This method only works in Node, with the presence of require()";
   }
   var fs = require('fs');
   var text = fs.readFileSync(filename, 'UTF-8');
-  return new TextParser(runner, text);
+  return new TextParser(runner, text, filename);
 };
 
 TextParser.prototype = {
@@ -1298,13 +1396,13 @@ TextParser.prototype = {
       var end = comment.range[1];
       var example = this.text.substr(pos, start-pos);
       var output = comment.value.replace(/^\s*=>\s*/, '');
-      var ex = this.runner.makeExample(example, output);
+      var ex = this.runner.makeExample(example, output, this.filename);
       this.runner.examples.push(ex);
       pos = end;
     }
     var last = this.text.substr(pos, this.text.length-pos);
     if (strip(last)) {
-      this.runner.examples.push(this.runner.makeExample(last, ''));
+      this.runner.examples.push(this.runner.makeExample(last, '', this.filename));
     }
   }
 };
@@ -1352,6 +1450,34 @@ var genID = exports.genID = function (prefix) {
 };
 genID._idGen = 1;
 
+function deIndent(text) {
+    var minimum_spaces = 10000;
+    var foo = text.split('\n');
+    var i = 0;
+    var j = 0;
+    var result = '';
+    for (i=0; i < foo.length; i++) {
+        for (j=0; j < foo[i].length && j < minimum_spaces; j++) {
+            if (foo[i][j] != ' ') {
+                if (j < minimum_spaces) {
+                    minimum_spaces = j;
+                }
+                break;
+            }
+        }
+    }
+    if (minimum_spaces == 0) {
+        return text.replace(/^\s+|\s+$/g, '');
+    }
+    for (i=0; i < foo.length; i++) {
+        if (strip(foo[i].substr(0, minimum_spaces)) !== '') {
+            throw 'Deindent failed';
+        }
+        result += foo[i].substr(minimum_spaces) + '\n';
+    }
+    return strip(result);
+}
+
 var getElementText = exports.getElementText = function (el) {
   if (! el) {
     throw('You must pass in an element');
@@ -1366,7 +1492,8 @@ var getElementText = exports.getElementText = function (el) {
       text += getElementText(sub);
     }
   }
-  return text;
+
+  return deIndent(text);
 };
 
 var makeElement = exports.makeElement = function (tagName, attrs, children) {
@@ -1532,7 +1659,11 @@ var Spy = exports.Spy = function (name, options, extraOptions) {
     self.selfList.push(this);
     // It might be possible to get the caller?
     if (self.writes) {
-      writeln(self.formatCall());
+      if (typeof writeln == "undefined") {
+        console.warn("Spy writing outside of test:", self.formatCall());
+      } else {
+        writeln(self.formatCall());
+      }
     }
     if (self.throwError) {
       var throwError = self.throwError;
@@ -1545,7 +1676,7 @@ var Spy = exports.Spy = function (name, options, extraOptions) {
       try {
         return self.applies.apply(this, arguments);
       } catch (e) {
-        console.error('Error in ' + this.repr() + '.applies:', e);
+        console.error('Error in ' + self.repr() + '.applies:', e);
         throw e;
       }
     }
