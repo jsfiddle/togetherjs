@@ -1,3 +1,4 @@
+/*global storage */
 $("#fixture, #other").hide();
 getRequire("storage", "util");
 // => Loaded modules: storage util
