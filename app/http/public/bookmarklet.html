@@ -4,11 +4,23 @@
     <title>Bookmarklet</title>
     <script src="towtruck.js"></script>
 	<link rel="stylesheet/less" type="text/css" href="towtruck.less">
+    <script>
+
+function bookmarklet() {
+  var s = "window._TowTruckBookmarklet = true;";
+  s += "s=document.createElement('script');";
+  s += "s.src=" + JSON.stringify(TowTruck.baseUrl + "/towtruck.js") + ";";
+  s += "document.head.appendChild(s);";
+  s = "(function () {" + s + "})();void(0)";
+  return "javascript:" + encodeURIComponent(s);
+};
+
+    </script>
 
     <script>
 window.addEventListener("load", function () {
   var el = document.getElementById("towtruck-bookmarklet");
-  el.href = TowTruck.bookmarklet();
+  el.href = bookmarklet();
 }, false);
     </script>
   </head>

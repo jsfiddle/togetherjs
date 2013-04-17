@@ -5,8 +5,6 @@
 /*jshint scripturl:true */
 (function () {
 
-  var button;
-
   var styles = [
     "/towtruck.min.css"
   ];
@@ -23,6 +21,19 @@
     cacheBust = Date.now() + "";
   }
 
+  // Make sure we have all of the console.* methods:
+  if (typeof console == "undefined") {
+    console = {};
+  }
+  if (! console.log) {
+    console.log = function () {};
+  }
+  ["debug", "info", "warn", "error"].forEach(function (method) {
+    if (! console[method]) {
+      console[method] = console.log;
+    }
+  });
+
   if (! baseUrl) {
     var scripts = document.getElementsByTagName("script");
     for (var i=0; i<scripts.length; i++) {
@@ -33,24 +44,9 @@
       }
     }
   }
-  if ((! baseUrl) && console.warn) {
+  if (! baseUrl) {
     console.warn("Could not determine TowTruck's baseUrl (looked for a <script> with towtruck.js)");
   }
-
-  // FIXME: I think there's an event that would be called before load?
-  // DOMReady?
-  window.addEventListener("load", function () {
-    var control = document.getElementById("towtruck-starter");
-    // FIXME: not sure where to put the control if the page doesn't have
-    // a specific place in mind?
-    if (! control) {
-      return;
-    }
-    button = document.createElement("button");
-    button.innerHTML = "Start TowTruck";
-    button.addEventListener("click", TowTruck, false);
-    control.appendChild(button);
-  }, false);
 
   function addStyle(url) {
     var link = document.createElement("link");
@@ -115,6 +111,9 @@
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
+      // Though jquery uses requirejs, it also always also defines a
+      // global, so we have to keep it from conflicting with any
+      // previous jquery:
       jquery.noConflict();
       TowTruck._loaded = true;
       TowTruck.require = require.config({context: "towtruck"});
@@ -200,7 +199,7 @@
     return value;
   };
 
-  /* TowTruck.config(configuration)
+  /* TowTruck.config(configurationObject)
      or: TowTruck.config(configName, value)
 
      Adds configuration to TowTruck.  You may also set the global variable TowTruckConfig
@@ -254,16 +253,6 @@
   TowTruck.version = "unknown";
   TowTruck.baseUrl = baseUrl;
 
-  // FIXME: this really doesn't need to be in this file:
-  TowTruck.bookmarklet = function () {
-    var s = "window._TowTruckBookmarklet = true;";
-    s += "s=document.createElement('script');";
-    s += "s.src=" + JSON.stringify(baseUrl + "/towtruck.js") + ";";
-    s += "document.head.appendChild(s);";
-    s = "(function () {" + s + "})();void(0)";
-    return "javascript:" + encodeURIComponent(s);
-  };
-
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
@@ -271,6 +260,7 @@
   if (m) {
     TowTruck._shareId = m[1];
     TowTruck._sessionStarting = true;
+    // FIXME: we should let session do this:
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }
