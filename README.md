@@ -57,6 +57,8 @@ $ scp -r STATIC_FILES/* url.where:/www/public/you/will/publish/
 
 Now you have your own static copy of the client, potentially with your own modifications and customizations of the code.
 
+<span id="local-server"></span>
+
 Running a Local Server
 ----------------------
 
@@ -95,6 +97,14 @@ This exists in app/hub/server.js.
 
 - `server.js`: the Node.js server, just one file.  It's pretty dumb, just passing messages back and forth between clients.  It is a goal to keep it dumb, and leave the important logic in the client.
 
+### Site Server
+
+You can look at [Local Server](#local-server), which is the server that we use in production and development.  But really it is focused on the actual `towtruck.mozillalabs.com` site; the only part you'd typically care about in a local deployment is the client code.  You may want to investigate `bin/make-static-client` (it supports `-h`) to make a copy of the code that requires no special server.
+
+The server compiles `towtruck.less` to `towtruck.css`, it inlines HTML as Javascript strings into `templates.js`, and does some substitution in `towtruck.js` to setup default locations for the client code and hub.
+
+### Client Code
+
 Third-party libraries are in `app/http/public/towtruck/libs/`.
 
 To see an overview of the client code [read the TowTruck README](https://github.com/mozilla/towtruck/tree/develop/app/http/public/towtruck/README.md)
@@ -123,12 +133,6 @@ A basic overview of the code, which is in `app/http/public/towtruck`:
 - `cobrowse.js`: handles cases when the users are at different URLs
 
 - `app/http/views/towtruck/*.tmpl`: these are Underscore templates for the UI bits.  These are automatically inlined into `towtruck-runner.js`.
-
-
-
-### Examples Server
-
-There are some examples in `app/http/public/example/`.
 
 Bookmarklet
 -----------
