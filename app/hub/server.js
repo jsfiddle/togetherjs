@@ -5,12 +5,10 @@
 var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
-var static = require('node-static');
 var parseUrl = require('url').parse;
 var fs = require('fs');
 var path = require('path');
 var less = require('less');
-var coffeeCompile = require("coffee-script").compile;
 var logger = require('../../lib/logger');
 
 var server = http.createServer(function(request, response) {
