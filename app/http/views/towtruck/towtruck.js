@@ -86,12 +86,35 @@
       TowTruck.config(window.TowTruckConfig);
       window.TowTruckConfig.loaded = true;
     }
-    for (var attr in window) {
-      if (attr.indexOf("TowTruckConfig_") === 0) {
-        var attrName = attr.substr(("TowTruckConfig_").length);
+
+    // This handles loading configuration from global variables.  This
+    // includes TowTruckConfig_on_*, which are attributes folded into
+    // the "on" configuration value.
+    var attr;
+    var attrName;
+    var globalOns = {};
+    for (attr in window) {
+      if (attr.indexOf("TowTruckConfig_on_") === 0) {
+        attrName = attr.substr(("TowTruckConfig_on_").length);
+        globalOns[attrName] = window[attr];
+      } else if (attr.indexOf("TowTruckConfig_") === 0) {
+        attrName = attr.substr(("TowTruckConfig_").length);
         TowTruck.config(attrName, window[attr]);
       }
     }
+    // FIXME: copy existing config?
+    var ons = TowTruck.getConfig("on");
+    for (attr in globalOns) {
+      if (globalOns.hasOwnProperty(attr)) {
+        // FIXME: should we avoid overwriting?  Maybe use arrays?
+        ons[attr] = globalOns[attr];
+      }
+    }
+    TowTruck.config("on", ons);
+    for (attr in ons) {
+      TowTruck.on(attr, ons[attr]);
+    }
+
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
       if (session.running) {
@@ -166,6 +189,83 @@
     return base;
   };
 
+  TowTruck._mixinEvents = function (proto) {
+    proto.on = function on(name, callback) {
+      if (name.search(" ") != -1) {
+        var names = name.split(/ +/g);
+        names.forEach(function (n) {
+          this.on(n, callback);
+        }, this);
+        return;
+      }
+      if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+        var thisString = "" + this;
+        if (thisString.length > 20) {
+          thisString = thisString.substr(0, 20) + "...";
+        }
+        console.warn(thisString + ".on('" + name + "', ...): unknown event");
+        if (console.trace) {
+          console.trace();
+        }
+      }
+      if (! this._listeners) {
+        this._listeners = {};
+      }
+      if (! this._listeners[name]) {
+        this._listeners[name] = [];
+      }
+      if (this._listeners[name].indexOf(callback) == -1) {
+        this._listeners[name].push(callback);
+      }
+    };
+    proto.once = function once(name, callback) {
+      if (! callback.once) {
+        callback.once = function onceCallback() {
+          callback.apply(this, arguments);
+          this.off(name, onceCallback);
+          delete callback.once;
+        };
+      }
+      this.on(name, callback.once);
+    };
+    proto.off = proto.removeListener = function off(name, callback) {
+      if (name.search(" ") != -1) {
+        var names = name.split(/ +/g);
+        names.forEach(function (n) {
+          this.off(n, callback);
+        }, this);
+        return;
+      }
+      if ((! this._listeners) || ! this._listeners[name]) {
+        return;
+      }
+      var l = this._listeners[name], _len = l.length;
+      for (var i=0; i<_len; i++) {
+        if (l[i] == callback) {
+          l.splice(i, 1);
+          break;
+        }
+      }
+    };
+    proto.emit = function emit(name) {
+      if ((! this._listeners) || ! this._listeners[name]) {
+        return;
+      }
+      var args = Array.prototype.slice.call(arguments, 1);
+      var l = this._listeners[name], _len = l.length;
+      for (var i=0; i<_len; i++) {
+        l[i].apply(this, args);
+      }
+    };
+    return proto;
+  };
+
+  TowTruck._mixinEvents(TowTruck);
+  TowTruck._knownEvents = ["ready", "close"];
+  TowTruck.toString = function () {
+    return "TowTruck";
+  };
+
   var defaultHubBase = "<%= process.env.HUB_BASE %>";
   if (defaultHubBase.indexOf("<" + "%") === 0) {
     // Substitution wasn't made
@@ -181,7 +281,9 @@
     // The code to enable (this is defaulting to a Mozilla code):
     analyticsCode: "UA-35433268-28",
     // The base URL of the hub
-    hubBase: defaultHubBase
+    hubBase: defaultHubBase,
+    // Any events to bind to
+    on: {}
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep

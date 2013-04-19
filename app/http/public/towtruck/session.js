@@ -447,6 +447,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
             });
           }
           sendHello(false);
+          TowTruck.emit("ready");
         });
       });
     });
@@ -472,6 +473,7 @@ define(["require", "util", "channels", "jquery"], function (require, util, chann
     channel = null;
     session.shareId = null;
     session.emit("shareId");
+    TowTruck.emit("close");
   };
 
   function cleanOldSessions() {

@@ -47,18 +47,7 @@ define(["jquery"], function ($) {
   };
 
   /* Extends obj with other, or copies obj if no other is given. */
-  util.extend = function (obj, other) {
-    if (other === undefined) {
-      other = obj;
-      obj = {};
-    }
-    for (var a in other) {
-      if (other.hasOwnProperty(a)) {
-        obj[a] = other[a];
-      }
-    }
-    return obj;
-  };
+  util.extend = TowTruck._extend;
 
   /* Trim whitespace from a string */
   util.trim = function trim(s) {
@@ -102,61 +91,7 @@ define(["jquery"], function ($) {
     return s;
   };
 
-  util.mixinEvents = function (proto) {
-    proto.on = function on(name, callback) {
-      if (name.search(" ") != -1) {
-        var names = name.split(/ +/g);
-        names.forEach(function (n) {
-          this.on(n, callback);
-        }, this);
-        return;
-      }
-      if (! this._listeners) {
-        this._listeners = {};
-      }
-      if (! this._listeners[name]) {
-        this._listeners[name] = [];
-      }
-      this._listeners[name].push(callback);
-    };
-    proto.once = function once(name, callback) {
-      function onceCallback() {
-        callback.apply(this, arguments);
-        this.off(name, onceCallback);
-      }
-      this.on(name, onceCallback);
-    };
-    proto.off = proto.removeListener = function off(name, callback) {
-      if (name.search(" ") != -1) {
-        var names = name.split(/ +/g);
-        names.forEach(function (n) {
-          this.off(n, callback);
-        }, this);
-        return;
-      }
-      if ((! this._listeners) || ! this._listeners[name]) {
-        return;
-      }
-      var l = this._listeners[name], _len = l.length;
-      for (var i=0; i<_len; i++) {
-        if (l[i] == callback) {
-          l.splice(i, 1);
-          break;
-        }
-      }
-    };
-    proto.emit = function emit(name) {
-      if ((! this._listeners) || ! this._listeners[name]) {
-        return;
-      }
-      var args = Array.prototype.slice.call(arguments, 1);
-      var l = this._listeners[name], _len = l.length;
-      for (var i=0; i<_len; i++) {
-        l[i].apply(this, args);
-      }
-    };
-    return proto;
-  };
+  util.mixinEvents = TowTruck._mixinEvents;
 
   util.Module = util.Class({
     constructor: function (name) {
