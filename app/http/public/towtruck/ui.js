@@ -319,6 +319,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     // so abruptly
     var anchor = container.find("#towtruck-anchor");
     assert(anchor.length);
+    // FIXME: This is in place to temporarily disable dock dragging:
+    anchor = container.find("#towtruck-anchor-disabled");
     anchor.mousedown(function (event) {
       var iface = $("#towtruck-interface");
       // FIXME: switch to .offset() and pageX/Y

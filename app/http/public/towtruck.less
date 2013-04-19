@@ -38,7 +38,7 @@
 
 /* Reset: */
 .towtruck {
-  /* 
+  /*
   http://meyerweb.com/eric/tools/css/reset/
   v2.0 | 20110126
   License: none (public domain)
@@ -463,12 +463,12 @@
       /*background-color: darken(@background-color, 10%);*/
     }
   }
-  
+
   #towtruck-buttons hr {
     padding:0px !important;
     margin:0px !important;
   }
-  
+
   #towtruck-button-bg {
     background: #0095dd; /* Old browsers */
     background: -moz-linear-gradient(top,  #0095dd 0%, #0077b0 100%); /* FF3.6+ */
@@ -477,7 +477,7 @@
     background: -o-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Opera 11.10+ */
     background: -ms-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #0095dd 0%,#0077b0 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */    
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */
     box-shadow:0px 1px 2px rgba(0,0,0,0.3);
   }
 
@@ -544,7 +544,8 @@
   #towtruck-anchor {
     height: @anchor-height;
     text-align: center;
-    cursor: move;
+    /* FIXME: disabling dock movement for now, cursor would be misleading: */
+    /*cursor: move;*/
     .user-select(none);
     width:100%;
     position:relative;
@@ -555,7 +556,7 @@
     border-top-right-radius: 2px;
     box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
   }
-  
+
   #towtruck-button-bottom-bg {
     background: #0095dd; /* Old browsers */
     background: -moz-linear-gradient(top,  #0095dd 0%, #0077b0 100%); /* FF3.6+ */
@@ -564,7 +565,7 @@
     background: -o-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Opera 11.10+ */
     background: -ms-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #0095dd 0%,#0077b0 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */    
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */
     box-shadow:0px 1px 2px rgba(0,0,0,0.3);
   }
 
@@ -641,7 +642,7 @@
     z-index:1111;
   }
 
-  /*  
+  /*
   #towtruck-chat.towtruck-window:after {
     content: '';
     display: block;
@@ -967,7 +968,7 @@
       }
     }
   }
-  
+
   #towtruck-feedbackbtn-box {
     width:100px;
     height:30px;
@@ -979,22 +980,22 @@
     background-repeat: no-repeat;
     padding:5px 10px 10px 25px;
   }
-  
+
   #towtruck-feedbackbtn-box a{
     color:#36510e !important;
     text-shadow:0px 1px rgba(255,255,255,0.15);
     font-size:12px;
   }
-  
+
   #towtruck-feedback-form .towtruck-title{
     width:361px;
     left:8px;
   }
-  
+
   #towtruck-feedback-form h1.ss-form-title {
     display:none !important;
   }
-  
+
   #towtruck-feedback-form.towtruck-modal {
     background-color: #fff;
     color: #000000;
@@ -1016,7 +1017,7 @@
     width:399px;
     z-index: 10003;
   }
-  
+
   #towtruck-alpha-intro button.towtruck-minimize {
     display:none;
   }
@@ -1035,7 +1036,7 @@
   #towtruck-alpha-intro img {
     height:80px;
     text-align:center;
-  } 
+  }
   #towtruck-alpha-intro .towtruck-modal-close {
     background-color: #73a729;
     background-repeat: repeat-x;
@@ -1179,16 +1180,16 @@
   #towtruck-rtc-info label {
     font-size:12px;
   }
-  
+
   #towtruck-template-new-user.towtruck-popup {
     width: 240px;
   }
-  
+
   p.towtruck-notify-btns {
     padding-top:10px;
     padding-left:10px;
   }
-  
+
   p.towtruck-notify-btns button.towtruck-dismiss {
     background-color: #0095DD !important;
     background-repeat: repeat-x;
@@ -1204,7 +1205,7 @@
     margin:0px 5px 0px 0px;
     clear:both;
   }
-  
+
 
   #towtruck-chat-notifier.towtruck-popup {
     background:rgba(242,244,245,0.9);
