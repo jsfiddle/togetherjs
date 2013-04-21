@@ -16,7 +16,7 @@ var server = http.createServer(function(request, response) {
   var protocol = request.headers["forwarded-proto"] || "http:";
   var host = request.headers["host"];
   var base = protocol + "//" + host;
-  
+
   if (url.path == '/status'){
     response.end("OK");
   }
@@ -89,10 +89,10 @@ wsServer.on('request', function(request) {
   logger.info((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
   connection.on('message', function(message) {
     var parsed = JSON.parse(message.utf8Data);
-    logger.debug('Message on ' + id + ' bytes: '
-                + (message.utf8Data && message.utf8Data.length)
-                + ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20)
-                + ' connections: ' + allConnections[id].length);
+    logger.debug('Message on ' + id + ' bytes: ' +
+                 (message.utf8Data && message.utf8Data.length) +
+                 ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20) +
+                 ' connections: ' + allConnections[id].length);
     for (var i=0; i<allConnections[id].length; i++) {
       var c = allConnections[id][i];
       if (c == connection) {
@@ -110,6 +110,11 @@ wsServer.on('request', function(request) {
     if (index != -1) {
       allConnections[id].splice(index, 1);
     }
+    console.log("size", id, allConnections[id].length);
+    if (! allConnections[id].length) {
+      delete allConnections[id];
+    }
+    console.log(allConnections);
     logger.info((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
