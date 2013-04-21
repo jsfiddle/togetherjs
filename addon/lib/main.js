@@ -15,6 +15,7 @@ var button = widgets.Widget({
   contentURL: data.url("button.html"),
   contentScriptFile: data.url("button.js"),
   onClick: function () {
+    console.log("Starting TowTruck because of click");
     startTowTruck();
   },
   width: 48
@@ -31,6 +32,9 @@ function updateAutoDomains() {
   domains = domains.split(/,/g);
   autoDomains = [];
   domains.forEach(function (item) {
+    if (item.search(/^\s*$/) === 0) {
+      return;
+    }
     item = item.replace(/^\s+/, "").replace(/\s+$/, "");
     item = item.split(/;/);
     var domain = item[0];
@@ -81,12 +85,15 @@ tabs.on("open", watchTab);
 function watchTab(tab) {
   tab.on("ready", function () {
     if (tabs.activeTab == tab && tab.url.indexOf("#&towtruck") != -1) {
+      console.log("Starting TowTruck on share link", tab.url);
       startTowTruck();
     }
     if (tabs.activeTab == tab && ! tab.towtruckCloser) {
       var started = false;
       autoDomains.forEach(function (matcher) {
+        console.log("matcher", matcher, matcher.domain);
         if ((! started) && tab.url.search(matcher.domain) != -1) {
+          console.log("Start TowTruck autoDomain");
           startTowTruck(matcher.shareId);
           started = true;
         }
