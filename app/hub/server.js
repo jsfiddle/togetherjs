@@ -110,11 +110,9 @@ wsServer.on('request', function(request) {
     if (index != -1) {
       allConnections[id].splice(index, 1);
     }
-    console.log("size", id, allConnections[id].length);
     if (! allConnections[id].length) {
       delete allConnections[id];
     }
-    console.log(allConnections);
     logger.info((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
