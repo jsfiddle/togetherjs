@@ -3,10 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["util"], function (util) {
-  var storage = util.Module("storage");
   var assert = util.assert;
   var Deferred = util.Deferred;
-  var STORAGE_PREFIX = "towtruck.";
   var DEFAULT_SETTINGS = {
     name: "",
     defaultName: "",
@@ -17,68 +15,83 @@ define(["util"], function (util) {
     seenWalkthrough: false,
     dontShowRtcInfo: false
   };
-  var WINDOW_STORAGE_EXPIRES = 30*24*60*60*1000; // 30 days
 
-  storage.get = function (key, defaultValue) {
-    return Deferred(function (def) {
-      // Strictly this isn't necessary, but eventually I want to move to something more
-      // async for the storage, and this simulates that much better.
-      setTimeout(util.resolver(def, function () {
-        key = STORAGE_PREFIX + key;
-        var value = localStorage.getItem(key);
-        if (! value) {
-          value = defaultValue;
-        } else {
-          value = JSON.parse(value);
-        }
-        return value;
-      }));
-    });
-  };
+  var Storage = util.Class({
+    constructor: function (storage, prefix) {
+      this.storage = storage;
+      this.prefix = prefix;
+    },
 
-  storage.set = function (key, value) {
-    return Deferred(function (def) {
-      setTimeout(util.resolver(def, function () {
-        key = STORAGE_PREFIX + key;
-        if (value === undefined) {
-          localStorage.removeItem(key);
-        } else {
-          localStorage.setItem(key, JSON.stringify(value));
-        }
-      }));
-    });
-  };
-
-  storage.clear = function () {
-    return storage.keys().then(function (keys) {
-      keys.forEach(function (key) {
-        // FIXME: technically we're ignoring the promise returned by all
-        // these sets:
-        storage.set(key, undefined);
-      });
-    });
-  };
-
-  storage.keys = function (prefix, excludePrefix) {
-    // Returns a list of keys, potentially with the given prefix
-    return Deferred(function (def) {
-      setTimeout(util.resolver(def, function () {
-        prefix = prefix || "";
-        var result = [];
-        for (var i=0; i<localStorage.length; i++) {
-          var key = localStorage.key(i);
-          if (key.indexOf(STORAGE_PREFIX + prefix) === 0) {
-            var shortKey = key.substr(STORAGE_PREFIX.length);
-            if (excludePrefix) {
-              shortKey = shortKey.substr(prefix.length);
-            }
-            result.push(shortKey);
+    get: function (key, defaultValue) {
+      var self = this;
+      return Deferred(function (def) {
+        // Strictly this isn't necessary, but eventually I want to move to something more
+        // async for the storage, and this simulates that much better.
+        setTimeout(util.resolver(def, function () {
+          key = self.prefix + key;
+          var value = self.storage.getItem(key);
+          if (! value) {
+            value = defaultValue;
+          } else {
+            value = JSON.parse(value);
           }
-        }
-        return result;
-      }));
-    });
-  };
+          return value;
+        }));
+      });
+    },
+
+    set: function (key, value) {
+      var self = this;
+      return Deferred(function (def) {
+        setTimeout(util.resolver(def, function () {
+          key = self.prefix + key;
+          if (value === undefined) {
+            self.storage.removeItem(key);
+          } else {
+            self.storage.setItem(key, JSON.stringify(value));
+          }
+        }));
+      });
+    },
+
+    clear: function () {
+      var self = this;
+      var promises = [];
+      return this.keys().then(function (keys) {
+        keys.forEach(function (key) {
+          // FIXME: technically we're ignoring the promise returned by all
+          // these sets:
+          promises.push(self.set(key, undefined));
+        });
+        return util.resolveMany(promises);
+      });
+    },
+
+    keys: function (prefix, excludePrefix) {
+      // Returns a list of keys, potentially with the given prefix
+      var self = this;
+      return Deferred(function (def) {
+        setTimeout(util.resolver(def, function () {
+          prefix = prefix || "";
+          var result = [];
+          for (var i=0; i<self.storage.length; i++) {
+            var key = self.storage.key(i);
+            if (key.indexOf(self.prefix + prefix) === 0) {
+              var shortKey = key.substr(self.prefix.length);
+              if (excludePrefix) {
+                shortKey = shortKey.substr(prefix.length);
+              }
+              result.push(shortKey);
+            }
+          }
+          return result;
+        }));
+      });
+    }
+
+  });
+
+  var storage = Storage(localStorage, "towtruck.");
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -110,40 +123,7 @@ define(["util"], function (util) {
 
   });
 
-  storage.tab = {
-    get: function (key, defaultValue) {
-      return storage.get(this._makeKey(key), defaultValue);
-    },
-    set: function (key, value) {
-      if (value !== undefined) {
-        value.date = Date.now();
-      }
-      return storage.set(this._makeKey(key), value);
-    },
-    keys: function (prefix) {
-      return storage.keys(this._makeKey(prefix || ""), true);
-    },
-    expire: function () {
-      var expireTime = Date.now() + WINDOW_STORAGE_EXPIRES;
-      return this.keys().then(function (keys) {
-        keys.forEach(function (key) {
-          storage.tab.get(key).then(function (value) {
-            if ((! value) || (! value.date) ||
-                value.date < expireTime) {
-              storage.tab.set(key, undefined);
-            }
-          });
-        });
-      });
-    },
-    _makeKey: function (name) {
-      return util.safeClassName(window.name) + "." + name;
-    }
-  };
-
-  if (! window.name) {
-    window.name = "towtruck-" + util.generateId();
-  }
+  storage.tab = Storage(sessionStorage, "towtruck-session.");
 
   return storage;
 });
