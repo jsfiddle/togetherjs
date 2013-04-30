@@ -72,11 +72,24 @@
             <input type="reset" class="btn" value="Reset">
           </div>
 
-          </fieldset>
-
         </form>
 
 
         </div>
       </div> <!-- /container -->
     </div>
+
+    <script>
+      $("#about-toggle").click(function () {
+        console.log("heya", this);
+        var group = $("#about-group");
+        if (group.is(":visible")) {
+          group.hide();
+          $(this).text("Essay (+)");
+        } else {
+          group.show();
+          $(this).text("Essay (-)");
+        }
+      });
+      TowTruckConfig_cloneClicks = "#about-toggle";
+    </script>
