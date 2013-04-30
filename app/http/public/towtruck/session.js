@@ -111,6 +111,17 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     channel.send(msg);
   };
 
+  session.appSend = function (msg) {
+    var type = msg.type;
+    if (type.search(/^towtruck\./) === 0) {
+      type = type.substr("towtruck.".length);
+    } else if (type.search(/^app\./) === -1) {
+      type = "app." + type;
+    }
+    msg.type = type;
+    session.send(msg);
+  };
+
   /****************************************
    * Standard message responses
    */
@@ -139,7 +150,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
     }
-    if (TowTruck._sessionStarting) {
+    if (! TowTruck.startup.continued) {
       msg.starting = true;
     }
     session.send(msg);
@@ -155,92 +166,89 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // ui must be the first item:
   var features = ["ui", "chat", "tracker", "webrtc", "cursor", "startup", "peers"];
 
-  function initClientId() {
-    if (session.clientId) {
-      return;
-    }
-    storage.get("clientId").then(function (clientId) {
-      if (! clientId) {
-        clientId = util.generateId();
-        storage.set("clientId", clientId);
+  function initIdentityId() {
+    return util.Deferred(function (def) {
+      if (session.identityId) {
+        def.resolve();
+        return;
       }
-      session.clientId = clientId;
+      storage.get("identityId").then(function (identityId) {
+        if (! identityId) {
+          identityId = util.generateId();
+          storage.set("identityId", identityId);
+        }
+        session.identityId = identityId;
+        // We don't actually have to wait for the set to succede, so
+        // long as session.identityId is set
+        def.resolve();
+      });
     });
   }
 
-  initClientId();
+  initIdentityId.done = initIdentityId();
 
   function initShareId() {
     return util.Deferred(function (def) {
       var hash = location.hash;
       var shareId = session.shareId;
       var isClient = true;
-      var name = window.name;
       var set = true;
-      if (! name) {
-        name = window.name = "towtruck-" + util.generateId();
-      }
+      var sessionId;
+      session.firstRun = ! TowTruck.startup.continued;
       if (! shareId) {
-        if (TowTruck._shareId) {
+        if (TowTruck.startup._joinShareId) {
           // Like, below, this *also* means we got the shareId from the hash
           // (in towtruck.js):
-          session.firstRun = true;
-          shareId = TowTruck._shareId;
+          shareId = TowTruck.startup._joinShareId;
         }
       }
       if (! shareId) {
-        var m = /&?towtruck(-head)?=([^&]*)/.exec(hash);
+        // FIXME: I'm not sure if this will ever happen, because towtruck.js should
+        // handle it
+        var m = /&?towtruck=([^&]*)/.exec(hash);
         if (m) {
-          session.firstRun = true;
           isClient = ! m[1];
           shareId = m[2];
           var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
           location.hash = newHash;
         }
-        // FIXME: we should probably test at this time if the stored window.name-based
-        // key already exists, because if it does we might have a second tab with the
-        // same name running, and then there will be a conflict
       }
-      if (! shareId) {
-        storage.tab.get("status").then(function (saved) {
-          assert(
-            saved || TowTruck.startTowTruckImmediately,
-            "No clientId could be found via location.hash or in localStorage; it is unclear why TowTruck was ever started");
-          if ((! saved) && TowTruck.startTowTruckImmediately) {
-            session.firstRun = true;
-            isClient = false;
-            if (! shareId) {
-              shareId = util.generateId();
-            }
-          } else {
-            isClient = saved.isClient;
-            shareId = saved.shareId;
-            // The only case when we don't need to set the storage status again is when
-            // we're already set to be running
-            set = ! saved.running;
+      return storage.tab.get("status").then(function (saved) {
+        if ((! saved) && TowTruck.startup._launch) {
+          isClient = false;
+          if (! shareId) {
+            shareId = util.generateId();
           }
-          finish();
-        });
-      } else {
-        finish();
-      }
-      function finish() {
+          if (! sessionId) {
+            sessionId = util.generateId();
+          }
+        } else {
+          isClient = saved.reason == "joined";
+          TowTruck.startup.reason = saved.reason;
+          TowTruck.startup.continued = true;
+          shareId = saved.shareId;
+          sessionId = saved.sessionId;
+          // The only case when we don't need to set the storage status again is when
+          // we're already set to be running
+          set = ! saved.running;
+        }
+        assert(session.identityId);
+        session.clientId = session.identityId + "." + sessionId;
         if (set) {
-          storage.tab.set("status", {isClient: isClient, shareId: shareId, running: true, date: Date.now()});
+          storage.tab.set("status", {reason: TowTruck.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId});
         }
         session.isClient = isClient;
         session.shareId = shareId;
         session.emit("shareId");
         def.resolve(session.shareId);
-      }
-      return def;
+      });
     });
   }
 
   function initStartTarget() {
     var id;
-    if (TowTruck.startTarget) {
-      id = TowTruck.startTarget.id;
+    if (TowTruck.startup.button) {
+      id = TowTruck.startup.button.id;
       if (id) {
         storage.set("startTarget", id);
       }
@@ -249,7 +257,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     storage.get("startTarget").then(function (id) {
       var el = document.getElementById(id);
       if (el) {
-        TowTruck.startTarget = el;
+        TowTruck.startup.button = el;
       }
     });
   }
@@ -257,29 +265,31 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.start = function () {
     session.running = true;
     initStartTarget();
-    initShareId().then(function () {
-      openChannel();
-      require(["ui"], function (ui) {
-        ui.prepareUI();
-        require(features, function () {
-          $(function () {
-            peers = require("peers");
-            var startup = require("startup");
-            session.emit("start");
-            session.once("ui-ready", function () {
-              startup.start();
-            });
-            var ui = require("ui");
-            ui.activateUI();
-            if (TowTruck.getConfig("enableAnalytics")) {
-              require(["analytics"], function (analytics) {
-                analytics.activate();
+    initIdentityId().then(function () {
+      initShareId().then(function () {
+        openChannel();
+        require(["ui"], function (ui) {
+          ui.prepareUI();
+          require(features, function () {
+            $(function () {
+              peers = require("peers");
+              var startup = require("startup");
+              session.emit("start");
+              session.once("ui-ready", function () {
+                startup.start();
               });
-            }
-            peers._SelfLoaded.then(function () {
-              sendHello(false);
+              var ui = require("ui");
+              ui.activateUI();
+              if (TowTruck.getConfig("enableAnalytics")) {
+                require(["analytics"], function (analytics) {
+                  analytics.activate();
+                });
+              }
+              peers._SelfLoaded.then(function () {
+                sendHello(false);
+              });
+              TowTruck.emit("ready");
             });
-            TowTruck.emit("ready");
           });
         });
       });
@@ -307,7 +317,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
-  if (TowTruck.startTowTruckImmediately) {
+  if (TowTruck.startup._launch) {
     setTimeout(session.start);
   }
 

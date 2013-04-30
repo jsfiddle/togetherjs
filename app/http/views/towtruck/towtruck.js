@@ -61,25 +61,16 @@
     document.head.appendChild(script);
   }
 
-  var oldTowTruck = window.TowTruck;
-
-  var TowTruck = window.TowTruck = function TowTruck(event, doneCallback) {
-    if (typeof event == "function") {
-      if (doneCallback) {
-        console.warn("TowTruck() first argument *and* second argument is a function");
-      } else {
-        doneCallback = event;
-      }
-    }
-    TowTruck.startTarget = null;
+  var TowTruck = window.TowTruck = function TowTruck(event) {
+    TowTruck.startup.button = null;
     if (event && typeof event == "object") {
       if (event.target && typeof event) {
-        TowTruck.startTarget = event.target;
+        TowTruck.startup.button = event.target;
       } else if (event.nodeType == 1) {
-        TowTruck.startTarget = event;
+        TowTruck.startup.button = event;
       } else if (event[0] && event[0].nodeType == 1) {
         // Probably a jQuery element
-        TowTruck.startTarget = event[0];
+        TowTruck.startup.button = event[0];
       }
     }
     if (window.TowTruckConfig && (! window.TowTruckConfig.loaded)) {
@@ -115,6 +106,11 @@
       TowTruck.on(attr, ons[attr]);
     }
 
+    if (! TowTruck.startup.reason) {
+      // Then a call to TowTruck() from a button must be started TowTruck
+      TowTruck.startup.reason = "started";
+    }
+
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
       if (session.running) {
@@ -122,14 +118,12 @@
       } else {
         session.start();
       }
-      if (doneCallback && typeof doneCallback == "function") {
-        doneCallback();
-      }
       return;
     }
     // A sort of signal to session.js to tell it to actually
     // start itself (i.e., put up a UI and try to activate)
-    TowTruck.startTowTruckImmediately = true;
+    TowTruck.startup._launch = true;
+
     styles.forEach(addStyle);
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
@@ -140,9 +134,6 @@
       jquery.noConflict();
       TowTruck._loaded = true;
       TowTruck.require = require.config({context: "towtruck"});
-      if (doneCallback && typeof doneCallback == "function") {
-        doneCallback();
-      }
     }
     if (typeof require == "function") {
       TowTruck.require = require.config(requireConfig);
@@ -159,6 +150,26 @@
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
     addScript("/towtruck/libs/require.js");
+  };
+
+  TowTruck.startup = {
+    // What element, if any, was used to start the session:
+    button: null,
+    // The startReason is the reason TowTruck was started.  One of:
+    //   null: not started
+    //   started: hit the start button (first page view)
+    //   joined: joined the session (first page view)
+    reason: null,
+    // Also, the session may have started on "this" page, or maybe is continued
+    // from a past page.  TowTruck.continued indicates the difference (false the
+    // first time TowTruck is started or joined, true on later page loads).
+    continued: false,
+    // This is set to tell the session what shareId to use, if the boot
+    // code knows (mostly because the URL indicates the id).
+    _joinShareId: null,
+    // This tells session to start up immediately (otherwise it would wait
+    // for session.start() to be run)
+    _launch: false
   };
 
   TowTruck.requireConfig = {
@@ -321,7 +332,7 @@
       settings[name] = value;
     }
     for (var attr in settings) {
-      if (attr == "loaded" || ! settings.hasOwnProperty(attr)) {
+      if (attr == "loaded" || attr == "callToStart" || ! settings.hasOwnProperty(attr)) {
         continue;
       }
       if (! TowTruck._defaultConfiguration.hasOwnProperty(attr)) {
@@ -339,16 +350,6 @@
     }
     // If it's not set, TowTruck has not been loaded, and reinitialization is not needed
   };
-
-  // If TowTruck previously existed, copy all its properties over to our new
-  // TowTruck function:
-  if (oldTowTruck !== undefined) {
-    for (var a in oldTowTruck) {
-      if (oldTowTruck.hasOwnProperty(a)) {
-        TowTruck[a] = oldTowTruck[a];
-      }
-    }
-  }
 
   // This should contain the output of "git describe --always --dirty"
   // FIXME: substitute this on the server (and update make-static-client)
@@ -376,14 +377,7 @@
       }
       session = TowTruck.require("session");
     }
-    var type = msg.type;
-    if (type.search(/^towtruck\./) === 0) {
-      type = type.substr("towtruck.".length);
-    } else if (type.search(/^app\./) === -1) {
-      type = "app." + type;
-    }
-    msg.type = type;
-    session.send(msg);
+    session.appSend(msg);
   };
 
   // It's nice to replace this early, before the load event fires, so we conflict
@@ -391,22 +385,27 @@
   var hash = location.hash.replace(/^#/, "");
   var m = /&?towtruck=([^&]*)/.exec(hash);
   if (m) {
-    TowTruck._shareId = m[1];
-    TowTruck._sessionStarting = true;
-    // FIXME: we should let session do this:
+    TowTruck.startup._joinShareId = m[1];
+    TowTruck.startup.reason = "joined";
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }
   if (window._TowTruckShareId) {
-    TowTruck._shareId = window._TowTruckShareId;
+    // A weird hack for something the addon does, to force a shareId.
+    // FIXME: probably should remove, it's a wonky feature.
+    TowTruck.startup._joinShareId = window._TowTruckShareId;
     delete window._TowTruckShareId;
   }
 
   function conditionalOnload() {
     // A page can define this function to defer TowTruck from starting
-    if (window._TowTruckCallToStart) {
+    var callToStart = window.TowTruckConfig_callToStart;
+    if (window.TowTruckConfig && window.TowTruckConfig.callToStart) {
+      callToStart = window.TowTruckConfig.callToStart;
+    }
+    if (callToStart) {
       // FIXME: need to document this:
-      window._TowTruckCallToStart(onload);
+      callToStart(onload);
     } else {
       onload();
     }
@@ -415,21 +414,19 @@
   // FIXME: can we push this up before the load event?
   // Do we need to wait at all?
   function onload() {
-    if (TowTruck._shareId) {
-      TowTruck.startTowTruckImmediately = true;
+    if (TowTruck.startup._joinShareId) {
       TowTruck();
     } else if (window._TowTruckBookmarklet) {
       delete window._TowTruckBookmarklet;
       TowTruck();
     } else {
-      var name = window.name;
-      // FIXME: should escape key (like util.safeClassName)
-      var key = "towtruck." + name + "." + "status";
-      var value = localStorage.getItem(key);
-      console.log("LOAD CHECK", key);
+      var key = "towtruck-session.status";
+      var value = sessionStorage.getItem(key);
       if (value) {
         value = JSON.parse(value);
         if (value && value.running) {
+          TowTruck.startup.continued = true;
+          TowTruck.startup.reason = value.startupReason;
           TowTruck();
         }
       }
