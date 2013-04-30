@@ -4,9 +4,8 @@
 
 // Cursor viewing support
 
-define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker) {
+define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker", "peers"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers) {
   var assert = util.assert;
-  var AssertionError = util.AssertionError;
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
   var CURSOR_HEIGHT = 50;
@@ -30,7 +29,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
       this.element = ui.cloneTemplate("cursor");
       this.elementClass = "towtruck-scrolled-normal";
       this.element.addClass(this.elementClass);
-      this.updatePeer(session.peers.get(clientId));
+      this.updatePeer(peers.getPeer(clientId));
       this.lastTop = this.lastLeft = null;
       $(document.body).append(this.element);
       this.keydownTimeout = null;
@@ -43,13 +42,14 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     KEYDOWN_WAIT_TIME: 2000,
 
     updatePeer: function (peer) {
+      // FIXME: can I use peer.setElement()?
       this.element.css({color: peer.color});
       var img = this.element.find("img.towtruck-cursor-img");
       img.attr("src", makeCursor(peer.color));
       var name = this.element.find(".towtruck-cursor-name");
       var nameContainer = this.element.find(".towtruck-cursor-container");
       assert(name.length);
-      name.text(peer.nickname);
+      name.text(peer.name);
       nameContainer.css({
         backgroundColor: peer.color,
         color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
@@ -164,8 +164,8 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
     delete Cursor._cursors[clientId];
   };
 
-  session.peers.on("add update", function (peer) {
-    var c = Cursor.getClient(peer.clientId);
+  peers.on("new-peer identity-updated", function (peer) {
+    var c = Cursor.getClient(peer.id);
     c.updatePeer(peer);
   });
 
@@ -283,8 +283,7 @@ define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "event
   }
 
   session.hub.on("scroll-update", function (msg) {
-    var status = session.peers.getStatus(msg.clientId);
-    status.scrollPosition = msg.position;
+    msg.peer.scrollPosition = msg.position;
   });
 
   session.on("ui-ready", function () {

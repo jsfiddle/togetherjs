@@ -2,114 +2,54 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "ui", "templates", "playback"], function (require, $, util, session, ui, templates, playback) {
+define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers"], function (require, $, util, session, ui, templates, playback, storage, peers) {
   var chat = util.Module("chat");
   var assert = util.assert;
   var Walkabout;
 
-  // FIXME: this is used to turn off the chat history, restore, and
-  // replay.  This replay has caused problems, and may simply be
-  // redesigned, or may be reformed.
-  var DISABLE_LOG = true;
-
   session.hub.on("chat", function (msg) {
-    ui.addChat({
-      type: "text",
-      clientId: msg.clientId,
+    ui.chat.text({
       text: msg.text,
+      peer: msg.peer,
+      // FIXME: a little unsure of trusting this (maybe I should prefix it?)
       messageId: msg.messageId
     });
-    if ((! session.isClient) && (! DISABLE_LOG)) {
-      chat.Chat.addChat({
-        type: "text",
-        text: msg.text,
-        clientId: msg.clientId,
-        date: Date.now(),
-        messageId: msg.messageId
-      });
-    }
   });
 
   session.hub.on("bye", function (msg) {
-    ui.addChat({
-      type: "left-session",
-      clientId: msg.clientId
+    ui.chat.leftSession({
+      peer: msg.peer
     });
   });
 
-  session.hub.on("hello", function () {
-    if ((! session.isClient) && (! DISABLE_LOG)) {
-      var log = chat.Chat.loadChat();
-      if (log.length) {
-        session.send({
-          type: "chat-catchup",
-          log: log
-        });
-      }
-    }
-  });
-
-  if (! DISABLE_LOG) {
-    session.hub.on("chat-catchup", function (msg) {
-      assert(session.isClient, "Master received chat-catchup", session.isClient);
-      if (ui.isChatEmpty()) {
-        ui.addChat({type: "clear"});
-        for (var i=0; i<msg.log.length; i++) {
-          var l = msg.log[i];
-          ui.addChat({
-            type: "text",
-            text: l.text,
-            date: l.date,
-            clientId: l.clientId,
-            messageId: l.messageId,
-            catchup: true
-          });
-        }
-      }
-    });
-  }
-
-  // The number of milliseconds after which to put a break in the conversation
-  // (if messages come faster than this, they will be kind of combined)
-  var MESSAGE_BREAK_TIME = 20000;
-
-  session.peers.on("add update", function (peer) {
-    ui.updatePerson(peer.clientId);
-  });
-
-  chat.Chat = {
-    submit: function (message) {
-      var parts = message.split(/ /);
-      if (parts[0].charAt(0) == "/") {
-        var name = parts[0].substr(1).toLowerCase();
-        var method = this["command_" + name];
-        if (method) {
-          method.call(this, parts[1]);
-        }
+  chat.submit = function (message) {
+    var parts = message.split(/ /);
+    if (parts[0].charAt(0) == "/") {
+      var name = parts[0].substr(1).toLowerCase();
+      var method = commands["command_" + name];
+      if (method) {
+        method(parts[1]);
         return;
       }
-      var msg = {
-        type: "text",
-        text: message,
-        clientId: session.clientId,
-        messageId: session.clientId + "-" + Date.now(),
-        date: Date.now()
-      };
-      session.send({
-        type: "chat",
-        text: message,
-        messageId: msg.messageId
-      });
-      ui.addChat(msg);
-      if (! session.isClient) {
-        this.addChat(msg);
-      }
-    },
+    }
+    var messageId = session.clientId + "-" + Date.now();
+    session.send({
+      type: "chat",
+      text: message,
+      messageId: messageId
+    });
+    ui.chat.text({
+      text: message,
+      peer: peers.Self,
+      messageId: messageId,
+      notify: false
+    });
+  };
 
+  var commands = {
     command_help: function () {
       var msg = util.trim(templates.help);
-      ui.addChat({
-        type: "system",
+      ui.chat.system({
         text: msg
       });
     },
@@ -131,8 +71,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
         }
       }
       if (args[0] == "cancel") {
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "Aborting test"
         });
         this._testCancel();
@@ -144,8 +83,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
         if (isNaN(times) || ! times) {
           times = 100;
         }
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "Testing with walkabout.js"
         });
         var tmpl = $(templates.walkabout);
@@ -189,15 +127,13 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
       }
       if (args[0] == "describe") {
         Walkabout.findActions().forEach(function (action) {
-          ui.addChat({
-            type: "system",
+          ui.chat.system({
             text: action.description()
           });
         }, this);
         return;
       }
-      ui.addChat({
-        type: "system",
+      ui.chat.system({
         text: "Did not understand: " + args.join(" ")
       });
     },
@@ -206,10 +142,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
     _testShow: [],
 
     command_clear: function () {
-      ui.addChat({
-        type: "clear"
-      });
-      this.clearHistory();
+      ui.chat.clear();
     },
 
     command_exec: function () {
@@ -219,38 +152,19 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
       try {
         result = eval(expr);
       } catch (e) {
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "Error: " + e
         });
       }
       if (result !== undefined) {
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "" + result
         });
       }
     },
 
-    command_stickyshare: function (id) {
-      id = id || null;
-      session.settings.set("stickyShare", id);
-      if (id) {
-        ui.addChat({
-          type: "system",
-          text: "Set shareId to " + id + " (restart to use)"
-        });
-      } else {
-        ui.addChat({
-          type: "system",
-          text: "Removed sticky shareId"
-        });
-      }
-    },
-
     command_record: function () {
-      ui.addChat({
-        type: "system",
+      ui.chat.system({
         text: "When you see the robot appear, the recording will have started"
       });
       window.open(
@@ -265,15 +179,13 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
         this.playing.cancel();
         this.playing.unload();
         this.playing = null;
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "playback cancelled"
         });
         return;
       }
       if (! url) {
-        ui.addChat({
-          type: "system",
+        ui.chat.system({
           text: "Nothing is playing"
         });
         return;
@@ -286,84 +198,14 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback"], 
           logs.play();
         }).bind(this),
         function (error) {
-          ui.addChat({
-            type: "system",
+          ui.chat.system({
             text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
           });
         });
       ui.hideWindow("#towtruck-chat");
-    },
-
-    storageKey: "towtruck.chatlog",
-    messageExpireTime: 1000 * 60 * 60 * 6, // 6 hours in milliseconds
-    maxLogMessages: 100,
-
-    addChat: function (obj) {
-      assert(! session.isClient);
-      var log = this.loadChat();
-      log.push(obj);
-      // Cull old entries:
-      var earlies = -1;
-      var now = Date.now();
-      for (var i=0; i<log.length; i++) {
-        if (now - log[i].date < this.messageExpireTime) {
-          break;
-        }
-        earlies = i;
-      }
-      if (earlies > -1) {
-        log.splice(0, earlies + 1);
-      }
-      if (log.length > this.maxLogMessages) {
-        log.splice(0, log.length - this.maxLogMessages);
-      }
-      localStorage.setItem(this.storageKey, JSON.stringify(log));
-    },
-
-    loadChat: function () {
-      var log = localStorage.getItem(this.storageKey);
-      if (! log) {
-        log = [];
-      } else {
-        log = JSON.parse(log);
-      }
-      return log;
-    },
-
-    clearHistory: function () {
-      localStorage.removeItem(this.storageKey);
     }
 
   };
-
-  session.on("ui-ready", function () {
-    if (session.isClient || DISABLE_LOG) {
-      // If we're a client, the master will send the messages
-      return;
-    }
-    if (! ui.isChatEmpty()) {
-      return;
-    }
-    var log = chat.Chat.loadChat();
-    for (var i=0; i<log.length; i++) {
-      var l = log[i];
-      // FIXME: duplicated from chat-catchup
-      ui.addChat({
-        type: "text",
-        text: l.text,
-        date: l.date,
-        clientId: l.clientId,
-        messageId: l.messageId,
-        catchup: true
-      });
-    }
-    // Re-load a partial playback:
-    var logs = playback.getRunningLogs();
-    if (logs) {
-      chat.Chat.playing = logs;
-      logs.play();
-    }
-  });
 
   return chat;
 

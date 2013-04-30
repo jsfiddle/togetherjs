@@ -4,10 +4,9 @@
 
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
-define(["require", "jquery", "util", "session", "ui"], function (require, $, util, session, ui) {
+define(["require", "jquery", "util", "session", "ui", "peers", "storage"], function (require, $, util, session, ui, peers, storage) {
   var webrtc = util.Module("webrtc");
   var assert = util.assert;
-  var AssertionError = util.AssertionError;
 
   session.RTCSupported = !!(window.mozRTCPeerConnection ||
                             window.webkitRTCPeerConnection ||
@@ -58,7 +57,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
         "optional": []
       });
     }
-    throw AssertionError("Called makePeerConnection() without supported connection");
+    throw new util.AssertionError("Called makePeerConnection() without supported connection");
   }
 
   function ensureCryptoLine(sdp) {
@@ -99,7 +98,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
 
   session.on("ui-ready", function () {
     $("#towtruck-self-avatar").click(function () {
-      var avatar = session.settings.get("avatar");
+      var avatar = peers.Self.avatar;
       if (avatar) {
         $preview.attr("src", avatar);
       }
@@ -132,7 +131,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     }
 
     $accept.click(function () {
-      session.settings.set("avatar", avatarData);
+      peers.Self.update({avatar:  avatarData});
       ui.displayToggle("#towtruck-no-avatar-edit");
       // FIXME: these probably shouldn't be two elements:
       $("#towtruck-participants-other").show();
@@ -262,9 +261,11 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
 
     function enableAudio() {
       accepted = true;
-      if (! session.settings.get("dontShowRtcInfo")) {
-        ui.displayWindow("#towtruck-rtc-info");
-      }
+      storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
+        if (! dontShow) {
+          ui.displayWindow("#towtruck-rtc-info");
+        }
+      });
       if (! audioStream) {
         startStreaming(connect);
         return;
@@ -276,7 +277,7 @@ define(["require", "jquery", "util", "session", "ui"], function (require, $, uti
     }
 
     ui.container.find("#towtruck-rtc-info .towtruck-dont-show-again").change(function () {
-      session.settings.set("dontShowRtcInfo", this.checked);
+      storage.settings.set("dontShowRtcInfo", this.checked);
     });
 
     function error() {

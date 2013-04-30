@@ -8,8 +8,8 @@ define(["util"], function (util) {
   var Deferred = util.Deferred;
   var STORAGE_PREFIX = "towtruck.";
   var DEFAULT_SETTINGS = {
-    nickname: "",
-    defaultNickname: "",
+    name: "",
+    defaultName: "",
     avatar: null,
     stickyShare: null,
     color: null,
@@ -86,14 +86,11 @@ define(["util"], function (util) {
     get: function (name) {
       assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
       return Deferred(function (def) {
-        setTimeout(util.resolver(def, function () {
-          var s = storage.get("settings");
-          return s.then(function (settings) {
-            if ((! settings) || settings[name] === undefined) {
-              return storage.settings.defaults[name];
-            }
-            return s[name];
-          });
+        storage.get("settings").then(util.resolver(def, function (settings) {
+          if ((! settings) || settings[name] === undefined) {
+            return storage.settings.defaults[name];
+          }
+          return settings[name];
         }));
       });
     },
@@ -101,13 +98,13 @@ define(["util"], function (util) {
     set: function (name, value) {
       assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
       return Deferred(function (def) {
-        var s = storage.get("settings", {});
-        s.then(util.resolver(function (def, settings) {
-          var oldValue = s[name];
-          s[name] = value;
-          storage.set("settings", s);
+        storage.get("settings", {}).then(function (settings) {
+          var oldValue = settings[name];
+          settings[name] = value;
+          var def = storage.set("settings", settings);
           storage.settings.emit("change", name, oldValue, value);
-        }));
+          return def;
+        });
       });
     }
 

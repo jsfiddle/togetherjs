@@ -355,6 +355,37 @@
   TowTruck.version = "unknown";
   TowTruck.baseUrl = baseUrl;
 
+  TowTruck.hub = TowTruck._mixinEvents({});
+  var session = null;
+
+  TowTruck._onmessage = function (msg) {
+    var type = msg.type;
+    if (type.search(/^app\./) === 0) {
+      type = type.substr("app.".length);
+    } else {
+      type = "towtruck." + type;
+    }
+    msg.type = type;
+    TowTruck.hub.emit(msg.type, msg);
+  };
+
+  TowTruck.send = function (msg) {
+    if (session === null) {
+      if (! TowTruck.require) {
+        throw "You cannot use TowTruck.send() when TowTruck is not running";
+      }
+      session = TowTruck.require("session");
+    }
+    var type = msg.type;
+    if (type.search(/^towtruck\./) === 0) {
+      type = type.substr("towtruck.".length);
+    } else if (type.search(/^app\./) === -1) {
+      type = "app." + type;
+    }
+    msg.type = type;
+    session.send(msg);
+  };
+
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
@@ -392,8 +423,10 @@
       TowTruck();
     } else {
       var name = window.name;
-      var key = "towtruck.status." + name;
+      // FIXME: should escape key (like util.safeClassName)
+      var key = "towtruck." + name + "." + "status";
       var value = localStorage.getItem(key);
+      console.log("LOAD CHECK", key);
       if (value) {
         value = JSON.parse(value);
         if (value && value.running) {

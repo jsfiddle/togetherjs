@@ -62,7 +62,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
   function sendHello(helloBack) {
     var msg = {
       type: helloBack ? "hello-back" : "hello",
-      nickname: "Recorder 'bot",
+      name: "Recorder 'bot",
       // FIXME: replace with robot:
       avatar: TowTruck.baseUrl + "/images/trucks.jpg",
       color: "#888888",

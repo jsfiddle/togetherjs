@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "element-finder", "modal"], function (require, $, util, session, templates, elementFinder, modal) {
-  TowTruck.$ = $;
+define(["require", "jquery", "util", "session", "templates", "element-finder", "modal", "linkify", "peers"], function (require, $, util, session, templates, elementFinder, modal, linkify, peers) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -22,7 +21,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
   var DOCK_ANIMATION_TIME = 300;
 
   // This would be a circular import, but we just need the chat module sometime
-  // after everything is loaded:
+  // after everything is loaded, and this is sure to complete by that time:
   require(["chat"], function (c) {
     chat = c;
   });
@@ -35,6 +34,9 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     return el;
   };
 
+  /* Displays some toggleable element; toggleable elements have a
+     data-toggles attribute that indicates what other elements should
+     be hidden when this element is shown. */
   ui.displayToggle = function (el) {
     el = $(el);
     assert(el.length, "No element", arguments[0]);
@@ -53,10 +55,12 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     } else if (iface.hasClass("towtruck-interface-bottom")) {
       return "bottom";
     } else {
-      throw AssertionError("#towtruck-interface doesn't have positioning class");
+      throw new AssertionError("#towtruck-interface doesn't have positioning class");
     }
   }
 
+  /* Displays one window.  A window must already exist.  This hides other windows, and
+     positions the window according to its data-bound-to attributes */
   ui.displayWindow = function (el) {
     el = $(el);
     assert(el.length);
@@ -66,6 +70,8 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     session.emit("display-window", el.attr("id"), el);
   };
 
+  /* Moves a window to be attached to data-bound-to, e.g., the button
+     that opened the window. Or you can provide an element that it should bind to. */
   ui.bindWindow = function (win, bound) {
     win = $(win);
     if (! bound) {
@@ -122,10 +128,10 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   };
 
+  /* Hides any windows given by the selector.  Any opener buttons are
+     animated for the closing. */
   ui.hideWindow = function (el) {
-    if (! el) {
-      el = ".towtruck-window, .towtruck-popup";
-    }
+    el = el || ".towtruck-window, .towtruck-popup";
     el = $(el).filter(":visible");
     el.hide();
     if (el.attr("data-bound-to")) {
@@ -148,54 +154,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   }
 
-  /* Finds any links in the text of an element (or its children) and turns them
-     into anchors (with target=_blank) */
-  function linkify(el) {
-    if (el.jquery) {
-      el = el[0];
-    }
-    el.normalize();
-    function linkifyNode(node) {
-      var _len = node.childNodes.length;
-      for (var i=0; i<_len; i++) {
-        if (node.childNodes[i].nodeType == document.ELEMENT_NODE) {
-          linkifyNode(node.childNodes[i]);
-        }
-      }
-      var texts = [];
-      for (i=0; i<_len; i++) {
-        if (node.childNodes[i].nodeType == document.TEXT_NODE) {
-          texts.push(node.childNodes[i]);
-        }
-      }
-      texts.forEach(function (item) {
-        if (item.nodeType == document.ELEMENT_NODE) {
-          linkifyNode(item);
-        } else if (item.nodeType == document.TEXT_NODE) {
-          while (true) {
-            var text = item.nodeValue;
-            var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^<>()\[\]]*/i;
-            var match = regex.exec(text);
-            if (! match) {
-              break;
-            }
-            var leadingNode = document.createTextNode(text.substr(0, match.index));
-            node.replaceChild(leadingNode, item);
-            var anchor = document.createElement("a");
-            anchor.setAttribute("target", "_blank");
-            anchor.href = match[0];
-            anchor.appendChild(document.createTextNode(match[0]));
-            node.insertBefore(anchor, leadingNode.nextSibling);
-            var trailing = document.createTextNode(text.substr(match.index + match[0].length));
-            node.insertBefore(trailing, anchor.nextSibling);
-            item = trailing;
-          }
-        }
-      });
-    }
-    linkifyNode(el);
-  }
-
   ui.container = null;
 
   // This is called before activateUI; it doesn't bind anything, but does display
@@ -208,7 +166,6 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     var container = ui.container = $(templates["interface"]);
     assert(container.length);
     $("body").append(container);
-    var seenDialog = session.settings.get("seenIntroDialog");
     if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
@@ -267,6 +224,11 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   };
 
+  // After prepareUI, this actually makes the interface live.  We have
+  // to do this later because we call prepareUI when many components
+  // aren't initialized, so we don't even want the user to be able to
+  // interact with the interface.  But activateUI is called once
+  // everything is loaded and ready for interaction.
   ui.activateUI = function () {
     if (! ui.container) {
       ui.prepareUI();
@@ -284,17 +246,17 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
 
     // Setting your name:
     var name = container.find("#towtruck-self-name");
-    name.val(session.settings.get("nickname"));
+    name.val(peers.Self.name);
     name.on("keyup", function () {
       var val = name.val();
-      session.settings.set("nickname", val);
+      peers.Self.update({name: val});
       ui.displayToggle("#towtruck-self-name-saving");
       // Fake timed saving, to make it look like we're doing work:
       // can we have the checkmark go to a greencheckmark once the name is confirmed?
       setTimeout(function () {
         ui.displayToggle("#towtruck-self-name-saved");
       }, 300);
-      session.send({type: "nickname-update", nickname: val || session.settings.get("defaultNickname")});
+      session.send({type: "peer-update", name: val || peers.Self.defaultName});
     });
 
     // The chat input element:
@@ -305,7 +267,7 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
         if (! val) {
           return false;
         }
-        chat.Chat.submit(val);
+        chat.submit(val);
         input.val("");
       }
       if (event.which == 27) { // Escape
@@ -419,9 +381,9 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       ui.displayToggle("#towtruck-no-avatar-edit");
     });
 
-    $("#towtruck-self-color").css({backgroundColor: session.settings.get("color")});
+    $("#towtruck-self-color").css({backgroundColor: peers.Self.color});
 
-    var avatar = session.settings.get("avatar");
+    var avatar = peers.Self.avatar;
     if (avatar) {
       $("#towtruck-self-avatar").attr("src", avatar);
     }
@@ -487,127 +449,96 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     }
   });
 
-  // FIXME: this should be a series of methods, not one big method with
-  // different msg.type
-  ui.addChat = function (msg) {
-    var nick, el;
-    var container = ui.container.find("#towtruck-chat-messages");
-    var popup = ui.container.find("#towtruck-chat-notifier");
-    assert(container.length);
-    function addEl(el, id, self) {
-      if (id) {
-        el.attr("id", "towtruck-chat-" + util.safeClassName(id));
-      }
-      container.append(el);
-      scrollChat();
-      if ((! self) && ! container.is(":visible")) {
-        var section = popup.find("#towtruck-chat-notifier-message");
-        section.empty();
-        section.append(el.clone());
-        ui.displayWindow(popup);
-      }
-    }
-    if (msg.type == "text") {
-      // FIXME: this should not show the name if the last chat was fairly
-      // recent
-      assert(msg.clientId);
-      assert(typeof msg.text == "string");
-      el = ui.cloneTemplate("chat-message");
-      ui.setPerson(el, msg.clientId);
-      el.find(".towtruck-chat-content").text(msg.text);
+  ui.chat = {
+    text: function (attrs) {
+      assert(typeof attrs.text == "string");
+      assert(attrs.peer);
+      assert(attrs.messageId);
+      var date = attrs.date || Date.now();
+      var el = ui.cloneTemplate("chat-message");
+      attrs.peer.view.setElement(el);
+      el.find(".towtruck-chat-content").text(attrs.text);
       linkify(el.find(".towtruck-chat-content"));
-      el.attr("data-person", msg.clientId)
-        .attr("data-date", msg.date || Date.now());
-      setDate(el, msg.date || Date.now());
-      assert(msg.messageId);
-      addEl(el, msg.messageId, msg.clientId == session.clientId || msg.catchup);
-    } else if (msg.type == "left-session") {
-      nick = session.peers.get(msg.clientId).nickname;
-      el = ui.cloneTemplate("chat-left");
-      ui.setPerson(el, msg.clientId);
-      setDate(el, msg.date || Date.now());
-      addEl(el, msg.messageId, false);
-    } else if (msg.type == "system") {
-      assert(! msg.clientId);
-      assert(typeof msg.text == "string");
-      el = ui.cloneTemplate("chat-system");
-      el.find(".towtruck-chat-content").text(msg.text);
-      setDate(el, msg.date || Date.now());
-      addEl(el, msg.clientId, false);
-    } else if (msg.type == "clear") {
+      el.attr("data-person", attrs.peer.id)
+        .attr("data-date", date);
+      setDate(el, date);
+      ui.chat.add(el, attrs.messageId, attrs.notify);
+    },
+
+    leftSession: function (attrs) {
+      assert(attrs.peer);
+      var date = attrs.date || Date.now();
+      var el = ui.cloneTemplate("chat-left");
+      attrs.peer.view.setElement(el);
+      setDate(el, date);
+      ui.chat.add(el, attrs.messageId, true);
+    },
+
+    system: function (attrs) {
+      assert(! attrs.peer);
+      assert(typeof attrs.text == "string");
+      var date = attrs.date || Date.now();
+      var el = ui.cloneTemplate("chat-system");
+      el.find(".towtruck-chat-content").text(attrs.text);
+      setDate(el, date);
+      ui.chat.add(el, undefined, true);
+    },
+
+    clear: function () {
+      var container = ui.container.find("#towtruck-chat-messages");
       container.empty();
-    } else if (msg.type == "url-change") {
-      assert(msg.clientId);
-      assert(typeof msg.url == "string");
-      el = ui.cloneTemplate("url-change");
-      ui.setPerson(el, msg.clientId);
-      setDate(el, msg.date || Date.now());
+    },
+
+    urlChange: function (attrs) {
+      assert(attrs.peer);
+      assert(typeof attrs.url == "string");
+      var date = attrs.date || Date.now();
+      var el = ui.cloneTemplate("url-change");
+      attrs.peer.view.setElement(el);
+      setDate(el, date);
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
       // http://example.com/foobar, and someone goes to http://example.com/baz then
       // show only /baz
       // FIXME: truncate long titles
-      if (msg.title) {
-        title = msg.title + " (" + msg.url + ")";
+      if (attrs.title) {
+        title = attrs.title + " (" + attrs.url + ")";
       } else {
-        title = msg.url;
+        title = attrs.url;
       }
-      el.find(".towtruck-url").attr("href", msg.url).text(title);
-      addEl(el, msg.clientId, msg.clientId == session.clientId);
-    } else {
-      console.warn("Did not understand message type:", msg.type, "in message", msg);
-    }
-  };
+      el.find(".towtruck-url").attr("href", attrs.url).text(title);
+      ui.chat.add(el, attrs.peer.className("url-change-"), true);
+    },
 
-  function scrollChat() {
-    var container = ui.container.find("#towtruck-chat-messages");
-    var content = container.find(".towtruck-chat-content:last")[0];
-    if (! content) {
-      content = container.find(".towtruck-chat-message:last")[0];
+    add: function (el, id, notify) {
+      if (id) {
+        el.attr("id", "towtruck-chat-" + util.safeClassName(id));
+      }
+      var container = ui.container.find("#towtruck-chat-messages");
+      assert(container.length);
+      var popup = ui.container.find("#towtruck-chat-notifier");
+      container.append(el);
+      ui.chat.scroll();
+      if (notify && ! container.is(":visible")) {
+        var section = popup.find("#towtruck-chat-notifier-message");
+        section.empty();
+        section.append(el.clone());
+        ui.displayWindow(popup);
+      }
+    },
+
+    scroll: function () {
+      var container = ui.container.find("#towtruck-chat-messages")[0];
+      container.scrollTop = container.scrollHeight;
     }
-    if (content) {
-      content.scrollIntoView();
-    }
-  }
+
+  };
 
   session.on("display-window", function (id, win) {
     if (id == "towtruck-chat") {
-      scrollChat();
+      ui.chat.scroll();
     }
   });
-
-  // FIXME: this is crude:
-  ui.isChatEmpty = function () {
-    var container = ui.container.find(".towtruck-chat-container");
-    // We find if there's any chat messages with people who aren't ourself:
-    return ! container.find(
-      ".towtruck-chat-real .towtruck-person:not(.towtruck-person-" +
-      util.safeClassName(session.clientId) + ")").length;
-  };
-
-  /* Given a template with a .towtruck-person element, puts the appropriate
-     name into the element and sets the class name so it can be updated with
-     updatePerson() later */
-  ui.setPerson = function (templateElement, clientId) {
-    var nick, avatar;
-    if (clientId == session.clientId) {
-      nick = "me";
-      avatar = session.settings.get("avatar");
-    } else {
-      var peer = session.peers.get(clientId);
-      nick = peer.nickname;
-      avatar = peer.avatar;
-    }
-    templateElement.find(".towtruck-person")
-      .text(nick)
-      .addClass("towtruck-person-" + util.safeClassName(clientId));
-    var avatarEl = templateElement.find(".towtruck-avatar img, img.towtruck-avatar");
-    if (avatar) {
-      avatarEl.attr("src", avatar);
-      avatarEl.attr("title", nick);
-    }
-    avatarEl.addClass("towtruck-avatar-" + util.safeClassName(clientId));
-  };
 
   function setDate(templateElement, date) {
     if (typeof date == "number") {
@@ -629,135 +560,137 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
     templateElement.find(".towtruck-ampm").text(ampm);
   }
 
-  /* Called when a person's nickname is updated */
-  ui.updatePerson = function (clientId) {
-    var nick, avatar;
-    if (clientId == session.clientId) {
-      nick = "me";
-      avatar = session.settings.get("avatar");
-    } else {
-      var peer = session.peers.get(clientId);
-      nick = peer.nickname;
-      avatar = peer.avatar;
-    }
-    ui.container.find(".towtruck-person-" + util.safeClassName(clientId)).text(nick);
-    var avatarEl = ui.container.find(".towtruck-avatar-" + util.safeClassName(clientId));
-    if (avatar) {
-      avatarEl.attr("src", avatar);
-    }
-    if (nick) {
-      avatarEl.attr("title", nick);
-    }
-  };
+  /* This class is bound to peers.Peer instances as peer.view.
+     The .update() method is regularly called by peer objects when info changes. */
+  ui.PeerView = util.Class({
 
-  session.peers.on("add", function (peer) {
-    var newPeer = ui.Peer(peer.clientId);
-  });
-
-  session.settings.on("change", function (name, oldValue, newValue) {
-    if (name == "color") {
-      $("#towtruck-self-color").css({backgroundColor: newValue});
-    } else if (name == "avatar") {
-      // FIXME: should fixup any other places where the avatar is set:
-      $("#towtruck-self-avatar").attr("src", newValue);
-    }
-    ui.updatePerson(session.clientId);
-  });
-
-  /****************************************
-   * Dock peers
-   */
-
-  ui.Peer = util.Class({
-
-    constructor: function (clientId) {
-      this.clientId = clientId;
-      this.element = ui.cloneTemplate("dock-person");
-      ui.setPerson(this.element, this.clientId);
-      ui.container.find("#towtruck-dock-participants").append(this.element);
-      this.click = this.click.bind(this);
-      this.element.click(this.click);
-      var iface = $("#towtruck-interface");
-      iface.css({
-        height: iface.height() + BUTTON_HEIGHT + "px"
-      });
-      ui.Peer._peers[this.clientId] = this;
+    constructor: function (peer) {
+      assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
+      this.peer = peer;
+      this.urlNotification = null;
+      this.dockClick = this.dockClick.bind(this);
     },
 
-    destroy: function () {
-      this.element.remove();
-      if (this._urlChangeElement) {
-        this._urlChangeElement.remove();
+    /* Takes an element and sets any person-related attributes on the element
+       Different from updates, which use the class names we set here: */
+    setElement: function (el) {
+      var nick = this.peer.name;
+      var avatar = this.peer.avatar;
+      if (this.peer.isSelf) {
+        nick = "me";
       }
-      delete ui.Peer._peers[this.clientId];
+      console.trace();
+      el.find(".towtruck-person")
+        .text(nick)
+        .addClass(this.peer.className("towtruck-person-"));
+      var avatarEl = el.find(".towtruck-avatar img, img.towtruck-avatar");
+      if (avatar) {
+        avatarEl.attr("src", avatar);
+        avatarEl.attr("title", nick);
+      }
+      avatarEl.addClass(this.peer.className("towtuck-avatar-"));
     },
 
-    urlChangeElement: function () {
-      if (! this._urlChangeElement) {
-        var c = this._urlChangeElement = ui.cloneTemplate("url-change-popup");
-        ui.setPerson(c, this.clientId);
-        c.find(".towtruck-follow").click(function () {
-          var url = c.find("a.towtruck-url").attr("href");
-          location.href = url;
+    update: function () {
+      if (! this.peer.isSelf) {
+        if (this.peer.status == "live") {
+          this.dock();
+        } else {
+          this.undock();
+        }
+      }
+      if (! this.peer.isSelf) {
+        var curUrl = location.href.replace(/\#.*$/, "");
+        if (this.peer.url != curUrl) {
+          if (this.urlNotification) {
+            this.updateUrl();
+          } else {
+            this.createUrl();
+          }
+        } else if (this.urlNotification) {
+          this.removeUrl();
+        }
+      }
+      var name;
+      if (this.peer.isSelf) {
+        name = "me";
+      } else {
+        name = this.name;
+      }
+      ui.container.find("." + this.peer.className("towtruck-person-")).text(name);
+      var avatarEl = ui.container.find("." + this.peer.className("towtruck-avatar-"));
+      if (this.peer.avatar) {
+        avatarEl.attr("src", this.peer.avatar);
+      }
+      if (name) {
+        avatarEl.attr("title", name);
+      }
+      if (this.peer.isSelf) {
+        // FIXME: these could also have consistent/reliable class names:
+        $("#towtruck-self-color").css({backgroundColor: this.peer.color});
+        $("#towtruck-self-avatar").attr("src", this.peer.avatar);
+      }
+    },
+
+    createUrl: function () {
+      this.urlNotification = ui.cloneTemplate("url-change-popup");
+      this.setElement(this.urlNotification);
+      this.urlNotification.find(".towtruck-follow").click((function () {
+        var url = this.urlNotification.find("a.towtruck-url").attr("href");
+        location.href = url;
+      }).bind(this));
+      this.urlNotification.find(".towtruck-ignore .towtruck-close").click((function () {
+        this.urlNotification.remove();
+        return false;
+      }).bind(this));
+      this.urlNotification.find(".towtruck-nudge").click((function () {
+        session.send({
+          type: "url-change-nudge",
+          url: location.href,
+          to: this.peer.id
         });
-        c.find(".towtruck-ignore, .towtruck-close").click((function () {
-          c.hide();
-          return false;
-        }).bind(this));
-        c.find(".towtruck-nudge").click((function () {
-          // FIXME: the .send() is here, but the receive is in cobrowse.js,
-          // kind of messy
-          session.send({
-            type: "url-change-nudge",
-            url: location.href,
-            to: this.clientId
-          });
-        }).bind(this));
-        ui.container.append(c);
-        ui.bindWindow(c, this.element);
-      }
-      return this._urlChangeElement;
+      }).bind(this));
+      ui.container.append(this.urlNotification);
+      ui.bindWindow(this.urlNotification, this.dockElement);
+      this.updateUrl();
     },
 
-    updateUrl: function (url, title, force) {
-      var c = this.urlChangeElement();
-      var fullTitle = title;
-      if (title) {
+    updateUrl: function () {
+      assert(this.urlNotification);
+      var fullTitle = this.peer.title;
+      if (this.peer.title) {
         fullTitle += " (";
       }
-      fullTitle += util.truncateCommonDomain(url, location.href);
-      if (title) {
+      fullTitle += util.truncateCommonDomain(this.peer.url, location.href);
+      if (this.peer.title) {
         fullTitle += ")";
       }
-      c.find("a.towtruck-url").attr("href", url).text(fullTitle);
-      if (force) {
-        c.show();
-      }
+      this.urlNotification.find("a.towtruck-url").attr("href", this.peer.url).text(fullTitle);
+      // FIXME: we've lost the notion of hiding the notification
     },
 
     removeUrl: function () {
-      if (this._urlChangeElement) {
-        this._urlChangeElement.remove();
-        this._urlChangeElement = null;
-      }
+      this.urlNotification.remove();
+      this.urlNotification = null;
     },
 
     urlNudge: function () {
-      if (this._urlChangeElement) {
-        this._urlChangeElement.show();
-        this._urlChangeElement.find(".towtruck-follow").addClass("towtruck-nudge");
+      // Called when this peer has nudged us to follow them
+      if (this.urlNotification) {
+        this.urlNotification.show();
+        this.urlNotification.find(".towtruck-follow").addClass("towtruck-nudge");
       }
     },
 
-    notifyNewUser: function () {
+    notifyJoined: function () {
       ui.hideWindow();
       var el = ui.cloneTemplate("new-user");
-      ui.setPerson(el, this.clientId);
+      this.setElement(el);
       el.find(".towtruck-dismiss").click(function () {
         ui.hideWindow(el);
       });
       ui.container.append(el);
-      ui.bindWindow(el, this.element);
+      ui.bindWindow(el, this.dockElement);
       setTimeout(function () {
         // FIXME: also set opacity of towtruck-window-pointer-left/right?
         el.css({
@@ -772,45 +705,50 @@ define(["require", "jquery", "util", "session", "templates", "element-finder", "
       }, NEW_USER_FADE_TIMEOUT);
     },
 
-    click: function () {
-      if (this._urlChangeElement) {
-        this._urlChangeElement.show();
+    dock: function () {
+      if (this.dockElement) {
         return;
       }
-      var status = session.peers.getStatus(this.clientId);
-      var height = 0;
-      if (! status.scrollPosition) {
-        console.warn("No status.scrollPosition for peer", this.clientId);
-      } else {
-        assert(status.url == location.href.replace(/\#.*$/, ""));
-        height = elementFinder.pixelForPosition(status.scrollPosition);
+      this.dockElement = ui.cloneTemplate("dock-person");
+      this.setElement(this.dockElement);
+      ui.container.find("#towtruck-dock-participants").append(this.dockElement);
+      this.dockElement.click(this.click);
+      var iface = $("#towtruck-interface");
+      iface.css({
+        height: iface.height() + BUTTON_HEIGHT + "px"
+      });
+    },
+
+    undock: function () {
+      if (! this.dockElement) {
+        return;
       }
-      // FIXME: this should animate the scrolling
-      $window.scrollTop(height);
-    }
+      this.dockElement.remove();
+      this.dockElement = null;
+      var iface = $("#towtruck-interface");
+      iface.css({
+        height: (iface.height() - BUTTON_HEIGHT) + "px"
+      });
+    },
 
+    dockClick: function () {
+      // FIXME: scroll to person
+    },
+
+    destroy: function () {
+      if (this.urlNotification) {
+        this.removeUrl();
+      }
+    }
   });
 
-  session.hub.on("hello", function (msg) {
-    if (msg.starting) {
-      var uiPeer = ui.Peer.get(msg.clientId);
-      uiPeer.notifyNewUser();
+  session.hub.on("url-change-nudge", function (msg) {
+    if (msg.to && msg.to != session.clientId) {
+      // Not directed to us
+      return;
     }
+    msg.peer.urlNudge();
   });
-
-  ui.Peer._peers = {};
-  ui.Peer.get = function (id) {
-    var peer = ui.Peer._peers[id];
-    assert(peer);
-    return peer;
-  };
-
-  ui.urlNudge = function (clientId) {
-    var c = "towtruck-url-change-" + util.safeClassName(clientId);
-    var changer = $("." + c);
-    changer.show();
-    changer.find(".towtruck-follow").addClass("towtruck-nudge");
-  };
 
   return ui;
 

@@ -12,7 +12,6 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   $("head").append(link);
 
   walkthrough.stop = function () {
-    console.log("hey, stopped");
     guiders.hideAll();
     if (onHideAll) {
       onHideAll();

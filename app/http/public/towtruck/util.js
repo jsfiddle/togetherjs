@@ -6,6 +6,7 @@ define(["jquery"], function ($) {
   var util = {};
 
   util.Deferred = $.Deferred;
+  TowTruck.$ = $;
 
   /* A simple class pattern, use like:
 
@@ -49,6 +50,15 @@ define(["jquery"], function ($) {
   /* Extends obj with other, or copies obj if no other is given. */
   util.extend = TowTruck._extend;
 
+  util.forEachAttr = function (obj, callback, context) {
+    context = context || obj;
+    for (var a in obj) {
+      if (obj.hasOwnProperty(a)) {
+        callback.call(context, obj[a], a);
+      }
+    }
+  };
+
   /* Trim whitespace from a string */
   util.trim = function trim(s) {
     return s.replace(/^\s+/, "").replace(/\s+$/, "");
@@ -59,15 +69,14 @@ define(["jquery"], function ($) {
     return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
   };
 
-  util.AssertionError = util.Class({
-    constructor: function (msg) {
-      this.message = msg;
-    },
-
-    toString: function () {
-      return "Assertion error: " + (this.message || "?");
+  util.AssertionError = function (message) {
+    if (! this instanceof util.AssertionError) {
+      return new util.AssertionError(message);
     }
-  });
+    this.message = message;
+    this.name = "AssertionError";
+  };
+  util.AssertionError.prototype = Error.prototype;
 
   util.assert = function (cond) {
     if (! cond) {
@@ -89,6 +98,10 @@ define(["jquery"], function ($) {
       s += letters.charAt(Math.floor(Math.random() * letters.length));
     }
     return s;
+  };
+
+  util.pickRandom = function (array) {
+    return array[Math.floor(Math.random() * array.length)];
   };
 
   util.mixinEvents = TowTruck._mixinEvents;
@@ -130,6 +143,8 @@ define(["jquery"], function ($) {
   };
 
   util.resolver = function (deferred, func) {
+    util.assert(deferred.then, "Bad deferred:", deferred);
+    util.assert(typeof func == "function", "Not a function:", func);
     return function () {
       var result;
       try {
@@ -138,7 +153,7 @@ define(["jquery"], function ($) {
         deferred.reject(e);
         throw e;
       }
-      if (result instanceof util.Deferred) {
+      if (result && result.then) {
         result.then(function () {
           deferred.resolveWith(this, arguments);
         }, function () {
@@ -152,6 +167,50 @@ define(["jquery"], function ($) {
       }
       return result;
     };
+  };
+
+  /* Resolves several promises (the promises are the arguments to the function)
+     or the first argument may be an array of promises.
+
+     Returns a promise that will resolve with the results of all the
+     promises.  If any promise fails then the returned promise fails.
+
+     FIXME: if a promise has more than one return value (like with
+     promise.resolve(a, b)) then the latter arguments will be lost.
+     */
+  util.resolveMany = function () {
+    var args;
+    if (arguments.length == 1 && Array.isArray(arguments[0])) {
+      args = arguments[0];
+    } else {
+      args = Array.prototype.slice.call(arguments);
+    }
+    return util.Deferred(function (def) {
+      var count = args.length;
+      var allResults = [];
+      var anyError = false;
+      args.forEach(function (arg, index) {
+        arg.then(function (result) {
+          allResults[index] = result;
+          count--;
+          check();
+        }, function (error) {
+          allResults[index] = error;
+          anyError = true;
+          count--;
+          check();
+        });
+      });
+      function check() {
+        if (! count) {
+          if (anyError) {
+            def.reject.apply(def, allResults);
+          } else {
+            def.resolve.apply(def, allResults);
+          }
+        }
+      }
+    });
   };
 
   return util;

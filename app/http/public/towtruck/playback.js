@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session"], function ($, util, session) {
+define(["jquery", "util", "session", "storage"], function ($, util, session, storage) {
   var playback = util.Module("playback");
   var assert = util.assert;
 
@@ -145,18 +145,18 @@ define(["jquery", "util", "session"], function ($, util, session) {
 
     save: function () {
       this.fromStorage = true;
-      session.setStorage("playback.logs", this.logs);
+      storage.set("playback.logs", this.logs);
       this.savePos();
     },
 
     savePos: function () {
-      session.setStorage("playback.pos", this.pos);
+      storage.set("playback.pos", this.pos);
     },
 
     unload: function () {
       if (this.fromStorage) {
-        session.setStorage("playback.logs");
-        session.setStorage("playback.pos");
+        storage.set("playback.logs", undefined);
+        storage.set("playback.pos", undefined);
       }
       // FIXME: should do a bye message here
     }
@@ -164,14 +164,17 @@ define(["jquery", "util", "session"], function ($, util, session) {
   });
 
   playback.getRunningLogs = function () {
-    var value = session.getStorage("playback.logs");
-    if (! value) {
-      return null;
-    }
-    var logs = Logs(value, true);
-    var pos = session.getStorage("playback.pos") || 0;
-    logs.pos = pos;
-    return logs;
+    return storage.get("playback.logs").then(function (value) {
+      if (! value) {
+        return null;
+      }
+      var logs = Logs(value, true);
+      return storage.get("playback.pos").then(function (pos) {
+        pos = pos || 0;
+        logs.pos = pos;
+        return logs;
+      });
+    });
   };
 
   return playback;

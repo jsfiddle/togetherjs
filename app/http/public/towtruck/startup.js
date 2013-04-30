@@ -13,7 +13,7 @@
    When everything is done it fires session.emit("startup-ready")
 
 */
-define(["util", "require", "jquery", "modal"], function (util, require, $, modal) {
+define(["util", "require", "jquery", "modal", "storage"], function (util, require, $, modal, storage) {
   var assert = util.assert;
   var startup = util.Module("startup");
   // Avoid circular import:
@@ -103,14 +103,16 @@ define(["util", "require", "jquery", "modal"], function (util, require, $, modal
     },
 
     walkthrough: function (next) {
-      if (session.settings.get("seenIntroDialog")) {
-        next();
-        return;
-      }
-      require(["walkthrough"], function (walkthrough) {
-        walkthrough.start(function () {
-          session.settings.set("seenIntroDialog", true);
+      storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
+        if (seenIntroDialog) {
           next();
+          return;
+        }
+        require(["walkthrough"], function (walkthrough) {
+          walkthrough.start(function () {
+            storage.settings.set("seenIntroDialog", true);
+            next();
+          });
         });
       });
     },
