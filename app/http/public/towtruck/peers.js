@@ -253,13 +253,61 @@ define(["util", "session", "storage", "require"], function (util, session, stora
             });
             peers._SelfLoaded.resolve();
           }).bind(this)); // FIXME: ignoring error
+      },
+
+      _loadFromApp: function () {
+        // FIXME: I wonder if these should be optionally functions?
+        // We could test typeof==function to distinguish between a getter and a concrete value
+        var getUserName = TowTruck.getConfig("getUserName");
+        var getUserColor = TowTruck.getConfig("getUserColor");
+        var getUserAvatar = TowTruck.getConfig("getUserAvatar");
+        var name, color, avatar;
+        if (getUserName) {
+          name = getUserName();
+          if (name && typeof name != "string") {
+            // FIXME: test for HTML safe?  Not that we require it, but
+            // <>'s are probably a sign something is wrong.
+            console.warn("Error in getUserName(): should return a string (got", name, ")");
+            name = null;
+          }
+        }
+        if (getUserColor) {
+          color = getUserColor();
+          if (color && typeof color != "string") {
+            // FIXME: would be nice to test for color-ness here.
+            console.warn("Error in getUserColor(): should return a string (got", color, ")");
+            color = null;
+          }
+        }
+        if (getUserAvatar) {
+          avatar = getUserAvatar();
+          if (avatar && typeof avatar != "string") {
+            console.warn("Error in getUserAvatar(): should return a string (got", avatar, ")");
+            avatar = null;
+          }
+        }
+        if (name || color || avatar) {
+          console.log("updating", name, color, avatar);
+          this.update({
+            name: name,
+            color: color,
+            avatar: avatar
+          });
+        }
       }
     });
 
     peers.Self.view = ui.PeerView(peers.Self);
     storage.tab.get("peerCache").then(deserialize);
     peers.Self._loadFromSettings();
+    peers.Self._loadFromApp();
 
+  });
+
+  session.on("refresh-user-data", function () {
+    if (peers.Self) {
+      peers.Self._loadFromApp();
+    }
   });
 
   peers._SelfLoaded = util.Deferred();

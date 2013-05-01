@@ -1,22 +1,6 @@
 <% layout('../../layout.ejs') -%>
 <% block("enableExample", true) %>
 <% block("title", "Mozilla Labs : TowTruck form example") %>
-<div class="containerbg">
-  <div class="container examples">
-      <div class="span3">
-         <div class="well sidebar-nav">
-          <ul class="nav nav-list">
-            <button onclick="TowTruck(this); return false" class="btn btn-large btn-primary" id="btn-tryitout">Start TowTruck</button>
-            <li class="nav-header">Test TowTruck on these pages:</li>
-            <li><a href="/example">Examples</a></li>
-            <li><a href="./code">Code editor</a></li>
-            <li><a href="./longpage">A long page</a></li>
-            <li><a href="./form">A form</a></li>
-          </ul>
-        </div><!--/.well -->
-      </div>
-
-      <div class="span8">
 
         <h1>A form</h1>
 
@@ -76,8 +60,6 @@
 
 
         </div>
-      </div> <!-- /container -->
-    </div>
 
     <script>
       $("#about-toggle").click(function () {

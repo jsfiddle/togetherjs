@@ -3,23 +3,6 @@
 <% block("enableExample", true) %>
 <% block("styles", "<style>pre {/* Override bootrap pre padding */ padding: 0;}  #ace-editor {margin: 0; top: 0; position: absolute; width: 80%; height: 25em; right: 0;}  #ace-container {height: 25em;}  #codemirror-container {border: 1px solid #000;}</style>") %>
 
-<div class="containerbg">
-  <div class="container examples">
-      <div class="span3">
-         <div class="well sidebar-nav">
-          <ul class="nav nav-list">
-            <button onclick="TowTruck(this); return false" class="btn btn-large btn-primary" id="btn-tryitout">Start TowTruck</button>
-            <li class="nav-header">Test TowTruck on these pages:</li>
-            <li><a href="/example">Examples</a></li>
-            <li><a href="./code">Code editor</a></li>
-            <li><a href="./longpage">A long page</a></li>
-            <li><a href="./form">A form</a></li>
-          </ul>
-        </div><!--/.well -->
-      </div>
-
-      <div class="span8">
-
           <h1>Code editor</h1>
 
           <p>TowTruck requires specific support for editors.  There is active support for
@@ -51,8 +34,6 @@
           <p>And that's all folks!</p>
         </div>
 
-      </div> <!-- /container -->
-</div>
    <!-- ACE editor: -->
    <script src="//d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js"></script>
    <script>

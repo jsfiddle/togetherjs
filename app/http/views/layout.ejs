@@ -3,6 +3,7 @@
 
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <title><%= blocks.title || "Mozilla Labs : TowTruck" %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A service for your website that makes it surprisingly easy to collaborate in real-time.">
@@ -63,10 +64,10 @@
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
-                
+
                 <!-- add logo <li <% if (blocks.enableExample) { %>class="active"<% } %>><a href="/example">Examples</a></li> -->
-                
-                
+
+
                 <li <% if (blocks.enableHome) { %>class="active"<% } %>><a href="/">Home</a></li>
                 <li <% if (blocks.enableExample) { %>class="active"<% } %>><a href="/example">Examples</a></li>
                 <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
@@ -84,7 +85,32 @@
       </div>
     </div>
 
+<% if (blocks.enableExample) { %>
+<div class="containerbg">
+  <div class="container examples">
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <button onclick="TowTruck(this); return false" class="btn btn-large btn-primary" id="btn-tryitout">Start TowTruck</button>
+        <ul class="nav nav-list">
+          <li class="nav-header">Test TowTruck on these pages:</li>
+          <li><a href="/example">Examples</a></li>
+          <li><a href="./code">Code editor</a></li>
+          <li><a href="./longpage">A long page</a></li>
+          <li><a href="./form">A form</a></li>
+          <li><a href="./app-integration">Identity integration</a></li>
+        </ul>
+      </div><!--/.well -->
+    </div><!--/.span3 -->
+    <div class="span8">
+<% } %>
+
     <%- body %>
+
+<% if (blocks.enableExample) { %>
+    </div><!--/.span8-->
+  </div><!--/.container.examples -->
+</div><!--/.containerbg -->
+<% } %>
 
     <footer>
       <div class="container">

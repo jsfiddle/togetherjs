@@ -171,6 +171,7 @@
     // for session.start() to be run)
     _launch: false
   };
+  TowTruck.running = false;
 
   TowTruck.requireConfig = {
     context: "towtruck",
@@ -293,6 +294,12 @@
     analyticsCode: "UA-35433268-28",
     // The base URL of the hub
     hubBase: defaultHubBase,
+    // A function that will return the name of the user:
+    getUserName: null,
+    // A function that will return the color of the user:
+    getUserColor: null,
+    // A function that will return the avatar of the user:
+    getUserAvatar: null,
     // Any events to bind to
     on: {}
   };
@@ -343,12 +350,20 @@
   };
 
   TowTruck.reinitialize = function () {
-    if (typeof TowTruck.require == "function") {
+    if (TowTruck.running && typeof TowTruck.require == "function") {
       TowTruck.require(["session"], function (session) {
         session.emit("reinitialize");
       });
     }
     // If it's not set, TowTruck has not been loaded, and reinitialization is not needed
+  };
+
+  TowTruck.refreshUserData = function () {
+    if (TowTruck.running && typeof TowTruck.require ==  "function") {
+      TowTruck.require(["session"], function (session) {
+        session.emit("refresh-user-data");
+      });
+    }
   };
 
   // This should contain the output of "git describe --always --dirty"

@@ -627,6 +627,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       }
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:
+        $("#towtruck-self-name").val(this.peer.name);
         $("#towtruck-self-color").css({backgroundColor: this.peer.color});
         $("#towtruck-self-avatar").attr("src", this.peer.avatar);
       }
