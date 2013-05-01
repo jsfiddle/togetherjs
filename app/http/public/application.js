@@ -48,7 +48,7 @@ $(function(){
   });
 
   /* Vimeo player on index.ejs */
-  if ($('#modal_vimeo_iframe')){
+  if ($('#modal_vimeo_iframe').length){
     var player = $f($('#modal_vimeo_iframe')[0]);
 
     var playOnLoad = false;
