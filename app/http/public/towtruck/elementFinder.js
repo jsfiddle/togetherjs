@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["util", "jquery"], function (util, $) {
-  var elementFinder = util.Module("element-finder");
+  var elementFinder = util.Module("elementFinder");
   var assert = util.assert;
 
   elementFinder.ignoreElement = function ignoreElement(el) {

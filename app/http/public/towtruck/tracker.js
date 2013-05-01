@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "element-finder"], function ($, util, session, elementFinder) {
+define(["jquery", "util", "session", "elementFinder"], function ($, util, session, elementFinder) {
 
   var tracker = util.Module("tracker");
   var assert = util.assert;

@@ -4,7 +4,7 @@
 
 // Cursor viewing support
 
-define(["jquery", "ui", "util", "session", "element-finder", "tinycolor", "eventMaker", "peers"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers) {
+define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers) {
   var assert = util.assert;
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
