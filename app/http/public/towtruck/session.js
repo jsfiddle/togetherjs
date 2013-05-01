@@ -31,8 +31,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   // Setting, essentially global:
   session.AVATAR_SIZE = 90;
-  // True while TowTruck is running:
-  session.running = false;
 
   var MAX_SESSION_AGE = 30*24*60*60*1000; // 30 days
 
@@ -263,12 +261,12 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   }
 
   session.start = function () {
-    session.running = true;
     initStartTarget();
     initIdentityId().then(function () {
       initShareId().then(function () {
         openChannel();
         require(["ui"], function (ui) {
+          TowTruck.running = true;
           ui.prepareUI();
           require(features, function () {
             $(function () {
@@ -297,7 +295,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   };
 
   session.close = function () {
-    session.running = false;
+    TowTruck.running = false;
     session.send({type: "bye"});
     session.emit("close");
     var name = window.name;

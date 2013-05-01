@@ -324,7 +324,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
     setTimeout(function () {
-      if (! session.running) {
+      if (! TowTruck.running) {
         // This can end up running right after TowTruck has been closed, often
         // because TowTruck was closed with a click...
         return;
