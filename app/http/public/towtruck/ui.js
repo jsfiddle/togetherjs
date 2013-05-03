@@ -579,7 +579,6 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       if (this.peer.isSelf) {
         nick = "me";
       }
-      console.trace();
       el.find(".towtruck-person")
         .text(nick)
         .addClass(this.peer.className("towtruck-person-"));
