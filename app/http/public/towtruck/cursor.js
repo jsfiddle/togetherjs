@@ -16,6 +16,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     if (msg.sameUrl) {
       Cursor.getClient(msg.clientId).updatePosition(msg);
     } else {
+      // FIXME: This should be caught even before the cursor-update message,
+      // when the peer goes to another URL
       Cursor.getClient(msg.clientId).hideOtherUrl(msg);
     }
   });
@@ -54,6 +56,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         backgroundColor: peer.color,
         color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
       });
+      // FIXME: should I just remove the element?
+      if (peer.status != "live") {
+        this.element.hide();
+      } else {
+        this.element.show();
+      }
     },
 
     setClass: function (name) {
@@ -164,7 +172,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     delete Cursor._cursors[clientId];
   };
 
-  peers.on("new-peer identity-updated", function (peer) {
+  peers.on("new-peer identity-updated status-updated", function (peer) {
     var c = Cursor.getClient(peer.id);
     c.updatePeer(peer);
   });
@@ -412,5 +420,9 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var cursor = Cursor.getClient(msg.clientId);
     cursor.setKeydown();
   });
+
+  if (TowTruckTestSpy) {
+    TowTruckTestSpy.Cursor = Cursor;
+  }
 
 });
