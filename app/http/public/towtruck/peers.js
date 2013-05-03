@@ -53,6 +53,10 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       }
     },
 
+    repr: function () {
+      return "Peer(" + JSON.stringify(this.id) + ")";
+    },
+
     serialize: function () {
       return {
         id: this.id,
@@ -141,6 +145,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         this.status = "bye";
         peers.emit("status-updated", this);
       }
+      this.view.update();
     }
 
   });
@@ -347,7 +352,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   };
 
   session.hub.on("bye", function (msg) {
-    var peer = peers.getPeer(msg.id);
+    var peer = peers.getPeer(msg.clientId);
     peer.bye();
   });
 
