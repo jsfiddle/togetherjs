@@ -5,9 +5,7 @@
 /*jshint scripturl:true */
 (function () {
 
-  var styles = [
-    "/towtruck.min.css"
-  ];
+  var styleSheet = "/towtruck.min.css";
 
   var baseUrl = "<%= process.env.PUBLIC_BASE_URL || '' %>";
   if (baseUrl && typeof baseUrl == "string" && baseUrl.indexOf("<" + "%") === 0) {
@@ -48,11 +46,15 @@
     console.warn("Could not determine TowTruck's baseUrl (looked for a <script> with towtruck.js)");
   }
 
-  function addStyle(url) {
-    var link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
-    link.href = baseUrl + url + "?bust=" + cacheBust;
-    document.head.appendChild(link);
+  function addStyle() {
+    var existing = document.getElementById("towtruck-stylesheet");
+    if (! existing) {
+      var link = document.createElement("link");
+      link.id = "towtruck-stylesheet";
+      link.setAttribute("rel", "stylesheet");
+      link.href = baseUrl + styleSheet + "?bust=" + cacheBust;
+      document.head.appendChild(link);
+    }
   }
 
   function addScript(url) {
@@ -111,11 +113,13 @@
       TowTruck.startup.reason = "started";
     }
 
+    // FIXME: maybe I should just test for TowTruck.require:
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
       if (session.running) {
         session.close();
       } else {
+        addStyle();
         session.start();
       }
       return;
@@ -124,7 +128,7 @@
     // start itself (i.e., put up a UI and try to activate)
     TowTruck.startup._launch = true;
 
-    styles.forEach(addStyle);
+    addStyle();
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
@@ -203,6 +207,10 @@
 
   TowTruck._mixinEvents = function (proto) {
     proto.on = function on(name, callback) {
+      if (typeof callback != "function") {
+        console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+        throw "Error: .once() called with non-callback";
+      }
       if (name.search(" ") != -1) {
         var names = name.split(/ +/g);
         names.forEach(function (n) {
@@ -231,14 +239,20 @@
       }
     };
     proto.once = function once(name, callback) {
-      if (! callback.once) {
-        callback.once = function onceCallback() {
+      if (typeof callback != "function") {
+        console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+        throw "Error: .once() called with non-callback";
+      }
+      var attr = "onceCallback_" + name;
+      // FIXME: maybe I should add the event name to the .once attribute:
+      if (! callback[attr]) {
+        callback[attr] = function onceCallback() {
           callback.apply(this, arguments);
           this.off(name, onceCallback);
-          delete callback.once;
+          delete callback[attr];
         };
       }
-      this.on(name, callback.once);
+      this.on(name, callback[attr]);
     };
     proto.off = proto.removeListener = function off(name, callback) {
       if (name.search(" ") != -1) {
@@ -264,10 +278,11 @@
         return;
       }
       var args = Array.prototype.slice.call(arguments, 1);
-      var l = this._listeners[name], _len = l.length;
-      for (var i=0; i<_len; i++) {
-        l[i].apply(this, args);
-      }
+      var l = this._listeners[name];
+      l.forEach(function (callback) {
+        console.warn("emitting", name, callback);
+        callback.apply(this, args);
+      }, this);
     };
     return proto;
   };
