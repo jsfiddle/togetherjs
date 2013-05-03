@@ -6,25 +6,13 @@
 
 // First we test that we can load modules
 
+getRequire("ui", "chat", "util", "session", "tracker", "jquery");
+// =>
+
 TowTruck();
 wait(500);
 
 // =>
-
-var ui, chat, util, session, tracker, $;
-TowTruck.require(
-  ["ui", "chat", "util", "session", "tracker", "jquery"],
-  Spy("loader", function (uiMod, chatMod, utilMod, sessionMod, trackerMod, $mod) {
-    ui = uiMod;
-    chat = chatMod;
-    util = utilMod;
-    session = sessionMod;
-    tracker = trackerMod;
-    $ = $mod;
-    print("loaded");
-  }, {writes: false, wait: true}));
-
-// => loaded
 
 var channel = session._getChannel();
 var oldSend = channel.send;

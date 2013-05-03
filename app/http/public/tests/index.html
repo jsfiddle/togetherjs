@@ -3,6 +3,11 @@
   <head>
     <title>TowTruck tests</title>
     <script src="./doctestjs/doctest.js"></script>
+    <script>
+      // This keeps TowTruck from auto-starting:
+      sessionStorage.removeItem("towtruck-session.status");
+      sessionStorage.removeItem("towtruck-session.peerCache");
+    </script>
     <script src="../towtruck.js"></script>
     <script src="../towtruck/libs/jquery-1.8.3.min.js"></script>
     <script src="testutils.js"></script>
@@ -31,6 +36,7 @@
         <li><a href="?name=exercise.js">exercise</a></li>
         <li><a href="?name=test_storage.js">test_storage</a></li>
         <li><a href="?name=test_resolves.js">test_resolves</a></li>
+        <li><a href="?name=functional.js">functional</a></li>
       </ol>
     </div>
 

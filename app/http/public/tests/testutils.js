@@ -1,3 +1,5 @@
+TowTruckTestSpy = {};
+
 /* Adds a global trequire which is the TowTruck-local require() function.
    May be async, so use like:
 
@@ -15,17 +17,18 @@ function getRequire() {
 
   function loadModules() {
     if (! modules.length) {
-      done = true;
       print("Require loaded");
+      done = true;
       return;
     }
     TowTruck.require(modules, function () {
       for (var i=0; i<modules.length; i++) {
         window[modules[i]] = arguments[i];
       }
-      done = true;
       var msg = ["Loaded modules:"].concat(modules);
       print.apply(null, msg);
+      TowTruck._loaded = true;
+      done = true;
     });
   }
 
@@ -40,7 +43,6 @@ function getRequire() {
   } else {
     window.require = TowTruck._extend(TowTruck.requireConfig);
     window.require.callback = function () {
-      done = true;
       window.trequire = TowTruck.require = require.config({context: "towtruck"});
       loadModules();
     };
@@ -52,3 +54,45 @@ function getRequire() {
   }
   wait(function () {return done;});
 }
+
+var IGNORE_MESSAGES = ["cursor-update", "scroll-update"];
+
+function viewSend() {
+  // Prints out all send() messages
+  console.log("called viewSend()");
+  var channel = TowTruck.require("session")._getChannel();
+  var oldSend = channel.send;
+  channel.send = function (msg) {
+    oldSend.apply(channel, arguments);
+    viewSend.emit(msg.type, msg);
+    if (viewSend.running && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
+      if (typeof print == "function") {
+        print("send:", msg.type);
+        var shortMsg = TowTruck._extend(msg);
+        delete shortMsg.type;
+        var r = repr(shortMsg);
+        r = "  " + r.replace(/^\{\s+/, "");
+        r = r.replace(/\s+\}$/, "");
+        print(r);
+      } else {
+        console.log("send[out-of-test](", msg, ")");
+      }
+    }
+  };
+  /*var oldOnMessage = channel.onmessage;
+  channel.onmessage = function (msg) {
+    if (IGNORE_MESSAGES.indexOf(msg.type) == -1) {
+      print("onmessage(" + repr(msg) + ")");
+    }
+    oldOnMessage.apply(channel, arguments);
+  };*/
+}
+
+TowTruck._mixinEvents(viewSend);
+viewSend.running = true;
+viewSend.on = function () {
+  viewSend.running = true;
+};
+viewSend.off = function () {
+  viewSend.running = false;
+};
