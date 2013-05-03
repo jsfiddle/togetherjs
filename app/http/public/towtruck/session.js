@@ -75,12 +75,14 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.hub = util.mixinEvents({});
 
+  var IGNORE_MESSAGES = ["cursor-update", "keydown", "scroll-update"];
+
   function openChannel() {
     assert(! channel);
     console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {
-      if (DEBUG && msg.type != "cursor-update" && msg.type != "keydown") {
+      if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
         console.info("In:", msg);
       }
       msg.peer = peers.getPeer(msg.clientId, msg);
@@ -102,7 +104,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   var currentUrl = (location.href + "").replace(/\#.*$/, "");
 
   session.send = function (msg) {
-    if (DEBUG && msg.type != "cursor-update" && msg.type != "keydown") {
+    if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
       console.info("Send:", msg);
     }
     msg.clientId = session.clientId;
@@ -212,7 +214,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        if ((! saved) && TowTruck.startup._launch) {
+        if (! saved) {
           isClient = false;
           if (! shareId) {
             shareId = util.generateId();
