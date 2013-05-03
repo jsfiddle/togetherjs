@@ -16,6 +16,8 @@ define(["util"], function (util) {
     dontShowRtcInfo: false
   };
 
+  var DEBUG_STORAGE = false;
+
   var Storage = util.Class({
     constructor: function (storage, prefix) {
       this.storage = storage;
@@ -32,8 +34,14 @@ define(["util"], function (util) {
           var value = self.storage.getItem(key);
           if (! value) {
             value = defaultValue;
+            if (DEBUG_STORAGE) {
+              console.debug("Get storage", key, "defaults to", value);
+            }
           } else {
             value = JSON.parse(value);
+            if (DEBUG_STORAGE) {
+              console.debug("Get storage", key, "=", value);
+            }
           }
           return value;
         }));
@@ -47,8 +55,14 @@ define(["util"], function (util) {
           key = self.prefix + key;
           if (value === undefined) {
             self.storage.removeItem(key);
+            if (DEBUG_STORAGE) {
+              console.debug("Delete storage", key);
+            }
           } else {
             self.storage.setItem(key, JSON.stringify(value));
+            if (DEBUG_STORAGE) {
+              console.debug("Set storage", key, value);
+            }
           }
         }));
       });
@@ -98,27 +112,12 @@ define(["util"], function (util) {
 
     get: function (name) {
       assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-      return Deferred(function (def) {
-        storage.get("settings").then(util.resolver(def, function (settings) {
-          if ((! settings) || settings[name] === undefined) {
-            return storage.settings.defaults[name];
-          }
-          return settings[name];
-        }));
-      });
+      return storage.get("settings." + name, storage.settings.defaults[name]);
     },
 
     set: function (name, value) {
       assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-      return Deferred(function (def) {
-        storage.get("settings", {}).then(function (settings) {
-          var oldValue = settings[name];
-          settings[name] = value;
-          var def = storage.set("settings", settings);
-          storage.settings.emit("change", name, oldValue, value);
-          return def;
-        });
-      });
+      return storage.set("settings." + name, value);
     }
 
   });
