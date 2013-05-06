@@ -219,9 +219,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           if (! shareId) {
             shareId = util.generateId();
           }
-          if (! sessionId) {
-            sessionId = util.generateId();
-          }
+          assert(! sessionId);
+          sessionId = util.generateId();
         } else {
           isClient = saved.reason == "joined";
           TowTruck.startup.reason = saved.reason;
@@ -307,7 +306,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       } else {
         saved.running = false;
         saved.date = Date.now();
-        storage.tab.set("status", undefined);
+        storage.tab.set("status", saved);
       }
       channel.close();
       channel = null;

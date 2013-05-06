@@ -421,7 +421,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     cursor.setKeydown();
   });
 
-  if (TowTruckTestSpy) {
+  if (typeof TowTruckTestSpy != "undefined") {
     TowTruckTestSpy.Cursor = Cursor;
   }
 
