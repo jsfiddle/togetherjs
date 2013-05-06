@@ -214,14 +214,22 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        if (! saved) {
-          isClient = false;
+        if (TowTruck.startup._launch) {
+          if (saved) {
+            isClient = saved.reason == "joined";
+            if (! shareId) {
+              shareId = saved.shareId;
+            }
+            sessionId = saved.sessionId;
+          } else {
+            isClient = TowTruck.startup.reason == "joined";
+            assert(! sessionId);
+            sessionId = util.generateId();
+          }
           if (! shareId) {
             shareId = util.generateId();
           }
-          assert(! sessionId);
-          sessionId = util.generateId();
-        } else {
+        } else if (saved) {
           isClient = saved.reason == "joined";
           TowTruck.startup.reason = saved.reason;
           TowTruck.startup.continued = true;
@@ -230,6 +238,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           // The only case when we don't need to set the storage status again is when
           // we're already set to be running
           set = ! saved.running;
+        } else {
+          throw new util.AssertionError("No saved status, and no startup._launch request; why did TowTruck start?");
         }
         assert(session.identityId);
         session.clientId = session.identityId + "." + sessionId;
