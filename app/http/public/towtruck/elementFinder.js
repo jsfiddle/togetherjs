@@ -11,7 +11,7 @@ define(["util", "jquery"], function (util, $) {
       el = el.get(0);
     }
     while (el) {
-      if (el.className && (el.className == "towtruck" || el.className.indexOf(" towtruck") != -1 || el.className == "guider" || el.id == "guiders_overlay")) {
+      if (el.className && (el.className == "towtruck" || (el.className.indexOf && el.className.indexOf(" towtruck") != -1) || el.className == "guider" || el.id == "guiders_overlay")) {
         return true;
       }
       el = el.parentNode;
