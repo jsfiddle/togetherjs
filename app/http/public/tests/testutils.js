@@ -59,7 +59,10 @@ var IGNORE_MESSAGES = ["cursor-update", "scroll-update"];
 
 function viewSend() {
   // Prints out all send() messages
-  console.log("called viewSend()");
+  if (! TowTruck.running) {
+    session.once("start", viewSend);
+    return;
+  }
   var channel = TowTruck.require("session")._getChannel();
   var oldSend = channel.send;
   channel.send = function (msg) {
@@ -79,20 +82,23 @@ function viewSend() {
       }
     }
   };
-  /*var oldOnMessage = channel.onmessage;
-  channel.onmessage = function (msg) {
-    if (IGNORE_MESSAGES.indexOf(msg.type) == -1) {
-      print("onmessage(" + repr(msg) + ")");
-    }
-    oldOnMessage.apply(channel, arguments);
-  };*/
 }
 
 TowTruck._mixinEvents(viewSend);
 viewSend.running = true;
-viewSend.on = function () {
+// FIXME: this looks like events:
+viewSend.activate = function () {
   viewSend.running = true;
 };
-viewSend.off = function () {
+viewSend.deactivate = function () {
   viewSend.running = false;
 };
+
+function waitEvent(context, event, options) {
+  var ops = TowTruck._extend({wait: true, ignoreThis: true}, options);
+  context.once(event, Spy(event, ops));
+}
+
+function waitMessage(messageType) {
+  waitEvent(viewSend, messageType, {writes: false});
+}

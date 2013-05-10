@@ -24,13 +24,13 @@
 </pre>
 
           </div>
-<!--
+
           <h2>CodeMirror</h2>
 
           <div id="codemirror-container"></div>
 
           <hr>
--->
+
           <p>And that's all folks!</p>
         </div>
 
@@ -54,15 +54,14 @@
    <link rel="stylesheet" href="codemirror/codemirror.css">
    <script src="codemirror/javascript.js"></script>
    <script>
-   /*
-     $.ajax({
-       url: "/towtruck.js"
-     }).then(function (data) {
-       var cmEditor = CodeMirror($("#codemirror-container")[0], {
-         value: data,
-         mode: "javascript"
-       });
-       TowTruck.reinitialize();
+     var cmEditor = CodeMirror($("#codemirror-container")[0], {
+       mode: "javascript"
      });
-     */
+     /*$.ajax({
+       url: "/towtruck/session.js",
+       dataType: "text"
+     }).then(function (data) {
+       cmEditor.setValue(data);
+       //TowTruck.reinitialize();
+     });*/
    </script>

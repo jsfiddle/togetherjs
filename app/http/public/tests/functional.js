@@ -5,11 +5,6 @@ $("#other").remove();
 getRequire("ui", "chat", "util", "session", "tracker", "jquery", "storage", "peers", "cursor");
 // => Loaded modules: ...
 
-function waitEvent(context, event) {
-  console.log("waiting on", event, context);
-  context.once(event, Spy(event, {wait: true, ignoreThis: true}));
-}
-
 printResolved(
   storage.settings.set("name", ""),
   storage.settings.set("defaultName", "Jane Doe"),
@@ -23,7 +18,7 @@ printResolved(
   );
 // => (resolved) ... done.
 
-session.once("start", viewSend);
+viewSend();
 waitEvent(session, "ui-ready");
 TowTruck();
 

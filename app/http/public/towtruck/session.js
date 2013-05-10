@@ -164,7 +164,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["ui", "chat", "tracker", "webrtc", "cursor", "startup", "peers"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"];
 
   function initIdentityId() {
     return util.Deferred(function (def) {
