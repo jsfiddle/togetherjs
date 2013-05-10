@@ -156,6 +156,8 @@
     addScript("/towtruck/libs/require.js");
   };
 
+  TowTruck.pageLoaded = Date.now();
+
   TowTruck.startup = {
     // What element, if any, was used to start the session:
     button: null,
@@ -255,6 +257,11 @@
       this.on(name, callback[attr]);
     };
     proto.off = proto.removeListener = function off(name, callback) {
+      if (this._listenerOffs) {
+        // Defer the .off() call until the .emit() is done.
+        this._listenerOffs.push([name, callback]);
+        return;
+      }
       if (name.search(" ") != -1) {
         var names = name.split(/ +/g);
         names.forEach(function (n) {
@@ -274,14 +281,23 @@
       }
     };
     proto.emit = function emit(name) {
+      var offs = this._listenerOffs = [];
       if ((! this._listeners) || ! this._listeners[name]) {
         return;
       }
       var args = Array.prototype.slice.call(arguments, 1);
       var l = this._listeners[name];
       l.forEach(function (callback) {
+
         callback.apply(this, args);
       }, this);
+      delete this._listenerOffs;
+      if (offs.length) {
+        offs.forEach(function (item) {
+          this.off(item[0], item[1]);
+        }, this);
+      }
+
     };
     return proto;
   };
