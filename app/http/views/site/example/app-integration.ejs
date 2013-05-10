@@ -61,7 +61,7 @@ function gravatar(email, options) {
   options = options || "";
   email = email.toLowerCase().replace(/^\s+/, "").replace(/\s+$/, "");
   var md5 = CryptoJS.MD5(email);
-  return "http://www.gravatar.com/avatar/" + md5 + options;
+  return "https://www.gravatar.com/avatar/" + md5 + options;
 }
 
 TowTruckConfig_getUserName = function () {
