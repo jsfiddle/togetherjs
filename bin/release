@@ -31,7 +31,7 @@ git push heroku master
 
 echo
 echo "Setting commit config"
-heroku config:add GIT_LAST_COMMIT="$(git rev-parse HEAD)"
+heroku config:add --app towtruck GIT_LAST_COMMIT="$(git rev-parse HEAD)"
 
 echo "Changing to develop"
 git checkout develop
