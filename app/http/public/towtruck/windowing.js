@@ -127,10 +127,6 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     });
   }
 
-  session.on("ui-ready", function (ui) {
-    bindEvents(ui.container);
-  });
-
   session.on("new-element", function (el) {
     bindEvents(el);
   });

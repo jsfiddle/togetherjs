@@ -295,6 +295,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       starterButton.text("End TowTruck Session");
     }
 
+    session.emit("new-element", ui.container);
+
     if (finishedAt && finishedAt > Date.now()) {
       setTimeout(function () {
         finishedAt = null;

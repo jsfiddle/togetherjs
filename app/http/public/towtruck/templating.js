@@ -10,6 +10,7 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
     assert(template.length);
     template = template.clone();
     template.attr("id", null);
+    // FIXME: if called directly, doesn't emit new-element event:
     return template;
   };
 
