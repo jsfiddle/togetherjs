@@ -81,9 +81,10 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     win.data("boundTo", bound.selector || "#" + bound.attr("id"));
   }
 
-  windowing.hide = function () {
+  windowing.hide = function (els) {
     // FIXME: also hide modals?
-    var els = $(".towtruck-window");
+    els = els || ".towtruck-window, .towtruck-popup";
+    els = $(els);
     els = els.filter(":visible");
     els.hide();
     els.each(function (index, element) {
