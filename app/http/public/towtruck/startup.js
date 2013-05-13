@@ -122,8 +122,8 @@ define(["util", "require", "jquery", "modal", "storage"], function (util, requir
         next();
         return;
       }
-      require(["ui"], function (ui) {
-        ui.displayWindow("#towtruck-about");
+      require(["windowing"], function (windowing) {
+        windowing.show("#towtruck-about");
         // FIXME: no way to detect when the window is closed
         // If there was a next() step then it would not work
       });

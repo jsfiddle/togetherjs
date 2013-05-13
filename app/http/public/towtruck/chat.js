@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers"], function (require, $, util, session, ui, templates, playback, storage, peers) {
+define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
   var chat = util.Module("chat");
   var assert = util.assert;
   var Walkabout;
@@ -202,7 +202,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
             text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
           });
         });
-      ui.hideWindow("#towtruck-chat");
+      windowing.hide("#towtruck-chat");
     }
 
   };

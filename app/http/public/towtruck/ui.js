@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "modal", "linkify", "peers"], function (require, $, util, session, templates, modal, linkify, peers) {
+define(["require", "jquery", "util", "session", "templates", "templating", "modal", "linkify", "peers", "windowing"], function (require, $, util, session, templates, templating, modal, linkify, peers, windowing) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -26,14 +26,6 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     chat = c;
   });
 
-  ui.cloneTemplate = function (id) {
-    id = "towtruck-template-" + id;
-    var el = $("#" + id).clone();
-    assert(el.length, "No element found with id", id);
-    el.attr("id", null);
-    return el;
-  };
-
   /* Displays some toggleable element; toggleable elements have a
      data-toggles attribute that indicates what other elements should
      be hidden when this element is shown. */
@@ -56,101 +48,6 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       return "bottom";
     } else {
       throw new AssertionError("#towtruck-interface doesn't have positioning class");
-    }
-  }
-
-  /* Displays one window.  A window must already exist.  This hides other windows, and
-     positions the window according to its data-bound-to attributes */
-  ui.displayWindow = function (el) {
-    el = $(el);
-    assert(el.length);
-    ui.hideWindow(".towtruck-window, .towtruck-popup");
-    el.show();
-    ui.bindWindow(el);
-    session.emit("display-window", el.attr("id"), el);
-  };
-
-  /* Moves a window to be attached to data-bound-to, e.g., the button
-     that opened the window. Or you can provide an element that it should bind to. */
-  ui.bindWindow = function (win, bound) {
-    win = $(win);
-    if (! bound) {
-      bound = $("#" + win.attr("data-bound-to"));
-    } else {
-      bound = $(bound);
-    }
-    assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
-    var ifacePos = panelPosition();
-    var boundPos = bound.offset();
-    boundPos.height = bound.height();
-    boundPos.width = bound.width();
-    var windowHeight = $window.height();
-    var windowWidth = $window.width();
-    boundPos.top -= $window.scrollTop();
-    boundPos.left -= $window.scrollLeft();
-    // FIXME: I appear to have to add the padding to the width to get a "true"
-    // width.  But it's still not entirely consistent.
-    var height = win.height() + 5;
-    var width = win.width() + 20;
-    var left, top;
-    if (ifacePos == "right") {
-      left = boundPos.left - 15 - width;
-      top = boundPos.top + (boundPos.height / 2) - (height / 2);
-    } else if (ifacePos == "left") {
-      left = boundPos.left + boundPos.width + 15;
-      top = boundPos.top + (boundPos.height / 2) - (height / 2);
-    } else if (ifacePos == "bottom") {
-      left = (boundPos.left + boundPos.width / 2) - (width / 2);
-      top = boundPos.top - 10 - height;
-    }
-    top = Math.min(windowHeight - 10 - height, Math.max(10, top));
-    win.css({
-      top: top + "px",
-      left: left + "px"
-    });
-    if (win.hasClass("towtruck-window")) {
-      $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-      var pointer = $("#towtruck-window-pointer-" + ifacePos);
-      pointer.show();
-      if (ifacePos == "right") {
-        pointer.css({
-          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-          left: left + win.width() + 16 + "px"
-        });
-      } else if (ifacePos == "left") {
-        pointer.css({
-          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-          left: (left - 5) + "px"
-        });
-      } else {
-        console.warn("don't know how to deal with position:", ifacePos);
-      }
-    }
-  };
-
-  /* Hides any windows given by the selector.  Any opener buttons are
-     animated for the closing. */
-  ui.hideWindow = function (el) {
-    el = el || ".towtruck-window, .towtruck-popup";
-    el = $(el).filter(":visible");
-    el.hide();
-    if (el.attr("data-bound-to")) {
-      var bound = $("#" + el.attr("data-bound-to"));
-      assert(bound.length);
-      bound.addClass("towtruck-animated").addClass("towtruck-color-pulse");
-      setTimeout(function () {
-        bound.removeClass("towtruck-color-pulse").removeClass("towtruck-animated");
-      }, ANIMATION_DURATION+10);
-    }
-    $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-  };
-
-  function toggleWindow(el) {
-    el = $(el);
-    if (el.is(":visible")) {
-      ui.hideWindow(el);
-    } else {
-      ui.displayWindow(el);
     }
   }
 
@@ -271,7 +168,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
         input.val("");
       }
       if (event.which == 27) { // Escape
-        ui.hideWindow("#towtruck-chat");
+        windowing.hide("#towtruck-chat");
       }
       return false;
     });
@@ -310,7 +207,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
         iface.removeClass("towtruck-interface-bottom");
         iface.addClass("towtruck-interface-" + pos);
         if (startPos && pos != startPos) {
-          ui.hideWindow();
+          windowing.hide();
           startPos = null;
         }
       }
@@ -328,7 +225,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     });
 
     $("#towtruck-about-button").click(function () {
-      toggleWindow("#towtruck-about");
+      windowing.toggle("#towtruck-about");
     });
 
     $("#towtruck-end-button").click(function () {
@@ -336,16 +233,16 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     });
 
     $("#towtruck-feedback-button").click(function(){
-      ui.hideWindow();
+      windowing.hide();
       modal.showModal("#towtruck-feedback-form");
     });
 
     $("#towtruck-cancel-end-session").click(function () {
-      ui.hideWindow("#towtruck-about");
+      windowing.hide("#towtruck-about");
     });
 
     $("#towtruck-chat-button").click(function () {
-      toggleWindow("#towtruck-chat");
+      windowing.toggle("#towtruck-chat");
     });
 
     session.on("display-window", function (id, element) {
@@ -354,25 +251,19 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       }
     });
 
-    container.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
-      var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
-      ui.hideWindow(w);
-      event.stopPropagation();
-      return false;
-    });
-
     container.find("#towtruck-chat-notifier").click(function (event) {
       if ($(event.target).is("a") || container.is(".towtruck-close")) {
         return;
       }
-      ui.displayWindow("#towtruck-chat");
+      windowing.show("#towtruck-chat");
     });
 
+    // FIXME: Don't think this makes sense
     $(".towtruck header.towtruck-title").each(function (index, item) {
       var button = $('<button class="towtruck-minimize"></button>');
       button.click(function (event) {
         var window = button.closest(".towtruck-window");
-        ui.hideWindow(window);
+        windowing.hide(window);
       });
       $(item).append(button);
     });
@@ -390,14 +281,14 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
 
     $(".towtruck-help").click(function () {
       require(["walkthrough"], function (walkthrough) {
-        ui.hideWindow();
+        windowing.hide();
         walkthrough.start();
       });
     });
 
     var starterButton = $("#towtruck-starter button");
     starterButton.click(function () {
-      ui.displayWindow("#towtruck-about");
+      windowing.show("#towtruck-about");
     }).addClass("towtruck-running");
     if (starterButton.text() == "Start TowTruck") {
       starterButton.attr("data-start-text", starterButton.text());
@@ -407,10 +298,10 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     if (finishedAt && finishedAt > Date.now()) {
       setTimeout(function () {
         finishedAt = null;
-        session.emit("ui-ready");
+        session.emit("ui-ready", ui);
       }, finishedAt - Date.now());
     } else {
-      session.emit("ui-ready");
+      session.emit("ui-ready", ui);
     }
 
   };
@@ -455,22 +346,24 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       assert(attrs.peer);
       assert(attrs.messageId);
       var date = attrs.date || Date.now();
-      var el = ui.cloneTemplate("chat-message");
-      attrs.peer.view.setElement(el);
-      el.find(".towtruck-chat-content").text(attrs.text);
+      var el = templating.sub("chat-message", {
+        peer: attrs.peer,
+        content: attrs.text,
+        date: date
+      });
       linkify(el.find(".towtruck-chat-content"));
       el.attr("data-person", attrs.peer.id)
         .attr("data-date", date);
-      setDate(el, date);
       ui.chat.add(el, attrs.messageId, attrs.notify);
     },
 
     leftSession: function (attrs) {
       assert(attrs.peer);
       var date = attrs.date || Date.now();
-      var el = ui.cloneTemplate("chat-left");
-      attrs.peer.view.setElement(el);
-      setDate(el, date);
+      var el = templating.sub("chat-left", {
+        peer: attrs.peer,
+        date: date
+      });
       ui.chat.add(el, attrs.messageId, true);
     },
 
@@ -478,9 +371,10 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       assert(! attrs.peer);
       assert(typeof attrs.text == "string");
       var date = attrs.date || Date.now();
-      var el = ui.cloneTemplate("chat-system");
-      el.find(".towtruck-chat-content").text(attrs.text);
-      setDate(el, date);
+      var el = templating.sub("chat-system", {
+        content: attrs.text,
+        date: date
+      });
       ui.chat.add(el, undefined, true);
     },
 
@@ -493,9 +387,6 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       assert(attrs.peer);
       assert(typeof attrs.url == "string");
       var date = attrs.date || Date.now();
-      var el = ui.cloneTemplate("url-change");
-      attrs.peer.view.setElement(el);
-      setDate(el, date);
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
       // http://example.com/foobar, and someone goes to http://example.com/baz then
@@ -506,7 +397,12 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       } else {
         title = attrs.url;
       }
-      el.find(".towtruck-url").attr("href", attrs.url).text(title);
+      var el = templating.sub("url-change", {
+        peer: attrs.peer,
+        date: date,
+        href: attrs.url,
+        title: title
+      });
       ui.chat.add(el, attrs.peer.className("url-change-"), true);
     },
 
@@ -523,7 +419,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
         var section = popup.find("#towtruck-chat-notifier-message");
         section.empty();
         section.append(el.clone());
-        ui.displayWindow(popup);
+        windowing.show(popup);
       }
     },
 
@@ -539,26 +435,6 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       ui.chat.scroll();
     }
   });
-
-  function setDate(templateElement, date) {
-    if (typeof date == "number") {
-      date = new Date(date);
-    }
-    var ampm = "AM";
-    var hour = date.getHours();
-    if (hour > 12) {
-      hour -= 12;
-      ampm = "PM";
-    }
-    var minute = date.getMinutes();
-    var t = hour + ":";
-    if (minute < 10) {
-      t += "0";
-    }
-    t += minute;
-    templateElement.find(".towtruck-time").text(t);
-    templateElement.find(".towtruck-ampm").text(ampm);
-  }
 
   /* This class is bound to peers.Peer instances as peer.view.
      The .update() method is regularly called by peer objects when info changes. */
@@ -633,12 +509,14 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     },
 
     createUrl: function () {
-      this.urlNotification = ui.cloneTemplate("url-change-popup");
-      this.setElement(this.urlNotification);
+      this.urlNotification = templating.sub("url-change-popup", {
+        peer: this.peer
+      });
       this.urlNotification.find(".towtruck-follow").click((function () {
         var url = this.urlNotification.find("a.towtruck-url").attr("href");
         location.href = url;
       }).bind(this));
+      // FIXME: should be handled in windowing:
       this.urlNotification.find(".towtruck-ignore .towtruck-close").click((function () {
         this.urlNotification.remove();
         return false;
@@ -651,7 +529,9 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
         });
       }).bind(this));
       ui.container.append(this.urlNotification);
-      ui.bindWindow(this.urlNotification, this.dockElement);
+      windowing.show(this.urlNotification, {
+        bind: this.dockElement
+      });
       this.updateUrl();
     },
 
@@ -683,14 +563,14 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
     },
 
     notifyJoined: function () {
-      ui.hideWindow();
-      var el = ui.cloneTemplate("new-user");
-      this.setElement(el);
-      el.find(".towtruck-dismiss").click(function () {
-        ui.hideWindow(el);
+      windowing.hide();
+      var el = templating.sub("new-user", {
+        peer: this.peer
       });
       ui.container.append(el);
-      ui.bindWindow(el, this.dockElement);
+      windowing.show(el, {
+        bind: this.dockElement
+      });
       setTimeout(function () {
         // FIXME: also set opacity of towtruck-window-pointer-left/right?
         el.css({
@@ -700,7 +580,7 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
           opacity: "0"
         });
         setTimeout(function () {
-          ui.hideWindow(el);
+          windowing.hide();
         }, 1000);
       }, NEW_USER_FADE_TIMEOUT);
     },
@@ -709,8 +589,9 @@ define(["require", "jquery", "util", "session", "templates", "modal", "linkify",
       if (this.dockElement) {
         return;
       }
-      this.dockElement = ui.cloneTemplate("dock-person");
-      this.setElement(this.dockElement);
+      this.dockElement = templating.sub("dock-person", {
+        peer: this.peer
+      });
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
       this.dockElement.click(this.click);
       var iface = $("#towtruck-interface");

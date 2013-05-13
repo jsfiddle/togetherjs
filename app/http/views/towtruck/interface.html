@@ -53,7 +53,7 @@
   </div>
 
   <!-- The window for closing the session: -->
-  <div id="towtruck-about" class="towtruck-window" data-bound-to="towtruck-about-button" style="display: none">
+  <div id="towtruck-about" class="towtruck-window" data-bind-to="#towtruck-about-button" style="display: none">
     <header class="towtruck-title">
       Settings
     </header>
@@ -94,7 +94,7 @@
   </div>
 
   <!-- The chat screen: -->
-  <div id="towtruck-chat" class="towtruck-window" data-bound-to="towtruck-chat-button"
+  <div id="towtruck-chat" class="towtruck-window" data-bind-to="#towtruck-chat-button"
        style="display: none">
     <header class="towtruck-title">
       Chat
@@ -107,7 +107,7 @@
         <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
         <div class="towtruck-timestamp"><span class="towtruck-time">HH:MM</span> <span class="towtruck-ampm">AM/PM</span></div>
         <div class="towtruck-person"></div>
-        <div class="towtruck-chat-content"></div>
+        <div class="towtruck-chat-content template-sub-content"></div>
         <div class="towtruck-hr-line"></div>
       </div>
 
@@ -118,7 +118,7 @@
 
       <!-- Template for system-derived messages: -->
       <div id="towtruck-template-chat-system" class="towtruck-chat-message">
-        <span class="towtruck-chat-content"></span>
+        <span class="towtruck-chat-content template-sub-content"></span>
       </div>
 
       <!-- Template for when someone goes to a new URL: -->
@@ -126,7 +126,7 @@
         <div class="towtruck-avatar"><img src="http://localhost:8080/images/default-avatar.png"></div>
         <div class="towtruck-timestamp"><span class="towtruck-time">HH:MM</span> <span class="ampm">AM/PM</span></div>
         <div class="towtruck-person"></div>
-        <div class="towtruck-chat-content">I've gone to: <a href="#" class="towtruck-url" target="_self"></a>
+        <div class="towtruck-chat-content">I've gone to: <a href="#" class="towtruck-url towtruck-sub-title" data-towtruck-subattr-href="href" target="_self"></a>
         </div>
       </div>
     </div>
@@ -141,7 +141,7 @@
 
   <!-- this is a kind of warning popped up when you (successfully) start RTC: -->
   <div id="towtruck-rtc-info" class="towtruck-window"
-       data-bound-to="towtruck-audio-button"
+       data-bind-to="#towtruck-audio-button"
        style="display: none">
 
     <header class="towtruck-title">
@@ -169,7 +169,7 @@
   <!-- this is popped up when you hit the audio button, but RTC isn't
   supported: -->
   <div id="towtruck-rtc-not-supported" class="towtruck-window"
-       data-bound-to="towtruck-audio-button"
+       data-bind-to="#towtruck-audio-button"
        style="display: none">
     <header class="towtruck-title">Audio Chat</header>
 
@@ -192,7 +192,7 @@
 
   <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
   <div id="towtruck-chat-notifier" class="towtruck-popup"
-       data-bound-to="towtruck-chat-button"
+       data-bind-to="#towtruck-chat-button"
        style="display: none">
     <div class="towtruck-close"><img src="/images/icn-close-btn.png" alt="close"></div>
     <section id="towtruck-chat-notifier-message">

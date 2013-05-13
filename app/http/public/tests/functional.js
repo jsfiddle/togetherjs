@@ -2,7 +2,7 @@
 
 $("#other").remove();
 
-getRequire("ui", "chat", "util", "session", "tracker", "jquery", "storage", "peers", "cursor");
+getRequire("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor");
 // => Loaded modules: ...
 
 printResolved(
@@ -20,10 +20,11 @@ printResolved(
 
 viewSend();
 waitEvent(session, "ui-ready");
+TowTruck.startup._launch = true;
 TowTruck();
 
 /* =>
-ui-ready()
+ui-ready([Module ui])
 send: hello
   avatar: "/images/introducing-mozilla.png",
   clientId: "...",
@@ -47,14 +48,14 @@ var incoming = session._getChannel().onmessage;
 print(incoming);
 // => function (msg) {...}
 
-viewSend.off();
+viewSend.deactivate();
 incoming({
   type: "hello",
   clientId: "faker",
   name: "Faker",
   avatar: "about:blank",
   color: "#ff0000",
-  url: location.href,
+  url: location.href.replace(/#.*/, ""),
   urlHash: "",
   title: document.title,
   rtcSupported: false

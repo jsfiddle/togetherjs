@@ -4,7 +4,7 @@
 
 // Cursor viewing support
 
-define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers) {
+define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
   var assert = util.assert;
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
@@ -28,7 +28,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
 
     constructor: function (clientId) {
       this.clientId = clientId;
-      this.element = ui.cloneTemplate("cursor");
+      this.element = templating.clone("cursor");
       this.elementClass = "towtruck-scrolled-normal";
       this.element.addClass(this.elementClass);
       this.updatePeer(peers.getPeer(clientId));
@@ -367,7 +367,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
-    var element = ui.cloneTemplate("click");
+    var element = templating.clone("click");
     var target = $(elementFinder.findElement(pos.element));
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
@@ -382,7 +382,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   function displayClick(pos) {
     // FIXME: should we hide the local click if no one else is going to see it?
     // That means tracking who might be able to see our screen.
-    var element = ui.cloneTemplate("click");
+    var element = templating.clone("click");
     $(document.body).append(element);
     element.css({
       top: pos.top,

@@ -4,7 +4,7 @@
 
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
-define(["require", "jquery", "util", "session", "ui", "peers", "storage"], function (require, $, util, session, ui, peers, storage) {
+define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], function (require, $, util, session, ui, peers, storage, windowing) {
   var webrtc = util.Module("webrtc");
   var assert = util.assert;
 
@@ -236,7 +236,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage"], funct
       if (session.RTCSupported) {
         enableAudio();
       } else {
-        ui.displayWindow("#towtruck-rtc-not-supported");
+        windowing.show("#towtruck-rtc-not-supported");
       }
     });
 
@@ -263,7 +263,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage"], funct
       accepted = true;
       storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
         if (! dontShow) {
-          ui.displayWindow("#towtruck-rtc-info");
+          windowing.show("#towtruck-rtc-info");
         }
       });
       if (! audioStream) {

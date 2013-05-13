@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
+define(["util", "guiders", "jquery", "windowing"], function (util, guiders, $, windowing) {
   var assert = util.assert;
   var walkthrough = util.Module("walkthrough");
 
@@ -71,14 +71,14 @@ define(["util", "guiders", "jquery", "ui"], function (util, guiders, $, ui) {
   };
 
   function showChat(){
-    ui.displayWindow('#towtruck-chat');
+    windowing.show('#towtruck-chat');
   }
 
   function showSettings(){
-    ui.displayWindow('#towtruck-about');
+    windowing.show('#towtruck-about');
   }
   function hideWindow(){
-    ui.hideWindow();
+    windowing.hide();
   }
 
   // See here for information about the options for Guiders:
