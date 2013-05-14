@@ -12,6 +12,44 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+
+  var baseUrlOverride = localStorage.getItem("towtruck.baseUrlOverride");
+  if (baseUrlOverride) {
+    try {
+      baseUrlOverride = JSON.parse(baseUrlOverride);
+    } catch (e) {
+      baseUrlOverride = null;
+    }
+    if ((! baseUrlOverride) || baseUrlOverride.expiresAt < Date.now()) {
+      // Ignore because it has expired
+      localStorage.removeItem("towtruck.baseUrlOverride");
+    } else {
+      baseUrl = baseUrlOverride.baseUrl;
+      var logger = console.warn || console.log;
+      logger.call(console, "Using TowTruck baseUrlOverride:", baseUrl);
+      logger.call(console, "To undo run: localStorage.removeItem('towtruck.baseUrlOverride')");
+    }
+  }
+
+  var configOverride = localStorage.getItem("towtruck.configOverride");
+  if (configOverride) {
+    try {
+      configOverride = JSON.parse(configOverride);
+    } catch (e) {
+      configOverride = null;
+    }
+    if ((! configOverride) || configOverride.expiresAt < Date.now()) {
+      localStorage.removeItem("towtruck.cnofigOverride");
+    } else {
+      for (var attr in configOverride) {
+        if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
+          continue;
+        }
+        window["TowTruckConfig_" + attr] = configOverride[attr];
+      }
+    }
+  }
+
   var version = "unknown";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
