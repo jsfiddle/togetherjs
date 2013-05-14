@@ -7,8 +7,8 @@ define(["util", "jquery"], function (util, $) {
   var assert = util.assert;
 
   elementFinder.ignoreElement = function ignoreElement(el) {
-    if (el.get) {
-      el = el.get(0);
+    if (el instanceof $) {
+      el = el[0];
     }
     while (el) {
       if (el.className && (el.className == "towtruck" || (el.className.indexOf && el.className.indexOf(" towtruck") != -1) || el.className == "guider" || el.id == "guiders_overlay")) {
