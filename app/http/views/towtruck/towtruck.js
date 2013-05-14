@@ -12,11 +12,14 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+  var version = "unknown";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
-  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>" || (Date.now() + "");
-  if (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0) {
+  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>";
+  if ((! cacheBust) || (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0)) {
     cacheBust = Date.now() + "";
+  } else {
+    version = cacheBust;
   }
 
   // Make sure we have all of the console.* methods:
@@ -398,7 +401,7 @@
 
   // This should contain the output of "git describe --always --dirty"
   // FIXME: substitute this on the server (and update make-static-client)
-  TowTruck.version = "unknown";
+  TowTruck.version = version;
   TowTruck.baseUrl = baseUrl;
 
   TowTruck.hub = TowTruck._mixinEvents({});
