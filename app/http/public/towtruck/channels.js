@@ -111,8 +111,14 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
     this.address = address;
     this.socket = null;
     this._reopening = false;
+    this._lastConnectTime = 0;
+    this._backoff = 0;
     this.baseConstructor();
   },
+
+  backoffTime: 50, // Milliseconds to add to each reconnect time
+  maxBackoffTime: 1500,
+  backoffDetection: 2000, // Amount of time since last connection attempt that shows we need to back off
 
   toString: function () {
     var s = '[WebSocketChannel to ' + this.address;
@@ -152,6 +158,7 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
     if (this.closed) {
       return;
     }
+    this._lastConnectTime = Date.now();
     this.socket = new WebSocket(this.address);
     this.socket.onopen = (function () {
       this._flush();
@@ -168,7 +175,15 @@ channels.WebSocketChannel = util.Class(AbstractChannel, {
                       'code:', event.code, 'reason:', event.reason || 'none');
       if (! this.closed) {
         this._reopening = true;
-        this._setupConnection();
+        if (Date.now() - this._lastConnectTime > this.backoffDetection) {
+          this._backoff = 0;
+        } else {
+          this._backoff++;
+        }
+        var time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
+        setTimeout((function () {
+          this._setupConnection();
+        }).bind(this), time);
       }
     }).bind(this);
     this.socket.onmessage = (function (event) {
