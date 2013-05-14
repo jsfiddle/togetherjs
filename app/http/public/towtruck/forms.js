@@ -428,7 +428,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
     }
     // FIXME: need to figure out when to ignore inits
     msg.updates.forEach(function (update) {
-      var el = elementFinder.findElement(update.location);
+      var el = elementFinder.findElement(update.element);
       if (update.tracker) {
         var tracker = getTracker(el, update.tracker);
         assert(tracker);
