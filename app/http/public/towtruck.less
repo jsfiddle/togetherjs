@@ -371,36 +371,6 @@
     height:32px;
   }
 
-  input#towtruck-self-name {
-    width: 188px;
-    font-size: 12px;
-    padding: 6px;
-    border-radius:2px;
-    border:1px solid #cccccc;
-    box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
-    margin:8px -2px 0px 0px;
-    float:left;
-    font-family:openSansRegular;
-  }
-
-  span#towtruck-checkmark {
-    position:relative;
-    left:-18px;
-    top:18px;
-  }
-
-  input#towtruck-self-name:focus {
-    border: 1px solid #0095DD;
-  }
-
-  #towtruck-self-name-saved {
-    color: #393;
-  }
-
-  #towtruck-self-name-saving {
-    color: #333;
-  }
-
   .towtruck-avatar img:hover {
     opacity:0.5;
   }
@@ -1363,6 +1333,63 @@
   }
 }
 
+/* Menu */
+#towtruck-menu {
+  @icon-size: 12px;
+  position: fixed;
+  font-size: 90%;
+  background-color: #fff;
+  z-index: @z-index + 3;
+  border: 2px solid #666;
+  border-radius: 4px;
+  .towtruck-menu-separator {
+    border-top: 1px solid #999;
+  }
+  .towtruck-menu-item {
+    padding: 4px 7px;
+    cursor: pointer;
+    &.towtruck-menu-disabled {
+      cursor: default;
+      &:hover {
+        background-color: inherit;
+      }
+    }
+    img {
+      height: @icon-size;
+      width: @icon-size;
+      margin-right: 10px;
+    }
+    &:hover {
+      background-color: #aaa;
+    }
+    & .towtruck-avatar {
+      height: @icon-size;
+      width: @icon-size;
+      padding: 0;
+      margin: 0 10px 0 0;
+    }
+    & .towtruck-person-bgcolor-self {
+      display: inline-block;
+      width: @icon-size - 2px;
+      height: @icon-size - 2px;
+      border: 1px solid #999;
+      border-radius: 2px;
+      margin-right: 10px;
+    }
+  }
+
+  input#towtruck-self-name {
+    border-radius: 2px;
+    border: 1px solid #cccccc;
+    box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
+  }
+
+  input#towtruck-self-name:focus {
+    border: 1px solid #0095DD;
+  }
+
+}
+
 /* Button set */
 #towtruck-interface {
   position: fixed;
@@ -1370,7 +1397,7 @@
   background-color: @background-color;
   .box-dropshadow;
   @border-radius: 2px;
-  @long-side: (@button-size + 12) * 4 + 98px; // actual button-size * number of buttons + expand thingy
+  @long-side: (@button-size + 12) * 4 + 64px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
@@ -1446,7 +1473,7 @@
 .towtruck-arrow {
   position: absolute;
   border: 2px solid #f00;
-  z-index: 10010;
+  z-index: @z-index + 10;
   padding: 0;
   margin: 0;
   .transform-origin(top left);

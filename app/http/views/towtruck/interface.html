@@ -17,9 +17,11 @@
         </button>
       </div>
       <div id="towtruck-button-bg">
-        <button id="towtruck-end-button" class="towtruck-button">
+        <button id="towtruck-profile-button" class="towtruck-button">
+          <img class="towtruck-avatar-self">
         </button>
-        <button id="towtruck-about-button" class="towtruck-button">
+        <button id="towtruck-share-button" class="towtruck-button">
+          S
         </button>
       </div>
       <button id="towtruck-audio-button" class="towtruck-button">
@@ -45,52 +47,27 @@
       <!-- <button id="towtruck-ui-help-button" class="towtruck-button towtruck-help"><div id="towtruck-audio-error" class="towtruck-audio-set">
       </button> -->
       <div id="towtruck-dock-participants"></div>
-      <div id="towtruck-button-bottom-bg">
-        <button id="towtruck-expand-button" class="towtruck-help">
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- The window for closing the session: -->
-  <div id="towtruck-about" class="towtruck-window" data-bind-to="#towtruck-about-button" style="display: none">
+  <!-- The window for editing the avatar: -->
+  <div id="towtruck-avatar-edit" class="towtruck-window" data-bind-to="#towtruck-profile-button" style="display: none">
     <header class="towtruck-title">
-      Settings
+      Edit Avatar
     </header>
     <section>
-      <p class="towtruck-about-txt-bottom">
-        Set up your profile
-      </p>
-      <div id="towtruck-setup-profile-box" data-toggles="#towtruck-avatar-edit">
-        <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar" id="towtruck-self-avatar">
-        <input type="text" id="towtruck-self-name" placeholder="Enter your name">
-        <span id="towtruck-checkmark">
-          <span id="towtruck-self-name-saved" data-toggles="#towtruck-self-name-saving">&#x2713;</span>
-          <span id="towtruck-self-name-saving" data-toggles="#towtruck-self-name-saved" style="display: none">&#8230;</span>
-        </span>
-        <span id="towtruck-self-color" class="towtruck-color"></span>
-      </div>
-      <p class="towtruck-about-txt">
-        Send this link to a friend
-      </p>
-      <div id="towtruck-share-link-box">
-        <p>
-          <input type="text" id="towtruck-share-link">
-        </p>
-      </div>
-
-      <!-- <p class="small">This is session: <span id="towtruck-session-id"></span></p> -->
-      <div class="towtruck-bottom-panel">
-        <p class="small">
-          TowTruck
-          created by
-          <a href="https://mozillalabs.com" target="_blank">Mozilla Labs</a>
-        </p>
-      </div>
+      <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar" id="towtruck-self-avatar">
     </section>
-    <div id="towtruck-feedbackbtn-box">
-      <a href="#" id="towtruck-feedback-button">Feedback</a>
-    </div>
+  </div>
+
+  <!-- The window for sharing the link: -->
+  <div id="towtruck-share" class="towtruck-window" data-bind-to="#towtruck-share-button" style="display: none">
+    <header class="towtruck-title">
+      Share
+    </header>
+    <section>
+      <input type="text" id="towtruck-share-link">
+    </section>
   </div>
 
   <!-- The chat screen: -->
@@ -148,7 +125,7 @@
       Audio Chat
     </header>
     <p>
-      Activate your browser microphone above <img src="/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+      Activate your browser microphone above <img src="http://localhost:8080/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
     </p>
     <p>
       Talking on your microphone through your web browser is an experimental feature.
@@ -194,9 +171,27 @@
   <div id="towtruck-chat-notifier" class="towtruck-popup"
        data-bind-to="#towtruck-chat-button"
        style="display: none">
-    <div class="towtruck-close"><img src="/images/icn-close-btn.png" alt="close"></div>
+    <div class="towtruck-close"><img src="http://localhost:8080/images/icn-close-btn.png" alt="close"></div>
     <section id="towtruck-chat-notifier-message">
     </section>
+  </div>
+
+  <!-- The menu when you click on the profile: -->
+  <div id="towtruck-menu" style="display: none">
+    <div class="towtruck-menu-item towtruck-menu-disabled" id="towtruck-menu-profile">
+      <img class="towtruck-avatar-self">
+      <span class="towtruck-person-literal-self" id="towtruck-self-name-display" data-toggles="#towtruck-self-name"></span>
+      <input id="towtruck-self-name" type="text" data-toggles="#towtruck-self-name-display" style="display: none" placeholder="Enter your name">
+    </div>
+    <div class="towtruck-menu-separator"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/images/menu-update-name.png" alt=""> Update your name</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/images/menu-update-avatar" alt=""> Change avatar</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-color"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="towtruck-menu-separator"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-help">Help</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-feedback">Feedback</div>
+    <div class="towtruck-menu-separator"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/images/menu-end.png" alt=""> End TowTruck</div>
   </div>
 
   <div style="display: none">
@@ -297,7 +292,7 @@
 
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
-      <img class="towtruck-cursor-img" src="/images/cursor-white.png">
+      <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
         <span style="display:none" class="towtruck-cursor-typing">...</span>

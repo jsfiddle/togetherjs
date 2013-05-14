@@ -75,7 +75,6 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
     destroy: function () {
       this.view.destroy();
-      this.identity.removePeer(this);
       delete Peer.peers[this.id];
     },
 
@@ -178,8 +177,10 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
       update: function (attrs) {
         var updatePeers = false;
+        var updateMsg = {type: "peer-update"};
         if (attrs.name && attrs.name != this.name) {
           this.name = attrs.name;
+          updateMsg.name = this.name;
           if (! attrs.fromLoad) {
             storage.settings.set("name", this.name);
             updatePeers = true;
@@ -187,6 +188,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         }
         if (attrs.avatar && attrs.avatar != this.avatar) {
           this.avatar = attrs.avatar;
+          updateMsg.avatar = this.avatar;
           if (! attrs.fromLoad) {
             storage.settings.set("avatar", this.avatar);
             updatePeers = true;
@@ -194,6 +196,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         }
         if (attrs.color && attrs.color != this.color) {
           this.color = attrs.color;
+          updateMsg.color = this.color;
           if (! attrs.fromLoad) {
             storage.settings.set("color", this.color);
             updatePeers = true;
@@ -215,6 +218,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           peers.emit("idle-updated", this);
         }
         this.view.update();
+        if (updatePeers && ! attrs.fromLoad) {
+          session.send(updateMsg);
+        }
       },
 
       className: function (prefix) {

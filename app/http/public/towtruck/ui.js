@@ -141,21 +141,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     session.on("shareId", updateShareLink);
     updateShareLink();
 
-    // Setting your name:
-    var name = container.find("#towtruck-self-name");
-    name.val(peers.Self.name);
-    name.on("keyup", function () {
-      var val = name.val();
-      peers.Self.update({name: val});
-      ui.displayToggle("#towtruck-self-name-saving");
-      // Fake timed saving, to make it look like we're doing work:
-      // can we have the checkmark go to a greencheckmark once the name is confirmed?
-      setTimeout(function () {
-        ui.displayToggle("#towtruck-self-name-saved");
-      }, 300);
-      session.send({type: "peer-update", name: val || peers.Self.defaultName});
-    });
-
     // The chat input element:
     var input = container.find("#towtruck-chat-input");
     input.bind("keyup", function (event) {
@@ -224,17 +209,59 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       return false;
     });
 
-    $("#towtruck-about-button").click(function () {
-      windowing.toggle("#towtruck-about");
+    $("#towtruck-share-button").click(function () {
+      windowing.toggle("#towtruck-share");
     });
 
-    $("#towtruck-end-button").click(function () {
+    $("#towtruck-profile-button").click(function (event) {
+      toggleMenu();
+      event.stopPropagation();
+      return false;
+    });
+
+    $("#towtruck-menu-end").click(function () {
       session.close();
     });
 
-    $("#towtruck-feedback-button").click(function(){
+    $("#towtruck-menu-feedback").click(function(){
       windowing.hide();
+      hideMenu();
       modal.showModal("#towtruck-feedback-form");
+    });
+
+    $("#towtruck-menu-help").click(function () {
+      windowing.hide();
+      hideMenu();
+      require(["walkthrough"], function (walkthrough) {
+        windowing.hide();
+        walkthrough.start();
+      });
+    });
+
+    $("#towtruck-menu-update-name").click(function () {
+      var input = $("#towtruck-self-name");
+      input.css({
+        width: $("#towtruck-menu").width() - 32 + "px"
+      });
+      ui.displayToggle("#towtruck-self-name");
+      $("#towtruck-self-name").focus();
+    });
+
+    $("#towtruck-self-name").bind("keyup", function (event) {
+      if (event.which == 13) {
+        ui.displayToggle("#towtruck-self-name-display");
+        return false;
+      }
+      var val = $("#towtruck-self-name").val();
+      if (val) {
+        peers.Self.update({name: val});
+      }
+      return undefined;
+    });
+
+    $("#towtruck-menu-update-avatar").click(function () {
+      hideMenu();
+      windowing.show("#towtruck-avatar-edit");
     });
 
     $("#towtruck-cancel-end-session").click(function () {
@@ -248,6 +275,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     session.on("display-window", function (id, element) {
       if (id == "towtruck-chat") {
         $("#towtruck-chat-input").focus();
+      } else if (id == "towtruck-share") {
+        $("#towtruck-share-link").focus();
+        $("#towtruck-share-link").select();
       }
     });
 
@@ -279,13 +309,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       $("#towtruck-self-avatar").attr("src", avatar);
     }
 
-    $(".towtruck-help").click(function () {
-      require(["walkthrough"], function (walkthrough) {
-        windowing.hide();
-        walkthrough.start();
-      });
-    });
-
     var starterButton = $("#towtruck-starter button");
     starterButton.click(function () {
       windowing.show("#towtruck-about");
@@ -307,6 +330,50 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     }
 
   };
+
+  // Menu
+
+  function showMenu(event) {
+    var el = $("#towtruck-menu");
+    assert(el.length);
+    el.show();
+    var bound = $("#towtruck-profile-button");
+    var boundOffset = bound.offset();
+    el.css({
+      top: boundOffset.top + bound.height() + "px",
+      left: (boundOffset.left + bound.width() - 10 - el.width()) + "px"
+    });
+    $(document).bind("click", maybeHideMenu);
+  }
+
+  function toggleMenu() {
+    if ($("#towtruck-menu").is(":visible")) {
+      hideMenu();
+    } else {
+      showMenu();
+    }
+  }
+
+  function hideMenu() {
+    var el = $("#towtruck-menu");
+    el.hide();
+    $(document).unbind("click", maybeHideMenu);
+    ui.displayToggle("#towtruck-self-name-display");
+  }
+
+  function maybeHideMenu(event) {
+    var t = event.target;
+    while (t) {
+      if (t.id == "towtruck-menu") {
+        // Click inside the menu, ignore this
+        return;
+      }
+      t = t.parentNode;
+    }
+    hideMenu();
+  }
+
+  // Misc
 
   function updateShareLink() {
     var el = $("#towtruck-share-link");
@@ -460,12 +527,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       el.find(".towtruck-person")
         .text(nick)
         .addClass(this.peer.className("towtruck-person-"));
+      el.find(".towtruck-person-literal")
+        .text(this.peer.name || "(no name set)")
+        .addClass(this.peer.className("towtruck-person-literal-"));
       var avatarEl = el.find(".towtruck-avatar img, img.towtruck-avatar");
       if (avatar) {
         avatarEl.attr("src", avatar);
         avatarEl.attr("title", nick);
       }
       avatarEl.addClass(this.peer.className("towtuck-avatar-"));
+      var colors = el.find(".towtruck-person-bgcolor");
+      console.log("setting on", el[0], this.peer.color, colors);
+      colors.css({
+        backgroundColor: this.peer.color
+      });
+      colors.addClass(this.peer.className("towtruck-person-bgcolor-"));
     },
 
     update: function () {
@@ -494,13 +570,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       } else {
         name = this.name;
       }
-      ui.container.find("." + this.peer.className("towtruck-person-")).text(name);
+      ui.container.find("." + this.peer.className("towtruck-person-")).text(name || "");
+      ui.container.find("." + this.peer.className("towtruck-person-literal-")).text(this.peer.name || "(no name set)");
       var avatarEl = ui.container.find("." + this.peer.className("towtruck-avatar-"));
       if (this.peer.avatar) {
         avatarEl.attr("src", this.peer.avatar);
       }
       if (name) {
         avatarEl.attr("title", name);
+      }
+      if (this.peer.color) {
+        var colors = ui.container.find("." + this.peer.className("towtruck-person-bgcolor-"));
+        console.log("updating on", colors, this.peer.className("towtruck-person-bgcolor-"));
+        colors.css({
+          backgroundColor: this.peer.color
+        });
       }
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:

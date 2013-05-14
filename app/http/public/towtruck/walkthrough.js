@@ -100,7 +100,7 @@ define(["util", "guiders", "jquery", "windowing"], function (util, guiders, $, w
     },
     {
       overlay: true,
-      attachTo: "#towtruck-about-button",
+      attachTo: "#towtruck-profile-button",
       title: "Connect with friends",
       description: "<img src=\"/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to collaborate with friends.</p>"
     },
