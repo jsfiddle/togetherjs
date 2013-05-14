@@ -135,7 +135,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
     },
 
     init: function (update, msg) {
-      this._editor().setValue(msg.value);
+      this._editor().setValue(update.value);
     },
 
     makeInit: function () {
