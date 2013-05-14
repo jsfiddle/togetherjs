@@ -207,11 +207,20 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
 
     command_baseurl: function (url) {
       if (! url) {
-        ui.chat.system({
-          text: "Error: must provide a URL"
+        storage.get("baseUrlOverride").then(function (b) {
+          if (b) {
+            ui.chat.system({
+              text: "Set to: " + b.baseUrl
+            });
+          } else {
+            ui.chat.system({
+              text: "No baseUrl override set"
+            });
+          }
         });
         return;
       }
+      url = url.replace(/\/*$/, "");
       ui.chat.system({
         text: "If this goes wrong, do this in the console to reset:\n  localStorage.setItem('towtruck.baseUrlOverride', null)"
       });
