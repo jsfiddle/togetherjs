@@ -21,7 +21,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($
     if (inRemoteUpdate) {
       return;
     }
-    if (elementFinder.ignoreElement(event.target)) {
+    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target)) {
       return;
     }
     var el = $(event.target);
