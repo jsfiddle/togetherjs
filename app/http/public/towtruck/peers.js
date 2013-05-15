@@ -233,7 +233,11 @@ define(["util", "session", "storage", "require"], function (util, session, stora
               storage.settings.set("defaultName", defaultName);
             }
             if (! color) {
-              color = "#" + Math.floor(Math.random() * 0xffffff).toString(16);
+              color = Math.floor(Math.random() * 0xffffff).toString(16);
+              while (color.length < 6) {
+                color = "0" + color;
+              }
+              color = "#" + color;
               storage.settings.set("color", color);
             }
             if (! avatar) {
@@ -306,6 +310,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     storage.tab.get("peerCache").then(deserialize);
     peers.Self._loadFromSettings();
     peers.Self._loadFromApp();
+    peers.Self.view.update();
 
   });
 
