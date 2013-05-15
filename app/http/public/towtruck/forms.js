@@ -160,12 +160,17 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($
         return;
       }
       delete change.origin;
+      var next = change.next;
+      delete change.next;
       session.send({
         type: "form-update",
         tracker: this.trackerName,
         element: elementFinder.elementLocation(this.element),
         change: change
       });
+      if (next) {
+        this._change(editor, next);
+      }
     },
 
     _editor: function () {
