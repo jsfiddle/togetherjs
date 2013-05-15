@@ -178,7 +178,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
       update: function (attrs) {
         var updatePeers = false;
-        if (attrs.name && attrs.name != this.name) {
+        if (typeof attrs.name == "string" && attrs.name != this.name) {
           this.name = attrs.name;
           if (! attrs.fromLoad) {
             storage.settings.set("name", this.name);
