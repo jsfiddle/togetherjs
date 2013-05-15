@@ -193,6 +193,12 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       var logLoader = playback.getLogs(url);
       logLoader.then(
         (function (logs) {
+          if (! logs) {
+            ui.chat.system({
+              text: "No logs found."
+            });
+            return;
+          }
           logs.save();
           this.playing = logs;
           logs.play();
@@ -203,6 +209,25 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
           });
         });
       windowing.hide("#towtruck-chat");
+    },
+
+    command_savelogs: function (name) {
+      session.send({
+        type: "get-logs",
+        forClient: session.clientId,
+        saveAs: name
+      });
+      function save(msg) {
+        if (msg.request.forClient == session.clientId && msg.request.saveAs == name) {
+          storage.set("recording." + name, msg.logs).then(function () {
+            session.hub.off("logs", save);
+            ui.chat.system({
+              text: "Saved as local:" + name
+            });
+          });
+        }
+      }
+      session.hub.on("logs", save);
     },
 
     command_baseurl: function (url) {

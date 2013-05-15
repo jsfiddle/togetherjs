@@ -484,6 +484,9 @@
   }
 
   function conditionalOnload() {
+    if (window.TowTruckConfig_noAutoStart) {
+      return;
+    }
     // A page can define this function to defer TowTruck from starting
     var callToStart = window.TowTruckConfig_callToStart;
     if (window.TowTruckConfig && window.TowTruckConfig.callToStart) {

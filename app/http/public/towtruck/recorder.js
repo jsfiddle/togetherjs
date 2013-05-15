@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "channels"], function ($, util, channels) {
+define(["jquery", "util", "channels", "storage"], function ($, util, channels, storage) {
   var recorder = util.Module("recorder");
   var assert = util.assert;
   var channel = null;
@@ -32,13 +32,17 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
   };
 
   recorder.activate = function (options) {
+    var match;
     baseUrl = options.baseUrl;
-    var match = /\&towtruck=([^&]+)/.exec(location.hash);
-    if (! match) {
-      display("#no-session-id");
-      return;
+    recorder.shareId = TowTruck.startup._joinShareId;
+    if (! recorder.shareId) {
+      match = /\&towtruck=([^&]+)/.exec(location.hash);
+      if (! match) {
+        display("#no-session-id");
+        return;
+      }
+      recorder.shareId = match[1];
     }
-    recorder.shareId = match[1];
     var hubBase = options.defaultHubBase;
     match = /\&hubBase=([^&]+)/.exec(location.hash);
     if (match) {
@@ -54,6 +58,10 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
       if (msg.type == "hello") {
         sendHello(true);
       }
+      if (msg.type == "get-logs") {
+        sendLogs(msg);
+        return;
+      }
       recorder.logMessage(msg);
     };
     sendHello(false);
@@ -64,10 +72,21 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
       type: helloBack ? "hello-back" : "hello",
       name: "Recorder 'bot",
       // FIXME: replace with robot:
-      avatar: TowTruck.baseUrl + "/images/trucks.jpg",
+      avatar: TowTruck.baseUrl + "/images/robot-avatar.png",
       color: "#888888",
       rtcSupported: false,
-      clientId: clientId
+      clientId: clientId,
+      url: "about:blank"
+    };
+    channel.send(msg);
+  }
+
+  function sendLogs(req) {
+    var msg = {
+      type: "logs",
+      clientId: clientId,
+      logs: $("#record").val(),
+      request: req
     };
     channel.send(msg);
   }
@@ -78,6 +97,13 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
     var $record = $("#record");
     $record.val($record.val() + msg + "\n\n");
   };
+
+  $(window).unload(function () {
+    channel.send({
+      type: "bye",
+      clientId: clientId
+    });
+  });
 
   return recorder;
 
