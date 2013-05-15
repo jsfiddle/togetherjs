@@ -50,6 +50,9 @@ define(["util"], function (util) {
 
     set: function (key, value) {
       var self = this;
+      if (value !== undefined) {
+        value = JSON.stringify(value);
+      }
       return Deferred(function (def) {
         setTimeout(util.resolver(def, function () {
           key = self.prefix + key;
@@ -59,7 +62,7 @@ define(["util"], function (util) {
               console.debug("Delete storage", key);
             }
           } else {
-            self.storage.setItem(key, JSON.stringify(value));
+            self.storage.setItem(key, value);
             if (DEBUG_STORAGE) {
               console.debug("Set storage", key, value);
             }
