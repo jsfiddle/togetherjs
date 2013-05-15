@@ -2,11 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "elementFinder"], function ($, util, session, elementFinder) {
+define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($, util, session, elementFinder, eventMaker) {
   var forms = util.Module("forms");
   var assert = util.assert;
 
   var inRemoteUpdate = false;
+
+  function maybeChange(event) {
+    // Called when we get an event that may or may not indicate a real change
+    // (like keyup in a textarea)
+    var tag = event.target.tagName;
+    if (tag == "TEXTAREA" || tag == "INPUT") {
+      change(event);
+    }
+  }
 
   function change(event) {
     if (inRemoteUpdate) {
@@ -215,7 +224,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
       }
     });
     return result;
-  };
+  }
 
   function getTracker(el, name) {
     el = $(el)[0];
@@ -263,6 +272,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
       el.val(value);
     }
     el.data("towtruckPrevValue", value);
+    eventMaker.fireChange(el);
   }
 
   session.hub.on("form-update", function (msg) {
@@ -451,10 +461,12 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
 
   session.on("ui-ready", function () {
     $(document).on("change", change);
+    $(document).on("textInput keyup cut paste", maybeChange);
   });
 
   session.on("close", function () {
     $(document).off("change", change);
+    $(document).off("textInput keyup cut paste", maybeChange);
   });
 
   session.hub.on("hello", function (msg) {
