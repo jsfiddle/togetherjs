@@ -85,6 +85,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
         console.info("In:", msg);
       }
+      if (! peers) {
+        // We're getting messages before everything is fully initialized
+        console.warn("Message received before all modules loaded (ignoring):", msg);
+        return;
+      }
       msg.peer = peers.getPeer(msg.clientId, msg);
       if (msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
         // We do this here to make sure this is run before any other

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "storage"], function ($, util, session, storage) {
+define(["jquery", "util", "session", "storage", "require"], function ($, util, session, storage, require) {
   var playback = util.Module("playback");
   var assert = util.assert;
 
@@ -12,19 +12,33 @@ define(["jquery", "util", "session", "storage"], function ($, util, session, sto
   };
 
   playback.getLogs = function (url) {
-    var result = $.Deferred();
-    $.ajax({
-      url: url,
-      dataType: "text"
-    }).then(
-      function (logs) {
-        logs = parseLogs(logs);
-        result.resolve(logs);
-      },
-      function (error) {
-        result.reject(error);
+    if (url.search(/^local:/) === 0) {
+      return $.Deferred(function (def) {
+        storage.get("recording." + url.substr("local:".length)).then(function (logs) {
+          if (! logs) {
+            def.resolve(null);
+            return;
+          }
+          logs = parseLogs(logs);
+          def.resolve(logs);
+        }, function (error) {
+          def.reject(error);
+        });
       });
-    return result;
+    }
+    return $.Deferred(function (def) {
+      $.ajax({
+        url: url,
+        dataType: "text"
+      }).then(
+        function (logs) {
+          logs = parseLogs(logs);
+          def.resolve(logs);
+        },
+        function (error) {
+          def.reject(error);
+        });
+    });
   };
 
   function parseLogs(logs) {

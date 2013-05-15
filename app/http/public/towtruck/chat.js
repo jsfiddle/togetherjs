@@ -28,7 +28,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       var name = parts[0].substr(1).toLowerCase();
       var method = commands["command_" + name];
       if (method) {
-        method(parts[1]);
+        method.apply(null, parts.slice(1));
         return;
       }
     }
@@ -193,6 +193,12 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       var logLoader = playback.getLogs(url);
       logLoader.then(
         (function (logs) {
+          if (! logs) {
+            ui.chat.system({
+              text: "No logs found."
+            });
+            return;
+          }
           logs.save();
           this.playing = logs;
           logs.play();
@@ -203,6 +209,111 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
           });
         });
       windowing.hide("#towtruck-chat");
+    },
+
+    command_savelogs: function (name) {
+      session.send({
+        type: "get-logs",
+        forClient: session.clientId,
+        saveAs: name
+      });
+      function save(msg) {
+        if (msg.request.forClient == session.clientId && msg.request.saveAs == name) {
+          storage.set("recording." + name, msg.logs).then(function () {
+            session.hub.off("logs", save);
+            ui.chat.system({
+              text: "Saved as local:" + name
+            });
+          });
+        }
+      }
+      session.hub.on("logs", save);
+    },
+
+    command_baseurl: function (url) {
+      if (! url) {
+        storage.get("baseUrlOverride").then(function (b) {
+          if (b) {
+            ui.chat.system({
+              text: "Set to: " + b.baseUrl
+            });
+          } else {
+            ui.chat.system({
+              text: "No baseUrl override set"
+            });
+          }
+        });
+        return;
+      }
+      url = url.replace(/\/*$/, "");
+      ui.chat.system({
+        text: "If this goes wrong, do this in the console to reset:\n  localStorage.setItem('towtruck.baseUrlOverride', null)"
+      });
+      storage.set("baseUrlOverride", {
+        baseUrl: url,
+        expiresAt: Date.now() + (1000 * 60 * 60 * 24)
+      }).then(function () {
+        ui.chat.system({
+          text: "baseUrl overridden (to " + url + "), will last for one day."
+        });
+      });
+    },
+
+    command_config: function (variable, value) {
+      if (! (variable || value)) {
+        storage.get("configOverride").then(function (c) {
+          if (c) {
+            util.forEachAttr(c, function (value, attr) {
+              if (attr == "expiresAt") {
+                return;
+              }
+              ui.chat.system({
+                text: "  " + attr + " = " + JSON.stringify(value)
+              });
+            });
+            ui.chat.system({
+              text: "Config expires at " + (new Date(c.expiresAt))
+            });
+          } else {
+            ui.chat.system({
+              text: "No config override"
+            });
+          }
+        });
+        return;
+      }
+      if (variable == "clear") {
+        storage.set("configOverride", undefined);
+        ui.chat.system({
+          text: "Clearing all overridden configuration"
+        });
+        return;
+      }
+      console.log("config", [variable, value]);
+      if (! (variable && value)) {
+        ui.chat.system({
+          text: "Error: must provide /config VAR VALUE"
+        });
+        return;
+      }
+      try {
+        value = JSON.parse(value);
+      } catch (e) {
+        ui.chat.system({
+          text: "Error: value (" + value + ") could not be parsed: " + e
+        });
+        return;
+      }
+      storage.get("configOverride").then(function (c) {
+        c = c || {};
+        c[variable] = value;
+        c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
+        storage.set("configOverride", c).then(function () {
+          ui.chat.system({
+            text: "Variable " + variable + " = " + JSON.stringify(value) + "\nValue will be set for one day."
+          });
+        });
+      });
     }
 
   };

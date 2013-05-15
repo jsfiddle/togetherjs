@@ -12,11 +12,52 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+
+  var baseUrlOverride = localStorage.getItem("towtruck.baseUrlOverride");
+  if (baseUrlOverride) {
+    try {
+      baseUrlOverride = JSON.parse(baseUrlOverride);
+    } catch (e) {
+      baseUrlOverride = null;
+    }
+    if ((! baseUrlOverride) || baseUrlOverride.expiresAt < Date.now()) {
+      // Ignore because it has expired
+      localStorage.removeItem("towtruck.baseUrlOverride");
+    } else {
+      baseUrl = baseUrlOverride.baseUrl;
+      var logger = console.warn || console.log;
+      logger.call(console, "Using TowTruck baseUrlOverride:", baseUrl);
+      logger.call(console, "To undo run: localStorage.removeItem('towtruck.baseUrlOverride')");
+    }
+  }
+
+  var configOverride = localStorage.getItem("towtruck.configOverride");
+  if (configOverride) {
+    try {
+      configOverride = JSON.parse(configOverride);
+    } catch (e) {
+      configOverride = null;
+    }
+    if ((! configOverride) || configOverride.expiresAt < Date.now()) {
+      localStorage.removeItem("towtruck.cnofigOverride");
+    } else {
+      for (var attr in configOverride) {
+        if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
+          continue;
+        }
+        window["TowTruckConfig_" + attr] = configOverride[attr];
+      }
+    }
+  }
+
+  var version = "unknown";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
-  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>" || (Date.now() + "");
-  if (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0) {
+  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>";
+  if ((! cacheBust) || (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0)) {
     cacheBust = Date.now() + "";
+  } else {
+    version = cacheBust;
   }
 
   // Make sure we have all of the console.* methods:
@@ -398,7 +439,7 @@
 
   // This should contain the output of "git describe --always --dirty"
   // FIXME: substitute this on the server (and update make-static-client)
-  TowTruck.version = "unknown";
+  TowTruck.version = version;
   TowTruck.baseUrl = baseUrl;
 
   TowTruck.hub = TowTruck._mixinEvents({});
@@ -443,6 +484,9 @@
   }
 
   function conditionalOnload() {
+    if (window.TowTruckConfig_noAutoStart) {
+      return;
+    }
     // A page can define this function to defer TowTruck from starting
     var callToStart = window.TowTruckConfig_callToStart;
     if (window.TowTruckConfig && window.TowTruckConfig.callToStart) {

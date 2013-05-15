@@ -46,7 +46,12 @@ define(["jquery", "util"], function ($, util) {
     // FIXME: should run .onclick() as well
   };
 
-  eventMaker.inEvent = false;
+  eventMaker.fireChange = function (target) {
+    target = $(target)[0];
+    var event = document.createEvent("HTMLEvents");
+    event.initEvent("change", true, true);
+    var cancelled = target.dispatchEvent(event);
+  };
 
   return eventMaker;
 });

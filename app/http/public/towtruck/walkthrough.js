@@ -81,6 +81,8 @@ define(["util", "guiders", "jquery", "windowing"], function (util, guiders, $, w
     windowing.hide();
   }
 
+  var base = TowTruck.baseUrl;
+
   // See here for information about the options for Guiders:
   //   https://github.com/jeff-optimizely/Guiders-JS
   var guide = [
@@ -102,33 +104,33 @@ define(["util", "guiders", "jquery", "windowing"], function (util, guiders, $, w
       overlay: true,
       attachTo: "#towtruck-profile-button",
       title: "Connect with friends",
-      description: "<img src=\"/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to collaborate with friends.</p>"
+      description: "<img src=\"" + base + "/images/walkthru-img-01.png\" alt=\"Walkthrough image 1\"><p>Click here to collaborate with friends.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-share-link",
       title: "Share this link",
-      description: "<img src=\"/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To collaborate using TowTruck, just copy and paste this link and send it to a friend!</p>",
+      description: "<img src=\"" + base + "/images/walkthru-img-02.png\" alt=\"Walkthrough image 2\"><p>To collaborate using TowTruck, just copy and paste this link and send it to a friend!</p>",
       onShow: showSettings
     },
     {
       overlay: true,
       attachTo: "#towtruck-audio-button",
       title: "Talk in real-time",
-      description: "<img src=\"/images/walkthru-img-03.png\" alt=\"Walkthrough image 3\"><p>If your browser supports it, click here to begin a live audio chat.</p><p>Since this is an experimental feature, you can learn more <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\">here</a>.</p>"
+      description: "<img src=\"" + base + "/images/walkthru-img-03.png\" alt=\"Walkthrough image 3\"><p>If your browser supports it, click here to begin a live audio chat.</p><p>Since this is an experimental feature, you can learn more <a href=\"https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.</p>"
     },
     {
       overlay: true,
       attachTo: "#towtruck-chat",
       onHide: hideWindow,
       title: "Chat with friends",
-      description: "<img src=\"/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily text chat with your friends.</p>",
+      description: "<img src=\"" + base + "/images/walkthru-img-04.png\" alt=\"Walkthrough image 4\"><p>Easily text chat with your friends.</p>",
       onShow: showChat
     },
     {
       overlay: true,
       title: "Start TowTruck!",
-      description: "<img src=\"/images/walkthru-img-05.png\" alt=\"Walkthrough image 5\"><p>Alright, you're ready to use TowTruck! Now get collaborating!</p>"
+      description: "<img src=\"" + base + "/images/walkthru-img-05.png\" alt=\"Walkthrough image 5\"><p>Alright, you're ready to use TowTruck! Now get collaborating!</p>"
     }
   ];
 

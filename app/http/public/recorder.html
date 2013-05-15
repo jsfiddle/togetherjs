@@ -4,31 +4,23 @@
     <meta charset="UTF-8">
     <title>TowTruck recorder</title>
     <script>
-      // FIXME: need to make this dynamic:
-      defaultHubBase = "";
-      baseUrl = (location.href + "").replace(/\/recorder\.html.*/, "");
-      // FIXME: this is copied from towtruck.js:
-      require = {
-        context: "towtruck",
-        baseUrl: baseUrl + "/towtruck",
-        urlArgs: "bust=" + Date.now(),
-        paths: {
-          jquery: "libs/jquery-1.8.3.min",
-          walkabout: "libs/walkabout.js/walkabout",
-          tinycolor: "libs/tinycolor",
-          "alien-avatar-generator": "libs/alien-avatar-generator"
-        },
-        deps: ["recorder"],
-        callback: function () {
-          require({context: "towtruck"})(["recorder"], function (recorder) {
-            recorder.start({
-              baseUrl: baseUrl,
-              defaultHubBase: defaultHubBase
-            });
+      TowTruckConfig_noAutoStart = true;
+    </script>
+    <script src="./towtruck.js"></script>
+    <script>
+      var config = TowTruck._extend(TowTruck.requireConfig);
+      config.deps = ["recorder"];
+      config.callback = function () {
+        console.log("got back");
+        require({context: "towtruck"})(["recorder"], function (recorder) {
+          recorder.start({
+            baseUrl: TowTruck.baseUrl,
+            defaultHubBase: TowTruck.getConfig("hubBase")
           });
-        }
+        });
       };
-      console.log("require", require);
+      require = config;
+      console.log("required");
     </script>
     <script src="./towtruck/libs/require.js"></script>
     <link rel="stylesheet" href="recorder.css">
