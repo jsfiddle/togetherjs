@@ -1,3 +1,0 @@
-[submodule "slowparse"]
-	path = slowparse
-	url = git://github.com/mozilla/slowparse.git
