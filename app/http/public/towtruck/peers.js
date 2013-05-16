@@ -352,6 +352,17 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     return Peer.peers[id];
   };
 
+  peers.getAllPeers = function (liveOnly) {
+    var result = [];
+    util.forEachAttr(Peer.peers, function (peer) {
+      if (liveOnly && peer.status != "live") {
+        return;
+      }
+      result.push(peer);
+    });
+    return result;
+  };
+
   session.hub.on("bye", function (msg) {
     var peer = peers.getPeer(msg.clientId);
     peer.bye();

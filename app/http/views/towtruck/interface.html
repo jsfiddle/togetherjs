@@ -109,7 +109,15 @@
     <header class="towtruck-title">
       Chat
     </header>
-    <div id="towtruck-chat-participants"></div>
+    <section class="towtruck-header-addition">
+      <div id="towtruck-chat-participants" data-toggles="#towtruck-chat-no-participants" style="display: none">
+        <span id="towtruck-chat-participant-list"></span>
+        and You
+      </div>
+      <div id="towtruck-chat-no-participants" data-toggles="#towtruck-chat-participants">
+        No one else is here
+      </div>
+    </section>
 
     <div style="display: none">
 

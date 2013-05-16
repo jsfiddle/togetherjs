@@ -314,7 +314,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       el.css({
         display: "inline-block"
       });
-      console.log("adding", el[0]);
       $("#towtruck-pick-color").append(el);
     });
 
@@ -646,6 +645,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         $("#towtruck-self-color").css({backgroundColor: this.peer.color});
         $("#towtruck-self-avatar").attr("src", this.peer.avatar);
       }
+      updateChatParticipantList();
     },
 
     update: function () {
@@ -797,6 +797,17 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       }
     }
   });
+
+  function updateChatParticipantList() {
+    var live = peers.getAllPeers(true);
+    if (live.length) {
+      ui.displayToggle("#towtruck-chat-participants");
+      $("#towtruck-chat-participant-list").text(
+        live.map(function (p) {return p.name;}).join(", "));
+    } else {
+      ui.displayToggle("#towtruck-chat-no-participants");
+    }
+  }
 
   session.hub.on("url-change-nudge", function (msg) {
     if (msg.to && msg.to != session.clientId) {
