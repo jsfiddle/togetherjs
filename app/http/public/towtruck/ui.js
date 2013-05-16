@@ -519,18 +519,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     /* Takes an element and sets any person-related attributes on the element
        Different from updates, which use the class names we set here: */
     setElement: function (el) {
-      el.find(".towtruck-person")
-        .addClass(this.peer.className("towtruck-person-"));
-      el.find(".towtruck-person-literal")
-        .addClass(this.peer.className("towtruck-person-literal-"));
-      var avatarEl = el.find(".towtruck-avatar img, img.towtruck-avatar");
-      avatarEl.addClass(this.peer.className("towtuck-avatar-"));
-      avatarEl = el.find(".towtruck-avatar-box");
-      avatarEl.addClass(this.peer.className("towtruck-avatar-box-"));
-      var colors = el.find(".towtruck-person-bgcolor");
-      colors.addClass(this.peer.className("towtruck-person-bgcolor-"));
-      colors = el.find(".towtruck-person-bordercolor");
-      colors.addClass(this.peer.className("towtruck-person-bordercolor-"));
+      var classes = ["towtruck-person", "towtruck-person-literal",
+                     "towtruck-avatar", "towtruck-avatar-box",
+                     "towtruck-person-bgcolor", "towtruck-person-role",
+                     "towtruck-person-url-name", "towtruck-person-status"];
+      classes.forEach(function (cls) {
+        el.find("." + cls).addClass(this.peer.className(cls + "-"));
+      }, this);
       this.updateDisplay(el);
     },
 
@@ -573,6 +568,27 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
           borderColor: this.peer.color
         });
       }
+      container.find("." + this.peer.className("towtruck-person-role-"))
+        .text(this.peer.isOwner ? "Owner" : "Participant");
+      var urlName = this.peer.title || "";
+      if (this.peer.title) {
+        urlName += " (";
+      }
+      urlName += util.truncateCommonDomain(this.peer.url, location.href);
+      if (this.peer.title) {
+        urlName += ")";
+      }
+      container.find("." + this.peer.className("towtruck-person-url-name-"))
+        .text(urlName);
+      var url = this.peer.url;
+      if (this.peer.urlHash) {
+        url += this.peer.urlHash;
+      }
+      container.find("." + this.peer.className("towtruck-person-url-"))
+        .attr("href", url);
+      // FIXME: should have richer status:
+      container.find("." + this.peer.className("towtruck-person-status-"))
+        .text(this.peer.idle == "active" ? "Active" : "Inactive");
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:
         $("#towtruck-self-name").val(this.peer.name);
@@ -689,11 +705,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         peer: this.peer
       });
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
-      this.dockElement.click(this.click);
       var iface = $("#towtruck-interface");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"
       });
+      this.detailElement = templating.sub("participant-window", {
+        peer: this.peer
+      });
+      ui.container.append(this.detailElement);
+      this.dockElement.click((function () {
+        if (this.detailElement.is(":visible")) {
+          windowing.hide(this.detailElement);
+        } else {
+          windowing.show(this.detailElement, {bind: this.dockElement});
+        }
+      }).bind(this));
     },
 
     undock: function () {
@@ -702,6 +728,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       }
       this.dockElement.remove();
       this.dockElement = null;
+      this.detailElement.remove();
+      this.detailElement = null;
       var iface = $("#towtruck-interface");
       iface.css({
         height: (iface.height() - BUTTON_HEIGHT) + "px"
