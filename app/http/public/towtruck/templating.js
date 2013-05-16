@@ -16,6 +16,7 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
 
   templating.sub = function (templateId, variables) {
     var template = templating.clone(templateId);
+    variables = variables || {};
     util.forEachAttr(variables, function (value, attr) {
       // FIXME: do the substitution... somehow?
       var subs = template.find(".towtruck-sub-" + attr).removeClass("towtruck-sub-" + attr);

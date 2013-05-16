@@ -1715,6 +1715,42 @@
   -o-animation-iteration-count: infinite;
 }
 
+#towtruck-profile-arrow {
+  position: relative;
+  width: 10px;
+  height: 6px;
+  left: 30px;
+  top: 3px;
+  background: url(/images/btn-triangle.png);
+  background-size: 50%;
+  background-repeat: no-repeat;
+}
+
+#towtruck-pick-color {
+  width: 200px;
+  height: 100px;
+  margin-left: -100px;
+  position: absolute;
+  background-color: #fff;
+  z-index: @z-index + 4;
+  // FIXME: shouldn't be one-off like this:
+  border: 2px solid #666;
+  border-radius: 4px;
+  padding: 5px;
+  .towtruck-color-swatch {
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    border: 1px solid;
+    border-radius: 1px;
+    margin: 4px;
+    // Border and background color gets set dynamically
+    &.towtruck-swatch-active {
+      border: 2px solid;
+    }
+  }
+}
+
 // FIXME: these images are double size for retina, but all the same size,
 // so this gets them down to a decent size, but is still weird.
 .guiders_content img {

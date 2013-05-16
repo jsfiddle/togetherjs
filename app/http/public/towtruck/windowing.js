@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "peers", "session"], function ($, util, peers, session) {
+define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers, session, modal) {
   var assert = util.assert;
   var windowing = util.Module("windowing");
   var $window = $(window);
@@ -13,6 +13,11 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
   windowing.show = function (element, options) {
     element = $(element);
     options = options || {};
+    if (element.hasClass("towtruck-modal")) {
+      windowing.hide();
+      modal.showModal(element, options.onClose);
+      return;
+    }
     options.bind = options.bind || element.attr("data-bind-to");
     if (options.bind) {
       options.bind = $(options.bind);
@@ -101,6 +106,10 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       element.data("boundTo", null);
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
+    var modals = $(".towtruck-modal:visible");
+    if (modals.length) {
+      modal.stopModal();
+    }
   };
 
   windowing.showNotification = function (element, options) {

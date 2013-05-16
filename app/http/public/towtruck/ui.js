@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "templating", "modal", "linkify", "peers", "windowing"], function (require, $, util, session, templates, templating, modal, linkify, peers, windowing) {
+define(["require", "jquery", "util", "session", "templates", "templating", "modal", "linkify", "peers", "windowing", "tinycolor"], function (require, $, util, session, templates, templating, modal, linkify, peers, windowing, tinycolor) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -19,6 +19,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
   var finishedAt = null;
   // Time in milliseconds for the dock to animate out:
   var DOCK_ANIMATION_TIME = 300;
+
+  var COLORS = [
+    "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
+    "#FFD700", "#F08080", "#90EE90", "#FF6347"];
 
   // This would be a circular import, but we just need the chat module sometime
   // after everything is loaded, and this is sure to complete by that time:
@@ -219,10 +223,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       return false;
     });
 
-    $("#towtruck-menu-end").click(function () {
-      session.close();
-    });
-
     $("#towtruck-menu-feedback").click(function(){
       windowing.hide();
       hideMenu();
@@ -264,8 +264,58 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       windowing.show("#towtruck-avatar-edit");
     });
 
-    $("#towtruck-cancel-end-session").click(function () {
-      windowing.hide("#towtruck-about");
+    $("#towtruck-menu-end").click(function () {
+      hideMenu();
+      windowing.show("#towtruck-confirm-end");
+    });
+
+    $("#towtruck-end-session").click(function () {
+      session.close();
+    });
+
+    $("#towtruck-menu-update-color").click(function () {
+      var menu = $(this);
+      var menuOffset = menu.offset();
+      var picker = $("#towtruck-pick-color");
+      picker.show();
+      picker.css({
+        top: menuOffset.top + menu.height(),
+        left: menuOffset.left
+      });
+      picker.find(".towtruck-swatch-active").removeClass("towtruck-swatch-active");
+      picker.find(".towtruck-color-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
+    });
+
+    $("#towtruck-pick-color").click(".towtruck-color-swatch", function (event) {
+      var swatch = $(event.target);
+      var color = swatch.attr("data-color");
+      peers.Self.update({
+        color: color
+      });
+      event.stopPropagation();
+      return false;
+    });
+
+    $("#towtruck-pick-color").click(function (event) {
+      $("#towtruck-pick-color").hide();
+      event.stopPropagation();
+      return false;
+    });
+
+    COLORS.forEach(function (color) {
+      var el = templating.sub("color-swatch");
+      el.attr("data-color", color);
+      var darkened = tinycolor.darken(color);
+      el.css({
+        backgroundColor: color,
+        borderColor: darkened
+      });
+      // For some reason el.show() sets display to block:
+      el.css({
+        display: "inline-block"
+      });
+      console.log("adding", el[0]);
+      $("#towtruck-pick-color").append(el);
     });
 
     $("#towtruck-chat-button").click(function () {
@@ -359,6 +409,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     el.hide();
     $(document).unbind("click", maybeHideMenu);
     ui.displayToggle("#towtruck-self-name-display");
+    $("#towtruck-pick-color").hide();
   }
 
   function maybeHideMenu(event) {

@@ -19,6 +19,7 @@
       <div id="towtruck-button-bg">
         <button id="towtruck-profile-button" class="towtruck-button">
           <div class="towtruck-avatar-box towtruck-avatar-box-self"></div>
+          <div id="towtruck-profile-arrow"></div>
         </button>
         <button id="towtruck-share-button" class="towtruck-button">
 
@@ -53,10 +54,17 @@
   <!-- The window for editing the avatar: -->
   <div id="towtruck-avatar-edit" class="towtruck-window" data-bind-to="#towtruck-profile-button" style="display: none">
     <header class="towtruck-title">
-      Edit Avatar
+      Update avatar
     </header>
     <section>
       <img src="http://localhost:8080/images/default-avatar.png" class="towtruck-avatar" id="towtruck-self-avatar">
+      <div><button id="towtruck-upload-avatar">Upload a picture</button></div>
+      <div><button id="towtruck-camera-avatar">Take a picture</button></div>
+    </section>
+    <section class="towtruck-window-buttons">
+      <button class="towtruck-dismiss">Cancel</button>
+      or
+      <button id="towtruck-avatar-save">Save</button>
     </section>
   </div>
 
@@ -220,6 +228,11 @@
     <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/images/btn-end-session.png" alt=""> End TowTruck</div>
   </div>
 
+  <div id="towtruck-pick-color" style="display: none">
+    <div id="towtruck-template-color-swatch" class="towtruck-color-swatch" style="display: none">
+    </div>
+  </div>
+
   <div style="display: none">
     <!-- User went to new URL: -->
     <div id="towtruck-template-url-change-popup" class="towtruck-popup towtruck-url-change-popup">
@@ -298,6 +311,20 @@
     <p><button class="towtruck-modal-close">End TowTruck</button></p>
     <p><button class="towtruck-modal-close towtruck-browser-unsupported-anyway">Try TowTruck Anyway</button></p>
 
+  </div>
+
+  <div id="towtruck-confirm-end" class="towtruck-modal" style="display: none">
+    <header class="towtruck-title">End session?</header>
+    <section>
+      <p>
+        Are you sure you'd like to end your TowTruck session?
+      </p>
+    </section>
+    <section class="towtruck-window-buttons">
+      <button class="towtruck-dismiss">Cancel</button>
+      or
+      <button id="towtruck-end-session">End session</button>
+    </section>
   </div>
 
   <div id="towtruck-feedback-form" class="towtruck-modal" style="display: none;">
