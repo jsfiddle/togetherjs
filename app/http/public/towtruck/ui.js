@@ -340,8 +340,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     var bound = $("#towtruck-profile-button");
     var boundOffset = bound.offset();
     el.css({
-      top: boundOffset.top + bound.height() + "px",
-      left: (boundOffset.left + bound.width() - 10 - el.width()) + "px"
+      top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
+      left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
     });
     $(document).bind("click", maybeHideMenu);
   }
@@ -519,29 +519,66 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     /* Takes an element and sets any person-related attributes on the element
        Different from updates, which use the class names we set here: */
     setElement: function (el) {
-      var nick = this.peer.name;
-      var avatar = this.peer.avatar;
-      if (this.peer.isSelf) {
-        nick = "me";
-      }
       el.find(".towtruck-person")
-        .text(nick)
         .addClass(this.peer.className("towtruck-person-"));
       el.find(".towtruck-person-literal")
-        .text(this.peer.name || "(no name set)")
         .addClass(this.peer.className("towtruck-person-literal-"));
       var avatarEl = el.find(".towtruck-avatar img, img.towtruck-avatar");
-      if (avatar) {
-        avatarEl.attr("src", avatar);
-        avatarEl.attr("title", nick);
-      }
       avatarEl.addClass(this.peer.className("towtuck-avatar-"));
+      avatarEl = el.find(".towtruck-avatar-box");
+      avatarEl.addClass(this.peer.className("towtruck-avatar-box-"));
       var colors = el.find(".towtruck-person-bgcolor");
-      console.log("setting on", el[0], this.peer.color, colors);
-      colors.css({
-        backgroundColor: this.peer.color
-      });
       colors.addClass(this.peer.className("towtruck-person-bgcolor-"));
+      colors = el.find(".towtruck-person-bordercolor");
+      colors.addClass(this.peer.className("towtruck-person-bordercolor-"));
+      this.updateDisplay(el);
+    },
+
+    updateDisplay: function (container) {
+      container = container || ui.container;
+      var name;
+      if (this.peer.isSelf) {
+        name = "me";
+      } else {
+        name = this.name;
+      }
+      container.find("." + this.peer.className("towtruck-person-")).text(name || "");
+      container.find("." + this.peer.className("towtruck-person-literal-")).text(this.peer.name || "(no name set)");
+      var avatarEl = container.find("." + this.peer.className("towtruck-avatar-"));
+      if (this.peer.avatar) {
+        avatarEl.attr("src", this.peer.avatar);
+      }
+      avatarEl = container.find("." + this.peer.className("towtruck-avatar-box-"));
+      if (this.peer.avatar) {
+        avatarEl.css({
+          backgroundImage: "url(" + this.peer.avatar + ")"
+        });
+      }
+      avatarEl.attr("title", this.peer.name);
+      if (this.peer.color) {
+        avatarEl.css({
+          borderColor: this.peer.color
+        });
+      }
+      if (name) {
+        avatarEl.attr("title", name);
+      }
+      if (this.peer.color) {
+        var colors = container.find("." + this.peer.className("towtruck-person-bgcolor-"));
+        colors.css({
+          backgroundColor: this.peer.color
+        });
+        colors = container.find("." + this.peer.className("towtruck-person-bordercolor-"));
+        colors.css({
+          borderColor: this.peer.color
+        });
+      }
+      if (this.peer.isSelf) {
+        // FIXME: these could also have consistent/reliable class names:
+        $("#towtruck-self-name").val(this.peer.name);
+        $("#towtruck-self-color").css({backgroundColor: this.peer.color});
+        $("#towtruck-self-avatar").attr("src", this.peer.avatar);
+      }
     },
 
     update: function () {
@@ -564,34 +601,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
           this.removeUrl();
         }
       }
-      var name;
-      if (this.peer.isSelf) {
-        name = "me";
-      } else {
-        name = this.name;
-      }
-      ui.container.find("." + this.peer.className("towtruck-person-")).text(name || "");
-      ui.container.find("." + this.peer.className("towtruck-person-literal-")).text(this.peer.name || "(no name set)");
-      var avatarEl = ui.container.find("." + this.peer.className("towtruck-avatar-"));
-      if (this.peer.avatar) {
-        avatarEl.attr("src", this.peer.avatar);
-      }
-      if (name) {
-        avatarEl.attr("title", name);
-      }
-      if (this.peer.color) {
-        var colors = ui.container.find("." + this.peer.className("towtruck-person-bgcolor-"));
-        console.log("updating on", colors, this.peer.className("towtruck-person-bgcolor-"));
-        colors.css({
-          backgroundColor: this.peer.color
-        });
-      }
-      if (this.peer.isSelf) {
-        // FIXME: these could also have consistent/reliable class names:
-        $("#towtruck-self-name").val(this.peer.name);
-        $("#towtruck-self-color").css({backgroundColor: this.peer.color});
-        $("#towtruck-self-avatar").attr("src", this.peer.avatar);
-      }
+      this.updateDisplay();
     },
 
     createUrl: function () {

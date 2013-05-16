@@ -84,6 +84,23 @@ function viewSend() {
   };
 }
 
+function newPeer(options) {
+  options = options || {};
+  var msg = {
+    type: "hello",
+    clientId: options.clientId || "faker",
+    name: options.name || "Faker",
+    avatar: options.avatar || TowTruck.baseUrl + "/images/robot-avatar.png",
+    color: options.color || "#ff0000",
+    url: location.href.replace(/#.*/, ""),
+    urlHash: "",
+    title: document.title,
+    rtcSupported: false
+  };
+  TowTruck.require("session")._getChannel().onmessage(msg);
+}
+
+
 TowTruck._mixinEvents(viewSend);
 viewSend.running = true;
 // FIXME: this looks like events:

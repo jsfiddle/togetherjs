@@ -247,17 +247,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
               storage.settings.set("color", color);
             }
             if (! avatar) {
-              // FIXME: this should be replaced with a single generic avatar:
-              require(["alien-avatar-generator"], (function (Alien) {
-                var c = new Alien({width: session.AVATAR_SIZE, height: session.AVATAR_SIZE});
-                c.ctx.arc(session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, 0, Math.PI*2);
-                c.ctx.closePath();
-                c.ctx.clip();
-                c.newAvatar();
-                avatar = c.toImgSrc();
-                storage.settings.set("avatar", avatar);
-                this.update({avatar: avatar, fromLoad: true});
-              }).bind(this));
+              avatar = TowTruck.baseUrl + "/images/default-avatar.png";
             }
             this.update({
               name: name,

@@ -8,7 +8,7 @@ getRequire("ui", "chat", "util", "session", "jquery", "storage", "peers", "curso
 printResolved(
   storage.settings.set("name", ""),
   storage.settings.set("defaultName", "Jane Doe"),
-  storage.settings.set("avatar", "/images/introducing-mozilla.png"),
+  storage.settings.set("avatar", undefined),
   storage.settings.set("stickyShare", null),
   storage.settings.set("color", "#00ff00"),
   storage.settings.set("seenIntroDialog", true),
@@ -26,7 +26,7 @@ TowTruck();
 /* =>
 ui-ready([Module ui])
 send: hello
-  avatar: "/images/introducing-mozilla.png",
+  avatar: "...",
   clientId: "...",
   clientVersion: "unknown",
   color: "#00ff00",
@@ -49,18 +49,7 @@ print(incoming);
 // => function (msg) {...}
 
 viewSend.deactivate();
-incoming({
-  type: "hello",
-  clientId: "faker",
-  name: "Faker",
-  avatar: "about:blank",
-  color: "#ff0000",
-  url: location.href.replace(/#.*/, ""),
-  urlHash: "",
-  title: document.title,
-  rtcSupported: false
-});
-
+newPeer();
 wait(500);
 
 // =>
@@ -89,7 +78,7 @@ print(faker);
 print(faker.status, faker.idle, faker.view.dockElement && faker.view.dockElement.is(":visible"));
 
 // => live active true
-
+/*
 incoming({
   type: "bye",
   clientId: "faker"
@@ -106,3 +95,4 @@ print(faker.status, faker.idle, faker.dockElement && faker.dockElement.is(":visi
 print(fakeCursor.element && fakeCursor.element.is(":visible"));
 
 // => false
+*/

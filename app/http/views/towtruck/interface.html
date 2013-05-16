@@ -13,15 +13,15 @@
     <div id="towtruck-buttons">
       <div style="display: none">
         <button id="towtruck-template-dock-person" class="towtruck-button towtruck-dock-person">
-          <img src="" class="towtruck-avatar" alt="Avatar Placeholder">
+          <div class="towtruck-avatar-box"></div>
         </button>
       </div>
       <div id="towtruck-button-bg">
         <button id="towtruck-profile-button" class="towtruck-button">
-          <img class="towtruck-avatar-self">
+          <div class="towtruck-avatar-box towtruck-avatar-box-self"></div>
         </button>
         <button id="towtruck-share-button" class="towtruck-button">
-          S
+
         </button>
       </div>
       <button id="towtruck-audio-button" class="towtruck-button">
@@ -76,6 +76,7 @@
     <header class="towtruck-title">
       Chat
     </header>
+    <div id="towtruck-chat-participants"></div>
 
     <div style="display: none">
 
@@ -184,7 +185,7 @@
       <input id="towtruck-self-name" type="text" data-toggles="#towtruck-self-name-display" style="display: none" placeholder="Enter your name">
     </div>
     <div class="towtruck-menu-separator"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/images/menu-update-name.png" alt=""> Update your name</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/images/btn-pencil.png" alt=""> Update your name</div>
     <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/images/menu-update-avatar" alt=""> Change avatar</div>
     <div class="towtruck-menu-item" id="towtruck-menu-update-color"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
     <div class="towtruck-menu-separator"></div>

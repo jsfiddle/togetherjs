@@ -466,20 +466,8 @@
     background-image:url('/images/icn-phone-active.png');
   }
 
-  #towtruck-buttons #towtruck-about-button {
-    background-image:url('/images/icn-logo.png');
-    background-size: @button-size @button-size;
-    border-right:1px solid #00539F;
-    border-left:1px solid #00539F;
-    border-bottom:1px solid #00539F;
-    padding-top:2px;
-    margin-top:-6px;
-  }
-  #towtruck-buttons #towtruck-about-button:hover {
-    background-image:url('/images/icn-logo-hover.png');
-  }
-  #towtruck-buttons #towtruck-about-button:active {
-    background-image:url('/images/icn-logo-press.png');
+  #towtruck-buttons #towtruck-share-button {
+    background-image: url('/images/btn-share.png');
   }
 
   #towtruck-buttons #towtruck-audio-button{
@@ -658,10 +646,21 @@
     text-shadow:0px 1px rgba(255,255,255,1);
   }
 
-  .towtruck-avatar {
+  img.towtruck-avatar {
     float:left;
     margin:10px 10px 10px 10px;
     padding:0px 10px 10px 10px;
+  }
+
+  div.towtruck-avatar-box {
+    height: 32px;
+    width: 32px;
+    background-repeat: no-repeat;
+    background-size: 34px 34px;
+    background-position: -1px -1px;
+    border: 2px solid;
+    border-radius: 2px;
+    background-clip: border-box;
   }
 
   .towtruck-avatar img{
