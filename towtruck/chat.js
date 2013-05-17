@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
+/*jshint evil:true */
 define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
   var chat = util.Module("chat");
   var assert = util.assert;
@@ -151,9 +151,9 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       var e = eval;
       try {
         result = eval(expr);
-      } catch (e) {
+      } catch (error) {
         ui.chat.system({
-          text: "Error: " + e
+          text: "Error: " + error
         });
       }
       if (result !== undefined) {

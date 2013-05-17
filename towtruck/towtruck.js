@@ -226,9 +226,9 @@
     urlArgs: "bust=" + cacheBust,
     paths: {
       jquery: "libs/jquery-1.8.3.min",
-      walkabout: "libs/walkabout.js/walkabout",
-      esprima: "libs/walkabout.js/lib/esprima",
-      falafel: "libs/walkabout.js/lib/falafel",
+      walkabout: "libs/walkabout/walkabout",
+      esprima: "libs/walkabout/lib/esprima",
+      falafel: "libs/walkabout/lib/falafel",
       tinycolor: "libs/tinycolor",
       "alien-avatar-generator": "libs/alien-avatar-generator",
       guiders: "libs/Guider-JS/guiders-1.3.0"
