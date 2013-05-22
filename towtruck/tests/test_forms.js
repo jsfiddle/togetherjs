@@ -5,7 +5,7 @@ $("#fixture").append('<textarea id="textarea" style="width: 10em; height: 3em;">
 $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');
 
-getRequire("forms", "session", "ui");
+getRequire("forms", "session", "ui", "windowing");
 // => Loaded modules: ...
 
 viewSend();
@@ -24,7 +24,7 @@ var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
 
-ui.hideWindow("#towtruck-about");
+windowing.hide("#towtruck-about");
 
 // =SECTION Changes
 

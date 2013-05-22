@@ -3,7 +3,7 @@
 $("#fixture").empty();
 $("#other").remove();
 $("#output-container").remove();
-var cmSrc = "../example/codemirror/codemirror.js";
+var cmSrc = "../../example/codemirror/codemirror.js";
 var script = $("<script>").attr("onload", Spy("cmLoad", {wait: true})).attr("src", cmSrc);
 $(document.head).append(script);
 

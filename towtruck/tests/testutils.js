@@ -46,7 +46,7 @@ function getRequire() {
       window.trequire = TowTruck.require = require.config({context: "towtruck"});
       loadModules();
     };
-    var url = "../towtruck/libs/require.js";
+    var url = "../libs/require.js";
     var script = document.createElement("script");
     script.src = url;
     console.log("Loading require.js from", url);

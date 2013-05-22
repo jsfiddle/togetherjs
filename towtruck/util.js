@@ -28,7 +28,9 @@ define(["jquery"], function ($) {
     } else {
       var newPrototype = Object.create(superClass);
       for (var a in prototype) {
-        newPrototype[a] = prototype[a];
+        if (prototype.hasOwnProperty(a)) {
+          newPrototype[a] = prototype[a];
+        }
       }
       prototype = newPrototype;
     }
@@ -187,6 +189,10 @@ define(["jquery"], function ($) {
     }
     return util.Deferred(function (def) {
       var count = args.length;
+      if (! count) {
+        def.resolve();
+        return;
+      }
       var allResults = [];
       var anyError = false;
       args.forEach(function (arg, index) {

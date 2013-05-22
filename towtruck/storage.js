@@ -19,7 +19,8 @@ define(["util"], function (util) {
   var DEBUG_STORAGE = false;
 
   var Storage = util.Class({
-    constructor: function (storage, prefix) {
+    constructor: function (name, storage, prefix) {
+      this.name = name;
       this.storage = storage;
       this.prefix = prefix;
     },
@@ -74,14 +75,18 @@ define(["util"], function (util) {
     clear: function () {
       var self = this;
       var promises = [];
-      return this.keys().then(function (keys) {
-        keys.forEach(function (key) {
-          // FIXME: technically we're ignoring the promise returned by all
-          // these sets:
-          promises.push(self.set(key, undefined));
+      return Deferred((function (def) {
+        this.keys().then(function (keys) {
+          keys.forEach(function (key) {
+            // FIXME: technically we're ignoring the promise returned by all
+            // these sets:
+            promises.push(self.set(key, undefined));
+          });
+          util.resolveMany(promises).then(function () {
+            def.resolve();
+          });
         });
-        return util.resolveMany(promises);
-      });
+      }).bind(this));
     },
 
     keys: function (prefix, excludePrefix) {
@@ -104,11 +109,15 @@ define(["util"], function (util) {
           return result;
         }));
       });
+    },
+
+    toString: function () {
+      return '[storage for ' + this.name + ']';
     }
 
   });
 
-  var storage = Storage(localStorage, "towtruck.");
+  var storage = Storage('localStorage', localStorage, "towtruck.");
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -125,7 +134,7 @@ define(["util"], function (util) {
 
   });
 
-  storage.tab = Storage(sessionStorage, "towtruck-session.");
+  storage.tab = Storage('sessionStorage', sessionStorage, "towtruck-session.");
 
   return storage;
 });
