@@ -1,6 +1,7 @@
-<% layout('../../layout.ejs') -%>
-<% block("enableExample", true) %>
-<% block("title", "Mozilla Labs : TowTruck form example") %>
+{% extends "base.tmpl" %}
+{% block title %} Mozilla Labs : TowTruck form example {% endblock %}
+{# set enableExample true #}
+{% block body %}
 
         <h1>A form</h1>
 
@@ -75,3 +76,5 @@
       });
       TowTruckConfig_cloneClicks = "#about-toggle";
     </script>
+
+{% endblock %}

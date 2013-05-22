@@ -4,21 +4,23 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <title><%= blocks.title || "Mozilla Labs : TowTruck" %></title>
+    <title>{% block title %}
+      Mozilla Labs : TowTruck
+    {% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A service for your website that makes it surprisingly easy to collaborate in real-time.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="/images/fav-icon.png">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="/javascripts/froogaloop2.min.js"></script>
+    <script src="/js/froogaloop2.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <script src="/towtruck.js"></script>
     <script src="/example/startup.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', '<%= process.env.GA_ACCOUNT%>']);
+      _gaq.push(['_setAccount', '{{ GA_ACCOUNT }}']);
       _gaq.push(['_trackPageview']);
 
       (function() {
@@ -28,12 +30,12 @@
       })();
     </script>
 
-    <script type="text/javascript" src="/application.js"></script>
+    <script type="text/javascript" src="/js/application.js"></script>
 
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
     <link href="/style.css"                       rel="stylesheet" type="text/css" media="all">
     <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
-    <%- blocks.styles %>
+    {% block styles %}{% endblock %}
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -60,24 +62,23 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <% if (blocks.enableExample) { %><a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a><% } %>
+            {% if (enableExample) %}
+            <a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
+            {% endif %}
             <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
             <div class="nav-collapse collapse">
               <ul class="nav">
 
-                <!-- add logo <li <% if (blocks.enableExample) { %>class="active"<% } %>><a href="/example">Examples</a></li> -->
-
-
-                <li <% if (blocks.enableHome) { %>class="active"<% } %>><a href="/">Home</a></li>
-                <li <% if (blocks.enableExample) { %>class="active"<% } %>><a href="/example">Examples</a></li>
+                <li {% if (enableHome) %}class="active"{% endif %}><a href="/">Home</a></li>
+                <li {% if (enableExample) %}class="active"{% endif %}><a href="/example">Examples</a></li>
                 <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
                 <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developers</a></li>
                 <!--li><a href="#">API Docs</a></li>
                 <li><a href="#">Extending TowTruck</a></li-->
                 <li><a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a></li>
-                <% if (blocks.enableExample) { %>
+                {% if (enableExample) %}
                 <!-- <li><a href="#" onclick="TowTruck(this); return false">Start TowTruck</a></li> -->
-                <% } %>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -85,7 +86,7 @@
       </div>
     </div>
 
-<% if (blocks.enableExample) { %>
+{% if (enableExample) %}
 <div class="containerbg">
   <div class="container examples">
     <div class="span3">
@@ -102,15 +103,15 @@
       </div><!--/.well -->
     </div><!--/.span3 -->
     <div class="span8">
-<% } %>
+{% endif %}
 
-    <%- body %>
+    {% block body %}{% endblock %}
 
-<% if (blocks.enableExample) { %>
+{% if (enableExample) %}
     </div><!--/.span8-->
   </div><!--/.container.examples -->
 </div><!--/.containerbg -->
-<% } %>
+{% endif %}
 
     <footer>
       <div class="container">

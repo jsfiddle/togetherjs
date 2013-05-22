@@ -5,10 +5,10 @@
 /*jshint scripturl:true */
 (function () {
 
-  var styleSheet = "/towtruck.min.css";
+  var styleSheet = "/towtruck/towtruck.css";
 
-  var baseUrl = "<%= process.env.PUBLIC_BASE_URL || '' %>";
-  if (baseUrl && typeof baseUrl == "string" && baseUrl.indexOf("<" + "%") === 0) {
+  var baseUrl = "__baseUrl__";
+  if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
@@ -53,8 +53,8 @@
   var version = "unknown";
   // FIXME: we could/should use a version from the checkout, at least
   // for production
-  var cacheBust = "<%= process.env.GIT_LAST_COMMIT || '' %>";
-  if ((! cacheBust) || (typeof cacheBust == "string" && cacheBust.indexOf("<" + "%") === 0)) {
+  var cacheBust = "__gitCommit__";
+  if ((! cacheBust) || cacheBust == "__gitCommit__") {
     cacheBust = Date.now() + "";
   } else {
     version = cacheBust;
@@ -349,8 +349,8 @@
     return "TowTruck";
   };
 
-  var defaultHubBase = "<%= process.env.HUB_BASE %>";
-  if (defaultHubBase.indexOf("<" + "%") === 0) {
+  var defaultHubBase = "__hubUrl__";
+  if (defaultHubBase == "__hubUrl__") {
     // Substitution wasn't made
     defaultHubBase = "https://hub.towtruck.mozillalabs.com";
   }

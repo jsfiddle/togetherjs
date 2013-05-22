@@ -1,5 +1,7 @@
-<% layout('../layout.ejs') -%>
-<% block("enableHome", true) %>
+{% extends "base.tmpl" %}
+{% block body %}
+
+{# set enableHome true #}
 
 <div class="containerbg">
   <div id="introduction" class="section">
@@ -29,7 +31,7 @@
       </div>
     </div>
   </div>
-      
+
   <script type="text/javascript" charset="utf-8">
 		//check if mobile device, and play Vimeo with no modal
 		var isiPhone = navigator.userAgent.toLowerCase().indexOf("iphone");
@@ -198,7 +200,7 @@
     </div>
     <hr style="width:50%;margin:50px auto 0px;">
   </div>
-  
+
   <div id="tryitout" class="section">
     <div class="container">
       <h1 class="main-header">Try out TowTruck today!</h1>
@@ -206,3 +208,5 @@
     </div>
   </div>
 </div>
+
+{% endblock %}

@@ -1,7 +1,30 @@
-<% layout('../../layout.ejs') -%>
-<% block("title", "Mozilla Labs : TowTruck example code editing") %>
-<% block("enableExample", true) %>
-<% block("styles", "<style>pre {/* Override bootrap pre padding */ padding: 0;}  #ace-editor {margin: 0; top: 0; position: absolute; width: 80%; height: 25em; right: 0;}  #ace-container {height: 25em;}  #codemirror-container {border: 1px solid #000;}</style>") %>
+{% extends "base.tmpl" %}
+{% block title %} Mozilla Labs : TowTruck example code editing {% endblock %}
+{# set enableExample true #}
+{% block styles %}
+<style>
+  pre {
+    /* Override bootrap pre padding */
+    padding: 0;
+  }
+  #ace-editor {
+    margin: 0;
+    top: 0;
+    position: absolute;
+    width: 80%;
+    height: 25em;
+    right: 0;
+  }
+  #ace-container {
+    height: 25em;
+  }
+  #codemirror-container {
+    border: 1px solid #000;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
 
           <h1>Code editor</h1>
 
@@ -65,3 +88,5 @@
        //TowTruck.reinitialize();
      });*/
    </script>
+
+{% endblock %}
