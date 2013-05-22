@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="doctest.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Doctest.js: the humane Javascript test framework</title>
+    <meta name="description" content="Doctest.js is a Javascript testing framework">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href=".resources/boilerplate/css/normalize.min.css">
+    <link rel="stylesheet" href=".resources/boilerplate/css/main.css">
+    <link rel="stylesheet" href=".resources/doc.css">
+    <script src=".resources/boilerplate/js/vendor/modernizr-2.6.1.min.js"></script>
+    <script src="doctest.js"></script>
+    <!-- EXTRA_HEAD -->
+<script type="text/javascript" src="./.resources/toc.js"></script>
+<script>
+  if (location.href.search(/^http:\/\/ianb.github.com/) == 0) {
+    location.href = 'http://doctestjs.org';
+  }
+</script>
+<!-- /EXTRA_HEAD -->
+  </head>
+  <body class="autodoctest">
+
+    <div class="header-container">
+      <header class="wrapper clearfix">
+        <h1 class="title"><a href="/">Doctest.js</a>: <!-- TITLE -->A Humane Javascript Test Framework<!-- /TITLE --></h1>
+
+        <nav>
+          <ul>
+            <li><a href="https://github.com/ianb/doctestjs">Github</a></li>
+            <li><a href="/reference.html">Reference</a></li>
+            <li><a href="/tutorial.html">Tutorial</a></li>
+          </ul>
+        </nav>
+
+      </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+
+
+     <!-- BODY -->
+
+
+<p><strong>Doctest.js</strong> is a test runner and testing framework for Javascript.</p>
+
+<p>Doctest uses a novel approach to testing: <em>example</em> and <em>expected result</em>.  Each test is a chunk of code that prints out results and side effects, and then the expected result is matched against that to see if the test passed or failed.</p>
+
+<p>An example (note: these are live examples &mdash; you can also try your own via the <a href="try.html">live demo</a>):
+
+<pre class="test">
+function capitalize(words) {
+  return words.replace(/\b[a-z]/g, function (m) {
+    return m[0].toUpperCase();
+  });
+}
+
+print(capitalize('some words'));
+// => Some Words
+
+print(capitalize('some 4ward words'));
+// => Some 4ward Words
+</pre>
+</p>
+
+<p>This is similar to something like <code>assertEqual(capitalize('some words'), 'Some Words')</code> &mdash; there's a kind of "equal" check every time you print something.  Instead of doing stuff then testing every detail of what happened or what was returned, testing almost happens for you &mdash; you print out what you are interested in, and you can even punt: you can start by simply exercising everything that matters, and then inspecting that what happens is what you expect, and copying those results into the test.  For instance:
+
+<pre class="test">
+function getProperties(obj) {
+  var result = [];
+  for (i in obj) {
+    result.push(i);
+  }
+  result.sort();
+  return result;
+}
+
+print(getProperties({b: 1, a: 2}));
+// =>
+
+print(getProperties("a"));
+// =>
+</pre>
+
+</p>
+
+<p>Look: the first example worked great, <code>["a", "b"]</code>.  The second example though wasn't right at all.  <code>"0"</code>?  Once we have a better idea we can adjust those tests:
+
+<pre class="test">
+function getProperties(obj) {
+  var result = [];
+  for (i in obj) {
+    if (obj.hasOwnProperty(i)) {
+      result.push(i);
+    }
+  }
+  result.sort();
+  return result;
+}
+
+print(getProperties({b: 1, a: 2}));
+// => ["a", "b"]
+
+print(getProperties("a"));
+// => []
+</pre>
+
+Well, that wasn't quite enough, but this kind of incremental development is exactly why doctest.js is so helpful: it shows you what you've done, it shows you both <em>presence</em> and <em>absence</em>. Most test frameworks only give you tools to test what <em>is</em> there, and not ensure that the things you don't want aren't there.</p>
+
+<h3>Async testing made easy!</h3>
+
+<p>The other <strong>great</strong> feature of doctest.js is how it lets you test async code.</p>
+
+<p>Async code is a bit tricky for all test runners.  When you run the test, the <em>result</em> of the test won't be known until after you wait some time.  Test runners might have ways to pause the test process while the test code completes.  They also need ways to test that everything you wanted to happen will happen.  Something that is often tricky in test code is to <em>make sure</em> that some callback was called &mdash; it's relatively easier to test that the callback was called correctly.</p>
+
+<p>Here doctest's ability to test both what's present and what's missing shines.  And the test runner also gives you a great way to serialize your asynchronous tests.</p>
+
+<p>The core feature here is <code>wait()</code> &mdash; this lets you register a callback that will tell the test runner when this block of code is fully finished.  An example:
+
+<pre class="test">
+var now = Date.now();
+var done = false;
+
+setTimeout(function () {
+  done = true;
+  print('The timeout finished!', Date.now() - now);
+}, 300);
+
+wait(function () {return done;});
+// => The timeout finished! ...
+</pre>
+
+(Notice we use <code>...</code> to ignore the specific number that is printed: ellipsis act as a kind of wildcard)
+
+</p>
+
+<p>With Doctest you don't have to use fake <code>setTimeout</code> or fake async anywhere &mdash; you always use the real thing, and it's nearly as easy to test as async code.  Frameworks that make this code synchronous are cheating you, because asynchronous code is the hardest of code and deserves to be tested accurately.  But when a test framework makes synchronous easy and asynchronous hard, it's all too easy when in the depth of test development to take shortcuts.</p>
+
+<h3>Mocking with Spy</h3>
+
+<p>In addition there's a simply mocking framework in doctest with Spy. This lets you create a function that records over time it is called &mdash; and each time it is called it prints out how it is called. It also makes it easy to wait on the Spy to be called:
+
+<pre class="test">
+var button = $('&lt;button>&lt;/button>');
+$('body').append(button);
+button.click(Spy('button.click'));
+button.click();
+Spy('button.click').wait();
+/* =>
+&lt;button />.button.click({...})
+*/
+</pre>
+
+You'll notice here that we also ignored the details of the object passed to the callback.  We could use wildcards to match no part or any specific part of the argument called.  Also note that the value of <code>this</code> is shown: people usually forget that <code>this</code> is a kind of implicit argument to many functions, but again doctest makes the implicit explicit.  Also note that the <em>actual</em> output is always displayed, so you can use this to inspect aspects of the environment even if you don't want to test all fo them.
+</p>
+
+
+<h3>Lineage</h3>
+
+<p>Doctest is based on the Python <a href="http://docs.python.org/library/doctest.html">doctest module</a> originally written by Tim Peters.  Spy was inspired some by Jasmine's <a href="http://pivotal.github.com/jasmine/jsdoc/symbols/jasmine.Spy.html">Spy class</a>, and carries over ideas from <a href="http://pypi.python.org/pypi/MiniMock">MiniMock</a>.</p>
+
+<p>If you've used Python's doctest and found it annoying or not widely useful for doctest: <strong>doctest.js fixes all those problems</strong>: see <a href="http://blog.ianbicking.org/2012/10/02/why-doctest-js-is-better-than-pythons-doctest/">this post for more</a>.</p>
+
+
+<div style="display: none">
+  <div id="doctest-output"></div>
+</div>
+
+
+<!-- /BODY -->
+
+      </div> <!-- #main -->
+
+    </div> <!-- #main-container -->
+
+    <div class="footer-container">
+      <footer class="wrapper">
+        <h3 class="no-toc">doctest.js is by <a href="http://ianbicking.org">Ian Bicking</a>.
+          It's on <a href="https://github.com/ianb/doctestjs">github</a>!</h3>
+      </footer>
+    </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src=".resources/boilerplate/js/vendor/jquery-1.8.1.min.js"><\/script>')
+</script>
+
+<script src=".resources/boilerplate/js/main.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-34921728-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </body>
+</html>

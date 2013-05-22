@@ -1,0 +1,140 @@
+/* Basic styling: */
+
+body {
+    font-family: sans-serif;
+}
+
+pre {
+    padding: 0.3em;
+}
+
+/* Test block formatting: */
+
+pre.doctest, pre.commenttest, pre.test {
+    border: 1px solid #999;
+    border-radius: 4px;
+}
+
+pre.doctest.doctest-some-failure, pre.commenttest.doctest-some-failure, pre.test.doctest-some-failure {
+    border: 1px solid #f00;
+}
+
+/* FIXME: it would be nice if this was more obviously styled to show that there
+   was more content */
+pre.doctest.expand-on-failure, pre.commenttest.expand-on-failure, pre.test.expand-on-failure {
+    max-height: 3em;
+    overflow-y: auto;
+}
+
+pre.doctest.expand-on-failure.doctest-some-failure, pre.commenttest.expand-on-failure.doctest-some-failure, pre.test.expand-on-failure.doctest-some-failure {
+    max-height: none;
+}
+
+/* Individual example formatting: */
+
+.doctest-example:target {
+    border-left: 4px solid #f00;
+    padding-left: 4px;
+}
+
+.doctest-example {
+}
+
+.doctest-example.doctest-success {
+    color: #060;
+}
+
+.doctest-example.doctest-failure {
+    color: #900;
+}
+
+.doctest-example .doctest-actual-output {
+    color: #066;
+    /*padding-left: 1em;*/
+}
+
+.doctest-example.doctest-failure .doctest-output {
+    padding-left: 1em;
+}
+
+.doctest-example .doctest-output {
+    font-weight: bold;
+}
+
+.doctest-example .doctest-description {
+    color: #000;
+    font-weight: bold;
+}
+
+.doctest-example .doctest-console {
+    color: #009;
+    padding-left: 1em;
+}
+
+/* Reporter formatting: */
+
+#doctest-success-count.doctest-nonzero {
+    color: #0f0;
+}
+
+#doctest-failure-count.doctest-nonzero {
+    color: #f00;
+}
+
+#doctest-aborted {
+    background-color: #900;
+    color: #fff;
+}
+
+.doctest-report-table th {
+    font-weight: normal;
+    text-align: left;
+}
+
+.doctest-report-table td {
+    padding: 0 1em;
+}
+
+a.doctest-failure-link {
+    color: #00f;
+    text-decoration: none;
+    padding: 0 1em 0 0;
+}
+
+a.doctest-failure-link:visited {
+    color: #00f;
+}
+
+a.doctest-failure-link:hover {
+    text-decoration: underline;
+}
+
+/* Comparison table */
+
+.doctest-comparison-table {
+    border: 1px solid #000;
+    /* FIXME: not sure why this doesn't keep the table limited to 100% */
+    width: 100%;
+}
+
+.doctest-comparison-table td {
+    overflow: auto;
+}
+
+.doctest-comparison-header th {
+    background-color: #000;
+    color: #fff;
+}
+
+.doctest-comparison-error td {
+    background-color: #fdd;
+}
+
+td.doctest-comparison-got {
+    padding-right: 1em;
+    color: #060;
+}
+
+td.doctest-comparison-expected {
+    color: #900;
+}

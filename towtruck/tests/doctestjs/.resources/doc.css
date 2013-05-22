@@ -1,0 +1,89 @@
+i, em {
+    font-family: serif;
+}
+
+#contents ul {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+#contents > ul {
+    padding-left: 0;
+}
+
+#contents li {
+    list-style: none;
+}
+
+#contents {
+    border-bottom: 1px solid #999;
+    padding-left: 1em;
+}
+
+.header-container header {
+    width: 98%;
+}
+
+code {
+    color: #288;
+}
+
+aside code {
+    color: #9ff;
+}
+
+section:target h1, section:target h2, section:target h3, section:target h4,
+section:target h5, section:target h6, h3:target, h4:target {
+    border-bottom: 3px solid #f90;
+}
+
+footer a:link, footer a:visited,
+aside a:link, aside a:visited {
+    text-decoration: none;
+    color: #fd1;
+}
+
+section header h1, section header h2, section header h3, section header h4,
+section header h5, section header h6 {
+    margin-left: -1em;
+    margin-top: 1.75em;
+    border-bottom: 1px solid #000;
+}
+
+pre {
+    font-size: 90%;
+    line-height: 1.3;
+    border: 1px solid #999;
+    border-radius: 4px;
+}
+
+@media only screen and (min-width: 768px) {
+
+    .main aside {
+        position: absolute;
+        right: 1em;
+    }
+
+}
+
+.header-container header {
+    margin-left: 1em;
+}
+
+h1.title a:link, h1.title a:visited {
+    text-decoration: none;
+    color: #fff;
+}
+
+h1.title a:hover {
+    text-decoration: underline;
+}
+
+
+dd p {
+    margin-top: 0;
+}
+
+dd p:last-child {
+    margin-bottom: 0;
+}
