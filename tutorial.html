@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="doctest.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>A doctest.js tutorial</title>
+    <meta name="description" content="An introduction to the Javascript testing framework, doctest.js">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href=".resources/boilerplate/css/normalize.min.css">
+    <link rel="stylesheet" href=".resources/boilerplate/css/main.css">
+    <link rel="stylesheet" href=".resources/doc.css">
+    <script src=".resources/boilerplate/js/vendor/modernizr-2.6.1.min.js"></script>
+    <script src="doctest.js"></script>
+    <!-- EXTRA_HEAD -->
+      <script type="text/javascript" src="./.resources/toc.js"></script>
+      <!-- /EXTRA_HEAD -->
+  </head>
+  <body class="autodoctest">
+
+    <div class="header-container">
+      <header class="wrapper clearfix">
+        <h1 class="title"><a href="/">Doctest.js</a>: <!-- TITLE -->A Tutorial <!-- /TITLE --></h1>
+
+        <nav>
+          <ul>
+            <li><a href="https://github.com/ianb/doctestjs">Github</a></li>
+            <li><a href="/reference.html">Reference</a></li>
+            <li><a href="/tutorial.html">Tutorial</a></li>
+          </ul>
+        </nav>
+
+      </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+
+
+     <!-- BODY -->
+
+
+<aside>
+  <h3>Try it now!</h3>
+
+  <p>If you want to try writing/running your own tests (maybe as you read the tutorial) try the <strong><a href="try.html">live demo</a></strong>.
+    </p>
+</aside>
+
+<div id="contents"></div>
+
+          <article>
+            <section id="introduction">
+              <header>
+                <h1 id="intro">What's it like?</h1>
+              </header>
+
+<p>
+
+So you've decided to finally get religion when it comes to testing your Javascript code?  Or, you feel like testing just isn't as easy as it could be, and want to find a better way to test your Javascript code?  Or even: you've thought about or tried doing Test Driven Development but you've found it hard to get going? Let's do this...
+
+</p>
+
+<p>
+
+Doctest.js is basically <em>example code</em> and then <em>expected output</em>.  This is really what most tests look like, but instead of lots of <code>assertEqual(example, expected)</code> this example/expected combination is embedded into the structure of the test.
+
+</p>
+
+<aside>
+  <h3 id="page-setup">Page Setup</h3>
+
+  <p>
+    See <a href="#html">Setting Up Your HTML</a> to see how to get your test running in the browser.
+  </p>
+</aside>
+
+<p>
+
+I'm going to get right into how the test code looks, but to actually <em>use</em> doctest.js you have to setup an HTML file in a specific format.  That is described later in the <a href="#html">HTML section</a>.
+
+</p>
+
+<p>
+
+The structure looks like something you've probably seen before.  We add one new function, <code>print()</code>, that works a lot like <code>console.log()</code>.  Then we have a comment that shows what we expect to be output.  A really simple example:
+
+    <pre class="test">
+function factorial(n) {
+  if (typeof n != "number") {
+    throw "You must give a number";
+  }
+  if (n <= 0) {
+    return 1;
+  }
+  return n * factorial(n-1);
+}
+
+print(factorial(4))
+// => 25
+    </pre>
+
+</p>
+
+<p>
+
+See what I did there?  25 is totally the wrong answer!  Also see what happened, the test just ran and told us so!  There's also a summary of all the tests; if you do nothing it shows up at the top of the page, but in the interest of introducing the summary, here it is:
+
+</p>
+
+<p id="doctest-output" style="border: 1px solid #999"></p>
+
+<p>
+
+You'll notice it shows a failure (or more than one &mdash; it's the summary for all the examples in this tutorial).  It also has a link to each failure, so you can jump to the problematic section.
+
+</p>
+
+<aside>
+  <h3 id="quoting">Quoting</h3>
+
+  <p>
+    If you are writing your tests inline in the document, remember that you don't need to quote <code>></code> as <code>&amp;gt;</code>, that's only needed for <code>&lt;</code>
+  </p>
+</aside>
+
+<p>
+
+Let's look at what we did there: <code>print(factorial(4))</code> and <code>// => 25</code> &mdash; the output is just a comment that starts with <code>=></code>.
+
+</p>
+
+</section>
+
+<section id="errors">
+  <header>
+    <h3 id="errors">Testing for error conditions</h3>
+  </header>
+
+<p>
+
+You can also test errors:
+
+<pre class="test">
+print(factorial(null));
+// => Error: You must give a number
+</pre>
+
+When an exception is thrown it will print out <code>Error: (error text)</code> which you can match against. This way you can test for error conditions just like you test how "correct" invocations work.  Note that the <code>print()</code> isn't really necessary here, you could do this just as well:
+
+<pre class="test">
+factorial(null);
+// => Error: You must give a number
+</pre>
+
+</p>
+
+</section>
+
+<section id="print">
+  <header>
+    <h3 id="print"><code>print()</code> and output matching</h3>
+  </header>
+
+<aside>
+  <p>For more detail on printing see <a href="reference.html#print">the reference</a>.</p>
+</aside>
+
+<p>
+
+<code>print()</code> pretty-prints things.  This is important, because you have to "expect" the same output that <code>print()</code> produces.  You can give multiple arguments, like with <code>console.log</code>.
+
+<pre class="test">
+print({someProperty: 123, something: {a: 1, b: 2}, "foo": 123.1032, "another-property": [1,2,3,4]});
+/* =>
+{
+  "another-property": [1, 2, 3, 4],
+  foo: 123.1032,
+  someProperty: 123,
+  something: {a: 1, b: 2}
+}
+*/
+</pre>
+
+You might notice that the attributes are alphabetized and are quoted only when necessary.  If it's a small object it stays on one line:
+
+<pre class="test">
+print({someProperty: 123});
+// => {someProperty: 123}
+</pre>
+
+</p>
+
+<p>
+
+But sometimes the output is unpredictable; or rather you can predict it will change.  When that's the case you can basically put a wildcard in the expected output: <code>...</code> &mdash; that will match anything, including multiple lines.  In addition you can use <code>?</code> to match one word-like-thing (a number, symbol, etc; not <code>&quot;</code> or whitespace or other symbols).  You can use it like this:
+
+<pre class="test">
+print({
+  date: new Date(),
+  timestamp: Date.now()
+});
+
+// => {date: ..., timestamp: ?}
+</pre>
+
+</p>
+
+<p>
+
+You might notice that it <em>passes</em>, but you still get to see the actual output.  This is a great way to show information that you can review, without actually testing.  For instance, you might be testing something that connects to a server, in that case you might want to do this:
+
+<pre class="test">
+var server = {url: "http://localhost:8000"} // or some calculated value
+print(server.url);
+// => ...
+</pre>
+
+Now if everything seems breaky you can be 100% sure of what server you are connecting to.
+
+</p>
+
+<p>
+
+If you have a variable that is dynamic but you still care about the value, you should do something like this:
+
+<pre class="test">
+var date = Date.now();
+print(date == date, date);
+// => true ...
+</pre>
+
+Think of this pattern of <code>print(x == y)</code> as a kind of <code>assertEqual()</code> equivalent.
+
+</p>
+
+</section>
+
+<section id="async">
+  <header>
+    <h3 id="async">Testing async code</h3>
+  </header>
+
+<aside>
+  <p>For more on async and <code>wait</code> see <a href="reference.html#wait">the reference</a>.</p>
+</aside>
+
+<p>
+
+This is all well and good, but lots of code in Javascript is <em>asynchronous</em>, meaning that you don't just call a function that returns a value.  Doctest.js has an answer to that too: a great answer!
+
+</p>
+
+<p>
+
+For our example we'll use <code>XMLHttpRequest</code>, a common source of asynchronosity.  We'll test a request (just a loopback request, but if you are testing a foreign service you'd need <a href="http://enable-cors.org/">CORS access</a>).  When we instantiate and setup the request we don't have anything really to test &mdash; we want to test what happens when the request <em>completes</em>.
+
+</p>
+
+<p>
+
+To do this we'll use <code>wait()</code> &mdash; when this function is called the test runner will wait at the point where it sees <code>// =></code>, for a certain amount of time or until a certain condition is met. Only then will it compare all the output that has happened to what was expected, and run the next chunk of test.
+
+</p>
+
+<p>
+
+You can use this like: <code>wait(function () {return true when done})</code> or <code>wait(millisecondsToWait)</code>.  We'll use the first form, which is almost always better, since it allows the test to continue more quickly.  Tests also always time out eventually (by default the timeout is 5000 milliseconds, i.e., 5 seconds &mdash; by convention everything in Javascript is in milliseconds).
+
+<pre class="test">
+var endpoint = location.href;
+print(endpoint);
+// => ...
+
+var req = new XMLHttpRequest();
+req.open("GET", endpoint);
+req.onreadystatechange = function () {
+  if (req.readyState != 4) {
+    // hasn't actually finished
+    return;
+  }
+  print("Result:", req.status, req.getResponseHeader('content-type'));
+};
+req.send();
+
+wait(function () {return req.readyState == 4;});
+
+print("Current state:", req.readyState);
+
+/* =>
+Current state: 1
+Result: 200 text/html
+*/
+</pre>
+
+I put in something tricky there to try to clarify what <code>wait()</code> really does.  You'll notice there's a call to <code>wait()</code> that makes sure that <code>req.readyState == 4</code> (that's the code that means the request is finished).  But right after when we do <code>print(req.readyState)</code> it shows a readyState of 1.  That's because the <em>entire</em> block is printed (from the previous <code>// =></code> output up until the next one).  But the test runner keeps collecting output and doesn't run the next section until that <code>wait()</code> clause returns true.
+
+</p>
+
+<p>
+
+Another thing to note is that <code>wait()</code> needs to be called when that block of code is run &mdash; it can't be inside a function that isn't called.  That said, if you write test helper functions (and you should!), it often works well to put those calls in the helper function.  We'll see an example of that next...
+
+</p>
+
+</section>
+
+<section id="spy">
+  <header>
+    <h3 id="spy">The Spy</h3>
+  </header>
+
+<aside>
+  <p>For more information on <code>Spy</code> see <a href="reference.html#spy">the reference</a>.</p>
+</aside>
+
+<p>
+
+Note: the next example will use some jQuery, just for the heck of it, though there is no special support for jQuery or other frameworks in Doctest.
+
+</p>
+
+<p>
+
+If you use these tools you might end up writing code like this quite a lot:
+
+<pre class="test">
+// We've embedded a button just below this element
+var button = $('#example-button');
+// Just to highlight what we're working with:
+button.css({border: '1px dotted #f00'});
+button.click(function () {
+  print('Button clicked');
+});
+
+// Now we test that our event handler gets called when we do an artificial click of the button:
+button.click();
+// => Button clicked
+</pre>
+
+<button id="example-button" type="button">Example Button</button>
+
+</p>
+
+<p>
+
+But maybe we are curious about the arguments passed to that handler &mdash; even though we ignored the arguments, there was one passed.  And we might want to show what <code>this</code> is bound to; <code>this</code> is kind of like an invisible extra argument passed to every function invocation.  We could make a fancier <code>print()</code> statement there.  But instead, there's also a handy tool for tracking calls: <code>Spy</code>.
+
+</p>
+
+<p>
+
+An example:
+
+<pre class="test">
+var button = $('#example-button2');
+button.css({border: '1px dotted #00f'});
+button.click(Spy('button.click'));
+button.click();
+
+// => ...
+</pre>
+
+<button id="example-button2" type="button">Example Button 2</button>
+
+</p>
+
+<p>
+
+That's a lot more information!  Let's break it down:
+
+<pre>
+<b style="color: #00a">&lt;button id="example-button2" style="border: 1px solid rgb(0, 0, 255); " type="button">Example Button 2&lt;/button>.</b><span style="color: #0a0">button.click</span>({ ...
+</pre>
+
+There's two bits of information here.  The first is the value (in <span style="color: #00a">blue</span>) of <code>this</code>, which is the <code>#example-button2</code> element.  You'll notice it shows the HTML of the element.  If you want Spy to ignore this you can use <code>Spy('button.click', {ignoreThis: true})</code>.
+
+</p>
+
+<p>
+
+The second value (in <span style="color: #0a0">green</span>) is the name we gave the Spy when we created it. Note that Spy names are also identifiers, that is, <code>Spy('button.click') === Spy('button.click')</code>.
+
+</p>
+
+<p>
+
+Next of course is all the arguments.  There's a lot of arguments there.  They are... interesting.  You'll notice some references to <code>...recursive...</code> which is what you get when you have self-referencing data structures.  But maybe you want to test just a little of that structure without testing all of it.  You might do something like this:
+
+<pre class="test">
+// Spy('button.click') fetches the same Spy we were using before, which still has all its call information
+// .formatCall() shows the way the Spy was last called.
+print(Spy('button.click').formatCall());
+
+/* =>
+&lt;button...&lt;/button>.button.click({
+  currentTarget: &lt;button...
+  ...
+  timeStamp: ?,
+  type: "click"
+})
+*/
+
+</pre>
+
+So we've tested that the <code>type</code> is click, that it has a timeStamp (though not the value) and that the <code>currentTarget</code> is a button (presumably the button we bound it to).  We still get to <em>see</em> all the other information, we just aren't <em>testing</em> it.  This can be helpful in the future when you realize there's more you want to test &mdash; you can look at the test output and transcribe more into the test.  Or when something fails later you might want to inspect that output to make sure everything is what you expect (and when you see something unexpected that's also a great time to expand your test).
+
+</p>
+
+<p>
+
+Spies have a bunch of options, and act as a kind of mock object as well.  You can pass in options as the second argument, like <code>Spy('name', {options...})</code>.  Some highlights:
+
+
+<dl>
+  <dt><code>applies</code></dt>
+  <dd>This is a function that the Spy "wraps".  So if you do <code>Spy('click', {applies: function (event) {this.remove(); return false;}})</code> then you'll get the same output printed, but you'll also run <code>this.remove()</code>.</dd>
+
+  <dt><code>writes</code></dt>
+  <dd>If you set this to <code>false</code> then it won't automatically print out the calls.  The values of the calls will still be recorded, and you can use <code>aSpy.formatCall()</code> to see them.</dd>
+
+  <dt><code>ignoreThis</code></dt>
+  <dd><p>Lots of code binds <code>this</code> without intending too.  It's really easy in Javascript to do this.  For instance, if you do <code>handlers[i]()</code> then <code>this</code> will be <code>handlers</code>.  (Instead you might do <code>var handler = handlers[i]; handler()</code>)</p>
+
+    <p>Anyway, sometimes you don't care about <code>this</code>, and using <code>{ignoreThis: true}</code> lets you do that.
+  </p></dd>
+
+  <dt><code>returns</code></dt>
+  <dd>If you want the Spy to return a value when its called, give the value here.  Normally it returns <code>undefined</code>.</dd>
+
+  <dt><code>throwError</code></dt>
+  <dd>This makes the Spy throw the given error anytime it is called.</dd>
+
+  <dt><code>wait</code></dt>
+  <dd>If you use <code>Spy('name', {wait: true})</code> then the test will wait until the Spy has been called. This is a pretty common pattern.  It's basically the same as <code>Spy('name').wait()</code>.</dd>
+
+</dl>
+
+</p>
+
+<p>
+
+You can set values like <code>Spy.defaultOptions.writes = false</code> if you want to set one of these by default.
+
+</p>
+
+<p>
+
+If you want to inspect how the Spy has been called, you can check a few attributes:
+
+<dl>
+
+  <dt><code>.called</code></dt>
+  <dd>True once this Spy has been called.</dd>
+
+  <dt><code>.self</code> and <code>.selfList</code></dt>
+  <dd>This is the value of <code>this</code>, or <code>.selfList</code> contains a history for each call.</dd>
+
+  <dt><code>.args</code> and <code>.argList</code></dt>
+  <dd>The arguments the function was called with, or <code>.argList</code> is a history of arguments.</dd>
+
+</dl>
+
+</p>
+
+</section>
+
+<section id="console">
+  <header>
+    <h3 id="console-log">console.log</h3>
+  </header>
+
+<p>
+
+This isn't a feature you have to <em>do</em> anything about, it's just there for you, so I'm just going to point it out.
+
+</p>
+
+<p>
+
+When you use <code>console.log</code> (or any of its friends, like <code>console.warn</code>) those messages will be captured (in addition to going to the log as normal), and the output will be shown in the specific test where they happened.  A quick example:
+
+<pre class="test">
+function enumProps(object) {
+  console.log('obj', object);
+  var result = {}
+  for (var attr in object) {
+    if (typeof object[attr] == "number" && attr.toUpperCase() == attr) {
+      result[object[attr]] = attr;
+    }
+  }
+  return result;
+}
+
+print(enumProps($('#example-button')[0]));
+
+// => {...}
+
+</pre>
+
+You can think of it a little like <code>print()</code> goes to stdout, and <code>console.log()</code> goes to stderr.
+
+</p>
+
+</section>
+
+<section id="abort">
+  <header>
+    <h3 id="abort">Giving Up</h3>
+  </header>
+
+<p>
+
+Tests often require some feature or setup to be usable at all.  When it's not setup right you'll just get a bunch of meaningless failures.  For this reason there's a way to abort all your tests.  If you call <code>Abort()</code> then no further tests will be run.  If you want to connect to a server, for instance, you might check that the server is really there, and if not then just abort the rest of the tests.  For example:
+
+<pre>
+$.ajax({
+  url: '/ping',
+  success: Spy('ping', {wait: true, ignoreThis: true}),
+  error: function () {
+    Abort("Server isn't up");
+  }
+});
+
+// => ping(...)
+</pre>
+
+</p>
+
+</section>
+
+<section id="html">
+  <header>
+    <h2 id="html">Setting Up Your HTML</h2>
+  </header>
+
+<aside>
+  <p>For more on the HTML setup see <a href="reference.html#format">the reference documentation</a>.</p>
+</aside>
+
+<p>
+
+I wanted to show you all the cool features of doctest first, but you can't actually use any of them unless you set up a test runner page.  Luckily the page is pretty simple.  Let's say you've put doctest.js into <code>doctest/</code>:
+
+<pre>
+&lt;DOCTYPE html>
+&lt;html>
+  &lt;head>
+    &lt;meta charset="UTF-8">
+    &lt;title>My Test&lt;/title>
+    &lt;script src="doctest/doctest.js">&lt;/script>
+    &lt;link href="doctest/doctest.css" rel="stylesheet">
+    <b>&lt;script src="mylibrary.js">&lt;/script></b>
+  &lt;/head>
+  &lt;body class="autodoctest">
+
+  A test:
+
+&lt;pre class="test">
+test goes here
+&lt;/pre>
+
+  &lt;/body>&lt;/html>
+</pre>
+
+</p>
+
+<p>
+
+Mostly it's just boilerplate: you have to include <code>doctest.js</code> and <code>doctest.css</code> and of course any libraries or dependencies of the thing you are testing.  You also must use <b><code>&lt;body class="autodoctest"></code></b> &mdash; that's what tells doctest.js you want to find and run tests right away.
+
+</p>
+
+<p>
+
+Each test then is in a <code>&lt;pre class="test"></code>.  You might not want to actully write your tests <em>inside</em> the HTML, and instead put them in a separate Javascript file.  To do that use:
+
+<pre>
+&lt;pre class="test" href="./my_tests.js">&lt;/pre>
+</pre>
+
+This will load the test code from <code>./my_tests.js</code> and inline it into the element.  This is how I personally write most of my tests, though when moving between a narrative and tests (as I am doing in this tutorial) it is nice to keep the tests together with the descriptions.
+
+</p>
+
+<p>
+
+Note that specifically when you use <code>href="URL.js"</code> you can split the tests into sections by including the comment <code><b>// == SECTION</b> Your Section Header Name</code> in the included file, and you'll get multiple elements with headers automatically.
+
+</p>
+
+<p>
+
+A pass/fail summary is automatically added to the top of the page, though you can use <code>&lt;div id="doctest-output">&lt;/div></code> to position it someplace specific (as we did in this tutorial).
+
+</p>
+
+</section>
+
+
+<section id="feedback">
+  <header>
+    <h2 id="feedback">Feedback?</h2>
+  </header>
+
+<p>Was something in this tutorial confusing?  Is there a testing problem or pattern you think this tutorial should talk about?  Please give feedback in the form of an <a href="https://github.com/ianb/doctestjs/issues/new">new issue</a>.  Thanks!</p>
+
+</section>
+
+
+<h3 href="try.html">Live Demo...</h3>
+
+          </article>
+
+          <!--
+          <aside>
+            <h3>aside</h3>
+
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sodales urna non odio egestas tempor. Nunc vel vehicula ante. Etiam bibendum iaculis libero, eget molestie nisl pharetra in. In semper consequat est, eu porta velit mollis nec. Curabitur posuere enim eget turpis feugiat tempor. Etiam ullamcorper lorem dapibus velit suscipit ultrices.</p>
+
+          </aside>
+          -->
+
+<!-- /BODY -->
+
+      </div> <!-- #main -->
+
+    </div> <!-- #main-container -->
+
+    <div class="footer-container">
+      <footer class="wrapper">
+        <h3 class="no-toc">doctest.js is by <a href="http://ianbicking.org">Ian Bicking</a>.
+          It's on <a href="https://github.com/ianb/doctestjs">github</a>!</h3>
+      </footer>
+    </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src=".resources/boilerplate/js/vendor/jquery-1.8.1.min.js"><\/script>')
+</script>
+
+<script src=".resources/boilerplate/js/main.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-34921728-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Doctest.js: examples</title>
+<script type="text/javascript" src="../doctest.js"></script>
+<script type="text/javascript" src="../.resources/toc.js"></script>
+<link rel="stylesheet" type="text/css" href="../.resources/doc.css" />
+<link rel="stylesheet" type="text/css" href="../doctest.css" />
+
+</head>
+<body class="autodoctest">
+
+<!-- HEADER --><a href="http://github.com/ianb/doctestjs"><img
+style="position: absolute; top: 0; right: 0; border: 0;"
+src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+alt="Fork me on GitHub" /></a>
+
+<div id="container">
+
+<div class="download">
+ <a href="http://github.com/ianb/doctestjs/zipball/master">
+  <img border="0" width="90"
+   src="http://github.com/images/modules/download/zip.png" /></a>
+ <a href="http://github.com/ianb/doctestjs/tarball/master">
+  <img border="0" width="90"
+   src="http://github.com/images/modules/download/tar.png" /></a>
+</div>
+
+<h1 class="title"><a href="http://github.com/ianb/doctestjs">doctest.js</a>
+ <span class="small">by
+ <a href="http://blog.ianbicking.org">Ian Bicking</a></span>
+</h1>
+
+<div>
+<!-- /HEADER -->
+
+<h2>Doctest.js: examples</h2>
+
+<div id="contents"></div>
+
+<div id="doctest-output"></div>
+
+<h3>Web Service</h3>
+
+<div>
+  You can use doctest.js to test APIs; in fact, it's reasonable to use
+  it for acceptance tests of the web APIs themselves, not just to test
+  the Javascript wrappers around those APIs.
+</div>
+
+<div class="test">
+  In this example we'll access the <a
+  href="http://www.geonames.org/export/web-services.html">Geonames
+  API</a>.  First we'll want some routines to help us later on.  You
+  could put these into a separate <code>.js</code> file and include
+  it, but often (especially in an example ;) it's best to be fully
+  transparent and list all the routines out in the open...
+
+<pre class="doctest">
+$ apiLocation = 'http://ws.geonames.org/';
+$ function query(endpoint, q) {
+>   var url = apiLocation + endpoint;
+>   jQuery.ajax({
+>     url: url,
+>     data: q,
+>     dataType: "json",
+>     success: Spy('success', {wait: true, ignoreThis: true}),
+>     error: Spy('error')
+>   });
+> }
+</pre>
+
+  Some things to notice about this example:
+
+  <ul>
+    <li><code>apiLocation</code> is hard coded, but you could read it
+    from the query string, allowing something like
+    <code>test.html?apiLocation=http://localhost:8080</code>.
+    </li>
+
+    <li>We create a Spy for both success and failure, as we want to
+    track both of these.  We could just use functions, but mostly
+    there's an advantage to being able to watch <code>.called</code>.
+    If you used <code>{writes: true}</code> you might not need the
+    <code>.applies</code> functions.
+    </li>
+
+    <li><code>wait</code> can be called from anywhere.  That means
+    when you call this function doctest will wait until something is
+    called, and will test all the output since that time (either the
+    success or failure <code>writeln()</code>).  Timeout is the other
+    possibility.
+    </li>
+  </ul>
+
+</div>
+
+<div>
+  Now we'll use the routine to actually run a test:
+
+<pre class="doctest">
+$ query('postalCodeSearchJSON', {postalcode: 9011, maxRows: 5});
+success({
+  postalCodes: [
+    {...}
+  ]
+}, ...)
+</pre>
+
+</div>
+
+<h3>Web Service/XML</h3>
+
+<div class="test">
+  What we do for JSON, we can also do for XML; in this case
+  it's just fetching a static XML Atom document.
+
+<pre class="test">
+$.ajax({
+  url: './.resources/example.xml',
+  dataType: 'xml',
+  success: function (doc) {
+    gdoc = doc;
+    writeln(repr(doc));
+  },
+  error: Spy('error')
+});
+wait(0.5);
+/* =>
+&lt;feed xmlns="http://www.w3.org/2005/Atom">
+  &lt;title>Example Feed&lt;/title>
+  ...
+&lt;/feed>
+*/
+
+</pre>
+
+</div>
+
+<h3>Deferred/Promise</h3>
+
+<div class="test">
+
+  You can also
+  print <a href="http://api.jquery.com/category/deferred-object/">jquery.Deferred</a>
+  (promise) objects once they've resolved, using
+  the <code>printResolved()</code> function.  This also implicitly
+  calls <code>wait()</code> with the condition that all the promises
+  be resolved.  Both errors and resolved values are printed.
+
+  <pre class="test">
+var def1 = $.Deferred();
+var def2 = $.Deferred();
+def1.resolve("Value 1!", "Value2!");
+setTimeout(function () {
+  def2.reject("sucka");
+}, 500);
+printResolved("def1", def1, "def2", def2);
+// => def1 Value 1! Value2! def2 Error: sucka
+  </pre>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<!-- FOOTER --></div>
+
+<h3>Download</h3>
+<p>
+ You can download this project in either
+ <a href="http://github.com/ianb/doctestjs/zipball/master">zip</a> or
+ <a href="http://github.com/ianb/doctestjs/tarball/master">tar</a> formats.
+</p>
+
+<p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+ by running:
+ <pre>$ git clone git://github.com/ianb/doctestjs</pre>
+</p>
+
+<div class="footer">
+ get the source code on GitHub:
+ <a href="http://github.com/ianb/doctestjs">ianb/doctestjs</a>
+</div>
+
+</div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-6731441-12");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+<!-- /FOOTER -->
+
+</body> </html>
