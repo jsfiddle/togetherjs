@@ -11,9 +11,9 @@ printResolved(
   storage.settings.set("avatar", undefined),
   storage.settings.set("stickyShare", null),
   storage.settings.set("color", "#00ff00"),
-  storage.settings.set("seenIntroDialog", true),
-  storage.settings.set("seenWalkthrough", true),
-  storage.settings.set("dontShowRtcInfo", true),
+  storage.settings.set("seenIntroDialog", undefined),
+  storage.settings.set("seenWalkthrough", undefined),
+  storage.settings.set("dontShowRtcInfo", undefined),
   "done."
   );
 // => (resolved) ... done.
@@ -39,6 +39,22 @@ send: hello
 */
 
 session.clientId = "me";
+
+var buttonSelector = ".guiders_button.towtruck-walkthru-getstarted-button";
+wait(function () {
+  return $(buttonSelector).length;
+});
+
+// =>
+
+$(buttonSelector).click();
+wait(1000);
+
+// =>
+
+printResolved(storage.settings.get("seenIntroDialog"));
+
+// => true
 
 // =SECTION Peer handling
 

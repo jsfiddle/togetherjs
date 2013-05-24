@@ -22,13 +22,14 @@
 
 // Size of the buttons (they're square):
 @button-size: 40px;
+@avatar-size: 32px;
 // Note: this is also in ui.js, BUTTON_HEIGHT
 // Height of the draggable anchor at the top:
 @anchor-height: @button-size * 0.5;
 // Extra padding on the edge of the screen:
 @side-padding: 0px;
 // Background color of most elements:
-@background-color: #fff;
+@background-color: #0095DD;
 @window-background-color: #f2f4f5;
 @window-color: #000;
 
@@ -37,8 +38,16 @@
 @z-index: 10000;
 
 @import "reset.less";
+@import "functions.less";
 
 .towtruck {
+
+  /* General styles */
+
+  font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(51, 51, 51);
 
   a {
     color: #0095DD;
@@ -50,181 +59,21 @@
     text-decoration: underline;
   }
 
-  .body {
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .large {
-    font-size: 72px;
-    letter-spacing: -3px;
-    line-height: 100%;
-  }
-
-  .towtruck-clear {
-    clear:both;
-  }
-
   p {
-    font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 300;
-    line-height: 20px;
-    color:rgb(51, 51, 51);
-    margin: 0px 0px 10px;
+    margin: 0.5em 0 0.5em 0;
   }
 
-  .regular {
-    font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 300;
-    line-height: 20px;
-    color:rgb(51, 51, 51);
-    margin: 0px 0px 10px;
+  input:focus {
+    outline: none;
   }
 
-  h1 {
-    font-size: 48px;
-    letter-spacing: -2px;
-    line-height: 100%;
-  }
-  h2 {
-    font-size: 32px;
-    letter-spacing: -1px;
-    line-height: 100%;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 100;
-  }
-  h3 {
-    font-size: 28px;
-    letter-spacing: -0.5px;
-    line-height: 100%;
-  }
-  h4 {
-    font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 300;
-    line-height: 40px;
-    color:rgb(51, 51, 51);
-  }
-
-  .strong {
-    font-family: openSansRegular, Helvetica, 'Helvetica Neue', Arial;
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 300;
-    line-height: 20px;
-    color:rgb(51, 51, 51);
-    margin: 0px 0px 10px;
-  }
-
-
-  .small, small {
-    font-size: 10px;
-    line-height: 24px;
-  }
-
-  article, aside, details, figcaption, figure,
-  footer, header, hgroup, menu, nav, section {
-    /* HTML5 display-role reset for older browsers */
-    display: block;
-  }
-
-  ol, ul {
-    list-style: none;
-  }
-
-  blockquote, q {
-    quotes: none;
-  }
-
-  blockquote:before, blockquote:after,
-  q:before, q:after {
-    content: '';
-    content: none;
-  }
-
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
 }
 
 
-/* Functions */
-
-.box-shadow(...) {
-  -moz-box-shadow: @arguments;
-  -webkit-box-shadow: @arguments;
-  box-shadow: @arguments;
-}
-
-.box-dropshadow() {
-  .box-shadow(0px 1px 2px rgba(0,0,0,0.5));
-}
-
-.rounded-corners() {
+.towtruck-primary {
+  //display: inline-block;
   border-radius: 0.25em;
-}
-
-// FIXME: maybe use something like this? http://stackoverflow.com/questions/7874507/a-linear-gradient-with-variable-number-of-stops-in-less-or-sass
-/*headerbar style*/
-.header-chrome() {
-  background: -moz-linear-gradient(top,  #f1f1f1 1%, #ffffff 3%, #f1f1f1 5%, #f1f1f1 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#f1f1f1), color-stop(3%,#ffffff), color-stop(5%,#f1f1f1), color-stop(100%,#f1f1f1)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #f1f1f1 1%,#ffffff 3%,#f1f1f1 5%,#f1f1f1 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f1f1', endColorstr='#f1f1f1',GradientType=0 ); /* IE6-9 */
-}
-
-/*cancel btn*/
-.cancel-btn() {
-  display: inline-block;
-  border-radius: 0.25em;
-  background: #ffffff; /* Old browsers */
-  background: -moz-linear-gradient(top,  #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #ffffff 0%,#e5e5e5 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
-  color: rgb(0, 0, 0);
-  text-align: center;
-  font-size: 14px;
-  padding: 0px 20px;
-  height: 40px;
-  line-height: 40px;
-  text-decoration: none;
-  min-width: 100px;
-  border: 0px none;
-  text-shadow: 0px 1px 0px rgba(255, 255, 255, 1);
-  font-family: @default-font;
-  transition: all 0.25s linear 0s;
-}
-
-/*confirm btn*/
-.confirm-btn() {
-  display: inline-block;
-  border-radius: 0.25em;
-  background: #3c88cc; /* Old browsers */
-  background: -moz-linear-gradient(top,  #3c88cc 0%, #276195 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3c88cc), color-stop(100%,#276195)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #3c88cc 0%,#276195 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #3c88cc 0%,#276195 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3c88cc', endColorstr='#276195',GradientType=0 ); /* IE6-9 */
+  .gradient(#3c88cc, #276195);
   color: #fff;
   text-align: center;
   font-size: 14px;
@@ -233,428 +82,147 @@
   line-height: 40px;
   text-decoration: none;
   min-width: 100px;
-  border: 0px none;
+  border: none;
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
   font-family: @default-font;
   transition: all 0.25s linear 0s;
 }
 
-.transition (@val) {
-  /*    Note, you must call this like:
-  .transition(~"value, value, value")*/
-  transition: @val;
-  -moz-transition: @val;
-  -webkit-transition: @val;
+.towtruck-destructive {
+  .towtruck-primary;
+  .gradient(#990000, #880000);
+  color: #ffffff;
 }
 
-.rounded-corners (@radius: 5px) {
-  -webkit-border-radius: @radius;
-  -moz-border-radius: @radius;
-  -ms-border-radius: @radius;
-  -o-border-radius: @radius;
-  border-radius: @radius;
+.towtruck-secondary {
+  .towtruck-primary;
+  .gradient(#999999, #888888);
+  color: #000;
 }
 
-.user-select (@value) {
-  -moz-user-select: @value;
-  -webkit-user-select: @value;
-  -ms-user-select: @value;
-  user-select: @value;
-}
-
-.button-reset () {
-  background-color: inherit;
+.towtruck-cancel {
+  .towtruck-primary;
+  background: inherit;
   border: none;
-  padding: 0;
-  margin: 0;
+  color: rgb(0, 0, 0);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0px 5px;
+  min-width: 0px;
 }
 
-/* General interface rules: */
+/* General dock rules: */
 
 .towtruck {
-  /*Participants window*/
-  section#towtruck-participants-self {
-    margin:10px;
-  }
 
-  #towtruck-participants-self header {
-    padding-top:10px;
-    font-size:10px;
-    padding-bottom:6px;
-    text-shadow:0px 1px 1px #fff;
-    font-family:openSansLight;
-    color:rgba(0,0,0,0.5);
-  }
-
-  #towtruck-participants-other header {
-    padding-top:20px;
-    font-size:10px;
-    padding-bottom:6px;
-    text-shadow:0px 1px 1px #fff;
-    font-family:openSansLight;
-    color:rgba(0,0,0,0.5);
-  }
-
-  span#towtruck-participants-is-owner {
-  }
-
-  #towtruck-no-avatar-edit {
-    background:#fff;
-    border-radius:2px;
-    height:70px;
-    border-bottom:1px solid rgba(0,0,0,0.1);
-  }
-
-  #towtruck-no-avatar-edit img#towtruck-self-avatar {
-  }
-
-  #towtruck-self-avatar {
-    width:45px;
-    height:45px;
-  }
-
-  #towtruck-about .towtruck-avatar {
-    width:40px;
-    height:40px;
-    margin-left:0px;
-    padding-left:0px;
-    padding-right:0px;
-    padding-top:0px;
-    margin-top:5px;
-  }
-
-  span#towtruck-self-color {
-    width:10px;
-    float:left;
-    margin-left:10px;
-    margin-top:-6px;
-  }
-
-  .towtruck-color {
-    border:1px solid #cccccc;
-    border-radius: 2px;
-    width:8px;
-    height:32px;
-  }
-
-  .towtruck-avatar img:hover {
-    opacity:0.5;
-  }
-
-  section#towtruck-participants-other {
-    margin:0px;
-  }
-
-  p#towtruck-participants-none {
-    padding:10px;
-    text-align:center;
-    text-shadow:0px 1px rgba(255,255,255,1);
-    line-height:22px;
-    /*
-    background:#fff;
-    border-radius:2px;
-    border-bottom:1px solid rgba(0,0,0,0.1);
-    */
-  }
-
-  #towtruck-participants-list {
-    padding:10px;
-    /*
-    background:#fff;
-    border-radius:2px;
-    border-bottom:1px solid rgba(0,0,0,0.1);
-    */
-  }
-
-  .towtruck-participant {
-    padding:10px;
-  }
-
-  span.towtruck-participant-color{
-    padding:4px;
-    float:left;
-    margin-top:-2px;
-  }
-
-  span.towtruck-participant-name {
-    margin:10px;
-  }
-
+  // The dock buttons
   #towtruck-buttons .towtruck-button {
     .button-reset;
-    position:relative;
+    position: relative;
     -webkit-padding-start: 2px;
-    left:-1px;
+    left: -1px;
     width: @button-size + 12;
     height: @button-size + 8;
     background-size: @button-size @button-size;
     background-repeat: no-repeat;
     background-position: center;
-    /*border-bottom: 1px solid #ebebeb;*/
-    img {
-      width: @button-size;
-      height: @button-size;
-    }
     &:hover {
       /*background-color: darken(@background-color, 10%);*/
     }
   }
 
   #towtruck-buttons hr {
-    padding:0px !important;
-    margin:0px !important;
-  }
-
-  #towtruck-button-bg {
-    background: #0095dd; /* Old browsers */
-    background: -moz-linear-gradient(top,  #0095dd 0%, #0077b0 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0095dd), color-stop(100%,#0077b0)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #0095dd 0%,#0077b0 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */
-    box-shadow:0px 1px 2px rgba(0,0,0,0.3);
-  }
-
-  #towtruck-buttons #towtruck-end-button {
-    background-image:url('/images/icn-phone.png');
-    background-size: @button-size @button-size;
-    border-right:1px solid #00539F;
-    border-left:1px solid #00539F;
-    border-top:1px solid rgba(255,255,255,0.3);
-    padding-top:2px;
-  }
-  #towtruck-buttons #towtruck-end-button:hover {
-    background-image:url('/images/icn-phone-hover.png');
-  }
-  #towtruck-buttons #towtruck-end-button:active {
-    background-image:url('/images/icn-phone-active.png');
+    padding: 0px;
+    margin: 0px;
   }
 
   #towtruck-buttons #towtruck-share-button {
-    background-image: url('/images/btn-share.png');
+    background-image: url('./images/button-share.png');
   }
 
   #towtruck-buttons #towtruck-audio-button{
-    background-image:url('/images/icn-mic.png');
-  }
-  #towtruck-buttons #towtruck-audio-button:hover {
-    background-image:url('/images/icn-mic-active.png');
+    background-image: url('./images/button-mic.png');
+    &:hover {
+      background-image: url('./images/button-mic-active.png');
+    }
   }
 
   #towtruck-buttons #towtruck-chat-button{
-    background-image:url('/images/icn-chat.png');
-  }
-  #towtruck-buttons #towtruck-chat-button:hover {
-    background-image:url('/images/icn-chat-active.png');
-  }
-
-  #towtruck-buttons #towtruck-ui-help-button{
-    background-image:url('/images/icn-help.png');
-  }
-  #towtruck-buttons #towtruck-ui-help-button:hover {
-    background-image:url('/images/icn-help-active.png');
+    background-image: url('./images/button-chat.png');
+    &:hover {
+      background-image: url('./images/button-chat-active.png');
+    }
   }
 
-  #towtruck-buttons #towtruck-participants-button{
-    background-image:url('/images/icn-participants.png');
-    border:0px;
-  }
-  #towtruck-buttons #towtruck-participants-button:hover {
-    background-image:url('/images/icn-participants-active.png');
-  }
-
-  #towtruck-anchor {
+  #towtruck-dock-anchor {
     height: @anchor-height;
     text-align: center;
     /* FIXME: disabling dock movement for now, cursor would be misleading: */
     /*cursor: move;*/
     .user-select(none);
-    width:100%;
-    position:relative;
-    left:-1px;
-    background:#0095DD;
-    border:1px solid #00539F;
+    width: 100%;
+    position: relative;
+    left: -1px;
+    border: 1px solid #00539F;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
     box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
-  }
-
-  #towtruck-button-bottom-bg {
-    background: #0095dd; /* Old browsers */
-    background: -moz-linear-gradient(top,  #0095dd 0%, #0077b0 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0095dd), color-stop(100%,#0077b0)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #0095dd 0%,#0077b0 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #0095dd 0%,#0077b0 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0095dd', endColorstr='#0077b0',GradientType=0 ); /* IE6-9 */
-    box-shadow:0px 1px 2px rgba(0,0,0,0.3);
-  }
-
-  #towtruck-buttons #towtruck-expand-button {
-    background:none;
-    height:48px;
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-    border:1px solid #00539F;
-    cursor:default;
-    box-shadow: none;
-    width:52px;
-    position:relative;
-    left:-1px;
-    background-image:url('/images/icn-info.png');
-    background-repeat:no-repeat;
-    background-position:4px 3px;
-    background-size:40px 40px;
-    cursor:pointer;
-    margin-top:0px;
-  }
-
-  #towtruck-buttons #towtruck-expand-button:hover {
-    background-image:url('/images/icn-info-hover.png');
-  }
-
-  #towtruck-buttons #towtruck-expand-button:active {
-    background-image:url('/images/icn-info-active.png');
-  }
-
-  .towtruck-dock-person img.towtruck-avatar {
-    height: 28px !important;
-    width: 28px !important;
-    margin:0px !important;
-  }
-
-  #towtruck-dock-participants {
-  }
-
-  #towtruck-dock-participants .towtruck-dock-person {
-    padding-top:10px !important;
-    padding-left:2px;
-  }
-
-  .towtruck-dock-person img.towtruck-avatar {
-    height: 40px;
-    width: 40px;
-  }
-
-  input:focus {
-    outline: none;
   }
 
   input#towtruck-chat-input {
     width: 285px;
     font-size: 12px;
     padding: 6px;
-    border-radius:2px;
-    border:1px solid #cccccc;
+    border-radius: 2px;
+    border: 1px solid #cccccc;
     box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
-    font-family:openSansRegular;
+    font-family: openSansRegular;
+    &:focus {
+      border: 1px solid #0095DD;
+    }
   }
 
-  input#towtruck-chat-input:focus {
-    border: 1px solid #0095DD;
-  }
-
-  #towtruck-chat.towtruck-window section {
-    margin:0px !important;
-  }
-
-  #towtruck-chat .towtruck-title {
-    /*box-shadow:0px 1px 1px rgba(0,0,0,0.2);*/
-    z-index:1111;
-  }
-
-  /*
-  #towtruck-chat.towtruck-window:after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 145px;
-    right:-6px;
-    width: 10px;
-    height: 10px;
-    background: #fff;
-    border-right:1px solid #ccc;
-    border-bottom:1px solid #ccc;
-    -moz-transform:rotate(-45deg);
-    -webkit-transform:rotate(-45deg);
-    box-shadow:1px 1px 1px rgba(0,0,0,0.1);
-  }
-  */
-
-  #towtruck-chat-messages-box {
-    margin:0px;
-    padding:10px;
-    border-top:1px solid rgba(0,0,0,0.1);
-    width:300px;
-    position:relative;
-    left:-10px;
-    box-shadow:0px -1px 2px rgba(0,0,0,0.1);
-    height:30px;
+  #towtruck-chat-input-box {
+    margin: 0px;
+    padding: 10px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    width: 300px;
+    position: relative;
+    left: -10px;
+    box-shadow: 0px -1px 2px rgba(0,0,0,0.1);
+    height: 30px;
   }
 
   .towtruck-window #towtruck-chat-messages {
-    width:320px;
-    position:relative;
-    left:-10px;
-    background:#f2f4f5;
+    width: 320px;
+    position: relative;
+    left: -10px;
+    background: #f2f4f5;
   }
 
-  .towtruck-chat-message {
-    padding:0px 0px 20px 0px;
+  .towtruck-chat-item {
+    padding: 0px 0px 20px 0px;
     font-family: @default-font;
-    font-size:14px;
-    padding-top:10px;
-    margin:0px 0px 0px 0px;
-    border-bottom:1px solid rgba(0,0,0,0.1);
-    text-shadow:0px 1px rgba(255,255,255,1);
-  }
-
-  img.towtruck-avatar {
-    float:left;
-    margin:10px 10px 10px 10px;
-    padding:0px 10px 10px 10px;
-  }
-
-  div.towtruck-avatar-box {
-    height: 32px;
-    width: 32px;
-    background-repeat: no-repeat;
-    background-size: 34px 34px;
-    background-position: -1px -1px;
-    border: 2px solid;
-    border-radius: 2px;
-    background-clip: border-box;
-  }
-
-  .towtruck-avatar img{
-    width:45px;
-    height:45px;
+    font-size: 14px;
+    padding-top: 10px;
+    margin: 0px 0px 0px 0px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    text-shadow: 0px 1px rgba(255,255,255,1);
   }
 
   .towtruck-timestamp {
     float: right;
     font-size: 10px;
     opacity: 0.5;
-    padding:13px 15px 10px 10px;
-    text-shadow:0px 1px rgba(255,255,255,1);
-  }
-
-  .towtruck-person {
-    font-size: 14px;
-    font-family: openSansBold;
-    padding:10px 0px 10px 10px;
-    margin-top:0px;
-    text-shadow:0px 1px rgba(255,255,255,1);
+    padding: 13px 15px 10px 10px;
+    text-shadow: 0px 1px rgba(255,255,255,1);
   }
 
   .towtruck-chat-content {
     white-space: pre-wrap;
-    line-height:20px;
+    line-height: 20px;
     font-family: @default-font;
-    padding-left:65px;
+    padding-left: 65px;
   }
 
   #towtruck-window-pointer-right, #towtruck-window-pointer-left {
@@ -679,6 +247,7 @@
   }
 
   .towtruck-window {
+    // top/left is set in code
     position: fixed;
     background-color: @window-background-color;
     color: @window-color;
@@ -686,191 +255,64 @@
     padding: 0 10px 5px 10px;
     z-index: @z-index + 1;
     border-radius: 2px;
-    .box-dropshadow;
-    border-left:1px solid #c9c9c9;
-    border-right:1px solid #c9c9c9;
-    border-bottom:1px solid #c9c9c9;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+    border-left: 1px solid #c9c9c9;
+    border-right: 1px solid #c9c9c9;
+    border-bottom: 1px solid #c9c9c9;
 
     section {
       margin: 10px;
     }
 
-    header {
-      font-weight: bold;
-      margin-bottom: 0.4em;
-    }
-
-    section header {
-      margin-left: 0em;
-    }
-
-    header.towtruck-title {
+    & > header {
       font-size: 13px;
       font-weight: bold;
       font-variant: normal;
       text-align: center;
-      font-family:openSansRegular;
+      font-family: openSansRegular;
       color: #fff;
       text-shadow: 0px -1px rgba(0,83,159,1);
       border-bottom: 1px solid darken(@window-background-color, 20%);
       margin: 0 -10px 0 -10px;
       padding: 10px 20px 5px 20px;
       height: @anchor-height;
-      background:#0095DD;
-      border-bottom:1px solid #00539F;
-      border-right:1px solid #00539F;
-      border-left:1px solid #00539F;
-      border-top:1px solid #00539F;
-      border-top-left-radius: 2px;
-      border-top-right-radius: 2px;
+      background: #0095DD;
+      border: 1px solid #00539F;
+      border: radius: 2px 2px 0 0;
       box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
-      width:280px;
-      position:relative;
-      left:-1px;
-    }
-
-    #towtruck-session-id {
-      font-family:openSansRegular;
+      width: 280px;
+      position: relative;
+      left: -1px;
     }
 
     input#towtruck-share-link {
       width: 265px;
       font-size: 12px;
       padding: 6px;
-      border-radius:2px;
-      border:1px solid #cccccc;
+      border-radius: 2px;
+      border: 1px solid #cccccc;
       box-shadow: inset 0px 2px 2px rgba(0,0,0,0.1);
-      font-family:openSansRegular;
-      margin:0px;
+      font-family: openSansRegular;
+      margin: 0px;
+      &:focus {
+        border:1px solid #0095DD;
+      }
     }
 
-    input#towtruck-share-link:focus {
-      border:1px solid #0095DD;
-    }
-
-    &#towtruck-about section {
-      text-align:left;
-      margin:0px;
-      padding:0px 10px 0px 10px;
-      // background:#fff;
-    }
-
-    &#towtruck-about p {
-      font-size:14px;
-      font-family:openSansRegular;
-      text-align:left;
-      clear:left;
-    }
-
-    &#towtruck-about .towtruck-about-txt-bottom {
-      padding-top:10px;
-    }
-
-    &#towtruck-about #towtruck-setup-profile-box {
-      /*
-      background:#fff;
-      height:70px;
-      margin-bottom:15px;
-      margin:0px;
-      padding:0px;
-      */
-    }
-
-
-    &#towtruck-about #towtruck-share-link-box {
-      /*
-      background:#fff;
-      border-radius:2px;
-      height:51px;
-      border-bottom:1px solid rgba(0,0,0,0.1);
-      margin-bottom:20px;
-      */
-    }
-
-    &#towtruck-about p.small {
-      margin-top:6px;
-      padding-top:4px;
-      font-size:10px;
-      letter-spacing: 0px;
-      line-height: 14px;
-      color:#939393;
-      text-align:center;
-      font-family:openSansLight;
-    }
-
-    &#towtruck-about .towtruck-bottom-panel {
-      margin-top:10px;
-    }
-
-    &#towtruck-about button#towtruck-end-session {
-      background-color: rgba(233,59,40,1);
-      background-repeat: repeat-x;
-      border-radius: 2px;
-      border:0px;
-      color: rgb(255, 255, 255);
-      cursor: pointer;
-      display: inline-block;
-      font-size: 12px;
-      text-transform: none;
-      vertical-align: middle;
-      width: 100%;
-      padding:10px 10px 10px 10px;
-      margin:0px 5px 0px 0px;
-    }
-
-    &#towtruck-about button#towtruck-end-session:hover {
-      background-color: rgba(212,6,6,1);
-    }
-
-    &#towtruck-about button#towtruck-cancel-end-session {
-      background-color: rgba(115,167,41,0.5);
-      background-repeat: repeat-x;
-      border-radius: 2px;
-      border:0px;
-      color: rgb(255, 255, 255);
-      cursor: pointer;
-      display: inline-block;
-      font-size: 12px;
-      text-transform: none;
-      vertical-align: middle;
-      width: 130px;
-      word-spacing: 0px;
-      padding:10px;
-      margin:10px 0px 10px 5px;
-    }
-
-    &#towtruck-about button#towtruck-cancel-end-session:hover {
-      background-color: rgba(150,212,44,1);
-    }
-
-    p {
-      margin: 0.5em 0 0.5em 0;
-    }
-
-    button.towtruck-minimize {
+    header button.towtruck-close {
       .button-reset;
       float: right;
       font-weight: bold;
-      margin-right:-5px;
-      cursor:pointer;
-      background-image:url('/images/icn-close-btn.png');
+      margin-right: -5px;
+      cursor: pointer;
+      background-image: url('./images/icon-close.png');
       background-size:13px 13px;
       width:13px;
       height:13px;
       margin-top:1px;
-    }
-
-    button.towtruck-minimize:hover {
-      .button-reset;
-      float: right;
-      font-weight: bold;
-      margin-right:-5px;
-      cursor:pointer;
-      background-image:url('/images/icn-close-btn-active.png');
-      background-size:13px 13px;
-      width:13px;
-      height:13px;
-      margin-top:1px;
+      &:hover {
+        background-image:url('./images/icon-close-active.png');
+      }
     }
 
     #towtruck-chat-messages {
@@ -879,66 +321,15 @@
       height: 210px;
     }
 
-    #towtruck-avatar-video {
-      height: 100px;
-      width: 150px;
-    }
-
-    fieldset {
-      border: 1px solid darken(@window-background-color, 60%);
-      border-radius: 3px;
-      legend {
-        font-size: 70%;
-      }
-    }
-
-    .towtruck-close {
-      float: right;
-      cursor: pointer;
-      color: darken(@window-background-color, 50%);
-      padding-top: 7px;
-      .user-select(none);
-      &:hover {
-        color: #000;
-      }
-    }
   }
 
-  #towtruck-feedbackbtn-box {
-    width:100px;
-    height:30px;
-    background-image:url('/images/btn-feedback.png');
-    position:absolute;
-    left:119px;
-    bottom:-42px;
-    background-size:93px 30px;
-    background-repeat: no-repeat;
-    padding:5px 10px 10px 25px;
-  }
-
-  #towtruck-feedbackbtn-box a{
-    color:#36510e !important;
-    text-shadow:0px 1px rgba(255,255,255,0.15);
-    font-size:12px;
-  }
-
-  #towtruck-feedback-form .towtruck-title{
-    width:361px;
-    left:8px;
-  }
-
-  #towtruck-feedback-form h1.ss-form-title {
-    display:none !important;
-  }
-
+  // FIXME: why the override?
   #towtruck-feedback-form.towtruck-modal {
     background-color: #fff;
     color: #000000;
     padding: 0 0px 5px 0px;
     z-index: 10001;
     border-radius: 2px;
-    -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
     border-left: 1px solid #c9c9c9;
     border-right: 1px solid #c9c9c9;
@@ -953,84 +344,23 @@
     z-index: 10003;
   }
 
-  #towtruck-alpha-intro button.towtruck-minimize {
-    display:none;
-  }
-
-  #towtruck-alpha-intro p {
-    padding:10px 10px 0px 10px;
-  }
-
   #towtruck-alpha-intro .towtruck-small-feedback-txt {
-    font-size:10px;
-  }
-
-  #towtruck-alpha-intro .towtruck-img-alpha {
-    text-align:center;
-  }
-  #towtruck-alpha-intro img {
-    height:80px;
-    text-align:center;
-  }
-  #towtruck-alpha-intro .towtruck-modal-close {
-    background-color: #73a729;
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border:0px;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-    text-transform: none;
-    vertical-align: middle;
-    width: 100%;
-    padding:10px 0px 10px 0px;
-    margin:0px 0px 0px 0px;
+    font-size: 10px;
   }
 
   #towtruck-alpha-intro .towtruck-modal-close:hover {
-    background:#61921b;
+    background: #61921b;
   }
 
   #towtruck-alpha-intro {
-    height:24em;
+    height: 24em;
   }
-
-  #towtruck-intro .towtruck-modal .towtruck-title{
-    left:-2px;
-    width:282px;
-  }
-
-  #towtruck-intro button.towtruck-minimize{
-    display:none !important;
-  }
-
-  #towtruck-intro .towtruck-modal-close {
-    background-color: #73a729;
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border:0px;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-    text-transform: none;
-    vertical-align: middle;
-    width: 100%;
-    padding:10px 0px 10px 0px;
-    margin:0px 0px 0px 0px;
-  }
-
-  #towtruck-intro .towtruck-modal-close:hover {
-    background:#61921b;
-  }
-
 
   #towtruck-intro .towtruck-modal-dont-join {
     background-color: rgba(233,59,40,1);
     background-repeat: repeat-x;
     border-radius: 2px;
-    border:0px;
+    border: 0px;
     color: rgb(255, 255, 255);
     cursor: pointer;
     display: inline-block;
@@ -1038,265 +368,36 @@
     text-transform: none;
     vertical-align: middle;
     width: 100%;
-    padding:10px 0px 10px 0px;
-    margin:0px 0px 10px 0px;
+    padding: 10px 0px 10px 0px;
+    margin: 0px 0px 10px 0px;
+    &:hover {
+      background-color: rgba(212,6,6,1);
+    }
   }
 
-  #towtruck-intro .towtruck-modal-dont-join:hover {
-    background-color: rgba(212,6,6,1);
-  }
-
-  #towtruck-rtc-not-supported p {
-    padding:10px 10px 0px 10px;
-  }
-
-  #towtruck-rtc-not-supported .towtruck-rtc-dialog-btn button.towtruck-dismiss{
-    background-color: rgba(233,59,40,1);
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border:0px;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-    text-transform: none;
-    vertical-align: middle;
-    width: 93%;
-    padding:10px 0px 10px 0px;
-    margin:10px 10px 10px 10px;
-  }
-
-  #towtruck-rtc-not-supported .towtruck-rtc-dialog-btn button.towtruck-dismiss:hover {
-    background-color: rgba(212,6,6,1);
-  }
-
-  #towtruck-intro p {
-    padding:10px 10px 0px 10px;
-  }
-  #towtruck-rtc-info p{
-    padding:10px 10px 0px 10px;
-  }
-
-  #towtruck-rtc-info input#towtruck-rtc-info-dismiss {
-    margin-top:-2px;
-    background:red;
-  }
-
-  #towtruck-rtc-info img.towtruck-arrow-up {
-    width:13px;
-    height:13px;
-  }
-
-  #towtruck-rtc-info .towtruck-rtc-dialog-btn {
-    text-align:center;
-    padding:10px;
-  }
-
-  #towtruck-rtc-info .towtruck-rtc-dialog-btn button.towtruck-dismiss{
-    background-color: rgba(233,59,40,1);
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border:0px;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-    text-transform: none;
-    vertical-align: middle;
-    width: 100%;
-    padding:10px 0px 10px 0px;
-    margin:0px 0px 10px 0px;
-  }
-
-  #towtruck-rtc-info .towtruck-rtc-dialog-btn button.towtruck-dismiss:hover {
-    background-color: rgba(212,6,6,1);
-  }
-
-  #towtruck-rtc-info label {
-    font-size:12px;
-  }
-
-  #towtruck-template-new-user.towtruck-popup {
-    width: 240px;
-  }
-
-  p.towtruck-notify-btns {
-    padding-top:10px;
-    padding-left:10px;
-  }
-
-  p.towtruck-notify-btns button.towtruck-dismiss {
-    background-color: #0095DD !important;
-    background-repeat: repeat-x;
-    border-radius: 2px;
-    border:0px;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-    vertical-align: middle;
-    width: 27%;
-    padding:8px;
-    margin:0px 5px 0px 0px;
-    clear:both;
-  }
-
-
-  #towtruck-chat-notifier.towtruck-popup {
-    background:rgba(242,244,245,0.9);
-    /* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
-    border-radius:2px;
-    border:1px solid rgba(0,0,0,0.1);
-    box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
-    width:300px;
-    padding-left:5px;
-  }
-
-  #towtruck-chat-notifier .towtruck-avatar {
-    margin-top:10px;
-    padding:0px;
-  }
-
-  #towtruck-chat-notifier .towtruck-chat-message {
-    border-bottom: 0px solid rgba(0, 0, 0, 0.1);
-  }
-
-  #towtruck-chat-notifier section {
-    margin:0px;
-  }
-
-  #towtruck-chat-notifier span.towtruck-time,span.towtruck-ampm {
-    display:none;
-  }
-
-  #towtruck-chat-notifier .towtruck-close img{
-    width:13px;
-    height:13px;
-  }
-
-  #towtruck-chat-notifier-message {
-    box-shadow:0px 0px 0px;
-  }
-
-  #towtruck-template-new-user {
-    background:rgba(242,244,245,0.9);
-    /* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
-    border-radius:2px;
-    border:1px solid rgba(0,0,0,0.1);
-    box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
-    width:300px;
-  }
-
-  .towtruck-popup {
+  .towtruck-notification {
     .towtruck-window;
     width: 340px;
-    background:rgba(242,244,245,0.9);
-    /* Safari 4-5, Chrome 1-9 */ background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(242,244,245,0.9)), from(rgba(255,255,255,255.9))); /* Safari 5.1, Chrome 10+ */ background: -webkit-linear-gradient(top,  rgba(255,255,255,0.9),rgba(242,244,245,0.9)); /* Firefox 3.6+ */ background: -moz-linear-gradient(top, rgba(255,255,255,0.9),rgba(242,244,245,0.9));
+    .gradient(rgba(242, 244, 245, 0.9), rgba(255,255,255,0.9));
     border-radius:2px;
-    border:1px solid rgba(0,0,0,0.1);
-    box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .towtruck-url-change-popup {
-    background:rgba(242,244,245,0.9);
-    border-radius:2px;
-    border:1px solid rgba(0,0,0,0.1);
-    box-shadow:0px 0px 4px rgba(0, 0, 0, 0.2);
-    width:300px;
-    padding:0px;
-
-    .towtruck-close {
-      float:right;
-      padding:10px;
-    }
-
-    p.towtruck-snippet {
-      padding-top:0px;
-      padding-right:13px;
-    }
-
-    .towtruck-person {
-      font-family:openSansRegular;
-    }
-
-    .towtruck-avatar {
-      float:left;
-      padding:0px 10px 0px;
-      margin:10px 3px 10px 0px;
-    }
-
-    .towtruck-close img{
-      width:13px;
-      height:13px;
-    }
-
-    button.towtruck-follow {
-      background-color: #73a729;
-      background-repeat: repeat-x;
+  .towtruck-person {
+      height: @avatar-size;
+      width: @avatar-size;
+      margin-left: (@button-size - @avatar-size) / 2;
+      background-repeat: no-repeat;
+      background-size: 34px 34px;
+      background-position: -1px -1px;
+      border: 2px solid;
       border-radius: 2px;
-      border:0px;
-      color: rgb(255, 255, 255);
-      cursor: pointer;
-      display: inline-block;
-      font-size: 12px;
-      vertical-align: middle;
-      width: 27%;
-      padding:8px;
-      margin:0px 5px 0px 12px;
-    }
-
-    button.towtruck-follow:hover {
-      background:#61921b;
-    }
-
-    button.towtruck-nudge {
-      background-color: #0095DD;
-      background-repeat: repeat-x;
-      border-radius: 2px;
-      border:0px;
-      color: rgb(255, 255, 255);
-      cursor: pointer;
-      display: inline-block;
-      font-size: 12px;
-      vertical-align: middle;
-      width: 28%;
-      padding:8px;
-      margin:0px 5px 0px 0px;
-    }
-
-    button.towtruck-nudge:hover {
-      background:#0082c1;
-    }
-
-
-    a.towtruck-ignore {
-      color:#0095DD;
-      font-size:12px;
-      background-repeat: repeat-x;
-      border-radius: 2px;
-      border:0px;
-      cursor: pointer;
-      display: inline-block;
-      text-transform:none;
-      vertical-align: middle;
-      width: 20%;
-      padding:8px;
-      margin:0px 5px 0px 0px;
-    }
-
-    .towtruck-follow {
-      background-color: #0f0;
-      &.towtruck-nudge {
-        // FIXME: add some animation/transition here:
-        background-color: #73a729;
-      }
-
-      &.towtruck-nudge:hover {
-        background:#61921b;
-      }
-    }
+      background-clip: border-box;
   }
+
 }
+
 
 /* Menu */
 #towtruck-menu {
@@ -1307,7 +408,7 @@
   z-index: @z-index + 3;
   border: 2px solid #666;
   border-radius: 4px;
-  .towtruck-menu-separator {
+  hr {
     border-top: 1px solid #999;
   }
   .towtruck-menu-item {
@@ -1356,59 +457,59 @@
 }
 
 /* Button set */
-#towtruck-interface {
+#towtruck-dock {
   position: fixed;
   z-index: @z-index;
   background-color: @background-color;
-  .box-dropshadow;
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
   @border-radius: 2px;
   @long-side: (@button-size + 12) * 4 + 64px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 10px;
   /*border:1px solid #000;*/
 
-  &.towtruck-interface-right {
-    padding: 0px 0px 0px 0px;
-    bottom: 260px;
+  &.towtruck-dock-right {
+    padding: 0;
+    bottom: 60px;
     right: 5px;
     border-radius: @border-radius 0 0 @border-radius;
     height: @long-side - 46px;
     width: @short-side;
-    #towtruck-anchor-vertical {
+    #towtruck-dock-anchor-vertical {
       display: none;
     }
-    #towtruck-anchor-horizontal {
+    #towtruck-dock-anchor-horizontal {
       display: inline;
     }
 
-    #towtruck-anchor-horizontal img {
+    #towtruck-dock-anchor-horizontal img {
       width:6px;
       height:6px;
       padding:7px 2px 2px 2px
     }
   }
 
-  &.towtruck-interface-left {
+  &.towtruck-dock-left {
     padding: 0px 0px 0px 0px;
     bottom: 60px;
     left: 5px;
     border-radius: 0 @border-radius @border-radius 0;
     height: @long-side - 46px;
     width: @short-side;
-    #towtruck-anchor-vertical {
+    #towtruck-dock-anchor-vertical {
       display: none;
     }
-    #towtruck-anchor-horizontal {
+    #towtruck-dock-anchor-horizontal {
       display: inline;
     }
 
-    #towtruck-anchor-horizontal img {
-      width:6px;
-      height:6px;
-      padding:7px 2px 2px 2px
+    #towtruck-dock-anchor-horizontal img {
+      width: 6px;
+      height: 6px;
+      padding: 7px 2px 2px 2px
     }
   }
 
-  &.towtruck-interface-bottom {
+  &.towtruck-dock-bottom {
     padding: 0px 0px 0px 0px;
     bottom: 0px;
     left: 50%;
@@ -1416,19 +517,19 @@
     border-radius: @border-radius @border-radius 0 0;
     height: @short-side;
     width: @long-side;
-    #towtruck-buttons, #towtruck-anchor {
+    #towtruck-buttons, #towtruck-dock-anchor {
       display: inline;
     }
-    #towtruck-anchor-vertical {
+    #towtruck-dock-anchor-vertical {
       display: inline;
     }
-    #towtruck-anchor-horizontal {
+    #towtruck-dock-anchor-horizontal {
       display: none;
     }
-    #towtruck-anchor-vertical img {
-      width:6px;
-      height:6px;
-      padding:2px;
+    #towtruck-dock-anchor-vertical img {
+      width: 6px;
+      height: 6px;
+      padding: 2px;
     }
   }
 }
@@ -1444,15 +545,6 @@
   .transform-origin(top left);
 }
 
-.transform-origin (...) {
-  -moz-transform-origin: @arguments;
-  -webkit-transform-origin: @arguments;
-  -ms-transform-origin: @arguments;
-  -o-transform-origin: @arguments;
-  transform-origin: @arguments;
-}
-
-
 .towtruck-chat-message.towtruck-arrow-message {
   border: 2px solid #f00;
 }
@@ -1460,12 +552,12 @@
 /* Shared cursors */
 
 .towtruck-cursor-img {
-  position:relative;
-  top:0px;
+  position: relative;
+  top: 0px;
 }
 
 .towtruck-cursor img {
-  width:13px;
+  width: 13px;
 }
 
 .towtruck-cursor {
@@ -1509,7 +601,7 @@
     left: 5px;
     padding: 8px;
     border-radius: 2px;
-    box-shadow:0px 1px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.2);
   }
 }
 
@@ -1571,9 +663,6 @@
     margin-top: -(@height/2);
     height: @height;
     z-index: @z-index+3;
-    .towtruck-close {
-      .towtruck.towtruck-window.towtruck-close;
-    }
     &.towtruck-modal-wide {
       width: 70%;
       margin-left: -35%;
@@ -1687,7 +776,7 @@
   height: 6px;
   left: 30px;
   top: 3px;
-  background: url(/images/btn-triangle.png);
+  background: url('./images/icon-profile-triangle.png');
   background-size: 50%;
   background-repeat: no-repeat;
 }
@@ -1716,15 +805,4 @@
       border: 2px solid;
     }
   }
-}
-
-// FIXME: these images are double size for retina, but all the same size,
-// so this gets them down to a decent size, but is still weird.
-.guiders_content img {
-  width: 400px;
-  height: 110px;
-}
-
-h1.guiders_title {
-  height: 40px;
 }

@@ -78,7 +78,7 @@
     for (var i=0; i<scripts.length; i++) {
       var src = scripts[i].src;
       if (src && src.search(/towtruck.js(\?.*)?$/) !== -1) {
-        baseUrl = src.replace(/towtruck.js(\?.*)?$/, "");
+        baseUrl = src.replace(/\/*towtruck.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
       }

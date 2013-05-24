@@ -197,7 +197,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     lastPosX = pageX;
     lastPosY = pageY;
     var target = event.target;
-    var parent = $(target).closest(".towtruck-window, .towtruck-popup, #towtruck-interface");
+    var parent = $(target).closest(".towtruck-window, .towtruck-popup, #towtruck-dock");
     if (parent.length) {
       target = parent[0];
     } else if (elementFinder.ignoreElement(target)) {

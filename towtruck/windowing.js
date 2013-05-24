@@ -128,7 +128,7 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
   };
 
   function bindEvents(el) {
-    el.find(".towtruck-close, .towtruck-dismiss, .towtruck-minimize").click(function (event) {
+    el.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
       var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
       windowing.hide(w);
       event.stopPropagation();

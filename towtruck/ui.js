@@ -9,7 +9,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
   var chat;
   var $window = $(window);
   // This is also in towtruck.less, as @button-height:
-  var BUTTON_HEIGHT = 48;
+  var BUTTON_HEIGHT = 48 + 5; // Not sure why +5 is necessary.
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
   // Time the new user window sticks around until it fades away:
@@ -43,15 +43,15 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
   };
 
   function panelPosition() {
-    var iface = $("#towtruck-interface");
-    if (iface.hasClass("towtruck-interface-right")) {
+    var iface = $("#towtruck-dock");
+    if (iface.hasClass("towtruck-dock-right")) {
       return "right";
-    } else if (iface.hasClass("towtruck-interface-left")) {
+    } else if (iface.hasClass("towtruck-dock-left")) {
       return "left";
-    } else if (iface.hasClass("towtruck-interface-bottom")) {
+    } else if (iface.hasClass("towtruck-dock-bottom")) {
       return "bottom";
     } else {
-      throw new AssertionError("#towtruck-interface doesn't have positioning class");
+      throw new AssertionError("#towtruck-dock doesn't have positioning class");
     }
   }
 
@@ -77,7 +77,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
       setTimeout(function () {
         finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
-        var iface = container.find("#towtruck-interface");
+        var iface = container.find("#towtruck-dock");
         var start = iface.offset();
         var pos = $(TowTruck.startTarget).offset();
         pos.top = Math.floor(pos.top - start.top);
@@ -123,6 +123,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       }
       el.addClass("towtruck-started");
     }
+    ui.container.find(".towtruck-window > header, .towtruck-modal > header").each(function () {
+      $(this).append($('<button class="towtruck-close"></button>'));
+    });
   };
 
   // After prepareUI, this actually makes the interface live.  We have
@@ -165,12 +168,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     // Moving the window:
     // FIXME: this should probably be stickier, and not just move the window around
     // so abruptly
-    var anchor = container.find("#towtruck-anchor");
+    var anchor = container.find("#towtruck-dock-anchor");
     assert(anchor.length);
     // FIXME: This is in place to temporarily disable dock dragging:
-    anchor = container.find("#towtruck-anchor-disabled");
+    anchor = container.find("#towtruck-dock-anchor-disabled");
     anchor.mousedown(function (event) {
-      var iface = $("#towtruck-interface");
+      var iface = $("#towtruck-dock");
       // FIXME: switch to .offset() and pageX/Y
       var startPos = panelPosition();
       function selectoff() {
@@ -191,10 +194,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         } else {
           pos = "bottom";
         }
-        iface.removeClass("towtruck-interface-left");
-        iface.removeClass("towtruck-interface-right");
-        iface.removeClass("towtruck-interface-bottom");
-        iface.addClass("towtruck-interface-" + pos);
+        iface.removeClass("towtruck-dock-left");
+        iface.removeClass("towtruck-dock-right");
+        iface.removeClass("towtruck-dock-bottom");
+        iface.addClass("towtruck-dock-" + pos);
         if (startPos && pos != startPos) {
           windowing.hide();
           startPos = null;
@@ -283,10 +286,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         left: menuOffset.left
       });
       picker.find(".towtruck-swatch-active").removeClass("towtruck-swatch-active");
-      picker.find(".towtruck-color-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
+      picker.find(".towtruck-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
     });
 
-    $("#towtruck-pick-color").click(".towtruck-color-swatch", function (event) {
+    $("#towtruck-pick-color").click(".towtruck-swatch", function (event) {
       var swatch = $(event.target);
       var color = swatch.attr("data-color");
       peers.Self.update({
@@ -303,7 +306,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     });
 
     COLORS.forEach(function (color) {
-      var el = templating.sub("color-swatch");
+      var el = templating.sub("swatch");
       el.attr("data-color", color);
       var darkened = tinycolor.darken(color);
       el.css({
@@ -569,31 +572,32 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     /* Takes an element and sets any person-related attributes on the element
        Different from updates, which use the class names we set here: */
     setElement: function (el) {
-      var classes = ["towtruck-person", "towtruck-person-literal",
-                     "towtruck-avatar", "towtruck-avatar-box",
-                     "towtruck-person-bgcolor", "towtruck-person-role",
-                     "towtruck-person-url-name", "towtruck-person-status"];
+      var count = 0;
+      var classes = ["towtruck-person", "towtruck-person-status",
+                     "towtruck-person-name", "towtruck-person-name-abbrev",
+                     "towtruck-person-bgcolor", "towtruck-person-swatch",
+                     "towtruck-person-status", "towtruck-person-role",
+                     "towtruck-person-url", "towtruck-person-url-title"];
       classes.forEach(function (cls) {
-        el.find("." + cls).addClass(this.peer.className(cls + "-"));
+        var els = el.find("." + cls);
+        els.addClass(this.peer.className(cls + "-"));
+        count += els.length;
       }, this);
+      if (! count) {
+        console.warn("setElement(", el, ") doesn't contain any person items");
+      }
       this.updateDisplay(el);
     },
 
     updateDisplay: function (container) {
       container = container || ui.container;
-      var name;
+      var abbrev = this.name;
       if (this.peer.isSelf) {
-        name = "me";
-      } else {
-        name = this.name;
+        abbrev = "me";
       }
-      container.find("." + this.peer.className("towtruck-person-")).text(name || "");
-      container.find("." + this.peer.className("towtruck-person-literal-")).text(this.peer.name || "(no name set)");
-      var avatarEl = container.find("." + this.peer.className("towtruck-avatar-"));
-      if (this.peer.avatar) {
-        avatarEl.attr("src", this.peer.avatar);
-      }
-      avatarEl = container.find("." + this.peer.className("towtruck-avatar-box-"));
+      container.find("." + this.peer.className("towtruck-person-name")).text(this.name || "");
+      container.find("." + this.peer.className("towtruck-person-name-abbrev")).text(abbrev);
+      var avatarEl = container.find("." + this.peer.className("towtruck-person-"));
       if (this.peer.avatar) {
         avatarEl.css({
           backgroundImage: "url(" + this.peer.avatar + ")"
@@ -605,21 +609,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
           borderColor: this.peer.color
         });
       }
-      if (name) {
-        avatarEl.attr("title", name);
-      }
       if (this.peer.color) {
         var colors = container.find("." + this.peer.className("towtruck-person-bgcolor-"));
         colors.css({
           backgroundColor: this.peer.color
         });
-        colors = container.find("." + this.peer.className("towtruck-person-bordercolor-"));
-        colors.css({
-          borderColor: this.peer.color
-        });
       }
       container.find("." + this.peer.className("towtruck-person-role-"))
-        .text(this.peer.isOwner ? "Owner" : "Participant");
+        .text(this.peer.isOwner ? "Creator" : "Participant");
       var urlName = this.peer.title || "";
       if (this.peer.title) {
         urlName += " (";
@@ -628,7 +625,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       if (this.peer.title) {
         urlName += ")";
       }
-      container.find("." + this.peer.className("towtruck-person-url-name-"))
+      container.find("." + this.peer.className("towtruck-person-url-title-"))
         .text(urlName);
       var url = this.peer.url;
       if (this.peer.urlHash) {
@@ -642,8 +639,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:
         $("#towtruck-self-name").val(this.peer.name);
-        $("#towtruck-self-color").css({backgroundColor: this.peer.color});
-        $("#towtruck-self-avatar").attr("src", this.peer.avatar);
+        $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
       }
       updateChatParticipantList();
     },
@@ -756,7 +752,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         peer: this.peer
       });
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
-      var iface = $("#towtruck-interface");
+      var iface = $("#towtruck-dock");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"
       });
@@ -781,7 +777,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       this.dockElement = null;
       this.detailElement.remove();
       this.detailElement = null;
-      var iface = $("#towtruck-interface");
+      var iface = $("#towtruck-dock");
       iface.css({
         height: (iface.height() - BUTTON_HEIGHT) + "px"
       });

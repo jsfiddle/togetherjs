@@ -24,10 +24,7 @@ define(["util", "jquery", "session"], function (util, $, session) {
     onClose = onCloseCallback;
     el = $(el);
     assert(el.hasClass("towtruck-modal"), "no modal class");
-    if (! el.find(".towtruck-close").length) {
-      el.prepend($('<div class="towtruck-close">&times;</div>'));
-    }
-    el.find(".towtruck-close, .towtruck-modal-close, .towtruck-minimize").click(modal.stopModal);
+    el.find(".towtruck-close, .towtruck-dismiss").click(modal.stopModal);
     getBackground().show();
     el.show();
     bindEscape();
