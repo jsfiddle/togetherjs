@@ -6,8 +6,9 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
   var templating = util.Module("templating");
 
   templating.clone = function (templateId) {
-    var template = $("#towtruck-template-" + templateId);
-    assert(template.length);
+    templateId = "#towtruck-template-" + templateId;
+    var template = $(templateId);
+    assert(template.length, "No template found with id:", templateId);
     template = template.clone();
     template.attr("id", null);
     // FIXME: if called directly, doesn't emit new-element event:
