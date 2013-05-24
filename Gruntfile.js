@@ -76,7 +76,10 @@ module.exports = function (grunt) {
            src: ["towtruck/**", "!towtruck/towtruck.js", "!towtruck/templates.js", "!towtruck/towtruck.less"],
            dest: "build/"
           }
-        ]
+        ],
+        options: {
+          hardLink: true
+        }
       },
       site: {
         files: [
@@ -97,7 +100,10 @@ module.exports = function (grunt) {
     watch: {
       main: {
         files: ["towtruck/**/*", "Gruntfile.js"],
-        tasks: ["build"]
+        tasks: ["build"],
+        options: {
+          nospawn: true
+        }
       },
       site: {
         files: ["towtruck/**/*", "Gruntfile.js", "site/**/*"],
@@ -130,10 +136,10 @@ module.exports = function (grunt) {
     "Substitute templates.js and parameters in towtruck.js",
     function () {
       // FIXME: I could use grunt.file.copy(..., {process: function (content, path) {}}) here
-      if (! process.env.BASE_URL) {
-        grunt.log.writeln("$BASE_URL not set, using auto-detect");
+      var baseUrl = grunt.option("base-url") || "";
+      if (! baseUrl) {
+        grunt.log.writeln("No --base-url, using auto-detect");
       }
-      var baseUrl = process.env.BASE_URL || "";
       var hubUrl = process.env.HUB_URL || "https://towtruck.mozillalabs.com";
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
