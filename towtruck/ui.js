@@ -591,12 +591,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
 
     updateDisplay: function (container) {
       container = container || ui.container;
-      var abbrev = this.name;
+      var abbrev = this.peer.name;
       if (this.peer.isSelf) {
         abbrev = "me";
       }
-      container.find("." + this.peer.className("towtruck-person-name")).text(this.name || "");
-      container.find("." + this.peer.className("towtruck-person-name-abbrev")).text(abbrev);
+      container.find("." + this.peer.className("towtruck-person-name-")).text(this.peer.name || "");
+      container.find("." + this.peer.className("towtruck-person-name-abbrev-")).text(abbrev);
       var avatarEl = container.find("." + this.peer.className("towtruck-person-"));
       if (this.peer.avatar) {
         avatarEl.css({
@@ -642,6 +642,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
       }
       updateChatParticipantList();
+      this.updateFollow();
     },
 
     update: function () {
@@ -681,11 +682,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
         return false;
       }).bind(this));
       this.urlNotification.find(".towtruck-nudge").click((function () {
-        session.send({
-          type: "url-change-nudge",
-          url: location.href,
-          to: this.peer.id
-        });
+        this.peer.nudge();
       }).bind(this));
       ui.container.append(this.urlNotification);
       windowing.show(this.urlNotification, {
@@ -759,6 +756,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       this.detailElement = templating.sub("participant-window", {
         peer: this.peer
       });
+      this.detailElement.find(".towtruck-follow").click(function () {
+        location.href = $(this).attr("href");
+      });
+      this.detailElement.find(".towtruck-nudge").click((function () {
+        this.peer.nudge();
+      }).bind(this));
       ui.container.append(this.detailElement);
       this.dockElement.click((function () {
         if (this.detailElement.is(":visible")) {
@@ -767,6 +770,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
           windowing.show(this.detailElement, {bind: this.dockElement});
         }
       }).bind(this));
+      this.updateFollow();
     },
 
     undock: function () {
@@ -781,6 +785,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       iface.css({
         height: (iface.height() - BUTTON_HEIGHT) + "px"
       });
+    },
+
+    updateFollow: function () {
+      if (! this.detailElement) {
+        return;
+      }
+      var same = this.detailElement.find(".towtruck-same-url");
+      var different = this.detailElement.find(".towtruck-different-url");
+      if (this.peer.url == session.currentUrl()) {
+        same.show();
+        different.hide();
+      } else {
+        same.hide();
+        different.show();
+      }
     },
 
     dockClick: function () {

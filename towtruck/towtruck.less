@@ -32,6 +32,7 @@
 @background-color: #0095DD;
 @window-background-color: #f2f4f5;
 @window-color: #000;
+@text-color: #000;
 
 // This is the base z-index of the buttons; items you want below or above
 // this can be @z-index+1, etc.
@@ -71,7 +72,7 @@
 
 
 .towtruck-primary {
-  //display: inline-block;
+  display: inline-block;
   border-radius: 0.25em;
   .gradient(#3c88cc, #276195);
   color: #fff;
@@ -86,7 +87,11 @@
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.25);
   font-family: @default-font;
   transition: all 0.25s linear 0s;
+  &.towtruck-follow {
+    cursor: pointer;
+  }
 }
+
 
 .towtruck-destructive {
   .towtruck-primary;

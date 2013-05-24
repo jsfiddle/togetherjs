@@ -145,6 +145,14 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         peers.emit("status-updated", this);
       }
       this.view.update();
+    },
+
+    nudge: function () {
+      session.send({
+        type: "url-change-nudge",
+        url: location.href,
+        to: this.id
+      });
     }
 
   });

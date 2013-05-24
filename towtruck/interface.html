@@ -70,7 +70,7 @@
 
   <!-- Participant detail template: -->
   <div id="towtruck-template-participant-window" class="towtruck-window" style="display: none">
-    <header><span class="towtruck-title towtruck-person-name"></span></header>
+    <header><span class="towtruck-person-name"></span></header>
 
     <section>
       <p><strong>Role:</strong>
@@ -85,10 +85,18 @@
         <span class="towtruck-person-status"></span>
       </p>
 
-      <p>
+    </section>
+
+    <section class="towtruck-buttons">
+      <!-- Displayed when the peer is at a different URL: -->
+      <div class="towtruck-different-url">
         <button class="towtruck-nudge towtruck-secondary">Join Me!</button>
-        <button class="towtruck-person-url towtruck-primary">Follow them</button>
-      </p>
+        <button class="towtruck-follow towtruck-person-url towtruck-primary">Follow them</button>
+      </div>
+      <!-- Displayed when the peer is at your same URL: -->
+      <div class="towtruck-same-url" style="display: none">
+        <span class="towtruck-person-name"></span> is at the same URL as you.
+      </div>
     </section>
   </div>
 
