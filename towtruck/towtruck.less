@@ -125,12 +125,12 @@
     .button-reset;
     position: relative;
     -webkit-padding-start: 2px;
-    left: -1px;
-    width: @button-size + 12;
-    height: @button-size + 8;
+    width: @button-size+20;
+    height: @button-size+19;
     background-size: @button-size @button-size;
     background-repeat: no-repeat;
     background-position: center;
+    border-top:1px solid rgba(0,0,0,0.2);
     &:hover {
       /*background-color: darken(@background-color, 10%);*/
     }
@@ -143,12 +143,15 @@
 
   #towtruck-buttons #towtruck-share-button {
     background-image: url('./images/button-share.png');
+    &:hover {
+      background-image: url('./images/button-share-active.png');
+    }
   }
 
   #towtruck-buttons #towtruck-audio-button{
     background-image: url('./images/button-mic.png');
     &:hover {
-      background-image: url('./images/button-mic-active.png');
+      background-image: url('./images/button-mic.png');
     }
   }
 
@@ -466,18 +469,18 @@
   position: fixed;
   z-index: @z-index;
   background-color: @background-color;
-  box-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.5);
   @border-radius: 4px;
-  @long-side: (@button-size + 12) * 4 + 64px; // actual button-size * number of buttons + expand thingy
+  @long-side: (@button-size + 9px) * 4 + 64px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 20px;
   /*border:1px solid #000;*/
 
   &.towtruck-dock-right {
     padding: 0;
-    bottom: 60px;
+    bottom: 150px;
     right: 5px;
-    border-radius: @border-radius 0 0 @border-radius;
-    height: @long-side - 46px;
+    border-radius: @border-radius;
+    height: @long-side;
     width: @short-side;
     #towtruck-dock-anchor-vertical {
       display: none;
