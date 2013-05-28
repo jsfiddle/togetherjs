@@ -409,17 +409,20 @@
 /* Menu */
 #towtruck-menu {
   @icon-size: 12px;
+  width:216px;
   position: fixed;
-  font-size: 90%;
+  font-size: 14px;
   background-color: #fff;
   z-index: @z-index + 3;
-  border: 2px solid #666;
+  border: 1px solid #979797;
   border-radius: 4px;
   hr {
-    border-top: 1px solid #999;
+    margin:0px;
+    border-top: 1px solid #E1E1E1;
   }
   .towtruck-menu-item {
-    padding: 4px 7px;
+    padding: 12px 12px;
+    height:12px;
     cursor: pointer;
     &.towtruck-menu-disabled {
       cursor: default;
@@ -428,26 +431,26 @@
       }
     }
     img {
-      height: @icon-size;
-      width: @icon-size;
+      height: (@icon-size)+8;
+      width: (@icon-size)+8;
       margin-right: 10px;
     }
     &:hover {
-      background-color: #aaa;
+      background-color: rgba(216,216,216,0.5);
     }
     & .towtruck-avatar {
-      height: @icon-size;
-      width: @icon-size;
+      height: (@icon-size)+8;
+      width: (@icon-size)+8;
       padding: 0;
       margin: 0 10px 0 0;
     }
     & .towtruck-person-bgcolor-self {
       display: inline-block;
-      width: @icon-size - 2px;
-      height: @icon-size - 2px;
+      width: @icon-size;
+      height: @icon-size;
       border: 1px solid #999;
       border-radius: 2px;
-      margin-right: 10px;
+      margin-right: 14px;
     }
   }
 
