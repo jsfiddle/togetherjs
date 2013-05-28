@@ -25,7 +25,7 @@
 @avatar-size: 32px;
 // Note: this is also in ui.js, BUTTON_HEIGHT
 // Height of the draggable anchor at the top:
-@anchor-height: @button-size * 0.5;
+@anchor-height: @button-size / 2;
 // Extra padding on the edge of the screen:
 @side-padding: 0px;
 // Background color of most elements:
@@ -171,10 +171,8 @@
     width: 100%;
     position: relative;
     left: -1px;
-    border: 1px solid #00539F;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-    box-shadow: inset 0px 1px 1px rgba(255,255,255,0.3);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
 
   input#towtruck-chat-input {
@@ -393,11 +391,12 @@
   }
 
   .towtruck-person {
-      height: @avatar-size;
-      width: @avatar-size;
-      margin-left: (@button-size - @avatar-size) / 2;
+      height: (@avatar-size)-2;
+      width: (@avatar-size)-2;
+      margin:(@button-size/4)+1;
+      /*margin-left: (@button-size - @avatar-size) / 2;*/
       background-repeat: no-repeat;
-      background-size: 34px 34px;
+      background-size: 32px 32px;
       background-position: -1px -1px;
       border: 2px solid;
       border-radius: 2px;
@@ -490,8 +489,8 @@
     }
 
     #towtruck-dock-anchor-horizontal img {
-      width:6px;
-      height:6px;
+      width:31px;
+      height:7px;
       padding:7px 2px 2px 2px
     }
   }
@@ -780,10 +779,10 @@
 
 #towtruck-profile-arrow {
   position: relative;
-  width: 10px;
-  height: 6px;
-  left: 30px;
-  top: 3px;
+  width: 20px;
+  height: 12px;
+  left: 38px;
+  top: -8px;
   background: url('./images/icon-profile-triangle.png');
   background-size: 50%;
   background-repeat: no-repeat;
