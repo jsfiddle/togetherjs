@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers, session, modal) {
+define(["jquery", "util", "peers", "session"], function ($, util, peers, session) {
   var assert = util.assert;
   var windowing = util.Module("windowing");
   var $window = $(window);
@@ -13,11 +13,6 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
   windowing.show = function (element, options) {
     element = $(element);
     options = options || {};
-    if (element.hasClass("towtruck-modal")) {
-      windowing.hide();
-      modal.showModal(element, options.onClose);
-      return;
-    }
     options.bind = options.bind || element.attr("data-bind-to");
     if (options.bind) {
       options.bind = $(options.bind);
@@ -27,8 +22,15 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
     if (options.bind) {
       bind(element, options.bind);
     }
+    if (element.hasClass("towtruck-modal")) {
+      getModalBackground().show();
+      modalEscape.bind();
+    }
+    onClose = options.onClose || null;
     session.emit("display-window", element.attr("id"), element);
   };
+
+  var onClose = null;
 
   /* Moves a window to be attached to data-bind-to, e.g., the button
      that opened the window. Or you can provide an element that it should bind to. */
@@ -88,10 +90,11 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
 
   windowing.hide = function (els) {
     // FIXME: also hide modals?
-    els = els || ".towtruck-window, .towtruck-popup";
+    els = els || ".towtruck-window, .towtruck-modal";
     els = $(els);
     els = els.filter(":visible");
     els.hide();
+    getModalBackground().hide();
     els.each(function (index, element) {
       element = $(element);
       var bound = element.data("boundTo");
@@ -106,9 +109,9 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
       element.data("boundTo", null);
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-    var modals = $(".towtruck-modal:visible");
-    if (modals.length) {
-      modal.stopModal();
+    if (onClose) {
+      onClose();
+      onClose = null;
     }
   };
 
@@ -129,12 +132,43 @@ define(["jquery", "util", "peers", "session", "modal"], function ($, util, peers
 
   function bindEvents(el) {
     el.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
-      var w = $(event.target).closest(".towtruck-window, .towtruck-popup");
+      var w = $(event.target).closest(".towtruck-window, .towtruck-modal");
       windowing.hide(w);
       event.stopPropagation();
       return false;
     });
   }
+
+  function getModalBackground() {
+    if (getModalBackground.element) {
+      return getModalBackground.element;
+    }
+    var background = $("#towtruck-modal-background");
+    assert(background.length);
+    getModalBackground.element = background;
+    background.click(function () {
+      windowing.hide();
+    });
+    return background;
+  }
+
+  var modalEscape = {
+    bind: function () {
+      $(document).keydown(modalEscape.onKeydown);
+    },
+    unbind: function () {
+      $(document).unbind("keydown", modalEscape.onKeydown);
+    },
+    onKeydown: function (event) {
+      if (event.which == 27) {
+        windowing.hide();
+      }
+    }
+  };
+
+  session.on("close", function () {
+    modalEscape.unbind();
+  });
 
   session.on("new-element", function (el) {
     bindEvents(el);

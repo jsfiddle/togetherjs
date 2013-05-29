@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "templating", "modal", "linkify", "peers", "windowing", "tinycolor"], function (require, $, util, session, templates, templating, modal, linkify, peers, windowing, tinycolor) {
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
   var chat;
   var $window = $(window);
   // This is also in towtruck.less, as @button-height:
-  var BUTTON_HEIGHT = 48 + 5; // Not sure why +5 is necessary.
+  var BUTTON_HEIGHT = 59; // Not sure why +5 is necessary.
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
   // Time the new user window sticks around until it fades away:
@@ -144,6 +144,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
       $(this).select();
     }).change(function () {
       updateShareLink();
+    }).on("keydown", function (event) {
+      if (event.which == 27) {
+        windowing.hide("#towtruck-share");
+        return false;
+      }
+      return undefined;
     });
     session.on("shareId", updateShareLink);
     updateShareLink();
@@ -229,7 +235,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "moda
     $("#towtruck-menu-feedback").click(function(){
       windowing.hide();
       hideMenu();
-      modal.showModal("#towtruck-feedback-form");
+      windowing.show("#towtruck-feedback-form");
     });
 
     $("#towtruck-menu-help").click(function () {

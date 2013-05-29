@@ -13,7 +13,7 @@
    When everything is done it fires session.emit("startup-ready")
 
 */
-define(["util", "require", "jquery", "modal", "storage"], function (util, require, $, modal, storage) {
+define(["util", "require", "jquery", "windowing", "storage"], function (util, require, $, windowing, storage) {
   var assert = util.assert;
   var startup = util.Module("startup");
   // Avoid circular import:
@@ -58,8 +58,10 @@ define(["util", "require", "jquery", "modal", "storage"], function (util, requir
         next();
         return;
       }
-      modal.showModal("#towtruck-browser-broken", function () {
-        session.close();
+      windowing.show("#towtruck-browser-broken", {
+        onClose: function () {
+          session.close();
+        }
       });
       if ($.browser.msie) {
         $("#towtruck-browser-broken-is-ie").show();
@@ -72,11 +74,13 @@ define(["util", "require", "jquery", "modal", "storage"], function (util, requir
         return;
       }
       var cancel = true;
-      modal.showModal("#towtruck-browser-unsupported", function () {
-        if (cancel) {
-          session.close();
-        } else {
-          next();
+      windowing.show("#towtruck-browser-unsupported", {
+        onClose: function () {
+          if (cancel) {
+            session.close();
+          } else {
+            next();
+          }
         }
       });
       $("#towtruck-browser-unsupported-anyway").click(function () {
@@ -90,14 +94,16 @@ define(["util", "require", "jquery", "modal", "storage"], function (util, requir
         return;
       }
       var cancelled = false;
-      modal.showModal("#towtruck-intro", function () {
-        if (! cancelled) {
-          next();
+      windowing.show("#towtruck-intro", {
+        onClose: function () {
+          if (! cancelled) {
+            next();
+          }
         }
       });
       $("#towtruck-intro .towtruck-modal-dont-join").click(function () {
         cancelled = true;
-        modal.stopModal();
+        windowing.hide();
         session.close();
       });
     },
