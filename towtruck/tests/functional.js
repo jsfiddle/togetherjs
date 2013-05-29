@@ -94,6 +94,45 @@ print(faker);
 print(faker.status, faker.idle, faker.view.dockElement && faker.view.dockElement.is(":visible"));
 
 // => live active true
+
+incoming({
+  type: "chat",
+  text: "Test message",
+  clientId: "faker",
+  messageId: "message1"
+});
+wait(100);
+
+// =>
+
+print($("#towtruck-chat-notifier").is(":visible"));
+
+// => true
+
+print($("#towtruck-chat-notifier")[0]);
+
+/* =>
+...
+<div class="towtruck-person towtruck-person-faker"...>
+...
+<div class="towtruck-person-name-abbrev towtruck-person-name-abbrev-faker">Faker</div>
+<div class="towtruck-chat-content">Test message</div>
+...
+*/
+
+$("#towtruck-chat-button").click();
+wait(500);
+// =>
+
+print($("#towtruck-chat-notifier").is(":visible"), $("#towtruck-chat").is(":visible"));
+
+// => false true
+
+
+/****************************************
+ * Skipping these for now, because leaving the client in place is handy:
+ */
+
 /*
 incoming({
   type: "bye",

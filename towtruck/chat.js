@@ -12,7 +12,8 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       text: msg.text,
       peer: msg.peer,
       // FIXME: a little unsure of trusting this (maybe I should prefix it?)
-      messageId: msg.messageId
+      messageId: msg.messageId,
+      notify: true
     });
   });
 

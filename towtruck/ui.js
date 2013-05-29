@@ -561,6 +561,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   session.on("display-window", function (id, win) {
     if (id == "towtruck-chat") {
       ui.chat.scroll();
+      windowing.hide("#towtruck-chat-notifier");
     }
   });
 
