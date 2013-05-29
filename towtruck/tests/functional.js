@@ -2,7 +2,7 @@
 
 $("#other").remove();
 
-getRequire("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor");
+getRequire("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
 // => Loaded modules: ...
 
 printResolved(
@@ -121,12 +121,53 @@ print($("#towtruck-chat-notifier")[0]);
 */
 
 $("#towtruck-chat-button").click();
-wait(500);
-// =>
 
 print($("#towtruck-chat-notifier").is(":visible"), $("#towtruck-chat").is(":visible"));
 
 // => false true
+
+viewSend.activate();
+$("#towtruck-chat-input").val("outgoing message");
+TowTruckTestSpy.submitChat();
+
+/* =>
+send: chat
+  {clientId: "me", messageId: "...", text: "outgoing message"}
+*/
+
+print($("#towtruck-chat-input").val() === "");
+// => true
+
+print($("#towtruck-chat")[0]);
+/* =>
+...
+<div class="towtruck-chat-content">outgoing message</div>
+...
+*/
+
+windowing.hide();
+$("#towtruck-profile-button").click();
+print($("#towtruck-menu").is(":visible"), $("#towtruck-self-name").is(":visible"));
+// => true false
+$("#towtruck-menu-update-name").click();
+print($("#towtruck-self-name").is(":visible"));
+// => true
+$("#towtruck-self-name").val("Joe");
+// First we do a keyup to trigger the change event:
+$("#towtruck-self-name").trigger("keyup");
+// Then we submit:
+$("#towtruck-self-name").trigger($.Event("keyup", {which: 13}));
+print(peers.Self.name);
+print($("#towtruck-menu").is(":visible"), $("#towtruck-self-name").is(":visible"));
+print($("#towtruck-self-name-display").text());
+/* =>
+send: peer-update
+  {clientId: "me", name: "Joe"}
+Joe
+true false
+Joe
+*/
+
 
 
 /****************************************

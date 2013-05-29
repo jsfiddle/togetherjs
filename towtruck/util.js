@@ -219,5 +219,14 @@ define(["jquery"], function ($) {
     });
   };
 
+  util.testExpose = function (objs) {
+    if (typeof TowTruckTestSpy == "undefined") {
+      return;
+    }
+    util.forEachAttr(objs, function (value, attr) {
+      TowTruckTestSpy[attr] = value;
+    });
+  };
+
   return util;
 });

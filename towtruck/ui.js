@@ -158,18 +158,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     var input = container.find("#towtruck-chat-input");
     input.bind("keyup", function (event) {
       if (event.which == 13) { // Enter
-        var val = input.val();
-        if (! val) {
-          return false;
-        }
-        chat.submit(val);
-        input.val("");
+        submitChat();
+        return false;
       }
       if (event.which == 27) { // Escape
         windowing.hide("#towtruck-chat");
       }
       return false;
     });
+
+    function submitChat() {
+      var val = input.val();
+      if (! val) {
+        return;
+      }
+      chat.submit(val);
+      input.val("");
+    }
+
+    util.testExpose({submitChat: submitChat});
 
     // Moving the window:
     // FIXME: this should probably be stickier, and not just move the window around

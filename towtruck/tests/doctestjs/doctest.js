@@ -519,7 +519,8 @@ repr.ReprClass.prototype = {
     if (el.nodeType == el.DOCUMENT_TYPE_NODE) {
       return "<!DOCTYPE " + el.name + ">";
     }
-    var s = '<' + el.tagName.toLowerCase();
+    var tagName = el.tagName || "(no tag)";
+    var s = '<' + tagName.toLowerCase();
     var attrs = [];
     if (el.attributes && el.attributes.length) {
       for (i=0; i<el.attributes.length; i++) {
