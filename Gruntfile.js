@@ -11,6 +11,12 @@ var vars = {
 
 module.exports = function (grunt) {
 
+  var dumpLineNumbers = false;
+  if (!! grunt.option("less-line-numbers")) {
+    grunt.verbose.writeln("Enabling LESS line numbers");
+    dumpLineNumbers = true;
+  }
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -19,6 +25,9 @@ module.exports = function (grunt) {
         files: {
           "build/towtruck/towtruck.css": "towtruck/towtruck.less",
           "build/towtruck/recorder.css": "towtruck/recorder.less"
+        },
+        options: {
+          dumpLineNumbers: dumpLineNumbers
         }
       }
     },
@@ -63,6 +72,7 @@ module.exports = function (grunt) {
     csslint: {
       // Check here for options: https://github.com/stubbornella/csslint/wiki/Rules
       options: {
+        csslintrc: ".csslint.rc"
       },
       src: ["build/towtruck/towtruck.css"]
     },
@@ -163,7 +173,7 @@ module.exports = function (grunt) {
         }
         grunt.log.writeln("writing " + src.cyan + " to " + dest.cyan);
         grunt.file.write(dest, content);
-      };
+      }
       return true;
     }
   );
