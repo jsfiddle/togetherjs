@@ -813,7 +813,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         return;
       }
       pos = elementFinder.pixelForPosition(pos);
-      window.scrollTo(0, pos);
+      $(document.body).easeTo(pos);
     },
 
     updateFollow: function () {

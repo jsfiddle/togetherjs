@@ -185,12 +185,13 @@ incoming({
 });
 var prevPos = $(window).scrollTop();
 dockEl.click();
+wait(400);
+// => Starts visible: false
 var curPos = $(window).scrollTop();
 print("Moved from:", prevPos, "to:", curPos, "same?", prevPos == curPos);
 window.scrollTo(0, prevPos);
 print("Ends visible:", partEl.is(":visible"));
 /* =>
-Starts visible: false
 Moved from: ? to: ? same? false
 Ends visible: true
 */
