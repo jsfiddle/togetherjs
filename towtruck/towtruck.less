@@ -183,7 +183,7 @@
   #towtruck-chat-messages {
     overflow-y: auto;
     /*FIXME: I'm just pulling numbers out of thin air here:*/
-    height: 210px;
+    height: 260px;
   }
 
 } // End of .window()
@@ -205,7 +205,7 @@
     background-position: center;
     border-top:1px solid rgba(0,0,0,0.2);
     &:hover {
-      /*background-color: darken(@background-color, 10%);*/
+      background-color: #0F81BF;
     }
   }
 
@@ -247,61 +247,89 @@
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
   }
+  
+  .towtruck-subtitle {
+    background:#0195DD;
+    width:286px;
+    height:17px;
+    border-bottom:1px solid #0071A7;
+    color: rgba(255,255,255,0.5);
+    font-size:12px;
+    padding:7px;
+    left:-14px;
+    top:-15px;
+    position:relative;
+  }
 
   #towtruck-chat-input {
-    width: 285px;
-    font-size: 12px;
-    padding: 6px;
-    border-radius: 2px;
+    width: 264px;
+    font-size: 14px;
+    padding: 6px 6px 4px;
+    border-radius: 4px;
     border: 1px solid #cccccc;
-    box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);
-    font-family: openSansRegular;
+    /*box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);*/
+    font-family: openSansLight;
     &:focus {
-      border: 1px solid #0095DD;
+      border:1px solid #0095DD;
     }
   }
 
   #towtruck-chat-input-box {
     margin: 0;
-    padding: 10px;
+    padding: 10px 10px 11px;
     border-top: 1px solid rgba(0,0,0,0.1);
-    width: 300px;
+    background:#F2F2F2;
     position: relative;
-    left: -10px;
-    box-shadow: 0 -1px 2px rgba(0,0,0,0.1);
-    height: 30px;
+    /*box-shadow: 0 -1px 2px rgba(0,0,0,0.1);*/
+    height: 31px;
+    width: 280px;
+    margin-left:-7px;
+    border-bottom-right-radius:4px;
+    border-bottom-left-radius:4px;
   }
 
   .towtruck-window #towtruck-chat-messages {
-    width: 320px;
+    width: 300px;
     position: relative;
-    left: -10px;
-    background: #f2f4f5;
+    left: -14px;
+    background: #fff;
+    top:-30px;
+    margin-bottom:-30px !important;
   }
 
   .towtruck-chat-item {
     padding: 0 0 20px 0;
     font-family: @default-font;
     font-size: 14px;
-    padding-top: 10px;
+    padding: 10px 0px;
     margin: 0;
     border-bottom: 1px solid rgba(0,0,0,0.1);
-    text-shadow: 0 1px rgba(255,255,255,1);
+    color:rgba(51,51,51,1);
+  }
+  
+  #towtruck-chat-messages .towtruck-person-self {
+    float:left;
+    margin-bottom:20px;
+  }
+  
+  .towtruck-person-name-abbrev {
+    color:rgba(51,51,51,1);
+    font-family:openSansRegular;
+    padding-top:7px;
   }
 
   .towtruck-timestamp {
     float: right;
-    font-size: 10px;
-    opacity: 0.5;
-    padding: 13px 15px 10px 10px;
-    text-shadow: 0 1px rgba(255,255,255,1);
+    color:rgba(51,51,51,0.5);
+    font-size: 9px;
+    padding: 8px 15px 0px 10px;
   }
 
   .towtruck-chat-content {
     white-space: pre-wrap;
     line-height: 20px;
     font-family: @default-font;
-    padding-left: 65px;
+    padding: 0px 14px 7px;
   }
 
   #towtruck-window-pointer-right, #towtruck-window-pointer-left {
@@ -442,12 +470,14 @@
   border: 1px solid #979797;
   border-radius: 4px;
   hr {
-    margin:0;
+    margin:0px;
     border-top: 1px solid #E1E1E1;
   }
   .towtruck-menu-item {
-    padding: 12px 12px;
-    height:12px;
+    margin:-1px 0px -1px;
+    padding: 12px;
+    line-height:10px;
+    height:10px;
     cursor: pointer;
     &.towtruck-menu-disabled {
       cursor: default;
@@ -456,9 +486,11 @@
       }
     }
     img {
+      float:left;
       height: (@icon-size)+8;
       width: (@icon-size)+8;
       margin-right: 10px;
+      margin-top:-5px;
     }
     &:hover {
       background-color: rgba(216,216,216,0.5);
