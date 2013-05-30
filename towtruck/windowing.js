@@ -53,7 +53,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     var width = win.width() + 20;
     var left, top;
     if (ifacePos == "right") {
-      left = boundPos.left - 15 - width;
+      left = boundPos.left - 11 - width;
       top = boundPos.top + (boundPos.height / 2) - (height / 2);
     } else if (ifacePos == "left") {
       left = boundPos.left + boundPos.width + 15;
@@ -74,7 +74,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       if (ifacePos == "right") {
         pointer.css({
           top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-          left: left + win.width() + 16 + "px"
+          left: left + win.width() + 9 + "px"
         });
       } else if (ifacePos == "left") {
         pointer.css({
