@@ -762,6 +762,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.dockElement = templating.sub("dock-person", {
         peer: this.peer
       });
+      this.dockElement.attr("id", this.peer.className("towtruck-dock-element-"));
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
       var iface = $("#towtruck-dock");
       iface.css({

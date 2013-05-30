@@ -86,6 +86,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       }
     }
     win.data("boundTo", bound.selector || "#" + bound.attr("id"));
+    bound.addClass("towtruck-active");
   }
 
   windowing.hide = function (els) {
@@ -107,6 +108,8 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
         bound.removeClass("towtruck-color-pulse").removeClass("towtruck-animated");
       }, ANIMATION_DURATION+10);
       element.data("boundTo", null);
+      console.log("removing towtruck-active from", bound[0]);
+      bound.removeClass("towtruck-active");
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
     if (onClose) {

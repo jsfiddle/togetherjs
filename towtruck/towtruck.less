@@ -389,16 +389,40 @@
   }
 
   .towtruck-person {
-      height: (@avatar-size)-2;
-      width: (@avatar-size)-2;
-      margin:(@button-size/4)+1;
-      /*margin-left: (@button-size - @avatar-size) / 2;*/
-      background-repeat: no-repeat;
-      background-size: 32px 32px;
-      background-position: -1px -1px;
-      border: 2px solid;
-      border-radius: 2px;
-      background-clip: border-box;
+    height: (@avatar-size)-2;
+    width: (@avatar-size)-2;
+    margin:(@button-size/4)+1;
+    /*margin-left: (@button-size - @avatar-size) / 2;*/
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+    border: 2px solid;
+    border-radius: 2px;
+    background-clip: border-box;
+  }
+
+  .towtruck-dock-person > .towtruck-dock-person-tooltip {
+    display: none;
+  }
+  .towtruck-dock-person:hover > .towtruck-dock-person-tooltip {
+    display: block;
+  }
+  .towtruck-dock-person.towtruck-active:hover > .towtruck-dock-person-tooltip {
+    display: none;
+  }
+
+  .towtruck-dock-person-tooltip {
+    position: absolute;
+    right: 60px;
+    top: @button-size / 2;
+    padding: 4px;
+  }
+
+  .towtruck-tooltip {
+    background-color: #444;
+    color: #fff;
+    border-radius: 4px;
+    border: 2px solid #fff;
   }
 
 }
