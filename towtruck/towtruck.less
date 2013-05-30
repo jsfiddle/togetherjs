@@ -73,17 +73,18 @@
 
 .button-style () {
   display: inline-block;
-  border-radius: 0.25em;
+  border-radius: 4px;
   text-align: center;
-  padding: 0 20px;
+  padding: 0 10px;
   height: 40px;
-  line-height: 40px;
+  line-height: 20px;
   text-decoration: none;
   min-width: 100px;
   border: none;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
   font-family: @default-font;
-  transition: all 0.25s linear 0s;
+  /*transition: all 0.25s linear 0s;*/
+  text-shadow: none;
+  margin:3px;
 }
 
 .towtruck-primary {
@@ -98,8 +99,14 @@
 
 .towtruck-destructive {
   .button-style;
-  .gradient(#990000, #880000);
+  background:#CB433D;
+  border:1px solid #AD241D;
   color: #ffffff;
+  
+  &:hover {
+    background:#AC2924;
+  }
+  
 }
 
 .towtruck-secondary {
@@ -113,10 +120,14 @@
   background: inherit;
   border: none;
   color: rgb(0, 0, 0);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0 5px;
+  padding:0 0px;
+  margin:0px 3px;
   min-width: 0;
+  &:hover {
+    cursor: pointer;
+    border-bottom:1px solid #BCBCBC;
+  }
+  
 }
 
 
@@ -175,8 +186,11 @@
     width:39px;
     height:39px;
     margin-top:-10px;
+    margin-right:-3px;
+    border-top-right-radius:4px;
     &:hover {
       background-image:url('./images/icon-close-active.png');
+      background-color:rgba(0,0,0,0.1);
     }
   }
 
@@ -224,7 +238,9 @@
   #towtruck-buttons #towtruck-audio-button{
     background-image: url('./images/button-mic.png');
     &:hover {
-      background-image: url('./images/button-mic.png');
+      /*background-image: url('./images/button-mic.png');*/
+      background-color:#0095dd;
+      cursor: default;
     }
   }
 
@@ -339,8 +355,8 @@
     margin-right: -5px;
     margin-top: -5px;
     background: #fff;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    border-right: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
     z-index: @z-index + 2;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
   }
@@ -444,16 +460,17 @@
 
   .towtruck-dock-person-tooltip {
     position: absolute;
-    right: 60px;
-    top: @button-size / 2;
-    padding: 4px;
+    right: 70px;
+    top: @button-size / 2 - 5;
+    padding: 8px;
+    font-size:12px;
+    text-align:left;
   }
 
   .towtruck-tooltip {
-    background-color: #444;
+    background-color: rgba(42,42,42,.9);
     color: #fff;
     border-radius: 4px;
-    border: 2px solid #fff;
   }
 
 }
@@ -753,18 +770,33 @@
     @height: 20em;
     @width: 300px;
     .towtruck.towtruck-window;
+    border-radius:5px !important;
     position: fixed;
     top: 50%;
     left: 50%;
     margin-left: -(@width/2);
     width: @width;
     margin-top: -(@height/2);
-    height: @height;
     z-index: @z-index+3;
     &.towtruck-modal-wide {
       width: 70%;
       margin-left: -35%;
     }
+    
+    section.towtruck-buttons {
+      position: relative;
+      bottom: 0;
+      background: #F2F2F2;
+      width: 294px;
+      padding: 10px;
+      text-align: right;
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 4px;
+      margin-left: -7px;
+      margin-bottom: 0px;
+      border-top:1px solid #E1E1E1;
+    }
+    
   }
 }
 
