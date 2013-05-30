@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor) {
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -782,6 +782,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           windowing.hide(this.detailElement);
         } else {
           windowing.show(this.detailElement, {bind: this.dockElement});
+          this.scrollTo();
         }
       }).bind(this));
       this.updateFollow();
@@ -799,6 +800,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       iface.css({
         height: (iface.height() - BUTTON_HEIGHT) + "px"
       });
+    },
+
+    scrollTo: function () {
+      if (this.peer.url != session.currentUrl()) {
+        return;
+      }
+      var pos = this.peer.scrollPosition;
+      if (! pos) {
+        console.warn("Peer has no scroll position:", this.peer);
+        return;
+      }
+      pos = elementFinder.pixelForPosition(pos);
+      window.scrollTo(0, pos);
     },
 
     updateFollow: function () {

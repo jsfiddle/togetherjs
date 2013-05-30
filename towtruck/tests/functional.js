@@ -168,7 +168,35 @@ true false
 Joe
 */
 
+// =SECTION Scrolling and participant screen
 
+var lastEl = $('<div id="last-element" />');
+$(document.body).append(lastEl);
+var dockEl = peers.getPeer("faker").view.dockElement;
+var partEl = peers.getPeer("faker").view.detailElement;
+print("Starts visible:", partEl.is(":visible"));
+incoming({
+  type: "scroll-update",
+  position: {
+    location: "#last-element",
+    offset: 0
+  },
+  clientId: "faker"
+});
+var prevPos = $(window).scrollTop();
+dockEl.click();
+var curPos = $(window).scrollTop();
+print("Moved from:", prevPos, "to:", curPos, "same?", prevPos == curPos);
+window.scrollTo(0, prevPos);
+print("Ends visible:", partEl.is(":visible"));
+/* =>
+Starts visible: false
+Moved from: ? to: ? same? false
+Ends visible: true
+*/
+
+
+// =SECTION Attic
 
 /****************************************
  * Skipping these for now, because leaving the client in place is handy:
