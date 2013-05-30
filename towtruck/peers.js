@@ -185,6 +185,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       color: null,
       defaultName: null,
       loaded: false,
+      isCreator: ! session.isClient,
 
       update: function (attrs) {
         var updatePeers = false;
