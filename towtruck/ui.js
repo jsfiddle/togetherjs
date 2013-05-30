@@ -630,7 +630,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         });
       }
       container.find("." + this.peer.className("towtruck-person-role-"))
-        .text(this.peer.isOwner ? "Creator" : "Participant");
+        .text(this.peer.isCreator ? "Creator" : "Participant");
       var urlName = this.peer.title || "";
       if (this.peer.title) {
         urlName += " (";
@@ -852,6 +852,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.displayToggle("#towtruck-chat-no-participants");
     }
   }
+
+  ui.showUrlChangeMessage = function (peer, url) {
+    var window = templating.sub("url-change", {peer: peer});
+    ui.container.append(window);
+    windowing.show(window);
+  };
 
   session.hub.on("url-change-nudge", function (msg) {
     if (msg.to && msg.to != session.clientId) {

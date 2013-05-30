@@ -5,6 +5,9 @@
 define(["require", "util", "channels", "jquery", "storage"], function (require, util, channels, $, storage) {
 
   var DEBUG = true;
+  // This is the amount of time in which a hello-back must be received after a hello
+  // for us to respect a URL change:
+  var HELLO_BACK_CUTOFF = 1500;
 
   var session = util.mixinEvents(util.Module("session"));
   var assert = util.assert;
@@ -136,7 +139,27 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     if (msg.type == "hello") {
       sendHello(true);
     }
+    if (session.isClient && (! msg.isClient) &&
+        session.firstRun && timeHelloSent &&
+        Date.now() - timeHelloSent < HELLO_BACK_CUTOFF) {
+      processFirstHello(msg);
+    }
   });
+
+  function processFirstHello(msg) {
+    console.log("got first hello", msg.sameUrl);
+    if (! msg.sameUrl) {
+      var url = msg.url;
+      if (msg.urlHash) {
+        url += msg.urlHash;
+      }
+      console.log("going to new url", url);
+      require("ui").showUrlChangeMessage(msg.peer, url);
+      location.href = url;
+    }
+  }
+
+  var timeHelloSent = null;
 
   function sendHello(helloBack) {
     var msg = {
@@ -147,13 +170,15 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       urlHash: location.hash,
       // FIXME: titles update, we should track those changes:
       title: document.title,
-      rtcSupported: session.RTCSupported
+      rtcSupported: session.RTCSupported,
+      isClient: session.isClient
     };
     if (helloBack) {
       msg.type = "hello-back";
     } else {
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
+      timeHelloSent = Date.now();
     }
     if (! TowTruck.startup.continued) {
       msg.starting = true;

@@ -114,6 +114,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         this.color = msg.color;
         identityUpdated = true;
       }
+      if (msg.isClient !== undefined) {
+        this.isCreator = ! msg.isClient;
+      }
       if (this.status != "live") {
         this.status = "live";
         peers.emit("status-updated", this);

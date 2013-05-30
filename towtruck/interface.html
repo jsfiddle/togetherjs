@@ -286,8 +286,8 @@
     </section>
 
     <section class="towtruck-buttons">
-      <button class="towtruck-modal-close">Yes, join session</button>
-      <button class="towtruck-modal-dont-join">No, don't join</button>
+      <button class="towtruck-primary towtruck-dismiss">Yes, join session</button>
+      <button class="towtruck-destructive towtruck-modal-dont-join">No, don't join</button>
     </section>
   </div>
 
@@ -357,6 +357,19 @@
     <header> Feedback </header>
     <iframe src="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true" width="400" height="300" frameborder="0" marginheight="0" marginwidth="0">Loading form...</iframe>
     <!-- <p><button class="towtruck-modal-close">Close</button></p> -->
+  </div>
+
+  <div style="display: none">
+    <!-- This is when you join a session and the other person has already changed to another URL: -->
+    <div id="towtruck-template-url-change" class="towtruck-modal">
+      <header> Following to new URL... </header>
+      <section>
+        <div class="towtruck-person"></div>
+        Following
+        <span class="towtruck-person-name"></span>
+        to <a href="" class="towtruck-person-url towtruck-person-url-title"></a>
+      </section>
+    </div>
   </div>
 
   <!-- The pointer at the side of a window: -->
