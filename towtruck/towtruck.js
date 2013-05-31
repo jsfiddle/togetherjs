@@ -180,6 +180,7 @@
       jquery.noConflict();
       TowTruck._loaded = true;
       TowTruck.require = require.config({context: "towtruck"});
+      TowTruck._requireObject = require;
     }
     if (typeof require == "function") {
       TowTruck.require = require.config(requireConfig);
@@ -200,7 +201,20 @@
 
   TowTruck.pageLoaded = Date.now();
 
-  TowTruck.startup = {
+  TowTruck._extend = function (base, extensions) {
+    if (! extensions) {
+      extensions = base;
+      base = {};
+    }
+    for (var a in extensions) {
+      if (extensions.hasOwnProperty(a)) {
+        base[a] = extensions[a];
+      }
+    }
+    return base;
+  };
+
+  TowTruck._startupInit = {
     // What element, if any, was used to start the session:
     button: null,
     // The startReason is the reason TowTruck was started.  One of:
@@ -219,6 +233,7 @@
     // for session.start() to be run)
     _launch: false
   };
+  TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
   TowTruck.running = false;
 
   TowTruck.requireConfig = {
@@ -234,19 +249,6 @@
       "alien-avatar-generator": "libs/alien-avatar-generator",
       guiders: "libs/Guider-JS/guiders-1.3.0"
     }
-  };
-
-  TowTruck._extend = function (base, extensions) {
-    if (! extensions) {
-      extensions = base;
-      base = {};
-    }
-    for (var a in extensions) {
-      if (extensions.hasOwnProperty(a)) {
-        base[a] = extensions[a];
-      }
-    }
-    return base;
   };
 
   TowTruck._mixinEvents = function (proto) {
@@ -342,6 +344,14 @@
 
     };
     return proto;
+  };
+
+  /* This finalizes the unloading of TowTruck, including unloading modules */
+  TowTruck._teardown = function () {
+    delete TowTruck._requireObject.s.contexts.towtruck;
+    TowTruck._loaded = false;
+    TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
+    TowTruck.running = false;
   };
 
   TowTruck._mixinEvents(TowTruck);

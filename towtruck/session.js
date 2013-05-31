@@ -355,6 +355,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       session.shareId = null;
       session.emit("shareId");
       TowTruck.emit("close");
+      TowTruck._teardown();
     });
   };
 
