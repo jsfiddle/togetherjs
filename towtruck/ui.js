@@ -326,10 +326,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         backgroundColor: color,
         borderColor: darkened
       });
-      // For some reason el.show() sets display to block:
-      el.css({
-        display: "inline-block"
-      });
       $("#towtruck-pick-color").append(el);
     });
 

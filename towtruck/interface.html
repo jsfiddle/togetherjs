@@ -164,7 +164,7 @@
     <header> Audio Chat </header>
     <section>
       <p>
-        Activate your browser microphone above <img src="http://localhost:8080/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+        Activate your browser microphone above <img src="http://localhost:8080/towtruck/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
       </p>
       <p>
         Talking on your microphone through your web browser is an experimental feature.
@@ -227,18 +227,20 @@
       <input id="towtruck-self-name" type="text" data-toggles="#towtruck-self-name-display" style="display: none" placeholder="Enter your name">
     </div>
     <hr class="towtruck-menu-hr-avatar">
-    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/images/btn-pencil.png" alt=""> Update your name</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/towtruck/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/towtruck/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
     <div class="towtruck-menu-item" id="towtruck-menu-update-color"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
     <hr>
     <div class="towtruck-menu-item" id="towtruck-menu-help">Help</div>
     <div class="towtruck-menu-item" id="towtruck-menu-feedback">Feedback</div>
     <hr>
-    <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/images/btn-end-session.png" alt=""> End TowTruck</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End TowTruck</div>
   </div>
 
   <div class="towtruck-menu" id="towtruck-pick-color" style="display: none">
-    <div id="towtruck-template-swatch" class="towtruck-swatch" style="display: none">
+    <div style="display: none">
+      <div id="towtruck-template-swatch" class="towtruck-swatch">
+      </div>
     </div>
   </div>
 
@@ -384,7 +386,7 @@
 
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
-      <img class="towtruck-cursor-img" src="http://localhost:8080/images/cursor-white.png">
+      <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor-white.png">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
         <span style="display:none" class="towtruck-cursor-typing">...</span>
