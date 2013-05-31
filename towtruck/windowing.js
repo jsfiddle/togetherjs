@@ -20,6 +20,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     windowing.hide();
     element.show();
     if (options.bind) {
+      assert(! element.hasClass("towtruck-modal"), "Binding does not currently work with modals");
       bind(element, options.bind);
     }
     if (element.hasClass("towtruck-modal")) {
