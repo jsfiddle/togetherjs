@@ -293,6 +293,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       var menu = $(this);
       var menuOffset = menu.offset();
       var picker = $("#towtruck-pick-color");
+      if (picker.is(":visible")) {
+        picker.hide();
+        return;
+      }
       picker.show();
       picker.css({
         top: menuOffset.top + menu.height(),
