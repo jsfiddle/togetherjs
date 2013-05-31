@@ -383,7 +383,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         offsetX: offsetX,
         offsetY: offsetY
       });
-      displayClick({top: event.pageY, left: event.pageX});
+      displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
     });
   }
 
@@ -405,21 +405,22 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
-    displayClick({top: top, left: left});
+    displayClick({top: top, left: left}, pos.peer.color);
     var cloneClicks = TowTruck.getConfig("cloneClicks");
     if (cloneClicks && target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
   });
 
-  function displayClick(pos) {
+  function displayClick(pos, color) {
     // FIXME: should we hide the local click if no one else is going to see it?
     // That means tracking who might be able to see our screen.
     var element = templating.clone("click");
     $(document.body).append(element);
     element.css({
       top: pos.top,
-      left: pos.left
+      left: pos.left,
+      borderColor: color
     });
     setTimeout(function () {
       element.addClass("towtruck-clicking");
