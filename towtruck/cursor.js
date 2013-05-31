@@ -11,6 +11,9 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   var CURSOR_HEIGHT = 50;
   var CURSOR_ANGLE = (35 / 180) * Math.PI;
   var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
+  // Number of milliseconds after page load in which a scroll-update
+  // related hello-back message will be processed:
+  var SCROLL_UPDATE_CUTOFF = 2000;
 
   session.hub.on("cursor-update", function (msg) {
     if (msg.sameUrl) {
@@ -290,8 +293,38 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     session.send(lastScrollMessage);
   }
 
+  // FIXME: do the same thing for cursor position?  And give up on the
+  // ad hoc update-on-hello?
+  session.on("prepare-hello", function (helloMessage) {
+    if (lastScrollMessage) {
+      helloMessage.scrollPosition = lastScrollMessage.position;
+    }
+  });
+
   session.hub.on("scroll-update", function (msg) {
     msg.peer.scrollPosition = msg.position;
+  });
+
+  // In case there are multiple peers, we track that we've accepted one of their
+  // hello-based scroll updates, just so we don't bounce around (we don't intelligently
+  // choose which one to use, just the first that comes in)
+  var acceptedScrollUpdate = false;
+  session.hub.on("hello-back hello", function (msg) {
+    if (msg.type == "hello") {
+      // Once a hello comes in, a bunch of hello-backs not intended for us will also
+      // come in, and we should ignore them
+      acceptedScrollUpdate = true;
+    }
+    if (! msg.scrollPosition) {
+      return;
+    }
+    msg.peer.scrollPosition = msg.scrollPosition;
+    if ((! acceptedScrollUpdate) &&
+        msg.sameUrl &&
+        Date.now() - session.timeHelloSent < SCROLL_UPDATE_CUTOFF) {
+      acceptedScrollUpdate = true;
+      msg.peer.view.scrollTo();
+    }
   });
 
   session.on("ui-ready", function () {

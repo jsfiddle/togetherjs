@@ -140,8 +140,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       sendHello(true);
     }
     if (session.isClient && (! msg.isClient) &&
-        session.firstRun && timeHelloSent &&
-        Date.now() - timeHelloSent < HELLO_BACK_CUTOFF) {
+        session.firstRun && session.timeHelloSent &&
+        Date.now() - session.timeHelloSent < HELLO_BACK_CUTOFF) {
       processFirstHello(msg);
     }
   });
@@ -159,7 +159,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     }
   }
 
-  var timeHelloSent = null;
+  session.timeHelloSent = null;
 
   function sendHello(helloBack) {
     var msg = {
@@ -178,11 +178,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     } else {
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
-      timeHelloSent = Date.now();
+      session.timeHelloSent = Date.now();
     }
     if (! TowTruck.startup.continued) {
       msg.starting = true;
     }
+    // This is a chance for other modules to effect the hello message:
+    session.emit("prepare-hello", msg);
     session.send(msg);
   }
 

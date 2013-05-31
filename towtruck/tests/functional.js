@@ -30,6 +30,7 @@ send: hello
   clientId: "...",
   clientVersion: "unknown",
   color: "#00ff00",
+  isClient: false,
   name: "Jane Doe",
   rtcSupported: true,
   starting: true,

@@ -88,6 +88,7 @@ function newPeer(options) {
   options = options || {};
   var msg = {
     type: "hello",
+    isClient: false,
     clientId: options.clientId || "faker",
     name: options.name || "Faker",
     avatar: options.avatar || TowTruck.baseUrl + "/images/robot-avatar.png",
