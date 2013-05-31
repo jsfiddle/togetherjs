@@ -290,18 +290,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
 
     $("#towtruck-menu-update-color").click(function () {
-      var menu = $(this);
-      var menuOffset = menu.offset();
       var picker = $("#towtruck-pick-color");
       if (picker.is(":visible")) {
         picker.hide();
         return;
       }
       picker.show();
-      picker.css({
-        top: menuOffset.top + menu.height(),
-        left: menuOffset.left
-      });
+      bindPicker();
       picker.find(".towtruck-swatch-active").removeClass("towtruck-swatch-active");
       picker.find(".towtruck-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
     });
@@ -402,14 +397,38 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     var el = $("#towtruck-menu");
     assert(el.length);
     el.show();
-    var bound = $("#towtruck-profile-button");
-    var boundOffset = bound.offset();
-    el.css({
-      top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
-      left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
-    });
+    bindMenu();
     $(document).bind("click", maybeHideMenu);
   }
+
+  function bindMenu() {
+    var el = $("#towtruck-menu:visible");
+    if (el.length) {
+      var bound = $("#towtruck-profile-button");
+      var boundOffset = bound.offset();
+      el.css({
+        top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
+        left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
+      });
+    }
+  }
+
+  function bindPicker() {
+    var picker = $("#towtruck-pick-color:visible");
+    if (picker.length) {
+      var menu = $("#towtruck-menu-update-color");
+      var menuOffset = menu.offset();
+      picker.css({
+        top: menuOffset.top + menu.height(),
+        left: menuOffset.left
+      });
+    }
+  }
+
+  session.on("resize", function () {
+    bindMenu();
+    bindPicker();
+  });
 
   function toggleMenu() {
     if ($("#towtruck-menu").is(":visible")) {

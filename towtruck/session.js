@@ -359,6 +359,17 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
+
+  session.on("start", function () {
+    $(window).on("resize", resizeEvent);
+  });
+  session.on("close", function () {
+    $(window).removeListener("resize", resizeEvent);
+  });
+  function resizeEvent() {
+    session.emit("resize");
+  }
+
   if (TowTruck.startup._launch) {
     setTimeout(session.start);
   }

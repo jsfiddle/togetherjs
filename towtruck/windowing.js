@@ -90,6 +90,19 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     bound.addClass("towtruck-active");
   }
 
+  session.on("resize", function () {
+    var win = $(".towtruck-modal:visible, .towtruck-window:visible");
+    if (! win.length) {
+      return;
+    }
+    var boundTo = win.data("boundTo");
+    if (! boundTo) {
+      return;
+    }
+    boundTo = $(boundTo);
+    bind(win, boundTo);
+  });
+
   windowing.hide = function (els) {
     // FIXME: also hide modals?
     els = els || ".towtruck-window, .towtruck-modal";
