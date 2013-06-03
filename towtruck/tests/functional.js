@@ -2,56 +2,31 @@
 
 $("#other").remove();
 
-getRequire("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
+Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
 // => Loaded modules: ...
 
-printResolved(
-  storage.settings.set("name", ""),
-  storage.settings.set("defaultName", "Jane Doe"),
-  storage.settings.set("avatar", undefined),
-  storage.settings.set("stickyShare", null),
-  storage.settings.set("color", "#00ff00"),
-  storage.settings.set("seenIntroDialog", undefined),
-  storage.settings.set("seenWalkthrough", undefined),
-  storage.settings.set("dontShowRtcInfo", undefined),
-  "done."
-  );
-// => (resolved) ... done.
-
-viewSend();
-waitEvent(session, "ui-ready");
-TowTruck.startup._launch = true;
-TowTruck();
+printChained(
+  Test.resetSettings(),
+  Test.startTowTruck(),
+  Test.closeWalkthrough());
 
 /* =>
-ui-ready([Module ui])
+Settings reset
+TowTruck started
 send: hello
-  avatar: "...",
+  avatar: "...default-avatar.png",
   clientId: "...",
-  clientVersion: "unknown",
-  color: "#00ff00",
+  clientVersion: "...",
+  color: "...",
   isClient: false,
-  name: "Jane Doe",
-  rtcSupported: true,
+  name: "...",
+  rtcSupported: ?,
   starting: true,
-  title: "TowTruck tests",
-  url: ".../tests/?name=functional.js",
-  urlHash: ""
-*/
-
-session.clientId = "me";
-
-var buttonSelector = ".guiders_button.towtruck-walkthru-getstarted-button";
-wait(function () {
-  return $(buttonSelector).length;
-});
-
-// =>
-
-$(buttonSelector).click();
-wait(1000);
-
-// =>
+  title: "...",
+  url: "...",
+  urlHash: "..."
+Walkthrough closed
+ */
 
 printResolved(storage.settings.get("seenIntroDialog"));
 
@@ -59,19 +34,13 @@ printResolved(storage.settings.get("seenIntroDialog"));
 
 // =SECTION Peer handling
 
-// We'll be faking the existence of a peer here by sending messages in:
-
-var incoming = session._getChannel().onmessage;
-print(incoming);
-// => function (msg) {...}
-
-viewSend.deactivate();
-newPeer();
+Test.viewSend.deactivate();
+Test.newPeer();
 wait(500);
 
 // =>
 
-incoming({
+Test.incoming({
   type: "cursor-update",
   clientId: "faker",
   top: 100,
@@ -96,7 +65,7 @@ print(faker.status, faker.idle, faker.view.dockElement && faker.view.dockElement
 
 // => live active true
 
-incoming({
+Test.incoming({
   type: "chat",
   text: "Test message",
   clientId: "faker",
@@ -127,13 +96,15 @@ print($("#towtruck-chat-notifier").is(":visible"), $("#towtruck-chat").is(":visi
 
 // => false true
 
-viewSend.activate();
+Test.viewSend.activate();
 $("#towtruck-chat-input").val("outgoing message");
 TowTruckTestSpy.submitChat();
 
 /* =>
 send: chat
-  {clientId: "me", messageId: "...", text: "outgoing message"}
+  clientId: "me",
+  messageId: "...",
+  text: "outgoing message"
 */
 
 print($("#towtruck-chat-input").val() === "");
@@ -163,7 +134,8 @@ print($("#towtruck-menu").is(":visible"), $("#towtruck-self-name").is(":visible"
 print($("#towtruck-self-name-display").text());
 /* =>
 send: peer-update
-  {clientId: "me", name: "Joe"}
+  clientId: "me",
+  name: "Joe"
 Joe
 true false
 Joe
@@ -176,7 +148,7 @@ $(document.body).append(lastEl);
 var dockEl = peers.getPeer("faker").view.dockElement;
 var partEl = peers.getPeer("faker").view.detailElement;
 print("Starts visible:", partEl.is(":visible"));
-incoming({
+Test.incoming({
   type: "scroll-update",
   position: {
     location: "#last-element",
@@ -205,7 +177,7 @@ Ends visible: true
  */
 
 /*
-incoming({
+Test.incoming({
   type: "bye",
   clientId: "faker"
 });

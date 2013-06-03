@@ -1,17 +1,15 @@
 TowTruckTestSpy = {};
 
-/* Adds a global trequire which is the TowTruck-local require() function.
-   May be async, so use like:
+var Test = {};
 
-   getRequire();
-   // => Require loaded
-   session = trequire("session");
-   ...
+/* Loads the modules that are listed as individual arguments, and adds
+   them to the global scope.  Blocks on the loading.  Use like:
 
-   Optional variable arguments are modules to pre-load.  These modules
-   will each be added to the global scope.
-   */
-function getRequire() {
+   Test.require("foo", "bar");
+   // => ...
+   foo.someFunction()...
+*/
+Test.require = function () {
   var done = false;
   var modules = Array.prototype.slice.call(arguments);
 
@@ -34,16 +32,14 @@ function getRequire() {
 
   if (TowTruck.require) {
     console.log("TowTruck already initialized");
-    window.trequire = TowTruck.require;
     loadModules();
   } else if (typeof require == "function") {
     console.log("require.js already loaded; configuring");
-    window.trequire = TowTruck.require = require.config(TowTruck.requireConfig);
     loadModules();
   } else {
     window.require = TowTruck._extend(TowTruck.requireConfig);
     window.require.callback = function () {
-      window.trequire = TowTruck.require = require.config({context: "towtruck"});
+      TowTruck.require = require.config({context: "towtruck"});
       loadModules();
     };
     var url = "../libs/require.js";
@@ -53,27 +49,28 @@ function getRequire() {
     document.head.appendChild(script);
   }
   wait(function () {return done;});
-}
+};
 
-var IGNORE_MESSAGES = ["cursor-update", "scroll-update"];
+Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update"];
 
-function viewSend() {
+Test.viewSend = function () {
   // Prints out all send() messages
+  var session = TowTruck.require("session");
   if (! TowTruck.running) {
-    session.once("start", viewSend);
+    session.once("start", Test.viewSend);
     return;
   }
-  var channel = TowTruck.require("session")._getChannel();
+  var channel = TowTruckTestSpy.getChannel();
   var oldSend = channel.send;
   channel.send = function (msg) {
     oldSend.apply(channel, arguments);
-    viewSend.emit(msg.type, msg);
-    if (viewSend.running && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
+    Test.viewSend.emit(msg.type, msg);
+    if (Test.viewSend.running && Test.IGNORE_MESSAGES.indexOf(msg.type) == -1) {
       if (typeof print == "function") {
         print("send:", msg.type);
         var shortMsg = TowTruck._extend(msg);
         delete shortMsg.type;
-        var r = repr(shortMsg);
+        var r = repr(shortMsg, undefined, 10);
         r = "  " + r.replace(/^\{\s+/, "");
         r = r.replace(/\s+\}$/, "");
         print(r);
@@ -82,9 +79,19 @@ function viewSend() {
       }
     }
   };
-}
+};
 
-function newPeer(options) {
+TowTruck._mixinEvents(Test.viewSend);
+Test.viewSend.running = true;
+Test.viewSend.activate = function () {
+  Test.viewSend.running = true;
+};
+Test.viewSend.deactivate = function () {
+  Test.viewSend.running = false;
+};
+
+
+Test.newPeer = function (options) {
   options = options || {};
   var msg = {
     type: "hello",
@@ -98,25 +105,101 @@ function newPeer(options) {
     title: document.title,
     rtcSupported: false
   };
-  TowTruck.require("session")._getChannel().onmessage(msg);
-}
-
-
-TowTruck._mixinEvents(viewSend);
-viewSend.running = true;
-// FIXME: this looks like events:
-viewSend.activate = function () {
-  viewSend.running = true;
-};
-viewSend.deactivate = function () {
-  viewSend.running = false;
+  Test.incoming(msg);
 };
 
-function waitEvent(context, event, options) {
+Test.waitEvent = function (context, event, options) {
   var ops = TowTruck._extend({wait: true, ignoreThis: true}, options);
   context.once(event, Spy(event, ops));
+};
+
+Test.waitMessage = function (messageType) {
+  Test.waitEvent(Test.viewSend, messageType, {writes: false});
+};
+
+Test.resetSettings = function () {
+  var util = TowTruck.require("util");
+  return $.Deferred(function (def) {
+    util.resolveMany(
+      storage.settings.set("name", ""),
+      storage.settings.set("defaultName", "Jane Doe"),
+      storage.settings.set("avatar", undefined),
+      storage.settings.set("stickyShare", null),
+      storage.settings.set("color", "#00ff00"),
+      storage.settings.set("seenIntroDialog", undefined),
+      storage.settings.set("seenWalkthrough", undefined),
+      storage.settings.set("dontShowRtcInfo", undefined)
+    ).then(function () {
+      def.resolve("Settings reset");
+    });
+  });
+};
+
+Test.startTowTruck = function () {
+  return $.Deferred(function (def) {
+    var session = TowTruck.require("session");
+    Test.viewSend();
+    session.once("ui-ready", function () {
+      session.clientId = "me";
+      def.resolve("TowTruck started");
+    });
+    TowTruck.startup._launch = true;
+    TowTruck();
+  });
+};
+
+Test.closeWalkthrough = function () {
+  return $.Deferred(function (def) {
+    var buttonSelector = ".guiders_button.towtruck-walkthru-getstarted-button:visible";
+    var seenButton = false;
+    var id = setInterval(function () {
+      var button = $(buttonSelector);
+      if (seenButton && ! button.length) {
+        // The walkthrough popped up, and then disappeared
+        clearTimeout(id);
+        def.resolve("Walkthrough closed");
+      }
+      if ((! seenButton) && button.length) {
+        seenButton = true;
+        button.click();
+      }
+    }, 100);
+  });
+};
+
+function printChained() {
+  var args = Array.prototype.slice.call(arguments);
+  var index = 0;
+  var done = false;
+  function run() {
+    if (index >= args.length) {
+      done = true;
+      return;
+    }
+    args[index].then(function () {
+      if (! arguments.length) {
+        print("(done)");
+      } else {
+        print.apply(null, arguments);
+      }
+      check(1);
+    }, function () {
+      if (! arguments.length) {
+        print("(error)");
+      } else {
+        print.apply(null, ["Error:"].concat(arguments));
+      }
+      check(1);
+    });
+    function check(increment) {
+      index += increment;
+      setTimeout(run);
+    }
+  }
+  wait(function () {return done;});
+  run();
 }
 
-function waitMessage(messageType) {
-  waitEvent(viewSend, messageType, {writes: false});
-}
+Test.incoming = function (msg) {
+  TowTruckTestSpy.getChannel().onmessage(msg);
+};
