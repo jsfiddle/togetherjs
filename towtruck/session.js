@@ -27,10 +27,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   var localStoragePrefix = "towtruck.";
   // This is the channel to the hub:
   var channel = null;
-  // For testing:
-  session._getChannel = function () {
-    return channel;
-  };
 
   // Setting, essentially global:
   session.AVATAR_SIZE = 90;
@@ -373,6 +369,12 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   if (TowTruck.startup._launch) {
     setTimeout(session.start);
   }
+
+  util.testExpose({
+    getChannel: function () {
+      return channel;
+    }
+  });
 
   return session;
 });
