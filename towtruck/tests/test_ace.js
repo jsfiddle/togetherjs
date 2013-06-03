@@ -1,8 +1,6 @@
 // =SECTION Setup
 
 $("#fixture").empty();
-$("#other").remove();
-$("#output-container").remove();
 var aceSrc = "./ace.js";
 var script = $("<script>").attr("onload", Spy("aceLoad", {wait: true})).attr("src", aceSrc);
 $(document.head).append(script);
@@ -29,35 +27,22 @@ var editor = ace.edit("ace-editor");
 editor.setTheme("ace/theme/textmate");
 editor.getSession().setMode("ace/mode/javascript");
 
-getRequire("forms", "session", "ui");
+Test.require("forms", "session", "ui");
 /* =>
 <pre...</pre>
 Loaded modules: ...
 */
 
-viewSend();
-waitMessage("hello");
-TowTruck.startup._launch = true;
-TowTruck();
-setTimeout(function () {
-  ui.hideWindow("#towtruck-about");
-}, 1000);
+Test.normalStartup();
+// => ...
 
-/* =>
-send: hello
-...
-*/
-
-session.clientId = "me";
 print(editor.getValue());
 
 // => function square...
 
 // =SECTION Setup peer
 
-var incoming = session._getChannel().onmessage;
-
-incoming({
+Test.incoming({
   type: "hello",
   clientId: "faker",
   url: location.href.replace(/\#.*/, ""),
@@ -72,16 +57,7 @@ wait(100);
 
 /* =>
 
-send: hello-back
-  avatar: "...",
-  clientId: "me",
-  color: "...",
-  name: "...",
-  rtcSupported: ?,
-  starting: ?,
-  title: "TowTruck tests",
-  url: ".../tests/...",
-  urlHash: ""
+send: hello-back...
 send: form-init
   clientId: "me",
   pageAge: ?,
@@ -104,14 +80,23 @@ send: form-update
   clientId: "me",
   delta: {
     action: "insertText",
-    range: {end: {column: 14, row: 0}, start: {column: 0, row: 0}},
+    range: {
+      end: {
+        column: 14,
+        row: 0
+      },
+      start: {
+        column: 0,
+        row: 0
+      }
+    },
     text: "Some more text"
   },
   element: "#ace-editor",
   tracker: "AceEditor"
 */
 
-incoming({
+Test.incoming({
   type: "form-update",
   clientId: "faker",
   element: "#ace-editor",

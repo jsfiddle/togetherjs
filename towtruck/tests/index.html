@@ -12,28 +12,14 @@
     <script src="../libs/jquery-1.8.3.min.js"></script>
     <script src="testutils.js"></script>
     <link rel="stylesheet" href="doctestjs/doctest.css">
-    <style>
-      body.client {
-        background-color: #ffd;
-      }
-    </style>
   </head>
   <body class="autodoctest">
-
-    <script>
-      if (TowTruck._shareId) {
-        // This is the client loaded by the other page
-        document.body.className = "client";
-        location.hash += "&client";
-      }
-    </script>
 
     <div id="doctest-output"></div>
 
     <div id="contents">
       Tests:
       <ol>
-        <li><a href="?name=exercise.js">exercise</a></li>
         <li><a href="?name=functional.js">functional</a></li>
         <li><a href="?name=test_storage.js">test_storage</a></li>
         <li><a href="?name=test_resolves.js">test_resolves</a></li>
@@ -43,79 +29,10 @@
       </ol>
     </div>
 
-<pre class="test">
-if (location.hash.indexOf("towtruck-") != -1) {
-  // This is the client and we don't want to run any tests
-  Abort();
-}
-</pre>
-
 <pre class="test" data-href-pattern="./{name:[a-zA-Z0-9_-]+\.js}">xxx
 </pre>
 
 <div id="fixture">
-  <textarea id="textarea" style="width: 10em; height: 3em; whitespace: wrap"></textarea>
-  <br>
-
-  <label for="yes"><input type="radio" name="answer" id="yes"> Yes</label>
-  <label for="no"><input type="radio" name="answer" id="no"> No</label>
-  <br>
-
 </div>
-
-<div id="other">
-  This iframe contains the "other" client:
-  <br>
-
-  <iframe id="other-client" style="height: 40em; width: 100%"></iframe>
-</div>
-
-<div id="output-container" style="display: none">
-  Console:
-<pre id="output" style="white-space: pre-wrap; overflow: auto; overflow-y: auto; max-height: 20em; border: 1px solid #00f"></pre>
-</div>
-
-<style>
-  .console-warn {
-    color: #a00;
-  }
-  .console-error {
-    color: #f00;
-  }
-  .console-debug {
-    color: #666;
-  }
-</style>
-<script>
-if (document.body.className.indexOf("autodoctest") == -1) {
-  (function () {
-    $("#other, .commenttest, #contents, #doctest-output").hide();
-    $("#output-container").show();
-    var output = $("#output");
-    ["debug", "log", "info", "warn", "error"].forEach(function (n) {
-      var orig = console[n];
-      console[n] = function () {
-        var s = [];
-        Array.prototype.slice.call(arguments).forEach(function (a) {
-          if (typeof a == "string") {
-            s.push(a);
-          } else {
-            s.push(doctest.repr(a));
-          }
-        });
-        s = s.join(" ") + "\n";
-        var el = $("<span>").addClass("console-" + n).text(s);
-        output.append(el);
-        orig.apply(console, arguments);
-      };
-    });
-    window.onerror = function (message, filename, lineno) {
-      message += " " + filename + ":" + lineno;
-      var el = $("<span>").addClass("console-error").text(message);
-      output.append(el);
-    };
-  })();
-}
-</script>
 
 </body></html>

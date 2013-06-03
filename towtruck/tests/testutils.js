@@ -119,6 +119,7 @@ Test.waitMessage = function (messageType) {
 
 Test.resetSettings = function () {
   var util = TowTruck.require("util");
+  var storage = TowTruck.require("storage");
   return $.Deferred(function (def) {
     util.resolveMany(
       storage.settings.set("name", ""),
@@ -165,6 +166,13 @@ Test.closeWalkthrough = function () {
       }
     }, 100);
   });
+};
+
+Test.normalStartup = function () {
+  printChained(
+    Test.resetSettings(),
+    Test.startTowTruck(),
+    Test.closeWalkthrough());
 };
 
 function printChained() {

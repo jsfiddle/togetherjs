@@ -1,5 +1,4 @@
-$("#fixture, #other").hide();
-getRequire("util");
+Test.require("util");
 // => Loaded modules: util
 
 var def = util.Deferred();

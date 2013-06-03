@@ -1,6 +1,5 @@
 /*global storage */
-$("#fixture, #other").hide();
-getRequire("storage", "util");
+Test.require("storage", "util");
 // => Loaded modules: storage util
 
 print(storage);

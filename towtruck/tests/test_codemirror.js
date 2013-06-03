@@ -1,8 +1,5 @@
 // =SECTION Setup
 
-$("#fixture").empty();
-$("#other").remove();
-$("#output-container").remove();
 var cmSrc = "../../example/codemirror/codemirror.js";
 var script = $("<script>").attr("onload", Spy("cmLoad", {wait: true})).attr("src", cmSrc);
 $(document.head).append(script);
@@ -24,35 +21,22 @@ var editor = CodeMirror($("#cm-editor")[0], {
 });
 editor.setValue("function square(x) {\n  return x * x;\n}\n");
 
-getRequire("forms", "session", "ui");
+Test.require("forms", "session", "ui");
 /* =>
 <pre...
 Loaded modules: ...
 */
 
-viewSend();
-waitMessage("hello");
-TowTruck.startup._launch = true;
-TowTruck();
-setTimeout(function () {
-  ui.hideWindow("#towtruck-about");
-}, 1000);
+Test.normalStartup();
+// => ...
 
-/* =>
-send: hello
-...
-*/
-
-session.clientId = "me";
 print(editor.getValue());
 
 // => function square...
 
 // =SECTION Setup peer
 
-var incoming = session._getChannel().onmessage;
-
-incoming({
+Test.incoming({
   type: "hello",
   clientId: "faker",
   url: location.href.replace(/\#.*/, ""),
@@ -67,16 +51,7 @@ wait(100);
 
 /* =>
 
-send: hello-back
-  avatar: "...",
-  clientId: "me",
-  color: "...",
-  name: "...",
-  rtcSupported: ?,
-  starting: ?,
-  title: "TowTruck tests",
-  url: ".../tests/...",
-  urlHash: ""
+send: hello-back...
 send: form-init
   clientId: "me",
   pageAge: ?,
@@ -96,13 +71,25 @@ wait(100);
 
 /* =>
 send: form-update
-  change: {from: {ch: 0, line: 0}, text: ["Some more text"], to: {ch: 0, line: 0}},
+  change: {
+    from: {
+      ch: 0,
+      line: 0
+    },
+    text: [
+      "Some more text"
+    ],
+    to: {
+      ch: 0,
+      line: 0
+    }
+  },
   clientId: "me",
   element: "#cm-editor:nth-child(1)",
   tracker: "CodeMirrorEditor"
 */
 
-incoming({
+Test.incoming({
   type: "form-update",
   clientId: "faker",
   element: "#cm-editor:nth-child(1)",
