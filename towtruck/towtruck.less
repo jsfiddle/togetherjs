@@ -175,6 +175,7 @@
   min-width: 0;
   font-size:14px;
   color:#333333;
+  font-family: openSansLight, Helvetica;
   &:hover {
     cursor: pointer;
     border-bottom:1px solid #BCBCBC;
@@ -200,7 +201,7 @@
     font-weight: bold;
     font-variant: normal;
     text-align: center;
-    font-family: openSansRegular;
+    font-family: openSansRegular, Helvetica;
     color: #fff;
     margin: 0 -7px 0 -7px;
     padding: 10px 4px 5px 30px;
@@ -506,25 +507,59 @@
     }
   }
   
-  #towtruck-chat-notifier section {
-    margin:0px !important;
-  }
-
-  #towtruck-chat-notifier .towtruck-chat-item {
+  .towtruck-notification .towtruck-chat-item {
     border-bottom:0px;
   }
-
-  #towtruck-chat-notifier .towtruck-chat-item .towtruck-person {
-    display:none;
+  
+  .towtruck-notification section#towtruck-chat-notifier-message {
+    margin:0px !important;
   }
-
-  #towtruck-chat-notifier .towtruck-chat-item .towtruck-timestamp {
+  
+  .towtruck-notification .towtruck-chat-content {
+    font-size:12px;
+  }
+  
+  .towtruck-notification section {
+    font-size:12px;
+  }
+  
+  .towtruck-notification .towtruck-person-name {
+    font-family: openSansRegular, Helvetica Bold, 'Helvetica Neue', Arial;
+    font-size:14px;
+  }
+  
+  .towtruck-notification button {
+    min-width:47% !important;
+  }
+  
+  .towtruck-notification .towtruck-person {
     display:none;
   }
   
-  #towtruck-chat-notifier img.towtruck-notification-logo {
+  .towtruck-notification .towtruck-timestamp {
+    display:none;
+  }
+
+  .towtruck-notification {
+    border-bottom:0px;
+  }
+
+  .towtruck-notification img.towtruck-notification-logo {
     float:left;
     margin: 22px 14px 10px 10px;
+  }
+  
+  .towtruck-notification img.towtruck-notification-closebtn{
+    float:right;
+    padding: 14px 7px;
+    
+    &:hover{
+      opacity:0.5;
+    }
+  }
+  
+  .towtruck-notification section.towtruck-buttons {
+    border-top:1px solid #E1E1E1;
   }
 
   .towtruck-person {
@@ -710,9 +745,13 @@ section.towtruck-buttons {
   border-bottom-left-radius: 4px;
 }
 
-.towtruck-different-url {
-  text-align:right;
+.towtruck-different-url button {
+  min-width:47% !important;
 }
+
+/*.towtruck-different-url {
+  text-align:right;
+}*/
 
 .towtruck-same-url {
   padding-left: 7px !important;

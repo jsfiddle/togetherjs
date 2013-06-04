@@ -220,6 +220,7 @@
        data-bind-to="#towtruck-chat-button"
        style="display: none">
     <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
+    <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn" alt="">
     <section id="towtruck-chat-notifier-message">
     </section>
   </div>
@@ -254,15 +255,16 @@
 
     <!-- User went to new URL: -->
     <div id="towtruck-template-url-change-popup" class="towtruck-notification">
+      <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
+      <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn" alt="">
       <section>
         <div class="towtruck-person"></div>
-        <span class="towtruck-person-name"></span> is at <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
+        <span class="towtruck-person-name"></span><br/>is currently on page: <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
       </section>
       <section class="towtruck-buttons">
         <p class="towtruck-notify-btns">
-          <button class="towtruck-follow">Follow</button>
-          <button class="towtruck-nudge">Come back!</button>
-          <a href="#" class="towtruck-ignore">Not now</a>
+          <button class="towtruck-nudge towtruck-default">Nudge them</button>
+          <button class="towtruck-follow towtruck-primary">Join them</button>
         </p>
       </section>
     </div>
