@@ -171,7 +171,7 @@
   background: inherit;
   border: none;
   padding:0 0px;
-  margin:0px 3px;
+  margin:0px 0px 3px;
   min-width: 0;
   font-size:14px;
   color:#333333;
@@ -179,6 +179,7 @@
   &:hover {
     cursor: pointer;
     border-bottom:1px solid #BCBCBC;
+    margin:0px 0px 2px;
   }
 
 }
@@ -756,6 +757,8 @@ section.towtruck-buttons {
 .towtruck-same-url {
   padding-left: 7px !important;
   opacity:.5 !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
 }
 
 
@@ -873,6 +876,9 @@ section.towtruck-buttons {
   /* This magic CSS rule makes this element basically invisible to clicks/etc:
   (good on all but IE: http://caniuse.com/pointer-events */
   pointer-events: none;
+  &:hover{
+    cursor:pointer;
+  }
 
   /*FIXME: maybe these should use position: fixed so the cursor
   stays stuck to the top of the screen until the appropriate time
@@ -898,6 +904,7 @@ section.towtruck-buttons {
   }
 
   .towtruck-cursor-container {
+    opacity:0.7;
     white-space: nowrap;
     font-family: @default-font;
     font-size: 40%;
