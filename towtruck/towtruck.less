@@ -67,6 +67,10 @@
   input:focus {
     outline: none;
   }
+  
+  .towtruck-right {
+    float:right;
+  }
 
 }
 
@@ -87,6 +91,19 @@
   margin:3px;
 }
 
+.towtruck-default {
+  .button-style;
+  background:#9A9A9A;
+  color: #fff;
+  &.towtruck-follow {
+    cursor: pointer;
+  }
+  
+  &:hover {
+    background:#ADADAD;
+  } 
+}
+
 .towtruck-primary {
   .button-style;
   background:#0194DB;
@@ -97,8 +114,38 @@
   
   &:hover {
     background:#00ACFF;
-  }
-  
+  } 
+}
+
+#towtruck-avatar-edit .towtruck-person {
+  float: left;
+  height: 50px;
+  width: 50px;
+  margin: 30px;
+  background-repeat: no-repeat;
+  background-size: 52px 52px;
+  background-position: -1px -1px;
+  border: 2px solid;
+  border-radius: 2px;
+  background-clip: border-box;
+}
+
+#towtruck-avatar-edit #towtruck-avatar-buttons {
+  float:right;
+  width:160px;
+  padding:20px 0px;
+}
+
+#towtruck-upload-avatar {
+  float:left;
+}
+
+#towtruck-camera-avatar {
+  clear:both;
+}
+
+#towtruck-avatar-edit .towtruck-buttons {
+  clear:both;
 }
 
 
@@ -108,7 +155,7 @@
   color: #ffffff;
 
   &:hover {
-    background:#901914;
+    background: rgba(212,6,6,1);
   }
 
 }
@@ -331,6 +378,11 @@
     float:left;
     margin-bottom:20px;
   }
+  
+  #towtruck-chat-messages .towtruck-person {
+    float:left;
+    margin-bottom:20px;
+  }
 
   .towtruck-person-name-abbrev {
     color:rgba(51,51,51,1);
@@ -412,18 +464,14 @@
   }
 
   #towtruck-intro .towtruck-modal-dont-join {
-    background-repeat: repeat-x;
+/*    background-repeat: repeat-x;
     border: 0;
     color: rgb(255, 255, 255);
     cursor: pointer;
     display: inline-block;
-    font-size: 12px;
     text-transform: none;
     vertical-align: middle;
-    padding: 10px 0 10px 0;
-    &:hover {
-      background-color: rgba(212,6,6,1);
-    }
+    padding: 10px 0 10px 0;*/
   }
 
   .towtruck-notification {
@@ -439,6 +487,18 @@
       background: rgba(242,242,242,1);
       cursor:pointer;
     }
+  }
+  
+  #towtruck-chat-notifier .towtruck-chat-item {
+    border-bottom:0px;
+  }
+
+  #towtruck-chat-notifier .towtruck-chat-item .towtruck-person {
+    display:none;
+  }
+
+  #towtruck-chat-notifier .towtruck-chat-item .towtruck-timestamp {
+    display:none;
   }
 
   .towtruck-person {
@@ -481,17 +541,7 @@
 
 }
 
-#towtruck-chat-notifier .towtruck-chat-item {
-  border-bottom:0px;
-}
 
-#towtruck-chat-notifier .towtruck-chat-item .towtruck-person {
-  display:none;
-}
-
-#towtruck-chat-notifier .towtruck-chat-item .towtruck-timestamp {
-  display:none;
-}
 
 
 /* Menu */
