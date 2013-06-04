@@ -51,7 +51,7 @@ Test.require = function () {
   wait(function () {return done;});
 };
 
-Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update"];
+Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update", "keypress"];
 
 Test.viewSend = function () {
   // Prints out all send() messages
