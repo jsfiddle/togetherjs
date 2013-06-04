@@ -67,7 +67,7 @@
   input:focus {
     outline: none;
   }
-  
+
   .towtruck-right {
     float:right;
   }
@@ -98,10 +98,10 @@
   &.towtruck-follow {
     cursor: pointer;
   }
-  
+
   &:hover {
     background:#ADADAD;
-  } 
+  }
 }
 
 .towtruck-primary {
@@ -111,10 +111,10 @@
   &.towtruck-follow {
     cursor: pointer;
   }
-  
+
   &:hover {
     background:#00ACFF;
-  } 
+  }
 }
 
 #towtruck-avatar-edit .towtruck-person {
@@ -379,7 +379,7 @@
     float:left;
     margin-bottom:20px;
   }
-  
+
   #towtruck-chat-messages .towtruck-person {
     float:left;
     margin-bottom:20px;
@@ -434,7 +434,7 @@
   }
 
   // FIXME: why the override?
-  
+
   #towtruck-feedback-form > header {
     font-weight: bold;
     font-variant: normal;
@@ -449,7 +449,7 @@
     position: relative;
     border-bottom: 1px solid #0071A7;
   }
-  
+
   #towtruck-feedback-form.towtruck-modal {
     background-color: #fff;
     color: #000000;
@@ -505,7 +505,7 @@
       cursor:pointer;
     }
   }
-  
+
   #towtruck-chat-notifier .towtruck-chat-item {
     border-bottom:0px;
   }
@@ -1031,7 +1031,11 @@
       border-radius: 3px;
     }
     &:hover {
-      border:2px solid rgba(0,0,0,0.5);
+      border: 2px solid rgba(0,0,0,0.5);
+      // Adjusting down the size, so that the total size (height or
+      // width + border) is the same as the non-hover swatch:
+      height: 10px;
+      width: 10px;
       border-radius: 3px;
     }
   }
