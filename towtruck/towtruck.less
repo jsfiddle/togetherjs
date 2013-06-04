@@ -170,10 +170,11 @@
   display: inline-block;
   background: inherit;
   border: none;
-  color: rgb(0, 0, 0);
   padding:0 0px;
   margin:0px 3px;
   min-width: 0;
+  font-size:14px;
+  color:#333333;
   &:hover {
     cursor: pointer;
     border-bottom:1px solid #BCBCBC;
@@ -433,6 +434,22 @@
   }
 
   // FIXME: why the override?
+  
+  #towtruck-feedback-form > header {
+    font-weight: bold;
+    font-variant: normal;
+    text-align: center;
+    font-family: openSansRegular;
+    color: #fff;
+    margin: 0 -1px 0 -1px;
+    padding: 10px 4px 5px 30px;
+    height: 24px;
+    background: #0095DD;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    border-bottom: 1px solid #0071A7;
+  }
+  
   #towtruck-feedback-form.towtruck-modal {
     background-color: #fff;
     color: #000000;
