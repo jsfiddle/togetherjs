@@ -166,7 +166,7 @@
     <header> Audio Chat </header>
     <section>
       <p>
-        Activate your browser microphone above <img src="http://localhost:8080/towtruck/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+        Activate your <strong>browser microphone</strong> near your URL bar above.
       </p>
       <p>
         Talking on your microphone through your web browser is an experimental feature.
@@ -177,11 +177,11 @@
     </section>
 
     <section class="towtruck-buttons">
-      <button class="towtruck-primary towtruck-dismiss" type="button">Close</button>
-      <label for="towtruck-rtc-info-dismiss" style="display: inline">
+      <label for="towtruck-rtc-info-dismiss" style="display: inline;">
         <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
         Don't show again.
       </label>
+      <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
     </section>
   </div>
 
@@ -193,7 +193,9 @@
     <header> Audio Chat </header>
 
     <section>
-      <p>Audio chat requires a newer browser!</p>
+      <p>Audio chat requires you to use a <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+        newer browser
+      </a>!</p>
       <p>
         Live audio chat requires a newer (or different) browser than you're using.
       </p>
@@ -208,7 +210,7 @@
 
     <section class="towtruck-buttons">
       <div class="towtruck-rtc-dialog-btn">
-        <button class="towtruck-dismiss" type="button">Close</button>
+        <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
       </div>
     </section>
   </div>
@@ -217,6 +219,7 @@
   <div id="towtruck-chat-notifier" class="towtruck-notification"
        data-bind-to="#towtruck-chat-button"
        style="display: none">
+    <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
     <section id="towtruck-chat-notifier-message">
     </section>
   </div>
@@ -388,7 +391,7 @@
 
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
-      <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor-white.png">
+      <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor.svg">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
         <span style="display:none" class="towtruck-cursor-typing">...</span>
