@@ -256,6 +256,10 @@
 
 } // End of .window()
 
+/*FIX ME something weird is going on here. the avatar has no paddingTop only on Safari*/
+/*button#towtruck-profile-button.towtruck-button {
+  padding:10px 0px !important;
+}*/
 
 /* General dock rules: */
 
@@ -271,6 +275,7 @@
     background-repeat: no-repeat;
     background-position: center;
     border-top:1px solid rgba(0,0,0,0.2);
+    -webkit-padding-start: 0px;
     &:hover {
       background-color: #0F81BF;
     }
@@ -291,9 +296,9 @@
   #towtruck-buttons #towtruck-audio-button{
     background-image: url('./images/button-mic.png');
     &:hover {
-      /*background-image: url('./images/button-mic.png');*/
-      background-color:#0095dd;
-      cursor: default;
+      background-image: url('./images/button-mic-active.png');
+      /*background-color:#0095dd;*/
+      /*cursor: default;*/
     }
   }
 
@@ -312,7 +317,7 @@
     .user-select(none);
     width: 100%;
     position: relative;
-    left: -1px;
+    left: 0px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
   }
