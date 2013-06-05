@@ -171,13 +171,15 @@
   background: inherit;
   border: none;
   padding:0 0px;
-  margin:0px 3px;
+  margin:0px 0px 3px;
   min-width: 0;
   font-size:14px;
   color:#333333;
+  font-family: openSansLight, Helvetica;
   &:hover {
     cursor: pointer;
     border-bottom:1px solid #BCBCBC;
+    margin:0px 0px 2px;
   }
 
 }
@@ -200,7 +202,7 @@
     font-weight: bold;
     font-variant: normal;
     text-align: center;
-    font-family: openSansRegular;
+    font-family: openSansRegular, Helvetica;
     color: #fff;
     margin: 0 -7px 0 -7px;
     padding: 10px 4px 5px 30px;
@@ -238,7 +240,7 @@
     width:39px;
     height:39px;
     margin-top:-10px;
-    margin-right:-3px;
+    margin-right:-4px;
     border-top-right-radius:4px;
     &:hover {
       background-image:url('./images/icon-close-active.png');
@@ -254,6 +256,10 @@
 
 } // End of .window()
 
+/*FIX ME something weird is going on here. the avatar has no paddingTop only on Safari*/
+/*button#towtruck-profile-button.towtruck-button {
+  padding:10px 0px !important;
+}*/
 
 /* General dock rules: */
 
@@ -263,13 +269,13 @@
   #towtruck-buttons .towtruck-button {
     .button-reset;
     position: relative;
-    -webkit-padding-start: 2px;
     width: @button-size+20;
-    height: @button-size+19;
+    height: @button-size+20;
     background-size: @button-size @button-size;
     background-repeat: no-repeat;
     background-position: center;
     border-top:1px solid rgba(0,0,0,0.2);
+    -webkit-padding-start: 0px;
     &:hover {
       background-color: #0F81BF;
     }
@@ -290,9 +296,9 @@
   #towtruck-buttons #towtruck-audio-button{
     background-image: url('./images/button-mic.png');
     &:hover {
-      /*background-image: url('./images/button-mic.png');*/
-      background-color:#0095dd;
-      cursor: default;
+      background-image: url('./images/button-mic-active.png');
+      /*background-color:#0095dd;*/
+      /*cursor: default;*/
     }
   }
 
@@ -311,7 +317,7 @@
     .user-select(none);
     width: 100%;
     position: relative;
-    left: -1px;
+    left: 0px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
   }
@@ -505,27 +511,69 @@
       cursor:pointer;
     }
   }
+  
+  .towtruck-notification .towtruck-chat-item {
+    border-bottom:0px;
+  }
+  
+  .towtruck-notification section#towtruck-chat-notifier-message {
+    margin:0px !important;
+  }
+  
+  .towtruck-notification .towtruck-chat-content {
+    font-size:12px;
+  }
+  
+  .towtruck-notification section {
+    font-size:12px;
+  }
+  
+  .towtruck-notification .towtruck-person-name {
+    font-family: openSansRegular, Helvetica Bold, 'Helvetica Neue', Arial;
+    font-size:14px;
+  }
+  
+  .towtruck-notification button {
+    min-width:47% !important;
+  }
+  
+  .towtruck-notification .towtruck-person {
+    display:none;
+  }
+  
+  .towtruck-notification .towtruck-timestamp {
+    display:none;
+  }
 
-  #towtruck-chat-notifier .towtruck-chat-item {
+  .towtruck-notification {
     border-bottom:0px;
   }
 
-  #towtruck-chat-notifier .towtruck-chat-item .towtruck-person {
-    display:none;
+  .towtruck-notification img.towtruck-notification-logo {
+    float:left;
+    margin: 22px 14px 10px 10px;
   }
-
-  #towtruck-chat-notifier .towtruck-chat-item .towtruck-timestamp {
-    display:none;
+  
+  .towtruck-notification img.towtruck-notification-closebtn{
+    float:right;
+    padding: 14px 7px;
+    
+    &:hover{
+      opacity:0.5;
+    }
+  }
+  
+  .towtruck-notification section.towtruck-buttons {
+    border-top:1px solid #E1E1E1;
   }
 
   .towtruck-person {
-    height: (@avatar-size)-2;
-    width: (@avatar-size)-2;
-    margin:(@button-size/4)+1;
-    /*margin-left: (@button-size - @avatar-size) / 2;*/
+    height: @avatar-size + 4;
+    width: @avatar-size + 4;
+    margin:(@button-size/5) + 2;
     background-repeat: no-repeat;
-    background-size: 32px 32px;
-    background-position: -1px -1px;
+    background-size: 40px 40px;
+    background-position: -2px -2px;
     border: 2px solid;
     border-radius: 2px;
     background-clip: border-box;
@@ -558,8 +606,25 @@
 
 }
 
+.towtruck-rtc-dialog-btn {
+  text-align:right;
+}
 
 
+#towtruck-rtc-info section.towtruck-buttons {
+  text-align:right !important;
+}
+
+#towtruck-rtc-info label {
+  font-size: 12px !important;
+  float: left !important;
+  padding-top: 13px;
+  padding-left: 30px;
+}
+
+#towtruck-rtc-info input {
+  margin-top:0px !important;
+}
 
 /* Menu */
 #towtruck-menu {
@@ -657,12 +722,50 @@
 }
 
 #towtruck-dock-participants .towtruck-person {
-  margin-top:6px;
+  /*margin-top:0px !important;*/
+  -webkit-margin-before: 0px;
+  
 }
 
-#towtruck-template-participant-window p.towtruck-participant-window-row {
-  background:#000;
+/*Participant windows*/
+
+section.towtruck-participant-window-main {
+  margin:0px -7px -7px !important;
 }
+
+.towtruck p.towtruck-participant-window-row {
+  border-bottom:1px solid #E1E1E1 !important;
+  padding:7px 14px 14px !important
+}
+
+.towtruck-participant-window-row strong {
+  font-weight:800;
+}
+
+section.towtruck-buttons {
+  background: #F3F2F2;
+  margin: 0px -7px !important;
+  padding: 7px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.towtruck-different-url button {
+  min-width:47% !important;
+}
+
+/*.towtruck-different-url {
+  text-align:right;
+}*/
+
+.towtruck-same-url {
+  padding-left: 7px !important;
+  opacity:.5 !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+
+
 
 
 /* Button set */
@@ -777,6 +880,9 @@
   /* This magic CSS rule makes this element basically invisible to clicks/etc:
   (good on all but IE: http://caniuse.com/pointer-events */
   pointer-events: none;
+  &:hover{
+    cursor:pointer;
+  }
 
   /*FIXME: maybe these should use position: fixed so the cursor
   stays stuck to the top of the screen until the appropriate time
@@ -802,6 +908,7 @@
   }
 
   .towtruck-cursor-container {
+    opacity:0.7;
     white-space: nowrap;
     font-family: @default-font;
     font-size: 40%;
@@ -809,8 +916,12 @@
     top: 0;
     left: 5px;
     padding: 8px;
-    border-radius: 2px;
+    border-radius: 4px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.2);
+    -moz-box-shadow:    0px 2px 4px 0px rgba(0,0,0,0.50);
+    -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.50);
+    box-shadow:         0px 2px 4px 0px rgba(0,0,0,0.50);
   }
 }
 

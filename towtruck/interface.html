@@ -77,8 +77,8 @@
   <div id="towtruck-template-participant-window" class="towtruck-window" style="display: none">
     <header><span class="towtruck-person towtruck-person-self"></span><span class="towtruck-person-name"></span></header>
 
-    <section>
-      <p class="towtruck-participant-window-row"><strong>Role1:</strong>
+    <section class="towtruck-participant-window-main">
+      <p class="towtruck-participant-window-row"><strong>Role:</strong>
         <span class="towtruck-person-role"></span>
       </p>
 
@@ -95,12 +95,12 @@
     <section class="towtruck-buttons">
       <!-- Displayed when the peer is at a different URL: -->
       <div class="towtruck-different-url">
-        <button class="towtruck-nudge towtruck-secondary">Join Me!</button>
-        <button class="towtruck-follow towtruck-person-url towtruck-primary">Follow them</button>
+        <button class="towtruck-nudge towtruck-default">Nudge them</button>
+        <button class="towtruck-follow towtruck-person-url towtruck-primary">Join them</button>
       </div>
       <!-- Displayed when the peer is at your same URL: -->
       <div class="towtruck-same-url" style="display: none">
-        <span class="towtruck-person-name"></span> is at the same URL as you.
+        <span class="towtruck-person-name"></span> is on the same page as you.
       </div>
     </section>
   </div>
@@ -166,7 +166,7 @@
     <header> Audio Chat </header>
     <section>
       <p>
-        Activate your browser microphone above <img src="http://localhost:8080/towtruck/images/icn-arrow-up.png" class="towtruck-arrow-up" alt="at the top of the page">
+        Activate your <strong>browser microphone</strong> near your URL bar above.
       </p>
       <p>
         Talking on your microphone through your web browser is an experimental feature.
@@ -177,11 +177,11 @@
     </section>
 
     <section class="towtruck-buttons">
-      <button class="towtruck-primary towtruck-dismiss" type="button">Close</button>
-      <label for="towtruck-rtc-info-dismiss" style="display: inline">
+      <label for="towtruck-rtc-info-dismiss" style="display: inline;">
         <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
         Don't show again.
       </label>
+      <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
     </section>
   </div>
 
@@ -193,7 +193,9 @@
     <header> Audio Chat </header>
 
     <section>
-      <p>Audio chat requires a newer browser!</p>
+      <p>Audio chat requires you to use a <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+        newer browser
+      </a>!</p>
       <p>
         Live audio chat requires a newer (or different) browser than you're using.
       </p>
@@ -208,7 +210,7 @@
 
     <section class="towtruck-buttons">
       <div class="towtruck-rtc-dialog-btn">
-        <button class="towtruck-dismiss" type="button">Close</button>
+        <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
       </div>
     </section>
   </div>
@@ -217,6 +219,8 @@
   <div id="towtruck-chat-notifier" class="towtruck-notification"
        data-bind-to="#towtruck-chat-button"
        style="display: none">
+    <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
+    <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn" alt="">
     <section id="towtruck-chat-notifier-message">
     </section>
   </div>
@@ -251,15 +255,16 @@
 
     <!-- User went to new URL: -->
     <div id="towtruck-template-url-change-popup" class="towtruck-notification">
+      <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
+      <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn" alt="">
       <section>
         <div class="towtruck-person"></div>
-        <span class="towtruck-person-name"></span> is at <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
+        <span class="towtruck-person-name"></span><br/>is currently on page: <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
       </section>
       <section class="towtruck-buttons">
         <p class="towtruck-notify-btns">
-          <button class="towtruck-follow">Follow</button>
-          <button class="towtruck-nudge">Come back!</button>
-          <a href="#" class="towtruck-ignore">Not now</a>
+          <button class="towtruck-nudge towtruck-default">Nudge them</button>
+          <button class="towtruck-follow towtruck-primary">Join them</button>
         </p>
       </section>
     </div>
@@ -388,7 +393,7 @@
 
     <!-- This is the cursor: -->
     <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
-      <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor-white.png">
+      <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor.svg">
       <span class="towtruck-cursor-container">
         <span class="towtruck-cursor-name"></span>
         <span style="display:none" class="towtruck-cursor-typing">...</span>
