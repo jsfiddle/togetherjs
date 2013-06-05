@@ -240,7 +240,7 @@
     width:39px;
     height:39px;
     margin-top:-10px;
-    margin-right:-3px;
+    margin-right:-4px;
     border-top-right-radius:4px;
     &:hover {
       background-image:url('./images/icon-close-active.png');
@@ -265,9 +265,8 @@
   #towtruck-buttons .towtruck-button {
     .button-reset;
     position: relative;
-    -webkit-padding-start: 2px;
     width: @button-size+20;
-    height: @button-size+19;
+    height: @button-size+20;
     background-size: @button-size @button-size;
     background-repeat: no-repeat;
     background-position: center;
@@ -564,13 +563,12 @@
   }
 
   .towtruck-person {
-    height: (@avatar-size)-2;
-    width: (@avatar-size)-2;
-    margin:(@button-size/4)+1;
-    /*margin-left: (@button-size - @avatar-size) / 2;*/
+    height: @avatar-size + 4;
+    width: @avatar-size + 4;
+    margin:(@button-size/5) + 2;
     background-repeat: no-repeat;
-    background-size: 32px 32px;
-    background-position: -1px -1px;
+    background-size: 40px 40px;
+    background-position: -2px -2px;
     border: 2px solid;
     border-radius: 2px;
     background-clip: border-box;
@@ -719,7 +717,8 @@
 }
 
 #towtruck-dock-participants .towtruck-person {
-  margin-top:0px !important;
+  /*margin-top:0px !important;*/
+  -webkit-margin-before: 0px;
   
 }
 
