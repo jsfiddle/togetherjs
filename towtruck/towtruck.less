@@ -285,12 +285,21 @@
     padding: 0;
     margin: 0;
   }
+  
+  #towtruck-dock-participants button.towtruck-active {
+    background-color: #0F81BF !important;
+  }
 
   #towtruck-buttons #towtruck-share-button {
     background-image: url('./images/button-share.png');
     &:hover {
       background-image: url('./images/button-share-active.png');
     }
+  }
+  
+  #towtruck-buttons #towtruck-share-button.towtruck-active {
+    background-image: url('./images/button-share-active.png') !important;
+    background-color: #0F81BF;
   }
 
   #towtruck-buttons #towtruck-audio-button{
@@ -301,12 +310,22 @@
       /*cursor: default;*/
     }
   }
+  
+  #towtruck-buttons #towtruck-audio-button.towtruck-active {
+    background-image: url('./images/button-mic-active.png') !important;
+    background-color: #0F81BF;
+  }
 
   #towtruck-buttons #towtruck-chat-button{
     background-image: url('./images/button-chat.png');
     &:hover {
       background-image: url('./images/button-chat-active.png');
     }
+  }
+  
+  #towtruck-buttons #towtruck-chat-button.towtruck-active {
+    background-image: url('./images/button-chat-active.png') !important;
+    background-color: #0F81BF;
   }
 
   #towtruck-dock-anchor {
@@ -603,7 +622,21 @@
     color: #fff;
     border-radius: 4px;
   }
+  
+  .towtruck-person-tooltip-arrow-r {
+    color: rgba(42,42,42,.9);
+    position: absolute;
+    left: 37px;
+    font-size:8px;
+  }
 
+}
+
+.towtruck-triangle-up  {
+	position: absolute;
+  top: -11px;
+  width: 13px;
+  left: 50px;
 }
 
 .towtruck-rtc-dialog-btn {

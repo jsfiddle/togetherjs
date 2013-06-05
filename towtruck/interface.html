@@ -2,7 +2,7 @@
 
   <!-- This is the main set of buttons: -->
   <div id="towtruck-dock" class="towtruck-dock-right">
-    <div id="towtruck-dock-anchor">
+    <div id="towtruck-dock-anchor" title="Move the dock">
       <span id="towtruck-dock-anchor-horizontal">
         <img src="http://localhost:8080/towtruck/images/icn-handle-circle@2x.png" alt="drag">
       </span>
@@ -14,17 +14,18 @@
       <div style="display: none">
         <button id="towtruck-template-dock-person" class="towtruck-button towtruck-dock-person">
           <div class="towtruck-tooltip towtruck-dock-person-tooltip">
+            <span class="towtruck-person-tooltip-arrow-r">&#9654;</span>
             <span class="towtruck-person-name"></span>
           </div>
           <div class="towtruck-person towtruck-person-status-overlay"></div>
         </button>
       </div>
-      <button id="towtruck-profile-button" class="towtruck-button">
+      <button id="towtruck-profile-button" class="towtruck-button" title="This is you">
         <div class="towtruck-person towtruck-person-self"></div>
         <div id="towtruck-profile-arrow"></div>
       </button>
-      <button id="towtruck-share-button" class="towtruck-button"></button>
-      <button id="towtruck-audio-button" class="towtruck-button">
+      <button id="towtruck-share-button" class="towtruck-button" title="Add a friend"></button>
+      <button id="towtruck-audio-button" class="towtruck-button" title="Turn on microphone">
         <span id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
         </span>
         <span id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
@@ -40,7 +41,7 @@
         <span id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
         </span>
       </button>
-      <button id="towtruck-chat-button" class="towtruck-button"></button>
+      <button id="towtruck-chat-button" class="towtruck-button" title="Chat"></button>
       <div id="towtruck-dock-participants"></div>
     </div>
   </div>
@@ -244,6 +245,7 @@
   </div>
 
   <div class="towtruck-menu" id="towtruck-pick-color" style="display: none">
+    <div class="towtruck-triangle-up"><img src="http://localhost:8080/towtruck/images/icn-triangle-up.png"></div>
     <div style="display: none">
       <div id="towtruck-template-swatch" class="towtruck-swatch">
       </div>
