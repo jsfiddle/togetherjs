@@ -110,6 +110,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     els = els.filter(":visible");
     els.hide();
     getModalBackground().hide();
+    var windows = [];
     els.each(function (index, element) {
       element = $(element);
       var bound = element.data("boundTo");
@@ -122,13 +123,16 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
         bound.removeClass("towtruck-color-pulse").removeClass("towtruck-animated");
       }, ANIMATION_DURATION+10);
       element.data("boundTo", null);
-      console.log("removing towtruck-active from", bound[0]);
       bound.removeClass("towtruck-active");
+      windows.push(element);
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
     if (onClose) {
       onClose();
       onClose = null;
+    }
+    if (windows.length) {
+      session.emit("hide-window", windows);
     }
   };
 

@@ -246,8 +246,7 @@
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
       tinycolor: "libs/tinycolor",
-      "alien-avatar-generator": "libs/alien-avatar-generator",
-      guiders: "libs/Guider-JS/guiders-1.3.0"
+      "alien-avatar-generator": "libs/alien-avatar-generator"
     }
   };
 

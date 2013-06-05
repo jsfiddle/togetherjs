@@ -12,6 +12,7 @@ define(["util"], function (util) {
   }
   return {
     "interface": clean("__interface_html__"),
-    help: clean("__help_txt__")
+    help: clean("__help_txt__"),
+    walkthrough: clean("__walkthrough_html__")
   };
 });

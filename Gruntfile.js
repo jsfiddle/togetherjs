@@ -155,6 +155,7 @@ module.exports = function (grunt) {
       var subs = {
         __interface_html__: grunt.file.read("towtruck/interface.html"),
         __help_txt__: grunt.file.read("towtruck/help.txt"),
+        __walkthrough_html__: grunt.file.read("towtruck/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
         __gitCommit__: gitCommit

@@ -151,7 +151,7 @@ Test.startTowTruck = function () {
 
 Test.closeWalkthrough = function () {
   return $.Deferred(function (def) {
-    var buttonSelector = ".guiders_button.towtruck-walkthru-getstarted-button:visible";
+    var buttonSelector = "#towtruck-walkthrough .towtruck-dismiss:visible";
     var seenButton = false;
     var id = setInterval(function () {
       var button = $(buttonSelector);

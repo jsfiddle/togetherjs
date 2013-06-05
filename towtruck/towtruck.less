@@ -860,25 +860,32 @@
 }
 
 .towtruck {
+
   .towtruck-modal {
+    .towtruck.towtruck-window;
     @height: 20em;
     @width: 300px;
-    .towtruck.towtruck-window;
     border-radius:5px !important;
     position: fixed;
+    z-index: @z-index+3;
     top: 50%;
     left: 50%;
     margin-left: -(@width/2);
     width: @width;
     margin-top: -(@height/2);
-    z-index: @z-index+3;
     &.towtruck-modal-wide {
-      width: 70%;
-      margin-left: -35%;
+      width: 700px;
+      margin-left: -350px;
+      height: 550px;
+      // FIXME: Why isn't -35% the right number?
+      // I can't for the life of me figure out why 20% is right
+      margin-top: -(550px / 2);
     }
+  }
 
+  .towtruck-modal {
     section.towtruck-buttons {
-      position: relative;
+      position: absolute;
       bottom: 0;
       background: #F2F2F2;
       width: 294px;
@@ -890,8 +897,46 @@
       margin-bottom: 0px;
       border-top:1px solid #E1E1E1;
     }
-
   }
+  .towtruck-modal-wide section.towtruck-buttons {
+    width: 694px;
+  }
+
+  .towtruck-walkthrough-slide {
+    padding: 0 30px 0 30px;
+  }
+
+  #towtruck-walkthrough-previous {
+    position: absolute;
+    left: 0px;
+    cursor: pointer;
+    height: 100%;
+    width: 30px;
+  }
+
+  #towtruck-walkthrough-next {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 30px;
+  }
+
+  #towtruck-walkthrough-progress {
+    width: 694px;
+    position: absolute;
+    bottom: 55px;
+  }
+
+  .towtruck-walkthrough-slide-progress {
+    cursor: pointer;
+    padding: 0 10px 0 10px;
+    color: #999;
+    &.towtruck-active {
+      color: #000;
+    }
+  }
+
 }
 
 /* Animations */
