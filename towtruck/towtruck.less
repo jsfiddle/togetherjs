@@ -985,9 +985,9 @@ section.towtruck-buttons {
     width: @width;
     margin-top: -(@height/2);
     &.towtruck-modal-wide {
-      width: 700px;
-      margin-left: -350px;
-      height: 550px;
+      width: 550px;
+      margin-left: -284px;
+      height: 530px;
       // FIXME: Why isn't -35% the right number?
       // I can't for the life of me figure out why 20% is right
       margin-top: -(550px / 2);
@@ -1001,7 +1001,7 @@ section.towtruck-buttons {
       background: #F2F2F2;
       width: 294px;
       padding: 10px;
-      text-align: right;
+      text-align: center;
       border-bottom-right-radius: 4px;
       border-bottom-left-radius: 4px;
       margin-left: -7px;
@@ -1010,11 +1010,21 @@ section.towtruck-buttons {
     }
   }
   .towtruck-modal-wide section.towtruck-buttons {
-    width: 694px;
+    width: 544px;
   }
 
   .towtruck-walkthrough-slide {
     padding: 0 30px 0 30px;
+    text-align:center;
+  }
+
+  .towtruck-walkthrough-main-image {
+    width:400px;
+    height:300px;
+    background:rgba(216,216,216,0.1);
+    border-radius:4px;
+    border:1px solid rgba(151,151,151,0.1);
+    margin:0 auto;
   }
 
   #towtruck-walkthrough-previous {
@@ -1023,6 +1033,10 @@ section.towtruck-buttons {
     cursor: pointer;
     height: 100%;
     width: 30px;
+    color:#E5E5E5;
+    &:hover{
+     color:#DDDDDD; 
+    }
   }
 
   #towtruck-walkthrough-next {
@@ -1031,6 +1045,10 @@ section.towtruck-buttons {
     cursor: pointer;
     height: 100%;
     width: 30px;
+    color:#E5E5E5;
+    &:hover{
+     color:#DDDDDD; 
+    }
   }
 
   #towtruck-walkthrough-progress {
@@ -1042,9 +1060,13 @@ section.towtruck-buttons {
   .towtruck-walkthrough-slide-progress {
     cursor: pointer;
     padding: 0 10px 0 10px;
-    color: #999;
+    color: #D8D8D8;
+    font-size:20px;
     &.towtruck-active {
-      color: #000;
+      color: #9C9C9C;
+    }
+    &:hover {
+      color: #9C9C9C;
     }
   }
 
