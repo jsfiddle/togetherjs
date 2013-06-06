@@ -360,7 +360,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     $(window).on("resize", resizeEvent);
   });
   session.on("close", function () {
-    $(window).removeListener("resize", resizeEvent);
+    $(window).off("resize", resizeEvent);
   });
   function resizeEvent() {
     session.emit("resize");
