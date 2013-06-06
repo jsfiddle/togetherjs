@@ -599,10 +599,11 @@
     &.towtruck-person-small {
       display: inline-block;
       @height: (@button-size + 8px) / 2 - 9px;
-      height: @height;
-      width: @height;
-      margin: 0;
-      background-size: @height @height;
+      height: @height + 5;
+      width: @height + 5;
+      margin: -1px -18px;
+      background-size: (@height + 7) (@height + 7);
+      background-position: -1px -1px;
     }
   }
 
