@@ -1084,12 +1084,12 @@ section.towtruck-buttons {
 
   .towtruck-modal {
     section.towtruck-buttons {
-      position: absolute;
+      /*position: absolute;*/
       bottom: 0;
       background: #F2F2F2;
       width: 294px;
       padding: 10px;
-      text-align: center;
+      text-align: right;
       border-bottom-right-radius: 4px;
       border-bottom-left-radius: 4px;
       margin-left: -7px;
@@ -1099,6 +1099,8 @@ section.towtruck-buttons {
   }
   .towtruck-modal-wide section.towtruck-buttons {
     width: 544px;
+    text-align: center !important;
+    position: absolute;
   }
 
   .towtruck-walkthrough-slide {
@@ -1176,9 +1178,23 @@ section.towtruck-buttons {
       opacity: 0.2;
     }
   }
+  
+  .towtruck-walkthrough-arrow-l() {
+    cursor: pointer;
+    width:19px;
+    height:36px;
+    background-repeat:no-repeat;
+    background-size:60% 60%;
+    margin-left:36px;
+    margin-top:28%;
+    &.towtruck-disabled {
+      cursor: default;
+      opacity: 0.2;
+    }
+  }
 
   #towtruck-walkthrough-previous {
-    .towtruck-walkthrough-arrow;
+    .towtruck-walkthrough-arrow-l;
     background-image: url('./images/icn-walkthrough-arrow-l.png');
     float:left;
     &:hover {
