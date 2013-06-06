@@ -117,13 +117,13 @@ send: url-change-nudge
 
 // =SECTION Helpers
 
-$('<p>Some perhaps helpful test buttons to trigger events (not all combos are valid):</p>');
+var el = $('<p>Some perhaps helpful test buttons to trigger events (not all combos are valid):<br></p>').prependTo(document.body);
 
-$("<button>Faker Rejoin</button>").prependTo(document.body).click(function () {
+$("<button>Faker Rejoin</button>").appendTo(el).click(function () {
   Test.newPeer();
 });
 
-$("<button>Join Random New Faker</button>").prependTo(document.body).click(function () {
+$("<button>Join Random New Faker</button>").appendTo(el).click(function () {
   var id = Math.floor(Math.random() * 1000);
   Test.newPeer({
     name: "Faker " + id,
@@ -131,21 +131,21 @@ $("<button>Join Random New Faker</button>").prependTo(document.body).click(funct
   });
 });
 
-$('<input placeholder="Change Faker URL">').prependTo(document.body).keypress(function (ev) {
+$('<input placeholder="Change Faker URL">').appendTo(el).keypress(function (ev) {
   if (ev.which == 13) {
     Test.newPeer({url: ev.target.value});
     ev.target.value = "";
   }
 });
 
-$('<button>Faker Leave</button>').prependTo(document.body).click(function () {
+$('<button>Faker Leave</button>').appendTo(el).click(function () {
   Test.incoming({
     type: "bye",
     clientId: "faker"
   });
 });
 
-$('<button>Nudge Me</button>').prependTo(document.body).click(function () {
+$('<button>Nudge Me</button>').appendTo(el).click(function () {
   Test.incoming({
     type: "url-change-nudge",
     url: peers.getPeer("faker").url,
