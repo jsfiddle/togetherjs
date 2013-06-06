@@ -158,7 +158,7 @@
     // FIXME: maybe I should just test for TowTruck.require:
     if (TowTruck._loaded) {
       var session = TowTruck.require("session");
-      if (session.running) {
+      if (TowTruck.running) {
         session.close();
       } else {
         addStyle();
@@ -347,7 +347,8 @@
 
   /* This finalizes the unloading of TowTruck, including unloading modules */
   TowTruck._teardown = function () {
-    delete TowTruck._requireObject.s.contexts.towtruck;
+    var requireObject = TowTruck._requireObject || window.require;
+    delete requireObject.s.contexts.towtruck;
     TowTruck._loaded = false;
     TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
     TowTruck.running = false;
