@@ -1074,7 +1074,7 @@ section.towtruck-buttons {
     border-radius:4px;
     -webkit-border-radius: 4px;
   }
-  
+
   section.towtruck-walkthrough-slide .towtruck-walkthrough-avatar {
     width: 80px;
     height: 80px;
@@ -1085,13 +1085,13 @@ section.towtruck-buttons {
     border: 2px solid rgb(204, 204, 204);
     background: none repeat scroll 0% 0% rgb(0, 0, 0);
   }
-  
+
   section.towtruck-walkthrough-slide input#towtruck-self-name {
     position: absolute;
     top: 50%;
     left: 29%;
   }
-  
+
   section.towtruck-walkthrough-slide .towtruck-walkthrough-colorpicker {
     width: 29px;
     height: 29px;
@@ -1102,17 +1102,17 @@ section.towtruck-buttons {
     border-radius: 4px 4px 4px 4px;
     border: 1px solid rgb(204, 204, 204);
   }
-  
+
   section.towtruck-walkthrough-slide span.towtruck-walkthrough-sendlink {
     top: 44%;
     position: relative;
   }
-  
+
   section.towtruck-walkthrough-slide input#towtruck-share-link {
     top: 44%;
     position: relative;
   }
-  
+
   .towtruck-walkthrough-main-image {
     width:400px;
     height:300px;
@@ -1122,15 +1122,23 @@ section.towtruck-buttons {
     margin:0 auto;
   }
 
-  #towtruck-walkthrough-previous {
+  .towtruck-walkthrough-arrow() {
     cursor: pointer;
     width:19px;
     height:36px;
-    background-image: url('./images/icn-walkthrough-arrow-l.png');
     background-repeat:no-repeat;
     background-size:60% 60%;
-    margin-left:34px;
+    margin-right:28px;
     margin-top:28%;
+    &.towtruck-disabled {
+      cursor: default;
+      opacity: 0.2;
+    }
+  }
+
+  #towtruck-walkthrough-previous {
+    .towtruck-walkthrough-arrow;
+    background-image: url('./images/icn-walkthrough-arrow-l.png');
     float:left;
     &:hover {
       background-image: url('./images/icn-walkthrough-arrow-l-hover.png');
@@ -1138,14 +1146,8 @@ section.towtruck-buttons {
   }
 
   #towtruck-walkthrough-next {
-    cursor: pointer;
-    width:19px;
-    height:36px;
+    .towtruck-walkthrough-arrow;
     background-image: url('./images/icn-walkthrough-arrow-r.png');
-    background-repeat:no-repeat;
-    background-size:60% 60%;
-    margin-right:28px;
-    margin-top:28%;
     float:right;
     &:hover {
       background-image: url('./images/icn-walkthrough-arrow-r-hover.png');

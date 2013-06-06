@@ -40,6 +40,13 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
     var bullets = container.find("#towtruck-walkthrough-progress .towtruck-walkthrough-slide-progress");
     bullets.removeClass("towtruck-active");
     $(bullets[index]).addClass("towtruck-active");
+    var $next = $("#towtruck-walkthrough-next").removeClass("towtruck-disabled");
+    var $previous = $("#towtruck-walkthrough-previous").removeClass("towtruck-disabled");
+    if (index == slides.length - 1) {
+      $next.addClass("towtruck-disabled");
+    } else if (index === 0) {
+      $previous.addClass("towtruck-disabled");
+    }
   }
 
   function previous() {
