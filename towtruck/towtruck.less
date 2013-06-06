@@ -1050,6 +1050,16 @@ section.towtruck-buttons {
     padding: 0 30px 0 30px;
     text-align:center;
   }
+  
+  .towtruck-walkthrough-slide p {
+    margin:18px auto;
+    width:400px;
+  }
+  
+  .towtruck-walkthrough-slide iframe {
+    border-radius:4px;
+    -webkit-border-radius: 4px;
+  }
 
   .towtruck-walkthrough-main-image {
     width:400px;
@@ -1061,37 +1071,39 @@ section.towtruck-buttons {
   }
 
   #towtruck-walkthrough-previous {
-    position: absolute;
-    left: 50px;
     cursor: pointer;
-    height: 100%;
-    width: 30px;
-    color: #E5E5E5;
-    top: 40%;
-    font-size: 20px;
-    &:hover{
-     color:#DDDDDD; 
+    width:19px;
+    height:36px;
+    background-image: url('./images/icn-walkthrough-arrow-l.png');
+    background-repeat:no-repeat;
+    background-size:60% 60%;
+    margin-left:34px;
+    margin-top:28%;
+    float:left;
+    &:hover {
+      background-image: url('./images/icn-walkthrough-arrow-l-hover.png');
     }
   }
 
   #towtruck-walkthrough-next {
-    position: absolute;
-    right: 0;
     cursor: pointer;
-    height: 100%;
-    width: 30px;
-    color:#E5E5E5;
-    font-size: 20px;
-    top:40%;
-    &:hover{
-     color:#DDDDDD; 
+    width:19px;
+    height:36px;
+    background-image: url('./images/icn-walkthrough-arrow-r.png');
+    background-repeat:no-repeat;
+    background-size:60% 60%;
+    margin-right:30px;
+    margin-top:28%;
+    float:right;
+    &:hover {
+      background-image: url('./images/icn-walkthrough-arrow-r-hover.png');
     }
   }
 
   #towtruck-walkthrough-progress {
     width: 537px;
     position: absolute;
-    bottom: 55px;
+    bottom: 66px;
     text-align:center;
   }
 
