@@ -27,6 +27,7 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
       });
       container.find("#towtruck-walkthrough-previous").click(previous);
       container.find("#towtruck-walkthrough-next").click(next);
+      ui.prepareShareLink(container);
       session.emit("new-element", container);
     }
     onHideAll = doneCallback;

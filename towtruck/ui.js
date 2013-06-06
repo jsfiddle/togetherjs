@@ -140,11 +140,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     var container = ui.container;
 
     // The share link:
-    container.find("#towtruck-share-link").click(function () {
-      $(this).select();
-    }).change(function () {
-      updateShareLink();
-    }).on("keydown", function (event) {
+    ui.prepareShareLink(container);
+    container.find(".towtruck-share-link").on("keydown", function (event) {
       if (event.which == 27) {
         windowing.hide("#towtruck-share");
         return false;
@@ -152,7 +149,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       return undefined;
     });
     session.on("shareId", updateShareLink);
-    updateShareLink();
 
     // The chat input element:
     var input = container.find("#towtruck-chat-input");
@@ -336,8 +332,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (id == "towtruck-chat") {
         $("#towtruck-chat-input").focus();
       } else if (id == "towtruck-share") {
-        $("#towtruck-share-link").focus();
-        $("#towtruck-share-link").select();
+        element.find(".towtruck-share-link").focus();
+        element.find(".towtruck-share-link").select();
       }
     });
 
@@ -389,6 +385,15 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       session.emit("ui-ready", ui);
     }
 
+  };
+
+  ui.prepareShareLink = function (container) {
+    container.find(".towtruck-share-link").click(function () {
+      $(this).select();
+    }).change(function () {
+      updateShareLink();
+    });
+    updateShareLink();
   };
 
   // Menu
@@ -461,7 +466,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // Misc
 
   function updateShareLink() {
-    var el = $("#towtruck-share-link");
+    var el = $(".towtruck-share-link");
     var display = $("#towtruck-session-id");
     if (! session.shareId) {
       el.val("");
