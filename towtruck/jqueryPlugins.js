@@ -14,4 +14,14 @@ define(["jquery"], function ($) {
     });
   };
 
+  /* Used to fade away notification windows: */
+  $.fn.fadeOut = function (time) {
+    return this.animate({
+      opacity: 0
+    }, {
+      duration: time || 1000,
+      easing: "linear"
+    });
+  };
+
 });

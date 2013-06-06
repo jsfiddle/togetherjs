@@ -136,6 +136,12 @@
         <span class="towtruck-person-name"></span> left the session.
       </div>
 
+      <!-- Template when a person joins the session: -->
+      <div id="towtruck-template-chat-joined" class="towtruck-chat-item">
+        <div class="towtruck-person"></div>
+        <span class="towtruck-person-name"></span> joined the session.
+      </div>
+
       <!-- Template for system-derived messages: -->
       <div id="towtruck-template-chat-system" class="towtruck-chat-item">
         <span class="towtruck-chat-content towtruck-sub-content"></span>
@@ -259,9 +265,9 @@
     <!-- Templates: -->
 
     <!-- User went to new URL: -->
-    <div id="towtruck-template-url-change-popup" class="towtruck-notification">
+    <div id="towtruck-template-url-change-popup" class="towtruck-notification towtruck-url-change-notification">
       <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
-      <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn" alt="">
+      <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn towtruck-dismiss" alt="">
       <section>
         <div class="towtruck-person"></div>
         <span class="towtruck-person-name"></span><br/>is currently on page: <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
@@ -271,16 +277,6 @@
           <button class="towtruck-nudge towtruck-default">Nudge them</button>
           <button class="towtruck-follow towtruck-primary">Join them</button>
         </p>
-      </section>
-    </div>
-
-    <!-- New user notification: -->
-    <div id="towtruck-template-new-user" class="towtruck-notification">
-      <section>
-        <span class="towtruck-person-name"></span> has joined!
-      </section>
-      <section class="towtruck-buttons">
-        <button class="towtruck-dismiss">Okay</button>
       </section>
     </div>
 

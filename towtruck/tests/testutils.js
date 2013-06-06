@@ -100,8 +100,8 @@ Test.newPeer = function (options) {
     name: options.name || "Faker",
     avatar: options.avatar || TowTruck.baseUrl + "/images/robot-avatar.png",
     color: options.color || "#ff0000",
-    url: location.href.replace(/#.*/, ""),
-    urlHash: "",
+    url: options.url || location.href.replace(/#.*/, ""),
+    urlHash: options.urlHash || "",
     title: document.title,
     rtcSupported: false
   };

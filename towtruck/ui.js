@@ -511,6 +511,17 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.add(el, attrs.messageId, attrs.notify);
     },
 
+    joinedSession: function (attrs) {
+      assert(attrs.peer);
+      var date = attrs.date || Date.now();
+      var el = templating.sub("chat-joined", {
+        peer: attrs.peer,
+        date: date
+      });
+      // FIXME: should bind the notification to the dock location
+      ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
+    },
+
     leftSession: function (attrs) {
       assert(attrs.peer);
       var date = attrs.date || Date.now();
@@ -518,7 +529,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: attrs.peer,
         date: date
       });
-      ui.chat.add(el, attrs.messageId, true);
+      ui.chat.add(el, attrs.peer.className("join-message-"), true);
     },
 
     system: function (attrs) {
@@ -574,6 +585,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         section.empty();
         section.append(el.clone());
         windowing.show(popup);
+        if (typeof notify == "number") {
+          // This is the amount of time we're supposed to notify
+          popup.fadeOut(notify);
+        }
       }
     },
 
@@ -752,26 +767,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     },
 
     notifyJoined: function () {
-      windowing.hide();
-      var el = templating.sub("new-user", {
+      ui.chat.joinedSession({
         peer: this.peer
       });
-      ui.container.append(el);
-      windowing.show(el, {
-        bind: this.dockElement
-      });
-      setTimeout(function () {
-        // FIXME: also set opacity of towtruck-window-pointer-left/right?
-        el.css({
-          MozTransition: "opacity 1s",
-          WebkitTransition: "opacity 1s",
-          transition: "opacity 1s",
-          opacity: "0"
-        });
-        setTimeout(function () {
-          windowing.hide();
-        }, 1000);
-      }, NEW_USER_FADE_TIMEOUT);
     },
 
     dock: function () {

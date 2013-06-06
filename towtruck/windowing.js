@@ -18,7 +18,10 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       options.bind = $(options.bind);
     }
     windowing.hide();
+    element.stop();
     element.show();
+    // In addition to being hidden, the window can be faded out, which we want to undo:
+    element.css({opacity: "1"});
     if (options.bind) {
       assert(! element.hasClass("towtruck-modal"), "Binding does not currently work with modals");
       bind(element, options.bind);
@@ -105,7 +108,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
 
   windowing.hide = function (els) {
     // FIXME: also hide modals?
-    els = els || ".towtruck-window, .towtruck-modal";
+    els = els || ".towtruck-window, .towtruck-modal, .towtruck-notification";
     els = $(els);
     els = els.filter(":visible");
     els.hide();

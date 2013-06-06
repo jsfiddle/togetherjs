@@ -41,9 +41,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       this.lastMessageDate = 0;
       Peer.peers[id] = this;
       var joined = attrs.joined || false;
-      if (attrs.helloMessage) {
-        this.updateFromHello(attrs.helloMessage);
-        if (attrs.type == "hello") {
+      if (attrs.fromHelloMessage) {
+        this.updateFromHello(attrs.fromHelloMessage);
+        if (attrs.fromHelloMessage.type == "hello") {
           joined = true;
         }
       }
