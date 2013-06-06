@@ -116,6 +116,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     var windows = [];
     els.each(function (index, element) {
       element = $(element);
+      windows.push(element);
       var bound = element.data("boundTo");
       if (! bound) {
         return;
@@ -127,7 +128,6 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       }, ANIMATION_DURATION+10);
       element.data("boundTo", null);
       bound.removeClass("towtruck-active");
-      windows.push(element);
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
     if (onClose) {
