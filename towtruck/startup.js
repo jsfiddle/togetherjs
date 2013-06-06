@@ -24,8 +24,8 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
     "browserUnsupported",
     "sessionIntro",
     "walkthrough",
-    // Look in the about() below if you add anything after here:
-    "about"
+    // Look in the share() below if you add anything after here:
+    "share"
     ];
 
   var currentStep = null;
@@ -123,13 +123,13 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
       });
     },
 
-    about: function (next) {
+    share: function (next) {
       if (session.isClient || ! session.firstRun) {
         next();
         return;
       }
       require(["windowing"], function (windowing) {
-        windowing.show("#towtruck-about");
+        windowing.show("#towtruck-share");
         // FIXME: no way to detect when the window is closed
         // If there was a next() step then it would not work
       });
