@@ -529,7 +529,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: attrs.peer,
         date: date
       });
-      ui.chat.add(el, attrs.peer.className("join-message-"), true);
+      // FIXME: should bind the notification to the dock location
+      ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
     },
 
     system: function (attrs) {
