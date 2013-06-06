@@ -285,7 +285,7 @@
     padding: 0;
     margin: 0;
   }
-  
+
   #towtruck-dock-participants button.towtruck-active {
     background-color: #0F81BF !important;
   }
@@ -296,7 +296,7 @@
       background-image: url('./images/button-share-active.png');
     }
   }
-  
+
   #towtruck-buttons #towtruck-share-button.towtruck-active {
     background-image: url('./images/button-share-active.png') !important;
     background-color: #0F81BF;
@@ -310,7 +310,7 @@
       /*cursor: default;*/
     }
   }
-  
+
   #towtruck-buttons #towtruck-audio-button.towtruck-active {
     background-image: url('./images/button-mic-active.png') !important;
     background-color: #0F81BF;
@@ -322,7 +322,7 @@
       background-image: url('./images/button-chat-active.png');
     }
   }
-  
+
   #towtruck-buttons #towtruck-chat-button.towtruck-active {
     background-image: url('./images/button-chat-active.png') !important;
     background-color: #0F81BF;
@@ -530,36 +530,36 @@
       cursor:pointer;
     }
   }
-  
+
   .towtruck-notification .towtruck-chat-item {
     border-bottom:0px;
   }
-  
+
   .towtruck-notification section#towtruck-chat-notifier-message {
     margin:0px !important;
   }
-  
+
   .towtruck-notification .towtruck-chat-content {
     font-size:12px;
   }
-  
+
   .towtruck-notification section {
     font-size:12px;
   }
-  
+
   .towtruck-notification .towtruck-person-name {
     font-family: openSansRegular, Helvetica Bold, 'Helvetica Neue', Arial;
     font-size:14px;
   }
-  
+
   .towtruck-notification button {
     min-width:47% !important;
   }
-  
+
   .towtruck-notification .towtruck-person {
     display:none;
   }
-  
+
   .towtruck-notification .towtruck-timestamp {
     display:none;
   }
@@ -572,16 +572,16 @@
     float:left;
     margin: 22px 14px 10px 10px;
   }
-  
+
   .towtruck-notification img.towtruck-notification-closebtn{
     float:right;
     padding: 14px 7px;
-    
+
     &:hover{
       opacity:0.5;
     }
   }
-  
+
   .towtruck-notification section.towtruck-buttons {
     border-top:1px solid #E1E1E1;
   }
@@ -596,6 +596,19 @@
     border: 2px solid;
     border-radius: 2px;
     background-clip: border-box;
+    &.towtruck-person-small {
+      display: inline-block;
+      @height: (@button-size + 8px) / 2 - 9px;
+      height: @height;
+      width: @height;
+      margin: 0;
+      background-size: @height @height;
+    }
+  }
+
+  // Only applies to the participant-detail screen, really?
+  header .towtruck-person {
+    float: left;
   }
 
   .towtruck-dock-person > .towtruck-dock-person-tooltip {
@@ -622,7 +635,7 @@
     color: #fff;
     border-radius: 4px;
   }
-  
+
   .towtruck-person-tooltip-arrow-r {
     color: rgba(42,42,42,.9);
     position: absolute;
@@ -757,7 +770,7 @@
 #towtruck-dock-participants .towtruck-person {
   /*margin-top:0px !important;*/
   -webkit-margin-before: 0px;
-  
+
 }
 
 /*Participant windows*/
@@ -1050,12 +1063,12 @@ section.towtruck-buttons {
     padding: 0 30px 0 30px;
     text-align:center;
   }
-  
+
   .towtruck-walkthrough-slide p {
     margin:18px auto;
     width:400px;
   }
-  
+
   .towtruck-walkthrough-slide iframe {
     border-radius:4px;
     -webkit-border-radius: 4px;
