@@ -651,7 +651,7 @@
   .towtruck-person-tooltip-arrow-r {
     color: rgba(42,42,42,.9);
     position: absolute;
-    left: 37px;
+    left: 47px;
     font-size:8px;
   }
 
@@ -662,6 +662,11 @@
   top: -11px;
   width: 13px;
   left: 50px;
+}
+
+.towtruck-triangle-up img {
+  width:12px;
+  height:13px;
 }
 
 .towtruck-rtc-dialog-btn {
@@ -736,7 +741,7 @@
   border-radius: 4px;
   hr {
     margin:0px;
-    border-top: 1px solid #E1E1E1;
+    border-top: 0px solid #E1E1E1;
   }
   hr.towtruck-menu-hr-avatar{
     margin-top:20px;
@@ -806,11 +811,19 @@
   }
 
   input#towtruck-self-name {
-    border-radius: 4px;
-    box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);
-    width:150px !important;
+    width:146px !important;
     float:right;
     margin-top:-23px;
+    font-size: 12px;
+    padding: 7px 7px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);
+    font-family: Monaco;
+    margin: -2px 0px;
+    &:focus {
+      border:1px solid #0095DD;
+    }
   }
 
   #towtruck-self-name:focus {
