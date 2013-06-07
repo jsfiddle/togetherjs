@@ -608,6 +608,12 @@
     }
   }
 
+  .towtruck-button .towtruck-person {
+    // A hack of sorts, because we don't want any top or bottom margin when the avatar
+    // is inside a dock button (but we do want the left margin);
+    margin: 0 0 0 10px;
+  }
+
   // Only applies to the participant-detail screen, really?
   header .towtruck-person {
     float: left;
@@ -676,12 +682,12 @@
 
 
 .towtruck-chat-join-item {
-  background: #f2f2f2; 
+  background: #f2f2f2;
   margin-top:0px !important;
 }
 
 .towtruck-chat-left-item {
-  background: #f2f2f2; 
+  background: #f2f2f2;
   margin-top:0px !important;
 }
 
@@ -690,13 +696,13 @@
 }
 
 .towtruck-chat-join-item .towtruck-person{
-  float: left; 
+  float: left;
   margin-bottom:0px !important;
   margin-top:0px;
 }
 
 .towtruck-chat-left-item .towtruck-person{
-  float: left; 
+  float: left;
   margin-bottom:0px !important;
   margin-top:0px;
 }
@@ -1164,7 +1170,7 @@ section.towtruck-buttons {
     border:1px solid rgba(151,151,151,0.1);
     margin:0 auto;
   }
-  
+
   .towtruck-walkthrough-main-image img {
     width:400px;
     height:300px;
@@ -1183,7 +1189,7 @@ section.towtruck-buttons {
       opacity: 0.2;
     }
   }
-  
+
   .towtruck-walkthrough-arrow-l() {
     cursor: pointer;
     width:19px;
@@ -1339,13 +1345,13 @@ section.towtruck-buttons {
 }
 
 #towtruck-profile-arrow {
-  position: relative;
-  width: 24px;
-  height: 24px;
+  position: absolute;
+  width: 12px;
+  height: 12px;
   left: 42px;
-  top: -18px;
+  top: 46px;
   background: url('./images/icn-gear.png');
-  background-size: 50%;
+  background-size: 12px 12px;
   background-repeat: no-repeat;
 }
 
