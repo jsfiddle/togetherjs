@@ -9,7 +9,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   var chat;
   var $window = $(window);
   // This is also in towtruck.less, as @button-height:
-  var BUTTON_HEIGHT = 59; // Not sure why +5 is necessary.
+  var BUTTON_HEIGHT = 60 + 1; // 60 is button height, 1 is border
   // This is also in towtruck.less, under .towtruck-animated
   var ANIMATION_DURATION = 1000;
   // Time the new user window sticks around until it fades away:
