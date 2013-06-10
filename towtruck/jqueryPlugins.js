@@ -5,6 +5,8 @@
 define(["jquery"], function ($) {
   // This isn't really a "module" since it just patches jQuery itself
 
+  // towtruck animations go here...
+
   $.fn.easeTo = function (y) {
     return this.animate({
       scrollTop: y
