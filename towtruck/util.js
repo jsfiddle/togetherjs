@@ -26,7 +26,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
     if (prototype === undefined) {
       prototype = superClass;
     } else {
-      var newPrototype = Object.create(superClass);
+      var newPrototype = Object.create(superClass.prototype);
       for (var a in prototype) {
         if (prototype.hasOwnProperty(a)) {
           newPrototype[a] = prototype[a];
