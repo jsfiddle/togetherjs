@@ -15,6 +15,29 @@ define(["jquery"], function ($) {
       easing: "swing"
     });
   };
+  
+  /* Pop in window from dock button: */
+  $.fn.popinWindow = function () {
+    return this.animate({
+      opacity: 0,
+      right: '+=50'
+    }, {
+      duration: 400,
+      easing: "linear"
+    });
+  };
+  
+  
+  /* Slide in notification window: */
+  $.fn.slideIn = function () {
+    return this.animate({
+      opacity: 0,
+      right: '+=50'
+    }, {
+      duration: 400,
+      easing: "linear"
+    });
+  };
 
   /* Used to fade away notification windows: */
   $.fn.fadeOut = function (time) {
