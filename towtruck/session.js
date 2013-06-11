@@ -76,11 +76,20 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   var IGNORE_MESSAGES = ["cursor-update", "keydown", "scroll-update"];
 
+  // We ignore incoming messages from the channel until this is true:
+  var readyForMessages = false;
+
   function openChannel() {
     assert(! channel);
     console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {
+      if (! readyForMessages) {
+        if (DEBUG) {
+          console.info("In (but ignored for being early):", msg);
+        }
+        return;
+      }
       if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
         console.info("In:", msg);
       }
@@ -303,6 +312,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     initStartTarget();
     initIdentityId().then(function () {
       initShareId().then(function () {
+        readyForMessages = false;
         openChannel();
         require(["ui"], function (ui) {
           TowTruck.running = true;
@@ -313,6 +323,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
               var startup = require("startup");
               session.emit("start");
               session.once("ui-ready", function () {
+                readyForMessages = true;
                 startup.start();
               });
               var ui = require("ui");
