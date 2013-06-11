@@ -262,13 +262,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     $("#towtruck-self-name").bind("keyup", function (event) {
       if (event.which == 13) {
         ui.displayToggle("#towtruck-self-name-display");
-        return false;
+        return;
       }
       var val = $("#towtruck-self-name").val();
       if (val) {
         peers.Self.update({name: val});
       }
-      return undefined;
     });
 
     $("#towtruck-menu-update-avatar").click(function () {
@@ -692,7 +691,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         .text(this.peer.idle == "active" ? "Active" : "Inactive");
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:
-        $("#towtruck-self-name").val(this.peer.name);
+        var selfName = $("#towtruck-self-name");
+        if (selfName.val() != this.peer.name) {
+          selfName.val(this.peer.name);
+        }
         $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
       }
       updateChatParticipantList();
