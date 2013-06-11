@@ -477,6 +477,16 @@
     session.appSend(msg);
   };
 
+  TowTruck.shareUrl = function () {
+    if (session === null) {
+      if (! TowTruck.require) {
+        return null;
+      }
+      session = TowTruck.require("session");
+    }
+    return session.shareUrl();
+  };
+
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
