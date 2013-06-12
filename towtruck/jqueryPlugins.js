@@ -30,13 +30,23 @@ define(["jquery"], function ($) {
   
   /* Slide in notification window: */
   $.fn.slideIn = function () {
-    return this.animate({
-      opacity: 0,
-      right: '+=50'
-    }, {
-      duration: 400,
-      easing: "linear"
-    });
+    console.log("executing slideIn on", this)
+    this.css({
+      left: "+=74px",
+      opacity: 1,
+      zindex: 0
+    })
+    // return this.animate({
+    //   "left": "-=74px",
+    //    opacity: 1
+    //   }, "fast");
+    // return this.animate({
+    //   opacity: 1,
+    //   right: '+=50px'
+    // }, {
+    //   duration: 400,
+    //   easing: "linear"
+    // });
   };
 
   /* Used to fade away notification windows: */

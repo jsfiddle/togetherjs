@@ -14,6 +14,8 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     element = $(element);
     options = options || {};
     options.bind = options.bind || element.attr("data-bind-to");
+    var notification = element.hasClass("towtruck-notification");
+    var modal = element.hasClass("towtruck-modal")
     if (options.bind) {
       options.bind = $(options.bind);
     }
@@ -23,10 +25,15 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     // In addition to being hidden, the window can be faded out, which we want to undo:
     element.css({opacity: "1"});
     if (options.bind) {
-      assert(! element.hasClass("towtruck-modal"), "Binding does not currently work with modals");
+      assert(! modal, "Binding does not currently work with modals");
       bind(element, options.bind);
     }
-    if (element.hasClass("towtruck-modal")) {
+    if (notification) {
+      element.slideIn();
+    } else if (! modal) {
+      element.popIn();
+    }
+    if (modal) {
       getModalBackground().show();
       modalEscape.bind();
     }
