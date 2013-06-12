@@ -31,12 +31,10 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
         }
       }
       var ifs = template.find(".towtruck-if-" + attr).removeClass("towtruck-sub-" + attr);
-      console.log("ifs", attr, ifs);
       if (! value) {
         ifs.hide();
       }
       ifs = template.find(".towtruck-ifnot-" + attr).removeClass("towtruck-ifnot-" + attr);
-      console.log("ifs not", attr, ifs);
       if (value) {
         ifs.hide();
       }
