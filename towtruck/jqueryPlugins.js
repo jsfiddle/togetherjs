@@ -15,17 +15,17 @@ define(["jquery"], function ($) {
       easing: "swing"
     });
   };
-  
-  
+
+
   // animate avatar poping into the dock / telescope in the avatar
-  
-  
+
+
   // animate avatar exiting the dock / telescope out the avatar
-  
-  
+
+
   // animate the participant cursor
-  
-  
+
+
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
     return this.animate({
@@ -36,16 +36,15 @@ define(["jquery"], function ($) {
       easing: "linear"
     });
   };
-  
-  
+
+
   /* Slide in notification window: */
   $.fn.slideIn = function () {
-    console.log("executing slideIn on", this)
     this.css({
       left: "+=74px",
       opacity: 1,
       "zIndex": 8888
-    })
+    });
     return this.animate({
       "left": "-=74px",
        opacity: 1,

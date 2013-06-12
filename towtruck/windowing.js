@@ -15,7 +15,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     options = options || {};
     options.bind = options.bind || element.attr("data-bind-to");
     var notification = element.hasClass("towtruck-notification");
-    var modal = element.hasClass("towtruck-modal")
+    var modal = element.hasClass("towtruck-modal");
     if (options.bind) {
       options.bind = $(options.bind);
     }
@@ -31,7 +31,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     if (notification) {
       element.slideIn();
     } else if (! modal) {
-      element.popIn();
+      //element.popinWindow();
     }
     if (modal) {
       getModalBackground().show();
