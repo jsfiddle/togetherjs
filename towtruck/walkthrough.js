@@ -48,6 +48,13 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
           left: location.left-7
         });
       });
+      if (session.isClient) {
+        container.find(".towtruck-if-creator").hide();
+        container.find(".towtruck-ifnot-creator").show();
+      } else {
+        container.find(".towtruck-if-creator").show();
+        container.find(".towtruck-ifnot-creator").hide();
+      }
       peers.Self.update({});
       session.emit("new-element", container);
     }
