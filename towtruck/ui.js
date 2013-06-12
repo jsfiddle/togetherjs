@@ -555,8 +555,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     },
 
     urlChange: function (attrs) {
+      console.log("urlChange", attrs);
       assert(attrs.peer);
       assert(typeof attrs.url == "string");
+      assert(typeof attrs.sameUrl == "boolean");
       var date = attrs.date || Date.now();
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
@@ -572,9 +574,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: attrs.peer,
         date: date,
         href: attrs.url,
-        title: title
+        title: title,
+        sameUrl: attrs.sameUrl
       });
-      ui.chat.add(el, attrs.peer.className("url-change-"), true);
+      ui.chat.add(el, attrs.peer.className("url-change-"), false);
     },
 
     add: function (el, id, notify) {
@@ -726,6 +729,22 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         }
       }
       this.updateDisplay();
+      this.updateUrlDisplay();
+    },
+
+    updateUrlDisplay: function () {
+      var url = this.peer.url;
+      if ((! url) || url == this._lastUpdateUrlDisplay) {
+        return;
+      }
+      this._lastUpdateUrlDisplay = url;
+      var sameUrl = url == session.currentUrl();
+      ui.chat.urlChange({
+        peer: this.peer,
+        url: this.peer.url,
+        title: this.peer.title,
+        sameUrl: sameUrl
+      });
     },
 
     createUrl: function () {
@@ -846,6 +865,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     },
 
     updateFollow: function () {
+      if (! this.peer.url) {
+        return;
+      }
       if (! this.detailElement) {
         return;
       }
