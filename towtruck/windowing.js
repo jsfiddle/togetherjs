@@ -31,7 +31,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     if (notification) {
       element.slideIn();
     } else if (! modal) {
-      //element.popinWindow();
+      element.popinWindow();
     }
     if (modal) {
       getModalBackground().show();

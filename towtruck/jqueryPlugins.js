@@ -8,6 +8,15 @@ define(["jquery"], function ($) {
   // walkthrough animations go here
 
   // animate avatar popping into the dock when they enter the session / telescope in the avatar
+  $.fn.avatarEnter = function (y) {
+    return this.animate({
+      scrollTop: y
+    }, {
+      duration: 400,
+      easing: "swing"
+    });
+  };
+  
   // animate participant cursor and box popping in when they enter the session
 
   // animate avatar exiting the dock when the exit the session/ telescope out the avatar
@@ -20,20 +29,41 @@ define(["jquery"], function ($) {
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
-    return this.animate({
+    
+    //start scale small
+    
+    //starting position
+    this.css({
+      left: "+=74px",
       opacity: 0,
-      right: '+=50'
-    }, {
-      duration: 400,
-      easing: "linear"
+      "zIndex": 8888
+    });
+    
+    //scale larger
+    
+    //animate window out
+    this.animate({
+      opacity: 1, 
+      left: "-=78px",
+      }, {
+        duration:80, easing:"linear"
+      });
+    this.queue();
+    
+    //bounce window back
+    this.animate({
+      left:'+=4px'
+      }, {
+        duration:80, easing:"linear"
     });
   };
 
   /* Slide in notification window: */
   $.fn.slideIn = function () {
     this.css({
+      top: "240px",
       left: "+=74px",
-      opacity: 1,
+      opacity: 0,
       "zIndex": 8888
     });
     return this.animate({
@@ -47,6 +77,9 @@ define(["jquery"], function ($) {
 
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function (time) {
+    // needs to rotate on the x axis http://ricostacruz.com/jquery.transit/
+    // also make the fadeout faster
+    //this.slideUp("slow");
     return this.animate({
       opacity: 0
     }, {
