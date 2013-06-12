@@ -16,6 +16,16 @@ define(["jquery"], function ($) {
     });
   };
   
+  
+  // animate avatar poping into the dock / telescope in the avatar
+  
+  
+  // animate avatar exiting the dock / telescope out the avatar
+  
+  
+  // animate the participant cursor
+  
+  
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
     return this.animate({
@@ -34,12 +44,13 @@ define(["jquery"], function ($) {
     this.css({
       left: "+=74px",
       opacity: 1,
-      zindex: 0
+      "zIndex": 8888
     })
-    // return this.animate({
-    //   "left": "-=74px",
-    //    opacity: 1
-    //   }, "fast");
+    return this.animate({
+      "left": "-=74px",
+       opacity: 1,
+       "zIndex": 9999
+      }, "fast");
     // return this.animate({
     //   opacity: 1,
     //   right: '+=50px'
