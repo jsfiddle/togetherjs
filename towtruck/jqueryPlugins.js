@@ -5,26 +5,18 @@
 define(["jquery"], function ($) {
   // This isn't really a "module" since it just patches jQuery itself
 
-  // towtruck animations go here...
+  // walkthrough animations go here
 
-  $.fn.easeTo = function (y) {
-    return this.animate({
-      scrollTop: y
-    }, {
-      duration: 400,
-      easing: "swing"
-    });
-  };
+  // animate avatar popping into the dock when they enter the session / telescope in the avatar
+  // animate participant cursor and box popping in when they enter the session
 
+  // animate avatar exiting the dock when the exit the session/ telescope out the avatar
+  // animate participant cursor and box popping out when they leave the session
 
-  // animate avatar poping into the dock / telescope in the avatar
+  // animate the participant cursor -> rotate down when they're down the page
+  // animate the participant cursor -> rotate up when they're on the same frame as the user
 
-
-  // animate avatar exiting the dock / telescope out the avatar
-
-
-  // animate the participant cursor
-
+  // animate participant typing
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
@@ -36,7 +28,6 @@ define(["jquery"], function ($) {
       easing: "linear"
     });
   };
-
 
   /* Slide in notification window: */
   $.fn.slideIn = function () {
@@ -50,22 +41,27 @@ define(["jquery"], function ($) {
        opacity: 1,
        "zIndex": 9999
       }, "fast");
-    // return this.animate({
-    //   opacity: 1,
-    //   right: '+=50px'
-    // }, {
-    //   duration: 400,
-    //   easing: "linear"
-    // });
   };
 
-  /* Used to fade away notification windows: */
+  /* Move notification when another notification slides in */
+
+  /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function (time) {
     return this.animate({
       opacity: 0
     }, {
       duration: time || 1000,
       easing: "linear"
+    });
+  };
+
+  /* used when user goes down to participant cursor location on screen */
+  $.fn.easeTo = function (y) {
+    return this.animate({
+      scrollTop: y
+    }, {
+      duration: 400,
+      easing: "swing"
     });
   };
 
