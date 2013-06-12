@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "ui", "jquery", "windowing", "templates", "templating", "session"], function (util, ui, $, windowing, templates, templating, session) {
+define(["util", "ui", "jquery", "windowing", "templates", "templating", "session", "peers"], function (util, ui, $, windowing, templates, templating, session, peers) {
   var assert = util.assert;
   var walkthrough = util.Module("walkthrough");
   var onHideAll = null;
@@ -28,6 +28,27 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
       container.find("#towtruck-walkthrough-previous").click(previous);
       container.find("#towtruck-walkthrough-next").click(next);
       ui.prepareShareLink(container);
+      container.find(".towtruck-self-name").bind("keyup", function (event) {
+        var val = $(event.target).val();
+        peers.Self.update({name: val});
+      });
+      container.find(".towtruck-swatch").click(function () {
+        var picker = $("#towtruck-pick-color");
+        if (picker.is(":visible")) {
+          picker.hide();
+          return;
+        }
+        picker.show();
+        picker.find(".towtruck-swatch-active").removeClass("towtruck-swatch-active");
+        picker.find(".towtruck-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
+        var location = container.find(".towtruck-swatch").offset();
+        picker.css({
+          top: location.top,
+          // The -7 comes out of thin air, but puts it in the right place:
+          left: location.left-7
+        });
+      });
+      peers.Self.update({});
       session.emit("new-element", container);
     }
     onHideAll = doneCallback;

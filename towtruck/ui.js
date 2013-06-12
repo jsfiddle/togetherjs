@@ -251,20 +251,20 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
 
     $("#towtruck-menu-update-name").click(function () {
-      var input = $("#towtruck-self-name");
+      var input = $("#towtruck-menu .towtruck-self-name");
       input.css({
         width: $("#towtruck-menu").width() - 32 + "px"
       });
-      ui.displayToggle("#towtruck-self-name");
-      $("#towtruck-self-name").focus();
+      ui.displayToggle("#towtruck-menu .towtruck-self-name");
+      $("#towtruck-menu .towtruck-self-name").focus();
     });
 
-    $("#towtruck-self-name").bind("keyup", function (event) {
+    $("#towtruck-menu .towtruck-self-name").bind("keyup", function (event) {
       if (event.which == 13) {
         ui.displayToggle("#towtruck-self-name-display");
         return;
       }
-      var val = $("#towtruck-self-name").val();
+      var val = $("#towtruck-menu .towtruck-self-name").val();
       if (val) {
         peers.Self.update({name: val});
       }
@@ -691,10 +691,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         .text(this.peer.idle == "active" ? "Active" : "Inactive");
       if (this.peer.isSelf) {
         // FIXME: these could also have consistent/reliable class names:
-        var selfName = $("#towtruck-self-name");
-        if (selfName.val() != this.peer.name) {
-          selfName.val(this.peer.name);
-        }
+        var selfName = $(".towtruck-self-name");
+        selfName.each((function (index, el) {
+          el = $(el);
+          if (el.val() != this.peer.name) {
+            el.val(this.peer.name);
+          }
+        }).bind(this));
         $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
       }
       updateChatParticipantList();
