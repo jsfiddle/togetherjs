@@ -344,9 +344,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
-  session.close = function () {
+  session.close = function (reason) {
     TowTruck.running = false;
-    session.send({type: "bye"});
+    var msg = {type: "bye"};
+    if (reason) {
+      msg.reason = reason;
+    }
+    session.send(msg);
     session.emit("close");
     var name = window.name;
     storage.tab.get("status").then(function (saved) {

@@ -133,7 +133,12 @@
       <!-- Template for when a person leaves: -->
       <div id="towtruck-template-chat-left" class="towtruck-chat-item towtruck-chat-left-item">
         <div class="towtruck-person"></div>
-        <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> left the session.</div>
+        <div class="towtruck-ifnot-declinedJoin">
+          <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> left the session.</div>
+        </div>
+        <div class="towtruck-if-declinedJoin">
+          <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> declined to join the session.</div>
+        </div>
         <div class="towtruck-clear"></div>
       </div>
 

@@ -30,6 +30,16 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
           assert(false, "Unknown variable value type:", attr, "=", value);
         }
       }
+      var ifs = template.find(".towtruck-if-" + attr).removeClass("towtruck-sub-" + attr);
+      console.log("ifs", attr, ifs);
+      if (! value) {
+        ifs.hide();
+      }
+      ifs = template.find(".towtruck-ifnot-" + attr).removeClass("towtruck-ifnot-" + attr);
+      console.log("ifs not", attr, ifs);
+      if (value) {
+        ifs.hide();
+      }
       var attrName = "data-towtruck-subattr-" + attr;
       var attrs = template.find("[" + attrName + "]");
       attrs.each(function (index, element) {

@@ -104,7 +104,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
       $("#towtruck-intro .towtruck-modal-dont-join").click(function () {
         cancelled = true;
         windowing.hide();
-        session.close();
+        session.close("declined-join");
       });
     },
 

@@ -20,7 +20,8 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
   // FIXME: this doesn't really belong in this module:
   session.hub.on("bye", function (msg) {
     ui.chat.leftSession({
-      peer: msg.peer
+      peer: msg.peer,
+      declinedJoin: msg.reason == "declined-join"
     });
   });
 

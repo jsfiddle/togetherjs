@@ -145,6 +145,14 @@ $('<button>Faker Leave</button>').appendTo(el).click(function () {
   });
 });
 
+$('<button>Faker decline</button>').appendTo(el).click(function () {
+  Test.incoming({
+    type: "bye",
+    clientId: "faker",
+    reason: "declined-join"
+  });
+});
+
 $('<button>Nudge Me</button>').appendTo(el).click(function () {
   Test.incoming({
     type: "url-change-nudge",

@@ -531,7 +531,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       var date = attrs.date || Date.now();
       var el = templating.sub("chat-left", {
         peer: attrs.peer,
-        date: date
+        date: date,
+        declinedJoin: attrs.declinedJoin
       });
       // FIXME: should bind the notification to the dock location
       ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
