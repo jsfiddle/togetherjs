@@ -43,8 +43,10 @@ define(["jquery"], function ($) {
        "zIndex": 9999
       }, "fast");
   };
+  
+  /* Move notification when another notification slides in */
 
-  /* Used to fade away notification windows: */
+  /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function (time) {
     return this.animate({
       opacity: 0
