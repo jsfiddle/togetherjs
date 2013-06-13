@@ -1,0 +1,24 @@
+{
+  "name": "towtruck.mozillalabs.com",
+  "version": "0.0.0",
+  "description": "Public Site static hosting for towtruck.mozillalabs.com",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mozilla/towtruck"
+  },
+  "author": "",
+  "license": "MPLv2",
+  "gitHead": "c0191b88e52323dfee91c06d83b8c82b2374feba",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/mozilla/towtruck/issues"
+  },
+  "dependencies": {
+    "express": "~3.2.6",
+    "connect": "~2.7.11"
+  }
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Walkabout tests</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://doctestjs.org/doctest.js"></script>
+    <link rel="stylesheet" href="http://doctestjs.org/doctest.css"></script>
+    <!--<script src="doctestjs/doctest.js"></script>-->
+    <script src="walkabout.js"></script>
+  </head>
+  <body class="autodoctest">
+
+    <div>
+      <pre class="commenttest" href="test_walkabout.js"></pre>
+    </div>
+
+    <div id="fixture">
+      <button id="button">A button</button>
+      <input type="text" id="textinput">
+      <a href="#1" id="link">link</a>
+      <ul>
+        <li class="item">an item 1</li>
+        <li class="item">an item 2</li>
+      </ul>
+      <pre id="log"></pre>
+    </div>
+
+    <div id="textarea-fixture">
+      <textarea id="textarea" style="width: 50%; height: 3em"
+                data-walkabout-edit-value="type paste delete move"></textarea>
+    </div>
+
+  </body>
+</html>

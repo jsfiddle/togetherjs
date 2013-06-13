@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TowTruck recorder</title>
+    <script>
+      TowTruckConfig_noAutoStart = true;
+    </script>
+    <script src="./towtruck.js"></script>
+    <script>
+      var config = TowTruck._extend(TowTruck.requireConfig);
+      config.deps = ["recorder"];
+      config.callback = function () {
+        console.log("got back");
+        require({context: "towtruck"})(["recorder"], function (recorder) {
+          recorder.start({
+            baseUrl: TowTruck.baseUrl,
+            defaultHubBase: TowTruck.getConfig("hubBase")
+          });
+        });
+      };
+      require = config;
+      console.log("required");
+    </script>
+    <script src="./towtruck/libs/require.js"></script>
+    <link rel="stylesheet" href="recorder.css">
+  </head>
+  <body>
+
+<div id="connection-status">
+  <span id="not-connected" data-toggles="#connection-status span">Not Connected</span>
+  <span id="connected" data-toggles="#connection-status span" style="display: none">Connected</span>
+  <span id="no-session-id" data-toggles="#connection-status span" style="display: none">There's no <code>#&amp;towtruck=SESSION_ID</code> in the URL.</span>
+  <button id="restart">Restart recording</button>
+  <button id="select">Select record</button>
+</div>
+
+<div>
+  <textarea id="record">/* TowTruck session starts */
+
+</textarea>
+</div>
+
+
+  </body>
+</html>

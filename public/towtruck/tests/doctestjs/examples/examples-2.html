@@ -1,0 +1,69 @@
+<!DOCTEST html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+    <script src="../doctest.js"></script>
+    <script type="text/javascript" src="../.resources/toc.js"></script>
+    <link rel="stylesheet" type="text/css" href="../.resources/doc.css" />
+    <script src="../.resources/esprima/esprima.js"></script>
+    <link rel="stylesheet" href="../doctest.css" type="text/css">
+  </head>
+  <body class="autodoctest">
+
+<!-- HEADER -->
+<!-- /HEADER -->
+<pre class="doctest">
+$ print('hey you')
+hey you
+$ print({'whatever': 'example', something: [1, 2, 3]});
+{something: [1, 2, 3], whatever: "example"}
+$ print(1/0)
+NaN
+$ function foo() {
+>   console.log({hey: 'you'});
+>   throw 'whatever';
+> }
+> foo();
+Error: whatever
+</pre>
+
+<pre class="test">
+print(1+2)
+/* =>
+   3
+*/
+
+function testme() {
+  setTimeout(function () {
+    print('hey you!');
+  }, 10);
+}
+testme();
+wait(200);
+/* => hey you! */
+</pre>
+
+<pre class="test" href="./examples-2.js"></pre>
+
+<pre class="test">
+function stop() {
+  throw Abort();
+}
+
+print(1+2);
+/* => 3 */
+
+stop();
+/* => something */
+
+print(5+5);
+/* => 12 */
+</pre>
+
+<!-- FOOTER -->
+<!-- /FOOTER -->
+
+
+  </body>
+</html>

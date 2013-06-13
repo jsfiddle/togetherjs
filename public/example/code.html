@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title> Mozilla Labs : TowTruck example code editing </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A service for your website that makes it surprisingly easy to collaborate in real-time.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/images/fav-icon.png">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="/js/froogaloop2.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/towtruck.js"></script>
+    <script src="/example/startup.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', '']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <script type="text/javascript" src="/js/application.js"></script>
+
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/style.css"                       rel="stylesheet" type="text/css" media="all">
+    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
+    
+<style>
+  pre {
+    /* Override bootrap pre padding */
+    padding: 0;
+  }
+  #ace-editor {
+    margin: 0;
+    top: 0;
+    position: absolute;
+    width: 80%;
+    height: 25em;
+    right: 0;
+  }
+  #ace-container {
+    height: 25em;
+  }
+  #codemirror-container {
+    border: 1px solid #000;
+  }
+</style>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+  <body>
+    <a href="http://www.mozilla.org/" id="tabzilla">mozilla</a>
+    <div class="navbar-wrapper towtruckula">
+      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
+      <div class="container">
+        <div class="navbar navbar-inverse">
+          <div class="navbar-inner towtruck-nav">
+            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            
+            <a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
+            
+            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
+            <div class="nav-collapse collapse">
+              <ul class="nav">
+
+                <li ><a href="/">Home</a></li>
+                <li class="active"><a href="/example">Examples</a></li>
+                <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developers</a></li>
+                <!--li><a href="#">API Docs</a></li>
+                <li><a href="#">Extending TowTruck</a></li-->
+                <li><a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a></li>
+                
+                <!-- <li><a href="#" onclick="TowTruck(this); return false">Start TowTruck</a></li> -->
+                
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<div class="containerbg">
+  <div class="container examples">
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <button onclick="TowTruck(this); return false" class="btn btn-large btn-primary" id="btn-tryitout">Start TowTruck</button>
+        <ul class="nav nav-list">
+          <li class="nav-header">Test TowTruck on these pages:</li>
+          <li><a href="/example/">Examples</a></li>
+          <li><a href="/example/code.html">Code editor</a></li>
+          <li><a href="/example/longpage.html">A long page</a></li>
+          <li><a href="/example/form.html">A form</a></li>
+          <li><a href="/example/app-integration.html">Identity integration</a></li>
+        </ul>
+      </div><!--/.well -->
+    </div><!--/.span3 -->
+    <div class="span8">
+
+
+    
+
+          <h1>Code editor</h1>
+
+          <p>TowTruck requires specific support for editors.  There is active support for
+            <a href="http://codemirror.net/">CodeMirror</a> (used for
+            example by Thimble),
+            and <a href="http://ace.ajax.org/">ACE</a> (used by Github,
+            Cloud9).</p>
+
+          <h2>ACE</h2>
+
+          <div id="ace-container">
+
+<pre id="ace-editor">function foo(items) {
+  var i;
+  for (i = 0; i &lt; items.length; i++) {
+    alert("Ace Rocks " + items[i]);
+  }
+}
+</pre>
+
+          </div>
+
+          <h2>CodeMirror</h2>
+
+          <div id="codemirror-container"></div>
+
+          <hr>
+
+          <p>And that's all folks!</p>
+        </div>
+
+   <!-- ACE editor: -->
+   <script src="//d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js"></script>
+   <script>
+     var editor = ace.edit("ace-editor");
+     editor.setTheme("ace/theme/textmate");
+     editor.getSession().setMode("ace/mode/javascript");
+     var container = $("#ace-container");
+     $("#ace-editor").css({
+       top: container.offset().top + "px",
+       left: container.offset().left + "px",
+       height: (container.height()-20) + "px",
+       width: container.width() + "px"
+     });
+   </script>
+
+   <!-- CodeMirror editor: -->
+   <script src="codemirror/codemirror.js"></script>
+   <link rel="stylesheet" href="codemirror/codemirror.css">
+   <script src="codemirror/javascript.js"></script>
+   <script>
+     var cmEditor = CodeMirror($("#codemirror-container")[0], {
+       mode: "javascript"
+     });
+     /*$.ajax({
+       url: "/towtruck/session.js",
+       dataType: "text"
+     }).then(function (data) {
+       cmEditor.setValue(data);
+       //TowTruck.reinitialize();
+     });*/
+   </script>
+
+
+
+
+    </div><!--/.span8-->
+  </div><!--/.container.examples -->
+</div><!--/.containerbg -->
+
+
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="span3">
+            <a href="https://mozillalabs.com/" class="footer-logo"><img src="/images/footer-mozilla-labs.png" alt="mozilla"></a>
+          </div>
+          <nav class="span3">
+            <ul>
+              <li>
+                <a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a>
+              </li>
+              <li>
+                <a href="https://github.com/mozilla/towtruck" target="_blank">TowTruck on Github</a>
+              </li>
+              <li>
+                <a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a>
+              </li>
+              <li>
+                <a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a>
+              </li>
+              <li>
+                <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuse</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
+    </footer>
+  </body>
+</html>

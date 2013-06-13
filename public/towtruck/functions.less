@@ -1,0 +1,44 @@
+.transition (@val) {
+  /*    Note, you must call this like:
+  .transition(~"value, value, value")*/
+  transition: @val;
+  -moz-transition: @val;
+  -webkit-transition: @val;
+  -o-transition: @val;
+}
+
+.transform-origin (...) {
+  -moz-transform-origin: @arguments;
+  -webkit-transform-origin: @arguments;
+  -ms-transform-origin: @arguments;
+  -o-transform-origin: @arguments;
+  transform-origin: @arguments;
+}
+
+.user-select (@value) {
+  -moz-user-select: @value;
+  -webkit-user-select: @value;
+  -ms-user-select: @value;
+  user-select: @value;
+}
+
+// The CSS reset doesn't reset everything, just resets them to normal.
+// This resets buttons back to nothing.
+.button-reset () {
+  background-color: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gradient (@startColor, @endColor) {
+  background: @startColor; /* Old browsers */
+  background: -moz-linear-gradient(top,  @startColor 0%, @endColor 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, @startColor), color-stop(100%, @endColor)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, @startColor 0%, @endColor 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, @startColor 0%, @endColor 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, @startColor 0%, @endColor 100%); /* IE10+ */
+  background: linear-gradient(to bottom, @startColor 0%, @endColor 100%); /* W3C */
+  // Not sure we can do this in LESS
+  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@startColor', endColorstr='@endColor',GradientType=0 ); /* IE6-9 */
+}

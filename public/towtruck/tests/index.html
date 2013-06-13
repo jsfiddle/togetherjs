@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TowTruck tests</title>
+    <script src="./doctestjs/doctest.js" charset="UTF-8"></script>
+    <script>
+      // This keeps TowTruck from auto-starting:
+      sessionStorage.removeItem("towtruck-session.status");
+      sessionStorage.removeItem("towtruck-session.peerCache");
+    </script>
+    <script src="../../towtruck.js"></script>
+    <script src="../libs/jquery-1.8.3.min.js"></script>
+    <script src="testutils.js"></script>
+    <link rel="stylesheet" href="doctestjs/doctest.css">
+  </head>
+  <body class="autodoctest">
+
+    <div id="doctest-output"></div>
+
+    <div id="contents">
+      Tests:
+      <ol>
+        <li><a href="?name=functional.js">misc (functional)</a></li>
+        <li><a href="?name=func_notifications.js">notifications (functional)</a></li>
+        <li><a href="?name=func_walkthrough.js">walkthrough (functional)</a></li>
+        <li><a href="?name=test_storage.js">storage (unit)</a></li>
+        <li><a href="?name=test_resolves.js">resolves (unit)</a></li>
+        <li><a href="?name=test_elementFinder.js">elementFinder (unit)</a></li>
+        <li><a href="?name=test_forms.js">forms (functional)</a></li>
+        <li><a href="?name=test_ace.js">ace (functional)</a></li>
+        <li><a href="?name=test_codemirror.js">codemirror (functional)</a></li>
+        <li><a href="?name=func_join_confirm.js">join confirmation (functional)</a></li>
+      </ol>
+    </div>
+
+<pre class="test" data-href-pattern="./{name:[a-zA-Z0-9_-]+\.js}">xxx
+</pre>
+
+<div id="fixture">
+</div>
+
+</body></html>

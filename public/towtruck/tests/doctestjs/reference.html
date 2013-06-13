@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="doctest.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Doctest.js: The Reference</title>
+    <meta name="description" content="Doctest.js is a Javascript testing framework">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href=".resources/boilerplate/css/normalize.min.css">
+    <link rel="stylesheet" href=".resources/boilerplate/css/main.css">
+    <link rel="stylesheet" href=".resources/doc.css">
+    <script src=".resources/boilerplate/js/vendor/modernizr-2.6.1.min.js"></script>
+    <script src="doctest.js"></script>
+    <!-- EXTRA_HEAD -->
+<script type="text/javascript" src="./.resources/toc.js"></script>
+<!-- /EXTRA_HEAD -->
+  </head>
+  <body class="autodoctest">
+
+    <div class="header-container">
+      <header class="wrapper clearfix">
+        <h1 class="title"><a href="/">Doctest.js</a>: <!-- TITLE -->The Reference<!-- /TITLE --></h1>
+
+        <nav>
+          <ul>
+            <li><a href="https://github.com/ianb/doctestjs">Github</a></li>
+            <li><a href="/reference.html">Reference</a></li>
+            <li><a href="/tutorial.html">Tutorial</a></li>
+          </ul>
+        </nav>
+
+      </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+
+
+     <!-- BODY -->
+
+
+<p>
+Author: Ian Bicking,
+<a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a>
+</p>
+
+<div id="contents"></div>
+
+<h3 id="html">HTML page</h3>
+
+<p>Your HTML page needs just a couple things to set it up for a test:
+
+<pre>
+&lt;html>
+ &lt;head>
+  &lt;script src="doctestjs/doctest.js">&lt;/script>
+  &lt;link href="doctestjs/doctest.css" rel="stylesheet">
+ &lt;/head>
+ &lt;body class="autodoctest">
+
+  &lt;pre class="test / doctest">
+    test
+  &lt;/pre>
+ &lt;/body>
+&lt;/html>
+</pre>
+
+</p>
+
+<p>Notably you need <code>&lt;body <strong>class="autodoctest"</strong>></code> to get the tests to run automatically on page load.  If you were invoking doctest explicitly (like is done on the <a href="try.html">Try It</a> page) then you might leave this off.</p>
+
+<h4 id="external">External code</h4>
+
+<p>Often you won't want to write your test code inside the test itself.  Instead you'll want to put it in its own <code>.js</code> file.  Especially with <a href="#format-test"><code>test</code></a> the code is valid Javascript, and you will probably want syntax highlighting and all that.</p>
+
+<p>To do this, use an <code>href</code> attribtue on your <code>&lt;pre></code> element, like:
+
+<pre>
+&lt;pre class="test" href="./tests.js">&lt;/pre>
+</pre>
+
+The contents of the element don't matter.  The test will be loaded from that location (which could be a full URL but you'll probably have <a href="http://www.w3.org/TR/cors/">cross-origin</a> errors if you tried that &mdash; this doesn't use <code>&lt;script></code> tags to load those scripts, it uses XMLHttpRequest).  Note that the class is still required!</p>
+
+<p>You can also load it from a variable location, using query string parameters to find the file.  The most common pattern would be like this:
+
+<pre>
+&lt;pre class="test" data-href-pattern="./{test-name|default.js}">&lt;/pre>
+</pre>
+
+Any URL parameters (like <code>{test-name}</code>) get filled in by the query string (<code>?test-name=example.js</code>).  By default these values can only contain letters, numbers, <code>_</code>, <code>-</code> and <code>.</code> &mdash; this is to protect against loading scripts from unexpected locations via an implicitly unsafe parameters in the query string.</p>
+
+<p>If you want to use a different restriction on a variable name, use <code>{variable-name:regular_expression}</code> &mdash; and use <code>^</code> and <code>$</code> to make sure to match the entire string.</p>
+
+<p>If you want a default (if the parameter isn't set or is empty) use <code>|</code> to separate out the default.  The default should come after the regular expression.  In the example the default is <code>default.js</code>.  Don't use extra spaces around <code>|</code>!</p>
+
+<p>Note this works well with relative addresses like <code>&lt;a href="?test-name=foo.js">foo.js&lt;/a></code></p>
+
+<h3 id="format">Format of test</h3>
+
+<p>There are two formats that a doctest can take.  You've probably seen the <code>test</code> format, there is also the more traditional <code>doctest</code> format.</p>
+
+<h4 id="format-doctest"><code>doctest</code> format</h4>
+
+<p>This format is used like:
+
+<pre>
+&lt;pre class="doctest">
+$ first_line();
+> continuation line
+output
+&lt;/pre>
+</pre>
+
+</p>
+
+<p>The first line of course starts wtih <code>$</code> and a space. Think of it like a Unix command line.  And also similar to a command line shell the continuation line is <code>></code>.  Any line <em>without</em> a leading <code>$</code> or <code>></code> is considered expected output.</p>
+
+<p>Note you can still have multiple statements using a continuation line.  The only difference between two lines with <code>$</code> and one with a <code>$</code> followed by <code>></code> is that in the latter case the two lines are executed <em>together</em> and the output from both is combined into what is expected.</p>
+
+<h4 id="format-test"><code>test</code> format</h4>
+
+<p>In this format the expected output is in a comment, like:
+
+<pre>
+&lt;pre class="test">
+statement_1();
+statement_2();
+// Some other comment
+// => expected output
+
+More statements
+
+/* =>
+expected output
+*/
+</pre>
+
+</p>
+
+<p>Basically the test is split up by using the <code>// =></code> comments.  Each chunk is executed independently, and the test may be paused at the point where the expected output is found.</p>
+
+<h4 id="sections">Test sections</h4>
+
+<p><em>If</em> you are using <a href="#external">external test code</a> (and <code>test</code>) you can include <em>section headers</em> like:
+
+<pre>
+// == SECTION A section header
+</pre>
+
+</p>
+
+<p>You can have one or more <code>=</code>'s.  The text <code>A section header</code> will become a header.  Each section header turns into a new <code>&lt;pre></code> element.</p>
+
+<h4 id="compact">Compact <code>&lt;pre></code>'s</h4>
+
+<p>Sometimes you'll have boilerplate code that sets up the test environment, and you'll be uninterested in that code (unless it fails).  This might define helper functions, or run some really routine sanity tests.  You can use this to make those test blocks small:
+
+<pre>
+&lt;pre class="test expand-on-failure">
+  ...
+&lt;/pre>
+</pre>
+
+This will make the test 3em tall unless there's a failure, at which point it expands to its full size.</p>
+
+<h3 id="print">Printing/writing</h3>
+
+<p>The <code>print()</code> function is pretty important, of course. (Note it also was called <code>writeln()</code>, a name which is still supported).</p>
+
+<p><code>print()</code> will print out any strings given to it, and the <code>repr()</code> of any other objects, with a space between each argument.</p>
+
+<p>You can make a <strong>custom <code>repr()</code></strong> for any object by adding a <code>.repr()</code> method.  It should look like:
+
+<pre>
+MyObject.prototype.repr = function () {
+  return '[MyObject attr: ' + repr(this.attr) + ']';
+};
+</pre>
+
+</p>
+
+<p>If you can't add a method to your object, you can also add a stringifier using <code>repr.register()</code>.</p>
+
+<p>You might do this like:
+
+<pre>
+repr.register(
+  function (o) {
+    return o instanceof MyClass;
+  },
+  function (o, indentString) {
+    return '[MyClass attr: ' + repr(o.attr) + ']';
+  }
+);
+</pre>
+
+The first function is a <em>test</em> that is applied to objects.  If it returns true, then the second function is called to stringify the object.  <em>If</em> your representation uses multiple lines, then you should indent subsequent lines with the string, like <code>return '[Beginning\n' + indentString + '  end\n' + indentString + ']';</code>.  The beginning is never indented.
+
+</p>
+
+<p>Some of the objects that have custom representations:</p>
+
+<dl>
+  <dt>XML and DOM objects</dt>
+  <dd>These are displayed as the normal serialization, e.g., <code>&lt;input type="text" /></code>.  XML-style endings for empty tags are always used.  Attributes are alphabetized.  HTML tags are upppercase and attributes are lowercase, because the DOM seems to like that.</dd>
+
+  <dt>XMLHttpRequest</dt>
+  <dd>These are displayed like <code>[XMLHttpRequest STATE [STATUS]]</code>.  The <code>STATE</code> is one of <code>UNSENT</code>, <code>OPENED</code>, <code>HEADERS_RECEIVED</code>, <code>LOADING</code> and <code>DONE</code>.  The <code>[STATUS]</code> is only displayed if the request has finished.</dd>
+
+</dl>
+
+<p>Arrays and objects are displayed like you'd think.  This might include objects that you might not think of as "plain" objects.  Also the object prototype is not displayed.  You'll have to use something like <code>print(o.constructor)</code> if you want to be specific about classes.</p>
+
+<h4 id="console"><code>console.log()</code></h3>
+
+<p><code>console.log()</code> works a lot like <code>print()</code>. But unlike <code>print()</code> it doesn't make a test pass or fail, it's purely informative.</p>
+
+<p>All the methods on console should work, like <code>console.warn()</code>.  The underlying normal console function is called, but in addition on a test-by-test basis these are collected and displayed.</p>
+
+<h4 id="printResolved"><code>printResolved()</code> for Deferred and Promises</h4>
+
+<p>There's special support for the jQuery <a href="http://api.jquery.com/category/deferred-object/">Deferred</a> object, and generally <a href="http://wiki.commonjs.org/wiki/Promises/A">Promises/A</a>.</p>
+
+<p>This support is through the <code>printResolved()</code> function, which is basically equivalent to <code>print()</code> except any promise arguments will be waited on to resolve (proper resolution or an error).  You can use it like this:</p>
+
+<pre class="test">
+var def = $.Deferred();
+setTimeout(function () {
+  def.resolve("Resolved!");
+});
+printResolved(def);
+// => Resolved!
+</pre>
+
+<p>Errors are printed out with <code>Error:</code> before the value, and multiple arguments are printed out with spaces between them, or a placeholder if there's no arguments.  For instance:</p>
+
+<pre class="test">
+var def = $.Deferred();
+def.reject({code: 1}, "a message");
+printResolved(def);
+// => Error: {code: 1} a message
+// Or you might not have any value at all:
+def = $.Deferred();
+def.resolve();
+printResolved(def);
+// => (resolved)
+</pre>
+
+<h3 id="matching">Output matching</h3>
+
+<p>The <em>expected</em> output is compared with the output you actually <em>got</em> (received).</p>
+
+<p>First all whitespace is normalized.  Empty lines are removed from both sides.  Leading spaces are removed (i.e., indentation does not matter).  Multiple spaces are normalized to a single space.</p>
+
+<p>There are two wildcard patterns.  Ellipsis &mdash; <code>...</code> &mdash; means "match anything".  This will match zero character, or multiple lines.  You should be careful about matching <em>too</em> much.</p>
+
+<p>The shorter wildcard is <code>?</code>.  This matches letters, numbers, underscore, period, and question mark.  Note if you want to match a string with such characters you might have to use <code>"?"</code>.</p>
+
+<p>Also a special case, <code>&quot;</code> matches <code>'</code> and vice versa.  Since in most contexts these mean the same thing, this lets you be agnostic.</p>
+
+<p>When you have a large expected text and got a lot of text, and that text differs just a bit, you'll see a line-by-line comparison of the two, to help you identify exactly where the problem is.  Note if you use wildcards the line-by-line comparison might be very inaccurate.</p>
+
+<h3 id="wait"><code>wait()</code>, async code, and pausing the tests</h3>
+
+<p>Often you'll want to let code run for a while on its own before you are done with testing a section of code.  I.e., you want to let all the requests complete, DOM elements update, and so forth.</p>
+
+<p>Each <em>section</em> of code can be paused at the end. <strong>Code cannot be paused in the middle of a section.</strong>  So before the output (i.e., before <code>// =></code>) the test runner can wait and collect output.<p>
+
+<p>Anytime you call <code>wait()</code> inside a section of code it tells the test runner to wait <em>at the end of the test</em>, either until some condition is true or until some time has passed.  If the condition doesn't complete an error/timeout message is <code>print()</code>'d.</p>
+
+<p>A half baked version of what happens is this:
+
+<pre>
+var printed = [], waiting = null;
+function print(arg) {
+  printed.push(arg);
+}
+function wait(condition) {
+  waiting = condition;
+}
+function checkOutput() {
+  if (printed.join('\n') != expectedOutput) {
+     fail();
+  }
+}
+eval(exampleCode);
+hardTimeout = 5000; // 5 seconds
+checkTime = 100; // check every 0.1 seconds
+if (waiting === null) {
+  checkOutput();
+} else if (typeof waiting == "number") {
+  setTimeout(checkOutput, waiting);
+} else {
+  var now = Date.now();
+  function checker() {
+    if (waiting()) {
+      checkOutput();
+    } else if (Date.now() - now > hardTimeout) {
+      print("Error: timed out");
+      checkOutput();
+    } else {
+      setTimeout(checker, hardTimeout);
+    }
+  }
+  setTimeout(checker, 0);
+}
+</pre>
+
+Now you practically know how to write doctest yourself!
+</p>
+
+<p>Specifically this is how you can run <code>wait()</code>:</p>
+
+<dl>
+  <dt><code>wait()</code></dt>
+  <dd>This makes the test pause just for a moment.  It's the same as <code>wait(0)</code>.</dd>
+
+  <dt><code>wait(milliseconds)</code></dt>
+  <dd>This forces the test to pause for the given number of milliseconds.  Everything is always in milliseconds.</dd>
+
+  <dt><code>wait(condition)</code></dt>
+  <dd>This calls <code>condition()</code> frequently until it returns true.</dd>
+
+  <dt><code>wait(condition, timeout)</code></dt>
+  <dd>This calls condition up until <code>timeout</code> milliseconds. You can use this to extend the timeout.  The default timeout is 5 seconds (5000).</dd>
+</dl>
+
+<h3 id="spy">Spy, mocking, and watching functions</h3>
+
+<p><code>Spy</code> is used to create a mock object/function that can be used to track calls and inspect call order and arguments.</p>
+
+<p>The basic use is like this:
+
+<pre class="test">
+func = Spy('func');
+func(1, 2, 3);
+
+obj = {a: 1, func: func};
+obj.func();
+
+/* =>
+func(1, 2, 3)
+{a: 1, func: Spy('func')}.func()
+*/
+</pre>
+
+</p>
+
+<p>That is, every time the Spy is called it will print out the call, all its arguments, and if there was a bound <code>this</code> (as in the <code>obj.func()</code> example) then that value will be displayed as well.</p>
+
+<p>Each spy is <em>named</em>, and if you call <code>Spy(name)</code> with a name that has been used before you will get the same Spy object back.</p>
+
+<p><code>Spy</code> can be invoked in a couple ways:</p>
+
+<dl>
+  <dt><code>Spy(name)</code></dt>
+  <dd>Just creates/gets the Spy with the given name.</dd>
+
+  <dt><code>Spy(name, {options})</code></dt>
+  <dd>Create the Spy with some options (as described below)</dd>
+
+  <dt><code>Spy(name, function () {...})</code></dt>
+  <dd>Creates a Spy that wraps another function that you provide.  The Spy will be called first, and will print out the call, and then it will call the sub-function with the same arguments and <code>this</code>.</dd>
+
+  <dt><code>Spy(name, function () {...}, {options})</code></dt>
+  <dd>Create a Spy that wraps a function and has extra options.</dd>
+
+</dl>
+
+<p>Note that your function can raise an exception, and the Spy will pass it through (though also note the exception using <code>console.log()</code>).  You can use this to inspect how a library reacts to exceptions in callbacks.</p>
+
+<h4 id="spy-options">Spy options</h4>
+
+<p>The options available:</p>
+
+<dl>
+  <dt><code>applies: function () {...}</code></dt>
+  <dd>This is the function that will be called when the Spy is called. It's the same as passing in the function as the second argument.</dd>
+
+  <dt><code>writes: false</code> (default <code>true</code>)</dt>
+  <dd>If this is false (default true) then it will <em>not</em> print out the call.</dd>
+
+  <dt><code>returns: value</code> (default <code>undefined</code>)</dt>
+  <dd>This is what the Spy returns when called (assuming you did not use <code>applies</code>).  By default it simply returns <code>undefined</code>, which is what a function returns when you have no explicit <code>return</code> statement.</dd>
+
+  <dt><code>throwError: exceptionObject</code></dt>
+  <dd>If given, when the Spy is called it'll do <code>throw exceptionObject</code></dd>
+
+  <dt><code>ignoreThis: true</code> (default <code>false</code>)</dt>
+  <dd>If true, then <code>this</code> won't be printed out regardless of whether it is bound.  This is useful when a library binds <code>this</code> carelessly.</dd>
+
+  <dt><code>wrapArgs: true</code> (default <code>false</code>)</dt>
+  <dd>If true then wrapping will be forced when the arguments are printed out.  Otherwise wrapping is only applied if an argument is longer than 80 columns (the default for printing generally).</dd>
+
+  <dt><code>wait: true</code> (default <code>false</code>)</dt>
+  <dd>This is equivalent to calling <code>Spy(name).wait()</code>. You can also pass in a number, which will be the millisecond timeout, e.g., <code>Spy(name, {wait: 10000})</code> to wait for 10 seconds for the Spy to be called.</dd>
+
+  <dt><code>methods: {...}</code></dt>
+  <dd>Equivalent to calling <code>Spy.methods({...})</code>.  See below for details.</dd>
+
+</dl>
+
+<p>You can also change <code>Spy.defaultOptions</code> if you want to override one option by default, for instance to turn off printing or ignore <code>this</code>.</p>
+
+<h4 id="spy-methods">Spy methods</h4>
+
+<p>Several methods are available:</p>
+
+<dl>
+  <dt><code>Spy().wait([timeout])</code></dt>
+  <dd>This makes the test pause until the Spy has been called. Sometimes you <em>must</em> use the method instead of <code>Spy(name, {wait: true})</code>.  An example:
+
+    <pre>
+SomeAPI.onload = Spy('SomeAPI.onload', function (data) {
+  SomeOtherAPI.save(data, Spy('SomeOtherAPI.save'));
+};
+Spy('SomeOtherAPI.save').wait();
+/* =>
+SomeAPI.onlaod({...})
+SomeOtherAPI.save()
+*/
+</pre>
+
+    In this case the Spy is created <em>inside</em> another method, and that method is not called right away.  <code>wait: true</code> doesn't work in this case.  Instead you should call <code>Spy(name).wait()</code> later.  Since names are unique, this will be the same Spy object as referenced earlier.
+</dd>
+
+  <dt><code>Spy.on("obj.attr", [applies/options])</code></dt>
+  <dd>This replaces the attribute <code>attr</code> on the object <code>obj</code> with a Spy.  The object must be defined at the top level (i.e., <code>eval("obj")</code> must return the object).  This is basically the same as:
+
+<pre>
+obj = eval("obj");
+spy = Spy("obj.attr", [applies/options]);
+obj.attr = spy;
+</pre>
+
+</dd>
+
+  <dt><code>Spy.on(obj, "obj.attr", [applies/options])</code></dt>
+  <dd>This is the same as the previous form, except for use when <code>obj</code> is not a global variable.</dd>
+
+  <dt><code>aSpy.formatCall()</code></dt>
+  <dd>When the Spy is called, generally this does:
+
+    <pre>
+print(aSpy.formatCall());
+</pre>
+
+    If you use <code>writes: false</code> then this might be helpful.
+  </dd>
+
+  <dt><code>aSpy.method("methodName", [applies/options])</code></dt>
+  <dd>This creates an attribute <code>aSpy.methodName</code> and assigns a Spy to that attribute.  You may give the normal constructor arguments.</dd>
+
+  <dt><code>aSpy.methods({methodName: [true or options], ...})</code></dt>
+  <dd>This creates multiple attributes at once.  You may use <code>{methodName: true}</code> if you have no options to pass in.</dd>
+
+</dl>
+
+<h4 id="spy-attributes">Spy attributes</h4>
+
+<p>Spies have several attributes to inspect how they have been called:</p>
+
+<dl>
+  <dt><code>aSpy.self</code> and <code>aSpy.selfList</code></dt>
+  <dd>This is the value of <code>this</code> as the spy was called. As the spy is called multiple times each <code>this</code> value is appended to <code>selfList</code>, forming a history.</dd>
+
+  <dt><code>aSpy.args</code> and <code>aSpy.argList</code></dt>
+  <dd>This is the list of arguments that the function was called with. <code>.argList</code> gives the history of past calls.</dd>
+
+</dl>
+
+
+<h3 id="abort">Aborting your tests</h3>
+
+<p>Tests often has prerequesites.  Perhaps some browsers aren't supported.  Maybe you need a server setup.  Normally doctest will run through all the tests regardless of failures, but when basic prerequesites are missing this creates lots of chatter and failures with no purpose.</p>
+
+<p>To stop the tests from running call <code>Abort()</code>.  This will still run the rest of the test block (up until the next <code>// =></code>).</p>
+
+<h3 id="jshint">jshint</h3>
+
+<p>A helper is provided to help you run <a href="http://www.jshint.com/">JSHint</a> regularly on your code. Just do this:</p>
+
+<pre>
+jshint("source-filename.js", [jshint options]);
+</pre>
+
+<p>You can give a full URL, but you can also just give the filename. When given a filename then all the <code>&lt;script></code> tags are searched for that filename.  The source is fetched and JSHint is run on that source.</p>
+
+<p>You may <a href="http://www.jshint.com/docs/">give options to suppress or enforce checks</a>.  In addition you may list the known issues that you wish to ignore: issues are printed out in order, and are matched like any other text.  You might want to use this to simply see the errors without checking them for anything in paticular:
+
+<pre>
+jshint("source-filename");
+// => ...
+</pre>
+
+</p>
+
+<h3 id="nosyxmlhttprequest"><code>NosyXMLHttpRequest</code></h3>
+
+<p>Sometimes you may want to watch the progress of XMLHttpRequest requests &mdash; both how the request is constructed and its result. You can use <code>NosyXMLHttpRequest</code> to wrap request objects.</p>
+
+<p>You probably want to use it like:
+
+<pre>
+XMLHttpRequest = NosyXMLHttpRequest.factory("request");
+</pre>
+</p>
+
+<p>The name will be used when showing output (e.g., <code>request.setRequestHeader('X-Something', 'value')</code>).</p>
+
+
+<h3 id="node">Node.js</h3>
+
+<p>Doctest.js has some Node support.  You must use the <a href="#format-test">comment-based test format</a> in stand-alone Javascript files.  Then:</p>
+
+<pre>
+$ npm install -g doctestjs
+$ doctest test.js
+</pre>
+
+<p>This will print a success or failure message, and will exit with a code (the number of failures) if the test does not pass.</p>
+
+<p>If you do not wish to install the package globally, do:</p>
+
+<pre>
+$ npm install doctestjs
+$ node_modules/.bin/doctest test.js
+</pre>
+
+
+
+<div style="display: none">
+  <!-- This is where the summary goes, which we basically want to hide
+       on this page: -->
+  <div id="doctest-output"></div>
+</div>
+
+
+
+
+
+
+
+<!-- /BODY -->
+
+      </div> <!-- #main -->
+
+    </div> <!-- #main-container -->
+
+    <div class="footer-container">
+      <footer class="wrapper">
+        <h3 class="no-toc">doctest.js is by <a href="http://ianbicking.org">Ian Bicking</a>.
+          It's on <a href="https://github.com/ianb/doctestjs">github</a>!</h3>
+      </footer>
+    </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src=".resources/boilerplate/js/vendor/jquery-1.8.1.min.js"><\/script>')
+</script>
+
+<script src=".resources/boilerplate/js/main.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-34921728-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </body>
+</html>
