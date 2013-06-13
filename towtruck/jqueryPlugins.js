@@ -31,6 +31,7 @@ define(["jquery"], function ($) {
   $.fn.popinWindow = function () {
     
     //start scale small
+    //set css width small
     
     //starting position
     this.css({
@@ -40,6 +41,7 @@ define(["jquery"], function ($) {
     });
     
     //scale larger
+    //set css height large
     //this.show( "scale", {percent: 200, direction: 'horizontal' }, 2000 );
     
     //animate window out
@@ -81,14 +83,14 @@ define(["jquery"], function ($) {
     // needs to rotate on the x axis http://ricostacruz.com/jquery.transit/
     // also make the fadeout faster
 
-    this.css({ '-moz-transform': 'rotate(180deg)'});
-    this.queue();
     this.animate({
       opacity: 0
     }, {
       duration: time || 1000,
       easing: "linear"
     });
+    this.queue();
+    this.css({ '-moz-transform': 'rotate(180deg)'});
 
     
   };
