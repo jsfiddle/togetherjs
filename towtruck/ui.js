@@ -660,6 +660,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           backgroundImage: "url(" + this.peer.avatar + ")"
         });
       }
+      if (this.peer.idle == "inactive") {
+        avatarEl.addClass("towtruck-person-inactive");
+      } else {
+        avatarEl.removeClass("towtruck-person-inactive");
+      }
       avatarEl.attr("title", this.peer.name);
       if (this.peer.color) {
         avatarEl.css({

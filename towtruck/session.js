@@ -105,7 +105,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         msg.peer.updateFromHello(msg);
       }
       msg.sameUrl = msg.peer.url == currentUrl;
-      msg.peer.lastMessageDate = Date.now();
+      msg.peer.updateMessageDate(msg);
       session.hub.emit(msg.type, msg);
       TowTruck._onmessage(msg);
     };
@@ -201,7 +201,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
 
   function initIdentityId() {
     return util.Deferred(function (def) {
