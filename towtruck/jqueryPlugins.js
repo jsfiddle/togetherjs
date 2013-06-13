@@ -32,17 +32,6 @@ define(["jquery"], function ($) {
     
     //start scale small
     //set css width small
-    this.css({
-      height: "10px",
-      width: "10px",
-    })
-
-    this.animate({
-       left: 200,
-       height: ($(this).height()*2),
-       width: ($(this).width()*2)
-    }, 1000);
-
     
     //starting position
     this.css({
@@ -100,8 +89,6 @@ define(["jquery"], function ($) {
       duration: time || 1000,
       easing: "linear"
     });
-    this.queue();
-    this.css({ '-moz-transform': 'rotate(180deg)'});
     
   };
 
