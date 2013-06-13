@@ -35,11 +35,12 @@ define(["jquery"], function ($) {
     //starting position
     this.css({
       left: "+=74px",
-      opacity: 0,
+      opacity: 1,
       "zIndex": 8888
     });
     
     //scale larger
+    //this.show( "scale", {percent: 200, direction: 'horizontal' }, 2000 );
     
     //animate window out
     this.animate({
@@ -79,13 +80,17 @@ define(["jquery"], function ($) {
   $.fn.fadeOut = function (time) {
     // needs to rotate on the x axis http://ricostacruz.com/jquery.transit/
     // also make the fadeout faster
-    //this.slideUp("slow");
-    return this.animate({
+
+    this.css({ '-moz-transform': 'rotate(180deg)'});
+    this.queue();
+    this.animate({
       opacity: 0
     }, {
       duration: time || 1000,
       easing: "linear"
     });
+
+    
   };
 
   /* used when user goes down to participant cursor location on screen */
