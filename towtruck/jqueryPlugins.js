@@ -8,14 +8,14 @@ define(["jquery"], function ($) {
   // walkthrough animations go here
 
   // animate avatar popping into the dock when they enter the session / telescope in the avatar
-  $.fn.avatarEnter = function (y) {
-    return this.animate({
-      scrollTop: y
-    }, {
-      duration: 400,
-      easing: "swing"
-    });
-  };
+  // $.fn.avatarEnter = function (y) {
+  //   return this.animate({
+  //     scrollTop: y
+  //   }, {
+  //     duration: 400,
+  //     easing: "swing"
+  //   });
+  // };
   
   // animate participant cursor and box popping in when they enter the session
 
@@ -39,7 +39,7 @@ define(["jquery"], function ($) {
       opacity: 1,
       "zIndex": 8888
     });
-    
+    //this.show( { effect: "scale", origin: ['bottom' , 'right'] } );
     //scale larger
     //set css height large
     //this.show( "scale", {percent: 200, direction: 'horizontal' }, 2000 );
@@ -49,7 +49,7 @@ define(["jquery"], function ($) {
       opacity: 1, 
       left: "-=78px",
       }, {
-        duration:80, easing:"linear"
+        duration:60, easing:"linear"
       });
     this.queue();
     
@@ -57,14 +57,14 @@ define(["jquery"], function ($) {
     this.animate({
       left:'+=4px'
       }, {
-        duration:80, easing:"linear"
+        duration:60, easing:"linear"
     });
   };
 
   /* Slide in notification window: */
   $.fn.slideIn = function () {
     this.css({
-      top: "240px",
+      //top: "240px",
       left: "+=74px",
       opacity: 0,
       "zIndex": 8888
@@ -80,15 +80,25 @@ define(["jquery"], function ($) {
 
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function (time) {
-    // needs to rotate on the x axis http://ricostacruz.com/jquery.transit/
-    // also make the fadeout faster
 
-    this.animate({
-      opacity: 0
-    }, {
-      duration: time || 1000,
-      easing: "linear"
-    });
+    $(this).css('-moz-perspective:200');
+    this.animate({  borderSpacing: -90 }, {
+        step: function(now,fx) {
+          $(this).css('-webkit-transform','rotateX('+now+'deg)');
+          $(this).css('-moz-transform','rotateX('+now+'deg)'); 
+          $(this).css('-ms-transform','rotateX('+now+'deg)');
+          $(this).css('-o-transform','rotateX('+now+'deg)');
+          $(this).css('transform','rotateX('+now+'deg)');  
+        },
+        duration: "slow"
+    },'linear');
+    
+    // this.animate({
+    //   opacity: 0
+    // }, {
+    //   duration: time || 1000,
+    //   easing: "linear"
+    // });
     
   };
 
@@ -103,12 +113,17 @@ define(["jquery"], function ($) {
   };
 
   $.fn.animateDockEntry = function () {
+    
+    // scale from Center is not working.  it scales from the Top Left
+    this.hide();
+    this.show( { effect: "scale", origin: ['middle' , 'center'] } );
     // expand avatar into place
-    //this.transition({ opacity: 1, scale: 2 });
+
   };
   
   $.fn.animateDockExit = function () {
-    return this.animate({});
+    //alert("test");
+    //return this.animate({});
   };
   
   $.fn.animateCursorEntry = function () {
