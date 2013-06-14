@@ -74,16 +74,31 @@
     };
   
     function cursorPopIn() {
-      $("#participant-box")
-        .transition({ opacity: 1, scale: 2.2 })
-        .transition({ scale: 2 });
+      scaleUp($("#participant-box"), 10);
     }
   
     function cursorPopOut() {
       $("#participant-box")
         .transition({ opacity: 0, scale: 0 })
     }
-  	 
+  
+    function scaleUp(el, size) {
+      var height = el.height();
+      var width = el.width();
+      var buffer = size / 2;
+      el.animate({
+        opacity: 1,
+        width: (width + size) + "px",
+        height: (height + size) + "px",
+        marginLeft: -buffer + "px",
+        paddingLeft: buffer + "px"
+      }).animate({
+        width: width + "px",
+        height: height + "px",
+        marginLeft: 0,
+        paddingLeft: 0
+      });
+    }
   	 
     // Objects	  
     

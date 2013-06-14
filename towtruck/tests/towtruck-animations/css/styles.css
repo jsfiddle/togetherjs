@@ -94,5 +94,10 @@
     left:300px;
     top:200px;
     opacity:0;
-    font-size:6px;
+    font-size:12px;
   }
+  
+  html {
+      -webkit-transform-style: preserve-3d;
+      -webkit-font-smoothing: antialiased !important;
+    }

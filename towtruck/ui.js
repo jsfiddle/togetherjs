@@ -817,6 +817,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       this.dockElement.attr("id", this.peer.className("towtruck-dock-element-"));
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
+      this.dockElement.animateDockEntry();
       var iface = $("#towtruck-dock");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"
@@ -846,14 +847,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (! this.dockElement) {
         return;
       }
-      this.dockElement.remove();
-      this.dockElement = null;
-      this.detailElement.remove();
-      this.detailElement = null;
-      var iface = $("#towtruck-dock");
-      iface.css({
-        height: (iface.height() - BUTTON_HEIGHT) + "px"
-      });
+      this.dockElement.animateDockExit().then((function () {
+        this.dockElement.remove();
+        this.dockElement = null;
+        this.detailElement.remove();
+        this.detailElement = null;
+        var iface = $("#towtruck-dock");
+        iface.css({
+         height: (iface.height() - BUTTON_HEIGHT) + "px"
+        });
+      }).bind(this));
     },
 
     scrollTo: function () {

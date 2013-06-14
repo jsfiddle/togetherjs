@@ -102,4 +102,32 @@ define(["jquery"], function ($) {
     });
   };
 
+  $.fn.animateDockEntry = function () {
+    // expand avatar into place
+    //this.transition({ opacity: 1, scale: 2 });
+  };
+  
+  $.fn.animateDockExit = function () {
+    return this.animate({});
+  };
+  
+  $.fn.animateCursorEntry = function () {
+    // Make the cursor bubble pop in
+  };
+  
+  $.fn.animateKeyboard = function () {
+    var count = 0;
+    var interval = setInterval((function () {
+      count++;
+      this.text(count);
+    }).bind(this), 1000);
+    this.data("animateKeyboard", interval)
+  };
+  
+  $.fn.stopKeyboardAnimation = function () {
+    clearTimeout(this.data("animateKeyboard"));
+    this.data("animateKeyboard", null);
+  };
+
+
 });

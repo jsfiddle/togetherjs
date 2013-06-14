@@ -37,6 +37,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.updatePeer(peers.getPeer(clientId));
       this.lastTop = this.lastLeft = null;
       $(document.body).append(this.element);
+      this.element.animateCursorEntry();
       this.keydownTimeout = null;
       this.clearKeydown = this.clearKeydown.bind(this);
       this.atOtherUrl = false;
@@ -135,14 +136,14 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (this.keydownTimeout) {
         clearTimeout(this.keydownTimeout);
       } else {
-        this.element.find(".towtruck-cursor-typing").show();
+        this.element.find(".towtruck-cursor-typing").show().animateKeyboard();
       }
       this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
     },
 
     clearKeydown: function () {
       this.keydownTimeout = null;
-      this.element.find(".towtruck-cursor-typing").hide();
+      this.element.find(".towtruck-cursor-typing").hide().stopKeyboardAnimation();
     },
 
     _destroy: function () {

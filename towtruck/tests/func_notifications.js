@@ -156,7 +156,15 @@ $('<button>Faker decline</button>').appendTo(el).click(function () {
 $('<button>Nudge Me</button>').appendTo(el).click(function () {
   Test.incoming({
     type: "url-change-nudge",
+    clientId: "faker",
     url: peers.getPeer("faker").url,
     to: peers.Self.id
   });
 });
+
+$('<button>Keyboard</button>').appendTo(el).click(function () {
+  Test.incoming({
+    type: "keydown",
+    clientId: "faker"
+  })
+})
