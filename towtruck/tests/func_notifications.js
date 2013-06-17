@@ -117,54 +117,54 @@ send: url-change-nudge
 
 // =SECTION Helpers
 
-var el = $('<p>Some perhaps helpful test buttons to trigger events (not all combos are valid):<br></p>').prependTo(document.body);
+Test.addControl('<div>Some perhaps helpful test buttons to trigger events (not all combos are valid):</div>');
 
-$("<button>Faker Rejoin</button>").appendTo(el).click(function () {
+Test.addControl($("<button>Faker Rejoin</button>").click(function () {
   Test.newPeer();
-});
+}));
 
-$("<button>Join Random New Faker</button>").appendTo(el).click(function () {
+Test.addControl($("<button>Join Random New Faker</button>").click(function () {
   var id = Math.floor(Math.random() * 1000);
   Test.newPeer({
     name: "Faker " + id,
     clientId: "random-" + id
   });
-});
+}));
 
-$('<input placeholder="Change Faker URL">').appendTo(el).keypress(function (ev) {
+Test.addControl($('<input placeholder="Change Faker URL">').keypress(function (ev) {
   if (ev.which == 13) {
     Test.newPeer({url: ev.target.value});
     ev.target.value = "";
   }
-});
+}));
 
-$('<button>Faker Leave</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker Leave</button>').click(function () {
   Test.incoming({
     type: "bye",
     clientId: "faker"
   });
-});
+}));
 
-$('<button>Faker decline</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker decline</button>').click(function () {
   Test.incoming({
     type: "bye",
     clientId: "faker",
     reason: "declined-join"
   });
-});
+}));
 
-$('<button>Nudge Me</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Nudge Me</button>').click(function () {
   Test.incoming({
     type: "url-change-nudge",
     clientId: "faker",
     url: peers.getPeer("faker").url,
     to: peers.Self.id
   });
-});
+}));
 
-$('<button>Keyboard</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Keyboard</button>').click(function () {
   Test.incoming({
     type: "keydown",
     clientId: "faker"
-  })
-})
+  });
+}));

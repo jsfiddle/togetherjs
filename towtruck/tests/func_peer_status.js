@@ -32,29 +32,29 @@ print(peer.status, peer.idle);
 // 3 second idle time:
 TowTruckTestSpy.setIdleTime(3000);
 
-var el = $('<p>Trigger activity states:<br></p>').prependTo(document.body);
+Test.addControl('<div>Trigger activity states:</div>');
 
-$('<input type="text" placeholder="Idle time (milliseconds)">').appendTo(el).keyup(function (event) {
+Test.addControl($('<input type="text" placeholder="Idle time (milliseconds)">').keyup(function (event) {
   var el = $(event.target);
   if (event.which == 13) {
     var value = parseInt(el.val(), 10);
     TowTruckTestSpy.setIdleTime(value);
     el.val("");
   }
-});
+}));
 
-$('<button>Faker inactive</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker inactive</button>').click(function () {
   Test.incoming({
     type: "idle-status",
     idle: "inactive",
     clientId: "faker"
   });
-});
+}));
 
-$('<button>Faker active</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker active</button>').click(function () {
   Test.incoming({
     type: "idle-status",
     idle: "active",
     clientId: "faker"
   });
-});
+}));
