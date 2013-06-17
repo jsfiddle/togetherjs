@@ -81,7 +81,7 @@ define(["jquery"], function ($) {
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function (time) {
 
-    $(this).css('-moz-perspective:200');
+    $(this).css('perspective', '500');
     this.animate({  borderSpacing: -90 }, {
         step: function(now,fx) {
           $(this).css('-webkit-transform','rotateX('+now+'deg)');
