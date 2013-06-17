@@ -555,7 +555,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     },
 
     urlChange: function (attrs) {
-      console.log("urlChange", attrs);
       assert(attrs.peer);
       assert(typeof attrs.url == "string");
       assert(typeof attrs.sameUrl == "boolean");
@@ -577,7 +576,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         title: title,
         sameUrl: attrs.sameUrl
       });
-      ui.chat.add(el, attrs.peer.className("url-change-"), false);
+      el.find(".towtruck-nudge").click(function () {
+        attrs.peer.nudge();
+        return false;
+      });
+      el.find(".towtruck-follow").click(function () {
+        var url = attrs.peers.url;
+        if (attrs.peer.urlHash) {
+          url += attrs.peer.urlHash;
+        }
+        location.href = url;
+      });
+      var notify = ! attrs.sameUrl;
+      ui.chat.add(el, attrs.peer.className("url-change-"), notify);
     },
 
     add: function (el, id, notify) {
@@ -589,10 +600,18 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       var popup = ui.container.find("#towtruck-chat-notifier");
       container.append(el);
       ui.chat.scroll();
-      if (notify && ! container.is(":visible")) {
-        var section = popup.find("#towtruck-chat-notifier-message");
+      var doNotify = !! notify;
+      var section = popup.find("#towtruck-chat-notifier-message");
+      if (id && section.data("message-id") == id) {
+        doNotify = true;
+      }
+      if (container.is(":visible")) {
+        doNotify = false;
+      }
+      if (doNotify) {
         section.empty();
-        section.append(el.clone());
+        section.append(el.clone(true, true));
+        section.data("message-id", id || "");
         windowing.show(popup);
         if (typeof notify == "number") {
           // This is the amount of time we're supposed to notify
@@ -622,7 +641,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     constructor: function (peer) {
       assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
       this.peer = peer;
-      this.urlNotification = null;
       this.dockClick = this.dockClick.bind(this);
     },
 
@@ -724,25 +742,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           this.undock();
         }
       }
-      if (! this.peer.isSelf) {
-        var curUrl = location.href.replace(/\#.*$/, "");
-        if (this.peer.url != curUrl) {
-          if (this.urlNotification) {
-            this.updateUrl();
-          } else {
-            this.createUrl();
-          }
-        } else if (this.urlNotification) {
-          this.removeUrl();
-        }
-      }
       this.updateDisplay();
       this.updateUrlDisplay();
     },
 
-    updateUrlDisplay: function () {
+    updateUrlDisplay: function (force) {
       var url = this.peer.url;
-      if ((! url) || url == this._lastUpdateUrlDisplay) {
+      if ((! url) || (url == this._lastUpdateUrlDisplay && ! force)) {
         return;
       }
       this._lastUpdateUrlDisplay = url;
@@ -755,54 +761,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
     },
 
-    createUrl: function () {
-      this.urlNotification = templating.sub("url-change-popup", {
-        peer: this.peer
-      });
-      this.urlNotification.find(".towtruck-follow").click((function () {
-        var url = this.urlNotification.find("a.towtruck-url").attr("href");
-        location.href = url;
-      }).bind(this));
-      // FIXME: should be handled in windowing:
-      this.urlNotification.find(".towtruck-ignore .towtruck-close").click((function () {
-        this.urlNotification.remove();
-        return false;
-      }).bind(this));
-      this.urlNotification.find(".towtruck-nudge").click((function () {
-        this.peer.nudge();
-      }).bind(this));
-      ui.container.append(this.urlNotification);
-      windowing.show(this.urlNotification, {
-        bind: this.dockElement
-      });
-      this.updateUrl();
-    },
-
-    updateUrl: function () {
-      assert(this.urlNotification);
-      var fullTitle = this.peer.title;
-      if (this.peer.title) {
-        fullTitle += " (";
-      }
-      fullTitle += util.truncateCommonDomain(this.peer.url, location.href);
-      if (this.peer.title) {
-        fullTitle += ")";
-      }
-      this.urlNotification.find("a.towtruck-url").attr("href", this.peer.url).text(fullTitle);
-      // FIXME: we've lost the notion of hiding the notification
-    },
-
-    removeUrl: function () {
-      this.urlNotification.remove();
-      this.urlNotification = null;
-    },
-
     urlNudge: function () {
-      // Called when this peer has nudged us to follow them
-      if (this.urlNotification) {
-        this.urlNotification.show();
-        this.urlNotification.find(".towtruck-follow").addClass("towtruck-nudge");
-      }
+      // FIXME: do something more distinct here
+      this.updateUrlDisplay(true);
     },
 
     notifyJoined: function () {
@@ -898,9 +859,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     },
 
     destroy: function () {
-      if (this.urlNotification) {
-        this.removeUrl();
-      }
+      // FIXME: should I get rid of the dockElement?
     }
   });
 
