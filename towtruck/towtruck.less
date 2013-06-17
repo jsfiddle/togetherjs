@@ -44,13 +44,9 @@
 .towtruck {
 
   /* General styles */
-
-  * {
-    font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
-    font-size: 14px;
-    line-height: 20px;
-  }
-
+  font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  line-height: 20px;
   color: rgb(51, 51, 51);
   font-weight: normal;
 
@@ -451,7 +447,7 @@
     padding-top:7px;
   }
 
- .towtruck .towtruck-timestamp {
+ .towtruck-timestamp {
     float: right;
     color:rgba(51,51,51,0.5);
     font-size: 9px !important;
@@ -729,7 +725,8 @@
 
 
 .towtruck-chat-url-change {
-  background:#fff;
+  background: #f2f2f2;
+  margin-top:0px !important;
 }
 
 .towtruck-chat-join-item {
@@ -758,11 +755,21 @@
   margin-top:0px;
 }
 
+.towtruck-chat-url-change .towtruck-person{
+  float: left;
+  margin-bottom:0px !important;
+  margin-top:0px;
+}
+
 .towtruck-chat-join-item span.towtruck-person-name{
   font-family:openSansRegular, Helvetica;
 }
 
 .towtruck-chat-left-item span.towtruck-person-name{
+  font-family:openSansRegular, Helvetica;
+}
+
+.towtruck-chat-url-change span.towtruck-person-name{
   font-family:openSansRegular, Helvetica;
 }
 
