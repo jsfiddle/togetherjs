@@ -90,13 +90,6 @@ define(["jquery"], function ($) {
         $(this).css('-o-transform', 'rotateX('+now+'deg)');
         $(this).css('transform', 'rotateX('+now+'deg)');
       },
-      always: function () {
-        $(this).css('-webkit-transform', '');
-        $(this).css('-moz-transform', '');
-        $(this).css('-ms-transform', '');
-        $(this).css('-o-transform', '');
-        $(this).css('transform', '');
-      },
       duration: "slow"
     }, 'linear');
 
