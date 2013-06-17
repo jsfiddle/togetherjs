@@ -683,21 +683,26 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     text-align:left;
   }
 
-  .towtruck-dock-person-tooltip .towtruck-person-name {
-    font-size:12px;
-  }
-
   .towtruck-tooltip {
     background-color: rgba(42,42,42,.9);
     color: #fff;
     border-radius: 4px;
+    line-height:20px !important;
+  }
+  
+  .towtruck-dock-person-tooltip .towtruck-person-name {
+    font-size:12px;
   }
 
   .towtruck-person-tooltip-arrow-r {
-    color: rgba(42,42,42,.9);
-    position: absolute;
-    left: 45px;
-    font-size:8px;
+    position:absolute;
+    left:42px;
+  	width: 0; 
+  	height: 0; 
+  	border-top: 4px solid transparent;
+  	border-bottom: 4px solid transparent;
+  	border-left: 4px solid rgba(0,0,0,0.9);
+  	line-height:20px;
   }
 
 }
@@ -1044,7 +1049,9 @@ section.towtruck-buttons {
 .towtruck-cursor img {
   width: 20px;
   -webkit-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
-          filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
+  /*FIX ME, moz filter not working...*/
+  -moz-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
+          filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );          
 }
 
 .towtruck-cursor {
@@ -1213,23 +1220,38 @@ section.towtruck-buttons {
     border-radius: 4px 4px 4px 4px;
     border: 2px solid rgb(204, 204, 204);
     background: none repeat scroll 0% 0% rgb(0, 0, 0);
+    &:hover {
+      cursor:pointer;
+      border: 2px solid rgb(204, 204, 204, 0.2);
+    }
   }
 
   section.towtruck-walkthrough-slide input.towtruck-self-name {
     position: absolute;
     top: 50%;
     left: 29%;
+    font-size: 14px;
+    padding: 6px 6px 6px;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid rgb(204, 204, 204);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+    font-family: openSansRegular;
+    margin: 7px 0px;
   }
 
   section.towtruck-walkthrough-slide .towtruck-swatch {
-    width: 29px;
-    height: 29px;
+    width: 32px;
+    height: 32px;
     background: none repeat scroll 0% 0% rgb(0, 0, 0);
     position: absolute;
-    top: 50%;
-    right: 25%;
+    top: 51.2%;
+    right: 29%;
     border-radius: 4px 4px 4px 4px;
     border: 1px solid rgb(204, 204, 204);
+    &:hover {
+      cursor:pointer;
+      border: 1px solid rgba(204, 204, 204,0.2);
+    }
   }
 
   section.towtruck-walkthrough-slide span.towtruck-walkthrough-sendlink {
