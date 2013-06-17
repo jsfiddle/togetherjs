@@ -119,18 +119,18 @@ print($("#towtruck-chat")[0]);
 
 windowing.hide();
 $("#towtruck-profile-button").click();
-print($("#towtruck-menu").is(":visible"), $("#towtruck-self-name").is(":visible"));
+print($("#towtruck-menu").is(":visible"), $("#towtruck-menu .towtruck-self-name").is(":visible"));
 // => true false
 $("#towtruck-menu-update-name").click();
-print($("#towtruck-self-name").is(":visible"));
+print($("#towtruck-menu .towtruck-self-name").is(":visible"));
 // => true
-$("#towtruck-self-name").val("Joe");
+$("#towtruck-menu .towtruck-self-name").val("Joe");
 // First we do a keyup to trigger the change event:
-$("#towtruck-self-name").trigger("keyup");
+$("#towtruck-menu .towtruck-self-name").trigger("keyup");
 // Then we submit:
-$("#towtruck-self-name").trigger($.Event("keyup", {which: 13}));
+$("#towtruck-menu .towtruck-self-name").trigger($.Event("keyup", {which: 13}));
 print(peers.Self.name);
-print($("#towtruck-menu").is(":visible"), $("#towtruck-self-name").is(":visible"));
+print($("#towtruck-menu").is(":visible"), $("#towtruck-menu .towtruck-self-name").is(":visible"));
 print($("#towtruck-self-name-display").text());
 /* =>
 send: peer-update

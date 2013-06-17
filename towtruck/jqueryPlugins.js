@@ -16,7 +16,7 @@ define(["jquery"], function ($) {
   //     easing: "swing"
   //   });
   // };
-  
+
   // animate participant cursor and box popping in when they enter the session
 
   // animate avatar exiting the dock when the exit the session/ telescope out the avatar
@@ -29,10 +29,10 @@ define(["jquery"], function ($) {
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
-    
+
     //start scale small
     //set css width small
-    
+
     //starting position
     this.css({
       left: "+=74px",
@@ -43,16 +43,16 @@ define(["jquery"], function ($) {
     //scale larger
     //set css height large
     //this.show( "scale", {percent: 200, direction: 'horizontal' }, 2000 );
-    
+
     //animate window out
     this.animate({
-      opacity: 1, 
+      opacity: 1,
       left: "-=78px",
       }, {
         duration:60, easing:"linear"
       });
     this.queue();
-    
+
     //bounce window back
     this.animate({
       left:'+=4px'
@@ -85,21 +85,21 @@ define(["jquery"], function ($) {
     this.animate({  borderSpacing: -90 }, {
         step: function(now,fx) {
           $(this).css('-webkit-transform','rotateX('+now+'deg)');
-          $(this).css('-moz-transform','rotateX('+now+'deg)'); 
+          $(this).css('-moz-transform','rotateX('+now+'deg)');
           $(this).css('-ms-transform','rotateX('+now+'deg)');
           $(this).css('-o-transform','rotateX('+now+'deg)');
-          $(this).css('transform','rotateX('+now+'deg)');  
+          $(this).css('transform','rotateX('+now+'deg)');
         },
         duration: "slow"
     },'linear');
-    
+
     // this.animate({
     //   opacity: 0
     // }, {
     //   duration: time || 1000,
     //   easing: "linear"
     // });
-    
+
   };
 
   /* used when user goes down to participant cursor location on screen */
@@ -113,32 +113,31 @@ define(["jquery"], function ($) {
   };
 
   $.fn.animateDockEntry = function () {
-    
+
     // scale from Center is not working.  it scales from the Top Left
     this.hide();
     this.show( { effect: "scale", origin: ['middle' , 'center'] } );
     // expand avatar into place
 
   };
-  
+
   $.fn.animateDockExit = function () {
-    //alert("test");
-    //return this.animate({});
+    return this.animate({});
   };
-  
+
   $.fn.animateCursorEntry = function () {
     // Make the cursor bubble pop in
   };
-  
+
   $.fn.animateKeyboard = function () {
     var count = 0;
     var interval = setInterval((function () {
       count++;
       this.text(count);
     }).bind(this), 1000);
-    this.data("animateKeyboard", interval)
+    this.data("animateKeyboard", interval);
   };
-  
+
   $.fn.stopKeyboardAnimation = function () {
     clearTimeout(this.data("animateKeyboard"));
     this.data("animateKeyboard", null);
