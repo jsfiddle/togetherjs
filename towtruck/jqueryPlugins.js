@@ -47,17 +47,17 @@ define(["jquery"], function ($) {
     //animate window out
     this.animate({
       opacity: 1,
-      left: "-=78px",
-      }, {
-        duration:60, easing:"linear"
-      });
+      left: "-=78px"
+    }, {
+      duration:60, easing:"linear"
+    });
     this.queue();
 
     //bounce window back
     this.animate({
       left:'+=4px'
-      }, {
-        duration:60, easing:"linear"
+    }, {
+      duration:60, easing:"linear"
     });
   };
 
@@ -71,9 +71,9 @@ define(["jquery"], function ($) {
     });
     return this.animate({
       "left": "-=74px",
-       opacity: 1,
-       "zIndex": 9999
-      }, "fast");
+      opacity: 1,
+      "zIndex": 9999
+    }, "fast");
   };
 
   /* Move notification when another notification slides in */
@@ -82,16 +82,23 @@ define(["jquery"], function ($) {
   $.fn.fadeOut = function (time) {
 
     $(this).css('-moz-perspective:200');
-    this.animate({  borderSpacing: -90 }, {
-        step: function(now,fx) {
-          $(this).css('-webkit-transform','rotateX('+now+'deg)');
-          $(this).css('-moz-transform','rotateX('+now+'deg)');
-          $(this).css('-ms-transform','rotateX('+now+'deg)');
-          $(this).css('-o-transform','rotateX('+now+'deg)');
-          $(this).css('transform','rotateX('+now+'deg)');
-        },
-        duration: "slow"
-    },'linear');
+    this.animate({borderSpacing: -90}, {
+      step: function(now, fx) {
+        $(this).css('-webkit-transform', 'rotateX('+now+'deg)');
+        $(this).css('-moz-transform', 'rotateX('+now+'deg)');
+        $(this).css('-ms-transform', 'rotateX('+now+'deg)');
+        $(this).css('-o-transform', 'rotateX('+now+'deg)');
+        $(this).css('transform', 'rotateX('+now+'deg)');
+      },
+      always: function () {
+        $(this).css('-webkit-transform', '');
+        $(this).css('-moz-transform', '');
+        $(this).css('-ms-transform', '');
+        $(this).css('-o-transform', '');
+        $(this).css('transform', '');
+      },
+      duration: "slow"
+    }, 'linear');
 
     // this.animate({
     //   opacity: 0
