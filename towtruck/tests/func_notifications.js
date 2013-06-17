@@ -99,13 +99,13 @@ Test.newPeer({url: "http://example.com/foo"});
 
 // => ...
 
-visible(".towtruck-url-change-notification");
+visible(".towtruck-follow");
 
 /* =>
-.towtruck-url-change-notification : visible
+.towtruck-follow : visible
 */
 
-$(".towtruck-url-change-notification .towtruck-nudge").click();
+$(".towtruck-nudge").click();
 
 /* =>
 send: url-change-nudge

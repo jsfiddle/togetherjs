@@ -53,6 +53,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (joined) {
         this.view.notifyJoined();
       }
+      this.view.update();
     },
 
     repr: function () {
@@ -143,7 +144,6 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (identityUpdated) {
         peers.emit("identity-updated", this);
       }
-      this.view.update();
     },
 
     update: function (attrs) {
@@ -388,6 +388,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         (message.type == "hello" || message.type == "hello-back" ||
          message.type == "peer-update")) {
       peer.updateFromHello(message);
+      peer.view.update();
     }
     return Peer.peers[id];
   };

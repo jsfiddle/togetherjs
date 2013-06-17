@@ -558,6 +558,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       assert(attrs.peer);
       assert(typeof attrs.url == "string");
       assert(typeof attrs.sameUrl == "boolean");
+      var messageId = attrs.peer.className("url-change-");
+      // FIXME: duplicating functionality in .add():
+      var realId = "towtruck-chat-" + messageId;
       var date = attrs.date || Date.now();
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
@@ -588,7 +591,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         location.href = url;
       });
       var notify = ! attrs.sameUrl;
-      ui.chat.add(el, attrs.peer.className("url-change-"), notify);
+      if (attrs.sameUrl && ! $("#" + realId).length) {
+        // Don't bother showing a same-url notification, if no previous notification
+        // had been shown
+        return;
+      }
+      ui.chat.add(el, messageId, notify);
     },
 
     add: function (el, id, notify) {
