@@ -708,6 +708,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           }
         }).bind(this));
         $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
+        if (! this.peer.name) {
+          $("#towtruck-menu .towtruck-person-name-self").text(this.peer.defaultName);
+        }
       }
       updateChatParticipantList();
       this.updateFollow();
