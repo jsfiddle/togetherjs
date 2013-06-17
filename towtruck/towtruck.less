@@ -88,9 +88,12 @@
   display: inline-block;
   border-radius: 4px;
   text-align: center;
-  padding: 3px 10px 3px;
+  // FIXME: for some reason this effects the total space of a <a
+  // class="towtruck-primary/etc"> but not a <button
+  // class="towtruck-primary/etc"> :
+  //padding: 3px 10px 3px;
   height: 40px;
-  line-height: 19px;
+  line-height: 40px;
   text-decoration: none;
   min-width: 100px;
   border: none;
@@ -124,6 +127,14 @@
 
   &:hover {
     background:#00ACFF;
+  }
+}
+
+a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
+  &, &:link, &:active, &:visited, &:hover {
+    color: #fff;
+    text-decoration: none;
+    vertical-align: middle;
   }
 }
 
