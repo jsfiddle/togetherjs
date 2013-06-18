@@ -172,10 +172,19 @@
           <div class="towtruck-ifnot-sameUrl">
             <span class="towtruck-person-name"></span>
             has gone to: <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
-            <div>
-              <button class="towtruck-nudge towtruck-secondary">Nudge them</button>
+            <section class="towtruck-buttons towtruck-buttons-notification-diff-url">
+              <!-- Displayed when the peer is at a different URL: -->
+              <div class="towtruck-different-url towtruck-notification-diff-url">
+                <button class="towtruck-nudge towtruck-default">Nudge them</button>
+                <button class="towtruck-follow towtruck-person-url towtruck-primary">Join them</button>
+              </div>
+            </section>
+            
+            <!-- <div>
+              <a class="towtruck-nudge towtruck-secondary">Nudge them</a>
               <a href="" class="towtruck-person-url towtruck-follow towtruck-primary">Join them</a>
-            </div>
+            </div> -->
+            
           </div>
         </div>
         <div class="towtruck-clear"></div>

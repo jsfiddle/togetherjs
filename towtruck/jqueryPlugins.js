@@ -79,18 +79,7 @@ define(["jquery"], function ($) {
   /* Move notification when another notification slides in */
 
   /* Used to fade away notification windows + flip the bottom of them out: */
-  $.fn.fadeOut = function () {
-    // Perspective
-    //this.css('transform','perspective( 100px ) rotateX( 45deg )');
-    
-    // this.animate({
-    //   transform
-    // })
-    
-    // -moz-transform: perspective( 100px ) rotateX( 45deg );
-    // -webkit-transform: perspective( 100px ) rotateX( 45deg );
-    //         transform: perspective( 100px ) rotateX( 45deg );
-    
+  $.fn.fadeOut = function () {    
     this.animate({borderSpacing: -90, opacity: 0.5}, {
       step: function(now, fx) {
         if (fx.prop == "borderSpacing") {
