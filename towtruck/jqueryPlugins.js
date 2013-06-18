@@ -130,6 +130,23 @@ define(["jquery"], function ($) {
   };
 
   $.fn.animateKeyboard = function () {
+    
+    $( ".towtruck-typing-ellipse-one" ).animate({
+      opacity: 0,
+    }, 1500 );
+    
+    $( ".towtruck-typing-ellipse-two" ).animate({
+      opacity: 0,
+    }, 1500 );
+    
+    $( ".towtruck-typing-ellipse-three" ).animate({
+      opacity: 0,
+    }, 1500 );
+    
+    // $('#navigation > a, #navigation dt').each(function(idx) {
+    //     $(this).delay( idx * 600 ).fadeIn( 600 );
+    // });
+    
     var count = 0;
     var interval = setInterval((function () {
       count++;
