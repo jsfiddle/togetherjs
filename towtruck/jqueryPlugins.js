@@ -25,8 +25,6 @@ define(["jquery"], function ($) {
   // animate the participant cursor -> rotate down when they're down the page
   // animate the participant cursor -> rotate up when they're on the same frame as the user
 
-  // animate participant typing
-
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
 
@@ -92,7 +90,7 @@ define(["jquery"], function ($) {
           $(this).css(fx.prop, now);
         }
       },
-      duration: "slow"
+      duration: 500
     }, 'linear').promise().then(function () {
       this.css('-webkit-transform', '');
       this.css('-moz-transform', '');
@@ -114,10 +112,8 @@ define(["jquery"], function ($) {
     });
   };
 
+  // avatar animate in
   $.fn.animateDockEntry = function () {
-
-    // scale from Center is not working.  it scales from the Top Left
-    // this.hide();
     var height = this.height();
     var width = this.width();
     var backgroundSize = height + 4;
@@ -146,11 +142,9 @@ define(["jquery"], function ($) {
       });
     });
     return this;
-    //this.show( { effect: "scale", origin: ['middle' , 'center'], duration: 5000 } );
-    // expand avatar into place
-
   };
 
+  // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
     return this.animate({});
   };
@@ -159,6 +153,7 @@ define(["jquery"], function ($) {
     // Make the cursor bubble pop in
   };
 
+  // keyboard typing animation
   $.fn.animateKeyboard = function () {
     var one = this.find(".towtruck-typing-ellipse-one");
     var two = this.find(".towtruck-typing-ellipse-two");
