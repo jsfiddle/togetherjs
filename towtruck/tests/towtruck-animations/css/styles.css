@@ -97,6 +97,15 @@
     font-size:12px;
   }
   
+  #notification-transform {
+    width:300px;
+    height:200px;
+    background-color: red;
+/*    -moz-transform: perspective( 100px ) rotateX( 45deg );
+    -webkit-transform: perspective( 100px ) rotateX( 45deg );*/
+            transform: perspective( 100px ) rotateX( 45deg );
+  }
+  
   html {
       -webkit-transform-style: preserve-3d;
       -webkit-font-smoothing: antialiased !important;

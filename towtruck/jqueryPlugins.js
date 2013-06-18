@@ -81,15 +81,24 @@ define(["jquery"], function ($) {
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function () {
     // Perspective
-    this.css('perspective','700px');
-    this.animate({borderSpacing: -90, opacity:0.2}, {
+    //this.css('transform','perspective( 100px ) rotateX( 45deg )');
+    
+    // this.animate({
+    //   transform
+    // })
+    
+    // -moz-transform: perspective( 100px ) rotateX( 45deg );
+    // -webkit-transform: perspective( 100px ) rotateX( 45deg );
+    //         transform: perspective( 100px ) rotateX( 45deg );
+    
+    this.animate({borderSpacing: -90, opacity: 0.5}, {
       step: function(now, fx) {
         if (fx.prop == "borderSpacing") {
-          $(this).css('-webkit-transform', 'rotateX('+now+'deg)')
-            .css('-moz-transform', 'rotateX('+now+'deg)')
-            .css('-ms-transform', 'rotateX('+now+'deg)')
-            .css('-o-transform', 'rotateX('+now+'deg)')
-            .css('transform', 'rotateX('+now+'deg)');
+          $(this).css('-webkit-transform', 'perspective( 600px ) rotateX('+now+'deg)')
+            .css('-moz-transform', 'perspective( 600px ) rotateX('+now+'deg)')
+            .css('-ms-transform', 'perspective( 600px ) rotateX('+now+'deg)')
+            .css('-o-transform', 'perspective( 600px ) rotateX('+now+'deg)')
+            .css('transform', 'perspective( 600px ) rotateX('+now+'deg)');
         } else {
           $(this).css(fx.prop, now);
         }
