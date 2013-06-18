@@ -131,26 +131,24 @@ define(["jquery"], function ($) {
 
   $.fn.animateKeyboard = function () {
     
-    $( ".towtruck-typing-ellipse-one" ).animate({
-      opacity: 0,
-    }, 1500 );
-    
-    $( ".towtruck-typing-ellipse-two" ).animate({
-      opacity: 0,
-    }, 1500 );
-    
-    $( ".towtruck-typing-ellipse-three" ).animate({
-      opacity: 0,
-    }, 1500 );
-    
-    // $('#navigation > a, #navigation dt').each(function(idx) {
-    //     $(this).delay( idx * 600 ).fadeIn( 600 );
-    // });
-    
+    $( ".towtruck-typing-ellipse-one" ).css("opacity","0.5");
+    $( ".towtruck-typing-ellipse-two" ).css("opacity","0.5");
+    $( ".towtruck-typing-ellipse-three" ).css("opacity","0.5");
+         
     var count = 0;
-    var interval = setInterval((function () {
+    var interval = setInterval((function () { 
       count++;
-      this.text(count);
+      $( ".towtruck-typing-ellipse-one" ).animate({
+        opacity: 1,
+      }, 300 ).queue(function(){
+        $( ".towtruck-typing-ellipse-two" ).animate({
+          opacity: 1,
+        }, 300 ).queue(function(){
+          $( ".towtruck-typing-ellipse-three" ).animate({
+            opacity: 1,
+          }, 300 );
+        });
+      });
     }).bind(this), 1000);
     this.data("animateKeyboard", interval);
   };
