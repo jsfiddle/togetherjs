@@ -623,7 +623,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         windowing.show(popup);
         if (typeof notify == "number") {
           // This is the amount of time we're supposed to notify
-          popup.fadeOut(notify);
+          setTimeout(function () {
+            windowing.hide(popup);
+          }, notify);
         }
       }
     },
@@ -789,7 +791,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       this.dockElement.attr("id", this.peer.className("towtruck-dock-element-"));
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
-      this.dockElement.animateDockEntry();
+      this.dockElement.find(".towtruck-person").animateDockEntry();
       var iface = $("#towtruck-dock");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"

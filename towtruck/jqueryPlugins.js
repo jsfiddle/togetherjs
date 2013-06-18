@@ -79,19 +79,30 @@ define(["jquery"], function ($) {
   /* Move notification when another notification slides in */
 
   /* Used to fade away notification windows + flip the bottom of them out: */
-  $.fn.fadeOut = function (time) {
-
-    $(this).css('-moz-perspective:200');
+  $.fn.fadeOut = function () {
+    
+    // Perspective
+    //this.css('-moz-perspective:200');
+    
+    //opacity -> fadeout
+    
     this.animate({borderSpacing: -90}, {
       step: function(now, fx) {
-        $(this).css('-webkit-transform', 'rotateX('+now+'deg)');
-        $(this).css('-moz-transform', 'rotateX('+now+'deg)');
-        $(this).css('-ms-transform', 'rotateX('+now+'deg)');
-        $(this).css('-o-transform', 'rotateX('+now+'deg)');
-        $(this).css('transform', 'rotateX('+now+'deg)');
+        $(this).css('-webkit-transform', 'rotateX('+now+'deg)')
+          .css('-moz-transform', 'rotateX('+now+'deg)')
+          .css('-ms-transform', 'rotateX('+now+'deg)')
+          .css('-o-transform', 'rotateX('+now+'deg)')
+          .css('transform', 'rotateX('+now+'deg)');
       },
       duration: "slow"
-    }, 'linear');
+    }, 'linear').promise().then(function () {
+      this.css('-webkit-transform', '');
+      this.css('-moz-transform', '');
+      this.css('-ms-transform', '');
+      this.css('-o-transform', '');
+      this.css('transform', '');
+    });
+    return this;
 
     // this.animate({
     //   opacity: 0
@@ -115,8 +126,36 @@ define(["jquery"], function ($) {
   $.fn.animateDockEntry = function () {
 
     // scale from Center is not working.  it scales from the Top Left
-    this.hide();
-    this.show( { effect: "scale", origin: ['middle' , 'center'] } );
+    // this.hide();
+    var height = this.height();
+    var width = this.width();
+    var backgroundSize = height + 4;
+    var margin = parseInt(this.css("marginLeft"), 10);
+    //console.log("calculated", margin, margin + width/2);
+    this.css({
+      marginLeft: margin + width/2,
+      height: 0,
+      width: 0,
+      backgroundSize: "0 0"
+    });
+    var self = this;
+    this.animate({
+      marginLeft: margin,
+      height: height,
+      width: width,
+      backgroundSize: backgroundSize
+    }, {
+      duration: 600
+    }).promise().then(function () {
+      self.css({
+        marginLeft: "",
+        height: "",
+        width: "",
+        backgroundSize: ""
+      });
+    });
+    return this;
+    //this.show( { effect: "scale", origin: ['middle' , 'center'], duration: 5000 } );
     // expand avatar into place
 
   };

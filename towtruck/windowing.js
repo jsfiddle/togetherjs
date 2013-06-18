@@ -118,7 +118,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     els = els || ".towtruck-window, .towtruck-modal, .towtruck-notification";
     els = $(els);
     els = els.filter(":visible");
-    els.hide();
+    els.filter(":not(.towtruck-notification)").hide();
     getModalBackground().hide();
     var windows = [];
     els.each(function (index, element) {
@@ -135,6 +135,11 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       }, ANIMATION_DURATION+10);
       element.data("boundTo", null);
       bound.removeClass("towtruck-active");
+      if (element.hasClass("towtruck-notification")) {
+        element.fadeOut().promise().then(function () {
+          this.hide();
+        });
+      }
     });
     $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
     if (onClose) {
