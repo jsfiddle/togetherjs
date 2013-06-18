@@ -80,14 +80,11 @@ define(["jquery"], function ($) {
 
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function () {
-    
     // Perspective
-    //$(document.body).css('perspective','700');
-    //$(document.body).css('perspective-origin','top');
- 
-    this.animate({rotation: -90, opacity:0.2}, {
+    this.css('perspective','700px');
+    this.animate({borderSpacing: -90, opacity:0.2}, {
       step: function(now, fx) {
-        if (fx.prop == "rotation") {
+        if (fx.prop == "borderSpacing") {
           $(this).css('-webkit-transform', 'rotateX('+now+'deg)')
             .css('-moz-transform', 'rotateX('+now+'deg)')
             .css('-ms-transform', 'rotateX('+now+'deg)')
@@ -97,7 +94,7 @@ define(["jquery"], function ($) {
           $(this).css(fx.prop, now);
         }
       },
-      duration: 5000
+      duration: "slow"
     }, 'linear').promise().then(function () {
       this.css('-webkit-transform', '');
       this.css('-moz-transform', '');
@@ -105,23 +102,8 @@ define(["jquery"], function ($) {
       this.css('-o-transform', '');
       this.css('transform', '');
       this.css("opacity", "");
-      //this.animate({opacity: 0}, 1000)
     });
     return this;
-    
-    //opacity -> fadeout
-    // this.animate({
-    //   opacity: 0.25
-    // },1000);
-
-
-    // this.animate({
-    //   opacity: 0
-    // }, {
-    //   duration: 1000,
-    //   easing: "linear"
-    // });
-
   };
 
   /* used when user goes down to participant cursor location on screen */
