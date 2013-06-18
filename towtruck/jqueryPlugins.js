@@ -82,32 +82,43 @@ define(["jquery"], function ($) {
   $.fn.fadeOut = function () {
     
     // Perspective
-    //this.css('-moz-perspective:200');
-    
-    //opacity -> fadeout
-    
-    this.animate({borderSpacing: -90}, {
+    //$(document.body).css('perspective','700');
+    //$(document.body).css('perspective-origin','top');
+ 
+    this.animate({rotation: -90, opacity:0.2}, {
       step: function(now, fx) {
-        $(this).css('-webkit-transform', 'rotateX('+now+'deg)')
-          .css('-moz-transform', 'rotateX('+now+'deg)')
-          .css('-ms-transform', 'rotateX('+now+'deg)')
-          .css('-o-transform', 'rotateX('+now+'deg)')
-          .css('transform', 'rotateX('+now+'deg)');
+        if (fx.prop == "rotation") {
+          $(this).css('-webkit-transform', 'rotateX('+now+'deg)')
+            .css('-moz-transform', 'rotateX('+now+'deg)')
+            .css('-ms-transform', 'rotateX('+now+'deg)')
+            .css('-o-transform', 'rotateX('+now+'deg)')
+            .css('transform', 'rotateX('+now+'deg)');
+        } else {
+          $(this).css(fx.prop, now);
+        }
       },
-      duration: "slow"
+      duration: 5000
     }, 'linear').promise().then(function () {
       this.css('-webkit-transform', '');
       this.css('-moz-transform', '');
       this.css('-ms-transform', '');
       this.css('-o-transform', '');
       this.css('transform', '');
+      this.css("opacity", "");
+      //this.animate({opacity: 0}, 1000)
     });
     return this;
+    
+    //opacity -> fadeout
+    // this.animate({
+    //   opacity: 0.25
+    // },1000);
+
 
     // this.animate({
     //   opacity: 0
     // }, {
-    //   duration: time || 1000,
+    //   duration: 1000,
     //   easing: "linear"
     // });
 
@@ -169,26 +180,26 @@ define(["jquery"], function ($) {
   };
 
   $.fn.animateKeyboard = function () {
-    
-    $( ".towtruck-typing-ellipse-one" ).css("opacity","0.5");
-    $( ".towtruck-typing-ellipse-two" ).css("opacity","0.5");
-    $( ".towtruck-typing-ellipse-three" ).css("opacity","0.5");
-         
-    var count = 0;
-    var interval = setInterval((function () { 
-      count++;
-      $( ".towtruck-typing-ellipse-one" ).animate({
-        opacity: 1,
-      }, 300 ).queue(function(){
-        $( ".towtruck-typing-ellipse-two" ).animate({
-          opacity: 1,
-        }, 300 ).queue(function(){
-          $( ".towtruck-typing-ellipse-three" ).animate({
-            opacity: 1,
-          }, 300 );
-        });
-      });
-    }).bind(this), 1000);
+    var one = this.find(".towtruck-typing-ellipse-one");
+    var two = this.find(".towtruck-typing-ellipse-two");
+    var three = this.find(".towtruck-typing-ellipse-three");
+    var count = -1;
+    var run = (function () { 
+      count = (count+1) % 4;
+      if (count === 0) {
+        one.css("opacity", 0.5);
+        two.css("opacity", 0.5);
+        three.css("opacity", 0.5);
+      } else if (count == 1) {
+        one.css("opacity", 1);
+      } else if (count == 2) {
+        two.css("opacity", 1);
+      } else { // count==3
+        three.css("opacity", 1);
+      }
+    }).bind(this);
+    run();
+    var interval = setInterval(run, 300);
     this.data("animateKeyboard", interval);
   };
 
