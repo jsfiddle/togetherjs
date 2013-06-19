@@ -175,7 +175,7 @@ define(["jquery"], function ($) {
     //     backgroundSize: ""
     //   });
     // });
-    // return this;
+    return this;
   };
 
   $.fn.animateCursorEntry = function () {
