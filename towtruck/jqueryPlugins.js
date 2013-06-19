@@ -77,7 +77,7 @@ define(["jquery"], function ($) {
   /* Move notification when another notification slides in */
 
   /* Used to fade away notification windows + flip the bottom of them out: */
-  $.fn.fadeOut = function () {    
+  $.fn.fadeOut = function () {
     this.animate({borderSpacing: -90, opacity: 0.5}, {
       step: function(now, fx) {
         if (fx.prop == "borderSpacing") {
@@ -188,7 +188,7 @@ define(["jquery"], function ($) {
     var two = this.find(".towtruck-typing-ellipse-two");
     var three = this.find(".towtruck-typing-ellipse-three");
     var count = -1;
-    var run = (function () { 
+    var run = (function () {
       count = (count+1) % 4;
       if (count === 0) {
         one.css("opacity", 0.5);
