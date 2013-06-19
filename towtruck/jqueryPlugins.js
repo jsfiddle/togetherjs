@@ -151,31 +151,21 @@ define(["jquery"], function ($) {
     // var width = this.width();
     // var backgroundSize = height + 4;
     // var margin = parseInt(this.css("marginLeft"), 10);
-    //console.log("calculated", margin, margin + width/2);
-    //set the avatar to small/hidden
+    // console.log("calculated", margin, margin + width/2);
+    // set the avatar to small/hidden
     // this.css({
     //   marginLeft: margin + width/2,
     //   height: 0,
     //   width: 0,
     //   backgroundSize: "0 0"
     // });
-    // var self = this;
-    // this.animate({
-    //   marginLeft: margin,
-    //   height: height,
-    //   width: width,
-    //   backgroundSize: backgroundSize
-    // }, {
-    //   duration: 600
-    // }).promise().then(function () {
-    //   self.css({
-    //     marginLeft: "",
-    //     height: "",
-    //     width: "",
-    //     backgroundSize: ""
-    //   });
-    // });
-    return this;
+    this.animate({
+      height: 0,
+      width: 0,
+    }, {
+      duration: 600
+    });
+    //return this;
   };
 
   $.fn.animateCursorEntry = function () {
