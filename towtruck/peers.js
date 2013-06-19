@@ -31,6 +31,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
     constructor: function (id, attrs) {
       attrs = attrs || {};
+      assert(id);
       assert(! Peer.peers[id]);
       this.id = id;
       this.identityId = attrs.identityId || null;
@@ -378,6 +379,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   }
 
   peers.getPeer = function getPeer(id, message) {
+    assert(id);
     var peer = Peer.peers[id];
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
