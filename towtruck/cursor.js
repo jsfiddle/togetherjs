@@ -60,6 +60,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         backgroundColor: peer.color,
         color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
       });
+      var path = this.element.find("svg path");
+      path.attr("fill", peer.color);
       // FIXME: should I just remove the element?
       if (peer.status != "live") {
         this.element.hide();

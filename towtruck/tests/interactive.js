@@ -18,8 +18,10 @@ function addPeer(id) {
     name += " " + id;
   }
   id = id || 'faker';
+  var color = "#" + Math.floor(Math.random() * 0xffffff).toString(16);
   Test.newPeer({
     name: name,
+    color: color,
     clientId: id
   });
   var len = peers.getAllPeers().length;
