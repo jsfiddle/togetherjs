@@ -118,14 +118,20 @@ define(["jquery"], function ($) {
     var width = this.width();
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
-    //console.log("calculated", margin, margin + width/2);
+    
+    console.log("calculated", margin, margin + width/2);
+    
+    // set starting position CSS for avatar
     this.css({
       marginLeft: margin + width/2,
       height: 0,
       width: 0,
       backgroundSize: "0 0"
     });
+        
     var self = this;
+    
+    //then animate avatar to the actual dimensions, and reset the values
     this.animate({
       marginLeft: margin,
       height: height,
@@ -146,26 +152,40 @@ define(["jquery"], function ($) {
 
   // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
-    //alert("exit");
-    // var height = this.height();
-    // var width = this.width();
-    // var backgroundSize = height + 4;
-    // var margin = parseInt(this.css("marginLeft"), 10);
-    // console.log("calculated", margin, margin + width/2);
-    // set the avatar to small/hidden
-    // this.css({
-    //   marginLeft: margin + width/2,
+    var height = this.height();
+    var width = this.width();
+    var backgroundSize = height + 4;
+    var margin = parseInt(this.css("marginLeft"), 10);
+    console.log("calculated again", margin, margin + width/2);
+    
+
+    // set starting position for the avatar
+    this.css({
+      marginLeft: margin + width/2,
+      height: 40,
+      width: 40,
+      backgroundSize: "40px 40px"
+    });
+    
+    //then animate avatar to shrink to nothing, and reset the values again
+    // this.animate({
+    //   marginLeft: margin,
     //   height: 0,
     //   width: 0,
-    //   backgroundSize: "0 0"
+    //   backgroundSize: "0px 0px"
+    // }, {
+    //   duration: 600
+    // }).promise().then(function () {
+    //   self.css({
+    //     marginLeft: "",
+    //     height: "",
+    //     width: "",
+    //     backgroundSize: ""
+    //   });
     // });
-    this.animate({
-      height: 0,
-      width: 0,
-    }, {
-      duration: 600
-    });
-    //return this;
+    
+    return this;
+    
   };
 
   $.fn.animateCursorEntry = function () {
