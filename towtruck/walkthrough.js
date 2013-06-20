@@ -55,6 +55,8 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         container.find(".towtruck-if-creator").show();
         container.find(".towtruck-ifnot-creator").hide();
       }
+      container.find(".towtruck-site-name").text(session.siteName());
+      // This triggers substititions in the walkthrough:
       peers.Self.update({});
       session.emit("new-element", container);
     }

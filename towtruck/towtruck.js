@@ -382,6 +382,8 @@
     getUserColor: null,
     // A function that will return the avatar of the user:
     getUserAvatar: null,
+    // The siteName is used in the walkthrough (defaults to document.title):
+    siteName: null,
     // Any events to bind to
     on: {}
   };

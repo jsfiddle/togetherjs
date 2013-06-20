@@ -68,6 +68,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     return location.href.replace(/#.*/, "");
   };
 
+  session.siteName = function () {
+    return TowTruck.getConfig("siteName") || document.title;
+  };
+
   /****************************************
    * Message handling/dispatching
    */
