@@ -649,6 +649,18 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     }
   }
 
+  .towtruck-person-avatar-swatch {
+    @size: 7px;
+    width: 0;
+    height: 0;
+    margin-left: @avatar-size - @size;
+    padding: 0;
+    border-top: @size solid transparent;
+    border-left: @size solid transparent;
+    border-right: @size solid transparent;
+    border-bottom: @size solid transparent;
+  }
+
   .towtruck-person-inactive {
     opacity: 0.5;
   }
@@ -689,7 +701,7 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     border-radius: 4px;
     line-height:20px !important;
   }
-  
+
   .towtruck-dock-person-tooltip .towtruck-person-name {
     font-size:12px;
   }
@@ -697,8 +709,8 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
   .towtruck-person-tooltip-arrow-r {
     position:absolute;
     left:42px;
-  	width: 0; 
-  	height: 0; 
+  	width: 0;
+  	height: 0;
   	border-top: 4px solid transparent;
   	border-bottom: 4px solid transparent;
   	border-left: 4px solid rgba(0,0,0,0.9);
@@ -1065,7 +1077,7 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   -webkit-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
   /*FIX ME, moz filter not working...*/
   -moz-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
-          filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );          
+          filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
 }
 
 .towtruck-cursor {

@@ -67,6 +67,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     var container = ui.container = $(templates["interface"]);
     assert(container.length);
     $("body").append(container);
+    fixupAvatars(container);
     if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
@@ -447,6 +448,18 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
   }
 
+  function fixupAvatars(container) {
+    /* All <div class="towtruck-person" /> elements need an element inside,
+       so we add that element here */
+    container.find(".towtruck-person").each(function () {
+      var $this = $(this);
+      var inner = $this.find(".towtruck-person-avatar-swatch");
+      if (! inner.length) {
+        $this.append('<div class="towtruck-person-avatar-swatch"></div>');
+      }
+    });
+  }
+
   ui.prepareShareLink = function (container) {
     container.find(".towtruck-share-link").click(function () {
       $(this).select();
@@ -758,6 +771,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (this.peer.color) {
         avatarEl.css({
           borderColor: this.peer.color
+        });
+        avatarEl.find(".towtruck-person-avatar-swatch").css({
+          borderTopColor: this.peer.color,
+          borderRightColor: this.peer.color
         });
       }
       if (this.peer.color) {
