@@ -49,6 +49,10 @@ visible("#towtruck-chat-notifier", "#towtruck-chat");
 */
 
 $("#towtruck-chat-button").click();
+// The animation makes this take a while:
+// (We could check $("#towtruck-chat-notifier").queue().length though)
+wait(function () {return ! $("#towtruck-chat-notifier").is(":visible");});
+// =>
 visible("#towtruck-chat-notifier", "#towtruck-chat");
 
 /* =>
