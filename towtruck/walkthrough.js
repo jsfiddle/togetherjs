@@ -56,6 +56,16 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         container.find(".towtruck-ifnot-creator").hide();
       }
       container.find(".towtruck-site-name").text(session.siteName());
+      ui.activateAvatarEdit(container, {
+        onSave: function () {
+          container.find("#towtruck-avatar-when-saved").show();
+          container.find("#towtruck-avatar-when-unsaved").hide();
+        },
+        onPending: function () {
+          container.find("#towtruck-avatar-when-saved").hide();
+          container.find("#towtruck-avatar-when-unsaved").show();
+        }
+      });
       // This triggers substititions in the walkthrough:
       peers.Self.update({});
       session.emit("new-element", container);

@@ -51,16 +51,17 @@
        style="display: none">
     <header> Update avatar </header>
     <section>
-      <div class="towtruck-person towtruck-person-self"></div>
+      <div class="towtruck-avatar-preview towtruck-person towtruck-person-self"></div>
       <div id="towtruck-avatar-buttons">
-        <button id="towtruck-upload-avatar" class="towtruck-primary">Upload a picture</button>
-        <button id="towtruck-camera-avatar" class="towtruck-default">Take a picture</button>
+        <input type="file" class="towtruck-upload-avatar">
+        <!--<button id="towtruck-upload-avatar" class="towtruck-primary">Upload a picture</button>-->
+        <!--<button id="towtruck-camera-avatar" class="towtruck-default">Take a picture</button>-->
       </div>
     </section>
     <section class="towtruck-buttons">
       <button class="towtruck-cancel towtruck-dismiss">Cancel</button>
       <span class="towtruck-alt-text">or</span>
-      <button id="towtruck-avatar-save" class="towtruck-primary">Save</button>
+      <button class="towtruck-avatar-save towtruck-primary">Save</button>
     </section>
   </div>
 
@@ -275,10 +276,7 @@
     </div>
     <div class="towtruck-menu-hr-avatar"></div>
     <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/towtruck/images/button-pencil.png" alt=""> Update your name</div>
-    <!--
-    Disabled until we have the avatar screen working: (https://github.com/mozilla/towtruck/issues/555)
     <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/towtruck/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
-    -->
     <div class="towtruck-menu-item" id="towtruck-menu-update-color"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
     <div class="towtruck-hr"></div>
     <div class="towtruck-menu-item" id="towtruck-menu-help">Help</div>

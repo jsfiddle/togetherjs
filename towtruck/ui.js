@@ -373,6 +373,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       starterButton.text("End TowTruck Session");
     }
 
+    ui.activateAvatarEdit(container, {
+      onSave: function () {
+        windowing.hide("#towtruck-avatar-edit");
+      }
+    });
+
     session.emit("new-element", ui.container);
 
     if (finishedAt && finishedAt > Date.now()) {
@@ -385,6 +391,61 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
 
   };
+
+  ui.activateAvatarEdit = function (container, options) {
+    options = options || {};
+    var pendingImage = null;
+
+    container.find(".towtruck-avatar-save").prop("disabled", true);
+
+    container.find(".towtruck-avatar-save").click(function () {
+      if (pendingImage) {
+        peers.Self.update({avatar: pendingImage});
+        container.find(".towtruck-avatar-save").prop("disabled", true);
+        if (options.onSave) {
+          options.onSave();
+        }
+      }
+    });
+
+    container.find(".towtruck-upload-avatar").on("change", function () {
+      util.readFileImage(this).then(function (url) {
+        sizeDownImage(url).then(function (smallUrl) {
+          pendingImage = smallUrl;
+          container.find(".towtruck-avatar-preview").css({
+            backgroundImage: 'url(' + pendingImage + ')'
+          });
+          container.find(".towtruck-avatar-save").prop("disabled", false);
+          if (options.onPending) {
+            options.onPending();
+          }
+        });
+      });
+    });
+
+  };
+
+  function sizeDownImage(imageUrl) {
+    return util.Deferred(function (def) {
+      var $canvas = $("<canvas>");
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
+      var context = $canvas[0].getContext("2d");
+      var img = new Image();
+      img.src = imageUrl;
+      // Sometimes the DOM updates immediately to call
+      // naturalWidth/etc, and sometimes it doesn't; using setTimeout
+      // gives it a chance to catch up
+      setTimeout(function () {
+        var width = img.naturalWidth || img.width;
+        var height = img.naturalHeight || img.height;
+        width = width * (session.AVATAR_SIZE / height);
+        height = session.AVATAR_SIZE;
+        context.drawImage(img, 0, 0, width, height);
+        def.resolve($canvas[0].toDataURL("image/png"));
+      });
+    });
+  }
 
   ui.prepareShareLink = function (container) {
     container.find(".towtruck-share-link").click(function () {

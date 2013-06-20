@@ -222,6 +222,19 @@ define(["jquery", "jqueryPlugins"], function ($) {
     });
   };
 
+  util.readFileImage = function (el) {
+    return util.Deferred(function (def) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        def.resolve("data:image/jpeg;base64," + util.blobToBase64(this.result));
+      };
+      reader.onerror = function () {
+        def.reject(this.error);
+      };
+      reader.readAsArrayBuffer(el.files[0]);
+    });
+  };
+
   util.testExpose = function (objs) {
     if (typeof TowTruckTestSpy == "undefined") {
       return;
