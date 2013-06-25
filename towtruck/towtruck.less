@@ -357,7 +357,7 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     height: @anchor-height;
     text-align: center;
     /* FIXME: disabling dock movement for now, cursor would be misleading: */
-    /*cursor: move;*/
+    cursor: move;
     .user-select(none);
     width: 100%;
     position: relative;
@@ -648,6 +648,12 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
       background-position: -1px -1px;
     }
   }
+  
+  .towtruck-person-small .towtruck-person-avatar-swatch {
+    border-width: 3px;
+    margin-left: 14px;
+    margin-top: 0px;
+  }
 
   .towtruck-person-avatar-swatch {
     /* This is the element that lives inside all .towtruck-person elements
@@ -655,12 +661,13 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     @size: 7px;
     width: 0;
     height: 0;
-    margin-left: @avatar-size - @size;
+    margin-left: @avatar-size - @size - 2px;
     padding: 0;
     border-top: @size solid transparent;
     border-left: @size solid transparent;
     border-right: @size solid transparent;
     border-bottom: @size solid transparent;
+    margin-top: -2px;
   }
 
   .towtruck-person-inactive {
