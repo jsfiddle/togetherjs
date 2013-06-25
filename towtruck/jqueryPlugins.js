@@ -152,37 +152,21 @@ define(["jquery"], function ($) {
 
   // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
+        
+    // get the current avatar dimenensions
     var height = this.height();
     var width = this.width();
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
-    console.log("calculated again", margin, margin + width/2);
-    
-
-    // set starting position for the avatar
-    this.css({
-      marginLeft: margin + width/2,
-      height: 40,
-      width: 40,
-      backgroundSize: "40px 40px"
-    });
     
     //then animate avatar to shrink to nothing, and reset the values again
-    // this.animate({
-    //   marginLeft: margin,
-    //   height: 0,
-    //   width: 0,
-    //   backgroundSize: "0px 0px"
-    // }, {
-    //   duration: 600
-    // }).promise().then(function () {
-    //   self.css({
-    //     marginLeft: "",
-    //     height: "",
-    //     width: "",
-    //     backgroundSize: ""
-    //   });
-    // });
+    this.animate({
+      marginLeft: margin + width/2,
+      height: 0,
+      width: 0,
+      backgroundSize: "0 0",
+      opacity: 0
+    }, 600 );
     
     return this;
     
