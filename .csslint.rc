@@ -1,0 +1,25 @@
+{
+  "empty-rules": false,
+  "empty-rules-reason": "LESS creates some empty rules",
+
+  "bulletproof-font-face": false,
+  "buttetproof-font-face-reason": "This only seems to apply when you provide multiple formats, and we aren't doing that",
+
+  "qualified-headings": false,
+  "qualified-headings-reason": "This happens as part of the reset, we reset headings inside .towtruck (though technically we aren't using headings so we could remove that reset)",
+
+  "adjoining-classes": false,
+  "adjoining-classes-reason": ".class1.class2 isn't supported in some older browsers, but we don't support those",
+
+  "vendor-prefix": false,
+  "vendor-prefix-reason": "We have some vendor prefixes in vendor-prefix-specific selectors, and CSSLint complains about that.",
+  "compatible-vendor-prefixes": false,
+  "compatible-vendor-prefixes-reason": "Same as vendor-prefix",
+
+  "duplicate-background-images": false,
+  "duplicate-background-images-reason": "LESS explodes out some background images, creating duplicates, but they aren't duplicated in the source.",
+
+  "fallback-colors": false,
+  "fallback-colors-reason": "Some old browsers don't support RGBA, but we don't care about those browsers"
+
+}

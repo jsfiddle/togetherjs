@@ -1,3 +1,0 @@
-{
-  "processes": ["app/http/server.js", "app/hub/server.js"]
-}

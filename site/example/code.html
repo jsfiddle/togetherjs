@@ -1,0 +1,92 @@
+{% extends "base.tmpl" %}
+{% block title %} Mozilla Labs : TowTruck example code editing {% endblock %}
+{# set enableExample true #}
+{% block styles %}
+<style>
+  pre {
+    /* Override bootrap pre padding */
+    padding: 0;
+  }
+  #ace-editor {
+    margin: 0;
+    top: 0;
+    position: absolute;
+    width: 80%;
+    height: 25em;
+    right: 0;
+  }
+  #ace-container {
+    height: 25em;
+  }
+  #codemirror-container {
+    border: 1px solid #000;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+
+          <h1>Code editor</h1>
+
+          <p>TowTruck requires specific support for editors.  There is active support for
+            <a href="http://codemirror.net/">CodeMirror</a> (used for
+            example by Thimble),
+            and <a href="http://ace.ajax.org/">ACE</a> (used by Github,
+            Cloud9).</p>
+
+          <h2>ACE</h2>
+
+          <div id="ace-container">
+
+<pre id="ace-editor">function foo(items) {
+  var i;
+  for (i = 0; i &lt; items.length; i++) {
+    alert("Ace Rocks " + items[i]);
+  }
+}
+</pre>
+
+          </div>
+
+          <h2>CodeMirror</h2>
+
+          <div id="codemirror-container"></div>
+
+          <hr>
+
+          <p>And that's all folks!</p>
+        </div>
+
+   <!-- ACE editor: -->
+   <script src="//d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js"></script>
+   <script>
+     var editor = ace.edit("ace-editor");
+     editor.setTheme("ace/theme/textmate");
+     editor.getSession().setMode("ace/mode/javascript");
+     var container = $("#ace-container");
+     $("#ace-editor").css({
+       top: container.offset().top + "px",
+       left: container.offset().left + "px",
+       height: (container.height()-20) + "px",
+       width: container.width() + "px"
+     });
+   </script>
+
+   <!-- CodeMirror editor: -->
+   <script src="codemirror/codemirror.js"></script>
+   <link rel="stylesheet" href="codemirror/codemirror.css">
+   <script src="codemirror/javascript.js"></script>
+   <script>
+     var cmEditor = CodeMirror($("#codemirror-container")[0], {
+       mode: "javascript"
+     });
+     /*$.ajax({
+       url: "/towtruck/session.js",
+       dataType: "text"
+     }).then(function (data) {
+       cmEditor.setValue(data);
+       //TowTruck.reinitialize();
+     });*/
+   </script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{
+    // JSHint configurations for node-jshint.
+    // install with "npm install -g jshint"
+    // run with "jshint <file(s)> --config config.json"
+
+    "asi"       : false, // Semicolons required! we minify.
+    "undef"     : false, // var early, var often
+
+    // Predefined globals whom JSHint will accept the existence of.
+    "browser"   : true,
+
+    // Require curly braces
+    "curly": true,
+    // Require hasOwnProperty check
+    "forin": true,
+    "indent": 2,
+    // No arguments.callee/caller
+    "noarg": true,
+    // Warn about unused variables
+    "unused": true,
+    // No trailing whitespace
+    "trailing": true
+}

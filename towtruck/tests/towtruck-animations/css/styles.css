@@ -1,0 +1,112 @@
+  #canvas {
+    background:#efefef;
+    width:800;
+    height:400px;
+  }
+  
+  .ellipse {
+    position:absolute;
+    opacity:0;
+  }
+
+  #windowpopout {
+    width:150px;
+    height:170px;
+    border-radius:4px;
+    background:#fff;
+    position:absolute;
+    right:80px;
+    top:140px;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    opacity:0;
+  }
+
+  #notification {
+    width:300px;
+    height:100px;
+    background:#ccc;
+    position:absolute;
+    right:20px;
+    top:160px;
+    opacity:0;
+    border-radius:4px;
+  }
+
+  #notification2 {
+    width:300px;
+    height:100px;
+    background:#ccc;
+    position:absolute;
+    right:20px;
+    top:160px;
+    opacity:0;
+    border-radius:4px;
+  }
+  
+  #notification3 {
+    width:300px;
+    height:100px;
+    background:#ccc;
+    position:absolute;
+    right:20px;
+    top:160px;
+    opacity:0;
+    border-radius:4px;
+  }
+
+  #dock {
+    position:absolute;
+    right:20px;
+    top:160px;
+    width:60px;
+    height:300px;
+    z-index:9999;
+    background:#999;
+    border-radius:4px;
+  }
+
+  #participant-avatar {
+    width:20px;
+    height:20px;
+    margin:20px;
+    background:#fff;
+    position:absolute;
+    bottom:0px;
+    opacity:0;
+    border-radius:4px;
+  }
+
+  #participant-cursor {
+    position:absolute;
+    left:-10px;
+    bottom:19px;
+    transform:rotate(-30deg);
+    -ms-transform:rotate(-30deg); /* IE 9 */
+    -webkit-transform:rotate(-30deg); /* Safari and Chrome */
+  }
+
+  #participant-box {
+    width:50px;
+    height:20px;
+    border-radius:4px;
+    background:#ccc;
+    position:absolute;
+    left:300px;
+    top:200px;
+    opacity:0;
+    font-size:12px;
+  }
+  
+  #notification-transform {
+    width:300px;
+    height:200px;
+    background-color: red;
+/*    -moz-transform: perspective( 100px ) rotateX( 45deg );
+    -webkit-transform: perspective( 100px ) rotateX( 45deg );*/
+            transform: perspective( 100px ) rotateX( 45deg );
+  }
+  
+  html {
+      -webkit-transform-style: preserve-3d;
+      -webkit-font-smoothing: antialiased !important;
+    }

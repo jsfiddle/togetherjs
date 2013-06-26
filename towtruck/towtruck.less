@@ -1,0 +1,1529 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*Fonts*/
+@font-face {
+  font-family: openSansRegular;
+  src: url('../fonts/OpenSans-Regular.ttf');
+}
+
+@font-face {
+  font-family: openSansLight;
+  src: url('../fonts/OpenSans-Light.ttf');
+}
+
+@font-face {
+  font-family: openSansBold;
+  src: url('../fonts/OpenSans-Bold.ttf');
+}
+
+@default-font: openSansLight, Helvetica, 'Helvetica Neue', Arial, sans-serif;
+
+// Size of the buttons (they're square):
+@button-size: 40px;
+@avatar-size: 32px;
+// Note: this is also in ui.js, BUTTON_HEIGHT
+// Height of the draggable anchor at the top:
+@anchor-height: @button-size / 2;
+// Extra padding on the edge of the screen:
+@side-padding: 0;
+// Background color of most elements:
+@background-color: #0095DD;
+@window-background-color: #ffffff;
+@window-color: #000;
+@text-color: #000;
+
+// This is the base z-index of the buttons; items you want below or above
+// this can be @z-index+1, etc.
+@z-index: 10000;
+
+@import "reset.less";
+@import "functions.less";
+
+.towtruck {
+
+  /* General styles */
+  font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(51, 51, 51);
+  font-weight: normal;
+
+  a {
+    color: #0095DD;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #0095DD;
+    text-decoration: underline;
+  }
+
+  p {
+    margin: 7px 0 7px 0;
+  }
+
+  button, img {
+    vertical-align: middle;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  button::-moz-focus-inner, input::-moz-focus-inner { // Inner padding and border oddities in FF3/4
+    padding: 0;
+    border: 0;
+  }
+
+  .towtruck-right {
+    float:right;
+  }
+
+}
+
+
+.button-style () {
+  display: inline-block;
+  border-radius: 4px;
+  text-align: center;
+  // FIXME: for some reason this effects the total space of a <a
+  // class="towtruck-primary/etc"> but not a <button
+  // class="towtruck-primary/etc"> :
+  //padding: 3px 10px 3px;
+  height: 40px;
+  line-height: 40px;
+  text-decoration: none;
+  min-width: 100px;
+  border: none;
+  font-family: @default-font;
+  /*transition: all 0.25s linear 0s;*/
+  text-shadow: none;
+  margin:3px;
+  font-size:14px;
+}
+
+.towtruck-default {
+  .button-style;
+  background:#9A9A9A;
+  color: #fff;
+  &.towtruck-follow {
+    cursor: pointer;
+  }
+
+  &:hover {
+    background:#ADADAD;
+  }
+}
+
+.towtruck-primary {
+  .button-style;
+  background:#0194DB;
+  color: #fff;
+  &.towtruck-follow {
+    cursor: pointer;
+  }
+
+  &:hover {
+    background:#00ACFF;
+  }
+}
+
+a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
+  &, &:link, &:active, &:visited, &:hover {
+    color: #fff;
+    text-decoration: none;
+    vertical-align: middle;
+  }
+}
+
+#towtruck-avatar-edit .towtruck-person {
+  float: left;
+  height: 50px;
+  width: 50px;
+  margin: 30px;
+  background-repeat: no-repeat;
+  background-size: 52px 52px;
+  background-position: -1px -1px;
+  border: 2px solid;
+  border-radius: 2px;
+  background-clip: border-box;
+}
+
+#towtruck-avatar-edit #towtruck-avatar-buttons {
+  float:right;
+  width:160px;
+  padding:20px 0px;
+}
+
+#towtruck-upload-avatar {
+  float:left;
+}
+
+#towtruck-camera-avatar {
+  clear:both;
+}
+
+#towtruck-avatar-edit .towtruck-buttons {
+  clear:both;
+}
+
+
+.towtruck-destructive {
+  .button-style;
+  background:#AC2924;
+  color: #ffffff;
+
+  &:hover {
+    background: rgba(212,6,6,1);
+  }
+
+}
+
+.towtruck-secondary {
+  .button-style;
+  .gradient(#999999, #888888);
+  color: #000;
+}
+
+.towtruck-cancel {
+  display: inline-block;
+  background: inherit;
+  border: none;
+  padding:3px 0px;
+  margin:0px 0px 0px;
+  min-width: 0;
+  font-size:14px;
+  color:#333333;
+  font-family: openSansLight, Helvetica;
+  vertical-align:-2px !important;
+  &:hover {
+    cursor: pointer;
+    border-bottom:1px solid #BCBCBC;
+    margin:0px 0px -1px;
+  }
+
+}
+
+.towtruck-alt-text {
+  vertical-align:-2px;
+}
+
+
+.window() {
+  // top/left is set in code
+  position: fixed;
+  background-color: @window-background-color;
+  color: @window-color;
+  padding: 0 7px 0 7px;
+  z-index: @z-index + 1;
+
+
+  section {
+    margin: 15px 7px;
+  }
+
+  & > header {
+    font-weight: bold;
+    font-variant: normal;
+    text-align: center;
+    font-family: openSansRegular, Helvetica;
+    color: #fff;
+    margin: 0 -7px 0 -7px;
+    padding: 10px 4px 5px 30px;
+    height: (@button-size + 8)/2;
+    background: #0095DD;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    border-bottom:1px solid #0071A7;
+  }
+
+  .towtruck-share-link {
+    width: 256px;
+    font-size: 12px;
+    padding: 6px 6px 4px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);
+    font-family: Monaco;
+    margin: 7px 0px;
+    &:focus {
+      border:1px solid #0095DD;
+    }
+  }
+
+  header button.towtruck-close {
+    .button-reset;
+    border-left:1px solid #0071A7;
+    float: right;
+    font-weight: bold;
+    cursor: pointer;
+    background-image: url('./images/icon-close@2x.png');
+    background-position:center center;
+    background-repeat: no-repeat;
+    background-size:13px 13px;
+    width:39px;
+    height:39px;
+    margin-top:-10px;
+    margin-right:-4px;
+    border-top-right-radius:4px;
+    &:hover {
+      background-image:url('./images/icon-close-active.png');
+      background-color:rgba(0,0,0,0.1);
+    }
+  }
+
+  #towtruck-chat-messages {
+    overflow-y: auto;
+    /*FIXME: I'm just pulling numbers out of thin air here:*/
+    height: 260px;
+  }
+
+} // End of .window()
+
+/*FIX ME something weird is going on here. the avatar has no paddingTop only on Safari*/
+/*button#towtruck-profile-button.towtruck-button {
+  padding:10px 0px !important;
+}*/
+
+/* General dock rules: */
+
+.towtruck {
+
+  // The dock buttons
+  #towtruck-buttons .towtruck-button {
+    .button-reset;
+    position: relative;
+    width: @button-size+20;
+    height: @button-size+20;
+    background-size: @button-size @button-size;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-top:1px solid rgba(0,0,0,0.2);
+    &:hover {
+      background-color: #0F81BF;
+    }
+  }
+
+  #towtruck-buttons hr {
+    padding: 0;
+    margin: 0;
+  }
+
+  #towtruck-dock-participants button.towtruck-active {
+    background-color: #0F81BF !important;
+  }
+
+  #towtruck-buttons #towtruck-share-button {
+    background-image: url('./images/button-share.png');
+    &:hover {
+      background-image: url('./images/button-share-active.png');
+    }
+  }
+
+  #towtruck-buttons #towtruck-share-button.towtruck-active {
+    background-image: url('./images/button-share-active.png') !important;
+    background-color: #0F81BF;
+  }
+
+  #towtruck-buttons #towtruck-audio-button{
+    background-image: url('./images/button-mic.png');
+    &:hover {
+      background-image: url('./images/button-mic-active.png');
+      /*background-color:#0095dd;*/
+      /*cursor: default;*/
+    }
+  }
+
+  #towtruck-buttons #towtruck-audio-button.towtruck-active {
+    background-image: url('./images/button-mic-active.png') !important;
+    background-color: #0F81BF;
+  }
+
+  #towtruck-buttons #towtruck-chat-button{
+    background-image: url('./images/button-chat.png');
+    &:hover {
+      background-image: url('./images/button-chat-active.png');
+    }
+  }
+
+  #towtruck-buttons #towtruck-chat-button.towtruck-active {
+    background-image: url('./images/button-chat-active.png') !important;
+    background-color: #0F81BF;
+  }
+
+  #towtruck-dock-anchor {
+    height: @anchor-height;
+    text-align: center;
+    /* FIXME: disabling dock movement for now, cursor would be misleading: */
+    cursor: move;
+    .user-select(none);
+    width: 100%;
+    position: relative;
+    left: 0px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  .towtruck-subtitle {
+    background:#0195DD;
+    width:280px;
+    height:17px;
+    border-bottom:1px solid #0071A7;
+    color: rgba(255,255,255,0.5);
+    font-size:12px;
+    padding:7px 10px;
+    left:-14px;
+    top:-15px;
+    position:relative;
+  }
+
+  .towtruck-subtitle #towtruck-chat-participants {
+    font-size:12px;
+    color:rgba(255,255,255,0.5);
+  }
+
+  .towtruck-subtitle #towtruck-chat-no-participants {
+    font-size:12px;
+    color:rgba(255,255,255,0.5);
+  }
+
+  .towtruck-subtitle #towtruck-chat-participant-list {
+    font-size:12px;
+    color:rgba(255,255,255,0.5);
+  }
+
+
+  #towtruck-chat-input {
+    width: 264px;
+    font-size: 14px;
+    padding: 4px 6px 5px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    /*box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);*/
+    font-family: openSansLight;
+    &:focus {
+      border:1px solid #0095DD;
+    }
+  }
+
+  #towtruck-chat-input-box {
+    margin: 0;
+    padding: 10px 10px 11px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    background:#F2F2F2;
+    position: relative;
+    /*box-shadow: 0 -1px 2px rgba(0,0,0,0.1);*/
+    height: 31px;
+    width: 280px;
+    margin-left:-7px;
+    border-bottom-right-radius:4px;
+    border-bottom-left-radius:4px;
+  }
+
+  .towtruck-window #towtruck-chat-messages {
+    width: 300px;
+    position: relative;
+    left: -14px;
+    background: #fff;
+    top:-30px;
+    margin-bottom:-30px !important;
+  }
+
+  .towtruck-chat-item {
+    padding: 0 0 20px 0;
+    font-family: @default-font;
+    font-size: 14px;
+    padding: 10px 0px;
+    margin: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    color:rgba(51,51,51,1);
+  }
+
+  #towtruck-chat-messages .towtruck-person-self {
+    float:left;
+    margin-bottom:20px;
+    margin-top:7px;
+  }
+
+  #towtruck-chat-messages .towtruck-person {
+    float:left;
+    margin-bottom:20px;
+  }
+
+  .towtruck-person-name-abbrev {
+    color:rgba(51,51,51,1);
+    font-family:openSansRegular;
+    padding-top:7px;
+  }
+
+ .towtruck-timestamp {
+    float: right;
+    color:rgba(51,51,51,0.5);
+    font-size: 9px !important;
+    padding: 8px 15px 0px 10px;
+  }
+
+  .towtruck-chat-content {
+    white-space: pre-wrap;
+    line-height: 20px;
+    font-family: @default-font;
+    padding: 0px 14px 7px;
+  }
+
+  #towtruck-window-pointer-right, #towtruck-window-pointer-left {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    margin-right: -5px;
+    margin-top: -5px;
+    background: #fff;
+    border-right: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    z-index: @z-index + 2;
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+  }
+  #towtruck-window-pointer-right {
+    -moz-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+  #towtruck-window-pointer-left {
+    -moz-transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+  }
+
+  .towtruck-window {
+    .window;
+    width: 286px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  // FIXME: why the override?
+
+  #towtruck-feedback-form > header {
+    font-weight: bold;
+    font-variant: normal;
+    text-align: center;
+    font-family: openSansRegular;
+    color: #fff;
+    margin: 0 -1px 0 -1px;
+    padding: 10px 4px 5px 30px;
+    height: 24px;
+    background: #0095DD;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    border-bottom: 1px solid #0071A7;
+  }
+
+  #towtruck-feedback-form.towtruck-modal {
+    background-color: #fff;
+    color: #000000;
+    padding: 0 0 5px 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    border-left: 1px solid #c9c9c9;
+    border-right: 1px solid #c9c9c9;
+    border-bottom: 1px solid #c9c9c9;
+    position: fixed;
+    top: 46%;
+    left: 47%;
+    margin-left: -150px;
+    margin-top: -10em;
+    height: 24em;
+    width:399px;
+  }
+
+  #towtruck-alpha-intro .towtruck-small-feedback-txt {
+    font-size: 10px;
+  }
+
+  #towtruck-alpha-intro .towtruck-modal-close:hover {
+    background: #61921b;
+  }
+
+  #towtruck-alpha-intro {
+    height: 24em;
+  }
+
+  #towtruck-intro .towtruck-modal-dont-join {
+/*    background-repeat: repeat-x;
+    border: 0;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    display: inline-block;
+    text-transform: none;
+    vertical-align: middle;
+    padding: 10px 0 10px 0;*/
+  }
+
+  .towtruck-notification {
+    .window;
+    width: 300px;
+    border-radius: 4px;
+    background: rgba(242,242,242,0.9);
+    border: 1px solid #BCBCBC;
+    -moz-box-shadow:    0px 5px 15px 0px rgba(0,0,0,0.40), inset 0px 3px 1px 0px #FFFFFF;
+    -webkit-box-shadow: 0px 5px 15px 0px rgba(0,0,0,0.40), inset 0px 3px 1px 0px #FFFFFF;
+    box-shadow:         0px 5px 15px 0px rgba(0,0,0,0.40), inset 0px 3px 1px 0px #FFFFFF;
+    &:hover {
+      background: rgba(242,242,242,1);
+      cursor:pointer;
+    }
+  }
+
+  .towtruck-notification .towtruck-chat-item {
+    border-bottom:0px;
+  }
+
+  .towtruck-notification section#towtruck-chat-notifier-message {
+    margin:0px !important;
+  }
+
+  .towtruck-notification .towtruck-chat-content {
+    font-size:12px;
+  }
+
+  .towtruck-notification section {
+    font-size:12px;
+  }
+
+  .towtruck-notification .towtruck-person-name {
+    font-family: openSansRegular, Helvetica Bold, 'Helvetica Neue', Arial;
+    font-size:14px;
+  }
+
+  .towtruck-notification button {
+    min-width:47% !important;
+  }
+
+  .towtruck-notification .towtruck-person {
+    display:none;
+  }
+
+  .towtruck-notification .towtruck-timestamp {
+    display:none;
+  }
+
+  .towtruck-notification {
+    border-bottom:0px;
+  }
+
+  .towtruck-notification img.towtruck-notification-logo {
+    float:left;
+    margin: 22px 14px 10px 10px;
+  }
+
+  .towtruck-notification img.towtruck-notification-closebtn{
+    float:right;
+    padding: 14px 7px;
+
+    &:hover{
+      opacity:0.5;
+    }
+  }
+
+  .towtruck-notification section.towtruck-buttons {
+    border-top:1px solid #E1E1E1;
+  }
+
+  .towtruck-person {
+    height: @avatar-size + 4;
+    width: @avatar-size + 4;
+    margin:(@button-size/5) + 2;
+    background-repeat: no-repeat;
+    background-size: 40px 40px;
+    background-position: -2px -2px;
+    border: 2px solid;
+    border-radius: 2px;
+    background-clip: border-box;
+    &.towtruck-person-small {
+      display: inline-block;
+      @height: (@button-size + 8px) / 2 - 9px;
+      height: @height + 5;
+      width: @height + 5;
+      margin: -1px -18px;
+      background-size: (@height + 7) (@height + 7);
+      background-position: -1px -1px;
+    }
+  }
+  
+  .towtruck-person-small .towtruck-person-avatar-swatch {
+    border-width: 3px;
+    margin-left: 14px;
+    margin-top: 0px;
+  }
+
+  .towtruck-person-avatar-swatch {
+    /* This is the element that lives inside all .towtruck-person elements
+       and is used for the triangle. */
+    @size: 7px;
+    width: 0;
+    height: 0;
+    margin-left: @avatar-size - @size - 2px;
+    padding: 0;
+    border-top: @size solid transparent;
+    border-left: @size solid transparent;
+    border-right: @size solid transparent;
+    border-bottom: @size solid transparent;
+    margin-top: -2px;
+  }
+
+  .towtruck-person-inactive {
+    opacity: 0.5;
+  }
+
+  .towtruck-button .towtruck-person {
+    // A hack of sorts, because we don't want any top or bottom margin when the avatar
+    // is inside a dock button (but we do want the left margin);
+    margin: 0 0 0 10px;
+  }
+
+  // Only applies to the participant-detail screen, really?
+  header .towtruck-person {
+    float: left;
+  }
+
+  .towtruck-dock-person > .towtruck-dock-person-tooltip {
+    display: none;
+  }
+  .towtruck-dock-person:hover > .towtruck-dock-person-tooltip {
+    display: block;
+  }
+  .towtruck-dock-person.towtruck-active:hover > .towtruck-dock-person-tooltip {
+    display: none;
+  }
+
+  .towtruck-dock-person-tooltip {
+    position: absolute;
+    right: 70px;
+    top: @button-size / 2 - 5;
+    padding: 8px;
+    font-size:12px;
+    text-align:left;
+  }
+
+  .towtruck-tooltip {
+    background-color: rgba(42,42,42,.9);
+    color: #fff;
+    border-radius: 4px;
+    line-height:20px !important;
+  }
+
+  .towtruck-dock-person-tooltip .towtruck-person-name {
+    font-size:12px;
+  }
+
+  .towtruck-person-tooltip-arrow-r {
+    position:absolute;
+    left:42px;
+  	width: 0;
+  	height: 0;
+  	border-top: 4px solid transparent;
+  	border-bottom: 4px solid transparent;
+  	border-left: 4px solid rgba(0,0,0,0.9);
+  	line-height:20px;
+  }
+
+}
+
+.towtruck-triangle-up  {
+	position: absolute;
+  top: -15px;
+  width: 13px;
+  left: 50px;
+}
+
+.towtruck-triangle-up img {
+  width:12px;
+  height:13px;
+}
+
+.towtruck-rtc-dialog-btn {
+  text-align:right;
+}
+
+
+#towtruck-rtc-info section.towtruck-buttons {
+  text-align:right !important;
+}
+
+#towtruck-rtc-info label {
+  font-size: 12px !important;
+  float: left !important;
+  padding-top: 13px;
+  padding-left: 30px;
+}
+
+#towtruck-rtc-info input {
+  margin-top:0px !important;
+}
+
+
+.towtruck-chat-url-change {
+  background: #f2f2f2;
+  margin-top:0px !important;
+}
+
+.towtruck-chat-join-item {
+  background: #f2f2f2;
+  margin-top:0px !important;
+}
+
+.towtruck-chat-left-item {
+  background: #f2f2f2;
+  margin-top:0px !important;
+}
+
+.towtruck-inline-text {
+  margin-top:10px !important;
+}
+
+.towtruck-chat-join-item .towtruck-person{
+  float: left;
+  margin-bottom:0px !important;
+  margin-top:0px;
+}
+
+.towtruck-chat-left-item .towtruck-person{
+  float: left;
+  margin-bottom:0px !important;
+  margin-top:0px;
+}
+
+.towtruck-chat-url-change .towtruck-person{
+  float: left;
+  margin-bottom:0px !important;
+  margin-top:0px;
+}
+
+.towtruck-chat-join-item span.towtruck-person-name{
+  font-family:openSansRegular, Helvetica;
+}
+
+.towtruck-chat-left-item span.towtruck-person-name{
+  font-family:openSansRegular, Helvetica;
+}
+
+.towtruck-chat-url-change span.towtruck-person-name{
+  font-family:openSansRegular, Helvetica;
+}
+
+.towtruck-clear {
+  clear:both;
+}
+
+
+/* Menu */
+#towtruck-menu {
+  @icon-size: 12px;
+  width:216px;
+  position: fixed;
+  font-size: 14px;
+  background-color: #fff;
+  z-index: @z-index + 3;
+  border: 1px solid #979797;
+  border-radius: 4px;
+  hr {
+    margin:0px;
+    border-top: 0px solid #E1E1E1;
+  }
+  .towtruck-menu-hr-avatar{
+    margin-top:20px;
+    height: 0px;
+    border-bottom: 1px solid #E1E1E1;
+    font-size: 1px;
+  }
+  .towtruck-hr {
+    height: 0px;
+    margin: 0px;
+    border-bottom: 1px solid #E1E1E1;
+    font-size: 1px;
+  }
+  .towtruck-menu-item {
+    margin:-1px 0px -1px;
+    padding: 12px;
+    line-height:9px;
+    height:10px;
+    clear:both;
+    cursor: pointer;
+    &.towtruck-menu-disabled {
+      cursor: default;
+      &:hover {
+        background-color: inherit;
+        border-radius:4px;
+        border-top:1px solid #979797;
+        padding-top:11px !important;
+      }
+    }
+    img {
+      float:left;
+      height: (@icon-size)+8;
+      width: (@icon-size)+8;
+      margin-right: 10px;
+      margin-top:-5px;
+    }
+    &:hover {
+      background-color: rgba(216,216,216,0.5);
+    }
+    & .towtruck-avatar {
+      height: (@icon-size)+8;
+      width: (@icon-size)+8;
+      padding: 0;
+      margin: 0 10px 0 0;
+    }
+    & .towtruck-person-bgcolor-self {
+      display: inline-block;
+      width: @icon-size;
+      height: @icon-size;
+      border: 1px solid #999;
+      border-radius: 2px;
+      margin-right: 12px;
+      float:left;
+      margin-top:-2px;
+      margin-left:4px;
+    }
+  }
+
+  #towtruck-menu-help {
+    padding-left:15px;
+  }
+
+  #towtruck-menu-feedback {
+    padding-left:15px;
+  }
+
+  img#towtruck-menu-avatar {
+    float:left;
+    padding-top:8px;
+  }
+
+  .towtruck-person-name-self {
+    padding-top:8px;
+    line-height:32px;
+    font-weight:bold;
+  }
+
+  .towtruck-self-name {
+    width:146px !important;
+    float:right;
+    margin-top:-23px;
+    font-size: 12px;
+    padding: 7px 7px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);
+    margin: -2px 0px;
+    &:focus {
+      border:1px solid #0095DD;
+    }
+  }
+
+  .towtruck-self-name:focus {
+    border-bottom: 1px solid #0095DD;
+  }
+
+}
+
+/*Participant windows*/
+
+section.towtruck-participant-window-main {
+  margin:0px -7px -7px !important;
+}
+
+.towtruck p.towtruck-participant-window-row {
+  border-bottom:1px solid #E1E1E1 !important;
+  padding:7px 14px 14px !important
+}
+
+.towtruck-participant-window-row strong {
+  font-weight:800;
+}
+
+section.towtruck-buttons {
+  background: #F3F2F2;
+  margin: 0px -7px !important;
+  padding: 7px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+section.towtruck-buttons.towtruck-buttons-notification-diff-url {
+  margin: 7px -7px 0px !important;
+  padding: 7px 7px 0px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  width:290px;
+}
+
+.towtruck-notification-diff-url {
+  width: 288px !important;
+  margin: 0px 7px !important;
+}
+
+
+.towtruck-different-url button {
+  min-width:47% !important;
+}
+
+/*.towtruck-different-url {
+  text-align:right;
+}*/
+
+.towtruck-same-url {
+  padding-left: 7px !important;
+  opacity:.5 !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+
+
+
+
+/* Button set */
+#towtruck-dock {
+  position: fixed;
+  z-index: @z-index;
+  background-color: @background-color;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  @border-radius: 4px;
+  @long-side: (@button-size + 9px) * 4 + 64px; // actual button-size * number of buttons + expand thingy
+  @short-side: @button-size + 20px;
+  /*border:1px solid #000;*/
+
+  &.towtruck-dock-right {
+    padding: 0;
+    bottom: 150px;
+    right: 5px;
+    border-radius: @border-radius;
+    height: @long-side;
+    width: @short-side;
+    #towtruck-dock-anchor-vertical {
+      display: none;
+    }
+    #towtruck-dock-anchor-horizontal {
+      display: inline;
+    }
+
+    #towtruck-dock-anchor-horizontal img {
+      width:31px;
+      height:7px;
+      padding:0px 2px 2px 2px
+    }
+  }
+
+  &.towtruck-dock-left {
+    padding: 0;
+    bottom: 60px;
+    left: 5px;
+    border-radius: 0 @border-radius @border-radius 0;
+    height: @long-side - 46px;
+    width: @short-side;
+    #towtruck-dock-anchor-vertical {
+      display: none;
+    }
+    #towtruck-dock-anchor-horizontal {
+      display: inline;
+    }
+
+    #towtruck-dock-anchor-horizontal img {
+      width: 6px;
+      height: 6px;
+      padding: 7px 2px 2px 2px
+    }
+  }
+
+  &.towtruck-dock-bottom {
+    padding: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -(@long-side / 2);
+    border-radius: @border-radius @border-radius 0 0;
+    height: @short-side;
+    width: @long-side;
+    #towtruck-buttons, #towtruck-dock-anchor {
+      display: inline;
+    }
+    #towtruck-dock-anchor-vertical {
+      display: inline;
+    }
+    #towtruck-dock-anchor-horizontal {
+      display: none;
+    }
+    #towtruck-dock-anchor-vertical img {
+      width: 6px;
+      height: 6px;
+      padding: 2px;
+    }
+  }
+}
+
+/* Arrows for pointing */
+
+.towtruck-arrow {
+  position: absolute;
+  border: 2px solid #f00;
+  z-index: @z-index + 10;
+  padding: 0;
+  margin: 0;
+  .transform-origin(top left);
+}
+
+.towtruck-chat-message.towtruck-arrow-message {
+  border: 2px solid #f00;
+}
+
+/* Shared cursors */
+
+.towtruck-cursor-img {
+  position: relative;
+  top: 0;
+}
+
+.towtruck-cursor img {
+  width: 20px;
+  -webkit-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
+  /*FIX ME, moz filter not working...*/
+  -moz-filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
+          filter: drop-shadow( 0px 2px 1px rgba(0,0,0,0.2) );
+}
+
+.towtruck-cursor {
+  position: absolute;
+  z-index: @z-index - 1;
+  font-size: 28px;
+  font-weight: bolder;
+  /* This magic CSS rule makes this element basically invisible to clicks/etc:
+  (good on all but IE: http://caniuse.com/pointer-events */
+  pointer-events: none;
+  &:hover{
+    cursor:pointer;
+  }
+
+  /*FIXME: maybe these should use position: fixed so the cursor
+  stays stuck to the top of the screen until the appropriate time
+  (when .towtruck-scrolled-above/below is removed)?*/
+  &.towtruck-scrolled-above {
+    position: fixed;
+    .towtruck-cursor-down {
+      display: none;
+    }
+  }
+
+  &.towtruck-scrolled-below {
+    position: fixed;
+    .towtruck-cursor-up {
+      display: none;
+    }
+  }
+
+  &.towtruck-scrolled-normal {
+    .towtruck-cursor-up, .towtruck-cursor-down {
+      display: none;
+    }
+  }
+
+  .towtruck-cursor-container {
+    opacity:0.7;
+    white-space: nowrap;
+    font-family: @default-font;
+    font-size: 40%;
+    position: relative;
+    top: 0;
+    left: 5px;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.2);
+    -moz-box-shadow:    0px 2px 4px 0px rgba(0,0,0,0.50);
+    -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.50);
+    box-shadow:         0px 2px 4px 0px rgba(0,0,0,0.50);
+  }
+}
+
+@start-click: 10px;
+@end-click: 40px;
+
+.towtruck-click {
+  position: absolute;
+  z-index: @z-index - 2;
+  pointer-events: none;
+  width: @start-click;
+  height: @start-click;
+  margin: (-@start-click/2) 0 0 (-@start-click/2);
+  border-radius: @start-click/2;
+  border: 3px solid rgba(288, 58, 41, 1);
+  .transition(~"width 2s, height 2s, margin 2s, border 2s");
+
+  // This class is immediately applied for the purpose of transitioning:
+  &.towtruck-clicking {
+    width: @end-click;
+    height: @end-click;
+    margin: (-@end-click/2) 0 0 (-@end-click/2);
+    border-radius: @end-click/2;
+    border: 3px solid rgba(0, 0, 0, 0);
+  }
+}
+
+#towtruck-starter .towtruck-running {
+  background-color: #f00;
+  color: #fff;
+  border-radius: 4px;
+  border: 3px outset #d00;
+  /*FIXME: add gradient*/
+}
+
+/* Modals */
+
+#towtruck-modal-background {
+  position: fixed;
+  background-color: #000;
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: @z-index + 2;
+}
+
+.towtruck {
+
+  .towtruck-modal {
+    .towtruck.towtruck-window;
+    @height: 20em;
+    @width: 300px;
+    border-radius:5px !important;
+    position: fixed;
+    z-index: @z-index+3;
+    top: 50%;
+    left: 50%;
+    margin-left: -(@width/2);
+    width: @width;
+    margin-top: -(@height/2);
+    &.towtruck-modal-wide {
+      width: 550px;
+      margin-left: -284px;
+      height: 530px;
+      // FIXME: Why isn't -35% the right number?
+      // I can't for the life of me figure out why 20% is right
+      margin-top: -(550px / 2);
+    }
+  }
+
+  .towtruck-modal {
+    section.towtruck-buttons {
+      /*position: absolute;*/
+      bottom: 0;
+      background: #F2F2F2;
+      width: 294px;
+      padding: 10px;
+      text-align: right;
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 4px;
+      margin-left: -7px;
+      margin-bottom: 0px;
+      border-top:1px solid #E1E1E1;
+    }
+  }
+  .towtruck-modal-wide section.towtruck-buttons {
+    width: 544px;
+    text-align: center !important;
+    position: absolute;
+  }
+
+  .towtruck-walkthrough-slide {
+    padding: 0 30px 0 30px;
+    text-align:center;
+  }
+
+  .towtruck-walkthrough-slide p {
+    margin:18px auto;
+    width:400px;
+  }
+
+  .towtruck-walkthrough-slide iframe {
+    border-radius:4px;
+  }
+
+  section.towtruck-walkthrough-slide .towtruck-walkthrough-avatar {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    left: 44%;
+    top: 30%;
+    border-radius: 4px 4px 4px 4px;
+    border: 2px solid rgb(204, 204, 204);
+    background: none repeat scroll 0% 0% rgb(0, 0, 0);
+    &:hover {
+      cursor:pointer;
+      border: 2px solid rgb(204, 204, 204, 0.2);
+    }
+  }
+
+  section.towtruck-walkthrough-slide input.towtruck-self-name {
+    position: absolute;
+    top: 50%;
+    left: 29%;
+    font-size: 14px;
+    padding: 6px 6px 6px;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid rgb(204, 204, 204);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+    font-family: openSansRegular;
+    margin: 7px 0px;
+  }
+
+  section.towtruck-walkthrough-slide .towtruck-swatch {
+    width: 32px;
+    height: 32px;
+    background: none repeat scroll 0% 0% rgb(0, 0, 0);
+    position: absolute;
+    top: 51.2%;
+    right: 29%;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid rgb(204, 204, 204);
+    &:hover {
+      cursor:pointer;
+      border: 1px solid rgba(204, 204, 204,0.2);
+    }
+  }
+
+  section.towtruck-walkthrough-slide span.towtruck-walkthrough-sendlink {
+    top: 44%;
+    position: relative;
+  }
+
+  section.towtruck-walkthrough-slide input.towtruck-share-link {
+    top: 44%;
+    position: relative;
+  }
+
+  .towtruck-walkthrough-main-image {
+    width:400px;
+    height:300px;
+    background:rgba(216,216,216,0.1);
+    border-radius:4px;
+    border:1px solid rgba(151,151,151,0.1);
+    margin:0 auto;
+  }
+
+  .towtruck-walkthrough-main-image img {
+    width:400px;
+    height:300px;
+  }
+
+  .towtruck-walkthrough-arrow() {
+    cursor: pointer;
+    width:19px;
+    height:36px;
+    background-repeat:no-repeat;
+    background-size:60% 60%;
+    margin-right:28px;
+    margin-top:28%;
+    &.towtruck-disabled {
+      cursor: default;
+      opacity: 0.2;
+    }
+  }
+
+  .towtruck-walkthrough-arrow-l() {
+    cursor: pointer;
+    width:19px;
+    height:36px;
+    background-repeat:no-repeat;
+    background-size:60% 60%;
+    margin-left:36px;
+    margin-top:28%;
+    &.towtruck-disabled {
+      cursor: default;
+      opacity: 0.2;
+    }
+  }
+
+  #towtruck-walkthrough-previous {
+    .towtruck-walkthrough-arrow-l;
+    background-image: url('./images/icn-walkthrough-arrow-l.png');
+    float:left;
+    &:hover {
+      background-image: url('./images/icn-walkthrough-arrow-l-hover.png');
+    }
+  }
+
+  #towtruck-walkthrough-next {
+    .towtruck-walkthrough-arrow;
+    background-image: url('./images/icn-walkthrough-arrow-r.png');
+    float:right;
+    &:hover {
+      background-image: url('./images/icn-walkthrough-arrow-r-hover.png');
+    }
+  }
+
+  #towtruck-walkthrough-progress {
+    width: 537px;
+    position: absolute;
+    bottom: 66px;
+    text-align:center;
+  }
+
+  .towtruck-walkthrough-slide-progress {
+    cursor: pointer;
+    padding: 0 5px 0 5px;
+    color: #D8D8D8;
+    font-size:20px;
+    &.towtruck-active {
+      color: #9C9C9C;
+    }
+    &:hover {
+      color: #9C9C9C;
+    }
+  }
+
+}
+
+/* Animations */
+
+/* Inspired by https://github.com/daneden/animate.css */
+
+@-webkit-keyframes towtruck-pulse {
+  0% { -webkit-transform: scale(1); }
+  50% { -webkit-transform: scale(1.1); }
+  100% { -webkit-transform: scale(1); }
+}
+@-moz-keyframes towtruck-pulse {
+  0% { -moz-transform: scale(1); }
+  50% { -moz-transform: scale(1.1); }
+  100% { -moz-transform: scale(1); }
+}
+@-o-keyframes towtruck-pulse {
+  0% { -o-transform: scale(1); }
+  50% { -o-transform: scale(1.1); }
+  100% { -o-transform: scale(1); }
+}
+@keyframes towtruck-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.towtruck-pulse {
+  -webkit-animation-name: towtruck-pulse;
+  -moz-animation-name: towtruck-pulse;
+  -o-animation-name: towtruck-pulse;
+  animation-name: towtruck-pulse;
+}
+// Note: the 1s is also present in ui.js (ANIMATION_DURATION)
+.towtruck-animated {
+  -webkit-animation-duration: 1s;
+  -moz-animation-duration: 1s;
+  -o-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  -moz-animation-fill-mode: both;
+  -o-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes towtruck-color-pulse {
+  0% {box-shadow: none;}
+  50% {box-shadow: inset 0 0 2px #0095dd;}
+  100% {box-shadow: none;}
+}
+@-moz-keyframes towtruck-color-pulse {
+  0% {box-shadow: none;}
+  50% {box-shadow: inset 0 0 2px #0095dd;}
+  100% {box-shadow: none;}
+}
+@-o-keyframes towtruck-color-pulse {
+  0% {box-shadow: none;}
+  50% {box-shadow: inset 0 0 2px #0095dd;}
+  100% {box-shadow: none;}
+}
+@keyframes towtruck-color-pulse {
+  0% {box-shadow: none;}
+  50% {box-shadow: inset 0 0 2px #0095dd;}
+  100% {box-shadow: none;}
+}
+.towtruck-color-pulse {
+  -webkit-animation-name: towtruck-color-pulse;
+  -moz-animation-name: towtruck-color-pulse;
+  -o-animation-name: towtruck-color-pulse;
+  animation-name: towtruck-color-pulse;
+}
+
+@-webkit-keyframes towtruck-color-alert {
+  0% {box-shadow: none;}
+  50% {box-shadow: 0 0 5px #0095dd;}
+  100% {box-shadow: none;}
+}
+@-moz-keyframes towtruck-color-alert {
+  0% {box-shadow: none;}
+  50% {box-shadow: 0 0 5px #0095dd;}
+  100% {box-shadow: none;}
+}
+@-o-keyframes towtruck-color-alert {
+  0% {box-shadow: none;}
+  50% {box-shadow: 0 0 5px #0095dd;}
+  100% {box-shadow: none;}
+}
+@keyframes towtruck-color-alert {
+  0% {box-shadow: none;}
+  50% {box-shadow: 0 0 5px #0095dd;}
+  100% {box-shadow: none;}
+}
+.towtruck-color-alert {
+  -webkit-animation-name: towtruck-color-alert;
+  -moz-animation-name: towtruck-color-alert;
+  -o-animation-name: towtruck-color-alert;
+  animation-name: towtruck-color-alert;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  -o-animation-iteration-count: infinite;
+}
+
+#towtruck-profile-arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  left: 42px;
+  top: 46px;
+  background: url('./images/icn-gear.png');
+  background-size: 12px 12px;
+  background-repeat: no-repeat;
+}
+
+#towtruck-pick-color {
+  width: 100px;
+  height: 76px;
+  margin-left: -35px;
+  position: absolute;
+  margin-top:25px;
+  background-color: #fff;
+  z-index: @z-index + 4;
+  // FIXME: shouldn't be one-off like this:
+  border: 1px solid #979797;
+  border-radius: 4px;
+  padding: 5px;
+  .towtruck-swatch {
+    cursor: pointer;
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    border: 1px solid;
+    border-radius: 1px;
+    margin: 4px;
+    // Border and background color gets set dynamically
+    &.towtruck-swatch-active {
+      border: 3px solid;
+      border-radius: 3px;
+    }
+    &:hover {
+      border: 2px solid rgba(0,0,0,0.5);
+      // Adjusting down the size, so that the total size (height or
+      // width + border) is the same as the non-hover swatch:
+      height: 10px;
+      width: 10px;
+      border-radius: 3px;
+    }
+  }
+}
