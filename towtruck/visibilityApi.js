@@ -31,7 +31,7 @@ define(["session"], function (session) {
   });
 
   session.on("close", function () {
-    document.removeListener(visibilityChange, change, false);
+    document.removeEventListener(visibilityChange, change, false);
   });
 
   function change() {
