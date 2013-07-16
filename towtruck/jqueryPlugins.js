@@ -5,31 +5,17 @@
 define(["jquery"], function ($) {
   // This isn't really a "module" since it just patches jQuery itself
 
+  // FIX ME Animations TO DO
   // walkthrough animations go here
-
-  // animate avatar popping into the dock when they enter the session / telescope in the avatar
-  // $.fn.avatarEnter = function (y) {
-  //   return this.animate({
-  //     scrollTop: y
-  //   }, {
-  //     duration: 400,
-  //     easing: "swing"
-  //   });
-  // };
-
   // animate participant cursor and box popping in when they enter the session
-
-  // animate avatar exiting the dock when the exit the session/ telescope out the avatar
   // animate participant cursor and box popping out when they leave the session
-
   // animate the participant cursor -> rotate down when they're down the page
   // animate the participant cursor -> rotate up when they're on the same frame as the user
+  // Move notification when another notification slides in //
+  
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
-
-    //start scale small
-    //set css width small
 
     //starting position
     this.css({
@@ -37,10 +23,29 @@ define(["jquery"], function ($) {
       opacity: 1,
       "zIndex": 8888
     });
-    //this.show( { effect: "scale", origin: ['bottom' , 'right'] } );
-    //scale larger
-    //set css height large
-    //this.show( "scale", {percent: 200, direction: 'horizontal' }, 2000 );
+    
+    //starting position for arrow
+    $('#towtruck-window-pointer-right').css({
+      left: "+=74px",
+      opacity: 1,
+      "zIndex": 8888
+    });
+        
+    //animate arrow out
+    $('#towtruck-window-pointer-right').animate({
+      opacity: 1,
+      left: "-=78px"
+    }, {
+      duration:60, easing:"linear"
+    });
+    $('#towtruck-window-pointer-right').queue();
+    
+    //bounce arrow back
+    $('#towtruck-window-pointer-right').animate({
+      left:'+=4px'
+    }, {
+      duration:60, easing:"linear"
+    });
 
     //animate window out
     this.animate({
@@ -73,8 +78,6 @@ define(["jquery"], function ($) {
       "zIndex": 9999
     }, "fast");
   };
-
-  /* Move notification when another notification slides in */
 
   /* Used to fade away notification windows + flip the bottom of them out: */
   $.fn.fadeOut = function () {
@@ -152,37 +155,22 @@ define(["jquery"], function ($) {
 
   // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
+        
+    // get the current avatar dimenensions
     var height = this.height();
     var width = this.width();
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
-    console.log("calculated again", margin, margin + width/2);
-    
-
-    // set starting position for the avatar
-    this.css({
-      marginLeft: margin + width/2,
-      height: 40,
-      width: 40,
-      backgroundSize: "40px 40px"
-    });
     
     //then animate avatar to shrink to nothing, and reset the values again
-    // this.animate({
-    //   marginLeft: margin,
-    //   height: 0,
-    //   width: 0,
-    //   backgroundSize: "0px 0px"
-    // }, {
-    //   duration: 600
-    // }).promise().then(function () {
-    //   self.css({
-    //     marginLeft: "",
-    //     height: "",
-    //     width: "",
-    //     backgroundSize: ""
-    //   });
-    // });
+    // FIXME this needs to animate from the CENTER
+    this.animate({
+      marginLeft: margin + width/2,
+      height: 0,
+      width: 0,
+      backgroundSize: "0 0",
+      opacity: 0
+    }, 600 );
     
     return this;
     

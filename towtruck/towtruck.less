@@ -93,7 +93,7 @@
   // class="towtruck-primary/etc"> :
   //padding: 3px 10px 3px;
   height: 40px;
-  line-height: 40px;
+  line-height: 0px;
   text-decoration: none;
   min-width: 100px;
   border: none;
@@ -138,6 +138,10 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
   }
 }
 
+#towtruck-avatar-edit .towtruck-person-avatar-swatch {
+  margin-left: 36px;
+}
+
 #towtruck-avatar-edit .towtruck-person {
   float: left;
   height: 50px;
@@ -153,8 +157,13 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
 
 #towtruck-avatar-edit #towtruck-avatar-buttons {
   float:right;
-  width:160px;
-  padding:20px 0px;
+  width:172px;
+  padding:45px 0px;
+}
+
+input.towtruck-upload-avatar {
+  line-height: 0px;
+  width: 174px;
 }
 
 #towtruck-upload-avatar {
@@ -357,7 +366,7 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     height: @anchor-height;
     text-align: center;
     /* FIXME: disabling dock movement for now, cursor would be misleading: */
-    /*cursor: move;*/
+    cursor: move;
     .user-select(none);
     width: 100%;
     position: relative;
@@ -648,6 +657,12 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
       background-position: -1px -1px;
     }
   }
+  
+  .towtruck-person-small .towtruck-person-avatar-swatch {
+    border-width: 3px;
+    margin-left: 14px;
+    margin-top: 0px;
+  }
 
   .towtruck-person-avatar-swatch {
     /* This is the element that lives inside all .towtruck-person elements
@@ -655,12 +670,13 @@ a.towtruck-primary, a.towtruck-default, a.towtruck-secondary {
     @size: 7px;
     width: 0;
     height: 0;
-    margin-left: @avatar-size - @size;
+    margin-left: @avatar-size - @size - 2px;
     padding: 0;
     border-top: @size solid transparent;
     border-left: @size solid transparent;
     border-right: @size solid transparent;
     border-bottom: @size solid transparent;
+    margin-top: -2px;
   }
 
   .towtruck-person-inactive {
@@ -1238,6 +1254,25 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   .towtruck-walkthrough-slide iframe {
     border-radius:4px;
   }
+  
+  section.towtruck-walkthrough-slide .towtruck-walkthrough-main-image .towtruck-walkthrough-avatar-section {
+    margin-top:115px;
+  }
+  
+  .towtruck-avatar-preview {
+    float:left;
+    margin-left:82px;
+  }
+  
+  .towtruck-avatar-upload-input {
+    float:right;
+    margin-right:82px;
+    margin-top:19px;
+  }
+  
+  .towtruck-save-settings {
+    margin-top:239px;
+  }
 
   section.towtruck-walkthrough-slide .towtruck-walkthrough-avatar {
     width: 80px;
@@ -1264,7 +1299,7 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
     border: 1px solid rgb(204, 204, 204);
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
     font-family: openSansRegular;
-    margin: 7px 0px;
+    margin: -20px 0px;
   }
 
   section.towtruck-walkthrough-slide .towtruck-swatch {
@@ -1272,7 +1307,7 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
     height: 32px;
     background: none repeat scroll 0% 0% rgb(0, 0, 0);
     position: absolute;
-    top: 51.2%;
+    top: 46.2%;
     right: 29%;
     border-radius: 4px 4px 4px 4px;
     border: 1px solid rgb(204, 204, 204);
