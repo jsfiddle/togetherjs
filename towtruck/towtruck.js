@@ -246,7 +246,7 @@
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
       tinycolor: "libs/tinycolor",
-      "alien-avatar-generator": "libs/alien-avatar-generator"
+      whrandom: "libs/whrandom/random"
     }
   };
 
