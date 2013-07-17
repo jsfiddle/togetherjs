@@ -37,16 +37,16 @@ module.exports = function (grunt) {
         options: {
           baseUrl: "towtruck/",
           paths: {
+            require: "libs/require",
             jquery: "libs/jquery-1.8.3.min",
             walkabout: "libs/walkabout/walkabout",
             esprima: "libs/walkabout/lib/esprima",
             falafel: "libs/walkabout/lib/falafel",
             tinycolor: "libs/tinycolor",
-            "alien-avatar-generator": "libs/alien-avatar-generator",
-            guiders: "libs/Guider-JS/guiders-1.3.0"
+            whrandom: "libs/whrandom/random"
           },
           // FIXME: this includes everything from session features variable:
-          include: ["session", "jquery", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"],
+          include: ["require", "session", "jquery", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"],
           // FIXME: seems to have no effect?
           optimize: "none",
           namespace: "TOWTRUCK",
