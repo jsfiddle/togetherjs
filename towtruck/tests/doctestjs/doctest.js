@@ -75,6 +75,9 @@ Example.prototype = {
   writeConsole: function (message) {
     this.consoleOutput.push(message);
   },
+  clearConsole: function () {
+    this.consoleOutput = [];
+  },
   timeout: function (passed) {
     this.runner.reporter.logFailure(this, "Error: wait timed out after " + passed + " milliseconds");
   },
@@ -686,7 +689,8 @@ Runner.prototype = {
       log: this.logFactory(null, console.log),
       warn: this.logFactory(null, console.warn),
       error: this.logFactory(null, console.error),
-      info: this.logFactory(null, console.info)
+      info: this.logFactory(null, console.info),
+      clear: this.clearLogs.bind(this)
     };
     if (typeof window == 'undefined') {
       // Can't just overwrite the console object
@@ -852,6 +856,13 @@ Runner.prototype = {
     return func;
   },
 
+  clearLogs: function () {
+    this._currentExample.clearConsole();
+    if (console.clear.origFunc) {
+      console.clear.origFunc.call(console);
+    }
+  },
+
   Abort: function (message) {
     this._abortCalled = message || 'aborted';
     return {
@@ -881,6 +892,7 @@ Runner.prototype = {
       window.console.warn = window.console.warn.origFunc;
       window.console.error = window.console.error.origFunc;
       window.console.info = window.console.info.origFunc;
+      window.console.clear = window.console.clear.origFunc;
     }
   },
 
@@ -1307,6 +1319,9 @@ HTMLParser.prototype = {
           var pre = document.createElement('pre');
           pre.className = el.className;
           pre.appendChild(document.createTextNode(texts[i].body));
+          if (texts[i].expandOnFailure) {
+            pre.className += " expand-on-failure";
+          }
           el.parentNode.insertBefore(pre, null);
         }
         el.parentNode.removeChild(el);
@@ -1338,6 +1353,11 @@ HTMLParser.prototype = {
       var end = comment.range[1];
       var body = text.substr(pos, start-pos);
       var header = strip(comment.value.replace(/^\s*=+\s*SECTION\s*/, ''));
+      var expandOnFailure = false;
+      if (header.search(/expand-on-failure/i) !== -1) {
+        expandOnFailure = true;
+        header = header.replace(/\s*expand-on-failure/i, "");
+      }
       if (! result.length) {
         if (strip(body)) {
           result.push({header: null, body: body});
@@ -1345,7 +1365,7 @@ HTMLParser.prototype = {
       } else {
         result[result.length-1].body = body;
       }
-      result.push({header: header, body: null});
+      result.push({header: header, body: null, expandOnFailure: expandOnFailure});
       pos = end;
     }
     if (! result.length) {
