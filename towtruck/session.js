@@ -330,7 +330,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
                 readyForMessages = true;
                 startup.start();
               });
-              var ui = require("ui");
               ui.activateUI();
               if (TowTruck.getConfig("enableAnalytics")) {
                 require(["analytics"], function (analytics) {
