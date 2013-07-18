@@ -61,6 +61,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // ui.activateUI is called before the DOM is fully loaded:
   var deferringPrepareUI = null;
 
+  function deferForContainer(func) {
+    /* Defers any calls to func() until after ui.container is set
+       Function cannot have a return value (as sometimes the call will
+       become async).  Use like:
+
+       method: deferForContainer(function (args) {...})
+       */
+    return function () {
+      if (ui.container) {
+        func.apply(this, arguments);
+      }
+      var self = this;
+      var args = Array.prototype.slice.call(arguments);
+      session.once("ui-ready", function () {
+        func.apply(self, args);
+      });
+    };
+  }
+
   // This is called before activateUI; it doesn't bind anything, but does display
   // the dock
   // FIXME: because this module has lots of requirements we can't do
@@ -647,10 +666,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.add(el, undefined, true);
     },
 
-    clear: function () {
+    clear: deferForContainer(function () {
       var container = ui.container.find("#towtruck-chat-messages");
       container.empty();
-    },
+    }),
 
     urlChange: function (attrs) {
       assert(attrs.peer);
@@ -697,7 +716,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.add(el, messageId, notify);
     },
 
-    add: function (el, id, notify) {
+    add: deferForContainer(function (el, id, notify) {
       if (id) {
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
@@ -726,12 +745,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           }, notify);
         }
       }
-    },
+    }),
 
-    scroll: function () {
+    scroll: deferForContainer(function () {
       var container = ui.container.find("#towtruck-chat-messages")[0];
       container.scrollTop = container.scrollHeight;
-    }
+    })
 
   };
 
@@ -772,7 +791,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.updateDisplay(el);
     },
 
-    updateDisplay: function (container) {
+    updateDisplay: deferForContainer(function (container) {
       container = container || ui.container;
       var abbrev = this.peer.name;
       if (this.peer.isSelf) {
@@ -844,7 +863,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
       updateChatParticipantList();
       this.updateFollow();
-    },
+    }),
 
     update: function () {
       if (! this.peer.isSelf) {
@@ -884,7 +903,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
     },
 
-    dock: function () {
+    dock: deferForContainer(function () {
       if (this.dockElement) {
         return;
       }
@@ -917,7 +936,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         }
       }).bind(this));
       this.updateFollow();
-    },
+    }),
 
     undock: function () {
       if (! this.dockElement) {
@@ -986,11 +1005,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
   }
 
-  ui.showUrlChangeMessage = function (peer, url) {
+  ui.showUrlChangeMessage = deferForContainer(function (peer, url) {
     var window = templating.sub("url-change", {peer: peer});
     ui.container.append(window);
     windowing.show(window);
-  };
+  });
 
   session.hub.on("url-change-nudge", function (msg) {
     if (msg.to && msg.to != session.clientId) {
