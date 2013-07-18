@@ -180,10 +180,14 @@
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
-      // Though jquery uses requirejs, it also always also defines a
-      // global, so we have to keep it from conflicting with any
-      // previous jquery:
-      jquery.noConflict();
+      if (! min) {
+        // Though jquery uses requirejs, it also always also defines a
+        // global, so we have to keep it from conflicting with any
+        // previous jquery:
+        jquery.noConflict();
+        // Note this isn't an issue when everything is packaged up, as
+        // all the definitions happen inside a closure.
+      }
       TowTruck._loaded = true;
       if (min) {
         TowTruck.require = TOWTRUCK.require;
@@ -219,9 +223,6 @@
         window.require = requireConfig;
       }
     }
-    // FIXME: we should namespace require.js to avoid conflicts.  See:
-    //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
-    //   http://requirejs.org/docs/faq-advanced.html#rename
     if (min) {
       addScript("/towtruck/towtruckPackage.js");
     } else {
