@@ -59,6 +59,14 @@ module.exports = function (grunt) {
             text = text.replace(
               /typeof\s+define\s*!==?\s*"undefined"/g,
               'typeof TOWTRUCK.define != "undefined"');
+            // And for: https://github.com/jrburke/requirejs/issues/815
+            text = text.replace(
+              "if (typeof require !== 'undefined' && !isFunction(require)) {",
+              "if (typeof TOWTRUCK !== 'undefined' && TOWTRUCK.require !== undefined && !isFunction(TOWTRUCK.require)) {");
+            // FIXME: kind of hacky followon
+            text = text.replace(
+              /cfg = require;/,
+              "cfg = TOWTRUCK.require;");
             grunt.file.write("build/towtruck/towtruckPackage.js", text);
           }
         }
