@@ -180,14 +180,10 @@
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
-      if (! min) {
-        // Though jquery uses requirejs, it also always also defines a
-        // global, so we have to keep it from conflicting with any
-        // previous jquery:
-        jquery.noConflict();
-        // Note this isn't an issue when everything is packaged up, as
-        // all the definitions happen inside a closure.
-      }
+      // Though jquery uses requirejs, it also always also defines a
+      // global, so we have to keep it from conflicting with any
+      // previous jquery:
+      jquery.noConflict(true);
       TowTruck._loaded = true;
       if (min) {
         TowTruck.require = TOWTRUCK.require;
@@ -540,7 +536,7 @@
     delete window._TowTruckShareId;
   }
 
-  function conditionalOnload() {
+  function conditionalActivate() {
     if (window.TowTruckConfig_noAutoStart) {
       return;
     }
@@ -579,10 +575,6 @@
     }
   }
 
-  if (document.readyState == "complete") {
-    conditionalOnload();
-  } else {
-    window.addEventListener("load", conditionalOnload, false);
-  }
+  conditionalActivate();
 
 })();

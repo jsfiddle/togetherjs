@@ -57,6 +57,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
   ui.container = null;
 
+  // This is used for some signalling when ui.prepareUI and/or
+  // ui.activateUI is called before the DOM is fully loaded:
+  var deferringPrepareUI = null;
+
   // This is called before activateUI; it doesn't bind anything, but does display
   // the dock
   // FIXME: because this module has lots of requirements we can't do
@@ -64,6 +68,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // this out?  OTOH, in production we should have all the files
   // combined so there's not much problem loading those modules.
   ui.prepareUI = function () {
+    if (! (document.readyState == "complete" || document.readyState == "interactive")) {
+      // Too soon!  Wait a sec...
+      deferringPrepareUI = "deferring";
+      document.addEventListener("DOMContentLoaded", function () {
+        var d = deferringPrepareUI;
+        deferringPrepareUI = null;
+        ui.prepareUI();
+        // This happens when ui.activateUI is called before the document has been
+        // loaded:
+        if (d == "activate") {
+          ui.activateUI();
+        }
+      });
+      return;
+    }
     var container = ui.container = $(templates["interface"]);
     assert(container.length);
     $("body").append(container);
@@ -135,6 +154,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // interact with the interface.  But activateUI is called once
   // everything is loaded and ready for interaction.
   ui.activateUI = function () {
+    if (deferringPrepareUI) {
+      console.warn("ui.activateUI called before document is ready; waiting...");
+      deferringPrepareUI = "activate";
+      return;
+    }
     if (! ui.container) {
       ui.prepareUI();
     }
