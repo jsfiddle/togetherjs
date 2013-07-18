@@ -12,6 +12,8 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+  // True if this file should use minimized sub-resources:
+  var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
   var baseUrlOverride = localStorage.getItem("towtruck.baseUrlOverride");
   if (baseUrlOverride) {
@@ -171,6 +173,10 @@
     TowTruck.startup._launch = true;
 
     addStyle();
+    var minSetting = TowTruck.getConfig("useMinimizedCode");
+    if (minSetting !== undefined) {
+      min = !! minSetting;
+    }
     var requireConfig = TowTruck._extend(TowTruck.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
@@ -179,11 +185,23 @@
       // previous jquery:
       jquery.noConflict();
       TowTruck._loaded = true;
-      TowTruck.require = require.config({context: "towtruck"});
-      TowTruck._requireObject = require;
+      if (min) {
+        TowTruck.require = TOWTRUCK.require;
+        TowTruck._requireObject = TOWTRUCK.require;
+      } else {
+        TowTruck.require = require.config({context: "towtruck"});
+        TowTruck._requireObject = require;
+      }
     }
-    if (typeof require == "function") {
-      TowTruck.require = require.config(requireConfig);
+    if (min) {
+      if (typeof TOWTRUCK != "undefined" && typeof TOWTRUCK.require == "function") {
+        delete requireConfig.context;
+        TowTruck.require = TOWTRUCK.require.config(requireConfig);
+      }
+    } else {
+      if (typeof require == "function") {
+        TowTruck.require = require.config(requireConfig);
+      }
     }
     if (typeof TowTruck.require == "function") {
       // This is an already-configured version of require
@@ -191,12 +209,24 @@
     } else {
       requireConfig.deps = deps;
       requireConfig.callback = callback;
-      window.require = requireConfig;
+      if (min) {
+        if (typeof TOWTRUCK == "undefined") {
+          TOWTRUCK = {};
+        }
+        delete requireConfig.context;
+        TOWTRUCK.require = requireConfig;
+      } else {
+        window.require = requireConfig;
+      }
     }
     // FIXME: we should namespace require.js to avoid conflicts.  See:
     //   https://github.com/jrburke/r.js/blob/master/build/example.build.js#L267
     //   http://requirejs.org/docs/faq-advanced.html#rename
-    addScript("/towtruck/libs/require.js");
+    if (min) {
+      addScript("/towtruck/towtruckPackage.js");
+    } else {
+      addScript("/towtruck/libs/require.js");
+    }
   };
 
   TowTruck.pageLoaded = Date.now();
@@ -348,6 +378,7 @@
   /* This finalizes the unloading of TowTruck, including unloading modules */
   TowTruck._teardown = function () {
     var requireObject = TowTruck._requireObject || window.require;
+    // FIXME: this doesn't clear the context for TOWTRUCK/min-case
     delete requireObject.s.contexts.towtruck;
     TowTruck._loaded = false;
     TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
@@ -384,6 +415,8 @@
     getUserAvatar: null,
     // The siteName is used in the walkthrough (defaults to document.title):
     siteName: null,
+    // Whether to use the minimized version of the code (overriding the built setting)
+    useMinimizedCode: undefined,
     // Any events to bind to
     on: {}
   };

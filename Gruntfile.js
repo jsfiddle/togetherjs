@@ -42,14 +42,25 @@ module.exports = function (grunt) {
             esprima: "libs/walkabout/lib/esprima",
             falafel: "libs/walkabout/lib/falafel",
             tinycolor: "libs/tinycolor",
-            whrandom: "libs/whrandom/random"
+            whrandom: "libs/whrandom/random",
+            // Make sure we get the built form of this one:
+            templates: "../build/towtruck/templates"
           },
-          // FIXME: this includes everything from session features variable:
-          include: ["libs/require-nomin", "session", "jquery", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"],
-          // FIXME: seems to have no effect?
+          include: ["libs/require-nomin", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
           optimize: "none",
           namespace: "TOWTRUCK",
-          out: "build/towtruck/towtruckPackage.js"
+          out: function (text) {
+            // Fix this bug: https://github.com/jrburke/requirejs/issues/813
+            // First for jQuery:
+            text = text.replace(
+              'typeof define=="function"&&define.amd&&define.amd.jQuery',
+              'typeof TOWTRUCK.define=="function"&&TOWTRUCK.define.amd&&TOWTRUCK.define.amd.jQuery');
+            // Another fix for tinycolor:
+            text = text.replace(
+              /typeof\s+define\s*!==?\s*"undefined"/g,
+              'typeof TOWTRUCK.define != "undefined"');
+            grunt.file.write("build/towtruck/towtruckPackage.js", text);
+          }
         }
       }
     },
@@ -129,7 +140,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask("build", ["copy:main", "maybeless", "substitute"]);
+  grunt.registerTask("build", ["copy:main", "maybeless", "substitute", "requirejs"]);
   grunt.registerTask("buildsite", ["copy:site", "render"]);
 
   function escapeString(s) {
@@ -160,16 +171,34 @@ module.exports = function (grunt) {
         __gitCommit__: gitCommit
       };
       var filenames = {
-        "towtruck/templates.js": "towtruck/templates.js",
-        "towtruck/towtruck.js": "towtruck.js"
+        "towtruck/templates.js": {
+          src: "towtruck/templates.js"
+        },
+        "towtruck.js": {
+          src: "towtruck/towtruck.js",
+          extraVariables: {__min__: "no"}
+        },
+        "towtruck-min.js": {
+          src: "towtruck/towtruck.js",
+          extraVariables: {__min__: "yes"}
+        }
       };
-      for (var src in filenames) {
-        var dest = filenames[src];
+      for (var dest in filenames) {
+        var info = filenames[dest];
+        var src = info.src;
+        var extraVariables = info.extraVariables;
         dest = "build/" + dest;
         var content = fs.readFileSync(src, "UTF-8");
-        for (var v in subs) {
+        var s = subs;
+        if (extraVariables) {
+          s = Object.create(subs);
+          for (var a in extraVariables) {
+            s[a] = extraVariables[a];
+          }
+        }
+        for (var v in s) {
           var re = new RegExp(v, "g");
-          content = content.replace(re, escapeString(subs[v]));
+          content = content.replace(re, escapeString(s[v]));
         }
         grunt.log.writeln("writing " + src.cyan + " to " + dest.cyan);
         grunt.file.write(dest, content);
