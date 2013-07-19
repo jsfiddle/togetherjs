@@ -20,7 +20,7 @@ logger = {
 };
 ["warn", "error", "info", "debug"].forEach(function (n) {
   logger[n] = function () {
-    logger.log.apply(logger, [n.toUpperCase()].concat(arguments));
+    logger.log.apply(logger, [n.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
   };
 });
 
@@ -54,7 +54,7 @@ function write404(response) {
 
 function startServer(port, host) {
   server.listen(port, host, function() {
-    logger.info('HUB Server listening on port ' + port + " (Should be " + (process.env.HUB_SERVER_PORT || 'default') + ")");
+    logger.info('HUB Server listening on port ' + port + " interface: " + host);
   });
 }
 
