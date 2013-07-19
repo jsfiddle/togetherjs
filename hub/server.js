@@ -9,7 +9,20 @@ var parseUrl = require('url').parse;
 var fs = require('fs');
 var path = require('path');
 var less = require('less');
-var logger = require('../../lib/logger');
+// FIXME: not sure what logger to use
+//var logger = require('../../lib/logger');
+var logger = console;
+
+logger = {
+  log: function () {
+    console.log.apply(console, arguments);
+  }
+};
+["warn", "error", "info", "debug"].forEach(function (n) {
+  logger[n] = function () {
+    logger.log.apply(logger, [n.toUpperCase()].concat(arguments));
+  };
+});
 
 var server = http.createServer(function(request, response) {
   var url = parseUrl(request.url);
@@ -41,7 +54,7 @@ function write404(response) {
 
 function startServer(port, host) {
   server.listen(port, host, function() {
-    logger.info('HUB Server listening on port ' + port + " (Should be " + process.env.HUB_BASE + ")");
+    logger.info('HUB Server listening on port ' + port + " (Should be " + (process.env.HUB_SERVER_PORT || 'default') + ")");
   });
 }
 
@@ -75,7 +88,11 @@ wsServer.on('request', function(request) {
     return;
   }
 
-  var id = request.httpRequest.url.replace(/^\/hub\/+/, '').replace(/\/.*/, '');
+  var id = request.httpRequest.url.replace(/^\/+hub\/+/, '').replace(/\//g, "");
+  if (! id) {
+    request.reject(404, 'No ID Found');
+    return;
+  }
 
   // FIXME: we should use a protocol here instead of null, but I can't
   // get it to work.  "Protocol" is what the two clients are using
