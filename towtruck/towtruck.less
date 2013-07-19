@@ -691,11 +691,19 @@ input.towtruck-upload-avatar {
     opacity: 0.5;
   }
 
+  // causes a problem on FF
   .towtruck-button .towtruck-person {
     // A hack of sorts, because we don't want any top or bottom margin when the avatar
     // is inside a dock button (but we do want the left margin);
     margin: 0 0 0 10px;
   }
+  
+  @-moz-document url-prefix() {
+      /* firefox only styles */
+      .towtruck-button .towtruck-person {
+        margin: 10px 0 0 10px !important;
+      }
+  }  
 
   // Only applies to the participant-detail screen, really?
   header .towtruck-person {
@@ -1097,6 +1105,10 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
 }
 
 /* Shared cursors */
+
+.towtruck-cursor svg {
+  -webkit-filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.3));
+}
 
 .towtruck-cursor-img {
   position: relative;

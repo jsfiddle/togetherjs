@@ -36,7 +36,7 @@ define(["jquery"], function ($) {
   
   // animate the participant cursor -> rotate up when they're on the same frame as the user
   $.fn.rotateCursorDown = function () {
-    $('svg').animate({borderSpacing: 0, opacity: 1}, {
+    $('.towtruck-cursor svg').animate({borderSpacing: 0, opacity: 1}, {
       step: function(now, fx) {
         if (fx.prop == "borderSpacing") {
           $(this).css('-webkit-transform', 'rotate('+now+'deg)')

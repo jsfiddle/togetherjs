@@ -175,7 +175,7 @@ Test.addControl($('<button>Keyboard</button>').click(function () {
 
 Test.addControl($('<button>Participant down page (cursor rotate)</button>').click(function () {
   
-  $('svg').animate({borderSpacing: -150, opacity: 1}, {
+  $('.towtruck-cursor svg').animate({borderSpacing: -150, opacity: 1}, {
     step: function(now, fx) {
       if (fx.prop == "borderSpacing") {
         $(this).css('-webkit-transform', 'rotate('+now+'deg)')
