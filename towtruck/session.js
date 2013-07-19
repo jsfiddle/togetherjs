@@ -39,7 +39,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.hubUrl = function () {
     assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return TowTruck.getConfig("hubBase") + "/hub/" + session.shareId;
+    return TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + session.shareId;
   };
 
   session.shareUrl = function () {
