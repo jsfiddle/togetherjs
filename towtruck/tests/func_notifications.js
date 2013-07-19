@@ -172,3 +172,33 @@ Test.addControl($('<button>Keyboard</button>').click(function () {
     clientId: "faker"
   });
 }));
+
+Test.addControl($('<button>Participant down page (cursor rotate)</button>').click(function () {
+  
+  $('svg').animate({borderSpacing: -150, opacity: 1}, {
+    step: function(now, fx) {
+      if (fx.prop == "borderSpacing") {
+        $(this).css('-webkit-transform', 'rotate('+now+'deg)')
+          .css('-moz-transform', 'rotate('+now+'deg)')
+          .css('-ms-transform', 'rotate('+now+'deg)')
+          .css('-o-transform', 'rotate('+now+'deg)')
+          .css('transform', 'rotate('+now+'deg)');
+      } else {
+        $(this).css(fx.prop, now);
+      }
+    },
+    duration: 500
+  }, 'linear').promise().then(function () {
+    this.css('-webkit-transform', '');
+    this.css('-moz-transform', '');
+    this.css('-ms-transform', '');
+    this.css('-o-transform', '');
+    this.css('transform', '');
+    this.css("opacity", "");
+  });
+
+  // Test.incoming({
+  //   type: "keydown",
+  //   clientId: "faker"
+  // });
+}));

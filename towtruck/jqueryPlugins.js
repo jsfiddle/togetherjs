@@ -10,7 +10,55 @@ define(["jquery"], function ($) {
   // animate participant cursor and box popping in when they enter the session
   // animate participant cursor and box popping out when they leave the session
   // animate the participant cursor -> rotate down when they're down the page
+  $.fn.rotateCursorDown = function () {
+    $('svg').animate({borderSpacing: -150, opacity: 1}, {
+      step: function(now, fx) {
+        if (fx.prop == "borderSpacing") {
+          $(this).css('-webkit-transform', 'rotate('+now+'deg)')
+            .css('-moz-transform', 'rotate('+now+'deg)')
+            .css('-ms-transform', 'rotate('+now+'deg)')
+            .css('-o-transform', 'rotate('+now+'deg)')
+            .css('transform', 'rotate('+now+'deg)');
+        } else {
+          $(this).css(fx.prop, now);
+        }
+      },
+      duration: 500
+    }, 'linear').promise().then(function () {
+      this.css('-webkit-transform', '');
+      this.css('-moz-transform', '');
+      this.css('-ms-transform', '');
+      this.css('-o-transform', '');
+      this.css('transform', '');
+      this.css("opacity", "");
+    });
+  };
+  
   // animate the participant cursor -> rotate up when they're on the same frame as the user
+  $.fn.rotateCursorDown = function () {
+    $('svg').animate({borderSpacing: 0, opacity: 1}, {
+      step: function(now, fx) {
+        if (fx.prop == "borderSpacing") {
+          $(this).css('-webkit-transform', 'rotate('+now+'deg)')
+            .css('-moz-transform', 'rotate('+now+'deg)')
+            .css('-ms-transform', 'rotate('+now+'deg)')
+            .css('-o-transform', 'rotate('+now+'deg)')
+            .css('transform', 'rotate('+now+'deg)');
+        } else {
+          $(this).css(fx.prop, now);
+        }
+      },
+      duration: 500
+    }, 'linear').promise().then(function () {
+      this.css('-webkit-transform', '');
+      this.css('-moz-transform', '');
+      this.css('-ms-transform', '');
+      this.css('-o-transform', '');
+      this.css('transform', '');
+      this.css("opacity", "");
+    });
+  };
+  
   // Move notification when another notification slides in //
   
 
