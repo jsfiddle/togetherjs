@@ -289,7 +289,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
               storage.settings.set("color", color);
             }
             if (! avatar) {
-              avatar = TowTruck.baseUrl + "/images/default-avatar.png";
+              avatar = TowTruck.baseUrl + "/towtruck/images/default-avatar.png";
             }
             this.update({
               name: name,
