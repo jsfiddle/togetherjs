@@ -33,7 +33,7 @@ define(["jquery"], function ($) {
       this.css("opacity", "");
     });
   };
-  
+
   // animate the participant cursor -> rotate up when they're on the same frame as the user
   $.fn.rotateCursorDown = function () {
     $('.towtruck-cursor svg').animate({borderSpacing: 0, opacity: 1}, {
@@ -58,9 +58,9 @@ define(["jquery"], function ($) {
       this.css("opacity", "");
     });
   };
-  
+
   // Move notification when another notification slides in //
-  
+
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
@@ -71,14 +71,14 @@ define(["jquery"], function ($) {
       opacity: 1,
       "zIndex": 8888
     });
-    
+
     //starting position for arrow
     $('#towtruck-window-pointer-right').css({
       left: "+=74px",
       opacity: 1,
       "zIndex": 8888
     });
-        
+
     //animate arrow out
     $('#towtruck-window-pointer-right').animate({
       opacity: 1,
@@ -87,7 +87,7 @@ define(["jquery"], function ($) {
       duration:60, easing:"linear"
     });
     $('#towtruck-window-pointer-right').queue();
-    
+
     //bounce arrow back
     $('#towtruck-window-pointer-right').animate({
       left:'+=4px'
@@ -169,9 +169,9 @@ define(["jquery"], function ($) {
     var width = this.width();
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
-    
+
     console.log("calculated", margin, margin + width/2);
-    
+
     // set starting position CSS for avatar
     this.css({
       marginLeft: margin + width/2,
@@ -179,9 +179,9 @@ define(["jquery"], function ($) {
       width: 0,
       backgroundSize: "0 0"
     });
-        
+
     var self = this;
-    
+
     //then animate avatar to the actual dimensions, and reset the values
     this.animate({
       marginLeft: margin,
@@ -203,13 +203,13 @@ define(["jquery"], function ($) {
 
   // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
-        
+
     // get the current avatar dimenensions
     var height = this.height();
     var width = this.width();
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
-    
+
     //then animate avatar to shrink to nothing, and reset the values again
     // FIXME this needs to animate from the CENTER
     this.animate({
@@ -219,9 +219,9 @@ define(["jquery"], function ($) {
       backgroundSize: "0 0",
       opacity: 0
     }, 600 );
-    
+
     return this;
-    
+
   };
 
   $.fn.animateCursorEntry = function () {
@@ -258,5 +258,8 @@ define(["jquery"], function ($) {
     this.data("animateKeyboard", null);
   };
 
+  // FIXME: not sure if this is legit, but at least the modern mobile devices we
+  // care about should have this defined:
+  $.browser.mobile = window.orientation !== undefined;
 
 });
