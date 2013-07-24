@@ -133,7 +133,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($
     },
 
     destroy: function (el) {
-      this._editor().removeListener("change", this._change);
+      this._editor().off("change", this._change);
     },
 
     update: function (msg) {
