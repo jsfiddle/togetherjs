@@ -669,7 +669,7 @@ input.towtruck-upload-avatar {
       background-position: -1px -1px;
     }
   }
-  
+
   .towtruck-person-small .towtruck-person-avatar-swatch {
     border-width: 3px;
     margin-left: 14px;
@@ -701,13 +701,13 @@ input.towtruck-upload-avatar {
     // is inside a dock button (but we do want the left margin);
     margin: 0 0 0 10px;
   }
-  
+
   @-moz-document url-prefix() {
       /* firefox only styles */
       .towtruck-button .towtruck-person {
         margin: 10px 0 0 10px !important;
       }
-  }  
+  }
 
   // Only applies to the participant-detail screen, really?
   header .towtruck-person {
@@ -1283,22 +1283,22 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   .towtruck-walkthrough-slide iframe {
     border-radius:4px;
   }
-  
+
   section.towtruck-walkthrough-slide .towtruck-walkthrough-main-image .towtruck-walkthrough-avatar-section {
     margin-top:115px;
   }
-  
+
   .towtruck-avatar-preview {
     float:left;
     margin-left:82px;
   }
-  
+
   .towtruck-avatar-upload-input {
     float:right;
     margin-right:82px;
     margin-top:19px;
   }
-  
+
   .towtruck-save-settings {
     margin-top:239px;
   }
@@ -1583,4 +1583,12 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
       border-radius: 3px;
     }
   }
+}
+
+@media screen and (max-device-width: 480px) {
+  @import "mobile.less";
+}
+
+.towtruck-mobile-browser {
+  @import "mobile.less";
 }

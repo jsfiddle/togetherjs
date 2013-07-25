@@ -170,8 +170,6 @@ define(["jquery"], function ($) {
     var backgroundSize = height + 4;
     var margin = parseInt(this.css("marginLeft"), 10);
 
-    console.log("calculated", margin, margin + width/2);
-
     // set starting position CSS for avatar
     this.css({
       marginLeft: margin + width/2,
@@ -261,5 +259,14 @@ define(["jquery"], function ($) {
   // FIXME: not sure if this is legit, but at least the modern mobile devices we
   // care about should have this defined:
   $.browser.mobile = window.orientation !== undefined;
+  if (navigator.userAgent.search(/mobile/i) != -1) {
+    // FIXME: At least on the Firefox OS simulator I need this
+    $.browser.mobile = true;
+  }
+
+  if ($.browser.mobile && window.matchMedia && ! window.matchMedia("screen and (max-screen-width: 480px)").matches) {
+    // FIXME: for Firefox OS simulator really:
+    document.body.className += " towtruck-mobile-browser";
+  }
 
 });
