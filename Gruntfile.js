@@ -220,7 +220,7 @@ module.exports = function (grunt) {
     var found = false;
     sources.forEach(function (fn) {
       var source = fs.statSync(fn);
-      destFn = "build/" + fn.substr(0, fn.length-4) + "css";
+      var destFn = "build/" + fn.substr(0, fn.length-4) + "css";
       if (! fs.existsSync(destFn)) {
         found = true;
         grunt.log.writeln("Destination LESS does not exist: " + destFn.cyan);
