@@ -1585,10 +1585,16 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   }
 }
 
+.towtruck-only-mobile {
+  display: none;
+}
+
 @media screen and (max-device-width: 480px) {
   @import "mobile.less";
 }
 
+/* We set this class on the <body> element when that last media query won't work
+   but we detect in Javascript that the client should be treated as mobile */
 .towtruck-mobile-browser {
   @import "mobile.less";
 }

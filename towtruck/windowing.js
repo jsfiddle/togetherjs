@@ -46,6 +46,9 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
   /* Moves a window to be attached to data-bind-to, e.g., the button
      that opened the window. Or you can provide an element that it should bind to. */
   function bind(win, bound) {
+    if ($.browser.mobile) {
+      return;
+    }
     win = $(win);
     assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
     // FIXME: hardcoding

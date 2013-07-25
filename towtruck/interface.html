@@ -70,8 +70,14 @@
        data-bind-to="#towtruck-share-button" style="display: none">
     <header> Invite a friend </header>
     <section>
-      <p>Copy and paste this link over IM or email:</p>
-      <input type="text" class="towtruck-share-link">
+      <div class="towtruck-not-mobile">
+        <p>Copy and paste this link over IM or email:</p>
+        <input type="text" class="towtruck-share-link">
+      </div>
+      <div class="towtruck-only-mobile">
+        <p>Share <a class="towtruck-share-link" href="#">this link</a>
+          over a message or email.</p>
+      </div>
     </section>
   </div>
 
@@ -283,6 +289,42 @@
     <div class="towtruck-menu-item" id="towtruck-menu-feedback">Feedback</div>
     <div class="towtruck-hr"></div>
     <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End TowTruck</div>
+  </div>
+
+  <!-- A window version of #towtruck-menu, for use on mobile -->
+  <div id="towtruck-menu-window" class="towtruck-window" style="display: none">
+    <header>Settings and Profile</header>
+    <section>
+    <div class="towtruck-menu-item">
+      <img class="towtruck-menu-avatar">
+      <span class="towtruck-person-name-self" id="towtruck-self-name-display"></span>
+    </div>
+    <div class="towtruck-menu-hr-avatar"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-name-button"><img src="http://localhost:8080/towtruck/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar-button"><img src="http://localhost:8080/towtruck/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-update-color-button"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="towtruck-hr"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-help-button">Help</div>
+    <div class="towtruck-menu-item" id="towtruck-menu-feedback-button">Feedback</div>
+    <div class="towtruck-hr"></div>
+    <div class="towtruck-menu-item" id="towtruck-menu-end-button"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End TowTruck</div>
+    </section>
+    <section class="towtruck-buttons">
+      <button class="towtruck-dismiss towtruck-primary">OK</button>
+    </section>
+  </div>
+
+  <!-- The name editor, for use on mobile -->
+  <div id="towtruck-edit-name-window" class="towtruck-window" style="display: none">
+    <header>Update Name</header>
+    <section>
+      <div>
+        <input class="towtruck-self-name" type="text" placeholder="Enter your name">
+      </div>
+    </section>
+    <section class="towtruck-buttons">
+      <button class="towtruck-dismiss towtruck-primary">OK</button>
+    </section>
   </div>
 
   <div class="towtruck-menu" id="towtruck-pick-color" style="display: none">

@@ -185,7 +185,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     // The share link:
     ui.prepareShareLink(container);
-    container.find(".towtruck-share-link").on("keydown", function (event) {
+    container.find("input.towtruck-share-link").on("keydown", function (event) {
       if (event.which == 27) {
         windowing.hide("#towtruck-share");
         return false;
@@ -274,18 +274,23 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
 
     $("#towtruck-profile-button").click(function (event) {
+      if ($.browser.mobile) {
+        console.log("showing #towtruck-menu-window", $("#towtruck-menu-window")[0]);
+        windowing.show("#towtruck-menu-window");
+        return false;
+      }
       toggleMenu();
       event.stopPropagation();
       return false;
     });
 
-    $("#towtruck-menu-feedback").click(function(){
+    $("#towtruck-menu-feedback, #towtruck-menu-feedback-button").click(function(){
       windowing.hide();
       hideMenu();
       windowing.show("#towtruck-feedback-form");
     });
 
-    $("#towtruck-menu-help").click(function () {
+    $("#towtruck-menu-help, #towtruck-menu-help-button").click(function () {
       windowing.hide();
       hideMenu();
       require(["walkthrough"], function (walkthrough) {
@@ -303,6 +308,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#towtruck-menu .towtruck-self-name").focus();
     });
 
+    $("#towtruck-menu-update-name-button").click(function () {
+      windowing.show("#towtruck-edit-name-window");
+      $("#towtruck-edit-name-window input").focus();
+    });
+
     $("#towtruck-menu .towtruck-self-name").bind("keyup", function (event) {
       if (event.which == 13) {
         ui.displayToggle("#towtruck-self-name-display");
@@ -314,12 +324,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
     });
 
-    $("#towtruck-menu-update-avatar").click(function () {
+    $("#towtruck-menu-update-avatar, #towtruck-menu-update-avatar-button").click(function () {
       hideMenu();
       windowing.show("#towtruck-avatar-edit");
     });
 
-    $("#towtruck-menu-end").click(function () {
+    $("#towtruck-menu-end, #towtruck-menu-end-button").click(function () {
       hideMenu();
       windowing.show("#towtruck-confirm-end");
     });
@@ -373,10 +383,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     session.on("display-window", function (id, element) {
       if (id == "towtruck-chat") {
-        $("#towtruck-chat-input").focus();
+        if (! $.browser.mobile) {
+          $("#towtruck-chat-input").focus();
+        }
       } else if (id == "towtruck-share") {
-        element.find(".towtruck-share-link").focus();
-        element.find(".towtruck-share-link").select();
+        var link = element.find("input.towtruck-share-link");
+        if (link.is(":visible")) {
+          link.focus().select();
+        }
       }
     });
 
@@ -504,10 +518,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   }
 
   ui.prepareShareLink = function (container) {
-    container.find(".towtruck-share-link").click(function () {
+    container.find("input.towtruck-share-link").click(function () {
       $(this).select();
     }).change(function () {
       updateShareLink();
+    });
+    container.find("a.towtruck-share-link").click(function () {
+      // FIXME: this is currently opening up Bluetooth, not sharing a link
+      if (false && window.MozActivity) {
+        var activity = new MozActivity({
+          name: "share",
+          data: {
+            type: "url",
+            url: $(this).attr("href")
+          }
+        });
+      }
+      // FIXME: should show some help if you actually try to follow the link
+      // like this, instead of simply suppressing it
+      return false;
     });
     updateShareLink();
   };
@@ -582,13 +611,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // Misc
 
   function updateShareLink() {
-    var el = $(".towtruck-share-link");
+    var input = $("input.towtruck-share-link");
+    var link = $("a.towtruck-share-link");
     var display = $("#towtruck-session-id");
     if (! session.shareId) {
-      el.val("");
+      input.val("");
+      link.attr("href", "#");
       display.text("(none)");
     } else {
-      el.val(session.shareUrl());
+      input.val(session.shareUrl());
+      link.attr("href", session.shareUrl());
       display.text(session.shareId);
     }
   }
