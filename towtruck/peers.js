@@ -457,7 +457,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     session.send({type: "ping-back"});
   });
 
-  window.addEventListener("unload", function () {
+  window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
     storage.tab.set("peerCache", serialize());
   }, false);
