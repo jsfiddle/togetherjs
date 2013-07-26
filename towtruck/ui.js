@@ -19,6 +19,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   var finishedAt = null;
   // Time in milliseconds for the dock to animate out:
   var DOCK_ANIMATION_TIME = 300;
+  // If two chat messages come from the same person in this time
+  // (milliseconds) then they are collapsed into one message:
+  var COLLAPSE_MESSAGE_LIMIT = 5000;
 
   var COLORS = [
     "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
@@ -275,7 +278,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#towtruck-profile-button").click(function (event) {
       if ($.browser.mobile) {
-        console.log("showing #towtruck-menu-window", $("#towtruck-menu-window")[0]);
         windowing.show("#towtruck-menu-window");
         return false;
       }
@@ -653,6 +655,22 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       assert(attrs.peer);
       assert(attrs.messageId);
       var date = attrs.date || Date.now();
+      var lastEl = ui.container.find("#towtruck-chat .towtruck-chat-message");
+      if (lastEl.length) {
+        lastEl = $(lastEl[lastEl.length-1]);
+      }
+      var lastDate = null;
+      if (lastEl) {
+        lastDate = parseInt(lastEl.attr("data-date"), 10);
+      }
+      if (lastEl && lastEl.attr("data-person") == attrs.peer.id &&
+          lastDate && date < lastDate + COLLAPSE_MESSAGE_LIMIT) {
+        lastEl.attr("data-date", date);
+        var content = lastEl.find(".towtruck-chat-content");
+        assert(content.length);
+        attrs.text = content.text() + "\n" + attrs.text;
+        attrs.messageId = lastEl.attr("data-message-id");
+      }
       var el = templating.sub("chat-message", {
         peer: attrs.peer,
         content: attrs.text,
@@ -660,7 +678,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       linkify(el.find(".towtruck-chat-content"));
       el.attr("data-person", attrs.peer.id)
-        .attr("data-date", date);
+        .attr("data-date", date)
+        .attr("data-message-id", attrs.messageId);
       ui.chat.add(el, attrs.messageId, attrs.notify);
     },
 
@@ -748,6 +767,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.add(el, messageId, notify);
     },
 
+    hideTimeout: null,
+
     add: deferForContainer(function (el, id, notify) {
       if (id) {
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
@@ -768,13 +789,22 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (doNotify) {
         section.empty();
         section.append(el.clone(true, true));
-        section.data("message-id", id || "");
-        windowing.show(popup);
+        if (section.data("message-id") != id)  {
+          section.data("message-id", id || "");
+          windowing.show(popup);
+        } else if (! popup.is(":visible")) {
+          windowing.show(popup);
+        }
         if (typeof notify == "number") {
           // This is the amount of time we're supposed to notify
-          setTimeout(function () {
+          if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+            this.hideTimeout = null;
+          }
+          this.hideTimeout = setTimeout((function () {
             windowing.hide(popup);
-          }, notify);
+            this.hideTimeout = null;
+          }).bind(this), notify);
         }
       }
     }),
