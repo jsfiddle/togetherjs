@@ -53,6 +53,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       return "left";
     } else if (iface.hasClass("towtruck-dock-bottom")) {
       return "bottom";
+    } else if (iface.hasClass("towtruck-dock-top")) {
+      return "top";
     } else {
       throw new AssertionError("#towtruck-dock doesn't have positioning class");
     }
@@ -112,7 +114,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     if ($.browser.mobile) {
       container.find("#towtruck-dock")
         .removeClass("towtruck-dock-right")
-        .addClass("towtruck-dock-bottom");
+        .addClass("towtruck-dock-top");
+        //.addClass("towtruck-dock-top");
     }    
     if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:

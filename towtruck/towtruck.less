@@ -1067,6 +1067,30 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
       padding: 7px 2px 2px 2px
     }
   }
+  
+  &.towtruck-dock-top {
+    padding: 0;
+    top: 0;
+    left: 50%;
+    margin-left: -(@long-side / 2);
+    border-radius: @border-radius @border-radius 0 0;
+    height: @short-side;
+    width: @long-side;
+    #towtruck-buttons, #towtruck-dock-anchor {
+      display: inline;
+    }
+    #towtruck-dock-anchor-vertical {
+      display: inline;
+    }
+    #towtruck-dock-anchor-horizontal {
+      display: none;
+    }
+    #towtruck-dock-anchor-vertical img {
+      width: 6px;
+      height: 6px;
+      padding: 2px;
+    }
+  }
 
   &.towtruck-dock-bottom {
     padding: 0;
