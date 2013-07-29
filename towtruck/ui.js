@@ -109,6 +109,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     assert(container.length);
     $("body").append(container);
     fixupAvatars(container);
+    if ($.browser.mobile) {
+      container.find("#towtruck-dock")
+        .removeClass("towtruck-dock-right")
+        .addClass("towtruck-dock-bottom");
+    }    
     if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
