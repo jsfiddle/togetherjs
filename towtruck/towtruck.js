@@ -151,6 +151,14 @@
     for (attr in ons) {
       TowTruck.on(attr, ons[attr]);
     }
+    var hubOns = TowTruck.getConfig("hub_on");
+    if (hubOns) {
+      for (attr in hubOns) {
+        if (hubOns.hasOwnProperty(attr)) {
+          TowTruck.hub.on(attr, hubOns[attr]);
+        }
+      }
+    }
 
     if (! TowTruck.startup.reason) {
       // Then a call to TowTruck() from a button must be started TowTruck
@@ -415,7 +423,9 @@
     // Whether to use the minimized version of the code (overriding the built setting)
     useMinimizedCode: undefined,
     // Any events to bind to
-    on: {}
+    on: {},
+    // Hub events to bind to
+    hub_on: {}
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep
