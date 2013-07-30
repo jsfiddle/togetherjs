@@ -74,10 +74,6 @@ Test.addControl(
       clientId: peer.id
     });
     
-    $('.towtruck-cursor').animate({
-       opacity: 0,
-    }, 1000);
-    
   }),
   $('<button>Decline</button>').click(function () {
     var peer = pick();

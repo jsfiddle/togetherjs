@@ -1003,7 +1003,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     undock: function () {
       if (! this.dockElement) {
         return;
-      }
+      }      
       this.dockElement.animateDockExit().promise().then((function () {
         this.dockElement.remove();
         this.dockElement = null;

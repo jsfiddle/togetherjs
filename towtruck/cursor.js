@@ -63,9 +63,29 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       path.attr("fill", peer.color);
       // FIXME: should I just remove the element?
       if (peer.status != "live") {
-        this.element.hide();
+        //this.element.hide();
+        this.element.find("svg").animate({
+          opacity: 0
+        }, 350);
+        this.element.find(".towtruck-cursor-container").animate({
+                width: 34,
+                height: 20,
+                padding: 12,
+                margin: 0
+            }, 200).animate({
+                width: 0,
+                height: 0,
+                padding: 0,
+                opacity: 0
+                }, 200);
+        console.log("animate out participant box and cursor");
       } else {
-        this.element.show();
+        //this.element.show();
+        this.element.animate({
+          opacity:0.3
+        }).animate({
+          opacity:1
+        });
       }
     },
 
