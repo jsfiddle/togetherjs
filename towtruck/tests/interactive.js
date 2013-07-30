@@ -54,11 +54,11 @@ addPeer();
 Test.addControl(
   
   $("<button>Animate in cursor/box</button>").click(function () {
-    $(".towtruck-cursor").fadeOut();
+    //$(".towtruck-cursor").fadeOut();
   }),
   
   $("<button>Animate out cursor/box</button>").click(function () {
-    $(".towtruck-cursor").fadeOut();
+    //$(".towtruck-cursor").fadeOut();
   }),
   
   $("<button>Faker Join</button>").click(function () {
@@ -73,7 +73,11 @@ Test.addControl(
       type: "bye",
       clientId: peer.id
     });
-    $(".towtruck-cursor").fadeOut();
+    
+    $('.towtruck-cursor').animate({
+       opacity: 0,
+    }, 1000);
+    
   }),
   $('<button>Decline</button>').click(function () {
     var peer = pick();

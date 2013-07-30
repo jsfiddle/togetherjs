@@ -26,9 +26,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   });
 
   // FIXME: should check for a peer leaving and remove the cursor object
-
   var Cursor = util.Class({
-
+    
     constructor: function (clientId) {
       this.clientId = clientId;
       this.element = templating.clone("cursor");
@@ -108,19 +107,56 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.element.hide();
     },
 
+    // place Cursor rotate function down here
+    rotateCursorDown: function(){
+      var e = $(this.element).find('svg');
+        e.animate({borderSpacing: -150, opacity: 1}, {
+        step: function(now, fx) {
+          if (fx.prop == "borderSpacing") {
+            e.css('-webkit-transform', 'rotate('+now+'deg)')
+              .css('-moz-transform', 'rotate('+now+'deg)')
+              .css('-ms-transform', 'rotate('+now+'deg)')
+              .css('-o-transform', 'rotate('+now+'deg)')
+              .css('transform', 'rotate('+now+'deg)');
+          } else {
+            e.css(fx.prop, now);
+          }
+        },
+        duration: 500
+      }, 'linear').promise().then(function () {
+        e.css('-webkit-transform', '')
+          .css('-moz-transform', '')
+          .css('-ms-transform', '')
+          .css('-o-transform', '')
+          .css('transform', '')
+          .css("opacity", "");
+      });
+    },
+
+    // place Cursor rotate function up here
+
+    // so the cursor doesnt keep rotating, check to see if it's still at the y position, and use this.cursorScrolledBelow
+    
     setPosition: function (top, left) {
       var wTop = $(window).scrollTop();
       var height = $(window).height();
+
       if (top < wTop) {
+              this.currentCursorPosition = 'above'
         // FIXME: this is a totally arbitrary number, but is meant to be big enough
         // to keep the cursor name from being off the top of the screen.
         top = 25;
         this.setClass("towtruck-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
         top = height - CURSOR_HEIGHT - 5;
-        this.setClass("towtruck-scrolled-below");
+        // add function
+        if (the cursor wasn't already below, animate)
+        this.rotateCursorDown();
+              this.currentCursorPosition = 'below'
+        //this.setClass("towtruck-scrolled-below");
       } else {
         this.setClass("towtruck-scrolled-normal");
+              this.currentCursorPosition = 'normal'
       }
       this.element.css({
         top: top,
