@@ -139,7 +139,9 @@ function runExample(first, second) {
 
 // =SECTION Test
 
-for (var run=0; run<100; run++) {
+var start = doctest.params.startRun;
+start = start ? parseInt(start, 10) : 0;
+for (var run=start; run<100; run++) {
   for (var first=0; first<4; first++) {
     for (var second=0; second<4; second++) {
       if (! (first || second)) {

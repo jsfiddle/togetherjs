@@ -257,11 +257,59 @@ trans(text, r(0, 0, "X"), r(2, 2, "Y"));
 [insert "X" @0] + [replace 2 chars with "Y" @3] -> XabYef
 */
 
-// =SECTION Test
+// =SECTION Test (TP1)
 
 for (var i=0; i<1000; i++) {
   console.log("Run", i);
   run();
+}
+print("done.");
+
+// => done.
+
+// =SECTION Test (TP2 attempt)
+
+
+function runTp2() {
+  var base = "abcdefg";
+  console.log("Start:", JSON.stringify(base) + "/" + base.length);
+  var deltaFirst = ot.TextReplace.random(base, generator);
+  var delta1 = ot.TextReplace.random(base, generator);
+  var delta2 = ot.TextReplace.random(base, generator);
+  console.log("Delta First:", deltaFirst+"");
+  console.log("Delta1:", delta1+"");
+  console.log("Delta2:", delta2+"");
+  // Now we'll try two orderings:
+  // first + 1 + 2
+  // first + 2 + 1
+  var delta1Trans = delta1.transpose(deltaFirst)[0];
+  console.log("Translate:", deltaFirst, "+ (", delta1, "becomes", delta1Trans, ")");
+  var delta2Trans = delta2.transpose(deltaFirst)[0];
+  console.log("Translate:", deltaFirst, "+ (", delta2, "becomes", delta2Trans, ")");
+  var delta1Trans_a = delta1Trans.transpose(delta2Trans)[0];
+  console.log("Translate:", delta2Trans, "+ (", delta1Trans, "becomes", delta1Trans_a, ")");
+  var delta2Trans_a = delta1Trans.transpose(delta2Trans)[1];
+  console.log("Translate:", delta1Trans, "+ (", delta2Trans, "becomes", delta2Trans_a, ")");
+  var text1 = delta1Trans_a.apply(delta2Trans.apply(deltaFirst.apply(base)));
+  console.log("text1:", JSON.stringify(base), "->", JSON.stringify(text1));
+  console.log(" ", deltaFirst, deltaFirst.apply(base));
+  console.log(" ", delta2Trans, delta2Trans.apply(deltaFirst.apply(base)));
+  console.log(" ", delta1Trans_a, text1);
+  var text2 = delta2Trans_a.apply(delta1Trans.apply(deltaFirst.apply(base)));
+  console.log("text2:", JSON.stringify(base), "->", JSON.stringify(text2));
+  console.log(" ", deltaFirst, deltaFirst.apply(base));
+  console.log(" ", delta1Trans, delta1Trans.apply(deltaFirst.apply(base)));
+  console.log(" ", delta2Trans_a, text2);
+  if (text1 != text2) {
+    print("Not equal");
+    throw new Error("Error; not equal");
+  }
+}
+
+for (var i=0; i<1000; i++) {
+  console.clear();
+  console.log("Run", i);
+  runTp2();
 }
 print("done.");
 
