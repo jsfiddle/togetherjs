@@ -425,7 +425,10 @@
     // Any events to bind to
     on: {},
     // Hub events to bind to
-    hub_on: {}
+    hub_on: {},
+    // Enables the alt-T alt-T TowTruck shortcut; however, this setting
+    // must be enabled early as TowTruckConfig_enableShortcut = true;
+    enableShortcut: false
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep
@@ -529,6 +532,34 @@
     return session.shareUrl();
   };
 
+  var listener = null;
+
+  TowTruck.listenForShortcut = function () {
+    console.warn("Listening for alt-T alt-T to start TowTruck");
+    listener = function listener(event) {
+      if (event.which == 84 && event.altKey) {
+        if (listener.pressed) {
+          // Second hit
+          TowTruck();
+        } else {
+          listener.pressed = true;
+        }
+      } else {
+        listener.pressed = false;
+      }
+    };
+    TowTruck.once("ready", TowTruck.removeShortcut);
+    document.addEventListener("keyup", listener, false);
+  };
+
+  TowTruck.removeShortcut = function () {
+    console.log("removed listener");
+    if (listener) {
+      document.addEventListener("keyup", listener, false);
+      listener = null;
+    }
+  };
+
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
@@ -586,5 +617,10 @@
   }
 
   conditionalActivate();
+
+  // FIXME: wait until load event to double check if this gets set?
+  if (window.TowTruckConfig_enableShortcut) {
+    TowTruck.listenForShortcut();
+  }
 
 })();
