@@ -107,7 +107,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.element.hide();
     },
 
-    // place Cursor rotate function down here
+    // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
     rotateCursorDown: function(){
       var e = $(this.element).find('svg');
         e.animate({borderSpacing: -150, opacity: 1}, {
@@ -132,31 +132,21 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
           .css("opacity", "");
       });
     },
-
-    // place Cursor rotate function up here
-
-    // so the cursor doesnt keep rotating, check to see if it's still at the y position, and use this.cursorScrolledBelow
     
     setPosition: function (top, left) {
       var wTop = $(window).scrollTop();
       var height = $(window).height();
 
       if (top < wTop) {
-              this.currentCursorPosition = 'above'
         // FIXME: this is a totally arbitrary number, but is meant to be big enough
         // to keep the cursor name from being off the top of the screen.
         top = 25;
         this.setClass("towtruck-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
         top = height - CURSOR_HEIGHT - 5;
-        // add function
-        if (the cursor wasn't already below, animate)
-        this.rotateCursorDown();
-              this.currentCursorPosition = 'below'
-        //this.setClass("towtruck-scrolled-below");
+        this.setClass("towtruck-scrolled-below");
       } else {
         this.setClass("towtruck-scrolled-normal");
-              this.currentCursorPosition = 'normal'
       }
       this.element.css({
         top: top,

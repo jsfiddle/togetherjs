@@ -1112,6 +1112,7 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
 
 .towtruck-cursor svg {
   -webkit-filter: drop-shadow(1px 3px 2px rgba(0,0,0,0.3));
+  -webkit-transform: rotate(-10deg);
 }
 
 .towtruck-cursor-img {
@@ -1144,6 +1145,14 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   (when .towtruck-scrolled-above/below is removed)?*/
   &.towtruck-scrolled-above {
     position: fixed;
+    svg {
+      -webkit-transition-duration: 0.8s;
+      -webkit-transition-property: -webkit-transform;
+      -webkit-transform: rotate(20deg);
+      transition-duration: 0.8s;
+      transition-property: transform;
+      transform: rotate(20deg);
+    }
     .towtruck-cursor-down {
       display: none;
     }
@@ -1151,12 +1160,28 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
 
   &.towtruck-scrolled-below {
     position: fixed;
+    svg {
+      -webkit-transition-duration: 0.8s;
+      -webkit-transition-property: -webkit-transform;
+      -webkit-transform: rotate(-150deg);
+      transition-duration: 0.8s;
+      transition-property: transform;
+      transform: rotate(-150deg);
+    }
     .towtruck-cursor-up {
       display: none;
     }
   }
 
   &.towtruck-scrolled-normal {
+    svg {
+      -webkit-transition-duration: 0.8s;
+      -webkit-transition-property: -webkit-transform;
+      -webkit-transform: rotate(-10deg);
+      transition-duration: 0.8s;
+      transition-property: transform;
+      transform: rotate(-10deg);
+    }
     .towtruck-cursor-up, .towtruck-cursor-down {
       display: none;
     }
@@ -1168,8 +1193,8 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
     font-family: @default-font;
     font-size: 40%;
     position: relative;
-    top: 0;
-    left: 5px;
+    top: 5px;
+    left: 15px;
     padding: 8px;
     border-radius: 4px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.2);
