@@ -1,3 +1,13 @@
+<!--
+    Any elements with .towtruck-walkthrough-firsttime will only be
+    displayed on during the first-time experience.  Any elements with
+    .towtruck-walkthrough-not-firsttime will only be displayed when
+    the walkthrough is accessed through the Help menu.
+
+    Note you *cannot* use <section class="towtruck-walkthrough-slide
+    towtruck-walkthrough-firsttime">: the number of sections must be the
+    same regardless.
+  -->
 <div id="towtruck-walkthrough" class="towtruck-modal towtruck-modal-wide">
   <header>You're using <span class="towtruck-tool-name">TowTruck</span>!<button class="towtruck-close"></button></header>
 
@@ -10,21 +20,26 @@
   </section>
 
   <section class="towtruck-walkthrough-slide">
-    <div class="towtruck-walkthrough-main-image">
-      <div class="towtruck-walkthrough-avatar-section">
-        <div class="towtruck-avatar-preview towtruck-person towtruck-person-self"></div>
-        <div class="towtruck-avatar-upload-input"><input type="file" class="towtruck-upload-avatar"></div>
+    <div class="towtruck-walkthrough-firsttime">
+      <div class="towtruck-walkthrough-main-image">
+        <div class="towtruck-walkthrough-avatar-section">
+          <div class="towtruck-avatar-preview towtruck-person towtruck-person-self"></div>
+          <div class="towtruck-avatar-upload-input"><input type="file" class="towtruck-upload-avatar"></div>
+        </div>
+        <input class="towtruck-self-name" type="text" placeholder="Enter your name">
+        <div class="towtruck-swatch towtruck-person-bgcolor-self"></div>
+        <div class="towtruck-save-settings">
+          <button class="towtruck-avatar-save towtruck-primary">
+            <span id="towtruck-avatar-when-unsaved">Save</span>
+            <span id="towtruck-avatar-when-saved" style="display: none">Saved!</span>
+          </button>
+        </div>
       </div>
-      <input class="towtruck-self-name" type="text" placeholder="Enter your name">
-      <div class="towtruck-swatch towtruck-person-bgcolor-self"></div>
-      <div class="towtruck-save-settings">
-        <button class="towtruck-avatar-save towtruck-primary">
-          <span id="towtruck-avatar-when-unsaved">Save</span>
-          <span id="towtruck-avatar-when-saved" style="display: none">Saved!</span>
-        </button>
-      </div>
+      <p>Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.</p>
     </div>
-    <p>Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.</p>
+    <div class="towtruck-walkthrough-not-firsttime">
+      <p>Set up your avatar, name and user color using the Profile button.</p>
+    </div>
   </section>
 
   <section class="towtruck-walkthrough-slide">

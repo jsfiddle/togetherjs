@@ -115,7 +115,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
           return;
         }
         require(["walkthrough"], function (walkthrough) {
-          walkthrough.start(function () {
+          walkthrough.start(true, function () {
             storage.settings.set("seenIntroDialog", true);
             next();
           });

@@ -297,7 +297,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       hideMenu();
       require(["walkthrough"], function (walkthrough) {
         windowing.hide();
-        walkthrough.start();
+        walkthrough.start(false);
       });
     });
 

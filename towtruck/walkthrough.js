@@ -10,7 +10,7 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
 
   var slides = null;
 
-  walkthrough.start = function (doneCallback) {
+  walkthrough.start = function (firstTime, doneCallback) {
     if (! container) {
       container = $(templates.walkthrough);
       container.hide();
@@ -69,6 +69,14 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
       // This triggers substititions in the walkthrough:
       peers.Self.update({});
       session.emit("new-element", container);
+    }
+    assert(typeof firstTime == "boolean", "You must provide a firstTime boolean parameter");
+    if (firstTime) {
+      container.find(".towtruck-walkthrough-firsttime").show();
+      container.find(".towtruck-walkthrough-not-firsttime").hide();
+    } else {
+      container.find(".towtruck-walkthrough-firsttime").hide();
+      container.find(".towtruck-walkthrough-not-firsttime").show();
     }
     onHideAll = doneCallback;
     show(0);
