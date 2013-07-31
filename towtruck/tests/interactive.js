@@ -52,15 +52,15 @@ addPeer();
 // =SECTION Helpers
 
 Test.addControl(
-  
+
   $("<button>Animate in cursor/box</button>").click(function () {
     //$(".towtruck-cursor").fadeOut();
   }),
-  
+
   $("<button>Animate out cursor/box</button>").click(function () {
     //$(".towtruck-cursor").fadeOut();
   }),
-  
+
   $("<button>Faker Join</button>").click(function () {
     addPeer();
   }),
@@ -73,7 +73,7 @@ Test.addControl(
       type: "bye",
       clientId: peer.id
     });
-    
+
   }),
   $('<button>Decline</button>').click(function () {
     var peer = pick();
@@ -157,3 +157,11 @@ Test.addControl(
     });
   })
 );
+
+Test.addControl($('<input placeholder="Tool name">').keypress(function (event) {
+  var el = $(event.target);
+  if (event.which == 13) {
+    TowTruck.config("toolName", el.val() || null);
+    el.val("");
+  }
+}));

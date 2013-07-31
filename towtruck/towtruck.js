@@ -428,7 +428,11 @@
     hub_on: {},
     // Enables the alt-T alt-T TowTruck shortcut; however, this setting
     // must be enabled early as TowTruckConfig_enableShortcut = true;
-    enableShortcut: false
+    enableShortcut: false,
+    // The name of this tool as provided to users.  The UI is updated to use this.
+    // Because of how it is used in text it should be a proper noun, e.g.,
+    // "MySite's Collaboration Tool"
+    toolName: null
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep
@@ -473,6 +477,18 @@
         console.warn("Unknown configuration value passed to TowTruck.config():", attr);
       }
       TowTruck._configuration[attr] = settings[attr];
+      if (TowTruck.running && attr == "toolName") {
+        TowTruck.require("ui").updateToolName();
+      }
+      if (attr == "enableShortcut") {
+        if (settings[attr]) {
+          TowTruck.listenForShortcut();
+        } else {
+          TowTruck.removeShortcut();
+        }
+      }
+      // FIXME: maybe run an update function when certain values are
+      // updated, especially when TowTruck is running
     }
   };
 
@@ -536,6 +552,7 @@
 
   TowTruck.listenForShortcut = function () {
     console.warn("Listening for alt-T alt-T to start TowTruck");
+    TowTruck.removeShortcut();
     listener = function listener(event) {
       if (event.which == 84 && event.altKey) {
         if (listener.pressed) {
@@ -553,7 +570,6 @@
   };
 
   TowTruck.removeShortcut = function () {
-    console.log("removed listener");
     if (listener) {
       document.addEventListener("keyup", listener, false);
       listener = null;

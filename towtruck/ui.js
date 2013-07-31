@@ -1013,7 +1013,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     undock: function () {
       if (! this.dockElement) {
         return;
-      }      
+      }
       this.dockElement.animateDockExit().promise().then((function () {
         this.dockElement.remove();
         this.dockElement = null;
@@ -1094,6 +1094,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
     msg.peer.urlNudge();
   });
+
+  session.on("new-element", function (el) {
+    if (TowTruck.getConfig("toolName")) {
+      ui.updateToolName(el);
+    }
+  });
+
+  var setToolName = false;
+  ui.updateToolName = function (container) {
+    container = container || $(document.body);
+    var name = TowTruck.getConfig("toolName");
+    if (setToolName && ! name) {
+      name = "TowTruck";
+    }
+    if (name) {
+      container.find(".towtruck-tool-name").text(name);
+      setToolName = true;
+    }
+  };
 
   return ui;
 
