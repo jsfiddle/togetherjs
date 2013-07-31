@@ -6,6 +6,7 @@
 
 define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
   var assert = util.assert;
+  var cursor = util.Module("cursor");
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
   var CURSOR_HEIGHT = 50;
@@ -202,7 +203,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
 
   Cursor._cursors = {};
 
-  Cursor.getClient = function (clientId) {
+  cursor.getClient = Cursor.getClient = function (clientId) {
     var c = Cursor._cursors[clientId];
     if (! c) {
       c = Cursor._cursors[clientId] = Cursor(clientId);
@@ -505,5 +506,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   });
 
   util.testExpose({Cursor: Cursor});
+
+  return cursor;
 
 });

@@ -1051,6 +1051,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       // FIXME: scroll to person
     },
 
+    cursor: function () {
+      return require("cursor").getClient(this.peer.id);
+    },
+
     destroy: function () {
       // FIXME: should I get rid of the dockElement?
     }
