@@ -995,6 +995,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         } else {
           windowing.show(this.detailElement, {bind: this.dockElement});
           this.scrollTo();
+          console.log("pulse");
+          this.cursor().element.animate({
+            opacity:0.3
+          }).animate({
+            opacity:1
+          }).animate({
+            opacity:0.3
+          }).animate({
+            opacity:1
+          });
         }
       }).bind(this));
       this.updateFollow();
