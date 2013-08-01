@@ -5,6 +5,9 @@
 define(["util", "session", "storage", "require"], function (util, session, storage, require) {
   var peers = util.Module("peers");
   var assert = util.assert;
+  var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle
+  var IDLE_TIME = 3*60*1000; // Idle time is 3 minutes
+  var BYE_TIME = 10*60*1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
   var ui;
   require(["ui"], function (uiModule) {
@@ -29,6 +32,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
     constructor: function (id, attrs) {
       attrs = attrs || {};
+      assert(id);
       assert(! Peer.peers[id]);
       this.id = id;
       this.identityId = attrs.identityId || null;
@@ -51,6 +55,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (joined) {
         this.view.notifyJoined();
       }
+      this.view.update();
     },
 
     repr: function () {
@@ -76,6 +81,13 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     destroy: function () {
       this.view.destroy();
       delete Peer.peers[this.id];
+    },
+
+    updateMessageDate: function (msg) {
+      if (this.idle == "inactive") {
+        this.update({idle: "active"});
+      }
+      this.lastMessageDate = Date.now();
     },
 
     updateFromHello: function (msg) {
@@ -134,6 +146,17 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (identityUpdated) {
         peers.emit("identity-updated", this);
       }
+    },
+
+    update: function (attrs) {
+      // FIXME: should probably test that only a couple attributes are settable
+      // particularly status and idle
+      if (attrs.idle) {
+        this.idle = attrs.idle;
+      }
+      if (attrs.status) {
+        this.status = attrs.status;
+      }
       this.view.update();
     },
 
@@ -189,6 +212,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
       update: function (attrs) {
         var updatePeers = false;
+        var updateIdle = false;
         var updateMsg = {type: "peer-update"};
         if (typeof attrs.name == "string" && attrs.name != this.name) {
           this.name = attrs.name;
@@ -227,11 +251,18 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         }
         if (attrs.idle && attrs.idle != this.idle) {
           this.idle = attrs.idle;
+          updateIdle = true;
           peers.emit("idle-updated", this);
         }
         this.view.update();
         if (updatePeers && ! attrs.fromLoad) {
           session.send(updateMsg);
+        }
+        if (updateIdle && ! attrs.fromLoad) {
+          session.send({
+            type: "idle-status",
+            idle: this.idle
+          });
         }
       },
 
@@ -259,7 +290,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
               storage.settings.set("color", color);
             }
             if (! avatar) {
-              avatar = TowTruck.baseUrl + "/images/default-avatar.png";
+              avatar = TowTruck.baseUrl + "/towtruck/images/default-avatar.png";
             }
             this.update({
               name: name,
@@ -304,7 +335,6 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           }
         }
         if (name || color || avatar) {
-          console.log("updating", name, color, avatar);
           this.update({
             name: name,
             color: color,
@@ -350,6 +380,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   }
 
   peers.getPeer = function getPeer(id, message) {
+    assert(id);
     var peer = Peer.peers[id];
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
@@ -360,6 +391,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         (message.type == "hello" || message.type == "hello-back" ||
          message.type == "peer-update")) {
       peer.updateFromHello(message);
+      peer.view.update();
     }
     return Peer.peers[id];
   };
@@ -375,12 +407,32 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     return result;
   };
 
+  function checkActivity() {
+    var ps = peers.getAllPeers();
+    var now = Date.now();
+    ps.forEach(function (p) {
+      if (p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
+        p.update({idle: "inactive"});
+      }
+      if (p.status != "bye" && now - p.lastMessageDate > BYE_TIME) {
+        p.bye();
+      }
+    });
+  }
+
   session.hub.on("bye", function (msg) {
     var peer = peers.getPeer(msg.clientId);
     peer.bye();
   });
 
+  var checkActivityTask = null;
+
   session.on("start", function () {
+    if (checkActivityTask) {
+      console.warn("Old peers checkActivityTask left over?");
+      clearTimeout(checkActivityTask);
+    }
+    checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
   });
 
   session.on("close", function () {
@@ -388,14 +440,55 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       peer.destroy();
     });
     storage.tab.set("peerCache", undefined);
+    clearTimeout(checkActivityTask);
+    checkActivityTask = null;
   });
 
-  window.addEventListener("unload", function () {
+  session.on("visibility-change", function (hidden) {
+    if (hidden) {
+      peers.Self.update({idle: "inactive"});
+    } else {
+      peers.Self.update({idle: "active"});
+    }
+  });
+
+  session.hub.on("idle-status", function (msg) {
+    msg.peer.update({idle: msg.idle});
+  });
+
+  // Pings are a straight alive check, and contain no more information:
+  session.hub.on("ping", function () {
+    session.send({type: "ping-back"});
+  });
+
+  window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
     storage.tab.set("peerCache", serialize());
   }, false);
 
   util.mixinEvents(peers);
+
+  util.testExpose({
+    setIdleTime: function (time) {
+      IDLE_TIME = time;
+      CHECK_ACTIVITY_INTERVAL = time / 2;
+      if (TowTruck.running) {
+        clearTimeout(checkActivityTask);
+        checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+      }
+    }
+  });
+
+  util.testExpose({
+    setByeTime: function (time) {
+      BYE_TIME = time;
+      CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
+      if (TowTruck.running) {
+        clearTimeout(checkActivityTask);
+        checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+      }
+    }
+  });
 
   return peers;
 });

@@ -211,3 +211,14 @@ function printChained() {
 Test.incoming = function (msg) {
   TowTruckTestSpy.getChannel().onmessage(msg);
 };
+
+Test.addControl = function () {
+  var div = $("<div />");
+  var el;
+  for (var i=0; i<arguments.length; i++) {
+    el = $(arguments[i]);
+    div.append(el);
+  }
+  $("#controls").append(div);
+  return el;
+};

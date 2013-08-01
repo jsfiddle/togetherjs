@@ -1,0 +1,36 @@
+#towtruck-dock {
+  &.towtruck-dock-right {
+    bottom: 15px;
+  }
+}
+
+.towtruck-only-mobile {
+  display: block;
+}
+
+.towtruck-not-mobile {
+  display: none;
+}
+
+.towtruck {
+  .towtruck-window {
+    width: 94%;
+    margin-left: 1%;
+    height: 94%;
+    margin-top: 1%;
+    z-index: @z-index+3 !important;
+  }
+
+  .towtruck-modal {
+    width: 94%;
+    margin-left: 1%;
+    height: 94%;
+    margin-top: 1%;
+    top: 0;
+    left: 0;
+  }
+}
+
+.towtruck-menu-item {
+  cursor: pointer;
+}

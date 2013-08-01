@@ -233,6 +233,10 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
 
   session.on("ui-ready", function () {
     $("#towtruck-audio-button").click(function () {
+      if ($("#towtruck-rtc-info").is(":visible")) {
+        windowing.hide();
+        return;
+      }
       if (session.RTCSupported) {
         enableAudio();
       } else {

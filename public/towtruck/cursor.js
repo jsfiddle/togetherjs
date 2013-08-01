@@ -6,6 +6,7 @@
 
 define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
   var assert = util.assert;
+  var cursor = util.Module("cursor");
 
   var FOREGROUND_COLORS = ["#111", "#eee"];
   var CURSOR_HEIGHT = 50;
@@ -26,9 +27,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   });
 
   // FIXME: should check for a peer leaving and remove the cursor object
-
   var Cursor = util.Class({
-
+    
     constructor: function (clientId) {
       this.clientId = clientId;
       this.element = templating.clone("cursor");
@@ -37,6 +37,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.updatePeer(peers.getPeer(clientId));
       this.lastTop = this.lastLeft = null;
       $(document.body).append(this.element);
+      this.element.animateCursorEntry();
       this.keydownTimeout = null;
       this.clearKeydown = this.clearKeydown.bind(this);
       this.atOtherUrl = false;
@@ -59,11 +60,33 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         backgroundColor: peer.color,
         color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
       });
+      var path = this.element.find("svg path");
+      path.attr("fill", peer.color);
       // FIXME: should I just remove the element?
       if (peer.status != "live") {
-        this.element.hide();
+        //this.element.hide();
+        this.element.find("svg").animate({
+          opacity: 0
+        }, 350);
+        this.element.find(".towtruck-cursor-container").animate({
+                width: 34,
+                height: 20,
+                padding: 12,
+                margin: 0
+            }, 200).animate({
+                width: 0,
+                height: 0,
+                padding: 0,
+                opacity: 0
+                }, 200);
+        console.log("animate out participant box and cursor");
       } else {
-        this.element.show();
+        //this.element.show();
+        this.element.animate({
+          opacity:0.3
+        }).animate({
+          opacity:1
+        });
       }
     },
 
@@ -105,9 +128,36 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.element.hide();
     },
 
+    // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
+    rotateCursorDown: function(){
+      var e = $(this.element).find('svg');
+        e.animate({borderSpacing: -150, opacity: 1}, {
+        step: function(now, fx) {
+          if (fx.prop == "borderSpacing") {
+            e.css('-webkit-transform', 'rotate('+now+'deg)')
+              .css('-moz-transform', 'rotate('+now+'deg)')
+              .css('-ms-transform', 'rotate('+now+'deg)')
+              .css('-o-transform', 'rotate('+now+'deg)')
+              .css('transform', 'rotate('+now+'deg)');
+          } else {
+            e.css(fx.prop, now);
+          }
+        },
+        duration: 500
+      }, 'linear').promise().then(function () {
+        e.css('-webkit-transform', '')
+          .css('-moz-transform', '')
+          .css('-ms-transform', '')
+          .css('-o-transform', '')
+          .css('transform', '')
+          .css("opacity", "");
+      });
+    },
+    
     setPosition: function (top, left) {
       var wTop = $(window).scrollTop();
       var height = $(window).height();
+
       if (top < wTop) {
         // FIXME: this is a totally arbitrary number, but is meant to be big enough
         // to keep the cursor name from being off the top of the screen.
@@ -135,14 +185,14 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (this.keydownTimeout) {
         clearTimeout(this.keydownTimeout);
       } else {
-        this.element.find(".towtruck-cursor-typing").show();
+        this.element.find(".towtruck-cursor-typing").show().animateKeyboard();
       }
       this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
     },
 
     clearKeydown: function () {
       this.keydownTimeout = null;
-      this.element.find(".towtruck-cursor-typing").hide();
+      this.element.find(".towtruck-cursor-typing").hide().stopKeyboardAnimation();
     },
 
     _destroy: function () {
@@ -153,7 +203,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
 
   Cursor._cursors = {};
 
-  Cursor.getClient = function (clientId) {
+  cursor.getClient = Cursor.getClient = function (clientId) {
     var c = Cursor._cursors[clientId];
     if (! c) {
       c = Cursor._cursors[clientId] = Cursor(clientId);
@@ -456,5 +506,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   });
 
   util.testExpose({Cursor: Cursor});
+
+  return cursor;
 
 });

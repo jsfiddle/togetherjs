@@ -49,6 +49,10 @@ visible("#towtruck-chat-notifier", "#towtruck-chat");
 */
 
 $("#towtruck-chat-button").click();
+// The animation makes this take a while:
+// (We could check $("#towtruck-chat-notifier").queue().length though)
+wait(function () {return ! $("#towtruck-chat-notifier").is(":visible");});
+// =>
 visible("#towtruck-chat-notifier", "#towtruck-chat");
 
 /* =>
@@ -99,13 +103,13 @@ Test.newPeer({url: "http://example.com/foo"});
 
 // => ...
 
-visible(".towtruck-url-change-notification");
+visible(".towtruck-follow");
 
 /* =>
-.towtruck-url-change-notification : visible
+.towtruck-follow : visible
 */
 
-$(".towtruck-url-change-notification .towtruck-nudge").click();
+$(".towtruck-nudge").click();
 
 /* =>
 send: url-change-nudge
@@ -117,46 +121,84 @@ send: url-change-nudge
 
 // =SECTION Helpers
 
-var el = $('<p>Some perhaps helpful test buttons to trigger events (not all combos are valid):<br></p>').prependTo(document.body);
+Test.addControl('<div>Some perhaps helpful test buttons to trigger events (not all combos are valid):</div>');
 
-$("<button>Faker Rejoin</button>").appendTo(el).click(function () {
+Test.addControl($("<button>Faker Rejoin</button>").click(function () {
   Test.newPeer();
-});
+}));
 
-$("<button>Join Random New Faker</button>").appendTo(el).click(function () {
+Test.addControl($("<button>Join Random New Faker</button>").click(function () {
   var id = Math.floor(Math.random() * 1000);
   Test.newPeer({
     name: "Faker " + id,
     clientId: "random-" + id
   });
-});
+}));
 
-$('<input placeholder="Change Faker URL">').appendTo(el).keypress(function (ev) {
+Test.addControl($('<input placeholder="Change Faker URL">').keypress(function (ev) {
   if (ev.which == 13) {
     Test.newPeer({url: ev.target.value});
     ev.target.value = "";
   }
-});
+}));
 
-$('<button>Faker Leave</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker Leave</button>').click(function () {
   Test.incoming({
     type: "bye",
     clientId: "faker"
   });
-});
+}));
 
-$('<button>Faker decline</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Faker decline</button>').click(function () {
   Test.incoming({
     type: "bye",
     clientId: "faker",
     reason: "declined-join"
   });
-});
+}));
 
-$('<button>Nudge Me</button>').appendTo(el).click(function () {
+Test.addControl($('<button>Nudge Me</button>').click(function () {
   Test.incoming({
     type: "url-change-nudge",
+    clientId: "faker",
     url: peers.getPeer("faker").url,
     to: peers.Self.id
   });
-});
+}));
+
+Test.addControl($('<button>Keyboard</button>').click(function () {
+  Test.incoming({
+    type: "keydown",
+    clientId: "faker"
+  });
+}));
+
+Test.addControl($('<button>Participant down page (cursor rotate)</button>').click(function () {
+  
+  $('.towtruck-cursor svg').animate({borderSpacing: -150, opacity: 1}, {
+    step: function(now, fx) {
+      if (fx.prop == "borderSpacing") {
+        $(this).css('-webkit-transform', 'rotate('+now+'deg)')
+          .css('-moz-transform', 'rotate('+now+'deg)')
+          .css('-ms-transform', 'rotate('+now+'deg)')
+          .css('-o-transform', 'rotate('+now+'deg)')
+          .css('transform', 'rotate('+now+'deg)');
+      } else {
+        $(this).css(fx.prop, now);
+      }
+    },
+    duration: 500
+  }, 'linear').promise().then(function () {
+    this.css('-webkit-transform', '');
+    this.css('-moz-transform', '');
+    this.css('-ms-transform', '');
+    this.css('-o-transform', '');
+    this.css('transform', '');
+    this.css("opacity", "");
+  });
+
+  // Test.incoming({
+  //   type: "keydown",
+  //   clientId: "faker"
+  // });
+}));

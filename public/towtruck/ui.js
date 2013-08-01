@@ -19,6 +19,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   var finishedAt = null;
   // Time in milliseconds for the dock to animate out:
   var DOCK_ANIMATION_TIME = 300;
+  // If two chat messages come from the same person in this time
+  // (milliseconds) then they are collapsed into one message:
+  var COLLAPSE_MESSAGE_LIMIT = 5000;
 
   var COLORS = [
     "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
@@ -57,6 +60,29 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
   ui.container = null;
 
+  // This is used for some signalling when ui.prepareUI and/or
+  // ui.activateUI is called before the DOM is fully loaded:
+  var deferringPrepareUI = null;
+
+  function deferForContainer(func) {
+    /* Defers any calls to func() until after ui.container is set
+       Function cannot have a return value (as sometimes the call will
+       become async).  Use like:
+
+       method: deferForContainer(function (args) {...})
+       */
+    return function () {
+      if (ui.container) {
+        func.apply(this, arguments);
+      }
+      var self = this;
+      var args = Array.prototype.slice.call(arguments);
+      session.once("ui-ready", function () {
+        func.apply(self, args);
+      });
+    };
+  }
+
   // This is called before activateUI; it doesn't bind anything, but does display
   // the dock
   // FIXME: because this module has lots of requirements we can't do
@@ -64,9 +90,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // this out?  OTOH, in production we should have all the files
   // combined so there's not much problem loading those modules.
   ui.prepareUI = function () {
+    if (! (document.readyState == "complete" || document.readyState == "interactive")) {
+      // Too soon!  Wait a sec...
+      deferringPrepareUI = "deferring";
+      document.addEventListener("DOMContentLoaded", function () {
+        var d = deferringPrepareUI;
+        deferringPrepareUI = null;
+        ui.prepareUI();
+        // This happens when ui.activateUI is called before the document has been
+        // loaded:
+        if (d == "activate") {
+          ui.activateUI();
+        }
+      });
+      return;
+    }
     var container = ui.container = $(templates["interface"]);
     assert(container.length);
     $("body").append(container);
+    fixupAvatars(container);
     if (session.firstRun && TowTruck.startTarget) {
       // Time at which the UI will be fully ready:
       // (We have to do this because the offset won't be quite right
@@ -134,6 +176,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // interact with the interface.  But activateUI is called once
   // everything is loaded and ready for interaction.
   ui.activateUI = function () {
+    if (deferringPrepareUI) {
+      console.warn("ui.activateUI called before document is ready; waiting...");
+      deferringPrepareUI = "activate";
+      return;
+    }
     if (! ui.container) {
       ui.prepareUI();
     }
@@ -141,7 +188,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     // The share link:
     ui.prepareShareLink(container);
-    container.find(".towtruck-share-link").on("keydown", function (event) {
+    container.find("input.towtruck-share-link").on("keydown", function (event) {
       if (event.which == 27) {
         windowing.hide("#towtruck-share");
         return false;
@@ -230,23 +277,27 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
 
     $("#towtruck-profile-button").click(function (event) {
+      if ($.browser.mobile) {
+        windowing.show("#towtruck-menu-window");
+        return false;
+      }
       toggleMenu();
       event.stopPropagation();
       return false;
     });
 
-    $("#towtruck-menu-feedback").click(function(){
+    $("#towtruck-menu-feedback, #towtruck-menu-feedback-button").click(function(){
       windowing.hide();
       hideMenu();
       windowing.show("#towtruck-feedback-form");
     });
 
-    $("#towtruck-menu-help").click(function () {
+    $("#towtruck-menu-help, #towtruck-menu-help-button").click(function () {
       windowing.hide();
       hideMenu();
       require(["walkthrough"], function (walkthrough) {
         windowing.hide();
-        walkthrough.start();
+        walkthrough.start(false);
       });
     });
 
@@ -257,6 +308,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       ui.displayToggle("#towtruck-menu .towtruck-self-name");
       $("#towtruck-menu .towtruck-self-name").focus();
+    });
+
+    $("#towtruck-menu-update-name-button").click(function () {
+      windowing.show("#towtruck-edit-name-window");
+      $("#towtruck-edit-name-window input").focus();
     });
 
     $("#towtruck-menu .towtruck-self-name").bind("keyup", function (event) {
@@ -270,12 +326,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
     });
 
-    $("#towtruck-menu-update-avatar").click(function () {
+    $("#towtruck-menu-update-avatar, #towtruck-menu-update-avatar-button").click(function () {
       hideMenu();
       windowing.show("#towtruck-avatar-edit");
     });
 
-    $("#towtruck-menu-end").click(function () {
+    $("#towtruck-menu-end, #towtruck-menu-end-button").click(function () {
       hideMenu();
       windowing.show("#towtruck-confirm-end");
     });
@@ -329,10 +385,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     session.on("display-window", function (id, element) {
       if (id == "towtruck-chat") {
-        $("#towtruck-chat-input").focus();
+        if (! $.browser.mobile) {
+          $("#towtruck-chat-input").focus();
+        }
       } else if (id == "towtruck-share") {
-        element.find(".towtruck-share-link").focus();
-        element.find(".towtruck-share-link").select();
+        var link = element.find("input.towtruck-share-link");
+        if (link.is(":visible")) {
+          link.focus().select();
+        }
       }
     });
 
@@ -373,6 +433,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       starterButton.text("End TowTruck Session");
     }
 
+    ui.activateAvatarEdit(container, {
+      onSave: function () {
+        windowing.hide("#towtruck-avatar-edit");
+      }
+    });
+
     session.emit("new-element", ui.container);
 
     if (finishedAt && finishedAt > Date.now()) {
@@ -386,11 +452,93 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
   };
 
+  ui.activateAvatarEdit = function (container, options) {
+    options = options || {};
+    var pendingImage = null;
+
+    container.find(".towtruck-avatar-save").prop("disabled", true);
+
+    container.find(".towtruck-avatar-save").click(function () {
+      if (pendingImage) {
+        peers.Self.update({avatar: pendingImage});
+        container.find(".towtruck-avatar-save").prop("disabled", true);
+        if (options.onSave) {
+          options.onSave();
+        }
+      }
+    });
+
+    container.find(".towtruck-upload-avatar").on("change", function () {
+      util.readFileImage(this).then(function (url) {
+        sizeDownImage(url).then(function (smallUrl) {
+          pendingImage = smallUrl;
+          container.find(".towtruck-avatar-preview").css({
+            backgroundImage: 'url(' + pendingImage + ')'
+          });
+          container.find(".towtruck-avatar-save").prop("disabled", false);
+          if (options.onPending) {
+            options.onPending();
+          }
+        });
+      });
+    });
+
+  };
+
+  function sizeDownImage(imageUrl) {
+    return util.Deferred(function (def) {
+      var $canvas = $("<canvas>");
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
+      var context = $canvas[0].getContext("2d");
+      var img = new Image();
+      img.src = imageUrl;
+      // Sometimes the DOM updates immediately to call
+      // naturalWidth/etc, and sometimes it doesn't; using setTimeout
+      // gives it a chance to catch up
+      setTimeout(function () {
+        var width = img.naturalWidth || img.width;
+        var height = img.naturalHeight || img.height;
+        width = width * (session.AVATAR_SIZE / height);
+        height = session.AVATAR_SIZE;
+        context.drawImage(img, 0, 0, width, height);
+        def.resolve($canvas[0].toDataURL("image/png"));
+      });
+    });
+  }
+
+  function fixupAvatars(container) {
+    /* All <div class="towtruck-person" /> elements need an element inside,
+       so we add that element here */
+    container.find(".towtruck-person").each(function () {
+      var $this = $(this);
+      var inner = $this.find(".towtruck-person-avatar-swatch");
+      if (! inner.length) {
+        $this.append('<div class="towtruck-person-avatar-swatch"></div>');
+      }
+    });
+  }
+
   ui.prepareShareLink = function (container) {
-    container.find(".towtruck-share-link").click(function () {
+    container.find("input.towtruck-share-link").click(function () {
       $(this).select();
     }).change(function () {
       updateShareLink();
+    });
+    container.find("a.towtruck-share-link").click(function () {
+      // FIXME: this is currently opening up Bluetooth, not sharing a link
+      if (false && window.MozActivity) {
+        var activity = new MozActivity({
+          name: "share",
+          data: {
+            type: "url",
+            url: $(this).attr("href")
+          }
+        });
+      }
+      // FIXME: should show some help if you actually try to follow the link
+      // like this, instead of simply suppressing it
+      return false;
     });
     updateShareLink();
   };
@@ -465,13 +613,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   // Misc
 
   function updateShareLink() {
-    var el = $(".towtruck-share-link");
+    var input = $("input.towtruck-share-link");
+    var link = $("a.towtruck-share-link");
     var display = $("#towtruck-session-id");
     if (! session.shareId) {
-      el.val("");
+      input.val("");
+      link.attr("href", "#");
       display.text("(none)");
     } else {
-      el.val(session.shareUrl());
+      input.val(session.shareUrl());
+      link.attr("href", session.shareUrl());
       display.text(session.shareId);
     }
   }
@@ -504,6 +655,22 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       assert(attrs.peer);
       assert(attrs.messageId);
       var date = attrs.date || Date.now();
+      var lastEl = ui.container.find("#towtruck-chat .towtruck-chat-message");
+      if (lastEl.length) {
+        lastEl = $(lastEl[lastEl.length-1]);
+      }
+      var lastDate = null;
+      if (lastEl) {
+        lastDate = parseInt(lastEl.attr("data-date"), 10);
+      }
+      if (lastEl && lastEl.attr("data-person") == attrs.peer.id &&
+          lastDate && date < lastDate + COLLAPSE_MESSAGE_LIMIT) {
+        lastEl.attr("data-date", date);
+        var content = lastEl.find(".towtruck-chat-content");
+        assert(content.length);
+        attrs.text = content.text() + "\n" + attrs.text;
+        attrs.messageId = lastEl.attr("data-message-id");
+      }
       var el = templating.sub("chat-message", {
         peer: attrs.peer,
         content: attrs.text,
@@ -511,7 +678,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       linkify(el.find(".towtruck-chat-content"));
       el.attr("data-person", attrs.peer.id)
-        .attr("data-date", date);
+        .attr("data-date", date)
+        .attr("data-message-id", attrs.messageId);
       ui.chat.add(el, attrs.messageId, attrs.notify);
     },
 
@@ -549,16 +717,18 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.add(el, undefined, true);
     },
 
-    clear: function () {
+    clear: deferForContainer(function () {
       var container = ui.container.find("#towtruck-chat-messages");
       container.empty();
-    },
+    }),
 
     urlChange: function (attrs) {
-      console.log("urlChange", attrs);
       assert(attrs.peer);
       assert(typeof attrs.url == "string");
       assert(typeof attrs.sameUrl == "boolean");
+      var messageId = attrs.peer.className("url-change-");
+      // FIXME: duplicating functionality in .add():
+      var realId = "towtruck-chat-" + messageId;
       var date = attrs.date || Date.now();
       var title;
       // FIXME: strip off common domain from msg.url?  E.g., if I'm on
@@ -577,10 +747,29 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         title: title,
         sameUrl: attrs.sameUrl
       });
-      ui.chat.add(el, attrs.peer.className("url-change-"), false);
+      el.find(".towtruck-nudge").click(function () {
+        attrs.peer.nudge();
+        return false;
+      });
+      el.find(".towtruck-follow").click(function () {
+        var url = attrs.peers.url;
+        if (attrs.peer.urlHash) {
+          url += attrs.peer.urlHash;
+        }
+        location.href = url;
+      });
+      var notify = ! attrs.sameUrl;
+      if (attrs.sameUrl && ! $("#" + realId).length) {
+        // Don't bother showing a same-url notification, if no previous notification
+        // had been shown
+        return;
+      }
+      ui.chat.add(el, messageId, notify);
     },
 
-    add: function (el, id, notify) {
+    hideTimeout: null,
+
+    add: deferForContainer(function (el, id, notify) {
       if (id) {
         el.attr("id", "towtruck-chat-" + util.safeClassName(id));
       }
@@ -589,22 +778,41 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       var popup = ui.container.find("#towtruck-chat-notifier");
       container.append(el);
       ui.chat.scroll();
-      if (notify && ! container.is(":visible")) {
-        var section = popup.find("#towtruck-chat-notifier-message");
+      var doNotify = !! notify;
+      var section = popup.find("#towtruck-chat-notifier-message");
+      if (id && section.data("message-id") == id) {
+        doNotify = true;
+      }
+      if (container.is(":visible")) {
+        doNotify = false;
+      }
+      if (doNotify) {
         section.empty();
-        section.append(el.clone());
-        windowing.show(popup);
+        section.append(el.clone(true, true));
+        if (section.data("message-id") != id)  {
+          section.data("message-id", id || "");
+          windowing.show(popup);
+        } else if (! popup.is(":visible")) {
+          windowing.show(popup);
+        }
         if (typeof notify == "number") {
           // This is the amount of time we're supposed to notify
-          popup.fadeOut(notify);
+          if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+            this.hideTimeout = null;
+          }
+          this.hideTimeout = setTimeout((function () {
+            windowing.hide(popup);
+            this.hideTimeout = null;
+          }).bind(this), notify);
         }
       }
-    },
+    }),
 
-    scroll: function () {
+    scroll: deferForContainer(function () {
       var container = ui.container.find("#towtruck-chat-messages")[0];
       container.scrollTop = container.scrollHeight;
-    }
+    })
 
   };
 
@@ -622,7 +830,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     constructor: function (peer) {
       assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
       this.peer = peer;
-      this.urlNotification = null;
       this.dockClick = this.dockClick.bind(this);
     },
 
@@ -646,7 +853,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.updateDisplay(el);
     },
 
-    updateDisplay: function (container) {
+    updateDisplay: deferForContainer(function (container) {
       container = container || ui.container;
       var abbrev = this.peer.name;
       if (this.peer.isSelf) {
@@ -660,10 +867,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           backgroundImage: "url(" + this.peer.avatar + ")"
         });
       }
+      if (this.peer.idle == "inactive") {
+        avatarEl.addClass("towtruck-person-inactive");
+      } else {
+        avatarEl.removeClass("towtruck-person-inactive");
+      }
       avatarEl.attr("title", this.peer.name);
       if (this.peer.color) {
         avatarEl.css({
           borderColor: this.peer.color
+        });
+        avatarEl.find(".towtruck-person-avatar-swatch").css({
+          borderTopColor: this.peer.color,
+          borderRightColor: this.peer.color
         });
       }
       if (this.peer.color) {
@@ -703,10 +919,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           }
         }).bind(this));
         $("#towtruck-menu-avatar").attr("src", this.peer.avatar);
+        if (! this.peer.name) {
+          $("#towtruck-menu .towtruck-person-name-self").text(this.peer.defaultName);
+        }
       }
       updateChatParticipantList();
       this.updateFollow();
-    },
+    }),
 
     update: function () {
       if (! this.peer.isSelf) {
@@ -716,25 +935,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           this.undock();
         }
       }
-      if (! this.peer.isSelf) {
-        var curUrl = location.href.replace(/\#.*$/, "");
-        if (this.peer.url != curUrl) {
-          if (this.urlNotification) {
-            this.updateUrl();
-          } else {
-            this.createUrl();
-          }
-        } else if (this.urlNotification) {
-          this.removeUrl();
-        }
-      }
       this.updateDisplay();
       this.updateUrlDisplay();
     },
 
-    updateUrlDisplay: function () {
+    updateUrlDisplay: function (force) {
       var url = this.peer.url;
-      if ((! url) || url == this._lastUpdateUrlDisplay) {
+      if ((! url) || (url == this._lastUpdateUrlDisplay && ! force)) {
         return;
       }
       this._lastUpdateUrlDisplay = url;
@@ -747,54 +954,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
     },
 
-    createUrl: function () {
-      this.urlNotification = templating.sub("url-change-popup", {
-        peer: this.peer
-      });
-      this.urlNotification.find(".towtruck-follow").click((function () {
-        var url = this.urlNotification.find("a.towtruck-url").attr("href");
-        location.href = url;
-      }).bind(this));
-      // FIXME: should be handled in windowing:
-      this.urlNotification.find(".towtruck-ignore .towtruck-close").click((function () {
-        this.urlNotification.remove();
-        return false;
-      }).bind(this));
-      this.urlNotification.find(".towtruck-nudge").click((function () {
-        this.peer.nudge();
-      }).bind(this));
-      ui.container.append(this.urlNotification);
-      windowing.show(this.urlNotification, {
-        bind: this.dockElement
-      });
-      this.updateUrl();
-    },
-
-    updateUrl: function () {
-      assert(this.urlNotification);
-      var fullTitle = this.peer.title;
-      if (this.peer.title) {
-        fullTitle += " (";
-      }
-      fullTitle += util.truncateCommonDomain(this.peer.url, location.href);
-      if (this.peer.title) {
-        fullTitle += ")";
-      }
-      this.urlNotification.find("a.towtruck-url").attr("href", this.peer.url).text(fullTitle);
-      // FIXME: we've lost the notion of hiding the notification
-    },
-
-    removeUrl: function () {
-      this.urlNotification.remove();
-      this.urlNotification = null;
-    },
-
     urlNudge: function () {
-      // Called when this peer has nudged us to follow them
-      if (this.urlNotification) {
-        this.urlNotification.show();
-        this.urlNotification.find(".towtruck-follow").addClass("towtruck-nudge");
-      }
+      // FIXME: do something more distinct here
+      this.updateUrlDisplay(true);
     },
 
     notifyJoined: function () {
@@ -803,7 +965,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
     },
 
-    dock: function () {
+    dock: deferForContainer(function () {
       if (this.dockElement) {
         return;
       }
@@ -812,6 +974,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       this.dockElement.attr("id", this.peer.className("towtruck-dock-element-"));
       ui.container.find("#towtruck-dock-participants").append(this.dockElement);
+      this.dockElement.find(".towtruck-person").animateDockEntry();
       var iface = $("#towtruck-dock");
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + "px"
@@ -832,23 +995,35 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         } else {
           windowing.show(this.detailElement, {bind: this.dockElement});
           this.scrollTo();
+          console.log("pulse");
+          this.cursor().element.animate({
+            opacity:0.3
+          }).animate({
+            opacity:1
+          }).animate({
+            opacity:0.3
+          }).animate({
+            opacity:1
+          });
         }
       }).bind(this));
       this.updateFollow();
-    },
+    }),
 
     undock: function () {
       if (! this.dockElement) {
         return;
       }
-      this.dockElement.remove();
-      this.dockElement = null;
-      this.detailElement.remove();
-      this.detailElement = null;
-      var iface = $("#towtruck-dock");
-      iface.css({
-        height: (iface.height() - BUTTON_HEIGHT) + "px"
-      });
+      this.dockElement.animateDockExit().promise().then((function () {
+        this.dockElement.remove();
+        this.dockElement = null;
+        this.detailElement.remove();
+        this.detailElement = null;
+        var iface = $("#towtruck-dock");
+        iface.css({
+         height: (iface.height() - BUTTON_HEIGHT) + "px"
+        });
+      }).bind(this));
     },
 
     scrollTo: function () {
@@ -886,10 +1061,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       // FIXME: scroll to person
     },
 
+    cursor: function () {
+      return require("cursor").getClient(this.peer.id);
+    },
+
     destroy: function () {
-      if (this.urlNotification) {
-        this.removeUrl();
-      }
+      // FIXME: should I get rid of the dockElement?
     }
   });
 
@@ -904,11 +1081,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
   }
 
-  ui.showUrlChangeMessage = function (peer, url) {
+  ui.showUrlChangeMessage = deferForContainer(function (peer, url) {
     var window = templating.sub("url-change", {peer: peer});
     ui.container.append(window);
     windowing.show(window);
-  };
+  });
 
   session.hub.on("url-change-nudge", function (msg) {
     if (msg.to && msg.to != session.clientId) {
@@ -917,6 +1094,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
     msg.peer.urlNudge();
   });
+
+  session.on("new-element", function (el) {
+    if (TowTruck.getConfig("toolName")) {
+      ui.updateToolName(el);
+    }
+  });
+
+  var setToolName = false;
+  ui.updateToolName = function (container) {
+    container = container || $(document.body);
+    var name = TowTruck.getConfig("toolName");
+    if (setToolName && ! name) {
+      name = "TowTruck";
+    }
+    if (name) {
+      container.find(".towtruck-tool-name").text(name);
+      setToolName = true;
+    }
+  };
 
   return ui;
 

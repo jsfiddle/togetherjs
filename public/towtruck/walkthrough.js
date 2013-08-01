@@ -10,7 +10,7 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
 
   var slides = null;
 
-  walkthrough.start = function (doneCallback) {
+  walkthrough.start = function (firstTime, doneCallback) {
     if (! container) {
       container = $(templates.walkthrough);
       container.hide();
@@ -55,8 +55,28 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         container.find(".towtruck-if-creator").show();
         container.find(".towtruck-ifnot-creator").hide();
       }
+      container.find(".towtruck-site-name").text(session.siteName());
+      ui.activateAvatarEdit(container, {
+        onSave: function () {
+          container.find("#towtruck-avatar-when-saved").show();
+          container.find("#towtruck-avatar-when-unsaved").hide();
+        },
+        onPending: function () {
+          container.find("#towtruck-avatar-when-saved").hide();
+          container.find("#towtruck-avatar-when-unsaved").show();
+        }
+      });
+      // This triggers substititions in the walkthrough:
       peers.Self.update({});
       session.emit("new-element", container);
+    }
+    assert(typeof firstTime == "boolean", "You must provide a firstTime boolean parameter");
+    if (firstTime) {
+      container.find(".towtruck-walkthrough-firsttime").show();
+      container.find(".towtruck-walkthrough-not-firsttime").hide();
+    } else {
+      container.find(".towtruck-walkthrough-firsttime").hide();
+      container.find(".towtruck-walkthrough-not-firsttime").show();
     }
     onHideAll = doneCallback;
     show(0);

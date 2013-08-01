@@ -39,7 +39,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.hubUrl = function () {
     assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return TowTruck.getConfig("hubBase") + "/hub/" + session.shareId;
+    return TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + session.shareId;
   };
 
   session.shareUrl = function () {
@@ -66,6 +66,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /* location.href without the hash */
   session.currentUrl = function () {
     return location.href.replace(/#.*/, "");
+  };
+
+  session.siteName = function () {
+    return TowTruck.getConfig("siteName") || document.title;
   };
 
   /****************************************
@@ -105,7 +109,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         msg.peer.updateFromHello(msg);
       }
       msg.sameUrl = msg.peer.url == currentUrl;
-      msg.peer.lastMessageDate = Date.now();
+      msg.peer.updateMessageDate(msg);
       session.hub.emit(msg.type, msg);
       TowTruck._onmessage(msg);
     };
@@ -201,7 +205,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
 
   function initIdentityId() {
     return util.Deferred(function (def) {
@@ -326,7 +330,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
                 readyForMessages = true;
                 startup.start();
               });
-              var ui = require("ui");
               ui.activateUI();
               if (TowTruck.getConfig("enableAnalytics")) {
                 require(["analytics"], function (analytics) {

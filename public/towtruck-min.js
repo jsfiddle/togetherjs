@@ -13,7 +13,7 @@
     baseUrl = "";
   }
   // True if this file should use minimized sub-resources:
-  var min = "no" == "__" + "min__" ? false : "no" == "yes";
+  var min = "yes" == "__" + "min__" ? false : "yes" == "yes";
 
   var baseUrlOverride = localStorage.getItem("towtruck.baseUrlOverride");
   if (baseUrlOverride) {

@@ -23,6 +23,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
 
   */
   util.Class = function (superClass, prototype) {
+    var a;
     if (prototype === undefined) {
       prototype = superClass;
     } else {
@@ -30,7 +31,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
         superClass = superClass.prototype;
       }
       var newPrototype = Object.create(superClass);
-      for (var a in prototype) {
+      for (a in prototype) {
         if (prototype.hasOwnProperty(a)) {
           newPrototype[a] = prototype[a];
         }
@@ -40,6 +41,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
     var ClassObject = function () {
       var obj = Object.create(prototype);
       obj.constructor.apply(obj, arguments);
+      obj.constructor = ClassObject;
       return obj;
     };
     ClassObject.prototype = prototype;
@@ -48,6 +50,13 @@ define(["jquery", "jqueryPlugins"], function ($) {
       ClassObject.toString = function () {
         return '[Class ' + this.className + ']';
       };
+    }
+    if (prototype.classMethods) {
+      for (a in prototype.classMethods) {
+        if (prototype.classMethods.hasOwnProperty(a)) {
+          ClassObject[a] = prototype.classMethods[a];
+        }
+      }
     }
     return ClassObject;
   };
@@ -219,6 +228,19 @@ define(["jquery", "jqueryPlugins"], function ($) {
           }
         }
       }
+    });
+  };
+
+  util.readFileImage = function (el) {
+    return util.Deferred(function (def) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        def.resolve("data:image/jpeg;base64," + util.blobToBase64(this.result));
+      };
+      reader.onerror = function () {
+        def.reject(this.error);
+      };
+      reader.readAsArrayBuffer(el.files[0]);
     });
   };
 
