@@ -6,7 +6,8 @@ var nunjucks = require("nunjucks");
 
 var vars = {
   enableExample: false,
-  enableHome: false
+  enableHome: false,
+  GA_ACCOUNT: "UA-35433268-28"
 };
 
 module.exports = function (grunt) {
@@ -101,7 +102,7 @@ module.exports = function (grunt) {
       main: {
         files: [
           {expand: true,
-           src: ["towtruck/**", "!towtruck/towtruck.js", "!towtruck/templates.js", "!towtruck/towtruck.less"],
+           src: ["towtruck/**", "!towtruck/towtruck.js", "!towtruck/templates.js", "!towtruck/towtruck.less", "!#*"],
            dest: "build/"
           }
         ],
