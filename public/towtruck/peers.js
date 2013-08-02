@@ -87,6 +87,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (this.idle == "inactive") {
         this.update({idle: "active"});
       }
+      if (this.status == "bye") {
+        this.unbye();
+      }
       this.lastMessageDate = Date.now();
     },
 
@@ -168,6 +171,14 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     bye: function () {
       if (this.status != "bye") {
         this.status = "bye";
+        peers.emit("status-updated", this);
+      }
+      this.view.update();
+    },
+
+    unbye: function () {
+      if (this.status == "bye") {
+        this.status = "live";
         peers.emit("status-updated", this);
       }
       this.view.update();

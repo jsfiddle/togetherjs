@@ -193,20 +193,12 @@
       // previous jquery:
       jquery.noConflict(true);
       TowTruck._loaded = true;
-      if (min) {
-        TowTruck.require = TOWTRUCK.require;
-        TowTruck._requireObject = TOWTRUCK.require;
-      } else {
+      if (! min) {
         TowTruck.require = require.config({context: "towtruck"});
         TowTruck._requireObject = require;
       }
     }
-    if (min) {
-      if (typeof TOWTRUCK != "undefined" && typeof TOWTRUCK.require == "function") {
-        delete requireConfig.context;
-        TowTruck.require = TOWTRUCK.require.config(requireConfig);
-      }
-    } else {
+    if (! min) {
       if (typeof require == "function") {
         TowTruck.require = require.config(requireConfig);
       }
@@ -217,13 +209,7 @@
     } else {
       requireConfig.deps = deps;
       requireConfig.callback = callback;
-      if (min) {
-        if (typeof TOWTRUCK == "undefined") {
-          TOWTRUCK = {};
-        }
-        delete requireConfig.context;
-        TOWTRUCK.require = requireConfig;
-      } else {
+      if (! min) {
         window.require = requireConfig;
       }
     }
@@ -383,8 +369,10 @@
   /* This finalizes the unloading of TowTruck, including unloading modules */
   TowTruck._teardown = function () {
     var requireObject = TowTruck._requireObject || window.require;
-    // FIXME: this doesn't clear the context for TOWTRUCK/min-case
-    delete requireObject.s.contexts.towtruck;
+    // FIXME: this doesn't clear the context for min-case
+    if (requireObject.s && requireObject.s.contexts) {
+      delete requireObject.s.contexts.towtruck;
+    }
     TowTruck._loaded = false;
     TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
     TowTruck.running = false;
