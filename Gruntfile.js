@@ -31,8 +31,11 @@ module.exports = function (grunt) {
     if (! grunt.file.exists(destDir)) {
       grunt.file.mkdir(destDir);
     }
-    if (grunt.option("no-hardlink")) {
+    if (! grunt.option("no-hardlink")) {
       try {
+        if (grunt.file.exists(dest)) {
+          grunt.file.delete(dest);
+        }
         fs.linkSync(src, dest);
       } catch (e) {
         grunt.file.copy(src, dest);
@@ -142,6 +145,10 @@ module.exports = function (grunt) {
       site: {
         files: ["towtruck/**/*", "Gruntfile.js", "site/**/*"],
         tasks: ["build", "buildsite"]
+      },
+      minimal: {
+        files: ["towtruck/**/*.less", "towtruck/towtruck.js", "towtruck/**/*.html", "!**/*_flymake*"],
+        tasks: ["build"]
       }
     }
 
@@ -155,7 +162,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*"];
+    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*"];
     grunt.log.writeln("Copying files from " + "towtruck/".cyan + " to " + path.join(grunt.option("dest"), "towtruck").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
@@ -172,7 +179,7 @@ module.exports = function (grunt) {
     grunt.log.writeln("Copying files from " + "site/".cyan + " to " + grunt.option("dest").cyan);
     copyMany(
       "site/", grunt.option("dest"),
-      ["**", "!**/*.tmpl", "!**/*.html", "!public/**"]);
+      ["**", "!**/*.tmpl", "!**/*.html", "!public/**", "!**/*_flymake*"]);
     copyMany(
       "site/public/", grunt.option("dest"),
       ["**"]);
@@ -180,6 +187,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
   grunt.registerTask("buildsite", ["copysite", "render"]);
+  grunt.registerTask("devwatch", ["build", "watch:minimal"]);
 
   function escapeString(s) {
     if (typeof s != "string") {
