@@ -476,7 +476,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($
 
   session.hub.on("hello", function (msg) {
     if (msg.sameUrl) {
-      sendInit();
+      setTimeout(sendInit);
     }
   });
 
