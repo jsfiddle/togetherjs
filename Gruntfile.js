@@ -12,10 +12,43 @@ var vars = {
 
 module.exports = function (grunt) {
 
+  if (! grunt.option("dest")) {
+    grunt.option("dest", "build");
+  }
+
   var dumpLineNumbers = false;
   if (!! grunt.option("less-line-numbers")) {
     grunt.verbose.writeln("Enabling LESS line numbers");
     dumpLineNumbers = true;
+  }
+
+  function copyLink(src, dest) {
+    if (grunt.file.isDir(src)) {
+      grunt.file.mkdir(dest);
+      return;
+    }
+    var destDir = path.dirname(dest);
+    if (! grunt.file.exists(destDir)) {
+      grunt.file.mkdir(destDir);
+    }
+    if (grunt.option("no-hardlink")) {
+      try {
+        fs.linkSync(src, dest);
+      } catch (e) {
+        grunt.file.copy(src, dest);
+      }
+    } else {
+      grunt.file.copy(src, dest);
+    }
+  }
+
+  function copyMany(src, dest, patterns) {
+    var paths = grunt.file.expand({cwd: src}, patterns);
+    paths.forEach(function (p) {
+      var srcPath = path.join(src, p);
+      var destPath = path.join(dest, p);
+      copyLink(srcPath, destPath);
+    });
   }
 
   grunt.initConfig({
@@ -50,9 +83,11 @@ module.exports = function (grunt) {
           include: ["libs/require-nomin", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
           optimize: "none",
           namespace: "TOWTRUCK",
-          out: function (text) {
+          out: function writer(text) {
             // Fix this bug: https://github.com/jrburke/requirejs/issues/813
             // First for jQuery:
+            var dest = path.join(grunt.option("dest"), "towtruck/towtruckPackage.js");
+            grunt.log.writeln("Writing package to " + dest.cyan);
             text = text.replace(
               'typeof define=="function"&&define.amd&&define.amd.jQuery',
               'typeof TOWTRUCK.define=="function"&&TOWTRUCK.define.amd&&TOWTRUCK.define.amd.jQuery');
@@ -68,7 +103,7 @@ module.exports = function (grunt) {
             text = text.replace(
               /cfg = require;/,
               "cfg = TOWTRUCK.require;");
-            grunt.file.write("build/towtruck/towtruckPackage.js", text);
+            grunt.file.write(dest, text);
           }
         }
       }
@@ -96,36 +131,6 @@ module.exports = function (grunt) {
       src: ["build/towtruck/towtruck.css"]
     },
 
-    // FIXME: should use: https://npmjs.org/package/grunt-ejs-static
-
-    copy: {
-      main: {
-        files: [
-          {expand: true,
-           src: ["towtruck/**", "!towtruck/towtruck.js", "!towtruck/templates.js", "!towtruck/towtruck.less", "!#*"],
-           dest: "build/"
-          }
-        ],
-        options: {
-          hardLink: true
-        }
-      },
-      site: {
-        files: [
-          {expand: true,
-           cwd: "site/",
-           src: ["**", "!**/*.tmpl", "!**/*.html", "!public/**"],
-           dest: "build/"
-          },
-          {expand: true,
-           cwd: "site/public/",
-           src: ["**"],
-           dest: "build/"
-          }
-        ]
-      }
-    },
-
     watch: {
       main: {
         files: ["towtruck/**/*", "Gruntfile.js"],
@@ -149,8 +154,32 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask("build", ["copy:main", "maybeless", "substitute", "requirejs"]);
-  grunt.registerTask("buildsite", ["copy:site", "render"]);
+  grunt.registerTask("copylib", "copy the library", function () {
+    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*"];
+    grunt.log.writeln("Copying files from " + "towtruck/".cyan + " to " + path.join(grunt.option("dest"), "towtruck").cyan);
+    if (grunt.option("exclude-tests")) {
+      pattern.push("!tests/");
+      pattern.push("!tests/**");
+      grunt.log.writeln("  (excluding tests)");
+    }
+    copyMany(
+      "towtruck/", path.join(grunt.option("dest"), "towtruck"),
+      pattern
+      );
+  });
+
+  grunt.registerTask("copysite", "copy the site (not library)", function () {
+    grunt.log.writeln("Copying files from " + "site/".cyan + " to " + grunt.option("dest").cyan);
+    copyMany(
+      "site/", grunt.option("dest"),
+      ["**", "!**/*.tmpl", "!**/*.html", "!public/**"]);
+    copyMany(
+      "site/public/", grunt.option("dest"),
+      ["**"]);
+  });
+
+  grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
+  grunt.registerTask("buildsite", ["copysite", "render"]);
 
   function escapeString(s) {
     if (typeof s != "string") {
@@ -169,6 +198,7 @@ module.exports = function (grunt) {
       if (! baseUrl) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
+      var destBase = grunt.option("dest") || "build";
       var hubUrl = process.env.HUB_URL || "https://towtruck.mozillalabs.com";
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
@@ -196,7 +226,7 @@ module.exports = function (grunt) {
         var info = filenames[dest];
         var src = info.src;
         var extraVariables = info.extraVariables;
-        dest = "build/" + dest;
+        dest = destBase + "/" + dest;
         var content = fs.readFileSync(src, "UTF-8");
         var s = subs;
         if (extraVariables) {
@@ -221,7 +251,7 @@ module.exports = function (grunt) {
     var found = false;
     sources.forEach(function (fn) {
       var source = fs.statSync(fn);
-      var destFn = "build/" + fn.substr(0, fn.length-4) + "css";
+      var destFn = grunt.option("dest") + "/" + fn.substr(0, fn.length-4) + "css";
       if (! fs.existsSync(destFn)) {
         found = true;
         grunt.log.writeln("Destination LESS does not exist: " + destFn.cyan);
@@ -244,7 +274,7 @@ module.exports = function (grunt) {
     var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("site/"));
     var sources = grunt.file.expand({cwd: "site/"}, "**/*.html");
     sources.forEach(function (source) {
-      var dest = "build/" + source;
+      var dest = grunt.option("dest") + "/" + source;
       grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
       var data = grunt.file.read("site/" + source);
       var tmplVars = Object.create(vars);
@@ -260,6 +290,79 @@ module.exports = function (grunt) {
       var tmpl = env.getTemplate(source);
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
+    });
+  });
+
+  grunt.registerTask("publish", "Publish to towtruck.mozillalabs.com/public/", function () {
+    if (! grunt.file.isDir("towtruck.mozillalabs.com")) {
+      grunt.log.writeln("Error: you must check out towtruck.mozillalabs.com");
+      grunt.log.writeln("Use:");
+      grunt.log.writeln("  $ git clone -b towtruck.mozillalabs.com git:git@github.com:mozilla/towtruck.git towtruck.mozillalabs.com");
+      grunt.log.writeln("  $ cd towtruck.mozillalabs.com/.git");
+      grunt.log.writeln("  $ echo '[remote \"staging\"]\n\turl = git@heroku.com:towtruck-staging.git\n\tpush = refs/heads/towtruck.mozillalabs.com:refs/heads/master\n[remote \"production\"]\n\turl = git@heroku.com:towtruck.git\n\tpush = refs/heads/towtruck.mozillalabs.com:refs/heads/master\n' >> config");
+      grunt.fail.fatal("Must checkout towtruck.mozillalabs.com");
+      return;
+    }
+    var versions = "towtruck.mozillalabs.com/public/versions";
+    if (! grunt.file.isDir(versions)) {
+      grunt.log.writeln("Error: " + versions.cyan + " does not exist");
+      grunt.fail.fatal("No versions/ directory");
+      return;
+    }
+    var tmp = "towtruck.mozillalabs.com/public_versions_tmp";
+    fs.rename(versions, tmp);
+    grunt.file.delete("towtruck.mozillalabs.com/public");
+    grunt.file.mkdir("towtruck.mozillalabs.com/public");
+    fs.rename(tmp, versions);
+    grunt.option("base-url", "https://towtruck.mozillalabs.com");
+    grunt.option("dest", "towtruck.mozillalabs.com/public");
+    grunt.option("exclude-tests", true);
+    grunt.option("no-hardlink", true);
+    grunt.task.run(["build", "buildsite"]);
+    grunt.task.run(["movecss"]);
+    grunt.log.writeln("To actually publish you must do:");
+    grunt.log.writeln("  $ cd towtruck.mozillalabs.com/");
+    grunt.log.writeln("  $ git commit -a -m 'Publish'");
+    grunt.log.writeln("  $ git push && git push staging");
+  });
+
+  grunt.registerTask("publishversion", "Publish to towtruck.mozillalabs.com/public/versions/", function () {
+    var version = grunt.option("towtruck-version");
+    if (! version) {
+      grunt.log.error("You must provide a --towtruck-version=X.Y argument");
+      grunt.fail.fatal("No --towtruck-version");
+      return;
+    }
+    if (! grunt.file.isDir("towtruck.mozillalabs.com/public/versions")) {
+      grunt.log.error("The directory towtruck.mozillalabs.com/public/versions does not exist");
+      grunt.fail.fatal();
+      return;
+    }
+    var destDir = "towtruck.mozillalabs.com/public/versions/" + version;
+    if (grunt.file.exists(destDir)) {
+      grunt.log.error("The directory " + destDir + " already exists");
+      grunt.log.error("  Delete it first to re-create version");
+      grunt.fail.fatal();
+      return;
+    }
+    grunt.option("base-url", "https://towtruck.mozillalabs.com/versions/" + version);
+    grunt.option("dest", destDir);
+    grunt.option("exclude-tests", true);
+    grunt.option("no-hardlink", true);
+    grunt.task.run(["build"]);
+    grunt.task.run(["movecss"]);
+    var readme = grunt.file.read("towtruck.mozillalabs.com/public/versions/README.md");
+    readme += "  * [" + version + "](./" + version + "/towtruck.js)\n";
+    grunt.file.write("towtruck.mozillalabs.com/public/versions/README.md", readme);
+  });
+
+  grunt.registerTask("movecss", "Publish generated css files to dest", function () {
+    // Can't figure out how to parameterize the less task, hence this lame move
+    ["towtruck/towtruck.css", "towtruck/recorder.css"].forEach(function (css) {
+      var src = path.join("build", css);
+      var dest = path.join(grunt.option("dest"), css);
+      grunt.file.copy(src, dest);
+      grunt.log.writeln("Copying " + src.cyan + " to " + dest.cyan);
     });
   });
 
