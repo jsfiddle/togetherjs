@@ -7,7 +7,7 @@
 
   var styleSheet = "/towtruck/towtruck.css";
 
-  var baseUrl = "";
+  var baseUrl = "https://towtruck.mozillalabs.com";
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
