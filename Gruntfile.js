@@ -83,29 +83,21 @@ module.exports = function (grunt) {
             // Make sure we get the built form of this one:
             templates: "../build/towtruck/templates"
           },
-          include: ["libs/require-nomin", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
+          include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
+          //Wrap any build bundle in a start and end text specified by wrap.
+          //Use this to encapsulate the module code so that define/require are
+          //not globals. The end text can expose some globals from your file,
+          //making it easy to create stand-alone libraries that do not mandate
+          //the end user use requirejs.
+          wrap: {
+            start: "(function() {",
+            end: "TowTruck.require = TowTruck._requireObject = require;\nrequire([\"session\"]);\n}());"
+          },
           optimize: "none",
-          namespace: "TOWTRUCK",
           out: function writer(text) {
             // Fix this bug: https://github.com/jrburke/requirejs/issues/813
             // First for jQuery:
             var dest = path.join(grunt.option("dest"), "towtruck/towtruckPackage.js");
-            grunt.log.writeln("Writing package to " + dest.cyan);
-            text = text.replace(
-              'typeof define=="function"&&define.amd&&define.amd.jQuery',
-              'typeof TOWTRUCK.define=="function"&&TOWTRUCK.define.amd&&TOWTRUCK.define.amd.jQuery');
-            // Another fix for tinycolor:
-            text = text.replace(
-              /typeof\s+define\s*!==?\s*"undefined"/g,
-              'typeof TOWTRUCK.define != "undefined"');
-            // And for: https://github.com/jrburke/requirejs/issues/815
-            text = text.replace(
-              "if (typeof require !== 'undefined' && !isFunction(require)) {",
-              "if (typeof TOWTRUCK !== 'undefined' && TOWTRUCK.require !== undefined && !isFunction(TOWTRUCK.require)) {");
-            // FIXME: kind of hacky followon
-            text = text.replace(
-              /cfg = require;/,
-              "cfg = TOWTRUCK.require;");
             grunt.file.write(dest, text);
           }
         }
