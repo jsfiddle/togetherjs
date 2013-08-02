@@ -6,7 +6,8 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   var peers = util.Module("peers");
   var assert = util.assert;
   var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle
-  var IDLE_TIME = 5*60*1000; // Idle time is 5 minutes
+  var IDLE_TIME = 3*60*1000; // Idle time is 3 minutes
+  var BYE_TIME = 10*60*1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
   var ui;
   require(["ui"], function (uiModule) {
@@ -83,10 +84,15 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     },
 
     updateMessageDate: function (msg) {
+      console.log("updating", this.id, this.idle, this.status);
       if (this.idle == "inactive") {
         this.update({idle: "active"});
       }
+      if (this.status == "bye") {
+        this.unbye();
+      }
       this.lastMessageDate = Date.now();
+      console.log("done", this.id, this.idle, this.status);
     },
 
     updateFromHello: function (msg) {
@@ -167,6 +173,14 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     bye: function () {
       if (this.status != "bye") {
         this.status = "bye";
+        peers.emit("status-updated", this);
+      }
+      this.view.update();
+    },
+
+    unbye: function () {
+      if (this.status == "bye") {
+        this.status = "live";
         peers.emit("status-updated", this);
       }
       this.view.update();
@@ -413,6 +427,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
         p.update({idle: "inactive"});
       }
+      if (p.status != "bye" && now - p.lastMessageDate > BYE_TIME) {
+        p.bye();
+      }
     });
   }
 
@@ -468,6 +485,17 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     setIdleTime: function (time) {
       IDLE_TIME = time;
       CHECK_ACTIVITY_INTERVAL = time / 2;
+      if (TowTruck.running) {
+        clearTimeout(checkActivityTask);
+        checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+      }
+    }
+  });
+
+  util.testExpose({
+    setByeTime: function (time) {
+      BYE_TIME = time;
+      CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
       if (TowTruck.running) {
         clearTimeout(checkActivityTask);
         checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);

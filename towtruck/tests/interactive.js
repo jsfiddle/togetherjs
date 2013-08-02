@@ -125,12 +125,20 @@ Test.addControl($('<input placeholder="Incoming chat">').keypress(function (even
   }
 }));
 
-var el = $('<label for="idle-check">Quick idle <input type="checkbox" id="idle-check"></label>');
-el.find("input").change(function (event) {
+var el = $('<div><label for="idle-check">Quick idle <input type="checkbox" id="idle-check"></label>' +
+           '<label for="expire-check">Quick expire <input type="checkbox" id="expire-check"></label></div>');
+el.find("#idle-check").change(function (event) {
   if (event.target.checked) {
     TowTruckTestSpy.setIdleTime(100);
   } else {
-    TowTruckTestSpy.setIdleTime(5000);
+    TowTruckTestSpy.setIdleTime(3*60*1000);
+  }
+});
+el.find("#expire-check").change(function (event) {
+  if (event.target.checked) {
+    TowTruckTestSpy.setByeTime(10*1000);
+  } else {
+    TowTruckTestSpy.setIdleTime(10*60*1000);
   }
 });
 Test.addControl(el);
