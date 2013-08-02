@@ -84,7 +84,6 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     },
 
     updateMessageDate: function (msg) {
-      console.log("updating", this.id, this.idle, this.status);
       if (this.idle == "inactive") {
         this.update({idle: "active"});
       }
@@ -92,7 +91,6 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         this.unbye();
       }
       this.lastMessageDate = Date.now();
-      console.log("done", this.id, this.idle, this.status);
     },
 
     updateFromHello: function (msg) {
