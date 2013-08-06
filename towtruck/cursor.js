@@ -28,7 +28,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
 
   // FIXME: should check for a peer leaving and remove the cursor object
   var Cursor = util.Class({
-    
+
     constructor: function (clientId) {
       this.clientId = clientId;
       this.element = templating.clone("cursor");
@@ -79,7 +79,6 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
                 padding: 0,
                 opacity: 0
                 }, 200);
-        console.log("animate out participant box and cursor");
       } else {
         //this.element.show();
         this.element.animate({
@@ -153,7 +152,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
           .css("opacity", "");
       });
     },
-    
+
     setPosition: function (top, left) {
       var wTop = $(window).scrollTop();
       var height = $(window).height();
@@ -353,6 +352,9 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
 
   session.hub.on("scroll-update", function (msg) {
     msg.peer.scrollPosition = msg.position;
+    if (msg.peer.following) {
+      msg.peer.view.scrollTo();
+    }
   });
 
   // In case there are multiple peers, we track that we've accepted one of their

@@ -43,6 +43,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       this.color = attrs.color || "#00FF00";
       this.view = ui.PeerView(this);
       this.lastMessageDate = 0;
+      this.following = attrs.following || false;
       Peer.peers[id] = this;
       var joined = attrs.joined || false;
       if (attrs.fromHelloMessage) {
@@ -74,7 +75,8 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         rtcSupported: this.rtcSupported,
         name: this.name,
         avatar: this.avatar,
-        color: this.color
+        color: this.color,
+        following: this.following
       };
     },
 
@@ -149,6 +151,11 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       if (identityUpdated) {
         peers.emit("identity-updated", this);
       }
+      // FIXME: I can't decide if this is the only time we need to emit
+      // this message (and not .update() or other methods)
+      if (this.following) {
+        session.emit("follow-peer", this);
+      }
     },
 
     update: function (attrs) {
@@ -190,8 +197,42 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         url: location.href,
         to: this.id
       });
+    },
+
+    follow: function () {
+      if (this.following) {
+        return;
+      }
+      peers.getAllPeers().forEach(function (p) {
+        if (p.following) {
+          p.unfollow();
+        }
+      });
+      this.following = true;
+      // We have to make sure we remember this, even if we change URLs:
+      storeSerialization();
+      this.view.update();
+      session.emit("follow-peer", this);
+    },
+
+    unfollow: function () {
+      this.following = false;
+      storeSerialization();
+      this.view.update();
     }
 
+  });
+
+  // FIXME: I can't decide where this should actually go, seems weird
+  // that it is emitted and handled in the same module
+  session.on("follow-peer", function (peer) {
+    if (peer.url != session.currentUrl()) {
+      var url = peer.url;
+      if (peer.urlHash) {
+        url += peer.urlHash;
+      }
+      location.href = url;
+    }
   });
 
   Peer.peers = {};
@@ -474,8 +515,12 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
   window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
-    storage.tab.set("peerCache", serialize());
+    storeSerialization();
   }, false);
+
+  function storeSerialization() {
+    storage.tab.set("peerCache", serialize());
+  }
 
   util.mixinEvents(peers);
 
