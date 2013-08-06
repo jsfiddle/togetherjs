@@ -923,6 +923,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           $("#towtruck-menu .towtruck-person-name-self").text(this.peer.defaultName);
         }
       }
+      if (this.peer.url != session.currentUrl()) {
+        container.find("." + this.peer.className("towtruck-person-"))
+            .addClass("towtruck-person-other-url");
+      } else {
+        container.find("." + this.peer.className("towtruck-person-"))
+            .removeClass("towtruck-person-other-url");
+      }
       updateChatParticipantList();
       this.updateFollow();
     }),
