@@ -1,6 +1,6 @@
 // =SECTION Setup
 
-Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
+Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "elementFinder");
 // => Loaded ...
 
 printChained(
@@ -108,6 +108,31 @@ Test.addControl($('<button>Nudge Me</button>').click(function () {
     clientId: peer.id,
     url: peer.url,
     to: peers.Self.id
+  });
+}));
+
+var focused = {};
+Test.addControl($('<button>Focus something</button>').click(function () {
+  var peer = pick();
+  if (focused[peer.id]) {
+    Test.incoming({
+      type: "form-focus",
+      element: null,
+      clientId: peer.id,
+      url: peer.url
+    });
+    focused[peer.id] = null;
+    return;
+  }
+  var els = $("#controls textarea:visible, #controls input:visible, #controls select:visible");
+
+  var el = $(els[Math.floor(els.length * Math.random())]);
+  focused[peer.id] = el;
+  Test.incoming({
+    type: "form-focus",
+    element: elementFinder.elementLocation(el),
+    clientId: peer.id,
+    url: peer.url
   });
 }));
 

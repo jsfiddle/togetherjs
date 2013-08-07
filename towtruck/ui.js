@@ -841,7 +841,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
                      "towtruck-person-name", "towtruck-person-name-abbrev",
                      "towtruck-person-bgcolor", "towtruck-person-swatch",
                      "towtruck-person-status", "towtruck-person-role",
-                     "towtruck-person-url", "towtruck-person-url-title"];
+                     "towtruck-person-url", "towtruck-person-url-title",
+                     "towtruck-person-bordercolor"];
       classes.forEach(function (cls) {
         var els = el.find("." + cls);
         els.addClass(this.peer.className(cls + "-"));
@@ -886,6 +887,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         var colors = container.find("." + this.peer.className("towtruck-person-bgcolor-"));
         colors.css({
           backgroundColor: this.peer.color
+        });
+        colors = container.find("." + this.peer.className("towtruck-person-bordercolor-"));
+        colors.css({
+          borderColor: this.peer.color
         });
       }
       container.find("." + this.peer.className("towtruck-person-role-"))
@@ -1025,7 +1030,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         } else {
           windowing.show(this.detailElement, {bind: this.dockElement});
           this.scrollTo();
-          console.log("pulse");
           this.cursor().element.animate({
             opacity:0.3
           }).animate({
@@ -1089,7 +1093,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     maybeHideDetailWindow: function (windows) {
       if (windows[0] && windows[0][0] === this.detailElement[0]) {
-        console.log("closing", this.followCheckbox[0].checked);
         if (this.followCheckbox[0].checked) {
           this.peer.follow();
         } else {
