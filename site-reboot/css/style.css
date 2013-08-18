@@ -1,0 +1,284 @@
+/*
+
+
+
+
+
+/* =Global
+----------------------------------------------- */
+
+body {
+  background-color: rgb(255, 255, 255);
+  font: 300 18px/1.5 'museo-sans', 'Open Sans', sans-serif;
+  text-align: center;
+}
+
+a {
+  display: inline-block;
+  line-height: 1.38;
+  color: rgb(78, 169, 244);
+  font-size: 14px;
+  font-family: 'museo-sans', 'Open Sans', sans-serif;
+  
+}
+
+button {
+  display: inline-block;
+  float: left;
+  width: 28.406%;
+  height: 34px;
+  padding-bottom: 2px;
+  background: rgb(236, 71, 119);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(22, 22, 22);
+}
+
+footer {
+
+}
+
+h1 {
+  margin: 16px auto 0;
+  font-size: 13px;
+  font-weight: 100;
+  line-height: 1.38;
+  letter-spacing: 1px;
+}
+
+h2 {
+  margin: 0 auto;
+  font-size: 46px;
+  font-weight: 100;
+  line-height: 1.38;
+}
+
+.btn-primary {
+  font-size: 16px;
+  width: 150px;
+  display: block;
+  text-align: center;
+  padding: 6px 0;
+  margin: 0 auto;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  box-shadow: 0 5px 0 #1c5281;
+}
+
+
+/* =Header
+----------------------------------------------- */
+
+.main-header {
+  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
+  display: block;
+  font-family: sans-serif;
+}
+
+.main-header .main-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid white;
+  background-color: #e26868;
+  text-indent: -9999px;
+  float: left;
+  margin: 6px 0px;
+  padding: 0;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  overflow: hidden;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+}
+
+.main-header .masthead-title {
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #333;
+  margin: 6px 10px;
+  letter-spacing: 5px;
+}
+
+.main-header .masthead-title:hover {
+  color: #333;
+}
+
+.main-header a {
+  color: #666;
+}
+
+.navbar-inverse {
+  border-color: rgba(0,0,0,0);
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: #515151;
+}
+
+.main-header .navbar-nav > .active > a {
+  background: none;
+}
+
+.main-header .main-nav {
+  padding: 6px 0px;
+}
+
+.main-header .navbar-toggle {
+  width: 44px;
+  background: #000;
+  margin-top: 13px;
+}
+
+.main-header.navbar-inverse .navbar-collapse {
+  border-color: #ccc;
+}
+
+
+/* =Carousel
+----------------------------------------------- */
+
+#hero { 
+  background: url('../images/bg.png') 100% 0 repeat fixed; 
+  background-size: 100% 100%;
+	height: 600px;  
+	margin: 0 auto; 
+  width: 100%; 
+  max-width: 1920px; 
+  position: relative; 
+  //box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.hero-header-text {
+  color: rgb(255, 255, 255);
+  display: block;
+  font-family: museo-sans, 'Open Sans', sans-serif;
+  font-size: 46px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 100;
+  height: 63px;
+  line-height: 63px;
+}
+
+.hero-tagline {
+  font-size: 18px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 300;
+  height: 81px;
+  line-height: 27px;
+}
+
+#hero .container { 
+  padding-top: 40px;
+}
+
+#video-area {
+  background: rgba(0,0,0,0.5);
+  height: 300px;
+}
+
+
+/* =modal video
+----------------------------------------------- */
+
+#marketing-video {
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  position: absolute;
+  left:0px;
+  top:0px;
+  z-index: 99;
+  width: 100%;
+}
+
+
+
+/* =animations
+----------------------------------------------- */
+
+.hero-header-text
+{
+  position:relative;
+  animation:moveDown 1s 1;
+  -webkit-animation:moveDown 1s 1; /*Safari and Chrome*/
+}
+
+@keyframes moveDown
+{
+  from {top:-10px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+@-webkit-keyframes moveDown /*Safari and Chrome*/
+{
+  from {top:-10px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+.hero-tagline
+{
+  position:relative;
+  animation:moveUp 1s 1;
+  -webkit-animation:moveUp 1s 1; /*Safari and Chrome*/
+}
+
+@keyframes moveUp
+{
+  from {top:20px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+@-webkit-keyframes moveUp /*Safari and Chrome*/
+{
+  from {top:20px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+.main-get-started
+{
+  position:relative;
+  animation:moveUp 1s 1;
+  -webkit-animation:moveUp 1s 1; /*Safari and Chrome*/
+}
+
+@keyframes moveUp
+{
+  from {top:20px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+@-webkit-keyframes moveUp /*Safari and Chrome*/
+{
+  from {top:20px; opacity: 0;}
+  to {top:0px; opacity: 1;}
+}
+
+
+#video-area {
+  position:relative;
+  animation:moveRight 1s 1;
+  -webkit-animation:moveRight 1s 1; /*Safari and Chrome*/
+}
+
+@keyframes moveRight
+{
+  from {right:-200px; opacity: 0;}
+  to {right:0px; opacity: 1;}
+}
+
+@-webkit-keyframes moveRight /*Safari and Chrome*/
+{
+  from {right:-200px; opacity: 0;}
+  to {right:0px; opacity: 1;}
+}
