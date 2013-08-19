@@ -37,8 +37,12 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     };
     if (isText(el)) {
       var prev = el.data("towtruckPrevValue");
+      if (prev == value) {
+        return;
+      }
       if (prev) {
         msg.replace = makeDiff(el.data("towtruckPrevValue"), value);
+        assert(msg.replace);
       } else {
         if (typeof prev != "string") {
           console.warn("No previous known value on field", el[0]);
@@ -411,12 +415,16 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
     var commonEnd = 0;
     while (commonEnd < (newValue.length - commonStart) &&
+           commonEnd < (oldValue.length - commonStart) &&
            newValue.charAt(newValue.length - commonEnd - 1) ==
              oldValue.charAt(oldValue.length - commonEnd - 1)) {
       commonEnd++;
     }
     var removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
     var inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
+    if (! (removed.length || inserted)) {
+      return null;
+    }
     return {
       start: commonStart,
       // Not using .length because it makes it seem like an array or string:
