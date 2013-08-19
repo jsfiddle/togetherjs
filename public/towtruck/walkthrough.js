@@ -49,11 +49,11 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         });
       });
       if (session.isClient) {
-        container.find(".towtruck-if-creator").hide();
+        container.find(".towtruck-if-creator").remove();
         container.find(".towtruck-ifnot-creator").show();
       } else {
         container.find(".towtruck-if-creator").show();
-        container.find(".towtruck-ifnot-creator").hide();
+        container.find(".towtruck-ifnot-creator").remove();
       }
       container.find(".towtruck-site-name").text(session.siteName());
       ui.activateAvatarEdit(container, {

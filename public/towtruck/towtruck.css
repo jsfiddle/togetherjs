@@ -847,7 +847,7 @@ input.towtruck-upload-avatar {
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-bottom: 7px solid transparent;
-  margin-top: -2px;
+  margin-top: 0px;
 }
 .towtruck .towtruck-person-inactive {
   opacity: 0.5;
@@ -1083,6 +1083,20 @@ section.towtruck-participant-window-main {
 }
 .towtruck-participant-window-row strong {
   font-weight: 800;
+}
+.towtruck-follow-question {
+  margin-left: 10px;
+}
+.towtruck-float-left {
+  float: left;
+}
+.towtruck-window input[type="radio"],
+input[type="checkbox"] {
+  margin: 0px 0 0 !important;
+}
+.towtruck-clear {
+  clear: both;
+  margin: 10px;
 }
 section.towtruck-buttons {
   background: #F3F2F2;
@@ -1522,6 +1536,16 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   width: 400px;
   height: 300px;
 }
+.towtruck #towtruck-walkthrough input,
+.towtruck textarea,
+.towtruck .uneditable-input {
+  width: 177px;
+}
+.towtruck #towtruck-walkthrough select,
+.towtruck input[type="file"] {
+  height: 30px;
+  line-height: 0px;
+}
 .towtruck #towtruck-walkthrough-previous {
   cursor: pointer;
   width: 19px;
@@ -1783,6 +1807,13 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   width: 10px;
   border-radius: 3px;
 }
+.towtruck-focus {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+  border: 3px solid;
+}
 .towtruck-only-mobile {
   display: none;
 }
@@ -1814,9 +1845,145 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   .towtruck-menu-item {
     cursor: pointer;
   }
+  /*TowTruck walkthrough*/
+  .towtruck .towtruck-modal section {
+    margin: 0px 7px;
+  }
+  #towtruck-walkthrough-progress {
+    width: 93%;
+    text-align: center;
+    position: static;
+  }
+  .towtruck-modal-wide section.towtruck-buttons {
+    width: 93.9%;
+    text-align: center !important;
+    position: absolute;
+    bottom: -17px;
+  }
+  .towtruck-walkthrough-slide p {
+    margin: 13px auto;
+    width: 100%;
+    font-size: 11px;
+  }
+  .towtruck .towtruck-walkthrough-main-image {
+    width: auto;
+    height: auto;
+    background: rgba(216, 216, 216, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(151, 151, 151, 0.1);
+    padding: 10px;
+  }
+  .towtruck .towtruck-walkthrough-main-image img {
+    width: 400px;
+    height: auto;
+  }
+  .towtruck #towtruck-walkthrough-next {
+    cursor: pointer;
+    width: 19px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: 60% 60%;
+    margin-right: 0px;
+    margin-top: 28%;
+    background-image: url('./images/icn-walkthrough-arrow-r.png');
+    float: right;
+  }
+  .towtruck #towtruck-walkthrough-previous {
+    cursor: pointer;
+    width: 19px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: 60% 60%;
+    margin-top: 28%;
+    background-image: url('./images/icn-walkthrough-arrow-l.png');
+    float: left;
+    margin-left: 0px;
+  }
+  .towtruck .towtruck-modal .towtruck-share-link {
+    width: 80%;
+    font-size: 12px;
+    padding: 6px 6px 4px;
+    border-radius: 4px;
+    border: 1px solid 
+    #cccccc;
+    box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
+    font-family: Monaco;
+    margin: 7px 0px;
+  }
+  .towtruck-walkthrough-sendlink {
+    top: 44%;
+    position: relative;
+    padding: 15px;
+  }
+  .towtruck section.towtruck-walkthrough-slide input.towtruck-self-name {
+    position: absolute;
+    top: 50%;
+    left: 29%;
+    font-size: 14px;
+    padding: 6px 6px 6px;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid 
+    #cccccc;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+    font-family: openSansRegular;
+    margin: -20px 11px;
+    width: 60%;
+  }
+  .towtruck section.towtruck-walkthrough-slide .towtruck-walkthrough-main-image .towtruck-walkthrough-avatar-section {
+    margin-top: 15px;
+  }
+  .towtruck .towtruck-avatar-preview {
+    margin: 0 auto;
+    float: none;
+  }
+  .towtruck .towtruck-avatar-upload-input {
+    margin: 10px auto;
+    float: none;
+  }
+  .towtruck .towtruck-avatar-upload-input input {
+    width: 60%;
+  }
+  input.towtruck-upload-avatar {
+    line-height: 0px;
+    width: 174px;
+    margin-left: 0px;
+  }
+  .towtruck section.towtruck-walkthrough-slide input.towtruck-self-name {
+    float: left;
+    font-size: 14px;
+    padding: 6px 6px 6px;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid 
+    #cccccc;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+    font-family: openSansRegular;
+    width: 66%;
+    position: static;
+    margin: 10px 10px;
+  }
+  .towtruck section.towtruck-walkthrough-slide .towtruck-swatch {
+    width: 32px;
+    height: 32px;
+    background: none repeat scroll 0% 0% 
+    #000000;
+    position: relative;
+    float: right;
+    right: 10px;
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid #cccccc;
+    top: 10px;
+  }
+  .towtruck .towtruck-save-settings {
+    margin-top: 20px;
+    margin-bottom: 0px;
+  }
 }
 /* We set this class on the <body> element when that last media query won't work
    but we detect in Javascript that the client should be treated as mobile */
+.towtruck-mobile-browser {
+  /*TowTruck walkthrough*/
+
+}
 .towtruck-mobile-browser #towtruck-dock.towtruck-dock-right {
   bottom: 15px;
 }
@@ -1843,4 +2010,135 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
 }
 .towtruck-mobile-browser .towtruck-menu-item {
   cursor: pointer;
+}
+.towtruck-mobile-browser .towtruck .towtruck-modal section {
+  margin: 0px 7px;
+}
+.towtruck-mobile-browser #towtruck-walkthrough-progress {
+  width: 93%;
+  text-align: center;
+  position: static;
+}
+.towtruck-mobile-browser .towtruck-modal-wide section.towtruck-buttons {
+  width: 93.9%;
+  text-align: center !important;
+  position: absolute;
+  bottom: -17px;
+}
+.towtruck-mobile-browser .towtruck-walkthrough-slide p {
+  margin: 13px auto;
+  width: 100%;
+  font-size: 11px;
+}
+.towtruck-mobile-browser .towtruck .towtruck-walkthrough-main-image {
+  width: auto;
+  height: auto;
+  background: rgba(216, 216, 216, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(151, 151, 151, 0.1);
+  padding: 10px;
+}
+.towtruck-mobile-browser .towtruck .towtruck-walkthrough-main-image img {
+  width: 400px;
+  height: auto;
+}
+.towtruck-mobile-browser .towtruck #towtruck-walkthrough-next {
+  cursor: pointer;
+  width: 19px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-size: 60% 60%;
+  margin-right: 0px;
+  margin-top: 28%;
+  background-image: url('./images/icn-walkthrough-arrow-r.png');
+  float: right;
+}
+.towtruck-mobile-browser .towtruck #towtruck-walkthrough-previous {
+  cursor: pointer;
+  width: 19px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-size: 60% 60%;
+  margin-top: 28%;
+  background-image: url('./images/icn-walkthrough-arrow-l.png');
+  float: left;
+  margin-left: 0px;
+}
+.towtruck-mobile-browser .towtruck .towtruck-modal .towtruck-share-link {
+  width: 80%;
+  font-size: 12px;
+  padding: 6px 6px 4px;
+  border-radius: 4px;
+  border: 1px solid 
+  #cccccc;
+  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
+  font-family: Monaco;
+  margin: 7px 0px;
+}
+.towtruck-mobile-browser .towtruck-walkthrough-sendlink {
+  top: 44%;
+  position: relative;
+  padding: 15px;
+}
+.towtruck-mobile-browser .towtruck section.towtruck-walkthrough-slide input.towtruck-self-name {
+  position: absolute;
+  top: 50%;
+  left: 29%;
+  font-size: 14px;
+  padding: 6px 6px 6px;
+  border-radius: 4px 4px 4px 4px;
+  border: 1px solid 
+  #cccccc;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+  font-family: openSansRegular;
+  margin: -20px 11px;
+  width: 60%;
+}
+.towtruck-mobile-browser .towtruck section.towtruck-walkthrough-slide .towtruck-walkthrough-main-image .towtruck-walkthrough-avatar-section {
+  margin-top: 15px;
+}
+.towtruck-mobile-browser .towtruck .towtruck-avatar-preview {
+  margin: 0 auto;
+  float: none;
+}
+.towtruck-mobile-browser .towtruck .towtruck-avatar-upload-input {
+  margin: 10px auto;
+  float: none;
+}
+.towtruck-mobile-browser .towtruck .towtruck-avatar-upload-input input {
+  width: 60%;
+}
+.towtruck-mobile-browser input.towtruck-upload-avatar {
+  line-height: 0px;
+  width: 174px;
+  margin-left: 0px;
+}
+.towtruck-mobile-browser .towtruck section.towtruck-walkthrough-slide input.towtruck-self-name {
+  float: left;
+  font-size: 14px;
+  padding: 6px 6px 6px;
+  border-radius: 4px 4px 4px 4px;
+  border: 1px solid 
+  #cccccc;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
+  font-family: openSansRegular;
+  width: 66%;
+  position: static;
+  margin: 10px 10px;
+}
+.towtruck-mobile-browser .towtruck section.towtruck-walkthrough-slide .towtruck-swatch {
+  width: 32px;
+  height: 32px;
+  background: none repeat scroll 0% 0% 
+  #000000;
+  position: relative;
+  float: right;
+  right: 10px;
+  border-radius: 4px 4px 4px 4px;
+  border: 1px solid #cccccc;
+  top: 10px;
+}
+.towtruck-mobile-browser .towtruck .towtruck-save-settings {
+  margin-top: 20px;
+  margin-bottom: 0px;
 }

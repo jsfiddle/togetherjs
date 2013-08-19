@@ -2,9 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($, util, session, elementFinder, eventMaker) {
+define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"], function ($, util, session, elementFinder, eventMaker, templating) {
   var forms = util.Module("forms");
   var assert = util.assert;
+
+  // This is how much larger the focus element is than the element it surrounds
+  // (this is padding on each side)
+  var FOCUS_BUFFER = 5;
 
   var inRemoteUpdate = false;
 
@@ -464,14 +468,80 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker"], function ($
     });
   });
 
+  var lastFocus = null;
+
+  function focus(event) {
+    var target = event.target;
+    if (target != lastFocus) {
+      lastFocus = target;
+      session.send({type: "form-focus", element: elementFinder.elementLocation(target)});
+    }
+  }
+
+  function blur(event) {
+    var target = event.target;
+    if (lastFocus) {
+      lastFocus = null;
+      session.send({type: "form-focus", element: null});
+    }
+  }
+
+  var focusElements = {};
+
+  session.hub.on("form-focus", function (msg) {
+    var current = focusElements[msg.peer.id];
+    if (current) {
+      current.remove();
+      current = null;
+    }
+    if (! msg.element) {
+      // A blur
+      return;
+    }
+    var element = elementFinder.findElement(msg.element);
+    focusElements[msg.peer.id] = createFocusElement(msg.peer, element);
+  });
+
+  session.hub.on("hello", function (msg) {
+    if (lastFocus) {
+      setTimeout(function () {
+        session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
+      });
+    }
+  });
+
+  function createFocusElement(peer, around) {
+    around = $(around);
+    var el = templating.sub("focus", {peer: peer});
+    el = el.find(".towtruck-focus");
+    var aroundOffset = around.offset();
+    el.css({
+      top: aroundOffset.top-FOCUS_BUFFER + "px",
+      left: aroundOffset.left-FOCUS_BUFFER + "px",
+      width: around.width() + (FOCUS_BUFFER*2) + "px",
+      height: around.height() + (FOCUS_BUFFER*2) + "px"
+    });
+    $(document.body).append(el);
+    return el;
+  }
+
   session.on("ui-ready", function () {
     $(document).on("change", change);
-    $(document).on("textInput keyup cut paste", maybeChange);
+    $(document).on("textInput keydown keyup cut paste", maybeChange);
+    $(document).on("focus", focus);
+    // FIXME: not sure why, but the global focus listner doesn't work well...
+    document.addEventListener("focus", focus, true);
+    $(document).on("blur", blur);
+    document.addEventListener("blur", blur, true);
   });
 
   session.on("close", function () {
     $(document).off("change", change);
     $(document).off("textInput keyup cut paste", maybeChange);
+    $(document).off("focus", focus);
+    document.removeEventListener("focus", focus, true);
+    $(document).off("blur", blur);
+    document.removeEventListener("blur", blur, true);
   });
 
   session.hub.on("hello", function (msg) {

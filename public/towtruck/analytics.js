@@ -10,6 +10,7 @@ define(["util"], function (util) {
     // This is intended to be global:
     var gaq = window._gaq || [];
     gaq.push(["_setAccount", code]);
+    gaq.push(['_setDomainName', location.hostname]);
     gaq.push(["_trackPageview"]);
     window._gaq = gaq;
 

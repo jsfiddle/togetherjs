@@ -841,7 +841,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
                      "towtruck-person-name", "towtruck-person-name-abbrev",
                      "towtruck-person-bgcolor", "towtruck-person-swatch",
                      "towtruck-person-status", "towtruck-person-role",
-                     "towtruck-person-url", "towtruck-person-url-title"];
+                     "towtruck-person-url", "towtruck-person-url-title",
+                     "towtruck-person-bordercolor"];
       classes.forEach(function (cls) {
         var els = el.find("." + cls);
         els.addClass(this.peer.className(cls + "-"));
@@ -887,6 +888,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         colors.css({
           backgroundColor: this.peer.color
         });
+        colors = container.find("." + this.peer.className("towtruck-person-bordercolor-"));
+        colors.css({
+          borderColor: this.peer.color
+        });
       }
       container.find("." + this.peer.className("towtruck-person-role-"))
         .text(this.peer.isCreator ? "Creator" : "Participant");
@@ -923,6 +928,23 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           $("#towtruck-menu .towtruck-person-name-self").text(this.peer.defaultName);
         }
       }
+      if (this.peer.url != session.currentUrl()) {
+        container.find("." + this.peer.className("towtruck-person-"))
+            .addClass("towtruck-person-other-url");
+      } else {
+        container.find("." + this.peer.className("towtruck-person-"))
+            .removeClass("towtruck-person-other-url");
+      }
+      if (this.peer.following) {
+        if (this.followCheckbox) {
+          this.followCheckbox.prop("checked", true);
+        }
+      } else {
+        if (this.followCheckbox) {
+          this.followCheckbox.prop("checked", false);
+        }
+      }
+      // FIXME: add some style based on following?
       updateChatParticipantList();
       this.updateFollow();
     }),
@@ -982,12 +1004,25 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.detailElement = templating.sub("participant-window", {
         peer: this.peer
       });
+      var followId = this.peer.className("towtruck-person-status-follow-");
+      this.detailElement.find('[for="towtruck-person-status-follow"]').attr("for", followId);
+      this.detailElement.find('#towtruck-person-status-follow').attr("id", followId);
       this.detailElement.find(".towtruck-follow").click(function () {
         location.href = $(this).attr("href");
       });
       this.detailElement.find(".towtruck-nudge").click((function () {
         this.peer.nudge();
       }).bind(this));
+      this.followCheckbox = this.detailElement.find("#" + followId);
+      this.followCheckbox.change(function () {
+        if (! this.checked) {
+          this.peer.unfollow();
+        }
+        // Following doesn't happen until the window is closed
+        // FIXME: should we tell the user this?
+      });
+      this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
+      session.on("hide-window", this.maybeHideDetailWindow);
       ui.container.append(this.detailElement);
       this.dockElement.click((function () {
         if (this.detailElement.is(":visible")) {
@@ -995,7 +1030,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         } else {
           windowing.show(this.detailElement, {bind: this.dockElement});
           this.scrollTo();
-          console.log("pulse");
           this.cursor().element.animate({
             opacity:0.3
           }).animate({
@@ -1057,6 +1091,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
     },
 
+    maybeHideDetailWindow: function (windows) {
+      if (windows[0] && windows[0][0] === this.detailElement[0]) {
+        if (this.followCheckbox[0].checked) {
+          this.peer.follow();
+        } else {
+          this.peer.unfollow();
+        }
+      }
+    },
+
     dockClick: function () {
       // FIXME: scroll to person
     },
@@ -1067,6 +1111,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     destroy: function () {
       // FIXME: should I get rid of the dockElement?
+      session.off("hide-window", this.maybeHideDetailWindow);
     }
   });
 
