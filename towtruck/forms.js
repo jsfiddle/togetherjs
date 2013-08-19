@@ -527,7 +527,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   session.on("ui-ready", function () {
     $(document).on("change", change);
-    $(document).on("textInput keyup cut paste", maybeChange);
+    $(document).on("textInput keydown keyup cut paste", maybeChange);
     $(document).on("focus", focus);
     // FIXME: not sure why, but the global focus listner doesn't work well...
     document.addEventListener("focus", focus, true);
