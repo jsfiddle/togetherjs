@@ -202,6 +202,24 @@ h2 {
   width: 100%;
 }
 
+/* =main section
+----------------------------------------------- */
+
+#main-section .header-text {
+  margin: 40px 0px;
+}
+
+#main-section h3 {
+  font-size: 18px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 600;
+  height: 24px;
+  letter-spacing: 3px;
+  line-height: 24px;
+  text-transform: uppercase;
+}
+
 
 
 /* =animations
