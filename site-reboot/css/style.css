@@ -341,3 +341,26 @@ h4 {
   from {right:-200px; opacity: 0;}
   to {right:0px; opacity: 1;}
 }
+
+
+
+/* =responsive hacks
+----------------------------------------------- */
+
+/*@media (min-width: 1200px) {
+  .navbox {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 992px) {
+  .navbox {
+    max-width: 940px;
+  }
+}*/
+
+/*@media (min-width: 768px) {
+  .navbox {
+    max-width: 735px;
+  }
+}*/
