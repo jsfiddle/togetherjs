@@ -600,5 +600,250 @@ define(["util"], function (util) {
     }
   });
 
+  ot.SkipString = util.Class({
+    constructor: function (base) {
+      if (Array.isArray(base)) {
+        this._data = base;
+      } else {
+        this._data = [base || ""];
+      }
+      this.textLength = 0;
+      this.length = 0;
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (typeof item == "number") {
+          this.length += item;
+        } else {
+          this.textLength += item.length;
+          this.length += item.length;
+        }
+      }
+    },
+
+    del: function (start, length) {
+      var index = 0;
+      var deleting = true;
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (index >= start + length) {
+          break;
+        }
+        if (deleting) {
+          if (typeof item == "number") {
+            // already deleted
+            index += item;
+            continue;
+          }
+          if (index + item.length > start + length) {
+            // Need to delete just part of the text
+            this._data.splice(i, 2, index - start + length, item.substr(start + length - index));
+            break;
+          }
+          // We need to delete this chunk and then some
+          this._data[i] = item.length;
+          index += item.length;
+          continue;
+        }
+        if (typeof item == "number") {
+          if (index + item >= start) {
+            // Delete overlaps with previous delete
+            deleting = true;
+          }
+          index += item;
+          continue;
+        }
+        assert(typeof item == "string");
+        if (index + item.length >= start) {
+          // We need to delete some of this string
+          this._data.splice(i, 2, item.substr(0, start - index), index - start);
+          i++;
+        }
+        index += item.length;
+      }
+      this.textLength -= length;
+    },
+
+    ins: function (pos, text) {
+      var index = 0;
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (typeof item == "number") {
+          if (index + item == pos) {
+            // Insert just after
+            if (typeof this._data[i+1] == "string") {
+              this._data[i+1] = text + this._data[i+1];
+            } else {
+              this._data.splice(i+1, 0, text);
+            }
+            break;
+          } else if (index + item > pos) {
+            // Insert in the middle of the delete
+            this._data.splice(i, 3, item - (pos - index), text, (pos - index) - item);
+            break;
+          }
+          index += item;
+        } else {
+          assert(typeof item == "string");
+          if (index + item.length >= pos) {
+            // Splice into the string
+            this._data[i] = item.substr(0, pos - index) + text + item.substr(pos - index);
+            break;
+          }
+          index += item.length;
+        }
+      }
+      this.textLength += text.length;
+      this.length += text.length;
+    },
+
+    delPosition: function (plainPosition) {
+      /* Return the full position given a plain position */
+      assert(plainPosition < this.length);
+      var pos = 0;
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (typeof item == "number") {
+          pos += item;
+          continue;
+        }
+        if (plainPosition <= item.length) {
+          return pos + plainPosition;
+        }
+        plainPosition -= item.length;
+      }
+      throw util.AssertionError("Fell through");
+    },
+
+    plainPosition: function (delPosition) {
+      assert(delPosition < this.fullLength);
+      var pos = 0;
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (typeof item == "string") {
+          if (delPosition <= item.length) {
+            return pos + delPosition;
+          }
+          pos += item.length;
+          delPosition -= item.length;
+        } else {
+          if (delPosition <= item) {
+            return pos;
+          }
+          delPosition -= item;
+        }
+      }
+      throw util.AssertError("Fell through");
+    },
+
+    clone: function () {
+      return ot.SkipString(this._data.slice());
+    },
+
+    repr: function () {
+      var t = "[";
+      for (var i=0; i<this._data.length; i++) {
+        var item = this._data[i];
+        if (typeof item == "number") {
+          if (item <= 4) {
+            for (var j=0; j<item; j++) {
+              t += ".";
+            }
+          } else {
+            t += "(" + item + ")";
+          }
+        } else {
+          t += item;
+        }
+      }
+      return t + "]";
+    },
+
+    toString: function () {
+      var items = [];
+      for (var i=0; i<this._data.length; i++) {
+        if (typeof this._data[i] == "string") {
+          items.push(this._data[i]);
+        }
+      }
+      return items.join("");
+    }
+
+  });
+
+  ot.SkipTextReplace = util.Class(ot.TextReplace, {
+
+    apply: function (text) {
+      assert(text instanceof ot.SkipString);
+      if (this.empty()) {
+        return text;
+      }
+      if (this.start > text.length) {
+        console.trace();
+        throw new util.AssertionError("Start after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
+      }
+      if (this.start + this.del > text.length) {
+        throw new util.AssertionError("Start+del after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
+      }
+      text = text.clone();
+      if (this.del) {
+        text.del(this.start, this.del);
+      }
+      if (this.text) {
+        text.ins(this.start, this.text);
+      }
+      return text;
+    },
+
+    classMethods: {
+      random: function (source, generator) {
+        var delta = ot.TextReplace.random(source.toString(), generator);
+        var start = source.delPosition(delta.start);
+        var end = source.delPosition(delta.start + delta.del);
+        return this(start, end-start, delta.text);
+      }
+    }
+
+  });
+
+  ot.SkipChange = util.Class({
+    constructor: function (items) {
+      this._items = items;
+    },
+
+    transpose: function (delta) {
+      var thisPos = 0;
+      var deltaPos = 0;
+      var items = [];
+      while (thisPos < this._items.length || deltaPos < delta._items.length) {
+        var thisItem = this._items[thisPos];
+        var deltaItem = delta._items[deltaPos];
+        if (typeof thisItem == "number") {
+          if (typeof deltaItem == "number") {
+            // Both have a skip
+          }
+        }
+      }
+    },
+
+    classMethods: {
+      ins: function (base, text, pos) {
+        return ot.SkipChange([pos, "i", text, base.fullLength - pos]);
+      },
+      insPlain: function (base, text, pos) {
+        pos = base.delPosition(pos);
+        return ot.SkipChange.insert(base, text, pos);
+      },
+      del: function (base, pos, length) {
+        return ot.SkipChange([pos, "d", length, base.fullLength - pos]);
+      },
+      delPlain: function (base, text, pos) {
+        pos = base.delPosition(pos);
+        return ot.SkipChange.del(base, text, pos);
+      }
+    }
+
+  });
+
+
   return ot;
 });
