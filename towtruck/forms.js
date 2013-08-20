@@ -536,20 +536,15 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   session.on("ui-ready", function () {
     $(document).on("change", change);
     $(document).on("textInput keydown keyup cut paste", maybeChange);
-    $(document).on("focus", focus);
-    // FIXME: not sure why, but the global focus listner doesn't work well...
-    document.addEventListener("focus", focus, true);
-    $(document).on("blur", blur);
-    document.addEventListener("blur", blur, true);
+    $(document).on("focusin", focus);
+    $(document).on("focusout", blur);
   });
 
   session.on("close", function () {
     $(document).off("change", change);
     $(document).off("textInput keyup cut paste", maybeChange);
-    $(document).off("focus", focus);
-    document.removeEventListener("focus", focus, true);
-    $(document).off("blur", blur);
-    document.removeEventListener("blur", blur, true);
+    $(document).off("focusin", focus);
+    $(document).off("focusout", blur);
   });
 
   session.hub.on("hello", function (msg) {
