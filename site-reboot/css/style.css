@@ -46,7 +46,6 @@ a:hover {
 
 button {
   display: inline-block;
-  width: 28.406%;
   padding-bottom: 2px;
   background-color: rgb(39, 122, 193);
   font-weight: bold;
@@ -261,6 +260,89 @@ h4 {
   line-height: 24px;
 }
 
+
+/* =app examples
+----------------------------------------------- */
+.app-example {
+  padding: 0px;
+}
+
+.app-example iframe {
+  border-radius: 4px;
+}
+
+.app-example .top-bar {
+  width: 100%;
+  background: #c8c8c8;
+  height: 30px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.app-example .top-bar .red-circle {
+  margin: 10px 6px 10px 14px;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #df7166;
+  font-size: inherit;
+  opacity: 1;
+  line-height: 0;
+}
+
+.app-example .top-bar .yellow-circle {
+  margin: 10px 6px;
+  border-radius: 50px;
+  width: 10px;
+  height: 10px;
+  background: #e6c646;
+  border: none;
+  padding: 4px;
+}
+
+.app-example .top-bar .yellow-circle:hover {
+ cursor: default;
+}
+
+.app-example .top-bar .green-circle {
+  margin: 10px 6px;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #5ccc8b;
+  border: none;
+  padding: 4px;
+}
+
+.app-example .top-bar .green-circle:hover {
+ cursor: default;
+}
+
+.app-example .address-bar {
+  padding: 14px;
+  background: #e6e6e6;
+}
+
+.app-example .address-bar input:hover {
+ cursor: default;
+}
+
+.app-example .modal-header {
+  padding: 0px;
+}
+
+.app-example .modal-body {
+  padding: 0px;
+}
+
+.app-example .modal-footer {
+  margin-top: 0px;
+}
+
+.app-example .col-xs-12 {
+  padding: 0px;
+  height: 400px;
+}
 
 
 /* =animations

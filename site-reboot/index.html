@@ -43,11 +43,10 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href="#tour">Tour</a></li>
+            <li><a href="#examples">Examples</a></li>
             <li><a href="#customers">Customers</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#tryitout">Try it out</a></li>
-            <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-            <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developer Resources</a></li>
             <li><a href="#footer">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
@@ -142,6 +141,8 @@
           <div class="clearfix"></div>
           <div class="col-xs-7">
             <h4 class="text-left">Want to add Connect to your site?</h2>
+            <p>
+              See how the technology architecture works <a href="" target="_blank">here</a>.  
             <p class="text-left">
               <button type="button" class="btn btn-primary">Try it out now!</button>
             </p>
@@ -150,6 +151,98 @@
             <p>image</p>
           </div>
         </section>
+        
+        <hr>
+        
+        <section class="row" id="examples">
+          <h2 class="text-center header-text">Examples </h2>
+          <h3 class="text-center">Try out a few example apps to see how Connect works on these demo examples.</h2>
+          <div class="col-xs-4">
+            <a href="#" class="thumbnail">
+              <img data-src="holder.js/100%x180" alt="...">
+            </a>
+            <h4>To Do app</h4>
+            <p>Try out Connect on this sample To Do app with a friend.</p>
+            <p><button data-toggle="modal" href="#example-todoapp" class="btn btn-primary btn-lg">Launch demo</button></p>
+          </div>
+          <div class="col-xs-4">
+            <a href="#" class="thumbnail">
+              <img data-src="holder.js/100%x180" alt="...">
+            </a>
+            <h4>Friendly Code</h4>
+            <p>Work on coding together with your friend.</p>
+            <p><button data-toggle="modal" href="#example-friendlycode" class="btn btn-primary btn-lg">Launch demo</button></p>
+          </div>
+          <div class="col-xs-4">
+            <a href="#" class="thumbnail">
+              <img data-src="holder.js/100%x180" alt="...">
+            </a>
+            <h4>Mad Libs</h4>
+            <p>Play Mad Libs with a friend using Connect.</p>
+            <p><button data-toggle="modal" href="#example-madlibs" class="btn btn-primary btn-lg">Launch demo</button></p>
+          </div>
+        </section>
+        
+        <!-- TO DO APP -->
+         <div class="modal fade app-example" id="example-todoapp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+           <div class="modal-dialog">
+             <div class="modal-content">
+               <div class="modal-header">
+                 <div class="top-bar">
+                   <button type="button" class="close pull-left red-circle" data-dismiss="modal" aria-hidden="true"></button>
+                   <button class="yellow-circle pull-left"></button>
+                   <button class="green-circle pull-left"></button>
+                 </div>
+                 <div class="address-bar">
+                  <input type="text" class="form-control" placeholder="http://www.sample.com/todoapp" readonly>
+                 </div>
+               </div>
+               <div class="modal-body">
+                 <iframe class="col-xs-12"
+                          src="examples/todo/todo.html">
+                 </iframe>
+               </div>
+             </div><!-- /.modal-content -->
+           </div><!-- /.modal-dialog -->
+         </div><!-- /.modal -->
+         
+        <!-- FRIENDLY CODE APP -->
+        <div class="modal fade" id="example-friendlycode" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Friendly Code</h4>
+              </div>
+              <div class="modal-body">
+                ...
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+         <!-- MADLIBS APP -->
+       <div class="modal fade" id="example-madlibs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h4 class="modal-title">Mad Libs</h4>
+             </div>
+             <div class="modal-body">
+               ...
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="button" class="btn btn-primary">Save changes</button>
+             </div>
+           </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+       </div><!-- /.modal -->
         
         <hr>
         
@@ -230,7 +323,7 @@
             <a href="#" class="thumbnail">
               <img data-src="holder.js/100%x180" alt="...">
             </a>
-            <h4>Web RTC</h4>
+            <h4>Video or Audio chat</h4>
             Connect uses Web RTC technology to enhance communication for your users.
           </div>
           <div class="col-xs-4">
@@ -303,16 +396,19 @@
             <div class="col-xs-4">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="#tour">Tour</a></li>
+                <li class=""><a href="#examples">Examples</a></li>
                 <li class=""><a href="#customers">Customers</a></li>
                 <li class=""><a href="#features">Features</a></li>
                 <li class=""><a href="#getstarted">Get Started</a></li>
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developer Resources</a></li>
                 <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-4">
-              <ul class="list-unstyled text-left"><li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Connect on Github</a></li>
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About Connect</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Connect on Github</a></li>
+                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Connect Documentation</a></li>
+                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">FAQ</a></li>
                 <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Connect on Twitter</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
