@@ -263,12 +263,13 @@ h4 {
 
 /* =app examples
 ----------------------------------------------- */
+
 .app-example {
   padding: 0px;
 }
 
 .app-example iframe {
-  border-radius: 4px;
+
 }
 
 .app-example .top-bar {
@@ -341,7 +342,7 @@ h4 {
 
 .app-example .col-xs-12 {
   padding: 0px;
-  height: 400px;
+  height: 600px;
 }
 
 
@@ -428,6 +429,20 @@ h4 {
 
 /* =responsive hacks
 ----------------------------------------------- */
+
+@media screen and (min-width: 768px) {
+  
+  .app-example .modal-dialog {
+  right: auto;
+  left: 50%;
+  width: 900px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  }
+  
+}
+
+
 
 /*@media (min-width: 1200px) {
   .navbox {
