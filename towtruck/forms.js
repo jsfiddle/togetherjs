@@ -526,8 +526,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     el.css({
       top: aroundOffset.top-FOCUS_BUFFER + "px",
       left: aroundOffset.left-FOCUS_BUFFER + "px",
-      width: around.width() + (FOCUS_BUFFER*2) + "px",
-      height: around.height() + (FOCUS_BUFFER*2) + "px"
+      width: around.outerWidth() + (FOCUS_BUFFER*2) + "px",
+      height: around.outerHeight() + (FOCUS_BUFFER*2) + "px"
     });
     $(document.body).append(el);
     return el;
