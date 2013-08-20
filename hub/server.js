@@ -117,7 +117,7 @@ wsServer.on('request', function(request) {
                  ' connections: ' + allConnections[id].length);
     for (var i=0; i<allConnections[id].length; i++) {
       var c = allConnections[id][i];
-      if (c == connection) {
+      if (c == connection && !parsed["server-echo"]) {
         continue;
       }
       if (message.type === 'utf8') {
