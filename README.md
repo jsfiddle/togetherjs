@@ -80,6 +80,14 @@ $ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
 
 Then `static-myapp/towtruck.js` and `static-myapp/towtruck-min.js` will be in place, and the rest of the code will be under `static-myapp/towtruck/`.  You would deploy these on your server.
 
+Running a local server
+----------------------
+You shouldn't need to run your own version of the hub server.  But if you
+happen to make changes to the server, you can change the default hub
+URL by setting the HUB_URL environment variable when building.  For example:
+```
+$ HUB_URL=http://localhost:8080 grunt devwatch
+```
 
 Testing
 -------
