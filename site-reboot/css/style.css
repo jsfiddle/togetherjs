@@ -23,7 +23,7 @@
 
 body {
   background-color: rgb(255, 255, 255);
-  font: 300 18px/1.5 openSansLight, 'Open Sans', sans-serif;
+  font: 300 16px/24px openSansLight, 'Open Sans', sans-serif;
 }
 
 p {
@@ -65,7 +65,7 @@ footer a:hover {
   color: rgb(72, 72, 72);
   display: block;
   font-family: 'Open Sans Light', sans-serif;
-  font-size: 68px;
+  font-size: 680%;
   font-weight: normal;
   letter-spacing: -3px;
   line-height: 68px;
@@ -125,7 +125,7 @@ h4 {
 
 .main-header {
   -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
-  background-color: rgb(255, 255, 255);
+  background-color: #3a3a3a;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   display: block;
   font-family: sans-serif;
@@ -135,8 +135,8 @@ h4 {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 1px solid white;
-  background-color: #e26868;
+  border: 0px solid white;
+  background-color: #fff;
   text-indent: -9999px;
   float: left;
   margin: 6px 0px;
@@ -164,12 +164,12 @@ h4 {
 }
 
 .main-header .main-nav li a {
-  color: rgb(72, 72, 72);
+  color: rgb(255,255,255);
   opacity: 0.5;
 }
 
 .main-header .main-nav li a:hover {
-  color: rgb(72, 72, 72);
+  color: rgb(255, 255, 255);
   opacity: 1;
 }
 
@@ -473,6 +473,41 @@ h4 {
 /* =responsive hacks
 ----------------------------------------------- */
 
+/*responsive font sizes*/
+/*Smallest size*/
+@media only screen and (max-width: 400px) {
+  .large { font-size:44px;}
+}
+
+/*medium size*/
+@media only screen and (max-width: 800px) {
+  .large { font-size:64px;}
+}
+
+/* Extra small devices (phones, up to 480px) */
+/* No media query since this is the default in Bootstrap */
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: @screen-sm) { 
+  .large { font-size:44px;}
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: @screen-md) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: @screen-lg) { ... }
+
+
+
+
+
+
+
+
+
+
+/*making the modal size larger for the app examples*/
 @media screen and (min-width: 768px) {
   
   .app-example .modal-dialog {
