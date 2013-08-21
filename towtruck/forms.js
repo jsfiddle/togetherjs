@@ -335,41 +335,19 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     var value;
     if (msg.replace) {
       var history = el.data("towtruckHistory");
+      history.setSelection(selection);
       var changed = history.commit(msg.replace);
       maybeSendUpdate(msg.element, history);
       if (!changed) { return; }
       value = history.current;
+      selection = history.getSelection();
     } else {
       value = msg.value;
     }
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text && typeof selection[0] == "number" && typeof selection[1] == "number" && msg.replace) {
-        if (selection[0] > msg.replace.start) {
-          if (selection[0] < msg.replace.start + msg.replace.del) {
-            // selection start inside replacement
-            selection[0] = msg.replace.start;
-          } else {
-            // selection start after replacement
-            selection[0] += msg.replace.text.length - msg.replace.del;
-          }
-        } // otherwise selection start is before replacement (no change necessary)
-        if (selection[1] > msg.replace.start) {
-          if (selection[1] < msg.replace.start + msg.replace.del) {
-            // end selection inside replacement
-            if (selection[0] <= msg.replace.start) {
-              // Since the start is before the selection, select the entire replacement
-              selection[1] = msg.replace.start + msg.replace.del;
-            } else {
-              // Otherwise select nothing
-              selection[1] = msg.replace.start;
-            }
-          } else {
-            // end selection after replacement
-            selection[1] += msg.replace.text.length - msg.replace.del;
-          }
-        } // otherwise selection end is before replacement
+      if (text) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
       }

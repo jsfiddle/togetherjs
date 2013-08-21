@@ -206,6 +206,21 @@ define(["util"], function (util) {
       this.version = initVersion;
       this.queue = [];
       this.deltaId = 1;
+      this.selection = null;
+    },
+    setSelection: function(selection) {
+      if (selection) {
+        // use a fake change to represent the selection
+        this.selection = ot.TextReplace(selection[0],
+                                        selection[1] - selection[0], '@');
+      } else {
+        this.selection = null;
+      }
+    },
+    getSelection: function() {
+      if (!this.selection) { return null; }
+      // decode the fake change
+      return [this.selection.start, this.selection.start + this.selection.del];
     },
     add: function(delta) {
       delta.id = this.clientId + '.' + (this.deltaId++);
@@ -238,6 +253,10 @@ define(["util"], function (util) {
         assert(!tt[0].sent);
         return tt[0];
       });
+      if (this.selection) {
+        // update the selection!
+        this.selection = this.selection.transpose(inserted)[0];
+      }
       this.committed = delta.apply(this.committed);
       this.version++;
       if (this.queue.length) { this.queue[0].version = this.version; }
