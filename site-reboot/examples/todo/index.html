@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Grocery List</title>
+  <title>Grocery To Do List</title>
   <meta name="description" content="">
   <meta name="author" content="">
   <link rel="stylesheet" href=".css">
@@ -10,12 +10,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  
-  <!-- To do list app example from: http://www.webdesignerdepot.com/2013/04/how-to-use-local-storage-for-javascript/ -->
-  
+    
   <style type="text/css" media="screen">
     .main{
       padding: 80px 15px;
+    }
+    
+    h1 {
+      color: #e74c3c;
+    }
+    
+    .navbar {
+      background: #fa6374;
+    }
+    
+    .navbar-inverse .navbar-brand {
+      color: #fff;
     }
     
   </style>
@@ -25,7 +35,7 @@
     
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
-        <a class="navbar-brand pull-left" href="#">Grocery List</a>
+        <a class="navbar-brand pull-left" href="#">Grocery To Do List</a>
         <button type="button" class="btn btn-default navbar-btn pull-right" onclick="TowTruck(this); return false;">Call TowTruck</button>
       </div>
     </div>

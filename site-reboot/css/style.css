@@ -24,28 +24,26 @@
 body {
   background-color: rgb(255, 255, 255);
   font: 300 18px/1.5 openSansLight, 'Open Sans', sans-serif;
-  text-align: center;
 }
 
 p {
+  color: rgb(51, 51, 51);
+  font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  line-height: 20px;
+  line-height: 24px;
 }
 
 a {
-  display: inline-block;
   line-height: 1.38;
-  color: #0095DD;
   font-size: 14px;
   font-family: openSansLight, 'Open Sans', sans-serif;
 }
 
 a:hover {
-  color: #00539F;
+  text-decoration: underline;
 }
 
 button {
-  display: inline-block;
   padding-bottom: 2px;
   background-color: rgb(39, 122, 193);
   font-weight: bold;
@@ -54,65 +52,71 @@ button {
   font-family: openSansLight, 'Open Sans', sans-serif;
 }
 
-footer {
+footer a {
+  color: #0096dd;
+  text-decoration: none;
+}
 
+footer a:hover {
+  color: #008bb2;
 }
 
 .large {
-  font-weight: 100;
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
+  font-size: 68px;
+  font-weight: normal;
   letter-spacing: -3px;
-  font-size: 72px;
-  letter-spacing: 0px;
-  line-height: 100%;
-  font-family: openSansLight, 'Open Sans Light', sans-serif;
+  line-height: 68px;
 }
 
 h1 {
-  margin: 16px auto 0;
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
   font-size: 48px;
-  letter-spacing: -3px;
-  line-height: 100%;
-  
+  font-weight: normal;
+  letter-spacing: -2px;
+  line-height: 48px;
 }
 
 h2 {
-  margin: 0 auto;
-  font-weight: 100;
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
   font-size: 32px;
+  font-weight: normal;
   letter-spacing: -1px;
-  line-height: 100%;
+  line-height: 32px;
 }
 
 h3 {
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
   font-size: 28px;
-  letter-spacing: -0.5px;
-  line-height: 100%;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: 28px;
 }
 
 h4 {
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
   font-size: 24px;
-  letter-spacing: -0.25px;
-  line-height: 100%;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: 24px;
 }
 
 .small, small {
-  font-size: 12px;
-  line-height: 100%;
-}
-
-
-.btn-primary {
-  font-size: 16px;
-  width: 150px;
+  color: rgb(51, 51, 51);
   display: block;
-  text-align: center;
-  padding: 6px 0;
-  margin: 0 auto;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  box-shadow: 0 5px 0 #1c5281;
-  background-color: rgb(39, 122, 193);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 
@@ -159,20 +163,24 @@ h4 {
   color: #333;
 }
 
-.main-header a {
-  color: #666;
+.main-header .main-nav li a {
+  color: rgb(72, 72, 72);
+  opacity: 0.5;
+}
+
+.main-header .main-nav li a:hover {
+  color: rgb(72, 72, 72);
+  opacity: 1;
+}
+
+.main-header .navbar-nav > .active > a {
+  color: rgb(72, 72, 72);
+  opacity: 1;
+  background: none;
 }
 
 .navbar-inverse {
   border-color: rgba(0,0,0,0);
-}
-
-.navbar-inverse .navbar-nav > li > a:hover {
-  color: #515151;
-}
-
-.main-header .navbar-nav > .active > a {
-  background: none;
 }
 
 .main-header .main-nav {
@@ -181,7 +189,7 @@ h4 {
 
 .main-header .navbar-toggle {
   width: 44px;
-  background: #000;
+  background: rgb(72, 72, 72);
   margin-top: 13px;
 }
 
@@ -209,12 +217,8 @@ h4 {
 }
 
 .hero-tagline {
-  font-size: 18px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: 300;
-  height: 81px;
-  line-height: 27px;
+  color: rgb(255, 255, 255);
+  margin-bottom: 20px;
 }
 
 #hero .container { 
@@ -246,18 +250,57 @@ h4 {
 
 #main-section .header-text {
   margin: 40px 0px;
-  font-size: 48px;
-  letter-spacing: 0px;
-  line-height: 100%;
 }
 
-#main-section h3 {
-  font-size: 26px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: 600;
-  height: 26px;
-  line-height: 24px;
+/* =tour section
+----------------------------------------------- */
+
+#main-section #tour img.why-section {
+  width: 50%;
+  height: 50%;
+  margin: 0 auto;
+}
+
+#main-section #tour img.how-section {
+  width: 50%;
+  height: 50%;
+  margin: 0 auto;
+}
+
+/* =examples section
+----------------------------------------------- */
+
+#main-section #examples img {
+  width: 50%;
+  height: 50%;
+  margin: 0 auto;
+}
+
+/* =customers section
+----------------------------------------------- */
+
+#main-section #customers img {
+  width: 50%;
+  height: 50%;
+  margin: 0 auto;
+}
+
+/* =features section
+----------------------------------------------- */
+
+#main-section #features a img {
+  width: 64px;
+  height: 64px;
+}
+
+/* =tryitnow section
+----------------------------------------------- */
+
+/* =footer section
+----------------------------------------------- */
+
+#footer a img {
+  width: 50%;
 }
 
 
