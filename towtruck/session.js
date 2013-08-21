@@ -109,7 +109,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         msg.peer.updateFromHello(msg);
       }
       msg.sameUrl = msg.peer.url == currentUrl;
-      msg.peer.updateMessageDate(msg);
+      if (!msg.peer.isSelf) { msg.peer.updateMessageDate(msg); }
       session.hub.emit(msg.type, msg);
       TowTruck._onmessage(msg);
     };
@@ -188,6 +188,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
       session.timeHelloSent = Date.now();
+      peers.Self.url = msg.url;
     }
     if (! TowTruck.startup.continued) {
       msg.starting = true;

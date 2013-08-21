@@ -198,6 +198,57 @@ define(["util"], function (util) {
     }
   });
 
+  ot.SimpleHistory = util.Class({
+    constructor: function(clientId, initState, initVersion) {
+      this.clientId = clientId;
+      this.committed = initState;
+      this.current = initState;
+      this.version = initVersion;
+      this.queue = [];
+      this.deltaId = 1;
+    },
+    add: function(delta) {
+      delta.id = this.clientId + '.' + (this.deltaId++);
+      if (!this.queue.length) { delta.version = this.version; }
+      this.queue.push(delta);
+      this.current = delta.apply(this.current);
+      return !!delta.version;
+    },
+    commit: function(delta) {
+      // ignore it if the version doesn't match (this patch doesn't apply)
+      if (delta.version !== this.version) {
+        return false; // no need to update buffer
+      }
+      // is this the first thing on the queue?
+      if (this.queue.length && this.queue[0].id === delta.id) {
+        assert(delta.version === this.queue[0].version);
+        // good, apply this to commit state & remove it from queue
+        this.committed = this.queue.shift().apply(this.committed);
+        this.version++;
+        if (this.queue.length) { this.queue[0].version = this.version; }
+        return false; // no need to update buffer
+      }
+      // Transpose all bits on the queue to put this patch first.
+      delta = ot.TextReplace(delta.start, delta.del, delta.text);
+      var inserted = delta;
+      this.queue = this.queue.map(function(qdelta) {
+        var tt = qdelta.transpose(inserted);
+        inserted = tt[1];
+        tt[0].id = qdelta.id;
+        assert(!tt[0].sent);
+        return tt[0];
+      });
+      this.committed = delta.apply(this.committed);
+      this.version++;
+      if (this.queue.length) { this.queue[0].version = this.version; }
+      this.current = this.committed;
+      this.queue.forEach(function(qdelta) {
+        this.current = qdelta.apply(this.current);
+      }.bind(this));
+      return true; // need to update buffer & retransmit patch
+    }
+  });
+
   ot.History = util.Class({
 
     constructor: function (clientId, initState) {

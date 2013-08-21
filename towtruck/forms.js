@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"], function ($, util, session, elementFinder, eventMaker, templating) {
+define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($, util, session, elementFinder, eventMaker, templating, ot) {
   var forms = util.Module("forms");
   var assert = util.assert;
 
@@ -36,23 +36,26 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       element: location
     };
     if (isText(el)) {
-      var prev = el.data("towtruckPrevValue");
-      if (prev == value) {
+      var history = el.data("towtruckHistory");
+      if (history.current == value) {
         return;
       }
-      if (prev) {
-        msg.replace = makeDiff(el.data("towtruckPrevValue"), value);
-        assert(msg.replace);
+      if (history) {
+        var delta = makeDiff(history.current, value);
+        assert(delta);
+        history.add(delta);
+        return maybeSendUpdate(msg.element, history);
       } else {
         if (typeof prev != "string") {
           console.warn("No previous known value on field", el[0]);
         }
         msg.value = value;
+        msg.version = 1;
+        el.data("towtruckHistory", ot.SimpleHistory(session.clientId, value, 1));
       }
     } else {
       msg.value = value;
     }
-    el.data("towtruckPrevValue", value);
     session.send(msg);
   }
 
@@ -253,7 +256,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   var TEXT_TYPES = (
     "color date datetime datetime-local email " +
-        "tel time week").split(/ /g);
+        "tel text time week").split(/ /g);
 
   function isText(el) {
     el = $(el);
@@ -284,8 +287,28 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     } else {
       el.val(value);
     }
-    el.data("towtruckPrevValue", value);
     eventMaker.fireChange(el);
+  }
+
+  function maybeSendUpdate(element, history) {
+    var qdelta = history.queue[0];
+    if (!qdelta) { return; /* nothing to send */ }
+    if (qdelta.sent) { return; /* already sent */ }
+    assert(qdelta.version);
+    qdelta.sent = true;
+    var msg = {
+      type: "form-update",
+      element: element,
+      "server-echo": session.clientId,
+      replace: {
+        id: qdelta.id,
+        version: qdelta.version,
+        start: qdelta.start,
+        del: qdelta.del,
+        text: qdelta.text
+      }
+    };
+    session.send(msg);
   }
 
   session.hub.on("form-update", function (msg) {
@@ -311,8 +334,11 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
     var value;
     if (msg.replace) {
-      var cur = getValue(el);
-      value = applyDiff(msg.replace, cur);
+      var history = el.data("towtruckHistory");
+      var changed = history.commit(msg.replace);
+      maybeSendUpdate(msg.element, history);
+      if (!changed) { return; }
+      value = history.current;
     } else {
       value = msg.value;
     }
@@ -321,27 +347,27 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       setValue(el, value);
       if (text && typeof selection[0] == "number" && typeof selection[1] == "number" && msg.replace) {
         if (selection[0] > msg.replace.start) {
-          if (selection[0] < msg.replace.start + msg.replace.len) {
+          if (selection[0] < msg.replace.start + msg.replace.del) {
             // selection start inside replacement
             selection[0] = msg.replace.start;
           } else {
             // selection start after replacement
-            selection[0] += msg.replace.text.length - msg.replace.len;
+            selection[0] += msg.replace.text.length - msg.replace.del;
           }
         } // otherwise selection start is before replacement (no change necessary)
         if (selection[1] > msg.replace.start) {
-          if (selection[1] < msg.replace.start + msg.replace.len) {
+          if (selection[1] < msg.replace.start + msg.replace.del) {
             // end selection inside replacement
             if (selection[0] <= msg.replace.start) {
               // Since the start is before the selection, select the entire replacement
-              selection[1] = msg.replace.start + msg.replace.len;
+              selection[1] = msg.replace.start + msg.replace.del;
             } else {
               // Otherwise select nothing
               selection[1] = msg.replace.start;
             }
           } else {
             // end selection after replacement
-            selection[1] += msg.replace.text.length - msg.replace.len;
+            selection[1] += msg.replace.text.length - msg.replace.del;
           }
         } // otherwise selection end is before replacement
         el[0].selectionStart = selection[0];
@@ -368,11 +394,18 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       var el = $(this);
       var value = getValue(el);
-      el.data("towtruckPrevValue", value);
-      msg.updates.push({
+      var upd = {
         element: elementFinder.elementLocation(this),
         value: value
-      });
+      };
+      if (isText(el)) {
+        var history = el.data("towtruckHistory");
+        if (history) {
+          upd.value = history.committed;
+          upd.version = history.version;
+        }
+      }
+      msg.updates.push(upd);
     });
     liveTrackers.forEach(function (tracker) {
       var init = tracker.makeInit();
@@ -395,7 +428,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       var el = $(this);
       var value = getValue(el);
-      el.data("towtruckPrevValue", value);
+      el.data("towtruckHistory", ot.SimpleHistory(session.clientId, value, 1));
     });
     destroyTrackers();
     buildTrackers();
@@ -425,18 +458,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     if (! (removed.length || inserted)) {
       return null;
     }
-    return {
-      start: commonStart,
-      // Not using .length because it makes it seem like an array or string:
-      len: removed.length,
-      text: inserted
-    };
-  }
-
-  function applyDiff(diff, value) {
-    var start = value.substr(0, diff.start);
-    var end = value.substr(diff.start + diff.len);
-    return start + diff.text + end;
+    return ot.TextReplace(commonStart, removed.length, inserted);
   }
 
   session.hub.on("form-init", function (msg) {
@@ -469,6 +491,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         inRemoteUpdate = true;
         try {
           setValue(el, update.value);
+          if (update.version) {
+            $(el).data("towtruckHistory", ot.SimpleHistory(session.clientId, update.value, update.version));
+          }
         } finally {
           inRemoteUpdate = false;
         }
