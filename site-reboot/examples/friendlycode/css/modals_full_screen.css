@@ -1,0 +1,119 @@
+/**
+ * Styling for webpagemaker editor modal dialogs
+ */
+
+.modal-overlay {
+  z-index: 2000;
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: rgba(0,0,0,0.45); 
+  height: 100%; 
+  width: 100%;
+}
+
+.thimble-modal-menu {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  width: 650px;
+  margin-left: -325px;
+  height: 210px;
+  background-color: #FDFDFD;
+  border: 1px solid #C0C0C0;
+}
+
+.thimble-branding {
+  display: inline-block;
+  width: 115px;
+  height: 210px;
+  background-image: url("../img/webmaker-logo.png");
+  background-position: 50% 40%;
+  background-repeat: no-repeat;
+  border-right: 1px solid #C0C0C0;
+}
+
+.thimble-menu-content {
+  display: inline-block;
+  vertical-align: top;
+  height: 120px; /* 210 - 2 * 10 */
+  width: 405px;
+  margin: 50px;
+  /*
+  border: 1px solid black;
+  */
+}
+
+.thimble-title{
+  color: #4385F6;
+}
+
+.thimble-url-box {
+  background-color: #FFFFFF;
+  color: blue;
+  height: 30px;
+  width: 350px;
+  padding-top: 10px;
+  padding-left: 1em;
+  margin: 1em 0px;
+}
+
+.thimble-url-box a {
+  color: #50A5F8;
+}
+
+.thimble-url-box a:hover {
+  color: blue;
+}
+
+.thimble-additionals {
+  color: #222;
+  text-align: justify;
+}
+
+.thimble-additionals a {
+  text-decoration: none;
+  color: #3F9A31;
+}
+
+.thimble-additionals a:hover {
+  color: #236819;
+}
+
+.confirmation-buttons {
+  text-align: center;
+  margin-top: 1em;
+}
+
+.confirmation-button {
+  display: inline;
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px 15px;
+  margin: auto;
+  color: white;
+  margin: 0px 1em;
+}
+
+.confirmation-button.yes-button {
+  background-color: #1DBF84;
+} 
+
+.confirmation-button.no-button {
+  background-color: #F14D2A;
+}
+
+.confirmation-button .mark {
+  position: relative;
+  top: 0px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+  color: white;
+  margin-right: -9px;
+  background-position: 9px 5px;
+  background-repeat: no-repeat;
+}

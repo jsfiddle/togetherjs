@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Friendlycode Test Suite - Optimized Build</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+
+  <body>
+    <h1  id="qunit-header">Friendlycode Test Suite  - Optimized Build</h1>
+    <h2  id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2  id="qunit-userAgent"></h2>
+    <ol  id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+
+    <script src="qunit.js"></script>
+    <script src="define-tests.js"></script>
+    <script src="../js/require-config.js"></script>
+    <script src="../js/require.min.js"></script>
+    <script src="../js/friendlycode-built.js"
+            onerror="alert('please run build-require.js!');"></script>
+    <script>
+    defineTests.run(["test/all-tests"]);
+    
+    if (location.search.match(/externalreporter=1/))
+      document.write('<script src="/externalreporter.js"></' + 'script>');
+    </script>
+  </body>
+</html>

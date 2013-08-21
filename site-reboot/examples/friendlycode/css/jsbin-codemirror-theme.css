@@ -1,0 +1,126 @@
+/* jsbin - based on web inspector */
+.cm-s-jsbin span.cm-keyword {color: #AA0D91;}
+.cm-s-jsbin span.cm-atom {color: #219;}
+.cm-s-jsbin span.cm-number {color: #164;}
+.cm-s-jsbin span.cm-def {color: #00f;}
+.cm-s-jsbin span.cm-variable {color: black;}
+.cm-s-jsbin span.cm-variable-2 {color: #05a;}
+.cm-s-jsbin span.cm-variable-3 {color: #0a5;}
+.cm-s-jsbin span.cm-property {color: black;}
+.cm-s-jsbin span.cm-operator {color: black;}
+.cm-s-jsbin span.cm-comment {color: #236E25;}
+.cm-s-jsbin span.cm-string {color: #C41A16;}
+.cm-s-jsbin span.cm-meta {color: #555;}
+.cm-s-jsbin span.cm-error {color: #f00;}
+.cm-s-jsbin span.cm-qualifier {color: #555;}
+.cm-s-jsbin span.cm-builtin {color: #30a;}
+.cm-s-jsbin span.cm-bracket {color: #cc7;}
+.cm-s-jsbin span.cm-tag {color: #881280;}
+.cm-s-jsbin span.cm-attribute {color: #994500;}
+
+.CodeMirror {
+  font-family: 'Ubuntu Mono', monospace;
+  font-weight: 200;
+  font-size: 14px;
+}
+
+.CodeMirror .CodeMirror-lines {
+  color: #333;
+  font-size: 14px;
+  line-height: 15.75px;
+}
+
+.CodeMirror textarea {
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 15.75px;
+}
+
+.CodeMirror-gutter {
+  background-color: #EEEEEE !important;
+}
+
+.CodeMirror-gutter-text {
+  color: #A9A9A9;
+  font-size: 12px;
+  line-height: 15.75px;
+  padding-left: 0;
+}
+
+.cm-s-jsbin span.cm-meta {
+  color: #999999;
+}
+
+.cm-s-jsbin span.cm-comment {
+  color: #333;
+  font-style: italic;
+  font-weight: bold;
+  
+  /* This needs to be a little less than the standard line-height to align on
+     multi-line wrapped content. */
+  line-height: 15.75px;
+}
+
+.CodeMirror-wrap .CodeMirror-scroll {
+  overflow: hidden;
+}
+
+.CodeMirror-scroll.cm-s-jsbin {
+  height: 100%;
+}
+
+.cm-tag {
+  color: #3A85FF !important;
+}
+
+.CodeMirror-lines .CodeMirror-line-highlight {
+  background-color: #EEEEEE;
+  margin-left: -3em;
+  padding-left: 3em;
+}
+
+.CodeMirror-gutter {
+  opacity: 1 !important;
+}
+.CodeMirror span.preview-to-editor-highlight {
+  background-color: rgba(50,100,255,0.3);
+}
+
+/* Text size: small */
+
+.CodeMirror[data-size="small"] div,
+.CodeMirror[data-size="small"] pre {
+  font-size: 12px;
+  line-height: 13.5px;
+}
+
+.CodeMirror[data-size="small"] .cm-s-jsbin span.cm-comment {
+  font-size: 12px;
+  line-height: 12.5px;
+}
+
+/* Text size: normal */
+
+.CodeMirror[data-size="normal"] div,
+.CodeMirror[data-size="normal"] pre {
+  font-size: 14px;
+  line-height: 15.75px;
+}
+
+.CodeMirror[data-size="normal"] .cm-s-jsbin span.cm-comment {
+  font-size: 14px;
+  line-height: 14.75px;
+}
+
+/* Text size: large */
+
+.CodeMirror[data-size="large"] div,
+.CodeMirror[data-size="large"] pre {
+  font-size: 18px;
+  line-height: 20.25px;
+}
+
+.CodeMirror[data-size="large"] .cm-s-jsbin span.cm-comment {
+  font-size: 18px;
+  line-height: 19.25px;
+}

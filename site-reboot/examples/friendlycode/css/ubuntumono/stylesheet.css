@@ -1,0 +1,23 @@
+/*
+    http://font.ubuntu.com
+*/
+
+@font-face {
+    font-family: 'Ubuntu Mono';
+    src: url('ubuntumono-r.eot');
+    src: url('ubuntumono-r.eot?#iefix') format('embedded-opentype'),
+         url('ubuntumono-r.woff') format('woff'),
+         url('ubuntumono-r.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Ubuntu Mono';
+    src: url('ubuntumono-b.eot');
+    src: url('ubuntumono-b.eot?#iefix') format('embedded-opentype'),
+         url('ubuntumono-b.woff') format('woff'),
+         url('ubuntumono-b.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}

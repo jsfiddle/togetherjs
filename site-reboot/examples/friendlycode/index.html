@@ -1,71 +1,42 @@
 <!DOCTYPE html>
+<html class="deployment-type-development">
+  <head>
+    <meta charset="utf-8">
+    <base target="_blank">
 
-<html>
-<head>
-  <title>Friendly Code</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <link rel="stylesheet" href=".css">
-  <script src=".js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    
-  <style type="text/css" media="screen">
-    .main{
-      padding: 80px 15px;
-    }
-    
-    h1 {
-      color: #006475;
-    }
-    
-    .navbar {
-      background: #03638f;
-    }
-    
-    .navbar-inverse .navbar-brand {
-      color: #fff;
-    }
-    
-    .form-control {
-      width: inherit;
-      display: inline;
-      margin-bottom: 10px;
-    }
-    
-  </style>
-    
-</head>
-  <body>
-    
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <a class="navbar-brand pull-left" href="#">Friendly Code</a>
-        <button type="button" class="btn btn-default navbar-btn pull-right" onclick="TowTruck(this); return false;">Call TowTruck</button>
-      </div>
-    </div>
-      
-    <div class="container">
+    <title>Barebones Friendlycode Editor</title>
+    <link rel="stylesheet" href="css/friendlycode.css">
+  </head>
+  <body style="margin: 0">
+    <div id="bare-fc-holder" class="friendlycode-loading"></div>
 
-      <div class="main">
-        <div class="row">
-            <h1>Let's code together!</h1>
-            <div class="col-xs-12">
-              <p>code editor goes here</p>
-            </div>
-        </div>
-      </div>
-
-    </div>  
-    
-    <!-- towtruck -->
-    <script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
-  
-    <!-- JavaScript plugins (requires jQuery) -->
-    <script src="js/jquery-1.10.2.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-
+    <script src="js/require-config.js"></script>
+    <script src="js/require.min.js"></script>
+    <script>
+    require.baseUrl = "js";
+    // We don't want TowTruck to try to load until after FriendlyCode is started
+    // up:
+    window._TowTruckLoads = [];
+    window._TowTruckOnLoad = function (callback) {
+      window._TowTruckLoads.push(callback);
+    };
+    require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
+      var result = FriendlycodeEditor({
+        publishURL: "https://webpagemaker-dev.allizom.org",
+        container: $("#bare-fc-holder")
+      });
+      result.ready.then(function () {
+        var el = $(".publish-button");
+        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">T</div>');
+        newButton.click(startTowTruck);
+        el.before(newButton);
+        window._TowTruckLoads.forEach(function (callback) {
+          callback();
+        });
+      });
+      return result;
+    });
+    </script>
+    <script src="http://localhost:8080/towtruck.js"></script>
   </body>
 </html>
