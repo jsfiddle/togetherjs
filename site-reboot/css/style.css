@@ -221,6 +221,10 @@ h4 {
   //box-shadow: 0 0 50px rgba(0,0,0,0.8);
 }
 
+#hero-section {
+  margin-bottom: 0px;
+}
+
 .hero-header-text {
   color: rgb(255, 255, 255);
 }
@@ -235,6 +239,7 @@ h4 {
 }
 
 #video-area {
+  padding-bottom: 0px;
   //background: rgba(0,0,0,0.5);
 }
 
