@@ -129,7 +129,6 @@ h4 {
   line-height: 16px;
 }
 
-
 /* =Header
 ----------------------------------------------- */
 
@@ -204,7 +203,7 @@ h4 {
 }
 
 .main-header.navbar-inverse .navbar-collapse {
-  border-color: #ccc;
+  border-color: #000;
 }
 
 
@@ -277,6 +276,11 @@ h4 {
 #main-section #tour img.how-section {
   width: 100%;
   margin: 0 auto;
+}
+
+
+#howto-table td {
+  border-top: 0px;
 }
 
 /* =examples section
@@ -609,6 +613,11 @@ h4 {
     font-size: 14px;
     line-height: 20px;
   }
+  
+  #video-area img {
+    margin-top: 29px;
+  }
+  
 }
 
 /* Large devices (large desktops, 1200px and up) */
