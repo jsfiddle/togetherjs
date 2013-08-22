@@ -25,7 +25,8 @@ if( isMobile.any() ){
   
   $( "#marketing-video" ).click(function() {
     //auto play video
-    window.location = "http://www.google.com";
+    alert("tset");
+    //window.location = "http://www.google.com";
   });
   
   //alert('test');
