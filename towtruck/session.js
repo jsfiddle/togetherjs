@@ -156,13 +156,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   });
 
   function processFirstHello(msg) {
-    console.log("got first hello", msg.sameUrl);
     if (! msg.sameUrl) {
       var url = msg.url;
       if (msg.urlHash) {
         url += msg.urlHash;
       }
-      console.log("going to new url", url);
       require("ui").showUrlChangeMessage(msg.peer, url);
       location.href = url;
     }
@@ -206,6 +204,17 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // via define().
   // ui must be the first item:
   var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
+
+  function getRoomName(prefix, maxSize) {
+    var findRoom = TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
+    return $.ajax({
+      url: findRoom,
+      dataType: "json",
+      data: {prefix: prefix, max: maxSize}
+    }).then(function (resp) {
+      return resp.name;
+    });
+  }
 
   function initIdentityId() {
     return util.Deferred(function (def) {
@@ -255,7 +264,23 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        if (TowTruck.startup._launch) {
+        var findRoom = TowTruck.getConfig("findRoom");
+        if (findRoom && ! saved) {
+          assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
+          assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
+                 "Bad findRoom.max", findRoom);
+          sessionId = util.generateId();
+          getRoomName(findRoom.prefix, findRoom.max).then(function (shareId) {
+            // FIXME: duplicates code below:
+            session.clientId = session.identityId + "." + sessionId;
+            storage.tab.set("status", {reason: "joined", shareId: shareId, running: true, date: Date.now(), sessionId: sessionId});
+            session.isClient = true;
+            session.shareId = shareId;
+            session.emit("shareId");
+            def.resolve(session.shareId);
+          });
+          return;
+        } else if (TowTruck.startup._launch) {
           if (saved) {
             isClient = saved.reason == "joined";
             if (! shareId) {

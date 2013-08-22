@@ -93,6 +93,10 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         next();
         return;
       }
+      if (TowTruck.getConfig("suppressJoinConfirmation")) {
+        next();
+        return;
+      }
       var cancelled = false;
       windowing.show("#towtruck-intro", {
         onClose: function () {

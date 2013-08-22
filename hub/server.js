@@ -30,19 +30,41 @@ logger = {
 });
 
 var server = http.createServer(function(request, response) {
-  var url = parseUrl(request.url);
+  var url = parseUrl(request.url, true);
   var protocol = request.headers["forwarded-proto"] || "http:";
-  var host = request.headers["host"];
+  var host = request.headers.host;
   var base = protocol + "//" + host;
 
-  if (url.path == '/status'){
+  if (url.pathname == '/status'){
     response.end("OK");
-  }
-  else{
+  } else if (url.pathname == '/findroom') {
+    if (request.method == "OPTIONS") {
+      // CORS preflight
+      corsAccept(request, response);
+      return;
+    }
+    var prefix = url.query.prefix;
+    var max = parseInt(url.query.max, 10);
+    if (! (prefix && max)) {
+      write400("You must include a valid prefix=CHARS&max=NUM portion of the URL", response);
+      return;
+    }
+    if (prefix.search(/[^a-zA-Z0-9]/) != -1) {
+      write400("Invalid prefix", response);
+      return;
+    }
+    findRoom(prefix, max, response);
+  } else {
     write404(response);
   }
 });
 
+function corsAccept(request, response) {
+  response.writeHead(200, {
+    "Access-Control-Allow-Origin": "*"
+  });
+  response.end();
+}
 
 function write500(error, response) {
   response.writeHead(500, {"Content-Type": "text/plain"});
@@ -55,6 +77,54 @@ function write500(error, response) {
 function write404(response) {
   response.writeHead(404, {"Content-Type": "text/plain"});
   response.end("Resource not found");
+}
+
+function write400(error, response) {
+  response.writeHead(400, {"Content-Type": "text/plain"});
+  response.end("Bad request: " + error);
+}
+
+function findRoom(prefix, max, response) {
+  response.writeHead(200, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*"
+  });
+  var smallestNumber;
+  var smallestRooms = [];
+  for (var candidate in allConnections) {
+    if (candidate.indexOf(prefix + "__") === 0) {
+      var count = allConnections[candidate].length;
+      if (count < max && (smallestNumber === undefined || count <= smallestNumber)) {
+        if (smallestNumber === undefined || count < smallestNumber) {
+          smallestNumber = count;
+          smallestRooms = [candidate];
+        } else {
+          smallestRooms.push(candidate);
+        }
+      }
+    }
+  }
+  var room;
+  if (! smallestRooms.length) {
+    room = prefix + "__" + generateId();
+  } else {
+    room = pickRandom(smallestRooms);
+  }
+  response.end(JSON.stringify({name: room}));
+}
+
+function generateId(length) {
+  length = length || 10;
+  var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
+  var s = '';
+  for (var i=0; i<length; i++) {
+    s += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  return s;
+}
+
+function pickRandom(seq) {
+  return seq[Math.floor(Math.random() * seq.length)];
 }
 
 function startServer(port, host) {
