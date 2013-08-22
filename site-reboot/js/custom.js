@@ -21,6 +21,7 @@ var isMobile = {
     }
 };
 
+  // open up video url
   if(isMobile.any()){
   
     //play video on mobile a device
@@ -49,6 +50,18 @@ var isMobile = {
     
   }
 
+
+// hover effect over video player  
+  $('#main-image').on('mouseenter', function() {
+          $(this).fadeOut('slow');
+          $('#main-image-overlay').fadeIn('slow');
+  });
+
+  $('#main-image-overlay').css({left: $('#main-image').position().left, top: $('#main-image').position().top})
+             .on('mouseleave', function() {
+          $(this).fadeOut('slow');
+          $('#main-image').fadeIn('slow');
+  });
 
 
 // press Escape to close the video player
