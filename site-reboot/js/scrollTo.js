@@ -1,10 +1,10 @@
 !function ($) {
     $(function(){
-        $('#running-box, #bg-car').carousel({});
 
         var $root = $('html, body');
 
-        $('a').click(function() {
+        // unique nav tag here
+        $('a.scrollnav').click(function() {
             var href = $.attr(this, 'href');
             $root.animate({
                 scrollTop: $(href).offset().top - 50

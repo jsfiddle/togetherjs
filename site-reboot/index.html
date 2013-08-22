@@ -38,16 +38,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand main-logo" href="body"></a>
+          <a class="navbar-brand main-logo scrollnav" href="body"></a>
           <a class="navbar-brand masthead-title" href="#"></a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
-            <li><a href="#tour">Tour</a></li>
-            <li><a href="#examples-section">Examples</a></li>
-            <li><a href="#customers-section">Customers</a></li>
-            <li><a href="#features-section">Features</a></li>
-            <li><a href="#tryitout-section">Try it out</a></li>
+            <li><a href="#tour" class="scrollnav">Tour</a></li>
+            <li><a href="#examples-section" class="scrollnav">Examples</a></li>
+            <li><a href="#customers-section" class="scrollnav">Customers</a></li>
+            <li><a href="#features-section" class="scrollnav">Features</a></li>
+            <li><a href="#tryitout-section" class="scrollnav">Try it out</a></li>
             <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
@@ -57,9 +57,16 @@
     <section id="hero" data-speed="10" data-type="background">   
           
       <section id="marketing-video">
+        
+        <!-- load video if on mobile device -->
+        
         <div class="container" id="frame-video">
          
-          Loading video...
+          <p class="text-center" data-loading-text="Loading...">
+          <div class="flex-video widescreen">
+            <iframe src="http://player.vimeo.com/video/64117317?title=0&amp;byline=0&amp;portrait=0&amp;color=e1472f&amp;autoplay=0" width="100%" height="390px" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+          </div>
+          </p>
           
         </div>
       </section>
@@ -71,7 +78,7 @@
             <h4 class="hero-tagline">An API service that gives your website or web app real-time collaboration features.
             </h4>
             <p>
-              <a class="btn btn-primary btn-large main-get-started" href="#tryitout">Get Started &raquo;</a>
+              <a class="btn btn-primary btn-lg main-get-started" href="#tryitout">Get Started &raquo;</a>
             </p>
           </div>
           <div class="col-md-7" id="video-area">
@@ -88,28 +95,28 @@
           <h1 class="text-center">Tour</h1>
           <h2 class="text-center">Why use Connect?</h2>
           <div class="col-xs-4 text-center">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive why-section">
+            <img src="images/site-tour-why-moz.png" alt="mozilla logo" class="img-circle img-responsive why-section">
             <h4 class="text-center">By someone you trust.</h4>
             <p class="text-center">Built and hosted by Mozilla, Connect is open source.</p>
           </div>
           <div class="col-xs-4">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive why-section">
+            <img src="images/site-tour-why-create.png" alt="create with connect" class="img-circle img-responsive why-section">
             <h4 class="text-center">Create together.</h4>
             <p class="text-center"> Connect lets users communicate, co-author, co-browse and guide each other.</p>
           </div>
           <div class="col-xs-4">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive why-section">
+            <img src="images/site-tour-why-web.png" alt="built for the web icon" class="img-circle img-responsive why-section">
             <h4 class="text-center">Built for the web.</h4>
             <p class="text-center">Connect is implemented in Javascript; no software or plugins to install, and it's friendly with existing web pages, while still letting developers customize the experience.</p>
           </div>
           <div class="clearfix"></div>
           <h2 class="text-center">How does Connect work?</h2>
-          <div class="col-xs-7 text-vertical-align">
+          <div class="col-xs-5 text-vertical-align">
             <h4 class="text-left">Add Connect Javascript and HTML to your site.</h4>
             <p class="text-left">Just copy and paste Connect's JS library and HTML snippet into your site or app to give it out-of-the-box collaboration tools and features.</p>
           </div>
-          <div class="col-xs-5">
-            <p><img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive how-section"></p>
+          <div class="col-xs-7">
+            <p><img src="images/towtruck-how-01-addit.png" alt="..." class="img-rounded img-responsive how-section"></p>
           </div>
           <div class="clearfix"></div>
           <div class="col-xs-5">
@@ -142,19 +149,19 @@
           <h1 class="text-center">Examples</h1>
           <h2 class="text-center">Try out Connect on these sample apps.</h2>
           <div class="col-xs-4">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive">
+            <a data-toggle="modal" href="#example-todoapp"><img src="images/site-examples-todo.png" alt="to do app examples" class="img-responsive img-rounded"></a>
             <h4 class="text-center">Grocery To Do app</h4>
             <p class="text-center">Try out Connect on this sample grocery app with a friend.</p>
             <p class="text-center"><button data-toggle="modal" href="#example-todoapp" class="btn btn-primary">Launch</button></p>
           </div>
           <div class="col-xs-4">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive">
+            <a data-toggle="modal" href="#example-friendlycode"><img src="images/site-examples-friendlycode.png" alt="friendly code example" class="img-responsive img-rounded"></a>
             <h4 class="text-center">Friendly Code</h4>
             <p class="text-center">Code together with your friend.</p>
             <p class="text-center"><button data-toggle="modal" href="#example-friendlycode" class="btn btn-primary">Launch</button></p>
           </div>
           <div class="col-xs-4">
-            <img src="images/placeholder-360x360.png" alt="..." class="img-circle img-responsive">
+            <a data-toggle="modal" href="#example-madlibs"><img src="images/site-examples-madlibs.png" alt="mad libs example" class="img-responsive img-rounded"></a>
             <h4 class="text-center">Mad Libs</h4>
             <p class="text-center">Play Mad Libs with a friend using Connect.</p>
             <p class="text-center"><button data-toggle="modal" href="#example-madlibs" class="btn btn-primary">Launch</button></p>
@@ -234,33 +241,30 @@
         
         <section class="row" id="customers">
           <h1 class="text-center header-text">Customers </h1>
-          <h2 class="text-center">Who is Connect for?</h2>
+          <h2 class="text-center">Who is using Connect?</h2>
           <p class="text-center">
             Connect is for developers like you.  Whether if you have an <strong>education site</strong>, <strong>coding environment</strong> or <strong>travel site</strong>, Connect can help your users collaborate in real time to accomplish their tasks and work together.
           </p>
-          <p class="text-center">
-            Check out these products and services that are using Connect to help their users:
-          </p>
           <div class="col-xs-4">
-            <a href="#" class="thumbnail">
+            <!-- <a href="#" class="thumbnail">
               <img src="images/placeholder-360x360.png" alt="..." class="img-circle">
-            </a>
-            <h4 class="text-center">Bugzilla</h4>
-            <p class="text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </a> -->
+            <h4 class="text-center"></h4>
+            <p class="text-center"></p>
           </div>
           <div class="col-xs-4">
-            <a href="#" class="thumbnail">
-              <img src="images/placeholder-360x360.png" alt="..." class="img-circle">
+            <a href="http://jsfiddle.net" target="_blank">
+              <img src="images/site-customers-jsfiddle.png" alt="JSFiddle" class="img-responsive img-rounded">
             </a>
             <h4 class="text-center">JSFiddle</h4>
-            <p class="text-center">Users can press Control + K on their keyboards to activate Connect. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="text-center">Check out Connect on JSFiddle!  Users can press Control + K on their keyboards to activate Connect.</p>
           </div>
           <div class="col-xs-4">
-            <a href="#" class="thumbnail">
+            <!-- <a href="#" class="thumbnail">
               <img src="images/placeholder-360x360.png" alt="..." class="img-circle">
-            </a>
-            <h4 class="text-center">Thimble</h4>
-            <p class="text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </a> -->
+            <h4 class="text-center"></h4>
+            <p class="text-center"></p>
           </div>
           <div class="clearfix"></div>
           <h2 class="text-center">Testimonials</h2>
@@ -283,7 +287,7 @@
             <ul class="media-list">
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-audiovideo.png" alt="audio video chat" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">Video or Audio chat</h4>
@@ -292,7 +296,7 @@
               </li>
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-user-focus.png" alt="user focus" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">User focus</h4>
@@ -301,7 +305,7 @@
               </li>
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-user-presence.png" alt="user presence" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">User presence</h4>
@@ -314,7 +318,7 @@
             <ul class="media-list">
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-text-chat.png" alt="text chat" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">Text chat</h4>
@@ -323,7 +327,7 @@
               </li>
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-cobrowsing.png" alt="co browsing" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">Co-browsing</h4>
@@ -332,7 +336,7 @@
               </li>
               <li class="media">
                 <a class="pull-left" href="#">
-                  <img class="media-object" src="images/placeholder-64x64.png" alt="...">
+                  <img class="media-object" src="images/site-features-realtimesync.png" alt="real time sync" class="img-responsive">
                 </a>
                 <div class="media-body">
                   <h4 class="media-heading">Real time content sync</h4>
@@ -376,11 +380,11 @@
             </div>
             <div class="col-xs-4">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="#tour">Tour</a></li>
-                <li class=""><a href="#examples-section">Examples</a></li>
-                <li class=""><a href="#customers-section">Customers</a></li>
-                <li class=""><a href="#features-section">Features</a></li>
-                <li class=""><a href="#tryitout-section">Try it out</a></li>
+                <li class=""><a href="#tour" class="scrollnav">Tour</a></li>
+                <li class=""><a href="#examples-section" class="scrollnav">Examples</a></li>
+                <li class=""><a href="#customers-section" class="scrollnav">Customers</a></li>
+                <li class=""><a href="#features-section" class="scrollnav">Features</a></li>
+                <li class=""><a href="#tryitout-section" class="scrollnav">Try it out</a></li>
                 <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>

@@ -45,11 +45,21 @@ a:hover {
 
 button {
   padding-bottom: 2px;
-  background-color: rgb(39, 122, 193);
+  background-color: #41c3ac;
   font-weight: bold;
   text-align: center;
   color: rgb(22, 22, 22);
   font-family: openSansLight, 'Open Sans', sans-serif;
+}
+
+.btn-primary {
+  background: #41c3ac;
+  border-color: #2aa08b;
+}
+
+.btn-primary:hover {
+  background: #24a08a;
+  border-color: #34b7a0;
 }
 
 footer a {
@@ -225,7 +235,7 @@ h4 {
 }
 
 #video-area {
-  background: rgba(0,0,0,0.5);
+  //background: rgba(0,0,0,0.5);
 }
 
 
@@ -260,8 +270,7 @@ h4 {
 }
 
 #main-section #tour img.how-section {
-  width: 50%;
-  height: 50%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -269,18 +278,18 @@ h4 {
 ----------------------------------------------- */
 
 #main-section #examples img {
-  width: 50%;
-  height: 50%;
+  width: 100%;
   margin: 0 auto;
+  background: #efefef;
 }
 
 /* =customers section
 ----------------------------------------------- */
 
 #main-section #customers img {
-  width: 50%;
-  height: 50%;
+  width: 100%;
   margin: 0 auto;
+  background: #efefef;
 }
 
 /* =features section
