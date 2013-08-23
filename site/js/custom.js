@@ -1,6 +1,19 @@
 !function ($) {
     $(function(){
         
+        // hero image swap
+        $("img.swap1")
+             .mouseover(function() { 
+                 var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
+                 $(this).attr("src", src);
+             })
+             .mouseout(function() {
+                 var src = $(this).attr("src").replace("-overlay.png", ".png");
+                 $(this).attr("src", src);
+             });
+        
+        
+        
         // detect a mobile device
         var isMobile = {
             Android: function() {

@@ -249,36 +249,31 @@ h4 {
   cursor: pointer;
 }
 
-/*.swapper {
-  position: inherit;
-  overflow: inherit;
-  background: blue;
+.arrow {
+	display: inline-block;
+	position: relative;
+	text-indent: -9999px;
+	display: block;
+  height: 370px;
+  max-width: 720px;
+	background: url('/images/site-hero-image.png') no-repeat;
+	background-size: 100%;
 }
 
-.swapper img {
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all 0.3s ease-in-out;
-  -ms-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-  position: absolute;
-  }
-  
-.swap1, .swapper:hover .swap2 { 
-  -webkit-opacity: 1; 
-  -moz-opacity: 1;
-  opacity: 1;
-  }
+.arrow span {
+	position: absolute;
+	top: 0; left: 0; bottom: 0; right: 0;
+	background: url('/images/site-hero-image.png') no-repeat;
+	background-position: 0px -413px;
+	opacity: 0;
+	-webkit-transition: opacity 0.5s;
+	-moz-transition:    opacity 0.5s;
+	-o-transition:      opacity 0.5s;
+}
 
-.swapper:hover .swap1, .swap2 { 
-  -webkit-opacity: 0; 
-  -moz-opacity: 0; 
-  opacity: 0;
-  }
-  
-.swap2 {
-  text-indent: 500;
-}*/
+.arrow:hover span {
+	opacity: 1;
+}
 
 
 /* =modal video
