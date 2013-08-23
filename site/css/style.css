@@ -145,7 +145,7 @@ h4 {
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('/images/connect-logo.png') rgba(255,255,255,1);
+  background: url('/images/connect-logo@2x.png') rgba(255,255,255,1);
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -214,7 +214,7 @@ h4 {
 ----------------------------------------------- */
 
 #hero { 
-  background: url('../images/bg.png') 100% 0 repeat fixed; 
+  background: url('../images/bg@2x.png') 100% 0 repeat fixed; 
   background-size: 100% 100%;
 	margin: 0 auto; 
   width: 100%; 
@@ -222,6 +222,12 @@ h4 {
   position: relative; 
   //box-shadow: 0 0 50px rgba(0,0,0,0.8);
 }
+
+/*
+.hero {
+  .at2x('../images/bg.png', 200px, 100px);
+}
+*/
 
 #hero-section {
   margin-bottom: 0px;
@@ -249,31 +255,6 @@ h4 {
   cursor: pointer;
 }
 
-.arrow {
-	display: inline-block;
-	position: relative;
-	text-indent: -9999px;
-	display: block;
-  height: 370px;
-  max-width: 720px;
-	background: url('/images/site-hero-image.png') no-repeat;
-	background-size: 100%;
-}
-
-.arrow span {
-	position: absolute;
-	top: 0; left: 0; bottom: 0; right: 0;
-	background: url('/images/site-hero-image.png') no-repeat;
-	background-position: 0px -413px;
-	opacity: 0;
-	-webkit-transition: opacity 0.5s;
-	-moz-transition:    opacity 0.5s;
-	-o-transition:      opacity 0.5s;
-}
-
-.arrow:hover span {
-	opacity: 1;
-}
 
 
 /* =modal video
@@ -611,10 +592,6 @@ h4 {
     display: inherit;
   }
   
-  #video-area .swapper {
-/*    background: red;
-    position: static;*/
-  }
   
 }
 

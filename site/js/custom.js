@@ -4,11 +4,11 @@
         // hero image swap
         $("img.swap1")
              .mouseover(function() { 
-                 var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
+                 var src = $(this).attr("src").match(/[^\.]+/) + "-overlay@2x.png";
                  $(this).attr("src", src);
              })
              .mouseout(function() {
-                 var src = $(this).attr("src").replace("-overlay.png", ".png");
+                 var src = $(this).attr("src").replace("-overlay@2x.png", ".png");
                  $(this).attr("src", src);
              });
         
@@ -40,7 +40,7 @@
           if(isMobile.any()){
 
             //play video on mobile a device
-             $("#video-area").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-hero-image-overlay.png" class="img-responsive"></a>');
+             $("#video-area").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-hero-image-overlay@2x.png" class="img-responsive"></a>');
 
             //alert('test');
           }
