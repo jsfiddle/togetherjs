@@ -245,8 +245,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, function (TrackerClass) {
       var els = TrackerClass.scan();
-      els.each(function () {
-        liveTrackers.push(TrackerClass(this));
+      $.each(els, function () {
+        liveTrackers.push(new TrackerClass(this));
       });
     });
   }
