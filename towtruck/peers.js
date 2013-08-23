@@ -434,6 +434,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   peers.getPeer = function getPeer(id, message) {
     assert(id);
     var peer = Peer.peers[id];
+    if (id === session.clientId) {
+      return peers.Self;
+    }
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
       return peer;

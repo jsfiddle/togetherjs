@@ -198,6 +198,145 @@ define(["util"], function (util) {
     }
   });
 
+  /* SimpleHistory synchronizes peers by relying on the server to serialize
+   * the order of all updates.  Each client maintains a queue of patches
+   * which have not yet been 'committed' (by being echoed back from the
+   * server).  The client is responsible for transposing its own queue
+   * if 'earlier' patches are heard from the server.
+   *
+   * Let's say that A's edit "1" and B's edit "2" occur and get put in
+   * their respective SimpleHistory queues.  The server happens to
+   * handle 1 first, then 2, so those are the order that all peers
+   * (both A and B) see the messages.
+   *
+   * A sees 1, and has 1 on its queue, so everything's fine. It
+   * updates the 'committed' text to match its current text and drops
+   * the patch from its queue. It then sees 2, but the basis number
+   * for 2 no longer matches the committed basis, so it throws it
+   * away.
+   *
+   * B sees 1, and has 2 on its queue. It does the OT transpose thing,
+   * updating the committed text to include 1 and the 'current' text
+   * to include 1+2. It updates its queue with the newly transposed
+   * version of 2 (call it 2prime) and updates 2prime's basis
+   * number. It them resends 2prime to the server. It then receives 2
+   * (the original) but the basis number no longer matches the
+   * committed basis, so it throws it away.
+   *
+   * Now the server sees 2prime and rebroadcasts it to both A and B.
+   *
+   * A is seeing it for the first time, and the basis number matches,
+   * so it applies it to the current and committed text.
+   *
+   * B sees that 2prime matches what's on the start of its queue,
+   * shifts it off, and updates the committed text to match the
+   * current text.
+   *
+   * Note that no one tries to keep an entire history of changes,
+   * which is the main difference with ot.History.  Everyone applies
+   * the same patches in the same order.
+   */
+  ot.SimpleHistory = util.Class({
+
+    constructor: function(clientId, initState, initBasis) {
+      this.clientId = clientId;
+      this.committed = initState;
+      this.current = initState;
+      this.basis = initBasis;
+      this.queue = [];
+      this.deltaId = 1;
+      this.selection = null;
+    },
+
+    // Use a fake change to represent the selection.
+    // (This is the only bit that hard codes ot.TextReplace as the delta
+    // representation; override this in a subclass (or don't set the
+    // selection) if you are using a different delta representation.
+    setSelection: function(selection) {
+      if (selection) {
+        this.selection = ot.TextReplace(selection[0],
+                                        selection[1] - selection[0], '@');
+      } else {
+        this.selection = null;
+      }
+    },
+
+    // Decode the fake change to reconstruct the updated selection.
+    getSelection: function() {
+      if (!this.selection) { return null; }
+      return [this.selection.start, this.selection.start + this.selection.del];
+    },
+
+    // Add this delta to this client's queue.
+    add: function(delta) {
+      var change = {
+        id: this.clientId + '.' + (this.deltaId++),
+        delta: delta
+      };
+      if (!this.queue.length) { change.basis = this.basis; }
+      this.queue.push(change);
+      this.current = delta.apply(this.current);
+      return !!change.basis;
+    },
+
+    // Apply a delta received from the server.
+    // Return true iff the current text changed as a result.
+    commit: function(change) {
+
+      // ignore it if the basis doesn't match (this patch doesn't apply)
+      // if so, this delta is out of order; we expect the original client
+      // to retransmit an updated delta.
+      if (change.basis !== this.basis) {
+        return false; // 'current' text did not change
+      }
+
+      // is this the first thing on the queue?
+      if (this.queue.length && this.queue[0].id === change.id) {
+        assert(change.basis === this.queue[0].basis);
+        // good, apply this to commit state & remove it from queue
+        this.committed = this.queue.shift().delta.apply(this.committed);
+        this.basis++;
+        if (this.queue.length) { this.queue[0].basis = this.basis; }
+        return false; // 'current' text did not change
+      }
+
+      // Transpose all bits on the queue to put this patch first.
+      var inserted = change.delta;
+      this.queue = this.queue.map(function(qchange) {
+        var tt = qchange.delta.transpose(inserted);
+        inserted = tt[1];
+        return {
+          id: qchange.id,
+          delta: tt[0]
+        };
+      });
+      if (this.selection) {
+        // update the selection!
+        this.selection = this.selection.transpose(inserted)[0];
+      }
+      this.committed = change.delta.apply(this.committed);
+      this.basis++;
+      if (this.queue.length) { this.queue[0].basis = this.basis; }
+      // Update current by replaying queued changed starting from 'committed'
+      this.current = this.committed;
+      this.queue.forEach(function(qchange) {
+        this.current = qchange.delta.apply(this.current);
+      }.bind(this));
+      return true; // The 'current' text changed.
+    },
+
+    // Return the next change to transmit to the server, or null if there
+    // isn't one.
+    getNextToSend: function() {
+      var qchange = this.queue[0];
+      if (!qchange) { return null; /* nothing to send */ }
+      if (qchange.sent) { return null; /* already sent */ }
+      assert(qchange.basis);
+      qchange.sent = true;
+      return qchange;
+    }
+  });
+
   ot.History = util.Class({
 
     constructor: function (clientId, initState) {
@@ -553,6 +692,31 @@ define(["util"], function (util) {
     },
 
     classMethods: {
+
+      /* Make a new ot.TextReplace that converts oldValue to newValue. */
+      fromChange: function(oldValue, newValue) {
+        assert(typeof oldValue == "string");
+        assert(typeof newValue == "string");
+        var commonStart = 0;
+        while (commonStart < newValue.length &&
+               newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
+          commonStart++;
+        }
+        var commonEnd = 0;
+        while (commonEnd < (newValue.length - commonStart) &&
+               commonEnd < (oldValue.length - commonStart) &&
+               newValue.charAt(newValue.length - commonEnd - 1) ==
+               oldValue.charAt(oldValue.length - commonEnd - 1)) {
+          commonEnd++;
+        }
+        var removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
+        var inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
+        if (! (removed.length || inserted)) {
+          return null;
+        }
+        return this(commonStart, removed.length, inserted);
+      },
+
       random: function (source, generator) {
         var text, start, len;
         var ops = ["ins", "del", "repl"];
