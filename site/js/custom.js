@@ -4,8 +4,10 @@
         // hero image swap
         $("img.swap1")
              .mouseover(function() { 
-                 var src = $(this).attr("src").match(/[^\.]+/) + "-overlay@2x.png";
-                 $(this).attr("src", src);
+                 $(this).fadeIn("slow", function(){
+                   var src = $(this).attr("src").match(/[^\.]+/) + "-overlay@2x.png";
+                   $(this).attr("src", src);
+                 });
              })
              .mouseout(function() {
                  var src = $(this).attr("src").replace("-overlay@2x.png", ".png");
