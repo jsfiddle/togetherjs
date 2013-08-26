@@ -317,7 +317,7 @@ define(["util"], function (util) {
       this.committed = change.delta.apply(this.committed);
       this.basis++;
       if (this.queue.length) { this.queue[0].basis = this.basis; }
-      // Update current by replaying queued changed starting from 'committed'
+      // Update current by replaying queued changes starting from 'committed'
       this.current = this.committed;
       this.queue.forEach(function(qchange) {
         this.current = qchange.delta.apply(this.current);
