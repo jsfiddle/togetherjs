@@ -68,7 +68,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return false;
   }
 
-  var editTrackers = {};
+  var editTrackers = TowTruck.trackers = {};
   var liveTrackers = [];
 
   TowTruck.addTracker = function (TrackerClass, skipSetInit) {
