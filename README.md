@@ -92,7 +92,11 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 Testing
 -------
 
-Tests are go in `build/towtruck/tests/` -- if you have the server setup you can go there to see a list of tests.  The tests use [doctest.js](http://doctestjs.org/).
+Tests are in `towtruck/tests/` -- these are [doctest.js](http://doctestjs.org/) tests.  To actually run the tests build towtruck, serve it up, and go to `http://localhost:PORT/towtruck/tests/` -- from there the tests are linked to from the top of the page.  The actual tests are `*.js` files in `towtruck/tests/`, generally `test_*.js` for unit-style tests, and `func_*.js` for functional tests.
+
+The "Manual testing" link is something that lets you simulate different conditions in TowTruck without setting up a second browser/client.
+
+There is unfortunately no automated runner for these tests.  It might be nice if [Karma](http://karma-runner.github.io/) could be setup with doctest.js in general, but so far that isn't done.
 
 License
 -------
