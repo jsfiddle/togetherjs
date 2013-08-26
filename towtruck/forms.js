@@ -71,6 +71,24 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   var editTrackers = {};
   var liveTrackers = [];
 
+  TowTruck.addTracker = function (TrackerClass, skipSetInit) {
+    assert(typeof TrackerClass === "function", "You must pass in a class");
+    assert(typeof TrackerClass.prototype.trackerName === "string",
+           "Needs a .prototype.trackerName string");
+    // Test for required instance methods.
+    "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
+      assert(typeof TrackerClass.prototype[m] === "function",
+             "Missing required tracker method: "+m);
+    });
+    // Test for required class methods.
+    "scan tracked".split(/ /).forEach(function(m) {
+      assert(typeof TrackerClass[m] === "function",
+             "Missing required tracker class method: "+m);
+    });
+    editTrackers[TrackerClass.prototype.trackerName] = TrackerClass;
+    if (!skipSetInit) { setInit(); }
+  };
+
   var AceEditor = util.Class({
 
     trackerName: "AceEditor",
@@ -80,6 +98,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       assert(this.element.hasClass("ace_editor"));
       this._change = this._change.bind(this);
       this._editor().document.on("change", this._change);
+    },
+
+    tracked: function (el) {
+      return this.element[0] === el;
     },
 
     destroy: function (el) {
@@ -131,7 +153,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return !! $(el).closest(".ace_editor").length;
   };
 
-  editTrackers[AceEditor.prototype.trackerName] = AceEditor;
+  TowTruck.addTracker(AceEditor, true /* skip setInit */);
 
   var CodeMirrorEditor = util.Class({
     trackerName: "CodeMirrorEditor",
@@ -141,6 +163,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       assert(this.element[0].CodeMirror);
       this._change = this._change.bind(this);
       this._editor().on("change", this._change);
+    },
+
+    tracked: function (el) {
+      return this.element[0] === el;
     },
 
     destroy: function (el) {
@@ -213,7 +239,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return false;
   };
 
-  editTrackers[CodeMirrorEditor.prototype.trackerName] = CodeMirrorEditor;
+  TowTruck.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
   function buildTrackers() {
     assert(! liveTrackers.length);
@@ -246,7 +272,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     el = $(el)[0];
     for (var i=0; i<liveTrackers.length; i++) {
       var tracker = liveTrackers[i];
-      if (tracker.element[0] == el) {
+      if (tracker.tracked(el)) {
         assert((! name) || name == tracker.trackerName, "Expected to map to a tracker type", name, "but got", tracker.trackerName);
         return tracker;
       }
@@ -396,7 +422,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     });
     liveTrackers.forEach(function (tracker) {
       var init = tracker.makeInit();
-      assert(elementFinder.findElement(init.element) == tracker.element[0]);
+      assert(tracker.tracked(elementFinder.findElement(init.element)));
       msg.updates.push(init);
     });
     if (msg.updates.length) {
