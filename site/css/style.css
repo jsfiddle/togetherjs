@@ -329,7 +329,7 @@ h4 {
 .how-section-imganim-01 {
   position: absolute;
   top: 46%;
-  left: 12%;
+  left: 11%;
   z-index: 8;
   width: 12%;
 }
@@ -337,10 +337,72 @@ h4 {
 .how-section-imganim-02 {
   position: absolute;
   top: 26%;
-  left: 7%;
+  left: 6%;
   z-index: 7;
   width: 12%;
 }
+
+.how-section-imganim-03 {
+  position: absolute;
+  top: 40%;
+  right: 45%;
+  z-index: 7;
+  width: 10%;
+  display: none;
+}
+
+.how-section-btncollab {
+  position: absolute;
+  top: 36%;
+  left: 20%;
+  width: 10%;
+}
+
+.how-section-btncollabpressed {
+  position: absolute;
+  top: 36%;
+  left: 20%;
+  width: 10%;
+  display: none;
+}
+
+.how-section-dockplacement {
+  position: absolute;
+  top: 34%;
+  left: 51%;
+  width: 30%;
+  display: none;
+}
+
+.cursor-placement-01 {
+  width: 8%;
+  left: 78%;
+  top: 33%;
+  position: absolute;
+}
+
+.cursor-placement-04 {
+  width: 8%;
+  left: 69%;
+  top: 27%;
+  position: absolute;
+}
+
+.cursor-placement-02 {
+  width: 10%;
+  position: absolute;
+  top: 57%;
+  left: 32%;
+}
+
+
+.cursor-placement-03 {
+  width: 10%;
+  position: absolute;
+  top: 65%;
+  left: 44%;
+}
+
 
 /* =examples section
 ----------------------------------------------- */
