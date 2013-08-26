@@ -326,6 +326,22 @@ h4 {
   border-top: 0px;
 }
 
+.how-section-imganim-01 {
+  position: absolute;
+  top: 46%;
+  left: 12%;
+  z-index: 8;
+  width: 12%;
+}
+
+.how-section-imganim-02 {
+  position: absolute;
+  top: 26%;
+  left: 7%;
+  z-index: 7;
+  width: 12%;
+}
+
 /* =examples section
 ----------------------------------------------- */
 
