@@ -248,11 +248,11 @@ h4 {
 
 #video-area {
   padding-bottom: 0px;
-  //background: rgba(0,0,0,0.5);
+  cursor: pointer;
 }
 
-#video-area {
-  cursor: pointer;
+#video-area img {
+  width: 100%;
 }
 
 

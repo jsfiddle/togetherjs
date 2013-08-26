@@ -5,12 +5,12 @@
         $("img.swap1")
              .mouseover(function() { 
                  $(this).fadeIn("slow", function(){
-                   var src = $(this).attr("src").match(/[^\.]+/) + "-overlay@2x.png";
+                   var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
                    $(this).attr("src", src);
                  });
              })
              .mouseout(function() {
-                 var src = $(this).attr("src").replace("-overlay@2x.png", ".png");
+                 var src = $(this).attr("src").replace("-overlay.png", ".png");
                  $(this).attr("src", src);
              });
         
