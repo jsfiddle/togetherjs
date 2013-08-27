@@ -451,6 +451,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   session.on("ui-ready", setInit);
 
+  session.on("close", destroyTrackers);
+
   session.hub.on("form-init", function (msg) {
     if (! msg.sameUrl) {
       return;
