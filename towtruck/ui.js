@@ -271,6 +271,18 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       return false;
     });
+    
+    // Setting the anchor button + dock mobile actions
+    if($.browser.mobile) {
+      $("#towtruck-dock-anchor").toggle(function() {
+        console.log("open Dock");
+        
+        },function(){
+        console.log("Close dock");
+        
+        
+      });
+    }
 
     $("#towtruck-share-button").click(function () {
       windowing.toggle("#towtruck-share");
