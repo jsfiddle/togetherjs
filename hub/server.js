@@ -206,7 +206,10 @@ wsServer.on('request', function(request) {
 });
 
 if (require.main == module) {
-  startServer(process.env.HUB_SERVER_PORT || 8080, process.env.HOST || '127.0.0.1');
+  startServer(process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
+              process.env.PORT || 8080,
+              process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
+              process.env.HOST || '127.0.0.1');
 }
 
 exports.startServer = startServer;
