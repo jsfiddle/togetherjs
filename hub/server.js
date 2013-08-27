@@ -11,14 +11,10 @@ var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
 var parseUrl = require('url').parse;
-var fs = require('fs');
-var path = require('path');
-var less = require('less');
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
-var logger = console;
 
-logger = {
+var logger = {
   log: function () {
     console.log.apply(console, arguments);
   }
@@ -210,7 +206,10 @@ wsServer.on('request', function(request) {
 });
 
 if (require.main == module) {
-  startServer(process.env.HUB_SERVER_PORT || 8080, process.env.HOST || '127.0.0.1');
+  startServer(process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
+              process.env.PORT || 8080,
+              process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
+              process.env.HOST || '127.0.0.1');
 }
 
 exports.startServer = startServer;
