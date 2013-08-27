@@ -958,7 +958,7 @@ Runner.prototype = {
       this._currentExample = this.examples[this._exampleIndex];
       this._exampleIndex++;
       this._currentExample.run();
-      if (this._exampleWait) {
+      if (this._exampleWait && ! this._abortCalled) {
         this._runWait();
         break;
       }
