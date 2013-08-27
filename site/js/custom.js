@@ -1,6 +1,6 @@
 !function ($) {
     $(function(){
-        
+
         // hero image swap
         $("img.swap1")
              .mouseover(function() { 

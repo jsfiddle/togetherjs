@@ -321,6 +321,9 @@ h4 {
   margin: 0 auto;
 }
 
+#howto-table {
+  position: relative;
+}
 
 #howto-table td {
   border-top: 0px;
@@ -648,6 +651,53 @@ h4 {
   
   a#tabzilla {
     display: none;
+  }
+  
+  .how-section-imganim-01 {
+    top: 26%;
+  }
+
+  .how-section-imganim-02 {
+    top: 16%;
+  }
+  
+  .how-section-imganim-03 {
+    top: 20%;
+  }
+  
+  .how-section-btncollab {
+    top: 22%;
+    left: 22%;
+  }
+
+  .how-section-btncollabpressed {
+    top: 22%;
+    left: 22%;
+  }
+
+  .how-section-dockplacement {
+    top: 18%;
+    left: 50%;
+  }
+  
+  .cursor-placement-01 {
+    top: 13%;
+    left: 78%;
+  }
+
+  .cursor-placement-04 {
+    top: 17%;
+    left: 69%;
+  }
+
+  .cursor-placement-02 {
+    top: 32%;
+    left: 42%;
+  }
+
+  .cursor-placement-03 {
+    top: 25%;
+    left: 50%;
   }
   
 }

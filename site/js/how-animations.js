@@ -31,13 +31,13 @@
           
           // 1. Add ConnectJS Javascript and HTML to your site.
           $('.how-section-imganim-01').animate({
-            left: "350"
+            left: "60%"
           }, 800).animate({
               opacity: "0"
             }, 800);
             
           $('.how-section-imganim-02').animate({
-            left: "350"
+            left: "60%"
           }, 800).animate({
               opacity: "0"
             }, 800).queue(function(){ 
@@ -54,29 +54,29 @@
           setTimeout(function() {
             $(".how-section-dockplacement").fadeIn();     
           }, 1000);        
-        }, { offset: 400, triggerOnce: true });
+        }, { offset: 200, triggerOnce: true });
         
         // 3. Your site is now ConnectJS enabled.        
         $('.howto-animation-03').waypoint(function() {
           
           $('.cursor-placement-01').animate({
-            left: "-=15"
+            left: "-=10%"
           }, 800);
           $('.cursor-placement-03').animate({
-            left: "-=30"
+            left: "-=25%"
           }, 800);
           setTimeout(function() {
              $('.cursor-placement-02').animate({
-               top: "-=40"
+               top: "-=13%"
              }, 800);
              $('.cursor-placement-04').animate({
-               top: "-=15"
+               top: "-=5%"
              }, 800);  
                
            }, 1000);
           
           console.log("animation 3");
-        }, { offset: 500, triggerOnce: true });
+        }, { offset: 200, triggerOnce: true });
           
     })
 }(window.jQuery)
