@@ -262,6 +262,11 @@ define(["jquery"], function ($) {
   if (navigator.userAgent.search(/mobile/i) != -1) {
     // FIXME: At least on the Firefox OS simulator I need this
     $.browser.mobile = true;
+    
+    $(".towtruck-button").click( function(){
+      alert("test");
+    })
+    
   }
 
   if ($.browser.mobile && window.matchMedia && ! window.matchMedia("screen and (max-screen-width: 480px)").matches) {
