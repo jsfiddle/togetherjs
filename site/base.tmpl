@@ -5,18 +5,26 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <title>{% block title %}
-      Mozilla Labs : TowTruck
+      Mozilla Labs : ConnectJS
     {% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
     <meta name="description" content="A service for your website that makes it surprisingly easy to collaborate in real-time.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="/images/fav-icon.png">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="/js/froogaloop2.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/towtruck.js"></script>
-    <script src="/example/startup.js"></script>
+    
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/parallax.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="js/scrollTo.js"></script>
+    <script src="js/waypoints.min.js"></script>
+    <script src="js/how-animations.js"></script>
+    
+    <!-- retina library -->
+    <script src="js/retina.js"></script>
+    
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -29,12 +37,15 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
-
-    <script type="text/javascript" src="/js/application.js"></script>
-
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
-    <link href="/style.css"                       rel="stylesheet" type="text/css" media="all">
-    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
+    
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/jumbotron.css" rel="stylesheet">
+    <link href="css/carousel.css" rel="stylesheet">
+    <link href="css/grid.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+    
     {% block styles %}{% endblock %}
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -48,105 +59,78 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    
   </head>
   <body>
-    <a href="http://www.mozilla.org/" id="tabzilla">mozilla</a>
-    <div class="navbar-wrapper towtruckula">
-      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
-      <div class="container">
-        <div class="navbar navbar-inverse">
-          <div class="navbar-inner towtruck-nav">
-            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            {% if (enableExample) %}
-            <a class="brand" href="/"><img src="/images/site-icn-logo.png" alt="Logo">TowTruck</a>
-            {% endif %}
-            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
-            <div class="nav-collapse collapse">
-              <ul class="nav">
-
-                <li {% if (enableHome) %}class="active"{% endif %}><a href="/">Home</a></li>
-                <li {% if (enableExample) %}class="active"{% endif %}><a href="/example">Examples</a></li>
-                <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developers</a></li>
-                <!--li><a href="#">API Docs</a></li>
-                <li><a href="#">Extending TowTruck</a></li-->
-                <li><a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a></li>
-                {% if (enableExample) %}
-                <!-- <li><a href="#" onclick="TowTruck(this); return false">Start TowTruck</a></li> -->
-                {% endif %}
-              </ul>
-            </div>
-          </div>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+      
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+      
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href="body"></a>
+          <!-- <a class="navbar-brand masthead-title" href="#"></a> -->
         </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+            <li><a href="#tour" class="scrollnav">Tour</a></li>
+            <li><a href="#examples-section" class="scrollnav">Examples</a></li>
+            <li><a href="#customers-section" class="scrollnav">Customers</a></li>
+            <li><a href="#features-section" class="scrollnav">Features</a></li>
+            <li><a href="#tryitout-section" class="scrollnav">Try it out</a></li>
+            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+          </ul>
+        </div><!--/.navbar-collapse -->
       </div>
     </div>
 
-{% if (enableExample) %}
-<div class="containerbg">
-  <div class="container examples">
-    <div class="span3">
-      <div class="well sidebar-nav">
-        <button onclick="TowTruck(this); return false" class="btn btn-large btn-primary" id="btn-tryitout">Start TowTruck</button>
-        <ul class="nav nav-list">
-          <li class="nav-header">Test TowTruck on these pages:</li>
-          <li><a href="/example/">Examples</a></li>
-          <li><a href="/example/code.html">Code editor</a></li>
-          <li><a href="/example/longpage.html">A long page</a></li>
-          <li><a href="/example/form.html">A form</a></li>
-          <li><a href="/example/app-integration.html">Identity integration</a></li>
-        </ul>
-      </div><!--/.well -->
-    </div><!--/.span3 -->
-    <div class="span8">
-{% endif %}
+
 
     {% block body %}{% endblock %}
 
-{% if (enableExample) %}
-    </div><!--/.span8-->
-  </div><!--/.container.examples -->
-</div><!--/.containerbg -->
-{% endif %}
 
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="span3">
-            <a href="https://mozillalabs.com/" class="footer-logo"><img src="/images/footer-mozilla-labs.png" alt="mozilla"></a>
-          </div>
-          <nav class="span3">
-            <ul>
-              <li>
-                <a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a>
-              </li>
-              <li>
-                <a href="https://github.com/mozilla/towtruck" target="_blank">TowTruck on Github</a>
-              </li>
-              <li>
-                <a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a>
-              </li>
-              <li>
-                <a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuse</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
-    </footer>
+        <hr>
+
+        <footer>
+          
+          <section class="row" id="footer">
+            <div class="col-xs-4 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-4">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="#tour" class="scrollnav">Tour</a></li>
+                <li class=""><a href="#examples-section" class="scrollnav">Examples</a></li>
+                <li class=""><a href="#customers-section" class="scrollnav">Customers</a></li>
+                <li class=""><a href="#features-section" class="scrollnav">Features</a></li>
+                <li class=""><a href="#tryitout-section" class="scrollnav">Try it out</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-4">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About ConnectJS</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">ConnectJS on Github</a></li>
+                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Docs</a></li>
+                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">ConnectJS on Twitter</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+    
   </body>
 </html>
