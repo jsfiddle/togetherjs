@@ -11,14 +11,10 @@ var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
 var parseUrl = require('url').parse;
-var fs = require('fs');
-var path = require('path');
-var less = require('less');
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
-var logger = console;
 
-logger = {
+var logger = {
   log: function () {
     console.log.apply(console, arguments);
   }
