@@ -92,6 +92,11 @@ print($("#towtruck-chat-notifier")[0]);
 
 $("#towtruck-chat-button").click();
 
+// We need a wait here for the animation to finish:
+wait(1000);
+
+// =>
+
 print($("#towtruck-chat-notifier").is(":visible"), $("#towtruck-chat").is(":visible"));
 
 // => false true
