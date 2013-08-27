@@ -35,5 +35,8 @@
   "engines": {
     "node": "~0.8",
     "npm": "~1.1.18"
+  },
+  "scripts": {
+    "start": "node hub/server.js"
   }
 }
