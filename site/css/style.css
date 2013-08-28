@@ -83,6 +83,7 @@ footer a:hover {
   font-weight: normal;
   letter-spacing: -3px;
   line-height: 68px;
+  margin: 20px 0px;
 }
 
 h1 {
@@ -632,12 +633,12 @@ h4 {
   }
   
   h3 {
-    font-size: 24px;
-    line-height: 26px;
+    font-size: 20px;
+    line-height: 20px;
   }
   
   h4 {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 20px;
     font-weight: bold;
   }
