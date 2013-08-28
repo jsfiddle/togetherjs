@@ -71,7 +71,16 @@ $textarea.change();
 send: form-update
   clientId: "me",
   element: "#textarea",
-  value: "hello"
+  replace: {
+    basis: 1,
+    delta: {
+      del: 0,
+      start: 0,
+      text: "hello"
+    },
+    id: "..."
+  },
+  "server-echo": true
 */
 
 select(3, 4);
@@ -82,15 +91,21 @@ $textarea.val("hello there");
 $textarea.change();
 
 /* =>
+send: form-focus...
 selected 3 - 4
 send: form-update
   clientId: "me",
   element: "#textarea",
   replace: {
-    len: 0,
-    start: 5,
-    text: " there"
-  }
+    basis: 2,
+    delta: {
+      del: 0,
+      start: 5,
+      text: " there"
+    },
+    id: "..."
+  },
+  "server-echo": true
 */
 
 // This doesn't seem to have a reliable result, but I don't know why...
@@ -108,10 +123,15 @@ send: form-update
   clientId: "me",
   element: "#textarea",
   replace: {
-    len: 4,
-    start: 1,
-    text: "i"
-  }
+    basis: 3,
+    delta: {
+      del: 4,
+      start: 1,
+      text: "i"
+    },
+    id: "..."
+  },
+  "server-echo": true
 */
 
 select(3, 4);
@@ -131,31 +151,29 @@ Test.incoming({
   clientId: "faker",
   type: 'form-update',
   element: "#textarea",
-  replace: {start: 1, len: 1, text: "ey"}
+  replace: {
+    basis: 4,
+    delta: {
+      start: 1,
+      del: 1,
+      text: "ey"
+    }
+  }
 });
 wait(100);
 
 /* =>
 
-send: hello-back
-  avatar: "...",
-  clientId: "me",
-  color: "...",
-  isClient: false,
-  name: "...",
-  rtcSupported: ?,
-  scrollPosition: {...},
-  starting: ?,
-  title: "TowTruck tests",
-  url: ".../tests/...",
-  urlHash: ""
+send: hello-back...
+send: form-focus...
 send: form-init
   clientId: "me",
   pageAge: ?,
   updates: [
     {
+      basis: 5,
       element: "#textarea",
-      value: "hi there"
+      value: "hey there"
     },
     {
       element: "#yes",
@@ -181,7 +199,12 @@ Test.incoming({
   clientId: "faker",
   type: 'form-update',
   element: "#textarea",
-  replace: {start: 1, len: 2, text: "ELLO"}
+  replace: {
+    basis: 5,
+    delta: {
+      start: 1, del: 2, text: "ELLO"
+    }
+  }
 });
 wait(100);
 
