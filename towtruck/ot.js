@@ -263,7 +263,9 @@ define(["util"], function (util) {
 
     // Decode the fake change to reconstruct the updated selection.
     getSelection: function() {
-      if (!this.selection) { return null; }
+      if (! this.selection) {
+        return null;
+      }
       return [this.selection.start, this.selection.start + this.selection.del];
     },
 
@@ -273,7 +275,9 @@ define(["util"], function (util) {
         id: this.clientId + '.' + (this.deltaId++),
         delta: delta
       };
-      if (!this.queue.length) { change.basis = this.basis; }
+      if (! this.queue.length) {
+        change.basis = this.basis;
+      }
       this.queue.push(change);
       this.current = delta.apply(this.current);
       return !!change.basis;
@@ -296,7 +300,9 @@ define(["util"], function (util) {
         // good, apply this to commit state & remove it from queue
         this.committed = this.queue.shift().delta.apply(this.committed);
         this.basis++;
-        if (this.queue.length) { this.queue[0].basis = this.basis; }
+        if (this.queue.length) {
+          this.queue[0].basis = this.basis;
+        }
         return false; // 'current' text did not change
       }
 
@@ -316,7 +322,9 @@ define(["util"], function (util) {
       }
       this.committed = change.delta.apply(this.committed);
       this.basis++;
-      if (this.queue.length) { this.queue[0].basis = this.basis; }
+      if (this.queue.length) {
+        this.queue[0].basis = this.basis;
+      }
       // Update current by replaying queued changes starting from 'committed'
       this.current = this.committed;
       this.queue.forEach(function(qchange) {
@@ -329,8 +337,14 @@ define(["util"], function (util) {
     // isn't one.
     getNextToSend: function() {
       var qchange = this.queue[0];
-      if (!qchange) { return null; /* nothing to send */ }
-      if (qchange.sent) { return null; /* already sent */ }
+      if (! qchange) {
+        /* nothing to send */
+        return null;
+      }
+      if (qchange.sent) {
+        /* already sent */
+        return null;
+      }
       assert(qchange.basis);
       qchange.sent = true;
       return qchange;
@@ -354,7 +368,6 @@ define(["util"], function (util) {
       if (change.clientId == this.clientId) {
         this._history.push(change);
         this.mostRecentLocalChange = change.version;
-        console.log("Adding local change");
         return change.delta;
       }
       assert((! this.known[change.clientId]) || this.known[change.clientId] < change.version,
@@ -367,7 +380,6 @@ define(["util"], function (util) {
           change.knowsAboutVersion(this.mostRecentLocalChange, this.clientId)) {
         this._history.push(change);
         this.known[change.clientId] = change.version;
-        console.log("simple integration; no transposition", change);
         return change.delta;
       }
       // We must do work!
@@ -382,7 +394,6 @@ define(["util"], function (util) {
         if (! this.known.hasOwnProperty(clientId)) {
           continue;
         }
-        console.log("checking", clientId, this.known[clientId], change.maybeMissingChanges(this.known[clientId], clientId));
         if (change.maybeMissingChanges(this.known[clientId], clientId)) {
           clientsToCheck.add(clientId);
         }
@@ -416,7 +427,7 @@ define(["util"], function (util) {
           if (! change.knowsAboutChange(c)) {
             var presentDelta = this.promoteDelta(c.delta, index, change);
             if (! presentDelta.equals(c.delta)) {
-              console.log("->rebase delta rewrite", presentDelta+"");
+              //console.log("->rebase delta rewrite", presentDelta+"");
             }
             this.logChange("->rebase", change, function () {
               var result = change.delta.transpose(presentDelta);
@@ -634,39 +645,39 @@ define(["util"], function (util) {
       var overlap;
       assert(delta instanceof ot.TextReplace, "Transposing with non-TextReplace:", delta);
       if (this.empty()) {
-        console.log("  =this is empty");
+        //console.log("  =this is empty");
         return [this.clone(), delta.clone()];
       }
       if (delta.empty()) {
-        console.log("  =other is empty");
+        //console.log("  =other is empty");
         return [this.clone(), delta.clone()];
       }
       if (delta.before(this)) {
-        console.log("  =this after other");
+        //console.log("  =this after other");
         return [this.clone(this.start + delta.text.length - delta.del),
                 delta.clone()];
       } else if (this.before(delta)) {
-        console.log("  =this before other");
+        //console.log("  =this before other");
         return [this.clone(), delta.clone(delta.start + this.text.length - this.del)];
       } else if (delta.sameRange(this)) {
-        console.log("  =same range");
+        //console.log("  =same range");
         return [this.clone(this.start+delta.text.length, 0),
                 delta.clone(undefined, 0)];
       } else if (delta.contains(this)) {
-        console.log("  =other contains this");
+        //console.log("  =other contains this");
         return [this.clone(delta.start+delta.text.length, 0, this.text),
                 delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
       } else if (this.contains(delta)) {
-        console.log("  =this contains other");
+        //console.log("  =this contains other");
         return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text),
                 delta.clone(this.start, 0, delta.text)];
       } else if (this.overlapsStart(delta)) {
-        console.log("  =this overlaps start of other");
+        //console.log("  =this overlaps start of other");
         overlap = this.start + this.del - delta.start;
         return [this.clone(undefined, this.del - overlap),
                 delta.clone(this.start + this.text.length, delta.del - overlap)];
       } else {
-        console.log("  =this overlaps end of other");
+        //console.log("  =this overlaps end of other");
         assert(delta.overlapsStart(this), delta+"", "does not overlap start of", this+"", delta.before(this));
         overlap = delta.start + delta.del - this.start;
         return [this.clone(delta.start + delta.text.length, this.del - overlap),
