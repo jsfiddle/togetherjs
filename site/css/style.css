@@ -249,7 +249,7 @@ h4 {
 }
 
 #video-area {
-  padding-bottom: 0px;
+  /*padding-bottom: 0px;*/
   cursor: pointer;
 }
 
@@ -819,7 +819,7 @@ h4 {
   }
   
   #video-area img {
-    margin-top: 74px;
+    /*margin-top: 74px;*/
   }
   
   #hero {
@@ -865,7 +865,7 @@ h4 {
   }
   
   #video-area img {
-    margin-top: 11px;
+    /*margin-top: 11px;*/
   }
   
   #hero {

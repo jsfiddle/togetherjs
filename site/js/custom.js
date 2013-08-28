@@ -2,17 +2,17 @@
     $(function(){
 
         // hero image swap
-        $("img.swap1")
-             .mouseover(function() { 
-                 $(this).fadeIn("slow", function(){
-                   var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
-                   $(this).attr("src", src);
-                 });
-             })
-             .mouseout(function() {
-                 var src = $(this).attr("src").replace("-overlay.png", ".png");
-                 $(this).attr("src", src);
-             });
+        // $("img.swap1")
+        //      .mouseover(function() { 
+        //          $(this).fadeIn("slow", function(){
+        //            var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
+        //            $(this).attr("src", src);
+        //          });
+        //      })
+        //      .mouseout(function() {
+        //          var src = $(this).attr("src").replace("-overlay.png", ".png");
+        //          $(this).attr("src", src);
+        //      });
         
         
         
