@@ -5,7 +5,7 @@ var connect = require('connect');
 var app = express();
 
 app.use(function (req, res, next) {
-  console.log(req.method, req.url, req.headers.referer || '-');
+  console.log(req.method, req.url, 'referer=' + (req.headers.referer || '-'));
   next();
 });
 
