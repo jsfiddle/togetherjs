@@ -37,7 +37,7 @@
       });
       result.ready.then(function () {
         var el = $(".publish-button");
-        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">T</div>');
+        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">Collaborate</div>');
         newButton.click(startTowTruck);
         el.before(newButton);
         window._TowTruckLoads.forEach(function (callback) {
@@ -47,6 +47,6 @@
       return result;
     });
     </script>
-    <script src="http://localhost:8080/towtruck.js"></script>
+    <script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
   </body>
 </html>
