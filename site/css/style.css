@@ -92,6 +92,7 @@ h1 {
   font-weight: normal;
   letter-spacing: -2px;
   line-height: 48px;
+  margin: 40px 0px;
 }
 
 h2 {
@@ -118,7 +119,7 @@ h4 {
   font-family: 'Open Sans Light', sans-serif;
   font-weight: normal;
   letter-spacing: normal;
-  line-height: 24px;
+  line-height: 20px;
 }
 
 .small, small {
@@ -636,7 +637,7 @@ h4 {
   }
   
   h4 {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 20px;
     font-weight: bold;
   }
@@ -722,7 +723,7 @@ h4 {
   }
   
   h4 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
   }
   
@@ -764,7 +765,7 @@ h4 {
   }
   
   h4 {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 100%;
     font-weight: normal;
   }
@@ -807,7 +808,7 @@ h4 {
   }
   
   h4 {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 100%;
   }
   
@@ -853,7 +854,7 @@ h4 {
   }
   
   h4 {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 100%;
   }
   
