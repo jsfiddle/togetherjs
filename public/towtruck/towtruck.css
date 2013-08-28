@@ -1176,26 +1176,26 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   height: 6px;
   padding: 7px 2px 2px 2px;
 }
-#towtruck-dock.towtruck-dock-bottom {
+#towtruck-dock.towtruck-dock-top {
   padding: 0;
-  bottom: 0;
+  top: 40px;
   left: 50%;
   margin-left: -130px;
   border-radius: 4px 4px 0 0;
   height: 60px;
   width: 260px;
 }
-#towtruck-dock.towtruck-dock-bottom #towtruck-buttons,
-#towtruck-dock.towtruck-dock-bottom #towtruck-dock-anchor {
+#towtruck-dock.towtruck-dock-top #towtruck-buttons,
+#towtruck-dock.towtruck-dock-top #towtruck-dock-anchor {
   display: inline;
 }
-#towtruck-dock.towtruck-dock-bottom #towtruck-dock-anchor-vertical {
+#towtruck-dock.towtruck-dock-top #towtruck-dock-anchor-vertical {
   display: inline;
 }
-#towtruck-dock.towtruck-dock-bottom #towtruck-dock-anchor-horizontal {
+#towtruck-dock.towtruck-dock-top #towtruck-dock-anchor-horizontal {
   display: none;
 }
-#towtruck-dock.towtruck-dock-bottom #towtruck-dock-anchor-vertical img {
+#towtruck-dock.towtruck-dock-top #towtruck-dock-anchor-vertical img {
   width: 6px;
   height: 6px;
   padding: 2px;
@@ -1813,13 +1813,34 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
   z-index: 9999;
   opacity: 0.4;
   border: 3px solid;
+  margin: -3px;
 }
 .towtruck-only-mobile {
   display: none;
 }
 @media screen and (max-device-width: 480px) {
   #towtruck-dock.towtruck-dock-right {
-    bottom: 15px;
+    top: 0px;
+    width: 94%;
+    height: 17%;
+    right: 0px;
+    margin: 10px;
+    bottom: 0px;
+  }
+  #towtruck-dock #towtruck-dock-anchor {
+    width: 40px;
+    height: 40px;
+    float: right;
+    user-select: all;
+    cursor: default;
+  }
+  #towtruck-dock #towtruck-buttons {
+    display: block;
+  }
+  #towtruck-dock .towtruck-button {
+    float: right;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    border-top: none;
   }
   .towtruck-only-mobile {
     display: block;
@@ -1985,7 +2006,27 @@ section.towtruck-buttons.towtruck-buttons-notification-diff-url {
 
 }
 .towtruck-mobile-browser #towtruck-dock.towtruck-dock-right {
-  bottom: 15px;
+  top: 0px;
+  width: 94%;
+  height: 17%;
+  right: 0px;
+  margin: 10px;
+  bottom: 0px;
+}
+.towtruck-mobile-browser #towtruck-dock #towtruck-dock-anchor {
+  width: 40px;
+  height: 40px;
+  float: right;
+  user-select: all;
+  cursor: default;
+}
+.towtruck-mobile-browser #towtruck-dock #towtruck-buttons {
+  display: block;
+}
+.towtruck-mobile-browser #towtruck-dock .towtruck-button {
+  float: right;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-top: none;
 }
 .towtruck-mobile-browser .towtruck-only-mobile {
   display: block;
