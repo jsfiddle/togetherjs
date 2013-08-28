@@ -4,8 +4,13 @@ var express = require('express');
 var connect = require('connect');
 var app = express();
 
+app.use(function (req, res, next) {
+  console.log(req.method, req.url, req.headers.referer || '-');
+  next();
+});
+
 // Gzip output
-app.use(connect.compress())
+app.use(connect.compress());
 app.use(express.staticCache());
 app.use(function(req, resp, next) {
   // Expire all other resources in three hours
