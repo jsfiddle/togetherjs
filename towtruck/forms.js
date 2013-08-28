@@ -44,11 +44,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         var delta = ot.TextReplace.fromChange(history.current, value);
         assert(delta);
         history.add(delta);
-        return maybeSendUpdate(msg.element, history);
+        maybeSendUpdate(msg.element, history);
+        return;
       } else {
-        if (typeof prev != "string") {
-          console.warn("No previous known value on field", el[0]);
-        }
         msg.value = value;
         msg.basis = 1;
         el.data("towtruckHistory", ot.SimpleHistory(session.clientId, value, 1));
@@ -86,7 +84,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
              "Missing required tracker class method: "+m);
     });
     editTrackers[TrackerClass.prototype.trackerName] = TrackerClass;
-    if (!skipSetInit) { setInit(); }
+    if (!skipSetInit) {
+      setInit();
+    }
   };
 
   var AceEditor = util.Class({
@@ -319,7 +319,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   /* Send the top of this history queue, if it hasn't been already sent. */
   function maybeSendUpdate(element, history) {
     var change = history.getNextToSend();
-    if (!change) { return; /* nothing to send */ }
+    if (! change) {
+      /* nothing to send */
+      return;
+    }
     var msg = {
       type: "form-update",
       element: element,
@@ -373,7 +376,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       // apply this change to the history
       var changed = history.commit(msg.replace);
       maybeSendUpdate(msg.element, history);
-      if (!changed) { return; }
+      if (! changed) {
+        return;
+      }
       value = history.current;
       selection = history.getSelection();
     } else {
@@ -472,7 +477,11 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       var el;
       try {
         el = elementFinder.findElement(update.element);
-      } catch (e) { console.warn(e); return; /* skip missing element */ }
+      } catch (e) {
+        /* skip missing element */
+        console.warn(e);
+        return;
+      }
       if (update.tracker) {
         var tracker = getTracker(el, update.tracker);
         assert(tracker);
@@ -510,6 +519,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   function focus(event) {
     var target = event.target;
+    if (elementFinder.ignoreElement(target)) {
+      blur(event);
+      return;
+    }
     if (target != lastFocus) {
       lastFocus = target;
       session.send({type: "form-focus", element: elementFinder.elementLocation(target)});
@@ -543,7 +556,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   session.hub.on("hello", function (msg) {
     if (lastFocus) {
       setTimeout(function () {
-        session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
+        if (lastFocus) {
+          session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
+        }
       });
     }
   });
