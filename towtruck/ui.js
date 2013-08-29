@@ -277,8 +277,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#towtruck-dock-anchor").toggle(function() {
         console.log("open Dock");
         
+        $('#towtruck-dock #towtruck-buttons').show();
+        
         },function(){
         console.log("Close dock");
+        
+        $('#towtruck-dock #towtruck-buttons').hide();
         
         
       });

@@ -1,3 +1,4 @@
+/*TowTruck dock*/
 #towtruck-dock {
   &.towtruck-dock-right {
     top: 0px;
@@ -25,7 +26,6 @@
     border-right: 1px solid rgba(0,0,0,0.2);
     border-top: none;
   }
-  
 }
 
 
@@ -41,13 +41,41 @@
   display: none;
 }
 
+
 .towtruck {
   .towtruck-window {
-    width: 94%;
-    margin-left: 1%;
-    height: 94%;
-    margin-top: 1%;
+    width: 96%;
+    margin-left: 0;
+    height: 100%;
+    margin-top: 0%;
     z-index: @z-index+3 !important;
+    top: 84px;
+    left: 0px;
+    
+    .towtruck-close {
+     display: none;
+    }
+    
+    #towtruck-chat-messages {
+      height: 50%;
+    }
+    
+  }
+  
+  .towtruck-subtitle {
+    width: 98%;
+  }
+  
+  #towtruck-chat-input-box {
+    width: 98%;
+  }
+  
+  #towtruck-chat-input {
+    width: 95%;
+  }
+  
+  section.towtruck-buttons {
+    display: none;
   }
 
   .towtruck-modal {
