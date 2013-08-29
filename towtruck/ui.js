@@ -274,16 +274,38 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     
     // Setting the anchor button + dock mobile actions
     if($.browser.mobile) {
+          
       $("#towtruck-dock-anchor").toggle(function() {
-        console.log("open Dock");
         
-        $('#towtruck-dock #towtruck-buttons').show();
+          console.log("Close dock");
+          $('#towtruck-dock #towtruck-buttons').animate({
+            opacity: 0
+          });
+          $('.towtruck-dock-right').animate({
+            width: "60px"
+          }, {
+            duration:60, easing:"linear"
+          });
+          $('.towtruck-window').animate({
+            opacity: 0
+          });
         
         },function(){
-        console.log("Close dock");
         
-        $('#towtruck-dock #towtruck-buttons').hide();
-        
+          console.log("open Dock");
+          $('#towtruck-dock #towtruck-buttons').animate({
+            opacity: 1
+          });
+          $('.towtruck-dock-right').animate({
+            width: "94%"
+          }, {
+            duration:60, easing:"linear"
+          });
+          $('.towtruck-window').animate({
+            opacity: 1
+          });
+          
+          // add bg overlay
         
       });
     }
