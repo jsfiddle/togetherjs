@@ -185,7 +185,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.prepareUI();
     }
     var container = ui.container;
-
+    
+    //make the bg black
+    if($.browser.mobile) {
+      $("body").css({"background-color":"rgba(0,0,0,0.5)"});
+    }
+    
     // The share link:
     ui.prepareShareLink(container);
     container.find("input.towtruck-share-link").on("keydown", function (event) {
@@ -280,7 +285,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
                       
       $("#towtruck-dock-anchor").toggle(function() {
-        
           console.log("Close dock");
           
           //enable vertical scrolling
@@ -311,8 +315,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           $("body").css({ "background-color": "rgba(0,0,0,0)"});
         
         },function(){
-        
           console.log("open Dock");
+          
+          
+          
           $('.towtruck-window').animate({
             opacity: 1
           });
@@ -410,6 +416,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#towtruck-end-session").click(function () {
       session.close();
+      $("body").css({"background-color":"rgba(0,0,0,0)"})
     });
 
     $("#towtruck-menu-update-color").click(function () {

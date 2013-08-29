@@ -44,10 +44,6 @@
 }
 
 
-
-
-
-
 .towtruck-only-mobile {
   display: block;
 }
@@ -56,8 +52,18 @@
   display: none;
 }
 
-
 .towtruck {
+  
+  .towtruck-menu-item {
+    cursor: pointer;
+    margin: 0px -14px 0px;
+    padding: 5px;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  
+  .towtruck-menu-item:first-child {
+    display: none;
+  }
   
   .towtruck-button .towtruck-person {
     margin: 0 0 0 5px;
@@ -79,21 +85,27 @@
     height: 82%;
     margin-top: 0%;
     z-index: @z-index+3 !important;
-    top: 84px;
+    top: 20%;
     left: 0px;
+    
+    #towtruck-chat-messages {
+     width: 105%; 
+    }
     
     .towtruck-close {
      display: none;
     }
     
     #towtruck-chat-messages {
-      height: 50%;
+      height: 62%;
+      top: -37px;
     }
     
   }
   
   .towtruck-subtitle {
     width: 98%;
+    margin: 22px 7px;
   }
   
   #towtruck-chat-input-box {
@@ -106,7 +118,7 @@
     width: 95%;
   }
   
-  section.towtruck-buttons {
+  #towtruck-rtc-not-supported section.towtruck-buttons {
     display: none;
   }
 
@@ -125,9 +137,7 @@
   }
 }
 
-.towtruck-menu-item {
-  cursor: pointer;
-}
+
 
 /*TowTruck walkthrough*/
 
