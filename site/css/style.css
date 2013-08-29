@@ -81,7 +81,6 @@ footer a:hover {
   display: block;
   font-family: 'Open Sans Light', sans-serif;
   font-weight: normal;
-  letter-spacing: -3px;
   line-height: 68px;
   margin: 20px 0px;
 }
@@ -142,26 +141,34 @@ h4 {
   font-family: sans-serif;
 }
 
-.main-header .main-logo {
+.main-header a.main-logo {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('/images/connect-logo@2x.png') rgba(255,255,255,1);
+  background: url('/images/connect-logo@2x.png') #ffffff;
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
   text-indent: -9999px;
   float: left;
-  margin: 6px 0px;
+  margin: 8px 0px;
   padding: 0;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   transition: all 0.4s ease;
   overflow: hidden;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
+  -webkit-background-clip: padding-box; 
+  -moz-background-clip:    padding; 
+  background-clip:         padding-box;
+}
+
+.main-header a.main-logo:hover,
+.main-header a.main-logo:active {
+	background-color: #38c4ac;
+	-webkit-background-clip: padding-box; 
+	-moz-background-clip:    padding; 
+	background-clip:         padding-box;
 }
 
 .main-header .masthead-title {
@@ -620,6 +627,7 @@ h4 {
   .large {
     font-size: 48px;
     line-height: 48px;
+    letter-spacing: -3px;
   }
   
   h1 {
@@ -709,6 +717,7 @@ h4 {
   .large {
     font-size: 48px;
     line-height: 48px;
+    letter-spacing: -3px;
   }
   
   h1 {
@@ -748,6 +757,7 @@ h4 {
   .large {
     font-size: 72px;
     line-height: 100%;
+    letter-spacing: -5px;
   }
   
   h1 {
@@ -791,6 +801,7 @@ h4 {
   .large {
     font-size: 72px;
     line-height: 100%;
+    letter-spacing: -5px;
   }
   
   h1 {
@@ -837,6 +848,7 @@ h4 {
   .large {
     font-size: 72px;
     line-height: 100%;
+    letter-spacing: -5px;
   }
   
   h1 {
