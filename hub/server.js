@@ -7,6 +7,9 @@ if ( process.env.NEW_RELIC_HOME ) {
   require( "newrelic" );
 }
 
+var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
+var EMPTY_ROOM_LOG_TIMEOUT = 3*60*1000; // 3 minutes
+
 var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
@@ -14,14 +17,31 @@ var parseUrl = require('url').parse;
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
 
+// LOG_LEVEL values:
+// 0: show everything (including debug)
+// 1: don't show debug, do show logger.log
+// 2: don't show logger.log and debug, do show console.info
+// 3: don't show info, do show warn
+// 4: don't show warn, do show error
+// 5: don't show anything
+// Stats are at level 2
+var logLevel = process.env.LOG_LEVEL || '0';
+logLevel = parseInt(logLevel, 10);
+
 var logger = {
   log: function () {
-    console.log.apply(console, arguments);
+    if (logLevel <= 1) {
+      console.log.apply(console, arguments);
+    }
   }
 };
-["warn", "error", "info", "debug"].forEach(function (n) {
-  logger[n] = function () {
-    logger.log.apply(logger, [n.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
+[["error", 4], ["warn", 3], ["info", 2], ["debug", 0]].forEach(function (nameLevel) {
+  var name = nameLevel[0];
+  var level = nameLevel[1];
+  logger[name] = function () {
+    if (logLevel <= level) {
+      logger.log.apply(logger, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
+    }
   };
 });
 
@@ -148,6 +168,7 @@ function originIsAllowed(origin) {
 }
 
 var allConnections = {};
+var connectionStats = {};
 
 var ID = 0;
 
@@ -172,11 +193,36 @@ wsServer.on('request', function(request) {
   connection.ID = ID++;
   if (! allConnections[id]) {
     allConnections[id] = [];
+    connectionStats[id] = {
+      created: Date.now(),
+      sample: [],
+      clients: {},
+      domains: {},
+      urls: {},
+      firstDomain: null,
+      totalMessageChars: 0,
+      totalMessages: 0,
+      connections: 0
+    };
   }
   allConnections[id].push(connection);
+  connectionStats[id].connections++;
+  connectionStats[id].lastLeft = null;
   logger.info((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
   connection.on('message', function(message) {
     var parsed = JSON.parse(message.utf8Data);
+    connectionStats[id].clients[parsed.clientId] = true;
+    var domain = null;
+    if (parsed.url) {
+      domain = parseUrl(parsed.url).hostname;
+      connectionStats[id].urls[parsed.url] = true;
+    }
+    if ((! connectionStats[id].firstDomain) && domain) {
+      connectionStats[id].firstDomain = domain;
+    }
+    connectionStats[id].domains[domain] = true;
+    connectionStats[id].totalMessageChars += message.utf8Data.length;
+    connectionStats[id].totalMessages++;
     logger.debug('Message on ' + id + ' bytes: ' +
                  (message.utf8Data && message.utf8Data.length) +
                  ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20) +
@@ -200,10 +246,53 @@ wsServer.on('request', function(request) {
     }
     if (! allConnections[id].length) {
       delete allConnections[id];
+      connectionStats[id].lastLeft = Date.now();
     }
     logger.info((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
+
+setInterval(function () {
+  for (var id in connectionStats) {
+    if (connectionStats[id].lastLeft && Date.now() - connectionStats[id].lastLeft > EMPTY_ROOM_LOG_TIMEOUT) {
+      logStats(connectionStats[id]);
+      delete connectionStats[id];
+      continue;
+    }
+    var totalClients = countClients(connectionStats[id].clients);
+    var connections = 0;
+    if (allConnections[id]) {
+      connections = allConnections[id].length;
+    }
+    connectionStats[id].sample.push({
+      time: Date.now(),
+      totalClients: totalClients,
+      connections: connections
+    });
+  }
+}, SAMPLE_STATS_INTERVAL);
+
+function countClients(clients) {
+  var n = 0;
+  for (var clientId in clients) {
+    n++;
+  }
+  return n;
+}
+
+function logStats(id, stats) {
+  logger.info("STATS", JSON.stringify({
+    id: id,
+    created: stats.created,
+    sample: stats.sample,
+    totalClients: countClients(stats.clients),
+    totalMessageChars: stats.totalMessageChars,
+    totalMessages: stats.totalMessages,
+    domain: stats.firstDomain,
+    domainCount: countClients(stats.domains),
+    urls: countClients(stats.urls)
+  }));
+}
 
 if (require.main == module) {
   startServer(process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
