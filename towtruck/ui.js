@@ -275,42 +275,71 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     // Setting the anchor button + dock mobile actions
     if($.browser.mobile) {
       
-      
-          
+      //replace the anchor icon
+      var src = "../images/togetherjs-logo-close.png";
+      $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
+                      
       $("#towtruck-dock-anchor").toggle(function() {
         
           console.log("Close dock");
+          
+          //enable vertical scrolling
+          $("body").css({
+            "position": "",
+            top: "",
+            left: ""
+          });
+          
+          //replace the anchor icon
+          var src = "../images/togetherjs-logo-open.png";
+          $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
+
+          $('.towtruck-window').animate({
+            opacity: 0
+          });
+          $('#towtruck-dock-participants').animate({
+            opacity: 0
+          });
           $('#towtruck-dock #towtruck-buttons').animate({
             opacity: 0
           });
           $('.towtruck-dock-right').animate({
-            width: "60px"
+            width: "40px"
           }, {
             duration:60, easing:"linear"
           });
-          $('.towtruck-window').animate({
-            opacity: 0
-          });
-          
           $("body").css({ "background-color": "rgba(0,0,0,0)"});
         
         },function(){
         
           console.log("open Dock");
+          $('.towtruck-window').animate({
+            opacity: 1
+          });
+          $('#towtruck-dock-participants').animate({
+            opacity: 1
+          });
           $('#towtruck-dock #towtruck-buttons').animate({
             opacity: 1
           });
           $('.towtruck-dock-right').animate({
-            width: "94%"
+            width: "75%"
           }, {
             duration:60, easing:"linear"
           });
-          $('.towtruck-window').animate({
-            opacity: 1
-          });
-          
           // add bg overlay
           $("body").css({ "background-color": "rgba(0,0,0,0.5)"});
+          
+          //disable vertical scrolling
+          $("body").css({
+            "position": "fixed",
+            top: 0,
+            left: 0
+          });
+          
+          //replace the anchor icon
+          var src = "../images/togetherjs-logo-close.png";
+          $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
         
       });
     }

@@ -2,8 +2,8 @@
 #towtruck-dock {
   &.towtruck-dock-right {
     top: 0px;
-    width: 94%;
-    height: 17%;
+    width: 75%;
+    height: 40px !important;
     right: 0px;
     margin: 10px;
     bottom: 0px;
@@ -26,10 +26,19 @@
     float: right;
     border-right: 1px solid rgba(0,0,0,0.2);
     border-top: none;
+    width: 40px;
+    height: 40px;
+    background-size: 30px 30px;
   }
   
   #towtruck-profile-arrow {
     display: none;
+  }
+  
+  #towtruck-dock-anchor-horizontal img {
+    width: 24px;
+    height: 24px;
+    padding: 8px;
   }
   
 }
@@ -49,10 +58,25 @@
 
 
 .towtruck {
+  
+  .towtruck-button .towtruck-person {
+    margin: 0 0 0 5px;
+  }
+  
+  .towtruck-person {
+    background-size: 30px 30px;
+    height: 26px;
+    width: 26px;
+  }
+  
+  .towtruck-person-avatar-swatch {
+    margin-left: 12px;
+  }
+  
   .towtruck-window {
     width: 96%;
     margin-left: 0;
-    height: 100%;
+    height: 82%;
     margin-top: 0%;
     z-index: @z-index+3 !important;
     top: 84px;
@@ -73,7 +97,9 @@
   }
   
   #towtruck-chat-input-box {
-    width: 98%;
+    width: 94%;
+    bottom: 0px;
+    position: fixed;
   }
   
   #towtruck-chat-input {
@@ -91,6 +117,11 @@
     margin-top: 1%;
     top: 0;
     left: 0;
+  }
+  
+  .towtruck-window > header {
+    margin: -7px;
+    padding: 10px;
   }
 }
 
@@ -165,8 +196,8 @@ margin: 0px 7px;
 
 .towtruck .towtruck-modal .towtruck-share-link {
   width: 80%;
-  font-size: 12px;
-  padding: 6px 6px 4px;
+  font-size: 14px;
+  padding: 14px;
   border-radius: 4px;
   border: 1px solid 
   #cccccc;
