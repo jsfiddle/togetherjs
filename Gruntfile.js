@@ -154,7 +154,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*"];
+    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md"];
     grunt.log.writeln("Copying files from " + "towtruck/".cyan + " to " + path.join(grunt.option("dest"), "towtruck").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
