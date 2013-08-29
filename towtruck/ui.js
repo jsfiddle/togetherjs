@@ -274,6 +274,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     
     // Setting the anchor button + dock mobile actions
     if($.browser.mobile) {
+      
+      
           
       $("#towtruck-dock-anchor").toggle(function() {
         
@@ -289,6 +291,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           $('.towtruck-window').animate({
             opacity: 0
           });
+          
+          $("body").css({ "background-color": "rgba(0,0,0,0)"});
         
         },function(){
         
@@ -306,6 +310,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           });
           
           // add bg overlay
+          $("body").css({ "background-color": "rgba(0,0,0,0.5)"});
         
       });
     }

@@ -64,52 +64,107 @@ define(["jquery"], function ($) {
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
+  
+    //mobile popout window with no animation
+    if($.browser.mobile) {
+      
+       //starting position
+        this.css({
+          left: "0px",
+          opacity: 1,
+          "zIndex": 8888
+        });
 
-    //starting position
-    this.css({
-      left: "+=74px",
-      opacity: 1,
-      "zIndex": 8888
-    });
+        //starting position for arrow
+        $('#towtruck-window-pointer-right').css({
+          left: "+=74px",
+          opacity: 1,
+          "zIndex": 8888
+        });
 
-    //starting position for arrow
-    $('#towtruck-window-pointer-right').css({
-      left: "+=74px",
-      opacity: 1,
-      "zIndex": 8888
-    });
+        //animate arrow out
+        $('#towtruck-window-pointer-right').animate({
+          opacity: 1,
+          left: "-=78px"
+        }, {
+          duration:60, easing:"linear"
+        });
+        $('#towtruck-window-pointer-right').queue();
 
-    //animate arrow out
-    $('#towtruck-window-pointer-right').animate({
-      opacity: 1,
-      left: "-=78px"
-    }, {
-      duration:60, easing:"linear"
-    });
-    $('#towtruck-window-pointer-right').queue();
+        //bounce arrow back
+        $('#towtruck-window-pointer-right').animate({
+          left:'+=4px'
+        }, {
+          duration:60, easing:"linear"
+        });
 
-    //bounce arrow back
-    $('#towtruck-window-pointer-right').animate({
-      left:'+=4px'
-    }, {
-      duration:60, easing:"linear"
-    });
+        //animate window out
+        this.animate({
+          opacity: 1,
+          left: "0px"
+        }, {
+          duration:60, easing:"linear"
+        });
+        this.queue();
 
-    //animate window out
-    this.animate({
-      opacity: 1,
-      left: "-=78px"
-    }, {
-      duration:60, easing:"linear"
-    });
-    this.queue();
+        //bounce window back
+        this.animate({
+          left:'0px'
+        }, {
+          duration:60, easing:"linear"
+        });
+    }
 
-    //bounce window back
-    this.animate({
-      left:'+=4px'
-    }, {
-      duration:60, easing:"linear"
-    });
+    else {
+      
+      //starting position
+      this.css({
+        left: "+=74px",
+        opacity: 1,
+        "zIndex": 8888
+      });
+
+      //starting position for arrow
+      $('#towtruck-window-pointer-right').css({
+        left: "+=74px",
+        opacity: 1,
+        "zIndex": 8888
+      });
+
+      //animate arrow out
+      $('#towtruck-window-pointer-right').animate({
+        opacity: 1,
+        left: "-=78px"
+      }, {
+        duration:60, easing:"linear"
+      });
+      $('#towtruck-window-pointer-right').queue();
+
+      //bounce arrow back
+      $('#towtruck-window-pointer-right').animate({
+        left:'+=4px'
+      }, {
+        duration:60, easing:"linear"
+      });
+
+      //animate window out
+      this.animate({
+        opacity: 1,
+        left: "-=78px"
+      }, {
+        duration:60, easing:"linear"
+      });
+      this.queue();
+
+      //bounce window back
+      this.animate({
+        left:'+=4px'
+      }, {
+        duration:60, easing:"linear"
+      });
+      
+    }
+
   };
 
   /* Slide in notification window: */
