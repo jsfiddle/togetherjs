@@ -280,6 +280,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     // Setting the anchor button + dock mobile actions
     if($.browser.mobile) {
       
+      // Make the dock draggable
+      $('#towtruck-dock').draggable();
+      
       //replace the anchor icon
       var src = "../images/togetherjs-logo-close.png";
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);

@@ -267,7 +267,9 @@
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
       tinycolor: "libs/tinycolor",
-      whrandom: "libs/whrandom/random"
+      whrandom: "libs/whrandom/random",
+      jqueryui: "libs/jquery-ui.min",
+      jquerypunch: "libs/jquery.ui.touch-punch.min"
     }
   };
 

@@ -80,6 +80,8 @@ module.exports = function (grunt) {
             falafel: "libs/walkabout/lib/falafel",
             tinycolor: "libs/tinycolor",
             whrandom: "libs/whrandom/random",
+            jqueryui: "libs/jquery-ui.min",
+            jquerypunch: "libs/jquery.ui.touch-punch.min",
             // Make sure we get the built form of this one:
             templates: "../build/towtruck/templates"
           },
