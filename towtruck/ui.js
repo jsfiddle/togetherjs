@@ -277,8 +277,84 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       return false;
     });
     
+    function openDock() {
+      console.log("open Dock");
+      
+      $('.towtruck-window').animate({
+        opacity: 1
+      });
+      $('#towtruck-dock-participants').animate({
+        opacity: 1
+      });
+      $('#towtruck-dock #towtruck-buttons').animate({
+        opacity: 1
+      });
+      $('.towtruck-dock-right').animate({
+        width: "75%"
+      }, {
+        duration:60, easing:"linear"
+      });
+      
+      // add bg overlay
+      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'></div>" );
+      
+      //disable vertical scrolling
+      $("body").css({
+        "position": "fixed",
+        top: 0,
+        left: 0
+      });
+      
+      //replace the anchor icon
+      var src = "../images/togetherjs-logo-close.png";
+      $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
+    }
+    
+    function closeDock() {
+      console.log("Close dock");
+
+      //enable vertical scrolling
+      $("body").css({
+        "position": "",
+        top: "",
+        left: ""
+      });
+      
+      //replace the anchor icon
+      var src = "../images/togetherjs-logo-open.png";
+      $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
+
+      $('.towtruck-window').animate({
+        opacity: 0
+      });
+      $('#towtruck-dock-participants').animate({
+        opacity: 0
+      });
+      $('#towtruck-dock #towtruck-buttons').animate({
+        opacity: 0
+      });
+      $('.towtruck-dock-right').animate({
+        width: "40px"
+      }, {
+        duration:60, easing:"linear"
+      });
+      
+      // remove bg overlay
+      $(".overlay").remove();
+    }
+    
     // Setting the anchor button + dock mobile actions
-    if($.browser.mobile) {      
+    if($.browser.mobile) {  
+      
+      // toggle the audio button
+      $("#towtruck-audio-button").click(function () {
+        windowing.toggle("#towtruck-rtc-not-supported");
+      }); 
+      
+      // toggle the profile button
+      $("#towtruck-profile-button").click(function () {
+        windowing.toggle("#towtruck-menu-window");
+      });
 
       $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
 
@@ -289,81 +365,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         left: 0
       });
       
-      // Make the dock draggable
-      // $('#towtruck-dock').draggable();
-      
       //replace the anchor icon
       var src = "../images/togetherjs-logo-close.png";
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
                       
       $("#towtruck-dock-anchor").toggle(function() {
-          console.log("Close dock");
-          
-          //if you hit the nav button again, it'll close the dock
-
-          
-          //enable vertical scrolling
-          $("body").css({
-            "position": "",
-            top: "",
-            left: ""
-          });
-          
-          //replace the anchor icon
-          var src = "../images/togetherjs-logo-open.png";
-          $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
-
-          $('.towtruck-window').animate({
-            opacity: 0
-          });
-          $('#towtruck-dock-participants').animate({
-            opacity: 0
-          });
-          $('#towtruck-dock #towtruck-buttons').animate({
-            opacity: 0
-          });
-          $('.towtruck-dock-right').animate({
-            width: "40px"
-          }, {
-            duration:60, easing:"linear"
-          });
-
-          // remove bg overlay
-          $(".overlay").remove();
-          
-        
+          closeDock();
         },function(){
-          console.log("open Dock");
-          
-          $('.towtruck-window').animate({
-            opacity: 1
-          });
-          $('#towtruck-dock-participants').animate({
-            opacity: 1
-          });
-          $('#towtruck-dock #towtruck-buttons').animate({
-            opacity: 1
-          });
-          $('.towtruck-dock-right').animate({
-            width: "75%"
-          }, {
-            duration:60, easing:"linear"
-          });
-          
-          // add bg overlay
-          $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'></div>" );
-          
-          //disable vertical scrolling
-          $("body").css({
-            "position": "fixed",
-            top: 0,
-            left: 0
-          });
-          
-          //replace the anchor icon
-          var src = "../images/togetherjs-logo-close.png";
-          $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
-        
+          openDock();
       });
     }
 

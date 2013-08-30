@@ -148,6 +148,28 @@
 }
 
 
+#towtruck-window-pointer-right, #towtruck-window-pointer-left {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  margin-right: -5px;
+  margin-top: -5px;
+  background: #fff;
+  border-right: 1px solid rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  z-index: @z-index + 2;
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+#towtruck-window-pointer-right {
+  -moz-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+#towtruck-window-pointer-left {
+  -moz-transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
+
 
 /*TowTruck walkthrough*/
 
@@ -186,7 +208,7 @@ margin: 0px 7px;
 }
 
 .towtruck .towtruck-walkthrough-main-image img {
-  width: 400px;
+  width: 50%;
   height: auto;
 }
 
