@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "jqueryPlugins", "jqueryui"], function ($) {
+define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
   var util = {};
 
   util.Deferred = $.Deferred;

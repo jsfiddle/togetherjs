@@ -186,9 +186,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
     var container = ui.container;
     
-    //make the bg black
+    //create the overlay
     if($.browser.mobile) {
-      $("body").css({"background-color":"rgba(0,0,0,0.5)"});
+      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
     }
     
     // The share link:
@@ -278,10 +278,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
     
     // Setting the anchor button + dock mobile actions
-    if($.browser.mobile) {
+    if($.browser.mobile) {      
+
+      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
+
+      //disable vertical scrolling
+      $("body").css({
+        "position": "fixed",
+        top: 0,
+        left: 0
+      });
       
       // Make the dock draggable
-      $('#towtruck-dock').draggable();
+      // $('#towtruck-dock').draggable();
       
       //replace the anchor icon
       var src = "../images/togetherjs-logo-close.png";
@@ -318,12 +327,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           }, {
             duration:60, easing:"linear"
           });
-          $("body").css({ "background-color": "rgba(0,0,0,0)"});
+
+          // remove bg overlay
+          $(".overlay").remove();
+          
         
         },function(){
           console.log("open Dock");
-          
-          
           
           $('.towtruck-window').animate({
             opacity: 1
@@ -339,8 +349,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           }, {
             duration:60, easing:"linear"
           });
+          
           // add bg overlay
-          $("body").css({ "background-color": "rgba(0,0,0,0.5)"});
+          $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'></div>" );
           
           //disable vertical scrolling
           $("body").css({
@@ -422,7 +433,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#towtruck-end-session").click(function () {
       session.close();
-      $("body").css({"background-color":"rgba(0,0,0,0)"})
+      $(".overlay").remove();
     });
 
     $("#towtruck-menu-update-color").click(function () {
@@ -713,6 +724,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   }
 
   session.on("close", function () {
+    
+    if($.browser.mobile) {
+      // remove bg overlay
+      $(".overlay").remove();
+      
+    }
+    
     if (ui.container) {
       ui.container.remove();
       ui.container = null;
