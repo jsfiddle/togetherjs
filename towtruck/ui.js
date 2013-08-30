@@ -434,6 +434,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     $("#towtruck-end-session").click(function () {
       session.close();
       $(".overlay").remove();
+      
     });
 
     $("#towtruck-menu-update-color").click(function () {
@@ -728,6 +729,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     if($.browser.mobile) {
       // remove bg overlay
       $(".overlay").remove();
+      
+      //after hitting End, reset window draggin
+      $("body").css({
+        "position": "",
+        top: "",
+        left: ""
+      });
       
     }
     
