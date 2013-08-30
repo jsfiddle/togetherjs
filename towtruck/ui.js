@@ -287,6 +287,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#towtruck-dock-anchor").toggle(function() {
           console.log("Close dock");
           
+          //if you hit the nav button again, it'll close the dock
+
+          
           //enable vertical scrolling
           $("body").css({
             "position": "",
