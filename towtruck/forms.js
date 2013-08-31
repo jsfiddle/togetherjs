@@ -1,5 +1,5 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * License, v. 2.0. If a copy of the MPL wsa not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($, util, session, elementFinder, eventMaker, templating, ot) {
