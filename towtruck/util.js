@@ -253,5 +253,18 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
     });
   };
 
+  util.throttle = function (func, wait) {
+    return function() {
+        var _this = this,
+            args = [].slice(arguments);
+
+        clearTimeout(func._throttleTimeout);
+
+        func._throttleTimeout = setTimeout(function() {
+            func.apply(_this, args);
+        }, wait);
+    };
+  }
+
   return util;
 });
