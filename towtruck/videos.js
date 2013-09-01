@@ -84,19 +84,23 @@ define(["jquery", "util", "session", "elementFinder"],
 
     session.hub.on('video-timeupdate', function (msg) {
         var element = elementFinder.findElement(msg.position),
-        onTimeUpdate = listeners[TIME_UPDATE];
+        onTimeUpdate = listeners[TIME_UPDATE],
+        oldTime = element.prop('currentTime'),
+        newTime = msg.position;
 
-        element.off(TIME_UPDATE, onTimeUpdate);
-        element.prop('currentTime', msg.position);
-        element.on(TIME_UPDATE, onTimeUpdate);
+        //to help throttle uneccesary position changes
+        if areTooFarApart(oldTime, newTime){
+            element.prop('currentTime', msg.position);
+        };
     })
 
     MIRRORED_EVENTS.forEach( function (eventName) {
         session.hub.on("video-"+eventName, function (msg) {
-            var element = elementFinder.findElement(msg.location);
+            var element = elementFinder.findElement(msg.location),
+            state = lookupState(msg);
             setTime(element, msg.position);
-            //this will cause an infinite loop, need to
-            //use event maker to dispatch a custom event
+            //UI tested in chromium:
+            //this won't trigger an infinite event loop
             element.trigger(eventName);
         });
     })
