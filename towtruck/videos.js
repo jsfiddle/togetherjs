@@ -89,8 +89,8 @@ define(["jquery", "util", "session", "elementFinder"],
         newTime = msg.position;
 
         //to help throttle uneccesary position changes
-        if areTooFarApart(oldTime, newTime){
-            element.prop('currentTime', msg.position);
+        if(areTooFarApart(oldTime, newTime)){
+            setTime(element, msg.position);
         };
     })
 
