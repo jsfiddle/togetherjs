@@ -32,17 +32,20 @@ define(["jquery", "util", "session", "elementFinder"],
         });
     };
 
-    function onTimeUpdate (event) {
-        var currentTime = event.target.currentTime;
-        if(areTooFarApart(currentTime, last)){
-            getEventSender(TIME_UPDATE)(event);
-        }
-        last = currentTime;
+    //all clo
+    function getTimeUpdater () {
+        var last = 0;
+        return function (){
+            var currentTime = event.target.currentTime;
+            if(areTooFarApart(currentTime, last)){
+                getEventSender(TIME_UPDATE)(event);
+            }
+            last = currentTime;
+        };
     };
 
     function setupTimeSync (videos) {
-        var last = 0;
-
+        var onTimeUpdate = getTimeUpdater();
         videos.on(TIME_UPDATE, onTimeUpdate);
         listeners[TIME_UPDATE] = onTimeUpdate;
     };
@@ -55,11 +58,10 @@ define(["jquery", "util", "session", "elementFinder"],
 
     function destroyTrackers () {
         var videos = $('video');
-        MIRRORED_EVENTS.forEach(function (eventName) {
+        Object.keys(listeners).forEach(function (eventName) {
             videos.off(eventName, listeners[eventName])
         });
-        videos.off(TIME_UPDATE, listeners[TIME_UPDATE]);
-        listeners = [];
+        listeners = {};
     };
 
 
