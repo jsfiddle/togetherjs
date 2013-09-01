@@ -1,14 +1,47 @@
 
 define(["jquery", "util", "session", "elementFinder"],
-    function($, util, session, elementFinder){
-
+function($, util, session, elementFinder){
     var returnMe = util.Module("videos"),
     listeners = {},
     TIME_UPDATE = 'timeupdate',
     MIRRORED_EVENTS = ['play', 'pause'],
-    SYNC_CHECK = 4000,
     TOO_FAR_APART = 3000;
 
+    session.on("reinitialize", setupListeners);
+
+    session.on("ui-ready", setupListeners);
+
+    function setupListeners () {
+        var videos = $('video');
+        setupMirroredEvents(videos);
+        setupTimeSync(videos);
+    };
+
+    function setupMirroredEvents (videos) {
+        var currentListener;
+        MIRRORED_EVENTS.forEach(function (eventName) {
+            currentListener = getEventSender(eventName);
+            videos.on(eventName, currentListener);
+            listeners[eventName] = currentListener;
+        });
+    };
+
+    function setupTimeSync (videos) {
+        var onTimeUpdate = getTimeUpdater();
+        videos.on(TIME_UPDATE, onTimeUpdate);
+        listeners[TIME_UPDATE] = onTimeUpdate;
+    };
+
+    function getTimeUpdater () {
+        var last = 0;
+        return function (){
+            var currentTime = event.target.currentTime;
+            if(areTooFarApart(currentTime, last)){
+                getEventSender(TIME_UPDATE)(event);
+            }
+            last = currentTime;
+        };
+    };
 
     function getEventSender (eventName) {
         return function (event) {
@@ -23,63 +56,21 @@ define(["jquery", "util", "session", "elementFinder"],
         }
     };
 
-    function setupMirroredEvents (videos) {
-        var currentListener;
-        MIRRORED_EVENTS.forEach(function (eventName) {
-            currentListener = getEventSender(eventName);
-            videos.on(eventName, currentListener);
-            listeners[eventName] = currentListener;
-        });
-    };
-
-    //all clo
-    function getTimeUpdater () {
-        var last = 0;
-        return function (){
-            var currentTime = event.target.currentTime;
-            if(areTooFarApart(currentTime, last)){
-                getEventSender(TIME_UPDATE)(event);
-            }
-            last = currentTime;
-        };
-    };
-
-    function setupTimeSync (videos) {
-        var onTimeUpdate = getTimeUpdater();
-        videos.on(TIME_UPDATE, onTimeUpdate);
-        listeners[TIME_UPDATE] = onTimeUpdate;
-    };
-
-    function setInit () {
-        var videos = $('video');
-        setupMirroredEvents(videos);
-        setupTimeSync(videos);
-    };
-
-    function destroyTrackers () {
-        var videos = $('video');
-        Object.keys(listeners).forEach(function (eventName) {
-            videos.off(eventName, listeners[eventName])
-        });
-        listeners = {};
-    };
-
-
-    function setTime (video, time) {
-        video.prop('currentTime', time);
-    }
-
     function areTooFarApart (currentTime, lastTime) {
         var secDiff = Math.abs(currentTime - lastTime),
         milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;
     }
 
-    session.on("reinitialize", setInit);
+    session.on("close", unsetListeners);
 
-    session.on("ui-ready", setInit);
-
-    session.on("close", destroyTrackers);
+    function unsetListeners () {
+        var videos = $('video');
+        Object.keys(listeners).forEach(function (eventName) {
+            videos.off(eventName, listeners[eventName])
+        });
+        listeners = {};
+    };
 
 
     session.hub.on('video-timeupdate', function (msg) {
@@ -105,7 +96,9 @@ define(["jquery", "util", "session", "elementFinder"],
         });
     })
 
+    function setTime (video, time) {
+        video.prop('currentTime', time);
+    }
 
     return returnMe;
-
-})
+});
