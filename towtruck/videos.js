@@ -2,7 +2,7 @@
 define(["jquery", "util", "session", "elementFinder"],
     function($, util, session, elementFinder){
 
-    var video = util.Module("videos"),
+    var returnMe = util.Module("videos"),
     listeners = {},
     TIME_UPDATE = 'timeupdate',
     MIRRORED_EVENTS = ['play', 'pause'],
@@ -96,6 +96,6 @@ define(["jquery", "util", "session", "elementFinder"],
     })
 
 
-    return video;
+    return returnMe;
 
 })
