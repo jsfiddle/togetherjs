@@ -5,40 +5,47 @@
 {% endblock %}
 {% block body %}
 
-<div id="source-toc">
-  <header>Source List
-    <button id="source-toc-show">+</button>
-    <button id="source-toc-hide">-</button>
-  </header>
-  <dl>
-    {% for source in sourceList %}
-      <dt><a href="{{ source.link }}">{{ source.name }}</a></dt>
-      {% if source.description %}
-        <dd>{{ source.description }}</dd>
-      {% endif %}
-    {% endfor %}
-  </dl>
-</div>
-
-<h1>{{ source }}</h1>
-
-<p><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/{{ source }}">See this file on Github</a></p>
-
-<ul class="sections">
-  {% for section in sections %}
-    <li id="section-{{ section.index }}">
-      <div class="annotation">
-        <div class="pilwrap">
-          <a class="pilcrow" href="#section-{{ section.index }}">&#182;</a>
+<div class="container">
+  
+    <section class="row">
+      <div class="col-xs-3" id="source-toc">
+        <div class="well well-lg fixed">
+          <h5>Source Code</h5>
+          <dl>
+            {% for source in sourceList %}
+              <dt><a href="{{ source.link }}">{{ source.name }}</a></dt>
+              {% if source.description %}
+                <div class="small">{{ source.description }}</div>
+              {% endif %}
+            {% endfor %}
+          </dl>
         </div>
-        {{ section.docsHtml }}
       </div>
-      {% if section.empty %}
-      {% else %}
-        <div class="content">{{ section.codeHtml }}</div>
-      {% endif %}
-    </li>
-  {% endfor %}
-</ul>
+
+      <div class="col-xs-9" id="source-content">
+        <h1>{{ source }}</h1>
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/{{ source }}">See this file on Github</a></div>
+
+        <ul class="sections">
+          {% for section in sections %}
+            <li id="section-{{ section.index }}">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-{{ section.index }}">&#182;</a>
+                </div>
+                {{ section.docsHtml }}
+              </div>
+              {% if section.empty %}
+              {% else %}
+                <div class="content">{{ section.codeHtml }}</div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+    
+</div>
 
 {% endblock %}

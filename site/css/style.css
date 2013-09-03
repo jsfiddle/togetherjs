@@ -122,6 +122,14 @@ h4 {
   line-height: 20px;
 }
 
+h5 {
+  color: rgb(72, 72, 72);
+  display: block;
+  font-family: 'Open Sans Light', sans-serif;
+  font-weight: normal;
+  letter-spacing: normal;
+}
+
 .small, small {
   color: rgb(51, 51, 51);
   display: block;
@@ -927,32 +935,37 @@ h4 {
 /* Source-specific styles */
 
 #source-toc {
-  border: 1px solid #000;
-  border-radius: 2px;
-  float: left;
-  width: 20em;
-  margin-top: 2em;
-  margin-left: 1em;
+  margin-top: 20px;
 }
 
+#source-content h1 {
+  margin-bottom: 10px;
+}
+
+#source-content ul.sections > li {
+  white-space: normal;
+}
+
+
+
 #source-toc header {
-  background-color: #000;
+/*  background-color: #000;
   color: #fff;
-  padding: 2px;
+  padding: 2px;*/
 }
 
 #source-toc header button {
-  width: 2em;
+/*  width: 2em;*/
 }
 
 #source-toc dl {
-  padding: 2px;
+/*  padding: 2px;*/
 }
 
 #source-toc dd {
-  margin-left: 1em;
+/*  margin-left: 1em;*/
 }
 
 div.content pre {
-  border-radius: 0;
+/*  border-radius: 0;*/
 }
