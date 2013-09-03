@@ -158,16 +158,16 @@ h4 {
   -moz-transition: all 0.4s ease;
   transition: all 0.4s ease;
   overflow: hidden;
-  -webkit-background-clip: padding-box; 
-  -moz-background-clip:    padding; 
+  -webkit-background-clip: padding-box;
+  -moz-background-clip:    padding;
   background-clip:         padding-box;
 }
 
 .main-header a.main-logo:hover,
 .main-header a.main-logo:active {
 	background-color: #38c4ac;
-	-webkit-background-clip: padding-box; 
-	-moz-background-clip:    padding; 
+	-webkit-background-clip: padding-box;
+	-moz-background-clip:    padding;
 	background-clip:         padding-box;
 }
 
@@ -222,13 +222,13 @@ h4 {
 /* =Carousel
 ----------------------------------------------- */
 
-#hero { 
-  background: url('../images/bg@2x.png') 100% 0 repeat fixed; 
+#hero {
+  background: url('../images/bg@2x.png') 100% 0 repeat fixed;
   background-size: 100% 100%;
-	margin: 0 auto; 
-  width: 100%; 
-  max-width: 1920px; 
-  position: relative; 
+	margin: 0 auto;
+  width: 100%;
+  max-width: 1920px;
+  position: relative;
   //box-shadow: 0 0 50px rgba(0,0,0,0.8);
 }
 
@@ -251,7 +251,7 @@ h4 {
   margin-bottom: 20px;
 }
 
-#hero .container { 
+#hero .container {
   padding-top: 40px;
 }
 
@@ -623,46 +623,46 @@ h4 {
 ----------------------------------------------- */
 
 /* Extra small devices (phones, up to 480px) */
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
   .large {
     font-size: 48px;
     line-height: 48px;
     letter-spacing: -3px;
   }
-  
+
   h1 {
     font-size: 32px;
     line-height: 32px;
   }
-  
+
   h2 {
     font-size: 28px;
     line-height: 30px;
   }
-  
+
   h3 {
     font-size: 20px;
     line-height: 20px;
   }
-  
+
   h4 {
     font-size: 14px;
     line-height: 20px;
     font-weight: bold;
   }
-  
+
   p {
     font-size: 14px;
   }
-  
+
   #marketing-video #frame-video {
     margin: 26px;
   }
-  
+
   a#tabzilla {
     display: none;
   }
-  
+
   .how-section-imganim-01 {
     top: 26%;
   }
@@ -670,11 +670,11 @@ h4 {
   .how-section-imganim-02 {
     top: 16%;
   }
-  
+
   .how-section-imganim-03 {
     top: 20%;
   }
-  
+
   .how-section-btncollab {
     top: 22%;
     left: 22%;
@@ -689,7 +689,7 @@ h4 {
     top: 18%;
     left: 50%;
   }
-  
+
   .cursor-placement-01 {
     top: 13%;
     left: 78%;
@@ -709,91 +709,91 @@ h4 {
     top: 25%;
     left: 50%;
   }
-  
+
 }
 
 /* Smaller devices (tablets, 480px and up) */
-@media (min-width: 480px) { 
+@media (min-width: 480px) {
   .large {
     font-size: 48px;
     line-height: 48px;
     letter-spacing: -3px;
   }
-  
+
   h1 {
     font-size: 32px;
   }
-  
+
   h2 {
     font-size: 28px;
   }
-  
+
   h3 {
     font-size: 24px;
   }
-  
+
   h4 {
     font-size: 15px;
     font-weight: bold;
   }
-  
+
   p {
     font-size: 14px;
   }
-  
+
   #marketing-video #frame-video {
     margin: 26px;
   }
-  
+
   a#tabzilla {
     display: inherit;
   }
-  
-  
+
+
 }
 
 /* Small devices (tablets, 768px and up) */
-@media (min-width: 768px) { 
+@media (min-width: 768px) {
   .large {
     font-size: 72px;
     line-height: 100%;
     letter-spacing: -5px;
   }
-  
+
   h1 {
     font-size: 48px;
     line-height: 100%;
   }
-  
+
   h2 {
     font-size: 32px;
     line-height: 100%;
   }
-  
+
   h3 {
     font-size: 28px;
     line-height: 100%;
   }
-  
+
   h4 {
     font-size: 20px;
     line-height: 100%;
     font-weight: normal;
   }
-  
+
   p {
     font-size: 14px;
     line-height: 20px;
   }
-  
+
   #marketing-video #frame-video {
     margin: 0 auto;
   }
-  
+
   a#tabzilla {
     display: inherit;
   }
-  
+
 }
 
 /* Medium devices (desktops, 992px and up) */
@@ -803,44 +803,44 @@ h4 {
     line-height: 100%;
     letter-spacing: -5px;
   }
-  
+
   h1 {
     font-size: 48px;
     line-height: 100%;
   }
-  
+
   h2 {
     font-size: 32px;
     line-height: 100%;
   }
-  
+
   h3 {
     font-size: 28px;
     line-height: 100%;
   }
-  
+
   h4 {
     font-size: 20px;
     line-height: 100%;
   }
-  
+
   p {
     font-size: 14px;
     line-height: 20px;
   }
-  
+
   #video-area img {
     /*margin-top: 74px;*/
   }
-  
+
   #hero {
     height: 436px;
   }
-  
+
   #marketing-video #frame-video {
     padding-top: 6px;
   }
-  
+
 }
 
 /* Large devices (large desktops, 1200px and up) */
@@ -850,50 +850,50 @@ h4 {
     line-height: 100%;
     letter-spacing: -5px;
   }
-  
+
   h1 {
     font-size: 48px;
     line-height: 100%;
   }
-  
+
   h2 {
     font-size: 32px;
     line-height: 100%;
   }
-  
+
   h3 {
     font-size: 28px;
     line-height: 100%;
   }
-  
+
   h4 {
     font-size: 20px;
     line-height: 100%;
   }
-  
+
   p {
     font-size: 14px;
     line-height: 20px;
   }
-  
+
   #video-area img {
     /*margin-top: 11px;*/
   }
-  
+
   #hero {
     height: 440px;
   }
-  
+
   #marketing-video #frame-video {
     padding-top: 8px;
   }
-  
+
 }
 
 
 /*making the modal size larger for the app examples*/
 @media screen and (min-width: 768px) {
-  
+
   .app-example .modal-dialog {
   right: auto;
   left: 50%;
@@ -901,7 +901,7 @@ h4 {
   padding-top: 30px;
   padding-bottom: 30px;
   }
-  
+
 }
 
 
@@ -923,3 +923,36 @@ h4 {
     max-width: 735px;
   }
 }*/
+
+/* Source-specific styles */
+
+#source-toc {
+  border: 1px solid #000;
+  border-radius: 2px;
+  float: left;
+  width: 20em;
+  margin-top: 2em;
+  margin-left: 1em;
+}
+
+#source-toc header {
+  background-color: #000;
+  color: #fff;
+  padding: 2px;
+}
+
+#source-toc header button {
+  width: 2em;
+}
+
+#source-toc dl {
+  padding: 2px;
+}
+
+#source-toc dd {
+  margin-left: 1em;
+}
+
+div.content pre {
+  border-radius: 0;
+}

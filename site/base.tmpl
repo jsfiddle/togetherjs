@@ -10,19 +10,19 @@
     <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="/images/fav-icon.png">
-    
-    <script src="js/jquery-1.10.2.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/parallax.js"></script>
-    <script src="js/custom.js"></script>
-    <script src="js/scrollTo.js"></script>
-    <script src="js/waypoints.min.js"></script>
-    <script src="js/how-animations.js"></script>
-    
+    <link rel="shortcut icon" href="{{ base }}images/fav-icon.png">
+
+    <script src="{{ base }}js/jquery-1.10.2.min.js"></script>
+    <script src="{{ base }}js/bootstrap.min.js"></script>
+    <script src="{{ base }}js/parallax.js"></script>
+    <script src="{{ base }}js/custom.js"></script>
+    <script src="{{ base }}js/scrollTo.js"></script>
+    <script src="{{ base }}js/waypoints.min.js"></script>
+    <script src="{{ base }}js/how-animations.js"></script>
+
     <!-- retina library -->
-    <script src="js/retina.js"></script>
-    
+    <script src="{{ base }}js/retina.js"></script>
+
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
     <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
@@ -37,15 +37,15 @@
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
     </script>
-    
+
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/jumbotron.css" rel="stylesheet">
-    <link href="css/carousel.css" rel="stylesheet">
-    <link href="css/grid.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="{{ base }}css/bootstrap.css" rel="stylesheet">
+    <link href="{{ base }}css/jumbotron.css" rel="stylesheet">
+    <link href="{{ base }}css/carousel.css" rel="stylesheet">
+    <link href="{{ base }}css/grid.css" rel="stylesheet">
+    <link href="{{ base }}css/style.css" rel="stylesheet">
     <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
-    
+
     {% block styles %}{% endblock %}
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -54,19 +54,19 @@
       </script>
     <![endif]-->
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
-    
+    <link rel="shortcut icon" href="{{ base }}assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ base }}assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ base }}assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ base }}assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="{{ base }}assets/ico/apple-touch-icon-57-precomposed.png">
+
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
-      
+
       <!-- Tabzilla -->
       <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
-      
+
       <!-- start container -->
       <div class="container navbox">
         <div class="navbar-header">
@@ -75,10 +75,10 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand main-logo scrollnav" href="index.html"></a>
+          <a class="navbar-brand main-logo scrollnav" href="{{base}}./"></a>
           <!-- <a class="navbar-brand masthead-title" href="#"></a> -->
         </div>
-        
+
         {% if (enableHome) %}
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
@@ -91,7 +91,7 @@
           </ul>
         </div><!--/.navbar-collapse -->
         {% endif %}
-        
+
       </div>
     </div>
 
@@ -103,19 +103,19 @@
         <hr>
 
         <footer>
-          
+
           <section class="row" id="footer">
             <div class="col-xs-4 text-left">
-              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="images/footer-mozilla-labs.png"></a></p>
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="{{ base }}images/footer-mozilla-labs.png"></a></p>
             </div>
             <div class="col-xs-4">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="index.html" class="scrollnav">Home</a></li>
-                <li class=""><a href="index.html#tour" class="scrollnav">Tour</a></li>
-                <li class=""><a href="index.html#examples-section" class="scrollnav">Examples</a></li>
-                <li class=""><a href="index.html#customers-section" class="scrollnav">Customers</a></li>
-                <li class=""><a href="index.html#features-section" class="scrollnav">Features</a></li>
-                <li class=""><a href="index.html#tryitout-section" class="scrollnav">Try it out</a></li>
+                <li class=""><a href="{{ base }}./" class="scrollnav">Home</a></li>
+                <li class=""><a href="{{ base }}./#tour" class="scrollnav">Tour</a></li>
+                <li class=""><a href="{{ base }}./#examples-section" class="scrollnav">Examples</a></li>
+                <li class=""><a href="{{ base }}./#customers-section" class="scrollnav">Customers</a></li>
+                <li class=""><a href="{{ base }}./#features-section" class="scrollnav">Features</a></li>
+                <li class=""><a href="{{ base }}./#tryitout-section" class="scrollnav">Try it out</a></li>
                 <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
@@ -124,7 +124,7 @@
                 <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
                 <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
                 <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Docs</a></li>
-                <li><a href="faq.html" target="_blank">FAQ</a></li>
+                <li><a href="{{ base }}faq.html" target="_blank">FAQ</a></li>
                 <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
@@ -136,6 +136,6 @@
       </section>
 
     </div> <!-- /container -->
-    
+
   </body>
 </html>

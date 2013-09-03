@@ -3,11 +3,14 @@
 var fs = require("fs");
 var path = require('path');
 var nunjucks = require("nunjucks");
+var marked = require("marked");
+var docco = require("docco");
 
 var vars = {
   enableExample: false,
   enableHome: false,
-  GA_ACCOUNT: "UA-35433268-28"
+  GA_ACCOUNT: "UA-35433268-28",
+  base: ""
 };
 
 module.exports = function (grunt) {
@@ -290,6 +293,107 @@ module.exports = function (grunt) {
         data = data.substr(match.index + match[0].length);
       }
       var tmpl = env.getTemplate(source);
+      var result = tmpl.render(tmplVars);
+      grunt.file.write(dest, result);
+    });
+  });
+
+  function parseMarkdownOutput(doc) {
+    var title = (/<h1>(.*)<\/h1>/i).exec(doc);
+    title = title[1];
+    var body = doc.replace(/<h1>.*<\/h1>/i, "");
+    return {
+      title: title,
+      body: body
+    };
+  }
+
+  function highlight(code, lang) {
+    var hjs = require("highlight.js");
+    var aliases = {
+      html: "xml",
+      js: "javascript"
+    };
+    lang = aliases[lang] || lang;
+    try {
+      if (lang) {
+        return hjs.highlight(lang, code).value;
+      } else {
+        return hjs.highlightAuto(code).value;
+      }
+    } catch (e) {
+      grunt.fail.fatal("Error highlighting: " + e);
+      throw e;
+    }
+  }
+
+  marked.setOptions({highlight: highlight});
+
+  grunt.registerTask("rendermd", "Render the site Markdown files", function () {
+    var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("site/"));
+    var sources = grunt.file.expand({cwd: "site/"}, "**/*.md", "!**/README.md");
+    sources.forEach(function (source) {
+      var basename = source.replace(/\.md$/, "");
+      var dest = grunt.option("dest") + "/" + basename + ".html";
+      grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
+      var data = grunt.file.read("site/" + source);
+      var html = marked(data, {
+        smartypants: true
+      });
+      var parsed = parseMarkdownOutput(html);
+      var tmpl = env.getTemplate("generic-markdown.tmpl");
+      var tmplVars = Object.create(vars);
+      tmplVars.markdownBody = parsed.body;
+      tmplVars.title = parsed.title;
+      var result = tmpl.render(tmplVars);
+      grunt.file.write(dest, result);
+    });
+  });
+
+  function doccoFormat(source, sections) {
+    sections.forEach(function (section) {
+      var code = highlight(section.codeText, "javascript");
+      code = code.replace(/\s+$/, '');
+      section.codeHtml = "<div class='highlight'><pre>" + code + "</pre></div>";
+      section.docsHtml = marked(section.docsText);
+    });
+  }
+
+  grunt.registerTask("docco", "Create comment-separating source code", function () {
+    var done = this.async();
+    var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("site/"));
+    var sources = grunt.file.expand({cwd: "towtruck/"}, "*.js");
+    sources.sort();
+    var sourceDescriptions = JSON.parse(grunt.file.read("towtruck/module-descriptions.json"));
+    var sourceList = [];
+    sources.forEach(function (source) {
+      var name = source.replace(/\.js$/, "");
+      sourceList.push({
+        name: name,
+        link: source + ".html",
+        description: sourceDescriptions[name] || ""
+      });
+    });
+    sources.forEach(function (source) {
+      var dest = grunt.option("dest") + "/source/" + source + ".html";
+      grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
+      var code = grunt.file.read("towtruck/" + source);
+      var sections = docco.parse(source, code);
+      doccoFormat(source, sections);
+      sections.forEach(function (section, i) {
+        section.index = i;
+        section.empty = section.codeText.replace(/\s/gm, "") === "";
+      });
+      var first = marked.lexer(sections[0].docsText)[0];
+      var hasTitle = first && first.type == 'heading' && first.depth == 1;
+      var title = hasTitle ? first.text : path.basename(source, ".js");
+      var tmpl = env.getTemplate("source-code.tmpl");
+      var tmplVars = Object.create(vars);
+      tmplVars.title = title;
+      tmplVars.sections = sections;
+      tmplVars.source = source;
+      tmplVars.base = "../";
+      tmplVars.sourceList = sourceList;
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
     });
