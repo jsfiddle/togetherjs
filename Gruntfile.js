@@ -176,7 +176,7 @@ module.exports = function (grunt) {
     grunt.log.writeln("Copying files from " + "site/".cyan + " to " + grunt.option("dest").cyan);
     copyMany(
       "site/", grunt.option("dest"),
-      ["**", "!**/*.tmpl", "!**/*.html", "!public/**", "!**/*_flymake*"]);
+      ["**", "!**/*.tmpl", "!**/*.html", "!public/**", "!**/*_flymake*", "!**/*.md"]);
     copyMany(
       "site/public/", grunt.option("dest"),
       ["**"]);
@@ -345,6 +345,10 @@ module.exports = function (grunt) {
       var tmplVars = Object.create(vars);
       tmplVars.markdownBody = parsed.body;
       tmplVars.title = parsed.title;
+      tmplVars.base = path.relative(path.dirname("site/" + source), "site/");
+      if (tmplVars.base && tmplVars.base.search(/\/$/) == -1) {
+        tmplVars.base += "/";
+      }
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
     });
