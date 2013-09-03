@@ -966,6 +966,11 @@ h5 {
 /*  margin-left: 1em;*/
 }
 
-div.content pre {
-/*  border-radius: 0;*/
+#source-content div.content {
+  padding: 13px;
+  border-radius: 6px;
+}
+
+#source-content div.annotation {
+  padding: 10px 25px 1px 20px;
 }
