@@ -14,9 +14,6 @@
           <dl>
             {% for source in sourceList %}
               <dt><a href="{{ source.link }}">{{ source.name }}</a></dt>
-              {% if source.description %}
-                <div class="small">{{ source.description }}</div>
-              {% endif %}
             {% endfor %}
           </dl>
         </div>
