@@ -126,7 +126,7 @@ h5 {
   color: rgb(72, 72, 72);
   display: block;
   font-family: 'Open Sans Light', sans-serif;
-  font-weight: normal;
+  font-weight: bold;
   letter-spacing: normal;
 }
 
@@ -180,16 +180,16 @@ h5 {
 }
 
 .main-header .masthead-title {
-  font-size: 16px;
+  font-size: 14px;
   text-transform: uppercase;
   font-weight: 700;
-  color: #333;
+  color: #fff;
   margin: 6px 10px;
   letter-spacing: 5px;
 }
 
 .main-header .masthead-title:hover {
-  color: #333;
+  color: #f1f1f1;
 }
 
 .main-header .main-nav li a {
