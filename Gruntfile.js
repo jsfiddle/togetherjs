@@ -396,6 +396,7 @@ module.exports = function (grunt) {
       tmplVars.title = title;
       tmplVars.sections = sections;
       tmplVars.source = source;
+      tmplVars.sourceDescription = sourceDescriptions[source] || "";
       tmplVars.base = "../";
       tmplVars.sourceList = sourceList;
       var result = tmpl.render(tmplVars);
