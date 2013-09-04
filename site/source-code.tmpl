@@ -7,19 +7,19 @@
 
 <div class="container">
 
-    <section class="row">
-      <div class="col-xs-3" id="source-toc">
-        <div class="well well-lg fixed">
-          <h5>Source Code</h5>
-          <dl>
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
             {% for source in sourceList %}
-              <dt><a href="{{ source.link }}">{{ source.name }}</a></dt>
+              <li><a href="{{ source.link }}">{{ source.name }}</a></li>
             {% endfor %}
-          </dl>
+          </ul>
         </div>
       </div>
 
-      <div class="col-xs-9" id="source-content">
+      <div class="col-md-9" id="source-content">
         <h1>{{ source }}</h1>
         {% if sourceDescription %}
           <h4>{{ sourceDescription }}</h4>

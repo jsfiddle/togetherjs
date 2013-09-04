@@ -86,9 +86,11 @@
             <li><a href="{{base}}./docs/developers-getting-started.html" class="scrollnav ">Docs</a></li>
             <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
           {% endif %}
+          {% if (enableMarkdown) %}
             <li><a href="{{base}}./" class="scrollnav">Overview</a></li>
             <li><a href="{{base}}./docs/developers-getting-started.html" class="scrollnav active">Docs</a></li>
             <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+          {% endif %}
           </ul>
         </div><!--/.navbar-collapse -->
 
