@@ -1,4 +1,12 @@
 {% extends "base.tmpl" %}
 {% block body %}
-{{ markdownBody }}
+
+<div class="container">
+  <section class="row">
+    <div class="col-xs-12">
+      <h1>{{ markdownTitle }}</h1>
+      {{ markdownBody }}
+    </div>
+  </section>
+  
 {% endblock %}

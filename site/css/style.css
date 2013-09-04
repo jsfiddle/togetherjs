@@ -946,6 +946,10 @@ h5 {
   white-space: normal;
 }
 
+#source-content ul.sections > li > div.content {
+  background: #f5f5f5;
+}
+
 
 
 #source-toc header {
