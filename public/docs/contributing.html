@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+
+<div class="container">
+  <section class="row" id="markdownpages">
+    <div class="col-md-3">
+      <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+        <ul class="nav">
+          <li><a href="#quick-start" class="scrollnavdocs">Quick Start</a></li>
+          <li><a href="#about-audio-chat-and-webrtc" class="scrollnavdocs">About Audio Chat and WebRTC</a></li>
+          <li><a href="#addons" class="scrollnavdocs">Addons</a></li>
+          <li><a href="#contributing" class="scrollnavdocs">Contributing</a></li>
+          <li><a href="#extending-togetherjs" class="scrollnavdocs">Extending TogetherJS</a></li>
+          <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting the Hub Server</a></li>
+          <li><a href="#browser-support" class="scrollnavdocs">Browser Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <h1>Contributing</h1>
+      
+<p>Here are a variety of notes about contributing to the TowTruck codebase.  This isn&#39;t stuff that applies if you are simply integrating TowTruck in your site.</p>
+<h2 id="code-style">Code Style</h2>
+<p><a href="https://github.com/ianb/javascript">Here is a style document</a>.  It&#39;s a fork of the <a href="https://github.com/airbnb/javascript">Airbnb</a> style guide, and maybe takes a little from the <a href="https://developer.mozilla.org/en-US/docs/Developer_Guide/Coding_Style">Mozilla style guide</a>, and then a little of our own opinions.</p>
+<h3 id="code-cleanliness">Code Cleanliness</h3>
+<p>Please figure out how to get your editor to delete trailing whitespace!  It&#39;s a nuisance and creates useless diffs.  Files should also end with a newline.</p>
+<h2 id="towtruck-patterns">TowTruck Patterns</h2>
+<h3 id="modules">Modules</h3>
+<p>There are <a href="https://github.com/ianb/javascript#modules">some notes in the style guide</a>.  TowTruck uses <a href="http://requirejs.org/">requirejs</a> for module loading, and the AMD pattern generally.  Each module should go in <code>app/http/towtruck/public/</code> and look like:</p>
+<pre><code class="lang-javascript">define([<span class="string">"util"</span>, <span class="string">"jquery"</span>, <span class="string">"require"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, $, require)</span> {</span>
+  <span class="keyword">var</span> myModule = util.Module(<span class="string">"myModule"</span>);
+  <span class="keyword">var</span> assert = util.assert;
+  myModule.object = ... <span class="comment">// and so on</span>
+  <span class="keyword">return</span> myModule;
+});</code></pre>
+<p>The first list is the dependencies (modules) you need.  If you need to require module modules later (lazily, or later than load time due to circular dependencies) you must include <code>require</code> among your dependencies.  There <em>is</em> a global <code>require()</code> object, but you can&#39;t use it, because TowTruck uses a <a href="http://requirejs.org/docs/api.html#multiversion">context</a>.</p>
+<p>You should define an object with a name matching the name of the module (and filename).  This way an object or function will be named the same throughout the project, both when used internally and externally (e.g., <code>myModule.object</code>), and when it is being created.</p>
+<p>If you want to load a module from the console, you do it like this:</p>
+<pre><code class="lang-javascript">session = require({context: <span class="string">"towtruck"</span>})(<span class="string">"session"</span>);</code></pre>
+<p>(This form of <code>require</code> only works when the module is already loaded, but from the console that&#39;s usually the case.)</p>
+<h3 id="classes">Classes</h3>
+<p>There is a class factory in <code>util.Class</code>.  It supports subclassing, but we haven‘t used any subclasses yet, and I’m not sure we will.  Look at the implementation if you want to know more.</p>
+<p>To define a class, do:</p>
+<pre><code class="lang-javascript"><span class="keyword">var</span> MyClass = util.Class({
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(...)</span> {</span>...}
+});
+MyClass.classMethod = <span class="function"><span class="keyword">function</span> <span class="params">(...)</span> {</span>...};
+<span class="keyword">var</span> instance = MyClass();</code></pre>
+<p>The <code>constructor</code> function is called when the object is instantiated.  You don&#39;t need to use <code>new</code> when creating instances, and really you shouldn‘t (it’ll just create an object that&#39;ll be thrown away).  MyClass.prototype is what you would expect.</p>
+<h3 id="codethiscode"><code>this</code></h3>
+<p>You should understand how <code>this</code> is bound, and how that binding is lost.</p>
+<p>Generally we prefer using <code>.bind(this)</code> to keep the references to this.  For example:</p>
+<pre><code><span class="keyword">var</span> MyClass = Class({
+
+  goodExample: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    doSomething((<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span><span class="keyword">return</span> <span class="keyword">this</span>.foo;}).bind(<span class="keyword">this</span>));
+  },
+
+  badExample: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> <span class="keyword">self</span> = <span class="keyword">this</span>;
+    doSomething(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span><span class="keyword">return</span> <span class="keyword">self</span>.foo;});
+  }
+});</code></pre>
+<p>Why?  Mostly so that <code>this</code> is always called <code>this</code>, and you don&#39;t have to figure out whether or where there is an alias.</p>
+<h3 id="templating">Templating</h3>
+<p>Right now we aren&#39;t using any real templating system.  Almost everything is in <code>app/http/views/interface.html</code> – and most likely any new markup should also go there.</p>
+<p>We try to keep most of the code that actually touches the ui in <code>ui.js</code> – though it&#39;s not done very strictly.  Moving stuff back into ui.js is appreciated though.</p>
+<p>“Templates” are just elements that are cloned out of <code>interface.html</code>.  They generally have an id like <code>towtruck-template-foo</code>, and you&#39;d clone them by doing <code>ui.cloneTemplate(&quot;foo&quot;)</code>.</p>
+<p>You should avoid having text or markup in Javascript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.</p>
+<h3 id="async">Async</h3>
+<p>Use <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> when possible.</p>
+
+    </div>
+  </section>
+  
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

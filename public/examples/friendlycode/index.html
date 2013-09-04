@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html class="deployment-type-development">
+  <head>
+    <meta charset="utf-8">
+    <base target="_blank">
+
+    <title>Barebones Friendlycode Editor</title>
+    <link rel="stylesheet" href="css/friendlycode.css">
+    <style type="text/css" media="screen">
+      /*reset Twitter Bootstrap*/
+      @media screen {
+        * {
+          -webkit-box-sizing: content-box !important;
+          -moz-box-sizing: content-box !important;
+          box-sizing: content-box !important;
+        }
+      }
+    </style>
+  </head>
+  <body style="margin: 0">
+    <div id="bare-fc-holder" class="friendlycode-loading"></div>
+
+    <script src="js/require-config.js"></script>
+    <script src="js/require.min.js"></script>
+    <script>
+    require.baseUrl = "js";
+    // We don't want TowTruck to try to load until after FriendlyCode is started
+    // up:
+    window._TowTruckLoads = [];
+    window._TowTruckOnLoad = function (callback) {
+      window._TowTruckLoads.push(callback);
+    };
+    require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
+      var result = FriendlycodeEditor({
+        publishURL: "https://webpagemaker-dev.allizom.org",
+        container: $("#bare-fc-holder")
+      });
+      result.ready.then(function () {
+        var el = $(".publish-button");
+        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">Collaborate</div>');
+        newButton.click(startTowTruck);
+        el.before(newButton);
+        window._TowTruckLoads.forEach(function (callback) {
+          callback();
+        });
+      });
+      return result;
+    });
+    </script>
+    <script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
+  </body>
+</html>

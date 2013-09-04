@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>cursor.js</h1>
+        
+          <h4>Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/cursor.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>Cursor viewing support</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>define([<span class="string">"jquery"</span>, <span class="string">"ui"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"elementFinder"</span>, <span class="string">"tinycolor"</span>, <span class="string">"eventMaker"</span>, <span class="string">"peers"</span>, <span class="string">"templating"</span>], <span class="function"><span class="keyword">function</span> <span class="params">($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating)</span> {</span>
+  <span class="keyword">var</span> assert = util.assert;
+  <span class="keyword">var</span> cursor = util.Module(<span class="string">"cursor"</span>);
+
+  <span class="keyword">var</span> FOREGROUND_COLORS = [<span class="string">"#111"</span>, <span class="string">"#eee"</span>];
+  <span class="keyword">var</span> CURSOR_HEIGHT = <span class="number">50</span>;
+  <span class="keyword">var</span> CURSOR_ANGLE = (<span class="number">35</span> / <span class="number">180</span>) * Math.PI;
+  <span class="keyword">var</span> CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>Number of milliseconds after page load in which a scroll-update
+related hello-back message will be processed:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> SCROLL_UPDATE_CUTOFF = <span class="number">2000</span>;
+
+  session.hub.on(<span class="string">"cursor-update"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (msg.sameUrl) {
+      Cursor.getClient(msg.clientId).updatePosition(msg);
+    } <span class="keyword">else</span> {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>FIXME: This should be caught even before the cursor-update message,
+when the peer goes to another URL</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      Cursor.getClient(msg.clientId).hideOtherUrl(msg);
+    }
+  });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>FIXME: should check for a peer leaving and remove the cursor object</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> Cursor = util.Class({
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(clientId)</span> {</span>
+      <span class="keyword">this</span>.clientId = clientId;
+      <span class="keyword">this</span>.element = templating.clone(<span class="string">"cursor"</span>);
+      <span class="keyword">this</span>.elementClass = <span class="string">"towtruck-scrolled-normal"</span>;
+      <span class="keyword">this</span>.element.addClass(<span class="keyword">this</span>.elementClass);
+      <span class="keyword">this</span>.updatePeer(peers.getPeer(clientId));
+      <span class="keyword">this</span>.lastTop = <span class="keyword">this</span>.lastLeft = <span class="literal">null</span>;
+      $(document.body).append(<span class="keyword">this</span>.element);
+      <span class="keyword">this</span>.element.animateCursorEntry();
+      <span class="keyword">this</span>.keydownTimeout = <span class="literal">null</span>;
+      <span class="keyword">this</span>.clearKeydown = <span class="keyword">this</span>.clearKeydown.bind(<span class="keyword">this</span>);
+      <span class="keyword">this</span>.atOtherUrl = <span class="literal">false</span>;
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>How long after receiving a setKeydown call that we should show the
+user typing.  This should be more than MIN_KEYDOWN_TIME:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    KEYDOWN_WAIT_TIME: <span class="number">2000</span>,
+
+    updatePeer: <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>FIXME: can I use peer.setElement()?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.element.css({color: peer.color});
+      <span class="keyword">var</span> img = <span class="keyword">this</span>.element.find(<span class="string">"img.towtruck-cursor-img"</span>);
+      img.attr(<span class="string">"src"</span>, makeCursor(peer.color));
+      <span class="keyword">var</span> name = <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-name"</span>);
+      <span class="keyword">var</span> nameContainer = <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-container"</span>);
+      assert(name.length);
+      name.text(peer.name);
+      nameContainer.css({
+        backgroundColor: peer.color,
+        color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
+      });
+      <span class="keyword">var</span> path = <span class="keyword">this</span>.element.find(<span class="string">"svg path"</span>);
+      path.attr(<span class="string">"fill"</span>, peer.color);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>FIXME: should I just remove the element?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (peer.status != <span class="string">"live"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>this.element.hide();</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.element.find(<span class="string">"svg"</span>).animate({
+          opacity: <span class="number">0</span>
+        }, <span class="number">350</span>);
+        <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-container"</span>).animate({
+                width: <span class="number">34</span>,
+                height: <span class="number">20</span>,
+                padding: <span class="number">12</span>,
+                margin: <span class="number">0</span>
+            }, <span class="number">200</span>).animate({
+                width: <span class="number">0</span>,
+                height: <span class="number">0</span>,
+                padding: <span class="number">0</span>,
+                opacity: <span class="number">0</span>
+                }, <span class="number">200</span>);
+      } <span class="keyword">else</span> {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>this.element.show();</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.element.animate({
+          opacity:<span class="number">0.3</span>
+        }).animate({
+          opacity:<span class="number">1</span>
+        });
+      }
+    },
+
+    setClass: <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+      <span class="keyword">if</span> (name != <span class="keyword">this</span>.elementClass) {
+        <span class="keyword">this</span>.element.removeClass(<span class="keyword">this</span>.elementClass).addClass(name);
+        <span class="keyword">this</span>.elementClass = name;
+      }
+    },
+
+    updatePosition: <span class="function"><span class="keyword">function</span> <span class="params">(pos)</span> {</span>
+      <span class="keyword">var</span> top, left;
+      <span class="keyword">if</span> (<span class="keyword">this</span>.atOtherUrl) {
+        <span class="keyword">this</span>.element.show();
+        <span class="keyword">this</span>.atOtherUrl = <span class="literal">false</span>;
+      }
+      <span class="keyword">if</span> (pos.element) {
+        <span class="keyword">var</span> target = $(elementFinder.findElement(pos.element));
+        <span class="keyword">var</span> offset = target.offset();
+        top = offset.top + pos.offsetY;
+        left = offset.left + pos.offsetX;
+      } <span class="keyword">else</span> {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>No anchor, just an absolute position</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        top = pos.top;
+        left = pos.left;
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>These are saved for use by .refresh():</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.lastTop = top;
+      <span class="keyword">this</span>.lastLeft = left;
+      <span class="keyword">this</span>.setPosition(top, left);
+    },
+
+    hideOtherUrl: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.atOtherUrl) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">this</span>.atOtherUrl = <span class="literal">true</span>;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>FIXME: should show away status better:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.element.hide();
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-13">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-13">&#182;</a>
+                </div>
+                <p>place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    rotateCursorDown: <span class="keyword">function</span>(){
+      <span class="keyword">var</span> e = $(<span class="keyword">this</span>.element).find(<span class="string">'svg'</span>);
+        e.animate({borderSpacing: -<span class="number">150</span>, opacity: <span class="number">1</span>}, {
+        step: <span class="keyword">function</span>(now, fx) {
+          <span class="keyword">if</span> (fx.prop == <span class="string">"borderSpacing"</span>) {
+            e.css(<span class="string">'-webkit-transform'</span>, <span class="string">'rotate('</span>+now+<span class="string">'deg)'</span>)
+              .css(<span class="string">'-moz-transform'</span>, <span class="string">'rotate('</span>+now+<span class="string">'deg)'</span>)
+              .css(<span class="string">'-ms-transform'</span>, <span class="string">'rotate('</span>+now+<span class="string">'deg)'</span>)
+              .css(<span class="string">'-o-transform'</span>, <span class="string">'rotate('</span>+now+<span class="string">'deg)'</span>)
+              .css(<span class="string">'transform'</span>, <span class="string">'rotate('</span>+now+<span class="string">'deg)'</span>);
+          } <span class="keyword">else</span> {
+            e.css(fx.prop, now);
+          }
+        },
+        duration: <span class="number">500</span>
+      }, <span class="string">'linear'</span>).promise().then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        e.css(<span class="string">'-webkit-transform'</span>, <span class="string">''</span>)
+          .css(<span class="string">'-moz-transform'</span>, <span class="string">''</span>)
+          .css(<span class="string">'-ms-transform'</span>, <span class="string">''</span>)
+          .css(<span class="string">'-o-transform'</span>, <span class="string">''</span>)
+          .css(<span class="string">'transform'</span>, <span class="string">''</span>)
+          .css(<span class="string">"opacity"</span>, <span class="string">""</span>);
+      });
+    },
+
+    setPosition: <span class="function"><span class="keyword">function</span> <span class="params">(top, left)</span> {</span>
+      <span class="keyword">var</span> wTop = $(window).scrollTop();
+      <span class="keyword">var</span> height = $(window).height();
+
+      <span class="keyword">if</span> (top &lt; wTop) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-14">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-14">&#182;</a>
+                </div>
+                <p>FIXME: this is a totally arbitrary number, but is meant to be big enough
+to keep the cursor name from being off the top of the screen.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        top = <span class="number">25</span>;
+        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-above"</span>);
+      } <span class="keyword">else</span> <span class="keyword">if</span> (top &gt; wTop + height - CURSOR_HEIGHT) {
+        top = height - CURSOR_HEIGHT - <span class="number">5</span>;
+        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-below"</span>);
+      } <span class="keyword">else</span> {
+        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-normal"</span>);
+      }
+      <span class="keyword">this</span>.element.css({
+        top: top,
+        left: left
+      });
+    },
+
+    refresh: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.lastTop !== <span class="literal">null</span>) {
+        <span class="keyword">this</span>.setPosition(<span class="keyword">this</span>.lastTop, <span class="keyword">this</span>.lastLeft);
+      }
+    },
+
+    setKeydown: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.keydownTimeout) {
+        clearTimeout(<span class="keyword">this</span>.keydownTimeout);
+      } <span class="keyword">else</span> {
+        <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-typing"</span>).show().animateKeyboard();
+      }
+      <span class="keyword">this</span>.keydownTimeout = setTimeout(<span class="keyword">this</span>.clearKeydown, <span class="keyword">this</span>.KEYDOWN_WAIT_TIME);
+    },
+
+    clearKeydown: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.keydownTimeout = <span class="literal">null</span>;
+      <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-typing"</span>).hide().stopKeyboardAnimation();
+    },
+
+    _destroy: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.element.remove();
+      <span class="keyword">this</span>.element = <span class="literal">null</span>;
+    }
+  });
+
+  Cursor._cursors = {};
+
+  cursor.getClient = Cursor.getClient = <span class="function"><span class="keyword">function</span> <span class="params">(clientId)</span> {</span>
+    <span class="keyword">var</span> c = Cursor._cursors[clientId];
+    <span class="keyword">if</span> (! c) {
+      c = Cursor._cursors[clientId] = Cursor(clientId);
+    }
+    <span class="keyword">return</span> c;
+  };
+
+  Cursor.forEach = <span class="function"><span class="keyword">function</span> <span class="params">(callback, context)</span> {</span>
+    context = context || <span class="literal">null</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> a <span class="keyword">in</span> Cursor._cursors) {
+      <span class="keyword">if</span> (Cursor._cursors.hasOwnProperty(a)) {
+        callback.call(context, Cursor._cursors[a], a);
+      }
+    }
+  };
+
+  Cursor.destroy = <span class="function"><span class="keyword">function</span> <span class="params">(clientId)</span> {</span>
+    Cursor._cursors[clientId]._destroy();
+    <span class="keyword">delete</span> Cursor._cursors[clientId];
+  };
+
+  peers.on(<span class="string">"new-peer identity-updated status-updated"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+    <span class="keyword">var</span> c = Cursor.getClient(peer.id);
+    c.updatePeer(peer);
+  });
+
+  <span class="keyword">var</span> lastTime = <span class="number">0</span>;
+  <span class="keyword">var</span> MIN_TIME = <span class="number">100</span>;
+  <span class="keyword">var</span> lastPosX = -<span class="number">1</span>;
+  <span class="keyword">var</span> lastPosY = -<span class="number">1</span>;
+  <span class="keyword">var</span> lastMessage = <span class="literal">null</span>;
+  <span class="function"><span class="keyword">function</span> <span class="title">mousemove</span><span class="params">(event)</span> {</span>
+    <span class="keyword">var</span> now = Date.now();
+    <span class="keyword">if</span> (now - lastTime &lt; MIN_TIME) {
+      <span class="keyword">return</span>;
+    }
+    lastTime = now;
+    <span class="keyword">var</span> pageX = event.pageX;
+    <span class="keyword">var</span> pageY = event.pageY;
+    <span class="keyword">if</span> (Math.abs(lastPosX - pageX) &lt; <span class="number">3</span> &amp;&amp; Math.abs(lastPosY - pageY) &lt; <span class="number">3</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-15">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>Not a substantial enough change</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
+    }
+    lastPosX = pageX;
+    lastPosY = pageY;
+    <span class="keyword">var</span> target = event.target;
+    <span class="keyword">var</span> parent = $(target).closest(<span class="string">".towtruck-window, .towtruck-popup, #towtruck-dock"</span>);
+    <span class="keyword">if</span> (parent.length) {
+      target = parent[<span class="number">0</span>];
+    } <span class="keyword">else</span> <span class="keyword">if</span> (elementFinder.ignoreElement(target)) {
+      target = <span class="literal">null</span>;
+    }
+    <span class="keyword">if</span> ((! target) || target == document.documentElement || target == document.body) {
+      lastMessage = {
+        type: <span class="string">"cursor-update"</span>,
+        top: pageY,
+        left: pageX
+      };
+      session.send(lastMessage);
+      <span class="keyword">return</span>;
+    }
+    target = $(target);
+    <span class="keyword">var</span> offset = target.offset();
+    <span class="keyword">if</span> (! offset) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>FIXME: this really is walkabout.js&#39;s problem to fire events on the
+document instead of a specific element</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      console.warn(<span class="string">"Could not get offset of element:"</span>, target[<span class="number">0</span>]);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">var</span> offsetX = pageX - offset.left;
+    <span class="keyword">var</span> offsetY = pageY - offset.top;
+    lastMessage = {
+      type: <span class="string">"cursor-update"</span>,
+      element: elementFinder.elementLocation(target),
+      offsetX: Math.floor(offsetX),
+      offsetY: Math.floor(offsetY)
+    };
+    session.send(lastMessage);
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">makeCursor</span><span class="params">(color)</span> {</span>
+    <span class="keyword">var</span> canvas = $(<span class="string">"&lt;canvas&gt;&lt;/canvas&gt;"</span>);
+    canvas.attr(<span class="string">"height"</span>, CURSOR_HEIGHT);
+    canvas.attr(<span class="string">"width"</span>, CURSOR_WIDTH);
+    <span class="keyword">var</span> context = canvas[<span class="number">0</span>].getContext(<span class="string">'2d'</span>);
+    context.fillStyle = color;
+    context.moveTo(<span class="number">0</span>, <span class="number">0</span>);
+    context.beginPath();
+    context.lineTo(<span class="number">0</span>, CURSOR_HEIGHT/<span class="number">1.2</span>);
+    context.lineTo(Math.sin(CURSOR_ANGLE/<span class="number">2</span>) * CURSOR_HEIGHT / <span class="number">1.5</span>,
+                   Math.cos(CURSOR_ANGLE/<span class="number">2</span>) * CURSOR_HEIGHT / <span class="number">1.5</span>);
+    context.lineTo(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT / <span class="number">1.2</span>,
+                   Math.cos(CURSOR_ANGLE) * CURSOR_HEIGHT / <span class="number">1.2</span>);
+    context.lineTo(<span class="number">0</span>, <span class="number">0</span>);
+    context.shadowColor = <span class="string">'rgba(0,0,0,0.3)'</span>;
+    context.shadowBlur = <span class="number">2</span>;
+    context.shadowOffsetX = <span class="number">1</span>;
+    context.shadowOffsetY = <span class="number">2</span>;
+	context.strokeStyle = <span class="string">"#ffffff"</span>;
+	context.stroke();
+    context.fill();
+    <span class="keyword">return</span> canvas[<span class="number">0</span>].toDataURL(<span class="string">"image/png"</span>);
+  }
+
+  <span class="keyword">var</span> scrollTimeout = <span class="literal">null</span>;
+  <span class="keyword">var</span> scrollTimeoutSet = <span class="number">0</span>;
+  <span class="keyword">var</span> SCROLL_DELAY_TIMEOUT = <span class="number">75</span>;
+  <span class="keyword">var</span> SCROLL_DELAY_LIMIT = <span class="number">300</span>;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">scroll</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> now = Date.now();
+    <span class="keyword">if</span> (scrollTimeout) {
+      <span class="keyword">if</span> (now - scrollTimeoutSet &lt; SCROLL_DELAY_LIMIT) {
+        clearTimeout(scrollTimeout);
+      } <span class="keyword">else</span> {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-17">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-17">&#182;</a>
+                </div>
+                <p>Just let it progress anyway</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span>;
+      }
+    }
+    scrollTimeout = setTimeout(_scrollRefresh, SCROLL_DELAY_TIMEOUT);
+    <span class="keyword">if</span> (! scrollTimeoutSet) {
+      scrollTimeoutSet = now;
+    }
+  }
+
+  <span class="keyword">var</span> lastScrollMessage = <span class="literal">null</span>;
+  <span class="function"><span class="keyword">function</span> <span class="title">_scrollRefresh</span><span class="params">()</span> {</span>
+    scrollTimeout = <span class="literal">null</span>;
+    scrollTimeoutSet = <span class="number">0</span>;
+    Cursor.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(c)</span> {</span>
+      c.refresh();
+    });
+    lastScrollMessage = {
+      type: <span class="string">"scroll-update"</span>,
+      position: elementFinder.elementByPixel($(window).scrollTop())
+    };
+    session.send(lastScrollMessage);
+  }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-18">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-18">&#182;</a>
+                </div>
+                <p>FIXME: do the same thing for cursor position?  And give up on the
+ad hoc update-on-hello?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  session.on(<span class="string">"prepare-hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(helloMessage)</span> {</span>
+    <span class="keyword">if</span> (lastScrollMessage) {
+      helloMessage.scrollPosition = lastScrollMessage.position;
+    }
+  });
+
+  session.hub.on(<span class="string">"scroll-update"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    msg.peer.scrollPosition = msg.position;
+    <span class="keyword">if</span> (msg.peer.following) {
+      msg.peer.view.scrollTo();
+    }
+  });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>In case there are multiple peers, we track that we&#39;ve accepted one of their
+hello-based scroll updates, just so we don&#39;t bounce around (we don&#39;t intelligently
+choose which one to use, just the first that comes in)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> acceptedScrollUpdate = <span class="literal">false</span>;
+  session.hub.on(<span class="string">"hello-back hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (msg.type == <span class="string">"hello"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-20">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-20">&#182;</a>
+                </div>
+                <p>Once a hello comes in, a bunch of hello-backs not intended for us will also
+come in, and we should ignore them</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      acceptedScrollUpdate = <span class="literal">true</span>;
+    }
+    <span class="keyword">if</span> (! msg.scrollPosition) {
+      <span class="keyword">return</span>;
+    }
+    msg.peer.scrollPosition = msg.scrollPosition;
+    <span class="keyword">if</span> ((! acceptedScrollUpdate) &amp;&amp;
+        msg.sameUrl &amp;&amp;
+        Date.now() - session.timeHelloSent &lt; SCROLL_UPDATE_CUTOFF) {
+      acceptedScrollUpdate = <span class="literal">true</span>;
+      msg.peer.view.scrollTo();
+    }
+  });
+
+  session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(document).mousemove(mousemove);
+    document.addEventListener(<span class="string">"click"</span>, documentClick, <span class="literal">true</span>);
+    document.addEventListener(<span class="string">"keydown"</span>, documentKeydown, <span class="literal">true</span>);
+    $(window).scroll(scroll);
+    scroll();
+  });
+
+  session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    Cursor.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(c, clientId)</span> {</span>
+      Cursor.destroy(clientId);
+    });
+    $(document).unbind(<span class="string">"mousemove"</span>, mousemove);
+    document.removeEventListener(<span class="string">"click"</span>, documentClick, <span class="literal">true</span>);
+    document.removeEventListener(<span class="string">"keydown"</span>, documentKeydown, <span class="literal">true</span>);
+    $(window).unbind(<span class="string">"scroll"</span>, scroll);
+  });
+
+  session.hub.on(<span class="string">"hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-21">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-21">&#182;</a>
+                </div>
+                <p>Immediately get our cursor onto this new person&#39;s screen:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (lastMessage) {
+      session.send(lastMessage);
+    }
+    <span class="keyword">if</span> (lastScrollMessage) {
+      session.send(lastScrollMessage);
+    }
+  });
+
+  <span class="function"><span class="keyword">function</span> <span class="title">documentClick</span><span class="params">(event)</span> {</span>
+    <span class="keyword">if</span> (event.towtruckInternal) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-22">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-22">&#182;</a>
+                </div>
+                <p>This is an artificial internal event</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-23">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-23">&#182;</a>
+                </div>
+                <p>FIXME: this might just be my imagination, but somehow I just
+really don&#39;t want to do anything at this stage of the event
+handling (since I&#39;m catching every click), and I&#39;ll just do
+something real soon:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (! TowTruck.running) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-24">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-24">&#182;</a>
+                </div>
+                <p>This can end up running right after TowTruck has been closed, often
+because TowTruck was closed with a click...</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (elementFinder.ignoreElement(event.target)) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> location = elementFinder.elementLocation(event.target);
+      <span class="keyword">var</span> offset = $(event.target).offset();
+      <span class="keyword">var</span> offsetX = event.pageX - offset.left;
+      <span class="keyword">var</span> offsetY = event.pageY - offset.top;
+      session.send({
+        type: <span class="string">"cursor-click"</span>,
+        element: location,
+        offsetX: offsetX,
+        offsetY: offsetY
+      });
+      displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
+    });
+  }
+
+  <span class="keyword">var</span> CLICK_TRANSITION_TIME = <span class="number">3000</span>;
+
+  session.hub.on(<span class="string">"cursor-click"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(pos)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-25">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-25">&#182;</a>
+                </div>
+                <p>When the click is calculated isn&#39;t always the same as how the
+last cursor update was calculated, so we force the cursor to
+the last location during a click:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (! pos.sameUrl) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-26">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-26">&#182;</a>
+                </div>
+                <p>FIXME: if we <em>could have</em> done a local click, but we follow along
+later, we&#39;ll be in different states if that click was important.
+Mostly click cloning just won&#39;t work.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
+    }
+    Cursor.getClient(pos.clientId).updatePosition(pos);
+    <span class="keyword">var</span> element = templating.clone(<span class="string">"click"</span>);
+    <span class="keyword">var</span> target = $(elementFinder.findElement(pos.element));
+    <span class="keyword">var</span> offset = target.offset();
+    <span class="keyword">var</span> top = offset.top + pos.offsetY;
+    <span class="keyword">var</span> left = offset.left + pos.offsetX;
+    displayClick({top: top, left: left}, pos.peer.color);
+    <span class="keyword">var</span> cloneClicks = TowTruck.getConfig(<span class="string">"cloneClicks"</span>);
+    <span class="keyword">if</span> (cloneClicks &amp;&amp; target.is(cloneClicks)) {
+      eventMaker.performClick(target);
+    }
+  });
+
+  <span class="function"><span class="keyword">function</span> <span class="title">displayClick</span><span class="params">(pos, color)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-27">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-27">&#182;</a>
+                </div>
+                <p>FIXME: should we hide the local click if no one else is going to see it?
+That means tracking who might be able to see our screen.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> element = templating.clone(<span class="string">"click"</span>);
+    $(document.body).append(element);
+    element.css({
+      top: pos.top,
+      left: pos.left,
+      borderColor: color
+    });
+    setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      element.addClass(<span class="string">"towtruck-clicking"</span>);
+    }, <span class="number">100</span>);
+    setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      element.remove();
+    }, CLICK_TRANSITION_TIME);
+  }
+
+  <span class="keyword">var</span> lastKeydown = <span class="number">0</span>;
+  <span class="keyword">var</span> MIN_KEYDOWN_TIME = <span class="number">500</span>;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">documentKeydown</span><span class="params">(event)</span> {</span>
+    setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> now = Date.now();
+      <span class="keyword">if</span> (now - lastKeydown &lt; MIN_KEYDOWN_TIME) {
+        <span class="keyword">return</span>;
+      }
+      lastKeydown = now;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-28">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-28">&#182;</a>
+                </div>
+                <p>FIXME: is event.target interesting here?  That is, <em>what</em> the
+user is typing into, not just that the user is typing?  Also
+I&#39;m assuming we don&#39;t care if the user it typing into a
+towtruck-related field, since chat activity is as interesting
+as any other activity.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      session.send({type: <span class="string">"keydown"</span>});
+    });
+  }
+
+  session.hub.on(<span class="string">"keydown"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-29">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-29">&#182;</a>
+                </div>
+                <p>FIXME: when the cursor is hidden there&#39;s nothing to show with setKeydown().</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> cursor = Cursor.getClient(msg.clientId);
+    cursor.setKeydown();
+  });
+
+  util.testExpose({Cursor: Cursor});
+
+  <span class="keyword">return</span> cursor;
+
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

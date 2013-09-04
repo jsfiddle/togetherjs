@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>ot.js</h1>
+        
+          <h4>Operational transformation support: what keeps big chunks of text in sync when multiple people are simultaneously editing those fields.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/ot.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+define([<span class="string">"util"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util)</span> {</span>
+
+  <span class="keyword">var</span> ot = util.Module(<span class="string">"ot"</span>);
+  <span class="keyword">var</span> assert = util.assert;
+
+  <span class="keyword">var</span> StringSet = util.Class({
+    <span class="comment">/* Set that only supports string items */</span>
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>._items = {};
+      <span class="keyword">this</span>._count = <span class="number">0</span>;
+    },
+    contains: <span class="function"><span class="keyword">function</span> <span class="params">(k)</span> {</span>
+      assert(<span class="keyword">typeof</span> k == <span class="string">"string"</span>);
+      <span class="keyword">return</span> <span class="keyword">this</span>._items.hasOwnProperty(k);
+    },
+    add: <span class="function"><span class="keyword">function</span> <span class="params">(k)</span> {</span>
+      assert(<span class="keyword">typeof</span> k == <span class="string">"string"</span>);
+      <span class="keyword">if</span> (<span class="keyword">this</span>.contains(k)) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">this</span>._items[k] = <span class="literal">null</span>;
+      <span class="keyword">this</span>._count++;
+    },
+    remove: <span class="function"><span class="keyword">function</span> <span class="params">(k)</span> {</span>
+      assert(<span class="keyword">typeof</span> k == <span class="string">"string"</span>);
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.contains(k)) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">delete</span> <span class="keyword">this</span>._items[k];
+      <span class="keyword">this</span>._count++;
+    },
+    isEmpty: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> ! <span class="keyword">this</span>._count;
+    }
+  });
+
+  <span class="keyword">var</span> Queue = util.Class({
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(size)</span> {</span>
+      <span class="keyword">this</span>._q = [];
+      <span class="keyword">this</span>._size = size;
+      <span class="keyword">this</span>._deleted = <span class="number">0</span>;
+    },
+
+    _trim: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>._size) {
+        <span class="keyword">if</span> (<span class="keyword">this</span>._q.length &gt; <span class="keyword">this</span>._size) {
+          <span class="keyword">this</span>._q.splice(<span class="number">0</span>, <span class="keyword">this</span>._q.length - <span class="keyword">this</span>._size);
+          <span class="keyword">this</span>._deleted += <span class="keyword">this</span>._q.length - <span class="keyword">this</span>._size;
+        }
+      }
+    },
+
+    push: <span class="function"><span class="keyword">function</span> <span class="params">(item)</span> {</span>
+      <span class="keyword">this</span>._q.push(item);
+      <span class="keyword">this</span>._trim();
+    },
+
+    last: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>._q[<span class="keyword">this</span>._q.length-<span class="number">1</span>];
+    },
+
+    walkBack: <span class="function"><span class="keyword">function</span> <span class="params">(callback, context)</span> {</span>
+      <span class="keyword">var</span> result = <span class="literal">true</span>;
+      <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="keyword">this</span>._q.length-<span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) {
+        <span class="keyword">var</span> item = <span class="keyword">this</span>._q[i];
+        result = callback.call(context, item, i + <span class="keyword">this</span>._deleted);
+        <span class="keyword">if</span> (result === <span class="literal">false</span>) {
+          <span class="keyword">return</span> result;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (! result) {
+          result = <span class="literal">true</span>;
+        }
+      }
+      <span class="keyword">return</span> result;
+    },
+
+    walkForward: <span class="function"><span class="keyword">function</span> <span class="params">(index, callback, context)</span> {</span>
+      <span class="keyword">var</span> result = <span class="literal">true</span>;
+      <span class="keyword">for</span> (<span class="keyword">var</span> i=index; i&lt;<span class="keyword">this</span>._q.length; i++) {
+        <span class="keyword">var</span> item = <span class="keyword">this</span>._q[i-<span class="keyword">this</span>._deleted];
+        result = callback.call(context, item, i);
+        <span class="keyword">if</span> (result === <span class="literal">false</span>) {
+          <span class="keyword">return</span> result;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (! result) {
+          result = <span class="literal">true</span>;
+        }
+      }
+      <span class="keyword">return</span> result;
+    },
+
+    insert: <span class="function"><span class="keyword">function</span> <span class="params">(index, item)</span> {</span>
+      <span class="keyword">this</span>._q.splice(index-<span class="keyword">this</span>._deleted, <span class="number">0</span>, item);
+    }
+
+  });
+
+  <span class="keyword">var</span> Change = util.Class({
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(version, clientId, delta, known, outOfOrder)</span> {</span>
+      <span class="keyword">this</span>.version = version;
+      <span class="keyword">this</span>.clientId = clientId;
+      <span class="keyword">this</span>.delta = delta;
+      <span class="keyword">this</span>.known = known;
+      <span class="keyword">this</span>.outOfOrder = !! outOfOrder;
+      assert(<span class="keyword">typeof</span> version == <span class="string">"number"</span> &amp;&amp; <span class="keyword">typeof</span> clientId == <span class="string">"string"</span>,
+             <span class="string">"Bad Change():"</span>, version, clientId);
+    },
+
+    toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> s = <span class="string">"[Change "</span> + <span class="keyword">this</span>.version + <span class="string">"."</span> + <span class="keyword">this</span>.clientId + <span class="string">": "</span>;
+      s += <span class="keyword">this</span>.delta + <span class="string">" "</span>;
+      <span class="keyword">if</span> (<span class="keyword">this</span>.outOfOrder) {
+        s += <span class="string">"(out of order) "</span>;
+      }
+      <span class="keyword">var</span> cids = [];
+      <span class="keyword">for</span> (<span class="keyword">var</span> a <span class="keyword">in</span> <span class="keyword">this</span>.known) {
+        <span class="keyword">if</span> (<span class="keyword">this</span>.known.hasOwnProperty(a)) {
+          cids.push(a);
+        }
+      }
+      cids.sort();
+      s += <span class="string">"{"</span>;
+      <span class="keyword">if</span> (! cids.length) {
+        s += <span class="string">"nothing known"</span>;
+      } <span class="keyword">else</span> {
+        cids.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(a, index)</span> {</span>
+          <span class="keyword">if</span> (index) {
+            s += <span class="string">";"</span>;
+          }
+          s += a + <span class="string">":"</span> + <span class="keyword">this</span>.known[a];
+        }, <span class="keyword">this</span>);
+      }
+      <span class="keyword">return</span> s + <span class="string">"}]"</span>;
+    },
+
+    clone: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> Change(<span class="keyword">this</span>.version, <span class="keyword">this</span>.clientId, <span class="keyword">this</span>.delta.clone(), util.extend(<span class="keyword">this</span>.known), <span class="keyword">this</span>.outOfOrder);
+    },
+
+    isBefore: <span class="function"><span class="keyword">function</span> <span class="params">(otherChange)</span> {</span>
+      assert(otherChange !== <span class="keyword">this</span>, <span class="string">"Tried to compare a change to itself"</span>, <span class="keyword">this</span>);
+      <span class="keyword">return</span> otherChange.version &gt; <span class="keyword">this</span>.version ||
+          (otherChange.version == <span class="keyword">this</span>.version &amp;&amp; otherChange.clientId &gt; <span class="keyword">this</span>.clientId);
+    },
+
+    knowsAboutAll: <span class="function"><span class="keyword">function</span> <span class="params">(versions)</span> {</span>
+      <span class="keyword">for</span> (<span class="keyword">var</span> clientId <span class="keyword">in</span> versions) {
+        <span class="keyword">if</span> (! versions.hasOwnProperty(clientId)) {
+          <span class="keyword">continue</span>;
+        }
+        <span class="keyword">if</span> (! versions[clientId]) {
+          <span class="keyword">continue</span>;
+        }
+        <span class="keyword">if</span> ((! <span class="keyword">this</span>.known[clientId]) || <span class="keyword">this</span>.known[clientId] &lt; versions[clientId]) {
+          <span class="keyword">return</span> <span class="literal">false</span>;
+        }
+      }
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    },
+
+    knowsAboutChange: <span class="function"><span class="keyword">function</span> <span class="params">(change)</span> {</span>
+      <span class="keyword">return</span> change.clientId == <span class="keyword">this</span>.clientId ||
+          (<span class="keyword">this</span>.known[change.clientId] &amp;&amp; <span class="keyword">this</span>.known[change.clientId] &gt;= change.version);
+    },
+
+    knowsAboutVersion: <span class="function"><span class="keyword">function</span> <span class="params">(version, clientId)</span> {</span>
+      <span class="keyword">if</span> ((! version) || clientId == <span class="keyword">this</span>.clientId) {
+        <span class="keyword">return</span> <span class="literal">true</span>;
+      }
+      <span class="keyword">return</span> <span class="keyword">this</span>.known[clientId] &amp;&amp; <span class="keyword">this</span>.known[clientId] &gt;= version;
+    },
+
+    maybeMissingChanges: <span class="function"><span class="keyword">function</span> <span class="params">(mostRecentVersion, clientId)</span> {</span>
+      <span class="keyword">if</span> (! mostRecentVersion) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>No actual changes for clientId exist</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.known[clientId]) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>We don&#39;t even know about clientId, so we are definitely missing something</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.known[clientId] &gt;= mostRecentVersion) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>We know about all versions through mostRecentVersion</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+      <span class="keyword">if</span> ((clientId &gt; <span class="keyword">this</span>.clientId &amp;&amp; <span class="keyword">this</span>.known[clientId] &gt;= <span class="keyword">this</span>.version-<span class="number">1</span>) ||
+          (clientId &lt; <span class="keyword">this</span>.clientId &amp;&amp; <span class="keyword">this</span>.known[clientId] == <span class="keyword">this</span>.version)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>We know about all versions from clientId that could exist before this
+version</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> <span class="literal">false</span>;
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>We may or may not be missing something</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span> <span class="literal">true</span>;
+    }
+  });
+
+  <span class="comment">/* SimpleHistory synchronizes peers by relying on the server to serialize
+   * the order of all updates.  Each client maintains a queue of patches
+   * which have not yet been 'committed' (by being echoed back from the
+   * server).  The client is responsible for transposing its own queue
+   * if 'earlier' patches are heard from the server.
+   *
+   * Let's say that A's edit "1" and B's edit "2" occur and get put in
+   * their respective SimpleHistory queues.  The server happens to
+   * handle 1 first, then 2, so those are the order that all peers
+   * (both A and B) see the messages.
+   *
+   * A sees 1, and has 1 on its queue, so everything's fine. It
+   * updates the 'committed' text to match its current text and drops
+   * the patch from its queue. It then sees 2, but the basis number
+   * for 2 no longer matches the committed basis, so it throws it
+   * away.
+   *
+   * B sees 1, and has 2 on its queue. It does the OT transpose thing,
+   * updating the committed text to include 1 and the 'current' text
+   * to include 1+2. It updates its queue with the newly transposed
+   * version of 2 (call it 2prime) and updates 2prime's basis
+   * number. It them resends 2prime to the server. It then receives 2
+   * (the original) but the basis number no longer matches the
+   * committed basis, so it throws it away.
+   *
+   * Now the server sees 2prime and rebroadcasts it to both A and B.
+   *
+   * A is seeing it for the first time, and the basis number matches,
+   * so it applies it to the current and committed text.
+   *
+   * B sees that 2prime matches what's on the start of its queue,
+   * shifts it off, and updates the committed text to match the
+   * current text.
+   *
+   * Note that no one tries to keep an entire history of changes,
+   * which is the main difference with ot.History.  Everyone applies
+   * the same patches in the same order.
+   */</span>
+  ot.SimpleHistory = util.Class({
+
+    constructor: <span class="keyword">function</span>(clientId, initState, initBasis) {
+      <span class="keyword">this</span>.clientId = clientId;
+      <span class="keyword">this</span>.committed = initState;
+      <span class="keyword">this</span>.current = initState;
+      <span class="keyword">this</span>.basis = initBasis;
+      <span class="keyword">this</span>.queue = [];
+      <span class="keyword">this</span>.deltaId = <span class="number">1</span>;
+      <span class="keyword">this</span>.selection = <span class="literal">null</span>;
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>Use a fake change to represent the selection.
+(This is the only bit that hard codes ot.TextReplace as the delta
+representation; override this in a subclass (or don&#39;t set the
+selection) if you are using a different delta representation.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    setSelection: <span class="keyword">function</span>(selection) {
+      <span class="keyword">if</span> (selection) {
+        <span class="keyword">this</span>.selection = ot.TextReplace(selection[<span class="number">0</span>],
+                                        selection[<span class="number">1</span>] - selection[<span class="number">0</span>], <span class="string">'@'</span>);
+      } <span class="keyword">else</span> {
+        <span class="keyword">this</span>.selection = <span class="literal">null</span>;
+      }
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>Decode the fake change to reconstruct the updated selection.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getSelection: <span class="keyword">function</span>() {
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.selection) {
+        <span class="keyword">return</span> <span class="literal">null</span>;
+      }
+      <span class="keyword">return</span> [<span class="keyword">this</span>.selection.start, <span class="keyword">this</span>.selection.start + <span class="keyword">this</span>.selection.del];
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>Add this delta to this client&#39;s queue.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    add: <span class="keyword">function</span>(delta) {
+      <span class="keyword">var</span> change = {
+        id: <span class="keyword">this</span>.clientId + <span class="string">'.'</span> + (<span class="keyword">this</span>.deltaId++),
+        delta: delta
+      };
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.queue.length) {
+        change.basis = <span class="keyword">this</span>.basis;
+      }
+      <span class="keyword">this</span>.queue.push(change);
+      <span class="keyword">this</span>.current = delta.apply(<span class="keyword">this</span>.current);
+      <span class="keyword">return</span> !!change.basis;
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>Apply a delta received from the server.
+Return true iff the current text changed as a result.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    commit: <span class="keyword">function</span>(change) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>ignore it if the basis doesn&#39;t match (this patch doesn&#39;t apply)
+if so, this delta is out of order; we expect the original client
+to retransmit an updated delta.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (change.basis !== <span class="keyword">this</span>.basis) {
+        <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// 'current' text did not change</span>
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>is this the first thing on the queue?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (<span class="keyword">this</span>.queue.length &amp;&amp; <span class="keyword">this</span>.queue[<span class="number">0</span>].id === change.id) {
+        assert(change.basis === <span class="keyword">this</span>.queue[<span class="number">0</span>].basis);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>good, apply this to commit state &amp; remove it from queue</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.committed = <span class="keyword">this</span>.queue.shift().delta.apply(<span class="keyword">this</span>.committed);
+        <span class="keyword">this</span>.basis++;
+        <span class="keyword">if</span> (<span class="keyword">this</span>.queue.length) {
+          <span class="keyword">this</span>.queue[<span class="number">0</span>].basis = <span class="keyword">this</span>.basis;
+        }
+        <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// 'current' text did not change</span>
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-13">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-13">&#182;</a>
+                </div>
+                <p>Transpose all bits on the queue to put this patch first.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> inserted = change.delta;
+      <span class="keyword">this</span>.queue = <span class="keyword">this</span>.queue.map(<span class="keyword">function</span>(qchange) {
+        <span class="keyword">var</span> tt = qchange.delta.transpose(inserted);
+        inserted = tt[<span class="number">1</span>];
+        <span class="keyword">return</span> {
+          id: qchange.id,
+          delta: tt[<span class="number">0</span>]
+        };
+      });
+      <span class="keyword">if</span> (<span class="keyword">this</span>.selection) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-14">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-14">&#182;</a>
+                </div>
+                <p>update the selection!</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.selection = <span class="keyword">this</span>.selection.transpose(inserted)[<span class="number">0</span>];
+      }
+      <span class="keyword">this</span>.committed = change.delta.apply(<span class="keyword">this</span>.committed);
+      <span class="keyword">this</span>.basis++;
+      <span class="keyword">if</span> (<span class="keyword">this</span>.queue.length) {
+        <span class="keyword">this</span>.queue[<span class="number">0</span>].basis = <span class="keyword">this</span>.basis;
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-15">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>Update current by replaying queued changes starting from &#39;committed&#39;</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.current = <span class="keyword">this</span>.committed;
+      <span class="keyword">this</span>.queue.forEach(<span class="keyword">function</span>(qchange) {
+        <span class="keyword">this</span>.current = qchange.delta.apply(<span class="keyword">this</span>.current);
+      }.bind(<span class="keyword">this</span>));
+      <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// The 'current' text changed.</span>
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>Return the next change to transmit to the server, or null if there
+isn&#39;t one.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getNextToSend: <span class="keyword">function</span>() {
+      <span class="keyword">var</span> qchange = <span class="keyword">this</span>.queue[<span class="number">0</span>];
+      <span class="keyword">if</span> (! qchange) {
+        <span class="comment">/* nothing to send */</span>
+        <span class="keyword">return</span> <span class="literal">null</span>;
+      }
+      <span class="keyword">if</span> (qchange.sent) {
+        <span class="comment">/* already sent */</span>
+        <span class="keyword">return</span> <span class="literal">null</span>;
+      }
+      assert(qchange.basis);
+      qchange.sent = <span class="literal">true</span>;
+      <span class="keyword">return</span> qchange;
+    }
+  });
+
+  ot.History = util.Class({
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(clientId, initState)</span> {</span>
+      <span class="keyword">this</span>._history = Queue();
+      <span class="keyword">this</span>._history.push({
+        clientId: <span class="string">"init"</span>, state: initState
+      });
+      <span class="keyword">this</span>.clientId = clientId;
+      <span class="keyword">this</span>.known = {};
+      <span class="keyword">this</span>.mostRecentLocalChange = <span class="literal">null</span>;
+    },
+
+    add: <span class="function"><span class="keyword">function</span> <span class="params">(change)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-17">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-17">&#182;</a>
+                </div>
+                <p>Simplest cast, it is our change:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (change.clientId == <span class="keyword">this</span>.clientId) {
+        <span class="keyword">this</span>._history.push(change);
+        <span class="keyword">this</span>.mostRecentLocalChange = change.version;
+        <span class="keyword">return</span> change.delta;
+      }
+      assert((! <span class="keyword">this</span>.known[change.clientId]) || <span class="keyword">this</span>.known[change.clientId] &lt; change.version,
+            <span class="string">"Got a change"</span>, change, <span class="string">"that appears older (or same as) a known change"</span>, <span class="keyword">this</span>.known[change.clientId]);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-18">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-18">&#182;</a>
+                </div>
+                <p>Second simplest case, we get a change that we can add to our
+history without modification:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> last = <span class="keyword">this</span>._history.last();
+      <span class="keyword">if</span> ((last.clientId == <span class="string">"init"</span> || last.isBefore(change)) &amp;&amp;
+          change.knowsAboutAll(<span class="keyword">this</span>.known) &amp;&amp;
+          change.knowsAboutVersion(<span class="keyword">this</span>.mostRecentLocalChange, <span class="keyword">this</span>.clientId)) {
+        <span class="keyword">this</span>._history.push(change);
+        <span class="keyword">this</span>.known[change.clientId] = change.version;
+        <span class="keyword">return</span> change.delta;
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>We must do work!</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.logHistory(<span class="string">"//"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-20">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-20">&#182;</a>
+                </div>
+                <p>First we check if we need to modify this change because we
+know about changes that it should know about (changes that
+preceed it that are in our local history).</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> clientsToCheck = StringSet();
+      <span class="keyword">for</span> (<span class="keyword">var</span> clientId <span class="keyword">in</span> <span class="keyword">this</span>.known) {
+        <span class="keyword">if</span> (! <span class="keyword">this</span>.known.hasOwnProperty(clientId)) {
+          <span class="keyword">continue</span>;
+        }
+        <span class="keyword">if</span> (change.maybeMissingChanges(<span class="keyword">this</span>.known[clientId], clientId)) {
+          clientsToCheck.add(clientId);
+        }
+      }
+      <span class="keyword">if</span> (change.maybeMissingChanges(<span class="keyword">this</span>.mostRecentLocalChange, <span class="keyword">this</span>.clientId)) {
+        clientsToCheck.add(<span class="keyword">this</span>.clientId);
+      }
+      <span class="keyword">if</span> (! clientsToCheck.isEmpty()) {
+        <span class="keyword">var</span> indexToCheckFrom = <span class="literal">null</span>;
+        <span class="keyword">this</span>._history.walkBack(<span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+          indexToCheckFrom = index;
+          <span class="keyword">if</span> (c.clientId == <span class="string">"init"</span>) {
+            <span class="keyword">return</span> <span class="literal">false</span>;
+          }
+          <span class="keyword">if</span> (clientsToCheck.contains(c.clientId) &amp;&amp;
+              ! change.maybeMissingChanges(c.version, c.clientId)) {
+            clientsToCheck.remove(c.clientId);
+            <span class="keyword">if</span> (clientsToCheck.isEmpty()) {
+              <span class="keyword">return</span> <span class="literal">false</span>;
+            }
+          }
+          <span class="keyword">return</span> <span class="literal">true</span>;
+        }, <span class="keyword">this</span>);
+        <span class="keyword">this</span>._history.walkForward(indexToCheckFrom, <span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+          <span class="keyword">if</span> (c.clientId == <span class="string">"init"</span>) {
+            <span class="keyword">return</span> <span class="literal">true</span>;
+          }
+          <span class="keyword">if</span> (change.isBefore(c)) {
+            <span class="keyword">return</span> <span class="literal">false</span>;
+          }
+          <span class="keyword">if</span> (! change.knowsAboutChange(c)) {
+            <span class="keyword">var</span> presentDelta = <span class="keyword">this</span>.promoteDelta(c.delta, index, change);
+            <span class="keyword">if</span> (! presentDelta.equals(c.delta)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-21">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-21">&#182;</a>
+                </div>
+                <p>console.log(&quot;-&gt;rebase delta rewrite&quot;, presentDelta+&quot;&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>            }
+            <span class="keyword">this</span>.logChange(<span class="string">"-&gt;rebase"</span>, change, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+              <span class="keyword">var</span> result = change.delta.transpose(presentDelta);
+              change.delta = result[<span class="number">0</span>];
+              change.known[c.clientId] = c.version;
+            }, <span class="string">"with:"</span>, c);
+          }
+          <span class="keyword">return</span> <span class="literal">true</span>;
+        }, <span class="keyword">this</span>);
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-22">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-22">&#182;</a>
+                </div>
+                <p>Next we insert the change into its proper location</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> indexToInsert = <span class="literal">null</span>;
+      <span class="keyword">this</span>._history.walkBack(<span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+        <span class="keyword">if</span> (c.clientId == <span class="string">"init"</span> || c.isBefore(change)) {
+          indexToInsert = index+<span class="number">1</span>;
+          <span class="keyword">return</span> <span class="literal">false</span>;
+        }
+        <span class="keyword">return</span> <span class="literal">true</span>;
+      }, <span class="keyword">this</span>);
+      assert(indexToInsert);
+      <span class="keyword">this</span>._history.insert(indexToInsert, change);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-23">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-23">&#182;</a>
+                </div>
+                <p>Now we fix up any forward changes</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> fixupDelta = change.delta;
+      <span class="keyword">this</span>._history.walkForward(indexToInsert+<span class="number">1</span>, <span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+        <span class="keyword">if</span> (! c.knowsAboutChange(change)) {
+          <span class="keyword">var</span> origChange = c.clone();
+          <span class="keyword">this</span>.logChange(<span class="string">"^^fix"</span>, c, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+            <span class="keyword">var</span> fixupResult = c.delta.transpose(fixupDelta);
+            console.log(<span class="string">"  ^^real"</span>);
+            <span class="keyword">var</span> result = c.delta.transpose(fixupDelta);
+            c.delta = result[<span class="number">0</span>];
+            c.known[change.clientId] = change.version;
+            fixupDelta = fixupResult[<span class="number">1</span>];
+          }, <span class="string">"clone:"</span>, change.delta+<span class="string">""</span>);
+          console.log(<span class="string">"(trans)"</span>, fixupDelta+<span class="string">""</span>);
+          assert(c.knowsAboutChange(change));
+        }
+      }, <span class="keyword">this</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-24">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-24">&#182;</a>
+                </div>
+                <p>Finally we return the transformed delta that represents
+changes that should be made to the state:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.logHistory(<span class="string">"!!"</span>);
+      <span class="keyword">return</span> fixupDelta;
+    },
+
+    promoteDelta: <span class="function"><span class="keyword">function</span> <span class="params">(delta, deltaIndex, untilChange)</span> {</span>
+      <span class="keyword">this</span>._history.walkForward(deltaIndex+<span class="number">1</span>, <span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+        <span class="keyword">if</span> (untilChange.isBefore(c)) {
+          <span class="keyword">return</span> <span class="literal">false</span>;
+        }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-25">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-25">&#182;</a>
+                </div>
+                <p>FIXME: not sure if this clientId check here is right.  Maybe
+if untilChange.knowsAbout(c)?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (untilChange.knowsAboutChange(c)) {
+          <span class="keyword">var</span> result = c.delta.transpose(delta);
+          delta = result[<span class="number">1</span>];
+        }
+        <span class="keyword">return</span> <span class="literal">true</span>;
+      });
+      <span class="keyword">return</span> delta;
+    },
+
+    logHistory: <span class="function"><span class="keyword">function</span> <span class="params">(prefix)</span> {</span>
+      prefix = prefix || <span class="string">""</span>;
+      <span class="keyword">var</span> postfix = Array.prototype.slice.call(arguments, <span class="number">1</span>);
+      console.log.apply(console, [prefix + <span class="string">"history"</span>, <span class="keyword">this</span>.clientId, <span class="string">":"</span>].concat(postfix));
+      console.log(prefix + <span class="string">" state:"</span>, JSON.stringify(<span class="keyword">this</span>.getStateSafe()));
+      <span class="keyword">var</span> hstate;
+      <span class="keyword">this</span>._history.walkForward(<span class="number">0</span>, <span class="function"><span class="keyword">function</span> <span class="params">(c, index)</span> {</span>
+        <span class="keyword">if</span> (! index) {
+          assert(c.clientId == <span class="string">"init"</span>);
+          console.log(prefix + <span class="string">" init:"</span>, JSON.stringify(c.state));
+          hstate = c.state;
+        } <span class="keyword">else</span> {
+          <span class="keyword">try</span> {
+            hstate = c.delta.apply(hstate);
+          } <span class="keyword">catch</span> (e) {
+            hstate = <span class="string">"Error: "</span> + e;
+          }
+          console.log(prefix + <span class="string">"  "</span>, index, c+<span class="string">""</span>, JSON.stringify(hstate));
+        }
+      });
+    },
+
+    logChange: <span class="function"><span class="keyword">function</span> <span class="params">(prefix, change, callback)</span> {</span>
+      prefix = prefix || <span class="string">"before"</span>;
+      <span class="keyword">var</span> postfix = Array.prototype.slice.call(arguments, <span class="number">3</span>);
+      console.log.apply(
+        console,
+        [prefix, <span class="keyword">this</span>.clientId, <span class="string">":"</span>, change+<span class="string">""</span>].concat(postfix).concat([JSON.stringify(<span class="keyword">this</span>.getStateSafe(<span class="literal">true</span>))]));
+      <span class="keyword">try</span> {
+        callback();
+      } <span class="keyword">finally</span> {
+        console.log(prefix + <span class="string">" after:"</span>, change+<span class="string">""</span>, JSON.stringify(<span class="keyword">this</span>.getStateSafe()));
+      }
+    },
+
+    addDelta: <span class="function"><span class="keyword">function</span> <span class="params">(delta)</span> {</span>
+      <span class="keyword">var</span> version = <span class="keyword">this</span>._createVersion();
+      <span class="keyword">var</span> change = Change(version, <span class="keyword">this</span>.clientId, delta, util.extend(<span class="keyword">this</span>.knownVersions));
+      <span class="keyword">this</span>.add(change);
+      <span class="keyword">return</span> change;
+    },
+
+    _createVersion: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> max = <span class="number">1</span>;
+      <span class="keyword">for</span> (<span class="keyword">var</span> id <span class="keyword">in</span> <span class="keyword">this</span>.knownVersions) {
+        max = Math.max(max, <span class="keyword">this</span>.knownVersions[id]);
+      }
+      max = Math.max(max, <span class="keyword">this</span>.mostRecentLocalChange);
+      <span class="keyword">return</span> max+<span class="number">1</span>;
+    },
+
+    fault: <span class="function"><span class="keyword">function</span> <span class="params">(change)</span> {</span>
+      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Fault'</span>);
+    },
+
+    getState: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> state;
+      <span class="keyword">this</span>._history.walkForward(<span class="number">0</span>, <span class="function"><span class="keyword">function</span> <span class="params">(c)</span> {</span>
+        <span class="keyword">if</span> (c.clientId == <span class="string">"init"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-26">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-26">&#182;</a>
+                </div>
+                <p>Initialization, has the state</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          state = c.state;
+        } <span class="keyword">else</span> {
+          state = c.delta.apply(state);
+        }
+      }, <span class="keyword">this</span>);
+      <span class="keyword">return</span> state;
+    },
+
+    getStateSafe: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">try</span> {
+        <span class="keyword">return</span> <span class="keyword">this</span>.getState();
+      } <span class="keyword">catch</span> (e) {
+        <span class="keyword">return</span> <span class="string">'Error: '</span> + e;
+      }
+    }
+
+  });
+
+  ot.TextReplace = util.Class({
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(start, del, text)</span> {</span>
+      assert(<span class="keyword">typeof</span> start == <span class="string">"number"</span> &amp;&amp; <span class="keyword">typeof</span> del == <span class="string">"number"</span> &amp;&amp; <span class="keyword">typeof</span> text == <span class="string">"string"</span>, start, del, text);
+      assert(start &gt;=<span class="number">0</span> &amp;&amp; del &gt;= <span class="number">0</span>, start, del);
+      <span class="keyword">this</span>.start = start;
+      <span class="keyword">this</span>.del = del;
+      <span class="keyword">this</span>.text = text;
+    },
+
+    toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.empty()) {
+        <span class="keyword">return</span> <span class="string">'[no-op]'</span>;
+      }
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.del) {
+        <span class="keyword">return</span> <span class="string">'[insert '</span> + JSON.stringify(<span class="keyword">this</span>.text) + <span class="string">' @'</span> + <span class="keyword">this</span>.start + <span class="string">']'</span>;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (! <span class="keyword">this</span>.text) {
+        <span class="keyword">return</span> <span class="string">'[delete '</span> + <span class="keyword">this</span>.del + <span class="string">' chars @'</span> + <span class="keyword">this</span>.start + <span class="string">']'</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> <span class="string">'[replace '</span> + <span class="keyword">this</span>.del + <span class="string">' chars with '</span> + JSON.stringify(<span class="keyword">this</span>.text) + <span class="string">' @'</span> + <span class="keyword">this</span>.start + <span class="string">']'</span>;
+      }
+    },
+
+    equals: <span class="function"><span class="keyword">function</span> <span class="params">(other)</span> {</span>
+      <span class="keyword">return</span> other.constructor === <span class="keyword">this</span>.constructor &amp;&amp;
+          other.del === <span class="keyword">this</span>.del &amp;&amp;
+          other.start === <span class="keyword">this</span>.start &amp;&amp;
+          other.text === <span class="keyword">this</span>.text;
+    },
+
+    clone: <span class="function"><span class="keyword">function</span> <span class="params">(start, del, text)</span> {</span>
+      <span class="keyword">if</span> (start === <span class="literal">undefined</span>) {
+        start = <span class="keyword">this</span>.start;
+      }
+      <span class="keyword">if</span> (del === <span class="literal">undefined</span>) {
+        del = <span class="keyword">this</span>.del;
+      }
+      <span class="keyword">if</span> (text === <span class="literal">undefined</span>) {
+        text = <span class="keyword">this</span>.text;
+      }
+      <span class="keyword">return</span> ot.TextReplace(start, del, text);
+    },
+
+    empty: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> (! <span class="keyword">this</span>.del) &amp;&amp; (! <span class="keyword">this</span>.text);
+    },
+
+    apply: <span class="function"><span class="keyword">function</span> <span class="params">(text)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.empty()) {
+        <span class="keyword">return</span> text;
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.start &gt; text.length) {
+        console.trace();
+        <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(<span class="string">"Start after end of text ("</span> + JSON.stringify(text) + <span class="string">"/"</span> + text.length + <span class="string">"): "</span> + <span class="keyword">this</span>);
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.start + <span class="keyword">this</span>.del &gt; text.length) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(<span class="string">"Start+del after end of text ("</span> + JSON.stringify(text) + <span class="string">"/"</span> + text.length + <span class="string">"): "</span> + <span class="keyword">this</span>);
+      }
+      <span class="keyword">return</span> text.substr(<span class="number">0</span>, <span class="keyword">this</span>.start) + <span class="keyword">this</span>.text + text.substr(<span class="keyword">this</span>.start+<span class="keyword">this</span>.del);
+    },
+
+    transpose: <span class="function"><span class="keyword">function</span> <span class="params">(delta)</span> {</span>
+      <span class="comment">/* Transform this delta as though the other delta had come before it.
+         Returns a [new_version_of_this, transformed_delta], where transformed_delta
+         satisfies:
+
+         result1 = new_version_of_this.apply(delta.apply(text));
+         result2 = transformed_delta.apply(this.apply(text));
+         assert(result1 == result2);
+
+         Does not modify this object.
+      */</span>
+      <span class="keyword">var</span> overlap;
+      assert(delta <span class="keyword">instanceof</span> ot.TextReplace, <span class="string">"Transposing with non-TextReplace:"</span>, delta);
+      <span class="keyword">if</span> (<span class="keyword">this</span>.empty()) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-27">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-27">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this is empty&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(), delta.clone()];
+      }
+      <span class="keyword">if</span> (delta.empty()) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-28">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-28">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =other is empty&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(), delta.clone()];
+      }
+      <span class="keyword">if</span> (delta.before(<span class="keyword">this</span>)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-29">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-29">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this after other&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(<span class="keyword">this</span>.start + delta.text.length - delta.del),
+                delta.clone()];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.before(delta)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-30">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-30">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this before other&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(), delta.clone(delta.start + <span class="keyword">this</span>.text.length - <span class="keyword">this</span>.del)];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (delta.sameRange(<span class="keyword">this</span>)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-31">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-31">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =same range&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(<span class="keyword">this</span>.start+delta.text.length, <span class="number">0</span>),
+                delta.clone(<span class="literal">undefined</span>, <span class="number">0</span>)];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (delta.contains(<span class="keyword">this</span>)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-32">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-32">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =other contains this&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(delta.start+delta.text.length, <span class="number">0</span>, <span class="keyword">this</span>.text),
+                delta.clone(<span class="literal">undefined</span>, delta.del - <span class="keyword">this</span>.del + <span class="keyword">this</span>.text.length, delta.text + <span class="keyword">this</span>.text)];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.contains(delta)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-33">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-33">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this contains other&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(<span class="literal">undefined</span>, <span class="keyword">this</span>.del - delta.del + delta.text.length, delta.text + <span class="keyword">this</span>.text),
+                delta.clone(<span class="keyword">this</span>.start, <span class="number">0</span>, delta.text)];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.overlapsStart(delta)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-34">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-34">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this overlaps start of other&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        overlap = <span class="keyword">this</span>.start + <span class="keyword">this</span>.del - delta.start;
+        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(<span class="literal">undefined</span>, <span class="keyword">this</span>.del - overlap),
+                delta.clone(<span class="keyword">this</span>.start + <span class="keyword">this</span>.text.length, delta.del - overlap)];
+      } <span class="keyword">else</span> {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-35">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-35">&#182;</a>
+                </div>
+                <p>console.log(&quot;  =this overlaps end of other&quot;);</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        assert(delta.overlapsStart(<span class="keyword">this</span>), delta+<span class="string">""</span>, <span class="string">"does not overlap start of"</span>, <span class="keyword">this</span>+<span class="string">""</span>, delta.before(<span class="keyword">this</span>));
+        overlap = delta.start + delta.del - <span class="keyword">this</span>.start;
+        <span class="keyword">return</span> [<span class="keyword">this</span>.clone(delta.start + delta.text.length, <span class="keyword">this</span>.del - overlap),
+                delta.clone(<span class="literal">undefined</span>, delta.del - overlap)];
+      }
+      <span class="keyword">throw</span> <span class="string">'Should not happen'</span>;
+    },
+
+    before: <span class="function"><span class="keyword">function</span> <span class="params">(other)</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>.start + <span class="keyword">this</span>.del &lt;= other.start;
+    },
+
+    contains: <span class="function"><span class="keyword">function</span> <span class="params">(other)</span> {</span>
+      <span class="keyword">return</span> other.start &gt;= <span class="keyword">this</span>.start &amp;&amp; other.start + other.del &lt; <span class="keyword">this</span>.start + <span class="keyword">this</span>.del;
+    },
+
+    sameRange: <span class="function"><span class="keyword">function</span> <span class="params">(other)</span> {</span>
+      <span class="keyword">return</span> other.start == <span class="keyword">this</span>.start &amp;&amp; other.del == <span class="keyword">this</span>.del;
+    },
+
+    overlapsStart: <span class="function"><span class="keyword">function</span> <span class="params">(other)</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>.start &lt; other.start &amp;&amp; <span class="keyword">this</span>.start + <span class="keyword">this</span>.del &gt; other.start;
+    },
+
+    classMethods: {
+
+      <span class="comment">/* Make a new ot.TextReplace that converts oldValue to newValue. */</span>
+      fromChange: <span class="keyword">function</span>(oldValue, newValue) {
+        assert(<span class="keyword">typeof</span> oldValue == <span class="string">"string"</span>);
+        assert(<span class="keyword">typeof</span> newValue == <span class="string">"string"</span>);
+        <span class="keyword">var</span> commonStart = <span class="number">0</span>;
+        <span class="keyword">while</span> (commonStart &lt; newValue.length &amp;&amp;
+               newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
+          commonStart++;
+        }
+        <span class="keyword">var</span> commonEnd = <span class="number">0</span>;
+        <span class="keyword">while</span> (commonEnd &lt; (newValue.length - commonStart) &amp;&amp;
+               commonEnd &lt; (oldValue.length - commonStart) &amp;&amp;
+               newValue.charAt(newValue.length - commonEnd - <span class="number">1</span>) ==
+               oldValue.charAt(oldValue.length - commonEnd - <span class="number">1</span>)) {
+          commonEnd++;
+        }
+        <span class="keyword">var</span> removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
+        <span class="keyword">var</span> inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
+        <span class="keyword">if</span> (! (removed.length || inserted)) {
+          <span class="keyword">return</span> <span class="literal">null</span>;
+        }
+        <span class="keyword">return</span> <span class="keyword">this</span>(commonStart, removed.length, inserted);
+      },
+
+      random: <span class="function"><span class="keyword">function</span> <span class="params">(source, generator)</span> {</span>
+        <span class="keyword">var</span> text, start, len;
+        <span class="keyword">var</span> ops = [<span class="string">"ins"</span>, <span class="string">"del"</span>, <span class="string">"repl"</span>];
+        <span class="keyword">if</span> (! source.length) {
+          ops = [<span class="string">"ins"</span>];
+        }
+        <span class="keyword">switch</span> (generator.pick(ops)) {
+        <span class="keyword">case</span> <span class="string">"ins"</span>:
+          <span class="keyword">if</span> (! generator.number(<span class="number">2</span>)) {
+            text = generator.string(<span class="number">1</span>);
+          } <span class="keyword">else</span> {
+            text = generator.string(generator.number(<span class="number">3</span>)+<span class="number">1</span>);
+          }
+          <span class="keyword">if</span> (! generator.number(<span class="number">4</span>)) {
+            start = <span class="number">0</span>;
+          } <span class="keyword">else</span> <span class="keyword">if</span> (! generator.number(<span class="number">3</span>)) {
+            start = source.length-<span class="number">1</span>;
+          } <span class="keyword">else</span> {
+            start = generator.number(source.length);
+          }
+          <span class="keyword">return</span> <span class="keyword">this</span>(start, <span class="number">0</span>, text);
+
+        <span class="keyword">case</span> <span class="string">"del"</span>:
+          <span class="keyword">if</span> (! generator.number(<span class="number">20</span>)) {
+            <span class="keyword">return</span> <span class="keyword">this</span>(<span class="number">0</span>, source.length, <span class="string">""</span>);
+          }
+          start = generator.number(source.length-<span class="number">1</span>);
+          <span class="keyword">if</span> (! generator.number(<span class="number">2</span>)) {
+            len = <span class="number">1</span>;
+          } <span class="keyword">else</span> {
+            len = generator.number(<span class="number">5</span>)+<span class="number">1</span>;
+          }
+          len = Math.min(len, source.length - start);
+          <span class="keyword">return</span> <span class="keyword">this</span>(start, len, <span class="string">""</span>);
+
+        <span class="keyword">case</span> <span class="string">"repl"</span>:
+          start = generator.number(source.length-<span class="number">1</span>);
+          len = generator.number(<span class="number">5</span>);
+          len = Math.min(len, source.length - start);
+          text = generator.string(generator.number(<span class="number">2</span>)+<span class="number">1</span>);
+          <span class="keyword">return</span> <span class="keyword">this</span>(start, len, text);
+        }
+        <span class="keyword">throw</span> <span class="string">'Unreachable'</span>;
+      }
+    }
+  });
+
+  <span class="keyword">return</span> ot;
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

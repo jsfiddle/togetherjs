@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>towtruck.js</h1>
+        
+          <h4>This is the bootstrap code.  It is included on all pages, defines the `TowTruck` variable, and handles configuration and initial loading.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/towtruck.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+<span class="comment">/*jshint scripturl:true */</span>
+(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+
+  <span class="keyword">var</span> styleSheet = <span class="string">"/towtruck/towtruck.css"</span>;
+
+  <span class="keyword">var</span> baseUrl = <span class="string">"__baseUrl__"</span>;
+  <span class="keyword">if</span> (baseUrl == <span class="string">"__"</span> + <span class="string">"baseUrl__"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>Reset the variable if it doesn&#39;t get substituted</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    baseUrl = <span class="string">""</span>;
+  }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>True if this file should use minimized sub-resources:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> min = <span class="string">"__min__"</span> == <span class="string">"__"</span> + <span class="string">"min__"</span> ? <span class="literal">false</span> : <span class="string">"__min__"</span> == <span class="string">"yes"</span>;
+
+  <span class="keyword">var</span> baseUrlOverride = localStorage.getItem(<span class="string">"towtruck.baseUrlOverride"</span>);
+  <span class="keyword">if</span> (baseUrlOverride) {
+    <span class="keyword">try</span> {
+      baseUrlOverride = JSON.parse(baseUrlOverride);
+    } <span class="keyword">catch</span> (e) {
+      baseUrlOverride = <span class="literal">null</span>;
+    }
+    <span class="keyword">if</span> ((! baseUrlOverride) || baseUrlOverride.expiresAt &lt; Date.now()) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>Ignore because it has expired</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      localStorage.removeItem(<span class="string">"towtruck.baseUrlOverride"</span>);
+    } <span class="keyword">else</span> {
+      baseUrl = baseUrlOverride.baseUrl;
+      <span class="keyword">var</span> logger = console.warn || console.log;
+      logger.call(console, <span class="string">"Using TowTruck baseUrlOverride:"</span>, baseUrl);
+      logger.call(console, <span class="string">"To undo run: localStorage.removeItem('towtruck.baseUrlOverride')"</span>);
+    }
+  }
+
+  <span class="keyword">var</span> configOverride = localStorage.getItem(<span class="string">"towtruck.configOverride"</span>);
+  <span class="keyword">if</span> (configOverride) {
+    <span class="keyword">try</span> {
+      configOverride = JSON.parse(configOverride);
+    } <span class="keyword">catch</span> (e) {
+      configOverride = <span class="literal">null</span>;
+    }
+    <span class="keyword">if</span> ((! configOverride) || configOverride.expiresAt &lt; Date.now()) {
+      localStorage.removeItem(<span class="string">"towtruck.cnofigOverride"</span>);
+    } <span class="keyword">else</span> {
+      <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> configOverride) {
+        <span class="keyword">if</span> (attr == <span class="string">"expiresAt"</span> || ! configOverride.hasOwnProperty(attr)) {
+          <span class="keyword">continue</span>;
+        }
+        window[<span class="string">"TowTruckConfig_"</span> + attr] = configOverride[attr];
+      }
+    }
+  }
+
+  <span class="keyword">var</span> version = <span class="string">"unknown"</span>;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>FIXME: we could/should use a version from the checkout, at least
+for production</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> cacheBust = <span class="string">"__gitCommit__"</span>;
+  <span class="keyword">if</span> ((! cacheBust) || cacheBust == <span class="string">"__gitCommit__"</span>) {
+    cacheBust = Date.now() + <span class="string">""</span>;
+  } <span class="keyword">else</span> {
+    version = cacheBust;
+  }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>Make sure we have all of the console.* methods:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">if</span> (<span class="keyword">typeof</span> console == <span class="string">"undefined"</span>) {
+    console = {};
+  }
+  <span class="keyword">if</span> (! console.log) {
+    console.log = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>};
+  }
+  [<span class="string">"debug"</span>, <span class="string">"info"</span>, <span class="string">"warn"</span>, <span class="string">"error"</span>].forEach(<span class="function"><span class="keyword">function</span> <span class="params">(method)</span> {</span>
+    <span class="keyword">if</span> (! console[method]) {
+      console[method] = console.log;
+    }
+  });
+
+  <span class="keyword">if</span> (! baseUrl) {
+    <span class="keyword">var</span> scripts = document.getElementsByTagName(<span class="string">"script"</span>);
+    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;scripts.length; i++) {
+      <span class="keyword">var</span> src = scripts[i].src;
+      <span class="keyword">if</span> (src &amp;&amp; src.search(<span class="regexp">/towtruck.js(\?.*)?$/</span>) !== -<span class="number">1</span>) {
+        baseUrl = src.replace(<span class="regexp">/\/*towtruck.js(\?.*)?$/</span>, <span class="string">""</span>);
+        console.warn(<span class="string">"Detected baseUrl as"</span>, baseUrl);
+        <span class="keyword">break</span>;
+      }
+    }
+  }
+  <span class="keyword">if</span> (! baseUrl) {
+    console.warn(<span class="string">"Could not determine TowTruck's baseUrl (looked for a &lt;script&gt; with towtruck.js)"</span>);
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">addStyle</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> existing = document.getElementById(<span class="string">"towtruck-stylesheet"</span>);
+    <span class="keyword">if</span> (! existing) {
+      <span class="keyword">var</span> link = document.createElement(<span class="string">"link"</span>);
+      link.id = <span class="string">"towtruck-stylesheet"</span>;
+      link.setAttribute(<span class="string">"rel"</span>, <span class="string">"stylesheet"</span>);
+      link.href = baseUrl + styleSheet + <span class="string">"?bust="</span> + cacheBust;
+      document.head.appendChild(link);
+    }
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">addScript</span><span class="params">(url)</span> {</span>
+    <span class="keyword">var</span> script = document.createElement(<span class="string">"script"</span>);
+    script.src = baseUrl + url + <span class="string">"?bust="</span> + cacheBust;
+    document.head.appendChild(script);
+  }
+
+  <span class="keyword">var</span> TowTruck = window.TowTruck = <span class="function"><span class="keyword">function</span> <span class="title">TowTruck</span><span class="params">(event)</span> {</span>
+    TowTruck.startup.button = <span class="literal">null</span>;
+    <span class="keyword">if</span> (event &amp;&amp; <span class="keyword">typeof</span> event == <span class="string">"object"</span>) {
+      <span class="keyword">if</span> (event.target &amp;&amp; <span class="keyword">typeof</span> event) {
+        TowTruck.startup.button = event.target;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (event.nodeType == <span class="number">1</span>) {
+        TowTruck.startup.button = event;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (event[<span class="number">0</span>] &amp;&amp; event[<span class="number">0</span>].nodeType == <span class="number">1</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>Probably a jQuery element</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        TowTruck.startup.button = event[<span class="number">0</span>];
+      }
+    }
+    <span class="keyword">if</span> (window.TowTruckConfig &amp;&amp; (! window.TowTruckConfig.loaded)) {
+      TowTruck.config(window.TowTruckConfig);
+      window.TowTruckConfig.loaded = <span class="literal">true</span>;
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>This handles loading configuration from global variables.  This
+includes TowTruckConfig<em>on</em>*, which are attributes folded into
+the &quot;on&quot; configuration value.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> attr;
+    <span class="keyword">var</span> attrName;
+    <span class="keyword">var</span> globalOns = {};
+    <span class="keyword">for</span> (attr <span class="keyword">in</span> window) {
+      <span class="keyword">if</span> (attr.indexOf(<span class="string">"TowTruckConfig_on_"</span>) === <span class="number">0</span>) {
+        attrName = attr.substr((<span class="string">"TowTruckConfig_on_"</span>).length);
+        globalOns[attrName] = window[attr];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (attr.indexOf(<span class="string">"TowTruckConfig_"</span>) === <span class="number">0</span>) {
+        attrName = attr.substr((<span class="string">"TowTruckConfig_"</span>).length);
+        TowTruck.config(attrName, window[attr]);
+      }
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>FIXME: copy existing config?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> ons = TowTruck.getConfig(<span class="string">"on"</span>);
+    <span class="keyword">for</span> (attr <span class="keyword">in</span> globalOns) {
+      <span class="keyword">if</span> (globalOns.hasOwnProperty(attr)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>FIXME: should we avoid overwriting?  Maybe use arrays?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        ons[attr] = globalOns[attr];
+      }
+    }
+    TowTruck.config(<span class="string">"on"</span>, ons);
+    <span class="keyword">for</span> (attr <span class="keyword">in</span> ons) {
+      TowTruck.on(attr, ons[attr]);
+    }
+    <span class="keyword">var</span> hubOns = TowTruck.getConfig(<span class="string">"hub_on"</span>);
+    <span class="keyword">if</span> (hubOns) {
+      <span class="keyword">for</span> (attr <span class="keyword">in</span> hubOns) {
+        <span class="keyword">if</span> (hubOns.hasOwnProperty(attr)) {
+          TowTruck.hub.on(attr, hubOns[attr]);
+        }
+      }
+    }
+
+    <span class="keyword">if</span> (! TowTruck.startup.reason) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>Then a call to TowTruck() from a button must be started TowTruck</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      TowTruck.startup.reason = <span class="string">"started"</span>;
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>FIXME: maybe I should just test for TowTruck.require:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (TowTruck._loaded) {
+      <span class="keyword">var</span> session = TowTruck.require(<span class="string">"session"</span>);
+      <span class="keyword">if</span> (TowTruck.running) {
+        session.close();
+      } <span class="keyword">else</span> {
+        addStyle();
+        session.start();
+      }
+      <span class="keyword">return</span>;
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>A sort of signal to session.js to tell it to actually
+start itself (i.e., put up a UI and try to activate)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    TowTruck.startup._launch = <span class="literal">true</span>;
+
+    addStyle();
+    <span class="keyword">var</span> minSetting = TowTruck.getConfig(<span class="string">"useMinimizedCode"</span>);
+    <span class="keyword">if</span> (minSetting !== <span class="literal">undefined</span>) {
+      min = !! minSetting;
+    }
+    <span class="keyword">var</span> requireConfig = TowTruck._extend(TowTruck.requireConfig);
+    <span class="keyword">var</span> deps = [<span class="string">"session"</span>, <span class="string">"jquery"</span>];
+    <span class="function"><span class="keyword">function</span> <span class="title">callback</span><span class="params">(session, jquery)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-13">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-13">&#182;</a>
+                </div>
+                <p>Though jquery uses requirejs, it also always also defines a
+global, so we have to keep it from conflicting with any
+previous jquery:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      jquery.noConflict(<span class="literal">true</span>);
+      TowTruck._loaded = <span class="literal">true</span>;
+      <span class="keyword">if</span> (! min) {
+        TowTruck.require = require.config({context: <span class="string">"towtruck"</span>});
+        TowTruck._requireObject = require;
+      }
+    }
+    <span class="keyword">if</span> (! min) {
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> require == <span class="string">"function"</span>) {
+        TowTruck.require = require.config(requireConfig);
+      }
+    }
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> TowTruck.require == <span class="string">"function"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-14">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-14">&#182;</a>
+                </div>
+                <p>This is an already-configured version of require</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      TowTruck.require(deps, callback);
+    } <span class="keyword">else</span> {
+      requireConfig.deps = deps;
+      requireConfig.callback = callback;
+      <span class="keyword">if</span> (! min) {
+        window.require = requireConfig;
+      }
+    }
+    <span class="keyword">if</span> (min) {
+      addScript(<span class="string">"/towtruck/towtruckPackage.js"</span>);
+    } <span class="keyword">else</span> {
+      addScript(<span class="string">"/towtruck/libs/require.js"</span>);
+    }
+  };
+
+  TowTruck.pageLoaded = Date.now();
+
+  TowTruck._extend = <span class="function"><span class="keyword">function</span> <span class="params">(base, extensions)</span> {</span>
+    <span class="keyword">if</span> (! extensions) {
+      extensions = base;
+      base = {};
+    }
+    <span class="keyword">for</span> (<span class="keyword">var</span> a <span class="keyword">in</span> extensions) {
+      <span class="keyword">if</span> (extensions.hasOwnProperty(a)) {
+        base[a] = extensions[a];
+      }
+    }
+    <span class="keyword">return</span> base;
+  };
+
+  TowTruck._startupInit = {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-15">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>What element, if any, was used to start the session:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    button: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>The startReason is the reason TowTruck was started.  One of:
+  null: not started
+  started: hit the start button (first page view)
+  joined: joined the session (first page view)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    reason: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-17">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-17">&#182;</a>
+                </div>
+                <p>Also, the session may have started on &quot;this&quot; page, or maybe is continued
+from a past page.  TowTruck.continued indicates the difference (false the
+first time TowTruck is started or joined, true on later page loads).</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    continued: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-18">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-18">&#182;</a>
+                </div>
+                <p>This is set to tell the session what shareId to use, if the boot
+code knows (mostly because the URL indicates the id).</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    _joinShareId: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>This tells session to start up immediately (otherwise it would wait
+for session.start() to be run)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    _launch: <span class="literal">false</span>
+  };
+  TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
+  TowTruck.running = <span class="literal">false</span>;
+
+  TowTruck.requireConfig = {
+    context: <span class="string">"towtruck"</span>,
+    baseUrl: baseUrl + <span class="string">"/towtruck"</span>,
+    urlArgs: <span class="string">"bust="</span> + cacheBust,
+    paths: {
+      jquery: <span class="string">"libs/jquery-1.8.3.min"</span>,
+      walkabout: <span class="string">"libs/walkabout/walkabout"</span>,
+      esprima: <span class="string">"libs/walkabout/lib/esprima"</span>,
+      falafel: <span class="string">"libs/walkabout/lib/falafel"</span>,
+      tinycolor: <span class="string">"libs/tinycolor"</span>,
+      whrandom: <span class="string">"libs/whrandom/random"</span>,
+      jqueryui: <span class="string">"libs/jquery-ui.min"</span>,
+      jquerypunch: <span class="string">"libs/jquery.ui.touch-punch.min"</span>
+    }
+  };
+
+  TowTruck._mixinEvents = <span class="function"><span class="keyword">function</span> <span class="params">(proto)</span> {</span>
+    proto.on = <span class="function"><span class="keyword">function</span> <span class="title">on</span><span class="params">(name, callback)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> callback != <span class="string">"function"</span>) {
+        console.warn(<span class="string">"Bad callback for"</span>, <span class="keyword">this</span>, <span class="string">".once("</span>, name, <span class="string">", "</span>, callback, <span class="string">")"</span>);
+        <span class="keyword">throw</span> <span class="string">"Error: .once() called with non-callback"</span>;
+      }
+      <span class="keyword">if</span> (name.search(<span class="string">" "</span>) != -<span class="number">1</span>) {
+        <span class="keyword">var</span> names = name.split(<span class="regexp">/ +/g</span>);
+        names.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(n)</span> {</span>
+          <span class="keyword">this</span>.on(n, callback);
+        }, <span class="keyword">this</span>);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>._knownEvents &amp;&amp; <span class="keyword">this</span>._knownEvents.indexOf(name) == -<span class="number">1</span>) {
+        <span class="keyword">var</span> thisString = <span class="string">""</span> + <span class="keyword">this</span>;
+        <span class="keyword">if</span> (thisString.length &gt; <span class="number">20</span>) {
+          thisString = thisString.substr(<span class="number">0</span>, <span class="number">20</span>) + <span class="string">"..."</span>;
+        }
+        console.warn(thisString + <span class="string">".on('"</span> + name + <span class="string">"', ...): unknown event"</span>);
+        <span class="keyword">if</span> (console.trace) {
+          console.trace();
+        }
+      }
+      <span class="keyword">if</span> (! <span class="keyword">this</span>._listeners) {
+        <span class="keyword">this</span>._listeners = {};
+      }
+      <span class="keyword">if</span> (! <span class="keyword">this</span>._listeners[name]) {
+        <span class="keyword">this</span>._listeners[name] = [];
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>._listeners[name].indexOf(callback) == -<span class="number">1</span>) {
+        <span class="keyword">this</span>._listeners[name].push(callback);
+      }
+    };
+    proto.once = <span class="function"><span class="keyword">function</span> <span class="title">once</span><span class="params">(name, callback)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> callback != <span class="string">"function"</span>) {
+        console.warn(<span class="string">"Bad callback for"</span>, <span class="keyword">this</span>, <span class="string">".once("</span>, name, <span class="string">", "</span>, callback, <span class="string">")"</span>);
+        <span class="keyword">throw</span> <span class="string">"Error: .once() called with non-callback"</span>;
+      }
+      <span class="keyword">var</span> attr = <span class="string">"onceCallback_"</span> + name;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-20">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-20">&#182;</a>
+                </div>
+                <p>FIXME: maybe I should add the event name to the .once attribute:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (! callback[attr]) {
+        callback[attr] = <span class="function"><span class="keyword">function</span> <span class="title">onceCallback</span><span class="params">()</span> {</span>
+          callback.apply(<span class="keyword">this</span>, arguments);
+          <span class="keyword">this</span>.off(name, onceCallback);
+          <span class="keyword">delete</span> callback[attr];
+        };
+      }
+      <span class="keyword">this</span>.on(name, callback[attr]);
+    };
+    proto.off = proto.removeListener = <span class="function"><span class="keyword">function</span> <span class="title">off</span><span class="params">(name, callback)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>._listenerOffs) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-21">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-21">&#182;</a>
+                </div>
+                <p>Defer the .off() call until the .emit() is done.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>._listenerOffs.push([name, callback]);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (name.search(<span class="string">" "</span>) != -<span class="number">1</span>) {
+        <span class="keyword">var</span> names = name.split(<span class="regexp">/ +/g</span>);
+        names.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(n)</span> {</span>
+          <span class="keyword">this</span>.off(n, callback);
+        }, <span class="keyword">this</span>);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> ((! <span class="keyword">this</span>._listeners) || ! <span class="keyword">this</span>._listeners[name]) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> l = <span class="keyword">this</span>._listeners[name], _len = l.length;
+      <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;_len; i++) {
+        <span class="keyword">if</span> (l[i] == callback) {
+          l.splice(i, <span class="number">1</span>);
+          <span class="keyword">break</span>;
+        }
+      }
+    };
+    proto.emit = <span class="function"><span class="keyword">function</span> <span class="title">emit</span><span class="params">(name)</span> {</span>
+      <span class="keyword">var</span> offs = <span class="keyword">this</span>._listenerOffs = [];
+      <span class="keyword">if</span> ((! <span class="keyword">this</span>._listeners) || ! <span class="keyword">this</span>._listeners[name]) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> args = Array.prototype.slice.call(arguments, <span class="number">1</span>);
+      <span class="keyword">var</span> l = <span class="keyword">this</span>._listeners[name];
+      l.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(callback)</span> {</span>
+
+        callback.apply(<span class="keyword">this</span>, args);
+      }, <span class="keyword">this</span>);
+      <span class="keyword">delete</span> <span class="keyword">this</span>._listenerOffs;
+      <span class="keyword">if</span> (offs.length) {
+        offs.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(item)</span> {</span>
+          <span class="keyword">this</span>.off(item[<span class="number">0</span>], item[<span class="number">1</span>]);
+        }, <span class="keyword">this</span>);
+      }
+
+    };
+    <span class="keyword">return</span> proto;
+  };
+
+  <span class="comment">/* This finalizes the unloading of TowTruck, including unloading modules */</span>
+  TowTruck._teardown = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> requireObject = TowTruck._requireObject || window.require;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-22">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-22">&#182;</a>
+                </div>
+                <p>FIXME: this doesn&#39;t clear the context for min-case</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (requireObject.s &amp;&amp; requireObject.s.contexts) {
+      <span class="keyword">delete</span> requireObject.s.contexts.towtruck;
+    }
+    TowTruck._loaded = <span class="literal">false</span>;
+    TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
+    TowTruck.running = <span class="literal">false</span>;
+  };
+
+  TowTruck._mixinEvents(TowTruck);
+  TowTruck._knownEvents = [<span class="string">"ready"</span>, <span class="string">"close"</span>];
+  TowTruck.toString = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">return</span> <span class="string">"TowTruck"</span>;
+  };
+
+  <span class="keyword">var</span> defaultHubBase = <span class="string">"__hubUrl__"</span>;
+  <span class="keyword">if</span> (defaultHubBase == <span class="string">"__"</span> + <span class="string">"hubUrl"</span>+ <span class="string">"__"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-23">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-23">&#182;</a>
+                </div>
+                <p>Substitution wasn&#39;t made</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    defaultHubBase = <span class="string">"https://hub.towtruck.mozillalabs.com"</span>;
+  }
+
+  TowTruck._configuration = {};
+  TowTruck._defaultConfiguration = {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-24">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-24">&#182;</a>
+                </div>
+                <p>Experimental feature to echo clicks to certain elements across clients:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    cloneClicks: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-25">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-25">&#182;</a>
+                </div>
+                <p>Enable Mozilla or Google analytics on the page when TowTruck is activated:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    enableAnalytics: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-26">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-26">&#182;</a>
+                </div>
+                <p>The code to enable (this is defaulting to a Mozilla code):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    analyticsCode: <span class="string">"UA-35433268-28"</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-27">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-27">&#182;</a>
+                </div>
+                <p>The base URL of the hub</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    hubBase: defaultHubBase,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-28">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-28">&#182;</a>
+                </div>
+                <p>A function that will return the name of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-29">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-29">&#182;</a>
+                </div>
+                <p>A function that will return the color of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserColor: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-30">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-30">&#182;</a>
+                </div>
+                <p>A function that will return the avatar of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserAvatar: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-31">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-31">&#182;</a>
+                </div>
+                <p>The siteName is used in the walkthrough (defaults to document.title):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    siteName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-32">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-32">&#182;</a>
+                </div>
+                <p>Whether to use the minimized version of the code (overriding the built setting)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    useMinimizedCode: <span class="literal">undefined</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-33">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-33">&#182;</a>
+                </div>
+                <p>Any events to bind to</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    on: {},</pre></div></div>
+              
+            </li>
+          
+            <li id="section-34">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-34">&#182;</a>
+                </div>
+                <p>Hub events to bind to</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    hub_on: {},</pre></div></div>
+              
+            </li>
+          
+            <li id="section-35">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-35">&#182;</a>
+                </div>
+                <p>Enables the alt-T alt-T TowTruck shortcut; however, this setting
+must be enabled early as TowTruckConfig_enableShortcut = true;</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    enableShortcut: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-36">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-36">&#182;</a>
+                </div>
+                <p>The name of this tool as provided to users.  The UI is updated to use this.
+Because of how it is used in text it should be a proper noun, e.g.,
+&quot;MySite&#39;s Collaboration Tool&quot;</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    toolName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-37">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-37">&#182;</a>
+                </div>
+                <p>Used to auto-start TowTruck with a {prefix: pageName, max: participants}
+Implies auto-start</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    findRoom: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-38">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-38">&#182;</a>
+                </div>
+                <p>If true, then the &quot;Join TowTruck Session?&quot; confirmation dialog
+won&#39;t come up</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    suppressJoinConfirmation: <span class="literal">false</span>
+  };</pre></div></div>
+              
+            </li>
+          
+            <li id="section-39">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-39">&#182;</a>
+                </div>
+                <p>FIXME: there&#39;s a point at which configuration can&#39;t be updated
+(e.g., hubBase after the TowTruck has loaded).  We should keep
+track of these and signal an error if someone attempts to
+reconfigure too late</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  TowTruck.getConfig = <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+    <span class="keyword">var</span> value = TowTruck._configuration[name];
+    <span class="keyword">if</span> (value === <span class="literal">undefined</span>) {
+      <span class="keyword">if</span> (! TowTruck._defaultConfiguration.hasOwnProperty(name)) {
+        console.error(<span class="string">"Tried to load unknown configuration value:"</span>, name);
+      }
+      value = TowTruck._defaultConfiguration[name];
+    }
+    <span class="keyword">return</span> value;
+  };
+
+  <span class="comment">/* TowTruck.config(configurationObject)
+     or: TowTruck.config(configName, value)
+
+     Adds configuration to TowTruck.  You may also set the global variable TowTruckConfig
+     and when TowTruck is started that configuration will be loaded.
+
+     Unknown configuration values will lead to console error messages.
+     */</span>
+  TowTruck.config = <span class="function"><span class="keyword">function</span> <span class="params">(name, value)</span> {</span>
+    <span class="keyword">var</span> settings;
+    <span class="keyword">if</span> (arguments.length == <span class="number">1</span>) {
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> name != <span class="string">"object"</span>) {
+        <span class="keyword">throw</span> <span class="string">'TowTruck.config(value) must have an object value (not: '</span> + name + <span class="string">')'</span>;
+      }
+      settings = name;
+    } <span class="keyword">else</span> {
+      settings = {};
+      settings[name] = value;
+    }
+    <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> settings) {
+      <span class="keyword">if</span> (attr == <span class="string">"loaded"</span> || attr == <span class="string">"callToStart"</span> || ! settings.hasOwnProperty(attr)) {
+        <span class="keyword">continue</span>;
+      }
+      <span class="keyword">if</span> (! TowTruck._defaultConfiguration.hasOwnProperty(attr)) {
+        console.warn(<span class="string">"Unknown configuration value passed to TowTruck.config():"</span>, attr);
+      }
+      TowTruck._configuration[attr] = settings[attr];
+      <span class="keyword">if</span> (TowTruck.running &amp;&amp; attr == <span class="string">"toolName"</span>) {
+        TowTruck.require(<span class="string">"ui"</span>).updateToolName();
+      }
+      <span class="keyword">if</span> (attr == <span class="string">"enableShortcut"</span>) {
+        <span class="keyword">if</span> (settings[attr]) {
+          TowTruck.listenForShortcut();
+        } <span class="keyword">else</span> {
+          TowTruck.removeShortcut();
+        }
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-40">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-40">&#182;</a>
+                </div>
+                <p>FIXME: maybe run an update function when certain values are
+updated, especially when TowTruck is running</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    }
+  };
+
+  TowTruck.reinitialize = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (TowTruck.running &amp;&amp; <span class="keyword">typeof</span> TowTruck.require == <span class="string">"function"</span>) {
+      TowTruck.require([<span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(session)</span> {</span>
+        session.emit(<span class="string">"reinitialize"</span>);
+      });
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-41">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-41">&#182;</a>
+                </div>
+                <p>If it&#39;s not set, TowTruck has not been loaded, and reinitialization is not needed</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  };
+
+  TowTruck.refreshUserData = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (TowTruck.running &amp;&amp; <span class="keyword">typeof</span> TowTruck.require ==  <span class="string">"function"</span>) {
+      TowTruck.require([<span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(session)</span> {</span>
+        session.emit(<span class="string">"refresh-user-data"</span>);
+      });
+    }
+  };</pre></div></div>
+              
+            </li>
+          
+            <li id="section-42">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-42">&#182;</a>
+                </div>
+                <p>This should contain the output of &quot;git describe --always --dirty&quot;
+FIXME: substitute this on the server (and update make-static-client)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  TowTruck.version = version;
+  TowTruck.baseUrl = baseUrl;
+
+  TowTruck.hub = TowTruck._mixinEvents({});
+  <span class="keyword">var</span> session = <span class="literal">null</span>;
+
+  TowTruck._onmessage = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">var</span> type = msg.type;
+    <span class="keyword">if</span> (type.search(<span class="regexp">/^app\./</span>) === <span class="number">0</span>) {
+      type = type.substr(<span class="string">"app."</span>.length);
+    } <span class="keyword">else</span> {
+      type = <span class="string">"towtruck."</span> + type;
+    }
+    msg.type = type;
+    TowTruck.hub.emit(msg.type, msg);
+  };
+
+  TowTruck.send = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (session === <span class="literal">null</span>) {
+      <span class="keyword">if</span> (! TowTruck.require) {
+        <span class="keyword">throw</span> <span class="string">"You cannot use TowTruck.send() when TowTruck is not running"</span>;
+      }
+      session = TowTruck.require(<span class="string">"session"</span>);
+    }
+    session.appSend(msg);
+  };
+
+  TowTruck.shareUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (session === <span class="literal">null</span>) {
+      <span class="keyword">if</span> (! TowTruck.require) {
+        <span class="keyword">return</span> <span class="literal">null</span>;
+      }
+      session = TowTruck.require(<span class="string">"session"</span>);
+    }
+    <span class="keyword">return</span> session.shareUrl();
+  };
+
+  <span class="keyword">var</span> listener = <span class="literal">null</span>;
+
+  TowTruck.listenForShortcut = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    console.warn(<span class="string">"Listening for alt-T alt-T to start TowTruck"</span>);
+    TowTruck.removeShortcut();
+    listener = <span class="function"><span class="keyword">function</span> <span class="title">listener</span><span class="params">(event)</span> {</span>
+      <span class="keyword">if</span> (event.which == <span class="number">84</span> &amp;&amp; event.altKey) {
+        <span class="keyword">if</span> (listener.pressed) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-43">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-43">&#182;</a>
+                </div>
+                <p>Second hit</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          TowTruck();
+        } <span class="keyword">else</span> {
+          listener.pressed = <span class="literal">true</span>;
+        }
+      } <span class="keyword">else</span> {
+        listener.pressed = <span class="literal">false</span>;
+      }
+    };
+    TowTruck.once(<span class="string">"ready"</span>, TowTruck.removeShortcut);
+    document.addEventListener(<span class="string">"keyup"</span>, listener, <span class="literal">false</span>);
+  };
+
+  TowTruck.removeShortcut = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (listener) {
+      document.addEventListener(<span class="string">"keyup"</span>, listener, <span class="literal">false</span>);
+      listener = <span class="literal">null</span>;
+    }
+  };</pre></div></div>
+              
+            </li>
+          
+            <li id="section-44">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-44">&#182;</a>
+                </div>
+                <p>It&#39;s nice to replace this early, before the load event fires, so we conflict
+as little as possible with the app we are embedded in:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> hash = location.hash.replace(<span class="regexp">/^#/</span>, <span class="string">""</span>);
+  <span class="keyword">var</span> m = <span class="regexp">/&amp;?towtruck=([^&amp;]*)/</span>.exec(hash);
+  <span class="keyword">if</span> (m) {
+    TowTruck.startup._joinShareId = m[<span class="number">1</span>];
+    TowTruck.startup.reason = <span class="string">"joined"</span>;
+    <span class="keyword">var</span> newHash = hash.substr(<span class="number">0</span>, m.index) + hash.substr(m.index + m[<span class="number">0</span>].length);
+    location.hash = newHash;
+  }
+  <span class="keyword">if</span> (window._TowTruckShareId) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-45">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-45">&#182;</a>
+                </div>
+                <p>A weird hack for something the addon does, to force a shareId.
+FIXME: probably should remove, it&#39;s a wonky feature.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    TowTruck.startup._joinShareId = window._TowTruckShareId;
+    <span class="keyword">delete</span> window._TowTruckShareId;
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">conditionalActivate</span><span class="params">()</span> {</span>
+    <span class="keyword">if</span> (window.TowTruckConfig_noAutoStart) {
+      <span class="keyword">return</span>;
+    }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-46">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-46">&#182;</a>
+                </div>
+                <p>A page can define this function to defer TowTruck from starting</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> callToStart = window.TowTruckConfig_callToStart;
+    <span class="keyword">if</span> (window.TowTruckConfig &amp;&amp; window.TowTruckConfig.callToStart) {
+      callToStart = window.TowTruckConfig.callToStart;
+    }
+    <span class="keyword">if</span> (callToStart) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-47">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-47">&#182;</a>
+                </div>
+                <p>FIXME: need to document this:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      callToStart(onload);
+    } <span class="keyword">else</span> {
+      onload();
+    }
+  }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-48">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-48">&#182;</a>
+                </div>
+                <p>FIXME: can we push this up before the load event?
+Do we need to wait at all?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">onload</span><span class="params">()</span> {</span>
+    <span class="keyword">if</span> (TowTruck.startup._joinShareId) {
+      TowTruck();
+    } <span class="keyword">else</span> <span class="keyword">if</span> (window._TowTruckBookmarklet) {
+      <span class="keyword">delete</span> window._TowTruckBookmarklet;
+      TowTruck();
+    } <span class="keyword">else</span> {
+      <span class="keyword">var</span> key = <span class="string">"towtruck-session.status"</span>;
+      <span class="keyword">var</span> value = sessionStorage.getItem(key);
+      <span class="keyword">if</span> (value) {
+        value = JSON.parse(value);
+        <span class="keyword">if</span> (value &amp;&amp; value.running) {
+          TowTruck.startup.continued = <span class="literal">true</span>;
+          TowTruck.startup.reason = value.startupReason;
+          TowTruck();
+        }
+      } <span class="keyword">else</span> <span class="keyword">if</span> (window.TowTruckConfig_findRoom) {
+        TowTruck.startup.reason = <span class="string">"joined"</span>;
+        TowTruck();
+      }
+    }
+  }
+
+  conditionalActivate();</pre></div></div>
+              
+            </li>
+          
+            <li id="section-49">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-49">&#182;</a>
+                </div>
+                <p>FIXME: wait until load event to double check if this gets set?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">if</span> (window.TowTruckConfig_enableShortcut) {
+    TowTruck.listenForShortcut();
+  }
+
+})();</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

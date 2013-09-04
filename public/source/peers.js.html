@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>peers.js</h1>
+        
+          <h4>Handles the objects representing the peers and oneself.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/peers.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+define([<span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"storage"</span>, <span class="string">"require"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, session, storage, require)</span> {</span>
+  <span class="keyword">var</span> peers = util.Module(<span class="string">"peers"</span>);
+  <span class="keyword">var</span> assert = util.assert;
+  <span class="keyword">var</span> CHECK_ACTIVITY_INTERVAL = <span class="number">10</span>*<span class="number">1000</span>; <span class="comment">// Every 10 seconds see if someone has gone idle</span>
+  <span class="keyword">var</span> IDLE_TIME = <span class="number">3</span>*<span class="number">60</span>*<span class="number">1000</span>; <span class="comment">// Idle time is 3 minutes</span>
+  <span class="keyword">var</span> BYE_TIME = <span class="number">10</span>*<span class="number">60</span>*<span class="number">1000</span>; <span class="comment">// After 10 minutes of inactivity the person is considered to be "gone"</span>
+
+  <span class="keyword">var</span> ui;
+  require([<span class="string">"ui"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(uiModule)</span> {</span>
+    ui = uiModule;
+  });
+
+  <span class="keyword">var</span> DEFAULT_NICKNAMES = [
+    <span class="string">"Friendly Fox"</span>,
+    <span class="string">"Brilliant Beaver"</span>,
+	<span class="string">"Observant Owl"</span>,
+	<span class="string">"Gregarious Giraffe"</span>,
+	<span class="string">"Wild Wolf"</span>,
+	<span class="string">"Silent Seal"</span>,
+	<span class="string">"Wacky Whale"</span>,
+	<span class="string">"Curious Cat"</span>,
+	<span class="string">"Intelligent Iguana"</span>
+  ];
+
+  <span class="keyword">var</span> Peer = util.Class({
+
+    isSelf: <span class="literal">false</span>,
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(id, attrs)</span> {</span>
+      attrs = attrs || {};
+      assert(id);
+      assert(! Peer.peers[id]);
+      <span class="keyword">this</span>.id = id;
+      <span class="keyword">this</span>.identityId = attrs.identityId || <span class="literal">null</span>;
+      <span class="keyword">this</span>.status = attrs.status || <span class="string">"live"</span>;
+      <span class="keyword">this</span>.idle = attrs.status || <span class="string">"active"</span>;
+      <span class="keyword">this</span>.name = attrs.name || <span class="literal">null</span>;
+      <span class="keyword">this</span>.avatar = attrs.avatar || <span class="literal">null</span>;
+      <span class="keyword">this</span>.color = attrs.color || <span class="string">"#00FF00"</span>;
+      <span class="keyword">this</span>.view = ui.PeerView(<span class="keyword">this</span>);
+      <span class="keyword">this</span>.lastMessageDate = <span class="number">0</span>;
+      <span class="keyword">this</span>.following = attrs.following || <span class="literal">false</span>;
+      Peer.peers[id] = <span class="keyword">this</span>;
+      <span class="keyword">var</span> joined = attrs.joined || <span class="literal">false</span>;
+      <span class="keyword">if</span> (attrs.fromHelloMessage) {
+        <span class="keyword">this</span>.updateFromHello(attrs.fromHelloMessage);
+        <span class="keyword">if</span> (attrs.fromHelloMessage.type == <span class="string">"hello"</span>) {
+          joined = <span class="literal">true</span>;
+        }
+      }
+      peers.emit(<span class="string">"new-peer"</span>, <span class="keyword">this</span>);
+      <span class="keyword">if</span> (joined) {
+        <span class="keyword">this</span>.view.notifyJoined();
+      }
+      <span class="keyword">this</span>.view.update();
+    },
+
+    repr: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> <span class="string">"Peer("</span> + JSON.stringify(<span class="keyword">this</span>.id) + <span class="string">")"</span>;
+    },
+
+    serialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> {
+        id: <span class="keyword">this</span>.id,
+        status: <span class="keyword">this</span>.status,
+        idle: <span class="keyword">this</span>.idle,
+        url: <span class="keyword">this</span>.url,
+        hash: <span class="keyword">this</span>.hash,
+        title: <span class="keyword">this</span>.title,
+        identityId: <span class="keyword">this</span>.identityId,
+        rtcSupported: <span class="keyword">this</span>.rtcSupported,
+        name: <span class="keyword">this</span>.name,
+        avatar: <span class="keyword">this</span>.avatar,
+        color: <span class="keyword">this</span>.color,
+        following: <span class="keyword">this</span>.following
+      };
+    },
+
+    destroy: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.view.destroy();
+      <span class="keyword">delete</span> Peer.peers[<span class="keyword">this</span>.id];
+    },
+
+    updateMessageDate: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.idle == <span class="string">"inactive"</span>) {
+        <span class="keyword">this</span>.update({idle: <span class="string">"active"</span>});
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.status == <span class="string">"bye"</span>) {
+        <span class="keyword">this</span>.unbye();
+      }
+      <span class="keyword">this</span>.lastMessageDate = Date.now();
+    },
+
+    updateFromHello: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">var</span> urlUpdated = <span class="literal">false</span>;
+      <span class="keyword">var</span> activeRTC = <span class="literal">false</span>;
+      <span class="keyword">var</span> identityUpdated = <span class="literal">false</span>;
+      <span class="keyword">if</span> (msg.url &amp;&amp; msg.url != <span class="keyword">this</span>.url) {
+        <span class="keyword">this</span>.url = msg.url;
+        <span class="keyword">this</span>.hash = <span class="literal">null</span>;
+        <span class="keyword">this</span>.title = <span class="literal">null</span>;
+        urlUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.hash != <span class="keyword">this</span>.hash) {
+        <span class="keyword">this</span>.hash = msg.urlHash;
+        urlUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.title != <span class="keyword">this</span>.title) {
+        <span class="keyword">this</span>.title = msg.title;
+        urlUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.rtcSupported !== <span class="literal">undefined</span>) {
+        <span class="keyword">this</span>.rtcSupported = msg.rtcSupported;
+      }
+      <span class="keyword">if</span> (msg.identityId !== <span class="literal">undefined</span>) {
+        <span class="keyword">this</span>.identityId = msg.identityId;
+      }
+      <span class="keyword">if</span> (msg.name &amp;&amp; msg.name != <span class="keyword">this</span>.name) {
+        <span class="keyword">this</span>.name = msg.name;
+        identityUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.avatar &amp;&amp; msg.avatar != <span class="keyword">this</span>.avatar) {
+        <span class="keyword">this</span>.avatar = msg.avatar;
+        identityUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.color &amp;&amp; msg.color != <span class="keyword">this</span>.color) {
+        <span class="keyword">this</span>.color = msg.color;
+        identityUpdated = <span class="literal">true</span>;
+      }
+      <span class="keyword">if</span> (msg.isClient !== <span class="literal">undefined</span>) {
+        <span class="keyword">this</span>.isCreator = ! msg.isClient;
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.status != <span class="string">"live"</span>) {
+        <span class="keyword">this</span>.status = <span class="string">"live"</span>;
+        peers.emit(<span class="string">"status-updated"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">if</span> (<span class="keyword">this</span>.idle != <span class="string">"active"</span>) {
+        <span class="keyword">this</span>.idle = <span class="string">"active"</span>;
+        peers.emit(<span class="string">"idle-updated"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">if</span> (msg.rtcSupported) {
+        peers.emit(<span class="string">"rtc-supported"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">if</span> (urlUpdated) {
+        peers.emit(<span class="string">"url-updated"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">if</span> (identityUpdated) {
+        peers.emit(<span class="string">"identity-updated"</span>, <span class="keyword">this</span>);
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>FIXME: I can&#39;t decide if this is the only time we need to emit
+this message (and not .update() or other methods)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (<span class="keyword">this</span>.following) {
+        session.emit(<span class="string">"follow-peer"</span>, <span class="keyword">this</span>);
+      }
+    },
+
+    update: <span class="function"><span class="keyword">function</span> <span class="params">(attrs)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>FIXME: should probably test that only a couple attributes are settable
+particularly status and idle</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (attrs.idle) {
+        <span class="keyword">this</span>.idle = attrs.idle;
+      }
+      <span class="keyword">if</span> (attrs.status) {
+        <span class="keyword">this</span>.status = attrs.status;
+      }
+      <span class="keyword">this</span>.view.update();
+    },
+
+    className: <span class="function"><span class="keyword">function</span> <span class="params">(prefix)</span> {</span>
+      prefix = prefix || <span class="string">""</span>;
+      <span class="keyword">return</span> prefix + util.safeClassName(<span class="keyword">this</span>.id);
+    },
+
+    bye: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.status != <span class="string">"bye"</span>) {
+        <span class="keyword">this</span>.status = <span class="string">"bye"</span>;
+        peers.emit(<span class="string">"status-updated"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">this</span>.view.update();
+    },
+
+    unbye: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.status == <span class="string">"bye"</span>) {
+        <span class="keyword">this</span>.status = <span class="string">"live"</span>;
+        peers.emit(<span class="string">"status-updated"</span>, <span class="keyword">this</span>);
+      }
+      <span class="keyword">this</span>.view.update();
+    },
+
+    nudge: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      session.send({
+        type: <span class="string">"url-change-nudge"</span>,
+        url: location.href,
+        to: <span class="keyword">this</span>.id
+      });
+    },
+
+    follow: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">this</span>.following) {
+        <span class="keyword">return</span>;
+      }
+      peers.getAllPeers().forEach(<span class="function"><span class="keyword">function</span> <span class="params">(p)</span> {</span>
+        <span class="keyword">if</span> (p.following) {
+          p.unfollow();
+        }
+      });
+      <span class="keyword">this</span>.following = <span class="literal">true</span>;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>We have to make sure we remember this, even if we change URLs:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      storeSerialization();
+      <span class="keyword">this</span>.view.update();
+      session.emit(<span class="string">"follow-peer"</span>, <span class="keyword">this</span>);
+    },
+
+    unfollow: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.following = <span class="literal">false</span>;
+      storeSerialization();
+      <span class="keyword">this</span>.view.update();
+    }
+
+  });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>FIXME: I can&#39;t decide where this should actually go, seems weird
+that it is emitted and handled in the same module</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  session.on(<span class="string">"follow-peer"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+    <span class="keyword">if</span> (peer.url != session.currentUrl()) {
+      <span class="keyword">var</span> url = peer.url;
+      <span class="keyword">if</span> (peer.urlHash) {
+        url += peer.urlHash;
+      }
+      location.href = url;
+    }
+  });
+
+  Peer.peers = {};
+
+  Peer.deserialize = <span class="function"><span class="keyword">function</span> <span class="params">(obj)</span> {</span>
+    obj.fromStorage = <span class="literal">true</span>;
+    <span class="keyword">var</span> peer = Peer(obj.id, obj);
+  };
+
+  peers.Self = <span class="literal">undefined</span>;
+
+  session.on(<span class="string">"start"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (peers.Self) {
+      <span class="keyword">return</span>;
+    }
+    <span class="comment">/* Same interface as Peer, represents oneself (local user): */</span>
+    peers.Self = util.mixinEvents({
+      isSelf: <span class="literal">true</span>,
+      id: session.clientId,
+      identityId: session.identityId,
+      status: <span class="string">"live"</span>,
+      idle: <span class="string">"active"</span>,
+      name: <span class="literal">null</span>,
+      avatar: <span class="literal">null</span>,
+      color: <span class="literal">null</span>,
+      defaultName: <span class="literal">null</span>,
+      loaded: <span class="literal">false</span>,
+      isCreator: ! session.isClient,
+
+      update: <span class="function"><span class="keyword">function</span> <span class="params">(attrs)</span> {</span>
+        <span class="keyword">var</span> updatePeers = <span class="literal">false</span>;
+        <span class="keyword">var</span> updateIdle = <span class="literal">false</span>;
+        <span class="keyword">var</span> updateMsg = {type: <span class="string">"peer-update"</span>};
+        <span class="keyword">if</span> (<span class="keyword">typeof</span> attrs.name == <span class="string">"string"</span> &amp;&amp; attrs.name != <span class="keyword">this</span>.name) {
+          <span class="keyword">this</span>.name = attrs.name;
+          updateMsg.name = <span class="keyword">this</span>.name;
+          <span class="keyword">if</span> (! attrs.fromLoad) {
+            storage.settings.set(<span class="string">"name"</span>, <span class="keyword">this</span>.name);
+            updatePeers = <span class="literal">true</span>;
+          }
+        }
+        <span class="keyword">if</span> (attrs.avatar &amp;&amp; attrs.avatar != <span class="keyword">this</span>.avatar) {
+          <span class="keyword">this</span>.avatar = attrs.avatar;
+          updateMsg.avatar = <span class="keyword">this</span>.avatar;
+          <span class="keyword">if</span> (! attrs.fromLoad) {
+            storage.settings.set(<span class="string">"avatar"</span>, <span class="keyword">this</span>.avatar);
+            updatePeers = <span class="literal">true</span>;
+          }
+        }
+        <span class="keyword">if</span> (attrs.color &amp;&amp; attrs.color != <span class="keyword">this</span>.color) {
+          <span class="keyword">this</span>.color = attrs.color;
+          updateMsg.color = <span class="keyword">this</span>.color;
+          <span class="keyword">if</span> (! attrs.fromLoad) {
+            storage.settings.set(<span class="string">"color"</span>, <span class="keyword">this</span>.color);
+            updatePeers = <span class="literal">true</span>;
+          }
+        }
+        <span class="keyword">if</span> (attrs.defaultName &amp;&amp; attrs.defaultName != <span class="keyword">this</span>.defaultName) {
+          <span class="keyword">this</span>.defaultName = attrs.defaultName;
+          <span class="keyword">if</span> (! attrs.fromLoad) {
+            storage.settings.set(<span class="string">"defaultName"</span>, <span class="keyword">this</span>.defaultName);
+            updatePeers = <span class="literal">true</span>;
+          }
+        }
+        <span class="keyword">if</span> (attrs.status &amp;&amp; attrs.status != <span class="keyword">this</span>.status) {
+          <span class="keyword">this</span>.status = attrs.status;
+          peers.emit(<span class="string">"status-updated"</span>, <span class="keyword">this</span>);
+        }
+        <span class="keyword">if</span> (attrs.idle &amp;&amp; attrs.idle != <span class="keyword">this</span>.idle) {
+          <span class="keyword">this</span>.idle = attrs.idle;
+          updateIdle = <span class="literal">true</span>;
+          peers.emit(<span class="string">"idle-updated"</span>, <span class="keyword">this</span>);
+        }
+        <span class="keyword">this</span>.view.update();
+        <span class="keyword">if</span> (updatePeers &amp;&amp; ! attrs.fromLoad) {
+          session.send(updateMsg);
+        }
+        <span class="keyword">if</span> (updateIdle &amp;&amp; ! attrs.fromLoad) {
+          session.send({
+            type: <span class="string">"idle-status"</span>,
+            idle: <span class="keyword">this</span>.idle
+          });
+        }
+      },
+
+      className: <span class="function"><span class="keyword">function</span> <span class="params">(prefix)</span> {</span>
+        prefix = prefix || <span class="string">""</span>;
+        <span class="keyword">return</span> prefix + <span class="string">"self"</span>;
+      },
+
+      _loadFromSettings: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        <span class="keyword">return</span> util.resolveMany(
+          storage.settings.get(<span class="string">"name"</span>),
+          storage.settings.get(<span class="string">"avatar"</span>),
+          storage.settings.get(<span class="string">"defaultName"</span>),
+          storage.settings.get(<span class="string">"color"</span>)).then((<span class="function"><span class="keyword">function</span> <span class="params">(name, avatar, defaultName, color)</span> {</span>
+            <span class="keyword">if</span> (! defaultName) {
+              defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+              storage.settings.set(<span class="string">"defaultName"</span>, defaultName);
+            }
+            <span class="keyword">if</span> (! color) {
+              color = Math.floor(Math.random() * <span class="number">0xffffff</span>).toString(<span class="number">16</span>);
+              <span class="keyword">while</span> (color.length &lt; <span class="number">6</span>) {
+                color = <span class="string">"0"</span> + color;
+              }
+              color = <span class="string">"#"</span> + color;
+              storage.settings.set(<span class="string">"color"</span>, color);
+            }
+            <span class="keyword">if</span> (! avatar) {
+              avatar = TowTruck.baseUrl + <span class="string">"/towtruck/images/default-avatar.png"</span>;
+            }
+            <span class="keyword">this</span>.update({
+              name: name,
+              avatar: avatar,
+              defaultName: defaultName,
+              color: color,
+              fromLoad: <span class="literal">true</span>
+            });
+            peers._SelfLoaded.resolve();
+          }).bind(<span class="keyword">this</span>)); <span class="comment">// FIXME: ignoring error</span>
+      },
+
+      _loadFromApp: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>FIXME: I wonder if these should be optionally functions?
+We could test typeof==function to distinguish between a getter and a concrete value</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> getUserName = TowTruck.getConfig(<span class="string">"getUserName"</span>);
+        <span class="keyword">var</span> getUserColor = TowTruck.getConfig(<span class="string">"getUserColor"</span>);
+        <span class="keyword">var</span> getUserAvatar = TowTruck.getConfig(<span class="string">"getUserAvatar"</span>);
+        <span class="keyword">var</span> name, color, avatar;
+        <span class="keyword">if</span> (getUserName) {
+          name = getUserName();
+          <span class="keyword">if</span> (name &amp;&amp; <span class="keyword">typeof</span> name != <span class="string">"string"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>FIXME: test for HTML safe?  Not that we require it, but
+&lt;&gt;&#39;s are probably a sign something is wrong.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>            console.warn(<span class="string">"Error in getUserName(): should return a string (got"</span>, name, <span class="string">")"</span>);
+            name = <span class="literal">null</span>;
+          }
+        }
+        <span class="keyword">if</span> (getUserColor) {
+          color = getUserColor();
+          <span class="keyword">if</span> (color &amp;&amp; <span class="keyword">typeof</span> color != <span class="string">"string"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>FIXME: would be nice to test for color-ness here.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>            console.warn(<span class="string">"Error in getUserColor(): should return a string (got"</span>, color, <span class="string">")"</span>);
+            color = <span class="literal">null</span>;
+          }
+        }
+        <span class="keyword">if</span> (getUserAvatar) {
+          avatar = getUserAvatar();
+          <span class="keyword">if</span> (avatar &amp;&amp; <span class="keyword">typeof</span> avatar != <span class="string">"string"</span>) {
+            console.warn(<span class="string">"Error in getUserAvatar(): should return a string (got"</span>, avatar, <span class="string">")"</span>);
+            avatar = <span class="literal">null</span>;
+          }
+        }
+        <span class="keyword">if</span> (name || color || avatar) {
+          <span class="keyword">this</span>.update({
+            name: name,
+            color: color,
+            avatar: avatar
+          });
+        }
+      }
+    });
+
+    peers.Self.view = ui.PeerView(peers.Self);
+    storage.tab.get(<span class="string">"peerCache"</span>).then(deserialize);
+    peers.Self._loadFromSettings().then(<span class="keyword">function</span>() {
+        peers.Self._loadFromApp();
+        peers.Self.view.update();
+    });
+  });
+
+  session.on(<span class="string">"refresh-user-data"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (peers.Self) {
+      peers.Self._loadFromApp();
+    }
+  });
+
+  peers._SelfLoaded = util.Deferred();
+
+  <span class="function"><span class="keyword">function</span> <span class="title">serialize</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> peers = [];
+    util.forEachAttr(Peer.peers, <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+      peers.push(peer.serialize());
+    });
+    <span class="keyword">return</span> {
+      peers: peers
+    };
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">deserialize</span><span class="params">(obj)</span> {</span>
+    <span class="keyword">if</span> (! obj) {
+      <span class="keyword">return</span>;
+    }
+    obj.peers.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+      Peer.deserialize(peer);
+    });
+  }
+
+  peers.getPeer = <span class="function"><span class="keyword">function</span> <span class="title">getPeer</span><span class="params">(id, message)</span> {</span>
+    assert(id);
+    <span class="keyword">var</span> peer = Peer.peers[id];
+    <span class="keyword">if</span> (id === session.clientId) {
+      <span class="keyword">return</span> peers.Self;
+    }
+    <span class="keyword">if</span> (message &amp;&amp; ! peer) {
+      peer = Peer(id, {fromHelloMessage: message});
+      <span class="keyword">return</span> peer;
+    }
+    assert(peer, <span class="string">"No peer with id:"</span>, id);
+    <span class="keyword">if</span> (message &amp;&amp;
+        (message.type == <span class="string">"hello"</span> || message.type == <span class="string">"hello-back"</span> ||
+         message.type == <span class="string">"peer-update"</span>)) {
+      peer.updateFromHello(message);
+      peer.view.update();
+    }
+    <span class="keyword">return</span> Peer.peers[id];
+  };
+
+  peers.getAllPeers = <span class="function"><span class="keyword">function</span> <span class="params">(liveOnly)</span> {</span>
+    <span class="keyword">var</span> result = [];
+    util.forEachAttr(Peer.peers, <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+      <span class="keyword">if</span> (liveOnly &amp;&amp; peer.status != <span class="string">"live"</span>) {
+        <span class="keyword">return</span>;
+      }
+      result.push(peer);
+    });
+    <span class="keyword">return</span> result;
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">checkActivity</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> ps = peers.getAllPeers();
+    <span class="keyword">var</span> now = Date.now();
+    ps.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(p)</span> {</span>
+      <span class="keyword">if</span> (p.idle == <span class="string">"active"</span> &amp;&amp; now - p.lastMessageDate &gt; IDLE_TIME) {
+        p.update({idle: <span class="string">"inactive"</span>});
+      }
+      <span class="keyword">if</span> (p.status != <span class="string">"bye"</span> &amp;&amp; now - p.lastMessageDate &gt; BYE_TIME) {
+        p.bye();
+      }
+    });
+  }
+
+  session.hub.on(<span class="string">"bye"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">var</span> peer = peers.getPeer(msg.clientId);
+    peer.bye();
+  });
+
+  <span class="keyword">var</span> checkActivityTask = <span class="literal">null</span>;
+
+  session.on(<span class="string">"start"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (checkActivityTask) {
+      console.warn(<span class="string">"Old peers checkActivityTask left over?"</span>);
+      clearTimeout(checkActivityTask);
+    }
+    checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+  });
+
+  session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    util.forEachAttr(Peer.peers, <span class="function"><span class="keyword">function</span> <span class="params">(peer)</span> {</span>
+      peer.destroy();
+    });
+    storage.tab.set(<span class="string">"peerCache"</span>, <span class="literal">undefined</span>);
+    clearTimeout(checkActivityTask);
+    checkActivityTask = <span class="literal">null</span>;
+  });
+
+  session.on(<span class="string">"visibility-change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(hidden)</span> {</span>
+    <span class="keyword">if</span> (hidden) {
+      peers.Self.update({idle: <span class="string">"inactive"</span>});
+    } <span class="keyword">else</span> {
+      peers.Self.update({idle: <span class="string">"active"</span>});
+    }
+  });
+
+  session.hub.on(<span class="string">"idle-status"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    msg.peer.update({idle: msg.idle});
+  });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>Pings are a straight alive check, and contain no more information:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  session.hub.on(<span class="string">"ping"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    session.send({type: <span class="string">"ping-back"</span>});
+  });
+
+  window.addEventListener(<span class="string">"pagehide"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>FIXME: not certain if this should be tab local or not:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    storeSerialization();
+  }, <span class="literal">false</span>);
+
+  <span class="function"><span class="keyword">function</span> <span class="title">storeSerialization</span><span class="params">()</span> {</span>
+    storage.tab.set(<span class="string">"peerCache"</span>, serialize());
+  }
+
+  util.mixinEvents(peers);
+
+  util.testExpose({
+    setIdleTime: <span class="function"><span class="keyword">function</span> <span class="params">(time)</span> {</span>
+      IDLE_TIME = time;
+      CHECK_ACTIVITY_INTERVAL = time / <span class="number">2</span>;
+      <span class="keyword">if</span> (TowTruck.running) {
+        clearTimeout(checkActivityTask);
+        checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+      }
+    }
+  });
+
+  util.testExpose({
+    setByeTime: <span class="function"><span class="keyword">function</span> <span class="params">(time)</span> {</span>
+      BYE_TIME = time;
+      CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / <span class="number">2</span>);
+      <span class="keyword">if</span> (TowTruck.running) {
+        clearTimeout(checkActivityTask);
+        checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+      }
+    }
+  });
+
+  <span class="keyword">return</span> peers;
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

@@ -324,7 +324,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       },
 
       _loadFromSettings: function () {
-        util.resolveMany(
+        return util.resolveMany(
           storage.settings.get("name"),
           storage.settings.get("avatar"),
           storage.settings.get("defaultName"),
@@ -398,10 +398,10 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
     peers.Self.view = ui.PeerView(peers.Self);
     storage.tab.get("peerCache").then(deserialize);
-    peers.Self._loadFromSettings();
-    peers.Self._loadFromApp();
-    peers.Self.view.update();
-
+    peers.Self._loadFromSettings().then(function() {
+        peers.Self._loadFromApp();
+        peers.Self.view.update();
+    });
   });
 
   session.on("refresh-user-data", function () {
@@ -434,6 +434,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   peers.getPeer = function getPeer(id, message) {
     assert(id);
     var peer = Peer.peers[id];
+    if (id === session.clientId) {
+      return peers.Self;
+    }
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
       return peer;

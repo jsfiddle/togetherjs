@@ -1,0 +1,110 @@
+div.element {
+  position: relative;
+  white-space: pre-wrap;
+  font-family: Monaco;
+  font-size: 9pt;
+  color: rgba(0,0,0,0.75);
+  border: 1px dotted black;
+  padding-bottom: 1.5em;
+  margin-left: 0.5em;
+  word-wrap: break-word;
+}
+
+div.element div.name {
+  display: inline;
+}
+
+div.element div.value {
+  display: inline-block;
+}
+
+li > div.element {
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;  
+}
+
+div.element > div.start, div.element > div.end {
+  background: rgba(0,0,0,0.5);
+  color: white;
+}
+
+div.element > div.start:before {
+  content: '<';
+}
+
+div.element > div.start:after {
+  content: '>';
+}
+
+div.element > div.start > div.name {
+}
+
+div.element li {
+  display: inline;
+}
+
+div.element > div.start > ul.attributes {
+  display: inline;
+  padding: 0;
+}
+
+div.element > div.start > ul.attributes div.name {
+  color: rgba(255,255,255,0.7);
+}
+
+div.element > div.start > ul.attributes div.name:before {
+  content: ' ';
+}
+
+div.element > div.start > ul.attributes div.name:after {
+  content: '=';
+}
+
+div.element > div.start > ul.attributes div.value {
+  color: white;
+}
+
+div.element > div.start > ul.attributes div.value:before {
+  content: '"';
+  color: rgba(255,255,255,0.7);
+}
+
+div.element > div.start > ul.attributes div.value:after {
+  content: '"';
+  color: rgba(255,255,255,0.7);
+}
+
+div.element > ul.children {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+div.element > div.end {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+div.element > div.end:before {
+  content: '</';
+}
+
+div.element > div.end:after {
+  content: '>';
+}
+
+div.text {
+  font-family: "Helvetica Neue";
+  color: black;
+}
+
+.drop-zone {
+  min-height: 8px;
+}
+
+.current-drag {
+}
+
+.current-drop {
+  background: rgba(0,0,0,0.25) !important;
+}

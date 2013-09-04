@@ -5,18 +5,26 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <title>
-      Mozilla Labs : TowTruck
+      Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A service for your website that makes it surprisingly easy to collaborate in real-time.">
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="/images/fav-icon.png">
+    <link rel="shortcut icon" href="images/fav-icon.png">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="/js/froogaloop2.min.js"></script>
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/towtruck.js"></script>
-    <script src="/example/startup.js"></script>
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/parallax.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="js/scrollTo.js"></script>
+    <script src="js/waypoints.min.js"></script>
+    <script src="js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -30,11 +38,14 @@
       })();
     </script>
 
-    <script type="text/javascript" src="/js/application.js"></script>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/jumbotron.css" rel="stylesheet">
+    <link href="css/carousel.css" rel="stylesheet">
+    <link href="css/grid.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
 
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
-    <link href="/style.css"                       rel="stylesheet" type="text/css" media="all">
-    <link href="//www.mozilla.org/tabzilla/media/css/tabzilla.css" rel="stylesheet" />
     
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -48,37 +59,37 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+
   </head>
   <body>
-    <a href="http://www.mozilla.org/" id="tabzilla">mozilla</a>
-    <div class="navbar-wrapper towtruckula">
-      <!-- Wrap the .navbar in .container to center it within the absolutely positioned parent. -->
-      <div class="container">
-        <div class="navbar navbar-inverse">
-          <div class="navbar-inner towtruck-nav">
-            <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            
-            <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
-            <div class="nav-collapse collapse">
-              <ul class="nav">
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
-                <li class="active"><a href="/">Home</a></li>
-                <li ><a href="/example">Examples</a></li>
-                <li><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li><a href="https://github.com/mozilla/towtruck/wiki/Developers:-Getting-Started#head" target="_blank">Developers</a></li>
-                <!--li><a href="#">API Docs</a></li>
-                <li><a href="#">Extending TowTruck</a></li-->
-                <li><a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a></li>
-                
-              </ul>
-            </div>
-          </div>
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href="./"></a>
+          <a class="navbar-brand masthead-title" href="./">TogetherJS</a>
         </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+            <li><a href="./" class="scrollnav active">Overview</a></li>
+            <li><a href="./docs/developers-getting-started.html" class="scrollnav ">Docs</a></li>
+            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
       </div>
     </div>
 
@@ -87,246 +98,389 @@
     
 
 
-
-<div class="containerbg">
-  <div id="introduction" class="section">
-    <div class="container">
-      <div class="row">
-        <div class="span5">
-          <h1>
-            <img src="/images/towtruck-logo-lrg.png" alt="Logo">
-            TowTruck
-          </h1>
-          <p class="lead">A <strong>service</strong> for your <strong>website</strong> that makes it surprisingly easy to <strong>collaborate</strong> in <strong>real-time</strong>.</p>
-          <p class="lead"><a class="btn btn-large btn-primary" href="/example" id="btn-tryitout">Try it out here</a></p>
-        </div>
-        <div class="span7" id="towtruck-product-video">
-          <a id="show_video_modal" href="#video_modal" role="button" data-toggle="modal">
-            <img src="images/site-product-shot.png" alt="Product shot">
-          </a>
-        </div>
-        <div id="video_modal" class="modal hide fade" tabindex="-1" role="dialog">
-          <button type="button" id="close_vimeo_modal" class="close" data-dismiss="modal">
-            <img src="/images/icn-close-btn-wht.png" alt="close button">
-          </button>
-          <div class="modal-body">
-            <iframe id="modal_vimeo_iframe" src="https://player.vimeo.com/video/64117317?portrait=0&amp;byline=0&amp;api=1&amp;player_id=modal_vimeo_iframe"></iframe>
+    <section id="hero" data-speed="10" data-type="background">   
+          
+      <section id="marketing-video">
+        
+        <div class="container" id="frame-video">
+          <p class="text-center" data-loading-text="Loading...">
+          <div class="flex-video widescreen">
+            <div class="video-closebtn">&#x2716;</div>
+            <iframe src="http://player.vimeo.com/video/64117317?title=0&amp;byline=0&amp;portrait=0&amp;color=e1472f&amp;autoplay=0" width="100%" height="390px" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
           </div>
+          </p>
         </div>
-      </div>
-    </div>
-  </div>
+      </section>
 
-  <script type="text/javascript" charset="utf-8">
-		//check if mobile device, and play Vimeo with no modal
-		var isiPhone = navigator.userAgent.toLowerCase().indexOf("iphone");
-		var isiPad = navigator.userAgent.toLowerCase().indexOf("ipad");
-		var isAndroid = navigator.userAgent.toLowerCase().indexOf("android");
-
-				if(isiPhone > -1)
-				{
-				    //Redirect to iPhone video player
-            $("#towtruck-product-video").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-product-shot.png" alt="Product shot"></a>');
-				}
-				if(isAndroid > -1)
-				{
-
-				}
-	</script>
-
-  <div id="introducing-towtruck" class="section">
-    <div class="container">
-      <h1 class="main-header">Introducing TowTruck.</h1>
-      <h2 class="sub-header">Let's make collaborating on the web easier.</h2>
-      <div class="span4 far-left">
-        <img class="main-img" src="images/introducing-mozilla.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">By someone you trust.</h2>
-        <p class="main-text">Built and hosted by <a href="http://www.mozilla.org/en-US/" target="_blank">Mozilla</a>, Towtruck is <a href="https://github.com/mozilla/towtruck" target="_blank">open source</a>.</p>
-      </div>
-      <div class="span4 textcenter">
-        <img class="main-img" src="images/introducing-collaborate.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">Create together.</h2>
-        <p class="main-text">TowTruck lets users communicate, co-author, co-browse and guide each other.</p>
-      </div>
-      <div class="span4 textcenter">
-        <img class="main-img" src="images/introducing-web.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">Built for the web.</h2>
-        <p class="main-text">TowTruck is implemented in Javascript; no software or plugins to install, and it's friendly with existing web pages, while still letting developers customize the experience.</p>
-      </div>
-    </div>
-    <hr style="width:50%;margin:20px auto 0px;">
-  </div>
-
-
-  <div id="how_it_works" class="section">
-    <div class="container">
-      <h1 class="main-header">How it works</h1>
-      <div class="row">
-        <ol class="span5" id="how_it_works_indicators">
-          <li data-slide-index="0" class="active">
-            <div class="col-right">
-              <h2 class="subheader">Click the TowTruck button</h2>
-              <p class="main-text">When on a TowTruck-enabled site, collaboration is only a click away.</p>
-            </div>
-            <div class="clear"></div>
-          </li>
-          <li  data-slide-index="1">
-            <div class="col-right">
-              <h2 class="subheader">Share the TowTruck link</h2>
-              <p class="main-text">Copy and paste the TowTruck link and send to a friend.</p>
-            </div>
-            <div class="clear"></div>
-          </li>
-          <li data-slide-index="2">
-            <div class="col-right">
-              <h2 class="subheader">Wait for your friend to join</h2>
-              <p class="main-text">
-                You'll see a notification when your friend joins your session, and you can then collaborate in real-time!</p>
-            </div>
-            <div class="clear"></div>
-          </li>
-        </ol>
-        <div class="span7">
-          <div id="how_it_works_carousel" class="carousel slide">
-            <div class="carousel-inner">
-              <div class="a active item">
-                <img src="/images/sections/how_it_works/carousel-a.png" alt="Click the TowTruck Button" />
-              </div>
-              <div class="b item">
-                <img src="/images/sections/how_it_works/carousel-b.png" alt="Click the TowTruck Button" />
-              </div>
-              <div class="c item">
-                <div id="towtruck_demo_cursor" style="color: rgb(190, 24, 14); top: 146px; left: 188px;">
-                  <img class="towtruck-cursor-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAyCAYAAACgadDsAAABq0lEQVRYR+3YQVLCMBQG4PfYqgwblZ0cgd6goReQI3gDvAnewCNwAS1H4Ai4a3VTW5xhmKHPEGDGalrS9iULh2666cyX95L+TYrhzdW9eM9m4PDCl9tu0sHNUETrpSsXX/tdAqD5KMqEY1SyBI9BnE5dwIdK9xRut574+FrYhgsoECxGceq5RaVGlD8F8WpiEy5WepAQciGi1dwWrEUltsR16okEEhtwGSrbTLMgzsZOUbWacxrbSKvSSlWFBAnixuNOq2p0L7OnlQHKn1ZGKHdaGaOcaWWOMqZVLVS1mSGtaqMcadUEbZ1WjdC2adUYbZNWzdEWadUSbZZWrdEmacWC1k0rHrRmWrGhddKKFTVNK27UKK3YUZO0MkblKesNAe6Mdocn9lZGKAE9BFH2vAPD/qWfAw7kR26AQD6pu24w5Xurk+hPsKpK3WDk+zvVnQQrUVOwbDBhD3q6U4IWlWfVT0CaHFtqNI81HvqD7sBOvvVtnlMLqAtQvVL7fw7qE2W9wuMMKNQlqCpVv3Qsz+HvNYbh9cXQ5qLRLWoZJu6vM2q15+f2/r/2fgOsvURCcTEEjAAAAABJRU5ErkJggg==" alt="Demo Cursor that moves around.">
-                  <span class="towtruck-cursor-name">Comrade</span>
-                </div>
-                <img src="/images/sections/how_it_works/carousel-c.png" alt="Click the TowTruck Button" />
-              </div>
-            </div>
-            <ol class="carousel-indicators">
-              <li data-target="#how_it_works_carousel" data-slide-to="0" class="active"></li>
-              <li data-target="#how_it_works_carousel" data-slide-to="1"></li>
-              <li data-target="#how_it_works_carousel" data-slide-to="2"></li>
-            </ol>
-            <!-- Carousel nav -->
-            <!-- FIX ME -- We should remove the prev nav button on the first slide -->
-              <a class="carousel-control left" href="#how_it_works_carousel" data-slide="prev">&lsaquo;</a>
-              <a class="carousel-control right" href="#how_it_works_carousel" data-slide="next">&rsaquo;</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <hr style="width:50%;margin:50px auto 0px;">
-  </div>
-
-  <div id="selector">
-    <div class="container">
-        I want to
-        <div class="btn-group" data-toggle="buttons-radio">
-          <button class="btn" type="button" name="rating" value="0"><i class="icon-user"></i>Use</button>
-          <button class="btn" type="button" name="rating" value="1"><i class="icon-wrench"></i>Implement</button>
-        </div>
-        <img src="/images/site-icn-logo.png" alt="logo">TowTruck
-    </div>
-  </div>
-
-  <div id="features" class="section">
-    <div class="container">
-      <h1 class="main-header">Features</h1>
-        <div class="span4 far-left">
-        <img class="main-img" src="images/site-features-01.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">Real-time authoring</h2>
-        <p class="main-text">Work together at the same time and see changes made instantly.</p>
-        <p></p>
-      </div><!-- /.span4 -->
-      <div class="span4 textcenter">
-        <img class="main-img" src="images/site-features-02.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">Real-time chat</h2>
-        <p class="main-text">Talk to your friends over chat, so you can share resources and links.</p>
-        <p></p>
-      </div><!-- /.span4 -->
-      <div class="span4 textcenter">
-        <img class="main-img" src="images/site-features-03.png" alt="Browser Header Shared Image">
-        <h2 class="subheader">Real-time voice chat</h2>
-        <p class="main-text">Using Web Real-Time Communication, you can talk with your friends over the microphone in the browser.</p>
-        <p></p>
-      </div><!-- /.span4 -->
-    </div>
-    <hr style="width:50%;margin:20px auto 0px;">
-  </div>
-
-  <div id="how_to_install" class="section">
-    <div class="container">
-      <h1 class="main-header">How to install TowTruck</h1>
-      <div class="row" id="steps">
-        <div class="span6">
-          <p class="main-text">Simply copy and paste the TowTruck JavaScript snippet below into your site.</p>
-          <form>
-            <fieldset>
-              <textarea class="span6 copy-input">
-&lt;script src="https://towtruck.mozillalabs.com/towtruck.js"&gt;&lt;/script&gt;</textarea>
-            </fieldset>
-          </form>
-        </div>
-        <div class="span6">
-          <p class="main-text">After you've included the TowTruck JavaScript snippet, copy and paste this anywhere onto your site!</p>
-          <form>
-            <fieldset>
-              <textarea class="span6 copy-input"><button onclick=&quot;TowTruck(this); return false;&quot;>Start TowTruck</button></textarea>
-            </fieldset>
-          </form>
-        </div>
-      </div>
-    </div>
-    <hr style="width:50%;margin:50px auto 0px;">
-  </div>
-
-  <div id="tryitout" class="section">
-    <div class="container">
-      <h1 class="main-header">Try out TowTruck today!</h1>
-      <p class="lead"><a class="btn btn-large btn-primary" id="btn-tryitout" href="/example">Try it out here</a></p>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-    <footer>
       <div class="container">
-        <div class="row">
-          <div class="span3">
-            <a href="https://mozillalabs.com/" class="footer-logo"><img src="/images/footer-mozilla-labs.png" alt="mozilla"></a>
+        <div class="row" id="hero-section">          
+          <div class="col-md-5" id="box-left">
+            <h1 class="hero-header-text large">Collaboration made easy.</h1>
+            <h4 class="hero-tagline">Add real time collaboration features to your website or app today!
+            </h4>
+            <p>
+              <a class="btn btn-primary btn-lg main-get-started scrollnav" href="#tryitout-section">Get Started</a>
+            </p>
           </div>
-          <nav class="span3">
-            <ul>
-              <li>
-                <a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a>
+          <div class="col-md-7" id="video-area">
+            <img src="images/site-hero-image.png" class="swap1 img-responsive"
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">      
+      <section class="body-content" id="main-section" data-speed="4" data-type="background">        
+        <section class="row" id="tour">
+          <h1 class="text-center">Tour</h1>
+          <h3 class="text-center">What is TogetherJS?</h3>
+          <div class="col-xs-12 text-center">
+            <p class="text-center">TogetherJS is a Javascript library that adds collaboration features and tools to your website or app.</p>
+          </div>
+          <h3 class="text-center">Why use TogetherJS?</h3>
+          <div class="col-xs-4 text-center why-connect-01">
+            <img src="images/site-tour-why-moz.png" alt="mozilla logo" class="img-circle img-responsive why-section">
+            <h4 class="text-center">By someone you trust.</h4>
+            <p class="text-center">TogetherJS is built and hosted by Mozilla, so you know it's safe to use.</p>
+          </div>
+          <div class="col-xs-4 why-connect-02">
+            <img src="images/site-tour-why-create.png" alt="create with connect" class="img-circle img-responsive why-section">
+            <h4 class="text-center">Create together.</h4>
+            <p class="text-center"> TogetherJS makes it easy for users on your site collaborate in real time.</p>
+          </div>
+          <div class="col-xs-4 why-connect-03">
+            <img src="images/site-tour-why-web.png" alt="built for the web icon" class="img-circle img-responsive why-section">
+            <h4 class="text-center">Built for the web.</h4>
+            <p class="text-center">TogetherJS is implemented in Javascript; no software or plugins to install, and it's friendly with existing web pages, while still letting developers customize the experience.</p>
+          </div>
+          <div class="clearfix"></div>
+          <h3 class="text-center">How does TogetherJS work?</h3>
+          
+          <div class="table-responsive">
+            <table class="table" id="howto-table">  
+              <tbody>  
+                <tr class="howto-animation-01">  
+                  <td class="col-xs-6" style="vertical-align:middle">
+                    <h4 class="text-left">Add TogetherJS Javascript and HTML to your site.</h4>
+                    <p class="text-left">Just copy and paste TogetherJS's JS library and HTML snippet into your site or app to give it out-of-the-box collaboration tools and features.</p>
+                  </td>  
+                  <td class="col-xs-6">
+                    <!-- FIREFOX FIX -->
+                    <div style="position:relative;">
+                      <img src="images/towtruck-how-01-addit-file-connecthtml.png" alt="..." class="img-responsive how-section-imganim-01">
+                      <img src="images/towtruck-how-01-addit-file-connectjs.png" alt="..." class="img-responsive how-section-imganim-02">
+                      <img src="images/towtruck-how-01-addit-btn-collaborate.png" alt="..." class="img-responsive how-section-imganim-03">
+                      <p><img src="images/towtruck-how-01-addit-noplus.png" alt="..." class="img-rounded img-responsive how-section"></p>
+                    </div>
+                  </td>  
+                </tr>  
+                <tr class="howto-animation-02">  
+                  <td class="col-xs-6">
+                    <div style="position:relative;">
+                      <img src="images/towtruck-how-02-maindockpiece.png" alt="..." class="img-responsive how-section-dockplacement">
+                      <img src="images/towtruck-how-02-dock-btn-collaborate-pressed.png" alt="..." class="img-responsive how-section-btncollabpressed">
+                      <img src="images/towtruck-how-01-addit-btn-collaborate.png" alt="..." class="img-responsive how-section-btncollab">
+                      <p><img src="images/towtruck-how-02-dock.png" alt="..." class="img-rounded img-responsive how-section"></p>
+                    </div>
+                  </td>
+                  <td class="col-xs-6" style="vertical-align:middle">
+                    <h4 class="text-right">Your site is now TogetherJS enabled.</h4>
+                    <p class="text-right">If your users want to collaborate with a friend, they can click the TogetherJS button on your site.</p>
+                  </td>  
+                </tr>  
+                <tr class="howto-animation-03">  
+                  <td class="col-xs-6" style="vertical-align:middle">
+                    <h4 class="text-left">Your users can then collaborate in real time!</h4>
+                    <p class="text-left">Your users can send a unique TogetherJS url to a friend.  When the friend opens the link, each user sees the same page and can interact with it together in real time.</p>
+                  </td>  
+                  <td class="col-xs-6">
+                    <div style="position:relative;">
+                      <img src="images/towtruck-how-03-cursor1.png" alt="..." class="img-responsive cursor-placement-01">
+                      <img src="images/towtruck-how-03-cursor2.png" alt="..." class="img-responsive cursor-placement-02">
+                      <img src="images/towtruck-how-03-cursor1.png" alt="..." class="img-responsive cursor-placement-03">
+                      <img src="images/towtruck-how-03-cursor2.png" alt="..." class="img-responsive cursor-placement-04">
+                      <p><img src="images/towtruck-how-03-collaborate.png" alt="..." class="img-rounded img-responsive how-section"></p>
+                    </div>
+                  </td>  
+                </tr>
+              </tbody>  
+            </table>  
+          </div>
+          <div class="clearfix"></div>
+          <div class="col-xs-12">
+            <h4 class="text-center">Want to add learn more about how it works?</h4>
+            <p class="text-center">
+              See how the technology architecture works <a href="" target="_blank">here</a>.  
+            </p>
+          </div>
+        </section>
+        
+        <hr id="examples-section">
+        
+        <section class="row" id="examples">
+          <h1 class="text-center">Examples</h1>
+          <h3 class="text-center">Try out TogetherJS on these sample apps.</h3>
+          <div class="col-xs-4">
+            <a data-toggle="modal" href="#example-todoapp"><img src="images/site-examples-todo.png" alt="to do app examples" class="img-responsive img-rounded"></a>
+            <h4 class="text-center">Grocery To Do app</h4>
+            <p class="text-center">Try out TogetherJS on this sample grocery app with a friend.</p>
+            <p class="text-center"><button data-toggle="modal" href="#example-todoapp" class="btn btn-primary">Launch</button></p>
+          </div>
+          <div class="col-xs-4">
+            <a data-toggle="modal" href="#example-friendlycode"><img src="images/site-examples-friendlycode.png" alt="friendly code example" class="img-responsive img-rounded"></a>
+            <h4 class="text-center">Friendly Code</h4>
+            <p class="text-center">Code together with your friend.</p>
+            <p class="text-center"><button data-toggle="modal" href="#example-friendlycode" class="btn btn-primary">Launch</button></p>
+          </div>
+          <div class="col-xs-4">
+            <a data-toggle="modal" href="#example-madlibs"><img src="images/site-examples-madlibs.png" alt="mad libs example" class="img-responsive img-rounded"></a>
+            <h4 class="text-center">Mad Libs</h4>
+            <p class="text-center">Play Mad Libs with a friend using TogetherJS.</p>
+            <p class="text-center"><button data-toggle="modal" href="#example-madlibs" class="btn btn-primary">Launch</button></p>
+          </div>
+        </section>
+        
+        <!-- TO DO APP -->
+         <div class="modal fade app-example" id="example-todoapp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+           <div class="modal-dialog">
+             <div class="modal-content">
+               <div class="modal-header">
+                 <div class="top-bar">
+                   <button type="button" class="close pull-left red-circle" data-dismiss="modal" aria-hidden="true"></button>
+                   <button class="yellow-circle pull-left"></button>
+                   <button class="green-circle pull-left"></button>
+                 </div>
+                 <div class="address-bar">
+                  <input type="text" class="form-control" placeholder="http://www.sample.com/todoapp" readonly>
+                 </div>
+               </div>
+               <div class="modal-body">
+                 <iframe class="col-xs-12"
+                          src="examples/todo/index.html">
+                 </iframe>
+               </div>
+             </div><!-- /.modal-content -->
+           </div><!-- /.modal-dialog -->
+         </div><!-- /.modal -->
+         
+        <!-- FRIENDLY CODE APP -->
+        <div class="modal fade app-example" id="example-friendlycode" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div class="top-bar">
+                  <button type="button" class="close pull-left red-circle" data-dismiss="modal" aria-hidden="true"></button>
+                  <button class="yellow-circle pull-left"></button>
+                  <button class="green-circle pull-left"></button>
+                </div>
+                <div class="address-bar">
+                 <input type="text" class="form-control" placeholder="http://www.sample.com/friendycode" readonly>
+                </div>
+              </div>
+              <div class="modal-body">
+                <iframe class="col-xs-12"
+                         src="examples/friendlycode/index.html">
+                </iframe>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        
+         <!-- MADLIBS APP -->
+         <div class="modal fade app-example" id="example-madlibs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+           <div class="modal-dialog">
+             <div class="modal-content">
+               <div class="modal-header">
+                 <div class="top-bar">
+                   <button type="button" class="close pull-left red-circle" data-dismiss="modal" aria-hidden="true"></button>
+                   <button class="yellow-circle pull-left"></button>
+                   <button class="green-circle pull-left"></button>
+                 </div>
+                 <div class="address-bar">
+                  <input type="text" class="form-control" placeholder="http://www.sample.com/madlibs" readonly>
+                 </div>
+               </div>
+               <div class="modal-body">
+                 <iframe class="col-xs-12"
+                          src="examples/madlibs/index.html">
+                 </iframe>
+               </div>
+             </div><!-- /.modal-content -->
+           </div><!-- /.modal-dialog -->
+         </div><!-- /.modal -->
+        
+        <hr id="customers-section">
+        
+        <section class="row" id="customers">
+          <h1 class="text-center header-text">Customers </h1>
+          <h3 class="text-center">Who is using TogetherJS?</h3>
+          <p class="text-center">
+            TogetherJS is for developers like you.  Whether if you have an <strong>education site</strong>, <strong>coding environment</strong> or <strong>travel site</strong>, TogetherJS can help your users collaborate in real time to accomplish their tasks and work together.
+          </p>
+          <div class="col-xs-4">
+            <!-- <a href="#" class="thumbnail">
+              <img src="images/placeholder-360x360.png" alt="..." class="img-circle">
+            </a> -->
+            <h4 class="text-center"></h4>
+            <p class="text-center"></p>
+          </div>
+          <div class="col-xs-4">
+            <a href="http://jsfiddle.net" target="_blank">
+              <img src="images/site-customers-jsfiddle.png" alt="JSFiddle" class="img-responsive img-rounded">
+            </a>
+            <h4 class="text-center">JSFiddle</h4>
+            <p class="text-center">Check out TogetherJS on JSFiddle!  Users can press Control + K on their keyboards to activate TogetherJS.</p>
+          </div>
+          <div class="col-xs-4">
+            <!-- <a href="#" class="thumbnail">
+              <img src="images/placeholder-360x360.png" alt="..." class="img-circle">
+            </a> -->
+            <h4 class="text-center"></h4>
+            <p class="text-center"></p>
+          </div>
+          <!-- <div class="clearfix"></div>
+          <h3 class="text-center">Testimonials</h3>
+          <p class="text-center">
+            See what people are saying about ConnectJS.
+          </p>
+          <blockquote class="text-center">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+            <small>John Doe from <cite title="Source Title">JSFiddle</cite></small>
+          </blockquote> -->
+          
+        </section>
+        
+        <hr id="features-section">
+                
+        <section class="row" id="features">
+          <h1 class="text-center">Features</h1>
+          <h3 class="text-center">Here's a list of built-in features you and your users will get right out of the box!</h3>
+          <div class="col-xs-6">
+            <ul class="media-list">
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-audiovideo.png" alt="audio video chat" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">Video or Audio chat</h4>
+                  <p>TogetherJS uses Web RTC technology to enhance communication for your users.</p>
+                </div>
               </li>
-              <li>
-                <a href="https://github.com/mozilla/towtruck" target="_blank">TowTruck on Github</a>
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-user-focus.png" alt="user focus" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">User focus</h4>
+                  <p>Your users can point to each other on a page or app.</p>
+                </div>
               </li>
-              <li>
-                <a href="mailto:towtruck@mozilla.com" target="_blank">Email Us</a>
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-user-presence.png" alt="user presence" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">User presence</h4>
+                  <p>TogetherJS enables your users to see each other in real time.</p>
+                </div>
               </li>
-              <li>
-                <a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a>
+            </ul>   
+          </div>
+          <div class="col-xs-6"> 
+            <ul class="media-list">
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-text-chat.png" alt="text chat" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">Text chat</h4>
+                  <p>Your users can chat with each other with familiar instant messaging.</p>
+                </div>
               </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a>
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-cobrowsing.png" alt="co browsing" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">Co-browsing</h4>
+                  <p>Your users can follow each other to different pages on the same domain.</p>
+                </div>
               </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a>
-              </li>
-              <li>
-                <a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuse</a>
+              <li class="media">
+                <a class="pull-left" href="#">
+                  <img class="media-object" src="images/site-features-realtimesync.png" alt="real time sync" class="img-responsive">
+                </a>
+                <div class="media-body">
+                  <h4 class="media-heading">Real time content sync</h4>
+                  <p>Your users can see content on a site or app dynamically change together.</p>
+                </div>
               </li>
             </ul>
-          </nav>
-        </div>
-      </div>
-      <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
-    </footer>
+          </div>
+          <div class="clearfix"></div>
+        </section>
+        
+        <hr id="tryitout-section">
+        
+        <section class="row" id="tryitout">
+          <h1 class="text-center header-text">Try out TogetherJS today!</h1>
+          <h3 class="text-center">Add it your site now in 2 easy steps!</h3>
+            <div class="col-xs-5">
+              <h4>Add the Javascript snippet</h4>
+              <p>Simply copy and paste the TogetherJS JavaScript snippet below into your site.</p>
+            </div>
+            <div class="col-xs-7">
+              <p><pre class="pre-scrollable text-center">&lt;script src="https://towtruck.mozillalabs.com/towtruck.js"&gt;&lt;/script&gt;</pre></p>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-xs-5">
+              <h4>Add the HTML button</h4>
+              <p>After you've included the TogetherJS JavaScript snippet, copy and paste this anywhere onto your site!</p>
+            </div>
+            <div class="col-xs-7">
+              <p><pre class="pre-scrollable text-center">&lt;button onclick="TowTruck(this); return false;"&gt;Start TogetherJS&lt;/button&gt;</pre></p>    
+            </div>
+        </section>
+     
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="./" class="scrollnav">Overview</a></li>
+                <li><a href="./docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="source/analytics.js.html">Source Code</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
   </body>
 </html>

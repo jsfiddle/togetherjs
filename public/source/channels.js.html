@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>channels.js</h1>
+        
+          <h4>An abstraction over WebSockets and other communication channels (like `postMessage`).</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/channels.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+<span class="comment">/* Channel abstraction.  Supported channels:
+
+- WebSocket to an address
+- postMessage between windows
+
+In the future:
+
+- XMLHttpRequest to a server (with some form of queuing)
+
+The interface:
+
+  channel = new ChannelName(parameters)
+
+The instantiation is specific to the kind of channel
+
+Methods:
+
+  onmessage: set to function (jsonData)
+  rawdata: set to true if you want onmessage to receive raw string data
+  onclose: set to function ()
+  send: function (string or jsonData)
+  close: function ()
+
+.send() will encode the data if it is not a string.
+
+(should I include readyState as an attribute?)
+
+Channels must accept messages immediately, caching if the connection
+is not fully established yet.
+
+*/</span>
+
+define([<span class="string">"util"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util)</span> {</span>
+
+<span class="keyword">var</span> channels = util.Module(<span class="string">"channels"</span>);
+<span class="comment">/* Subclasses must define:
+
+- ._send(string)
+- ._setupConnection()
+- ._ready()
+- .close() (and must set this.closed to true)
+
+And must call:
+
+- ._flush() on open
+- ._incoming(string) on incoming message
+- onclose() (not onmessage - instead _incoming)
+- emit("close")
+*/</span>
+
+<span class="keyword">var</span> AbstractChannel = util.mixinEvents({
+  onmessage: <span class="literal">null</span>,
+  rawdata: <span class="literal">false</span>,
+  onclose: <span class="literal">null</span>,
+  closed: <span class="literal">false</span>,
+
+  baseConstructor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">this</span>._buffer = [];
+    <span class="keyword">this</span>._setupConnection();
+  },
+
+  send: <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.closed) {
+      <span class="keyword">throw</span> <span class="string">'Cannot send to a closed connection'</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> data != <span class="string">"string"</span>) {
+      data = JSON.stringify(data);
+    }
+    <span class="keyword">if</span> (! <span class="keyword">this</span>._ready()) {
+      <span class="keyword">this</span>._buffer.push(data);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">this</span>._send(data);
+  },
+
+  _flush: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;<span class="keyword">this</span>._buffer.length; i++) {
+      <span class="keyword">this</span>._send(<span class="keyword">this</span>._buffer[i]);
+    }
+    <span class="keyword">this</span>._buffer = [];
+  },
+
+  _incoming: <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    <span class="keyword">if</span> (! <span class="keyword">this</span>.rawdata) {
+      <span class="keyword">try</span> {
+        data = JSON.parse(data);
+      } <span class="keyword">catch</span> (e) {
+        console.error(<span class="string">"Got invalid JSON data:"</span>, data.substr(<span class="number">0</span>, <span class="number">40</span>));
+        <span class="keyword">throw</span> e;
+      }
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.onmessage) {
+      <span class="keyword">this</span>.onmessage(data);
+    }
+    <span class="keyword">this</span>.emit(<span class="string">"message"</span>, data);
+  }
+
+});
+
+
+channels.WebSocketChannel = util.Class(AbstractChannel, {
+
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(address)</span> {</span>
+    <span class="keyword">if</span> (address.search(<span class="regexp">/^https?:/i</span>) === <span class="number">0</span>) {
+      address = address.replace(<span class="regexp">/^http/i</span>, <span class="string">'ws'</span>);
+    }
+    <span class="keyword">this</span>.address = address;
+    <span class="keyword">this</span>.socket = <span class="literal">null</span>;
+    <span class="keyword">this</span>._reopening = <span class="literal">false</span>;
+    <span class="keyword">this</span>._lastConnectTime = <span class="number">0</span>;
+    <span class="keyword">this</span>._backoff = <span class="number">0</span>;
+    <span class="keyword">this</span>.baseConstructor();
+  },
+
+  backoffTime: <span class="number">50</span>, <span class="comment">// Milliseconds to add to each reconnect time</span>
+  maxBackoffTime: <span class="number">1500</span>,
+  backoffDetection: <span class="number">2000</span>, <span class="comment">// Amount of time since last connection attempt that shows we need to back off</span>
+
+  toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> s = <span class="string">'[WebSocketChannel to '</span> + <span class="keyword">this</span>.address;
+    <span class="keyword">if</span> (! <span class="keyword">this</span>.socket) {
+      s += <span class="string">' (socket unopened)'</span>;
+    } <span class="keyword">else</span> {
+      s += <span class="string">' readyState: '</span> + <span class="keyword">this</span>.socket.readyState;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.closed) {
+      s += <span class="string">' CLOSED'</span>;
+    }
+    <span class="keyword">return</span> s + <span class="string">']'</span>;
+  },
+
+  close: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">this</span>.closed = <span class="literal">true</span>;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.socket) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>socket.onclose will call this.onclose:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.socket.close();
+    } <span class="keyword">else</span> {
+      <span class="keyword">if</span> (<span class="keyword">this</span>.onclose) {
+        <span class="keyword">this</span>.onclose();
+      }
+      <span class="keyword">this</span>.emit(<span class="string">"close"</span>);
+    }
+  },
+
+  _send: <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    <span class="keyword">this</span>.socket.send(data);
+  },
+
+  _ready: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">return</span> <span class="keyword">this</span>.socket &amp;&amp; <span class="keyword">this</span>.socket.readyState == <span class="keyword">this</span>.socket.OPEN;
+  },
+
+  _setupConnection: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.closed) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">this</span>._lastConnectTime = Date.now();
+    <span class="keyword">this</span>.socket = <span class="keyword">new</span> WebSocket(<span class="keyword">this</span>.address);
+    <span class="keyword">this</span>.socket.onopen = (<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>._flush();
+      <span class="keyword">this</span>._reopening = <span class="literal">false</span>;
+    }).bind(<span class="keyword">this</span>);
+    <span class="keyword">this</span>.socket.onclose = (<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      <span class="keyword">this</span>.socket = <span class="literal">null</span>;
+      <span class="keyword">var</span> method = <span class="string">"error"</span>;
+      <span class="keyword">if</span> (event.wasClean) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>FIXME: should I even log clean closes?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        method = <span class="string">"log"</span>;
+      }
+      console[method](<span class="string">'WebSocket close'</span>, event.wasClean ? <span class="string">'clean'</span> : <span class="string">'unclean'</span>,
+                      <span class="string">'code:'</span>, event.code, <span class="string">'reason:'</span>, event.reason || <span class="string">'none'</span>);
+      <span class="keyword">if</span> (! <span class="keyword">this</span>.closed) {
+        <span class="keyword">this</span>._reopening = <span class="literal">true</span>;
+        <span class="keyword">if</span> (Date.now() - <span class="keyword">this</span>._lastConnectTime &gt; <span class="keyword">this</span>.backoffDetection) {
+          <span class="keyword">this</span>._backoff = <span class="number">0</span>;
+        } <span class="keyword">else</span> {
+          <span class="keyword">this</span>._backoff++;
+        }
+        <span class="keyword">var</span> time = Math.min(<span class="keyword">this</span>._backoff * <span class="keyword">this</span>.backoffTime, <span class="keyword">this</span>.maxBackoffTime);
+        setTimeout((<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">this</span>._setupConnection();
+        }).bind(<span class="keyword">this</span>), time);
+      }
+    }).bind(<span class="keyword">this</span>);
+    <span class="keyword">this</span>.socket.onmessage = (<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      <span class="keyword">this</span>._incoming(event.data);
+    }).bind(<span class="keyword">this</span>);
+    <span class="keyword">this</span>.socket.onerror = (<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      console.error(<span class="string">'WebSocket error:'</span>, event.data);
+    }).bind(<span class="keyword">this</span>);
+  }
+
+});
+
+
+<span class="comment">/* Sends TO a window or iframe */</span>
+channels.PostMessageChannel = util.Class(AbstractChannel, {
+  _pingPollPeriod: <span class="number">100</span>, <span class="comment">// milliseconds</span>
+  _pingPollIncrease: <span class="number">100</span>, <span class="comment">// +100 milliseconds for each failure</span>
+  _pingMax: <span class="number">2000</span>, <span class="comment">// up to a max of 2000 milliseconds</span>
+
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(win, expectedOrigin)</span> {</span>
+    <span class="keyword">this</span>.expectedOrigin = expectedOrigin;
+    <span class="keyword">this</span>._pingReceived = <span class="literal">false</span>;
+    <span class="keyword">this</span>._receiveMessage = <span class="keyword">this</span>._receiveMessage.bind(<span class="keyword">this</span>);
+    <span class="keyword">if</span> (win) {
+      <span class="keyword">this</span>.bindWindow(win, <span class="literal">true</span>);
+    }
+    <span class="keyword">this</span>._pingFailures = <span class="number">0</span>;
+    <span class="keyword">this</span>.baseConstructor();
+  },
+
+  toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> s = <span class="string">'[PostMessageChannel'</span>;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.window) {
+      s += <span class="string">' to window '</span> + <span class="keyword">this</span>.window;
+    } <span class="keyword">else</span> {
+      s += <span class="string">' not bound to a window'</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.window &amp;&amp; ! <span class="keyword">this</span>._pingReceived) {
+      s += <span class="string">' still establishing'</span>;
+    }
+    <span class="keyword">return</span> s + <span class="string">']'</span>;
+  },
+
+  bindWindow: <span class="function"><span class="keyword">function</span> <span class="params">(win, noSetup)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.window) {
+      <span class="keyword">this</span>.close();</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>Though we deinitialized everything, we aren&#39;t exactly closed:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.closed = <span class="literal">false</span>;
+    }
+    <span class="keyword">if</span> (win &amp;&amp; win.contentWindow) {
+      win = win.contentWindow;
+    }
+    <span class="keyword">this</span>.window = win;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>FIXME: The distinction between this.window and window seems unimportant
+in the case of postMessage</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> w = <span class="keyword">this</span>.window;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>In a Content context we add the listener to the local window
+object, but in the addon context we add the listener to some
+other window, like the one we were given:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (<span class="keyword">typeof</span> window != <span class="string">"undefined"</span>) {
+      w = window;
+    }
+    w.addEventListener(<span class="string">"message"</span>, <span class="keyword">this</span>._receiveMessage, <span class="literal">false</span>);
+    <span class="keyword">if</span> (! noSetup) {
+      <span class="keyword">this</span>._setupConnection();
+    }
+  },
+
+  _send: <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    <span class="keyword">this</span>.window.postMessage(data, <span class="keyword">this</span>.expectedOrigin || <span class="string">"*"</span>);
+  },
+
+  _ready: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">return</span> <span class="keyword">this</span>.window &amp;&amp; <span class="keyword">this</span>._pingReceived;
+  },
+
+  _setupConnection: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.closed || <span class="keyword">this</span>._pingReceived || (! <span class="keyword">this</span>.window)) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">this</span>._pingFailures++;
+    <span class="keyword">this</span>._send(<span class="string">"hello"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>We&#39;ll keep sending ping messages until we get a reply</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> time = <span class="keyword">this</span>._pingPollPeriod + (<span class="keyword">this</span>._pingPollIncrease * <span class="keyword">this</span>._pingFailures);
+    time = time &gt; <span class="keyword">this</span>._pingPollMax ? <span class="keyword">this</span>._pingPollMax : time;
+    <span class="keyword">this</span>._pingTimeout = setTimeout(<span class="keyword">this</span>._setupConnection.bind(<span class="keyword">this</span>), time);
+  },
+
+  _receiveMessage: <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    <span class="keyword">if</span> (event.source !== <span class="keyword">this</span>.window) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.expectedOrigin &amp;&amp; event.origin != <span class="keyword">this</span>.expectedOrigin) {
+      console.info(<span class="string">"Expected message from"</span>, <span class="keyword">this</span>.expectedOrigin,
+                   <span class="string">"but got message from"</span>, event.origin);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">if</span> (! <span class="keyword">this</span>.expectedOrigin) {
+      <span class="keyword">this</span>.expectedOrigin = event.origin;
+    }
+    <span class="keyword">if</span> (event.data == <span class="string">"hello"</span>) {
+      <span class="keyword">this</span>._pingReceived = <span class="literal">true</span>;
+      <span class="keyword">if</span> (<span class="keyword">this</span>._pingTimeout) {
+        clearTimeout(<span class="keyword">this</span>._pingTimeout);
+        <span class="keyword">this</span>._pingTimeout = <span class="literal">null</span>;
+      }
+      <span class="keyword">this</span>._flush();
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">this</span>._incoming(event.data);
+  },
+
+  close: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">this</span>.closed = <span class="literal">true</span>;
+    <span class="keyword">this</span>._pingReceived = <span class="literal">false</span>;
+    <span class="keyword">if</span> (<span class="keyword">this</span>._pingTimeout) {
+      clearTimeout(<span class="keyword">this</span>._pingTimeout);
+    }
+    window.removeEventListener(<span class="string">"message"</span>, <span class="keyword">this</span>._receiveMessage, <span class="literal">false</span>);
+    <span class="keyword">if</span> (<span class="keyword">this</span>.onclose) {
+      <span class="keyword">this</span>.onclose();
+    }
+    <span class="keyword">this</span>.emit(<span class="string">"close"</span>);
+  }
+
+});
+
+
+<span class="comment">/* Handles message FROM an exterior window/parent */</span>
+channels.PostMessageIncomingChannel = util.Class(AbstractChannel, {
+
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(expectedOrigin)</span> {</span>
+    <span class="keyword">this</span>.source = <span class="literal">null</span>;
+    <span class="keyword">this</span>.expectedOrigin = expectedOrigin;
+    <span class="keyword">this</span>._receiveMessage = <span class="keyword">this</span>._receiveMessage.bind(<span class="keyword">this</span>);
+    window.addEventListener(<span class="string">"message"</span>, <span class="keyword">this</span>._receiveMessage, <span class="literal">false</span>);
+    <span class="keyword">this</span>.baseConstructor();
+  },
+
+  toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> s = <span class="string">'[PostMessageIncomingChannel'</span>;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.source) {
+      s += <span class="string">' bound to source '</span> + s;
+    } <span class="keyword">else</span> {
+      s += <span class="string">' awaiting source'</span>;
+    }
+    <span class="keyword">return</span> s + <span class="string">']'</span>;
+  },
+
+  _send: <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    <span class="keyword">this</span>.source.postMessage(data, <span class="keyword">this</span>.expectedOrigin);
+  },
+
+  _ready: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">return</span> !!<span class="keyword">this</span>.source;
+  },
+
+  _setupConnection: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  },
+
+  _receiveMessage: <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.expectedOrigin &amp;&amp; <span class="keyword">this</span>.expectedOrigin != <span class="string">"*"</span> &amp;&amp;
+        event.origin != <span class="keyword">this</span>.expectedOrigin) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>FIXME: Maybe not worth mentioning?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      console.info(<span class="string">"Expected message from"</span>, <span class="keyword">this</span>.expectedOrigin,
+                   <span class="string">"but got message from"</span>, event.origin);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">if</span> (! <span class="keyword">this</span>.expectedOrigin) {
+      <span class="keyword">this</span>.expectedOrigin = event.origin;
+    }
+    <span class="keyword">if</span> (! <span class="keyword">this</span>.source) {
+      <span class="keyword">this</span>.source = event.source;
+    }
+    <span class="keyword">if</span> (event.data == <span class="string">"hello"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>Just a ping</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.source.postMessage(<span class="string">"hello"</span>, <span class="keyword">this</span>.expectedOrigin);
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">this</span>._incoming(event.data);
+  },
+
+  close: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">this</span>.closed = <span class="literal">true</span>;
+    window.removeEventListener(<span class="string">"message"</span>, <span class="keyword">this</span>._receiveMessage, <span class="literal">false</span>);
+    <span class="keyword">if</span> (<span class="keyword">this</span>._pingTimeout) {
+      clearTimeout(<span class="keyword">this</span>._pingTimeout);
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.onclose) {
+      <span class="keyword">this</span>.onclose();
+    }
+    <span class="keyword">this</span>.emit(<span class="string">"close"</span>);
+  }
+
+});
+
+channels.Router = util.Class(util.mixinEvents({
+
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(channel)</span> {</span>
+    <span class="keyword">this</span>._channelMessage = <span class="keyword">this</span>._channelMessage.bind(<span class="keyword">this</span>);
+    <span class="keyword">this</span>._channelClosed = <span class="keyword">this</span>._channelClosed.bind(<span class="keyword">this</span>);
+    <span class="keyword">this</span>._routes = Object.create(<span class="literal">null</span>);
+    <span class="keyword">if</span> (channel) {
+      <span class="keyword">this</span>.bindChannel(channel);
+    }
+  },
+
+  bindChannel: <span class="function"><span class="keyword">function</span> <span class="params">(channel)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.channel) {
+      <span class="keyword">this</span>.channel.removeListener(<span class="string">"message"</span>, <span class="keyword">this</span>._channelMessage);
+      <span class="keyword">this</span>.channel.removeListener(<span class="string">"close"</span>, <span class="keyword">this</span>._channelClosed);
+    }
+    <span class="keyword">this</span>.channel = channel;
+    <span class="keyword">this</span>.channel.on(<span class="string">"message"</span>, <span class="keyword">this</span>._channelMessage.bind(<span class="keyword">this</span>));
+    <span class="keyword">this</span>.channel.on(<span class="string">"close"</span>, <span class="keyword">this</span>._channelClosed.bind(<span class="keyword">this</span>));
+  },
+
+  _channelMessage: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (msg.type == <span class="string">"route"</span>) {
+      <span class="keyword">var</span> id = msg.routeId;
+      <span class="keyword">var</span> route = <span class="keyword">this</span>._routes[id];
+      <span class="keyword">if</span> (! route) {
+        console.warn(<span class="string">"No route with the id"</span>, id);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (msg.close) {
+        <span class="keyword">this</span>._closeRoute(route.id);
+      } <span class="keyword">else</span> {
+        <span class="keyword">if</span> (route.onmessage) {
+          route.onmessage(msg.message);
+        }
+        route.emit(<span class="string">"message"</span>, msg.message);
+      }
+    }
+  },
+
+  _channelClosed: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">for</span> (<span class="keyword">var</span> id <span class="keyword">in</span> <span class="keyword">this</span>._routes) {
+      <span class="keyword">this</span>._closeRoute(id);
+    }
+  },
+
+  _closeRoute: <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
+    <span class="keyword">var</span> route = <span class="keyword">this</span>._routes[id];
+    <span class="keyword">if</span> (route.onclose) {
+      route.onclose();
+    }
+    route.emit(<span class="string">"close"</span>);
+    <span class="keyword">delete</span> <span class="keyword">this</span>._routes[id];
+  },
+
+  makeRoute: <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
+    id = id || util.generateId();
+    <span class="keyword">var</span> route = Route(<span class="keyword">this</span>, id);
+    <span class="keyword">this</span>._routes[id] = route;
+    <span class="keyword">return</span> route;
+  }
+}));
+
+<span class="keyword">var</span> Route = util.Class(util.mixinEvents({
+  constructor: <span class="function"><span class="keyword">function</span> <span class="params">(router, id)</span> {</span>
+    <span class="keyword">this</span>.router = router;
+    <span class="keyword">this</span>.id = id;
+  },
+
+  send: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">this</span>.router.channel.send({
+      type: <span class="string">"route"</span>,
+      routeId: <span class="keyword">this</span>.id,
+      message: msg
+    });
+  },
+
+  close: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.router._routes[<span class="keyword">this</span>.id] !== <span class="keyword">this</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>This route instance has been overwritten, so ignore</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
+    }
+    <span class="keyword">delete</span> <span class="keyword">this</span>.router._routes[<span class="keyword">this</span>.id];
+  }
+
+}));
+
+<span class="keyword">return</span> channels;
+
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

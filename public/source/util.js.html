@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>util.js</h1>
+        
+          <h4>Lots of support code in here.  It doesn't depend on other things, and has fairly abstract general-purpose code.  It includes a pattern for creating classes, assertions, events.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/util.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugins"</span>, <span class="string">"jqueryui"</span>, <span class="string">"jquerypunch"</span>], <span class="function"><span class="keyword">function</span> <span class="params">($)</span> {</span>
+  <span class="keyword">var</span> util = {};
+
+  util.Deferred = $.Deferred;
+  TowTruck.$ = $;
+
+  <span class="comment">/* A simple class pattern, use like:
+
+    var Foo = util.Class({
+      constructor: function (a, b) {
+        init the class
+      },
+      otherMethod: ...
+    });
+
+  You can also give a superclass as the optional first argument.
+
+  Instantiation does not require "new"
+
+  */</span>
+  util.Class = <span class="function"><span class="keyword">function</span> <span class="params">(superClass, prototype)</span> {</span>
+    <span class="keyword">var</span> a;
+    <span class="keyword">if</span> (prototype === <span class="literal">undefined</span>) {
+      prototype = superClass;
+    } <span class="keyword">else</span> {
+      <span class="keyword">if</span> (superClass.prototype) {
+        superClass = superClass.prototype;
+      }
+      <span class="keyword">var</span> newPrototype = Object.create(superClass);
+      <span class="keyword">for</span> (a <span class="keyword">in</span> prototype) {
+        <span class="keyword">if</span> (prototype.hasOwnProperty(a)) {
+          newPrototype[a] = prototype[a];
+        }
+      }
+      prototype = newPrototype;
+    }
+    <span class="keyword">var</span> ClassObject = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> obj = Object.create(prototype);
+      obj.constructor.apply(obj, arguments);
+      obj.constructor = ClassObject;
+      <span class="keyword">return</span> obj;
+    };
+    ClassObject.prototype = prototype;
+    <span class="keyword">if</span> (prototype.constructor.name) {
+      ClassObject.className = prototype.constructor.name;
+      ClassObject.toString = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        <span class="keyword">return</span> <span class="string">'[Class '</span> + <span class="keyword">this</span>.className + <span class="string">']'</span>;
+      };
+    }
+    <span class="keyword">if</span> (prototype.classMethods) {
+      <span class="keyword">for</span> (a <span class="keyword">in</span> prototype.classMethods) {
+        <span class="keyword">if</span> (prototype.classMethods.hasOwnProperty(a)) {
+          ClassObject[a] = prototype.classMethods[a];
+        }
+      }
+    }
+    <span class="keyword">return</span> ClassObject;
+  };
+
+  <span class="comment">/* Extends obj with other, or copies obj if no other is given. */</span>
+  util.extend = TowTruck._extend;
+
+  util.forEachAttr = <span class="function"><span class="keyword">function</span> <span class="params">(obj, callback, context)</span> {</span>
+    context = context || obj;
+    <span class="keyword">for</span> (<span class="keyword">var</span> a <span class="keyword">in</span> obj) {
+      <span class="keyword">if</span> (obj.hasOwnProperty(a)) {
+        callback.call(context, obj[a], a);
+      }
+    }
+  };
+
+  <span class="comment">/* Trim whitespace from a string */</span>
+  util.trim = <span class="function"><span class="keyword">function</span> <span class="title">trim</span><span class="params">(s)</span> {</span>
+    <span class="keyword">return</span> s.replace(<span class="regexp">/^\s+/</span>, <span class="string">""</span>).replace(<span class="regexp">/\s+$/</span>, <span class="string">""</span>);
+  };
+
+  <span class="comment">/* Convert a string into something safe to use as an HTML class name */</span>
+  util.safeClassName = <span class="function"><span class="keyword">function</span> <span class="title">safeClassName</span><span class="params">(name)</span> {</span>
+    <span class="keyword">return</span> name.replace(<span class="regexp">/[^a-zA-Z0-9_\-]/g</span>, <span class="string">"_"</span>) || <span class="string">"class"</span>;
+  };
+
+  util.AssertionError = <span class="function"><span class="keyword">function</span> <span class="params">(message)</span> {</span>
+    <span class="keyword">if</span> (! <span class="keyword">this</span> <span class="keyword">instanceof</span> util.AssertionError) {
+      <span class="keyword">return</span> <span class="keyword">new</span> util.AssertionError(message);
+    }
+    <span class="keyword">this</span>.message = message;
+    <span class="keyword">this</span>.name = <span class="string">"AssertionError"</span>;
+  };
+  util.AssertionError.prototype = Error.prototype;
+
+  util.assert = <span class="function"><span class="keyword">function</span> <span class="params">(cond)</span> {</span>
+    <span class="keyword">if</span> (! cond) {
+      <span class="keyword">var</span> args = [<span class="string">"Assertion error:"</span>].concat(Array.prototype.slice.call(arguments, <span class="number">1</span>));
+      console.error.apply(console, args);
+      <span class="keyword">if</span> (console.trace) {
+        console.trace();
+      }
+      <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(args.join(<span class="string">" "</span>));
+    }
+  };
+
+  <span class="comment">/* Generates a random ID */</span>
+  util.generateId = <span class="function"><span class="keyword">function</span> <span class="params">(length)</span> {</span>
+    length = length || <span class="number">10</span>;
+    <span class="keyword">var</span> letters = <span class="string">'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789'</span>;
+    <span class="keyword">var</span> s = <span class="string">''</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;length; i++) {
+      s += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    <span class="keyword">return</span> s;
+  };
+
+  util.pickRandom = <span class="function"><span class="keyword">function</span> <span class="params">(array)</span> {</span>
+    <span class="keyword">return</span> array[Math.floor(Math.random() * array.length)];
+  };
+
+  util.mixinEvents = TowTruck._mixinEvents;
+
+  util.Module = util.Class({
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+      <span class="keyword">this</span>._name = name;
+    },
+    toString: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> <span class="string">'[Module '</span> + <span class="keyword">this</span>._name + <span class="string">']'</span>;
+    }
+  });
+
+  util.blobToBase64 = <span class="function"><span class="keyword">function</span> <span class="params">(blob)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>Oh this is just terrible</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> binary = <span class="string">''</span>;
+    <span class="keyword">var</span> bytes = <span class="keyword">new</span> Uint8Array(blob);
+    <span class="keyword">var</span> len = bytes.byteLength;
+    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    <span class="keyword">return</span> btoa(binary);
+  };
+
+  util.truncateCommonDomain = <span class="function"><span class="keyword">function</span> <span class="params">(url, base)</span> {</span>
+    <span class="comment">/* Remove the scheme and domain from url, if it matches the scheme and domain
+       of base */</span>
+    <span class="keyword">if</span> (! base) {
+      <span class="keyword">return</span> url;
+    }
+    <span class="keyword">var</span> regex = <span class="regexp">/^https?:\/\/[^\/]*/i</span>;
+    <span class="keyword">var</span> match = regex.exec(url);
+    <span class="keyword">var</span> matchBase = regex.exec(base);
+    <span class="keyword">if</span> (match &amp;&amp; matchBase &amp;&amp; match[<span class="number">0</span>] == matchBase[<span class="number">0</span>]) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>There is a common scheme and domain</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span> url.substr(match[<span class="number">0</span>].length);
+    }
+    <span class="keyword">return</span> url;
+  };
+
+  util.resolver = <span class="function"><span class="keyword">function</span> <span class="params">(deferred, func)</span> {</span>
+    util.assert(deferred.then, <span class="string">"Bad deferred:"</span>, deferred);
+    util.assert(<span class="keyword">typeof</span> func == <span class="string">"function"</span>, <span class="string">"Not a function:"</span>, func);
+    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> result;
+      <span class="keyword">try</span> {
+        result = func.apply(<span class="keyword">this</span>, arguments);
+      } <span class="keyword">catch</span> (e) {
+        deferred.reject(e);
+        <span class="keyword">throw</span> e;
+      }
+      <span class="keyword">if</span> (result &amp;&amp; result.then) {
+        result.then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          deferred.resolveWith(<span class="keyword">this</span>, arguments);
+        }, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          deferred.rejectWith(<span class="keyword">this</span>, arguments);
+        });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>FIXME: doesn&#39;t pass progress through</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      } <span class="keyword">else</span> <span class="keyword">if</span> (result === <span class="literal">undefined</span>) {
+        deferred.resolve();
+      } <span class="keyword">else</span> {
+        deferred.resolve(result);
+      }
+      <span class="keyword">return</span> result;
+    };
+  };
+
+  <span class="comment">/* Resolves several promises (the promises are the arguments to the function)
+     or the first argument may be an array of promises.
+
+     Returns a promise that will resolve with the results of all the
+     promises.  If any promise fails then the returned promise fails.
+
+     FIXME: if a promise has more than one return value (like with
+     promise.resolve(a, b)) then the latter arguments will be lost.
+     */</span>
+  util.resolveMany = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> args;
+    <span class="keyword">if</span> (arguments.length == <span class="number">1</span> &amp;&amp; Array.isArray(arguments[<span class="number">0</span>])) {
+      args = arguments[<span class="number">0</span>];
+    } <span class="keyword">else</span> {
+      args = Array.prototype.slice.call(arguments);
+    }
+    <span class="keyword">return</span> util.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
+      <span class="keyword">var</span> count = args.length;
+      <span class="keyword">if</span> (! count) {
+        def.resolve();
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> allResults = [];
+      <span class="keyword">var</span> anyError = <span class="literal">false</span>;
+      args.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(arg, index)</span> {</span>
+        arg.then(<span class="function"><span class="keyword">function</span> <span class="params">(result)</span> {</span>
+          allResults[index] = result;
+          count--;
+          check();
+        }, <span class="function"><span class="keyword">function</span> <span class="params">(error)</span> {</span>
+          allResults[index] = error;
+          anyError = <span class="literal">true</span>;
+          count--;
+          check();
+        });
+      });
+      <span class="function"><span class="keyword">function</span> <span class="title">check</span><span class="params">()</span> {</span>
+        <span class="keyword">if</span> (! count) {
+          <span class="keyword">if</span> (anyError) {
+            def.reject.apply(def, allResults);
+          } <span class="keyword">else</span> {
+            def.resolve.apply(def, allResults);
+          }
+        }
+      }
+    });
+  };
+
+  util.readFileImage = <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+    <span class="keyword">return</span> util.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
+      <span class="keyword">var</span> reader = <span class="keyword">new</span> FileReader();
+      reader.onload = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        def.resolve(<span class="string">"data:image/jpeg;base64,"</span> + util.blobToBase64(<span class="keyword">this</span>.result));
+      };
+      reader.onerror = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        def.reject(<span class="keyword">this</span>.error);
+      };
+      reader.readAsArrayBuffer(el.files[<span class="number">0</span>]);
+    });
+  };
+
+  util.testExpose = <span class="function"><span class="keyword">function</span> <span class="params">(objs)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> TowTruckTestSpy == <span class="string">"undefined"</span>) {
+      <span class="keyword">return</span>;
+    }
+    util.forEachAttr(objs, <span class="function"><span class="keyword">function</span> <span class="params">(value, attr)</span> {</span>
+      TowTruckTestSpy[attr] = value;
+    });
+  };
+
+  <span class="keyword">return</span> util;
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

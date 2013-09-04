@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>startup.js</h1>
+        
+          <h4>Handles the logic of what to display when TowTruck is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session).</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/startup.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+
+<span class="comment">/* This module handles all the different UI that happens (sometimes in order) when
+   TowTruck is started:
+
+   - Introduce the session when you've been invited
+   - Show any browser compatibility indicators
+   - Show the walkthrough the first time
+   - Show the share link window
+
+   When everything is done it fires session.emit("startup-ready")
+
+*/</span>
+define([<span class="string">"util"</span>, <span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"windowing"</span>, <span class="string">"storage"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, require, $, windowing, storage)</span> {</span>
+  <span class="keyword">var</span> assert = util.assert;
+  <span class="keyword">var</span> startup = util.Module(<span class="string">"startup"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>Avoid circular import:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> session = <span class="literal">null</span>;
+
+  <span class="keyword">var</span> STEPS = [
+    <span class="string">"browserBroken"</span>,
+    <span class="string">"browserUnsupported"</span>,
+    <span class="string">"sessionIntro"</span>,
+    <span class="string">"walkthrough"</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>Look in the share() below if you add anything after here:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="string">"share"</span>
+    ];
+
+  <span class="keyword">var</span> currentStep = <span class="literal">null</span>;
+
+  startup.start = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">if</span> (! session) {
+      require([<span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(sessionModule)</span> {</span>
+        session = sessionModule;
+        startup.start();
+      });
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">var</span> index = -<span class="number">1</span>;
+    <span class="keyword">if</span> (currentStep) {
+      index = STEPS.indexOf(currentStep);
+    }
+    index++;
+    <span class="keyword">if</span> (index &gt;= STEPS.length) {
+      session.emit(<span class="string">"startup-ready"</span>);
+      <span class="keyword">return</span>;
+    }
+    currentStep = STEPS[index];
+    handlers[currentStep](startup.start);
+  };
+
+  <span class="keyword">var</span> handlers = {
+
+    browserBroken: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      <span class="keyword">if</span> (window.WebSocket) {
+        next();
+        <span class="keyword">return</span>;
+      }
+      windowing.show(<span class="string">"#towtruck-browser-broken"</span>, {
+        onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          session.close();
+        }
+      });
+      <span class="keyword">if</span> ($.browser.msie) {
+        $(<span class="string">"#towtruck-browser-broken-is-ie"</span>).show();
+      }
+    },
+
+    browserUnsupported: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      <span class="keyword">if</span> (! $.browser.msie) {
+        next();
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> cancel = <span class="literal">true</span>;
+      windowing.show(<span class="string">"#towtruck-browser-unsupported"</span>, {
+        onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">if</span> (cancel) {
+            session.close();
+          } <span class="keyword">else</span> {
+            next();
+          }
+        }
+      });
+      $(<span class="string">"#towtruck-browser-unsupported-anyway"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        cancel = <span class="literal">false</span>;
+      });
+    },
+
+    sessionIntro: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      <span class="keyword">if</span> ((! session.isClient) || ! session.firstRun) {
+        next();
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (TowTruck.getConfig(<span class="string">"suppressJoinConfirmation"</span>)) {
+        next();
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> cancelled = <span class="literal">false</span>;
+      windowing.show(<span class="string">"#towtruck-intro"</span>, {
+        onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">if</span> (! cancelled) {
+            next();
+          }
+        }
+      });
+      $(<span class="string">"#towtruck-intro .towtruck-modal-dont-join"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        cancelled = <span class="literal">true</span>;
+        windowing.hide();
+        session.close(<span class="string">"declined-join"</span>);
+      });
+    },
+
+    walkthrough: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      storage.settings.get(<span class="string">"seenIntroDialog"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(seenIntroDialog)</span> {</span>
+        <span class="keyword">if</span> (seenIntroDialog) {
+          next();
+          <span class="keyword">return</span>;
+        }
+        require([<span class="string">"walkthrough"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(walkthrough)</span> {</span>
+          walkthrough.start(<span class="literal">true</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+            storage.settings.set(<span class="string">"seenIntroDialog"</span>, <span class="literal">true</span>);
+            next();
+          });
+        });
+      });
+    },
+
+    share: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      <span class="keyword">if</span> (session.isClient || ! session.firstRun) {
+        next();
+        <span class="keyword">return</span>;
+      }
+      require([<span class="string">"windowing"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(windowing)</span> {</span>
+        windowing.show(<span class="string">"#towtruck-share"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>FIXME: no way to detect when the window is closed
+If there was a next() step then it would not work</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      });
+    }
+
+  };
+
+  <span class="keyword">return</span> startup;
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

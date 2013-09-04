@@ -1,0 +1,13 @@
+{
+  "name": "build-require",
+  "version": "0.0.0",
+  "private": true,
+  "description": "requirejs optimization script",
+  "main": "build-require.js",
+  "dependencies": {
+    "requirejs": "~2.x"
+  },
+  "scripts": {
+    "start": "node build-require.js"
+  }
+}

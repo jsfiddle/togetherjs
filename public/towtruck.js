@@ -267,7 +267,9 @@
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
       tinycolor: "libs/tinycolor",
-      whrandom: "libs/whrandom/random"
+      whrandom: "libs/whrandom/random",
+      jqueryui: "libs/jquery-ui.min",
+      jquerypunch: "libs/jquery.ui.touch-punch.min"
     }
   };
 
@@ -384,8 +386,8 @@
     return "TowTruck";
   };
 
-  var defaultHubBase = "https://towtruck.mozillalabs.com";
-  if (defaultHubBase == "https://towtruck.mozillalabs.com") {
+  var defaultHubBase = "https://hub.towtruck.mozillalabs.com";
+  if (defaultHubBase == "__" + "hubUrl"+ "__") {
     // Substitution wasn't made
     defaultHubBase = "https://hub.towtruck.mozillalabs.com";
   }
@@ -420,7 +422,13 @@
     // The name of this tool as provided to users.  The UI is updated to use this.
     // Because of how it is used in text it should be a proper noun, e.g.,
     // "MySite's Collaboration Tool"
-    toolName: null
+    toolName: null,
+    // Used to auto-start TowTruck with a {prefix: pageName, max: participants}
+    // Implies auto-start
+    findRoom: null,
+    // If true, then the "Join TowTruck Session?" confirmation dialog
+    // won't come up
+    suppressJoinConfirmation: false
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep
@@ -616,6 +624,9 @@
           TowTruck.startup.reason = value.startupReason;
           TowTruck();
         }
+      } else if (window.TowTruckConfig_findRoom) {
+        TowTruck.startup.reason = "joined";
+        TowTruck();
       }
     }
   }

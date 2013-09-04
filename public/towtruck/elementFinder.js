@@ -11,7 +11,7 @@ define(["util", "jquery"], function (util, $) {
       el = el[0];
     }
     while (el) {
-      if (el.className && (el.className == "towtruck" || (el.className.indexOf && el.className.indexOf(" towtruck") != -1))) {
+      if ($(el).hasClass("towtruck")) {
         return true;
       }
       el = el.parentNode;

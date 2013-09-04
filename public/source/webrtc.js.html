@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet" href="../css/docco.css">
+  <script src="../js/source-code.js"></script>
+
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+          
+          
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+
+    
+
+<div class="container">
+
+    <section class="row" id="sourcecode">
+      <div class="col-md-3" id="source-toc">
+        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+          <div class="panel-heading">Source Code</div>
+          <ul class="nav">
+            
+              <li><a href="analytics.js.html">analytics</a></li>
+            
+              <li><a href="channels.js.html">channels</a></li>
+            
+              <li><a href="chat.js.html">chat</a></li>
+            
+              <li><a href="cursor.js.html">cursor</a></li>
+            
+              <li><a href="elementFinder.js.html">elementFinder</a></li>
+            
+              <li><a href="eventMaker.js.html">eventMaker</a></li>
+            
+              <li><a href="forms.js.html">forms</a></li>
+            
+              <li><a href="jqueryPlugins.js.html">jqueryPlugins</a></li>
+            
+              <li><a href="linkify.js.html">linkify</a></li>
+            
+              <li><a href="ot.js.html">ot</a></li>
+            
+              <li><a href="peers.js.html">peers</a></li>
+            
+              <li><a href="playback.js.html">playback</a></li>
+            
+              <li><a href="presence.js.html">presence</a></li>
+            
+              <li><a href="randomutil.js.html">randomutil</a></li>
+            
+              <li><a href="recorder.js.html">recorder</a></li>
+            
+              <li><a href="session.js.html">session</a></li>
+            
+              <li><a href="startup.js.html">startup</a></li>
+            
+              <li><a href="storage.js.html">storage</a></li>
+            
+              <li><a href="templates.js.html">templates</a></li>
+            
+              <li><a href="templating.js.html">templating</a></li>
+            
+              <li><a href="towtruck.js.html">towtruck</a></li>
+            
+              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+            
+              <li><a href="ui.js.html">ui</a></li>
+            
+              <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="visibilityApi.js.html">visibilityApi</a></li>
+            
+              <li><a href="walkthrough.js.html">walkthrough</a></li>
+            
+              <li><a href="webrtc.js.html">webrtc</a></li>
+            
+              <li><a href="windowing.js.html">windowing</a></li>
+            
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9" id="source-content">
+        <h1>webrtc.js</h1>
+        
+          <h4>Handles live audio chat.</h4>
+        
+
+        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/webrtc.js">See this file on Github</a></div>
+
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>define([<span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"ui"</span>, <span class="string">"peers"</span>, <span class="string">"storage"</span>, <span class="string">"windowing"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(require, $, util, session, ui, peers, storage, windowing)</span> {</span>
+  <span class="keyword">var</span> webrtc = util.Module(<span class="string">"webrtc"</span>);
+  <span class="keyword">var</span> assert = util.assert;
+
+  session.RTCSupported = !!(window.mozRTCPeerConnection ||
+                            window.webkitRTCPeerConnection ||
+                            window.RTCPeerConnection);
+
+  <span class="keyword">if</span> (session.RTCSupported &amp;&amp; $.browser.mozilla &amp;&amp; parseInt($.browser.version, <span class="number">10</span>) &lt;= <span class="number">19</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>In a few versions of Firefox (18 and 19) these APIs are present but
+not actually usable
+See: <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=828839">https://bugzilla.mozilla.org/show_bug.cgi?id=828839</a>
+Because they could be pref&#39;d on we&#39;ll do a quick check:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">try</span> {
+      (<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        <span class="keyword">var</span> conn = <span class="keyword">new</span> window.mozRTCPeerConnection();
+      })();
+    } <span class="keyword">catch</span> (e) {
+      session.RTCSupported = <span class="literal">false</span>;
+    }
+  }
+
+  <span class="keyword">var</span> mediaConstraints = {
+    mandatory: {
+      OfferToReceiveAudio: <span class="literal">true</span>,
+      OfferToReceiveVideo: <span class="literal">false</span>
+    }
+  };
+  <span class="keyword">if</span> (window.mozRTCPeerConnection) {
+    mediaConstraints.mandatory.MozDontOfferDataChannel = <span class="literal">true</span>;
+  }
+
+  <span class="keyword">var</span> URL = window.webkitURL || window.URL;
+  <span class="keyword">var</span> RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+  <span class="keyword">var</span> RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">makePeerConnection</span><span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>Based roughly off: <a href="https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js">https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js</a></p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (window.webkitRTCPeerConnection) {
+      <span class="keyword">return</span> <span class="keyword">new</span> webkitRTCPeerConnection({
+        <span class="string">"iceServers"</span>: [{<span class="string">"url"</span>: <span class="string">"stun:stun.l.google.com:19302"</span>}]
+      }, {
+        <span class="string">"optional"</span>: [{<span class="string">"DtlsSrtpKeyAgreement"</span>: <span class="literal">true</span>}]
+      });
+    }
+    <span class="keyword">if</span> (window.mozRTCPeerConnection) {
+      <span class="keyword">return</span> <span class="keyword">new</span> mozRTCPeerConnection({</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>Or stun:124.124.124..2 ?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="string">"iceServers"</span>: [{<span class="string">"url"</span>: <span class="string">"stun:23.21.150.121"</span>}]
+      }, {
+        <span class="string">"optional"</span>: []
+      });
+    }
+    <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(<span class="string">"Called makePeerConnection() without supported connection"</span>);
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">ensureCryptoLine</span><span class="params">(sdp)</span> {</span>
+    <span class="keyword">if</span> (! window.mozRTCPeerConnection) {
+      <span class="keyword">return</span> sdp;
+    }
+
+    <span class="keyword">var</span> sdpLinesIn = sdp.split(<span class="string">'\r\n'</span>);
+    <span class="keyword">var</span> sdpLinesOut = [];</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>Search for m line.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; sdpLinesIn.length; i++) {
+      sdpLinesOut.push(sdpLinesIn[i]);
+      <span class="keyword">if</span> (sdpLinesIn[i].search(<span class="string">'m='</span>) !== -<span class="number">1</span>) {
+        sdpLinesOut.push(<span class="string">"a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"</span>);
+      }
+    }
+
+    sdp = sdpLinesOut.join(<span class="string">'\r\n'</span>);
+    <span class="keyword">return</span> sdp;
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">getUserMedia</span><span class="params">(options, success, failure)</span> {</span>
+    failure = failure || <span class="function"><span class="keyword">function</span> <span class="params">(error)</span> {</span>
+      console.error(<span class="string">"Error in getUserMedia:"</span>, error);
+    };
+    (navigator.getUserMedia ||
+     navigator.mozGetUserMedia ||
+     navigator.webkitGetUserMedia ||
+     navigator.msGetUserMedia).call(navigator, options, success, failure);
+  }
+
+  <span class="comment">/****************************************
+   * getUserMedia Avatar support
+   */</span>
+
+  <span class="keyword">var</span> avatarEditState = {};
+
+  session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#towtruck-self-avatar"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> avatar = peers.Self.avatar;
+      <span class="keyword">if</span> (avatar) {
+        $preview.attr(<span class="string">"src"</span>, avatar);
+      }
+      ui.displayToggle(<span class="string">"#towtruck-avatar-edit"</span>);
+    });
+    <span class="keyword">if</span> (! session.RTCSupported) {
+      $(<span class="string">"#towtruck-avatar-edit-rtc"</span>).hide();
+    }
+
+    <span class="keyword">var</span> avatarData = <span class="literal">null</span>;
+    <span class="keyword">var</span> $preview = $(<span class="string">"#towtruck-self-avatar-preview"</span>);
+    <span class="keyword">var</span> $accept = $(<span class="string">"#towtruck-self-avatar-accept"</span>);
+    <span class="keyword">var</span> $cancel = $(<span class="string">"#towtruck-self-avatar-cancel"</span>);
+    <span class="keyword">var</span> $takePic = $(<span class="string">"#towtruck-avatar-use-camera"</span>);
+    <span class="keyword">var</span> $video = $(<span class="string">"#towtruck-avatar-video"</span>);
+    <span class="keyword">var</span> $upload = $(<span class="string">"#towtruck-avatar-upload"</span>);
+
+    $takePic.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (! streaming) {
+        startStreaming();
+        <span class="keyword">return</span>;
+      }
+      takePicture();
+    });
+
+    <span class="function"><span class="keyword">function</span> <span class="title">savePicture</span><span class="params">(dataUrl)</span> {</span>
+      avatarData = dataUrl;
+      $preview.attr(<span class="string">"src"</span>, avatarData);
+      $accept.attr(<span class="string">"disabled"</span>, <span class="literal">null</span>);
+    }
+
+    $accept.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      peers.Self.update({avatar:  avatarData});
+      ui.displayToggle(<span class="string">"#towtruck-no-avatar-edit"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>FIXME: these probably shouldn&#39;t be two elements:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-participants-other"</span>).show();
+      $accept.attr(<span class="string">"disabled"</span>, <span class="string">"1"</span>);
+    });
+
+    $cancel.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      ui.displayToggle(<span class="string">"#towtruck-no-avatar-edit"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>FIXME: like above:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-participants-other"</span>).show();
+    });
+
+    <span class="keyword">var</span> streaming = <span class="literal">false</span>;
+    <span class="function"><span class="keyword">function</span> <span class="title">startStreaming</span><span class="params">()</span> {</span>
+      getUserMedia({
+          video: <span class="literal">true</span>,
+          audio: <span class="literal">false</span>
+        },
+        <span class="keyword">function</span>(stream) {
+          streaming = <span class="literal">true</span>;
+          $video[<span class="number">0</span>].src = URL.createObjectURL(stream);
+          $video[<span class="number">0</span>].play();
+        },
+        <span class="keyword">function</span>(err) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>FIXME: should pop up help or something in the case of a user
+cancel</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          console.error(<span class="string">"getUserMedia error:"</span>, err);
+        }
+      );
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">takePicture</span><span class="params">()</span> {</span>
+      assert(streaming);
+      <span class="keyword">var</span> height = $video[<span class="number">0</span>].videoHeight;
+      <span class="keyword">var</span> width = $video[<span class="number">0</span>].videoWidth;
+      width = width * (session.AVATAR_SIZE / height);
+      height = session.AVATAR_SIZE;
+      <span class="keyword">var</span> $canvas = $(<span class="string">"&lt;canvas&gt;"</span>);
+      $canvas[<span class="number">0</span>].height = session.AVATAR_SIZE;
+      $canvas[<span class="number">0</span>].width = session.AVATAR_SIZE;
+      <span class="keyword">var</span> context = $canvas[<span class="number">0</span>].getContext(<span class="string">"2d"</span>);
+      context.arc(session.AVATAR_SIZE/<span class="number">2</span>, session.AVATAR_SIZE/<span class="number">2</span>, session.AVATAR_SIZE/<span class="number">2</span>, <span class="number">0</span>, Math.PI*<span class="number">2</span>);
+      context.closePath();
+      context.clip();
+      context.drawImage($video[<span class="number">0</span>], (session.AVATAR_SIZE - width) / <span class="number">2</span>, <span class="number">0</span>, width, height);
+      savePicture($canvas[<span class="number">0</span>].toDataURL(<span class="string">"image/png"</span>));
+    }
+
+    $upload.on(<span class="string">"change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> reader = <span class="keyword">new</span> FileReader();
+      reader.onload = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>FIXME: I don&#39;t actually know it&#39;s JPEG, but it&#39;s probably a
+good enough guess:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> url = <span class="string">"data:image/jpeg;base64,"</span> + util.blobToBase64(<span class="keyword">this</span>.result);
+        convertImage(url, <span class="function"><span class="keyword">function</span> <span class="params">(result)</span> {</span>
+          savePicture(result);
+        });
+      };
+      reader.onerror = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        console.error(<span class="string">"Error reading file:"</span>, <span class="keyword">this</span>.error);
+      };
+      reader.readAsArrayBuffer(<span class="keyword">this</span>.files[<span class="number">0</span>]);
+    });
+
+    <span class="function"><span class="keyword">function</span> <span class="title">convertImage</span><span class="params">(imageUrl, callback)</span> {</span>
+      <span class="keyword">var</span> $canvas = $(<span class="string">"&lt;canvas&gt;"</span>);
+      $canvas[<span class="number">0</span>].height = session.AVATAR_SIZE;
+      $canvas[<span class="number">0</span>].width = session.AVATAR_SIZE;
+      <span class="keyword">var</span> context = $canvas[<span class="number">0</span>].getContext(<span class="string">"2d"</span>);
+      <span class="keyword">var</span> img = <span class="keyword">new</span> Image();
+      img.src = imageUrl;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>Sometimes the DOM updates immediately to call
+naturalWidth/etc, and sometimes it doesn&#39;t; using setTimeout
+gives it a chance to catch up</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        <span class="keyword">var</span> width = img.naturalWidth || img.width;
+        <span class="keyword">var</span> height = img.naturalHeight || img.height;
+        width = width * (session.AVATAR_SIZE / height);
+        height = session.AVATAR_SIZE;
+        context.drawImage(img, <span class="number">0</span>, <span class="number">0</span>, width, height);
+        callback($canvas[<span class="number">0</span>].toDataURL(<span class="string">"image/png"</span>));
+      });
+    }
+
+  });
+
+  <span class="comment">/****************************************
+   * RTC support
+   */</span>
+
+  <span class="function"><span class="keyword">function</span> <span class="title">audioButton</span><span class="params">(selector)</span> {</span>
+    ui.displayToggle(selector);
+    <span class="keyword">if</span> (selector == <span class="string">"#towtruck-audio-incoming"</span>) {
+      $(<span class="string">"#towtruck-audio-button"</span>).addClass(<span class="string">"towtruck-animated"</span>).addClass(<span class="string">"towtruck-color-alert"</span>);
+    } <span class="keyword">else</span> {
+      $(<span class="string">"#towtruck-audio-button"</span>).removeClass(<span class="string">"towtruck-animated"</span>).removeClass(<span class="string">"towtruck-color-alert"</span>);
+    }
+  }
+
+  session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#towtruck-audio-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> ($(<span class="string">"#towtruck-rtc-info"</span>).is(<span class="string">":visible"</span>)) {
+        windowing.hide();
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (session.RTCSupported) {
+        enableAudio();
+      } <span class="keyword">else</span> {
+        windowing.show(<span class="string">"#towtruck-rtc-not-supported"</span>);
+      }
+    });
+
+    <span class="keyword">if</span> (! session.RTCSupported) {
+      audioButton(<span class="string">"#towtruck-audio-unavailable"</span>);
+      <span class="keyword">return</span>;
+    }
+    audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+
+    <span class="keyword">var</span> audioStream = <span class="literal">null</span>;
+    <span class="keyword">var</span> accepted = <span class="literal">false</span>;
+    <span class="keyword">var</span> connected = <span class="literal">false</span>;
+    <span class="keyword">var</span> $audio = $(<span class="string">"#towtruck-audio-element"</span>);
+    <span class="keyword">var</span> offerSent = <span class="literal">null</span>;
+    <span class="keyword">var</span> offerReceived = <span class="literal">null</span>;
+    <span class="keyword">var</span> offerDescription = <span class="literal">false</span>;
+    <span class="keyword">var</span> answerSent = <span class="literal">null</span>;
+    <span class="keyword">var</span> answerReceived = <span class="literal">null</span>;
+    <span class="keyword">var</span> answerDescription = <span class="literal">false</span>;
+    <span class="keyword">var</span> _connection = <span class="literal">null</span>;
+    <span class="keyword">var</span> iceCandidate = <span class="literal">null</span>;
+
+    <span class="function"><span class="keyword">function</span> <span class="title">enableAudio</span><span class="params">()</span> {</span>
+      accepted = <span class="literal">true</span>;
+      storage.settings.get(<span class="string">"dontShowRtcInfo"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(dontShow)</span> {</span>
+        <span class="keyword">if</span> (! dontShow) {
+          windowing.show(<span class="string">"#towtruck-rtc-info"</span>);
+        }
+      });
+      <span class="keyword">if</span> (! audioStream) {
+        startStreaming(connect);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (! connected) {
+        connect();
+      }
+      toggleMute();
+    }
+
+    ui.container.find(<span class="string">"#towtruck-rtc-info .towtruck-dont-show-again"</span>).change(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      storage.settings.set(<span class="string">"dontShowRtcInfo"</span>, <span class="keyword">this</span>.checked);
+    });
+
+    <span class="function"><span class="keyword">function</span> <span class="title">error</span><span class="params">()</span> {</span>
+      console.warn.apply(console, arguments);
+      <span class="keyword">var</span> s = <span class="string">""</span>;
+      <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;arguments.length; i++) {
+        <span class="keyword">if</span> (s) {
+          s += <span class="string">" "</span>;
+        }
+        <span class="keyword">var</span> a = arguments[i];
+        <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">"string"</span>) {
+          s += a;
+        } <span class="keyword">else</span> {
+          <span class="keyword">var</span> repl;
+          <span class="keyword">try</span> {
+            repl = JSON.stringify(a);
+          } <span class="keyword">catch</span> (e) {
+          }
+          <span class="keyword">if</span> (! repl) {
+            repl = <span class="string">""</span> + a;
+          }
+          s += repl;
+        }
+      }
+      audioButton(<span class="string">"#towtruck-audio-error"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>FIXME: this title doesn&#39;t seem to display?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-audio-error"</span>).attr(<span class="string">"title"</span>, s);
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">startStreaming</span><span class="params">(callback)</span> {</span>
+      getUserMedia(
+        {
+          video: <span class="literal">false</span>,
+          audio: <span class="literal">true</span>
+        },
+        <span class="function"><span class="keyword">function</span> <span class="params">(stream)</span> {</span>
+          audioStream = stream;
+          attachMedia(<span class="string">"#towtruck-local-audio"</span>, stream);
+          <span class="keyword">if</span> (callback) {
+            callback();
+          }
+        },
+        <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>FIXME: handle cancel case</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          <span class="keyword">if</span> (err &amp;&amp; err.code == <span class="number">1</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-13">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-13">&#182;</a>
+                </div>
+                <p>User cancel</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>            <span class="keyword">return</span>;
+          }
+          error(<span class="string">"getUserMedia error:"</span>, err);
+        }
+      );
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">attachMedia</span><span class="params">(element, media)</span> {</span>
+      element = $(element)[<span class="number">0</span>];
+      console.log(<span class="string">"Attaching"</span>, media, <span class="string">"to"</span>, element);
+      <span class="keyword">if</span> (window.mozRTCPeerConnection) {
+        element.mozSrcObject = media;
+        element.play();
+      } <span class="keyword">else</span> {
+        element.autoplay = <span class="literal">true</span>;
+        element.src = URL.createObjectURL(media);
+      }
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">getConnection</span><span class="params">()</span> {</span>
+      assert(audioStream);
+      <span class="keyword">if</span> (_connection) {
+        <span class="keyword">return</span> _connection;
+      }
+      <span class="keyword">try</span> {
+        _connection = makePeerConnection();
+      } <span class="keyword">catch</span> (e) {
+        error(<span class="string">"Error creating PeerConnection:"</span>, e);
+        <span class="keyword">throw</span> e;
+      }
+      _connection.onaddstream = <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+        console.log(<span class="string">"got event"</span>, event, event.type);
+        attachMedia($audio, event.stream);
+        audioButton(<span class="string">"#towtruck-audio-active"</span>);
+      };
+      _connection.onstatechange = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-14">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-14">&#182;</a>
+                </div>
+                <p>FIXME: this doesn&#39;t seem to work:
+Actually just doesn&#39;t work on Firefox</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        console.log(<span class="string">"state change"</span>, _connection.readyState);
+        <span class="keyword">if</span> (_connection.readyState == <span class="string">"closed"</span>) {
+          audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+        }
+      };
+      _connection.onicecandidate = <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+        <span class="keyword">if</span> (event.candidate) {
+          session.send({
+            type: <span class="string">"rtc-ice-candidate"</span>,
+            candidate: {
+              sdpMLineIndex: event.candidate.sdpMLineIndex,
+              sdpMid: event.candidate.sdpMid,
+              candidate: event.candidate.candidate
+            }
+          });
+        }
+      };
+      _connection.addStream(audioStream);
+      <span class="keyword">return</span> _connection;
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">addIceCandidate</span><span class="params">()</span> {</span>
+      <span class="keyword">if</span> (iceCandidate) {
+        console.log(<span class="string">"adding ice"</span>, iceCandidate);
+        _connection.addIceCandidate(<span class="keyword">new</span> RTCIceCandidate(iceCandidate));
+      }
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">connect</span><span class="params">()</span> {</span>
+      <span class="keyword">var</span> connection = getConnection();
+      <span class="keyword">if</span> (offerReceived &amp;&amp; (! offerDescription)) {
+        connection.setRemoteDescription(
+          <span class="keyword">new</span> RTCSessionDescription({
+            type: <span class="string">"offer"</span>,
+            sdp: offerReceived
+          }),
+          <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+            offerDescription = <span class="literal">true</span>;
+            addIceCandidate();
+            connect();
+          },
+          <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+            error(<span class="string">"Error doing RTC setRemoteDescription:"</span>, err);
+          }
+        );
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (! (offerSent || offerReceived)) {
+        connection.createOffer(<span class="function"><span class="keyword">function</span> <span class="params">(offer)</span> {</span>
+          console.log(<span class="string">"made offer"</span>, offer);
+          offer.sdp = ensureCryptoLine(offer.sdp);
+          connection.setLocalDescription(
+            offer,
+            <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+              session.send({
+                type: <span class="string">"rtc-offer"</span>,
+                offer: offer.sdp
+              });
+              offerSent = offer;
+              audioButton(<span class="string">"#towtruck-audio-outgoing"</span>);
+            },
+            <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+              error(<span class="string">"Error doing RTC setLocalDescription:"</span>, err);
+            },
+            mediaConstraints
+          );
+        }, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+          error(<span class="string">"Error doing RTC createOffer:"</span>, err);
+        });
+      } <span class="keyword">else</span> <span class="keyword">if</span> (! (answerSent || answerReceived)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-15">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>FIXME: I might have only needed this due to my own bugs, this might
+not actually time out</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> timeout = setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">if</span> (! answerSent) {
+            error(<span class="string">"createAnswer Timed out; reload or restart browser"</span>);
+          }
+        }, <span class="number">2000</span>);
+        connection.createAnswer(<span class="function"><span class="keyword">function</span> <span class="params">(answer)</span> {</span>
+          answer.sdp = ensureCryptoLine(answer.sdp);
+          clearTimeout(timeout);
+          connection.setLocalDescription(
+            answer,
+            <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+              session.send({
+                type: <span class="string">"rtc-answer"</span>,
+                answer: answer.sdp
+              });
+              answerSent = answer;
+            },
+            <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+              clearTimeout(timeout);
+              error(<span class="string">"Error doing RTC setLocalDescription:"</span>, err);
+            },
+            mediaConstraints
+          );
+        }, <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+          error(<span class="string">"Error doing RTC createAnswer:"</span>, err);
+        });
+      }
+    }
+
+    <span class="function"><span class="keyword">function</span> <span class="title">toggleMute</span><span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>FIXME: implement.  Actually, wait for this to be implementable - currently
+muting of localStreams isn&#39;t possible
+FIXME: replace with hang-up?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    }
+
+    session.hub.on(<span class="string">"rtc-offer"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (offerReceived || answerSent || answerReceived || offerSent) {
+        abort();
+      }
+      offerReceived = msg.offer;
+      <span class="keyword">if</span> (! accepted) {
+        audioButton(<span class="string">"#towtruck-audio-incoming"</span>);
+        <span class="keyword">return</span>;
+      }
+      <span class="function"><span class="keyword">function</span> <span class="title">run</span><span class="params">()</span> {</span>
+        <span class="keyword">var</span> connection = getConnection();
+        connection.setRemoteDescription(
+          <span class="keyword">new</span> RTCSessionDescription({
+            type: <span class="string">"offer"</span>,
+            sdp: offerReceived
+          }),
+          <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+            offerDescription = <span class="literal">true</span>;
+            addIceCandidate();
+            connect();
+          },
+          <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+            error(<span class="string">"Error doing RTC setRemoteDescription:"</span>, err);
+          }
+        );
+      }
+      <span class="keyword">if</span> (! audioStream) {
+        startStreaming(run);
+      } <span class="keyword">else</span> {
+        run();
+      }
+    });
+
+    session.hub.on(<span class="string">"rtc-answer"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (answerSent || answerReceived || offerReceived || (! offerSent)) {
+        abort();</pre></div></div>
+              
+            </li>
+          
+            <li id="section-17">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-17">&#182;</a>
+                </div>
+                <p>Basically we have to abort and try again.  We&#39;ll expect the other
+client to restart when appropriate</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        session.send({type: <span class="string">"rtc-abort"</span>});
+        <span class="keyword">return</span>;
+      }
+      answerReceived = msg.answer;
+      assert(offerSent);
+      assert(audioStream);
+      <span class="keyword">var</span> connection = getConnection();
+      connection.setRemoteDescription(
+        <span class="keyword">new</span> RTCSessionDescription({
+          type: <span class="string">"answer"</span>,
+          sdp: answerReceived
+        }),
+        <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          answerDescription = <span class="literal">true</span>;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-18">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-18">&#182;</a>
+                </div>
+                <p>FIXME: I don&#39;t think this connect is ever needed?</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          connect();
+        },
+        <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
+          error(<span class="string">"Error doing RTC setRemoteDescription:"</span>, err);
+        }
+      );
+    });
+
+    session.hub.on(<span class="string">"rtc-ice-candidate"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      iceCandidate = msg.candidate;
+      <span class="keyword">if</span> (offerDescription || answerDescription) {
+        addIceCandidate();
+      }
+    });
+
+    session.hub.on(<span class="string">"rtc-abort"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      abort();
+      <span class="keyword">if</span> (! accepted) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (! audioStream) {
+        startStreaming(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          connect();
+        });
+      } <span class="keyword">else</span> {
+        connect();
+      }
+    });
+
+    session.hub.on(<span class="string">"hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>FIXME: displayToggle should be set due to
+_connection.onstatechange, but that&#39;s not working, so
+instead:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+      <span class="keyword">if</span> (accepted &amp;&amp; (offerSent || answerSent)) {
+        abort();
+        connect();
+      }
+    });
+
+    <span class="function"><span class="keyword">function</span> <span class="title">abort</span><span class="params">()</span> {</span>
+      answerSent = answerReceived = offerSent = offerReceived = <span class="literal">null</span>;
+      answerDescription = offerDescription = <span class="literal">false</span>;
+      _connection = <span class="literal">null</span>;
+      $audio[<span class="number">0</span>].removeAttribute(<span class="string">"src"</span>);
+    }
+
+  });
+
+  <span class="keyword">return</span> webrtc;
+
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
+      </div>
+    </section>
+
+
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
+                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
+                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
