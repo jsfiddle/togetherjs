@@ -154,7 +154,7 @@ h5 {
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('/images/connect-logo@2x.png') #ffffff;
+  background: url('/images/connect-logo@2x.png');
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -171,26 +171,26 @@ h5 {
   background-clip:         padding-box;
 }
 
-.main-header a.main-logo:hover,
+/*.main-header a.main-logo:hover,
 .main-header a.main-logo:active {
-	background-color: #38c4ac;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip:    padding;
-	background-clip:         padding-box;
-}
+  background-color: #38c4ac;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip:    padding;
+  background-clip:         padding-box;
+}*/
 
 .main-header .masthead-title {
   font-size: 14px;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 100;
   color: #fff;
-  margin: 6px 10px;
-  letter-spacing: 5px;
+  margin: 6px 0px 0px;
+  letter-spacing: 1px;
 }
 
-.main-header .masthead-title:hover {
+/*.main-header .masthead-title:hover {
   color: #f1f1f1;
-}
+}*/
 
 .main-header .main-nav li a {
   color: rgb(255,255,255);
@@ -269,7 +269,6 @@ h5 {
 }
 
 #video-area {
-  /*padding-bottom: 0px;*/
   cursor: pointer;
 }
 
@@ -867,6 +866,7 @@ h5 {
   h1 {
     font-size: 48px;
     line-height: 100%;
+    font-weight: 600;
   }
 
   h2 {
@@ -939,40 +939,95 @@ h5 {
 
 /* Source-specific styles */
 
-#source-toc {
-  margin-top: 20px;
+#sourcecode h1 {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 17px;
 }
 
-#source-content h1 {
-  margin-bottom: 10px;
+#sourcecode h2 {
+  margin-bottom: 18px;
+}
+
+#sourcecode h3 {
+  margin-bottom: 18px;
+}
+
+#sourcecode pre {
+  margin: 10px 0 20px;
+}
+
+#sourcecode #sidenav {
+  margin-top: 40px;
+}
+
+#sourcecode #sidenav.panel .panel-heading {
+  background: #fff;
+  border-bottom: none;
+  font-weight: 700;
+}
+
+#sourcecode #sidenav .affix {
+  width: 263px;
+  position: static;
+}
+
+@media (min-width: 1200px) {
+  #sourcecode .affix, #sourcecode .affix-bottom {
+    width: 263px !important;
+    position: static !important;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 40px !important;
+  }
+}
+
+@media (min-width: 992px) {
+  #sourcecode .affix, #sourcecode .affix-bottom {
+    width: 213px;
+  }
+  #sourcecode .affix {
+    position: static !important;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 40px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  #sourcecode .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
+}
+
+@media (min-width: 480px) {
+  #sourcecode .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
+}
+
+@media (max-width: 480px) {
+  #sourcecode .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
 }
 
 #source-content ul.sections > li {
   white-space: normal;
+  margin: 20px 0px;
 }
 
 #source-content ul.sections > li > div.content {
   background: #f5f5f5;
-}
-
-
-
-#source-toc header {
-/*  background-color: #000;
-  color: #fff;
-  padding: 2px;*/
-}
-
-#source-toc header button {
-/*  width: 2em;*/
-}
-
-#source-toc dl {
-/*  padding: 2px;*/
-}
-
-#source-toc dd {
-/*  margin-left: 1em;*/
 }
 
 #source-content div.content {
@@ -981,7 +1036,7 @@ h5 {
 }
 
 #source-content div.annotation {
-  padding: 10px 25px 1px 20px;
+  padding: 10px 25px 1px 0px;
 }
 
 
