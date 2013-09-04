@@ -81,22 +81,14 @@
 
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
-          {% if (enableHome) %}
-            <li><a href="{{base}}./" class="scrollnav active">Overview</a></li>
-            <li><a href="{{base}}./docs/developers-getting-started.html" class="scrollnav ">Docs</a></li>
+            <li><a href="{{base}}./" {% if (enableHome) %}class="scrollnav active"{% endif %} >Overview</a></li>
+            <li><a href="{{base}}./docs/developers-getting-started.html" {% if (enableMarkdown) %}class="active scrollnav"{% endif %} >Docs</a></li>
             <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
-          {% endif %}
-          {% if (enableMarkdown) %}
-            <li><a href="{{base}}./" class="scrollnav">Overview</a></li>
-            <li><a href="{{base}}./docs/developers-getting-started.html" class="scrollnav active">Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
-          {% endif %}
           </ul>
         </div><!--/.navbar-collapse -->
 
       </div>
     </div>
-
 
 
     {% block body %}{% endblock %}
