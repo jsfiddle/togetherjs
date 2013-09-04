@@ -202,6 +202,10 @@ h5 {
   opacity: 1;
 }
 
+.main-header .navbar-header {
+  padding-left: 0px;
+}
+
 .main-header .navbar-nav > .active > a {
   color: rgb(255, 255, 255);
   opacity: 1;
@@ -265,7 +269,7 @@ h5 {
 }
 
 #hero .container {
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 #video-area {

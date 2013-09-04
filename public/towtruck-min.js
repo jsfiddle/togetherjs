@@ -386,7 +386,7 @@
     return "TowTruck";
   };
 
-  var defaultHubBase = "https://hub.towtruck.mozillalabs.com";
+  var defaultHubBase = "http://towtruckhub.molabsstaging.com";
   if (defaultHubBase == "__" + "hubUrl"+ "__") {
     // Substitution wasn't made
     defaultHubBase = "https://hub.towtruck.mozillalabs.com";

@@ -47,6 +47,10 @@
       return result;
     });
     </script>
-    <script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
+    <script>
+      TowTruckConfig_findRoom = {prefix: "towtruckfriendly", max: 5};
+      TowTruckConfig_suppressJoinConfirmation = true;
+    </script>
+    <script src="/towtruck.js"></script>
   </body>
 </html>

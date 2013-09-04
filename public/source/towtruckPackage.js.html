@@ -84,14 +84,14 @@
 
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
-          
-          
+            <li><a href=".././"  >Overview</a></li>
+            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
+            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
       </div>
     </div>
-
 
 
     
@@ -3101,6 +3101,9 @@ handle it</p>
           assert(findRoom.max &amp;&amp; <span class="keyword">typeof</span> findRoom.max == <span class="string">"number"</span> &amp;&amp; findRoom.max &gt; <span class="number">0</span>,
                  <span class="string">"Bad findRoom.max"</span>, findRoom);
           sessionId = util.generateId();
+          <span class="keyword">if</span> (findRoom.prefix.search(<span class="regexp">/[^a-zA-Z0-9]/</span>) != -<span class="number">1</span>) {
+            console.warn(<span class="string">"Bad value for findRoom.prefix:"</span>, JSON.stringify(findRoom.prefix));
+          }
           getRoomName(findRoom.prefix, findRoom.max).then(<span class="function"><span class="keyword">function</span> <span class="params">(shareId)</span> {</span></pre></div></div>
               
             </li>

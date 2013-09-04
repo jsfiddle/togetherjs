@@ -1902,6 +1902,9 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
           assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
                  "Bad findRoom.max", findRoom);
           sessionId = util.generateId();
+          if (findRoom.prefix.search(/[^a-zA-Z0-9]/) != -1) {
+            console.warn("Bad value for findRoom.prefix:", JSON.stringify(findRoom.prefix));
+          }
           getRoomName(findRoom.prefix, findRoom.max).then(function (shareId) {
             // FIXME: duplicates code below:
             session.clientId = session.identityId + "." + sessionId;

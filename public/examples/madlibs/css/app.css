@@ -1,0 +1,7 @@
+.madlib-hidden {
+    color: rgba(1, 1, 1, 0);
+}
+
+.madlib-hidden input {
+    /*color: #000;*/
+}
