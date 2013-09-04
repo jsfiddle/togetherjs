@@ -96,7 +96,7 @@ function write404(response) {
 }
 
 function write400(error, response) {
-  response.writeHead(400, {"Content-Type": "text/plain"});
+  response.writeHead(400, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
   response.end("Bad request: " + error);
 }
 
@@ -255,7 +255,7 @@ wsServer.on('request', function(request) {
 setInterval(function () {
   for (var id in connectionStats) {
     if (connectionStats[id].lastLeft && Date.now() - connectionStats[id].lastLeft > EMPTY_ROOM_LOG_TIMEOUT) {
-      logStats(connectionStats[id]);
+      logStats(id, connectionStats[id]);
       delete connectionStats[id];
       continue;
     }
