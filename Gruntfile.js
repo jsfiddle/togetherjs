@@ -183,8 +183,9 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
-  grunt.registerTask("buildsite", ["copysite", "render"]);
+  grunt.registerTask("buildsite", ["copysite", "render", "rendermd", "docco"]);
   grunt.registerTask("devwatch", ["build", "watch:minimal"]);
+  grunt.registerTask("sitewatch", ["buildsite", "watch:site"]);
 
   function escapeString(s) {
     if (typeof s != "string") {
