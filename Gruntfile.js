@@ -208,7 +208,8 @@ module.exports = function (grunt) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
       var destBase = grunt.option("dest") || "build";
-      var hubUrl = process.env.HUB_URL || "https://hub.towtruck.mozillalabs.com";
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.towtruck.mozillalabs.com";
+      grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
         __interface_html__: grunt.file.read("towtruck/interface.html"),
