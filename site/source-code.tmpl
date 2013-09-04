@@ -6,7 +6,7 @@
 {% block body %}
 
 <div class="container">
-  
+
     <section class="row">
       <div class="col-xs-3" id="source-toc">
         <div class="well well-lg fixed">
@@ -21,7 +21,9 @@
 
       <div class="col-xs-9" id="source-content">
         <h1>{{ source }}</h1>
-        <h4>{{ source.description }}</h4>
+        {% if sourceDescription %}
+          <h4>{{ sourceDescription }}</h4>
+        {% endif %}
 
         <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/{{ source }}">See this file on Github</a></div>
 
@@ -43,7 +45,7 @@
         </ul>
       </div>
     </section>
-    
+
 
 
 {% endblock %}

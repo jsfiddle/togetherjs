@@ -379,6 +379,7 @@ module.exports = function (grunt) {
       });
     });
     sources.forEach(function (source) {
+      var sourceName = source.replace(/\.js$/, "");
       var dest = grunt.option("dest") + "/source/" + source + ".html";
       grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
       var code = grunt.file.read("towtruck/" + source);
@@ -396,7 +397,8 @@ module.exports = function (grunt) {
       tmplVars.title = title;
       tmplVars.sections = sections;
       tmplVars.source = source;
-      tmplVars.sourceDescription = sourceDescriptions[source] || "";
+      tmplVars.sourceName = sourceName;
+      tmplVars.sourceDescription = sourceDescriptions[sourceName] || "";
       tmplVars.base = "../";
       tmplVars.sourceList = sourceList;
       var result = tmpl.render(tmplVars);
