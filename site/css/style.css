@@ -203,9 +203,14 @@ h5 {
 }
 
 .main-header .navbar-nav > .active > a {
-  color: rgb(72, 72, 72);
+  color: rgb(255, 255, 255);
   opacity: 1;
   background: none;
+}
+
+.main-header .main-nav li a.active {
+  color: rgb(255,255,255);
+  opacity: 1;
 }
 
 .navbar-inverse {
