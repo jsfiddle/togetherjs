@@ -308,6 +308,26 @@ module.exports = function (grunt) {
     };
   }
 
+  function addHeaderIds(doc) {
+    var result = [];
+    while (doc) {
+      var match = (/(<h\d)>(.*)(<\/h\d>)/i).exec(doc);
+      if (! match) {
+        result.push(doc);
+        break;
+      }
+      var id = match[2];
+      id = id.toLowerCase();
+      id = id.replace(/ +/g, "-");
+      id = id.replace(/[^a-z0-9_\-]/g, "");
+      var header = match[1] + ' id="' + id + '">' + match[2] + match[3];
+      result.push(doc.substr(0, match.index));
+      result.push(header);
+      doc = doc.substr(match.index + match[0].length);
+    }
+    return result.join("");
+  }
+
   function highlight(code, lang) {
     var hjs = require("highlight.js");
     var aliases = {
@@ -341,6 +361,7 @@ module.exports = function (grunt) {
         smartypants: true
       });
       var parsed = parseMarkdownOutput(html);
+      parsed.body = addHeaderIds(parsed.body);
       var tmpl = env.getTemplate("generic-markdown.tmpl");
       var tmplVars = Object.create(vars);
       tmplVars.markdownBody = parsed.body;
