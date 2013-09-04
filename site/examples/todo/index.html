@@ -5,29 +5,27 @@
   <title>Grocery To Do List</title>
   <meta name="description" content="">
   <meta name="author" content="">
-  <link rel="stylesheet" href=".css">
-  <script src=".js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    
+
   <style type="text/css" media="screen">
     .main{
       padding: 80px 15px;
     }
-    
+
     h1 {
       color: #e74c3c;
     }
-    
+
     .navbar {
       background: #fa6374;
     }
-    
+
     .navbar-inverse .navbar-brand {
       color: #fff;
     }
-    
+
     /*reset Twitter Bootstrap*/
     @media screen {
       * {
@@ -36,30 +34,30 @@
         box-sizing: content-box !important;
       }
     }
-    
+
   </style>
-    
+
 </head>
   <body>
-    
+
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <a class="navbar-brand pull-left" href="#">Grocery To Do List</a>
         <button type="button" class="btn btn-default navbar-btn pull-right" onclick="TowTruck(this); return false;">Get Together</button>
       </div>
     </div>
-    
-    
+
+
     <div class="container">
 
       <div class="main">
-        
+
         <div class="row">
-          <form id="form" action="#" method="POST" class="navbar-form pull-left">
+          <div id="form" class="navbar-form pull-left">
             <input id="description" name="description" type="text" class="form-control" style="width: 200px;" placeholder="Add a grocery item" />
             <input id="add" type="submit" value="Add" class="btn btn-primary" />
             <button id="clear" type="button" class="btn btn-danger">Clear All</button>
-          </form>
+          </div>
         </div>
 
         <div class="row">
@@ -67,47 +65,20 @@
           <h4>Our groceries:</h4>
           <ul id="todos" class="list-group"></ul>
         </div>
-        
+
       </div>
 
-    </div>  
-    
+    </div>
+
     <!-- towtruck -->
-    <script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
-  
+    <script src="/towtruck.js"></script>
+
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="js/jquery-1.10.2.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-  
-    <script type="text/javascript" charset="utf-8">
-    
-      $('#add').click( function() {
-         var Description = $('#description').val();
-        if($("#description").val() == '') {
-          $('#alert').html("<strong>Oops!</strong> Please enter an item above.");
-          $('#alert').fadeIn().delay(1000).fadeOut();
-          return false;
-         }
-         $('#todos').prepend("<li class='list-group-item'><input id='check' name='check' type='checkbox'/>   " + Description + "</li>");
-         $('#form')[0].reset();
-         var todos = $('#todos').html();
-         localStorage.setItem('todos', todos);
-         return false;
-      });
 
-      if(localStorage.getItem('todos')) {
-      $('#todos').html(localStorage.getItem('todos'));
-      }
-
-      $('#clear').click( function() {
-      window.localStorage.clear();
-      location.reload();
-      return false;
-      });
-    
-    </script>
-  
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
 
   </body>
 </html>
