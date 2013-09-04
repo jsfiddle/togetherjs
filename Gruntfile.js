@@ -140,7 +140,7 @@ module.exports = function (grunt) {
         }
       },
       site: {
-        files: ["towtruck/**/*", "Gruntfile.js", "site/**/*"],
+        files: ["towtruck/**/*", "Gruntfile.js", "site/**/*", "!**/*_flymake*", "!**/*~", "!**/.*"],
         tasks: ["build", "buildsite"]
       },
       minimal: {
@@ -185,7 +185,10 @@ module.exports = function (grunt) {
   grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
   grunt.registerTask("buildsite", ["copysite", "render", "rendermd", "docco"]);
   grunt.registerTask("devwatch", ["build", "watch:minimal"]);
-  grunt.registerTask("sitewatch", ["buildsite", "watch:site"]);
+  // For some reason doing ["build", "buildsite", "watch:site"]
+  // doesn't work, it gets through buildsite and doesn't watch;
+  // instead just doing watch:site seems okay:
+  grunt.registerTask("sitewatch", ["watch:site"]);
 
   function escapeString(s) {
     if (typeof s != "string") {
