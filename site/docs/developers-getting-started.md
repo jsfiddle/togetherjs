@@ -1,4 +1,4 @@
-# Developers: Getting Started
+# Documentation
 
 Would you like to use TowTruck on your site?  Great!  If you have feedback on this or any other part of TowTruck [we'd like to hear it](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform)!
 

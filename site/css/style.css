@@ -983,3 +983,88 @@ h5 {
 #source-content div.annotation {
   padding: 10px 25px 1px 20px;
 }
+
+
+/*MARKDOWN*/
+
+#markdownpages h1 {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 17px;
+}
+
+#markdownpages h2 {
+  margin-bottom: 18px;
+}
+
+#markdownpages h3 {
+  margin-bottom: 18px;
+}
+
+#markdownpages pre {
+  margin: 10px 0 20px;
+}
+
+#markdownpages #sidenav {
+  margin-top: 40px;
+}
+
+#markdownpages #sidenav.panel .panel-heading {
+  background: #fff;
+  border-bottom: none;
+  font-weight: 700;
+}
+
+#markdownpages #sidenav .affix {
+  width: 263px;
+  position: fixed;
+}
+
+@media (min-width: 1200px) {
+  #markdownpages .affix, #markdownpages .affix-bottom {
+    width: 263px !important;
+    position: fixed !important;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 40px !important;
+  }
+}
+
+@media (min-width: 992px) {
+  #markdownpages .affix, #markdownpages .affix-bottom {
+    width: 213px;
+  }
+  #markdownpages .affix {
+    position: fixed !important;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 40px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  #markdownpages .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
+}
+
+@media (min-width: 480px) {
+  #markdownpages .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
+}
+
+@media (max-width: 480px) {
+  #markdownpages .affix {
+    position: static;
+  }
+  .col-md-9 h1:first-child {
+    margin-top: 0px;
+  }
+}
