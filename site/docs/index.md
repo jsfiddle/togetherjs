@@ -378,3 +378,21 @@ We recommend the most recent release of [Firefox](http://www.mozilla.org/en-US/f
 If you want to have [WebRTC support](https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC) and are using Firefox, as of April 2013 this requires [Firefox Nightly](http://nightly.mozilla.org/) (this support will be moving towards beta and release in the coming months).
 
 We haven't done much testing on mobile (yet!) and cannot recommend anything there.
+
+# Getting Help
+
+## IRC / Live Chat
+
+We are available on the `#towtruck` channel on `irc.mozilla.org`
+
+If you don't use IRC, you can quickly join the chat from the web [using kiwiirc](https://kiwiirc.com/client/irc.mozilla.org/towtruck).
+
+## Issues
+
+Please submit any issues you have via [the Github issue tracker](https://github.com/mozilla/towtruck/issues/new).
+
+Don't be shy about opening an issue.  If you have a question or feature request that might already be possible, we can exchange comments via the issue tracker to figure it out.  We don't have a mailing list, so issues are a good way to keep a persistent record of these exchanges.
+
+## Email
+
+Feel free to email us at [towtruck@mozilla.com](mailto:towtruck@mozilla.com) with any questions, suggestions, or concerns.
