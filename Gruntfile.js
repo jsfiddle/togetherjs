@@ -362,12 +362,17 @@ module.exports = function (grunt) {
       var dest = grunt.option("dest") + "/" + basename + ".html";
       grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
       var data = grunt.file.read("site/" + source);
+      var templateName = "generic-markdown.tmpl";
+      var match = (/template:\s*([a-zA-Z_\-0-9.]*)/).exec(data);
+      if (match) {
+        templateName = match[1];
+      }
       var html = marked(data, {
         smartypants: true
       });
       var parsed = parseMarkdownOutput(html);
       parsed.body = addHeaderIds(parsed.body);
-      var tmpl = env.getTemplate("generic-markdown.tmpl");
+      var tmpl = env.getTemplate(templateName);
       var tmplVars = Object.create(vars);
       tmplVars.markdownBody = parsed.body;
       tmplVars.title = parsed.title;

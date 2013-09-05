@@ -7,7 +7,7 @@
     <title>{% block title %}
       Mozilla Labs : TogetherJS
     {% endblock %}</title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="{{ base }}images/fav-icon.png">
@@ -17,6 +17,7 @@
     <script src="{{ base }}js/parallax.js"></script>
     <script src="{{ base }}js/custom.js"></script>
     <script src="{{ base }}js/scrollTo.js"></script>
+    <script src="{{ base }}js/scrollspy.js"></script>
     <script src="{{ base }}js/waypoints.min.js"></script>
     <script src="{{ base }}js/how-animations.js"></script>
 
@@ -24,7 +25,6 @@
     <script src="{{ base }}js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -61,7 +61,7 @@
     <link rel="apple-touch-icon-precomposed" href="{{ base }}assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body {% block body_tag %}{% endblock %}>
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -82,7 +82,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href="{{base}}./" {% if (enableHome) %}class="scrollnav active"{% endif %} >Overview</a></li>
-            <li><a href="{{base}}./docs/developers-getting-started.html" {% if (enableMarkdown) %}class="active scrollnav"{% endif %} >Docs</a></li>
+            <li><a href="{{base}}./docs/" {% if (enableMarkdown) %}class="active scrollnav"{% endif %} >Docs</a></li>
             <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
@@ -105,7 +105,7 @@
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="{{ base }}./" class="scrollnav">Overview</a></li>
-                <li><a href="{{base}}./docs/developers-getting-started.html" target="_blank">Docs</a></li>
+                <li><a href="{{base}}./docs/" target="_blank">Docs</a></li>
                 <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
