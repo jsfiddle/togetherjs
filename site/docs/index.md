@@ -15,7 +15,7 @@ The quickest is to include two things on your page.  First the Javascript:
   // Set to false or delete to disable analytics/tracking:
   TowTruckConfig_enableAnalytics = true;
 </script>
-<script src="https://towtruck.mozillalabs.com/towtruck.js"></script>
+<script src="https://towtruck.mozillalabs.com/towtruck-min.js"></script>
 ```
 
 The first part configures TowTruck.  In the example we configure it to send analytics information back to us (Mozilla), so we can get an idea of who is using TowTruck.  You can turn it off, but we do appreciate the information, especially during the alpha stage.  There's not much configuration yet, but we'll go over what there is later.
@@ -37,9 +37,9 @@ $(function () {
 </script>
 ```
 
-You should put the `towtruck.js` script on every page in your site – two people can collaborate across the entire site then.  If you forget it on a page, then if someone visits that page while in a TowTruck session they will essentially go "offline" until they come back to another page that includes `towtruck.js`
+You should put the `towtruck-min.js` script on every page in your site – two people can collaborate across the entire site then.  If you forget it on a page, then if someone visits that page while in a TowTruck session they will essentially go "offline" until they come back to another page that includes `towtruck-min.js`
 
-Note that `towtruck.js` *is not* the entire code for TowTruck, it's only a fairly small file that loads the rest of TowTruck on demand.  You can place the `<script>` anywhere on the page – generally before `</body>` is considered the best place to put scripts.
+Note that `towtruck-min.js` *is not* the entire code for TowTruck, it's only a fairly small file that loads the rest of TowTruck on demand.  You can place the `<script>` anywhere on the page – generally before `</body>` is considered the best place to put scripts.
 
 ### Scope of the session
 
@@ -112,7 +112,7 @@ Note that audio chat will not work between some networks.  These networks requir
 
 There is an addon for Firefox in [addon/](https://github.com/mozilla/towtruck/tree/develop/addon).
 
-This isn't intended to be the "normal" way anyone uses TowTruck, but it is a development tool to try TowTruck out on a site that hasn't integrated `towtruck.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `towtruck.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&towtruck=...` (the code used in the share link) it will automatically turn TowTruck on for the tab.
+This isn't intended to be the "normal" way anyone uses TowTruck, but it is a development tool to try TowTruck out on a site that hasn't integrated `towtruck-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `towtruck-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&towtruck=...` (the code used in the share link) it will automatically turn TowTruck on for the tab.
 
 ## Installing
 
@@ -132,7 +132,7 @@ We're still working on this part, and your feedback is especially important.  We
 
 ### Configuring events
 
-Like other configuration, you may not wish to set up these callbacks before `towtruck.js` is loaded.  You can do that with the `"on"` configuration parameter, like:
+Like other configuration, you may not wish to set up these callbacks before `towtruck-min.js` is loaded.  You can do that with the `"on"` configuration parameter, like:
 
 ```js
 TowTruckConfig_on = {
