@@ -6,3 +6,6 @@ dump.rdb
 app/http/public/recorder.css
 build
 towtruck.mozillalabs.com
+addon/towtruck.xpi
+towtruck/towtruck.css
+towtruck/towtruckPackage.js

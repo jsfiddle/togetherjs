@@ -406,7 +406,7 @@ module.exports = function (grunt) {
       sourceList.push({
         name: name,
         link: source + ".html",
-        description: sourceDescriptions[name] || ""
+        description: marked(sourceDescriptions[name] || "", {smartypants: true})
       });
     });
     sources.forEach(function (source) {
@@ -429,12 +429,18 @@ module.exports = function (grunt) {
       tmplVars.sections = sections;
       tmplVars.source = source;
       tmplVars.sourceName = sourceName;
-      tmplVars.sourceDescription = sourceDescriptions[sourceName] || "";
+      tmplVars.sourceDescription = marked(sourceDescriptions[sourceName] || "", {smartypants: true});
       tmplVars.base = "../";
       tmplVars.sourceList = sourceList;
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
     });
+    var tmplVars = Object.create(vars);
+    tmplVars.title = "TowTruck Source Code";
+    tmplVars.sourceList = sourceList;
+    tmplVars.base = "../";
+    var tmpl = env.getTemplate("source-code-index.tmpl");
+    grunt.file.write(grunt.option("dest") + "/source/index.html", tmpl.render(tmplVars));
   });
 
   grunt.registerTask("publish", "Publish to towtruck.mozillalabs.com/public/", function () {
