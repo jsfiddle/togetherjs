@@ -1,0 +1,24 @@
+{% extends "base.tmpl" %}
+{# set enableMarkdown true #}
+{% block body_tag %}data-spy="scroll" data-target="#markdownpages"{% endblock %}
+{% block body %}
+
+<div class="container">
+  <section class="row" id="markdownpages">
+    <div class="col-md-3">
+      <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+        <ul id="sectionmenu" class="nav">
+          <li><a href="#code-style" class="scrollnavdocs">Code Style</a></li>
+          <li><a href="#towtruck-patterns" class="scrollnavdocs">TowTruck Patterns</a></li>
+          <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting The Hub Server</a></li>
+          <li><a href="./" class="scrollnavdocs">TowTruck Documentation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <h1>{{ title }}</h1>
+      {{ markdownBody }}
+    </div>
+  </section>
+
+{% endblock %}
