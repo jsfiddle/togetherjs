@@ -41,14 +41,17 @@ function($, util, session, elementFinder){
     };
 
     function setupTimeSync (videos) {
-        var onTimeUpdate = getTimeUpdater();
-        videos.on(TIME_UPDATE, onTimeUpdate);
-        listeners[TIME_UPDATE] = onTimeUpdate;
+        listeners[TIME_UPDATE] || (listeners[TIME_UPDATE] = []);
+        videos.each(function(i, video) {
+            var onTimeUpdate = getTimeUpdater();
+            $(video).on(TIME_UPDATE, onTimeUpdate);
+            listeners[TIME_UPDATE].push(onTimeUpdate);
+        });
     };
 
     function getTimeUpdater () {
         var last = 0;
-        return function (){
+        return function (event) {
             var currentTime = event.target.currentTime;
             if(areTooFarApart(currentTime, last)){
                 getEventSender(TIME_UPDATE)(event);
