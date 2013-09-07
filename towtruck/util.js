@@ -156,6 +156,27 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
     return url;
   };
 
+  util.makeUrlAbsolute = function (url, base) {
+    if (url.search(/^(http|https|ws|wss):/i) === 0) {
+      // Absolute URL
+      return url;
+    }
+    if (url.search(/^\/\/[^\/]/) === 0) {
+      var scheme = (/^(http|https|ws|wss):/i).exec(base);
+      util.assert(scheme, "No scheme on base URL", base);
+      return scheme[1] + ":" + url;
+    }
+    if (url.search(/^\//) === 0) {
+      var domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
+      util.assert(domain, "No scheme/domain on base URL", base);
+      return domain[0] + url;
+    }
+    var last = (/[^\/]+$/).exec(base);
+    util.assert(last, "Does not appear to be a URL?", base);
+    var lastBase = base.substr(0, last.index);
+    return lastBase + url;
+  };
+
   util.resolver = function (deferred, func) {
     util.assert(deferred.then, "Bad deferred:", deferred);
     util.assert(typeof func == "function", "Not a function:", func);
