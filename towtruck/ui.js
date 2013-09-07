@@ -185,12 +185,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.prepareUI();
     }
     var container = ui.container;
-    
+
     //create the overlay
     if($.browser.mobile) {
       // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
     }
-    
+
     // The share link:
     ui.prepareShareLink(container);
     container.find("input.towtruck-share-link").on("keydown", function (event) {
@@ -276,10 +276,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       return false;
     });
-    
+
     function openDock() {
-      console.log("open Dock");
-      
       $('.towtruck-window').animate({
         opacity: 1
       });
@@ -294,32 +292,30 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }, {
         duration:60, easing:"linear"
       });
-      
+
       // add bg overlay
       $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'></div>" );
-      
+
       //disable vertical scrolling
       $("body").css({
         "position": "fixed",
         top: 0,
         left: 0
       });
-      
+
       //replace the anchor icon
       var src = "../images/togetherjs-logo-close.png";
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
     }
-    
-    function closeDock() {
-      console.log("Close dock");
 
+    function closeDock() {
       //enable vertical scrolling
       $("body").css({
         "position": "",
         top: "",
         left: ""
       });
-      
+
       //replace the anchor icon
       var src = "../images/togetherjs-logo-open.png";
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
@@ -338,19 +334,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }, {
         duration:60, easing:"linear"
       });
-      
+
       // remove bg overlay
       $(".overlay").remove();
     }
-    
+
     // Setting the anchor button + dock mobile actions
-    if($.browser.mobile) {  
-      
+    if($.browser.mobile) {
+
       // toggle the audio button
       $("#towtruck-audio-button").click(function () {
         windowing.toggle("#towtruck-rtc-not-supported");
-      }); 
-      
+      });
+
       // toggle the profile button
       $("#towtruck-profile-button").click(function () {
         windowing.toggle("#towtruck-menu-window");
@@ -364,11 +360,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         top: 0,
         left: 0
       });
-      
+
       //replace the anchor icon
       var src = "../images/togetherjs-logo-close.png";
       $("#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img").attr("src", src);
-                      
+
       $("#towtruck-dock-anchor").toggle(function() {
           closeDock();
         },function(){
@@ -443,7 +439,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     $("#towtruck-end-session").click(function () {
       session.close();
       $(".overlay").remove();
-      
+
     });
 
     $("#towtruck-menu-update-color").click(function () {
@@ -545,6 +541,17 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
     });
 
+    if (TowTruck.getConfig("inviteFromRoom")) {
+      container.find("#towtruck-invite").show();
+    }
+
+    container.find("#towtruck-menu-refresh-invite").click(refreshInvite);
+    container.find("#towtruck-menu-invite-anyone").click(function () {
+      invite(null);
+    });
+
+    // The following lines should be at the end of this function
+    // (new code goes above)
     session.emit("new-element", ui.container);
 
     if (finishedAt && finishedAt > Date.now()) {
@@ -556,7 +563,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       session.emit("ui-ready", ui);
     }
 
-  };
+  }; // End ui.activateUI()
 
   ui.activateAvatarEdit = function (container, options) {
     options = options || {};
@@ -734,20 +741,20 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   }
 
   session.on("close", function () {
-    
+
     if($.browser.mobile) {
       // remove bg overlay
       $(".overlay").remove();
-      
+
       //after hitting End, reset window draggin
       $("body").css({
         "position": "",
         top: "",
         left: ""
       });
-      
+
     }
-    
+
     if (ui.container) {
       ui.container.remove();
       ui.container = null;
@@ -885,6 +892,28 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         return;
       }
       ui.chat.add(el, messageId, notify);
+    },
+
+    invite: function (attrs) {
+      assert(attrs.peer);
+      assert(typeof attrs.url == "string");
+      var messageId = attrs.peer.className("invite-");
+      var date = attrs.date || Date.now();
+      var hrefTitle = attrs.url.replace(/\#?&towtruck=.*/, "").replace(/^\w+:\/\//, "");
+      var el = templating.sub("invite", {
+        peer: attrs.peer,
+        date: date,
+        href: attrs.url,
+        hrefTitle: hrefTitle,
+        forEveryone: attrs.forEveryone
+      });
+      if (attrs.forEveryone) {
+        el.find("a").click(function () {
+          // FIXME: hacky way to do this:
+          chat.submit("Followed link to " + attrs.url);
+        });
+      }
+      ui.chat.add(el, messageId, true);
     },
 
     hideTimeout: null,
@@ -1244,6 +1273,93 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     } else {
       ui.displayToggle("#towtruck-chat-no-participants");
     }
+  }
+
+  function inviteHubUrl() {
+    var base = TowTruck.getConfig("inviteFromRoom");
+    assert(base);
+    return util.makeUrlAbsolute(base, session.hubUrl());
+  }
+
+  var inRefresh = false;
+
+  function refreshInvite() {
+    if (inRefresh) {
+      return;
+    }
+    inRefresh = true;
+    require(["who"], function (who) {
+      var def = who.getList(inviteHubUrl());
+      function addUser(user, before) {
+        var item = templating.sub("invite-user-item", {peer: user});
+        item.attr("data-clientid", user.id);
+        if (before) {
+          item.insertBefore(before);
+        } else {
+          $("#towtruck-invite-users").append(item);
+        }
+        item.click(function() {
+          invite(user.clientId);
+        });
+      }
+      function refresh(users, finished) {
+        var sorted = [];
+        for (var id in users) {
+          if (users.hasOwnProperty(id)) {
+            sorted.push(users[id]);
+          }
+        }
+        sorted.sort(function (a, b) {
+          return a.name < b.name ? -1 : 1;
+        });
+        var pos = 0;
+        ui.container.find("#towtruck-invite-users .towtruck-menu-item").each(function () {
+          var $this = $(this);
+          if (finished && ! users[$this.attr("data-clientid")]) {
+            $this.remove();
+            return;
+          }
+          if (pos >= sorted.length) {
+            return;
+          }
+          while (pos < sorted.length && $this.attr("data-clientid") !== sorted[pos].id) {
+            addUser(sorted[pos], $this);
+            pos++;
+          }
+          while (pos < sorted.length && $this.attr("data-clientid") == sorted[pos].id) {
+            pos++;
+          }
+        });
+        for (var i=pos; i<sorted.length; i++) {
+          addUser(sorted[pos]);
+        }
+      }
+      def.then(function (users) {
+        refresh(users, true);
+        inRefresh = false;
+      });
+      def.progress(refresh);
+    });
+  }
+
+  session.hub.on("invite", function (msg) {
+    if (msg.forClientId && msg.clientId != peers.Self.id) {
+      return;
+    }
+    require(["who"], function (who) {
+      var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
+      ui.chat.invite({peer: peer, url: msg.url, forEveryone: ! msg.forClientId});
+    });
+  });
+
+  function invite(clientId) {
+    require(["who"], function (who) {
+      // FIXME: use the return value of this to give a signal that
+      // the invite has been successfully sent:
+      who.invite(inviteHubUrl(), clientId).then(function () {
+        hideMenu();
+      });
+    });
   }
 
   ui.showUrlChangeMessage = deferForContainer(function (peer, url) {

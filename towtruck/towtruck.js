@@ -425,10 +425,14 @@
     toolName: null,
     // Used to auto-start TowTruck with a {prefix: pageName, max: participants}
     // Implies auto-start
+    // Also with findRoom: "roomName" it will start TowTruck automatically in the
+    // given room.
     findRoom: null,
     // If true, then the "Join TowTruck Session?" confirmation dialog
     // won't come up
-    suppressJoinConfirmation: false
+    suppressJoinConfirmation: false,
+    // A room in which to find people to invite to this session,
+    inviteFromRoom: null
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TowTruck has loaded).  We should keep

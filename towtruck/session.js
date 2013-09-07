@@ -37,9 +37,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
    * URLs
    */
 
-  session.hubUrl = function () {
-    assert(session.shareId, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + session.shareId;
+  session.hubUrl = function (id) {
+    id = id || session.shareId;
+    assert(id, "URL cannot be resolved before TowTruck.shareId has been initialized");
+    return TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + id;
   };
 
   session.shareUrl = function () {
@@ -79,6 +80,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.hub = util.mixinEvents({});
 
   var IGNORE_MESSAGES = ["cursor-update", "keydown", "scroll-update"];
+  // These are messages sent by clients who aren't "part" of the TowTruck session:
+  var MESSAGES_WITHOUT_CLIENTID = ["who", "invite"];
 
   // We ignore incoming messages from the channel until this is true:
   var readyForMessages = false;
@@ -102,14 +105,24 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         console.warn("Message received before all modules loaded (ignoring):", msg);
         return;
       }
-      msg.peer = peers.getPeer(msg.clientId, msg);
+      if ((! msg.clientId) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
+        console.warn("Got message without clientId, where clientId is required", msg);
+        return;
+      }
+      if (msg.clientId) {
+        msg.peer = peers.getPeer(msg.clientId, msg);
+      }
       if (msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
         // We do this here to make sure this is run before any other
         // hello handlers:
         msg.peer.updateFromHello(msg);
       }
-      msg.sameUrl = msg.peer.url == currentUrl;
-      if (!msg.peer.isSelf) { msg.peer.updateMessageDate(msg); }
+      if (msg.peer) {
+        msg.sameUrl = msg.peer.url == currentUrl;
+        if (!msg.peer.isSelf) {
+          msg.peer.updateMessageDate(msg);
+        }
+      }
       session.hub.emit(msg.type, msg);
       TowTruck._onmessage(msg);
     };
@@ -155,6 +168,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     }
   });
 
+  session.hub.on("who", function (msg) {
+    sendHello(true);
+  });
+
   function processFirstHello(msg) {
     if (! msg.sameUrl) {
       var url = msg.url;
@@ -169,6 +186,15 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.timeHelloSent = null;
 
   function sendHello(helloBack) {
+    var msg = session.makeHelloMessage(helloBack);
+    if (! helloBack) {
+      session.timeHelloSent = Date.now();
+      peers.Self.url = msg.url;
+    }
+    session.send(msg);
+  }
+
+  session.makeHelloMessage = function (helloBack) {
     var msg = {
       name: peers.Self.name || peers.Self.defaultName,
       avatar: peers.Self.avatar,
@@ -185,16 +211,14 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     } else {
       msg.type = "hello";
       msg.clientVersion = TowTruck.version;
-      session.timeHelloSent = Date.now();
-      peers.Self.url = msg.url;
     }
     if (! TowTruck.startup.continued) {
       msg.starting = true;
     }
     // This is a chance for other modules to effect the hello message:
     session.emit("prepare-hello", msg);
-    session.send(msg);
-  }
+    return msg;
+  };
 
   /****************************************
    * Lifecycle (start and end)
@@ -266,7 +290,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       }
       return storage.tab.get("status").then(function (saved) {
         var findRoom = TowTruck.getConfig("findRoom");
-        if (findRoom && ! saved) {
+        if (findRoom && typeof findRoom == "string" && ! saved) {
+          isClient = true;
+          shareId = findRoom;
+          sessionId = util.generateId();
+        } else if (findRoom && ! saved) {
           assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
           assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
                  "Bad findRoom.max", findRoom);

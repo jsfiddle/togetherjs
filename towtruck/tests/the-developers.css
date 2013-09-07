@@ -1,0 +1,12 @@
+body {
+  font-family: sans-serif;
+  height: 100%;
+}
+
+#chat {
+  height: 90%;
+}
+
+#input {
+  width: 100%;
+}

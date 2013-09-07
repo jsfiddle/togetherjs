@@ -97,7 +97,7 @@
       <p class="towtruck-participant-window-row"><strong>Status:</strong>
         <span class="towtruck-person-status"></span>
       </p>
-      
+
       <p class="towtruck-participant-window-row"><strong class="towtruck-float-left">Follow this participant:</strong>
         <label class="towtruck-follow-question towtruck-float-left" for="towtruck-person-status-follow">
           <input type="checkbox" id="towtruck-person-status-follow">
@@ -294,8 +294,22 @@
     <div class="towtruck-hr"></div>
     <div class="towtruck-menu-item" id="towtruck-menu-help">Help</div>
     <div class="towtruck-menu-item" id="towtruck-menu-feedback">Feedback</div>
+    <div id="towtruck-invite" style="display: none">
+      <div class="towtruck-hr"></div>
+      <div id="towtruck-invite-users"></div>
+      <div class="towtruck-menu-item" id="towtruck-menu-refresh-invite">Refresh users</div>
+      <div class="towtruck-menu-item" id="towtruck-menu-invite-anyone">Invite anyone</div>
+    </div>
     <div class="towtruck-hr"></div>
     <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End <span class="towtruck-tool-name">TogetherJS</span></div>
+  </div>
+
+  <!-- template for one person in the invite-users list -->
+  <div style="display: none">
+    <div id="towtruck-template-invite-user-item" class="towtruck-menu-item">
+      <!-- FIXME: should include avatar in some way -->
+      <span class="towtruck-person-name"></span>
+    </div>
   </div>
 
   <!-- A window version of #towtruck-menu, for use on mobile -->
@@ -440,6 +454,18 @@
         to <a href="" class="towtruck-person-url towtruck-person-url-title"></a>
       </section>
     </div>
+
+    <!-- This is when someone invites you to their session: -->
+    <div id="towtruck-template-invite" class="towtruck-chat-item">
+      <div class="towtruck-person"></div>
+      <div>
+        <span class="towtruck-person-name"></span>
+        has invited <strong class="towtruck-if-forEveryone">anyone</strong>
+        <strong class="towtruck-ifnot-forEveryone">you</strong>
+        to <a href="" data-towtruck-subattr-href="href" class="towtruck-sub-hrefTitle" target="_blank"></a>
+      </div>
+    </div>
+
   </div>
 
   <!-- The pointer at the side of a window: -->
