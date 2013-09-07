@@ -1,11 +1,14 @@
 
 define(["jquery", "util", "session", "elementFinder"],
 function($, util, session, elementFinder){
-  var returnMe = util.Module("videos"),
-  listeners = {},
-  TIME_UPDATE = 'timeupdate',
-  MIRRORED_EVENTS = ['play', 'pause'],
-  TOO_FAR_APART = 3000;
+  var returnMe = util.Module("videos");
+
+  var listeners = {};
+
+  var TIME_UPDATE = 'timeupdate';
+  var MIRRORED_EVENTS = ['play', 'pause'];
+
+  var TOO_FAR_APART = 3000;
 
   session.on("reinitialize", setupListeners);
 
@@ -61,8 +64,8 @@ function($, util, session, elementFinder){
   };
 
   function areTooFarApart (currentTime, lastTime) {
-    var secDiff = Math.abs(currentTime - lastTime),
-    milliDiff = secDiff * 1000;
+    var secDiff = Math.abs(currentTime - lastTime);
+    var milliDiff = secDiff * 1000;
     return milliDiff > TOO_FAR_APART;
   }
 
@@ -85,9 +88,9 @@ function($, util, session, elementFinder){
 
 
   session.hub.on('video-timeupdate', function (msg) {
-    var element = $findElement(msg.location),
-    oldTime = element.prop('currentTime'),
-    newTime = msg.position;
+    var element = $findElement(msg.location);
+    var oldTime = element.prop('currentTime');
+    var newTime = msg.position;
 
     //to help throttle uneccesary position changes
     if(areTooFarApart(oldTime, newTime)){

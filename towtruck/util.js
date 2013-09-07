@@ -253,6 +253,5 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
     });
   };
 
-
   return util;
 });
