@@ -36,7 +36,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       element: location
     };
     if (isText(el)) {
-      var history = el.data("towtruckHistory");
+      var history = el.data("togetherjsHistory");
       if (history.current == value) {
         return;
       }
@@ -49,7 +49,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       } else {
         msg.value = value;
         msg.basis = 1;
-        el.data("towtruckHistory", ot.SimpleHistory(session.clientId, value, 1));
+        el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
       }
     } else {
       msg.value = value;
@@ -69,7 +69,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   var editTrackers = {};
   var liveTrackers = [];
 
-  TowTruck.addTracker = function (TrackerClass, skipSetInit) {
+  TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
     assert(typeof TrackerClass === "function", "You must pass in a class");
     assert(typeof TrackerClass.prototype.trackerName === "string",
            "Needs a .prototype.trackerName string");
@@ -153,7 +153,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return !! $(el).closest(".ace_editor").length;
   };
 
-  TowTruck.addTracker(AceEditor, true /* skip setInit */);
+  TogetherJS.addTracker(AceEditor, true /* skip setInit */);
 
   var CodeMirrorEditor = util.Class({
     trackerName: "CodeMirrorEditor",
@@ -239,7 +239,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return false;
   };
 
-  TowTruck.addTracker(CodeMirrorEditor, true /* skip setInit */);
+  TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
   function buildTrackers() {
     assert(! liveTrackers.length);
@@ -363,7 +363,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
     var value;
     if (msg.replace) {
-      var history = el.data("towtruckHistory");
+      var history = el.data("togetherjsHistory");
       if (!history) {
         console.warn("form update received for uninitialized form element");
         return;
@@ -402,7 +402,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     initSent = true;
     var msg = {
       type: "form-init",
-      pageAge: Date.now() - TowTruck.pageLoaded,
+      pageAge: Date.now() - TogetherJS.pageLoaded,
       updates: []
     };
     var els = $("textarea, input, select");
@@ -417,7 +417,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         value: value
       };
       if (isText(el)) {
-        var history = el.data("towtruckHistory");
+        var history = el.data("togetherjsHistory");
         if (history) {
           upd.value = history.committed;
           upd.basis = history.basis;
@@ -446,7 +446,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       var el = $(this);
       var value = getValue(el);
-      el.data("towtruckHistory", ot.SimpleHistory(session.clientId, value, 1));
+      el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
     });
     destroyTrackers();
     buildTrackers();
@@ -466,7 +466,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       // In a 3+-peer situation more than one client may init; in this case
       // we're probably the other peer, and not the peer that needs the init
       // A quick check to see if we should init...
-      var myAge = Date.now() - TowTruck.pageLoaded;
+      var myAge = Date.now() - TogetherJS.pageLoaded;
       if (msg.pageAge < myAge) {
         // We've been around longer than the other person...
         return;
@@ -496,16 +496,16 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         try {
           setValue(el, update.value);
           if (update.basis) {
-            var history = $(el).data("towtruckHistory");
+            var history = $(el).data("togetherjsHistory");
             // don't overwrite history if we're already up to date
             // (we might have outstanding queued changes we don't want to lose)
             if (!(history && history.basis === update.basis &&
                   // if history.basis is 1, the form could have lingering
-                  // edits from before towtruck was launched.  that's too bad,
+                  // edits from before togetherjs was launched.  that's too bad,
                   // we need to erase them to resynchronize with the peer
                   // we just asked to join.
                   history.basis !== 1)) {
-              $(el).data("towtruckHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
+              $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
             }
           }
         } finally {
@@ -566,7 +566,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   function createFocusElement(peer, around) {
     around = $(around);
     var el = templating.sub("focus", {peer: peer});
-    el = el.find(".towtruck-focus");
+    el = el.find(".togetherjs-focus");
     var aroundOffset = around.offset();
     el.css({
       top: aroundOffset.top-FOCUS_BUFFER + "px",

@@ -8,7 +8,7 @@ printChained(
   storage.settings.set("seenIntroDialog", true),
   storage.settings.set("seenWalkthrough", true),
   storage.settings.set("dontShowRtcInfo", true),
-  Test.startTowTruck());
+  Test.startTogetherJS());
 
 // => ...
 
@@ -54,11 +54,11 @@ addPeer();
 Test.addControl(
 
   $("<button>Animate in cursor/box</button>").click(function () {
-    //$(".towtruck-cursor").fadeOut();
+    //$(".togetherjs-cursor").fadeOut();
   }),
 
   $("<button>Animate out cursor/box</button>").click(function () {
-    //$(".towtruck-cursor").fadeOut();
+    //$(".togetherjs-cursor").fadeOut();
   }),
 
   $("<button>Faker Join</button>").click(function () {
@@ -154,16 +154,16 @@ var el = $('<div><label for="idle-check">Quick idle <input type="checkbox" id="i
            '<label for="expire-check">Quick expire <input type="checkbox" id="expire-check"></label></div>');
 el.find("#idle-check").change(function (event) {
   if (event.target.checked) {
-    TowTruckTestSpy.setIdleTime(100);
+    TogetherJSTestSpy.setIdleTime(100);
   } else {
-    TowTruckTestSpy.setIdleTime(3*60*1000);
+    TogetherJSTestSpy.setIdleTime(3*60*1000);
   }
 });
 el.find("#expire-check").change(function (event) {
   if (event.target.checked) {
-    TowTruckTestSpy.setByeTime(10*1000);
+    TogetherJSTestSpy.setByeTime(10*1000);
   } else {
-    TowTruckTestSpy.setIdleTime(10*60*1000);
+    TogetherJSTestSpy.setIdleTime(10*60*1000);
   }
 });
 Test.addControl(el);
@@ -194,7 +194,7 @@ Test.addControl(
 Test.addControl($('<input placeholder="Tool name">').keypress(function (event) {
   var el = $(event.target);
   if (event.which == 13) {
-    TowTruck.config("toolName", el.val() || null);
+    TogetherJS.config("toolName", el.val() || null);
     el.val("");
   }
 }));

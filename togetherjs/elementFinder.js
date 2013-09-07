@@ -11,7 +11,7 @@ define(["util", "jquery"], function (util, $) {
       el = el[0];
     }
     while (el) {
-      if ($(el).hasClass("towtruck")) {
+      if ($(el).hasClass("togetherjs")) {
         return true;
       }
       el = el.parentNode;
@@ -50,7 +50,7 @@ define(["util", "jquery"], function (util, $) {
         break;
       }
       if (children[i].nodeType == document.ELEMENT_NODE) {
-        if (children[i].className.indexOf("towtruck") != -1) {
+        if (children[i].className.indexOf("togetherjs") != -1) {
           // Don't count our UI
           continue;
         }
@@ -85,8 +85,8 @@ define(["util", "jquery"], function (util, $) {
 
   elementFinder.findElement = function findElement(loc, container) {
     // FIXME: should this all just be done with document.querySelector()?
-    // But no!  We can't ignore towtruck elements with querySelector.
-    // But maybe!  We *could* make towtruck elements less obtrusive?
+    // But no!  We can't ignore togetherjs elements with querySelector.
+    // But maybe!  We *could* make togetherjs elements less obtrusive?
     container = container || document;
     var el, rest;
     if (loc === "body") {
@@ -155,7 +155,7 @@ define(["util", "jquery"], function (util, $) {
       for (var i=0; i<children.length; i++) {
         var child = children[i];
         if (child.nodeType == document.ELEMENT_NODE) {
-          if (child.className.indexOf("towtruck") != -1) {
+          if (child.className.indexOf("togetherjs") != -1) {
             continue;
           }
           count--;
@@ -197,7 +197,7 @@ define(["util", "jquery"], function (util, $) {
       var children = start.children();
       children.each(function () {
         var el = $(this);
-        if (el.hasClass("towtruck") || el.css("position") == "fixed" || ! el.is(":visible")) {
+        if (el.hasClass("togetherjs") || el.css("position") == "fixed" || ! el.is(":visible")) {
           return;
         }
         if (el.offset().top > height) {

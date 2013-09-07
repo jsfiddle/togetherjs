@@ -1,4 +1,4 @@
-TowTruckTestSpy = {};
+TogetherJSTestSpy = {};
 
 var Test = {};
 
@@ -19,27 +19,27 @@ Test.require = function () {
       done = true;
       return;
     }
-    TowTruck.require(modules, function () {
+    TogetherJS.require(modules, function () {
       for (var i=0; i<modules.length; i++) {
         window[modules[i]] = arguments[i];
       }
       var msg = ["Loaded modules:"].concat(modules);
       print.apply(null, msg);
-      TowTruck._loaded = true;
+      TogetherJS._loaded = true;
       done = true;
     });
   }
 
-  if (TowTruck.require) {
-    console.log("TowTruck already initialized");
+  if (TogetherJS.require) {
+    console.log("TogetherJS already initialized");
     loadModules();
   } else if (typeof require == "function") {
     console.log("require.js already loaded; configuring");
     loadModules();
   } else {
-    window.require = TowTruck._extend(TowTruck.requireConfig);
+    window.require = TogetherJS._extend(TogetherJS.requireConfig);
     window.require.callback = function () {
-      TowTruck.require = require.config({context: "towtruck"});
+      TogetherJS.require = require.config({context: "togetherjs"});
       loadModules();
     };
     var url = "../libs/require.js";
@@ -55,12 +55,12 @@ Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update", "keypress"];
 
 Test.viewSend = function () {
   // Prints out all send() messages
-  var session = TowTruck.require("session");
-  if (! TowTruck.running) {
+  var session = TogetherJS.require("session");
+  if (! TogetherJS.running) {
     session.once("start", Test.viewSend);
     return;
   }
-  var channel = TowTruckTestSpy.getChannel();
+  var channel = TogetherJSTestSpy.getChannel();
   var oldSend = channel.send;
   channel.send = function (msg) {
     oldSend.apply(channel, arguments);
@@ -68,7 +68,7 @@ Test.viewSend = function () {
     if (Test.viewSend.running && Test.IGNORE_MESSAGES.indexOf(msg.type) == -1) {
       if (typeof print == "function") {
         print("send:", msg.type);
-        var shortMsg = TowTruck._extend(msg);
+        var shortMsg = TogetherJS._extend(msg);
         delete shortMsg.type;
         var r = repr(shortMsg, undefined, 10);
         r = "  " + r.replace(/^\{\s+/, "");
@@ -81,7 +81,7 @@ Test.viewSend = function () {
   };
 };
 
-TowTruck._mixinEvents(Test.viewSend);
+TogetherJS._mixinEvents(Test.viewSend);
 Test.viewSend.running = true;
 Test.viewSend.activate = function () {
   Test.viewSend.running = true;
@@ -98,7 +98,7 @@ Test.newPeer = function (options) {
     isClient: false,
     clientId: options.clientId || "faker",
     name: options.name || "Faker",
-    avatar: options.avatar || TowTruck.baseUrl + "/images/robot-avatar.png",
+    avatar: options.avatar || TogetherJS.baseUrl + "/images/robot-avatar.png",
     color: options.color || "#ff0000",
     url: options.url || location.href.replace(/#.*/, ""),
     urlHash: options.urlHash || "",
@@ -109,7 +109,7 @@ Test.newPeer = function (options) {
 };
 
 Test.waitEvent = function (context, event, options) {
-  var ops = TowTruck._extend({wait: true, ignoreThis: true}, options);
+  var ops = TogetherJS._extend({wait: true, ignoreThis: true}, options);
   context.once(event, Spy(event, ops));
 };
 
@@ -118,8 +118,8 @@ Test.waitMessage = function (messageType) {
 };
 
 Test.resetSettings = function () {
-  var util = TowTruck.require("util");
-  var storage = TowTruck.require("storage");
+  var util = TogetherJS.require("util");
+  var storage = TogetherJS.require("storage");
   return $.Deferred(function (def) {
     util.resolveMany(
       storage.settings.set("name", ""),
@@ -136,22 +136,22 @@ Test.resetSettings = function () {
   });
 };
 
-Test.startTowTruck = function () {
+Test.startTogetherJS = function () {
   return $.Deferred(function (def) {
-    var session = TowTruck.require("session");
+    var session = TogetherJS.require("session");
     Test.viewSend();
     session.once("ui-ready", function () {
       session.clientId = "me";
-      def.resolve("TowTruck started");
+      def.resolve("TogetherJS started");
     });
-    TowTruck.startup._launch = true;
-    TowTruck();
+    TogetherJS.startup._launch = true;
+    TogetherJS();
   });
 };
 
 Test.closeWalkthrough = function () {
   return $.Deferred(function (def) {
-    var buttonSelector = "#towtruck-walkthrough .towtruck-dismiss:visible";
+    var buttonSelector = "#togetherjs-walkthrough .togetherjs-dismiss:visible";
     var seenButton = false;
     var id = setInterval(function () {
       var button = $(buttonSelector);
@@ -171,7 +171,7 @@ Test.closeWalkthrough = function () {
 Test.normalStartup = function () {
   printChained(
     Test.resetSettings(),
-    Test.startTowTruck(),
+    Test.startTogetherJS(),
     Test.closeWalkthrough());
 };
 
@@ -209,7 +209,7 @@ function printChained() {
 }
 
 Test.incoming = function (msg) {
-  TowTruckTestSpy.getChannel().onmessage(msg);
+  TogetherJSTestSpy.getChannel().onmessage(msg);
 };
 
 Test.addControl = function () {

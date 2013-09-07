@@ -15,9 +15,9 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
       container = $(templates.walkthrough);
       container.hide();
       ui.container.append(container);
-      slides = container.find(".towtruck-walkthrough-slide");
+      slides = container.find(".togetherjs-walkthrough-slide");
       slides.hide();
-      var progress = $("#towtruck-walkthrough-progress");
+      var progress = $("#togetherjs-walkthrough-progress");
       slides.each(function (index) {
         var bullet = templating.sub("walkthrough-slide-progress");
         progress.append(bullet);
@@ -25,23 +25,23 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
           show(index);
         });
       });
-      container.find("#towtruck-walkthrough-previous").click(previous);
-      container.find("#towtruck-walkthrough-next").click(next);
+      container.find("#togetherjs-walkthrough-previous").click(previous);
+      container.find("#togetherjs-walkthrough-next").click(next);
       ui.prepareShareLink(container);
-      container.find(".towtruck-self-name").bind("keyup", function (event) {
+      container.find(".togetherjs-self-name").bind("keyup", function (event) {
         var val = $(event.target).val();
         peers.Self.update({name: val});
       });
-      container.find(".towtruck-swatch").click(function () {
-        var picker = $("#towtruck-pick-color");
+      container.find(".togetherjs-swatch").click(function () {
+        var picker = $("#togetherjs-pick-color");
         if (picker.is(":visible")) {
           picker.hide();
           return;
         }
         picker.show();
-        picker.find(".towtruck-swatch-active").removeClass("towtruck-swatch-active");
-        picker.find(".towtruck-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("towtruck-swatch-active");
-        var location = container.find(".towtruck-swatch").offset();
+        picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
+        picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
+        var location = container.find(".togetherjs-swatch").offset();
         picker.css({
           top: location.top,
           // The -7 comes out of thin air, but puts it in the right place:
@@ -49,21 +49,21 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         });
       });
       if (session.isClient) {
-        container.find(".towtruck-if-creator").remove();
-        container.find(".towtruck-ifnot-creator").show();
+        container.find(".togetherjs-if-creator").remove();
+        container.find(".togetherjs-ifnot-creator").show();
       } else {
-        container.find(".towtruck-if-creator").show();
-        container.find(".towtruck-ifnot-creator").remove();
+        container.find(".togetherjs-if-creator").show();
+        container.find(".togetherjs-ifnot-creator").remove();
       }
-      container.find(".towtruck-site-name").text(session.siteName());
+      container.find(".togetherjs-site-name").text(session.siteName());
       ui.activateAvatarEdit(container, {
         onSave: function () {
-          container.find("#towtruck-avatar-when-saved").show();
-          container.find("#towtruck-avatar-when-unsaved").hide();
+          container.find("#togetherjs-avatar-when-saved").show();
+          container.find("#togetherjs-avatar-when-unsaved").hide();
         },
         onPending: function () {
-          container.find("#towtruck-avatar-when-saved").hide();
-          container.find("#towtruck-avatar-when-unsaved").show();
+          container.find("#togetherjs-avatar-when-saved").hide();
+          container.find("#togetherjs-avatar-when-unsaved").show();
         }
       });
       // This triggers substititions in the walkthrough:
@@ -72,11 +72,11 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
     }
     assert(typeof firstTime == "boolean", "You must provide a firstTime boolean parameter");
     if (firstTime) {
-      container.find(".towtruck-walkthrough-firsttime").show();
-      container.find(".towtruck-walkthrough-not-firsttime").hide();
+      container.find(".togetherjs-walkthrough-firsttime").show();
+      container.find(".togetherjs-walkthrough-not-firsttime").hide();
     } else {
-      container.find(".towtruck-walkthrough-firsttime").hide();
-      container.find(".towtruck-walkthrough-not-firsttime").show();
+      container.find(".togetherjs-walkthrough-firsttime").hide();
+      container.find(".togetherjs-walkthrough-not-firsttime").show();
     }
     onHideAll = doneCallback;
     show(0);
@@ -86,15 +86,15 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
   function show(index) {
     slides.hide();
     $(slides[index]).show();
-    var bullets = container.find("#towtruck-walkthrough-progress .towtruck-walkthrough-slide-progress");
-    bullets.removeClass("towtruck-active");
-    $(bullets[index]).addClass("towtruck-active");
-    var $next = $("#towtruck-walkthrough-next").removeClass("towtruck-disabled");
-    var $previous = $("#towtruck-walkthrough-previous").removeClass("towtruck-disabled");
+    var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
+    bullets.removeClass("togetherjs-active");
+    $(bullets[index]).addClass("togetherjs-active");
+    var $next = $("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+    var $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
     if (index == slides.length - 1) {
-      $next.addClass("towtruck-disabled");
+      $next.addClass("togetherjs-disabled");
     } else if (index === 0) {
-      $previous.addClass("towtruck-disabled");
+      $previous.addClass("togetherjs-disabled");
     }
   }
 

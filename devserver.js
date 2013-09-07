@@ -7,7 +7,7 @@
 require('../../lib/extensions/number');
 
 const STATIC_EXPIRATION = 60*60*24; // 24 hours
-const TOWTRUCK_EXPIRATION = 60*60; // 1 hour
+const TOGETHERJS_EXPIRATION = 60*60; // 1 hour
 
 const
 env         = require('../../lib/environment'),
@@ -53,10 +53,10 @@ http.configure(function(){
 
   http.use(function (req, res, next) {
     var expire_time;
-    if (req.url.search("/towtruck.js") == -1) {
+    if (req.url.search("/togetherjs.js") == -1) {
       expire_time = STATIC_EXPIRATION;
     } else {
-      expire_time = TOWTRUCK_EXPIRATION;
+      expire_time = TOGETHERJS_EXPIRATION;
     }
     res.setHeader("Cache-Control", "public, max-age=" + expire_time);
     res.setHeader("Expires", new Date(Date.now() + expire_time * 1000).toUTCString());

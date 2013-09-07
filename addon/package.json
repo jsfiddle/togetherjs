@@ -3,30 +3,29 @@
         {
             "description": "This is where to find the script to inject",
             "type": "string",
-            "name": "towtruckJs",
-            "value": "https://towtruck.mozillalabs.com/towtruck.js",
-            "title": "towtruck.js location"
+            "name": "togetherjsJs",
+            "value": "https://togetherjs.mozillalabs.com/togetherjs.js",
+            "title": "togetherjs.js location"
         },
         {
             "description": "Override the location of the hub",
             "type": "string",
             "name": "hubBase",
-            "value": "https://hub.towtruck.mozillalabs.com",
+            "value": "https://hub.togetherjs.mozillalabs.com",
             "title": "Hub URL"
         },
         {
-            "description": "Domains on which to automatically start TowTruck (comma-separated)",
+            "description": "Domains on which to automatically start TogetherJS (comma-separated)",
             "type": "string",
             "name": "autoDomains",
             "value": "",
             "title": "Auto domains"
         }
     ],
-    "name": "towtruck",
+    "name": "togetherjs",
     "license": "MPL 2.0",
     "author": "",
     "version": "0.1",
-    "fullName": "TowTruck",
-    "id": "jid1-3K7ww1AkqsvtBw",
-    "description": "Runs TowTruck"
+    "fullName": "TogetherJS",
+    "description": "Runs TogetherJS"
 }

@@ -8,4 +8,4 @@
 
 ## Should I host my own server?
 
-## How stable is TowTruck?
+## How stable is TogetherJS?

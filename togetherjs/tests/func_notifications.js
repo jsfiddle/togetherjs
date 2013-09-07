@@ -26,11 +26,11 @@ Test.newPeer();
 
 // => ...
 
-visible("#towtruck-chat-notifier");
+visible("#togetherjs-chat-notifier");
 
-// => #towtruck-chat-notifier : visible
+// => #togetherjs-chat-notifier : visible
 
-$("#towtruck-chat-notifier .towtruck-dismiss").click();
+$("#togetherjs-chat-notifier .togetherjs-dismiss").click();
 
 Test.incoming({
   type: "chat",
@@ -41,34 +41,34 @@ Test.incoming({
 
 // => ...
 
-visible("#towtruck-chat-notifier", "#towtruck-chat");
+visible("#togetherjs-chat-notifier", "#togetherjs-chat");
 
 /* =>
-#towtruck-chat-notifier : visible
-#towtruck-chat : hidden
+#togetherjs-chat-notifier : visible
+#togetherjs-chat : hidden
 */
 
-$("#towtruck-chat-button").click();
+$("#togetherjs-chat-button").click();
 // The animation makes this take a while:
-// (We could check $("#towtruck-chat-notifier").queue().length though)
-wait(function () {return ! $("#towtruck-chat-notifier").is(":visible");});
+// (We could check $("#togetherjs-chat-notifier").queue().length though)
+wait(function () {return ! $("#togetherjs-chat-notifier").is(":visible");});
 // =>
-visible("#towtruck-chat-notifier", "#towtruck-chat");
+visible("#togetherjs-chat-notifier", "#togetherjs-chat");
 
 /* =>
-#towtruck-chat-notifier : hidden
-#towtruck-chat : visible
+#togetherjs-chat-notifier : hidden
+#togetherjs-chat : visible
 */
 
-$("#towtruck-chat .towtruck-close").click();
-visible("#towtruck-chat-notifier", "#towtruck-chat");
+$("#togetherjs-chat .togetherjs-close").click();
+visible("#togetherjs-chat-notifier", "#togetherjs-chat");
 
 /* =>
-#towtruck-chat-notifier : hidden
-#towtruck-chat : hidden
+#togetherjs-chat-notifier : hidden
+#togetherjs-chat : hidden
 */
 
-$("#towtruck-chat-button").click();
+$("#togetherjs-chat-button").click();
 
 Test.incoming({
   type: "chat",
@@ -76,14 +76,14 @@ Test.incoming({
   text: "Test 2",
   messageId: "test-message"
 });
-visible("#towtruck-chat-notifier", "#towtruck-chat");
+visible("#togetherjs-chat-notifier", "#togetherjs-chat");
 
 /* =>
-#towtruck-chat-notifier : hidden
-#towtruck-chat : visible
+#togetherjs-chat-notifier : hidden
+#togetherjs-chat : visible
 */
 
-$("#towtruck-chat .towtruck-close").click();
+$("#togetherjs-chat .togetherjs-close").click();
 Test.incoming({
   type: "bye",
   clientId: "faker"
@@ -91,11 +91,11 @@ Test.incoming({
 
 // =>
 
-visible("#towtruck-chat-notifier", "#towtruck-chat");
+visible("#togetherjs-chat-notifier", "#togetherjs-chat");
 
 /* =>
-#towtruck-chat-notifier : visible
-#towtruck-chat : hidden
+#togetherjs-chat-notifier : visible
+#togetherjs-chat : hidden
 */
 
 // Now we'll bring back the user:
@@ -103,13 +103,13 @@ Test.newPeer({url: "http://example.com/foo"});
 
 // => ...
 
-visible(".towtruck-follow");
+visible(".togetherjs-follow");
 
 /* =>
-.towtruck-follow : visible
+.togetherjs-follow : visible
 */
 
-$(".towtruck-nudge").click();
+$(".togetherjs-nudge").click();
 
 /* =>
 send: url-change-nudge
@@ -175,7 +175,7 @@ Test.addControl($('<button>Keyboard</button>').click(function () {
 
 Test.addControl($('<button>Participant down page (cursor rotate)</button>').click(function () {
   
-  $('.towtruck-cursor svg').animate({borderSpacing: -150, opacity: 1}, {
+  $('.togetherjs-cursor svg').animate({borderSpacing: -150, opacity: 1}, {
     step: function(now, fx) {
       if (fx.prop == "borderSpacing") {
         $(this).css('-webkit-transform', 'rotate('+now+'deg)')

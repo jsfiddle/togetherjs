@@ -1,135 +1,135 @@
-<div id="towtruck-container" class="towtruck">
+<div id="togetherjs-container" class="togetherjs">
 
   <!-- This is the main set of buttons: -->
-  <div id="towtruck-dock" class="towtruck-dock-right">
-    <div id="towtruck-dock-anchor" title="Move the dock">
-      <span id="towtruck-dock-anchor-horizontal">
-        <img src="http://localhost:8080/towtruck/images/icn-handle-circle@2x.png" alt="drag">
+  <div id="togetherjs-dock" class="togetherjs-dock-right">
+    <div id="togetherjs-dock-anchor" title="Move the dock">
+      <span id="togetherjs-dock-anchor-horizontal">
+        <img src="http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png" alt="drag">
       </span>
-      <span id="towtruck-dock-anchor-vertical">
-        <img src="http://localhost:8080/towtruck/images/icn-handle-circle@2x.png" alt="drag">
+      <span id="togetherjs-dock-anchor-vertical">
+        <img src="http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png" alt="drag">
       </span>
     </div>
-    <div id="towtruck-buttons">
+    <div id="togetherjs-buttons">
       <div style="display: none">
-        <button id="towtruck-template-dock-person" class="towtruck-button towtruck-dock-person">
-          <div class="towtruck-tooltip towtruck-dock-person-tooltip">
-            <span class="towtruck-person-name"></span>
-            <span class="towtruck-person-tooltip-arrow-r"></span>
+        <button id="togetherjs-template-dock-person" class="togetherjs-button togetherjs-dock-person">
+          <div class="togetherjs-tooltip togetherjs-dock-person-tooltip">
+            <span class="togetherjs-person-name"></span>
+            <span class="togetherjs-person-tooltip-arrow-r"></span>
           </div>
-          <div class="towtruck-person towtruck-person-status-overlay"></div>
+          <div class="togetherjs-person togetherjs-person-status-overlay"></div>
         </button>
       </div>
-      <button id="towtruck-profile-button" class="towtruck-button" title="This is you">
-        <div class="towtruck-person towtruck-person-self"></div>
-        <div id="towtruck-profile-arrow"></div>
+      <button id="togetherjs-profile-button" class="togetherjs-button" title="This is you">
+        <div class="togetherjs-person togetherjs-person-self"></div>
+        <div id="togetherjs-profile-arrow"></div>
       </button>
-      <button id="towtruck-share-button" class="towtruck-button" title="Add a friend"></button>
-      <button id="towtruck-audio-button" class="towtruck-button" title="Turn on microphone">
-        <span id="towtruck-audio-unavailable" class="towtruck-audio-set" data-toggles=".towtruck-audio-set">
+      <button id="togetherjs-share-button" class="togetherjs-button" title="Add a friend"></button>
+      <button id="togetherjs-audio-button" class="togetherjs-button" title="Turn on microphone">
+        <span id="togetherjs-audio-unavailable" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set">
         </span>
-        <span id="towtruck-audio-ready" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-ready" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="towtruck-audio-outgoing" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-outgoing" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="towtruck-audio-incoming" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-incoming" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="towtruck-audio-active" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-active" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="towtruck-audio-muted" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-muted" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="towtruck-audio-error" class="towtruck-audio-set" data-toggles=".towtruck-audio-set" style="display: none">
+        <span id="togetherjs-audio-error" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
       </button>
-      <button id="towtruck-chat-button" class="towtruck-button" title="Chat"></button>
-      <div id="towtruck-dock-participants"></div>
+      <button id="togetherjs-chat-button" class="togetherjs-button" title="Chat"></button>
+      <div id="togetherjs-dock-participants"></div>
     </div>
   </div>
 
   <!-- The window for editing the avatar: -->
-  <div id="towtruck-avatar-edit" class="towtruck-modal"
+  <div id="togetherjs-avatar-edit" class="togetherjs-modal"
        style="display: none">
     <header> Update avatar </header>
     <section>
-      <div class="towtruck-avatar-preview towtruck-person towtruck-person-self"></div>
-      <div id="towtruck-avatar-buttons">
-        <input type="file" class="towtruck-upload-avatar">
-        <!--<button id="towtruck-upload-avatar" class="towtruck-primary">Upload a picture</button>-->
-        <!--<button id="towtruck-camera-avatar" class="towtruck-default">Take a picture</button>-->
+      <div class="togetherjs-avatar-preview togetherjs-person togetherjs-person-self"></div>
+      <div id="togetherjs-avatar-buttons">
+        <input type="file" class="togetherjs-upload-avatar">
+        <!--<button id="togetherjs-upload-avatar" class="togetherjs-primary">Upload a picture</button>-->
+        <!--<button id="togetherjs-camera-avatar" class="togetherjs-default">Take a picture</button>-->
       </div>
     </section>
-    <section class="towtruck-buttons">
-      <button class="towtruck-cancel towtruck-dismiss">Cancel</button>
-      <span class="towtruck-alt-text">or</span>
-      <button class="towtruck-avatar-save towtruck-primary">Save</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-cancel togetherjs-dismiss">Cancel</button>
+      <span class="togetherjs-alt-text">or</span>
+      <button class="togetherjs-avatar-save togetherjs-primary">Save</button>
     </section>
   </div>
 
   <!-- The window for sharing the link: -->
-  <div id="towtruck-share" class="towtruck-window"
-       data-bind-to="#towtruck-share-button" style="display: none">
+  <div id="togetherjs-share" class="togetherjs-window"
+       data-bind-to="#togetherjs-share-button" style="display: none">
     <header> Invite a friend </header>
     <section>
-      <div class="towtruck-not-mobile">
+      <div class="togetherjs-not-mobile">
         <p>Copy and paste this link over IM or email:</p>
-        <input type="text" class="towtruck-share-link">
+        <input type="text" class="togetherjs-share-link">
       </div>
-      <div class="towtruck-only-mobile">
+      <div class="togetherjs-only-mobile">
         <p>Copy and paste this link over IM or email:</p>
-        <a class="towtruck-share-link" href="#">this link</a>
+        <a class="togetherjs-share-link" href="#">this link</a>
       </div>
     </section>
   </div>
 
   <!-- Participant detail template: -->
-  <div id="towtruck-template-participant-window" class="towtruck-window" style="display: none">
-    <header><div class="towtruck-person towtruck-person-small"></div><span class="towtruck-person-name"></span></header>
+  <div id="togetherjs-template-participant-window" class="togetherjs-window" style="display: none">
+    <header><div class="togetherjs-person togetherjs-person-small"></div><span class="togetherjs-person-name"></span></header>
 
-    <section class="towtruck-participant-window-main">
-      <p class="towtruck-participant-window-row"><strong>Role:</strong>
-        <span class="towtruck-person-role"></span>
+    <section class="togetherjs-participant-window-main">
+      <p class="togetherjs-participant-window-row"><strong>Role:</strong>
+        <span class="togetherjs-person-role"></span>
       </p>
 
-      <p class="towtruck-participant-window-row"><strong>Currently at:</strong>
-        <a class="towtruck-person-url towtruck-person-url-title"></a>
+      <p class="togetherjs-participant-window-row"><strong>Currently at:</strong>
+        <a class="togetherjs-person-url togetherjs-person-url-title"></a>
       </p>
 
-      <p class="towtruck-participant-window-row"><strong>Status:</strong>
-        <span class="towtruck-person-status"></span>
+      <p class="togetherjs-participant-window-row"><strong>Status:</strong>
+        <span class="togetherjs-person-status"></span>
       </p>
 
-      <p class="towtruck-participant-window-row"><strong class="towtruck-float-left">Follow this participant:</strong>
-        <label class="towtruck-follow-question towtruck-float-left" for="towtruck-person-status-follow">
-          <input type="checkbox" id="towtruck-person-status-follow">
+      <p class="togetherjs-participant-window-row"><strong class="togetherjs-float-left">Follow this participant:</strong>
+        <label class="togetherjs-follow-question togetherjs-float-left" for="togetherjs-person-status-follow">
+          <input type="checkbox" id="togetherjs-person-status-follow">
         </label>
-        <span class="towtruck-clear"></span>
+        <span class="togetherjs-clear"></span>
       </p>
 
     </section>
 
-    <section class="towtruck-buttons">
+    <section class="togetherjs-buttons">
       <!-- Displayed when the peer is at a different URL: -->
-      <div class="towtruck-different-url">
-        <button class="towtruck-nudge towtruck-default">Nudge them</button>
-        <a href="#" class="towtruck-follow towtruck-person-url towtruck-primary">Join them</a>
+      <div class="togetherjs-different-url">
+        <button class="togetherjs-nudge togetherjs-default">Nudge them</button>
+        <a href="#" class="togetherjs-follow togetherjs-person-url togetherjs-primary">Join them</a>
       </div>
       <!-- Displayed when the peer is at your same URL: -->
-      <div class="towtruck-same-url" style="display: none">
-        <span class="towtruck-person-name"></span> is on the same page as you.
+      <div class="togetherjs-same-url" style="display: none">
+        <span class="togetherjs-person-name"></span> is on the same page as you.
       </div>
     </section>
   </div>
 
   <!-- The chat screen: -->
-  <div id="towtruck-chat" class="towtruck-window" data-bind-to="#towtruck-chat-button"
+  <div id="togetherjs-chat" class="togetherjs-window" data-bind-to="#togetherjs-chat-button"
        style="display: none">
     <header> Chat </header>
-    <section class="towtruck-subtitle">
-      <div id="towtruck-chat-participants" data-toggles="#towtruck-chat-no-participants" style="display: none">
-        <span id="towtruck-chat-participant-list"></span>
+    <section class="togetherjs-subtitle">
+      <div id="togetherjs-chat-participants" data-toggles="#togetherjs-chat-no-participants" style="display: none">
+        <span id="togetherjs-chat-participant-list"></span>
         &amp; You
       </div>
-      <div id="towtruck-chat-no-participants" data-toggles="#towtruck-chat-participants">
+      <div id="togetherjs-chat-no-participants" data-toggles="#togetherjs-chat-participants">
         No one else is here.
       </div>
     </section>
@@ -137,85 +137,85 @@
     <div style="display: none">
 
       <!-- Template for one message: -->
-      <div id="towtruck-template-chat-message" class="towtruck-chat-item towtruck-chat-message">
-        <div class="towtruck-person"></div>
-        <div class="towtruck-timestamp"><span class="towtruck-time">HH:MM</span> <span class="towtruck-ampm">AM/PM</span></div>
-        <div class="towtruck-person-name-abbrev"></div>
-        <div class="towtruck-chat-content towtruck-sub-content"></div>
+      <div id="togetherjs-template-chat-message" class="togetherjs-chat-item togetherjs-chat-message">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-timestamp"><span class="togetherjs-time">HH:MM</span> <span class="togetherjs-ampm">AM/PM</span></div>
+        <div class="togetherjs-person-name-abbrev"></div>
+        <div class="togetherjs-chat-content togetherjs-sub-content"></div>
       </div>
 
       <!-- Template for when a person leaves: -->
-      <div id="towtruck-template-chat-left" class="towtruck-chat-item towtruck-chat-left-item">
-        <div class="towtruck-person"></div>
-        <div class="towtruck-ifnot-declinedJoin">
-          <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> left the session.</div>
+      <div id="togetherjs-template-chat-left" class="togetherjs-chat-item togetherjs-chat-left-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-ifnot-declinedJoin">
+          <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> left the session.</div>
         </div>
-        <div class="towtruck-if-declinedJoin">
-          <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> declined to join the session.</div>
+        <div class="togetherjs-if-declinedJoin">
+          <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> declined to join the session.</div>
         </div>
-        <div class="towtruck-clear"></div>
+        <div class="togetherjs-clear"></div>
       </div>
 
       <!-- Template when a person joins the session: -->
-      <div id="towtruck-template-chat-joined" class="towtruck-chat-item towtruck-chat-join-item">
-        <div class="towtruck-person"></div>
-        <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> joined the session.</div>
-        <div class="towtruck-clear"></div>
+      <div id="togetherjs-template-chat-joined" class="togetherjs-chat-item togetherjs-chat-join-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> joined the session.</div>
+        <div class="togetherjs-clear"></div>
       </div>
 
       <!-- Template for system-derived messages: -->
-      <div id="towtruck-template-chat-system" class="towtruck-chat-item">
-        <span class="towtruck-chat-content towtruck-sub-content"></span>
+      <div id="togetherjs-template-chat-system" class="togetherjs-chat-item">
+        <span class="togetherjs-chat-content togetherjs-sub-content"></span>
       </div>
 
       <!-- Template when a person joins the session: -->
-      <!-- <div id="towtruck-template-chat-joined" class="towtruck-chat-item towtruck-chat-join-item">
-        <div class="towtruck-person"></div>
-        <div class="towtruck-inline-text"><span class="towtruck-person-name"></span> joined the session.</div>
-        <div class="towtruck-clear"></div>
+      <!-- <div id="togetherjs-template-chat-joined" class="togetherjs-chat-item togetherjs-chat-join-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> joined the session.</div>
+        <div class="togetherjs-clear"></div>
       </div> -->
 
       <!-- Template for when someone goes to a new URL: -->
-      <div id="towtruck-template-url-change" class="towtruck-chat-item towtruck-chat-url-change">
-        <div class="towtruck-person"></div>
-        <div class="towtruck-inline-text">
-          <div class="towtruck-if-sameUrl">
-            <span class="towtruck-person-name"></span>
+      <div id="togetherjs-template-url-change" class="togetherjs-chat-item togetherjs-chat-url-change">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text">
+          <div class="togetherjs-if-sameUrl">
+            <span class="togetherjs-person-name"></span>
             is on the same page as you.
           </div>
-          <div class="towtruck-ifnot-sameUrl">
-            <span class="towtruck-person-name"></span>
-            has gone to: <a href="#" class="towtruck-person-url towtruck-person-url-title" target="_self"></a>
-            <section class="towtruck-buttons towtruck-buttons-notification-diff-url">
+          <div class="togetherjs-ifnot-sameUrl">
+            <span class="togetherjs-person-name"></span>
+            has gone to: <a href="#" class="togetherjs-person-url togetherjs-person-url-title" target="_self"></a>
+            <section class="togetherjs-buttons togetherjs-buttons-notification-diff-url">
               <!-- Displayed when the peer is at a different URL: -->
-              <div class="towtruck-different-url towtruck-notification-diff-url">
-                <button class="towtruck-nudge towtruck-default">Nudge them</button>
-                <a href="#" class="towtruck-follow towtruck-person-url towtruck-primary">Join them</a>
+              <div class="togetherjs-different-url togetherjs-notification-diff-url">
+                <button class="togetherjs-nudge togetherjs-default">Nudge them</button>
+                <a href="#" class="togetherjs-follow togetherjs-person-url togetherjs-primary">Join them</a>
               </div>
             </section>
 
             <!-- <div>
-              <a class="towtruck-nudge towtruck-secondary">Nudge them</a>
-              <a href="" class="towtruck-person-url towtruck-follow towtruck-primary">Join them</a>
+              <a class="togetherjs-nudge togetherjs-secondary">Nudge them</a>
+              <a href="" class="togetherjs-person-url togetherjs-follow togetherjs-primary">Join them</a>
             </div> -->
 
           </div>
         </div>
-        <div class="towtruck-clear"></div>
+        <div class="togetherjs-clear"></div>
       </div>
     </div>
 
-    <section id="towtruck-chat-messages">
+    <section id="togetherjs-chat-messages">
       <!-- FIX ME// need to have some dialogue that says something like - There are no chats yet! -->
     </section>
-    <section id="towtruck-chat-input-box">
-      <input type="text" id="towtruck-chat-input" placeholder="Type your message here">
+    <section id="togetherjs-chat-input-box">
+      <input type="text" id="togetherjs-chat-input" placeholder="Type your message here">
     </section>
   </div>
 
   <!-- this is a kind of warning popped up when you (successfully) start RTC: -->
-  <div id="towtruck-rtc-info" class="towtruck-window"
-       data-bind-to="#towtruck-audio-button"
+  <div id="togetherjs-rtc-info" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
        style="display: none">
 
     <header> Audio Chat </header>
@@ -227,28 +227,28 @@
         Talking on your microphone through your web browser is an experimental feature.
       </p>
       <p>
-        Read more about Audio Chat <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
+        Read more about Audio Chat <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
       </p>
     </section>
 
-    <section class="towtruck-buttons">
-      <label for="towtruck-rtc-info-dismiss" style="display: inline;">
-        <input class="towtruck-dont-show-again" id="towtruck-rtc-info-dismiss" type="checkbox">
+    <section class="togetherjs-buttons">
+      <label for="togetherjs-rtc-info-dismiss" style="display: inline;">
+        <input class="togetherjs-dont-show-again" id="togetherjs-rtc-info-dismiss" type="checkbox">
         Don't show again.
       </label>
-      <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
+      <button class="togetherjs-default togetherjs-dismiss" type="button">Close</button>
     </section>
   </div>
 
   <!-- this is popped up when you hit the audio button, but RTC isn't
   supported: -->
-  <div id="towtruck-rtc-not-supported" class="towtruck-window"
-       data-bind-to="#towtruck-audio-button"
+  <div id="togetherjs-rtc-not-supported" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
        style="display: none">
     <header> Audio Chat </header>
 
     <section>
-      <p>Audio chat requires you to use a <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+      <p>Audio chat requires you to use a <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
         newer browser
       </a>!</p>
       <p>
@@ -256,230 +256,230 @@
       </p>
       <p>
         See
-        <a href="https://github.com/mozilla/towtruck/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+        <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
           this page
         </a>
         for more information and a list of supported browsers.
       </p>
     </section>
 
-    <section class="towtruck-buttons">
-      <div class="towtruck-rtc-dialog-btn">
-        <button class="towtruck-default towtruck-dismiss" type="button">Close</button>
+    <section class="togetherjs-buttons">
+      <div class="togetherjs-rtc-dialog-btn">
+        <button class="togetherjs-default togetherjs-dismiss" type="button">Close</button>
       </div>
     </section>
   </div>
 
-  <!-- The popup when a chat message comes in and the #towtruck-chat window isn't open -->
-  <div id="towtruck-chat-notifier" class="towtruck-notification"
-       data-bind-to="#towtruck-chat-button"
+  <!-- The popup when a chat message comes in and the #togetherjs-chat window isn't open -->
+  <div id="togetherjs-chat-notifier" class="togetherjs-notification"
+       data-bind-to="#togetherjs-chat-button"
        style="display: none">
-    <img src="http://localhost:8080/towtruck/images/notification-towtruck-logo.png" class="towtruck-notification-logo" alt="">
-    <img src="http://localhost:8080/towtruck/images/notification-btn-close.png" class="towtruck-notification-closebtn towtruck-dismiss" alt="[close]">
-    <section id="towtruck-chat-notifier-message">
+    <img src="http://localhost:8080/togetherjs/images/notification-togetherjs-logo.png" class="togetherjs-notification-logo" alt="">
+    <img src="http://localhost:8080/togetherjs/images/notification-btn-close.png" class="togetherjs-notification-closebtn togetherjs-dismiss" alt="[close]">
+    <section id="togetherjs-chat-notifier-message">
     </section>
   </div>
 
   <!-- The menu when you click on the profile: -->
-  <div id="towtruck-menu" class="towtruck-menu" style="display: none">
-    <div class="towtruck-menu-item towtruck-menu-disabled" id="towtruck-menu-profile">
-      <img id="towtruck-menu-avatar">
-      <span class="towtruck-person-name-self" id="towtruck-self-name-display" data-toggles="#towtruck-menu .towtruck-self-name"></span>
-      <input class="towtruck-self-name" type="text" data-toggles="#towtruck-self-name-display" style="display: none" placeholder="Enter your name">
+  <div id="togetherjs-menu" class="togetherjs-menu" style="display: none">
+    <div class="togetherjs-menu-item togetherjs-menu-disabled" id="togetherjs-menu-profile">
+      <img id="togetherjs-menu-avatar">
+      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display" data-toggles="#togetherjs-menu .togetherjs-self-name"></span>
+      <input class="togetherjs-self-name" type="text" data-toggles="#togetherjs-self-name-display" style="display: none" placeholder="Enter your name">
     </div>
-    <div class="towtruck-menu-hr-avatar"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-name"><img src="http://localhost:8080/towtruck/images/button-pencil.png" alt=""> Update your name</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar"><img src="http://localhost:8080/towtruck/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-color"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
-    <div class="towtruck-hr"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-help">Help</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-feedback">Feedback</div>
-    <div id="towtruck-invite" style="display: none">
-      <div class="towtruck-hr"></div>
-      <div id="towtruck-invite-users"></div>
-      <div class="towtruck-menu-item" id="towtruck-menu-refresh-invite">Refresh users</div>
-      <div class="towtruck-menu-item" id="towtruck-menu-invite-anyone">Invite anyone</div>
+    <div class="togetherjs-menu-hr-avatar"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-name"><img src="http://localhost:8080/togetherjs/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-avatar"><img src="http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-color"><span class="togetherjs-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-help">Help</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback">Feedback</div>
+    <div id="togetherjs-invite" style="display: none">
+      <div class="togetherjs-hr"></div>
+      <div id="togetherjs-invite-users"></div>
+      <div class="togetherjs-menu-item" id="togetherjs-menu-refresh-invite">Refresh users</div>
+      <div class="togetherjs-menu-item" id="togetherjs-menu-invite-anyone">Invite anyone</div>
     </div>
-    <div class="towtruck-hr"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-end"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End <span class="towtruck-tool-name">TogetherJS</span></div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-end"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> End <span class="togetherjs-tool-name">TogetherJS</span></div>
   </div>
 
   <!-- template for one person in the invite-users list -->
   <div style="display: none">
-    <div id="towtruck-template-invite-user-item" class="towtruck-menu-item">
+    <div id="togetherjs-template-invite-user-item" class="togetherjs-menu-item">
       <!-- FIXME: should include avatar in some way -->
-      <span class="towtruck-person-name"></span>
+      <span class="togetherjs-person-name"></span>
     </div>
   </div>
 
-  <!-- A window version of #towtruck-menu, for use on mobile -->
-  <div id="towtruck-menu-window" class="towtruck-window" style="display: none">
+  <!-- A window version of #togetherjs-menu, for use on mobile -->
+  <div id="togetherjs-menu-window" class="togetherjs-window" style="display: none">
     <header>Settings and Profile</header>
     <section>
-    <div class="towtruck-menu-item">
-      <img class="towtruck-menu-avatar">
-      <span class="towtruck-person-name-self" id="towtruck-self-name-display"></span>
+    <div class="togetherjs-menu-item">
+      <img class="togetherjs-menu-avatar">
+      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display"></span>
     </div>
-    <div class="towtruck-menu-hr-avatar"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-name-button"><img src="http://localhost:8080/towtruck/images/button-pencil.png" alt=""> Update your name</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-avatar-button"><img src="http://localhost:8080/towtruck/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-update-color-button"><span class="towtruck-person-bgcolor-self"></span> Pick profile color</div>
-    <div class="towtruck-hr"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-help-button">Help</div>
-    <div class="towtruck-menu-item" id="towtruck-menu-feedback-button">Feedback</div>
-    <div class="towtruck-hr"></div>
-    <div class="towtruck-menu-item" id="towtruck-menu-end-button"><img src="http://localhost:8080/towtruck/images/button-end-session.png" alt=""> End <span class="towtruck-tool-name">TogetherJS</span></div>
+    <div class="togetherjs-menu-hr-avatar"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-name-button"><img src="http://localhost:8080/togetherjs/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-avatar-button"><img src="http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-color-button"><span class="togetherjs-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-help-button">Help</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback-button">Feedback</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-end-button"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> End <span class="togetherjs-tool-name">TogetherJS</span></div>
     </section>
-    <section class="towtruck-buttons">
-      <button class="towtruck-dismiss towtruck-primary">OK</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">OK</button>
     </section>
   </div>
 
   <!-- The name editor, for use on mobile -->
-  <div id="towtruck-edit-name-window" class="towtruck-window" style="display: none">
+  <div id="togetherjs-edit-name-window" class="togetherjs-window" style="display: none">
     <header>Update Name</header>
     <section>
       <div>
-        <input class="towtruck-self-name" type="text" placeholder="Enter your name">
+        <input class="togetherjs-self-name" type="text" placeholder="Enter your name">
       </div>
     </section>
-    <section class="towtruck-buttons">
-      <button class="towtruck-dismiss towtruck-primary">OK</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">OK</button>
     </section>
   </div>
 
-  <div class="towtruck-menu" id="towtruck-pick-color" style="display: none">
-    <div class="towtruck-triangle-up"><img src="http://localhost:8080/towtruck/images/icn-triangle-up.png"></div>
+  <div class="togetherjs-menu" id="togetherjs-pick-color" style="display: none">
+    <div class="togetherjs-triangle-up"><img src="http://localhost:8080/togetherjs/images/icn-triangle-up.png"></div>
     <div style="display: none">
-      <div id="towtruck-template-swatch" class="towtruck-swatch">
+      <div id="togetherjs-template-swatch" class="togetherjs-swatch">
       </div>
     </div>
   </div>
 
   <!-- Invisible elements that handle the RTC audio: -->
-  <audio id="towtruck-audio-element"></audio>
-  <audio id="towtruck-local-audio" muted="true"></audio>
+  <audio id="togetherjs-audio-element"></audio>
+  <audio id="togetherjs-local-audio" muted="true"></audio>
 
   <!-- The intro screen for someone who joins a session the first time: -->
-  <div id="towtruck-intro" class="towtruck-modal" style="display: none">
-    <header>Join <span class="towtruck-tool-name">TowTruck</span> session?</header>
+  <div id="togetherjs-intro" class="togetherjs-modal" style="display: none">
+    <header>Join <span class="togetherjs-tool-name">TogetherJS</span> session?</header>
     <section>
-      <p>Your friend has asked you to join their <a href="https://towtruck.mozillalabs.com/" target="_blank"><span class="towtruck-tool-name">TogetherJS</span></a> browser session to collaborate in real-time!</p>
+      <p>Your friend has asked you to join their <a href="https://togetherjs.mozillalabs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a> browser session to collaborate in real-time!</p>
 
       <p>Would you like to join their session?</p>
     </section>
 
-    <section class="towtruck-buttons">
-      <button class="towtruck-destructive towtruck-modal-dont-join">No, don't join</button>
-      <button class="towtruck-primary towtruck-dismiss">Yes, join session</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-destructive togetherjs-modal-dont-join">No, don't join</button>
+      <button class="togetherjs-primary togetherjs-dismiss">Yes, join session</button>
     </section>
   </div>
 
-  <!-- Shown when a web browser is completely incapable of running TowTruck: -->
-  <div id="towtruck-browser-broken" class="towtruck-modal" style="display: none">
+  <!-- Shown when a web browser is completely incapable of running TogetherJS: -->
+  <div id="togetherjs-browser-broken" class="togetherjs-modal" style="display: none">
     <header> Sorry </header>
 
     <section>
       <p>
-        We're sorry, <span class="towtruck-tool-name">TogetherJS</span> doesn't work with this browser.  Please
-        <a href="https://github.com/mozilla/towtruck/wiki/Supported-Browsers#supported-browsers">upgrade
-          to a supported browser</a> to try <span class="towtruck-tool-name">TogetherJS</span>.
+        We're sorry, <span class="togetherjs-tool-name">TogetherJS</span> doesn't work with this browser.  Please
+        <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers">upgrade
+          to a supported browser</a> to try <span class="togetherjs-tool-name">TogetherJS</span>.
       </p>
 
-      <p id="towtruck-browser-broken-is-ie" style="display: none">
+      <p id="togetherjs-browser-broken-is-ie" style="display: none">
         Internet
-        Explorer <a href="https://github.com/mozilla/towtruck/wiki/Supported-Browsers#internet-explorer">is
+        Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is
           not supported</a> and won't be supported in the near term,
         please use Firefox or Chrome.
       </p>
     </section>
 
-    <section class="towtruck-buttons">
-      <button class="towtruck-dismiss towtruck-primary">End <span class="towtruck-tool-name">TogetherJS</span></button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">End <span class="togetherjs-tool-name">TogetherJS</span></button>
     </section>
 
   </div>
 
   <!-- Shown when the browser has WebSockets, but is IE (i.e., IE10) -->
-  <div id="towtruck-browser-unsupported" class="towtruck-modal" style="display: none">
+  <div id="togetherjs-browser-unsupported" class="togetherjs-modal" style="display: none">
     <header> Unsupported Browser </header>
 
     <section>
       <p>
-        We're sorry, Internet Explorer <a href="https://github.com/mozilla/towtruck/wiki/Supported-Browsers#internet-explorer">is not supported</a>
+        We're sorry, Internet Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is not supported</a>
         at this time.  While we may add support later, adding support is
         not currently on our roadmap.  Please use Firefox or Chrome.
       </p>
 
-      <p>You can continue to try to use <span class="towtruck-tool-name">TogetherJS</span>, but you are likely to hit
+      <p>You can continue to try to use <span class="togetherjs-tool-name">TogetherJS</span>, but you are likely to hit
         lots of bugs.  So be warned.</p>
 
     </section>
 
-    <section class="towtruck-buttons">
-      <button class="towtruck-dismiss towtruck-primary">End <span class="towtruck-tool-name">TogetherJS</span></button>
-      <button class="towtruck-dismiss towtruck-secondary towtruck-browser-unsupported-anyway">Try <span class="towtruck-tool-name">TogetherJS</span> Anyway</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">End <span class="togetherjs-tool-name">TogetherJS</span></button>
+      <button class="togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway">Try <span class="togetherjs-tool-name">TogetherJS</span> Anyway</button>
     </section>
 
   </div>
 
-  <div id="towtruck-confirm-end" class="towtruck-modal" style="display: none">
+  <div id="togetherjs-confirm-end" class="togetherjs-modal" style="display: none">
     <header> End session? </header>
     <section>
       <p>
-        Are you sure you'd like to end your <span class="towtruck-tool-name">TogetherJS</span> session?
+        Are you sure you'd like to end your <span class="togetherjs-tool-name">TogetherJS</span> session?
       </p>
     </section>
-    <section class="towtruck-buttons">
-      <button class="towtruck-cancel towtruck-dismiss">Cancel</button>
-      <span class="towtruck-alt-text">or</span>
-      <button id="towtruck-end-session" class="towtruck-destructive">End session</button>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-cancel togetherjs-dismiss">Cancel</button>
+      <span class="togetherjs-alt-text">or</span>
+      <button id="togetherjs-end-session" class="togetherjs-destructive">End session</button>
     </section>
   </div>
 
-  <div id="towtruck-feedback-form" class="towtruck-modal" style="display: none;">
+  <div id="togetherjs-feedback-form" class="togetherjs-modal" style="display: none;">
     <header> Feedback </header>
     <iframe src="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true" width="400" height="300" frameborder="0" marginheight="0" marginwidth="0">Loading form...</iframe>
-    <!-- <p><button class="towtruck-modal-close">Close</button></p> -->
+    <!-- <p><button class="togetherjs-modal-close">Close</button></p> -->
   </div>
 
   <div style="display: none">
     <!-- This is when you join a session and the other person has already changed to another URL: -->
-    <div id="towtruck-template-url-change" class="towtruck-modal">
+    <div id="togetherjs-template-url-change" class="togetherjs-modal">
       <header> Following to new URL... </header>
       <section>
-        <div class="towtruck-person"></div>
+        <div class="togetherjs-person"></div>
         Following
-        <span class="towtruck-person-name"></span>
-        to <a href="" class="towtruck-person-url towtruck-person-url-title"></a>
+        <span class="togetherjs-person-name"></span>
+        to <a href="" class="togetherjs-person-url togetherjs-person-url-title"></a>
       </section>
     </div>
 
     <!-- This is when someone invites you to their session: -->
-    <div id="towtruck-template-invite" class="towtruck-chat-item">
-      <div class="towtruck-person"></div>
+    <div id="togetherjs-template-invite" class="togetherjs-chat-item">
+      <div class="togetherjs-person"></div>
       <div>
-        <span class="towtruck-person-name"></span>
-        has invited <strong class="towtruck-if-forEveryone">anyone</strong>
-        <strong class="towtruck-ifnot-forEveryone">you</strong>
-        to <a href="" data-towtruck-subattr-href="href" class="towtruck-sub-hrefTitle" target="_blank"></a>
+        <span class="togetherjs-person-name"></span>
+        has invited <strong class="togetherjs-if-forEveryone">anyone</strong>
+        <strong class="togetherjs-ifnot-forEveryone">you</strong>
+        to <a href="" data-togetherjs-subattr-href="href" class="togetherjs-sub-hrefTitle" target="_blank"></a>
       </div>
     </div>
 
   </div>
 
   <!-- The pointer at the side of a window: -->
-  <div id="towtruck-window-pointer-right" style="display: none"></div>
-  <div id="towtruck-window-pointer-left" style="display: none"></div>
+  <div id="togetherjs-window-pointer-right" style="display: none"></div>
+  <div id="togetherjs-window-pointer-left" style="display: none"></div>
 
   <!-- The element that overlaps the background of the page during a modal dialog: -->
-  <div id="towtruck-modal-background" style="display: none"></div>
+  <div id="togetherjs-modal-background" style="display: none"></div>
 
   <!-- Some miscellaneous templates -->
   <div style="display: none">
 
     <!-- This is the cursor: -->
-    <div id="towtruck-template-cursor" class="towtruck-cursor towtruck">
+    <div id="togetherjs-template-cursor" class="togetherjs-cursor togetherjs">
       <!-- Note: images/cursor.svg is a copy of this (for editing): -->
       <!-- crossbrowser svg dropshadow http://demosthenes.info/blog/600/Creating-a-True-CrossBrowser-Drop-Shadow- -->
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -490,30 +490,30 @@
 	L3.571,2.176c0,0-0.92-2.421-1.613-2.156C1.254,0.289,1.414,1.853,1.639,2.694c0.318,1.186,2.904,9.915,2.904,9.915
 	s-3.856-3.503-4.5-2.5c-0.393,0.688,2.023,4.821,3,5.501c0.978,0.679,3.021,1.998,4.016,3.02c0.995,1.023,0.902,0.97,0.902,0.97"/>
       </svg>
-      <!-- <img class="towtruck-cursor-img" src="http://localhost:8080/towtruck/images/cursor.svg"> -->
-      <span class="towtruck-cursor-container">
-        <span class="towtruck-cursor-name"></span>
-        <span style="display:none" class="towtruck-cursor-typing" id="towtruck-cursor-typebox">
-          <span class="towtruck-typing-ellipse-one">&#9679;</span><span class="towtruck-typing-ellipse-two">&#9679;</span><span class="towtruck-typing-ellipse-three">&#9679;</span>
+      <!-- <img class="togetherjs-cursor-img" src="http://localhost:8080/togetherjs/images/cursor.svg"> -->
+      <span class="togetherjs-cursor-container">
+        <span class="togetherjs-cursor-name"></span>
+        <span style="display:none" class="togetherjs-cursor-typing" id="togetherjs-cursor-typebox">
+          <span class="togetherjs-typing-ellipse-one">&#9679;</span><span class="togetherjs-typing-ellipse-two">&#9679;</span><span class="togetherjs-typing-ellipse-three">&#9679;</span>
         </span>
         <!-- Displayed when the cursor is below the screen: -->
-        <span class="towtruck-cursor-down">
+        <span class="togetherjs-cursor-down">
 
         </span>
         <!-- Displayed when the cursor is above the screen: -->
-        <span class="towtruck-cursor-up">
+        <span class="togetherjs-cursor-up">
 
         </span>
       </span>
     </div>
 
     <!-- This is the element that goes around focused form elements: -->
-    <div id="towtruck-template-focus">
-      <div class="towtruck-focus towtruck-person-bordercolor"></div>
+    <div id="togetherjs-template-focus">
+      <div class="togetherjs-focus togetherjs-person-bordercolor"></div>
     </div>
 
     <!-- This is a click: -->
-    <div id="towtruck-template-click" class="towtruck-click towtruck">
+    <div id="togetherjs-template-click" class="togetherjs-click togetherjs">
     </div>
   </div>
 </div>

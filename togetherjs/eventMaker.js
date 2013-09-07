@@ -29,7 +29,7 @@ define(["jquery", "util"], function ($, util) {
     // FIXME: I'm not sure this custom attribute always propagates?
     // seems okay in Firefox/Chrome, but I've had problems with
     // setting attributes on keyboard events in the past.
-    event.towtruckInternal = true;
+    event.togetherjsInternal = true;
     target = $(target)[0];
     var cancelled = target.dispatchEvent(event);
     if (cancelled) {

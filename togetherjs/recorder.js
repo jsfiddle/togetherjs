@@ -34,9 +34,9 @@ define(["jquery", "util", "channels", "storage"], function ($, util, channels, s
   recorder.activate = function (options) {
     var match;
     baseUrl = options.baseUrl;
-    recorder.shareId = TowTruck.startup._joinShareId;
+    recorder.shareId = TogetherJS.startup._joinShareId;
     if (! recorder.shareId) {
-      match = /\&towtruck=([^&]+)/.exec(location.hash);
+      match = /\&togetherjs=([^&]+)/.exec(location.hash);
       if (! match) {
         display("#no-session-id");
         return;
@@ -72,7 +72,7 @@ define(["jquery", "util", "channels", "storage"], function ($, util, channels, s
       type: helloBack ? "hello-back" : "hello",
       name: "Recorder 'bot",
       // FIXME: replace with robot:
-      avatar: TowTruck.baseUrl + "/images/robot-avatar.png",
+      avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
       color: "#888888",
       rtcSupported: false,
       clientId: clientId,

@@ -6,7 +6,7 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
   var templating = util.Module("templating");
 
   templating.clone = function (templateId) {
-    templateId = "#towtruck-template-" + templateId;
+    templateId = "#togetherjs-template-" + templateId;
     var template = $(templateId);
     assert(template.length, "No template found with id:", templateId);
     template = template.clone();
@@ -20,7 +20,7 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
     variables = variables || {};
     util.forEachAttr(variables, function (value, attr) {
       // FIXME: do the substitution... somehow?
-      var subs = template.find(".towtruck-sub-" + attr).removeClass("towtruck-sub-" + attr);
+      var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
       if (subs.length) {
         if (typeof value == "string") {
           subs.text(value);
@@ -30,15 +30,15 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
           assert(false, "Unknown variable value type:", attr, "=", value);
         }
       }
-      var ifs = template.find(".towtruck-if-" + attr).removeClass("towtruck-sub-" + attr);
+      var ifs = template.find(".togetherjs-if-" + attr).removeClass("togetherjs-sub-" + attr);
       if (! value) {
         ifs.hide();
       }
-      ifs = template.find(".towtruck-ifnot-" + attr).removeClass("towtruck-ifnot-" + attr);
+      ifs = template.find(".togetherjs-ifnot-" + attr).removeClass("togetherjs-ifnot-" + attr);
       if (value) {
         ifs.hide();
       }
-      var attrName = "data-towtruck-subattr-" + attr;
+      var attrName = "data-togetherjs-subattr-" + attr;
       var attrs = template.find("[" + attrName + "]");
       attrs.each(function (index, element) {
         assert(typeof value == "string");
@@ -68,8 +68,8 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
         t += "0";
       }
       t += minute;
-      template.find(".towtruck-time").text(t);
-      template.find(".towtruck-ampm").text(ampm);
+      template.find(".togetherjs-time").text(t);
+      template.find(".togetherjs-ampm").text(ampm);
     }
 
     // FIXME: silly this is on session:

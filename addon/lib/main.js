@@ -10,19 +10,19 @@ const { Page } = require("page-worker");
 const simplePrefs = require('simple-prefs');
 
 var button = widgets.Widget({
-  id: "towtruck-starter",
-  label: "Start TowTruck",
+  id: "togetherjs-starter",
+  label: "Start TogetherJS",
   contentURL: data.url("button.html"),
   contentScriptFile: data.url("button.js"),
   onClick: function () {
-    console.log("Starting TowTruck because of click");
-    startTowTruck();
+    console.log("Starting TogetherJS because of click");
+    startTogetherJS();
   },
   width: 48
 });
 
 StartupPanel({
-  name: "TowTruck",
+  name: "TogetherJS",
   contentURL: data.url("startup-help.html")
 });
 
@@ -51,15 +51,15 @@ simplePrefs.on("autoDomains", updateAutoDomains);
 updateAutoDomains();
 
 
-function startTowTruck(shareId) {
+function startTogetherJS(shareId) {
   var tab = tabs.activeTab;
-  if (tab.towtruckCloser) {
-    tab.towtruckCloser();
+  if (tab.togetherjsCloser) {
+    tab.togetherjsCloser();
     return;
   }
-  tab.towtruckCloser = function () {
-    tab.towtruckCloser = null;
-    button.port.emit("TowTruckOff");
+  tab.togetherjsCloser = function () {
+    tab.togetherjsCloser = null;
+    button.port.emit("TogetherJSOff");
     tab.removeListener("ready", attachWorker);
   };
   var worker;
@@ -70,11 +70,11 @@ function startTowTruck(shareId) {
       ]
     });
     worker.port.on("Close", function () {
-      tab.towtruckCloser();
+      tab.togetherjsCloser();
     });
-    worker.port.emit("Config", {url: simplePrefs.prefs.towtruckJs, hubBase: simplePrefs.prefs.hubBase, shareId: shareId || null});
+    worker.port.emit("Config", {url: simplePrefs.prefs.togetherjsJs, hubBase: simplePrefs.prefs.hubBase, shareId: shareId || null});
   }
-  button.port.emit("TowTruckOn");
+  button.port.emit("TogetherJSOn");
   tab.on("ready", attachWorker);
   attachWorker();
 }
@@ -84,17 +84,17 @@ tabs.on("open", watchTab);
 
 function watchTab(tab) {
   tab.on("ready", function () {
-    if (tabs.activeTab == tab && tab.url.indexOf("#&towtruck") != -1) {
-      console.log("Starting TowTruck on share link", tab.url);
-      startTowTruck();
+    if (tabs.activeTab == tab && tab.url.indexOf("#&togetherjs") != -1) {
+      console.log("Starting TogetherJS on share link", tab.url);
+      startTogetherJS();
     }
-    if (tabs.activeTab == tab && ! tab.towtruckCloser) {
+    if (tabs.activeTab == tab && ! tab.togetherjsCloser) {
       var started = false;
       autoDomains.forEach(function (matcher) {
         console.log("matcher", matcher, matcher.domain);
         if ((! started) && tab.url.search(matcher.domain) != -1) {
-          console.log("Start TowTruck autoDomain");
-          startTowTruck(matcher.shareId);
+          console.log("Start TogetherJS autoDomain");
+          startTogetherJS(matcher.shareId);
           started = true;
         }
       });
@@ -107,9 +107,9 @@ for (var i=0; i<tabs.length; i++) {
 }
 
 tabs.on("activate", function () {
-  if (tabs.activeTab.towtruckCloser) {
-    button.port.emit("TowTruckOn");
+  if (tabs.activeTab.togetherjsCloser) {
+    button.port.emit("TogetherJSOn");
   } else {
-    button.port.emit("TowTruckOff");
+    button.port.emit("TogetherJSOff");
   }
 });

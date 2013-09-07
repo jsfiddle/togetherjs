@@ -97,24 +97,24 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
   var avatarEditState = {};
 
   session.on("ui-ready", function () {
-    $("#towtruck-self-avatar").click(function () {
+    $("#togetherjs-self-avatar").click(function () {
       var avatar = peers.Self.avatar;
       if (avatar) {
         $preview.attr("src", avatar);
       }
-      ui.displayToggle("#towtruck-avatar-edit");
+      ui.displayToggle("#togetherjs-avatar-edit");
     });
     if (! session.RTCSupported) {
-      $("#towtruck-avatar-edit-rtc").hide();
+      $("#togetherjs-avatar-edit-rtc").hide();
     }
 
     var avatarData = null;
-    var $preview = $("#towtruck-self-avatar-preview");
-    var $accept = $("#towtruck-self-avatar-accept");
-    var $cancel = $("#towtruck-self-avatar-cancel");
-    var $takePic = $("#towtruck-avatar-use-camera");
-    var $video = $("#towtruck-avatar-video");
-    var $upload = $("#towtruck-avatar-upload");
+    var $preview = $("#togetherjs-self-avatar-preview");
+    var $accept = $("#togetherjs-self-avatar-accept");
+    var $cancel = $("#togetherjs-self-avatar-cancel");
+    var $takePic = $("#togetherjs-avatar-use-camera");
+    var $video = $("#togetherjs-avatar-video");
+    var $upload = $("#togetherjs-avatar-upload");
 
     $takePic.click(function () {
       if (! streaming) {
@@ -132,16 +132,16 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
 
     $accept.click(function () {
       peers.Self.update({avatar:  avatarData});
-      ui.displayToggle("#towtruck-no-avatar-edit");
+      ui.displayToggle("#togetherjs-no-avatar-edit");
       // FIXME: these probably shouldn't be two elements:
-      $("#towtruck-participants-other").show();
+      $("#togetherjs-participants-other").show();
       $accept.attr("disabled", "1");
     });
 
     $cancel.click(function () {
-      ui.displayToggle("#towtruck-no-avatar-edit");
+      ui.displayToggle("#togetherjs-no-avatar-edit");
       // FIXME: like above:
-      $("#towtruck-participants-other").show();
+      $("#togetherjs-participants-other").show();
     });
 
     var streaming = false;
@@ -224,36 +224,36 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
 
   function audioButton(selector) {
     ui.displayToggle(selector);
-    if (selector == "#towtruck-audio-incoming") {
-      $("#towtruck-audio-button").addClass("towtruck-animated").addClass("towtruck-color-alert");
+    if (selector == "#togetherjs-audio-incoming") {
+      $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
     } else {
-      $("#towtruck-audio-button").removeClass("towtruck-animated").removeClass("towtruck-color-alert");
+      $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
     }
   }
 
   session.on("ui-ready", function () {
-    $("#towtruck-audio-button").click(function () {
-      if ($("#towtruck-rtc-info").is(":visible")) {
+    $("#togetherjs-audio-button").click(function () {
+      if ($("#togetherjs-rtc-info").is(":visible")) {
         windowing.hide();
         return;
       }
       if (session.RTCSupported) {
         enableAudio();
       } else {
-        windowing.show("#towtruck-rtc-not-supported");
+        windowing.show("#togetherjs-rtc-not-supported");
       }
     });
 
     if (! session.RTCSupported) {
-      audioButton("#towtruck-audio-unavailable");
+      audioButton("#togetherjs-audio-unavailable");
       return;
     }
-    audioButton("#towtruck-audio-ready");
+    audioButton("#togetherjs-audio-ready");
 
     var audioStream = null;
     var accepted = false;
     var connected = false;
-    var $audio = $("#towtruck-audio-element");
+    var $audio = $("#togetherjs-audio-element");
     var offerSent = null;
     var offerReceived = null;
     var offerDescription = false;
@@ -267,7 +267,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       accepted = true;
       storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
         if (! dontShow) {
-          windowing.show("#towtruck-rtc-info");
+          windowing.show("#togetherjs-rtc-info");
         }
       });
       if (! audioStream) {
@@ -280,7 +280,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       toggleMute();
     }
 
-    ui.container.find("#towtruck-rtc-info .towtruck-dont-show-again").change(function () {
+    ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
       storage.settings.set("dontShowRtcInfo", this.checked);
     });
 
@@ -306,9 +306,9 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
           s += repl;
         }
       }
-      audioButton("#towtruck-audio-error");
+      audioButton("#togetherjs-audio-error");
       // FIXME: this title doesn't seem to display?
-      $("#towtruck-audio-error").attr("title", s);
+      $("#togetherjs-audio-error").attr("title", s);
     }
 
     function startStreaming(callback) {
@@ -319,7 +319,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
         },
         function (stream) {
           audioStream = stream;
-          attachMedia("#towtruck-local-audio", stream);
+          attachMedia("#togetherjs-local-audio", stream);
           if (callback) {
             callback();
           }
@@ -361,14 +361,14 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       _connection.onaddstream = function (event) {
         console.log("got event", event, event.type);
         attachMedia($audio, event.stream);
-        audioButton("#towtruck-audio-active");
+        audioButton("#togetherjs-audio-active");
       };
       _connection.onstatechange = function () {
         // FIXME: this doesn't seem to work:
         // Actually just doesn't work on Firefox
         console.log("state change", _connection.readyState);
         if (_connection.readyState == "closed") {
-          audioButton("#towtruck-audio-ready");
+          audioButton("#togetherjs-audio-ready");
         }
       };
       _connection.onicecandidate = function (event) {
@@ -425,7 +425,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
                 offer: offer.sdp
               });
               offerSent = offer;
-              audioButton("#towtruck-audio-outgoing");
+              audioButton("#togetherjs-audio-outgoing");
             },
             function (err) {
               error("Error doing RTC setLocalDescription:", err);
@@ -479,7 +479,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       }
       offerReceived = msg.offer;
       if (! accepted) {
-        audioButton("#towtruck-audio-incoming");
+        audioButton("#togetherjs-audio-incoming");
         return;
       }
       function run() {
@@ -559,7 +559,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       // FIXME: displayToggle should be set due to
       // _connection.onstatechange, but that's not working, so
       // instead:
-      audioButton("#towtruck-audio-ready");
+      audioButton("#togetherjs-audio-ready");
       if (accepted && (offerSent || answerSent)) {
         abort();
         connect();

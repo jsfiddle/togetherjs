@@ -342,7 +342,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
               storage.settings.set("color", color);
             }
             if (! avatar) {
-              avatar = TowTruck.baseUrl + "/towtruck/images/default-avatar.png";
+              avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
             }
             this.update({
               name: name,
@@ -358,9 +358,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       _loadFromApp: function () {
         // FIXME: I wonder if these should be optionally functions?
         // We could test typeof==function to distinguish between a getter and a concrete value
-        var getUserName = TowTruck.getConfig("getUserName");
-        var getUserColor = TowTruck.getConfig("getUserColor");
-        var getUserAvatar = TowTruck.getConfig("getUserAvatar");
+        var getUserName = TogetherJS.getConfig("getUserName");
+        var getUserColor = TogetherJS.getConfig("getUserColor");
+        var getUserAvatar = TogetherJS.getConfig("getUserAvatar");
         var name, color, avatar;
         if (getUserName) {
           name = getUserName();
@@ -531,7 +531,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     setIdleTime: function (time) {
       IDLE_TIME = time;
       CHECK_ACTIVITY_INTERVAL = time / 2;
-      if (TowTruck.running) {
+      if (TogetherJS.running) {
         clearTimeout(checkActivityTask);
         checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
       }
@@ -542,7 +542,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     setByeTime: function (time) {
       BYE_TIME = time;
       CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
-      if (TowTruck.running) {
+      if (TogetherJS.running) {
         clearTimeout(checkActivityTask);
         checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
       }

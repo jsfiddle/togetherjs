@@ -12,4 +12,4 @@ function hide() {
 
 $("#reveal").click(reveal);
 $("#hide").click(hide);
-TowTruck.config("cloneClicks", "#reveal, #hide");
+TogetherJS.config("cloneClicks", "#reveal, #hide");

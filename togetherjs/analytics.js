@@ -2,8 +2,8 @@ define(["util"], function (util) {
   var analytics = util.Module("analytics");
 
   analytics.activate = function () {
-    var enable = TowTruck.getConfig("enableAnalytics");
-    var code = TowTruck.getConfig("analyticsCode");
+    var enable = TogetherJS.getConfig("enableAnalytics");
+    var code = TogetherJS.getConfig("analyticsCode");
     if (! (enable && code)) {
       return;
     }

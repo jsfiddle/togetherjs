@@ -5,7 +5,7 @@
 /*jshint scripturl:true */
 (function () {
 
-  var styleSheet = "/towtruck/towtruck.css";
+  var styleSheet = "/togetherjs/togetherjs.css";
 
   var baseUrl = "__baseUrl__";
   if (baseUrl == "__" + "baseUrl__") {
@@ -15,7 +15,7 @@
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
-  var baseUrlOverride = localStorage.getItem("towtruck.baseUrlOverride");
+  var baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");
   if (baseUrlOverride) {
     try {
       baseUrlOverride = JSON.parse(baseUrlOverride);
@@ -24,16 +24,16 @@
     }
     if ((! baseUrlOverride) || baseUrlOverride.expiresAt < Date.now()) {
       // Ignore because it has expired
-      localStorage.removeItem("towtruck.baseUrlOverride");
+      localStorage.removeItem("togetherjs.baseUrlOverride");
     } else {
       baseUrl = baseUrlOverride.baseUrl;
       var logger = console.warn || console.log;
-      logger.call(console, "Using TowTruck baseUrlOverride:", baseUrl);
-      logger.call(console, "To undo run: localStorage.removeItem('towtruck.baseUrlOverride')");
+      logger.call(console, "Using TogetherJS baseUrlOverride:", baseUrl);
+      logger.call(console, "To undo run: localStorage.removeItem('togetherjs.baseUrlOverride')");
     }
   }
 
-  var configOverride = localStorage.getItem("towtruck.configOverride");
+  var configOverride = localStorage.getItem("togetherjs.configOverride");
   if (configOverride) {
     try {
       configOverride = JSON.parse(configOverride);
@@ -41,13 +41,13 @@
       configOverride = null;
     }
     if ((! configOverride) || configOverride.expiresAt < Date.now()) {
-      localStorage.removeItem("towtruck.cnofigOverride");
+      localStorage.removeItem("togetherjs.cnofigOverride");
     } else {
       for (var attr in configOverride) {
         if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
           continue;
         }
-        window["TowTruckConfig_" + attr] = configOverride[attr];
+        window["TogetherJSConfig_" + attr] = configOverride[attr];
       }
     }
   }
@@ -79,22 +79,22 @@
     var scripts = document.getElementsByTagName("script");
     for (var i=0; i<scripts.length; i++) {
       var src = scripts[i].src;
-      if (src && src.search(/towtruck.js(\?.*)?$/) !== -1) {
-        baseUrl = src.replace(/\/*towtruck.js(\?.*)?$/, "");
+      if (src && src.search(/togetherjs.js(\?.*)?$/) !== -1) {
+        baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
       }
     }
   }
   if (! baseUrl) {
-    console.warn("Could not determine TowTruck's baseUrl (looked for a <script> with towtruck.js)");
+    console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js)");
   }
 
   function addStyle() {
-    var existing = document.getElementById("towtruck-stylesheet");
+    var existing = document.getElementById("togetherjs-stylesheet");
     if (! existing) {
       var link = document.createElement("link");
-      link.id = "towtruck-stylesheet";
+      link.id = "togetherjs-stylesheet";
       link.setAttribute("rel", "stylesheet");
       link.href = baseUrl + styleSheet + "?bust=" + cacheBust;
       document.head.appendChild(link);
@@ -107,68 +107,68 @@
     document.head.appendChild(script);
   }
 
-  var TowTruck = window.TowTruck = function TowTruck(event) {
-    TowTruck.startup.button = null;
+  var TogetherJS = window.TogetherJS = function TogetherJS(event) {
+    TogetherJS.startup.button = null;
     if (event && typeof event == "object") {
       if (event.target && typeof event) {
-        TowTruck.startup.button = event.target;
+        TogetherJS.startup.button = event.target;
       } else if (event.nodeType == 1) {
-        TowTruck.startup.button = event;
+        TogetherJS.startup.button = event;
       } else if (event[0] && event[0].nodeType == 1) {
         // Probably a jQuery element
-        TowTruck.startup.button = event[0];
+        TogetherJS.startup.button = event[0];
       }
     }
-    if (window.TowTruckConfig && (! window.TowTruckConfig.loaded)) {
-      TowTruck.config(window.TowTruckConfig);
-      window.TowTruckConfig.loaded = true;
+    if (window.TogetherJSConfig && (! window.TogetherJSConfig.loaded)) {
+      TogetherJS.config(window.TogetherJSConfig);
+      window.TogetherJSConfig.loaded = true;
     }
 
     // This handles loading configuration from global variables.  This
-    // includes TowTruckConfig_on_*, which are attributes folded into
+    // includes TogetherJSConfig_on_*, which are attributes folded into
     // the "on" configuration value.
     var attr;
     var attrName;
     var globalOns = {};
     for (attr in window) {
-      if (attr.indexOf("TowTruckConfig_on_") === 0) {
-        attrName = attr.substr(("TowTruckConfig_on_").length);
+      if (attr.indexOf("TogetherJSConfig_on_") === 0) {
+        attrName = attr.substr(("TogetherJSConfig_on_").length);
         globalOns[attrName] = window[attr];
-      } else if (attr.indexOf("TowTruckConfig_") === 0) {
-        attrName = attr.substr(("TowTruckConfig_").length);
-        TowTruck.config(attrName, window[attr]);
+      } else if (attr.indexOf("TogetherJSConfig_") === 0) {
+        attrName = attr.substr(("TogetherJSConfig_").length);
+        TogetherJS.config(attrName, window[attr]);
       }
     }
     // FIXME: copy existing config?
-    var ons = TowTruck.getConfig("on");
+    var ons = TogetherJS.getConfig("on");
     for (attr in globalOns) {
       if (globalOns.hasOwnProperty(attr)) {
         // FIXME: should we avoid overwriting?  Maybe use arrays?
         ons[attr] = globalOns[attr];
       }
     }
-    TowTruck.config("on", ons);
+    TogetherJS.config("on", ons);
     for (attr in ons) {
-      TowTruck.on(attr, ons[attr]);
+      TogetherJS.on(attr, ons[attr]);
     }
-    var hubOns = TowTruck.getConfig("hub_on");
+    var hubOns = TogetherJS.getConfig("hub_on");
     if (hubOns) {
       for (attr in hubOns) {
         if (hubOns.hasOwnProperty(attr)) {
-          TowTruck.hub.on(attr, hubOns[attr]);
+          TogetherJS.hub.on(attr, hubOns[attr]);
         }
       }
     }
 
-    if (! TowTruck.startup.reason) {
-      // Then a call to TowTruck() from a button must be started TowTruck
-      TowTruck.startup.reason = "started";
+    if (! TogetherJS.startup.reason) {
+      // Then a call to TogetherJS() from a button must be started TogetherJS
+      TogetherJS.startup.reason = "started";
     }
 
-    // FIXME: maybe I should just test for TowTruck.require:
-    if (TowTruck._loaded) {
-      var session = TowTruck.require("session");
-      if (TowTruck.running) {
+    // FIXME: maybe I should just test for TogetherJS.require:
+    if (TogetherJS._loaded) {
+      var session = TogetherJS.require("session");
+      if (TogetherJS.running) {
         session.close();
       } else {
         addStyle();
@@ -178,34 +178,34 @@
     }
     // A sort of signal to session.js to tell it to actually
     // start itself (i.e., put up a UI and try to activate)
-    TowTruck.startup._launch = true;
+    TogetherJS.startup._launch = true;
 
     addStyle();
-    var minSetting = TowTruck.getConfig("useMinimizedCode");
+    var minSetting = TogetherJS.getConfig("useMinimizedCode");
     if (minSetting !== undefined) {
       min = !! minSetting;
     }
-    var requireConfig = TowTruck._extend(TowTruck.requireConfig);
+    var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
       // Though jquery uses requirejs, it also always also defines a
       // global, so we have to keep it from conflicting with any
       // previous jquery:
       jquery.noConflict(true);
-      TowTruck._loaded = true;
+      TogetherJS._loaded = true;
       if (! min) {
-        TowTruck.require = require.config({context: "towtruck"});
-        TowTruck._requireObject = require;
+        TogetherJS.require = require.config({context: "togetherjs"});
+        TogetherJS._requireObject = require;
       }
     }
     if (! min) {
       if (typeof require == "function") {
-        TowTruck.require = require.config(requireConfig);
+        TogetherJS.require = require.config(requireConfig);
       }
     }
-    if (typeof TowTruck.require == "function") {
+    if (typeof TogetherJS.require == "function") {
       // This is an already-configured version of require
-      TowTruck.require(deps, callback);
+      TogetherJS.require(deps, callback);
     } else {
       requireConfig.deps = deps;
       requireConfig.callback = callback;
@@ -214,15 +214,15 @@
       }
     }
     if (min) {
-      addScript("/towtruck/towtruckPackage.js");
+      addScript("/togetherjs/togetherjsPackage.js");
     } else {
-      addScript("/towtruck/libs/require.js");
+      addScript("/togetherjs/libs/require.js");
     }
   };
 
-  TowTruck.pageLoaded = Date.now();
+  TogetherJS.pageLoaded = Date.now();
 
-  TowTruck._extend = function (base, extensions) {
+  TogetherJS._extend = function (base, extensions) {
     if (! extensions) {
       extensions = base;
       base = {};
@@ -235,17 +235,17 @@
     return base;
   };
 
-  TowTruck._startupInit = {
+  TogetherJS._startupInit = {
     // What element, if any, was used to start the session:
     button: null,
-    // The startReason is the reason TowTruck was started.  One of:
+    // The startReason is the reason TogetherJS was started.  One of:
     //   null: not started
     //   started: hit the start button (first page view)
     //   joined: joined the session (first page view)
     reason: null,
     // Also, the session may have started on "this" page, or maybe is continued
-    // from a past page.  TowTruck.continued indicates the difference (false the
-    // first time TowTruck is started or joined, true on later page loads).
+    // from a past page.  TogetherJS.continued indicates the difference (false the
+    // first time TogetherJS is started or joined, true on later page loads).
     continued: false,
     // This is set to tell the session what shareId to use, if the boot
     // code knows (mostly because the URL indicates the id).
@@ -254,12 +254,12 @@
     // for session.start() to be run)
     _launch: false
   };
-  TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
-  TowTruck.running = false;
+  TogetherJS.startup = TogetherJS._extend(TogetherJS._startupInit);
+  TogetherJS.running = false;
 
-  TowTruck.requireConfig = {
-    context: "towtruck",
-    baseUrl: baseUrl + "/towtruck",
+  TogetherJS.requireConfig = {
+    context: "togetherjs",
+    baseUrl: baseUrl + "/togetherjs",
     urlArgs: "bust=" + cacheBust,
     paths: {
       jquery: "libs/jquery-1.8.3.min",
@@ -273,7 +273,7 @@
     }
   };
 
-  TowTruck._mixinEvents = function (proto) {
+  TogetherJS._mixinEvents = function (proto) {
     proto.on = function on(name, callback) {
       if (typeof callback != "function") {
         console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
@@ -368,35 +368,35 @@
     return proto;
   };
 
-  /* This finalizes the unloading of TowTruck, including unloading modules */
-  TowTruck._teardown = function () {
-    var requireObject = TowTruck._requireObject || window.require;
+  /* This finalizes the unloading of TogetherJS, including unloading modules */
+  TogetherJS._teardown = function () {
+    var requireObject = TogetherJS._requireObject || window.require;
     // FIXME: this doesn't clear the context for min-case
     if (requireObject.s && requireObject.s.contexts) {
-      delete requireObject.s.contexts.towtruck;
+      delete requireObject.s.contexts.togetherjs;
     }
-    TowTruck._loaded = false;
-    TowTruck.startup = TowTruck._extend(TowTruck._startupInit);
-    TowTruck.running = false;
+    TogetherJS._loaded = false;
+    TogetherJS.startup = TogetherJS._extend(TogetherJS._startupInit);
+    TogetherJS.running = false;
   };
 
-  TowTruck._mixinEvents(TowTruck);
-  TowTruck._knownEvents = ["ready", "close"];
-  TowTruck.toString = function () {
-    return "TowTruck";
+  TogetherJS._mixinEvents(TogetherJS);
+  TogetherJS._knownEvents = ["ready", "close"];
+  TogetherJS.toString = function () {
+    return "TogetherJS";
   };
 
   var defaultHubBase = "__hubUrl__";
   if (defaultHubBase == "__" + "hubUrl"+ "__") {
     // Substitution wasn't made
-    defaultHubBase = "https://hub.towtruck.mozillalabs.com";
+    defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
   }
 
-  TowTruck._configuration = {};
-  TowTruck._defaultConfiguration = {
+  TogetherJS._configuration = {};
+  TogetherJS._defaultConfiguration = {
     // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
-    // Enable Mozilla or Google analytics on the page when TowTruck is activated:
+    // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
     enableAnalytics: false,
     // The code to enable (this is defaulting to a Mozilla code):
     analyticsCode: "UA-35433268-28",
@@ -416,53 +416,53 @@
     on: {},
     // Hub events to bind to
     hub_on: {},
-    // Enables the alt-T alt-T TowTruck shortcut; however, this setting
-    // must be enabled early as TowTruckConfig_enableShortcut = true;
+    // Enables the alt-T alt-T TogetherJS shortcut; however, this setting
+    // must be enabled early as TogetherJSConfig_enableShortcut = true;
     enableShortcut: false,
     // The name of this tool as provided to users.  The UI is updated to use this.
     // Because of how it is used in text it should be a proper noun, e.g.,
     // "MySite's Collaboration Tool"
     toolName: null,
-    // Used to auto-start TowTruck with a {prefix: pageName, max: participants}
+    // Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
     // Implies auto-start
-    // Also with findRoom: "roomName" it will start TowTruck automatically in the
+    // Also with findRoom: "roomName" it will start TogetherJS automatically in the
     // given room.
     findRoom: null,
-    // If true, then the "Join TowTruck Session?" confirmation dialog
+    // If true, then the "Join TogetherJS Session?" confirmation dialog
     // won't come up
     suppressJoinConfirmation: false,
     // A room in which to find people to invite to this session,
     inviteFromRoom: null
   };
   // FIXME: there's a point at which configuration can't be updated
-  // (e.g., hubBase after the TowTruck has loaded).  We should keep
+  // (e.g., hubBase after the TogetherJS has loaded).  We should keep
   // track of these and signal an error if someone attempts to
   // reconfigure too late
 
-  TowTruck.getConfig = function (name) {
-    var value = TowTruck._configuration[name];
+  TogetherJS.getConfig = function (name) {
+    var value = TogetherJS._configuration[name];
     if (value === undefined) {
-      if (! TowTruck._defaultConfiguration.hasOwnProperty(name)) {
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
         console.error("Tried to load unknown configuration value:", name);
       }
-      value = TowTruck._defaultConfiguration[name];
+      value = TogetherJS._defaultConfiguration[name];
     }
     return value;
   };
 
-  /* TowTruck.config(configurationObject)
-     or: TowTruck.config(configName, value)
+  /* TogetherJS.config(configurationObject)
+     or: TogetherJS.config(configName, value)
 
-     Adds configuration to TowTruck.  You may also set the global variable TowTruckConfig
-     and when TowTruck is started that configuration will be loaded.
+     Adds configuration to TogetherJS.  You may also set the global variable TogetherJSConfig
+     and when TogetherJS is started that configuration will be loaded.
 
      Unknown configuration values will lead to console error messages.
      */
-  TowTruck.config = function (name, value) {
+  TogetherJS.config = function (name, value) {
     var settings;
     if (arguments.length == 1) {
       if (typeof name != "object") {
-        throw 'TowTruck.config(value) must have an object value (not: ' + name + ')';
+        throw 'TogetherJS.config(value) must have an object value (not: ' + name + ')';
       }
       settings = name;
     } else {
@@ -473,37 +473,37 @@
       if (attr == "loaded" || attr == "callToStart" || ! settings.hasOwnProperty(attr)) {
         continue;
       }
-      if (! TowTruck._defaultConfiguration.hasOwnProperty(attr)) {
-        console.warn("Unknown configuration value passed to TowTruck.config():", attr);
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
+        console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
       }
-      TowTruck._configuration[attr] = settings[attr];
-      if (TowTruck.running && attr == "toolName") {
-        TowTruck.require("ui").updateToolName();
+      TogetherJS._configuration[attr] = settings[attr];
+      if (TogetherJS.running && attr == "toolName") {
+        TogetherJS.require("ui").updateToolName();
       }
       if (attr == "enableShortcut") {
         if (settings[attr]) {
-          TowTruck.listenForShortcut();
+          TogetherJS.listenForShortcut();
         } else {
-          TowTruck.removeShortcut();
+          TogetherJS.removeShortcut();
         }
       }
       // FIXME: maybe run an update function when certain values are
-      // updated, especially when TowTruck is running
+      // updated, especially when TogetherJS is running
     }
   };
 
-  TowTruck.reinitialize = function () {
-    if (TowTruck.running && typeof TowTruck.require == "function") {
-      TowTruck.require(["session"], function (session) {
+  TogetherJS.reinitialize = function () {
+    if (TogetherJS.running && typeof TogetherJS.require == "function") {
+      TogetherJS.require(["session"], function (session) {
         session.emit("reinitialize");
       });
     }
-    // If it's not set, TowTruck has not been loaded, and reinitialization is not needed
+    // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
   };
 
-  TowTruck.refreshUserData = function () {
-    if (TowTruck.running && typeof TowTruck.require ==  "function") {
-      TowTruck.require(["session"], function (session) {
+  TogetherJS.refreshUserData = function () {
+    if (TogetherJS.running && typeof TogetherJS.require ==  "function") {
+      TogetherJS.require(["session"], function (session) {
         session.emit("refresh-user-data");
       });
     }
@@ -511,53 +511,53 @@
 
   // This should contain the output of "git describe --always --dirty"
   // FIXME: substitute this on the server (and update make-static-client)
-  TowTruck.version = version;
-  TowTruck.baseUrl = baseUrl;
+  TogetherJS.version = version;
+  TogetherJS.baseUrl = baseUrl;
 
-  TowTruck.hub = TowTruck._mixinEvents({});
+  TogetherJS.hub = TogetherJS._mixinEvents({});
   var session = null;
 
-  TowTruck._onmessage = function (msg) {
+  TogetherJS._onmessage = function (msg) {
     var type = msg.type;
     if (type.search(/^app\./) === 0) {
       type = type.substr("app.".length);
     } else {
-      type = "towtruck." + type;
+      type = "togetherjs." + type;
     }
     msg.type = type;
-    TowTruck.hub.emit(msg.type, msg);
+    TogetherJS.hub.emit(msg.type, msg);
   };
 
-  TowTruck.send = function (msg) {
+  TogetherJS.send = function (msg) {
     if (session === null) {
-      if (! TowTruck.require) {
-        throw "You cannot use TowTruck.send() when TowTruck is not running";
+      if (! TogetherJS.require) {
+        throw "You cannot use TogetherJS.send() when TogetherJS is not running";
       }
-      session = TowTruck.require("session");
+      session = TogetherJS.require("session");
     }
     session.appSend(msg);
   };
 
-  TowTruck.shareUrl = function () {
+  TogetherJS.shareUrl = function () {
     if (session === null) {
-      if (! TowTruck.require) {
+      if (! TogetherJS.require) {
         return null;
       }
-      session = TowTruck.require("session");
+      session = TogetherJS.require("session");
     }
     return session.shareUrl();
   };
 
   var listener = null;
 
-  TowTruck.listenForShortcut = function () {
-    console.warn("Listening for alt-T alt-T to start TowTruck");
-    TowTruck.removeShortcut();
+  TogetherJS.listenForShortcut = function () {
+    console.warn("Listening for alt-T alt-T to start TogetherJS");
+    TogetherJS.removeShortcut();
     listener = function listener(event) {
       if (event.which == 84 && event.altKey) {
         if (listener.pressed) {
           // Second hit
-          TowTruck();
+          TogetherJS();
         } else {
           listener.pressed = true;
         }
@@ -565,11 +565,11 @@
         listener.pressed = false;
       }
     };
-    TowTruck.once("ready", TowTruck.removeShortcut);
+    TogetherJS.once("ready", TogetherJS.removeShortcut);
     document.addEventListener("keyup", listener, false);
   };
 
-  TowTruck.removeShortcut = function () {
+  TogetherJS.removeShortcut = function () {
     if (listener) {
       document.addEventListener("keyup", listener, false);
       listener = null;
@@ -579,28 +579,28 @@
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
-  var m = /&?towtruck=([^&]*)/.exec(hash);
+  var m = /&?togetherjs=([^&]*)/.exec(hash);
   if (m) {
-    TowTruck.startup._joinShareId = m[1];
-    TowTruck.startup.reason = "joined";
+    TogetherJS.startup._joinShareId = m[1];
+    TogetherJS.startup.reason = "joined";
     var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
     location.hash = newHash;
   }
-  if (window._TowTruckShareId) {
+  if (window._TogetherJSShareId) {
     // A weird hack for something the addon does, to force a shareId.
     // FIXME: probably should remove, it's a wonky feature.
-    TowTruck.startup._joinShareId = window._TowTruckShareId;
-    delete window._TowTruckShareId;
+    TogetherJS.startup._joinShareId = window._TogetherJSShareId;
+    delete window._TogetherJSShareId;
   }
 
   function conditionalActivate() {
-    if (window.TowTruckConfig_noAutoStart) {
+    if (window.TogetherJSConfig_noAutoStart) {
       return;
     }
-    // A page can define this function to defer TowTruck from starting
-    var callToStart = window.TowTruckConfig_callToStart;
-    if (window.TowTruckConfig && window.TowTruckConfig.callToStart) {
-      callToStart = window.TowTruckConfig.callToStart;
+    // A page can define this function to defer TogetherJS from starting
+    var callToStart = window.TogetherJSConfig_callToStart;
+    if (window.TogetherJSConfig && window.TogetherJSConfig.callToStart) {
+      callToStart = window.TogetherJSConfig.callToStart;
     }
     if (callToStart) {
       // FIXME: need to document this:
@@ -613,24 +613,24 @@
   // FIXME: can we push this up before the load event?
   // Do we need to wait at all?
   function onload() {
-    if (TowTruck.startup._joinShareId) {
-      TowTruck();
-    } else if (window._TowTruckBookmarklet) {
-      delete window._TowTruckBookmarklet;
-      TowTruck();
+    if (TogetherJS.startup._joinShareId) {
+      TogetherJS();
+    } else if (window._TogetherJSBookmarklet) {
+      delete window._TogetherJSBookmarklet;
+      TogetherJS();
     } else {
-      var key = "towtruck-session.status";
+      var key = "togetherjs-session.status";
       var value = sessionStorage.getItem(key);
       if (value) {
         value = JSON.parse(value);
         if (value && value.running) {
-          TowTruck.startup.continued = true;
-          TowTruck.startup.reason = value.startupReason;
-          TowTruck();
+          TogetherJS.startup.continued = true;
+          TogetherJS.startup.reason = value.startupReason;
+          TogetherJS();
         }
-      } else if (window.TowTruckConfig_findRoom) {
-        TowTruck.startup.reason = "joined";
-        TowTruck();
+      } else if (window.TogetherJSConfig_findRoom) {
+        TogetherJS.startup.reason = "joined";
+        TogetherJS();
       }
     }
   }
@@ -638,8 +638,8 @@
   conditionalActivate();
 
   // FIXME: wait until load event to double check if this gets set?
-  if (window.TowTruckConfig_enableShortcut) {
-    TowTruck.listenForShortcut();
+  if (window.TogetherJSConfig_enableShortcut) {
+    TogetherJS.listenForShortcut();
   }
 
 })();

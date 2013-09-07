@@ -63,8 +63,8 @@ module.exports = function (grunt) {
     less: {
       development: {
         files: {
-          "build/towtruck/towtruck.css": "towtruck/towtruck.less",
-          "build/towtruck/recorder.css": "towtruck/recorder.less"
+          "build/togetherjs/togetherjs.css": "togetherjs/togetherjs.less",
+          "build/togetherjs/recorder.css": "togetherjs/recorder.less"
         },
         options: {
           dumpLineNumbers: dumpLineNumbers
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
     requirejs: {
       compile: {
         options: {
-          baseUrl: "towtruck/",
+          baseUrl: "togetherjs/",
           paths: {
             jquery: "libs/jquery-1.8.3.min",
             walkabout: "libs/walkabout/walkabout",
@@ -86,7 +86,7 @@ module.exports = function (grunt) {
             jqueryui: "libs/jquery-ui.min",
             jquerypunch: "libs/jquery.ui.touch-punch.min",
             // Make sure we get the built form of this one:
-            templates: "../build/towtruck/templates"
+            templates: "../build/togetherjs/templates"
           },
           include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
           //Wrap any build bundle in a start and end text specified by wrap.
@@ -96,13 +96,13 @@ module.exports = function (grunt) {
           //the end user use requirejs.
           wrap: {
             start: "(function() {",
-            end: "TowTruck.require = TowTruck._requireObject = require;\nrequire([\"session\"]);\n}());"
+            end: "TogetherJS.require = TogetherJS._requireObject = require;\nrequire([\"session\"]);\n}());"
           },
           optimize: "none",
           out: function writer(text) {
             // Fix this bug: https://github.com/jrburke/requirejs/issues/813
             // First for jQuery:
-            var dest = path.join(grunt.option("dest"), "towtruck/towtruckPackage.js");
+            var dest = path.join(grunt.option("dest"), "togetherjs/togetherjsPackage.js");
             grunt.file.write(dest, text);
           }
         }
@@ -119,7 +119,7 @@ module.exports = function (grunt) {
       },
       all: [
         "Gruntfile",
-        "towtruck/*.js"
+        "togetherjs/*.js"
       ]
     },
 
@@ -128,23 +128,23 @@ module.exports = function (grunt) {
       options: {
         csslintrc: ".csslint.rc"
       },
-      src: ["build/towtruck/towtruck.css"]
+      src: ["build/togetherjs/togetherjs.css"]
     },
 
     watch: {
       main: {
-        files: ["towtruck/**/*", "Gruntfile.js"],
+        files: ["togetherjs/**/*", "Gruntfile.js"],
         tasks: ["build"],
         options: {
           nospawn: true
         }
       },
       site: {
-        files: ["towtruck/**/*", "Gruntfile.js", "site/**/*", "!**/*_flymake*", "!**/*~", "!**/.*"],
+        files: ["togetherjs/**/*", "Gruntfile.js", "site/**/*", "!**/*_flymake*", "!**/*~", "!**/.*"],
         tasks: ["build", "buildsite"]
       },
       minimal: {
-        files: ["towtruck/**/*.less", "towtruck/towtruck.js", "towtruck/**/*.html", "!**/*_flymake*"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/**/*.html", "!**/*_flymake*"],
         tasks: ["build"]
       }
     }
@@ -159,15 +159,15 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!towtruck.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md"];
-    grunt.log.writeln("Copying files from " + "towtruck/".cyan + " to " + path.join(grunt.option("dest"), "towtruck").cyan);
+    var pattern = ["**", "!togetherjs.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md"];
+    grunt.log.writeln("Copying files from " + "togetherjs/".cyan + " to " + path.join(grunt.option("dest"), "togetherjs").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
       pattern.push("!tests/**");
       grunt.log.writeln("  (excluding tests)");
     }
     copyMany(
-      "towtruck/", path.join(grunt.option("dest"), "towtruck"),
+      "togetherjs/", path.join(grunt.option("dest"), "togetherjs"),
       pattern
       );
   });
@@ -200,7 +200,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask(
     "substitute",
-    "Substitute templates.js and parameters in towtruck.js",
+    "Substitute templates.js and parameters in togetherjs.js",
     function () {
       // FIXME: I could use grunt.file.copy(..., {process: function (content, path) {}}) here
       var baseUrl = grunt.option("base-url") || "";
@@ -208,27 +208,27 @@ module.exports = function (grunt) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
       var destBase = grunt.option("dest") || "build";
-      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.towtruck.mozillalabs.com";
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.mozillalabs.com";
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
-        __interface_html__: grunt.file.read("towtruck/interface.html"),
-        __help_txt__: grunt.file.read("towtruck/help.txt"),
-        __walkthrough_html__: grunt.file.read("towtruck/walkthrough.html"),
+        __interface_html__: grunt.file.read("togetherjs/interface.html"),
+        __help_txt__: grunt.file.read("togetherjs/help.txt"),
+        __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
         __gitCommit__: gitCommit
       };
       var filenames = {
-        "towtruck/templates.js": {
-          src: "towtruck/templates.js"
+        "togetherjs/templates.js": {
+          src: "togetherjs/templates.js"
         },
-        "towtruck.js": {
-          src: "towtruck/towtruck.js",
+        "togetherjs.js": {
+          src: "togetherjs/togetherjs.js",
           extraVariables: {__min__: "no"}
         },
-        "towtruck-min.js": {
-          src: "towtruck/towtruck.js",
+        "togetherjs-min.js": {
+          src: "togetherjs/togetherjs.js",
           extraVariables: {__min__: "yes"}
         }
       };
@@ -256,8 +256,8 @@ module.exports = function (grunt) {
     }
   );
 
-  grunt.registerTask("maybeless", "Maybe compile towtruck.less", function () {
-    var sources = grunt.file.expand(["towtruck/**/*.less", "site/**/*.less"]);
+  grunt.registerTask("maybeless", "Maybe compile togetherjs.less", function () {
+    var sources = grunt.file.expand(["togetherjs/**/*.less", "site/**/*.less"]);
     var found = false;
     sources.forEach(function (fn) {
       var source = fs.statSync(fn);
@@ -397,9 +397,9 @@ module.exports = function (grunt) {
   grunt.registerTask("docco", "Create comment-separating source code", function () {
     var done = this.async();
     var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("site/"));
-    var sources = grunt.file.expand({cwd: "towtruck/"}, "*.js");
+    var sources = grunt.file.expand({cwd: "togetherjs/"}, "*.js");
     sources.sort();
-    var sourceDescriptions = JSON.parse(grunt.file.read("towtruck/module-descriptions.json"));
+    var sourceDescriptions = JSON.parse(grunt.file.read("togetherjs/module-descriptions.json"));
     var sourceList = [];
     sources.forEach(function (source) {
       var name = source.replace(/\.js$/, "");
@@ -413,7 +413,7 @@ module.exports = function (grunt) {
       var sourceName = source.replace(/\.js$/, "");
       var dest = grunt.option("dest") + "/source/" + source + ".html";
       grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
-      var code = grunt.file.read("towtruck/" + source);
+      var code = grunt.file.read("togetherjs/" + source);
       var sections = docco.parse(source, code);
       doccoFormat(source, sections);
       sections.forEach(function (section, i) {
@@ -436,79 +436,79 @@ module.exports = function (grunt) {
       grunt.file.write(dest, result);
     });
     var tmplVars = Object.create(vars);
-    tmplVars.title = "TowTruck Source Code";
+    tmplVars.title = "TogetherJS Source Code";
     tmplVars.sourceList = sourceList;
     tmplVars.base = "../";
     var tmpl = env.getTemplate("source-code-index.tmpl");
     grunt.file.write(grunt.option("dest") + "/source/index.html", tmpl.render(tmplVars));
   });
 
-  grunt.registerTask("publish", "Publish to towtruck.mozillalabs.com/public/", function () {
-    if (! grunt.file.isDir("towtruck.mozillalabs.com")) {
-      grunt.log.writeln("Error: you must check out towtruck.mozillalabs.com");
+  grunt.registerTask("publish", "Publish to togetherjs.mozillalabs.com/public/", function () {
+    if (! grunt.file.isDir("togetherjs.mozillalabs.com")) {
+      grunt.log.writeln("Error: you must check out togetherjs.mozillalabs.com");
       grunt.log.writeln("Use:");
-      grunt.log.writeln("  $ git clone -b towtruck.mozillalabs.com git:git@github.com:mozilla/towtruck.git towtruck.mozillalabs.com");
-      grunt.log.writeln("  $ cd towtruck.mozillalabs.com/.git");
-      grunt.log.writeln("  $ echo '[remote \"staging\"]\n\turl = git@heroku.com:towtruck-staging.git\n\tpush = refs/heads/towtruck.mozillalabs.com:refs/heads/master\n[remote \"production\"]\n\turl = git@heroku.com:towtruck.git\n\tpush = refs/heads/towtruck.mozillalabs.com:refs/heads/master\n' >> config");
-      grunt.fail.fatal("Must checkout towtruck.mozillalabs.com");
+      grunt.log.writeln("  $ git clone -b togetherjs.mozillalabs.com git:git@github.com:mozilla/togetherjs.git togetherjs.mozillalabs.com");
+      grunt.log.writeln("  $ cd togetherjs.mozillalabs.com/.git");
+      grunt.log.writeln("  $ echo '[remote \"staging\"]\n\turl = git@heroku.com:togetherjs-staging.git\n\tpush = refs/heads/togetherjs.mozillalabs.com:refs/heads/master\n[remote \"production\"]\n\turl = git@heroku.com:togetherjs.git\n\tpush = refs/heads/togetherjs.mozillalabs.com:refs/heads/master\n' >> config");
+      grunt.fail.fatal("Must checkout togetherjs.mozillalabs.com");
       return;
     }
-    var versions = "towtruck.mozillalabs.com/public/versions";
+    var versions = "togetherjs.mozillalabs.com/public/versions";
     if (! grunt.file.isDir(versions)) {
       grunt.log.writeln("Error: " + versions.cyan + " does not exist");
       grunt.fail.fatal("No versions/ directory");
       return;
     }
-    var tmp = "towtruck.mozillalabs.com/public_versions_tmp";
+    var tmp = "togetherjs.mozillalabs.com/public_versions_tmp";
     fs.rename(versions, tmp);
-    grunt.file.delete("towtruck.mozillalabs.com/public");
-    grunt.file.mkdir("towtruck.mozillalabs.com/public");
+    grunt.file.delete("togetherjs.mozillalabs.com/public");
+    grunt.file.mkdir("togetherjs.mozillalabs.com/public");
     fs.rename(tmp, versions);
-    grunt.option("base-url", "https://towtruck.mozillalabs.com");
-    grunt.option("dest", "towtruck.mozillalabs.com/public");
+    grunt.option("base-url", "https://togetherjs.mozillalabs.com");
+    grunt.option("dest", "togetherjs.mozillalabs.com/public");
     grunt.option("exclude-tests", true);
     grunt.option("no-hardlink", true);
     grunt.task.run(["build", "buildsite"]);
     grunt.task.run(["movecss"]);
     grunt.log.writeln("To actually publish you must do:");
-    grunt.log.writeln("  $ cd towtruck.mozillalabs.com/");
+    grunt.log.writeln("  $ cd togetherjs.mozillalabs.com/");
     grunt.log.writeln("  $ git commit -a -m 'Publish'");
     grunt.log.writeln("  $ git push && git push staging");
   });
 
-  grunt.registerTask("publishversion", "Publish to towtruck.mozillalabs.com/public/versions/", function () {
-    var version = grunt.option("towtruck-version");
+  grunt.registerTask("publishversion", "Publish to togetherjs.mozillalabs.com/public/versions/", function () {
+    var version = grunt.option("togetherjs-version");
     if (! version) {
-      grunt.log.error("You must provide a --towtruck-version=X.Y argument");
-      grunt.fail.fatal("No --towtruck-version");
+      grunt.log.error("You must provide a --togetherjs-version=X.Y argument");
+      grunt.fail.fatal("No --togetherjs-version");
       return;
     }
-    if (! grunt.file.isDir("towtruck.mozillalabs.com/public/versions")) {
-      grunt.log.error("The directory towtruck.mozillalabs.com/public/versions does not exist");
+    if (! grunt.file.isDir("togetherjs.mozillalabs.com/public/versions")) {
+      grunt.log.error("The directory togetherjs.mozillalabs.com/public/versions does not exist");
       grunt.fail.fatal();
       return;
     }
-    var destDir = "towtruck.mozillalabs.com/public/versions/" + version;
+    var destDir = "togetherjs.mozillalabs.com/public/versions/" + version;
     if (grunt.file.exists(destDir)) {
       grunt.log.error("The directory " + destDir + " already exists");
       grunt.log.error("  Delete it first to re-create version");
       grunt.fail.fatal();
       return;
     }
-    grunt.option("base-url", "https://towtruck.mozillalabs.com/versions/" + version);
+    grunt.option("base-url", "https://togetherjs.mozillalabs.com/versions/" + version);
     grunt.option("dest", destDir);
     grunt.option("exclude-tests", true);
     grunt.option("no-hardlink", true);
     grunt.task.run(["build"]);
     grunt.task.run(["movecss"]);
-    var readme = grunt.file.read("towtruck.mozillalabs.com/public/versions/README.md");
-    readme += "  * [" + version + "](./" + version + "/towtruck.js)\n";
-    grunt.file.write("towtruck.mozillalabs.com/public/versions/README.md", readme);
+    var readme = grunt.file.read("togetherjs.mozillalabs.com/public/versions/README.md");
+    readme += "  * [" + version + "](./" + version + "/togetherjs.js)\n";
+    grunt.file.write("togetherjs.mozillalabs.com/public/versions/README.md", readme);
   });
 
   grunt.registerTask("movecss", "Publish generated css files to dest", function () {
     // Can't figure out how to parameterize the less task, hence this lame move
-    ["towtruck/towtruck.css", "towtruck/recorder.css"].forEach(function (css) {
+    ["togetherjs/togetherjs.css", "togetherjs/recorder.css"].forEach(function (css) {
       var src = path.join("build", css);
       var dest = path.join(grunt.option("dest"), css);
       grunt.file.copy(src, dest);

@@ -36,7 +36,7 @@ define(["jquery"], function ($) {
 
   // animate the participant cursor -> rotate up when they're on the same frame as the user
   $.fn.rotateCursorDown = function () {
-    $('.towtruck-cursor svg').animate({borderSpacing: 0, opacity: 1}, {
+    $('.togetherjs-cursor svg').animate({borderSpacing: 0, opacity: 1}, {
       step: function(now, fx) {
         if (fx.prop == "borderSpacing") {
           $(this).css('-webkit-transform', 'rotate('+now+'deg)')
@@ -76,23 +76,23 @@ define(["jquery"], function ($) {
         });
 
         //starting position for arrow
-        $('#towtruck-window-pointer-right').css({
+        $('#togetherjs-window-pointer-right').css({
           left: "+=74px",
           opacity: 1,
           "zIndex": 8888
         });
 
         //animate arrow out
-        $('#towtruck-window-pointer-right').animate({
+        $('#togetherjs-window-pointer-right').animate({
           opacity: 1,
           left: "-=78px"
         }, {
           duration:60, easing:"linear"
         });
-        $('#towtruck-window-pointer-right').queue();
+        $('#togetherjs-window-pointer-right').queue();
 
         //bounce arrow back
-        $('#towtruck-window-pointer-right').animate({
+        $('#togetherjs-window-pointer-right').animate({
           left:'+=4px'
         }, {
           duration:60, easing:"linear"
@@ -125,23 +125,23 @@ define(["jquery"], function ($) {
       });
 
       //starting position for arrow
-      $('#towtruck-window-pointer-right').css({
+      $('#togetherjs-window-pointer-right').css({
         left: "+=74px",
         opacity: 1,
         "zIndex": 8888
       });
 
       //animate arrow out
-      $('#towtruck-window-pointer-right').animate({
+      $('#togetherjs-window-pointer-right').animate({
         opacity: 1,
         left: "-=78px"
       }, {
         duration:60, easing:"linear"
       });
-      $('#towtruck-window-pointer-right').queue();
+      $('#togetherjs-window-pointer-right').queue();
 
       //bounce arrow back
-      $('#towtruck-window-pointer-right').animate({
+      $('#togetherjs-window-pointer-right').animate({
         left:'+=4px'
       }, {
         duration:60, easing:"linear"
@@ -283,9 +283,9 @@ define(["jquery"], function ($) {
 
   // keyboard typing animation
   $.fn.animateKeyboard = function () {
-    var one = this.find(".towtruck-typing-ellipse-one");
-    var two = this.find(".towtruck-typing-ellipse-two");
-    var three = this.find(".towtruck-typing-ellipse-three");
+    var one = this.find(".togetherjs-typing-ellipse-one");
+    var two = this.find(".togetherjs-typing-ellipse-two");
+    var three = this.find(".togetherjs-typing-ellipse-three");
     var count = -1;
     var run = (function () {
       count = (count+1) % 4;
@@ -321,7 +321,7 @@ define(["jquery"], function ($) {
 
   if ($.browser.mobile && window.matchMedia && ! window.matchMedia("screen and (max-screen-width: 480px)").matches) {
     // FIXME: for Firefox OS simulator really:
-    document.body.className += " towtruck-mobile-browser";
+    document.body.className += " togetherjs-mobile-browser";
   }
 
 });

@@ -5,7 +5,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
   var assert = util.assert;
   var windowing = util.Module("windowing");
   var $window = $(window);
-  // This is also in towtruck.less, under .towtruck-animated
+  // This is also in togetherjs.less, under .togetherjs-animated
   var ANIMATION_DURATION = 1000;
 
   /* Displays one window.  A window must already exist.  This hides other windows, and
@@ -14,8 +14,8 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     element = $(element);
     options = options || {};
     options.bind = options.bind || element.attr("data-bind-to");
-    var notification = element.hasClass("towtruck-notification");
-    var modal = element.hasClass("towtruck-modal");
+    var notification = element.hasClass("togetherjs-notification");
+    var modal = element.hasClass("togetherjs-modal");
     if (options.bind) {
       options.bind = $(options.bind);
     }
@@ -81,9 +81,9 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       top: top + "px",
       left: left + "px"
     });
-    if (win.hasClass("towtruck-window")) {
-      $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
-      var pointer = $("#towtruck-window-pointer-" + ifacePos);
+    if (win.hasClass("togetherjs-window")) {
+      $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+      var pointer = $("#togetherjs-window-pointer-" + ifacePos);
       pointer.show();
       if (ifacePos == "right") {
         pointer.css({
@@ -100,11 +100,11 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       }
     }
     win.data("boundTo", bound.selector || "#" + bound.attr("id"));
-    bound.addClass("towtruck-active");
+    bound.addClass("togetherjs-active");
   }
 
   session.on("resize", function () {
-    var win = $(".towtruck-modal:visible, .towtruck-window:visible");
+    var win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
     if (! win.length) {
       return;
     }
@@ -118,10 +118,10 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
 
   windowing.hide = function (els) {
     // FIXME: also hide modals?
-    els = els || ".towtruck-window, .towtruck-modal, .towtruck-notification";
+    els = els || ".togetherjs-window, .togetherjs-modal, .togetherjs-notification";
     els = $(els);
     els = els.filter(":visible");
-    els.filter(":not(.towtruck-notification)").hide();
+    els.filter(":not(.togetherjs-notification)").hide();
     getModalBackground().hide();
     var windows = [];
     els.each(function (index, element) {
@@ -132,19 +132,19 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
         return;
       }
       bound = $(bound);
-      bound.addClass("towtruck-animated").addClass("towtruck-color-pulse");
+      bound.addClass("togetherjs-animated").addClass("togetherjs-color-pulse");
       setTimeout(function () {
-        bound.removeClass("towtruck-color-pulse").removeClass("towtruck-animated");
+        bound.removeClass("togetherjs-color-pulse").removeClass("togetherjs-animated");
       }, ANIMATION_DURATION+10);
       element.data("boundTo", null);
-      bound.removeClass("towtruck-active");
-      if (element.hasClass("towtruck-notification")) {
+      bound.removeClass("togetherjs-active");
+      if (element.hasClass("togetherjs-notification")) {
         element.fadeOut().promise().then(function () {
           this.hide();
         });
       }
     });
-    $("#towtruck-window-pointer-right, #towtruck-window-pointer-left").hide();
+    $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
     if (onClose) {
       onClose();
       onClose = null;
@@ -173,8 +173,8 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
   };
 
   function bindEvents(el) {
-    el.find(".towtruck-close, .towtruck-dismiss").click(function (event) {
-      var w = $(event.target).closest(".towtruck-window, .towtruck-modal, .towtruck-notification");
+    el.find(".togetherjs-close, .togetherjs-dismiss").click(function (event) {
+      var w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
       windowing.hide(w);
       event.stopPropagation();
       return false;
@@ -185,7 +185,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     if (getModalBackground.element) {
       return getModalBackground.element;
     }
-    var background = $("#towtruck-modal-background");
+    var background = $("#togetherjs-modal-background");
     assert(background.length);
     getModalBackground.element = background;
     background.click(function () {

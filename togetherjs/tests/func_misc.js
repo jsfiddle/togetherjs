@@ -7,12 +7,12 @@ Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cur
 
 printChained(
   Test.resetSettings(),
-  Test.startTowTruck(),
+  Test.startTogetherJS(),
   Test.closeWalkthrough());
 
 /* =>
 Settings reset
-TowTruck started
+TogetherJS started
 send: hello
   avatar: "...default-avatar.png",
   clientId: "...",
@@ -51,7 +51,7 @@ wait(300);
 
 // =>
 
-var fakeCursor = TowTruckTestSpy.Cursor.getClient("faker");
+var fakeCursor = TogetherJSTestSpy.Cursor.getClient("faker");
 print(fakeCursor.element && fakeCursor.element.is(":visible"));
 
 // => true
@@ -75,35 +75,35 @@ wait(100);
 
 // =>
 
-print($("#towtruck-chat-notifier").is(":visible"));
+print($("#togetherjs-chat-notifier").is(":visible"));
 
 // => true
 
-print($("#towtruck-chat-notifier")[0]);
+print($("#togetherjs-chat-notifier")[0]);
 
 /* =>
 ...
-<div class="towtruck-person towtruck-person-faker"...>
+<div class="togetherjs-person togetherjs-person-faker"...>
 ...
-<div class="towtruck-person-name-abbrev towtruck-person-name-abbrev-faker">Faker</div>
-<div class="towtruck-chat-content">Test message</div>
+<div class="togetherjs-person-name-abbrev togetherjs-person-name-abbrev-faker">Faker</div>
+<div class="togetherjs-chat-content">Test message</div>
 ...
 */
 
-$("#towtruck-chat-button").click();
+$("#togetherjs-chat-button").click();
 
 // We need a wait here for the animation to finish:
 wait(1000);
 
 // =>
 
-print($("#towtruck-chat-notifier").is(":visible"), $("#towtruck-chat").is(":visible"));
+print($("#togetherjs-chat-notifier").is(":visible"), $("#togetherjs-chat").is(":visible"));
 
 // => false true
 
 Test.viewSend.activate();
-$("#towtruck-chat-input").val("outgoing message");
-TowTruckTestSpy.submitChat();
+$("#togetherjs-chat-input").val("outgoing message");
+TogetherJSTestSpy.submitChat();
 
 /* =>
 send: chat
@@ -112,31 +112,31 @@ send: chat
   text: "outgoing message"
 */
 
-print($("#towtruck-chat-input").val() === "");
+print($("#togetherjs-chat-input").val() === "");
 // => true
 
-print($("#towtruck-chat")[0]);
+print($("#togetherjs-chat")[0]);
 /* =>
 ...
-<div class="towtruck-chat-content">outgoing message</div>
+<div class="togetherjs-chat-content">outgoing message</div>
 ...
 */
 
 windowing.hide();
-$("#towtruck-profile-button").click();
-print($("#towtruck-menu").is(":visible"), $("#towtruck-menu .towtruck-self-name").is(":visible"));
+$("#togetherjs-profile-button").click();
+print($("#togetherjs-menu").is(":visible"), $("#togetherjs-menu .togetherjs-self-name").is(":visible"));
 // => true false
-$("#towtruck-menu-update-name").click();
-print($("#towtruck-menu .towtruck-self-name").is(":visible"));
+$("#togetherjs-menu-update-name").click();
+print($("#togetherjs-menu .togetherjs-self-name").is(":visible"));
 // => true
-$("#towtruck-menu .towtruck-self-name").val("Joe");
+$("#togetherjs-menu .togetherjs-self-name").val("Joe");
 // First we do a keyup to trigger the change event:
-$("#towtruck-menu .towtruck-self-name").trigger("keyup");
+$("#togetherjs-menu .togetherjs-self-name").trigger("keyup");
 // Then we submit:
-$("#towtruck-menu .towtruck-self-name").trigger($.Event("keyup", {which: 13}));
+$("#togetherjs-menu .togetherjs-self-name").trigger($.Event("keyup", {which: 13}));
 print(peers.Self.name);
-print($("#towtruck-menu").is(":visible"), $("#towtruck-menu .towtruck-self-name").is(":visible"));
-print($("#towtruck-self-name-display").text());
+print($("#togetherjs-menu").is(":visible"), $("#togetherjs-menu .togetherjs-self-name").is(":visible"));
+print($("#togetherjs-self-name-display").text());
 /* =>
 send: peer-update
   clientId: "me",

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* Loading this module will cause, when TowTruck is active, the
+/* Loading this module will cause, when TogetherJS is active, the
    session object to emit visibility-change with a `hidden` argument
    whenever the visibility changes, on browsers where we can detect
    it.

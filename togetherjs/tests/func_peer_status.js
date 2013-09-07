@@ -3,7 +3,7 @@
 Test.require("peers");
 // => Loaded modules: ...
 
-TowTruckTestSpy.setIdleTime(100);
+TogetherJSTestSpy.setIdleTime(100);
 
 Test.normalStartup();
 
@@ -30,7 +30,7 @@ print(peer.status, peer.idle);
 // =SECTION Manual test code
 
 // 3 second idle time:
-TowTruckTestSpy.setIdleTime(3000);
+TogetherJSTestSpy.setIdleTime(3000);
 
 Test.addControl('<div>Trigger activity states:</div>');
 
@@ -38,7 +38,7 @@ Test.addControl($('<input type="text" placeholder="Idle time (milliseconds)">').
   var el = $(event.target);
   if (event.which == 13) {
     var value = parseInt(el.val(), 10);
-    TowTruckTestSpy.setIdleTime(value);
+    TogetherJSTestSpy.setIdleTime(value);
     el.val("");
   }
 }));

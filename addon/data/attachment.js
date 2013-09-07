@@ -4,10 +4,10 @@
 
 self.port.on("Config", function (config) {
   var doc = unsafeWindow.document;
-  unsafeWindow._TowTruckBookmarklet = true;
-  unsafeWindow.TowTruckConfig_hubBase = config.hubBase;
+  unsafeWindow._TogetherJSBookmarklet = true;
+  unsafeWindow.TogetherJSConfig_hubBase = config.hubBase;
   if (config.shareId) {
-    unsafeWindow._TowTruckShareId = config.shareId;
+    unsafeWindow._TogetherJSShareId = config.shareId;
   }
   var script = doc.createElement("script");
   script.src = config.url;

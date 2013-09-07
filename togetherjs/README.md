@@ -1,7 +1,7 @@
-TowTruck client
-===============
+TogetherJS client
+=================
 
-This is all the files for the TowTruck client.
+This is all the files for the TogetherJS client.
 An overview of the modules:
 
 - `libs/`: contains external libraries, sometimes as [git subtree inclusions](https://github.com/apenwarr/git-subtree) and sometimes just copied in.
@@ -14,7 +14,7 @@ An overview of the modules:
 
 - `cursor.js`: handles the shared cursors, both displaying and capturing events.  Also handles clicks.  This *does* include the relevant UI.
 
-- `elementFinder.js`: this generates a description/locator/path for any element, and finds elements based on those paths.  It generates something similar to a CSS selector.  It also includes a function to determine what elements should be ignored (generally TowTruck's own elements).
+- `elementFinder.js`: this generates a description/locator/path for any element, and finds elements based on those paths.  It generates something similar to a CSS selector.  It also includes a function to determine what elements should be ignored (generally TogetherJS's own elements).
 
 - `eventMaker.js`: this creates artificial events, like a fake click event.
 
@@ -36,7 +36,7 @@ An overview of the modules:
 
 - `session.js`: probably the most important and most core module in the system.  This sets up the channels, routes messages, tracks peers, and is used for some communication (like `session.on("ui-ready")` - which is actually signalled by `ui.js` but is fired on the session module).
 
-- `startup.js`: handles the logic of what to display when TowTruck is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session)
+- `startup.js`: handles the logic of what to display when TogetherJS is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session)
 
 - `storage.js`: an abstraction of per-tab and client storage.  Mostly uses `localStorage` (or `sessionStorage`), but designed so it could use an async backed someday, perhaps.
 
@@ -44,7 +44,7 @@ An overview of the modules:
 
 - `templating.js`: handles creating nodes based on DOM templates.  Does some substitution based on specific class names.
 
-- `towtruck.js`: this is the bootstrap code.  It is included on all pages, defines the `TowTruck` variable, and handles configuration and initial loading.
+- `togetherjs.js`: this is the bootstrap code.  It is included on all pages, defines the `TogetherJS` variable, and handles configuration and initial loading.
 
 - `ui.js`: this has most of the UI.  It loads the UI and binds most of the methods.  It's a jumble of UI stuff.  `ui.activateUI()` is the most important function.
 

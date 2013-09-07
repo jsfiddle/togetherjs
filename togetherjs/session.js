@@ -20,11 +20,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // This is the ID that identifies this client:
   session.clientId = null;
   session.router = channels.Router();
-  // Indicates if TowTruck has just started (not continuing from a saved session):
+  // Indicates if TogetherJS has just started (not continuing from a saved session):
   session.firstRun = false;
 
   // This is the key we use for localStorage:
-  var localStoragePrefix = "towtruck.";
+  var localStoragePrefix = "togetherjs.";
   // This is the channel to the hub:
   var channel = null;
 
@@ -39,8 +39,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.hubUrl = function (id) {
     id = id || session.shareId;
-    assert(id, "URL cannot be resolved before TowTruck.shareId has been initialized");
-    return TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + id;
+    assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
+    return TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + id;
   };
 
   session.shareUrl = function () {
@@ -51,16 +51,16 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     if (m) {
       query = m[0];
     }
-    hash = hash.replace(/&?towtruck-[a-zA-Z0-9]+/, "");
+    hash = hash.replace(/&?togetherjs-[a-zA-Z0-9]+/, "");
     hash = hash || "#";
     return location.protocol + "//" + location.host + location.pathname + query +
-           hash + "&towtruck=" + session.shareId;
+           hash + "&togetherjs=" + session.shareId;
   };
 
   session.recordUrl = function () {
     assert(session.shareId);
-    var url = TowTruck.baseUrl.replace(/\/*$/, "") + "/recorder.html";
-    url += "#&towtruck=" + session.shareId + "&hubBase=" + TowTruck.getConfig("hubBase");
+    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+    url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
     return url;
   };
 
@@ -70,7 +70,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   };
 
   session.siteName = function () {
-    return TowTruck.getConfig("siteName") || document.title;
+    return TogetherJS.getConfig("siteName") || document.title;
   };
 
   /****************************************
@@ -80,7 +80,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.hub = util.mixinEvents({});
 
   var IGNORE_MESSAGES = ["cursor-update", "keydown", "scroll-update"];
-  // These are messages sent by clients who aren't "part" of the TowTruck session:
+  // These are messages sent by clients who aren't "part" of the TogetherJS session:
   var MESSAGES_WITHOUT_CLIENTID = ["who", "invite"];
 
   // We ignore incoming messages from the channel until this is true:
@@ -124,7 +124,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       session.hub.emit(msg.type, msg);
-      TowTruck._onmessage(msg);
+      TogetherJS._onmessage(msg);
     };
     channel = c;
     session.router.bindChannel(channel);
@@ -143,8 +143,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.appSend = function (msg) {
     var type = msg.type;
-    if (type.search(/^towtruck\./) === 0) {
-      type = type.substr("towtruck.".length);
+    if (type.search(/^togetherjs\./) === 0) {
+      type = type.substr("togetherjs.".length);
     } else if (type.search(/^app\./) === -1) {
       type = "app." + type;
     }
@@ -210,9 +210,9 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       msg.type = "hello-back";
     } else {
       msg.type = "hello";
-      msg.clientVersion = TowTruck.version;
+      msg.clientVersion = TogetherJS.version;
     }
-    if (! TowTruck.startup.continued) {
+    if (! TogetherJS.startup.continued) {
       msg.starting = true;
     }
     // This is a chance for other modules to effect the hello message:
@@ -231,7 +231,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
 
   function getRoomName(prefix, maxSize) {
-    var findRoom = TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
+    var findRoom = TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
     return $.ajax({
       url: findRoom,
       dataType: "json",
@@ -269,18 +269,18 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       var isClient = true;
       var set = true;
       var sessionId;
-      session.firstRun = ! TowTruck.startup.continued;
+      session.firstRun = ! TogetherJS.startup.continued;
       if (! shareId) {
-        if (TowTruck.startup._joinShareId) {
+        if (TogetherJS.startup._joinShareId) {
           // Like, below, this *also* means we got the shareId from the hash
-          // (in towtruck.js):
-          shareId = TowTruck.startup._joinShareId;
+          // (in togetherjs.js):
+          shareId = TogetherJS.startup._joinShareId;
         }
       }
       if (! shareId) {
-        // FIXME: I'm not sure if this will ever happen, because towtruck.js should
+        // FIXME: I'm not sure if this will ever happen, because togetherjs.js should
         // handle it
-        var m = /&?towtruck=([^&]*)/.exec(hash);
+        var m = /&?togetherjs=([^&]*)/.exec(hash);
         if (m) {
           isClient = ! m[1];
           shareId = m[2];
@@ -289,7 +289,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        var findRoom = TowTruck.getConfig("findRoom");
+        var findRoom = TogetherJS.getConfig("findRoom");
         if (findRoom && typeof findRoom == "string" && ! saved) {
           isClient = true;
           shareId = findRoom;
@@ -312,7 +312,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
             def.resolve(session.shareId);
           });
           return;
-        } else if (TowTruck.startup._launch) {
+        } else if (TogetherJS.startup._launch) {
           if (saved) {
             isClient = saved.reason == "joined";
             if (! shareId) {
@@ -320,7 +320,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
             }
             sessionId = saved.sessionId;
           } else {
-            isClient = TowTruck.startup.reason == "joined";
+            isClient = TogetherJS.startup.reason == "joined";
             assert(! sessionId);
             sessionId = util.generateId();
           }
@@ -329,20 +329,20 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           }
         } else if (saved) {
           isClient = saved.reason == "joined";
-          TowTruck.startup.reason = saved.reason;
-          TowTruck.startup.continued = true;
+          TogetherJS.startup.reason = saved.reason;
+          TogetherJS.startup.continued = true;
           shareId = saved.shareId;
           sessionId = saved.sessionId;
           // The only case when we don't need to set the storage status again is when
           // we're already set to be running
           set = ! saved.running;
         } else {
-          throw new util.AssertionError("No saved status, and no startup._launch request; why did TowTruck start?");
+          throw new util.AssertionError("No saved status, and no startup._launch request; why did TogetherJS start?");
         }
         assert(session.identityId);
         session.clientId = session.identityId + "." + sessionId;
         if (set) {
-          storage.tab.set("status", {reason: TowTruck.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId});
+          storage.tab.set("status", {reason: TogetherJS.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId});
         }
         session.isClient = isClient;
         session.shareId = shareId;
@@ -354,8 +354,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   function initStartTarget() {
     var id;
-    if (TowTruck.startup.button) {
-      id = TowTruck.startup.button.id;
+    if (TogetherJS.startup.button) {
+      id = TogetherJS.startup.button.id;
       if (id) {
         storage.set("startTarget", id);
       }
@@ -364,7 +364,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     storage.get("startTarget").then(function (id) {
       var el = document.getElementById(id);
       if (el) {
-        TowTruck.startup.button = el;
+        TogetherJS.startup.button = el;
       }
     });
   }
@@ -376,7 +376,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         readyForMessages = false;
         openChannel();
         require(["ui"], function (ui) {
-          TowTruck.running = true;
+          TogetherJS.running = true;
           ui.prepareUI();
           require(features, function () {
             $(function () {
@@ -388,7 +388,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
                 startup.start();
               });
               ui.activateUI();
-              if (TowTruck.getConfig("enableAnalytics")) {
+              if (TogetherJS.getConfig("enableAnalytics")) {
                 require(["analytics"], function (analytics) {
                   analytics.activate();
                 });
@@ -396,7 +396,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
               peers._SelfLoaded.then(function () {
                 sendHello(false);
               });
-              TowTruck.emit("ready");
+              TogetherJS.emit("ready");
             });
           });
         });
@@ -405,7 +405,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   };
 
   session.close = function (reason) {
-    TowTruck.running = false;
+    TogetherJS.running = false;
     var msg = {type: "bye"};
     if (reason) {
       msg.reason = reason;
@@ -425,8 +425,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       channel = null;
       session.shareId = null;
       session.emit("shareId");
-      TowTruck.emit("close");
-      TowTruck._teardown();
+      TogetherJS.emit("close");
+      TogetherJS._teardown();
     });
   };
 
@@ -441,7 +441,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     session.emit("resize");
   }
 
-  if (TowTruck.startup._launch) {
+  if (TogetherJS.startup._launch) {
     setTimeout(session.start);
   }
 

@@ -9,8 +9,8 @@ $('#add').click( function() {
   $('#description').val("").change();
   addItem(Description, id);
   save();
-  if (TowTruck.running) {
-    TowTruck.send({type: "new-item", description: Description, id: id});
+  if (TogetherJS.running) {
+    TogetherJS.send({type: "new-item", description: Description, id: id});
   }
   return false;
 });
@@ -34,18 +34,18 @@ function addItem(description, id) {
   $("#todos").append(li);
 }
 
-TowTruck.hub.on("new-item", function (msg) {
+TogetherJS.hub.on("new-item", function (msg) {
   addItem(msg.description, msg.id);
 });
 
-TowTruck.hub.on("init-items", function (msg) {
+TogetherJS.hub.on("init-items", function (msg) {
   msg.items.forEach(function (item) {
     addItem(item.description, item.id);
   });
 });
 
-TowTruck.hub.on("towtruck.hello towtruck.hello-back", function () {
-  TowTruck.send({type: "init-items", items: getItems()});
+TogetherJS.hub.on("togetherjs.hello togetherjs.hello-back", function () {
+  TogetherJS.send({type: "init-items", items: getItems()});
 });
 
 function getItems() {

@@ -9,7 +9,7 @@ Test.require("forms", "session", "ui", "windowing");
 
 printChained(
   Test.resetSettings(),
-  Test.startTowTruck(),
+  Test.startTogetherJS(),
   Test.closeWalkthrough());
 // =>...
 
@@ -17,7 +17,7 @@ var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
 
-windowing.hide("#towtruck-about");
+windowing.hide("#togetherjs-about");
 
 // =SECTION Changes
 
@@ -219,7 +219,7 @@ selected 0 - 7
 */
 
 // form-init should be ignored in some cases...
-print(Date.now() - TowTruck.pageLoaded > 10);
+print(Date.now() - TogetherJS.pageLoaded > 10);
 Test.incoming({
   clientId: "faker",
   type: "form-init",

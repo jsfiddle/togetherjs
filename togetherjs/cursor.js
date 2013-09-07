@@ -32,7 +32,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     constructor: function (clientId) {
       this.clientId = clientId;
       this.element = templating.clone("cursor");
-      this.elementClass = "towtruck-scrolled-normal";
+      this.elementClass = "togetherjs-scrolled-normal";
       this.element.addClass(this.elementClass);
       this.updatePeer(peers.getPeer(clientId));
       this.lastTop = this.lastLeft = null;
@@ -50,10 +50,10 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     updatePeer: function (peer) {
       // FIXME: can I use peer.setElement()?
       this.element.css({color: peer.color});
-      var img = this.element.find("img.towtruck-cursor-img");
+      var img = this.element.find("img.togetherjs-cursor-img");
       img.attr("src", makeCursor(peer.color));
-      var name = this.element.find(".towtruck-cursor-name");
-      var nameContainer = this.element.find(".towtruck-cursor-container");
+      var name = this.element.find(".togetherjs-cursor-name");
+      var nameContainer = this.element.find(".togetherjs-cursor-container");
       assert(name.length);
       name.text(peer.name);
       nameContainer.css({
@@ -68,7 +68,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         this.element.find("svg").animate({
           opacity: 0
         }, 350);
-        this.element.find(".towtruck-cursor-container").animate({
+        this.element.find(".togetherjs-cursor-container").animate({
                 width: 34,
                 height: 20,
                 padding: 12,
@@ -161,12 +161,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         // FIXME: this is a totally arbitrary number, but is meant to be big enough
         // to keep the cursor name from being off the top of the screen.
         top = 25;
-        this.setClass("towtruck-scrolled-above");
+        this.setClass("togetherjs-scrolled-above");
       } else if (top > wTop + height - CURSOR_HEIGHT) {
         top = height - CURSOR_HEIGHT - 5;
-        this.setClass("towtruck-scrolled-below");
+        this.setClass("togetherjs-scrolled-below");
       } else {
-        this.setClass("towtruck-scrolled-normal");
+        this.setClass("togetherjs-scrolled-normal");
       }
       this.element.css({
         top: top,
@@ -184,14 +184,14 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (this.keydownTimeout) {
         clearTimeout(this.keydownTimeout);
       } else {
-        this.element.find(".towtruck-cursor-typing").show().animateKeyboard();
+        this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
       }
       this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
     },
 
     clearKeydown: function () {
       this.keydownTimeout = null;
-      this.element.find(".towtruck-cursor-typing").hide().stopKeyboardAnimation();
+      this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
     },
 
     _destroy: function () {
@@ -249,7 +249,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     lastPosX = pageX;
     lastPosY = pageY;
     var target = event.target;
-    var parent = $(target).closest(".towtruck-window, .towtruck-popup, #towtruck-dock");
+    var parent = $(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
     if (parent.length) {
       target = parent[0];
     } else if (elementFinder.ignoreElement(target)) {
@@ -408,7 +408,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
   });
 
   function documentClick(event) {
-    if (event.towtruckInternal) {
+    if (event.togetherjsInternal) {
       // This is an artificial internal event
       return;
     }
@@ -417,9 +417,9 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
     setTimeout(function () {
-      if (! TowTruck.running) {
-        // This can end up running right after TowTruck has been closed, often
-        // because TowTruck was closed with a click...
+      if (! TogetherJS.running) {
+        // This can end up running right after TogetherJS has been closed, often
+        // because TogetherJS was closed with a click...
         return;
       }
       if (elementFinder.ignoreElement(event.target)) {
@@ -458,7 +458,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
     displayClick({top: top, left: left}, pos.peer.color);
-    var cloneClicks = TowTruck.getConfig("cloneClicks");
+    var cloneClicks = TogetherJS.getConfig("cloneClicks");
     if (cloneClicks && target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
@@ -475,7 +475,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       borderColor: color
     });
     setTimeout(function () {
-      element.addClass("towtruck-clicking");
+      element.addClass("togetherjs-clicking");
     }, 100);
     setTimeout(function () {
       element.remove();
@@ -495,7 +495,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       // FIXME: is event.target interesting here?  That is, *what* the
       // user is typing into, not just that the user is typing?  Also
       // I'm assuming we don't care if the user it typing into a
-      // towtruck-related field, since chat activity is as interesting
+      // togetherjs-related field, since chat activity is as interesting
       // as any other activity.
       session.send({type: "keydown"});
     });

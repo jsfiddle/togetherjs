@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /* This module handles all the different UI that happens (sometimes in order) when
-   TowTruck is started:
+   TogetherJS is started:
 
    - Introduce the session when you've been invited
    - Show any browser compatibility indicators
@@ -58,13 +58,13 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         next();
         return;
       }
-      windowing.show("#towtruck-browser-broken", {
+      windowing.show("#togetherjs-browser-broken", {
         onClose: function () {
           session.close();
         }
       });
       if ($.browser.msie) {
-        $("#towtruck-browser-broken-is-ie").show();
+        $("#togetherjs-browser-broken-is-ie").show();
       }
     },
 
@@ -74,7 +74,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         return;
       }
       var cancel = true;
-      windowing.show("#towtruck-browser-unsupported", {
+      windowing.show("#togetherjs-browser-unsupported", {
         onClose: function () {
           if (cancel) {
             session.close();
@@ -83,7 +83,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
           }
         }
       });
-      $("#towtruck-browser-unsupported-anyway").click(function () {
+      $("#togetherjs-browser-unsupported-anyway").click(function () {
         cancel = false;
       });
     },
@@ -93,19 +93,19 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         next();
         return;
       }
-      if (TowTruck.getConfig("suppressJoinConfirmation")) {
+      if (TogetherJS.getConfig("suppressJoinConfirmation")) {
         next();
         return;
       }
       var cancelled = false;
-      windowing.show("#towtruck-intro", {
+      windowing.show("#togetherjs-intro", {
         onClose: function () {
           if (! cancelled) {
             next();
           }
         }
       });
-      $("#towtruck-intro .towtruck-modal-dont-join").click(function () {
+      $("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
         cancelled = true;
         windowing.hide();
         session.close("declined-join");
@@ -133,7 +133,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         return;
       }
       require(["windowing"], function (windowing) {
-        windowing.show("#towtruck-share");
+        windowing.show("#togetherjs-share");
         // FIXME: no way to detect when the window is closed
         // If there was a next() step then it would not work
       });

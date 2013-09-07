@@ -90,11 +90,11 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
           text: "Testing with walkabout.js"
         });
         var tmpl = $(templates.walkabout);
-        var container = ui.container.find(".towtruck-test-container");
+        var container = ui.container.find(".togetherjs-test-container");
         container.empty();
         container.append(tmpl);
         container.show();
-        var statusContainer = container.find(".towtruck-status");
+        var statusContainer = container.find(".togetherjs-status");
         statusContainer.text("starting...");
         this._testCancel = Walkabout.runManyActions({
           ondone: function () {
@@ -211,7 +211,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
             text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
           });
         });
-      windowing.hide("#towtruck-chat");
+      windowing.hide("#togetherjs-chat");
     },
 
     command_savelogs: function (name) {
@@ -250,7 +250,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       }
       url = url.replace(/\/*$/, "");
       ui.chat.system({
-        text: "If this goes wrong, do this in the console to reset:\n  localStorage.setItem('towtruck.baseUrlOverride', null)"
+        text: "If this goes wrong, do this in the console to reset:\n  localStorage.setItem('togetherjs.baseUrlOverride', null)"
       });
       storage.set("baseUrlOverride", {
         baseUrl: url,

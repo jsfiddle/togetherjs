@@ -6,7 +6,7 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
   var util = {};
 
   util.Deferred = $.Deferred;
-  TowTruck.$ = $;
+  TogetherJS.$ = $;
 
   /* A simple class pattern, use like:
 
@@ -62,7 +62,7 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
   };
 
   /* Extends obj with other, or copies obj if no other is given. */
-  util.extend = TowTruck._extend;
+  util.extend = TogetherJS._extend;
 
   util.forEachAttr = function (obj, callback, context) {
     context = context || obj;
@@ -118,7 +118,7 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
     return array[Math.floor(Math.random() * array.length)];
   };
 
-  util.mixinEvents = TowTruck._mixinEvents;
+  util.mixinEvents = TogetherJS._mixinEvents;
 
   util.Module = util.Class({
     constructor: function (name) {
@@ -266,11 +266,11 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
   };
 
   util.testExpose = function (objs) {
-    if (typeof TowTruckTestSpy == "undefined") {
+    if (typeof TogetherJSTestSpy == "undefined") {
       return;
     }
     util.forEachAttr(objs, function (value, attr) {
-      TowTruckTestSpy[attr] = value;
+      TogetherJSTestSpy[attr] = value;
     });
   };
 

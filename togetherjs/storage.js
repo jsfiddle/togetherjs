@@ -117,7 +117,7 @@ define(["util"], function (util) {
 
   });
 
-  var storage = Storage('localStorage', localStorage, "towtruck.");
+  var storage = Storage('localStorage', localStorage, "togetherjs.");
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -134,7 +134,7 @@ define(["util"], function (util) {
 
   });
 
-  storage.tab = Storage('sessionStorage', sessionStorage, "towtruck-session.");
+  storage.tab = Storage('sessionStorage', sessionStorage, "togetherjs-session.");
 
   return storage;
 });
