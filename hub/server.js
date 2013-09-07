@@ -188,7 +188,7 @@ wsServer.on('request', function(request) {
 
   // FIXME: we should use a protocol here instead of null, but I can't
   // get it to work.  "Protocol" is what the two clients are using
-  // this channel for, "towtruck" in this case.
+  // this channel for (we don't bother to specify this)
   var connection = request.accept(null, request.origin);
   connection.ID = ID++;
   if (! allConnections[id]) {
