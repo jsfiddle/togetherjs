@@ -27,13 +27,16 @@ function($, util, session, elementFinder){
     };
 
     function getEventSender (eventName) {
-        return function (event) {
+        return function (event, options) {
             var element = event.target;
-            session.send({
-                type: ('video-'+eventName),
-                location: elementFinder.elementLocation(element),
-                position: element.currentTime
-            });
+            options || (options = {});
+            if (!options.silent) {
+                session.send({
+                    type: ('video-'+eventName),
+                    location: elementFinder.elementLocation(element),
+                    position: element.currentTime
+                });
+            }
         }
     };
 
@@ -87,14 +90,13 @@ function($, util, session, elementFinder){
             var element = $findElement(msg.location);
 
             setTime(element, msg.position);
-            //UI tested in chromium:
-            //this won't trigger an infinite event loop
-            element.trigger(eventName);
+
+            element.trigger(eventName, {silent: true});
         });
     })
 
     function $findElement (location) {
-        return $(elementFinder.findElement(msg.location));
+        return $(elementFinder.findElement(location));
     }
 
     function setTime (video, time) {
