@@ -26,6 +26,17 @@ function($, util, session, elementFinder){
         });
     };
 
+    function getEventSender (eventName) {
+        return function (event) {
+            var element = event.target;
+            session.send({
+                type: ('video-'+eventName),
+                location: elementFinder.elementLocation(element),
+                position: element.currentTime
+            });
+        }
+    };
+
     function setupTimeSync (videos) {
         var onTimeUpdate = getTimeUpdater();
         videos.on(TIME_UPDATE, onTimeUpdate);
@@ -41,19 +52,6 @@ function($, util, session, elementFinder){
             }
             last = currentTime;
         };
-    };
-
-    function getEventSender (eventName) {
-        return function (event) {
-            var element = event.target;
-            session.send({
-                type: ('video-'+eventName),
-                //'this' should refer to the video element grabbed by
-                //jquery, but watch out for this
-                location: elementFinder.elementLocation(element),
-                position: element.currentTime
-            });
-        }
     };
 
     function areTooFarApart (currentTime, lastTime) {
@@ -74,8 +72,7 @@ function($, util, session, elementFinder){
 
 
     session.hub.on('video-timeupdate', function (msg) {
-        var element = elementFinder.findElement(msg.position),
-        onTimeUpdate = listeners[TIME_UPDATE],
+        var element = $findElement(msg.location),
         oldTime = element.prop('currentTime'),
         newTime = msg.position;
 
@@ -87,14 +84,18 @@ function($, util, session, elementFinder){
 
     MIRRORED_EVENTS.forEach( function (eventName) {
         session.hub.on("video-"+eventName, function (msg) {
-            var element = elementFinder.findElement(msg.location),
-            state = lookupState(msg);
+            var element = $findElement(msg.location);
+
             setTime(element, msg.position);
             //UI tested in chromium:
             //this won't trigger an infinite event loop
             element.trigger(eventName);
         });
     })
+
+    function $findElement (location) {
+        return $(elementFinder.findElement(msg.location));
+    }
 
     function setTime (video, time) {
         video.prop('currentTime', time);
