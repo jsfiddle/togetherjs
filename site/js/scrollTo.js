@@ -10,8 +10,7 @@
             }
           }
         })
-      
-
+        
         var $root = $('html, body');
 
         // unique nav tag here for HOME PAGE

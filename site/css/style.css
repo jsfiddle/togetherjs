@@ -1072,6 +1072,23 @@ dd {
   margin-top: 40px;
 }
 
+#sidenav .well .btn {
+  margin-bottom: 10px;
+}
+
+#sectionmenu {
+  border: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel {
+  border:0px;
+  box-shadow: none;
+}
+
 #markdownpages #sidenav.panel .panel-heading {
   background: #fff;
   border-bottom: none;
