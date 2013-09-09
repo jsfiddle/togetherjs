@@ -725,6 +725,15 @@ h5 {
     top: 25%;
     left: 50%;
   }
+  
+  #footer a {
+    font-size: 11px;
+  }
+  
+  #footer a img {
+    width: 60px;
+    height: 10px;
+  }
 
 }
 
@@ -763,6 +772,11 @@ h5 {
 
   a#tabzilla {
     display: inherit;
+  }
+  
+  #footer a img {
+    width: 100px;
+    height: 17px;
   }
 
 
@@ -808,6 +822,11 @@ h5 {
 
   a#tabzilla {
     display: inherit;
+  }
+  
+  #footer a img {
+    width: 141px;
+    height: 24px;
   }
 
 }
@@ -940,6 +959,7 @@ h5 {
     max-width: 735px;
   }
 }*/
+
 
 /* Source-specific styles */
 
@@ -1089,19 +1109,19 @@ dd {
   box-shadow: none;
 }
 
-#markdownpages #sidenav.panel .panel-heading {
+#sidenav.panel .panel-heading {
   background: #fff;
   border-bottom: none;
   font-weight: 700;
 }
 
-#markdownpages #sidenav .affix {
+#sidenav .affix {
   width: 263px;
   position: fixed;
 }
 
 @media (min-width: 1200px) {
-  #markdownpages .affix, #markdownpages .affix-bottom {
+  .affix, .affix-bottom {
     width: 263px !important;
     position: fixed !important;
   }
@@ -1111,10 +1131,10 @@ dd {
 }
 
 @media (min-width: 992px) {
-  #markdownpages .affix, #markdownpages .affix-bottom {
+  .affix, .affix-bottom {
     width: 213px;
   }
-  #markdownpages .affix {
+  .affix {
     position: fixed !important;
   }
   .col-md-9 h1:first-child {
@@ -1123,7 +1143,7 @@ dd {
 }
 
 @media (min-width: 768px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {
@@ -1132,7 +1152,7 @@ dd {
 }
 
 @media (min-width: 480px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {
@@ -1141,7 +1161,7 @@ dd {
 }
 
 @media (max-width: 480px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {
