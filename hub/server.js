@@ -209,6 +209,10 @@ wsServer.on('request', function(request) {
   connectionStats[id].connections++;
   connectionStats[id].lastLeft = null;
   logger.info((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
+  connection.sendUTF(JSON.stringify({
+    type: "init-connection",
+    peerCount: allConnections[id].length-1
+  }));
   connection.on('message', function(message) {
     var parsed = JSON.parse(message.utf8Data);
     connectionStats[id].clients[parsed.clientId] = true;

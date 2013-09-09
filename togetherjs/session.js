@@ -81,13 +81,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   var IGNORE_MESSAGES = ["cursor-update", "keydown", "scroll-update"];
   // These are messages sent by clients who aren't "part" of the TogetherJS session:
-  var MESSAGES_WITHOUT_CLIENTID = ["who", "invite"];
+  var MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
 
   // We ignore incoming messages from the channel until this is true:
   var readyForMessages = false;
 
   function openChannel() {
-    assert(! channel);
+    assert(! channel, "Attempt to re-open channel");
     console.info("Connecting to", session.hubUrl(), location.href);
     var c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = function (msg) {

@@ -9,11 +9,16 @@ define(["util", "channels", "session", "ui"], function (util, channels, session,
 
   who.getList = function (hubUrl) {
     return util.Deferred(function (def) {
+      var expected;
       var channel = channels.WebSocketChannel(hubUrl);
       var users = {};
+      var responded = 0;
       var firstResponse = 0;
       var lateResponseTimeout;
       channel.onmessage = function (msg) {
+        if (msg.type == "init-connection") {
+          expected = msg.peerCount;
+        }
         if (msg.type == "who") {
           // Our message back to ourselves probably
           firstResponse = setTimeout(function () {
@@ -21,8 +26,15 @@ define(["util", "channels", "session", "ui"], function (util, channels, session,
           }, MAX_LATE_RESPONSE);
         }
         if (msg.type == "hello-back") {
-          users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
-          def.notify(users);
+          if (! users[msg.clientId]) {
+            users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
+            responded++;
+            if (expected && responded >= expected) {
+              close();
+            } else {
+              def.notify(users);
+            }
+          }
         }
         console.log("users", users);
       };

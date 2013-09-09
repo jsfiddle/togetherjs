@@ -3,7 +3,7 @@
 
         // hero image swap
         // $("img.swap1")
-        //      .mouseover(function() { 
+        //      .mouseover(function() {
         //          $(this).fadeIn("slow", function(){
         //            var src = $(this).attr("src").match(/[^\.]+/) + "-overlay.png";
         //            $(this).attr("src", src);
@@ -13,9 +13,9 @@
         //          var src = $(this).attr("src").replace("-overlay.png", ".png");
         //          $(this).attr("src", src);
         //      });
-        
-        
-        
+
+
+
         // detect a mobile device
         var isMobile = {
             Android: function() {
@@ -63,7 +63,7 @@
             });
 
           }
-          
+
     })
 }(window.jQuery)
 
@@ -71,12 +71,12 @@
 
 
 
-// hover effect over video player  
+// hover effect over video player
   // $('#main-image').on('mouseenter', function() {
   //         $(this).fadeOut('slow');
   //         $('#main-image-overlay').fadeIn('slow');
   // });
-  // 
+  //
   // $('#main-image-overlay').css({left: $('#main-image').position().left, top: $('#main-image').position().top})
   //            .on('mouseleave', function() {
   //         $(this).fadeOut('slow');
@@ -86,10 +86,36 @@
 
 // press Escape to close the video player
 // $(document).keyup(function(e) {
-// 
+//
 //   if (e.keyCode == 27) {
 //     $( "#marketing-video" ).fadeOut();
 //   }   // esc
-// 
+//
 // });
 
+// Handler for the Get Help button, to check that help is actually available
+$(function () {
+  var inviteChannel = "https://hub.towtruck.mozillalabs.com/hub/developers";
+  inviteChannel = "http://localhost:8080/hub/developers";
+  var $help = $("#get-help");
+  if (! $help.length) {
+    // No button on this page
+    return;
+  }
+  $help.click(TogetherJS);
+  TogetherJS.checkForUsersOnChannel(inviteChannel, function (n) {
+    if (n === 0) {
+      $help.prop("disabled", true);
+      $help.attr("title", "Sorry, no one is currently available");
+      // FIXME: should grey out the invite text too
+      $("#nobody-home").show();
+    }
+  });
+  TogetherJS.on("ready", function () {
+    TogetherJS.require(["who", "session"], function (who, session) {
+      if (session.firstRun) {
+        who.invite(inviteChannel, null);
+      }
+    });
+  });
+});

@@ -128,7 +128,8 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
     },
 
     share: function (next) {
-      if (session.isClient || ! session.firstRun) {
+      if (session.isClient || (! session.firstRun) ||
+          TogetherJS.getConfig("suppressInvite")) {
         next();
         return;
       }

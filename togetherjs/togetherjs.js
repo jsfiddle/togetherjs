@@ -431,6 +431,8 @@
     // If true, then the "Join TogetherJS Session?" confirmation dialog
     // won't come up
     suppressJoinConfirmation: false,
+    // If true, then the "Invite a friend" window won't automatically come up
+    suppressInvite: false,
     // A room in which to find people to invite to this session,
     inviteFromRoom: null
   };
@@ -574,6 +576,36 @@
       document.addEventListener("keyup", listener, false);
       listener = null;
     }
+  };
+
+  TogetherJS.checkForUsersOnChannel = function (address, callback) {
+    if (address.search(/^https?:/i) === 0) {
+      address = address.replace(/^http/i, 'ws');
+    }
+    var socket = new WebSocket(address);
+    var gotAnswer = false;
+    socket.onmessage = function (event) {
+      var msg = JSON.parse(event.data);
+      if (msg.type != "init-connection") {
+        console.warn("Got unexpected first message (should be init-connection):", msg);
+        return;
+      }
+      if (gotAnswer) {
+        console.warn("Somehow received two responses from channel; ignoring second");
+        socket.close();
+        return;
+      }
+      gotAnswer = true;
+      socket.close();
+      callback(msg.peerCount);
+    };
+    socket.onclose = socket.onerror = function () {
+      if (! gotAnswer) {
+        console.warn("Socket was closed without receiving answer");
+        gotAnswer = true;
+        callback(undefined);
+      }
+    };
   };
 
   // It's nice to replace this early, before the load event fires, so we conflict
