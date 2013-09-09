@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder) {
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -929,6 +929,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       ui.chat.scroll();
       var doNotify = !! notify;
       var section = popup.find("#togetherjs-chat-notifier-message");
+      if (notify && visibilityApi.hidden()) {
+        ui.container.find("#togetherjs-notification")[0].play();
+      }
       if (id && section.data("message-id") == id) {
         doNotify = true;
       }

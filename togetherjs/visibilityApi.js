@@ -8,8 +8,8 @@
    it.
    */
 
-define(["session"], function (session) {
-
+define(["util", "session"], function (util, session) {
+  var visibilityApi = util.Module("visibilityApi");
   var hidden;
   var visibilityChange;
   if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
@@ -38,4 +38,9 @@ define(["session"], function (session) {
     session.emit("visibility-change", document[hidden]);
   }
 
+  visibilityApi.hidden = function () {
+    return document[hidden];
+  };
+
+  return visibilityApi;
 });

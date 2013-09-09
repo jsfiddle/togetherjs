@@ -1,4 +1,4 @@
-# Contributing to TogetherJS
+# Contributing and Developing TogetherJS
 
 <!--
 template: docs-contributing.tmpl

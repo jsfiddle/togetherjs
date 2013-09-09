@@ -8,23 +8,6 @@
 <div class="container">
 
     <section class="row" id="sourcecode">
-      
-      <div class="col-md-3" id="source-toc">
-        <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
-          <div class="panel-heading">Source Code</div>
-          <ul class="nav" id="sectionmenu">
-            {% for source in sourceList %}
-              <li><a href="{{ source.link }}">{{ source.name }}</a></li>
-            {% endfor %}
-          </ul>
-          <div class="well">
-            <button type="button" class="btn btn-primary btn-lg btn-block">
-              Get help
-            </button>
-            <div class="small text-center">Get support from the TogetherJS team.</div>
-          </div>
-        </div>
-      </div>
 
       <div class="col-md-9" id="source-content">
         <h1>TogetherJS Source Code</h1>
