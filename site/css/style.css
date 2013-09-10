@@ -1166,6 +1166,7 @@ dd {
 .panel {
   border:0px;
   box-shadow: none;
+  background: none;
 }
 
 #sidenav.panel .panel-heading {
