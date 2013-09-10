@@ -14,22 +14,22 @@ function($, util, session, elementFinder){
 
   session.on("ui-ready", setupListeners);
 
-  function setupListeners () {
+  function setupListeners() {
     var videos = $('video');
     setupMirroredEvents(videos);
     setupTimeSync(videos);
   };
 
-  function setupMirroredEvents (videos) {
+  function setupMirroredEvents(videos) {
     var currentListener;
     MIRRORED_EVENTS.forEach(function (eventName) {
-      currentListener = getEventSender(eventName);
+      currentListener = makeEventSender(eventName);
       videos.on(eventName, currentListener);
       listeners[eventName] = currentListener;
     });
   };
 
-  function getEventSender (eventName) {
+  function makeEventSender(eventName) {
     return function (event, options) {
       var element = event.target;
       options || (options = {});
@@ -43,27 +43,27 @@ function($, util, session, elementFinder){
     }
   };
 
-  function setupTimeSync (videos) {
+  function setupTimeSync(videos) {
     listeners[TIME_UPDATE] || (listeners[TIME_UPDATE] = []);
     videos.each(function(i, video) {
-      var onTimeUpdate = getTimeUpdater();
+      var onTimeUpdate = makeTimeUpdater();
       $(video).on(TIME_UPDATE, onTimeUpdate);
       listeners[TIME_UPDATE].push(onTimeUpdate);
     });
   };
 
-  function getTimeUpdater () {
+  function makeTimeUpdater() {
     var last = 0;
     return function (event) {
       var currentTime = event.target.currentTime;
       if(areTooFarApart(currentTime, last)){
-        getEventSender(TIME_UPDATE)(event);
+        makeEventSender(TIME_UPDATE)(event);
       }
       last = currentTime;
     };
   };
 
-  function areTooFarApart (currentTime, lastTime) {
+  function areTooFarApart(currentTime, lastTime) {
     var secDiff = Math.abs(currentTime - lastTime);
     var milliDiff = secDiff * 1000;
     return milliDiff > TOO_FAR_APART;
@@ -71,7 +71,7 @@ function($, util, session, elementFinder){
 
   session.on("close", unsetListeners);
 
-  function unsetListeners () {
+  function unsetListeners() {
     var videos = $('video');
     Object.keys(listeners).forEach(function (eventName) {
       var listener = listeners[eventName];
@@ -108,11 +108,11 @@ function($, util, session, elementFinder){
     });
   })
 
-  function $findElement (location) {
+  function $findElement(location) {
     return $(elementFinder.findElement(location));
   }
 
-  function setTime (video, time) {
+  function setTime(video, time) {
     video.prop('currentTime', time);
   }
 
