@@ -96,7 +96,7 @@ module.exports = function (grunt) {
           //the end user use requirejs.
           wrap: {
             start: "(function() {",
-            end: "TogetherJS.require = TogetherJS._requireObject = require;\nrequire([\"session\"]);\n}());"
+            end: "TogetherJS.require = TogetherJS._requireObject = require;\nTogetherJS._loaded = true;\nrequire([\"session\"]);\n}());"
           },
           optimize: "none",
           out: function writer(text) {
@@ -188,7 +188,7 @@ module.exports = function (grunt) {
   // For some reason doing ["build", "buildsite", "watch:site"]
   // doesn't work, it gets through buildsite and doesn't watch;
   // instead just doing watch:site seems okay:
-  grunt.registerTask("sitewatch", ["watch:site"]);
+  grunt.registerTask("sitewatch", ["buildsite", "watch:site"]);
 
   function escapeString(s) {
     if (typeof s != "string") {
@@ -395,7 +395,6 @@ module.exports = function (grunt) {
   }
 
   grunt.registerTask("docco", "Create comment-separating source code", function () {
-    var done = this.async();
     var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("site/"));
     var sources = grunt.file.expand({cwd: "togetherjs/"}, "*.js");
     sources.sort();
