@@ -10,7 +10,10 @@ function($, util, session, elementFinder){
 
   var TOO_FAR_APART = 3000;
 
-  session.on("reinitialize", setupListeners);
+  session.on("reinitialize", function () {
+    unsetListeners();
+    setupListeners();
+  });
 
   session.on("ui-ready", setupListeners);
 
