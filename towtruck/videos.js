@@ -2,7 +2,7 @@
 define(["jquery", "util", "session", "elementFinder"],
 function($, util, session, elementFinder){
 
-  var listeners = {};
+  var listeners = [];
 
   var TIME_UPDATE = 'timeupdate';
   var MIRRORED_EVENTS = ['play', 'pause'];
@@ -27,7 +27,10 @@ function($, util, session, elementFinder){
     MIRRORED_EVENTS.forEach(function (eventName) {
       currentListener = makeEventSender(eventName);
       videos.on(eventName, currentListener);
-      listeners[eventName] = currentListener;
+      listeners.push({
+        name: eventName,
+        listener: currentListener
+      });
     });
   };
 
@@ -46,11 +49,13 @@ function($, util, session, elementFinder){
   };
 
   function setupTimeSync(videos) {
-    listeners[TIME_UPDATE] || (listeners[TIME_UPDATE] = []);
     videos.each(function(i, video) {
       var onTimeUpdate = makeTimeUpdater();
       $(video).on(TIME_UPDATE, onTimeUpdate);
-      listeners[TIME_UPDATE].push(onTimeUpdate);
+      listeners.push({
+        name: TIME_UPDATE,
+        listener: onTimeUpdate
+      });
     });
   };
 
@@ -75,17 +80,10 @@ function($, util, session, elementFinder){
 
   function unsetListeners() {
     var videos = $('video');
-    Object.keys(listeners).forEach(function (eventName) {
-      var listener = listeners[eventName];
-      if (listener instanceof Array) {
-        listener.forEach(function (fn) {
-          videos.off(eventName, fn);
-        });
-      } else {
-        videos.off(eventName, listener);
-      }
+    listeners.forEach(function (event) {
+        videos.off(event.name, event.listener);
     });
-    listeners = {};
+    listeners = [];
   };
 
 
