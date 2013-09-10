@@ -96,7 +96,7 @@ The button you add to your site to start TogetherJS will typically look like thi
 
 See the page [Extending TogetherJS](https://github.com/mozilla/togetherjs/wiki/Extending-TogetherJS)
 
-# About Audio Chat and WebRTC
+## About Audio Chat and WebRTC
 
 The live audio chat is based on [WebRTC](http://www.webrtc.org/).  This is a very new technology, built into some new browsers.
 
@@ -108,21 +108,21 @@ To see a summary of outstanding issues that we know of with audio chat see [this
 
 Note that audio chat will not work between some networks.  These networks require a [TURN server](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) which unfortunately we do not have allocated (and full support for TURN has not landed in some browsers).  Unfortunately when the network makes chat impossible, chat will simply not work – we don't receive an error, and can't tell you why chat is not working.  See [#327](https://github.com/mozilla/togetherjs/issues/327) for progress.
 
-# Addons
+## Addons
 
 There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
 
 This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn't integrated `togetherjs-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `togetherjs-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&togetherjs=...` (the code used in the share link) it will automatically turn TogetherJS on for the tab.
 
-## Installing
+### Installing
 
 A simple way to install is simply to [click this link](http://togetherjs.mozillalabs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
 
-## Building
+### Building
 
 You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder).  Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
 
-# Extending TogetherJS
+## Extending TogetherJS
 
 This page documents some of the ways you can customize the TogetherJS experience on your site.  Especially how you can extend TogetherJS to synchronize parts of your application that require special treatment.
 
@@ -288,7 +288,7 @@ If any of these values are updated while in the page (like if you have a login p
 
 See [#504](https://github.com/mozilla/togetherjs/issues/504) for a bug related to improving this support.
 
-## `TogetherJS.reinitialize()`
+## TogetherJS.reinitialize&#40;&#41;
 
 You can run this to try to reinitialize anything TogetherJS initializes on page load.  In particular you can use it if there are new textareas or code editors that should be sync'd, but were added dynamically to the page.  E.g.:
 
@@ -355,13 +355,13 @@ session.hub.on("my-custom-type", function (msg) {
 
 I.e., `session.send()` and `session.hub.on()`.  As you can see the messages are dispatched based on `msg.type`.  These messages are broadcasted to all other participants.  Note that the messages are *always* sent, even if the other person is at a different URL.  To check if an incoming message comes from a person on the same page as you, check `msg.sameUrl` (`msg.url` shows the actual URL of the other person).
 
-# Getting a static copy of the client
+## Getting a static copy of the client
 
 You may also want a static copy of the client that you can host yourself.  Run `grunt build` to create a static copy of the TogetherJS library in `build/` (use `--dest` to control the output location, and `--exclude-tests` to avoid including the tests in your version).
 
 The hub changes quite infrequently, so if you just stability then making a static copy of the client will do it for you.  This option is highly recommended for production!
 
-# Browser Support
+## Browser Support
 
 TogetherJS is intended for relatively newer browsers.  Especially as we experiment with what we're doing, supporting older browsers causes far more challenge than it is an advantage.
 
@@ -371,7 +371,7 @@ The bare minimum that we've identified for TogetherJS is [WebSocket support](htt
 
 With IE 10 it is *possible* to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don't plan to address bug reports for Internet Explorer that don't come with a pull request.  If Internet Explorer support is important to you we do [welcome your feedback](https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).  No decision is set in stone, but we don't want to mislead you with respect to our current priorities and intentions.
 
-# Supported Browsers
+## Supported Browsers
 
 We recommend the most recent release of [Firefox](http://www.mozilla.org/en-US/firefox/new/) or [Chrome](https://www.google.com/intl/en/chrome/browser/).
 
@@ -379,20 +379,20 @@ If you want to have [WebRTC support](https://github.com/mozilla/togetherjs/wiki/
 
 We haven't done much testing on mobile (yet!) and cannot recommend anything there.
 
-# Getting Help
+## Getting Help
 
-## IRC / Live Chat
+### IRC / Live Chat
 
 We are available on the `#togetherjs` channel on `irc.mozilla.org`
 
 If you don't use IRC, you can quickly join the chat from the web [using kiwiirc](https://kiwiirc.com/client/irc.mozilla.org/togetherjs).
 
-## Issues
+### Issues
 
 Please submit any issues you have via [the Github issue tracker](https://github.com/mozilla/togetherjs/issues/new).
 
 Don't be shy about opening an issue.  If you have a question or feature request that might already be possible, we can exchange comments via the issue tracker to figure it out.  We don't have a mailing list, so issues are a good way to keep a persistent record of these exchanges.
 
-## Email
+### Email
 
 Feel free to email us at [togetherjs@mozilla.com](mailto:togetherjs@mozilla.com) with any questions, suggestions, or concerns.

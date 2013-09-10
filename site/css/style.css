@@ -1077,15 +1077,22 @@ dd {
 }
 
 #markdownpages h2 {
-  margin-bottom: 18px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 36px;
 }
 
 #markdownpages h3 {
-  margin-bottom: 18px;
+  font-size: 24px;
 }
 
 #markdownpages pre {
   margin: 10px 0 20px;
+}
+
+#markdownpages ul li {
+  font-size: 14px;
+  font-family: 'Open Sans',sans-serif;
 }
 
 #markdownpages #sidenav {

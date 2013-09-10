@@ -57,7 +57,7 @@ var instance = MyClass();
 
 The `constructor` function is called when the object is instantiated.  You don't need to use `new` when creating instances, and really you shouldn't (it'll just create an object that'll be thrown away).  MyClass.prototype is what you would expect.
 
-### `this`
+### this
 
 You should understand how `this` is bound, and how that binding is lost.
 
