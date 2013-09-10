@@ -314,13 +314,47 @@ h5 {
   margin: 40px 0px;
 }
 
+#main-section h3 {
+  color: rgb(22, 22, 22);
+  font-family: 'Open Sans Light',sans-serif;
+  font-size: 32px;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 100;
+  margin: 40px 0px 20px;
+}
+
+#main-section p {
+  color: rgb(22, 22, 22);
+  font-family: 'Open Sans Light',sans-serif;
+  font-size: 16px;
+  line-height: 27px;
+}
+
+#main-section h4 {
+  margin-top: 20px;
+  font-family: openSansBold, sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 16px;
+}
+
 /* =tour section
 ----------------------------------------------- */
 
-#main-section #tour img.why-section {
-  width: 50%;
-  height: 50%;
+#main-section img.why-section {
+  width: 40%;
+  height: 40%;
   margin: 0 auto;
+}
+
+#tour h3 {
+  margin-top: 60px;
+  margin-bottom: 10px;
 }
 
 .why-connect-01 img {
@@ -654,6 +688,11 @@ h5 {
   h2 {
     font-size: 28px;
     line-height: 30px;
+  }
+  
+  #main-section h3 {
+    font-size: 24px;
+    line-height: 26px;
   }
 
   h3 {
