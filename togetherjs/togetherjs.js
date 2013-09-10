@@ -109,15 +109,19 @@
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
     TogetherJS.startup.button = null;
-    if (event && typeof event == "object") {
-      if (event.target && typeof event) {
-        TogetherJS.startup.button = event.target;
-      } else if (event.nodeType == 1) {
-        TogetherJS.startup.button = event;
-      } else if (event[0] && event[0].nodeType == 1) {
-        // Probably a jQuery element
-        TogetherJS.startup.button = event[0];
+    try {
+      if (event && typeof event == "object") {
+        if (event.target && typeof event) {
+          TogetherJS.startup.button = event.target;
+        } else if (event.nodeType == 1) {
+          TogetherJS.startup.button = event;
+        } else if (event[0] && event[0].nodeType == 1) {
+          // Probably a jQuery element
+          TogetherJS.startup.button = event[0];
+        }
       }
+    } catch (e) {
+      console.warn("Error determining starting button:", e);
     }
     if (window.TogetherJSConfig && (! window.TogetherJSConfig.loaded)) {
       TogetherJS.config(window.TogetherJSConfig);
