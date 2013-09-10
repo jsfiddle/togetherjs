@@ -7,7 +7,7 @@
 
   var styleSheet = "/togetherjs/togetherjs.css";
 
-  var baseUrl = "https://togetherjs.mozillalabs.com";
+  var baseUrl = "http://towtruck-staging.herokuapp.com/"
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
@@ -391,7 +391,7 @@
     return "TogetherJS";
   };
 
-  var defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
+  var defaultHubBase = "https://hub.towtruck.mozillalabs.com";
   if (defaultHubBase == "__" + "hubUrl"+ "__") {
     // Substitution wasn't made
     defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
