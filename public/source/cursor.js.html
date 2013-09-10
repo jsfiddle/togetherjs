@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>cursor.js</h1>
         
-          <h4>Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.</h4>
+          <h4><p>Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/cursor.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/cursor.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -257,7 +258,7 @@ when the peer goes to another URL</p>
     constructor: <span class="function"><span class="keyword">function</span> <span class="params">(clientId)</span> {</span>
       <span class="keyword">this</span>.clientId = clientId;
       <span class="keyword">this</span>.element = templating.clone(<span class="string">"cursor"</span>);
-      <span class="keyword">this</span>.elementClass = <span class="string">"towtruck-scrolled-normal"</span>;
+      <span class="keyword">this</span>.elementClass = <span class="string">"togetherjs-scrolled-normal"</span>;
       <span class="keyword">this</span>.element.addClass(<span class="keyword">this</span>.elementClass);
       <span class="keyword">this</span>.updatePeer(peers.getPeer(clientId));
       <span class="keyword">this</span>.lastTop = <span class="keyword">this</span>.lastLeft = <span class="literal">null</span>;
@@ -296,10 +297,10 @@ user typing.  This should be more than MIN_KEYDOWN_TIME:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>.element.css({color: peer.color});
-      <span class="keyword">var</span> img = <span class="keyword">this</span>.element.find(<span class="string">"img.towtruck-cursor-img"</span>);
+      <span class="keyword">var</span> img = <span class="keyword">this</span>.element.find(<span class="string">"img.togetherjs-cursor-img"</span>);
       img.attr(<span class="string">"src"</span>, makeCursor(peer.color));
-      <span class="keyword">var</span> name = <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-name"</span>);
-      <span class="keyword">var</span> nameContainer = <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-container"</span>);
+      <span class="keyword">var</span> name = <span class="keyword">this</span>.element.find(<span class="string">".togetherjs-cursor-name"</span>);
+      <span class="keyword">var</span> nameContainer = <span class="keyword">this</span>.element.find(<span class="string">".togetherjs-cursor-container"</span>);
       assert(name.length);
       name.text(peer.name);
       nameContainer.css({
@@ -336,7 +337,7 @@ user typing.  This should be more than MIN_KEYDOWN_TIME:</p>
                 <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.element.find(<span class="string">"svg"</span>).animate({
           opacity: <span class="number">0</span>
         }, <span class="number">350</span>);
-        <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-container"</span>).animate({
+        <span class="keyword">this</span>.element.find(<span class="string">".togetherjs-cursor-container"</span>).animate({
                 width: <span class="number">34</span>,
                 height: <span class="number">20</span>,
                 padding: <span class="number">12</span>,
@@ -494,12 +495,12 @@ to keep the cursor name from being off the top of the screen.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>        top = <span class="number">25</span>;
-        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-above"</span>);
+        <span class="keyword">this</span>.setClass(<span class="string">"togetherjs-scrolled-above"</span>);
       } <span class="keyword">else</span> <span class="keyword">if</span> (top &gt; wTop + height - CURSOR_HEIGHT) {
         top = height - CURSOR_HEIGHT - <span class="number">5</span>;
-        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-below"</span>);
+        <span class="keyword">this</span>.setClass(<span class="string">"togetherjs-scrolled-below"</span>);
       } <span class="keyword">else</span> {
-        <span class="keyword">this</span>.setClass(<span class="string">"towtruck-scrolled-normal"</span>);
+        <span class="keyword">this</span>.setClass(<span class="string">"togetherjs-scrolled-normal"</span>);
       }
       <span class="keyword">this</span>.element.css({
         top: top,
@@ -517,14 +518,14 @@ to keep the cursor name from being off the top of the screen.</p>
       <span class="keyword">if</span> (<span class="keyword">this</span>.keydownTimeout) {
         clearTimeout(<span class="keyword">this</span>.keydownTimeout);
       } <span class="keyword">else</span> {
-        <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-typing"</span>).show().animateKeyboard();
+        <span class="keyword">this</span>.element.find(<span class="string">".togetherjs-cursor-typing"</span>).show().animateKeyboard();
       }
       <span class="keyword">this</span>.keydownTimeout = setTimeout(<span class="keyword">this</span>.clearKeydown, <span class="keyword">this</span>.KEYDOWN_WAIT_TIME);
     },
 
     clearKeydown: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">this</span>.keydownTimeout = <span class="literal">null</span>;
-      <span class="keyword">this</span>.element.find(<span class="string">".towtruck-cursor-typing"</span>).hide().stopKeyboardAnimation();
+      <span class="keyword">this</span>.element.find(<span class="string">".togetherjs-cursor-typing"</span>).hide().stopKeyboardAnimation();
     },
 
     _destroy: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -593,7 +594,7 @@ to keep the cursor name from being off the top of the screen.</p>
     lastPosX = pageX;
     lastPosY = pageY;
     <span class="keyword">var</span> target = event.target;
-    <span class="keyword">var</span> parent = $(target).closest(<span class="string">".towtruck-window, .towtruck-popup, #towtruck-dock"</span>);
+    <span class="keyword">var</span> parent = $(target).closest(<span class="string">".togetherjs-window, .togetherjs-popup, #togetherjs-dock"</span>);
     <span class="keyword">if</span> (parent.length) {
       target = parent[<span class="number">0</span>];
     } <span class="keyword">else</span> <span class="keyword">if</span> (elementFinder.ignoreElement(target)) {
@@ -816,7 +817,7 @@ come in, and we should ignore them</p>
   });
 
   <span class="function"><span class="keyword">function</span> <span class="title">documentClick</span><span class="params">(event)</span> {</span>
-    <span class="keyword">if</span> (event.towtruckInternal) {</pre></div></div>
+    <span class="keyword">if</span> (event.togetherjsInternal) {</pre></div></div>
               
             </li>
           
@@ -847,7 +848,7 @@ something real soon:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>    setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">if</span> (! TowTruck.running) {</pre></div></div>
+      <span class="keyword">if</span> (! TogetherJS.running) {</pre></div></div>
               
             </li>
           
@@ -856,8 +857,8 @@ something real soon:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-24">&#182;</a>
                 </div>
-                <p>This can end up running right after TowTruck has been closed, often
-because TowTruck was closed with a click...</p>
+                <p>This can end up running right after TogetherJS has been closed, often
+because TogetherJS was closed with a click...</p>
 
               </div>
               
@@ -921,7 +922,7 @@ Mostly click cloning just won&#39;t work.</p>
     <span class="keyword">var</span> top = offset.top + pos.offsetY;
     <span class="keyword">var</span> left = offset.left + pos.offsetX;
     displayClick({top: top, left: left}, pos.peer.color);
-    <span class="keyword">var</span> cloneClicks = TowTruck.getConfig(<span class="string">"cloneClicks"</span>);
+    <span class="keyword">var</span> cloneClicks = TogetherJS.getConfig(<span class="string">"cloneClicks"</span>);
     <span class="keyword">if</span> (cloneClicks &amp;&amp; target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
@@ -949,7 +950,7 @@ That means tracking who might be able to see our screen.</p>
       borderColor: color
     });
     setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      element.addClass(<span class="string">"towtruck-clicking"</span>);
+      element.addClass(<span class="string">"togetherjs-clicking"</span>);
     }, <span class="number">100</span>);
     setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       element.remove();
@@ -977,7 +978,7 @@ That means tracking who might be able to see our screen.</p>
                 <p>FIXME: is event.target interesting here?  That is, <em>what</em> the
 user is typing into, not just that the user is typing?  Also
 I&#39;m assuming we don&#39;t care if the user it typing into a
-towtruck-related field, since chat activity is as interesting
+togetherjs-related field, since chat activity is as interesting
 as any other activity.</p>
 
               </div>
@@ -1031,17 +1032,18 @@ as any other activity.</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

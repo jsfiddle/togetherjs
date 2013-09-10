@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-
+  
   <style type="text/css" media="screen">
     .main{
       padding: 80px 15px;
@@ -26,11 +26,23 @@
     .navbar-inverse .navbar-brand {
       color: #fff;
     }
+    
+    .revealarea {
+      
+    }
+    
+    .madlib {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 4px;
+      border:1px solid #e3e3e3;
+    }
 
     .form-control {
       width: inherit;
       display: inline;
       margin-bottom: 10px;
+      padding: 0px 8px;
     }
 
     /*reset Twitter Bootstrap*/
@@ -50,33 +62,33 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <a class="navbar-brand pull-left" href="#">Mad Libs</a>
-        <button type="button" class="btn btn-default navbar-btn pull-right" onclick="TowTruck(this); return false;">Get Together</button>
+        <button type="button" class="btn btn-default navbar-btn pull-right" onclick="TogetherJS(this); return false;">Get Together</button>
       </div>
     </div>
 
     <div class="container">
-
       <div class="main">
         <div class="row">
             <h1>Let's play Mad Libs with a friend!</h1>
-            <div>
-              <button type="button" id="reveal">Reveal</button>
-              <button type="button" id="hide" style="display: none">Hide</button>
-            </div>
-            <div class="col-xs-12 madlib madlib-hidden">
+            <div class="madlib madlib-hidden">
               <p>One day my <input type="text" class="form-control" placeholder="adjective"> friend and I decided to go to the <input type="text" class="form-control" placeholder="sports noun"> game in <input type="text" class="form-control" placeholder="city name">.  We really wanted to see the <input type="text" class="form-control" placeholder="noun"> play the <input type="text" class="form-control" placeholder="noun">.  So we <input type="text" class="form-control" placeholder="action verb"> our <input type="text" class="form-control" placeholder="noun"> down to the <input type="text" class="form-control" placeholder="noun"> and bought some <input type="text" class="form-control" placeholder="noun">.  We got into the game and it was a lot of fun.  We ate some <input type="text" class="form-control" placeholder="adjective"> <input type="text" class="form-control" placeholder="noun"> and drank some <input type="text" class="form-control" placeholder="adjective"> <input type="text" class="form-control" placeholder="noun">.  We had a great time!  We plan to go again next year!</p>
+              
+              <button type="button" class="btn btn-default btn-block" id="reveal">Reveal MadLib!</button>
+              <button type="button" id="hide" style="display: none" class="btn btn-default btn-block">Hide Madlib!</button>
+              
+              
             </div>
+            
         </div>
       </div>
-
     </div>
 
-    <!-- towtruck -->
+    <!-- togetherjs -->
     <script>
-      TowTruckConfig_findRoom = {prefix: "towtruckmadlibs", max: 5};
-      TowTruckConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_findRoom = {prefix: "togetherjsmadlibs", max: 5};
+      TogetherJSConfig_suppressJoinConfirmation = true;
     </script>
-    <script src="/towtruck.js"></script>
+    <script src="/togetherjs.js"></script>
 
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="js/jquery-1.10.2.min.js"></script>

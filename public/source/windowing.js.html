@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>windowing.js</h1>
         
-          <h4>Handles the creation of different windows, notifications, and modal windows.</h4>
+          <h4><p>Handles the creation of different windows, notifications, and modal windows.</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/windowing.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/windowing.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -197,7 +198,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-1">&#182;</a>
                 </div>
-                <p>This is also in towtruck.less, under .towtruck-animated</p>
+                <p>This is also in togetherjs.less, under .togetherjs-animated</p>
 
               </div>
               
@@ -209,8 +210,8 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     element = $(element);
     options = options || {};
     options.bind = options.bind || element.attr(<span class="string">"data-bind-to"</span>);
-    <span class="keyword">var</span> notification = element.hasClass(<span class="string">"towtruck-notification"</span>);
-    <span class="keyword">var</span> modal = element.hasClass(<span class="string">"towtruck-modal"</span>);
+    <span class="keyword">var</span> notification = element.hasClass(<span class="string">"togetherjs-notification"</span>);
+    <span class="keyword">var</span> modal = element.hasClass(<span class="string">"togetherjs-modal"</span>);
     <span class="keyword">if</span> (options.bind) {
       options.bind = $(options.bind);
     }
@@ -320,9 +321,9 @@ width.  But it&#39;s still not entirely consistent.</p>
       top: top + <span class="string">"px"</span>,
       left: left + <span class="string">"px"</span>
     });
-    <span class="keyword">if</span> (win.hasClass(<span class="string">"towtruck-window"</span>)) {
-      $(<span class="string">"#towtruck-window-pointer-right, #towtruck-window-pointer-left"</span>).hide();
-      <span class="keyword">var</span> pointer = $(<span class="string">"#towtruck-window-pointer-"</span> + ifacePos);
+    <span class="keyword">if</span> (win.hasClass(<span class="string">"togetherjs-window"</span>)) {
+      $(<span class="string">"#togetherjs-window-pointer-right, #togetherjs-window-pointer-left"</span>).hide();
+      <span class="keyword">var</span> pointer = $(<span class="string">"#togetherjs-window-pointer-"</span> + ifacePos);
       pointer.show();
       <span class="keyword">if</span> (ifacePos == <span class="string">"right"</span>) {
         pointer.css({
@@ -339,11 +340,11 @@ width.  But it&#39;s still not entirely consistent.</p>
       }
     }
     win.data(<span class="string">"boundTo"</span>, bound.selector || <span class="string">"#"</span> + bound.attr(<span class="string">"id"</span>));
-    bound.addClass(<span class="string">"towtruck-active"</span>);
+    bound.addClass(<span class="string">"togetherjs-active"</span>);
   }
 
   session.on(<span class="string">"resize"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">var</span> win = $(<span class="string">".towtruck-modal:visible, .towtruck-window:visible"</span>);
+    <span class="keyword">var</span> win = $(<span class="string">".togetherjs-modal:visible, .togetherjs-window:visible"</span>);
     <span class="keyword">if</span> (! win.length) {
       <span class="keyword">return</span>;
     }
@@ -368,10 +369,10 @@ width.  But it&#39;s still not entirely consistent.</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    els = els || <span class="string">".towtruck-window, .towtruck-modal, .towtruck-notification"</span>;
+                <div class="content"><div class='highlight'><pre>    els = els || <span class="string">".togetherjs-window, .togetherjs-modal, .togetherjs-notification"</span>;
     els = $(els);
     els = els.filter(<span class="string">":visible"</span>);
-    els.filter(<span class="string">":not(.towtruck-notification)"</span>).hide();
+    els.filter(<span class="string">":not(.togetherjs-notification)"</span>).hide();
     getModalBackground().hide();
     <span class="keyword">var</span> windows = [];
     els.each(<span class="function"><span class="keyword">function</span> <span class="params">(index, element)</span> {</span>
@@ -382,19 +383,19 @@ width.  But it&#39;s still not entirely consistent.</p>
         <span class="keyword">return</span>;
       }
       bound = $(bound);
-      bound.addClass(<span class="string">"towtruck-animated"</span>).addClass(<span class="string">"towtruck-color-pulse"</span>);
+      bound.addClass(<span class="string">"togetherjs-animated"</span>).addClass(<span class="string">"togetherjs-color-pulse"</span>);
       setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        bound.removeClass(<span class="string">"towtruck-color-pulse"</span>).removeClass(<span class="string">"towtruck-animated"</span>);
+        bound.removeClass(<span class="string">"togetherjs-color-pulse"</span>).removeClass(<span class="string">"togetherjs-animated"</span>);
       }, ANIMATION_DURATION+<span class="number">10</span>);
       element.data(<span class="string">"boundTo"</span>, <span class="literal">null</span>);
-      bound.removeClass(<span class="string">"towtruck-active"</span>);
-      <span class="keyword">if</span> (element.hasClass(<span class="string">"towtruck-notification"</span>)) {
+      bound.removeClass(<span class="string">"togetherjs-active"</span>);
+      <span class="keyword">if</span> (element.hasClass(<span class="string">"togetherjs-notification"</span>)) {
         element.fadeOut().promise().then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           <span class="keyword">this</span>.hide();
         });
       }
     });
-    $(<span class="string">"#towtruck-window-pointer-right, #towtruck-window-pointer-left"</span>).hide();
+    $(<span class="string">"#togetherjs-window-pointer-right, #togetherjs-window-pointer-left"</span>).hide();
     <span class="keyword">if</span> (onClose) {
       onClose();
       onClose = <span class="literal">null</span>;
@@ -423,8 +424,8 @@ width.  But it&#39;s still not entirely consistent.</p>
   };
 
   <span class="function"><span class="keyword">function</span> <span class="title">bindEvents</span><span class="params">(el)</span> {</span>
-    el.find(<span class="string">".towtruck-close, .towtruck-dismiss"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
-      <span class="keyword">var</span> w = $(event.target).closest(<span class="string">".towtruck-window, .towtruck-modal, .towtruck-notification"</span>);
+    el.find(<span class="string">".togetherjs-close, .togetherjs-dismiss"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      <span class="keyword">var</span> w = $(event.target).closest(<span class="string">".togetherjs-window, .togetherjs-modal, .togetherjs-notification"</span>);
       windowing.hide(w);
       event.stopPropagation();
       <span class="keyword">return</span> <span class="literal">false</span>;
@@ -435,7 +436,7 @@ width.  But it&#39;s still not entirely consistent.</p>
     <span class="keyword">if</span> (getModalBackground.element) {
       <span class="keyword">return</span> getModalBackground.element;
     }
-    <span class="keyword">var</span> background = $(<span class="string">"#towtruck-modal-background"</span>);
+    <span class="keyword">var</span> background = $(<span class="string">"#togetherjs-modal-background"</span>);
     assert(background.length);
     getModalBackground.element = background;
     background.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -491,17 +492,18 @@ width.  But it&#39;s still not entirely consistent.</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

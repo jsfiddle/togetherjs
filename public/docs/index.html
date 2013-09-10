@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>
+      Mozilla Labs : TogetherJS
+    </title>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="description" content="Real time collaboration features for your website or app.">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../images/fav-icon.png">
+
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/parallax.js"></script>
+    <script src="../js/custom.js"></script>
+    <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
+    <script src="../js/waypoints.min.js"></script>
+    <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
+
+    <!-- retina library -->
+    <script src="../js/retina.js"></script>
+
+    <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-35433268-28']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/jumbotron.css" rel="stylesheet">
+    <link href="../css/carousel.css" rel="stylesheet">
+    <link href="../css/grid.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
+
+    
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+  <body data-spy="scroll" data-target="#markdownpages">
+    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+
+      <!-- Tabzilla -->
+      <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
+
+      <!-- start container -->
+      <div class="container navbox">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right main-nav">
+            <li><a href=".././"  >Overview</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
+          </ul>
+        </div><!--/.navbar-collapse -->
+
+      </div>
+    </div>
+
+
+    
+
+<div class="container">
+  <section class="row" id="markdownpages">
+    <div class="col-md-3">
+      <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
+        <ul id="sectionmenu" class="nav">
+          <li><a href="#about-audio-chat-and-webrtc" class="scrollnavdocs">About Audio Chat and WebRTC</a></li>
+          <li><a href="#addons" class="scrollnavdocs">Addons</a></li>
+          <li><a href="#extending-togetherjs" class="scrollnavdocs">Extending TogetherJS</a></li>
+          <li><a href="#browser-support" class="scrollnavdocs">Browser Support</a></li>
+          <li><a href="#getting-help" class="scrollnavdocs">Getting Help</a></li>
+        </ul>
+        <div class="well">
+          <button type="button" class="btn btn-primary btn-lg btn-block" id="get-help">
+            Get help
+          </button>
+          <div class="small text-center">Get support from the TogetherJS team.
+          <div style="display: none" id="nobody-home">Sorry, no one is available at this time.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <h1>Documentation</h1>
+      
+<!--
+template: docs.tmpl
+-->
+
+<p>Would you like to use TogetherJS on your site?  Great!  If you have feedback on this or any other part of TogetherJS <a href="https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">we&#39;d like to hear it</a>!</p>
+<h2 id="quick-start">Quick Start</h2>
+<p>The quickest is to include two things on your page.  First the Javascript:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript">
+  <span class="comment">// Set to false or delete to disable analytics/tracking:</span>
+  TogetherJSConfig_enableAnalytics = <span class="literal">true</span>;
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"https://togetherjs.mozillalabs.com/togetherjs-min.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></pre>
+<p>The first part configures TogetherJS.  In the example we configure it to send analytics information back to us (Mozilla), so we can get an idea of who is using TogetherJS.  You can turn it off, but we do appreciate the information, especially during the alpha stage.  There‘s not much configuration yet, but we’ll go over what there is later.</p>
+<p>The next step is to put a button on your site that lets a user start TogetherJS:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">button</span> <span class="attribute">onclick</span>=<span class="value">"TogetherJS(this); return false;"</span>&gt;</span>Start TogetherJS<span class="tag">&lt;/<span class="title">button</span>&gt;</span></code></pre>
+<p>You could also do something like:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">button</span> <span class="attribute">id</span>=<span class="value">"start-togetherjs"</span>&gt;</span>Start TogetherJS<span class="tag">&lt;/<span class="title">button</span>&gt;</span>
+<span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript">
+$(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  $(<span class="string">"#start-togetherjs"</span>).click(TogetherJS);
+});
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></pre>
+<p>You should put the <code>togetherjs-min.js</code> script on every page in your site – two people can collaborate across the entire site then.  If you forget it on a page, then if someone visits that page while in a TogetherJS session they will essentially go “offline” until they come back to another page that includes <code>togetherjs-min.js</code></p>
+<p>Note that <code>togetherjs-min.js</code> <em>is not</em> the entire code for TogetherJS, it&#39;s only a fairly small file that loads the rest of TogetherJS on demand.  You can place the <code>&lt;script&gt;</code> anywhere on the page – generally before <code>&lt;/body&gt;</code> is considered the best place to put scripts.</p>
+<h3 id="scope-of-the-session">Scope of the session</h3>
+<p>TogetherJS sessions are connected to the domain you start them on (specifically the <a href="http://tools.ietf.org/html/rfc6454">origin</a>).  So if part of your site is on another domain, people won‘t be able to talk across those domains.  Even a page that is on https when another is on http will cause the session to be lost.  We might make this work sometime, but if it’s an issue to you please give us <a href="https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">feedback</a>.</p>
+<h2 id="configuring-togetherjs">Configuring TogetherJS</h2>
+<p>As mentioned there are a few TogetherJS configuration parameters.  In the future there will probably be more.  To see the exact list of settings and their defaults, look at <code>TogetherJS._defaultConfiguration</code>.</p>
+<p><code>TogetherJSConfig_siteName</code>:
+    In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  The idea siteName is the name of your site.</p>
+<p><code>TogetherJSConfig_enableAnalytics</code>:
+    During the TogetherJS alpha we‘d like to get some idea of who is using the project, and what clients/browsers users have, the native language of users, and maybe some stuff we haven’t even thought of.  Setting this to <code>true</code> adds tracking when someone starts TogetherJS; Google manages the analytics, but the results are contractually private to Mozilla.  The setting <code>TogetherJSConfig_analyticsCode</code> is the analytics code that is used.</p>
+<p><code>TogetherJSConfig_hubBase</code>:
+    This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It‘s the only real server component of TogetherJS (besides the statically hosted scripts).  It’s also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You‘ll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets, and because there’s no public pages that a user will typically visit on the hub there&#39;s no opportunity to put in a security exception.</p>
+<p><code>TogetherJSConfig_cloneClicks</code>:
+    This is an experimental feature <strong>that will probably be removed</strong> (see <a href="https://github.com/mozilla/togetherjs/issues/75">#75</a>).  But if you want to play around you might find it amusing.  This setting should be a jQuery selector, and instead of just <em>showing</em> the other person a click, if the element clicked on matches this selector it will trigger an artificial click on the other user&#39;s browser.  For example, <code>TogetherJSConfig_cloneClicks = &quot;.tab&quot;</code></p>
+<p><code>TogetherJSConfig_siteName</code>:
+    This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.</p>
+<p><code>TogetherJSConfig_toolName</code>:
+    If you want to remove the “TogetherJS” brand from the tool, you can rename it.  You should use a proper noun of some sort, like “Collaboration Tool”, so that it fits into the text.</p>
+<p><code>TogetherJSConfig_enableShortcut</code>:
+    If you want to try TogetherJS out on an application, but don&#39;t want to put up a “Start TogetherJS” button, you can use <code>TogetherJSConfig_enableShortcut = true</code> and then an event handler will be put into place that will start TogetherJS when you hit <strong>alt-T alt-T</strong> (twice in a row!).  TogetherJS will still automatically start when someone opens an invitation link.</p>
+<p>In the future we expect to include more configuration parameters, specifically so you can customize TogetherJS to integrate with your site.  We&#39;d very much like to get <a href="https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">feedback</a> about what specifically in your site you&#39;d like to integrate with TogetherJS.</p>
+<h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
+<p>The button you add to your site to start TogetherJS will typically look like this:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">button</span> <span class="attribute">id</span>=<span class="value">"start-togetherjs"</span> <span class="attribute">type</span>=<span class="value">"button"</span>
+ <span class="attribute">onclick</span>=<span class="value">"TogetherJS(this); return false"</span>
+ <span class="attribute">data-end-togetherjs-html</span>=<span class="value">"End TogetherJS"</span>&gt;</span>
+  Start TogetherJS
+<span class="tag">&lt;/<span class="title">button</span>&gt;</span></code></pre>
+<ol>
+<li><p>If you give your button the same <code>id</code> across your site, TogetherJS will know what the start/end TogetherJS button is.</p>
+</li>
+<li><p><code>onclick=&quot;TogetherJS(this); return false&quot;</code> – this starts TogetherJS, and by passing <code>this</code> TogetherJS knows what button it started from.  This lets it animate out of the button.  It&#39;ll also work fine with <code>document.getElementById(&quot;start-togetherjs&quot;).addEventListener(&quot;click&quot;, TogetherJS, false)</code></p>
+</li>
+<li><p><code>data-end-togetherjs-html</code> is what TogetherJS will insert into the content of the button after it is started.  You can use this to switch Start to End, or whatever language you use.  As a special case “Start TogetherJS” is changed to “End TogetherJS”</p>
+</li>
+<li><p>The class <code>togetherjs-started</code> will be added to the button while TogetherJS is active.  You might want to use this to style the background color to red to show that it changes to ending the session.</p>
+</li>
+</ol>
+<h2 id="extending-togetherjs-for-your-application">Extending TogetherJS For Your Application</h2>
+<p>See the page <a href="https://github.com/mozilla/togetherjs/wiki/Extending-TogetherJS">Extending TogetherJS</a></p>
+<h2 id="about-audio-chat-and-webrtc">About Audio Chat and WebRTC</h2>
+<p>The live audio chat is based on <a href="http://www.webrtc.org/">WebRTC</a>.  This is a very new technology, built into some new browsers.</p>
+<p>To enable WebRTC both you and your collaborator need a new browser.  Right now, <a href="http://nightly.mozilla.org/">Firefox Nightly</a> is supported, and we believe that the newest release of Chrome should work.</p>
+<p>Sometime in 2013 support for this should be available in new (non-experimental) versions of Firefox, Chrome, and both Firefox and Chrome for Android.</p>
+<p>To see a summary of outstanding issues that we know of with audio chat see <a href="https://github.com/mozilla/togetherjs/issues?labels=rtc&amp;milestone=&amp;page=1&amp;state=open">this page</a>.</p>
+<p>Note that audio chat will not work between some networks.  These networks require a <a href="http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT">TURN server</a> which unfortunately we do not have allocated (and full support for TURN has not landed in some browsers).  Unfortunately when the network makes chat impossible, chat will simply not work – we don‘t receive an error, and can’t tell you why chat is not working.  See <a href="https://github.com/mozilla/togetherjs/issues/327">#327</a> for progress.</p>
+<h2 id="addons">Addons</h2>
+<p>There is an addon for Firefox in <a href="https://github.com/mozilla/togetherjs/tree/develop/addon">addon/</a>.</p>
+<p>This isn‘t intended to be the “normal” way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn’t integrated <code>togetherjs-min.js</code> itself.  When you activate the addon (via a link in the <a href="https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons">Add-On Toolbar</a>) it simply adds <code>togetherjs-min.js</code> to every page in that tab (until you close the tab or turn it off).  Also if you open a link with <code>#&amp;togetherjs=...</code> (the code used in the share link) it will automatically turn TogetherJS on for the tab.</p>
+<h3 id="installing">Installing</h3>
+<p>A simple way to install is simply to <a href="http://togetherjs.mozillalabs.com/togetherjs.xpi">click this link</a> in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.</p>
+<h3 id="building">Building</h3>
+<p>You can build the addon using the <a href="https://addons.mozilla.org/en-US/developers/builder">Addon-SDK</a>.  Once you&#39;ve installed the SDK, go into the <code>addon/</code> directory and run <code>cfx xpi</code> to create an XPI (packaged addon file) or <code>cfx run</code> to start up Firefox with the addon installed (for development).</p>
+<h2 id="extending-togetherjs">Extending TogetherJS</h2>
+<p>This page documents some of the ways you can customize the TogetherJS experience on your site.  Especially how you can extend TogetherJS to synchronize parts of your application that require special treatment.</p>
+<h3 id="work-in-progress">Work in progress</h3>
+<p>We‘re still working on this part, and your feedback is especially important.  We’re using the <a href="https://github.com/mozilla/togetherjs/issues?labels=extending&amp;milestone=&amp;page=1&amp;state=open">extending</a> label to categorize tickets related to this.  If you have a use case you&#39;d like us to address, please <a href="https://github.com/mozilla/togetherjs/issues/new">open a new issue</a> and describe it – and don‘t be shy, if it’s a problem that can be solved with the API we‘ve already implemented we don’t mind describing how to use it in detail in a ticket.</p>
+<h3 id="configuring-events">Configuring events</h3>
+<p>Like other configuration, you may not wish to set up these callbacks before <code>togetherjs-min.js</code> is loaded.  You can do that with the <code>&quot;on&quot;</code> configuration parameter, like:</p>
+<pre><code class="lang-js">TogetherJSConfig_on = {
+  ready: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>}
+};</code></pre>
+<p>Or if you want to set things separately you can do:</p>
+<pre><code class="lang-js">TogetherJSConfig_on_ready = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>};</code></pre>
+<h2 id="communication-channel">Communication Channel</h2>
+<p>If you have a component you want to synchronize between two clients, you&#39;ll want to use the TogetherJS communication channel.  This is a broadcast channel – any message you send is sent to everyone else in the session (which can also be no one), and includes people who are on different pages.</p>
+<p>All messages are JSON objects with a <code>type</code> property.  Custom application messages are put into their own namespace.  So imagine you want to keep an element hidden or visible on all clients, in a synchronized way, and when the element visibility changes an event is fired, <code>MyApp.emit(&quot;visibilityChange&quot;, element, isVisible)</code>:</p>
+<pre><code class="lang-js">TogetherJSConfig_on_ready = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  MyApp.on(<span class="string">"visibilityChange"</span>, fireTogetherJSVisibility);
+};
+TogetherJSConfig_on_close = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  MyApp.off(<span class="string">"visibilityChange"</span>, fireTogetherJSVisibility);
+};</code></pre>
+<p>Now when TogetherJS is activated we&#39;ll call <code>fireTogetherJSVisibility(el, isVisible)</code>.  Now we have to write that function:</p>
+<pre><code class="lang-js"><span class="function"><span class="keyword">function</span> <span class="title">fireTogetherJSVisibility</span><span class="params">(element, isVisible)</span> {</span>
+  TogetherJS.send({type: <span class="string">"visibilityChange"</span>, isVisible: isVisible, element: element});
+}</code></pre>
+<p>Well, that‘s not quite right, we have to send a JSON object, and we can’t send <code>element</code>.  Instead we need to give an identifier for the element.  TogetherJS has a helpful function for that, which will require us to import the <code>elementFinder</code> module:</p>
+<pre><code class="lang-js"><span class="function"><span class="keyword">function</span> <span class="title">fireTogetherJSVisibility</span><span class="params">(element, isVisible)</span> {</span>
+  <span class="keyword">var</span> elementFinder = TogetherJS.require(<span class="string">"elementFinder"</span>);
+  <span class="keyword">var</span> location = elementFinder.elementLocation(element);
+  TogetherJS.send({type: <span class="string">"visibilityChange"</span>, isVisible: isVisible, element: location});
+}</code></pre>
+<p>Then we also have to listen for the message.  We can setup this listener right away (without using the ready/close TogetherJS events) because when TogetherJS isn&#39;t on then the event will just not fire:</p>
+<pre><code class="lang-js">TogetherJS.hub.on(<span class="string">"visibilityChange"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+  <span class="keyword">var</span> elementFinder = TogetherJS.require(<span class="string">"elementFinder"</span>);
+  <span class="comment">// If the element can't be found this will throw an exception:</span>
+  <span class="keyword">var</span> element = elementFinder.findElement(msg.element);
+  MyApp.changeVisibility(element, msg.isVisible);
+});</code></pre>
+<p>This has two major problems though: when you call <code>MyApp.changeVisibility</code> it will probably fire a <code>visibilityChange</code> event, which will cause another <code>fireTogetherJSVisibility</code> call.  The result may or may not be circular, but it‘s definitely not efficient.  Another problem is that you can get messages from peers who are at a different URL.  We’ll use a simple global variable to handle the first case, and <code>msg.sameUrl</code> to fix the second:</p>
+<pre><code class="lang-js"><span class="keyword">var</span> visibilityChangeFromRemote = <span class="literal">false</span>;
+
+<span class="function"><span class="keyword">function</span> <span class="title">fireTogetherJSVisibility</span><span class="params">(element, isVisible)</span> {</span>
+  <span class="keyword">if</span> (visibilityChangeFromRemote) {
+    <span class="keyword">return</span>;
+  }
+  <span class="keyword">var</span> elementFinder = TogetherJS.require(<span class="string">"elementFinder"</span>);
+  <span class="keyword">var</span> location = elementFinder.elementLocation(element);
+  TogetherJS.send({type: <span class="string">"visibilityChange"</span>, isVisible: isVisible, element: location});
+}
+
+TogetherJS.hub.on(<span class="string">"visibilityChange"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+  <span class="keyword">if</span> (! msg.sameUrl) {
+    <span class="keyword">return</span>;
+  }
+  <span class="keyword">var</span> elementFinder = TogetherJS.require(<span class="string">"elementFinder"</span>);
+  <span class="comment">// If the element can't be found this will throw an exception:</span>
+  <span class="keyword">var</span> element = elementFinder.findElement(msg.element);
+  visibilityChangeFromRemote = <span class="literal">true</span>;
+  <span class="keyword">try</span> {
+    MyApp.changeVisibility(element, msg.isVisible);
+  } <span class="keyword">finally</span> {
+    visibilityChangeFromRemote = <span class="literal">false</span>;
+  }
+});</code></pre>
+<p>Now we‘re getting close, except for one last problem: these events sync everything when the users are on the same page, but there may be a late comer whose page won’t be in sync with everything else.  An event <code>togetherjs.hello</code> will fire when a person appears on a new page, and we can use to that send all our state.  To do this we&#39;ll imagine the <code>MyApp</code> object has a function like <code>MyApp.allToggleElements()</code> that returns a list of elements that we&#39;d be expected to sync.</p>
+<pre><code class="lang-js">TogetherJS.hub.on(<span class="string">"togetherjs.hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+  <span class="keyword">if</span> (! msg.sameUrl) {
+    <span class="keyword">return</span>;
+  }
+  MyApp.allToggleElements.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+    <span class="keyword">var</span> isVisible = $(el).is(<span class="string">":visible"</span>);
+    fireTogetherJSVisibility(el, isVisible);
+  });
+});</code></pre>
+<p>You‘ll notice that multiple clients might do this reset.  This is an open question for us, and in the future we’ll provide a higher-level API for this kind of initialization.</p>
+<h3 id="implementing-those-visibility-function-from-jquery">Implementing those visibility function from jQuery</h3>
+<p>Let‘s say your app doesn’t have all these methods, and you are just using plain ol‘ jQuery.  Here’s how you might implement them each; you&#39;ll just have to start using <code>$(el).syncShow()</code> and <code>$(el).syncHide()</code> to do your showing and hiding:</p>
+<pre><code class="lang-js">$.fn.syncShow = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">this</span>.show();
+  <span class="keyword">this</span>.trigger(<span class="string">"visibilityChange"</span>);
+};
+
+$.fn.syncHide = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">this</span>.hide();
+  <span class="keyword">this</span>.trigger(<span class="string">"visibilityChange"</span>);
+};
+
+$(document).on(<span class="string">"visibilityChange"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  MyApp.emit(<span class="string">"visibilityChange"</span>, <span class="keyword">this</span>, $(<span class="keyword">this</span>).is(<span class="string">":visible"</span>));
+});
+
+MyApp.changeVisibility = <span class="function"><span class="keyword">function</span> <span class="params">(el, isVisible)</span> {</span>
+  <span class="keyword">if</span> (isVisible &amp;&amp; ! el.is(<span class="string">":visible"</span>)) {
+    el.syncShow();
+  } <span class="keyword">else</span> <span class="keyword">if</span> ((! isVisible) &amp;&amp; el.is(<span class="string">":visible"</span>)) {
+    el.syncHide();
+  }
+};</code></pre>
+<h2 id="setting-identity-information">Setting identity information</h2>
+<p>There‘s a good chance your application has its own identity, and you know the name of the user, and perhaps have an avatar.  (If you don’t have an avatar but do have an email, you might want to use that to make a Gravatar.)</p>
+<p>To see an example of this see <code>/example/app-integration</code></p>
+<p>To do this you configure TogetherJS with some functions:</p>
+<p><code>TogetherJSConfig_getUserName = function () {return &#39;User Name&#39;;};</code></p>
+<p>This returns the user‘s name (or nick).  Return null if you can’t determine the name.</p>
+<p><code>TogetherJSConfig_getUserAvatar = function () {return avatarUrl;};</code></p>
+<p>This returns a URL to the user‘s avatar.  It should be 40px square.  Again return null if you aren’t sure.</p>
+<p><code>TogetherJSConfig_getUserColor = function () {return &#39;#ff00ff&#39;;};</code></p>
+<p>This returns the user&#39;s preferred color that represents them.  This should be a CSS color.</p>
+<p>If any of these values are updated while in the page (like if you have a login process that doesn&#39;t cause a page reload) then call <code>TogetherJS.refreshUserData()</code> and the respective <code>getUser*</code> callbacks will all be called again.</p>
+<p>See <a href="https://github.com/mozilla/togetherjs/issues/504">#504</a> for a bug related to improving this support.</p>
+<h2 id="togetherjsreinitialize4041">TogetherJS.reinitialize&#40;&#41;</h2>
+<p>You can run this to try to reinitialize anything TogetherJS initializes on page load.  In particular you can use it if there are new textareas or code editors that should be sync&#39;d, but were added dynamically to the page.  E.g.:</p>
+<pre><code class="lang-javascript">$(<span class="string">"#form"</span>).append(<span class="string">"&lt;textarea&gt;"</span>);
+TogetherJS.reinitialize();</code></pre>
+<p>(We hope with <a href="https://github.com/mozilla/togetherjs/issues/70">#70</a> that this will no longer be necessary.)</p>
+<h2 id="togetherjs-events">TogetherJS events</h2>
+<p>The <code>TogetherJS</code> object is an event emitter.  It uses the style of <code>TogetherJS.on(&quot;event&quot;, handler)</code>.  The available events:</p>
+<ul>
+<li><code>TogetherJS.on(&quot;ready&quot;, function () {})</code>: emitted when TogetherJS is fully started up.</li>
+<li><code>TogetherJS.on(&quot;close&quot;, function () {})</code>: emitted when TogetherJS is closed.  This is <em>not</em> emitted when the page simply closes or navigates elsewhere.  It is only closed when TogetherJS is specifically stopped.</li>
+</ul>
+<h2 id="deferring-initialization">Deferring Initialization</h2>
+<p>TogetherJS starts up automatically as soon as it can, especially when continuing a session.  Sometimes this is problematic, like an application that bootstraps all of its UI after page load.  To defer this initialization, define a function <code>TogetherJSConfig_callToStart</code> like:</p>
+<pre><code class="lang-js">TogetherJSConfig_callToStart = <span class="function"><span class="keyword">function</span> <span class="params">(callback)</span> {</span>
+  MyApp.onload = callback;
+};</code></pre>
+<p>In this example when <code>MyApp.onload()</code> is called, TogetherJS will start to initialize itself.  Note that calling <code>TogetherJS.reinitialize()</code> might be sufficient for your application&#39;s needs if it does a lot of setup after the page loads.</p>
+<h2 id="invitation">Invitation</h2>
+<p>Sometimes instead of having the user invite someone to TogetherJS you might want to handle the invitation internally in your app.  So typically when the person started TogetherJS, you&#39;d want to find some other person they want to collaborate with and send the TogetherJS link to them.  To get at the TogetherJS link:</p>
+<pre><code class="lang-js">TogetherJSConfig_on_ready = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  sendTogetherJSURLToServer(TogetherJS.shareUrl());
+};</code></pre>
+<p>If you call <code>TogetherJS.shareUrl()</code> before TogetherJS is initialized it will return <code>null</code>.</p>
+<h2 id="getting-at-the-innards">Getting At The Innards</h2>
+<p>You can still get at TogetherJS, even if you can&#39;t rely on the internals not to change underneath you.  (You would be well recommended to deploy your own copy of the client if you do this stuff.)</p>
+<p>Most of the TogetherJS features are implemented as individual modules, so it should be possible to introduce your own module to do many of the same things.  The most important thing is the <code>session</code> module, and sending and receiving messages.</p>
+<p>To get the session module (or any module) you can run this after TogetherJS starts:</p>
+<pre><code class="lang-javascript"><span class="keyword">var</span> session = TogetherJS.require(<span class="string">"session"</span>);</code></pre>
+<p>This assumes that the module has already been loaded… but that assumption would be correct once TogetherJS has started.</p>
+<p>Then there are two interesting methods:</p>
+<pre><code class="lang-javascript">session.send({type: <span class="string">"my-custom-type"</span>, attr: value});
+session.hub.on(<span class="string">"my-custom-type"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+  alert(msg.value);
+});</code></pre>
+<p>I.e., <code>session.send()</code> and <code>session.hub.on()</code>.  As you can see the messages are dispatched based on <code>msg.type</code>.  These messages are broadcasted to all other participants.  Note that the messages are <em>always</em> sent, even if the other person is at a different URL.  To check if an incoming message comes from a person on the same page as you, check <code>msg.sameUrl</code> (<code>msg.url</code> shows the actual URL of the other person).</p>
+<h2 id="getting-a-static-copy-of-the-client">Getting a static copy of the client</h2>
+<p>You may also want a static copy of the client that you can host yourself.  Run <code>grunt build</code> to create a static copy of the TogetherJS library in <code>build/</code> (use <code>--dest</code> to control the output location, and <code>--exclude-tests</code> to avoid including the tests in your version).</p>
+<p>The hub changes quite infrequently, so if you just stability then making a static copy of the client will do it for you.  This option is highly recommended for production!</p>
+<h2 id="browser-support">Browser Support</h2>
+<p>TogetherJS is intended for relatively newer browsers.  Especially as we experiment with what we&#39;re doing, supporting older browsers causes far more challenge than it is an advantage.</p>
+<p>The bare minimum that we&#39;ve identified for TogetherJS is <a href="http://caniuse.com/websockets">WebSocket support</a>.  That said, we generally only test on the most recent version of Firefox and Chrome, so bugs specific to older browsers are more likely (but please <a href="https://github.com/mozilla/togetherjs/issues/new">submit bugs</a> from those browsers anyway – we aren&#39;t deliberately not supporting them).  Our next set of browsers to target will be mobile browsers.</p>
+<h2 id="internet-explorer">Internet Explorer</h2>
+<p>With IE 10 it is <em>possible</em> to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don‘t plan to address bug reports for Internet Explorer that don’t come with a pull request.  If Internet Explorer support is important to you we do <a href="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">welcome your feedback</a>.  No decision is set in stone, but we don&#39;t want to mislead you with respect to our current priorities and intentions.</p>
+<h2 id="supported-browsers">Supported Browsers</h2>
+<p>We recommend the most recent release of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>.</p>
+<p>If you want to have <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC">WebRTC support</a> and are using Firefox, as of April 2013 this requires <a href="http://nightly.mozilla.org/">Firefox Nightly</a> (this support will be moving towards beta and release in the coming months).</p>
+<p>We haven&#39;t done much testing on mobile (yet!) and cannot recommend anything there.</p>
+<h2 id="getting-help">Getting Help</h2>
+<h3 id="irc--live-chat">IRC / Live Chat</h3>
+<p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code></p>
+<p>If you don&#39;t use IRC, you can quickly join the chat from the web <a href="https://kiwiirc.com/client/irc.mozilla.org/togetherjs">using kiwiirc</a>.</p>
+<h3 id="issues">Issues</h3>
+<p>Please submit any issues you have via <a href="https://github.com/mozilla/togetherjs/issues/new">the Github issue tracker</a>.</p>
+<p>Don‘t be shy about opening an issue.  If you have a question or feature request that might already be possible, we can exchange comments via the issue tracker to figure it out.  We don’t have a mailing list, so issues are a good way to keep a persistent record of these exchanges.</p>
+<h3 id="email">Email</h3>
+<p>Feel free to email us at <a href="mailto:togetherjs@mozilla.com">togetherjs@mozilla.com</a> with any questions, suggestions, or concerns.</p>
+
+    </div>
+  </section>
+
+
+
+
+        <hr>
+
+        <footer>
+
+          <section class="row" id="footer">
+            <div class="col-xs-3 text-left">
+              <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
+                <li><a href="../faq.html">FAQ</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-3">
+              <ul class="list-unstyled text-left">
+                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+              </ul>
+            </div>
+          </section>
+        </footer>
+      </section>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

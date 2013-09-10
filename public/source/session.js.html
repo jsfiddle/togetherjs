@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>session.js</h1>
         
-          <h4>The most important and most core module in the system.  This sets up the channels, routes messages, tracks peers, and is used for inter-module communication using events.</h4>
+          <h4><p>The most important and most core module in the system.  This sets up the channels, routes messages, tracks peers, and is used for inter-module communication using events.</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/session.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/session.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -254,7 +255,7 @@ for us to respect a URL change:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-5">&#182;</a>
                 </div>
-                <p>Indicates if TowTruck has just started (not continuing from a saved session):</p>
+                <p>Indicates if TogetherJS has just started (not continuing from a saved session):</p>
 
               </div>
               
@@ -271,7 +272,7 @@ for us to respect a URL change:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> localStoragePrefix = <span class="string">"towtruck."</span>;</pre></div></div>
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> localStoragePrefix = <span class="string">"togetherjs."</span>;</pre></div></div>
               
             </li>
           
@@ -305,9 +306,10 @@ for us to respect a URL change:</p>
    * URLs
    */</span>
 
-  session.hubUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    assert(session.shareId, <span class="string">"URL cannot be resolved before TowTruck.shareId has been initialized"</span>);
-    <span class="keyword">return</span> TowTruck.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/hub/"</span> + session.shareId;
+  session.hubUrl = <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
+    id = id || session.shareId;
+    assert(id, <span class="string">"URL cannot be resolved before TogetherJS.shareId has been initialized"</span>);
+    <span class="keyword">return</span> TogetherJS.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/hub/"</span> + id;
   };
 
   session.shareUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -318,16 +320,16 @@ for us to respect a URL change:</p>
     <span class="keyword">if</span> (m) {
       query = m[<span class="number">0</span>];
     }
-    hash = hash.replace(<span class="regexp">/&amp;?towtruck-[a-zA-Z0-9]+/</span>, <span class="string">""</span>);
+    hash = hash.replace(<span class="regexp">/&amp;?togetherjs-[a-zA-Z0-9]+/</span>, <span class="string">""</span>);
     hash = hash || <span class="string">"#"</span>;
     <span class="keyword">return</span> location.protocol + <span class="string">"//"</span> + location.host + location.pathname + query +
-           hash + <span class="string">"&amp;towtruck="</span> + session.shareId;
+           hash + <span class="string">"&amp;togetherjs="</span> + session.shareId;
   };
 
   session.recordUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     assert(session.shareId);
-    <span class="keyword">var</span> url = TowTruck.baseUrl.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/recorder.html"</span>;
-    url += <span class="string">"#&amp;towtruck="</span> + session.shareId + <span class="string">"&amp;hubBase="</span> + TowTruck.getConfig(<span class="string">"hubBase"</span>);
+    <span class="keyword">var</span> url = TogetherJS.baseUrl.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/recorder.html"</span>;
+    url += <span class="string">"#&amp;togetherjs="</span> + session.shareId + <span class="string">"&amp;hubBase="</span> + TogetherJS.getConfig(<span class="string">"hubBase"</span>);
     <span class="keyword">return</span> url;
   };
 
@@ -337,7 +339,7 @@ for us to respect a URL change:</p>
   };
 
   session.siteName = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">return</span> TowTruck.getConfig(<span class="string">"siteName"</span>) || document.title;
+    <span class="keyword">return</span> TogetherJS.getConfig(<span class="string">"siteName"</span>) || document.title;
   };
 
   <span class="comment">/****************************************
@@ -355,6 +357,19 @@ for us to respect a URL change:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-9">&#182;</a>
                 </div>
+                <p>These are messages sent by clients who aren&#39;t &quot;part&quot; of the TogetherJS session:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> MESSAGES_WITHOUT_CLIENTID = [<span class="string">"who"</span>, <span class="string">"invite"</span>, <span class="string">"init-connection"</span>];</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
                 <p>We ignore incoming messages from the channel until this is true:</p>
 
               </div>
@@ -362,7 +377,7 @@ for us to respect a URL change:</p>
                 <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> readyForMessages = <span class="literal">false</span>;
 
   <span class="function"><span class="keyword">function</span> <span class="title">openChannel</span><span class="params">()</span> {</span>
-    assert(! channel);
+    assert(! channel, <span class="string">"Attempt to re-open channel"</span>);
     console.info(<span class="string">"Connecting to"</span>, session.hubUrl(), location.href);
     <span class="keyword">var</span> c = channels.WebSocketChannel(session.hubUrl());
     c.onmessage = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -379,10 +394,10 @@ for us to respect a URL change:</p>
               
             </li>
           
-            <li id="section-10">
+            <li id="section-11">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-10">&#182;</a>
+                  <a class="pilcrow" href="#section-11">&#182;</a>
                 </div>
                 <p>We&#39;re getting messages before everything is fully initialized</p>
 
@@ -391,15 +406,21 @@ for us to respect a URL change:</p>
                 <div class="content"><div class='highlight'><pre>        console.warn(<span class="string">"Message received before all modules loaded (ignoring):"</span>, msg);
         <span class="keyword">return</span>;
       }
-      msg.peer = peers.getPeer(msg.clientId, msg);
+      <span class="keyword">if</span> ((! msg.clientId) &amp;&amp; MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -<span class="number">1</span>) {
+        console.warn(<span class="string">"Got message without clientId, where clientId is required"</span>, msg);
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (msg.clientId) {
+        msg.peer = peers.getPeer(msg.clientId, msg);
+      }
       <span class="keyword">if</span> (msg.type == <span class="string">"hello"</span> || msg.type == <span class="string">"hello-back"</span> || msg.type == <span class="string">"peer-update"</span>) {</pre></div></div>
               
             </li>
           
-            <li id="section-11">
+            <li id="section-12">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-11">&#182;</a>
+                  <a class="pilcrow" href="#section-12">&#182;</a>
                 </div>
                 <p>We do this here to make sure this is run before any other
 hello handlers:</p>
@@ -408,10 +429,14 @@ hello handlers:</p>
               
                 <div class="content"><div class='highlight'><pre>        msg.peer.updateFromHello(msg);
       }
-      msg.sameUrl = msg.peer.url == currentUrl;
-      <span class="keyword">if</span> (!msg.peer.isSelf) { msg.peer.updateMessageDate(msg); }
+      <span class="keyword">if</span> (msg.peer) {
+        msg.sameUrl = msg.peer.url == currentUrl;
+        <span class="keyword">if</span> (!msg.peer.isSelf) {
+          msg.peer.updateMessageDate(msg);
+        }
+      }
       session.hub.emit(msg.type, msg);
-      TowTruck._onmessage(msg);
+      TogetherJS._onmessage(msg);
     };
     channel = c;
     session.router.bindChannel(channel);
@@ -419,10 +444,10 @@ hello handlers:</p>
               
             </li>
           
-            <li id="section-12">
+            <li id="section-13">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-12">&#182;</a>
+                  <a class="pilcrow" href="#section-13">&#182;</a>
                 </div>
                 <p>FIXME: once we start looking at window.history we need to update this:</p>
 
@@ -440,8 +465,8 @@ hello handlers:</p>
 
   session.appSend = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
     <span class="keyword">var</span> type = msg.type;
-    <span class="keyword">if</span> (type.search(<span class="regexp">/^towtruck\./</span>) === <span class="number">0</span>) {
-      type = type.substr(<span class="string">"towtruck."</span>.length);
+    <span class="keyword">if</span> (type.search(<span class="regexp">/^togetherjs\./</span>) === <span class="number">0</span>) {
+      type = type.substr(<span class="string">"togetherjs."</span>.length);
     } <span class="keyword">else</span> <span class="keyword">if</span> (type.search(<span class="regexp">/^app\./</span>) === -<span class="number">1</span>) {
       type = <span class="string">"app."</span> + type;
     }
@@ -465,6 +490,10 @@ hello handlers:</p>
     }
   });
 
+  session.hub.on(<span class="string">"who"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    sendHello(<span class="literal">true</span>);
+  });
+
   <span class="function"><span class="keyword">function</span> <span class="title">processFirstHello</span><span class="params">(msg)</span> {</span>
     <span class="keyword">if</span> (! msg.sameUrl) {
       <span class="keyword">var</span> url = msg.url;
@@ -479,6 +508,15 @@ hello handlers:</p>
   session.timeHelloSent = <span class="literal">null</span>;
 
   <span class="function"><span class="keyword">function</span> <span class="title">sendHello</span><span class="params">(helloBack)</span> {</span>
+    <span class="keyword">var</span> msg = session.makeHelloMessage(helloBack);
+    <span class="keyword">if</span> (! helloBack) {
+      session.timeHelloSent = Date.now();
+      peers.Self.url = msg.url;
+    }
+    session.send(msg);
+  }
+
+  session.makeHelloMessage = <span class="function"><span class="keyword">function</span> <span class="params">(helloBack)</span> {</span>
     <span class="keyword">var</span> msg = {
       name: peers.Self.name || peers.Self.defaultName,
       avatar: peers.Self.avatar,
@@ -488,10 +526,10 @@ hello handlers:</p>
               
             </li>
           
-            <li id="section-13">
+            <li id="section-14">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
+                  <a class="pilcrow" href="#section-14">&#182;</a>
                 </div>
                 <p>FIXME: titles update, we should track those changes:</p>
 
@@ -505,32 +543,11 @@ hello handlers:</p>
       msg.type = <span class="string">"hello-back"</span>;
     } <span class="keyword">else</span> {
       msg.type = <span class="string">"hello"</span>;
-      msg.clientVersion = TowTruck.version;
-      session.timeHelloSent = Date.now();
-      peers.Self.url = msg.url;
+      msg.clientVersion = TogetherJS.version;
     }
-    <span class="keyword">if</span> (! TowTruck.startup.continued) {
+    <span class="keyword">if</span> (! TogetherJS.startup.continued) {
       msg.starting = <span class="literal">true</span>;
     }</pre></div></div>
-              
-            </li>
-          
-            <li id="section-14">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
-                </div>
-                <p>This is a chance for other modules to effect the hello message:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    session.emit(<span class="string">"prepare-hello"</span>, msg);
-    session.send(msg);
-  }
-
-  <span class="comment">/****************************************
-   * Lifecycle (start and end)
-   */</span></pre></div></div>
               
             </li>
           
@@ -538,6 +555,25 @@ hello handlers:</p>
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>This is a chance for other modules to effect the hello message:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    session.emit(<span class="string">"prepare-hello"</span>, msg);
+    <span class="keyword">return</span> msg;
+  };
+
+  <span class="comment">/****************************************
+   * Lifecycle (start and end)
+   */</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
                 </div>
                 <p>These are Javascript files that implement features, and so must
 be injected at runtime because they aren&#39;t pulled in naturally
@@ -549,7 +585,7 @@ ui must be the first item:</p>
                 <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> features = [<span class="string">"peers"</span>, <span class="string">"ui"</span>, <span class="string">"chat"</span>, <span class="string">"webrtc"</span>, <span class="string">"cursor"</span>, <span class="string">"startup"</span>, <span class="string">"forms"</span>, <span class="string">"visibilityApi"</span>];
 
   <span class="function"><span class="keyword">function</span> <span class="title">getRoomName</span><span class="params">(prefix, maxSize)</span> {</span>
-    <span class="keyword">var</span> findRoom = TowTruck.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/findroom"</span>;
+    <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/findroom"</span>;
     <span class="keyword">return</span> $.ajax({
       url: findRoom,
       dataType: <span class="string">"json"</span>,
@@ -574,10 +610,10 @@ ui must be the first item:</p>
               
             </li>
           
-            <li id="section-16">
+            <li id="section-17">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-16">&#182;</a>
+                  <a class="pilcrow" href="#section-17">&#182;</a>
                 </div>
                 <p>We don&#39;t actually have to wait for the set to succede, so
 long as session.identityId is set</p>
@@ -598,26 +634,9 @@ long as session.identityId is set</p>
       <span class="keyword">var</span> isClient = <span class="literal">true</span>;
       <span class="keyword">var</span> set = <span class="literal">true</span>;
       <span class="keyword">var</span> sessionId;
-      session.firstRun = ! TowTruck.startup.continued;
+      session.firstRun = ! TogetherJS.startup.continued;
       <span class="keyword">if</span> (! shareId) {
-        <span class="keyword">if</span> (TowTruck.startup._joinShareId) {</pre></div></div>
-              
-            </li>
-          
-            <li id="section-17">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-17">&#182;</a>
-                </div>
-                <p>Like, below, this <em>also</em> means we got the shareId from the hash
-(in towtruck.js):</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>          shareId = TowTruck.startup._joinShareId;
-        }
-      }
-      <span class="keyword">if</span> (! shareId) {</pre></div></div>
+        <span class="keyword">if</span> (TogetherJS.startup._joinShareId) {</pre></div></div>
               
             </li>
           
@@ -626,12 +645,29 @@ long as session.identityId is set</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-18">&#182;</a>
                 </div>
-                <p>FIXME: I&#39;m not sure if this will ever happen, because towtruck.js should
+                <p>Like, below, this <em>also</em> means we got the shareId from the hash
+(in togetherjs.js):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          shareId = TogetherJS.startup._joinShareId;
+        }
+      }
+      <span class="keyword">if</span> (! shareId) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>FIXME: I&#39;m not sure if this will ever happen, because togetherjs.js should
 handle it</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> m = <span class="regexp">/&amp;?towtruck=([^&amp;]*)/</span>.exec(hash);
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> m = <span class="regexp">/&amp;?togetherjs=([^&amp;]*)/</span>.exec(hash);
         <span class="keyword">if</span> (m) {
           isClient = ! m[<span class="number">1</span>];
           shareId = m[<span class="number">2</span>];
@@ -640,8 +676,12 @@ handle it</p>
         }
       }
       <span class="keyword">return</span> storage.tab.get(<span class="string">"status"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(saved)</span> {</span>
-        <span class="keyword">var</span> findRoom = TowTruck.getConfig(<span class="string">"findRoom"</span>);
-        <span class="keyword">if</span> (findRoom &amp;&amp; ! saved) {
+        <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"findRoom"</span>);
+        <span class="keyword">if</span> (findRoom &amp;&amp; <span class="keyword">typeof</span> findRoom == <span class="string">"string"</span> &amp;&amp; ! saved) {
+          isClient = <span class="literal">true</span>;
+          shareId = findRoom;
+          sessionId = util.generateId();
+        } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; ! saved) {
           assert(findRoom.prefix &amp;&amp; <span class="keyword">typeof</span> findRoom.prefix == <span class="string">"string"</span>, <span class="string">"Bad findRoom.prefix"</span>, findRoom);
           assert(findRoom.max &amp;&amp; <span class="keyword">typeof</span> findRoom.max == <span class="string">"number"</span> &amp;&amp; findRoom.max &gt; <span class="number">0</span>,
                  <span class="string">"Bad findRoom.max"</span>, findRoom);
@@ -653,10 +693,10 @@ handle it</p>
               
             </li>
           
-            <li id="section-19">
+            <li id="section-20">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-19">&#182;</a>
+                  <a class="pilcrow" href="#section-20">&#182;</a>
                 </div>
                 <p>FIXME: duplicates code below:</p>
 
@@ -670,7 +710,7 @@ handle it</p>
             def.resolve(session.shareId);
           });
           <span class="keyword">return</span>;
-        } <span class="keyword">else</span> <span class="keyword">if</span> (TowTruck.startup._launch) {
+        } <span class="keyword">else</span> <span class="keyword">if</span> (TogetherJS.startup._launch) {
           <span class="keyword">if</span> (saved) {
             isClient = saved.reason == <span class="string">"joined"</span>;
             <span class="keyword">if</span> (! shareId) {
@@ -678,7 +718,7 @@ handle it</p>
             }
             sessionId = saved.sessionId;
           } <span class="keyword">else</span> {
-            isClient = TowTruck.startup.reason == <span class="string">"joined"</span>;
+            isClient = TogetherJS.startup.reason == <span class="string">"joined"</span>;
             assert(! sessionId);
             sessionId = util.generateId();
           }
@@ -687,17 +727,17 @@ handle it</p>
           }
         } <span class="keyword">else</span> <span class="keyword">if</span> (saved) {
           isClient = saved.reason == <span class="string">"joined"</span>;
-          TowTruck.startup.reason = saved.reason;
-          TowTruck.startup.continued = <span class="literal">true</span>;
+          TogetherJS.startup.reason = saved.reason;
+          TogetherJS.startup.continued = <span class="literal">true</span>;
           shareId = saved.shareId;
           sessionId = saved.sessionId;</pre></div></div>
               
             </li>
           
-            <li id="section-20">
+            <li id="section-21">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-20">&#182;</a>
+                  <a class="pilcrow" href="#section-21">&#182;</a>
                 </div>
                 <p>The only case when we don&#39;t need to set the storage status again is when
 we&#39;re already set to be running</p>
@@ -706,12 +746,12 @@ we&#39;re already set to be running</p>
               
                 <div class="content"><div class='highlight'><pre>          set = ! saved.running;
         } <span class="keyword">else</span> {
-          <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(<span class="string">"No saved status, and no startup._launch request; why did TowTruck start?"</span>);
+          <span class="keyword">throw</span> <span class="keyword">new</span> util.AssertionError(<span class="string">"No saved status, and no startup._launch request; why did TogetherJS start?"</span>);
         }
         assert(session.identityId);
         session.clientId = session.identityId + <span class="string">"."</span> + sessionId;
         <span class="keyword">if</span> (set) {
-          storage.tab.set(<span class="string">"status"</span>, {reason: TowTruck.startup.reason, shareId: shareId, running: <span class="literal">true</span>, date: Date.now(), sessionId: sessionId});
+          storage.tab.set(<span class="string">"status"</span>, {reason: TogetherJS.startup.reason, shareId: shareId, running: <span class="literal">true</span>, date: Date.now(), sessionId: sessionId});
         }
         session.isClient = isClient;
         session.shareId = shareId;
@@ -723,8 +763,8 @@ we&#39;re already set to be running</p>
 
   <span class="function"><span class="keyword">function</span> <span class="title">initStartTarget</span><span class="params">()</span> {</span>
     <span class="keyword">var</span> id;
-    <span class="keyword">if</span> (TowTruck.startup.button) {
-      id = TowTruck.startup.button.id;
+    <span class="keyword">if</span> (TogetherJS.startup.button) {
+      id = TogetherJS.startup.button.id;
       <span class="keyword">if</span> (id) {
         storage.set(<span class="string">"startTarget"</span>, id);
       }
@@ -733,7 +773,7 @@ we&#39;re already set to be running</p>
     storage.get(<span class="string">"startTarget"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
       <span class="keyword">var</span> el = document.getElementById(id);
       <span class="keyword">if</span> (el) {
-        TowTruck.startup.button = el;
+        TogetherJS.startup.button = el;
       }
     });
   }
@@ -745,7 +785,7 @@ we&#39;re already set to be running</p>
         readyForMessages = <span class="literal">false</span>;
         openChannel();
         require([<span class="string">"ui"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(ui)</span> {</span>
-          TowTruck.running = <span class="literal">true</span>;
+          TogetherJS.running = <span class="literal">true</span>;
           ui.prepareUI();
           require(features, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
             $(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -757,7 +797,7 @@ we&#39;re already set to be running</p>
                 startup.start();
               });
               ui.activateUI();
-              <span class="keyword">if</span> (TowTruck.getConfig(<span class="string">"enableAnalytics"</span>)) {
+              <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"enableAnalytics"</span>)) {
                 require([<span class="string">"analytics"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(analytics)</span> {</span>
                   analytics.activate();
                 });
@@ -765,7 +805,7 @@ we&#39;re already set to be running</p>
               peers._SelfLoaded.then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
                 sendHello(<span class="literal">false</span>);
               });
-              TowTruck.emit(<span class="string">"ready"</span>);
+              TogetherJS.emit(<span class="string">"ready"</span>);
             });
           });
         });
@@ -774,7 +814,7 @@ we&#39;re already set to be running</p>
   };
 
   session.close = <span class="function"><span class="keyword">function</span> <span class="params">(reason)</span> {</span>
-    TowTruck.running = <span class="literal">false</span>;
+    TogetherJS.running = <span class="literal">false</span>;
     <span class="keyword">var</span> msg = {type: <span class="string">"bye"</span>};
     <span class="keyword">if</span> (reason) {
       msg.reason = reason;
@@ -794,8 +834,8 @@ we&#39;re already set to be running</p>
       channel = <span class="literal">null</span>;
       session.shareId = <span class="literal">null</span>;
       session.emit(<span class="string">"shareId"</span>);
-      TowTruck.emit(<span class="string">"close"</span>);
-      TowTruck._teardown();
+      TogetherJS.emit(<span class="string">"close"</span>);
+      TogetherJS._teardown();
     });
   };
 
@@ -810,7 +850,7 @@ we&#39;re already set to be running</p>
     session.emit(<span class="string">"resize"</span>);
   }
 
-  <span class="keyword">if</span> (TowTruck.startup._launch) {
+  <span class="keyword">if</span> (TogetherJS.startup._launch) {
     setTimeout(session.start);
   }
 
@@ -845,17 +885,18 @@ we&#39;re already set to be running</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

@@ -1,7 +1,11 @@
 .madlib-hidden {
-    color: rgba(1, 1, 1, 0);
+    color: transparent;
+    text-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
 .madlib-hidden input {
     /*color: #000;*/
 }
+
+
+

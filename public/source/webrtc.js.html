@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>webrtc.js</h1>
         
-          <h4>Handles live audio chat.</h4>
+          <h4><p>Handles live audio chat.</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/webrtc.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/webrtc.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -333,24 +334,24 @@ Because they could be pref&#39;d on we&#39;ll do a quick check:</p>
   <span class="keyword">var</span> avatarEditState = {};
 
   session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    $(<span class="string">"#towtruck-self-avatar"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#togetherjs-self-avatar"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">var</span> avatar = peers.Self.avatar;
       <span class="keyword">if</span> (avatar) {
         $preview.attr(<span class="string">"src"</span>, avatar);
       }
-      ui.displayToggle(<span class="string">"#towtruck-avatar-edit"</span>);
+      ui.displayToggle(<span class="string">"#togetherjs-avatar-edit"</span>);
     });
     <span class="keyword">if</span> (! session.RTCSupported) {
-      $(<span class="string">"#towtruck-avatar-edit-rtc"</span>).hide();
+      $(<span class="string">"#togetherjs-avatar-edit-rtc"</span>).hide();
     }
 
     <span class="keyword">var</span> avatarData = <span class="literal">null</span>;
-    <span class="keyword">var</span> $preview = $(<span class="string">"#towtruck-self-avatar-preview"</span>);
-    <span class="keyword">var</span> $accept = $(<span class="string">"#towtruck-self-avatar-accept"</span>);
-    <span class="keyword">var</span> $cancel = $(<span class="string">"#towtruck-self-avatar-cancel"</span>);
-    <span class="keyword">var</span> $takePic = $(<span class="string">"#towtruck-avatar-use-camera"</span>);
-    <span class="keyword">var</span> $video = $(<span class="string">"#towtruck-avatar-video"</span>);
-    <span class="keyword">var</span> $upload = $(<span class="string">"#towtruck-avatar-upload"</span>);
+    <span class="keyword">var</span> $preview = $(<span class="string">"#togetherjs-self-avatar-preview"</span>);
+    <span class="keyword">var</span> $accept = $(<span class="string">"#togetherjs-self-avatar-accept"</span>);
+    <span class="keyword">var</span> $cancel = $(<span class="string">"#togetherjs-self-avatar-cancel"</span>);
+    <span class="keyword">var</span> $takePic = $(<span class="string">"#togetherjs-avatar-use-camera"</span>);
+    <span class="keyword">var</span> $video = $(<span class="string">"#togetherjs-avatar-video"</span>);
+    <span class="keyword">var</span> $upload = $(<span class="string">"#togetherjs-avatar-upload"</span>);
 
     $takePic.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">if</span> (! streaming) {
@@ -368,7 +369,7 @@ Because they could be pref&#39;d on we&#39;ll do a quick check:</p>
 
     $accept.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       peers.Self.update({avatar:  avatarData});
-      ui.displayToggle(<span class="string">"#towtruck-no-avatar-edit"</span>);</pre></div></div>
+      ui.displayToggle(<span class="string">"#togetherjs-no-avatar-edit"</span>);</pre></div></div>
               
             </li>
           
@@ -381,12 +382,12 @@ Because they could be pref&#39;d on we&#39;ll do a quick check:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-participants-other"</span>).show();
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-participants-other"</span>).show();
       $accept.attr(<span class="string">"disabled"</span>, <span class="string">"1"</span>);
     });
 
     $cancel.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      ui.displayToggle(<span class="string">"#towtruck-no-avatar-edit"</span>);</pre></div></div>
+      ui.displayToggle(<span class="string">"#togetherjs-no-avatar-edit"</span>);</pre></div></div>
               
             </li>
           
@@ -399,7 +400,7 @@ Because they could be pref&#39;d on we&#39;ll do a quick check:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-participants-other"</span>).show();
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-participants-other"</span>).show();
     });
 
     <span class="keyword">var</span> streaming = <span class="literal">false</span>;
@@ -515,36 +516,36 @@ gives it a chance to catch up</p>
 
   <span class="function"><span class="keyword">function</span> <span class="title">audioButton</span><span class="params">(selector)</span> {</span>
     ui.displayToggle(selector);
-    <span class="keyword">if</span> (selector == <span class="string">"#towtruck-audio-incoming"</span>) {
-      $(<span class="string">"#towtruck-audio-button"</span>).addClass(<span class="string">"towtruck-animated"</span>).addClass(<span class="string">"towtruck-color-alert"</span>);
+    <span class="keyword">if</span> (selector == <span class="string">"#togetherjs-audio-incoming"</span>) {
+      $(<span class="string">"#togetherjs-audio-button"</span>).addClass(<span class="string">"togetherjs-animated"</span>).addClass(<span class="string">"togetherjs-color-alert"</span>);
     } <span class="keyword">else</span> {
-      $(<span class="string">"#towtruck-audio-button"</span>).removeClass(<span class="string">"towtruck-animated"</span>).removeClass(<span class="string">"towtruck-color-alert"</span>);
+      $(<span class="string">"#togetherjs-audio-button"</span>).removeClass(<span class="string">"togetherjs-animated"</span>).removeClass(<span class="string">"togetherjs-color-alert"</span>);
     }
   }
 
   session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    $(<span class="string">"#towtruck-audio-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">if</span> ($(<span class="string">"#towtruck-rtc-info"</span>).is(<span class="string">":visible"</span>)) {
+    $(<span class="string">"#togetherjs-audio-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> ($(<span class="string">"#togetherjs-rtc-info"</span>).is(<span class="string">":visible"</span>)) {
         windowing.hide();
         <span class="keyword">return</span>;
       }
       <span class="keyword">if</span> (session.RTCSupported) {
         enableAudio();
       } <span class="keyword">else</span> {
-        windowing.show(<span class="string">"#towtruck-rtc-not-supported"</span>);
+        windowing.show(<span class="string">"#togetherjs-rtc-not-supported"</span>);
       }
     });
 
     <span class="keyword">if</span> (! session.RTCSupported) {
-      audioButton(<span class="string">"#towtruck-audio-unavailable"</span>);
+      audioButton(<span class="string">"#togetherjs-audio-unavailable"</span>);
       <span class="keyword">return</span>;
     }
-    audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+    audioButton(<span class="string">"#togetherjs-audio-ready"</span>);
 
     <span class="keyword">var</span> audioStream = <span class="literal">null</span>;
     <span class="keyword">var</span> accepted = <span class="literal">false</span>;
     <span class="keyword">var</span> connected = <span class="literal">false</span>;
-    <span class="keyword">var</span> $audio = $(<span class="string">"#towtruck-audio-element"</span>);
+    <span class="keyword">var</span> $audio = $(<span class="string">"#togetherjs-audio-element"</span>);
     <span class="keyword">var</span> offerSent = <span class="literal">null</span>;
     <span class="keyword">var</span> offerReceived = <span class="literal">null</span>;
     <span class="keyword">var</span> offerDescription = <span class="literal">false</span>;
@@ -558,7 +559,7 @@ gives it a chance to catch up</p>
       accepted = <span class="literal">true</span>;
       storage.settings.get(<span class="string">"dontShowRtcInfo"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(dontShow)</span> {</span>
         <span class="keyword">if</span> (! dontShow) {
-          windowing.show(<span class="string">"#towtruck-rtc-info"</span>);
+          windowing.show(<span class="string">"#togetherjs-rtc-info"</span>);
         }
       });
       <span class="keyword">if</span> (! audioStream) {
@@ -571,7 +572,7 @@ gives it a chance to catch up</p>
       toggleMute();
     }
 
-    ui.container.find(<span class="string">"#towtruck-rtc-info .towtruck-dont-show-again"</span>).change(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    ui.container.find(<span class="string">"#togetherjs-rtc-info .togetherjs-dont-show-again"</span>).change(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       storage.settings.set(<span class="string">"dontShowRtcInfo"</span>, <span class="keyword">this</span>.checked);
     });
 
@@ -597,7 +598,7 @@ gives it a chance to catch up</p>
           s += repl;
         }
       }
-      audioButton(<span class="string">"#towtruck-audio-error"</span>);</pre></div></div>
+      audioButton(<span class="string">"#togetherjs-audio-error"</span>);</pre></div></div>
               
             </li>
           
@@ -610,7 +611,7 @@ gives it a chance to catch up</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-audio-error"</span>).attr(<span class="string">"title"</span>, s);
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-audio-error"</span>).attr(<span class="string">"title"</span>, s);
     }
 
     <span class="function"><span class="keyword">function</span> <span class="title">startStreaming</span><span class="params">(callback)</span> {</span>
@@ -621,7 +622,7 @@ gives it a chance to catch up</p>
         },
         <span class="function"><span class="keyword">function</span> <span class="params">(stream)</span> {</span>
           audioStream = stream;
-          attachMedia(<span class="string">"#towtruck-local-audio"</span>, stream);
+          attachMedia(<span class="string">"#togetherjs-local-audio"</span>, stream);
           <span class="keyword">if</span> (callback) {
             callback();
           }
@@ -685,7 +686,7 @@ gives it a chance to catch up</p>
       _connection.onaddstream = <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
         console.log(<span class="string">"got event"</span>, event, event.type);
         attachMedia($audio, event.stream);
-        audioButton(<span class="string">"#towtruck-audio-active"</span>);
+        audioButton(<span class="string">"#togetherjs-audio-active"</span>);
       };
       _connection.onstatechange = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
               
@@ -703,7 +704,7 @@ Actually just doesn&#39;t work on Firefox</p>
               
                 <div class="content"><div class='highlight'><pre>        console.log(<span class="string">"state change"</span>, _connection.readyState);
         <span class="keyword">if</span> (_connection.readyState == <span class="string">"closed"</span>) {
-          audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+          audioButton(<span class="string">"#togetherjs-audio-ready"</span>);
         }
       };
       _connection.onicecandidate = <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
@@ -760,7 +761,7 @@ Actually just doesn&#39;t work on Firefox</p>
                 offer: offer.sdp
               });
               offerSent = offer;
-              audioButton(<span class="string">"#towtruck-audio-outgoing"</span>);
+              audioButton(<span class="string">"#togetherjs-audio-outgoing"</span>);
             },
             <span class="function"><span class="keyword">function</span> <span class="params">(err)</span> {</span>
               error(<span class="string">"Error doing RTC setLocalDescription:"</span>, err);
@@ -836,7 +837,7 @@ FIXME: replace with hang-up?</p>
       }
       offerReceived = msg.offer;
       <span class="keyword">if</span> (! accepted) {
-        audioButton(<span class="string">"#towtruck-audio-incoming"</span>);
+        audioButton(<span class="string">"#togetherjs-audio-incoming"</span>);
         <span class="keyword">return</span>;
       }
       <span class="function"><span class="keyword">function</span> <span class="title">run</span><span class="params">()</span> {</span>
@@ -949,7 +950,7 @@ instead:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      audioButton(<span class="string">"#towtruck-audio-ready"</span>);
+                <div class="content"><div class='highlight'><pre>      audioButton(<span class="string">"#togetherjs-audio-ready"</span>);
       <span class="keyword">if</span> (accepted &amp;&amp; (offerSent || answerSent)) {
         abort();
         connect();
@@ -991,17 +992,18 @@ instead:</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

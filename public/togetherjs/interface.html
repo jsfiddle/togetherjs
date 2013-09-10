@@ -1,0 +1,520 @@
+<div id="togetherjs-container" class="togetherjs">
+
+  <!-- This is the main set of buttons: -->
+  <div id="togetherjs-dock" class="togetherjs-dock-right">
+    <div id="togetherjs-dock-anchor" title="Move the dock">
+      <span id="togetherjs-dock-anchor-horizontal">
+        <img src="http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png" alt="drag">
+      </span>
+      <span id="togetherjs-dock-anchor-vertical">
+        <img src="http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png" alt="drag">
+      </span>
+    </div>
+    <div id="togetherjs-buttons">
+      <div style="display: none">
+        <button id="togetherjs-template-dock-person" class="togetherjs-button togetherjs-dock-person">
+          <div class="togetherjs-tooltip togetherjs-dock-person-tooltip">
+            <span class="togetherjs-person-name"></span>
+            <span class="togetherjs-person-tooltip-arrow-r"></span>
+          </div>
+          <div class="togetherjs-person togetherjs-person-status-overlay"></div>
+        </button>
+      </div>
+      <button id="togetherjs-profile-button" class="togetherjs-button" title="This is you">
+        <div class="togetherjs-person togetherjs-person-self"></div>
+        <div id="togetherjs-profile-arrow"></div>
+      </button>
+      <button id="togetherjs-share-button" class="togetherjs-button" title="Add a friend"></button>
+      <button id="togetherjs-audio-button" class="togetherjs-button" title="Turn on microphone">
+        <span id="togetherjs-audio-unavailable" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set">
+        </span>
+        <span id="togetherjs-audio-ready" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+        <span id="togetherjs-audio-outgoing" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+        <span id="togetherjs-audio-incoming" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+        <span id="togetherjs-audio-active" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+        <span id="togetherjs-audio-muted" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+        <span id="togetherjs-audio-error" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
+        </span>
+      </button>
+      <button id="togetherjs-chat-button" class="togetherjs-button" title="Chat"></button>
+      <div id="togetherjs-dock-participants"></div>
+    </div>
+  </div>
+
+  <!-- The window for editing the avatar: -->
+  <div id="togetherjs-avatar-edit" class="togetherjs-modal"
+       style="display: none">
+    <header> Update avatar </header>
+    <section>
+      <div class="togetherjs-avatar-preview togetherjs-person togetherjs-person-self"></div>
+      <div id="togetherjs-avatar-buttons">
+        <input type="file" class="togetherjs-upload-avatar">
+        <!--<button id="togetherjs-upload-avatar" class="togetherjs-primary">Upload a picture</button>-->
+        <!--<button id="togetherjs-camera-avatar" class="togetherjs-default">Take a picture</button>-->
+      </div>
+    </section>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-cancel togetherjs-dismiss">Cancel</button>
+      <span class="togetherjs-alt-text">or</span>
+      <button class="togetherjs-avatar-save togetherjs-primary">Save</button>
+    </section>
+  </div>
+
+  <!-- The window for sharing the link: -->
+  <div id="togetherjs-share" class="togetherjs-window"
+       data-bind-to="#togetherjs-share-button" style="display: none">
+    <header> Invite a friend </header>
+    <section>
+      <div class="togetherjs-not-mobile">
+        <p>Copy and paste this link over IM or email:</p>
+        <input type="text" class="togetherjs-share-link">
+      </div>
+      <div class="togetherjs-only-mobile">
+        <p>Copy and paste this link over IM or email:</p>
+        <a class="togetherjs-share-link" href="#">this link</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Participant detail template: -->
+  <div id="togetherjs-template-participant-window" class="togetherjs-window" style="display: none">
+    <header><div class="togetherjs-person togetherjs-person-small"></div><span class="togetherjs-person-name"></span></header>
+
+    <section class="togetherjs-participant-window-main">
+      <p class="togetherjs-participant-window-row"><strong>Role:</strong>
+        <span class="togetherjs-person-role"></span>
+      </p>
+
+      <p class="togetherjs-participant-window-row"><strong>Currently at:</strong>
+        <a class="togetherjs-person-url togetherjs-person-url-title"></a>
+      </p>
+
+      <p class="togetherjs-participant-window-row"><strong>Status:</strong>
+        <span class="togetherjs-person-status"></span>
+      </p>
+
+      <p class="togetherjs-participant-window-row"><strong class="togetherjs-float-left">Follow this participant:</strong>
+        <label class="togetherjs-follow-question togetherjs-float-left" for="togetherjs-person-status-follow">
+          <input type="checkbox" id="togetherjs-person-status-follow">
+        </label>
+        <span class="togetherjs-clear"></span>
+      </p>
+
+    </section>
+
+    <section class="togetherjs-buttons">
+      <!-- Displayed when the peer is at a different URL: -->
+      <div class="togetherjs-different-url">
+        <button class="togetherjs-nudge togetherjs-default">Nudge them</button>
+        <a href="#" class="togetherjs-follow togetherjs-person-url togetherjs-primary">Join them</a>
+      </div>
+      <!-- Displayed when the peer is at your same URL: -->
+      <div class="togetherjs-same-url" style="display: none">
+        <span class="togetherjs-person-name"></span> is on the same page as you.
+      </div>
+    </section>
+  </div>
+
+  <!-- The chat screen: -->
+  <div id="togetherjs-chat" class="togetherjs-window" data-bind-to="#togetherjs-chat-button"
+       style="display: none">
+    <header> Chat </header>
+    <section class="togetherjs-subtitle">
+      <div id="togetherjs-chat-participants" data-toggles="#togetherjs-chat-no-participants" style="display: none">
+        <span id="togetherjs-chat-participant-list"></span>
+        &amp; You
+      </div>
+      <div id="togetherjs-chat-no-participants" data-toggles="#togetherjs-chat-participants">
+        No one else is here.
+      </div>
+    </section>
+
+    <div style="display: none">
+
+      <!-- Template for one message: -->
+      <div id="togetherjs-template-chat-message" class="togetherjs-chat-item togetherjs-chat-message">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-timestamp"><span class="togetherjs-time">HH:MM</span> <span class="togetherjs-ampm">AM/PM</span></div>
+        <div class="togetherjs-person-name-abbrev"></div>
+        <div class="togetherjs-chat-content togetherjs-sub-content"></div>
+      </div>
+
+      <!-- Template for when a person leaves: -->
+      <div id="togetherjs-template-chat-left" class="togetherjs-chat-item togetherjs-chat-left-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-ifnot-declinedJoin">
+          <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> left the session.</div>
+        </div>
+        <div class="togetherjs-if-declinedJoin">
+          <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> declined to join the session.</div>
+        </div>
+        <div class="togetherjs-clear"></div>
+      </div>
+
+      <!-- Template when a person joins the session: -->
+      <div id="togetherjs-template-chat-joined" class="togetherjs-chat-item togetherjs-chat-join-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> joined the session.</div>
+        <div class="togetherjs-clear"></div>
+      </div>
+
+      <!-- Template for system-derived messages: -->
+      <div id="togetherjs-template-chat-system" class="togetherjs-chat-item">
+        <span class="togetherjs-chat-content togetherjs-sub-content"></span>
+      </div>
+
+      <!-- Template when a person joins the session: -->
+      <!-- <div id="togetherjs-template-chat-joined" class="togetherjs-chat-item togetherjs-chat-join-item">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text"><span class="togetherjs-person-name"></span> joined the session.</div>
+        <div class="togetherjs-clear"></div>
+      </div> -->
+
+      <!-- Template for when someone goes to a new URL: -->
+      <div id="togetherjs-template-url-change" class="togetherjs-chat-item togetherjs-chat-url-change">
+        <div class="togetherjs-person"></div>
+        <div class="togetherjs-inline-text">
+          <div class="togetherjs-if-sameUrl">
+            <span class="togetherjs-person-name"></span>
+            is on the same page as you.
+          </div>
+          <div class="togetherjs-ifnot-sameUrl">
+            <span class="togetherjs-person-name"></span>
+            has gone to: <a href="#" class="togetherjs-person-url togetherjs-person-url-title" target="_self"></a>
+            <section class="togetherjs-buttons togetherjs-buttons-notification-diff-url">
+              <!-- Displayed when the peer is at a different URL: -->
+              <div class="togetherjs-different-url togetherjs-notification-diff-url">
+                <button class="togetherjs-nudge togetherjs-default">Nudge them</button>
+                <a href="#" class="togetherjs-follow togetherjs-person-url togetherjs-primary">Join them</a>
+              </div>
+            </section>
+
+            <!-- <div>
+              <a class="togetherjs-nudge togetherjs-secondary">Nudge them</a>
+              <a href="" class="togetherjs-person-url togetherjs-follow togetherjs-primary">Join them</a>
+            </div> -->
+
+          </div>
+        </div>
+        <div class="togetherjs-clear"></div>
+      </div>
+    </div>
+
+    <section id="togetherjs-chat-messages">
+      <!-- FIX ME// need to have some dialogue that says something like - There are no chats yet! -->
+    </section>
+    <section id="togetherjs-chat-input-box">
+      <input type="text" id="togetherjs-chat-input" placeholder="Type your message here">
+    </section>
+  </div>
+
+  <!-- this is a kind of warning popped up when you (successfully) start RTC: -->
+  <div id="togetherjs-rtc-info" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
+       style="display: none">
+
+    <header> Audio Chat </header>
+    <section>
+      <p>
+        Activate your <strong>browser microphone</strong> near your URL bar above.
+      </p>
+      <p>
+        Talking on your microphone through your web browser is an experimental feature.
+      </p>
+      <p>
+        Read more about Audio Chat <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.
+      </p>
+    </section>
+
+    <section class="togetherjs-buttons">
+      <label for="togetherjs-rtc-info-dismiss" style="display: inline;">
+        <input class="togetherjs-dont-show-again" id="togetherjs-rtc-info-dismiss" type="checkbox">
+        Don't show again.
+      </label>
+      <button class="togetherjs-default togetherjs-dismiss" type="button">Close</button>
+    </section>
+  </div>
+
+  <!-- this is popped up when you hit the audio button, but RTC isn't
+  supported: -->
+  <div id="togetherjs-rtc-not-supported" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
+       style="display: none">
+    <header> Audio Chat </header>
+
+    <section>
+      <p>Audio chat requires you to use a <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+        newer browser
+      </a>!</p>
+      <p>
+        Live audio chat requires a newer (or different) browser than you're using.
+      </p>
+      <p>
+        See
+        <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">
+          this page
+        </a>
+        for more information and a list of supported browsers.
+      </p>
+    </section>
+
+    <section class="togetherjs-buttons">
+      <div class="togetherjs-rtc-dialog-btn">
+        <button class="togetherjs-default togetherjs-dismiss" type="button">Close</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- The popup when a chat message comes in and the #togetherjs-chat window isn't open -->
+  <div id="togetherjs-chat-notifier" class="togetherjs-notification"
+       data-bind-to="#togetherjs-chat-button"
+       style="display: none">
+    <img src="http://localhost:8080/togetherjs/images/notification-togetherjs-logo.png" class="togetherjs-notification-logo" alt="">
+    <img src="http://localhost:8080/togetherjs/images/notification-btn-close.png" class="togetherjs-notification-closebtn togetherjs-dismiss" alt="[close]">
+    <section id="togetherjs-chat-notifier-message">
+    </section>
+  </div>
+
+  <!-- The menu when you click on the profile: -->
+  <div id="togetherjs-menu" class="togetherjs-menu" style="display: none">
+    <div class="togetherjs-menu-item togetherjs-menu-disabled" id="togetherjs-menu-profile">
+      <img id="togetherjs-menu-avatar">
+      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display" data-toggles="#togetherjs-menu .togetherjs-self-name"></span>
+      <input class="togetherjs-self-name" type="text" data-toggles="#togetherjs-self-name-display" style="display: none" placeholder="Enter your name">
+    </div>
+    <div class="togetherjs-menu-hr-avatar"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-name"><img src="http://localhost:8080/togetherjs/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-avatar"><img src="http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-color"><span class="togetherjs-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-help">Help</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback">Feedback</div>
+    <div id="togetherjs-invite" style="display: none">
+      <div class="togetherjs-hr"></div>
+      <div id="togetherjs-invite-users"></div>
+      <div class="togetherjs-menu-item" id="togetherjs-menu-refresh-invite">Refresh users</div>
+      <div class="togetherjs-menu-item" id="togetherjs-menu-invite-anyone">Invite anyone</div>
+    </div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-end"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> End <span class="togetherjs-tool-name">TogetherJS</span></div>
+  </div>
+
+  <!-- template for one person in the invite-users list -->
+  <div style="display: none">
+    <div id="togetherjs-template-invite-user-item" class="togetherjs-menu-item">
+      <!-- FIXME: should include avatar in some way -->
+      <span class="togetherjs-person-name"></span>
+    </div>
+  </div>
+
+  <!-- A window version of #togetherjs-menu, for use on mobile -->
+  <div id="togetherjs-menu-window" class="togetherjs-window" style="display: none">
+    <header>Settings and Profile</header>
+    <section>
+    <div class="togetherjs-menu-item">
+      <img class="togetherjs-menu-avatar">
+      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display"></span>
+    </div>
+    <div class="togetherjs-menu-hr-avatar"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-name-button"><img src="http://localhost:8080/togetherjs/images/button-pencil.png" alt=""> Update your name</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-avatar-button"><img src="http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png" alt=""> Change avatar</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-update-color-button"><span class="togetherjs-person-bgcolor-self"></span> Pick profile color</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-help-button">Help</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback-button">Feedback</div>
+    <div class="togetherjs-hr"></div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-end-button"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> End <span class="togetherjs-tool-name">TogetherJS</span></div>
+    </section>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">OK</button>
+    </section>
+  </div>
+
+  <!-- The name editor, for use on mobile -->
+  <div id="togetherjs-edit-name-window" class="togetherjs-window" style="display: none">
+    <header>Update Name</header>
+    <section>
+      <div>
+        <input class="togetherjs-self-name" type="text" placeholder="Enter your name">
+      </div>
+    </section>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">OK</button>
+    </section>
+  </div>
+
+  <div class="togetherjs-menu" id="togetherjs-pick-color" style="display: none">
+    <div class="togetherjs-triangle-up"><img src="http://localhost:8080/togetherjs/images/icn-triangle-up.png"></div>
+    <div style="display: none">
+      <div id="togetherjs-template-swatch" class="togetherjs-swatch">
+      </div>
+    </div>
+  </div>
+
+  <!-- Invisible elements that handle the RTC audio: -->
+  <audio id="togetherjs-audio-element"></audio>
+  <audio id="togetherjs-local-audio" muted="true" volume="0.3"></audio>
+  <audio id="togetherjs-notification" src="http://localhost:8080/togetherjs/images/notification.mp3"></audio>
+
+  <!-- The intro screen for someone who joins a session the first time: -->
+  <div id="togetherjs-intro" class="togetherjs-modal" style="display: none">
+    <header>Join <span class="togetherjs-tool-name">TogetherJS</span> session?</header>
+    <section>
+      <p>Your friend has asked you to join their <a href="https://togetherjs.mozillalabs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a> browser session to collaborate in real-time!</p>
+
+      <p>Would you like to join their session?</p>
+    </section>
+
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-destructive togetherjs-modal-dont-join">No, don't join</button>
+      <button class="togetherjs-primary togetherjs-dismiss">Yes, join session</button>
+    </section>
+  </div>
+
+  <!-- Shown when a web browser is completely incapable of running TogetherJS: -->
+  <div id="togetherjs-browser-broken" class="togetherjs-modal" style="display: none">
+    <header> Sorry </header>
+
+    <section>
+      <p>
+        We're sorry, <span class="togetherjs-tool-name">TogetherJS</span> doesn't work with this browser.  Please
+        <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers">upgrade
+          to a supported browser</a> to try <span class="togetherjs-tool-name">TogetherJS</span>.
+      </p>
+
+      <p id="togetherjs-browser-broken-is-ie" style="display: none">
+        Internet
+        Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is
+          not supported</a> and won't be supported in the near term,
+        please use Firefox or Chrome.
+      </p>
+    </section>
+
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">End <span class="togetherjs-tool-name">TogetherJS</span></button>
+    </section>
+
+  </div>
+
+  <!-- Shown when the browser has WebSockets, but is IE (i.e., IE10) -->
+  <div id="togetherjs-browser-unsupported" class="togetherjs-modal" style="display: none">
+    <header> Unsupported Browser </header>
+
+    <section>
+      <p>
+        We're sorry, Internet Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is not supported</a>
+        at this time.  While we may add support later, adding support is
+        not currently on our roadmap.  Please use Firefox or Chrome.
+      </p>
+
+      <p>You can continue to try to use <span class="togetherjs-tool-name">TogetherJS</span>, but you are likely to hit
+        lots of bugs.  So be warned.</p>
+
+    </section>
+
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-dismiss togetherjs-primary">End <span class="togetherjs-tool-name">TogetherJS</span></button>
+      <button class="togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway">Try <span class="togetherjs-tool-name">TogetherJS</span> Anyway</button>
+    </section>
+
+  </div>
+
+  <div id="togetherjs-confirm-end" class="togetherjs-modal" style="display: none">
+    <header> End session? </header>
+    <section>
+      <p>
+        Are you sure you'd like to end your <span class="togetherjs-tool-name">TogetherJS</span> session?
+      </p>
+    </section>
+    <section class="togetherjs-buttons">
+      <button class="togetherjs-cancel togetherjs-dismiss">Cancel</button>
+      <span class="togetherjs-alt-text">or</span>
+      <button id="togetherjs-end-session" class="togetherjs-destructive">End session</button>
+    </section>
+  </div>
+
+  <div id="togetherjs-feedback-form" class="togetherjs-modal" style="display: none;">
+    <header> Feedback </header>
+    <iframe src="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true" width="400" height="300" frameborder="0" marginheight="0" marginwidth="0">Loading form...</iframe>
+    <!-- <p><button class="togetherjs-modal-close">Close</button></p> -->
+  </div>
+
+  <div style="display: none">
+    <!-- This is when you join a session and the other person has already changed to another URL: -->
+    <div id="togetherjs-template-url-change" class="togetherjs-modal">
+      <header> Following to new URL... </header>
+      <section>
+        <div class="togetherjs-person"></div>
+        Following
+        <span class="togetherjs-person-name"></span>
+        to <a href="" class="togetherjs-person-url togetherjs-person-url-title"></a>
+      </section>
+    </div>
+
+    <!-- This is when someone invites you to their session: -->
+    <div id="togetherjs-template-invite" class="togetherjs-chat-item">
+      <div class="togetherjs-person"></div>
+      <div>
+        <span class="togetherjs-person-name"></span>
+        has invited <strong class="togetherjs-if-forEveryone">anyone</strong>
+        <strong class="togetherjs-ifnot-forEveryone">you</strong>
+        to <a href="" data-togetherjs-subattr-href="href" class="togetherjs-sub-hrefTitle" target="_blank"></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- The pointer at the side of a window: -->
+  <div id="togetherjs-window-pointer-right" style="display: none"></div>
+  <div id="togetherjs-window-pointer-left" style="display: none"></div>
+
+  <!-- The element that overlaps the background of the page during a modal dialog: -->
+  <div id="togetherjs-modal-background" style="display: none"></div>
+
+  <!-- Some miscellaneous templates -->
+  <div style="display: none">
+
+    <!-- This is the cursor: -->
+    <div id="togetherjs-template-cursor" class="togetherjs-cursor togetherjs">
+      <!-- Note: images/cursor.svg is a copy of this (for editing): -->
+      <!-- crossbrowser svg dropshadow http://demosthenes.info/blog/600/Creating-a-True-CrossBrowser-Drop-Shadow- -->
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	       width="15.147px" height="19.653px" viewBox="0 0 15.147 19.653" enable-background="new 0 0 15.147 19.653" xml:space="preserve" >
+        <path fill-rule="evenodd" clip-rule="evenodd" fill="#9F1D20" d="M7.85,19.653c0,0,4.886-1.31,6.603-1.769
+	c-0.373-1.391,1.128-3.674,0.567-5.766c-0.56-2.091-1.167-4.353-1.167-4.353s-0.236-1.055-1.232-0.788S11.498,7.76,11.498,7.76
+	s-0.427-1.152-1.461-1.266C9.003,6.379,8.555,7.201,8.555,7.201S8.451,5.987,7.146,6.337C5.474,6.785,6.374,9.52,6.374,9.52
+	L3.571,2.176c0,0-0.92-2.421-1.613-2.156C1.254,0.289,1.414,1.853,1.639,2.694c0.318,1.186,2.904,9.915,2.904,9.915
+	s-3.856-3.503-4.5-2.5c-0.393,0.688,2.023,4.821,3,5.501c0.978,0.679,3.021,1.998,4.016,3.02c0.995,1.023,0.902,0.97,0.902,0.97"/>
+      </svg>
+      <!-- <img class="togetherjs-cursor-img" src="http://localhost:8080/togetherjs/images/cursor.svg"> -->
+      <span class="togetherjs-cursor-container">
+        <span class="togetherjs-cursor-name"></span>
+        <span style="display:none" class="togetherjs-cursor-typing" id="togetherjs-cursor-typebox">
+          <span class="togetherjs-typing-ellipse-one">&#9679;</span><span class="togetherjs-typing-ellipse-two">&#9679;</span><span class="togetherjs-typing-ellipse-three">&#9679;</span>
+        </span>
+        <!-- Displayed when the cursor is below the screen: -->
+        <span class="togetherjs-cursor-down">
+
+        </span>
+        <!-- Displayed when the cursor is above the screen: -->
+        <span class="togetherjs-cursor-up">
+
+        </span>
+      </span>
+    </div>
+
+    <!-- This is the element that goes around focused form elements: -->
+    <div id="togetherjs-template-focus">
+      <div class="togetherjs-focus togetherjs-person-bordercolor"></div>
+    </div>
+
+    <!-- This is a click: -->
+    <div id="togetherjs-template-click" class="togetherjs-click togetherjs">
+    </div>
+  </div>
+</div>

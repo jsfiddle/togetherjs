@@ -13,17 +13,17 @@
 ----------------------------------------------- */
 @font-face {
   font-family: openSansRegular;
-  src: url('fonts/OpenSans-Regular.ttf');
+  src: url('../fonts/OpenSans-Regular.ttf');
 }
 
 @font-face {
   font-family: openSansLight;
-  src: url('fonts/OpenSans-Light.ttf');
+  src: url('../fonts/OpenSans-Light.ttf');
 }
 
 @font-face {
   font-family: openSansBold;
-  src: url('fonts/OpenSans-Bold.ttf');
+  src: url('../fonts/OpenSans-Bold.ttf');
 }
 
 body {
@@ -314,13 +314,47 @@ h5 {
   margin: 40px 0px;
 }
 
+#main-section h3 {
+  color: rgb(22, 22, 22);
+  font-family: 'Open Sans Light',sans-serif;
+  font-size: 32px;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 100;
+  margin: 40px 0px 20px;
+}
+
+#main-section p {
+  color: rgb(22, 22, 22);
+  font-family: 'Open Sans Light',sans-serif;
+  font-size: 16px;
+  line-height: 27px;
+}
+
+#main-section h4 {
+  margin-top: 20px;
+  font-family: openSansBold, sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 16px;
+}
+
 /* =tour section
 ----------------------------------------------- */
 
-#main-section #tour img.why-section {
-  width: 50%;
-  height: 50%;
+#main-section img.why-section {
+  width: 40%;
+  height: 40%;
   margin: 0 auto;
+}
+
+#tour h3 {
+  margin-top: 60px;
+  margin-bottom: 10px;
 }
 
 .why-connect-01 img {
@@ -655,6 +689,11 @@ h5 {
     font-size: 28px;
     line-height: 30px;
   }
+  
+  #main-section h3 {
+    font-size: 24px;
+    line-height: 26px;
+  }
 
   h3 {
     font-size: 20px;
@@ -725,6 +764,15 @@ h5 {
     top: 25%;
     left: 50%;
   }
+  
+  #footer a {
+    font-size: 11px;
+  }
+  
+  #footer a img {
+    width: 60px;
+    height: 10px;
+  }
 
 }
 
@@ -763,6 +811,11 @@ h5 {
 
   a#tabzilla {
     display: inherit;
+  }
+  
+  #footer a img {
+    width: 100px;
+    height: 17px;
   }
 
 
@@ -808,6 +861,11 @@ h5 {
 
   a#tabzilla {
     display: inherit;
+  }
+  
+  #footer a img {
+    width: 141px;
+    height: 24px;
   }
 
 }
@@ -941,6 +999,7 @@ h5 {
   }
 }*/
 
+
 /* Source-specific styles */
 
 #sourcecode h1 {
@@ -1043,6 +1102,10 @@ h5 {
   padding: 10px 25px 1px 0px;
 }
 
+dd {
+  padding-left: 2em;
+}
+
 
 /*MARKDOWN*/
 
@@ -1053,34 +1116,63 @@ h5 {
 }
 
 #markdownpages h2 {
-  margin-bottom: 18px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 36px;
 }
 
 #markdownpages h3 {
-  margin-bottom: 18px;
+  font-size: 24px;
 }
 
 #markdownpages pre {
   margin: 10px 0 20px;
 }
 
+#markdownpages ul li {
+  font-size: 14px;
+  font-family: 'Open Sans',sans-serif;
+}
+
 #markdownpages #sidenav {
   margin-top: 40px;
 }
 
-#markdownpages #sidenav.panel .panel-heading {
+#sidenav .well .btn {
+  margin-bottom: 10px;
+}
+
+#sectionmenu {
+  border: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/*this doesnt match up right*/
+/*#sectionmenu li.active {
+  text-decoration: underline;
+}*/
+
+.panel {
+  border:0px;
+  box-shadow: none;
+}
+
+#sidenav.panel .panel-heading {
   background: #fff;
   border-bottom: none;
   font-weight: 700;
 }
 
-#markdownpages #sidenav .affix {
+#sidenav .affix {
   width: 263px;
   position: fixed;
 }
 
 @media (min-width: 1200px) {
-  #markdownpages .affix, #markdownpages .affix-bottom {
+  .affix, .affix-bottom {
     width: 263px !important;
     position: fixed !important;
   }
@@ -1090,10 +1182,10 @@ h5 {
 }
 
 @media (min-width: 992px) {
-  #markdownpages .affix, #markdownpages .affix-bottom {
+  .affix, .affix-bottom {
     width: 213px;
   }
-  #markdownpages .affix {
+  .affix {
     position: fixed !important;
   }
   .col-md-9 h1:first-child {
@@ -1102,7 +1194,7 @@ h5 {
 }
 
 @media (min-width: 768px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {
@@ -1111,7 +1203,7 @@ h5 {
 }
 
 @media (min-width: 480px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {
@@ -1120,7 +1212,7 @@ h5 {
 }
 
 @media (max-width: 480px) {
-  #markdownpages .affix {
+  .affix {
     position: static;
   }
   .col-md-9 h1:first-child {

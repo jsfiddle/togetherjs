@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>ui.js</h1>
         
-          <h4>This has most of the UI, meaning everything involving HTML, and reacting to that interface.</h4>
+          <h4><p>This has most of the UI, meaning everything involving HTML, and reacting to that interface.</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/ui.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/ui.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -186,7 +187,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
 
-define([<span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"templates"</span>, <span class="string">"templating"</span>, <span class="string">"linkify"</span>, <span class="string">"peers"</span>, <span class="string">"windowing"</span>, <span class="string">"tinycolor"</span>, <span class="string">"elementFinder"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder)</span> {</span>
+define([<span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"templates"</span>, <span class="string">"templating"</span>, <span class="string">"linkify"</span>, <span class="string">"peers"</span>, <span class="string">"windowing"</span>, <span class="string">"tinycolor"</span>, <span class="string">"elementFinder"</span>, <span class="string">"visibilityApi"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi)</span> {</span>
   <span class="keyword">var</span> ui = util.Module(<span class="string">'ui'</span>);
   <span class="keyword">var</span> assert = util.assert;
   <span class="keyword">var</span> AssertionError = util.AssertionError;
@@ -200,7 +201,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-1">&#182;</a>
                 </div>
-                <p>This is also in towtruck.less, as @button-height:</p>
+                <p>This is also in togetherjs.less, as @button-height:</p>
 
               </div>
               
@@ -213,7 +214,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-2">&#182;</a>
                 </div>
-                <p>This is also in towtruck.less, under .towtruck-animated</p>
+                <p>This is also in togetherjs.less, under .togetherjs-animated</p>
 
               </div>
               
@@ -306,15 +307,15 @@ after everything is loaded, and this is sure to complete by that time:</p>
   };
 
   <span class="function"><span class="keyword">function</span> <span class="title">panelPosition</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> iface = $(<span class="string">"#towtruck-dock"</span>);
-    <span class="keyword">if</span> (iface.hasClass(<span class="string">"towtruck-dock-right"</span>)) {
+    <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
+    <span class="keyword">if</span> (iface.hasClass(<span class="string">"togetherjs-dock-right"</span>)) {
       <span class="keyword">return</span> <span class="string">"right"</span>;
-    } <span class="keyword">else</span> <span class="keyword">if</span> (iface.hasClass(<span class="string">"towtruck-dock-left"</span>)) {
+    } <span class="keyword">else</span> <span class="keyword">if</span> (iface.hasClass(<span class="string">"togetherjs-dock-left"</span>)) {
       <span class="keyword">return</span> <span class="string">"left"</span>;
-    } <span class="keyword">else</span> <span class="keyword">if</span> (iface.hasClass(<span class="string">"towtruck-dock-bottom"</span>)) {
+    } <span class="keyword">else</span> <span class="keyword">if</span> (iface.hasClass(<span class="string">"togetherjs-dock-bottom"</span>)) {
       <span class="keyword">return</span> <span class="string">"bottom"</span>;
     } <span class="keyword">else</span> {
-      <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"#towtruck-dock doesn't have positioning class"</span>);
+      <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"#togetherjs-dock doesn't have positioning class"</span>);
     }
   }
 
@@ -411,7 +412,7 @@ loaded:</p>
     assert(container.length);
     $(<span class="string">"body"</span>).append(container);
     fixupAvatars(container);
-    <span class="keyword">if</span> (session.firstRun &amp;&amp; TowTruck.startTarget) {</pre></div></div>
+    <span class="keyword">if</span> (session.firstRun &amp;&amp; TogetherJS.startTarget) {</pre></div></div>
               
             </li>
           
@@ -432,9 +433,9 @@ failed.)</p>
       finishedAt = Date.now() + DOCK_ANIMATION_TIME + <span class="number">50</span>;
       setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         finishedAt = Date.now() + DOCK_ANIMATION_TIME + <span class="number">40</span>;
-        <span class="keyword">var</span> iface = container.find(<span class="string">"#towtruck-dock"</span>);
+        <span class="keyword">var</span> iface = container.find(<span class="string">"#togetherjs-dock"</span>);
         <span class="keyword">var</span> start = iface.offset();
-        <span class="keyword">var</span> pos = $(TowTruck.startTarget).offset();
+        <span class="keyword">var</span> pos = $(TogetherJS.startTarget).offset();
         pos.top = Math.floor(pos.top - start.top);
         pos.left = Math.floor(pos.left - start.left);
         <span class="keyword">var</span> translate = <span class="string">"translate("</span> + pos.left + <span class="string">"px, "</span> + pos.top + <span class="string">"px)"</span>;
@@ -476,21 +477,21 @@ failed.)</p>
         }, <span class="number">5</span>);
       }, <span class="number">5</span>);
     }
-    <span class="keyword">if</span> (TowTruck.startTarget) {
-      <span class="keyword">var</span> el = $(TowTruck.startTarget);
+    <span class="keyword">if</span> (TogetherJS.startTarget) {
+      <span class="keyword">var</span> el = $(TogetherJS.startTarget);
       <span class="keyword">var</span> text = el.text().toLowerCase().replace(<span class="regexp">/\s+/g</span>, <span class="string">" "</span>);
       text = text.replace(<span class="regexp">/^\s*/</span>, <span class="string">""</span>).replace(<span class="regexp">/\s*$/</span>, <span class="string">""</span>);
-      <span class="keyword">if</span> (text == <span class="string">"start towtruck"</span>) {
-        el.attr(<span class="string">"data-end-towtruck-html"</span>, <span class="string">"End TowTruck"</span>);
+      <span class="keyword">if</span> (text == <span class="string">"start togetherjs"</span>) {
+        el.attr(<span class="string">"data-end-togetherjs-html"</span>, <span class="string">"End TogetherJS"</span>);
       }
-      <span class="keyword">if</span> (el.attr(<span class="string">"data-end-towtruck-html"</span>)) {
-        el.attr(<span class="string">"data-start-towtruck-html"</span>, el.html());
-        el.html(el.attr(<span class="string">"data-end-towtruck-html"</span>));
+      <span class="keyword">if</span> (el.attr(<span class="string">"data-end-togetherjs-html"</span>)) {
+        el.attr(<span class="string">"data-start-togetherjs-html"</span>, el.html());
+        el.html(el.attr(<span class="string">"data-end-togetherjs-html"</span>));
       }
-      el.addClass(<span class="string">"towtruck-started"</span>);
+      el.addClass(<span class="string">"togetherjs-started"</span>);
     }
-    ui.container.find(<span class="string">".towtruck-window &gt; header, .towtruck-modal &gt; header"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      $(<span class="keyword">this</span>).append($(<span class="string">'&lt;button class="towtruck-close"&gt;&lt;/button&gt;'</span>));
+    ui.container.find(<span class="string">".togetherjs-window &gt; header, .togetherjs-modal &gt; header"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      $(<span class="keyword">this</span>).append($(<span class="string">'&lt;button class="togetherjs-close"&gt;&lt;/button&gt;'</span>));
     });
   };</pre></div></div>
               
@@ -558,9 +559,9 @@ everything is loaded and ready for interaction.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>    ui.prepareShareLink(container);
-    container.find(<span class="string">"input.towtruck-share-link"</span>).on(<span class="string">"keydown"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    container.find(<span class="string">"input.togetherjs-share-link"</span>).on(<span class="string">"keydown"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">if</span> (event.which == <span class="number">27</span>) {
-        windowing.hide(<span class="string">"#towtruck-share"</span>);
+        windowing.hide(<span class="string">"#togetherjs-share"</span>);
         <span class="keyword">return</span> <span class="literal">false</span>;
       }
       <span class="keyword">return</span> <span class="literal">undefined</span>;
@@ -578,14 +579,14 @@ everything is loaded and ready for interaction.</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> input = container.find(<span class="string">"#towtruck-chat-input"</span>);
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> input = container.find(<span class="string">"#togetherjs-chat-input"</span>);
     input.bind(<span class="string">"keyup"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">if</span> (event.which == <span class="number">13</span>) { <span class="comment">// Enter</span>
         submitChat();
         <span class="keyword">return</span> <span class="literal">false</span>;
       }
       <span class="keyword">if</span> (event.which == <span class="number">27</span>) { <span class="comment">// Escape</span>
-        windowing.hide(<span class="string">"#towtruck-chat"</span>);
+        windowing.hide(<span class="string">"#togetherjs-chat"</span>);
       }
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
@@ -614,7 +615,7 @@ so abruptly</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> anchor = container.find(<span class="string">"#towtruck-dock-anchor"</span>);
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> anchor = container.find(<span class="string">"#togetherjs-dock-anchor"</span>);
     assert(anchor.length);</pre></div></div>
               
             </li>
@@ -628,9 +629,9 @@ so abruptly</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    anchor = container.find(<span class="string">"#towtruck-dock-anchor-disabled"</span>);
+                <div class="content"><div class='highlight'><pre>    anchor = container.find(<span class="string">"#togetherjs-dock-anchor-disabled"</span>);
     anchor.mousedown(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
-      <span class="keyword">var</span> iface = $(<span class="string">"#towtruck-dock"</span>);</pre></div></div>
+      <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);</pre></div></div>
               
             </li>
           
@@ -673,10 +674,10 @@ so abruptly</p>
         } <span class="keyword">else</span> {
           pos = <span class="string">"bottom"</span>;
         }
-        iface.removeClass(<span class="string">"towtruck-dock-left"</span>);
-        iface.removeClass(<span class="string">"towtruck-dock-right"</span>);
-        iface.removeClass(<span class="string">"towtruck-dock-bottom"</span>);
-        iface.addClass(<span class="string">"towtruck-dock-"</span> + pos);
+        iface.removeClass(<span class="string">"togetherjs-dock-left"</span>);
+        iface.removeClass(<span class="string">"togetherjs-dock-right"</span>);
+        iface.removeClass(<span class="string">"togetherjs-dock-bottom"</span>);
+        iface.addClass(<span class="string">"togetherjs-dock-"</span> + pos);
         <span class="keyword">if</span> (startPos &amp;&amp; pos != startPos) {
           windowing.hide();
           startPos = <span class="literal">null</span>;
@@ -716,20 +717,18 @@ the mouse is stuck down:</p>
       });
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
-    
+
     <span class="function"><span class="keyword">function</span> <span class="title">openDock</span><span class="params">()</span> {</span>
-      console.log(<span class="string">"open Dock"</span>);
-      
-      $(<span class="string">'.towtruck-window'</span>).animate({
+      $(<span class="string">'.togetherjs-window'</span>).animate({
         opacity: <span class="number">1</span>
       });
-      $(<span class="string">'#towtruck-dock-participants'</span>).animate({
+      $(<span class="string">'#togetherjs-dock-participants'</span>).animate({
         opacity: <span class="number">1</span>
       });
-      $(<span class="string">'#towtruck-dock #towtruck-buttons'</span>).animate({
+      $(<span class="string">'#togetherjs-dock #togetherjs-buttons'</span>).animate({
         opacity: <span class="number">1</span>
       });
-      $(<span class="string">'.towtruck-dock-right'</span>).animate({
+      $(<span class="string">'.togetherjs-dock-right'</span>).animate({
         width: <span class="string">"75%"</span>
       }, {
         duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
@@ -777,11 +776,10 @@ the mouse is stuck down:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> src = <span class="string">"../images/togetherjs-logo-close.png"</span>;
-      $(<span class="string">"#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
+      $(<span class="string">"#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
     }
-    
-    <span class="function"><span class="keyword">function</span> <span class="title">closeDock</span><span class="params">()</span> {</span>
-      console.log(<span class="string">"Close dock"</span>);</pre></div></div>
+
+    <span class="function"><span class="keyword">function</span> <span class="title">closeDock</span><span class="params">()</span> {</span></pre></div></div>
               
             </li>
           
@@ -812,18 +810,18 @@ the mouse is stuck down:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> src = <span class="string">"../images/togetherjs-logo-open.png"</span>;
-      $(<span class="string">"#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
+      $(<span class="string">"#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
 
-      $(<span class="string">'.towtruck-window'</span>).animate({
+      $(<span class="string">'.togetherjs-window'</span>).animate({
         opacity: <span class="number">0</span>
       });
-      $(<span class="string">'#towtruck-dock-participants'</span>).animate({
+      $(<span class="string">'#togetherjs-dock-participants'</span>).animate({
         opacity: <span class="number">0</span>
       });
-      $(<span class="string">'#towtruck-dock #towtruck-buttons'</span>).animate({
+      $(<span class="string">'#togetherjs-dock #togetherjs-buttons'</span>).animate({
         opacity: <span class="number">0</span>
       });
-      $(<span class="string">'.towtruck-dock-right'</span>).animate({
+      $(<span class="string">'.togetherjs-dock-right'</span>).animate({
         width: <span class="string">"40px"</span>
       }, {
         duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
@@ -867,8 +865,8 @@ the mouse is stuck down:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-audio-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        windowing.toggle(<span class="string">"#towtruck-rtc-not-supported"</span>);
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-audio-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        windowing.toggle(<span class="string">"#togetherjs-rtc-not-supported"</span>);
       });</pre></div></div>
               
             </li>
@@ -882,8 +880,8 @@ the mouse is stuck down:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#towtruck-profile-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        windowing.toggle(<span class="string">"#towtruck-menu-window"</span>);
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-profile-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        windowing.toggle(<span class="string">"#togetherjs-menu-window"</span>);
       });
 
       $(<span class="string">"body"</span>).append( <span class="string">"&lt;div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px'&gt;&lt;/div&gt;"</span> );</pre></div></div>
@@ -917,22 +915,22 @@ the mouse is stuck down:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> src = <span class="string">"../images/togetherjs-logo-close.png"</span>;
-      $(<span class="string">"#towtruck-dock-anchor #towtruck-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
-                      
-      $(<span class="string">"#towtruck-dock-anchor"</span>).toggle(<span class="keyword">function</span>() {
+      $(<span class="string">"#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img"</span>).attr(<span class="string">"src"</span>, src);
+
+      $(<span class="string">"#togetherjs-dock-anchor"</span>).toggle(<span class="keyword">function</span>() {
           closeDock();
         },<span class="keyword">function</span>(){
           openDock();
       });
     }
 
-    $(<span class="string">"#towtruck-share-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      windowing.toggle(<span class="string">"#towtruck-share"</span>);
+    $(<span class="string">"#togetherjs-share-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      windowing.toggle(<span class="string">"#togetherjs-share"</span>);
     });
 
-    $(<span class="string">"#towtruck-profile-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    $(<span class="string">"#togetherjs-profile-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">if</span> ($.browser.mobile) {
-        windowing.show(<span class="string">"#towtruck-menu-window"</span>);
+        windowing.show(<span class="string">"#togetherjs-menu-window"</span>);
         <span class="keyword">return</span> <span class="literal">false</span>;
       }
       toggleMenu();
@@ -940,13 +938,13 @@ the mouse is stuck down:</p>
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
 
-    $(<span class="string">"#towtruck-menu-feedback, #towtruck-menu-feedback-button"</span>).click(<span class="keyword">function</span>(){
+    $(<span class="string">"#togetherjs-menu-feedback, #togetherjs-menu-feedback-button"</span>).click(<span class="keyword">function</span>(){
       windowing.hide();
       hideMenu();
-      windowing.show(<span class="string">"#towtruck-feedback-form"</span>);
+      windowing.show(<span class="string">"#togetherjs-feedback-form"</span>);
     });
 
-    $(<span class="string">"#towtruck-menu-help, #towtruck-menu-help-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#togetherjs-menu-help, #togetherjs-menu-help-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       windowing.hide();
       hideMenu();
       require([<span class="string">"walkthrough"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(walkthrough)</span> {</span>
@@ -955,60 +953,60 @@ the mouse is stuck down:</p>
       });
     });
 
-    $(<span class="string">"#towtruck-menu-update-name"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> input = $(<span class="string">"#towtruck-menu .towtruck-self-name"</span>);
+    $(<span class="string">"#togetherjs-menu-update-name"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> input = $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>);
       input.css({
-        width: $(<span class="string">"#towtruck-menu"</span>).width() - <span class="number">32</span> + <span class="string">"px"</span>
+        width: $(<span class="string">"#togetherjs-menu"</span>).width() - <span class="number">32</span> + <span class="string">"px"</span>
       });
-      ui.displayToggle(<span class="string">"#towtruck-menu .towtruck-self-name"</span>);
-      $(<span class="string">"#towtruck-menu .towtruck-self-name"</span>).focus();
+      ui.displayToggle(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>);
+      $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).focus();
     });
 
-    $(<span class="string">"#towtruck-menu-update-name-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      windowing.show(<span class="string">"#towtruck-edit-name-window"</span>);
-      $(<span class="string">"#towtruck-edit-name-window input"</span>).focus();
+    $(<span class="string">"#togetherjs-menu-update-name-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      windowing.show(<span class="string">"#togetherjs-edit-name-window"</span>);
+      $(<span class="string">"#togetherjs-edit-name-window input"</span>).focus();
     });
 
-    $(<span class="string">"#towtruck-menu .towtruck-self-name"</span>).bind(<span class="string">"keyup"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).bind(<span class="string">"keyup"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">if</span> (event.which == <span class="number">13</span>) {
-        ui.displayToggle(<span class="string">"#towtruck-self-name-display"</span>);
+        ui.displayToggle(<span class="string">"#togetherjs-self-name-display"</span>);
         <span class="keyword">return</span>;
       }
-      <span class="keyword">var</span> val = $(<span class="string">"#towtruck-menu .towtruck-self-name"</span>).val();
+      <span class="keyword">var</span> val = $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).val();
       <span class="keyword">if</span> (val) {
         peers.Self.update({name: val});
       }
     });
 
-    $(<span class="string">"#towtruck-menu-update-avatar, #towtruck-menu-update-avatar-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#togetherjs-menu-update-avatar, #togetherjs-menu-update-avatar-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       hideMenu();
-      windowing.show(<span class="string">"#towtruck-avatar-edit"</span>);
+      windowing.show(<span class="string">"#togetherjs-avatar-edit"</span>);
     });
 
-    $(<span class="string">"#towtruck-menu-end, #towtruck-menu-end-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#togetherjs-menu-end, #togetherjs-menu-end-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       hideMenu();
-      windowing.show(<span class="string">"#towtruck-confirm-end"</span>);
+      windowing.show(<span class="string">"#togetherjs-confirm-end"</span>);
     });
 
-    $(<span class="string">"#towtruck-end-session"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(<span class="string">"#togetherjs-end-session"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       session.close();
       $(<span class="string">".overlay"</span>).remove();
-      
+
     });
 
-    $(<span class="string">"#towtruck-menu-update-color"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> picker = $(<span class="string">"#towtruck-pick-color"</span>);
+    $(<span class="string">"#togetherjs-menu-update-color"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> picker = $(<span class="string">"#togetherjs-pick-color"</span>);
       <span class="keyword">if</span> (picker.is(<span class="string">":visible"</span>)) {
         picker.hide();
         <span class="keyword">return</span>;
       }
       picker.show();
       bindPicker();
-      picker.find(<span class="string">".towtruck-swatch-active"</span>).removeClass(<span class="string">"towtruck-swatch-active"</span>);
-      picker.find(<span class="string">".towtruck-swatch[data-color=\""</span> + peers.Self.color + <span class="string">"\"]"</span>).addClass(<span class="string">"towtruck-swatch-active"</span>);
+      picker.find(<span class="string">".togetherjs-swatch-active"</span>).removeClass(<span class="string">"togetherjs-swatch-active"</span>);
+      picker.find(<span class="string">".togetherjs-swatch[data-color=\""</span> + peers.Self.color + <span class="string">"\"]"</span>).addClass(<span class="string">"togetherjs-swatch-active"</span>);
     });
 
-    $(<span class="string">"#towtruck-pick-color"</span>).click(<span class="string">".towtruck-swatch"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    $(<span class="string">"#togetherjs-pick-color"</span>).click(<span class="string">".togetherjs-swatch"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">var</span> swatch = $(event.target);
       <span class="keyword">var</span> color = swatch.attr(<span class="string">"data-color"</span>);
       peers.Self.update({
@@ -1018,8 +1016,8 @@ the mouse is stuck down:</p>
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
 
-    $(<span class="string">"#towtruck-pick-color"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
-      $(<span class="string">"#towtruck-pick-color"</span>).hide();
+    $(<span class="string">"#togetherjs-pick-color"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      $(<span class="string">"#togetherjs-pick-color"</span>).hide();
       event.stopPropagation();
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
@@ -1032,31 +1030,31 @@ the mouse is stuck down:</p>
         backgroundColor: color,
         borderColor: darkened
       });
-      $(<span class="string">"#towtruck-pick-color"</span>).append(el);
+      $(<span class="string">"#togetherjs-pick-color"</span>).append(el);
     });
 
-    $(<span class="string">"#towtruck-chat-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      windowing.toggle(<span class="string">"#towtruck-chat"</span>);
+    $(<span class="string">"#togetherjs-chat-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      windowing.toggle(<span class="string">"#togetherjs-chat"</span>);
     });
 
     session.on(<span class="string">"display-window"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(id, element)</span> {</span>
-      <span class="keyword">if</span> (id == <span class="string">"towtruck-chat"</span>) {
+      <span class="keyword">if</span> (id == <span class="string">"togetherjs-chat"</span>) {
         <span class="keyword">if</span> (! $.browser.mobile) {
-          $(<span class="string">"#towtruck-chat-input"</span>).focus();
+          $(<span class="string">"#togetherjs-chat-input"</span>).focus();
         }
-      } <span class="keyword">else</span> <span class="keyword">if</span> (id == <span class="string">"towtruck-share"</span>) {
-        <span class="keyword">var</span> link = element.find(<span class="string">"input.towtruck-share-link"</span>);
+      } <span class="keyword">else</span> <span class="keyword">if</span> (id == <span class="string">"togetherjs-share"</span>) {
+        <span class="keyword">var</span> link = element.find(<span class="string">"input.togetherjs-share-link"</span>);
         <span class="keyword">if</span> (link.is(<span class="string">":visible"</span>)) {
           link.focus().select();
         }
       }
     });
 
-    container.find(<span class="string">"#towtruck-chat-notifier"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
-      <span class="keyword">if</span> ($(event.target).is(<span class="string">"a"</span>) || container.is(<span class="string">".towtruck-close"</span>)) {
+    container.find(<span class="string">"#togetherjs-chat-notifier"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      <span class="keyword">if</span> ($(event.target).is(<span class="string">"a"</span>) || container.is(<span class="string">".togetherjs-close"</span>)) {
         <span class="keyword">return</span>;
       }
-      windowing.show(<span class="string">"#towtruck-chat"</span>);
+      windowing.show(<span class="string">"#togetherjs-chat"</span>);
     });</pre></div></div>
               
             </li>
@@ -1070,42 +1068,63 @@ the mouse is stuck down:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    $(<span class="string">".towtruck header.towtruck-title"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">(index, item)</span> {</span>
-      <span class="keyword">var</span> button = $(<span class="string">'&lt;button class="towtruck-minimize"&gt;&lt;/button&gt;'</span>);
+                <div class="content"><div class='highlight'><pre>    $(<span class="string">".togetherjs header.togetherjs-title"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">(index, item)</span> {</span>
+      <span class="keyword">var</span> button = $(<span class="string">'&lt;button class="togetherjs-minimize"&gt;&lt;/button&gt;'</span>);
       button.click(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
-        <span class="keyword">var</span> window = button.closest(<span class="string">".towtruck-window"</span>);
+        <span class="keyword">var</span> window = button.closest(<span class="string">".togetherjs-window"</span>);
         windowing.hide(window);
       });
       $(item).append(button);
     });
 
-    $(<span class="string">"#towtruck-avatar-done"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      ui.displayToggle(<span class="string">"#towtruck-no-avatar-edit"</span>);
+    $(<span class="string">"#togetherjs-avatar-done"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      ui.displayToggle(<span class="string">"#togetherjs-no-avatar-edit"</span>);
     });
 
-    $(<span class="string">"#towtruck-self-color"</span>).css({backgroundColor: peers.Self.color});
+    $(<span class="string">"#togetherjs-self-color"</span>).css({backgroundColor: peers.Self.color});
 
     <span class="keyword">var</span> avatar = peers.Self.avatar;
     <span class="keyword">if</span> (avatar) {
-      $(<span class="string">"#towtruck-self-avatar"</span>).attr(<span class="string">"src"</span>, avatar);
+      $(<span class="string">"#togetherjs-self-avatar"</span>).attr(<span class="string">"src"</span>, avatar);
     }
 
-    <span class="keyword">var</span> starterButton = $(<span class="string">"#towtruck-starter button"</span>);
+    <span class="keyword">var</span> starterButton = $(<span class="string">"#togetherjs-starter button"</span>);
     starterButton.click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      windowing.show(<span class="string">"#towtruck-about"</span>);
-    }).addClass(<span class="string">"towtruck-running"</span>);
-    <span class="keyword">if</span> (starterButton.text() == <span class="string">"Start TowTruck"</span>) {
+      windowing.show(<span class="string">"#togetherjs-about"</span>);
+    }).addClass(<span class="string">"togetherjs-running"</span>);
+    <span class="keyword">if</span> (starterButton.text() == <span class="string">"Start TogetherJS"</span>) {
       starterButton.attr(<span class="string">"data-start-text"</span>, starterButton.text());
-      starterButton.text(<span class="string">"End TowTruck Session"</span>);
+      starterButton.text(<span class="string">"End TogetherJS Session"</span>);
     }
 
     ui.activateAvatarEdit(container, {
       onSave: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        windowing.hide(<span class="string">"#towtruck-avatar-edit"</span>);
+        windowing.hide(<span class="string">"#togetherjs-avatar-edit"</span>);
       }
     });
 
-    session.emit(<span class="string">"new-element"</span>, ui.container);
+    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"inviteFromRoom"</span>)) {
+      container.find(<span class="string">"#togetherjs-invite"</span>).show();
+    }
+
+    container.find(<span class="string">"#togetherjs-menu-refresh-invite"</span>).click(refreshInvite);
+    container.find(<span class="string">"#togetherjs-menu-invite-anyone"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      invite(<span class="literal">null</span>);
+    });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-37">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-37">&#182;</a>
+                </div>
+                <p>The following lines should be at the end of this function
+(new code goes above)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    session.emit(<span class="string">"new-element"</span>, ui.container);
 
     <span class="keyword">if</span> (finishedAt &amp;&amp; finishedAt &gt; Date.now()) {
       setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -1116,32 +1135,32 @@ the mouse is stuck down:</p>
       session.emit(<span class="string">"ui-ready"</span>, ui);
     }
 
-  };
+  }; <span class="comment">// End ui.activateUI()</span>
 
   ui.activateAvatarEdit = <span class="function"><span class="keyword">function</span> <span class="params">(container, options)</span> {</span>
     options = options || {};
     <span class="keyword">var</span> pendingImage = <span class="literal">null</span>;
 
-    container.find(<span class="string">".towtruck-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">true</span>);
+    container.find(<span class="string">".togetherjs-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">true</span>);
 
-    container.find(<span class="string">".towtruck-avatar-save"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    container.find(<span class="string">".togetherjs-avatar-save"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">if</span> (pendingImage) {
         peers.Self.update({avatar: pendingImage});
-        container.find(<span class="string">".towtruck-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">true</span>);
+        container.find(<span class="string">".togetherjs-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">true</span>);
         <span class="keyword">if</span> (options.onSave) {
           options.onSave();
         }
       }
     });
 
-    container.find(<span class="string">".towtruck-upload-avatar"</span>).on(<span class="string">"change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    container.find(<span class="string">".togetherjs-upload-avatar"</span>).on(<span class="string">"change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       util.readFileImage(<span class="keyword">this</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(url)</span> {</span>
         sizeDownImage(url).then(<span class="function"><span class="keyword">function</span> <span class="params">(smallUrl)</span> {</span>
           pendingImage = smallUrl;
-          container.find(<span class="string">".towtruck-avatar-preview"</span>).css({
+          container.find(<span class="string">".togetherjs-avatar-preview"</span>).css({
             backgroundImage: <span class="string">'url('</span> + pendingImage + <span class="string">')'</span>
           });
-          container.find(<span class="string">".towtruck-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">false</span>);
+          container.find(<span class="string">".togetherjs-avatar-save"</span>).prop(<span class="string">"disabled"</span>, <span class="literal">false</span>);
           <span class="keyword">if</span> (options.onPending) {
             options.onPending();
           }
@@ -1162,10 +1181,10 @@ the mouse is stuck down:</p>
               
             </li>
           
-            <li id="section-37">
+            <li id="section-38">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-37">&#182;</a>
+                  <a class="pilcrow" href="#section-38">&#182;</a>
                 </div>
                 <p>Sometimes the DOM updates immediately to call
 naturalWidth/etc, and sometimes it doesn&#39;t; using setTimeout
@@ -1185,31 +1204,31 @@ gives it a chance to catch up</p>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">fixupAvatars</span><span class="params">(container)</span> {</span>
-    <span class="comment">/* All &lt;div class="towtruck-person" /&gt; elements need an element inside,
+    <span class="comment">/* All &lt;div class="togetherjs-person" /&gt; elements need an element inside,
        so we add that element here */</span>
-    container.find(<span class="string">".towtruck-person"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    container.find(<span class="string">".togetherjs-person"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>);
-      <span class="keyword">var</span> inner = $<span class="keyword">this</span>.find(<span class="string">".towtruck-person-avatar-swatch"</span>);
+      <span class="keyword">var</span> inner = $<span class="keyword">this</span>.find(<span class="string">".togetherjs-person-avatar-swatch"</span>);
       <span class="keyword">if</span> (! inner.length) {
-        $<span class="keyword">this</span>.append(<span class="string">'&lt;div class="towtruck-person-avatar-swatch"&gt;&lt;/div&gt;'</span>);
+        $<span class="keyword">this</span>.append(<span class="string">'&lt;div class="togetherjs-person-avatar-swatch"&gt;&lt;/div&gt;'</span>);
       }
     });
   }
 
   ui.prepareShareLink = <span class="function"><span class="keyword">function</span> <span class="params">(container)</span> {</span>
-    container.find(<span class="string">"input.towtruck-share-link"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    container.find(<span class="string">"input.togetherjs-share-link"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       $(<span class="keyword">this</span>).select();
     }).change(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       updateShareLink();
     });
-    container.find(<span class="string">"a.towtruck-share-link"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+    container.find(<span class="string">"a.togetherjs-share-link"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
               
             </li>
           
-            <li id="section-38">
+            <li id="section-39">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-38">&#182;</a>
+                  <a class="pilcrow" href="#section-39">&#182;</a>
                 </div>
                 <p>FIXME: this is currently opening up Bluetooth, not sharing a link</p>
 
@@ -1227,10 +1246,10 @@ gives it a chance to catch up</p>
               
             </li>
           
-            <li id="section-39">
+            <li id="section-40">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-39">&#182;</a>
+                  <a class="pilcrow" href="#section-40">&#182;</a>
                 </div>
                 <p>FIXME: should show some help if you actually try to follow the link
 like this, instead of simply suppressing it</p>
@@ -1244,17 +1263,17 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-40">
+            <li id="section-41">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-40">&#182;</a>
+                  <a class="pilcrow" href="#section-41">&#182;</a>
                 </div>
                 <p>Menu</p>
 
               </div>
               
                 <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">showMenu</span><span class="params">(event)</span> {</span>
-    <span class="keyword">var</span> el = $(<span class="string">"#towtruck-menu"</span>);
+    <span class="keyword">var</span> el = $(<span class="string">"#togetherjs-menu"</span>);
     assert(el.length);
     el.show();
     bindMenu();
@@ -1262,9 +1281,9 @@ like this, instead of simply suppressing it</p>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">bindMenu</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> el = $(<span class="string">"#towtruck-menu:visible"</span>);
+    <span class="keyword">var</span> el = $(<span class="string">"#togetherjs-menu:visible"</span>);
     <span class="keyword">if</span> (el.length) {
-      <span class="keyword">var</span> bound = $(<span class="string">"#towtruck-profile-button"</span>);
+      <span class="keyword">var</span> bound = $(<span class="string">"#togetherjs-profile-button"</span>);
       <span class="keyword">var</span> boundOffset = bound.offset();
       el.css({
         top: boundOffset.top + bound.height() - $window.scrollTop() + <span class="string">"px"</span>,
@@ -1274,9 +1293,9 @@ like this, instead of simply suppressing it</p>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">bindPicker</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> picker = $(<span class="string">"#towtruck-pick-color:visible"</span>);
+    <span class="keyword">var</span> picker = $(<span class="string">"#togetherjs-pick-color:visible"</span>);
     <span class="keyword">if</span> (picker.length) {
-      <span class="keyword">var</span> menu = $(<span class="string">"#towtruck-menu-update-color"</span>);
+      <span class="keyword">var</span> menu = $(<span class="string">"#togetherjs-menu-update-color"</span>);
       <span class="keyword">var</span> menuOffset = menu.offset();
       picker.css({
         top: menuOffset.top + menu.height(),
@@ -1291,7 +1310,7 @@ like this, instead of simply suppressing it</p>
   });
 
   <span class="function"><span class="keyword">function</span> <span class="title">toggleMenu</span><span class="params">()</span> {</span>
-    <span class="keyword">if</span> ($(<span class="string">"#towtruck-menu"</span>).is(<span class="string">":visible"</span>)) {
+    <span class="keyword">if</span> ($(<span class="string">"#togetherjs-menu"</span>).is(<span class="string">":visible"</span>)) {
       hideMenu();
     } <span class="keyword">else</span> {
       showMenu();
@@ -1299,24 +1318,24 @@ like this, instead of simply suppressing it</p>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">hideMenu</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> el = $(<span class="string">"#towtruck-menu"</span>);
+    <span class="keyword">var</span> el = $(<span class="string">"#togetherjs-menu"</span>);
     el.hide();
     $(document).unbind(<span class="string">"click"</span>, maybeHideMenu);
-    ui.displayToggle(<span class="string">"#towtruck-self-name-display"</span>);
-    $(<span class="string">"#towtruck-pick-color"</span>).hide();
+    ui.displayToggle(<span class="string">"#togetherjs-self-name-display"</span>);
+    $(<span class="string">"#togetherjs-pick-color"</span>).hide();
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">maybeHideMenu</span><span class="params">(event)</span> {</span>
     <span class="keyword">var</span> t = event.target;
     <span class="keyword">while</span> (t) {
-      <span class="keyword">if</span> (t.id == <span class="string">"towtruck-menu"</span>) {</pre></div></div>
+      <span class="keyword">if</span> (t.id == <span class="string">"togetherjs-menu"</span>) {</pre></div></div>
               
             </li>
           
-            <li id="section-41">
+            <li id="section-42">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-41">&#182;</a>
+                  <a class="pilcrow" href="#section-42">&#182;</a>
                 </div>
                 <p>Click inside the menu, ignore this</p>
 
@@ -1331,19 +1350,19 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-42">
+            <li id="section-43">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-42">&#182;</a>
+                  <a class="pilcrow" href="#section-43">&#182;</a>
                 </div>
                 <p>Misc</p>
 
               </div>
               
                 <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">updateShareLink</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> input = $(<span class="string">"input.towtruck-share-link"</span>);
-    <span class="keyword">var</span> link = $(<span class="string">"a.towtruck-share-link"</span>);
-    <span class="keyword">var</span> display = $(<span class="string">"#towtruck-session-id"</span>);
+    <span class="keyword">var</span> input = $(<span class="string">"input.togetherjs-share-link"</span>);
+    <span class="keyword">var</span> link = $(<span class="string">"a.togetherjs-share-link"</span>);
+    <span class="keyword">var</span> display = $(<span class="string">"#togetherjs-session-id"</span>);
     <span class="keyword">if</span> (! session.shareId) {
       input.val(<span class="string">""</span>);
       link.attr(<span class="string">"href"</span>, <span class="string">"#"</span>);
@@ -1356,15 +1375,15 @@ like this, instead of simply suppressing it</p>
   }
 
   session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    
+
     <span class="keyword">if</span>($.browser.mobile) {</pre></div></div>
               
             </li>
           
-            <li id="section-43">
+            <li id="section-44">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-43">&#182;</a>
+                  <a class="pilcrow" href="#section-44">&#182;</a>
                 </div>
                 <p>remove bg overlay</p>
 
@@ -1374,10 +1393,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-44">
+            <li id="section-45">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-44">&#182;</a>
+                  <a class="pilcrow" href="#section-45">&#182;</a>
                 </div>
                 <p>after hitting End, reset window draggin</p>
 
@@ -1388,9 +1407,9 @@ like this, instead of simply suppressing it</p>
         top: <span class="string">""</span>,
         left: <span class="string">""</span>
       });
-      
+
     }
-    
+
     <span class="keyword">if</span> (ui.container) {
       ui.container.remove();
       ui.container = <span class="literal">null</span>;
@@ -1398,28 +1417,28 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-45">
+            <li id="section-46">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-45">&#182;</a>
+                  <a class="pilcrow" href="#section-46">&#182;</a>
                 </div>
                 <p>Clear out any other spurious elements:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    $(<span class="string">".towtruck"</span>).remove();
-    <span class="keyword">var</span> starterButton = $(<span class="string">"#towtruck-starter button"</span>);
-    starterButton.removeClass(<span class="string">"towtruck-running"</span>);
+                <div class="content"><div class='highlight'><pre>    $(<span class="string">".togetherjs"</span>).remove();
+    <span class="keyword">var</span> starterButton = $(<span class="string">"#togetherjs-starter button"</span>);
+    starterButton.removeClass(<span class="string">"togetherjs-running"</span>);
     <span class="keyword">if</span> (starterButton.attr(<span class="string">"data-start-text"</span>)) {
       starterButton.text(starterButton.attr(<span class="string">"data-start-text"</span>));
       starterButton.attr(<span class="string">"data-start-text"</span>, <span class="string">""</span>);
     }
-    <span class="keyword">if</span> (TowTruck.startTarget) {
-      <span class="keyword">var</span> el = $(TowTruck.startTarget);
-      <span class="keyword">if</span> (el.attr(<span class="string">"data-start-towtruck-html"</span>)) {
-        el.html(el.attr(<span class="string">"data-start-towtruck-html"</span>));
+    <span class="keyword">if</span> (TogetherJS.startTarget) {
+      <span class="keyword">var</span> el = $(TogetherJS.startTarget);
+      <span class="keyword">if</span> (el.attr(<span class="string">"data-start-togetherjs-html"</span>)) {
+        el.html(el.attr(<span class="string">"data-start-togetherjs-html"</span>));
       }
-      el.removeClass(<span class="string">"towtruck-started"</span>);
+      el.removeClass(<span class="string">"togetherjs-started"</span>);
     }
   });
 
@@ -1429,7 +1448,7 @@ like this, instead of simply suppressing it</p>
       assert(attrs.peer);
       assert(attrs.messageId);
       <span class="keyword">var</span> date = attrs.date || Date.now();
-      <span class="keyword">var</span> lastEl = ui.container.find(<span class="string">"#towtruck-chat .towtruck-chat-message"</span>);
+      <span class="keyword">var</span> lastEl = ui.container.find(<span class="string">"#togetherjs-chat .togetherjs-chat-message"</span>);
       <span class="keyword">if</span> (lastEl.length) {
         lastEl = $(lastEl[lastEl.length-<span class="number">1</span>]);
       }
@@ -1440,7 +1459,7 @@ like this, instead of simply suppressing it</p>
       <span class="keyword">if</span> (lastEl &amp;&amp; lastEl.attr(<span class="string">"data-person"</span>) == attrs.peer.id &amp;&amp;
           lastDate &amp;&amp; date &lt; lastDate + COLLAPSE_MESSAGE_LIMIT) {
         lastEl.attr(<span class="string">"data-date"</span>, date);
-        <span class="keyword">var</span> content = lastEl.find(<span class="string">".towtruck-chat-content"</span>);
+        <span class="keyword">var</span> content = lastEl.find(<span class="string">".togetherjs-chat-content"</span>);
         assert(content.length);
         attrs.text = content.text() + <span class="string">"\n"</span> + attrs.text;
         attrs.messageId = lastEl.attr(<span class="string">"data-message-id"</span>);
@@ -1450,7 +1469,7 @@ like this, instead of simply suppressing it</p>
         content: attrs.text,
         date: date
       });
-      linkify(el.find(<span class="string">".towtruck-chat-content"</span>));
+      linkify(el.find(<span class="string">".togetherjs-chat-content"</span>));
       el.attr(<span class="string">"data-person"</span>, attrs.peer.id)
         .attr(<span class="string">"data-date"</span>, date)
         .attr(<span class="string">"data-message-id"</span>, attrs.messageId);
@@ -1467,10 +1486,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-46">
+            <li id="section-47">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-46">&#182;</a>
+                  <a class="pilcrow" href="#section-47">&#182;</a>
                 </div>
                 <p>FIXME: should bind the notification to the dock location</p>
 
@@ -1490,10 +1509,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-47">
+            <li id="section-48">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-47">&#182;</a>
+                  <a class="pilcrow" href="#section-48">&#182;</a>
                 </div>
                 <p>FIXME: should bind the notification to the dock location</p>
 
@@ -1514,7 +1533,7 @@ like this, instead of simply suppressing it</p>
     },
 
     clear: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#towtruck-chat-messages"</span>);
+      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#togetherjs-chat-messages"</span>);
       container.empty();
     }),
 
@@ -1526,25 +1545,25 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-48">
+            <li id="section-49">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-48">&#182;</a>
+                  <a class="pilcrow" href="#section-49">&#182;</a>
                 </div>
                 <p>FIXME: duplicating functionality in .add():</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> realId = <span class="string">"towtruck-chat-"</span> + messageId;
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> realId = <span class="string">"togetherjs-chat-"</span> + messageId;
       <span class="keyword">var</span> date = attrs.date || Date.now();
       <span class="keyword">var</span> title;</pre></div></div>
               
             </li>
           
-            <li id="section-49">
+            <li id="section-50">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-49">&#182;</a>
+                  <a class="pilcrow" href="#section-50">&#182;</a>
                 </div>
                 <p>FIXME: strip off common domain from msg.url?  E.g., if I&#39;m on
 <a href="http://example.com/foobar">http://example.com/foobar</a>, and someone goes to <a href="http://example.com/baz">http://example.com/baz</a> then
@@ -1565,11 +1584,11 @@ FIXME: truncate long titles</p>
         title: title,
         sameUrl: attrs.sameUrl
       });
-      el.find(<span class="string">".towtruck-nudge"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      el.find(<span class="string">".togetherjs-nudge"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         attrs.peer.nudge();
         <span class="keyword">return</span> <span class="literal">false</span>;
       });
-      el.find(<span class="string">".towtruck-follow"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      el.find(<span class="string">".togetherjs-follow"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         <span class="keyword">var</span> url = attrs.peers.url;
         <span class="keyword">if</span> (attrs.peer.urlHash) {
           url += attrs.peer.urlHash;
@@ -1581,10 +1600,10 @@ FIXME: truncate long titles</p>
               
             </li>
           
-            <li id="section-50">
+            <li id="section-51">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-50">&#182;</a>
+                  <a class="pilcrow" href="#section-51">&#182;</a>
                 </div>
                 <p>Don&#39;t bother showing a same-url notification, if no previous notification
 had been shown</p>
@@ -1596,19 +1615,55 @@ had been shown</p>
       ui.chat.add(el, messageId, notify);
     },
 
+    invite: <span class="function"><span class="keyword">function</span> <span class="params">(attrs)</span> {</span>
+      assert(attrs.peer);
+      assert(<span class="keyword">typeof</span> attrs.url == <span class="string">"string"</span>);
+      <span class="keyword">var</span> messageId = attrs.peer.className(<span class="string">"invite-"</span>);
+      <span class="keyword">var</span> date = attrs.date || Date.now();
+      <span class="keyword">var</span> hrefTitle = attrs.url.replace(<span class="regexp">/\#?&amp;togetherjs=.*/</span>, <span class="string">""</span>).replace(<span class="regexp">/^\w+:\/\//</span>, <span class="string">""</span>);
+      <span class="keyword">var</span> el = templating.sub(<span class="string">"invite"</span>, {
+        peer: attrs.peer,
+        date: date,
+        href: attrs.url,
+        hrefTitle: hrefTitle,
+        forEveryone: attrs.forEveryone
+      });
+      <span class="keyword">if</span> (attrs.forEveryone) {
+        el.find(<span class="string">"a"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-52">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-52">&#182;</a>
+                </div>
+                <p>FIXME: hacky way to do this:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          chat.submit(<span class="string">"Followed link to "</span> + attrs.url);
+        });
+      }
+      ui.chat.add(el, messageId, <span class="literal">true</span>);
+    },
+
     hideTimeout: <span class="literal">null</span>,
 
     add: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">(el, id, notify)</span> {</span>
       <span class="keyword">if</span> (id) {
-        el.attr(<span class="string">"id"</span>, <span class="string">"towtruck-chat-"</span> + util.safeClassName(id));
+        el.attr(<span class="string">"id"</span>, <span class="string">"togetherjs-chat-"</span> + util.safeClassName(id));
       }
-      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#towtruck-chat-messages"</span>);
+      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#togetherjs-chat-messages"</span>);
       assert(container.length);
-      <span class="keyword">var</span> popup = ui.container.find(<span class="string">"#towtruck-chat-notifier"</span>);
+      <span class="keyword">var</span> popup = ui.container.find(<span class="string">"#togetherjs-chat-notifier"</span>);
       container.append(el);
       ui.chat.scroll();
       <span class="keyword">var</span> doNotify = !! notify;
-      <span class="keyword">var</span> section = popup.find(<span class="string">"#towtruck-chat-notifier-message"</span>);
+      <span class="keyword">var</span> section = popup.find(<span class="string">"#togetherjs-chat-notifier-message"</span>);
+      <span class="keyword">if</span> (notify &amp;&amp; visibilityApi.hidden()) {
+        ui.container.find(<span class="string">"#togetherjs-notification"</span>)[<span class="number">0</span>].play();
+      }
       <span class="keyword">if</span> (id &amp;&amp; section.data(<span class="string">"message-id"</span>) == id) {
         doNotify = <span class="literal">true</span>;
       }
@@ -1628,10 +1683,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-51">
+            <li id="section-53">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-51">&#182;</a>
+                  <a class="pilcrow" href="#section-53">&#182;</a>
                 </div>
                 <p>This is the amount of time we&#39;re supposed to notify</p>
 
@@ -1650,16 +1705,16 @@ had been shown</p>
     }),
 
     scroll: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#towtruck-chat-messages"</span>)[<span class="number">0</span>];
+      <span class="keyword">var</span> container = ui.container.find(<span class="string">"#togetherjs-chat-messages"</span>)[<span class="number">0</span>];
       container.scrollTop = container.scrollHeight;
     })
 
   };
 
   session.on(<span class="string">"display-window"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(id, win)</span> {</span>
-    <span class="keyword">if</span> (id == <span class="string">"towtruck-chat"</span>) {
+    <span class="keyword">if</span> (id == <span class="string">"togetherjs-chat"</span>) {
       ui.chat.scroll();
-      windowing.hide(<span class="string">"#towtruck-chat-notifier"</span>);
+      windowing.hide(<span class="string">"#togetherjs-chat-notifier"</span>);
     }
   });
 
@@ -1677,12 +1732,12 @@ had been shown</p>
        Different from updates, which use the class names we set here: */</span>
     setElement: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
       <span class="keyword">var</span> count = <span class="number">0</span>;
-      <span class="keyword">var</span> classes = [<span class="string">"towtruck-person"</span>, <span class="string">"towtruck-person-status"</span>,
-                     <span class="string">"towtruck-person-name"</span>, <span class="string">"towtruck-person-name-abbrev"</span>,
-                     <span class="string">"towtruck-person-bgcolor"</span>, <span class="string">"towtruck-person-swatch"</span>,
-                     <span class="string">"towtruck-person-status"</span>, <span class="string">"towtruck-person-role"</span>,
-                     <span class="string">"towtruck-person-url"</span>, <span class="string">"towtruck-person-url-title"</span>,
-                     <span class="string">"towtruck-person-bordercolor"</span>];
+      <span class="keyword">var</span> classes = [<span class="string">"togetherjs-person"</span>, <span class="string">"togetherjs-person-status"</span>,
+                     <span class="string">"togetherjs-person-name"</span>, <span class="string">"togetherjs-person-name-abbrev"</span>,
+                     <span class="string">"togetherjs-person-bgcolor"</span>, <span class="string">"togetherjs-person-swatch"</span>,
+                     <span class="string">"togetherjs-person-status"</span>, <span class="string">"togetherjs-person-role"</span>,
+                     <span class="string">"togetherjs-person-url"</span>, <span class="string">"togetherjs-person-url-title"</span>,
+                     <span class="string">"togetherjs-person-bordercolor"</span>];
       classes.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(cls)</span> {</span>
         <span class="keyword">var</span> els = el.find(<span class="string">"."</span> + cls);
         els.addClass(<span class="keyword">this</span>.peer.className(cls + <span class="string">"-"</span>));
@@ -1700,40 +1755,40 @@ had been shown</p>
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.isSelf) {
         abbrev = <span class="string">"me"</span>;
       }
-      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-name-"</span>)).text(<span class="keyword">this</span>.peer.name || <span class="string">""</span>);
-      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-name-abbrev-"</span>)).text(abbrev);
-      <span class="keyword">var</span> avatarEl = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-"</span>));
+      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-name-"</span>)).text(<span class="keyword">this</span>.peer.name || <span class="string">""</span>);
+      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-name-abbrev-"</span>)).text(abbrev);
+      <span class="keyword">var</span> avatarEl = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-"</span>));
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.avatar) {
         avatarEl.css({
           backgroundImage: <span class="string">"url("</span> + <span class="keyword">this</span>.peer.avatar + <span class="string">")"</span>
         });
       }
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.idle == <span class="string">"inactive"</span>) {
-        avatarEl.addClass(<span class="string">"towtruck-person-inactive"</span>);
+        avatarEl.addClass(<span class="string">"togetherjs-person-inactive"</span>);
       } <span class="keyword">else</span> {
-        avatarEl.removeClass(<span class="string">"towtruck-person-inactive"</span>);
+        avatarEl.removeClass(<span class="string">"togetherjs-person-inactive"</span>);
       }
       avatarEl.attr(<span class="string">"title"</span>, <span class="keyword">this</span>.peer.name);
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.color) {
         avatarEl.css({
           borderColor: <span class="keyword">this</span>.peer.color
         });
-        avatarEl.find(<span class="string">".towtruck-person-avatar-swatch"</span>).css({
+        avatarEl.find(<span class="string">".togetherjs-person-avatar-swatch"</span>).css({
           borderTopColor: <span class="keyword">this</span>.peer.color,
           borderRightColor: <span class="keyword">this</span>.peer.color
         });
       }
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.color) {
-        <span class="keyword">var</span> colors = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-bgcolor-"</span>));
+        <span class="keyword">var</span> colors = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-bgcolor-"</span>));
         colors.css({
           backgroundColor: <span class="keyword">this</span>.peer.color
         });
-        colors = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-bordercolor-"</span>));
+        colors = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-bordercolor-"</span>));
         colors.css({
           borderColor: <span class="keyword">this</span>.peer.color
         });
       }
-      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-role-"</span>))
+      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-role-"</span>))
         .text(<span class="keyword">this</span>.peer.isCreator ? <span class="string">"Creator"</span> : <span class="string">"Participant"</span>);
       <span class="keyword">var</span> urlName = <span class="keyword">this</span>.peer.title || <span class="string">""</span>;
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.title) {
@@ -1743,59 +1798,59 @@ had been shown</p>
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.title) {
         urlName += <span class="string">")"</span>;
       }
-      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-url-title-"</span>))
+      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-url-title-"</span>))
         .text(urlName);
       <span class="keyword">var</span> url = <span class="keyword">this</span>.peer.url;
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.urlHash) {
         url += <span class="keyword">this</span>.peer.urlHash;
       }
-      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-url-"</span>))
+      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-url-"</span>))
         .attr(<span class="string">"href"</span>, url);</pre></div></div>
               
             </li>
           
-            <li id="section-52">
+            <li id="section-54">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-52">&#182;</a>
+                  <a class="pilcrow" href="#section-54">&#182;</a>
                 </div>
                 <p>FIXME: should have richer status:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-status-"</span>))
+                <div class="content"><div class='highlight'><pre>      container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-status-"</span>))
         .text(<span class="keyword">this</span>.peer.idle == <span class="string">"active"</span> ? <span class="string">"Active"</span> : <span class="string">"Inactive"</span>);
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.isSelf) {</pre></div></div>
               
             </li>
           
-            <li id="section-53">
+            <li id="section-55">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-53">&#182;</a>
+                  <a class="pilcrow" href="#section-55">&#182;</a>
                 </div>
                 <p>FIXME: these could also have consistent/reliable class names:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> selfName = $(<span class="string">".towtruck-self-name"</span>);
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> selfName = $(<span class="string">".togetherjs-self-name"</span>);
         selfName.each((<span class="function"><span class="keyword">function</span> <span class="params">(index, el)</span> {</span>
           el = $(el);
           <span class="keyword">if</span> (el.val() != <span class="keyword">this</span>.peer.name) {
             el.val(<span class="keyword">this</span>.peer.name);
           }
         }).bind(<span class="keyword">this</span>));
-        $(<span class="string">"#towtruck-menu-avatar"</span>).attr(<span class="string">"src"</span>, <span class="keyword">this</span>.peer.avatar);
+        $(<span class="string">"#togetherjs-menu-avatar"</span>).attr(<span class="string">"src"</span>, <span class="keyword">this</span>.peer.avatar);
         <span class="keyword">if</span> (! <span class="keyword">this</span>.peer.name) {
-          $(<span class="string">"#towtruck-menu .towtruck-person-name-self"</span>).text(<span class="keyword">this</span>.peer.defaultName);
+          $(<span class="string">"#togetherjs-menu .togetherjs-person-name-self"</span>).text(<span class="keyword">this</span>.peer.defaultName);
         }
       }
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.url != session.currentUrl()) {
-        container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-"</span>))
-            .addClass(<span class="string">"towtruck-person-other-url"</span>);
+        container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-"</span>))
+            .addClass(<span class="string">"togetherjs-person-other-url"</span>);
       } <span class="keyword">else</span> {
-        container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-"</span>))
-            .removeClass(<span class="string">"towtruck-person-other-url"</span>);
+        container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-"</span>))
+            .removeClass(<span class="string">"togetherjs-person-other-url"</span>);
       }
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.following) {
         <span class="keyword">if</span> (<span class="keyword">this</span>.followCheckbox) {
@@ -1809,10 +1864,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-54">
+            <li id="section-56">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-54">&#182;</a>
+                  <a class="pilcrow" href="#section-56">&#182;</a>
                 </div>
                 <p>FIXME: add some style based on following?</p>
 
@@ -1853,10 +1908,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-55">
+            <li id="section-57">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-55">&#182;</a>
+                  <a class="pilcrow" href="#section-57">&#182;</a>
                 </div>
                 <p>FIXME: do something more distinct here</p>
 
@@ -1878,23 +1933,23 @@ had been shown</p>
       <span class="keyword">this</span>.dockElement = templating.sub(<span class="string">"dock-person"</span>, {
         peer: <span class="keyword">this</span>.peer
       });
-      <span class="keyword">this</span>.dockElement.attr(<span class="string">"id"</span>, <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-dock-element-"</span>));
-      ui.container.find(<span class="string">"#towtruck-dock-participants"</span>).append(<span class="keyword">this</span>.dockElement);
-      <span class="keyword">this</span>.dockElement.find(<span class="string">".towtruck-person"</span>).animateDockEntry();
-      <span class="keyword">var</span> iface = $(<span class="string">"#towtruck-dock"</span>);
+      <span class="keyword">this</span>.dockElement.attr(<span class="string">"id"</span>, <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-dock-element-"</span>));
+      ui.container.find(<span class="string">"#togetherjs-dock-participants"</span>).append(<span class="keyword">this</span>.dockElement);
+      <span class="keyword">this</span>.dockElement.find(<span class="string">".togetherjs-person"</span>).animateDockEntry();
+      <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
       iface.css({
         height: iface.height() + BUTTON_HEIGHT + <span class="string">"px"</span>
       });
       <span class="keyword">this</span>.detailElement = templating.sub(<span class="string">"participant-window"</span>, {
         peer: <span class="keyword">this</span>.peer
       });
-      <span class="keyword">var</span> followId = <span class="keyword">this</span>.peer.className(<span class="string">"towtruck-person-status-follow-"</span>);
-      <span class="keyword">this</span>.detailElement.find(<span class="string">'[for="towtruck-person-status-follow"]'</span>).attr(<span class="string">"for"</span>, followId);
-      <span class="keyword">this</span>.detailElement.find(<span class="string">'#towtruck-person-status-follow'</span>).attr(<span class="string">"id"</span>, followId);
-      <span class="keyword">this</span>.detailElement.find(<span class="string">".towtruck-follow"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">var</span> followId = <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-status-follow-"</span>);
+      <span class="keyword">this</span>.detailElement.find(<span class="string">'[for="togetherjs-person-status-follow"]'</span>).attr(<span class="string">"for"</span>, followId);
+      <span class="keyword">this</span>.detailElement.find(<span class="string">'#togetherjs-person-status-follow'</span>).attr(<span class="string">"id"</span>, followId);
+      <span class="keyword">this</span>.detailElement.find(<span class="string">".togetherjs-follow"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         location.href = $(<span class="keyword">this</span>).attr(<span class="string">"href"</span>);
       });
-      <span class="keyword">this</span>.detailElement.find(<span class="string">".towtruck-nudge"</span>).click((<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.detailElement.find(<span class="string">".togetherjs-nudge"</span>).click((<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         <span class="keyword">this</span>.peer.nudge();
       }).bind(<span class="keyword">this</span>));
       <span class="keyword">this</span>.followCheckbox = <span class="keyword">this</span>.detailElement.find(<span class="string">"#"</span> + followId);
@@ -1905,10 +1960,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-56">
+            <li id="section-58">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-56">&#182;</a>
+                  <a class="pilcrow" href="#section-58">&#182;</a>
                 </div>
                 <p>Following doesn&#39;t happen until the window is closed
 FIXME: should we tell the user this?</p>
@@ -1948,7 +2003,7 @@ FIXME: should we tell the user this?</p>
         <span class="keyword">this</span>.dockElement = <span class="literal">null</span>;
         <span class="keyword">this</span>.detailElement.remove();
         <span class="keyword">this</span>.detailElement = <span class="literal">null</span>;
-        <span class="keyword">var</span> iface = $(<span class="string">"#towtruck-dock"</span>);
+        <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
         iface.css({
          height: (iface.height() - BUTTON_HEIGHT) + <span class="string">"px"</span>
         });
@@ -1975,8 +2030,8 @@ FIXME: should we tell the user this?</p>
       <span class="keyword">if</span> (! <span class="keyword">this</span>.detailElement) {
         <span class="keyword">return</span>;
       }
-      <span class="keyword">var</span> same = <span class="keyword">this</span>.detailElement.find(<span class="string">".towtruck-same-url"</span>);
-      <span class="keyword">var</span> different = <span class="keyword">this</span>.detailElement.find(<span class="string">".towtruck-different-url"</span>);
+      <span class="keyword">var</span> same = <span class="keyword">this</span>.detailElement.find(<span class="string">".togetherjs-same-url"</span>);
+      <span class="keyword">var</span> different = <span class="keyword">this</span>.detailElement.find(<span class="string">".togetherjs-different-url"</span>);
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.url == session.currentUrl()) {
         same.show();
         different.hide();
@@ -2000,10 +2055,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-57">
+            <li id="section-59">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-57">&#182;</a>
+                  <a class="pilcrow" href="#section-59">&#182;</a>
                 </div>
                 <p>FIXME: scroll to person</p>
 
@@ -2019,10 +2074,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-58">
+            <li id="section-60">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-58">&#182;</a>
+                  <a class="pilcrow" href="#section-60">&#182;</a>
                 </div>
                 <p>FIXME: should I get rid of the dockElement?</p>
 
@@ -2035,12 +2090,110 @@ FIXME: should we tell the user this?</p>
   <span class="function"><span class="keyword">function</span> <span class="title">updateChatParticipantList</span><span class="params">()</span> {</span>
     <span class="keyword">var</span> live = peers.getAllPeers(<span class="literal">true</span>);
     <span class="keyword">if</span> (live.length) {
-      ui.displayToggle(<span class="string">"#towtruck-chat-participants"</span>);
-      $(<span class="string">"#towtruck-chat-participant-list"</span>).text(
+      ui.displayToggle(<span class="string">"#togetherjs-chat-participants"</span>);
+      $(<span class="string">"#togetherjs-chat-participant-list"</span>).text(
         live.map(<span class="function"><span class="keyword">function</span> <span class="params">(p)</span> {</span><span class="keyword">return</span> p.name;}).join(<span class="string">", "</span>));
     } <span class="keyword">else</span> {
-      ui.displayToggle(<span class="string">"#towtruck-chat-no-participants"</span>);
+      ui.displayToggle(<span class="string">"#togetherjs-chat-no-participants"</span>);
     }
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">inviteHubUrl</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> base = TogetherJS.getConfig(<span class="string">"inviteFromRoom"</span>);
+    assert(base);
+    <span class="keyword">return</span> util.makeUrlAbsolute(base, session.hubUrl());
+  }
+
+  <span class="keyword">var</span> inRefresh = <span class="literal">false</span>;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">refreshInvite</span><span class="params">()</span> {</span>
+    <span class="keyword">if</span> (inRefresh) {
+      <span class="keyword">return</span>;
+    }
+    inRefresh = <span class="literal">true</span>;
+    require([<span class="string">"who"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(who)</span> {</span>
+      <span class="keyword">var</span> def = who.getList(inviteHubUrl());
+      <span class="function"><span class="keyword">function</span> <span class="title">addUser</span><span class="params">(user, before)</span> {</span>
+        <span class="keyword">var</span> item = templating.sub(<span class="string">"invite-user-item"</span>, {peer: user});
+        item.attr(<span class="string">"data-clientid"</span>, user.id);
+        <span class="keyword">if</span> (before) {
+          item.insertBefore(before);
+        } <span class="keyword">else</span> {
+          $(<span class="string">"#togetherjs-invite-users"</span>).append(item);
+        }
+        item.click(<span class="keyword">function</span>() {
+          invite(user.clientId);
+        });
+      }
+      <span class="function"><span class="keyword">function</span> <span class="title">refresh</span><span class="params">(users, finished)</span> {</span>
+        <span class="keyword">var</span> sorted = [];
+        <span class="keyword">for</span> (<span class="keyword">var</span> id <span class="keyword">in</span> users) {
+          <span class="keyword">if</span> (users.hasOwnProperty(id)) {
+            sorted.push(users[id]);
+          }
+        }
+        sorted.sort(<span class="function"><span class="keyword">function</span> <span class="params">(a, b)</span> {</span>
+          <span class="keyword">return</span> a.name &lt; b.name ? -<span class="number">1</span> : <span class="number">1</span>;
+        });
+        <span class="keyword">var</span> pos = <span class="number">0</span>;
+        ui.container.find(<span class="string">"#togetherjs-invite-users .togetherjs-menu-item"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>);
+          <span class="keyword">if</span> (finished &amp;&amp; ! users[$<span class="keyword">this</span>.attr(<span class="string">"data-clientid"</span>)]) {
+            $<span class="keyword">this</span>.remove();
+            <span class="keyword">return</span>;
+          }
+          <span class="keyword">if</span> (pos &gt;= sorted.length) {
+            <span class="keyword">return</span>;
+          }
+          <span class="keyword">while</span> (pos &lt; sorted.length &amp;&amp; $<span class="keyword">this</span>.attr(<span class="string">"data-clientid"</span>) !== sorted[pos].id) {
+            addUser(sorted[pos], $<span class="keyword">this</span>);
+            pos++;
+          }
+          <span class="keyword">while</span> (pos &lt; sorted.length &amp;&amp; $<span class="keyword">this</span>.attr(<span class="string">"data-clientid"</span>) == sorted[pos].id) {
+            pos++;
+          }
+        });
+        <span class="keyword">for</span> (<span class="keyword">var</span> i=pos; i&lt;sorted.length; i++) {
+          addUser(sorted[pos]);
+        }
+      }
+      def.then(<span class="function"><span class="keyword">function</span> <span class="params">(users)</span> {</span>
+        refresh(users, <span class="literal">true</span>);
+        inRefresh = <span class="literal">false</span>;
+      });
+      def.progress(refresh);
+    });
+  }
+
+  session.hub.on(<span class="string">"invite"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (msg.forClientId &amp;&amp; msg.clientId != peers.Self.id) {
+      <span class="keyword">return</span>;
+    }
+    require([<span class="string">"who"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(who)</span> {</span>
+      <span class="keyword">var</span> peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
+      ui.chat.invite({peer: peer, url: msg.url, forEveryone: ! msg.forClientId});
+    });
+  });
+
+  <span class="function"><span class="keyword">function</span> <span class="title">invite</span><span class="params">(clientId)</span> {</span>
+    require([<span class="string">"who"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(who)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-61">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-61">&#182;</a>
+                </div>
+                <p>FIXME: use the return value of this to give a signal that
+the invite has been successfully sent:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      who.invite(inviteHubUrl(), clientId).then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        hideMenu();
+      });
+    });
   }
 
   ui.showUrlChangeMessage = deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">(peer, url)</span> {</span>
@@ -2054,10 +2207,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-59">
+            <li id="section-62">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-59">&#182;</a>
+                  <a class="pilcrow" href="#section-62">&#182;</a>
                 </div>
                 <p>Not directed to us</p>
 
@@ -2069,7 +2222,7 @@ FIXME: should we tell the user this?</p>
   });
 
   session.on(<span class="string">"new-element"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-    <span class="keyword">if</span> (TowTruck.getConfig(<span class="string">"toolName"</span>)) {
+    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"toolName"</span>)) {
       ui.updateToolName(el);
     }
   });
@@ -2077,12 +2230,12 @@ FIXME: should we tell the user this?</p>
   <span class="keyword">var</span> setToolName = <span class="literal">false</span>;
   ui.updateToolName = <span class="function"><span class="keyword">function</span> <span class="params">(container)</span> {</span>
     container = container || $(document.body);
-    <span class="keyword">var</span> name = TowTruck.getConfig(<span class="string">"toolName"</span>);
+    <span class="keyword">var</span> name = TogetherJS.getConfig(<span class="string">"toolName"</span>);
     <span class="keyword">if</span> (setToolName &amp;&amp; ! name) {
-      name = <span class="string">"TowTruck"</span>;
+      name = <span class="string">"TogetherJS"</span>;
     }
     <span class="keyword">if</span> (name) {
-      container.find(<span class="string">".towtruck-tool-name"</span>).text(name);
+      container.find(<span class="string">".togetherjs-tool-name"</span>).text(name);
       setToolName = <span class="literal">true</span>;
     }
   };
@@ -2113,17 +2266,18 @@ FIXME: should we tell the user this?</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

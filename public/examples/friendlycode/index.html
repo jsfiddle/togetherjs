@@ -24,11 +24,11 @@
     <script src="js/require.min.js"></script>
     <script>
     require.baseUrl = "js";
-    // We don't want TowTruck to try to load until after FriendlyCode is started
+    // We don't want TogetherJS to try to load until after FriendlyCode is started
     // up:
-    window._TowTruckLoads = [];
-    window._TowTruckOnLoad = function (callback) {
-      window._TowTruckLoads.push(callback);
+    window._TogetherJSLoads = [];
+    window._TogetherJSOnLoad = function (callback) {
+      window._TogetherJSLoads.push(callback);
     };
     require(["jquery", "friendlycode"], function($, FriendlycodeEditor) {
       var result = FriendlycodeEditor({
@@ -37,10 +37,10 @@
       });
       result.ready.then(function () {
         var el = $(".publish-button");
-        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TowTruck">Collaborate</div>');
-        newButton.click(startTowTruck);
+        var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TogetherJS">Collaborate</div>');
+        newButton.click(startTogetherJS);
         el.before(newButton);
-        window._TowTruckLoads.forEach(function (callback) {
+        window._TogetherJSLoads.forEach(function (callback) {
           callback();
         });
       });
@@ -48,9 +48,9 @@
     });
     </script>
     <script>
-      TowTruckConfig_findRoom = {prefix: "towtruckfriendly", max: 5};
-      TowTruckConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_findRoom = {prefix: "togetherjsfriendly", max: 5};
+      TogetherJSConfig_suppressJoinConfirmation = true;
     </script>
-    <script src="/towtruck.js"></script>
+    <script src="/togetherjs.js"></script>
   </body>
 </html>

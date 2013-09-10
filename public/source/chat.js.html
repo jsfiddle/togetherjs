@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>chat.js</h1>
         
-          <h4>Handles the chat messages (except actual display, which is in `ui.js`).</h4>
+          <h4><p>Handles the chat messages (except actual display, which is in <code>ui.js</code>).</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/chat.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/chat.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -295,11 +296,11 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
           text: <span class="string">"Testing with walkabout.js"</span>
         });
         <span class="keyword">var</span> tmpl = $(templates.walkabout);
-        <span class="keyword">var</span> container = ui.container.find(<span class="string">".towtruck-test-container"</span>);
+        <span class="keyword">var</span> container = ui.container.find(<span class="string">".togetherjs-test-container"</span>);
         container.empty();
         container.append(tmpl);
         container.show();
-        <span class="keyword">var</span> statusContainer = container.find(<span class="string">".towtruck-status"</span>);
+        <span class="keyword">var</span> statusContainer = container.find(<span class="string">".togetherjs-status"</span>);
         statusContainer.text(<span class="string">"starting..."</span>);
         <span class="keyword">this</span>._testCancel = Walkabout.runManyActions({
           ondone: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -416,7 +417,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
             text: <span class="string">"Error fetching "</span> + url + <span class="string">":\n"</span> + JSON.stringify(error, <span class="literal">null</span>, <span class="string">"  "</span>)
           });
         });
-      windowing.hide(<span class="string">"#towtruck-chat"</span>);
+      windowing.hide(<span class="string">"#togetherjs-chat"</span>);
     },
 
     command_savelogs: <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
@@ -455,7 +456,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
       }
       url = url.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>);
       ui.chat.system({
-        text: <span class="string">"If this goes wrong, do this in the console to reset:\n  localStorage.setItem('towtruck.baseUrlOverride', null)"</span>
+        text: <span class="string">"If this goes wrong, do this in the console to reset:\n  localStorage.setItem('togetherjs.baseUrlOverride', null)"</span>
       });
       storage.set(<span class="string">"baseUrlOverride"</span>, {
         baseUrl: url,
@@ -552,17 +553,18 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

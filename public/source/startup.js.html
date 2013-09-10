@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -64,7 +65,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -85,8 +86,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -102,7 +104,7 @@
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
-          <ul class="nav">
+          <ul class="nav" id="sectionmenu">
             
               <li><a href="analytics.js.html">analytics</a></li>
             
@@ -128,8 +130,6 @@
             
               <li><a href="playback.js.html">playback</a></li>
             
-              <li><a href="presence.js.html">presence</a></li>
-            
               <li><a href="randomutil.js.html">randomutil</a></li>
             
               <li><a href="recorder.js.html">recorder</a></li>
@@ -144,9 +144,7 @@
             
               <li><a href="templating.js.html">templating</a></li>
             
-              <li><a href="towtruck.js.html">towtruck</a></li>
-            
-              <li><a href="towtruckPackage.js.html">towtruckPackage</a></li>
+              <li><a href="togetherjs.js.html">togetherjs</a></li>
             
               <li><a href="ui.js.html">ui</a></li>
             
@@ -158,6 +156,8 @@
             
               <li><a href="webrtc.js.html">webrtc</a></li>
             
+              <li><a href="who.js.html">who</a></li>
+            
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
@@ -167,10 +167,11 @@
       <div class="col-md-9" id="source-content">
         <h1>startup.js</h1>
         
-          <h4>Handles the logic of what to display when TowTruck is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session).</h4>
+          <h4><p>Handles the logic of what to display when TogetherJS is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session).</p>
+</h4>
         
 
-        <div class="small"><a href="https://github.com/mozilla/towtruck/blob/develop/towtruck/startup.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/startup.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -187,7 +188,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
 
 <span class="comment">/* This module handles all the different UI that happens (sometimes in order) when
-   TowTruck is started:
+   TogetherJS is started:
 
    - Introduce the session when you've been invited
    - Show any browser compatibility indicators
@@ -264,13 +265,13 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
         next();
         <span class="keyword">return</span>;
       }
-      windowing.show(<span class="string">"#towtruck-browser-broken"</span>, {
+      windowing.show(<span class="string">"#togetherjs-browser-broken"</span>, {
         onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           session.close();
         }
       });
       <span class="keyword">if</span> ($.browser.msie) {
-        $(<span class="string">"#towtruck-browser-broken-is-ie"</span>).show();
+        $(<span class="string">"#togetherjs-browser-broken-is-ie"</span>).show();
       }
     },
 
@@ -280,7 +281,7 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
         <span class="keyword">return</span>;
       }
       <span class="keyword">var</span> cancel = <span class="literal">true</span>;
-      windowing.show(<span class="string">"#towtruck-browser-unsupported"</span>, {
+      windowing.show(<span class="string">"#togetherjs-browser-unsupported"</span>, {
         onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           <span class="keyword">if</span> (cancel) {
             session.close();
@@ -289,7 +290,7 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
           }
         }
       });
-      $(<span class="string">"#towtruck-browser-unsupported-anyway"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      $(<span class="string">"#togetherjs-browser-unsupported-anyway"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         cancel = <span class="literal">false</span>;
       });
     },
@@ -299,19 +300,19 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
         next();
         <span class="keyword">return</span>;
       }
-      <span class="keyword">if</span> (TowTruck.getConfig(<span class="string">"suppressJoinConfirmation"</span>)) {
+      <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"suppressJoinConfirmation"</span>)) {
         next();
         <span class="keyword">return</span>;
       }
       <span class="keyword">var</span> cancelled = <span class="literal">false</span>;
-      windowing.show(<span class="string">"#towtruck-intro"</span>, {
+      windowing.show(<span class="string">"#togetherjs-intro"</span>, {
         onClose: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           <span class="keyword">if</span> (! cancelled) {
             next();
           }
         }
       });
-      $(<span class="string">"#towtruck-intro .towtruck-modal-dont-join"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      $(<span class="string">"#togetherjs-intro .togetherjs-modal-dont-join"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         cancelled = <span class="literal">true</span>;
         windowing.hide();
         session.close(<span class="string">"declined-join"</span>);
@@ -334,12 +335,13 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
     },
 
     share: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
-      <span class="keyword">if</span> (session.isClient || ! session.firstRun) {
+      <span class="keyword">if</span> (session.isClient || (! session.firstRun) ||
+          TogetherJS.getConfig(<span class="string">"suppressInvite"</span>)) {
         next();
         <span class="keyword">return</span>;
       }
       require([<span class="string">"windowing"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(windowing)</span> {</span>
-        windowing.show(<span class="string">"#towtruck-share"</span>);</pre></div></div>
+        windowing.show(<span class="string">"#togetherjs-share"</span>);</pre></div></div>
               
             </li>
           
@@ -383,17 +385,18 @@ If there was a next() step then it would not work</p>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">

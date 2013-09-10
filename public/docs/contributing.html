@@ -7,7 +7,7 @@
     <title>
       Mozilla Labs : TogetherJS
     </title>
-    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.png">
@@ -17,14 +17,15 @@
     <script src="../js/parallax.js"></script>
     <script src="../js/custom.js"></script>
     <script src="../js/scrollTo.js"></script>
+    <script src="../js/scrollspy.js"></script>
     <script src="../js/waypoints.min.js"></script>
     <script src="../js/how-animations.js"></script>
+    <script src="../togetherjs.js"></script>
 
     <!-- retina library -->
     <script src="../js/retina.js"></script>
 
     <script src="//mozorg.cdn.mozilla.net/tabzilla/tabzilla.js"></script>
-    <script src="//mozorg.cdn.mozilla.net/{locale}/tabzilla/tabzilla.js"></script>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -61,7 +62,7 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
   </head>
-  <body>
+  <body data-spy="scroll" data-target="#markdownpages">
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
 
       <!-- Tabzilla -->
@@ -82,8 +83,9 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/developers-getting-started.html"  >Docs</a></li>
-            <li><a href="mailto:towtruck@mozilla.com">Contact</a></li>
+            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+            <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
 
@@ -97,38 +99,44 @@
   <section class="row" id="markdownpages">
     <div class="col-md-3">
       <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
-        <ul class="nav">
-          <li><a href="#quick-start" class="scrollnavdocs">Quick Start</a></li>
-          <li><a href="#about-audio-chat-and-webrtc" class="scrollnavdocs">About Audio Chat and WebRTC</a></li>
-          <li><a href="#addons" class="scrollnavdocs">Addons</a></li>
-          <li><a href="#contributing" class="scrollnavdocs">Contributing</a></li>
-          <li><a href="#extending-togetherjs" class="scrollnavdocs">Extending TogetherJS</a></li>
-          <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting the Hub Server</a></li>
-          <li><a href="#browser-support" class="scrollnavdocs">Browser Support</a></li>
+        <ul id="sectionmenu" class="nav">
+          <li><a href="#code-style" class="scrollnavdocs">Code Style</a></li>
+          <li><a href="#togetherjs-patterns" class="scrollnavdocs">TogetherJS Patterns</a></li>
+          <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting The Hub Server</a></li>
         </ul>
+        <div class="well">
+          <button type="button" class="btn btn-primary btn-lg btn-block">
+            Get help
+          </button>
+          <div class="small text-center">Get support from the TogetherJS team.</div>
+        </div>
       </div>
     </div>
     <div class="col-md-9">
-      <h1>Contributing</h1>
+      <h1>Contributing to TogetherJS</h1>
       
-<p>Here are a variety of notes about contributing to the TowTruck codebase.  This isn&#39;t stuff that applies if you are simply integrating TowTruck in your site.</p>
+<!--
+template: docs-contributing.tmpl
+-->
+
+<p>Here are a variety of notes about contributing to the TogetherJS codebase.  This isn&#39;t stuff that applies if you are simply integrating TogetherJS in your site.</p>
 <h2 id="code-style">Code Style</h2>
 <p><a href="https://github.com/ianb/javascript">Here is a style document</a>.  It&#39;s a fork of the <a href="https://github.com/airbnb/javascript">Airbnb</a> style guide, and maybe takes a little from the <a href="https://developer.mozilla.org/en-US/docs/Developer_Guide/Coding_Style">Mozilla style guide</a>, and then a little of our own opinions.</p>
 <h3 id="code-cleanliness">Code Cleanliness</h3>
 <p>Please figure out how to get your editor to delete trailing whitespace!  It&#39;s a nuisance and creates useless diffs.  Files should also end with a newline.</p>
-<h2 id="towtruck-patterns">TowTruck Patterns</h2>
+<h2 id="togetherjs-patterns">TogetherJS Patterns</h2>
 <h3 id="modules">Modules</h3>
-<p>There are <a href="https://github.com/ianb/javascript#modules">some notes in the style guide</a>.  TowTruck uses <a href="http://requirejs.org/">requirejs</a> for module loading, and the AMD pattern generally.  Each module should go in <code>app/http/towtruck/public/</code> and look like:</p>
+<p>There are <a href="https://github.com/ianb/javascript#modules">some notes in the style guide</a>.  TogetherJS uses <a href="http://requirejs.org/">requirejs</a> for module loading, and the AMD pattern generally.  Each module should go in <code>app/http/togetherjs/public/</code> and look like:</p>
 <pre><code class="lang-javascript">define([<span class="string">"util"</span>, <span class="string">"jquery"</span>, <span class="string">"require"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, $, require)</span> {</span>
   <span class="keyword">var</span> myModule = util.Module(<span class="string">"myModule"</span>);
   <span class="keyword">var</span> assert = util.assert;
   myModule.object = ... <span class="comment">// and so on</span>
   <span class="keyword">return</span> myModule;
 });</code></pre>
-<p>The first list is the dependencies (modules) you need.  If you need to require module modules later (lazily, or later than load time due to circular dependencies) you must include <code>require</code> among your dependencies.  There <em>is</em> a global <code>require()</code> object, but you can&#39;t use it, because TowTruck uses a <a href="http://requirejs.org/docs/api.html#multiversion">context</a>.</p>
+<p>The first list is the dependencies (modules) you need.  If you need to require module modules later (lazily, or later than load time due to circular dependencies) you must include <code>require</code> among your dependencies.  There <em>is</em> a global <code>require()</code> object, but you can&#39;t use it, because TogetherJS uses a <a href="http://requirejs.org/docs/api.html#multiversion">context</a>.</p>
 <p>You should define an object with a name matching the name of the module (and filename).  This way an object or function will be named the same throughout the project, both when used internally and externally (e.g., <code>myModule.object</code>), and when it is being created.</p>
 <p>If you want to load a module from the console, you do it like this:</p>
-<pre><code class="lang-javascript">session = require({context: <span class="string">"towtruck"</span>})(<span class="string">"session"</span>);</code></pre>
+<pre><code class="lang-javascript">session = require({context: <span class="string">"togetherjs"</span>})(<span class="string">"session"</span>);</code></pre>
 <p>(This form of <code>require</code> only works when the module is already loaded, but from the console that&#39;s usually the case.)</p>
 <h3 id="classes">Classes</h3>
 <p>There is a class factory in <code>util.Class</code>.  It supports subclassing, but we haven‘t used any subclasses yet, and I’m not sure we will.  Look at the implementation if you want to know more.</p>
@@ -139,7 +147,7 @@
 MyClass.classMethod = <span class="function"><span class="keyword">function</span> <span class="params">(...)</span> {</span>...};
 <span class="keyword">var</span> instance = MyClass();</code></pre>
 <p>The <code>constructor</code> function is called when the object is instantiated.  You don&#39;t need to use <code>new</code> when creating instances, and really you shouldn‘t (it’ll just create an object that&#39;ll be thrown away).  MyClass.prototype is what you would expect.</p>
-<h3 id="codethiscode"><code>this</code></h3>
+<h3 id="this">this</h3>
 <p>You should understand how <code>this</code> is bound, and how that binding is lost.</p>
 <p>Generally we prefer using <code>.bind(this)</code> to keep the references to this.  For example:</p>
 <pre><code><span class="keyword">var</span> MyClass = Class({
@@ -157,14 +165,20 @@ MyClass.classMethod = <span class="function"><span class="keyword">function</spa
 <h3 id="templating">Templating</h3>
 <p>Right now we aren&#39;t using any real templating system.  Almost everything is in <code>app/http/views/interface.html</code> – and most likely any new markup should also go there.</p>
 <p>We try to keep most of the code that actually touches the ui in <code>ui.js</code> – though it&#39;s not done very strictly.  Moving stuff back into ui.js is appreciated though.</p>
-<p>“Templates” are just elements that are cloned out of <code>interface.html</code>.  They generally have an id like <code>towtruck-template-foo</code>, and you&#39;d clone them by doing <code>ui.cloneTemplate(&quot;foo&quot;)</code>.</p>
+<p>“Templates” are just elements that are cloned out of <code>interface.html</code>.  They generally have an id like <code>togetherjs-template-foo</code>, and you&#39;d clone them by doing <code>ui.cloneTemplate(&quot;foo&quot;)</code>.</p>
 <p>You should avoid having text or markup in Javascript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.</p>
 <h3 id="async">Async</h3>
 <p>Use <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> when possible.</p>
+<h2 id="hosting-the-hub-server">Hosting the Hub Server</h2>
+<p>We have a server at <code>https://hub.togetherjs.mozillalabs.com</code> which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven&#39;t really “finished” the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.</p>
+<p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code>, and you can use environmental variables to control things like the port (look in <code>server.js</code> for references to <code>process.env</code>).  You will need to <code>npm install websocket</code> to get the websocket library installed.</p>
+<p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t it setup in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy.  <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
+<p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
+<pre><code class="lang-javascript">TogetherJSConfig_hubBase = <span class="string">"https://myhub.com"</span>;</code></pre>
 
     </div>
   </section>
-  
+
 
 
 
@@ -179,17 +193,18 @@ MyClass.classMethod = <span class="function"><span class="keyword">function</spa
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="scrollnav">Overview</a></li>
-                <li><a href=".././docs/developers-getting-started.html" target="_blank">Docs</a></li>
-                <li class=""><a href="mailto:towtruck@mozilla.com" target="_blank">Contact</a></li>
+                <li><a href=".././docs/" target="_blank">Docs</a></li>
+                <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
+                <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://mozillalabs.com/en-US/towtruck/" target="_blank">About</a></li>
-                <li class=""><a href="https://github.com/mozilla/towtruck" target="_blank">Github</a></li>
-                <li><a href="../source/analytics.js.html">Source Code</a></li>
+                <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
+                <li><a href=".././docs/contributing.html">Contributing</a></li>
+                <li><a href="../source/">Source Code</a></li>
                 <li><a href="../faq.html">FAQ</a></li>
-                <li class=""><a href="https://twitter.com/moztowtruck" target="_blank">Twitter</a></li>
+                <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
             <div class="col-xs-3">
