@@ -417,16 +417,23 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
     setTimeout(function () {
+      var element = event.target;
       if (! TowTruck.running) {
         // This can end up running right after TowTruck has been closed, often
         // because TowTruck was closed with a click...
         return;
       }
-      if (elementFinder.ignoreElement(event.target)) {
+      if (elementFinder.ignoreElement(element)) {
         return;
       }
-      var location = elementFinder.elementLocation(event.target);
-      var offset = $(event.target).offset();
+      //Prevent click events on video objects to avoid conflicts with
+      //towtruck's own video events
+      if (element.nodeName.toLowerCase() === 'video'){
+        return;
+      }
+
+      var location = elementFinder.elementLocation(element);
+      var offset = $(element).offset();
       var offsetX = event.pageX - offset.left;
       var offsetY = event.pageY - offset.top;
       session.send({

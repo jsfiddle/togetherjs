@@ -228,7 +228,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup","videos", "forms", "visibilityApi"];
 
   function getRoomName(prefix, maxSize) {
     var findRoom = TowTruck.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
