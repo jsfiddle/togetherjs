@@ -1,7 +1,6 @@
 
 define(["jquery", "util", "session", "elementFinder"],
 function($, util, session, elementFinder){
-  var returnMe = util.Module("videos");
 
   var listeners = {};
 
@@ -111,6 +110,7 @@ function($, util, session, elementFinder){
     });
   })
 
+  //Currently does not discriminate between visible and invisible videos
   function $findElement(location) {
     return $(elementFinder.findElement(location));
   }
@@ -119,5 +119,4 @@ function($, util, session, elementFinder){
     video.prop('currentTime', time);
   }
 
-  return returnMe;
 });

@@ -426,6 +426,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (elementFinder.ignoreElement(element)) {
         return;
       }
+      //Prevent click events on video objects to avoid conflicts with
+      //towtruck's own video events
       if (element.nodeName.toLowerCase() === 'video'){
         return;
       }
