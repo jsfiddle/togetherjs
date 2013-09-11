@@ -420,6 +420,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
+      }
       var element = event.target;
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
