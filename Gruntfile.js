@@ -88,7 +88,7 @@ module.exports = function (grunt) {
             // Make sure we get the built form of this one:
             templates: "../build/towtruck/templates"
           },
-          include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
+          include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "videos", "cursor", "startup", "forms", "visibilityApi"],
           //Wrap any build bundle in a start and end text specified by wrap.
           //Use this to encapsulate the module code so that define/require are
           //not globals. The end text can expose some globals from your file,
