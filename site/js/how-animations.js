@@ -29,6 +29,13 @@
         //animate How does ConnectJS work?
         $('.howto-animation-01').waypoint(function() {
           
+          function start() {
+            
+            
+            $('#element').animate({}, 5000, 'linear', start());
+          }
+          
+          
           // 1. Add ConnectJS Javascript and HTML to your site.
           $('.how-section-imganim-01').animate({
             left: "60%"
