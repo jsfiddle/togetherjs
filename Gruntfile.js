@@ -86,7 +86,7 @@ module.exports = function (grunt) {
             jqueryui: "libs/jquery-ui.min",
             jquerypunch: "libs/jquery.ui.touch-punch.min",
             // Make sure we get the built form of this one:
-            templates: "../build/togetherjs/templates"
+            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
           },
           include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"],
           //Wrap any build bundle in a start and end text specified by wrap.
@@ -264,7 +264,6 @@ module.exports = function (grunt) {
       var destFn = grunt.option("dest") + "/" + fn.substr(0, fn.length-4) + "css";
       if (! fs.existsSync(destFn)) {
         found = true;
-        grunt.log.writeln("Destination LESS does not exist: " + destFn.cyan);
         return;
       }
       var dest = fs.statSync(destFn);
