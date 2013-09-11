@@ -18,7 +18,7 @@ The quickest is to include two things on your page.  First the Javascript:
 <script src="https://togetherjs.mozillalabs.com/togetherjs-min.js"></script>
 ```
 
-The first part configures TogetherJS.  In the example we configure it to send analytics information back to us (Mozilla), so we can get an idea of who is using TogetherJS.  You can turn it off, but we do appreciate the information, especially during the alpha stage.  There's not much configuration yet, but we'll go over what there is later.
+The first part configures TogetherJS.  In the example we configure it to send analytics information back to us (Mozilla), so we can get an idea of who is using TogetherJS.  You can turn it off, but we do appreciate the information, especially during the alpha stage. There's not much configuration yet, but we'll go over what there is later.
 
 The next step is to put a button on your site that lets a user start TogetherJS:
 
@@ -41,6 +41,14 @@ You should put the `togetherjs-min.js` script on every page in your site – two
 
 Note that `togetherjs-min.js` *is not* the entire code for TogetherJS, it's only a fairly small file that loads the rest of TogetherJS on demand.  You can place the `<script>` anywhere on the page – generally before `</body>` is considered the best place to put scripts.
 
+## Technology Overview
+
+In this section we'll describe the general way that TogetherJS works, without diving into any code.  If you are ready to use TogetherJS and want to know how, skip to the next section; if you want to understand how it works, or if it can help you in a particular use case, then this section is for you.
+
+The core of TogetherJS is the *hub*: this is a server that everyone in a session connects to, and it echos messages to all the participants using Web Sockets.  This server does not rewrite the messages or do much of anything besides pass the messages between the participants.
+
+[WebRTC](http://www.webrtc.org/) is available for audio chat, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunatley you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets.
+
 ### Scope of the session
 
 TogetherJS sessions are connected to the domain you start them on (specifically the [origin](http://tools.ietf.org/html/rfc6454)).  So if part of your site is on another domain, people won't be able to talk across those domains.  Even a page that is on https when another is on http will cause the session to be lost.  We might make this work sometime, but if it's an issue to you please give us [feedback](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).
@@ -53,7 +61,7 @@ As mentioned there are a few TogetherJS configuration parameters.  In the future
     In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  The idea siteName is the name of your site.
 
 `TogetherJSConfig_enableAnalytics`:
-    During the TogetherJS alpha we'd like to get some idea of who is using the project, and what clients/browsers users have, the native language of users, and maybe some stuff we haven't even thought of.  Setting this to `true` adds tracking when someone starts TogetherJS; Google manages the analytics, but the results are contractually private to Mozilla.  The setting `TogetherJSConfig_analyticsCode` is the analytics code that is used.
+    During the TogetherJS alpha we'd like to get some idea of who is using the project, and what clients/browsers users have, the native language of users, and maybe some stuff we haven't even thought of. Setting this to `true` adds tracking when someone starts TogetherJS; Google manages the analytics, but the results are contractually private to Mozilla.  The setting `TogetherJSConfig_analyticsCode` is the analytics code that is used.
 
 `TogetherJSConfig_hubBase`:
     This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It's the only real server component of TogetherJS (besides the statically hosted scripts).  It's also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You'll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets, and because there's no public pages that a user will typically visit on the hub there's no opportunity to put in a security exception.
@@ -98,9 +106,9 @@ See the page [Extending TogetherJS](https://github.com/mozilla/togetherjs/wiki/E
 
 ## About Audio Chat and WebRTC
 
-The live audio chat is based on [WebRTC](http://www.webrtc.org/).  This is a very new technology, built into some new browsers.
+The live audio chat is based on [WebRTC](http://www.webrtc.org/). This is a very new technology, built into some new browsers.
 
-To enable WebRTC both you and your collaborator need a new browser.  Right now, [Firefox Nightly](http://nightly.mozilla.org/) is supported, and we believe that the newest release of Chrome should work.
+To enable WebRTC both you and your collaborator need a new browser. Right now, [Firefox Nightly](http://nightly.mozilla.org/) is supported, and we believe that the newest release of Chrome should work.
 
 Sometime in 2013 support for this should be available in new (non-experimental) versions of Firefox, Chrome, and both Firefox and Chrome for Android.
 
@@ -120,7 +128,7 @@ A simple way to install is simply to [click this link](http://togetherjs.mozilla
 
 ### Building
 
-You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder).  Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
+You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
 
 ## Extending TogetherJS
 
@@ -190,7 +198,7 @@ TogetherJS.hub.on("visibilityChange", function (msg) {
 });
 ```
 
-This has two major problems though: when you call `MyApp.changeVisibility` it will probably fire a `visibilityChange` event, which will cause another `fireTogetherJSVisibility` call.  The result may or may not be circular, but it's definitely not efficient.  Another problem is that you can get messages from peers who are at a different URL.  We'll use a simple global variable to handle the first case, and `msg.sameUrl` to fix the second:
+This has two major problems though: when you call `MyApp.changeVisibility` it will probably fire a `visibilityChange` event, which will cause another `fireTogetherJSVisibility` call.  The result may or may not be circular, but it's definitely not efficient. Another problem is that you can get messages from peers who are at a different URL.  We'll use a simple global variable to handle the first case, and `msg.sameUrl` to fix the second:
 
 ```js
 var visibilityChangeFromRemote = false;
@@ -278,7 +286,7 @@ This returns the user's name (or nick).  Return null if you can't determine the 
 
 `TogetherJSConfig_getUserAvatar = function () {return avatarUrl;};`
 
-This returns a URL to the user's avatar.  It should be 40px square.  Again return null if you aren't sure.
+This returns a URL to the user's avatar.  It should be 40px square. Again return null if you aren't sure.
 
 `TogetherJSConfig_getUserColor = function () {return '#ff00ff';};`
 
@@ -365,11 +373,11 @@ The hub changes quite infrequently, so if you just stability then making a stati
 
 TogetherJS is intended for relatively newer browsers.  Especially as we experiment with what we're doing, supporting older browsers causes far more challenge than it is an advantage.
 
-The bare minimum that we've identified for TogetherJS is [WebSocket support](http://caniuse.com/websockets).  That said, we generally only test on the most recent version of Firefox and Chrome, so bugs specific to older browsers are more likely (but please [submit bugs](https://github.com/mozilla/togetherjs/issues/new) from those browsers anyway – we aren't deliberately not supporting them).  Our next set of browsers to target will be mobile browsers.
+The bare minimum that we've identified for TogetherJS is [WebSocket support](http://caniuse.com/websockets).  That said, we generally only test on the most recent version of Firefox and Chrome, so bugs specific to older browsers are more likely (but please [submit bugs](https://github.com/mozilla/togetherjs/issues/new) from those browsers anyway – we aren't deliberately not supporting them). Our next set of browsers to target will be mobile browsers.
 
 ## Internet Explorer
 
-With IE 10 it is *possible* to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don't plan to address bug reports for Internet Explorer that don't come with a pull request.  If Internet Explorer support is important to you we do [welcome your feedback](https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).  No decision is set in stone, but we don't want to mislead you with respect to our current priorities and intentions.
+With IE 10 it is *possible* to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don't plan to address bug reports for Internet Explorer that don't come with a pull request.  If Internet Explorer support is important to you we do [welcome your feedback](https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform). No decision is set in stone, but we don't want to mislead you with respect to our current priorities and intentions.
 
 ## Supported Browsers
 
