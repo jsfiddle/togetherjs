@@ -14,6 +14,7 @@ var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
 var parseUrl = require('url').parse;
+
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
 
@@ -299,10 +300,20 @@ function logStats(id, stats) {
 }
 
 if (require.main == module) {
-  startServer(process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
-              process.env.PORT || 8080,
-              process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
-              process.env.HOST || '127.0.0.1');
+  var ops = require('optimist')
+      .usage("Usage: $0 [--port 8080] [--host localhost]")
+      .describe("port", "The port to server on (default $HUB_SERVER_PORT, $PORT, $VCAP_APP_PORT, or 8080")
+      .describe("host", "The interface to serve on (default $HUB_SERVER_HOST, $HOST, $VCAP_APP_HOST, 127.0.0.1).  Use 0.0.0.0 to make it public");
+  var port = ops.argv.port || process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
+      process.env.PORT || 8080;
+  var host = ops.argv.host || process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
+      process.env.HOST || '127.0.0.1';
+  if (ops.argv.h || ops.argv.help) {
+    console.log(ops.help());
+    process.exit();
+  } else {
+    startServer(port, host);
+  }
 }
 
 exports.startServer = startServer;
