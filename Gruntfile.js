@@ -57,6 +57,15 @@ module.exports = function (grunt) {
     });
   }
 
+  var libs = [];
+  grunt.file.expand(
+    ["togetherjs/*.js", "!togetherjs/randomutil.js", "!togetherjs/recorder.js", "!togetherjs/togetherjs.js"]
+  ).forEach(function (filename) {
+    filename = filename.replace(/^togetherjs\//, "");
+    filename = filename.replace(/\.js$/, "");
+    libs.push(filename);
+  });
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -88,7 +97,7 @@ module.exports = function (grunt) {
             // Make sure we get the built form of this one:
             templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
           },
-          include: ["libs/almond", "jquery", "session", "peers", "ui", "chat", "webrtc", "videos", "cursor", "startup", "forms", "visibilityApi"],
+          include: ["libs/almond"].concat(libs),
           //Wrap any build bundle in a start and end text specified by wrap.
           //Use this to encapsulate the module code so that define/require are
           //not globals. The end text can expose some globals from your file,
