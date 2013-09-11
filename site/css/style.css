@@ -475,6 +475,10 @@ h5 {
   background: #efefef;
 }
 
+#main-section #examples .ex-description {
+  min-height: 50px;
+}
+
 /* =customers section
 ----------------------------------------------- */
 
@@ -778,6 +782,14 @@ h5 {
     width: 60px;
     height: 10px;
   }
+  
+  #main-section #examples .ex-description {
+    min-height: 131px;
+  }
+  
+  #main-section #examples .ex-title {
+    min-height: 31px;
+  }
 
 }
 
@@ -824,6 +836,10 @@ h5 {
   #footer a img {
     width: 100px;
     height: 17px;
+  }
+  
+  #main-section #examples .ex-description {
+    min-height: 81px;
   }
 
 
@@ -875,6 +891,10 @@ h5 {
     width: 141px;
     height: 24px;
   }
+  
+  #main-section #examples .ex-description {
+    min-height: 81px;
+  }
 
 }
 
@@ -921,6 +941,10 @@ h5 {
 
   #marketing-video #frame-video {
     padding-top: 6px;
+  }
+  
+  #main-section #examples .ex-description {
+    min-height: 51px;
   }
 
 }
