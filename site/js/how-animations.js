@@ -29,60 +29,110 @@
         //animate How does ConnectJS work?
         $('.howto-animation-01').waypoint(function() {
           
-          function start() {
-            
-            
-            $('#element').animate({}, 5000, 'linear', start());
-          }
+          // function start() {
+          //   
+          //   
+          //   $('#element').animate({}, 5000, 'linear', start());
+          // }
           
           
           // 1. Add ConnectJS Javascript and HTML to your site.
-          $('.how-section-imganim-01').animate({
-            left: "60%"
-          }, 800).animate({
-              opacity: "0"
-            }, 800);
-            
-          $('.how-section-imganim-02').animate({
-            left: "60%"
-          }, 800).animate({
-              opacity: "0"
-            }, 800).queue(function(){ 
-              //animate in the button
-              $('.how-section-imganim-03').fadeIn();
-              });
+          // animate in first 
+          startFirstAnimation();
+          function startFirstAnimation() {
+            $('.how-section-imganim-01').animate({
+              left: "60%"
+            }, 800).animate({
+                opacity: "0"
+              }, 800).animate({
+                left: "11%"
+                }, 7000).animate({
+                  opacity: "1"
+                  }, startFirstAnimation);
+          }
+          // animate in second
+          startSecondAnimation();
+          function startSecondAnimation() {
+            $('.how-section-imganim-02').animate({
+              left: "60%"
+            }, 800).animate({
+                opacity: "0"
+              }, 800).animate({
+                left: "9%"
+              }, 7000).animate({
+                opacity: "1"
+              }, startSecondAnimation);
           
-        }, { offset: 300, triggerOnce: true });
+            startFadeInOut();
+            function startFadeInOut(){
+              $('.how-section-imganim-03').delay(1000).fadeIn().delay(6000).fadeOut(); 
+            }
+
+          }
+          
+        }, { offset: 300, triggerOnce: false });
         
         // 2. Your site is now ConnectJS enabled.
         $('.howto-animation-02').waypoint(function() {   
-          $(".how-section-btncollab").fadeOut();  
-          $(".how-section-btncollabpressed").fadeIn();
-          setTimeout(function() {
-            $(".how-section-dockplacement").fadeIn();     
-          }, 1000);        
-        }, { offset: 200, triggerOnce: true });
+          
+          
+          function startHowAnimation2(){
+            $(".how-section-btncollab").fadeOut();  
+            $(".how-section-btncollabpressed").fadeIn();
+            setTimeout(function() {
+              $(".how-section-dockplacement").fadeIn();     
+            }, 1000); 
+            setTimeout(function() {
+              $(".how-section-dockplacement").fadeOut();   
+              $(".how-section-btncollabpressed").fadeOut();  
+              $(".how-section-btncollab").fadeIn(); 
+            }, 7000);
+            setTimeout(startHowAnimation2, 7000);
+          }    
+          startHowAnimation2();
+          
+        }, { offset: 200, triggerOnce: false });
         
         // 3. Your site is now ConnectJS enabled.        
         $('.howto-animation-03').waypoint(function() {
           
-          $('.cursor-placement-01').animate({
-            left: "-=10%"
-          }, 800);
-          $('.cursor-placement-03').animate({
-            left: "-=25%"
-          }, 800);
-          setTimeout(function() {
-             $('.cursor-placement-02').animate({
-               top: "-=13%"
-             }, 800);
-             $('.cursor-placement-04').animate({
-               top: "-=5%"
-             }, 800);  
-               
-           }, 1000);
-          
+          function startCursorAnimation(){
+            $('.cursor-placement-01').animate({
+              left: "76%"
+            }, 800);
+            $('.cursor-placement-03').animate({
+              left: "40%"
+            }, 800);
+            setTimeout(function() {
+               $('.cursor-placement-02').animate({
+                 top: "60%"
+               }, 800);
+               $('.cursor-placement-04').animate({
+                 top: "29%"
+               }, 800);  
+             }, 1000);
+            setTimeout(function() {
+                $('.cursor-placement-01').animate({
+                  left: "78%"
+                }, 800);
+                $('.cursor-placement-03').animate({
+                  left: "44%"
+                }, 800);  
+              }, 1000);
+              setTimeout(function() {
+                 $('.cursor-placement-02').animate({
+                   top: "57%"
+                 }, 800);
+                 $('.cursor-placement-04').animate({
+                   top: "27%"
+                 }, 800);  
+               }, 1000);
+            setTimeout(startCursorAnimation, 7000);
+            
+          }
+          startCursorAnimation();
           console.log("animation 3");
+          
         }, { offset: 200, triggerOnce: true });
           
     })
