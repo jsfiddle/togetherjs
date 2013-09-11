@@ -422,15 +422,15 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         // because TogetherJS was closed with a click...
       var element = event.target;
       if (! TogetherJS.running) {
-        // This can end up running right after TowTruck has been closed, often
-        // because TowTruck was closed with a click...
+        // This can end up running right after TogetherJS has been closed, often
+        // because TogetherJS was closed with a click...
         return;
       }
       if (elementFinder.ignoreElement(element)) {
         return;
       }
       //Prevent click events on video objects to avoid conflicts with
-      //towtruck's own video events
+      //togetherjs's own video events
       if (element.nodeName.toLowerCase() === 'video'){
         return;
       }
