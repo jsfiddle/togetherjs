@@ -1,5 +1,28 @@
 !function ($) {
     $(function(){
+      
+      function jsUpdateSize(){
+          // Get the dimensions of the viewport
+          var width = window.innerWidth ||
+                      document.documentElement.clientWidth ||
+                      document.body.clientWidth;
+          var height = window.innerHeight ||
+                       document.documentElement.clientHeight ||
+                       document.body.clientHeight;
+
+          //document.getElementById('jsWidth').innerHTML = width;  // Display the width
+          //document.getElementById('jsHeight').innerHTML = height;// Display the height
+          
+          if(width <= 480){
+            //disable animations
+          }
+          else{
+            //play animations
+          }
+          
+      };
+      window.onload = jsUpdateSize;       // When the page first loads
+      window.onresize = jsUpdateSize;     // When the browser changes size
 
       //animate Why use ConnectJS?
       $('#tour').waypoint(function() {
@@ -9,7 +32,7 @@
                 opacity: 1
               }, 300);
           }, 0);
-          
+
           setTimeout(function() {
             $( ".why-connect-02 img" ).animate({
                 top: "0",
