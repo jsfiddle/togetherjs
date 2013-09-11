@@ -2,6 +2,9 @@
 
 <!--
 template: docs-contributing.tmpl
+
+Note: you should update the index in that template when adding
+sections to this document.
 -->
 
 Here are a variety of notes about contributing to the TogetherJS codebase.  This isn't stuff that applies if you are simply integrating TogetherJS in your site.
@@ -61,7 +64,7 @@ The `constructor` function is called when the object is instantiated.  You don't
 
 You should understand how `this` is bound, and how that binding is lost.
 
-Generally we prefer using `.bind(this)` to keep the references to this.  For example:
+Generally we prefer using `.bind(this)` to keep the references to this (as opposed to using `self = this`).  For example:
 
 ```
 var MyClass = Class({
@@ -85,13 +88,26 @@ Right now we aren't using any real templating system.  Almost everything is in `
 
 We try to keep most of the code that actually touches the ui in `ui.js` – though it's not done very strictly.  Moving stuff back into ui.js is appreciated though.
 
-"Templates" are just elements that are cloned out of `interface.html`.  They generally have an id like `togetherjs-template-foo`, and you'd clone them by doing `ui.cloneTemplate("foo")`.
+"Templates" are just elements that are cloned out of `interface.html`.  They generally have an id like `togetherjs-template-foo`, and you'd clone them by doing `templating.sub("foo", {vars})`.
 
 You should avoid having text or markup in Javascript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.
 
+### Stateless controls
+
+Instead of "toggle" controls we prefer to show and hide controls for the alternate states.  For instances, if you have a expand/collapse control:
+
+```html
+<button id="togetherjs-collapse-foo" data-toggles="#togetherjs-expand-foo">-</button>
+<button id="togetherjs-expand-foo" data-toggles="#togetherjs-collapse-foo" style="display: none">+</button>
+```
+
+Then use `ui.displayToggle("#togetherjs-expand-foo")` to show the expand button, and the collapse button will be automatically hidden.  Note that the selector in `data-toggles` can be inclusive of the element itself (everything matching selector will be hidden, except the element itself).
+
+This requires less state in the Javascript, as the control is always an assertion to do something specific.  Also it means that we have to do a minimum of manipulation in Javascript, and the two controls are not required to be styled identically.
+
 ### Async
 
-Use [jQuery.Deferred](http://api.jquery.com/category/deferred-object/) when possible.
+Use [jQuery.Deferred](http://api.jquery.com/category/deferred-object/) when possible.  This is exposed as `util.Deferred`
 
 
 ## Hosting the Hub Server
@@ -107,3 +123,17 @@ Once you have the hub installed you need to configure TogetherJS to use the hub,
 ```javascript
 TogetherJSConfig_hubBase = "https://myhub.com";
 ```
+
+## The Issue Tracker and Milestones
+
+We do most of our planning in the [Github issue tracker](https://github.com/mozilla/togetherjs/issues), and make use of the [Milestones](https://github.com/mozilla/togetherjs/issues/milestones) (more than labels).  You are welcome to just submit issues without worrying about this, but if you are looking at a ticket and want how it relates to our plans then you might want to know our system.
+
+Generally we have three running milestones:
+
+* "Release X" or "Beta 1039", etc: something that represents our planned work for the current iteration.  We don't generally complete everything we plan for in an iteration (i.e., we err on the side of including stuff in a milestone), so if something is important to you then you might still want to note this in a ticket.
+
+* [Next Tasks](https://github.com/mozilla/togetherjs/issues?milestone=17&state=open): this is a long-standing milestone that represents tasks we want to do soon, but not in the current milestone.  Typically when planning the next iteration we'll look through this milestone and pick out issues.  If something in this milestone is a priority for you, please note that in a comment on the ticket so we can understand your needs.
+
+* [Blue Sky](https://github.com/mozilla/togetherjs/issues?milestone=23&state=open): another long-standing milestone, this represents stuff we'd like to do but don't have any plans to do any time soon.  If you are looking to contribute this is an excellent place to look for ideas.  And if it's something you think would be helpful to you, a comment would be good -- especially one that outlines a use case.
+
+* [Issues with no milestone](https://github.com/mozilla/togetherjs/issues?milestone=none&page=1&state=open): these are issues that haven't been triaged.  We try to assign milestones every week to these issues.  If we don't then probably we are caught up in something we need to focus on over a short period, or we're just all out on vacation or something.
