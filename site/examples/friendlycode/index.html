@@ -38,7 +38,7 @@
       result.ready.then(function () {
         var el = $(".publish-button");
         var newButton = $('<div class="wm-button wm-button-blue short" title="Call The TogetherJS">Collaborate</div>');
-        newButton.click(startTogetherJS);
+        newButton.click(TogetherJS);
         el.before(newButton);
         window._TogetherJSLoads.forEach(function (callback) {
           callback();
