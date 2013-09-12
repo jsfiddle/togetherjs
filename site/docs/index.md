@@ -8,17 +8,17 @@ Would you like to use TogetherJS on your site?  Great!  If you have feedback on 
 
 ## Quick Start
 
-The quickest is to include two things on your page.  First the Javascript:
+Get started quickly by including two things on your page.  First the Javascript:
 
 ```html
 <script>
-  // Set to false or delete to disable analytics/tracking:
-  TogetherJSConfig_enableAnalytics = true;
+  // TogetherJS configuration would go here, but we'll talk about that
+  // later
 </script>
 <script src="https://togetherjs.mozillalabs.com/togetherjs-min.js"></script>
 ```
 
-The first part configures TogetherJS.  In the example we configure it to send analytics information back to us (Mozilla), so we can get an idea of who is using TogetherJS.  You can turn it off, but we do appreciate the information, especially during the alpha stage. There's not much configuration yet, but we'll go over what there is later.
+You can put that wherever; e.g., right before `</body>`.
 
 The next step is to put a button on your site that lets a user start TogetherJS:
 
@@ -26,7 +26,7 @@ The next step is to put a button on your site that lets a user start TogetherJS:
 <button onclick="TogetherJS(this); return false;">Start TogetherJS</button>
 ```
 
-You could also do something like:
+Or if you don't like `onclick`:
 
 ```html
 <button id="start-togetherjs">Start TogetherJS</button>
@@ -37,48 +37,84 @@ $(function () {
 </script>
 ```
 
-You should put the `togetherjs-min.js` script on every page in your site – two people can collaborate across the entire site then.  If you forget it on a page, then if someone visits that page while in a TogetherJS session they will essentially go "offline" until they come back to another page that includes `togetherjs-min.js`
+Calling `TogetherJS()` will start the tool, or stop the tool if it is already started.
+
+You should put the `togetherjs-min.js` script on every page in your site, even if you don't include the "Start TogetherJS" button.  As long as the script is on a page then two people can collaborate on that page. If you forget it on a page, then if someone visits that page while in a TogetherJS session they will essentially go "offline" until they come back to another page that includes `togetherjs-min.js`
 
 Note that `togetherjs-min.js` *is not* the entire code for TogetherJS, it's only a fairly small file that loads the rest of TogetherJS on demand.  You can place the `<script>` anywhere on the page – generally before `</body>` is considered the best place to put scripts.
+
+If you want to dive into code you might want to skip to [Configuring TogetherJS](#configuring-togetherjs).
 
 ## Technology Overview
 
 In this section we'll describe the general way that TogetherJS works, without diving into any code.  If you are ready to use TogetherJS and want to know how, skip to the next section; if you want to understand how it works, or if it can help you in a particular use case, then this section is for you.
 
-The core of TogetherJS is the *hub*: this is a server that everyone in a session connects to, and it echos messages to all the participants using Web Sockets.  This server does not rewrite the messages or do much of anything besides pass the messages between the participants.
+The core of TogetherJS is the **hub**: this is a server that everyone in a session connects to, and it echos messages to all the participants using Web Sockets.  This server does not rewrite the messages or do much of anything besides **pass the messages between the participants**.
 
-[WebRTC](http://www.webrtc.org/) is available for audio chat, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunatley you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets.
+[WebRTC](http://www.webrtc.org/) is available for **audio chat**, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunatley you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets. But maybe someday.
 
-### Scope of the session
+Everything that TogetherJS does is based on these messages being passed between browsers.  It doesn't require that everyone be on the same page, all it requires is that everyone in the session know what hub URL to connect to (the URL is essentially the session name). People *can* be on different sites, but the session URL is stored in [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage#sessionStorage) which is local to one domain (and because we use sessionStorage instead of localStorage, it is local to one tab).  We don't have any techniques implemented to share sessions across multiple sites, but the only barrier is this local storage of session information.
 
-TogetherJS sessions are connected to the domain you start them on (specifically the [origin](http://tools.ietf.org/html/rfc6454)).  So if part of your site is on another domain, people won't be able to talk across those domains.  Even a page that is on https when another is on http will cause the session to be lost.  We might make this work sometime, but if it's an issue to you please give us [feedback](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).
+Features are built on top of this messaging system.  For instance when you move your mouse around, a `cursor-update` message is sent giving the new mouse position.  Other clients that aren't at the same page as you see the message but ignore it.
+
+**Most features work directly with the DOM**, and so don't require any special instrumenting of your code, or integration work.  As much as possible we anchor messages things to the most specific element possible.  When using [responsive web design](http://en.wikipedia.org/wiki/Responsive_web_design) different clients at the same URL may see different things, but to the degree they see the same elements things like the mouse position will be "correct".  For instance, on mobile you might put a button in a different location on the page, but because the cursor message says "the mouse is over the button named `#submit`" the mouse will be positioned in the equivalent position.  As a result **TogetherJS is also resolution-independent**.
+
+We support the **synchronization of form states**, and also support [operational transformation](http://en.wikipedia.org/wiki/Operational_transformation) for text fields.  Again, this is all layered on top of the message system.
+
+Unlike products like [Etherpad](http://etherpad.org/), the [Google Drive Realtime API](https://developers.google.com/drive/realtime/) we **do not have any persistence in our system**.  When two people are on the same page their text fields are synchronized, but all we've done is changed their browser states to be in sync.  We expect all persistence to still happen through your application.  You should generally write an application like you always have, and TogetherJS adds features on top of that.  **TogetherJS doesn't change your security model, your persistence model, or your authentication model**.  If one user hits "submit" then they are the one who saved the page, probably using a typical POST request, just as if they weren't using TogetherJS.
+
+**TogetherJS relies on the same URL returning the same page**.  When two users are at the same URL we don't force the page to be the same. For example one person might not have permission to view a page: in that case the person will still get a permission denied page, and will be unable to follow along with the first person.  Generally we try to fail gracefully, so inconsistencies will only degrade the experience, not completely break it.  In an ideal situation when two people are using TogetherJS you might allow them both to see an edit screen, but only put permission restrictions on who can actually save those edits.
+
+**TogetherJS relies on the application to synchronize its state**.  If you have a web application that has lots of dynamic client-side content, the two users won't automatically see the same things. TogetherJS isn't like screen sharing: each person is running your web application in their own normal browser environment.  We do [provide tools](#extending-togetherjs-for-your-application) to help you synchronize your state.
+
+You can [host your own hub](contributing.html#hosting-the-web-server), which is the only dynamic server-side part of TogetherJS.  But you don't need to host your own server, the server we host is entirely generic and capable of serving multiple sites.  Though if your site is generating a lot of traffic we'll probably want to talk.
+
+Most of the actual code is in the client, which is **open source** and **easy to freeze**.  You can easily make your own static copy of the client, and so ensure the code won't change out from underneath you and invalidate your own testing of the product on your site.  Almost all client updates do not involve the server, so version management and stability is very easy to achieve.  Because TogetherJS does not save anything, it's easy to include in any development environment as well, and you can run it on an intranet or private site so long as everyone using it has access to that site; our servers.
 
 ## Configuring TogetherJS
 
-As mentioned there are a few TogetherJS configuration parameters.  In the future there will probably be more.  To see the exact list of settings and their defaults, look at `TogetherJS._defaultConfiguration`.
+As mentioned there are several configuration parameters.  To see the exact list of settings and their defaults, look at `TogetherJS._defaultConfiguration` in [together.js](https://github.com/mozilla/togetherjs/blob/develop/togetherjs/togetherjs.js)
+
+There are a couple ways of configuring TogetherJS.  The one that we prefer is to set global variable before `togetherjs(-min).js` is included.  Each variable is named `TogetherJSConfig_*`.  This makes it fairly easy to add or remove variables.  Note however that once `togetherjs(-min).js)` is loaded that these variables might not be respected.
+
+The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.config("variable", value)`
+
+### The Configuration
 
 `TogetherJSConfig_siteName`:
-    In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  The idea siteName is the name of your site.
+    In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  `siteName` is the name of your site as you want it to be referred to.  Should be a proper noun.
 
-`TogetherJSConfig_enableAnalytics`:
-    During the TogetherJS alpha we'd like to get some idea of who is using the project, and what clients/browsers users have, the native language of users, and maybe some stuff we haven't even thought of. Setting this to `true` adds tracking when someone starts TogetherJS; Google manages the analytics, but the results are contractually private to Mozilla.  The setting `TogetherJSConfig_analyticsCode` is the analytics code that is used.
+`TogetherJSConfig_toolName`:
+    This is the name that you are giving this tool.  If you use this then "TogetherJS" won't be in the UI.  So you might want to use `TogetherJSConfig_toolName = "Collaboration".
 
 `TogetherJSConfig_hubBase`:
-    This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It's the only real server component of TogetherJS (besides the statically hosted scripts).  It's also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You'll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets, and because there's no public pages that a user will typically visit on the hub there's no opportunity to put in a security exception.
+    This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It's the only real server component of TogetherJS (besides the statically hosted scripts).  It's also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You'll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets.
 
 `TogetherJSConfig_cloneClicks`:
-    This is an experimental feature **that will probably be removed** (see [#75](https://github.com/mozilla/togetherjs/issues/75)).  But if you want to play around you might find it amusing.  This setting should be a jQuery selector, and instead of just *showing* the other person a click, if the element clicked on matches this selector it will trigger an artificial click on the other user's browser.  For example, `TogetherJSConfig_cloneClicks = ".tab"`
+    This should be set to a jQuery selector.  Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else's browser.  This is useful for cases when a click typically doesn't *do* anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use `TogetherJSConfig_cloneClicks = ".tab"`
 
 `TogetherJSConfig_siteName`:
     This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.
 
-`TogetherJSConfig_toolName`:
-    If you want to remove the "TogetherJS" brand from the tool, you can rename it.  You should use a proper noun of some sort, like "Collaboration Tool", so that it fits into the text.
-
 `TogetherJSConfig_enableShortcut`:
     If you want to try TogetherJS out on an application, but don't want to put up a "Start TogetherJS" button, you can use `TogetherJSConfig_enableShortcut = true` and then an event handler will be put into place that will start TogetherJS when you hit **alt-T alt-T** (twice in a row!).  TogetherJS will still automatically start when someone opens an invitation link.
 
-In the future we expect to include more configuration parameters, specifically so you can customize TogetherJS to integrate with your site.  We'd very much like to get [feedback](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform) about what specifically in your site you'd like to integrate with TogetherJS.
+`TogetherJSConfig_useMinimizedCode`:
+    Typically if you use `togetherjs.js` you'll get the unminimized and uncombined code, with each module loaded lazily.  If you use `togetherjs-min.js` you get the combined code.  But if you want to override that more dynamically, you can use this setting.
+
+`TogetherJSConfig_findRoom`:
+    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
+
+`TogetherJSConfig_suppressJoinConfirmation`:
+    When a person is invited to a session, they'll be asked if they want to join in browsing with the other person.  Set this to `true` and they won't be asked to confirm joining.  Useful when combined with `findRoom`.
+
+`TogetherJSConfig_suppressInvite`:
+    When a person starts a session, usually a window will pop open with the invite link so they can send it to someone.  If this is true then that window doesn't automatically pop open (but it is still available).
+
+`TogetherJSConfig_inviteFromRoom`:
+    This adds the ability from the profile menu to invite people who are hanging out in another room (using TowTruck).  This is kind of (but not exactly) how the "Get Help" button works on this site.  This is still an experimental feature.
+
+There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
 ## Start TogetherJS Button
 
@@ -92,17 +128,17 @@ The button you add to your site to start TogetherJS will typically look like thi
 </button>
 ```
 
-1. If you give your button the same `id` across your site, TogetherJS will know what the start/end TogetherJS button is.
+1. If you give your button the same `id` across your site, TogetherJS will know what the start/end TogetherJS button is.  It's not essential, but TogetherJS uses this to zoom the controls into and out of the button.
 
 2. `onclick="TogetherJS(this); return false"` – this starts TogetherJS, and by passing `this` TogetherJS knows what button it started from.  This lets it animate out of the button.  It'll also work fine with `document.getElementById("start-togetherjs").addEventListener("click", TogetherJS, false)`
 
-3. `data-end-togetherjs-html` is what TogetherJS will insert into the content of the button after it is started.  You can use this to switch Start to End, or whatever language you use.  As a special case "Start TogetherJS" is changed to "End TogetherJS"
+3. `data-end-togetherjs-html` is what TogetherJS will insert into the content of the button after it is started.  You can use this to switch Start to End, or whatever language you use.  As a special case "Start TogetherJS" is changed to "End TogetherJS".
 
 4. The class `togetherjs-started` will be added to the button while TogetherJS is active.  You might want to use this to style the background color to red to show that it changes to ending the session.
 
-## Extending TogetherJS For Your Application
+### Scope of the session
 
-See the page [Extending TogetherJS](https://github.com/mozilla/togetherjs/wiki/Extending-TogetherJS)
+TogetherJS sessions are connected to the domain you start them on (specifically the [origin](http://tools.ietf.org/html/rfc6454)).  So if part of your site is on another domain, people won't be able to talk across those domains.  Even a page that is on https when another is on http will cause the session to be lost.  We might make this work sometime, but if it's an issue to you please give us [feedback](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).
 
 ## About Audio Chat and WebRTC
 
@@ -116,31 +152,13 @@ To see a summary of outstanding issues that we know of with audio chat see [this
 
 Note that audio chat will not work between some networks.  These networks require a [TURN server](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) which unfortunately we do not have allocated (and full support for TURN has not landed in some browsers).  Unfortunately when the network makes chat impossible, chat will simply not work – we don't receive an error, and can't tell you why chat is not working.  See [#327](https://github.com/mozilla/togetherjs/issues/327) for progress.
 
-## Addons
-
-There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
-
-This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn't integrated `togetherjs-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `togetherjs-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&togetherjs=...` (the code used in the share link) it will automatically turn TogetherJS on for the tab.
-
-### Installing
-
-A simple way to install is simply to [click this link](http://togetherjs.mozillalabs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
-
-### Building
-
-You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
-
 ## Extending TogetherJS
 
-This page documents some of the ways you can customize the TogetherJS experience on your site.  Especially how you can extend TogetherJS to synchronize parts of your application that require special treatment.
-
-### Work in progress
-
-We're still working on this part, and your feedback is especially important.  We're using the [extending](https://github.com/mozilla/togetherjs/issues?labels=extending&milestone=&page=1&state=open) label to categorize tickets related to this.  If you have a use case you'd like us to address, please [open a new issue](https://github.com/mozilla/togetherjs/issues/new) and describe it – and don't be shy, if it's a problem that can be solved with the API we've already implemented we don't mind describing how to use it in detail in a ticket.
+While [configuration](#configuring-togetherjs) covers some of what you can do to customize TogetherJS, you may also need to integrate TogetherJS with your application, or sync your application data between clients.
 
 ### Configuring events
 
-Like other configuration, you may not wish to set up these callbacks before `togetherjs-min.js` is loaded.  You can do that with the `"on"` configuration parameter, like:
+Like other configuration, you can configure the event handlers and hooks we describe before `towtruck(-min).js` is loaded.  Event handlers are just a smidge different.  You'd normally add even handler like `TogetherJS.on("ready", function () {...})`.  To do it as configuration:
 
 ```js
 TogetherJSConfig_on = {
@@ -148,17 +166,26 @@ TogetherJSConfig_on = {
 };
 ```
 
-Or if you want to set things separately you can do:
+Or if you want to set things up one-by-one you can do:
 
 ```js
 TogetherJSConfig_on_ready = function () {};
 ```
 
-## Communication Channel
+Additionally you may want to add event listeners to `TogetherJS.hub`; these are done like:
+
+```js
+TogetherJS_hub_on = {
+  "my-event": function (msg) {
+  }
+};
+```
+
+### Communication Channel
 
 If you have a component you want to synchronize between two clients, you'll want to use the TogetherJS communication channel.  This is a broadcast channel – any message you send is sent to everyone else in the session (which can also be no one), and includes people who are on different pages.
 
-All messages are JSON objects with a `type` property.  Custom application messages are put into their own namespace.  So imagine you want to keep an element hidden or visible on all clients, in a synchronized way, and when the element visibility changes an event is fired, `MyApp.emit("visibilityChange", element, isVisible)`:
+All messages are JSON objects with a `type` property.  Custom application messages are put into their own namespace.  So imagine you want to keep an element hidden or visible on all clients, in a synchronized way, and when the element visibility changes an event is fired inside your app, `MyApp.emit("visibilityChange", element, isVisible)`:
 
 ```js
 TogetherJSConfig_on_ready = function () {
@@ -244,7 +271,7 @@ TogetherJS.hub.on("togetherjs.hello", function (msg) {
 
 You'll notice that multiple clients might do this reset.  This is an open question for us, and in the future we'll provide a higher-level API for this kind of initialization.
 
-### Implementing those visibility function from jQuery
+#### Implementing those visibility function from jQuery
 
 Let's say your app doesn't have all these methods, and you are just using plain ol' jQuery.  Here's how you might implement them each; you'll just have to start using `$(el).syncShow()` and `$(el).syncHide()` to do your showing and hiding:
 
@@ -272,7 +299,7 @@ MyApp.changeVisibility = function (el, isVisible) {
 };
 ```
 
-## Setting identity information
+### Setting identity information
 
 There's a good chance your application has its own identity, and you know the name of the user, and perhaps have an avatar.  (If you don't have an avatar but do have an email, you might want to use that to make a Gravatar.)
 
@@ -296,25 +323,23 @@ If any of these values are updated while in the page (like if you have a login p
 
 See [#504](https://github.com/mozilla/togetherjs/issues/504) for a bug related to improving this support.
 
-## TogetherJS.reinitialize&#40;&#41;
+### TogetherJS.reinitialize&#40;&#41;
 
-You can run this to try to reinitialize anything TogetherJS initializes on page load.  In particular you can use it if there are new textareas or code editors that should be sync'd, but were added dynamically to the page.  E.g.:
+You can run this to try to reinitialize anything TogetherJS initializes on page load.  In particular you can use it if there are new code editors or video elements that should be sync'd, but were added dynamically to the page.  E.g.:
 
 ```javascript
-$("#form").append("<textarea>");
+$("#content").append('<video src="foo.mov">');
 TogetherJS.reinitialize();
 ```
 
-(We hope with [#70](https://github.com/mozilla/togetherjs/issues/70) that this will no longer be necessary.)
-
-## TogetherJS events
+### TogetherJS events
 
 The `TogetherJS` object is an event emitter.  It uses the style of `TogetherJS.on("event", handler)`.  The available events:
 
 - `TogetherJS.on("ready", function () {})`: emitted when TogetherJS is fully started up.
 - `TogetherJS.on("close", function () {})`: emitted when TogetherJS is closed.  This is *not* emitted when the page simply closes or navigates elsewhere.  It is only closed when TogetherJS is specifically stopped.
 
-## Deferring Initialization
+### Deferring Initialization
 
 TogetherJS starts up automatically as soon as it can, especially when continuing a session.  Sometimes this is problematic, like an application that bootstraps all of its UI after page load.  To defer this initialization, define a function `TogetherJSConfig_callToStart` like:
 
@@ -326,7 +351,7 @@ TogetherJSConfig_callToStart = function (callback) {
 
 In this example when `MyApp.onload()` is called, TogetherJS will start to initialize itself.  Note that calling `TogetherJS.reinitialize()` might be sufficient for your application's needs if it does a lot of setup after the page loads.
 
-## Invitation
+### Invitation
 
 Sometimes instead of having the user invite someone to TogetherJS you might want to handle the invitation internally in your app.  So typically when the person started TogetherJS, you'd want to find some other person they want to collaborate with and send the TogetherJS link to them.  To get at the TogetherJS link:
 
@@ -338,7 +363,7 @@ TogetherJSConfig_on_ready = function () {
 
 If you call `TogetherJS.shareUrl()` before TogetherJS is initialized it will return `null`.
 
-## Getting At The Innards
+### Getting At The Innards
 
 You can still get at TogetherJS, even if you can't rely on the internals not to change underneath you.  (You would be well recommended to deploy your own copy of the client if you do this stuff.)
 
@@ -352,17 +377,6 @@ var session = TogetherJS.require("session");
 
 This assumes that the module has already been loaded... but that assumption would be correct once TogetherJS has started.
 
-Then there are two interesting methods:
-
-```javascript
-session.send({type: "my-custom-type", attr: value});
-session.hub.on("my-custom-type", function (msg) {
-  alert(msg.value);
-});
-```
-
-I.e., `session.send()` and `session.hub.on()`.  As you can see the messages are dispatched based on `msg.type`.  These messages are broadcasted to all other participants.  Note that the messages are *always* sent, even if the other person is at a different URL.  To check if an incoming message comes from a person on the same page as you, check `msg.sameUrl` (`msg.url` shows the actual URL of the other person).
-
 ## Getting a static copy of the client
 
 You may also want a static copy of the client that you can host yourself.  Run `grunt build` to create a static copy of the TogetherJS library in `build/` (use `--dest` to control the output location, and `--exclude-tests` to avoid including the tests in your version).
@@ -375,17 +389,31 @@ TogetherJS is intended for relatively newer browsers.  Especially as we experime
 
 The bare minimum that we've identified for TogetherJS is [WebSocket support](http://caniuse.com/websockets).  That said, we generally only test on the most recent version of Firefox and Chrome, so bugs specific to older browsers are more likely (but please [submit bugs](https://github.com/mozilla/togetherjs/issues/new) from those browsers anyway – we aren't deliberately not supporting them). Our next set of browsers to target will be mobile browsers.
 
-## Internet Explorer
+### Internet Explorer
 
 With IE 10 it is *possible* to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don't plan to address bug reports for Internet Explorer that don't come with a pull request.  If Internet Explorer support is important to you we do [welcome your feedback](https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform). No decision is set in stone, but we don't want to mislead you with respect to our current priorities and intentions.
 
-## Supported Browsers
+### Supported Browsers
 
 We recommend the most recent release of [Firefox](http://www.mozilla.org/en-US/firefox/new/) or [Chrome](https://www.google.com/intl/en/chrome/browser/).
 
 If you want to have [WebRTC support](https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC) and are using Firefox, as of April 2013 this requires [Firefox Nightly](http://nightly.mozilla.org/) (this support will be moving towards beta and release in the coming months).
 
 We haven't done much testing on mobile (yet!) and cannot recommend anything there.
+
+## Addons
+
+There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
+
+This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn't integrated `togetherjs-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `togetherjs-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&togetherjs=...` (the code used in the share link) it will automatically turn TogetherJS on for the tab.
+
+### Installing
+
+A simple way to install is simply to [click this link](http://togetherjs.mozillalabs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
+
+### Building
+
+You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
 
 ## Getting Help
 
