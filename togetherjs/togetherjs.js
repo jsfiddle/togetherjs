@@ -440,7 +440,11 @@
     // If true, then the "Invite a friend" window won't automatically come up
     suppressInvite: false,
     // A room in which to find people to invite to this session,
-    inviteFromRoom: null
+    inviteFromRoom: null,
+    // This is used to keep sessions from crossing over on the same
+    // domain, if for some reason you want sessions that are limited
+    // to only a portion of the domain:
+    storagePrefix: "togetherjs"
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

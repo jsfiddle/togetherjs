@@ -117,7 +117,9 @@ define(["util"], function (util) {
 
   });
 
-  var storage = Storage('localStorage', localStorage, "togetherjs.");
+  var namePrefix = TogetherJS.getConfig("storagePrefix");
+
+  var storage = Storage('localStorage', localStorage, namePrefix + ".");
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -134,7 +136,7 @@ define(["util"], function (util) {
 
   });
 
-  storage.tab = Storage('sessionStorage', sessionStorage, "togetherjs-session.");
+  storage.tab = Storage('sessionStorage', sessionStorage, namePrefix + "-session.");
 
   return storage;
 });

@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  
+
   <style type="text/css" media="screen">
     .main{
       padding: 80px 15px;
@@ -26,11 +26,11 @@
     .navbar-inverse .navbar-brand {
       color: #fff;
     }
-    
+
     .revealarea {
-      
+
     }
-    
+
     .madlib {
       background: #f5f5f5;
       padding: 20px;
@@ -72,13 +72,13 @@
             <h1>Let's play Mad Libs with a friend!</h1>
             <div class="madlib madlib-hidden">
               <p>One day my <input type="text" class="form-control" placeholder="adjective"> friend and I decided to go to the <input type="text" class="form-control" placeholder="sports noun"> game in <input type="text" class="form-control" placeholder="city name">.  We really wanted to see the <input type="text" class="form-control" placeholder="noun"> play the <input type="text" class="form-control" placeholder="noun">.  So we <input type="text" class="form-control" placeholder="action verb"> our <input type="text" class="form-control" placeholder="noun"> down to the <input type="text" class="form-control" placeholder="noun"> and bought some <input type="text" class="form-control" placeholder="noun">.  We got into the game and it was a lot of fun.  We ate some <input type="text" class="form-control" placeholder="adjective"> <input type="text" class="form-control" placeholder="noun"> and drank some <input type="text" class="form-control" placeholder="adjective"> <input type="text" class="form-control" placeholder="noun">.  We had a great time!  We plan to go again next year!</p>
-              
+
               <button type="button" class="btn btn-default btn-block" id="reveal">Reveal MadLib!</button>
               <button type="button" id="hide" style="display: none" class="btn btn-default btn-block">Hide Madlib!</button>
-              
-              
+
+
             </div>
-            
+
         </div>
       </div>
     </div>
@@ -87,6 +87,7 @@
     <script>
       TogetherJSConfig_findRoom = {prefix: "togetherjsmadlibs", max: 5};
       TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_storagePrefix = "tjs_madlibs";
     </script>
     <script src="/togetherjs.js"></script>
 
