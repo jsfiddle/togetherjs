@@ -527,14 +527,10 @@ h5 {
 }
 
 .app-example .top-bar .red-circle {
-  margin: 10px 6px 10px 14px;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  background: #df7166;
-  font-size: inherit;
-  opacity: 1;
-  line-height: 0;
+  text-shadow: none;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
 }
 
 .app-example .top-bar .yellow-circle {
@@ -545,10 +541,12 @@ h5 {
   background: #e6c646;
   border: none;
   padding: 4px;
+  display: none;
 }
 
 .app-example .top-bar .yellow-circle:hover {
  cursor: default;
+ display: none;
 }
 
 .app-example .top-bar .green-circle {
@@ -559,10 +557,12 @@ h5 {
   background: #5ccc8b;
   border: none;
   padding: 4px;
+  display: none;
 }
 
 .app-example .top-bar .green-circle:hover {
  cursor: default;
+ display: none;
 }
 
 .app-example .address-bar {
