@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../images/fav-icon.png">
+    <link rel="shortcut icon" href="../images/fav-icon.ico">
 
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
@@ -149,6 +149,8 @@
               <li><a href="ui.js.html">ui</a></li>
             
               <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="videos.js.html">videos</a></li>
             
               <li><a href="visibilityApi.js.html">visibilityApi</a></li>
             
@@ -335,7 +337,9 @@ these sets:</p>
 
   });
 
-  <span class="keyword">var</span> storage = Storage(<span class="string">'localStorage'</span>, localStorage, <span class="string">"togetherjs."</span>);
+  <span class="keyword">var</span> namePrefix = TogetherJS.getConfig(<span class="string">"storagePrefix"</span>);
+
+  <span class="keyword">var</span> storage = Storage(<span class="string">'localStorage'</span>, localStorage, namePrefix + <span class="string">"."</span>);
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -352,7 +356,7 @@ these sets:</p>
 
   });
 
-  storage.tab = Storage(<span class="string">'sessionStorage'</span>, sessionStorage, <span class="string">"togetherjs-session."</span>);
+  storage.tab = Storage(<span class="string">'sessionStorage'</span>, sessionStorage, namePrefix + <span class="string">"-session."</span>);
 
   <span class="keyword">return</span> storage;
 });</pre></div></div>

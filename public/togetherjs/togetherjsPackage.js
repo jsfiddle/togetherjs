@@ -1036,6 +1036,32 @@ define('util',["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function (
   return util;
 });
 
+define('analytics',["util"], function (util) {
+  var analytics = util.Module("analytics");
+
+  analytics.activate = function () {
+    var enable = TogetherJS.getConfig("enableAnalytics");
+    var code = TogetherJS.getConfig("analyticsCode");
+    if (! (enable && code)) {
+      return;
+    }
+    // This is intended to be global:
+    var gaq = window._gaq || [];
+    gaq.push(["_setAccount", code]);
+    gaq.push(['_setDomainName', location.hostname]);
+    gaq.push(["_trackPageview"]);
+    window._gaq = gaq;
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  };
+
+  return analytics;
+});
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -1628,7 +1654,9 @@ define('storage',["util"], function (util) {
 
   });
 
-  var storage = Storage('localStorage', localStorage, "togetherjs.");
+  var namePrefix = TogetherJS.getConfig("storagePrefix");
+
+  var storage = Storage('localStorage', localStorage, namePrefix + ".");
 
   storage.settings = util.mixinEvents({
     defaults: DEFAULT_SETTINGS,
@@ -1645,7 +1673,7 @@ define('storage',["util"], function (util) {
 
   });
 
-  storage.tab = Storage('sessionStorage', sessionStorage, "togetherjs-session.");
+  storage.tab = Storage('sessionStorage', sessionStorage, namePrefix + "-session.");
 
   return storage;
 });
@@ -1880,7 +1908,7 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "forms", "visibilityApi"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup","videos", "forms", "visibilityApi"];
 
   function getRoomName(prefix, maxSize) {
     var findRoom = TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
@@ -2104,6 +2132,25 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
   });
 
   return session;
+});
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+define('templates',["util"], function (util) {
+  function clean(t) {
+    // Removes <% /* ... */ %> comments:
+    t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
+    t = util.trim(t);
+    t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
+    return t;
+  }
+  return {
+    "interface": clean("<div id=\"togetherjs-container\" class=\"togetherjs\">\n\n  <!-- This is the main set of buttons: -->\n  <div id=\"togetherjs-dock\" class=\"togetherjs-dock-right\">\n    <div id=\"togetherjs-dock-anchor\" title=\"Move the dock\">\n      <span id=\"togetherjs-dock-anchor-horizontal\">\n        <img src=\"http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png\" alt=\"drag\">\n      </span>\n      <span id=\"togetherjs-dock-anchor-vertical\">\n        <img src=\"http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png\" alt=\"drag\">\n      </span>\n    </div>\n    <div id=\"togetherjs-buttons\">\n      <div style=\"display: none\">\n        <button id=\"togetherjs-template-dock-person\" class=\"togetherjs-button togetherjs-dock-person\">\n          <div class=\"togetherjs-tooltip togetherjs-dock-person-tooltip\">\n            <span class=\"togetherjs-person-name\"></span>\n            <span class=\"togetherjs-person-tooltip-arrow-r\"></span>\n          </div>\n          <div class=\"togetherjs-person togetherjs-person-status-overlay\"></div>\n        </button>\n      </div>\n      <button id=\"togetherjs-profile-button\" class=\"togetherjs-button\" title=\"This is you\">\n        <div class=\"togetherjs-person togetherjs-person-self\"></div>\n        <div id=\"togetherjs-profile-arrow\"></div>\n      </button>\n      <button id=\"togetherjs-share-button\" class=\"togetherjs-button\" title=\"Add a friend\"></button>\n      <button id=\"togetherjs-audio-button\" class=\"togetherjs-button\" title=\"Turn on microphone\">\n        <span id=\"togetherjs-audio-unavailable\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\">\n        </span>\n        <span id=\"togetherjs-audio-ready\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-outgoing\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-incoming\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-active\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-muted\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-error\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n      </button>\n      <button id=\"togetherjs-chat-button\" class=\"togetherjs-button\" title=\"Chat\"></button>\n      <div id=\"togetherjs-dock-participants\"></div>\n    </div>\n  </div>\n\n  <!-- The window for editing the avatar: -->\n  <div id=\"togetherjs-avatar-edit\" class=\"togetherjs-modal\"\n       style=\"display: none\">\n    <header> Update avatar </header>\n    <section>\n      <div class=\"togetherjs-avatar-preview togetherjs-person togetherjs-person-self\"></div>\n      <div id=\"togetherjs-avatar-buttons\">\n        <input type=\"file\" class=\"togetherjs-upload-avatar\">\n        <!--<button id=\"togetherjs-upload-avatar\" class=\"togetherjs-primary\">Upload a picture</button>-->\n        <!--<button id=\"togetherjs-camera-avatar\" class=\"togetherjs-default\">Take a picture</button>-->\n      </div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-cancel togetherjs-dismiss\">Cancel</button>\n      <span class=\"togetherjs-alt-text\">or</span>\n      <button class=\"togetherjs-avatar-save togetherjs-primary\">Save</button>\n    </section>\n  </div>\n\n  <!-- The window for sharing the link: -->\n  <div id=\"togetherjs-share\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-share-button\" style=\"display: none\">\n    <header> Invite a friend </header>\n    <section>\n      <div class=\"togetherjs-not-mobile\">\n        <p>Copy and paste this link over IM or email:</p>\n        <input type=\"text\" class=\"togetherjs-share-link\">\n      </div>\n      <div class=\"togetherjs-only-mobile\">\n        <p>Copy and paste this link over IM or email:</p>\n        <a class=\"togetherjs-share-link\" href=\"#\">this link</a>\n      </div>\n    </section>\n  </div>\n\n  <!-- Participant detail template: -->\n  <div id=\"togetherjs-template-participant-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header><div class=\"togetherjs-person togetherjs-person-small\"></div><span class=\"togetherjs-person-name\"></span></header>\n\n    <section class=\"togetherjs-participant-window-main\">\n      <p class=\"togetherjs-participant-window-row\"><strong>Role:</strong>\n        <span class=\"togetherjs-person-role\"></span>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong>Currently at:</strong>\n        <a class=\"togetherjs-person-url togetherjs-person-url-title\"></a>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong>Status:</strong>\n        <span class=\"togetherjs-person-status\"></span>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong class=\"togetherjs-float-left\">Follow this participant:</strong>\n        <label class=\"togetherjs-follow-question togetherjs-float-left\" for=\"togetherjs-person-status-follow\">\n          <input type=\"checkbox\" id=\"togetherjs-person-status-follow\">\n        </label>\n        <span class=\"togetherjs-clear\"></span>\n      </p>\n\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <!-- Displayed when the peer is at a different URL: -->\n      <div class=\"togetherjs-different-url\">\n        <button class=\"togetherjs-nudge togetherjs-default\">Nudge them</button>\n        <a href=\"#\" class=\"togetherjs-follow togetherjs-person-url togetherjs-primary\">Join them</a>\n      </div>\n      <!-- Displayed when the peer is at your same URL: -->\n      <div class=\"togetherjs-same-url\" style=\"display: none\">\n        <span class=\"togetherjs-person-name\"></span> is on the same page as you.\n      </div>\n    </section>\n  </div>\n\n  <!-- The chat screen: -->\n  <div id=\"togetherjs-chat\" class=\"togetherjs-window\" data-bind-to=\"#togetherjs-chat-button\"\n       style=\"display: none\">\n    <header> Chat </header>\n    <section class=\"togetherjs-subtitle\">\n      <div id=\"togetherjs-chat-participants\" data-toggles=\"#togetherjs-chat-no-participants\" style=\"display: none\">\n        <span id=\"togetherjs-chat-participant-list\"></span>\n        &amp; You\n      </div>\n      <div id=\"togetherjs-chat-no-participants\" data-toggles=\"#togetherjs-chat-participants\">\n        No one else is here.\n      </div>\n    </section>\n\n    <div style=\"display: none\">\n\n      <!-- Template for one message: -->\n      <div id=\"togetherjs-template-chat-message\" class=\"togetherjs-chat-item togetherjs-chat-message\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-timestamp\"><span class=\"togetherjs-time\">HH:MM</span> <span class=\"togetherjs-ampm\">AM/PM</span></div>\n        <div class=\"togetherjs-person-name-abbrev\"></div>\n        <div class=\"togetherjs-chat-content togetherjs-sub-content\"></div>\n      </div>\n\n      <!-- Template for when a person leaves: -->\n      <div id=\"togetherjs-template-chat-left\" class=\"togetherjs-chat-item togetherjs-chat-left-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-ifnot-declinedJoin\">\n          <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> left the session.</div>\n        </div>\n        <div class=\"togetherjs-if-declinedJoin\">\n          <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> declined to join the session.</div>\n        </div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n\n      <!-- Template when a person joins the session: -->\n      <div id=\"togetherjs-template-chat-joined\" class=\"togetherjs-chat-item togetherjs-chat-join-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> joined the session.</div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n\n      <!-- Template for system-derived messages: -->\n      <div id=\"togetherjs-template-chat-system\" class=\"togetherjs-chat-item\">\n        <span class=\"togetherjs-chat-content togetherjs-sub-content\"></span>\n      </div>\n\n      <!-- Template when a person joins the session: -->\n      <!-- <div id=\"togetherjs-template-chat-joined\" class=\"togetherjs-chat-item togetherjs-chat-join-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> joined the session.</div>\n        <div class=\"togetherjs-clear\"></div>\n      </div> -->\n\n      <!-- Template for when someone goes to a new URL: -->\n      <div id=\"togetherjs-template-url-change\" class=\"togetherjs-chat-item togetherjs-chat-url-change\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\">\n          <div class=\"togetherjs-if-sameUrl\">\n            <span class=\"togetherjs-person-name\"></span>\n            is on the same page as you.\n          </div>\n          <div class=\"togetherjs-ifnot-sameUrl\">\n            <span class=\"togetherjs-person-name\"></span>\n            has gone to: <a href=\"#\" class=\"togetherjs-person-url togetherjs-person-url-title\" target=\"_self\"></a>\n            <section class=\"togetherjs-buttons togetherjs-buttons-notification-diff-url\">\n              <!-- Displayed when the peer is at a different URL: -->\n              <div class=\"togetherjs-different-url togetherjs-notification-diff-url\">\n                <button class=\"togetherjs-nudge togetherjs-default\">Nudge them</button>\n                <a href=\"#\" class=\"togetherjs-follow togetherjs-person-url togetherjs-primary\">Join them</a>\n              </div>\n            </section>\n\n            <!-- <div>\n              <a class=\"togetherjs-nudge togetherjs-secondary\">Nudge them</a>\n              <a href=\"\" class=\"togetherjs-person-url togetherjs-follow togetherjs-primary\">Join them</a>\n            </div> -->\n\n          </div>\n        </div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n    </div>\n\n    <section id=\"togetherjs-chat-messages\">\n      <!-- FIX ME// need to have some dialogue that says something like - There are no chats yet! -->\n    </section>\n    <section id=\"togetherjs-chat-input-box\">\n      <input type=\"text\" id=\"togetherjs-chat-input\" placeholder=\"Type your message here\">\n    </section>\n  </div>\n\n  <!-- this is a kind of warning popped up when you (successfully) start RTC: -->\n  <div id=\"togetherjs-rtc-info\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-audio-button\"\n       style=\"display: none\">\n\n    <header> Audio Chat </header>\n    <section>\n      <p>\n        Activate your <strong>browser microphone</strong> near your URL bar above.\n      </p>\n      <p>\n        Talking on your microphone through your web browser is an experimental feature.\n      </p>\n      <p>\n        Read more about Audio Chat <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <label for=\"togetherjs-rtc-info-dismiss\" style=\"display: inline;\">\n        <input class=\"togetherjs-dont-show-again\" id=\"togetherjs-rtc-info-dismiss\" type=\"checkbox\">\n        Don't show again.\n      </label>\n      <button class=\"togetherjs-default togetherjs-dismiss\" type=\"button\">Close</button>\n    </section>\n  </div>\n\n  <!-- this is popped up when you hit the audio button, but RTC isn't\n  supported: -->\n  <div id=\"togetherjs-rtc-not-supported\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-audio-button\"\n       style=\"display: none\">\n    <header> Audio Chat </header>\n\n    <section>\n      <p>Audio chat requires you to use a <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">\n        newer browser\n      </a>!</p>\n      <p>\n        Live audio chat requires a newer (or different) browser than you're using.\n      </p>\n      <p>\n        See\n        <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">\n          this page\n        </a>\n        for more information and a list of supported browsers.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <div class=\"togetherjs-rtc-dialog-btn\">\n        <button class=\"togetherjs-default togetherjs-dismiss\" type=\"button\">Close</button>\n      </div>\n    </section>\n  </div>\n\n  <!-- The popup when a chat message comes in and the #togetherjs-chat window isn't open -->\n  <div id=\"togetherjs-chat-notifier\" class=\"togetherjs-notification\"\n       data-bind-to=\"#togetherjs-chat-button\"\n       style=\"display: none\">\n    <img src=\"http://localhost:8080/togetherjs/images/notification-togetherjs-logo.png\" class=\"togetherjs-notification-logo\" alt=\"\">\n    <img src=\"http://localhost:8080/togetherjs/images/notification-btn-close.png\" class=\"togetherjs-notification-closebtn togetherjs-dismiss\" alt=\"[close]\">\n    <section id=\"togetherjs-chat-notifier-message\">\n    </section>\n  </div>\n\n  <!-- The menu when you click on the profile: -->\n  <div id=\"togetherjs-menu\" class=\"togetherjs-menu\" style=\"display: none\">\n    <div class=\"togetherjs-menu-item togetherjs-menu-disabled\" id=\"togetherjs-menu-profile\">\n      <img id=\"togetherjs-menu-avatar\">\n      <span class=\"togetherjs-person-name-self\" id=\"togetherjs-self-name-display\" data-toggles=\"#togetherjs-menu .togetherjs-self-name\"></span>\n      <input class=\"togetherjs-self-name\" type=\"text\" data-toggles=\"#togetherjs-self-name-display\" style=\"display: none\" placeholder=\"Enter your name\">\n    </div>\n    <div class=\"togetherjs-menu-hr-avatar\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-name\"><img src=\"http://localhost:8080/togetherjs/images/button-pencil.png\" alt=\"\"> Update your name</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-avatar\"><img src=\"http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png\" alt=\"\"> Change avatar</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-color\"><span class=\"togetherjs-person-bgcolor-self\"></span> Pick profile color</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-help\">Help</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-feedback\">Feedback</div>\n    <div id=\"togetherjs-invite\" style=\"display: none\">\n      <div class=\"togetherjs-hr\"></div>\n      <div id=\"togetherjs-invite-users\"></div>\n      <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-refresh-invite\">Refresh users</div>\n      <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-invite-anyone\">Invite anyone</div>\n    </div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-end\"><img src=\"http://localhost:8080/togetherjs/images/button-end-session.png\" alt=\"\"> End <span class=\"togetherjs-tool-name\">TogetherJS</span></div>\n  </div>\n\n  <!-- template for one person in the invite-users list -->\n  <div style=\"display: none\">\n    <div id=\"togetherjs-template-invite-user-item\" class=\"togetherjs-menu-item\">\n      <!-- FIXME: should include avatar in some way -->\n      <span class=\"togetherjs-person-name\"></span>\n    </div>\n  </div>\n\n  <!-- A window version of #togetherjs-menu, for use on mobile -->\n  <div id=\"togetherjs-menu-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header>Settings and Profile</header>\n    <section>\n    <div class=\"togetherjs-menu-item\">\n      <img class=\"togetherjs-menu-avatar\">\n      <span class=\"togetherjs-person-name-self\" id=\"togetherjs-self-name-display\"></span>\n    </div>\n    <div class=\"togetherjs-menu-hr-avatar\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-name-button\"><img src=\"http://localhost:8080/togetherjs/images/button-pencil.png\" alt=\"\"> Update your name</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-avatar-button\"><img src=\"http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png\" alt=\"\"> Change avatar</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-color-button\"><span class=\"togetherjs-person-bgcolor-self\"></span> Pick profile color</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-help-button\">Help</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-feedback-button\">Feedback</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-end-button\"><img src=\"http://localhost:8080/togetherjs/images/button-end-session.png\" alt=\"\"> End <span class=\"togetherjs-tool-name\">TogetherJS</span></div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">OK</button>\n    </section>\n  </div>\n\n  <!-- The name editor, for use on mobile -->\n  <div id=\"togetherjs-edit-name-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header>Update Name</header>\n    <section>\n      <div>\n        <input class=\"togetherjs-self-name\" type=\"text\" placeholder=\"Enter your name\">\n      </div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">OK</button>\n    </section>\n  </div>\n\n  <div class=\"togetherjs-menu\" id=\"togetherjs-pick-color\" style=\"display: none\">\n    <div class=\"togetherjs-triangle-up\"><img src=\"http://localhost:8080/togetherjs/images/icn-triangle-up.png\"></div>\n    <div style=\"display: none\">\n      <div id=\"togetherjs-template-swatch\" class=\"togetherjs-swatch\">\n      </div>\n    </div>\n  </div>\n\n  <!-- Invisible elements that handle the RTC audio: -->\n  <audio id=\"togetherjs-audio-element\"></audio>\n  <audio id=\"togetherjs-local-audio\" muted=\"true\" volume=\"0.3\"></audio>\n  <audio id=\"togetherjs-notification\" src=\"http://localhost:8080/togetherjs/images/notification.mp3\"></audio>\n\n  <!-- The intro screen for someone who joins a session the first time: -->\n  <div id=\"togetherjs-intro\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header>Join <span class=\"togetherjs-tool-name\">TogetherJS</span> session?</header>\n    <section>\n      <p>Your friend has asked you to join their <a href=\"https://togetherjs.mozillalabs.com/\" target=\"_blank\"><span class=\"togetherjs-tool-name\">TogetherJS</span></a> browser session to collaborate in real-time!</p>\n\n      <p>Would you like to join their session?</p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-destructive togetherjs-modal-dont-join\">No, don't join</button>\n      <button class=\"togetherjs-primary togetherjs-dismiss\">Yes, join session</button>\n    </section>\n  </div>\n\n  <!-- Shown when a web browser is completely incapable of running TogetherJS: -->\n  <div id=\"togetherjs-browser-broken\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> Sorry </header>\n\n    <section>\n      <p>\n        We're sorry, <span class=\"togetherjs-tool-name\">TogetherJS</span> doesn't work with this browser.  Please\n        <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers\">upgrade\n          to a supported browser</a> to try <span class=\"togetherjs-tool-name\">TogetherJS</span>.\n      </p>\n\n      <p id=\"togetherjs-browser-broken-is-ie\" style=\"display: none\">\n        Internet\n        Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is\n          not supported</a> and won't be supported in the near term,\n        please use Firefox or Chrome.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">End <span class=\"togetherjs-tool-name\">TogetherJS</span></button>\n    </section>\n\n  </div>\n\n  <!-- Shown when the browser has WebSockets, but is IE (i.e., IE10) -->\n  <div id=\"togetherjs-browser-unsupported\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> Unsupported Browser </header>\n\n    <section>\n      <p>\n        We're sorry, Internet Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is not supported</a>\n        at this time.  While we may add support later, adding support is\n        not currently on our roadmap.  Please use Firefox or Chrome.\n      </p>\n\n      <p>You can continue to try to use <span class=\"togetherjs-tool-name\">TogetherJS</span>, but you are likely to hit\n        lots of bugs.  So be warned.</p>\n\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">End <span class=\"togetherjs-tool-name\">TogetherJS</span></button>\n      <button class=\"togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway\">Try <span class=\"togetherjs-tool-name\">TogetherJS</span> Anyway</button>\n    </section>\n\n  </div>\n\n  <div id=\"togetherjs-confirm-end\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> End session? </header>\n    <section>\n      <p>\n        Are you sure you'd like to end your <span class=\"togetherjs-tool-name\">TogetherJS</span> session?\n      </p>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-cancel togetherjs-dismiss\">Cancel</button>\n      <span class=\"togetherjs-alt-text\">or</span>\n      <button id=\"togetherjs-end-session\" class=\"togetherjs-destructive\">End session</button>\n    </section>\n  </div>\n\n  <div id=\"togetherjs-feedback-form\" class=\"togetherjs-modal\" style=\"display: none;\">\n    <header> Feedback </header>\n    <iframe src=\"https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true\" width=\"400\" height=\"300\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading form...</iframe>\n    <!-- <p><button class=\"togetherjs-modal-close\">Close</button></p> -->\n  </div>\n\n  <div style=\"display: none\">\n    <!-- This is when you join a session and the other person has already changed to another URL: -->\n    <div id=\"togetherjs-template-url-change\" class=\"togetherjs-modal\">\n      <header> Following to new URL... </header>\n      <section>\n        <div class=\"togetherjs-person\"></div>\n        Following\n        <span class=\"togetherjs-person-name\"></span>\n        to <a href=\"\" class=\"togetherjs-person-url togetherjs-person-url-title\"></a>\n      </section>\n    </div>\n\n    <!-- This is when someone invites you to their session: -->\n    <div id=\"togetherjs-template-invite\" class=\"togetherjs-chat-item\">\n      <div class=\"togetherjs-person\"></div>\n      <div>\n        <span class=\"togetherjs-person-name\"></span>\n        has invited <strong class=\"togetherjs-if-forEveryone\">anyone</strong>\n        <strong class=\"togetherjs-ifnot-forEveryone\">you</strong>\n        to <a href=\"\" data-togetherjs-subattr-href=\"href\" class=\"togetherjs-sub-hrefTitle\" target=\"_blank\"></a>\n      </div>\n    </div>\n\n  </div>\n\n  <!-- The pointer at the side of a window: -->\n  <div id=\"togetherjs-window-pointer-right\" style=\"display: none\"></div>\n  <div id=\"togetherjs-window-pointer-left\" style=\"display: none\"></div>\n\n  <!-- The element that overlaps the background of the page during a modal dialog: -->\n  <div id=\"togetherjs-modal-background\" style=\"display: none\"></div>\n\n  <!-- Some miscellaneous templates -->\n  <div style=\"display: none\">\n\n    <!-- This is the cursor: -->\n    <div id=\"togetherjs-template-cursor\" class=\"togetherjs-cursor togetherjs\">\n      <!-- Note: images/cursor.svg is a copy of this (for editing): -->\n      <!-- crossbrowser svg dropshadow http://demosthenes.info/blog/600/Creating-a-True-CrossBrowser-Drop-Shadow- -->\n      <svg version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n      \t width=\"15px\" height=\"22.838px\" viewBox=\"96.344 146.692 15 22.838\" enable-background=\"new 96.344 146.692 15 22.838\"\n      \t xml:space=\"preserve\">\n      <path fill=\"#231F20\" d=\"M98.984,146.692c2.167,1.322,1.624,6.067,3.773,7.298c-0.072-0.488,2.512-0.931,3.097,0\n      \tc0.503,0.337,1.104-0.846,2.653,0.443c0.555,0.593,3.258,2.179,1.001,8.851c-0.446,1.316,2.854,0.135,1.169,2.619\n      \tc-3.748,5.521-9.455,2.787-9.062,1.746c1.06-2.809-6.889-4.885-4.97-9.896c0.834-2.559,2.898,0.653,2.923,0.29\n      \tc-0.434-1.07-2.608-5.541-2.923-6.985C96.587,150.793,95.342,147.033,98.984,146.692z\"/>\n      </svg>\n      <!-- <img class=\"togetherjs-cursor-img\" src=\"http://localhost:8080/togetherjs/images/cursor.svg\"> -->\n      <span class=\"togetherjs-cursor-container\">\n        <span class=\"togetherjs-cursor-name\"></span>\n        <span style=\"display:none\" class=\"togetherjs-cursor-typing\" id=\"togetherjs-cursor-typebox\">\n          <span class=\"togetherjs-typing-ellipse-one\">&#9679;</span><span class=\"togetherjs-typing-ellipse-two\">&#9679;</span><span class=\"togetherjs-typing-ellipse-three\">&#9679;</span>\n        </span>\n        <!-- Displayed when the cursor is below the screen: -->\n        <span class=\"togetherjs-cursor-down\">\n\n        </span>\n        <!-- Displayed when the cursor is above the screen: -->\n        <span class=\"togetherjs-cursor-up\">\n\n        </span>\n      </span>\n    </div>\n\n    <!-- This is the element that goes around focused form elements: -->\n    <div id=\"togetherjs-template-focus\">\n      <div class=\"togetherjs-focus togetherjs-person-bordercolor\"></div>\n    </div>\n\n    <!-- This is a click: -->\n    <div id=\"togetherjs-template-click\" class=\"togetherjs-click togetherjs\">\n    </div>\n  </div>\n</div>\n"),
+    help: clean("<% /*\n  This is used to show the help when you type /help.  Used in\n  TogetherJS.localChatMessage().\n\n*/ %>\n/help : this message\n/test : run an automated/randomized test (or stop one that is in progress)\n  /test start N : run N times (instead of default 100)\n  /test show : show what kind of actions the random test would take (or stop showing)\n  /test describe : describe the possible actions (instead of showing them)\n/clear : clear the chat area\n/record : open up a recorder for the session\n/playback URL : play back a session that was recorded (it's up to you to figure out how to host it)\n  /playback local:NAME : play a locally saved log\n/savelogs NAME : save the currently recorded logs under NAME (recorder must be open)\n/baseurl : set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.\n/config : override some TogetherJS configuration parameters\n  /config VAR VALUE : set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.\n  /config clear : remove all overridden configuration\n"),
+    walkthrough: clean("<!--\n    Any elements with .togetherjs-walkthrough-firsttime will only be\n    displayed on during the first-time experience.  Any elements with\n    .togetherjs-walkthrough-not-firsttime will only be displayed when\n    the walkthrough is accessed through the Help menu.\n\n    Note you *cannot* use <section class=\"togetherjs-walkthrough-slide\n    togetherjs-walkthrough-firsttime\">: the number of sections must be the\n    same regardless.\n  -->\n<div id=\"togetherjs-walkthrough\" class=\"togetherjs-modal togetherjs-modal-wide\">\n  <header>You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!<button class=\"togetherjs-close\"></button></header>\n\n  <div id=\"togetherjs-walkthrough-previous\"></div>\n  <div id=\"togetherjs-walkthrough-next\"></div>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-intro.png\"></p>\n\t<p><span class=\"togetherjs-tool-name\">TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong></p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <div class=\"togetherjs-walkthrough-firsttime\">\n      <div class=\"togetherjs-walkthrough-main-image\">\n        <div class=\"togetherjs-walkthrough-avatar-section\">\n          <div class=\"togetherjs-avatar-preview togetherjs-person togetherjs-person-self\"></div>\n          <div class=\"togetherjs-avatar-upload-input\"><input type=\"file\" class=\"togetherjs-upload-avatar\"></div>\n        </div>\n        <input class=\"togetherjs-self-name\" type=\"text\" placeholder=\"Enter your name\">\n        <div class=\"togetherjs-swatch togetherjs-person-bgcolor-self\"></div>\n        <div class=\"togetherjs-save-settings\">\n          <button class=\"togetherjs-avatar-save togetherjs-primary\">\n            <span id=\"togetherjs-avatar-when-unsaved\">Save</span>\n            <span id=\"togetherjs-avatar-when-saved\" style=\"display: none\">Saved!</span>\n          </button>\n        </div>\n      </div>\n      <p>Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.</p>\n    </div>\n    <div class=\"togetherjs-walkthrough-not-firsttime\">\n      <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-profile.png\"></p>\n      <p>Change your avatar, name and user color using the Profile button.</p>\n    </div>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image togetherjs-ifnot-creator\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-invite.png\">\n    </p>\n    <p class=\"togetherjs-ifnot-creator\">You can invite more friends to the session by sending the invite link in the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock.</p>\n    <p class=\"togetherjs-walkthrough-main-image togetherjs-if-creator\">\n      <span class=\"togetherjs-walkthrough-sendlink\">\n        Copy and paste this link into IM or email to invite friends.\n      </span>\n      <input type=\"text\" class=\"togetherjs-share-link\">\n    </p>\n    <p class=\"togetherjs-if-creator\">Send the above link to a friend so they can join your session!  You can find this invite link on the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock as well.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-participant.png\"></p>\n    <p>Friends who join your <span class=\"togetherjs-tool-name\">TogetherJS</span> session will appear here.  You can click their avatars to see more.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-chat.png\"></p>\n    <p>When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-rtc.png\"></p>\n    <p>If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-logo.png\"></p>\n    <p>Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!</p>\n  </section>\n\n  <div style=\"display: none\">\n    <!-- There is one of these created for each slide: -->\n    <span id=\"togetherjs-template-walkthrough-slide-progress\" class=\"togetherjs-walkthrough-slide-progress\">&#9679;</span>\n  </div>\n  <section id=\"togetherjs-walkthrough-progress\">\n  </section>\n\n  <section class=\"togetherjs-buttons\">\n    <button class=\"togetherjs-primary togetherjs-dismiss\">I'm ready!</button>\n  </section>\n\n</div><!-- /.togetherjs-modal -->\n")
+  };
 });
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -2658,25 +2705,6 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
   });
 
   return peers;
-});
-
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-define('templates',["util"], function (util) {
-  function clean(t) {
-    // Removes <% /* ... */ %> comments:
-    t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
-    t = util.trim(t);
-    t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
-    return t;
-  }
-  return {
-    "interface": clean("<div id=\"togetherjs-container\" class=\"togetherjs\">\n\n  <!-- This is the main set of buttons: -->\n  <div id=\"togetherjs-dock\" class=\"togetherjs-dock-right\">\n    <div id=\"togetherjs-dock-anchor\" title=\"Move the dock\">\n      <span id=\"togetherjs-dock-anchor-horizontal\">\n        <img src=\"http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png\" alt=\"drag\">\n      </span>\n      <span id=\"togetherjs-dock-anchor-vertical\">\n        <img src=\"http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png\" alt=\"drag\">\n      </span>\n    </div>\n    <div id=\"togetherjs-buttons\">\n      <div style=\"display: none\">\n        <button id=\"togetherjs-template-dock-person\" class=\"togetherjs-button togetherjs-dock-person\">\n          <div class=\"togetherjs-tooltip togetherjs-dock-person-tooltip\">\n            <span class=\"togetherjs-person-name\"></span>\n            <span class=\"togetherjs-person-tooltip-arrow-r\"></span>\n          </div>\n          <div class=\"togetherjs-person togetherjs-person-status-overlay\"></div>\n        </button>\n      </div>\n      <button id=\"togetherjs-profile-button\" class=\"togetherjs-button\" title=\"This is you\">\n        <div class=\"togetherjs-person togetherjs-person-self\"></div>\n        <div id=\"togetherjs-profile-arrow\"></div>\n      </button>\n      <button id=\"togetherjs-share-button\" class=\"togetherjs-button\" title=\"Add a friend\"></button>\n      <button id=\"togetherjs-audio-button\" class=\"togetherjs-button\" title=\"Turn on microphone\">\n        <span id=\"togetherjs-audio-unavailable\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\">\n        </span>\n        <span id=\"togetherjs-audio-ready\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-outgoing\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-incoming\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-active\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-muted\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n        <span id=\"togetherjs-audio-error\" class=\"togetherjs-audio-set\" data-toggles=\".togetherjs-audio-set\" style=\"display: none\">\n        </span>\n      </button>\n      <button id=\"togetherjs-chat-button\" class=\"togetherjs-button\" title=\"Chat\"></button>\n      <div id=\"togetherjs-dock-participants\"></div>\n    </div>\n  </div>\n\n  <!-- The window for editing the avatar: -->\n  <div id=\"togetherjs-avatar-edit\" class=\"togetherjs-modal\"\n       style=\"display: none\">\n    <header> Update avatar </header>\n    <section>\n      <div class=\"togetherjs-avatar-preview togetherjs-person togetherjs-person-self\"></div>\n      <div id=\"togetherjs-avatar-buttons\">\n        <input type=\"file\" class=\"togetherjs-upload-avatar\">\n        <!--<button id=\"togetherjs-upload-avatar\" class=\"togetherjs-primary\">Upload a picture</button>-->\n        <!--<button id=\"togetherjs-camera-avatar\" class=\"togetherjs-default\">Take a picture</button>-->\n      </div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-cancel togetherjs-dismiss\">Cancel</button>\n      <span class=\"togetherjs-alt-text\">or</span>\n      <button class=\"togetherjs-avatar-save togetherjs-primary\">Save</button>\n    </section>\n  </div>\n\n  <!-- The window for sharing the link: -->\n  <div id=\"togetherjs-share\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-share-button\" style=\"display: none\">\n    <header> Invite a friend </header>\n    <section>\n      <div class=\"togetherjs-not-mobile\">\n        <p>Copy and paste this link over IM or email:</p>\n        <input type=\"text\" class=\"togetherjs-share-link\">\n      </div>\n      <div class=\"togetherjs-only-mobile\">\n        <p>Copy and paste this link over IM or email:</p>\n        <a class=\"togetherjs-share-link\" href=\"#\">this link</a>\n      </div>\n    </section>\n  </div>\n\n  <!-- Participant detail template: -->\n  <div id=\"togetherjs-template-participant-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header><div class=\"togetherjs-person togetherjs-person-small\"></div><span class=\"togetherjs-person-name\"></span></header>\n\n    <section class=\"togetherjs-participant-window-main\">\n      <p class=\"togetherjs-participant-window-row\"><strong>Role:</strong>\n        <span class=\"togetherjs-person-role\"></span>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong>Currently at:</strong>\n        <a class=\"togetherjs-person-url togetherjs-person-url-title\"></a>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong>Status:</strong>\n        <span class=\"togetherjs-person-status\"></span>\n      </p>\n\n      <p class=\"togetherjs-participant-window-row\"><strong class=\"togetherjs-float-left\">Follow this participant:</strong>\n        <label class=\"togetherjs-follow-question togetherjs-float-left\" for=\"togetherjs-person-status-follow\">\n          <input type=\"checkbox\" id=\"togetherjs-person-status-follow\">\n        </label>\n        <span class=\"togetherjs-clear\"></span>\n      </p>\n\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <!-- Displayed when the peer is at a different URL: -->\n      <div class=\"togetherjs-different-url\">\n        <button class=\"togetherjs-nudge togetherjs-default\">Nudge them</button>\n        <a href=\"#\" class=\"togetherjs-follow togetherjs-person-url togetherjs-primary\">Join them</a>\n      </div>\n      <!-- Displayed when the peer is at your same URL: -->\n      <div class=\"togetherjs-same-url\" style=\"display: none\">\n        <span class=\"togetherjs-person-name\"></span> is on the same page as you.\n      </div>\n    </section>\n  </div>\n\n  <!-- The chat screen: -->\n  <div id=\"togetherjs-chat\" class=\"togetherjs-window\" data-bind-to=\"#togetherjs-chat-button\"\n       style=\"display: none\">\n    <header> Chat </header>\n    <section class=\"togetherjs-subtitle\">\n      <div id=\"togetherjs-chat-participants\" data-toggles=\"#togetherjs-chat-no-participants\" style=\"display: none\">\n        <span id=\"togetherjs-chat-participant-list\"></span>\n        &amp; You\n      </div>\n      <div id=\"togetherjs-chat-no-participants\" data-toggles=\"#togetherjs-chat-participants\">\n        No one else is here.\n      </div>\n    </section>\n\n    <div style=\"display: none\">\n\n      <!-- Template for one message: -->\n      <div id=\"togetherjs-template-chat-message\" class=\"togetherjs-chat-item togetherjs-chat-message\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-timestamp\"><span class=\"togetherjs-time\">HH:MM</span> <span class=\"togetherjs-ampm\">AM/PM</span></div>\n        <div class=\"togetherjs-person-name-abbrev\"></div>\n        <div class=\"togetherjs-chat-content togetherjs-sub-content\"></div>\n      </div>\n\n      <!-- Template for when a person leaves: -->\n      <div id=\"togetherjs-template-chat-left\" class=\"togetherjs-chat-item togetherjs-chat-left-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-ifnot-declinedJoin\">\n          <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> left the session.</div>\n        </div>\n        <div class=\"togetherjs-if-declinedJoin\">\n          <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> declined to join the session.</div>\n        </div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n\n      <!-- Template when a person joins the session: -->\n      <div id=\"togetherjs-template-chat-joined\" class=\"togetherjs-chat-item togetherjs-chat-join-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> joined the session.</div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n\n      <!-- Template for system-derived messages: -->\n      <div id=\"togetherjs-template-chat-system\" class=\"togetherjs-chat-item\">\n        <span class=\"togetherjs-chat-content togetherjs-sub-content\"></span>\n      </div>\n\n      <!-- Template when a person joins the session: -->\n      <!-- <div id=\"togetherjs-template-chat-joined\" class=\"togetherjs-chat-item togetherjs-chat-join-item\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\"><span class=\"togetherjs-person-name\"></span> joined the session.</div>\n        <div class=\"togetherjs-clear\"></div>\n      </div> -->\n\n      <!-- Template for when someone goes to a new URL: -->\n      <div id=\"togetherjs-template-url-change\" class=\"togetherjs-chat-item togetherjs-chat-url-change\">\n        <div class=\"togetherjs-person\"></div>\n        <div class=\"togetherjs-inline-text\">\n          <div class=\"togetherjs-if-sameUrl\">\n            <span class=\"togetherjs-person-name\"></span>\n            is on the same page as you.\n          </div>\n          <div class=\"togetherjs-ifnot-sameUrl\">\n            <span class=\"togetherjs-person-name\"></span>\n            has gone to: <a href=\"#\" class=\"togetherjs-person-url togetherjs-person-url-title\" target=\"_self\"></a>\n            <section class=\"togetherjs-buttons togetherjs-buttons-notification-diff-url\">\n              <!-- Displayed when the peer is at a different URL: -->\n              <div class=\"togetherjs-different-url togetherjs-notification-diff-url\">\n                <button class=\"togetherjs-nudge togetherjs-default\">Nudge them</button>\n                <a href=\"#\" class=\"togetherjs-follow togetherjs-person-url togetherjs-primary\">Join them</a>\n              </div>\n            </section>\n\n            <!-- <div>\n              <a class=\"togetherjs-nudge togetherjs-secondary\">Nudge them</a>\n              <a href=\"\" class=\"togetherjs-person-url togetherjs-follow togetherjs-primary\">Join them</a>\n            </div> -->\n\n          </div>\n        </div>\n        <div class=\"togetherjs-clear\"></div>\n      </div>\n    </div>\n\n    <section id=\"togetherjs-chat-messages\">\n      <!-- FIX ME// need to have some dialogue that says something like - There are no chats yet! -->\n    </section>\n    <section id=\"togetherjs-chat-input-box\">\n      <input type=\"text\" id=\"togetherjs-chat-input\" placeholder=\"Type your message here\">\n    </section>\n  </div>\n\n  <!-- this is a kind of warning popped up when you (successfully) start RTC: -->\n  <div id=\"togetherjs-rtc-info\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-audio-button\"\n       style=\"display: none\">\n\n    <header> Audio Chat </header>\n    <section>\n      <p>\n        Activate your <strong>browser microphone</strong> near your URL bar above.\n      </p>\n      <p>\n        Talking on your microphone through your web browser is an experimental feature.\n      </p>\n      <p>\n        Read more about Audio Chat <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <label for=\"togetherjs-rtc-info-dismiss\" style=\"display: inline;\">\n        <input class=\"togetherjs-dont-show-again\" id=\"togetherjs-rtc-info-dismiss\" type=\"checkbox\">\n        Don't show again.\n      </label>\n      <button class=\"togetherjs-default togetherjs-dismiss\" type=\"button\">Close</button>\n    </section>\n  </div>\n\n  <!-- this is popped up when you hit the audio button, but RTC isn't\n  supported: -->\n  <div id=\"togetherjs-rtc-not-supported\" class=\"togetherjs-window\"\n       data-bind-to=\"#togetherjs-audio-button\"\n       style=\"display: none\">\n    <header> Audio Chat </header>\n\n    <section>\n      <p>Audio chat requires you to use a <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">\n        newer browser\n      </a>!</p>\n      <p>\n        Live audio chat requires a newer (or different) browser than you're using.\n      </p>\n      <p>\n        See\n        <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">\n          this page\n        </a>\n        for more information and a list of supported browsers.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <div class=\"togetherjs-rtc-dialog-btn\">\n        <button class=\"togetherjs-default togetherjs-dismiss\" type=\"button\">Close</button>\n      </div>\n    </section>\n  </div>\n\n  <!-- The popup when a chat message comes in and the #togetherjs-chat window isn't open -->\n  <div id=\"togetherjs-chat-notifier\" class=\"togetherjs-notification\"\n       data-bind-to=\"#togetherjs-chat-button\"\n       style=\"display: none\">\n    <img src=\"http://localhost:8080/togetherjs/images/notification-togetherjs-logo.png\" class=\"togetherjs-notification-logo\" alt=\"\">\n    <img src=\"http://localhost:8080/togetherjs/images/notification-btn-close.png\" class=\"togetherjs-notification-closebtn togetherjs-dismiss\" alt=\"[close]\">\n    <section id=\"togetherjs-chat-notifier-message\">\n    </section>\n  </div>\n\n  <!-- The menu when you click on the profile: -->\n  <div id=\"togetherjs-menu\" class=\"togetherjs-menu\" style=\"display: none\">\n    <div class=\"togetherjs-menu-item togetherjs-menu-disabled\" id=\"togetherjs-menu-profile\">\n      <img id=\"togetherjs-menu-avatar\">\n      <span class=\"togetherjs-person-name-self\" id=\"togetherjs-self-name-display\" data-toggles=\"#togetherjs-menu .togetherjs-self-name\"></span>\n      <input class=\"togetherjs-self-name\" type=\"text\" data-toggles=\"#togetherjs-self-name-display\" style=\"display: none\" placeholder=\"Enter your name\">\n    </div>\n    <div class=\"togetherjs-menu-hr-avatar\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-name\"><img src=\"http://localhost:8080/togetherjs/images/button-pencil.png\" alt=\"\"> Update your name</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-avatar\"><img src=\"http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png\" alt=\"\"> Change avatar</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-color\"><span class=\"togetherjs-person-bgcolor-self\"></span> Pick profile color</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-help\">Help</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-feedback\">Feedback</div>\n    <div id=\"togetherjs-invite\" style=\"display: none\">\n      <div class=\"togetherjs-hr\"></div>\n      <div id=\"togetherjs-invite-users\"></div>\n      <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-refresh-invite\">Refresh users</div>\n      <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-invite-anyone\">Invite anyone</div>\n    </div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-end\"><img src=\"http://localhost:8080/togetherjs/images/button-end-session.png\" alt=\"\"> End <span class=\"togetherjs-tool-name\">TogetherJS</span></div>\n  </div>\n\n  <!-- template for one person in the invite-users list -->\n  <div style=\"display: none\">\n    <div id=\"togetherjs-template-invite-user-item\" class=\"togetherjs-menu-item\">\n      <!-- FIXME: should include avatar in some way -->\n      <span class=\"togetherjs-person-name\"></span>\n    </div>\n  </div>\n\n  <!-- A window version of #togetherjs-menu, for use on mobile -->\n  <div id=\"togetherjs-menu-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header>Settings and Profile</header>\n    <section>\n    <div class=\"togetherjs-menu-item\">\n      <img class=\"togetherjs-menu-avatar\">\n      <span class=\"togetherjs-person-name-self\" id=\"togetherjs-self-name-display\"></span>\n    </div>\n    <div class=\"togetherjs-menu-hr-avatar\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-name-button\"><img src=\"http://localhost:8080/togetherjs/images/button-pencil.png\" alt=\"\"> Update your name</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-avatar-button\"><img src=\"http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png\" alt=\"\"> Change avatar</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-update-color-button\"><span class=\"togetherjs-person-bgcolor-self\"></span> Pick profile color</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-help-button\">Help</div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-feedback-button\">Feedback</div>\n    <div class=\"togetherjs-hr\"></div>\n    <div class=\"togetherjs-menu-item\" id=\"togetherjs-menu-end-button\"><img src=\"http://localhost:8080/togetherjs/images/button-end-session.png\" alt=\"\"> End <span class=\"togetherjs-tool-name\">TogetherJS</span></div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">OK</button>\n    </section>\n  </div>\n\n  <!-- The name editor, for use on mobile -->\n  <div id=\"togetherjs-edit-name-window\" class=\"togetherjs-window\" style=\"display: none\">\n    <header>Update Name</header>\n    <section>\n      <div>\n        <input class=\"togetherjs-self-name\" type=\"text\" placeholder=\"Enter your name\">\n      </div>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">OK</button>\n    </section>\n  </div>\n\n  <div class=\"togetherjs-menu\" id=\"togetherjs-pick-color\" style=\"display: none\">\n    <div class=\"togetherjs-triangle-up\"><img src=\"http://localhost:8080/togetherjs/images/icn-triangle-up.png\"></div>\n    <div style=\"display: none\">\n      <div id=\"togetherjs-template-swatch\" class=\"togetherjs-swatch\">\n      </div>\n    </div>\n  </div>\n\n  <!-- Invisible elements that handle the RTC audio: -->\n  <audio id=\"togetherjs-audio-element\"></audio>\n  <audio id=\"togetherjs-local-audio\" muted=\"true\" volume=\"0.3\"></audio>\n  <audio id=\"togetherjs-notification\" src=\"http://localhost:8080/togetherjs/images/notification.mp3\"></audio>\n\n  <!-- The intro screen for someone who joins a session the first time: -->\n  <div id=\"togetherjs-intro\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header>Join <span class=\"togetherjs-tool-name\">TogetherJS</span> session?</header>\n    <section>\n      <p>Your friend has asked you to join their <a href=\"https://togetherjs.mozillalabs.com/\" target=\"_blank\"><span class=\"togetherjs-tool-name\">TogetherJS</span></a> browser session to collaborate in real-time!</p>\n\n      <p>Would you like to join their session?</p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-destructive togetherjs-modal-dont-join\">No, don't join</button>\n      <button class=\"togetherjs-primary togetherjs-dismiss\">Yes, join session</button>\n    </section>\n  </div>\n\n  <!-- Shown when a web browser is completely incapable of running TogetherJS: -->\n  <div id=\"togetherjs-browser-broken\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> Sorry </header>\n\n    <section>\n      <p>\n        We're sorry, <span class=\"togetherjs-tool-name\">TogetherJS</span> doesn't work with this browser.  Please\n        <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers\">upgrade\n          to a supported browser</a> to try <span class=\"togetherjs-tool-name\">TogetherJS</span>.\n      </p>\n\n      <p id=\"togetherjs-browser-broken-is-ie\" style=\"display: none\">\n        Internet\n        Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is\n          not supported</a> and won't be supported in the near term,\n        please use Firefox or Chrome.\n      </p>\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">End <span class=\"togetherjs-tool-name\">TogetherJS</span></button>\n    </section>\n\n  </div>\n\n  <!-- Shown when the browser has WebSockets, but is IE (i.e., IE10) -->\n  <div id=\"togetherjs-browser-unsupported\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> Unsupported Browser </header>\n\n    <section>\n      <p>\n        We're sorry, Internet Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is not supported</a>\n        at this time.  While we may add support later, adding support is\n        not currently on our roadmap.  Please use Firefox or Chrome.\n      </p>\n\n      <p>You can continue to try to use <span class=\"togetherjs-tool-name\">TogetherJS</span>, but you are likely to hit\n        lots of bugs.  So be warned.</p>\n\n    </section>\n\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-dismiss togetherjs-primary\">End <span class=\"togetherjs-tool-name\">TogetherJS</span></button>\n      <button class=\"togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway\">Try <span class=\"togetherjs-tool-name\">TogetherJS</span> Anyway</button>\n    </section>\n\n  </div>\n\n  <div id=\"togetherjs-confirm-end\" class=\"togetherjs-modal\" style=\"display: none\">\n    <header> End session? </header>\n    <section>\n      <p>\n        Are you sure you'd like to end your <span class=\"togetherjs-tool-name\">TogetherJS</span> session?\n      </p>\n    </section>\n    <section class=\"togetherjs-buttons\">\n      <button class=\"togetherjs-cancel togetherjs-dismiss\">Cancel</button>\n      <span class=\"togetherjs-alt-text\">or</span>\n      <button id=\"togetherjs-end-session\" class=\"togetherjs-destructive\">End session</button>\n    </section>\n  </div>\n\n  <div id=\"togetherjs-feedback-form\" class=\"togetherjs-modal\" style=\"display: none;\">\n    <header> Feedback </header>\n    <iframe src=\"https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform?embedded=true\" width=\"400\" height=\"300\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading form...</iframe>\n    <!-- <p><button class=\"togetherjs-modal-close\">Close</button></p> -->\n  </div>\n\n  <div style=\"display: none\">\n    <!-- This is when you join a session and the other person has already changed to another URL: -->\n    <div id=\"togetherjs-template-url-change\" class=\"togetherjs-modal\">\n      <header> Following to new URL... </header>\n      <section>\n        <div class=\"togetherjs-person\"></div>\n        Following\n        <span class=\"togetherjs-person-name\"></span>\n        to <a href=\"\" class=\"togetherjs-person-url togetherjs-person-url-title\"></a>\n      </section>\n    </div>\n\n    <!-- This is when someone invites you to their session: -->\n    <div id=\"togetherjs-template-invite\" class=\"togetherjs-chat-item\">\n      <div class=\"togetherjs-person\"></div>\n      <div>\n        <span class=\"togetherjs-person-name\"></span>\n        has invited <strong class=\"togetherjs-if-forEveryone\">anyone</strong>\n        <strong class=\"togetherjs-ifnot-forEveryone\">you</strong>\n        to <a href=\"\" data-togetherjs-subattr-href=\"href\" class=\"togetherjs-sub-hrefTitle\" target=\"_blank\"></a>\n      </div>\n    </div>\n\n  </div>\n\n  <!-- The pointer at the side of a window: -->\n  <div id=\"togetherjs-window-pointer-right\" style=\"display: none\"></div>\n  <div id=\"togetherjs-window-pointer-left\" style=\"display: none\"></div>\n\n  <!-- The element that overlaps the background of the page during a modal dialog: -->\n  <div id=\"togetherjs-modal-background\" style=\"display: none\"></div>\n\n  <!-- Some miscellaneous templates -->\n  <div style=\"display: none\">\n\n    <!-- This is the cursor: -->\n    <div id=\"togetherjs-template-cursor\" class=\"togetherjs-cursor togetherjs\">\n      <!-- Note: images/cursor.svg is a copy of this (for editing): -->\n      <!-- crossbrowser svg dropshadow http://demosthenes.info/blog/600/Creating-a-True-CrossBrowser-Drop-Shadow- -->\n      <svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t       width=\"15.147px\" height=\"19.653px\" viewBox=\"0 0 15.147 19.653\" enable-background=\"new 0 0 15.147 19.653\" xml:space=\"preserve\" >\n        <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" fill=\"#9F1D20\" d=\"M7.85,19.653c0,0,4.886-1.31,6.603-1.769\n\tc-0.373-1.391,1.128-3.674,0.567-5.766c-0.56-2.091-1.167-4.353-1.167-4.353s-0.236-1.055-1.232-0.788S11.498,7.76,11.498,7.76\n\ts-0.427-1.152-1.461-1.266C9.003,6.379,8.555,7.201,8.555,7.201S8.451,5.987,7.146,6.337C5.474,6.785,6.374,9.52,6.374,9.52\n\tL3.571,2.176c0,0-0.92-2.421-1.613-2.156C1.254,0.289,1.414,1.853,1.639,2.694c0.318,1.186,2.904,9.915,2.904,9.915\n\ts-3.856-3.503-4.5-2.5c-0.393,0.688,2.023,4.821,3,5.501c0.978,0.679,3.021,1.998,4.016,3.02c0.995,1.023,0.902,0.97,0.902,0.97\"/>\n      </svg>\n      <!-- <img class=\"togetherjs-cursor-img\" src=\"http://localhost:8080/togetherjs/images/cursor.svg\"> -->\n      <span class=\"togetherjs-cursor-container\">\n        <span class=\"togetherjs-cursor-name\"></span>\n        <span style=\"display:none\" class=\"togetherjs-cursor-typing\" id=\"togetherjs-cursor-typebox\">\n          <span class=\"togetherjs-typing-ellipse-one\">&#9679;</span><span class=\"togetherjs-typing-ellipse-two\">&#9679;</span><span class=\"togetherjs-typing-ellipse-three\">&#9679;</span>\n        </span>\n        <!-- Displayed when the cursor is below the screen: -->\n        <span class=\"togetherjs-cursor-down\">\n\n        </span>\n        <!-- Displayed when the cursor is above the screen: -->\n        <span class=\"togetherjs-cursor-up\">\n\n        </span>\n      </span>\n    </div>\n\n    <!-- This is the element that goes around focused form elements: -->\n    <div id=\"togetherjs-template-focus\">\n      <div class=\"togetherjs-focus togetherjs-person-bordercolor\"></div>\n    </div>\n\n    <!-- This is a click: -->\n    <div id=\"togetherjs-template-click\" class=\"togetherjs-click togetherjs\">\n    </div>\n  </div>\n</div>\n"),
-    help: clean("<% /*\n  This is used to show the help when you type /help.  Used in\n  TogetherJS.localChatMessage().\n\n*/ %>\n/help : this message\n/test : run an automated/randomized test (or stop one that is in progress)\n  /test start N : run N times (instead of default 100)\n  /test show : show what kind of actions the random test would take (or stop showing)\n  /test describe : describe the possible actions (instead of showing them)\n/clear : clear the chat area\n/record : open up a recorder for the session\n/playback URL : play back a session that was recorded (it's up to you to figure out how to host it)\n  /playback local:NAME : play a locally saved log\n/savelogs NAME : save the currently recorded logs under NAME (recorder must be open)\n/baseurl : set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.\n/config : override some TogetherJS configuration parameters\n  /config VAR VALUE : set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.\n  /config clear : remove all overridden configuration\n"),
-    walkthrough: clean("<!--\n    Any elements with .togetherjs-walkthrough-firsttime will only be\n    displayed on during the first-time experience.  Any elements with\n    .togetherjs-walkthrough-not-firsttime will only be displayed when\n    the walkthrough is accessed through the Help menu.\n\n    Note you *cannot* use <section class=\"togetherjs-walkthrough-slide\n    togetherjs-walkthrough-firsttime\">: the number of sections must be the\n    same regardless.\n  -->\n<div id=\"togetherjs-walkthrough\" class=\"togetherjs-modal togetherjs-modal-wide\">\n  <header>You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!<button class=\"togetherjs-close\"></button></header>\n\n  <div id=\"togetherjs-walkthrough-previous\"></div>\n  <div id=\"togetherjs-walkthrough-next\"></div>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-intro.png\"></p>\n\t<p><span class=\"togetherjs-tool-name\">TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong></p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <div class=\"togetherjs-walkthrough-firsttime\">\n      <div class=\"togetherjs-walkthrough-main-image\">\n        <div class=\"togetherjs-walkthrough-avatar-section\">\n          <div class=\"togetherjs-avatar-preview togetherjs-person togetherjs-person-self\"></div>\n          <div class=\"togetherjs-avatar-upload-input\"><input type=\"file\" class=\"togetherjs-upload-avatar\"></div>\n        </div>\n        <input class=\"togetherjs-self-name\" type=\"text\" placeholder=\"Enter your name\">\n        <div class=\"togetherjs-swatch togetherjs-person-bgcolor-self\"></div>\n        <div class=\"togetherjs-save-settings\">\n          <button class=\"togetherjs-avatar-save togetherjs-primary\">\n            <span id=\"togetherjs-avatar-when-unsaved\">Save</span>\n            <span id=\"togetherjs-avatar-when-saved\" style=\"display: none\">Saved!</span>\n          </button>\n        </div>\n      </div>\n      <p>Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.</p>\n    </div>\n    <div class=\"togetherjs-walkthrough-not-firsttime\">\n      <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-profile.png\"></p>\n      <p>Change your avatar, name and user color using the Profile button.</p>\n    </div>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image togetherjs-ifnot-creator\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-invite.png\">\n    </p>\n    <p class=\"togetherjs-ifnot-creator\">You can invite more friends to the session by sending the invite link in the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock.</p>\n    <p class=\"togetherjs-walkthrough-main-image togetherjs-if-creator\">\n      <span class=\"togetherjs-walkthrough-sendlink\">\n        Copy and paste this link into IM or email to invite friends.\n      </span>\n      <input type=\"text\" class=\"togetherjs-share-link\">\n    </p>\n    <p class=\"togetherjs-if-creator\">Send the above link to a friend so they can join your session!  You can find this invite link on the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock as well.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-participant.png\"></p>\n    <p>Friends who join your <span class=\"togetherjs-tool-name\">TogetherJS</span> session will appear here.  You can click their avatars to see more.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-chat.png\"></p>\n    <p>When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-rtc.png\"></p>\n    <p>If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.</p>\n  </section>\n\n  <section class=\"togetherjs-walkthrough-slide\">\n    <p class=\"togetherjs-walkthrough-main-image\"><img src=\"http://localhost:8080/togetherjs/images/walkthrough-images-logo.png\"></p>\n    <p>Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!</p>\n  </section>\n\n  <div style=\"display: none\">\n    <!-- There is one of these created for each slide: -->\n    <span id=\"togetherjs-template-walkthrough-slide-progress\" class=\"togetherjs-walkthrough-slide-progress\">&#9679;</span>\n  </div>\n  <section id=\"togetherjs-walkthrough-progress\">\n  </section>\n\n  <section class=\"togetherjs-buttons\">\n    <button class=\"togetherjs-primary togetherjs-dismiss\">I'm ready!</button>\n  </section>\n\n</div><!-- /.togetherjs-modal -->\n")
-  };
 });
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -4508,7 +4536,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-close.png";
+      var src = "/togetherjs/images/togetherjs-logo-close.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
     }
 
@@ -4521,7 +4549,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-open.png";
+      var src = "/togetherjs/images/togetherjs-logo-open.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
       $('.togetherjs-window').animate({
@@ -4566,7 +4594,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-close.png";
+      var src = "/togetherjs/images/togetherjs-logo-close.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
       $("#togetherjs-dock-anchor").toggle(function() {
@@ -6133,587 +6161,6 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
-
-define('webrtc',["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], function (require, $, util, session, ui, peers, storage, windowing) {
-  var webrtc = util.Module("webrtc");
-  var assert = util.assert;
-
-  session.RTCSupported = !!(window.mozRTCPeerConnection ||
-                            window.webkitRTCPeerConnection ||
-                            window.RTCPeerConnection);
-
-  if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
-    // In a few versions of Firefox (18 and 19) these APIs are present but
-    // not actually usable
-    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
-    // Because they could be pref'd on we'll do a quick check:
-    try {
-      (function () {
-        var conn = new window.mozRTCPeerConnection();
-      })();
-    } catch (e) {
-      session.RTCSupported = false;
-    }
-  }
-
-  var mediaConstraints = {
-    mandatory: {
-      OfferToReceiveAudio: true,
-      OfferToReceiveVideo: false
-    }
-  };
-  if (window.mozRTCPeerConnection) {
-    mediaConstraints.mandatory.MozDontOfferDataChannel = true;
-  }
-
-  var URL = window.webkitURL || window.URL;
-  var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
-  var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
-
-  function makePeerConnection() {
-    // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
-    if (window.webkitRTCPeerConnection) {
-      return new webkitRTCPeerConnection({
-        "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
-      }, {
-        "optional": [{"DtlsSrtpKeyAgreement": true}]
-      });
-    }
-    if (window.mozRTCPeerConnection) {
-      return new mozRTCPeerConnection({
-        // Or stun:124.124.124..2 ?
-        "iceServers": [{"url": "stun:23.21.150.121"}]
-      }, {
-        "optional": []
-      });
-    }
-    throw new util.AssertionError("Called makePeerConnection() without supported connection");
-  }
-
-  function ensureCryptoLine(sdp) {
-    if (! window.mozRTCPeerConnection) {
-      return sdp;
-    }
-
-    var sdpLinesIn = sdp.split('\r\n');
-    var sdpLinesOut = [];
-
-    // Search for m line.
-    for (var i = 0; i < sdpLinesIn.length; i++) {
-      sdpLinesOut.push(sdpLinesIn[i]);
-      if (sdpLinesIn[i].search('m=') !== -1) {
-        sdpLinesOut.push("a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      }
-    }
-
-    sdp = sdpLinesOut.join('\r\n');
-    return sdp;
-  }
-
-  function getUserMedia(options, success, failure) {
-    failure = failure || function (error) {
-      console.error("Error in getUserMedia:", error);
-    };
-    (navigator.getUserMedia ||
-     navigator.mozGetUserMedia ||
-     navigator.webkitGetUserMedia ||
-     navigator.msGetUserMedia).call(navigator, options, success, failure);
-  }
-
-  /****************************************
-   * getUserMedia Avatar support
-   */
-
-  var avatarEditState = {};
-
-  session.on("ui-ready", function () {
-    $("#togetherjs-self-avatar").click(function () {
-      var avatar = peers.Self.avatar;
-      if (avatar) {
-        $preview.attr("src", avatar);
-      }
-      ui.displayToggle("#togetherjs-avatar-edit");
-    });
-    if (! session.RTCSupported) {
-      $("#togetherjs-avatar-edit-rtc").hide();
-    }
-
-    var avatarData = null;
-    var $preview = $("#togetherjs-self-avatar-preview");
-    var $accept = $("#togetherjs-self-avatar-accept");
-    var $cancel = $("#togetherjs-self-avatar-cancel");
-    var $takePic = $("#togetherjs-avatar-use-camera");
-    var $video = $("#togetherjs-avatar-video");
-    var $upload = $("#togetherjs-avatar-upload");
-
-    $takePic.click(function () {
-      if (! streaming) {
-        startStreaming();
-        return;
-      }
-      takePicture();
-    });
-
-    function savePicture(dataUrl) {
-      avatarData = dataUrl;
-      $preview.attr("src", avatarData);
-      $accept.attr("disabled", null);
-    }
-
-    $accept.click(function () {
-      peers.Self.update({avatar:  avatarData});
-      ui.displayToggle("#togetherjs-no-avatar-edit");
-      // FIXME: these probably shouldn't be two elements:
-      $("#togetherjs-participants-other").show();
-      $accept.attr("disabled", "1");
-    });
-
-    $cancel.click(function () {
-      ui.displayToggle("#togetherjs-no-avatar-edit");
-      // FIXME: like above:
-      $("#togetherjs-participants-other").show();
-    });
-
-    var streaming = false;
-    function startStreaming() {
-      getUserMedia({
-          video: true,
-          audio: false
-        },
-        function(stream) {
-          streaming = true;
-          $video[0].src = URL.createObjectURL(stream);
-          $video[0].play();
-        },
-        function(err) {
-          // FIXME: should pop up help or something in the case of a user
-          // cancel
-          console.error("getUserMedia error:", err);
-        }
-      );
-    }
-
-    function takePicture() {
-      assert(streaming);
-      var height = $video[0].videoHeight;
-      var width = $video[0].videoWidth;
-      width = width * (session.AVATAR_SIZE / height);
-      height = session.AVATAR_SIZE;
-      var $canvas = $("<canvas>");
-      $canvas[0].height = session.AVATAR_SIZE;
-      $canvas[0].width = session.AVATAR_SIZE;
-      var context = $canvas[0].getContext("2d");
-      context.arc(session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, 0, Math.PI*2);
-      context.closePath();
-      context.clip();
-      context.drawImage($video[0], (session.AVATAR_SIZE - width) / 2, 0, width, height);
-      savePicture($canvas[0].toDataURL("image/png"));
-    }
-
-    $upload.on("change", function () {
-      var reader = new FileReader();
-      reader.onload = function () {
-        // FIXME: I don't actually know it's JPEG, but it's probably a
-        // good enough guess:
-        var url = "data:image/jpeg;base64," + util.blobToBase64(this.result);
-        convertImage(url, function (result) {
-          savePicture(result);
-        });
-      };
-      reader.onerror = function () {
-        console.error("Error reading file:", this.error);
-      };
-      reader.readAsArrayBuffer(this.files[0]);
-    });
-
-    function convertImage(imageUrl, callback) {
-      var $canvas = $("<canvas>");
-      $canvas[0].height = session.AVATAR_SIZE;
-      $canvas[0].width = session.AVATAR_SIZE;
-      var context = $canvas[0].getContext("2d");
-      var img = new Image();
-      img.src = imageUrl;
-      // Sometimes the DOM updates immediately to call
-      // naturalWidth/etc, and sometimes it doesn't; using setTimeout
-      // gives it a chance to catch up
-      setTimeout(function () {
-        var width = img.naturalWidth || img.width;
-        var height = img.naturalHeight || img.height;
-        width = width * (session.AVATAR_SIZE / height);
-        height = session.AVATAR_SIZE;
-        context.drawImage(img, 0, 0, width, height);
-        callback($canvas[0].toDataURL("image/png"));
-      });
-    }
-
-  });
-
-  /****************************************
-   * RTC support
-   */
-
-  function audioButton(selector) {
-    ui.displayToggle(selector);
-    if (selector == "#togetherjs-audio-incoming") {
-      $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
-    } else {
-      $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
-    }
-  }
-
-  session.on("ui-ready", function () {
-    $("#togetherjs-audio-button").click(function () {
-      if ($("#togetherjs-rtc-info").is(":visible")) {
-        windowing.hide();
-        return;
-      }
-      if (session.RTCSupported) {
-        enableAudio();
-      } else {
-        windowing.show("#togetherjs-rtc-not-supported");
-      }
-    });
-
-    if (! session.RTCSupported) {
-      audioButton("#togetherjs-audio-unavailable");
-      return;
-    }
-    audioButton("#togetherjs-audio-ready");
-
-    var audioStream = null;
-    var accepted = false;
-    var connected = false;
-    var $audio = $("#togetherjs-audio-element");
-    var offerSent = null;
-    var offerReceived = null;
-    var offerDescription = false;
-    var answerSent = null;
-    var answerReceived = null;
-    var answerDescription = false;
-    var _connection = null;
-    var iceCandidate = null;
-
-    function enableAudio() {
-      accepted = true;
-      storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
-        if (! dontShow) {
-          windowing.show("#togetherjs-rtc-info");
-        }
-      });
-      if (! audioStream) {
-        startStreaming(connect);
-        return;
-      }
-      if (! connected) {
-        connect();
-      }
-      toggleMute();
-    }
-
-    ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
-      storage.settings.set("dontShowRtcInfo", this.checked);
-    });
-
-    function error() {
-      console.warn.apply(console, arguments);
-      var s = "";
-      for (var i=0; i<arguments.length; i++) {
-        if (s) {
-          s += " ";
-        }
-        var a = arguments[i];
-        if (typeof a == "string") {
-          s += a;
-        } else {
-          var repl;
-          try {
-            repl = JSON.stringify(a);
-          } catch (e) {
-          }
-          if (! repl) {
-            repl = "" + a;
-          }
-          s += repl;
-        }
-      }
-      audioButton("#togetherjs-audio-error");
-      // FIXME: this title doesn't seem to display?
-      $("#togetherjs-audio-error").attr("title", s);
-    }
-
-    function startStreaming(callback) {
-      getUserMedia(
-        {
-          video: false,
-          audio: true
-        },
-        function (stream) {
-          audioStream = stream;
-          attachMedia("#togetherjs-local-audio", stream);
-          if (callback) {
-            callback();
-          }
-        },
-        function (err) {
-          // FIXME: handle cancel case
-          if (err && err.code == 1) {
-            // User cancel
-            return;
-          }
-          error("getUserMedia error:", err);
-        }
-      );
-    }
-
-    function attachMedia(element, media) {
-      element = $(element)[0];
-      console.log("Attaching", media, "to", element);
-      if (window.mozRTCPeerConnection) {
-        element.mozSrcObject = media;
-        element.play();
-      } else {
-        element.autoplay = true;
-        element.src = URL.createObjectURL(media);
-      }
-    }
-
-    function getConnection() {
-      assert(audioStream);
-      if (_connection) {
-        return _connection;
-      }
-      try {
-        _connection = makePeerConnection();
-      } catch (e) {
-        error("Error creating PeerConnection:", e);
-        throw e;
-      }
-      _connection.onaddstream = function (event) {
-        console.log("got event", event, event.type);
-        attachMedia($audio, event.stream);
-        audioButton("#togetherjs-audio-active");
-      };
-      _connection.onstatechange = function () {
-        // FIXME: this doesn't seem to work:
-        // Actually just doesn't work on Firefox
-        console.log("state change", _connection.readyState);
-        if (_connection.readyState == "closed") {
-          audioButton("#togetherjs-audio-ready");
-        }
-      };
-      _connection.onicecandidate = function (event) {
-        if (event.candidate) {
-          session.send({
-            type: "rtc-ice-candidate",
-            candidate: {
-              sdpMLineIndex: event.candidate.sdpMLineIndex,
-              sdpMid: event.candidate.sdpMid,
-              candidate: event.candidate.candidate
-            }
-          });
-        }
-      };
-      _connection.addStream(audioStream);
-      return _connection;
-    }
-
-    function addIceCandidate() {
-      if (iceCandidate) {
-        console.log("adding ice", iceCandidate);
-        _connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
-      }
-    }
-
-    function connect() {
-      var connection = getConnection();
-      if (offerReceived && (! offerDescription)) {
-        connection.setRemoteDescription(
-          new RTCSessionDescription({
-            type: "offer",
-            sdp: offerReceived
-          }),
-          function () {
-            offerDescription = true;
-            addIceCandidate();
-            connect();
-          },
-          function (err) {
-            error("Error doing RTC setRemoteDescription:", err);
-          }
-        );
-        return;
-      }
-      if (! (offerSent || offerReceived)) {
-        connection.createOffer(function (offer) {
-          console.log("made offer", offer);
-          offer.sdp = ensureCryptoLine(offer.sdp);
-          connection.setLocalDescription(
-            offer,
-            function () {
-              session.send({
-                type: "rtc-offer",
-                offer: offer.sdp
-              });
-              offerSent = offer;
-              audioButton("#togetherjs-audio-outgoing");
-            },
-            function (err) {
-              error("Error doing RTC setLocalDescription:", err);
-            },
-            mediaConstraints
-          );
-        }, function (err) {
-          error("Error doing RTC createOffer:", err);
-        });
-      } else if (! (answerSent || answerReceived)) {
-        // FIXME: I might have only needed this due to my own bugs, this might
-        // not actually time out
-        var timeout = setTimeout(function () {
-          if (! answerSent) {
-            error("createAnswer Timed out; reload or restart browser");
-          }
-        }, 2000);
-        connection.createAnswer(function (answer) {
-          answer.sdp = ensureCryptoLine(answer.sdp);
-          clearTimeout(timeout);
-          connection.setLocalDescription(
-            answer,
-            function () {
-              session.send({
-                type: "rtc-answer",
-                answer: answer.sdp
-              });
-              answerSent = answer;
-            },
-            function (err) {
-              clearTimeout(timeout);
-              error("Error doing RTC setLocalDescription:", err);
-            },
-            mediaConstraints
-          );
-        }, function (err) {
-          error("Error doing RTC createAnswer:", err);
-        });
-      }
-    }
-
-    function toggleMute() {
-      // FIXME: implement.  Actually, wait for this to be implementable - currently
-      // muting of localStreams isn't possible
-      // FIXME: replace with hang-up?
-    }
-
-    session.hub.on("rtc-offer", function (msg) {
-      if (offerReceived || answerSent || answerReceived || offerSent) {
-        abort();
-      }
-      offerReceived = msg.offer;
-      if (! accepted) {
-        audioButton("#togetherjs-audio-incoming");
-        return;
-      }
-      function run() {
-        var connection = getConnection();
-        connection.setRemoteDescription(
-          new RTCSessionDescription({
-            type: "offer",
-            sdp: offerReceived
-          }),
-          function () {
-            offerDescription = true;
-            addIceCandidate();
-            connect();
-          },
-          function (err) {
-            error("Error doing RTC setRemoteDescription:", err);
-          }
-        );
-      }
-      if (! audioStream) {
-        startStreaming(run);
-      } else {
-        run();
-      }
-    });
-
-    session.hub.on("rtc-answer", function (msg) {
-      if (answerSent || answerReceived || offerReceived || (! offerSent)) {
-        abort();
-        // Basically we have to abort and try again.  We'll expect the other
-        // client to restart when appropriate
-        session.send({type: "rtc-abort"});
-        return;
-      }
-      answerReceived = msg.answer;
-      assert(offerSent);
-      assert(audioStream);
-      var connection = getConnection();
-      connection.setRemoteDescription(
-        new RTCSessionDescription({
-          type: "answer",
-          sdp: answerReceived
-        }),
-        function () {
-          answerDescription = true;
-          // FIXME: I don't think this connect is ever needed?
-          connect();
-        },
-        function (err) {
-          error("Error doing RTC setRemoteDescription:", err);
-        }
-      );
-    });
-
-    session.hub.on("rtc-ice-candidate", function (msg) {
-      iceCandidate = msg.candidate;
-      if (offerDescription || answerDescription) {
-        addIceCandidate();
-      }
-    });
-
-    session.hub.on("rtc-abort", function (msg) {
-      abort();
-      if (! accepted) {
-        return;
-      }
-      if (! audioStream) {
-        startStreaming(function () {
-          connect();
-        });
-      } else {
-        connect();
-      }
-    });
-
-    session.hub.on("hello", function (msg) {
-      // FIXME: displayToggle should be set due to
-      // _connection.onstatechange, but that's not working, so
-      // instead:
-      audioButton("#togetherjs-audio-ready");
-      if (accepted && (offerSent || answerSent)) {
-        abort();
-        connect();
-      }
-    });
-
-    function abort() {
-      answerSent = answerReceived = offerSent = offerReceived = null;
-      answerDescription = offerDescription = false;
-      _connection = null;
-      $audio[0].removeAttribute("src");
-    }
-
-  });
-
-  return webrtc;
-
-});
-
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 define('eventMaker',["jquery", "util"], function ($, util) {
   var eventMaker = util.Module("eventMaker");
   var assert = util.assert;
@@ -7190,13 +6637,24 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
+      }
+      var element = event.target;
+      if (! TogetherJS.running) {
+        // This can end up running right after TogetherJS has been closed, often
+        // because TogetherJS was closed with a click...
         return;
       }
-      if (elementFinder.ignoreElement(event.target)) {
+      if (elementFinder.ignoreElement(element)) {
         return;
       }
-      var location = elementFinder.elementLocation(event.target);
-      var offset = $(event.target).offset();
+      //Prevent click events on video objects to avoid conflicts with
+      //togetherjs's own video events
+      if (element.nodeName.toLowerCase() === 'video'){
+        return;
+      }
+
+      var location = elementFinder.elementLocation(element);
+      var offset = $(element).offset();
       var offsetX = event.pageX - offset.left;
       var offsetY = event.pageY - offset.top;
       session.send({
@@ -7281,153 +6739,6 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
 
   return cursor;
 
-});
-
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/* This module handles all the different UI that happens (sometimes in order) when
-   TogetherJS is started:
-
-   - Introduce the session when you've been invited
-   - Show any browser compatibility indicators
-   - Show the walkthrough the first time
-   - Show the share link window
-
-   When everything is done it fires session.emit("startup-ready")
-
-*/
-define('startup',["util", "require", "jquery", "windowing", "storage"], function (util, require, $, windowing, storage) {
-  var assert = util.assert;
-  var startup = util.Module("startup");
-  // Avoid circular import:
-  var session = null;
-
-  var STEPS = [
-    "browserBroken",
-    "browserUnsupported",
-    "sessionIntro",
-    "walkthrough",
-    // Look in the share() below if you add anything after here:
-    "share"
-    ];
-
-  var currentStep = null;
-
-  startup.start = function () {
-    if (! session) {
-      require(["session"], function (sessionModule) {
-        session = sessionModule;
-        startup.start();
-      });
-      return;
-    }
-    var index = -1;
-    if (currentStep) {
-      index = STEPS.indexOf(currentStep);
-    }
-    index++;
-    if (index >= STEPS.length) {
-      session.emit("startup-ready");
-      return;
-    }
-    currentStep = STEPS[index];
-    handlers[currentStep](startup.start);
-  };
-
-  var handlers = {
-
-    browserBroken: function (next) {
-      if (window.WebSocket) {
-        next();
-        return;
-      }
-      windowing.show("#togetherjs-browser-broken", {
-        onClose: function () {
-          session.close();
-        }
-      });
-      if ($.browser.msie) {
-        $("#togetherjs-browser-broken-is-ie").show();
-      }
-    },
-
-    browserUnsupported: function (next) {
-      if (! $.browser.msie) {
-        next();
-        return;
-      }
-      var cancel = true;
-      windowing.show("#togetherjs-browser-unsupported", {
-        onClose: function () {
-          if (cancel) {
-            session.close();
-          } else {
-            next();
-          }
-        }
-      });
-      $("#togetherjs-browser-unsupported-anyway").click(function () {
-        cancel = false;
-      });
-    },
-
-    sessionIntro: function (next) {
-      if ((! session.isClient) || ! session.firstRun) {
-        next();
-        return;
-      }
-      if (TogetherJS.getConfig("suppressJoinConfirmation")) {
-        next();
-        return;
-      }
-      var cancelled = false;
-      windowing.show("#togetherjs-intro", {
-        onClose: function () {
-          if (! cancelled) {
-            next();
-          }
-        }
-      });
-      $("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
-        cancelled = true;
-        windowing.hide();
-        session.close("declined-join");
-      });
-    },
-
-    walkthrough: function (next) {
-      storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
-        if (seenIntroDialog) {
-          next();
-          return;
-        }
-        require(["walkthrough"], function (walkthrough) {
-          walkthrough.start(true, function () {
-            storage.settings.set("seenIntroDialog", true);
-            next();
-          });
-        });
-      });
-    },
-
-    share: function (next) {
-      if (session.isClient || (! session.firstRun) ||
-          TogetherJS.getConfig("suppressInvite")) {
-        next();
-        return;
-      }
-      require(["windowing"], function (windowing) {
-        windowing.show("#togetherjs-share");
-        // FIXME: no way to detect when the window is closed
-        // If there was a next() step then it would not work
-      });
-    }
-
-  };
-
-  return startup;
 });
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
@@ -8814,6 +8125,1118 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
 
   return forms;
 });
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* This module handles all the different UI that happens (sometimes in order) when
+   TogetherJS is started:
+
+   - Introduce the session when you've been invited
+   - Show any browser compatibility indicators
+   - Show the walkthrough the first time
+   - Show the share link window
+
+   When everything is done it fires session.emit("startup-ready")
+
+*/
+define('startup',["util", "require", "jquery", "windowing", "storage"], function (util, require, $, windowing, storage) {
+  var assert = util.assert;
+  var startup = util.Module("startup");
+  // Avoid circular import:
+  var session = null;
+
+  var STEPS = [
+    "browserBroken",
+    "browserUnsupported",
+    "sessionIntro",
+    "walkthrough",
+    // Look in the share() below if you add anything after here:
+    "share"
+    ];
+
+  var currentStep = null;
+
+  startup.start = function () {
+    if (! session) {
+      require(["session"], function (sessionModule) {
+        session = sessionModule;
+        startup.start();
+      });
+      return;
+    }
+    var index = -1;
+    if (currentStep) {
+      index = STEPS.indexOf(currentStep);
+    }
+    index++;
+    if (index >= STEPS.length) {
+      session.emit("startup-ready");
+      return;
+    }
+    currentStep = STEPS[index];
+    handlers[currentStep](startup.start);
+  };
+
+  var handlers = {
+
+    browserBroken: function (next) {
+      if (window.WebSocket) {
+        next();
+        return;
+      }
+      windowing.show("#togetherjs-browser-broken", {
+        onClose: function () {
+          session.close();
+        }
+      });
+      if ($.browser.msie) {
+        $("#togetherjs-browser-broken-is-ie").show();
+      }
+    },
+
+    browserUnsupported: function (next) {
+      if (! $.browser.msie) {
+        next();
+        return;
+      }
+      var cancel = true;
+      windowing.show("#togetherjs-browser-unsupported", {
+        onClose: function () {
+          if (cancel) {
+            session.close();
+          } else {
+            next();
+          }
+        }
+      });
+      $("#togetherjs-browser-unsupported-anyway").click(function () {
+        cancel = false;
+      });
+    },
+
+    sessionIntro: function (next) {
+      if ((! session.isClient) || ! session.firstRun) {
+        next();
+        return;
+      }
+      if (TogetherJS.getConfig("suppressJoinConfirmation")) {
+        next();
+        return;
+      }
+      var cancelled = false;
+      windowing.show("#togetherjs-intro", {
+        onClose: function () {
+          if (! cancelled) {
+            next();
+          }
+        }
+      });
+      $("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
+        cancelled = true;
+        windowing.hide();
+        session.close("declined-join");
+      });
+    },
+
+    walkthrough: function (next) {
+      storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
+        if (seenIntroDialog) {
+          next();
+          return;
+        }
+        require(["walkthrough"], function (walkthrough) {
+          walkthrough.start(true, function () {
+            storage.settings.set("seenIntroDialog", true);
+            next();
+          });
+        });
+      });
+    },
+
+    share: function (next) {
+      if (session.isClient || (! session.firstRun) ||
+          TogetherJS.getConfig("suppressInvite")) {
+        next();
+        return;
+      }
+      require(["windowing"], function (windowing) {
+        windowing.show("#togetherjs-share");
+        // FIXME: no way to detect when the window is closed
+        // If there was a next() step then it would not work
+      });
+    }
+
+  };
+
+  return startup;
+});
+
+
+define('videos',["jquery", "util", "session", "elementFinder"],
+function($, util, session, elementFinder){
+
+  var listeners = [];
+
+  var TIME_UPDATE = 'timeupdate';
+  var MIRRORED_EVENTS = ['play', 'pause'];
+
+  var TOO_FAR_APART = 3000;
+
+  session.on("reinitialize", function () {
+    unsetListeners();
+    setupListeners();
+  });
+
+  session.on("ui-ready", setupListeners);
+
+  function setupListeners() {
+    var videos = $('video');
+    setupMirroredEvents(videos);
+    setupTimeSync(videos);
+  };
+
+  function setupMirroredEvents(videos) {
+    var currentListener;
+    MIRRORED_EVENTS.forEach(function (eventName) {
+      currentListener = makeEventSender(eventName);
+      videos.on(eventName, currentListener);
+      listeners.push({
+        name: eventName,
+        listener: currentListener
+      });
+    });
+  };
+
+  function makeEventSender(eventName) {
+    return function (event, options) {
+      var element = event.target;
+      options || (options = {});
+      if (!options.silent) {
+        session.send({
+          type: ('video-'+eventName),
+          location: elementFinder.elementLocation(element),
+          position: element.currentTime
+        });
+      }
+    }
+  };
+
+  function setupTimeSync(videos) {
+    videos.each(function(i, video) {
+      var onTimeUpdate = makeTimeUpdater();
+      $(video).on(TIME_UPDATE, onTimeUpdate);
+      listeners.push({
+        name: TIME_UPDATE,
+        listener: onTimeUpdate
+      });
+    });
+  };
+
+  function makeTimeUpdater() {
+    var last = 0;
+    return function (event) {
+      var currentTime = event.target.currentTime;
+      if(areTooFarApart(currentTime, last)){
+        makeEventSender(TIME_UPDATE)(event);
+      }
+      last = currentTime;
+    };
+  };
+
+  function areTooFarApart(currentTime, lastTime) {
+    var secDiff = Math.abs(currentTime - lastTime);
+    var milliDiff = secDiff * 1000;
+    return milliDiff > TOO_FAR_APART;
+  }
+
+  session.on("close", unsetListeners);
+
+  function unsetListeners() {
+    var videos = $('video');
+    listeners.forEach(function (event) {
+        videos.off(event.name, event.listener);
+    });
+    listeners = [];
+  };
+
+
+  session.hub.on('video-timeupdate', function (msg) {
+    var element = $findElement(msg.location);
+    var oldTime = element.prop('currentTime');
+    var newTime = msg.position;
+
+    //to help throttle uneccesary position changes
+    if(areTooFarApart(oldTime, newTime)){
+      setTime(element, msg.position);
+    };
+  })
+
+  MIRRORED_EVENTS.forEach( function (eventName) {
+    session.hub.on("video-"+eventName, function (msg) {
+      var element = $findElement(msg.location);
+
+      setTime(element, msg.position);
+
+      element.trigger(eventName, {silent: true});
+    });
+  })
+
+  //Currently does not discriminate between visible and invisible videos
+  function $findElement(location) {
+    return $(elementFinder.findElement(location));
+  }
+
+  function setTime(video, time) {
+    video.prop('currentTime', time);
+  }
+
+});
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+define('walkthrough',["util", "ui", "jquery", "windowing", "templates", "templating", "session", "peers"], function (util, ui, $, windowing, templates, templating, session, peers) {
+  var assert = util.assert;
+  var walkthrough = util.Module("walkthrough");
+  var onHideAll = null;
+  var container = null;
+
+  var slides = null;
+
+  walkthrough.start = function (firstTime, doneCallback) {
+    if (! container) {
+      container = $(templates.walkthrough);
+      container.hide();
+      ui.container.append(container);
+      slides = container.find(".togetherjs-walkthrough-slide");
+      slides.hide();
+      var progress = $("#togetherjs-walkthrough-progress");
+      slides.each(function (index) {
+        var bullet = templating.sub("walkthrough-slide-progress");
+        progress.append(bullet);
+        bullet.click(function () {
+          show(index);
+        });
+      });
+      container.find("#togetherjs-walkthrough-previous").click(previous);
+      container.find("#togetherjs-walkthrough-next").click(next);
+      ui.prepareShareLink(container);
+      container.find(".togetherjs-self-name").bind("keyup", function (event) {
+        var val = $(event.target).val();
+        peers.Self.update({name: val});
+      });
+      container.find(".togetherjs-swatch").click(function () {
+        var picker = $("#togetherjs-pick-color");
+        if (picker.is(":visible")) {
+          picker.hide();
+          return;
+        }
+        picker.show();
+        picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
+        picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
+        var location = container.find(".togetherjs-swatch").offset();
+        picker.css({
+          top: location.top,
+          // The -7 comes out of thin air, but puts it in the right place:
+          left: location.left-7
+        });
+      });
+      if (session.isClient) {
+        container.find(".togetherjs-if-creator").remove();
+        container.find(".togetherjs-ifnot-creator").show();
+      } else {
+        container.find(".togetherjs-if-creator").show();
+        container.find(".togetherjs-ifnot-creator").remove();
+      }
+      container.find(".togetherjs-site-name").text(session.siteName());
+      ui.activateAvatarEdit(container, {
+        onSave: function () {
+          container.find("#togetherjs-avatar-when-saved").show();
+          container.find("#togetherjs-avatar-when-unsaved").hide();
+        },
+        onPending: function () {
+          container.find("#togetherjs-avatar-when-saved").hide();
+          container.find("#togetherjs-avatar-when-unsaved").show();
+        }
+      });
+      // This triggers substititions in the walkthrough:
+      peers.Self.update({});
+      session.emit("new-element", container);
+    }
+    assert(typeof firstTime == "boolean", "You must provide a firstTime boolean parameter");
+    if (firstTime) {
+      container.find(".togetherjs-walkthrough-firsttime").show();
+      container.find(".togetherjs-walkthrough-not-firsttime").hide();
+    } else {
+      container.find(".togetherjs-walkthrough-firsttime").hide();
+      container.find(".togetherjs-walkthrough-not-firsttime").show();
+    }
+    onHideAll = doneCallback;
+    show(0);
+    windowing.show(container);
+  };
+
+  function show(index) {
+    slides.hide();
+    $(slides[index]).show();
+    var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
+    bullets.removeClass("togetherjs-active");
+    $(bullets[index]).addClass("togetherjs-active");
+    var $next = $("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+    var $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
+    if (index == slides.length - 1) {
+      $next.addClass("togetherjs-disabled");
+    } else if (index === 0) {
+      $previous.addClass("togetherjs-disabled");
+    }
+  }
+
+  function previous() {
+    var index = getIndex();
+    index--;
+    if (index < 0) {
+      index = 0;
+    }
+    show(index);
+  }
+
+  function next() {
+    var index = getIndex();
+    index++;
+    if (index >= slides.length) {
+      index = slides.length-1;
+    }
+    show(index);
+  }
+
+  function getIndex() {
+    var active = slides.filter(":visible");
+    if (! active.length) {
+      return 0;
+    }
+    for (var i=0; i<slides.length; i++) {
+      if (slides[i] == active[0]) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  walkthrough.stop = function () {
+    windowing.hide(container);
+    if (onHideAll) {
+      onHideAll();
+      onHideAll = null;
+    }
+  };
+
+  session.on("hide-window", function () {
+    if (onHideAll) {
+      onHideAll();
+      onHideAll = null;
+    }
+  });
+
+  return walkthrough;
+});
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
+
+define('webrtc',["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], function (require, $, util, session, ui, peers, storage, windowing) {
+  var webrtc = util.Module("webrtc");
+  var assert = util.assert;
+
+  session.RTCSupported = !!(window.mozRTCPeerConnection ||
+                            window.webkitRTCPeerConnection ||
+                            window.RTCPeerConnection);
+
+  if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
+    // In a few versions of Firefox (18 and 19) these APIs are present but
+    // not actually usable
+    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
+    // Because they could be pref'd on we'll do a quick check:
+    try {
+      (function () {
+        var conn = new window.mozRTCPeerConnection();
+      })();
+    } catch (e) {
+      session.RTCSupported = false;
+    }
+  }
+
+  var mediaConstraints = {
+    mandatory: {
+      OfferToReceiveAudio: true,
+      OfferToReceiveVideo: false
+    }
+  };
+  if (window.mozRTCPeerConnection) {
+    mediaConstraints.mandatory.MozDontOfferDataChannel = true;
+  }
+
+  var URL = window.webkitURL || window.URL;
+  var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+  var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
+
+  function makePeerConnection() {
+    // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
+    if (window.webkitRTCPeerConnection) {
+      return new webkitRTCPeerConnection({
+        "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
+      }, {
+        "optional": [{"DtlsSrtpKeyAgreement": true}]
+      });
+    }
+    if (window.mozRTCPeerConnection) {
+      return new mozRTCPeerConnection({
+        // Or stun:124.124.124..2 ?
+        "iceServers": [{"url": "stun:23.21.150.121"}]
+      }, {
+        "optional": []
+      });
+    }
+    throw new util.AssertionError("Called makePeerConnection() without supported connection");
+  }
+
+  function ensureCryptoLine(sdp) {
+    if (! window.mozRTCPeerConnection) {
+      return sdp;
+    }
+
+    var sdpLinesIn = sdp.split('\r\n');
+    var sdpLinesOut = [];
+
+    // Search for m line.
+    for (var i = 0; i < sdpLinesIn.length; i++) {
+      sdpLinesOut.push(sdpLinesIn[i]);
+      if (sdpLinesIn[i].search('m=') !== -1) {
+        sdpLinesOut.push("a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      }
+    }
+
+    sdp = sdpLinesOut.join('\r\n');
+    return sdp;
+  }
+
+  function getUserMedia(options, success, failure) {
+    failure = failure || function (error) {
+      console.error("Error in getUserMedia:", error);
+    };
+    (navigator.getUserMedia ||
+     navigator.mozGetUserMedia ||
+     navigator.webkitGetUserMedia ||
+     navigator.msGetUserMedia).call(navigator, options, success, failure);
+  }
+
+  /****************************************
+   * getUserMedia Avatar support
+   */
+
+  var avatarEditState = {};
+
+  session.on("ui-ready", function () {
+    $("#togetherjs-self-avatar").click(function () {
+      var avatar = peers.Self.avatar;
+      if (avatar) {
+        $preview.attr("src", avatar);
+      }
+      ui.displayToggle("#togetherjs-avatar-edit");
+    });
+    if (! session.RTCSupported) {
+      $("#togetherjs-avatar-edit-rtc").hide();
+    }
+
+    var avatarData = null;
+    var $preview = $("#togetherjs-self-avatar-preview");
+    var $accept = $("#togetherjs-self-avatar-accept");
+    var $cancel = $("#togetherjs-self-avatar-cancel");
+    var $takePic = $("#togetherjs-avatar-use-camera");
+    var $video = $("#togetherjs-avatar-video");
+    var $upload = $("#togetherjs-avatar-upload");
+
+    $takePic.click(function () {
+      if (! streaming) {
+        startStreaming();
+        return;
+      }
+      takePicture();
+    });
+
+    function savePicture(dataUrl) {
+      avatarData = dataUrl;
+      $preview.attr("src", avatarData);
+      $accept.attr("disabled", null);
+    }
+
+    $accept.click(function () {
+      peers.Self.update({avatar:  avatarData});
+      ui.displayToggle("#togetherjs-no-avatar-edit");
+      // FIXME: these probably shouldn't be two elements:
+      $("#togetherjs-participants-other").show();
+      $accept.attr("disabled", "1");
+    });
+
+    $cancel.click(function () {
+      ui.displayToggle("#togetherjs-no-avatar-edit");
+      // FIXME: like above:
+      $("#togetherjs-participants-other").show();
+    });
+
+    var streaming = false;
+    function startStreaming() {
+      getUserMedia({
+          video: true,
+          audio: false
+        },
+        function(stream) {
+          streaming = true;
+          $video[0].src = URL.createObjectURL(stream);
+          $video[0].play();
+        },
+        function(err) {
+          // FIXME: should pop up help or something in the case of a user
+          // cancel
+          console.error("getUserMedia error:", err);
+        }
+      );
+    }
+
+    function takePicture() {
+      assert(streaming);
+      var height = $video[0].videoHeight;
+      var width = $video[0].videoWidth;
+      width = width * (session.AVATAR_SIZE / height);
+      height = session.AVATAR_SIZE;
+      var $canvas = $("<canvas>");
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
+      var context = $canvas[0].getContext("2d");
+      context.arc(session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, session.AVATAR_SIZE/2, 0, Math.PI*2);
+      context.closePath();
+      context.clip();
+      context.drawImage($video[0], (session.AVATAR_SIZE - width) / 2, 0, width, height);
+      savePicture($canvas[0].toDataURL("image/png"));
+    }
+
+    $upload.on("change", function () {
+      var reader = new FileReader();
+      reader.onload = function () {
+        // FIXME: I don't actually know it's JPEG, but it's probably a
+        // good enough guess:
+        var url = "data:image/jpeg;base64," + util.blobToBase64(this.result);
+        convertImage(url, function (result) {
+          savePicture(result);
+        });
+      };
+      reader.onerror = function () {
+        console.error("Error reading file:", this.error);
+      };
+      reader.readAsArrayBuffer(this.files[0]);
+    });
+
+    function convertImage(imageUrl, callback) {
+      var $canvas = $("<canvas>");
+      $canvas[0].height = session.AVATAR_SIZE;
+      $canvas[0].width = session.AVATAR_SIZE;
+      var context = $canvas[0].getContext("2d");
+      var img = new Image();
+      img.src = imageUrl;
+      // Sometimes the DOM updates immediately to call
+      // naturalWidth/etc, and sometimes it doesn't; using setTimeout
+      // gives it a chance to catch up
+      setTimeout(function () {
+        var width = img.naturalWidth || img.width;
+        var height = img.naturalHeight || img.height;
+        width = width * (session.AVATAR_SIZE / height);
+        height = session.AVATAR_SIZE;
+        context.drawImage(img, 0, 0, width, height);
+        callback($canvas[0].toDataURL("image/png"));
+      });
+    }
+
+  });
+
+  /****************************************
+   * RTC support
+   */
+
+  function audioButton(selector) {
+    ui.displayToggle(selector);
+    if (selector == "#togetherjs-audio-incoming") {
+      $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
+    } else {
+      $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
+    }
+  }
+
+  session.on("ui-ready", function () {
+    $("#togetherjs-audio-button").click(function () {
+      if ($("#togetherjs-rtc-info").is(":visible")) {
+        windowing.hide();
+        return;
+      }
+      if (session.RTCSupported) {
+        enableAudio();
+      } else {
+        windowing.show("#togetherjs-rtc-not-supported");
+      }
+    });
+
+    if (! session.RTCSupported) {
+      audioButton("#togetherjs-audio-unavailable");
+      return;
+    }
+    audioButton("#togetherjs-audio-ready");
+
+    var audioStream = null;
+    var accepted = false;
+    var connected = false;
+    var $audio = $("#togetherjs-audio-element");
+    var offerSent = null;
+    var offerReceived = null;
+    var offerDescription = false;
+    var answerSent = null;
+    var answerReceived = null;
+    var answerDescription = false;
+    var _connection = null;
+    var iceCandidate = null;
+
+    function enableAudio() {
+      accepted = true;
+      storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
+        if (! dontShow) {
+          windowing.show("#togetherjs-rtc-info");
+        }
+      });
+      if (! audioStream) {
+        startStreaming(connect);
+        return;
+      }
+      if (! connected) {
+        connect();
+      }
+      toggleMute();
+    }
+
+    ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
+      storage.settings.set("dontShowRtcInfo", this.checked);
+    });
+
+    function error() {
+      console.warn.apply(console, arguments);
+      var s = "";
+      for (var i=0; i<arguments.length; i++) {
+        if (s) {
+          s += " ";
+        }
+        var a = arguments[i];
+        if (typeof a == "string") {
+          s += a;
+        } else {
+          var repl;
+          try {
+            repl = JSON.stringify(a);
+          } catch (e) {
+          }
+          if (! repl) {
+            repl = "" + a;
+          }
+          s += repl;
+        }
+      }
+      audioButton("#togetherjs-audio-error");
+      // FIXME: this title doesn't seem to display?
+      $("#togetherjs-audio-error").attr("title", s);
+    }
+
+    function startStreaming(callback) {
+      getUserMedia(
+        {
+          video: false,
+          audio: true
+        },
+        function (stream) {
+          audioStream = stream;
+          attachMedia("#togetherjs-local-audio", stream);
+          if (callback) {
+            callback();
+          }
+        },
+        function (err) {
+          // FIXME: handle cancel case
+          if (err && err.code == 1) {
+            // User cancel
+            return;
+          }
+          error("getUserMedia error:", err);
+        }
+      );
+    }
+
+    function attachMedia(element, media) {
+      element = $(element)[0];
+      console.log("Attaching", media, "to", element);
+      if (window.mozRTCPeerConnection) {
+        element.mozSrcObject = media;
+        element.play();
+      } else {
+        element.autoplay = true;
+        element.src = URL.createObjectURL(media);
+      }
+    }
+
+    function getConnection() {
+      assert(audioStream);
+      if (_connection) {
+        return _connection;
+      }
+      try {
+        _connection = makePeerConnection();
+      } catch (e) {
+        error("Error creating PeerConnection:", e);
+        throw e;
+      }
+      _connection.onaddstream = function (event) {
+        console.log("got event", event, event.type);
+        attachMedia($audio, event.stream);
+        audioButton("#togetherjs-audio-active");
+      };
+      _connection.onstatechange = function () {
+        // FIXME: this doesn't seem to work:
+        // Actually just doesn't work on Firefox
+        console.log("state change", _connection.readyState);
+        if (_connection.readyState == "closed") {
+          audioButton("#togetherjs-audio-ready");
+        }
+      };
+      _connection.onicecandidate = function (event) {
+        if (event.candidate) {
+          session.send({
+            type: "rtc-ice-candidate",
+            candidate: {
+              sdpMLineIndex: event.candidate.sdpMLineIndex,
+              sdpMid: event.candidate.sdpMid,
+              candidate: event.candidate.candidate
+            }
+          });
+        }
+      };
+      _connection.addStream(audioStream);
+      return _connection;
+    }
+
+    function addIceCandidate() {
+      if (iceCandidate) {
+        console.log("adding ice", iceCandidate);
+        _connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+      }
+    }
+
+    function connect() {
+      var connection = getConnection();
+      if (offerReceived && (! offerDescription)) {
+        connection.setRemoteDescription(
+          new RTCSessionDescription({
+            type: "offer",
+            sdp: offerReceived
+          }),
+          function () {
+            offerDescription = true;
+            addIceCandidate();
+            connect();
+          },
+          function (err) {
+            error("Error doing RTC setRemoteDescription:", err);
+          }
+        );
+        return;
+      }
+      if (! (offerSent || offerReceived)) {
+        connection.createOffer(function (offer) {
+          console.log("made offer", offer);
+          offer.sdp = ensureCryptoLine(offer.sdp);
+          connection.setLocalDescription(
+            offer,
+            function () {
+              session.send({
+                type: "rtc-offer",
+                offer: offer.sdp
+              });
+              offerSent = offer;
+              audioButton("#togetherjs-audio-outgoing");
+            },
+            function (err) {
+              error("Error doing RTC setLocalDescription:", err);
+            },
+            mediaConstraints
+          );
+        }, function (err) {
+          error("Error doing RTC createOffer:", err);
+        });
+      } else if (! (answerSent || answerReceived)) {
+        // FIXME: I might have only needed this due to my own bugs, this might
+        // not actually time out
+        var timeout = setTimeout(function () {
+          if (! answerSent) {
+            error("createAnswer Timed out; reload or restart browser");
+          }
+        }, 2000);
+        connection.createAnswer(function (answer) {
+          answer.sdp = ensureCryptoLine(answer.sdp);
+          clearTimeout(timeout);
+          connection.setLocalDescription(
+            answer,
+            function () {
+              session.send({
+                type: "rtc-answer",
+                answer: answer.sdp
+              });
+              answerSent = answer;
+            },
+            function (err) {
+              clearTimeout(timeout);
+              error("Error doing RTC setLocalDescription:", err);
+            },
+            mediaConstraints
+          );
+        }, function (err) {
+          error("Error doing RTC createAnswer:", err);
+        });
+      }
+    }
+
+    function toggleMute() {
+      // FIXME: implement.  Actually, wait for this to be implementable - currently
+      // muting of localStreams isn't possible
+      // FIXME: replace with hang-up?
+    }
+
+    session.hub.on("rtc-offer", function (msg) {
+      if (offerReceived || answerSent || answerReceived || offerSent) {
+        abort();
+      }
+      offerReceived = msg.offer;
+      if (! accepted) {
+        audioButton("#togetherjs-audio-incoming");
+        return;
+      }
+      function run() {
+        var connection = getConnection();
+        connection.setRemoteDescription(
+          new RTCSessionDescription({
+            type: "offer",
+            sdp: offerReceived
+          }),
+          function () {
+            offerDescription = true;
+            addIceCandidate();
+            connect();
+          },
+          function (err) {
+            error("Error doing RTC setRemoteDescription:", err);
+          }
+        );
+      }
+      if (! audioStream) {
+        startStreaming(run);
+      } else {
+        run();
+      }
+    });
+
+    session.hub.on("rtc-answer", function (msg) {
+      if (answerSent || answerReceived || offerReceived || (! offerSent)) {
+        abort();
+        // Basically we have to abort and try again.  We'll expect the other
+        // client to restart when appropriate
+        session.send({type: "rtc-abort"});
+        return;
+      }
+      answerReceived = msg.answer;
+      assert(offerSent);
+      assert(audioStream);
+      var connection = getConnection();
+      connection.setRemoteDescription(
+        new RTCSessionDescription({
+          type: "answer",
+          sdp: answerReceived
+        }),
+        function () {
+          answerDescription = true;
+          // FIXME: I don't think this connect is ever needed?
+          connect();
+        },
+        function (err) {
+          error("Error doing RTC setRemoteDescription:", err);
+        }
+      );
+    });
+
+    session.hub.on("rtc-ice-candidate", function (msg) {
+      iceCandidate = msg.candidate;
+      if (offerDescription || answerDescription) {
+        addIceCandidate();
+      }
+    });
+
+    session.hub.on("rtc-abort", function (msg) {
+      abort();
+      if (! accepted) {
+        return;
+      }
+      if (! audioStream) {
+        startStreaming(function () {
+          connect();
+        });
+      } else {
+        connect();
+      }
+    });
+
+    session.hub.on("hello", function (msg) {
+      // FIXME: displayToggle should be set due to
+      // _connection.onstatechange, but that's not working, so
+      // instead:
+      audioButton("#togetherjs-audio-ready");
+      if (accepted && (offerSent || answerSent)) {
+        abort();
+        connect();
+      }
+    });
+
+    function abort() {
+      answerSent = answerReceived = offerSent = offerReceived = null;
+      answerDescription = offerDescription = false;
+      _connection = null;
+      $audio[0].removeAttribute("src");
+    }
+
+  });
+
+  return webrtc;
+
+});
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+define('who',["util", "channels", "session", "ui"], function (util, channels, session, ui) {
+  var assert = util.assert;
+  var who = util.Module("who");
+  var MAX_RESPONSE_TIME = 5000;
+  var MAX_LATE_RESPONSE = 2000;
+
+  who.getList = function (hubUrl) {
+    return util.Deferred(function (def) {
+      var expected;
+      var channel = channels.WebSocketChannel(hubUrl);
+      var users = {};
+      var responded = 0;
+      var firstResponse = 0;
+      var lateResponseTimeout;
+      channel.onmessage = function (msg) {
+        if (msg.type == "init-connection") {
+          expected = msg.peerCount;
+        }
+        if (msg.type == "who") {
+          // Our message back to ourselves probably
+          firstResponse = setTimeout(function () {
+            close();
+          }, MAX_LATE_RESPONSE);
+        }
+        if (msg.type == "hello-back") {
+          if (! users[msg.clientId]) {
+            users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
+            responded++;
+            if (expected && responded >= expected) {
+              close();
+            } else {
+              def.notify(users);
+            }
+          }
+        }
+        console.log("users", users);
+      };
+      channel.send({
+        type: "who",
+        "server-echo": true,
+        clientId: null
+      });
+      var timeout = setTimeout(function () {
+        close();
+      }, MAX_RESPONSE_TIME);
+      function close() {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+        if (lateResponseTimeout) {
+          clearTimeout(lateResponseTimeout);
+        }
+        channel.close();
+        def.resolve(users);
+      }
+    });
+  };
+
+  who.invite = function (hubUrl, clientId) {
+    return util.Deferred(function (def) {
+      var channel = channels.WebSocketChannel(hubUrl);
+      var id = util.generateId();
+      channel.onmessage = function (msg) {
+        if (msg.type == "invite" && msg.inviteId == id) {
+          channel.close();
+          def.resolve();
+        }
+      };
+      var userInfo = session.makeHelloMessage(false);
+      delete userInfo.type;
+      userInfo.clientId = session.clientId;
+      channel.send({
+        type: "invite",
+        inviteId: id,
+        url: session.shareUrl(),
+        userInfo: userInfo,
+        forClientId: clientId,
+        clientId: null,
+        "server-echo": true
+      });
+    });
+  };
+
+  who.ExternalPeer = util.Class({
+    isSelf: false,
+    isExternal: true,
+    constructor: function (id, attrs) {
+      attrs = attrs || {};
+      assert(id);
+      this.id = id;
+      this.identityId = attrs.identityId || null;
+      this.status = attrs.status || "live";
+      this.idle = attrs.status || "active";
+      this.name = attrs.name || null;
+      this.avatar = attrs.avatar || null;
+      this.color = attrs.color || "#00FF00";
+      this.lastMessageDate = 0;
+      this.view = ui.PeerView(this);
+    },
+
+    className: function (prefix) {
+      prefix = prefix || "";
+      return prefix + util.safeClassName(this.id);
+    }
+
+  });
+
+  return who;
+});
 TogetherJS.require = TogetherJS._requireObject = require;
+TogetherJS._loaded = true;
 require(["session"]);
 }());

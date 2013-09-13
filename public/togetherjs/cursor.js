@@ -420,13 +420,24 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
+      }
+      var element = event.target;
+      if (! TogetherJS.running) {
+        // This can end up running right after TogetherJS has been closed, often
+        // because TogetherJS was closed with a click...
         return;
       }
-      if (elementFinder.ignoreElement(event.target)) {
+      if (elementFinder.ignoreElement(element)) {
         return;
       }
-      var location = elementFinder.elementLocation(event.target);
-      var offset = $(event.target).offset();
+      //Prevent click events on video objects to avoid conflicts with
+      //togetherjs's own video events
+      if (element.nodeName.toLowerCase() === 'video'){
+        return;
+      }
+
+      var location = elementFinder.elementLocation(element);
+      var offset = $(element).offset();
       var offsetX = event.pageX - offset.left;
       var offsetY = event.pageY - offset.top;
       session.send({

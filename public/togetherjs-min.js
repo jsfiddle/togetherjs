@@ -7,7 +7,7 @@
 
   var styleSheet = "/togetherjs/togetherjs.css";
 
-  var baseUrl = "http://towtruck-staging.herokuapp.com/"
+  var baseUrl = "https://togetherjs.mozillalabs.com";
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
@@ -134,7 +134,6 @@
     var attr;
     var attrName;
     var globalOns = {};
-    var hubOns = {};
     for (attr in window) {
       if (attr.indexOf("TogetherJSConfig_on_") === 0) {
         attrName = attr.substr(("TogetherJSConfig_on_").length);
@@ -402,6 +401,8 @@
     // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
     // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
+    // FIXME: these don't seem to be working, and probably should be removed in favor
+    // of the hub analytics
     enableAnalytics: false,
     // The code to enable (this is defaulting to a Mozilla code):
     analyticsCode: "UA-35433268-28",
@@ -439,7 +440,11 @@
     // If true, then the "Invite a friend" window won't automatically come up
     suppressInvite: false,
     // A room in which to find people to invite to this session,
-    inviteFromRoom: null
+    inviteFromRoom: null,
+    // This is used to keep sessions from crossing over on the same
+    // domain, if for some reason you want sessions that are limited
+    // to only a portion of the domain:
+    storagePrefix: "togetherjs"
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

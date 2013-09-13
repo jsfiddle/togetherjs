@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../images/fav-icon.png">
+    <link rel="shortcut icon" href="../images/fav-icon.ico">
 
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
@@ -149,6 +149,8 @@
               <li><a href="ui.js.html">ui</a></li>
             
               <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="videos.js.html">videos</a></li>
             
               <li><a href="visibilityApi.js.html">visibilityApi</a></li>
             
@@ -394,7 +396,6 @@ the &quot;on&quot; configuration value.</p>
                 <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> attr;
     <span class="keyword">var</span> attrName;
     <span class="keyword">var</span> globalOns = {};
-    <span class="keyword">var</span> hubOns = {};
     <span class="keyword">for</span> (attr <span class="keyword">in</span> window) {
       <span class="keyword">if</span> (attr.indexOf(<span class="string">"TogetherJSConfig_on_"</span>) === <span class="number">0</span>) {
         attrName = attr.substr((<span class="string">"TogetherJSConfig_on_"</span>).length);
@@ -855,7 +856,9 @@ for session.start() to be run)</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-25">&#182;</a>
                 </div>
-                <p>Enable Mozilla or Google analytics on the page when TogetherJS is activated:</p>
+                <p>Enable Mozilla or Google analytics on the page when TogetherJS is activated:
+FIXME: these don&#39;t seem to be working, and probably should be removed in favor
+of the hub analytics</p>
 
               </div>
               
@@ -1061,8 +1064,7 @@ won&#39;t come up</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    inviteFromRoom: <span class="literal">null</span>
-  };</pre></div></div>
+                <div class="content"><div class='highlight'><pre>    inviteFromRoom: <span class="literal">null</span>,</pre></div></div>
               
             </li>
           
@@ -1070,6 +1072,22 @@ won&#39;t come up</p>
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-41">&#182;</a>
+                </div>
+                <p>This is used to keep sessions from crossing over on the same
+domain, if for some reason you want sessions that are limited
+to only a portion of the domain:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    storagePrefix: <span class="string">"togetherjs"</span>
+  };</pre></div></div>
+              
+            </li>
+          
+            <li id="section-42">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-42">&#182;</a>
                 </div>
                 <p>FIXME: there&#39;s a point at which configuration can&#39;t be updated
 (e.g., hubBase after the TogetherJS has loaded).  We should keep
@@ -1129,10 +1147,10 @@ reconfigure too late</p>
               
             </li>
           
-            <li id="section-42">
+            <li id="section-43">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-42">&#182;</a>
+                  <a class="pilcrow" href="#section-43">&#182;</a>
                 </div>
                 <p>FIXME: maybe run an update function when certain values are
 updated, especially when TogetherJS is running</p>
@@ -1151,10 +1169,10 @@ updated, especially when TogetherJS is running</p>
               
             </li>
           
-            <li id="section-43">
+            <li id="section-44">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-43">&#182;</a>
+                  <a class="pilcrow" href="#section-44">&#182;</a>
                 </div>
                 <p>If it&#39;s not set, TogetherJS has not been loaded, and reinitialization is not needed</p>
 
@@ -1172,10 +1190,10 @@ updated, especially when TogetherJS is running</p>
               
             </li>
           
-            <li id="section-44">
+            <li id="section-45">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-44">&#182;</a>
+                  <a class="pilcrow" href="#section-45">&#182;</a>
                 </div>
                 <p>This should contain the output of &quot;git describe --always --dirty&quot;
 FIXME: substitute this on the server (and update make-static-client)</p>
@@ -1230,10 +1248,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-45">
+            <li id="section-46">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-45">&#182;</a>
+                  <a class="pilcrow" href="#section-46">&#182;</a>
                 </div>
                 <p>Second hit</p>
 
@@ -1290,10 +1308,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-46">
+            <li id="section-47">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-46">&#182;</a>
+                  <a class="pilcrow" href="#section-47">&#182;</a>
                 </div>
                 <p>It&#39;s nice to replace this early, before the load event fires, so we conflict
 as little as possible with the app we are embedded in:</p>
@@ -1312,10 +1330,10 @@ as little as possible with the app we are embedded in:</p>
               
             </li>
           
-            <li id="section-47">
+            <li id="section-48">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-47">&#182;</a>
+                  <a class="pilcrow" href="#section-48">&#182;</a>
                 </div>
                 <p>A weird hack for something the addon does, to force a shareId.
 FIXME: probably should remove, it&#39;s a wonky feature.</p>
@@ -1333,10 +1351,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-48">
+            <li id="section-49">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-48">&#182;</a>
+                  <a class="pilcrow" href="#section-49">&#182;</a>
                 </div>
                 <p>A page can define this function to defer TogetherJS from starting</p>
 
@@ -1350,10 +1368,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-49">
+            <li id="section-50">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-49">&#182;</a>
+                  <a class="pilcrow" href="#section-50">&#182;</a>
                 </div>
                 <p>FIXME: need to document this:</p>
 
@@ -1367,10 +1385,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-50">
+            <li id="section-51">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-50">&#182;</a>
+                  <a class="pilcrow" href="#section-51">&#182;</a>
                 </div>
                 <p>FIXME: can we push this up before the load event?
 Do we need to wait at all?</p>
@@ -1404,10 +1422,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-51">
+            <li id="section-52">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-51">&#182;</a>
+                  <a class="pilcrow" href="#section-52">&#182;</a>
                 </div>
                 <p>FIXME: wait until load event to double check if this gets set?</p>
 

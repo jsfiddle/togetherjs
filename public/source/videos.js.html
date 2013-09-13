@@ -101,7 +101,6 @@
 <div class="container">
 
     <section class="row" id="sourcecode">
-      
       <div class="col-md-3" id="source-toc">
         <div class="panel" role="complementary" data-spy="affix" data-offset-top="200" id="sidenav">
           <div class="panel-heading">Source Code</div>
@@ -164,135 +163,173 @@
               <li><a href="windowing.js.html">windowing</a></li>
             
           </ul>
-          <div class="well">
-            <button type="button" class="btn btn-primary btn-lg btn-block">
-              Get help
-            </button>
-            <div class="small text-center">Get support from the TogetherJS team.</div>
-          </div>
         </div>
       </div>
 
       <div class="col-md-9" id="source-content">
-        <h1>TogetherJS Source Code</h1>
+        <h1>videos.js</h1>
+        
 
-        <dl>
-          
-            <dt><code><a href="analytics.js.html">analytics</a></code></dt>
-            <dd><p>A small bit of code for handling Google Analytics</p>
-</dd>
-          
-            <dt><code><a href="channels.js.html">channels</a></code></dt>
-            <dd><p>An abstraction over WebSockets and other communication channels (like <code>postMessage</code>).</p>
-</dd>
-          
-            <dt><code><a href="chat.js.html">chat</a></code></dt>
-            <dd><p>Handles the chat messages (except actual display, which is in <code>ui.js</code>).</p>
-</dd>
-          
-            <dt><code><a href="cursor.js.html">cursor</a></code></dt>
-            <dd><p>Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.</p>
-</dd>
-          
-            <dt><code><a href="elementFinder.js.html">elementFinder</a></code></dt>
-            <dd><p>Generates something like a CSS selector for an element, and finds said elements based on selectors.  A portable description of an element.</p>
-</dd>
-          
-            <dt><code><a href="eventMaker.js.html">eventMaker</a></code></dt>
-            <dd><p>Creates artificial events, like a fake click event.</p>
-</dd>
-          
-            <dt><code><a href="forms.js.html">forms</a></code></dt>
-            <dd><p>Handles synchronization of forms, including CodeMirror and ACE support.  Implements a portion of OT.</p>
-</dd>
-          
-            <dt><code><a href="jqueryPlugins.js.html">jqueryPlugins</a></code></dt>
-            <dd><p>Some plugins for jQuery; doesn&#39;t export anything, just patches <code>$</code>.</p>
-</dd>
-          
-            <dt><code><a href="linkify.js.html">linkify</a></code></dt>
-            <dd><p>Detects and adds links to plain text.</p>
-</dd>
-          
-            <dt><code><a href="ot.js.html">ot</a></code></dt>
-            <dd><p>Operational transformation support: what keeps big chunks of text in sync when multiple people are simultaneously editing those fields.</p>
-</dd>
-          
-            <dt><code><a href="peers.js.html">peers</a></code></dt>
-            <dd><p>Handles the objects representing the peers and oneself.</p>
-</dd>
-          
-            <dt><code><a href="playback.js.html">playback</a></code></dt>
-            <dd><p>Handles the magic <code>/playback</code> command that plays recordings.</p>
-</dd>
-          
-            <dt><code><a href="randomutil.js.html">randomutil</a></code></dt>
-            <dd><p>Some functions/methods for random numbers, really just for testing support.</p>
-</dd>
-          
-            <dt><code><a href="recorder.js.html">recorder</a></code></dt>
-            <dd><p>Used by <code>recorder.html</code>, which is a kind of alternate mini-client used to record sessions when you put <code>/record</code> in the chat box.</p>
-</dd>
-          
-            <dt><code><a href="session.js.html">session</a></code></dt>
-            <dd><p>The most important and most core module in the system.  This sets up the channels, routes messages, tracks peers, and is used for inter-module communication using events.</p>
-</dd>
-          
-            <dt><code><a href="startup.js.html">startup</a></code></dt>
-            <dd><p>Handles the logic of what to display when TogetherJS is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session).</p>
-</dd>
-          
-            <dt><code><a href="storage.js.html">storage</a></code></dt>
-            <dd><p>An abstraction (over <code>localStorage</code>) of per-tab and client storage.</p>
-</dd>
-          
-            <dt><code><a href="templates.js.html">templates</a></code></dt>
-            <dd><p>This is generated from <code>interface.html</code> and other sources, including the content as inline strings.</p>
-</dd>
-          
-            <dt><code><a href="templating.js.html">templating</a></code></dt>
-            <dd><p>Handles creating new nodes based on DOM templates.  Does some substitution based on specific class names.</p>
-</dd>
-          
-            <dt><code><a href="togetherjs.js.html">togetherjs</a></code></dt>
-            <dd><p>This is the bootstrap code.  It is included on all pages, defines the <code>TogetherJS</code> variable, and handles configuration and initial loading.</p>
-</dd>
-          
-            <dt><code><a href="ui.js.html">ui</a></code></dt>
-            <dd><p>This has most of the UI, meaning everything involving HTML, and reacting to that interface.</p>
-</dd>
-          
-            <dt><code><a href="util.js.html">util</a></code></dt>
-            <dd><p>Lots of support code in here.  It doesn&#39;t depend on other things, and has fairly abstract general-purpose code.  It includes a pattern for creating classes, assertions, events.</p>
-</dd>
-          
-            <dt><code><a href="videos.js.html">videos</a></code></dt>
-            <dd></dd>
-          
-            <dt><code><a href="visibilityApi.js.html">visibilityApi</a></code></dt>
-            <dd><p>Handles cross-browser tab visibility events</p>
-</dd>
-          
-            <dt><code><a href="walkthrough.js.html">walkthrough</a></code></dt>
-            <dd><p>Implements the walkthrough interface (content is in <code>walkthrough.html</code>).</p>
-</dd>
-          
-            <dt><code><a href="webrtc.js.html">webrtc</a></code></dt>
-            <dd><p>Handles live audio chat.</p>
-</dd>
-          
-            <dt><code><a href="who.js.html">who</a></code></dt>
-            <dd></dd>
-          
-            <dt><code><a href="windowing.js.html">windowing</a></code></dt>
-            <dd><p>Handles the creation of different windows, notifications, and modal windows.</p>
-</dd>
-          
-        </dl>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/videos.js">See this file on Github</a></div>
 
-        <div class="small"><a href="https://github.com/mozilla/togetherjs/">See all files on Github</a></div>
+        <ul class="sections">
+          
+            <li id="section-0">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-0">&#182;</a>
+                </div>
+                
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>
+define([<span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"elementFinder"</span>],
+<span class="keyword">function</span>($, util, session, elementFinder){
+
+  <span class="keyword">var</span> listeners = [];
+
+  <span class="keyword">var</span> TIME_UPDATE = <span class="string">'timeupdate'</span>;
+  <span class="keyword">var</span> MIRRORED_EVENTS = [<span class="string">'play'</span>, <span class="string">'pause'</span>];
+
+  <span class="keyword">var</span> TOO_FAR_APART = <span class="number">3000</span>;
+
+  session.on(<span class="string">"reinitialize"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    unsetListeners();
+    setupListeners();
+  });
+
+  session.on(<span class="string">"ui-ready"</span>, setupListeners);
+
+  <span class="function"><span class="keyword">function</span> <span class="title">setupListeners</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> videos = $(<span class="string">'video'</span>);
+    setupMirroredEvents(videos);
+    setupTimeSync(videos);
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">setupMirroredEvents</span><span class="params">(videos)</span> {</span>
+    <span class="keyword">var</span> currentListener;
+    MIRRORED_EVENTS.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(eventName)</span> {</span>
+      currentListener = makeEventSender(eventName);
+      videos.on(eventName, currentListener);
+      listeners.push({
+        name: eventName,
+        listener: currentListener
+      });
+    });
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">makeEventSender</span><span class="params">(eventName)</span> {</span>
+    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(event, options)</span> {</span>
+      <span class="keyword">var</span> element = event.target;
+      options || (options = {});
+      <span class="keyword">if</span> (!options.silent) {
+        session.send({
+          type: (<span class="string">'video-'</span>+eventName),
+          location: elementFinder.elementLocation(element),
+          position: element.currentTime
+        });
+      }
+    }
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">setupTimeSync</span><span class="params">(videos)</span> {</span>
+    videos.each(<span class="keyword">function</span>(i, video) {
+      <span class="keyword">var</span> onTimeUpdate = makeTimeUpdater();
+      $(video).on(TIME_UPDATE, onTimeUpdate);
+      listeners.push({
+        name: TIME_UPDATE,
+        listener: onTimeUpdate
+      });
+    });
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">makeTimeUpdater</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> last = <span class="number">0</span>;
+    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      <span class="keyword">var</span> currentTime = event.target.currentTime;
+      <span class="keyword">if</span>(areTooFarApart(currentTime, last)){
+        makeEventSender(TIME_UPDATE)(event);
+      }
+      last = currentTime;
+    };
+  };
+
+  <span class="function"><span class="keyword">function</span> <span class="title">areTooFarApart</span><span class="params">(currentTime, lastTime)</span> {</span>
+    <span class="keyword">var</span> secDiff = Math.abs(currentTime - lastTime);
+    <span class="keyword">var</span> milliDiff = secDiff * <span class="number">1000</span>;
+    <span class="keyword">return</span> milliDiff &gt; TOO_FAR_APART;
+  }
+
+  session.on(<span class="string">"close"</span>, unsetListeners);
+
+  <span class="function"><span class="keyword">function</span> <span class="title">unsetListeners</span><span class="params">()</span> {</span>
+    <span class="keyword">var</span> videos = $(<span class="string">'video'</span>);
+    listeners.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+        videos.off(event.name, event.listener);
+    });
+    listeners = [];
+  };
+
+
+  session.hub.on(<span class="string">'video-timeupdate'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">var</span> element = $findElement(msg.location);
+    <span class="keyword">var</span> oldTime = element.prop(<span class="string">'currentTime'</span>);
+    <span class="keyword">var</span> newTime = msg.position;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-1">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>to help throttle uneccesary position changes</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span>(areTooFarApart(oldTime, newTime)){
+      setTime(element, msg.position);
+    };
+  })
+
+  MIRRORED_EVENTS.forEach( <span class="function"><span class="keyword">function</span> <span class="params">(eventName)</span> {</span>
+    session.hub.on(<span class="string">"video-"</span>+eventName, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">var</span> element = $findElement(msg.location);
+
+      setTime(element, msg.position);
+
+      element.trigger(eventName, {silent: <span class="literal">true</span>});
+    });
+  })</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>Currently does not discriminate between visible and invisible videos</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">$findElement</span><span class="params">(location)</span> {</span>
+    <span class="keyword">return</span> $(elementFinder.findElement(location));
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">setTime</span><span class="params">(video, time)</span> {</span>
+    video.prop(<span class="string">'currentTime'</span>, time);
+  }
+
+});</pre></div></div>
+              
+            </li>
+          
+        </ul>
       </div>
     </section>
+
+
 
 
 

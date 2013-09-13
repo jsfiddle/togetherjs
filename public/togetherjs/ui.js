@@ -304,7 +304,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-close.png";
+      var src = "/togetherjs/images/togetherjs-logo-close.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
     }
 
@@ -317,7 +317,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-open.png";
+      var src = "/togetherjs/images/togetherjs-logo-open.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
       $('.togetherjs-window').animate({
@@ -362,7 +362,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
 
       //replace the anchor icon
-      var src = "../images/togetherjs-logo-close.png";
+      var src = "/togetherjs/images/togetherjs-logo-close.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
       $("#togetherjs-dock-anchor").toggle(function() {

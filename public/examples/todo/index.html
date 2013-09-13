@@ -26,6 +26,10 @@
       color: #fff;
     }
 
+    .form-control {
+      padding: 0 12px;
+    }
+
     /*reset Twitter Bootstrap*/
     @media screen {
       * {
@@ -72,8 +76,9 @@
 
     <!-- togetherjs -->
     <script>
-      //TogetherJSConfig_findRoom = {prefix: "togetherjstodo", max: 5};
-      //TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_findRoom = {prefix: "togetherjstodo", max: 5};
+      TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_storagePrefix = "tjs_todo";
     </script>
     <script src="/togetherjs.js"></script>
 

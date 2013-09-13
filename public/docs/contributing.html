@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../images/fav-icon.png">
+    <link rel="shortcut icon" href="../images/fav-icon.ico">
 
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
@@ -103,6 +103,7 @@
           <li><a href="#code-style" class="scrollnavdocs">Code Style</a></li>
           <li><a href="#togetherjs-patterns" class="scrollnavdocs">TogetherJS Patterns</a></li>
           <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting The Hub Server</a></li>
+          <li><a href="#the-issue-tracker-and-milestones" class="Scrollnavdocs">The Issue Tracker and Milestones</a></li>
         </ul>
         <div class="well">
           <button type="button" class="btn btn-primary btn-lg btn-block">
@@ -117,6 +118,9 @@
       
 <!--
 template: docs-contributing.tmpl
+
+Note: you should update the index in that template when adding
+sections to this document.
 -->
 
 <p>Here are a variety of notes about contributing to the TogetherJS codebase.  This isn&#39;t stuff that applies if you are simply integrating TogetherJS in your site.</p>
@@ -149,7 +153,7 @@ MyClass.classMethod = <span class="function"><span class="keyword">function</spa
 <p>The <code>constructor</code> function is called when the object is instantiated.  You don&#39;t need to use <code>new</code> when creating instances, and really you shouldn‘t (it’ll just create an object that&#39;ll be thrown away).  MyClass.prototype is what you would expect.</p>
 <h3 id="this">this</h3>
 <p>You should understand how <code>this</code> is bound, and how that binding is lost.</p>
-<p>Generally we prefer using <code>.bind(this)</code> to keep the references to this.  For example:</p>
+<p>Generally we prefer using <code>.bind(this)</code> to keep the references to this (as opposed to using <code>self = this</code>).  For example:</p>
 <pre><code><span class="keyword">var</span> MyClass = Class({
 
   goodExample: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -165,16 +169,35 @@ MyClass.classMethod = <span class="function"><span class="keyword">function</spa
 <h3 id="templating">Templating</h3>
 <p>Right now we aren&#39;t using any real templating system.  Almost everything is in <code>app/http/views/interface.html</code> – and most likely any new markup should also go there.</p>
 <p>We try to keep most of the code that actually touches the ui in <code>ui.js</code> – though it&#39;s not done very strictly.  Moving stuff back into ui.js is appreciated though.</p>
-<p>“Templates” are just elements that are cloned out of <code>interface.html</code>.  They generally have an id like <code>togetherjs-template-foo</code>, and you&#39;d clone them by doing <code>ui.cloneTemplate(&quot;foo&quot;)</code>.</p>
+<p>“Templates” are just elements that are cloned out of <code>interface.html</code>.  They generally have an id like <code>togetherjs-template-foo</code>, and you&#39;d clone them by doing <code>templating.sub(&quot;foo&quot;, {vars})</code>.</p>
 <p>You should avoid having text or markup in Javascript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.</p>
+<h3 id="stateless-controls">Stateless controls</h3>
+<p>Instead of “toggle” controls we prefer to show and hide controls for the alternate states.  For instances, if you have a expand/collapse control:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">button</span> <span class="attribute">id</span>=<span class="value">"togetherjs-collapse-foo"</span> <span class="attribute">data-toggles</span>=<span class="value">"#togetherjs-expand-foo"</span>&gt;</span>-<span class="tag">&lt;/<span class="title">button</span>&gt;</span>
+<span class="tag">&lt;<span class="title">button</span> <span class="attribute">id</span>=<span class="value">"togetherjs-expand-foo"</span> <span class="attribute">data-toggles</span>=<span class="value">"#togetherjs-collapse-foo"</span> <span class="attribute">style</span>=<span class="value">"display: none"</span>&gt;</span>+<span class="tag">&lt;/<span class="title">button</span>&gt;</span></code></pre>
+<p>Then use <code>ui.displayToggle(&quot;#togetherjs-expand-foo&quot;)</code> to show the expand button, and the collapse button will be automatically hidden.  Note that the selector in <code>data-toggles</code> can be inclusive of the element itself (everything matching selector will be hidden, except the element itself).</p>
+<p>This requires less state in the Javascript, as the control is always an assertion to do something specific.  Also it means that we have to do a minimum of manipulation in Javascript, and the two controls are not required to be styled identically.</p>
 <h3 id="async">Async</h3>
-<p>Use <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> when possible.</p>
+<p>Use <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> when possible.  This is exposed as <code>util.Deferred</code></p>
 <h2 id="hosting-the-hub-server">Hosting the Hub Server</h2>
 <p>We have a server at <code>https://hub.togetherjs.mozillalabs.com</code> which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven&#39;t really “finished” the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.</p>
 <p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code>, and you can use environmental variables to control things like the port (look in <code>server.js</code> for references to <code>process.env</code>).  You will need to <code>npm install websocket</code> to get the websocket library installed.</p>
 <p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t it setup in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy.  <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
 <p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
 <pre><code class="lang-javascript">TogetherJSConfig_hubBase = <span class="string">"https://myhub.com"</span>;</code></pre>
+<h2 id="the-issue-tracker-and-milestones">The Issue Tracker and Milestones</h2>
+<p>We do most of our planning in the <a href="https://github.com/mozilla/togetherjs/issues">Github issue tracker</a>, and make use of the <a href="https://github.com/mozilla/togetherjs/issues/milestones">Milestones</a> (more than labels).  You are welcome to just submit issues without worrying about this, but if you are looking at a ticket and want how it relates to our plans then you might want to know our system.</p>
+<p>Generally we have three running milestones:</p>
+<ul>
+<li><p>“Release X” or “Beta 1039”, etc: something that represents our planned work for the current iteration.  We don&#39;t generally complete everything we plan for in an iteration (i.e., we err on the side of including stuff in a milestone), so if something is important to you then you might still want to note this in a ticket.</p>
+</li>
+<li><p><a href="https://github.com/mozilla/togetherjs/issues?milestone=17&amp;state=open">Next Tasks</a>: this is a long-standing milestone that represents tasks we want to do soon, but not in the current milestone.  Typically when planning the next iteration we&#39;ll look through this milestone and pick out issues.  If something in this milestone is a priority for you, please note that in a comment on the ticket so we can understand your needs.</p>
+</li>
+<li><p><a href="https://github.com/mozilla/togetherjs/issues?milestone=23&amp;state=open">Blue Sky</a>: another long-standing milestone, this represents stuff we‘d like to do but don’t have any plans to do any time soon.  If you are looking to contribute this is an excellent place to look for ideas.  And if it&#39;s something you think would be helpful to you, a comment would be good — especially one that outlines a use case.</p>
+</li>
+<li><p><a href="https://github.com/mozilla/togetherjs/issues?milestone=none&amp;page=1&amp;state=open">Issues with no milestone</a>: these are issues that haven‘t been triaged.  We try to assign milestones every week to these issues.  If we don’t then probably we are caught up in something we need to focus on over a short period, or we&#39;re just all out on vacation or something.</p>
+</li>
+</ul>
 
     </div>
   </section>

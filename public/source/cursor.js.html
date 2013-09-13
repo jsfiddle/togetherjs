@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../images/fav-icon.png">
+    <link rel="shortcut icon" href="../images/fav-icon.ico">
 
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
@@ -149,6 +149,8 @@
               <li><a href="ui.js.html">ui</a></li>
             
               <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="videos.js.html">videos</a></li>
             
               <li><a href="visibilityApi.js.html">visibilityApi</a></li>
             
@@ -862,13 +864,46 @@ because TogetherJS was closed with a click...</p>
 
               </div>
               
+                <div class="content"><div class='highlight'><pre>      }
+      <span class="keyword">var</span> element = event.target;
+      <span class="keyword">if</span> (! TogetherJS.running) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-25">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-25">&#182;</a>
+                </div>
+                <p>This can end up running right after TogetherJS has been closed, often
+because TogetherJS was closed with a click...</p>
+
+              </div>
+              
                 <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span>;
       }
-      <span class="keyword">if</span> (elementFinder.ignoreElement(event.target)) {
+      <span class="keyword">if</span> (elementFinder.ignoreElement(element)) {
+        <span class="keyword">return</span>;
+      }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-26">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-26">&#182;</a>
+                </div>
+                <p>Prevent click events on video objects to avoid conflicts with
+togetherjs&#39;s own video events</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (element.nodeName.toLowerCase() === <span class="string">'video'</span>){
         <span class="keyword">return</span>;
       }
-      <span class="keyword">var</span> location = elementFinder.elementLocation(event.target);
-      <span class="keyword">var</span> offset = $(event.target).offset();
+
+      <span class="keyword">var</span> location = elementFinder.elementLocation(element);
+      <span class="keyword">var</span> offset = $(element).offset();
       <span class="keyword">var</span> offsetX = event.pageX - offset.left;
       <span class="keyword">var</span> offsetY = event.pageY - offset.top;
       session.send({
@@ -887,10 +922,10 @@ because TogetherJS was closed with a click...</p>
               
             </li>
           
-            <li id="section-25">
+            <li id="section-27">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-25">&#182;</a>
+                  <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
                 <p>When the click is calculated isn&#39;t always the same as how the
 last cursor update was calculated, so we force the cursor to
@@ -902,10 +937,10 @@ the last location during a click:</p>
               
             </li>
           
-            <li id="section-26">
+            <li id="section-28">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-26">&#182;</a>
+                  <a class="pilcrow" href="#section-28">&#182;</a>
                 </div>
                 <p>FIXME: if we <em>could have</em> done a local click, but we follow along
 later, we&#39;ll be in different states if that click was important.
@@ -932,10 +967,10 @@ Mostly click cloning just won&#39;t work.</p>
               
             </li>
           
-            <li id="section-27">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-27">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>FIXME: should we hide the local click if no one else is going to see it?
 That means tracking who might be able to see our screen.</p>
@@ -970,10 +1005,10 @@ That means tracking who might be able to see our screen.</p>
               
             </li>
           
-            <li id="section-28">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>FIXME: is event.target interesting here?  That is, <em>what</em> the
 user is typing into, not just that the user is typing?  Also
@@ -991,10 +1026,10 @@ as any other activity.</p>
               
             </li>
           
-            <li id="section-29">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
                 <p>FIXME: when the cursor is hidden there&#39;s nothing to show with setKeydown().</p>
 

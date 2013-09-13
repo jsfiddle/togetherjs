@@ -154,7 +154,7 @@ h5 {
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('/images/connect-logo@2x.png');
+  background: url('../images/connect-logo@2x.png');
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -470,9 +470,13 @@ h5 {
 ----------------------------------------------- */
 
 #main-section #examples img {
-  width: 100%;
+  width: 50%;
   margin: 0 auto;
   background: #efefef;
+}
+
+#main-section #examples .ex-description {
+  min-height: 50px;
 }
 
 /* =customers section
@@ -523,14 +527,10 @@ h5 {
 }
 
 .app-example .top-bar .red-circle {
-  margin: 10px 6px 10px 14px;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  background: #df7166;
-  font-size: inherit;
-  opacity: 1;
-  line-height: 0;
+  text-shadow: none;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
 }
 
 .app-example .top-bar .yellow-circle {
@@ -541,10 +541,12 @@ h5 {
   background: #e6c646;
   border: none;
   padding: 4px;
+  display: none;
 }
 
 .app-example .top-bar .yellow-circle:hover {
  cursor: default;
+ display: none;
 }
 
 .app-example .top-bar .green-circle {
@@ -555,10 +557,12 @@ h5 {
   background: #5ccc8b;
   border: none;
   padding: 4px;
+  display: none;
 }
 
 .app-example .top-bar .green-circle:hover {
  cursor: default;
+ display: none;
 }
 
 .app-example .address-bar {
@@ -694,6 +698,11 @@ h5 {
     font-size: 24px;
     line-height: 26px;
   }
+  
+  #main-section p {
+    font-size: 14px;
+    line-height: 26px;
+  }
 
   h3 {
     font-size: 20px;
@@ -773,11 +782,22 @@ h5 {
     width: 60px;
     height: 10px;
   }
+  
+  #main-section #examples .ex-description {
+    min-height: 131px;
+  }
+  
+  #main-section #examples .ex-title {
+    min-height: 31px;
+  }
 
 }
 
 /* Smaller devices (tablets, 480px and up) */
 @media (min-width: 480px) {
+  
+  
+  
   .large {
     font-size: 48px;
     line-height: 48px;
@@ -816,6 +836,10 @@ h5 {
   #footer a img {
     width: 100px;
     height: 17px;
+  }
+  
+  #main-section #examples .ex-description {
+    min-height: 81px;
   }
 
 
@@ -867,6 +891,10 @@ h5 {
     width: 141px;
     height: 24px;
   }
+  
+  #main-section #examples .ex-description {
+    min-height: 81px;
+  }
 
 }
 
@@ -913,6 +941,10 @@ h5 {
 
   #marketing-video #frame-video {
     padding-top: 6px;
+  }
+  
+  #main-section #examples .ex-description {
+    min-height: 51px;
   }
 
 }
@@ -1158,6 +1190,7 @@ dd {
 .panel {
   border:0px;
   box-shadow: none;
+  background: none;
 }
 
 #sidenav.panel .panel-heading {

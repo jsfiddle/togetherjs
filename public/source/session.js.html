@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../images/fav-icon.png">
+    <link rel="shortcut icon" href="../images/fav-icon.ico">
 
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
@@ -149,6 +149,8 @@
               <li><a href="ui.js.html">ui</a></li>
             
               <li><a href="util.js.html">util</a></li>
+            
+              <li><a href="videos.js.html">videos</a></li>
             
               <li><a href="visibilityApi.js.html">visibilityApi</a></li>
             
@@ -582,7 +584,7 @@ ui must be the first item:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> features = [<span class="string">"peers"</span>, <span class="string">"ui"</span>, <span class="string">"chat"</span>, <span class="string">"webrtc"</span>, <span class="string">"cursor"</span>, <span class="string">"startup"</span>, <span class="string">"forms"</span>, <span class="string">"visibilityApi"</span>];
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> features = [<span class="string">"peers"</span>, <span class="string">"ui"</span>, <span class="string">"chat"</span>, <span class="string">"webrtc"</span>, <span class="string">"cursor"</span>, <span class="string">"startup"</span>,<span class="string">"videos"</span>, <span class="string">"forms"</span>, <span class="string">"visibilityApi"</span>];
 
   <span class="function"><span class="keyword">function</span> <span class="title">getRoomName</span><span class="params">(prefix, maxSize)</span> {</span>
     <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/findroom"</span>;
