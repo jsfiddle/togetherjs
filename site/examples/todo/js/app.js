@@ -71,7 +71,7 @@ function save() {
 }
 
 $('#clear').click(function() {
-  $("#todos").clear();
+  $("#todos").empty();
   save();
   return false;
 });
