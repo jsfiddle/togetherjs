@@ -2,6 +2,12 @@
 /* http://yuilibrary.com/yui/docs/cssreset/ */
 .togetherjs {
 
+* {
+    -webkit-box-sizing: content-box !important;
+    -moz-box-sizing: content-box !important;
+    box-sizing: content-box !important;
+}
+
 /*
 YUI 3.10.3 (build 2fb5187)
 Copyright 2013 Yahoo! Inc. All rights reserved.
@@ -9,22 +15,6 @@ Licensed under the BSD License.
 http://yuilibrary.com/license/
 */
 
-/*
-	TODO will need to remove settings on HTML since we can't namespace it.
-	TODO with the prefix, should I group by selector or property for weight savings?
-*/
-html{
-	color:#000;
-	background:#FFF;
-}
-/*
-	TODO remove settings on BODY since we can't namespace it.
-*/
-/*
-	TODO test putting a class on HEAD.
-		- Fails on FF.
-*/
-body,
 div,
 dl,
 dt,
