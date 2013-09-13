@@ -36,12 +36,15 @@ function addItem(description, id) {
 
 TogetherJS.hub.on("new-item", function (msg) {
   addItem(msg.description, msg.id);
+  save();
 });
 
 TogetherJS.hub.on("init-items", function (msg) {
+  $("#todos").empty();
   msg.items.forEach(function (item) {
     addItem(item.description, item.id);
   });
+  save();
 });
 
 TogetherJS.hub.on("togetherjs.hello togetherjs.hello-back", function () {
@@ -73,5 +76,8 @@ function save() {
 $('#clear').click(function() {
   $("#todos").empty();
   save();
+  if (TogetherJS.running) {
+    TogetherJS.send({type: "init-items", items: []});
+  }
   return false;
 });

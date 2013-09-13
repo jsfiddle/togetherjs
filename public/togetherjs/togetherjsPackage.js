@@ -8088,9 +8088,13 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
 
   function createFocusElement(peer, around) {
     around = $(around);
+    var aroundOffset = around.offset();
+    if (! aroundOffset) {
+      console.warn("Could not get offset of element:", around[0]);
+      return;
+    }
     var el = templating.sub("focus", {peer: peer});
     el = el.find(".togetherjs-focus");
-    var aroundOffset = around.offset();
     el.css({
       top: aroundOffset.top-FOCUS_BUFFER + "px",
       left: aroundOffset.left-FOCUS_BUFFER + "px",

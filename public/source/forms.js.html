@@ -905,9 +905,13 @@ we just asked to join.</p>
 
   <span class="function"><span class="keyword">function</span> <span class="title">createFocusElement</span><span class="params">(peer, around)</span> {</span>
     around = $(around);
+    <span class="keyword">var</span> aroundOffset = around.offset();
+    <span class="keyword">if</span> (! aroundOffset) {
+      console.warn(<span class="string">"Could not get offset of element:"</span>, around[<span class="number">0</span>]);
+      <span class="keyword">return</span>;
+    }
     <span class="keyword">var</span> el = templating.sub(<span class="string">"focus"</span>, {peer: peer});
     el = el.find(<span class="string">".togetherjs-focus"</span>);
-    <span class="keyword">var</span> aroundOffset = around.offset();
     el.css({
       top: aroundOffset.top-FOCUS_BUFFER + <span class="string">"px"</span>,
       left: aroundOffset.left-FOCUS_BUFFER + <span class="string">"px"</span>,
