@@ -2,7 +2,7 @@
 #togetherjs-dock {
   &.togetherjs-dock-right {
     top: 0px;
-    width: 75%;
+    width: 65%;
     height: 40px !important;
     right: 0px;
     margin: 10px;
@@ -46,6 +46,7 @@
 
 .togetherjs-only-mobile {
   display: block;
+  text-align: center;
   
 /*  a.togetherjs-share-link {
     padding: 6px 111px 6px;
@@ -53,6 +54,7 @@
   
   
 }
+
 
 .togetherjs-not-mobile {
   display: none;
@@ -157,6 +159,10 @@
     margin: -7px;
     padding: 10px;
   }
+}
+
+#togetherjs-dock-participants {
+  display: none;
 }
 
 #togetherjs-confirm-end section.togetherjs-buttons {
@@ -368,6 +374,55 @@ input.togetherjs-upload-avatar {
 .togetherjs .togetherjs-save-settings {
   margin-top: 20px;
   margin-bottom: 0px;
+}
+
+// for larger devices
+
+@media (min-width: 480px) {
+  
+  .togetherjs-mobile-browser input.togetherjs-self-name {
+    width: 95%;
+    margin-top: 10px;
+  }
+  
+  .togetherjs .togetherjs-window {
+    width: 100%;
+    left: -2px !important;
+  }
+  
+  .togetherjs-mobile-browser #togetherjs-edit-name-window section.togetherjs-buttons {
+    width: 99%;
+  }
+  
+/*  #togetherjs-dock.togetherjs-dock-right {
+    width: 27% !important; 
+  }*/
+ 
+  #togetherjs-confirm-end section.togetherjs-buttons {
+   width: 95%;
+  }
+
+  #togetherjs-edit-name-window section.togetherjs-buttons {
+   width: 99%;
+  }
+
+  input.togetherjs-self-name {
+   width: 94%;
+   margin-top: 10px;
+  }
+
+  #togetherjs-avatar-edit section.togetherjs-buttons {
+   width: 95%;
+  }
+  
+  .togetherjs-modal {
+    width: 96% !important;
+  }
+  
+  .togetherjs-modal-wide section.togetherjs-buttons {
+    width: 97.4% !important;
+  }
+  
 }
 
 //for smaller devices

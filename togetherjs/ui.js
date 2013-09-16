@@ -288,13 +288,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         opacity: 1
       });
       $('.togetherjs-dock-right').animate({
-        width: "75%"
+        width: "65%"
       }, {
         duration:60, easing:"linear"
       });
 
       // add bg overlay
-      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>" );
+      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>" );
 
       //disable vertical scrolling
       $("body").css({
@@ -336,7 +336,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
 
       // remove bg overlay
-      $(".overlay").remove();
+      //$(".overlay").remove();
     }
 
     // Setting the anchor button + dock mobile actions
@@ -352,7 +352,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         windowing.toggle("#togetherjs-menu-window");
       });
 
-      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>" );
+      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>" );
 
       //disable vertical scrolling
       $("body").css({
@@ -438,7 +438,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#togetherjs-end-session").click(function () {
       session.close();
-      $(".overlay").remove();
+      //$(".overlay").remove();
 
     });
 
@@ -744,7 +744,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     if($.browser.mobile) {
       // remove bg overlay
-      $(".overlay").remove();
+      //$(".overlay").remove();
 
       //after hitting End, reset window draggin
       $("body").css({
