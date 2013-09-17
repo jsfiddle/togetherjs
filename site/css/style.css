@@ -1167,7 +1167,7 @@ dd {
 }
 
 #markdownpages #sidenav {
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 #sidenav .well .btn {
@@ -1202,6 +1202,10 @@ dd {
 #sidenav .affix {
   width: 263px;
   position: fixed;
+}
+
+.affix-bottom {
+  top: -200px !important;
 }
 
 @media (min-width: 1200px) {
