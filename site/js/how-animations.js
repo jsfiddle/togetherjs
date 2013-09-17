@@ -92,21 +92,30 @@
         // 2. Your site is now ConnectJS enabled.
         $('.howto-animation-02').waypoint(function() {   
           
+          //startHowAnimation2();
           
-          function startHowAnimation2(){
+          function fadeinDock() {
             $(".how-section-btncollab").fadeOut();  
             $(".how-section-btncollabpressed").fadeIn();
-            setTimeout(function() {
-              $(".how-section-dockplacement").fadeIn();     
-            }, 1000); 
-            setTimeout(function() {
-              $(".how-section-dockplacement").fadeOut();   
-              $(".how-section-btncollabpressed").fadeOut();  
-              $(".how-section-btncollab").fadeIn(); 
-            }, 7000);
-            setTimeout(startHowAnimation2, 7000);
-          }    
-          startHowAnimation2();
+            $(".how-section-dockplacement").fadeIn();
+            
+          }
+            
+          function fadeoutDock() {
+            $(".how-section-dockplacement").fadeOut();   
+            $(".how-section-btncollabpressed").fadeOut();  
+            $(".how-section-btncollab").fadeIn(); 
+          }
+          
+          function startit(){
+            fadeinDock();
+            setTimeout(function () {
+              fadeoutDock(); 
+              setTimeout(startit, 5000);
+              }, 5000)
+          }
+          
+          startit();
           
         }, { offset: 200, triggerOnce: false });
         
