@@ -204,6 +204,26 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
     };
   };
 
+  /* Detects if a value is a promise.  Right now the presence of a
+     `.then()` method is the best we can do.
+  */
+  util.isPromise = function (obj) {
+    return typeof obj == "object" && obj.then;
+  };
+
+  /* Makes a value into a promise, by returning an already-resolved
+     promise if a non-promise objectx is given.
+  */
+  util.makePromise = function (obj) {
+    if (util.isPromise(obj)) {
+      return obj;
+    } else {
+      return $.Deferred(function (def) {
+        def.resolve(obj);
+      });
+    }
+  };
+
   /* Resolves several promises (the promises are the arguments to the function)
      or the first argument may be an array of promises.
 
@@ -215,7 +235,9 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
      */
   util.resolveMany = function () {
     var args;
+    var oneArg = false;
     if (arguments.length == 1 && Array.isArray(arguments[0])) {
+      oneArg = true;
       args = arguments[0];
     } else {
       args = Array.prototype.slice.call(arguments);
@@ -243,9 +265,17 @@ define(["jquery", "jqueryPlugins", "jqueryui", "jquerypunch"], function ($) {
       function check() {
         if (! count) {
           if (anyError) {
-            def.reject.apply(def, allResults);
+            if (oneArg) {
+              def.reject(allResults);
+            } else {
+              def.reject.apply(def, allResults);
+            }
           } else {
-            def.resolve.apply(def, allResults);
+            if (oneArg) {
+              def.resolve(allResults);
+            } else {
+              def.resolve.apply(def, allResults);
+            }
           }
         }
       }
