@@ -165,7 +165,7 @@ h5 {
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('../images/connect-logo@2x.png');
+  background: url('../images/togetherjs-logo@2x.png');
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -195,7 +195,7 @@ h5 {
   text-transform: uppercase;
   font-weight: 100;
   color: #fff;
-  margin: 6px 0px 0px;
+  margin: 7px 0px 0px;
   letter-spacing: 1px;
 }
 
