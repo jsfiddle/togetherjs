@@ -4,7 +4,7 @@
 
 // New Relic Server monitoring support
 if ( process.env.NEW_RELIC_HOME ) {
-  require( "newrelic" );
+  require("newrelic");
 }
 
 var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
@@ -21,7 +21,7 @@ var parseUrl = require('url').parse;
 // LOG_LEVEL values:
 // 0: show everything (including debug)
 // 1: don't show debug, do show logger.log
-// 2: don't show logger.log and debug, do show console.info
+// 2: don't show logger.log and debug, do show console.info (and STATS)
 // 3: don't show info, do show warn
 // 4: don't show warn, do show error
 // 5: don't show anything
@@ -30,18 +30,18 @@ var logLevel = process.env.LOG_LEVEL || '0';
 logLevel = parseInt(logLevel, 10);
 
 var logger = {
-  log: function () {
-    if (logLevel <= 1) {
-      console.log.apply(console, arguments);
-    }
-  }
 };
-[["error", 4], ["warn", 3], ["info", 2], ["debug", 0]].forEach(function (nameLevel) {
+
+[["error", 4], ["warn", 3], ["info", 2], ["log", 1], ["debug", 0]].forEach(function (nameLevel) {
   var name = nameLevel[0];
   var level = nameLevel[1];
   logger[name] = function () {
     if (logLevel <= level) {
-      logger.log.apply(logger, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
+      if (name != "log") {
+        console.log.apply(console, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
+      } else {
+        console.log.apply(console, arguments);
+      }
     }
   };
 });
@@ -293,7 +293,7 @@ function logStats(id, stats) {
     totalClients: countClients(stats.clients),
     totalMessageChars: stats.totalMessageChars,
     totalMessages: stats.totalMessages,
-    domain: stats.firstDomain,
+    domain: stats.firstDomain || null,
     domainCount: countClients(stats.domains),
     urls: countClients(stats.urls)
   }));
