@@ -108,6 +108,8 @@
             
               <li><a href="analytics.js.html">analytics</a></li>
             
+              <li><a href="appsync.js.html">appsync</a></li>
+            
               <li><a href="channels.js.html">channels</a></li>
             
               <li><a href="chat.js.html">chat</a></li>
@@ -890,7 +892,10 @@ we just asked to join.</p>
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
     }
     <span class="keyword">var</span> element = elementFinder.findElement(msg.element);
-    focusElements[msg.peer.id] = createFocusElement(msg.peer, element);
+    <span class="keyword">var</span> el = createFocusElement(msg.peer, element);
+    <span class="keyword">if</span> (el) {
+      focusElements[msg.peer.id] = el;
+    }
   });
 
   session.hub.on(<span class="string">"hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -908,7 +913,7 @@ we just asked to join.</p>
     <span class="keyword">var</span> aroundOffset = around.offset();
     <span class="keyword">if</span> (! aroundOffset) {
       console.warn(<span class="string">"Could not get offset of element:"</span>, around[<span class="number">0</span>]);
-      <span class="keyword">return</span>;
+      <span class="keyword">return</span> <span class="literal">null</span>;
     }
     <span class="keyword">var</span> el = templating.sub(<span class="string">"focus"</span>, {peer: peer});
     el = el.find(<span class="string">".togetherjs-focus"</span>);

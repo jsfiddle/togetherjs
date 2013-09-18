@@ -1,12 +1,23 @@
 /*
+Color palette based on Mozilla Style guide
+http://www.mozilla.org/en-US/styleguide/identity/firefox/color/
+
+Blue
+#0095DD
+
+Orange
+#FF9500
+
+Dark Grey
+#3A4349
+
+Red
+#DC3726
+
+Green
+#49BA7C
 
 */
-
-
-
-
-
-
 
 
 /* =Global
@@ -50,7 +61,7 @@ a:hover {
 
 button {
   padding-bottom: 2px;
-  background-color: #41c3ac;
+  background-color: #49BA7C;
   font-weight: bold;
   text-align: center;
   color: rgb(22, 22, 22);
@@ -58,17 +69,17 @@ button {
 }
 
 .btn-primary {
-  background: #41c3ac;
+  background: #49BA7C;
   border-color: #2aa08b;
 }
 
 .btn-primary:hover {
-  background: #24a08a;
+  background: #74C593;
   border-color: #34b7a0;
 }
 
 footer a {
-  color: #0096dd;
+  color: #0095DD;
   text-decoration: none;
 }
 
@@ -143,7 +154,7 @@ h5 {
 
 .main-header {
   -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
-  background-color: #3a3a3a;
+  background-color: #3A4349;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   display: block;
   font-family: sans-serif;
@@ -154,7 +165,7 @@ h5 {
   height: 48px;
   border-radius: 50%;
   border: 0px solid white;
-  background: url('../images/connect-logo@2x.png');
+  background: url('../images/togetherjs-logo@2x.png');
   background-size: 50% 50%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -184,7 +195,7 @@ h5 {
   text-transform: uppercase;
   font-weight: 100;
   color: #fff;
-  margin: 6px 0px 0px;
+  margin: 7px 0px 0px;
   letter-spacing: 1px;
 }
 
@@ -1167,7 +1178,7 @@ dd {
 }
 
 #markdownpages #sidenav {
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 #sidenav .well .btn {
@@ -1202,6 +1213,10 @@ dd {
 #sidenav .affix {
   width: 263px;
   position: fixed;
+}
+
+.affix-bottom {
+  top: -200px !important;
 }
 
 @media (min-width: 1200px) {

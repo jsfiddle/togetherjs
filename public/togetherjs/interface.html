@@ -76,7 +76,8 @@
       </div>
       <div class="togetherjs-only-mobile">
         <p>Copy and paste this link over IM or email:</p>
-        <a class="togetherjs-share-link" href="#">this link</a>
+        <input type="text" class="togetherjs-share-link">
+        <!-- <a class="togetherjs-share-link" href="#">Press your thumb here.</a> -->
       </div>
     </section>
   </div>
@@ -359,7 +360,7 @@
   <!-- Invisible elements that handle the RTC audio: -->
   <audio id="togetherjs-audio-element"></audio>
   <audio id="togetherjs-local-audio" muted="true" volume="0.3"></audio>
-  <audio id="togetherjs-notification" src="http://localhost:8080/togetherjs/images/notification.mp3"></audio>
+  <audio id="togetherjs-notification" src="http://localhost:8080/togetherjs/images/notification.ogg"></audio>
 
   <!-- The intro screen for someone who joins a session the first time: -->
   <div id="togetherjs-intro" class="togetherjs-modal" style="display: none">

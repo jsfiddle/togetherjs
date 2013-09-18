@@ -7,7 +7,7 @@
 
   var styleSheet = "/togetherjs/togetherjs.css";
 
-  var baseUrl = "http://towtruck-staging.herokuapp.com";
+  var baseUrl = "https://togetherjs.com";
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
@@ -123,6 +123,14 @@
     } catch (e) {
       console.warn("Error determining starting button:", e);
     }
+    if (window.TowTruckConfig) {
+      console.warn("TowTruckConfig is deprecated; please use TogetherJSConfig");
+      if (window.TogetherJSConfig) {
+        console.warn("Ignoring TowTruckConfig in favor of TogetherJSConfig");
+      } else {
+        window.TogetherJSConfig = TowTruckConfig;
+      }
+    }
     if (window.TogetherJSConfig && (! window.TogetherJSConfig.loaded)) {
       TogetherJS.config(window.TogetherJSConfig);
       window.TogetherJSConfig.loaded = true;
@@ -141,7 +149,17 @@
       } else if (attr.indexOf("TogetherJSConfig_") === 0) {
         attrName = attr.substr(("TogetherJSConfig_").length);
         TogetherJS.config(attrName, window[attr]);
+      } else if (attr.indexOf("TowTruckConfig_on_") === 0) {
+        attrName = attr.substr(("TowTruckConfig_on_").length);
+        console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
+        globalOns[attrName] = window[attr];
+      } else if (attr.indexOf("TogetherJSConfig_") === 0) {
+        attrName = attr.substr(("TogetherJSConfig_").length);
+        console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
+        TogetherJS.config(attrName, window[attr]);
       }
+
+
     }
     // FIXME: copy existing config?
     var ons = TogetherJS.getConfig("on");
@@ -390,7 +408,7 @@
     return "TogetherJS";
   };
 
-  var defaultHubBase = "http://towtruckhub.molabsstaging.com";
+  var defaultHubBase = "https://hub.togetherjs.com";
   if (defaultHubBase == "__" + "hubUrl"+ "__") {
     // Substitution wasn't made
     defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
@@ -641,6 +659,10 @@
     }
     // A page can define this function to defer TogetherJS from starting
     var callToStart = window.TogetherJSConfig_callToStart;
+    if (! callToStart && window.TowTruckConfig_callToStart) {
+      callToStart = window.TowTruckConfig_callToStart;
+      console.warn("Please rename TowTruckConfig_callToStart to TogetherJSConfig_callToStart");
+    }
     if (window.TogetherJSConfig && window.TogetherJSConfig.callToStart) {
       callToStart = window.TogetherJSConfig.callToStart;
     }
@@ -683,5 +705,8 @@
   if (window.TogetherJSConfig_enableShortcut) {
     TogetherJS.listenForShortcut();
   }
+
+  // For compatibility:
+  window.TowTruck = TogetherJS;
 
 })();

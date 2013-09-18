@@ -169,13 +169,10 @@
       </div>
 
       <div class="col-md-9" id="source-content">
-        <h1>analytics.js</h1>
-        
-          <h4><p>A small bit of code for handling Google Analytics</p>
-</h4>
+        <h1>appsync.js</h1>
         
 
-        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/analytics.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/appsync.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -187,15 +184,64 @@
                 
               </div>
               
-                <div class="content"><div class='highlight'><pre>define([<span class="string">"util"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util)</span> {</span>
-  <span class="keyword">var</span> analytics = util.Module(<span class="string">"analytics"</span>);
+                <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
+define([<span class="string">"util"</span>, <span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, session)</span> {</span>
+  <span class="keyword">var</span> appsync = util.Module(<span class="string">"visibilityApi"</span>);
+  <span class="keyword">var</span> assert = util.assert;
 
-  analytics.activate = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">var</span> enable = TogetherJS.getConfig(<span class="string">"enableAnalytics"</span>);
-    <span class="keyword">var</span> code = TogetherJS.getConfig(<span class="string">"analyticsCode"</span>);
-    <span class="keyword">if</span> (! (enable &amp;&amp; code)) {
-      <span class="keyword">return</span>;
-    }</pre></div></div>
+  <span class="keyword">var</span> activeSyncers = [];
+
+  appsync.Syncer = util.Class({
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(name, methods)</span> {</span>
+      <span class="keyword">this</span>.name = name;
+      <span class="keyword">this</span>.methods = methods;
+      <span class="keyword">this</span>.initMessage = <span class="keyword">this</span>.initMessage.bind(<span class="keyword">this</span>);
+      <span class="keyword">this</span>.updateMessage = <span class="keyword">this</span>.updateMessage.bind(<span class="keyword">this</span>);
+      <span class="keyword">this</span>.helloMessage = <span class="keyword">this</span>.helloMessage.bind(<span class="keyword">this</span>);
+    },
+    register: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      TogetherJS.hub.on(<span class="keyword">this</span>.name + <span class="string">"-init"</span>, <span class="keyword">this</span>.initMessage);
+      TogetherJS.hub.on(<span class="keyword">this</span>.name + <span class="string">"-update"</span>, <span class="keyword">this</span>.updateMessage);
+      TogetherJS.hub.on(<span class="string">"towtruck.hello"</span>, <span class="keyword">this</span>.helloMessage);
+      <span class="keyword">this</span>.methods.init.call(<span class="keyword">this</span>);
+      activeSyncers.push(<span class="keyword">this</span>);
+    },
+    unregister: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">this</span>.methods.uninit.call(<span class="keyword">this</span>);
+      <span class="keyword">var</span> pos = activeSyncers.indexOf(<span class="keyword">this</span>);
+      assert(pos != -<span class="number">1</span>);
+      activeSyncers.splice(pos, <span class="number">1</span>);
+    },
+
+    helloMessage: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (! msg.sameUrl) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> idUpdates = {};
+      <span class="keyword">var</span> anonUpdates = [];
+      <span class="keyword">var</span> promises = [];
+      util.forEachAttr(<span class="keyword">this</span>.methods.getters || {}, <span class="function"><span class="keyword">function</span> <span class="params">(getter, type)</span> {</span>
+        <span class="keyword">var</span> updates = getter();
+        updates = util.makePromise(updates);
+        <span class="keyword">var</span> typeUpdate = updates.then(<span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+          <span class="keyword">if</span> (! Array.isArray(value)) {
+            value = [value];
+          }
+          value.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(v)</span> {</span>
+            <span class="keyword">if</span> (! v.type) {
+              v.type = type;
+            }
+          });
+          <span class="keyword">return</span> value;
+        });
+        promises.push(typeUpdate);
+      });
+      util.resolveMany(promises, <span class="function"><span class="keyword">function</span> <span class="params">(results)</span> {</span>
+        <span class="keyword">var</span> values = [];
+        results.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(result)</span> {</span>
+          result.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(o)</span> {</span></pre></div></div>
               
             </li>
           
@@ -204,24 +250,71 @@
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-1">&#182;</a>
                 </div>
-                <p>This is intended to be global:</p>
+                <p>FIXME: check for required properties</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> gaq = window._gaq || [];
-    gaq.push([<span class="string">"_setAccount"</span>, code]);
-    gaq.push([<span class="string">'_setDomainName'</span>, location.hostname]);
-    gaq.push([<span class="string">"_trackPageview"</span>]);
-    window._gaq = gaq;
+                <div class="content"><div class='highlight'><pre>            values.push(o);
+          });
+          TogetherJS.send({
+            type: <span class="keyword">this</span>.name + <span class="string">"-init"</span>,
+            updates: values
+          });
+        });
+      });
+    },
 
-    (<span class="keyword">function</span>() {
-      <span class="keyword">var</span> ga = document.createElement(<span class="string">'script'</span>); ga.type = <span class="string">'text/javascript'</span>; ga.async = <span class="literal">true</span>;
-      ga.src = (<span class="string">'https:'</span> == document.location.protocol ? <span class="string">'https://ssl'</span> : <span class="string">'http://www'</span>) + <span class="string">'.google-analytics.com/ga.js'</span>;
-      <span class="keyword">var</span> s = document.getElementsByTagName(<span class="string">'script'</span>)[<span class="number">0</span>]; s.parentNode.insertBefore(ga, s);
-    })();
-  };
+    initMessage: <span class="function"><span class="keyword">function</span> <span class="params">(msg, noClear)</span> {</span>
+      <span class="keyword">if</span> (! msg.sameUrl) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">var</span> initTypes = {};
+      <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;msg.updates.length; i++) {
+        <span class="keyword">var</span> item = msg.updates[i];
+        <span class="keyword">if</span> (item.type &amp;&amp; ! <span class="keyword">this</span>.methods[<span class="string">'update_'</span> + item.type]) {
+          console.warn(<span class="string">"Received an update with a type"</span>, item.type, <span class="string">"and no update_"</span> + item.type + <span class="string">" method"</span>);
+        } <span class="keyword">else</span> <span class="keyword">if</span> (item.type) {
+          <span class="keyword">if</span> ((! noClear) &amp;&amp; ! initTypes.hasOwnProperty(item.type)) {
+            <span class="keyword">this</span>.methods[<span class="string">'clear_'</span> + item.type].call(<span class="keyword">this</span>);
+            initTypes[item.type] = <span class="literal">null</span>;
+          }
+          <span class="keyword">var</span> method = <span class="keyword">this</span>.methods[<span class="string">'update_'</span> + item.type];
+          method.call(<span class="keyword">this</span>, item);
+        } <span class="keyword">else</span> {
+          <span class="keyword">this</span>.methods.incoming.call(<span class="keyword">this</span>, item);
+        }
+      }
+    },
 
-  <span class="keyword">return</span> analytics;
+    updateMessage: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">this</span>.initMessage(msg);
+    },
+
+    update: <span class="function"><span class="keyword">function</span> <span class="params">(item)</span> {</span>
+      <span class="keyword">if</span> (! Array.isArray(item)) {
+        item = [item];
+      }
+      TogetherJS.send({
+        type: <span class="keyword">this</span>.name + <span class="string">"-update"</span>,
+        updates: item
+      });
+    }
+  });
+
+  session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    activeSyncers.slice().forEach(<span class="function"><span class="keyword">function</span> <span class="params">(syncer)</span> {</span>
+      syncer.unregister();
+    });
+  });
+
+  session.on(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    util.forEachAttr(TogetherJS.getConfig(<span class="string">"appsyncers"</span>), <span class="function"><span class="keyword">function</span> <span class="params">(methods, name)</span> {</span>
+      <span class="keyword">var</span> s = appsync.Syncer(name, methods);
+      s.register();
+    });
+  });
+
+  <span class="keyword">return</span> appsync;
 });</pre></div></div>
               
             </li>

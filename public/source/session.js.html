@@ -108,6 +108,8 @@
             
               <li><a href="analytics.js.html">analytics</a></li>
             
+              <li><a href="appsync.js.html">appsync</a></li>
+            
               <li><a href="channels.js.html">channels</a></li>
             
               <li><a href="chat.js.html">chat</a></li>
@@ -679,11 +681,11 @@ handle it</p>
       }
       <span class="keyword">return</span> storage.tab.get(<span class="string">"status"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(saved)</span> {</span>
         <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"findRoom"</span>);
-        <span class="keyword">if</span> (findRoom &amp;&amp; <span class="keyword">typeof</span> findRoom == <span class="string">"string"</span> &amp;&amp; ! saved) {
+        <span class="keyword">if</span> (findRoom &amp;&amp; <span class="keyword">typeof</span> findRoom == <span class="string">"string"</span> &amp;&amp; (! saved) &amp;&amp; (! TogetherJS.startup._joinShareId)) {
           isClient = <span class="literal">true</span>;
           shareId = findRoom;
           sessionId = util.generateId();
-        } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; ! saved) {
+        } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; (! saved) &amp;&amp; (! TogetherJS.startup._joinShareId)) {
           assert(findRoom.prefix &amp;&amp; <span class="keyword">typeof</span> findRoom.prefix == <span class="string">"string"</span>, <span class="string">"Bad findRoom.prefix"</span>, findRoom);
           assert(findRoom.max &amp;&amp; <span class="keyword">typeof</span> findRoom.max == <span class="string">"number"</span> &amp;&amp; findRoom.max &gt; <span class="number">0</span>,
                  <span class="string">"Bad findRoom.max"</span>, findRoom);

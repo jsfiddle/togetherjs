@@ -108,6 +108,8 @@
             
               <li><a href="analytics.js.html">analytics</a></li>
             
+              <li><a href="appsync.js.html">appsync</a></li>
+            
               <li><a href="channels.js.html">channels</a></li>
             
               <li><a href="chat.js.html">chat</a></li>
@@ -375,6 +377,14 @@ for production</p>
     } <span class="keyword">catch</span> (e) {
       console.warn(<span class="string">"Error determining starting button:"</span>, e);
     }
+    <span class="keyword">if</span> (window.TowTruckConfig) {
+      console.warn(<span class="string">"TowTruckConfig is deprecated; please use TogetherJSConfig"</span>);
+      <span class="keyword">if</span> (window.TogetherJSConfig) {
+        console.warn(<span class="string">"Ignoring TowTruckConfig in favor of TogetherJSConfig"</span>);
+      } <span class="keyword">else</span> {
+        window.TogetherJSConfig = TowTruckConfig;
+      }
+    }
     <span class="keyword">if</span> (window.TogetherJSConfig &amp;&amp; (! window.TogetherJSConfig.loaded)) {
       TogetherJS.config(window.TogetherJSConfig);
       window.TogetherJSConfig.loaded = <span class="literal">true</span>;
@@ -403,7 +413,17 @@ the &quot;on&quot; configuration value.</p>
       } <span class="keyword">else</span> <span class="keyword">if</span> (attr.indexOf(<span class="string">"TogetherJSConfig_"</span>) === <span class="number">0</span>) {
         attrName = attr.substr((<span class="string">"TogetherJSConfig_"</span>).length);
         TogetherJS.config(attrName, window[attr]);
+      } <span class="keyword">else</span> <span class="keyword">if</span> (attr.indexOf(<span class="string">"TowTruckConfig_on_"</span>) === <span class="number">0</span>) {
+        attrName = attr.substr((<span class="string">"TowTruckConfig_on_"</span>).length);
+        console.warn(<span class="string">"TowTruckConfig_* is deprecated, please rename"</span>, attr, <span class="string">"to TogetherJSConfig_on_"</span> + attrName);
+        globalOns[attrName] = window[attr];
+      } <span class="keyword">else</span> <span class="keyword">if</span> (attr.indexOf(<span class="string">"TogetherJSConfig_"</span>) === <span class="number">0</span>) {
+        attrName = attr.substr((<span class="string">"TogetherJSConfig_"</span>).length);
+        console.warn(<span class="string">"TowTruckConfig_* is deprecated, please rename"</span>, attr, <span class="string">"to TogetherJSConfig_"</span> + attrName);
+        TogetherJS.config(attrName, window[attr]);
       }
+
+
     }</pre></div></div>
               
             </li>
@@ -1361,6 +1381,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> callToStart = window.TogetherJSConfig_callToStart;
+    <span class="keyword">if</span> (! callToStart &amp;&amp; window.TowTruckConfig_callToStart) {
+      callToStart = window.TowTruckConfig_callToStart;
+      console.warn(<span class="string">"Please rename TowTruckConfig_callToStart to TogetherJSConfig_callToStart"</span>);
+    }
     <span class="keyword">if</span> (window.TogetherJSConfig &amp;&amp; window.TogetherJSConfig.callToStart) {
       callToStart = window.TogetherJSConfig.callToStart;
     }
@@ -1433,7 +1457,20 @@ Do we need to wait at all?</p>
               
                 <div class="content"><div class='highlight'><pre>  <span class="keyword">if</span> (window.TogetherJSConfig_enableShortcut) {
     TogetherJS.listenForShortcut();
-  }
+  }</pre></div></div>
+              
+            </li>
+          
+            <li id="section-53">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-53">&#182;</a>
+                </div>
+                <p>For compatibility:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  window.TowTruck = TogetherJS;
 
 })();</pre></div></div>
               

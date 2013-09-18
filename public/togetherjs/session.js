@@ -290,11 +290,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       }
       return storage.tab.get("status").then(function (saved) {
         var findRoom = TogetherJS.getConfig("findRoom");
-        if (findRoom && typeof findRoom == "string" && ! saved) {
+        if (findRoom && typeof findRoom == "string" && (! saved) && (! TogetherJS.startup._joinShareId)) {
           isClient = true;
           shareId = findRoom;
           sessionId = util.generateId();
-        } else if (findRoom && ! saved) {
+        } else if (findRoom && (! saved) && (! TogetherJS.startup._joinShareId)) {
           assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
           assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
                  "Bad findRoom.max", findRoom);

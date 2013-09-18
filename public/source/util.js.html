@@ -108,6 +108,8 @@
             
               <li><a href="analytics.js.html">analytics</a></li>
             
+              <li><a href="appsync.js.html">appsync</a></li>
+            
               <li><a href="channels.js.html">channels</a></li>
             
               <li><a href="chat.js.html">chat</a></li>
@@ -435,6 +437,26 @@ define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugin
     };
   };
 
+  <span class="comment">/* Detects if a value is a promise.  Right now the presence of a
+     `.then()` method is the best we can do.
+  */</span>
+  util.isPromise = <span class="function"><span class="keyword">function</span> <span class="params">(obj)</span> {</span>
+    <span class="keyword">return</span> <span class="keyword">typeof</span> obj == <span class="string">"object"</span> &amp;&amp; obj.then;
+  };
+
+  <span class="comment">/* Makes a value into a promise, by returning an already-resolved
+     promise if a non-promise objectx is given.
+  */</span>
+  util.makePromise = <span class="function"><span class="keyword">function</span> <span class="params">(obj)</span> {</span>
+    <span class="keyword">if</span> (util.isPromise(obj)) {
+      <span class="keyword">return</span> obj;
+    } <span class="keyword">else</span> {
+      <span class="keyword">return</span> $.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
+        def.resolve(obj);
+      });
+    }
+  };
+
   <span class="comment">/* Resolves several promises (the promises are the arguments to the function)
      or the first argument may be an array of promises.
 
@@ -446,7 +468,9 @@ define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugin
      */</span>
   util.resolveMany = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     <span class="keyword">var</span> args;
+    <span class="keyword">var</span> oneArg = <span class="literal">false</span>;
     <span class="keyword">if</span> (arguments.length == <span class="number">1</span> &amp;&amp; Array.isArray(arguments[<span class="number">0</span>])) {
+      oneArg = <span class="literal">true</span>;
       args = arguments[<span class="number">0</span>];
     } <span class="keyword">else</span> {
       args = Array.prototype.slice.call(arguments);
@@ -474,9 +498,17 @@ define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugin
       <span class="function"><span class="keyword">function</span> <span class="title">check</span><span class="params">()</span> {</span>
         <span class="keyword">if</span> (! count) {
           <span class="keyword">if</span> (anyError) {
-            def.reject.apply(def, allResults);
+            <span class="keyword">if</span> (oneArg) {
+              def.reject(allResults);
+            } <span class="keyword">else</span> {
+              def.reject.apply(def, allResults);
+            }
           } <span class="keyword">else</span> {
-            def.resolve.apply(def, allResults);
+            <span class="keyword">if</span> (oneArg) {
+              def.resolve(allResults);
+            } <span class="keyword">else</span> {
+              def.resolve.apply(def, allResults);
+            }
           }
         }
       }

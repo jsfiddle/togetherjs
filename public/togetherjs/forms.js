@@ -550,7 +550,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       return;
     }
     var element = elementFinder.findElement(msg.element);
-    focusElements[msg.peer.id] = createFocusElement(msg.peer, element);
+    var el = createFocusElement(msg.peer, element);
+    if (el) {
+      focusElements[msg.peer.id] = el;
+    }
   });
 
   session.hub.on("hello", function (msg) {
@@ -568,7 +571,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     var aroundOffset = around.offset();
     if (! aroundOffset) {
       console.warn("Could not get offset of element:", around[0]);
-      return;
+      return null;
     }
     var el = templating.sub("focus", {peer: peer});
     el = el.find(".togetherjs-focus");

@@ -108,6 +108,8 @@
             
               <li><a href="analytics.js.html">analytics</a></li>
             
+              <li><a href="appsync.js.html">appsync</a></li>
+            
               <li><a href="channels.js.html">channels</a></li>
             
               <li><a href="chat.js.html">chat</a></li>
@@ -729,11 +731,6 @@ the mouse is stuck down:</p>
       });
       $(<span class="string">'#togetherjs-dock #togetherjs-buttons'</span>).animate({
         opacity: <span class="number">1</span>
-      });
-      $(<span class="string">'.togetherjs-dock-right'</span>).animate({
-        width: <span class="string">"75%"</span>
-      }, {
-        duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
       });</pre></div></div>
               
             </li>
@@ -743,11 +740,17 @@ the mouse is stuck down:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-25">&#182;</a>
                 </div>
-                <p>add bg overlay</p>
+                <p>for iphone</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"body"</span>).append( <span class="string">"&lt;div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'&gt;&lt;/div&gt;"</span> );</pre></div></div>
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span>($(window).width() &lt; <span class="number">480</span>) {
+        $(<span class="string">'.togetherjs-dock-right'</span>).animate({
+          width: <span class="string">"204px"</span>
+        }, {
+          duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
+        });
+      }</pre></div></div>
               
             </li>
           
@@ -756,15 +759,17 @@ the mouse is stuck down:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-26">&#182;</a>
                 </div>
-                <p>disable vertical scrolling</p>
+                <p>for ipad</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"body"</span>).css({
-        <span class="string">"position"</span>: <span class="string">"fixed"</span>,
-        top: <span class="number">0</span>,
-        left: <span class="number">0</span>
-      });</pre></div></div>
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">else</span> {
+        $(<span class="string">'.togetherjs-dock-right'</span>).animate({
+          width: <span class="string">"27%"</span>
+        }, {
+          duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
+        });
+      }</pre></div></div>
               
             </li>
           
@@ -773,7 +778,15 @@ the mouse is stuck down:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
-                <p>replace the anchor icon</p>
+                <p>add bg overlay
+$(&quot;body&quot;).append( &quot;<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>&quot; );</p>
+<p>disable vertical scrolling
+$(&quot;body&quot;).css({
+  &quot;position&quot;: &quot;fixed&quot;,
+  top: 0,
+  left: 0
+});</p>
+<p>replace the anchor icon</p>
 
               </div>
               
@@ -836,12 +849,12 @@ the mouse is stuck down:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
-                <p>remove bg overlay</p>
+                <p>remove bg overlay
+$(&quot;.overlay&quot;).remove();</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">".overlay"</span>).remove();
-    }</pre></div></div>
+                <div class="content"><div class='highlight'><pre>    }</pre></div></div>
               
             </li>
           
@@ -884,9 +897,7 @@ the mouse is stuck down:</p>
               
                 <div class="content"><div class='highlight'><pre>      $(<span class="string">"#togetherjs-profile-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
         windowing.toggle(<span class="string">"#togetherjs-menu-window"</span>);
-      });
-
-      $(<span class="string">"body"</span>).append( <span class="string">"&lt;div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px'&gt;&lt;/div&gt;"</span> );</pre></div></div>
+      });</pre></div></div>
               
             </li>
           
@@ -895,24 +906,14 @@ the mouse is stuck down:</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-34">&#182;</a>
                 </div>
-                <p>disable vertical scrolling</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">"body"</span>).css({
-        <span class="string">"position"</span>: <span class="string">"fixed"</span>,
-        top: <span class="number">0</span>,
-        left: <span class="number">0</span>
-      });</pre></div></div>
-              
-            </li>
-          
-            <li id="section-35">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-35">&#182;</a>
-                </div>
-                <p>replace the anchor icon</p>
+                <p>$(&quot;body&quot;).append( &quot;<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>&quot; );</p>
+<p>disable vertical scrolling
+$(&quot;body&quot;).css({
+  &quot;position&quot;: &quot;fixed&quot;,
+  top: 0,
+  left: 0
+});</p>
+<p>replace the anchor icon</p>
 
               </div>
               
@@ -991,10 +992,20 @@ the mouse is stuck down:</p>
     });
 
     $(<span class="string">"#togetherjs-end-session"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      session.close();
-      $(<span class="string">".overlay"</span>).remove();
+      session.close();</pre></div></div>
+              
+            </li>
+          
+            <li id="section-35">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-35">&#182;</a>
+                </div>
+                <p>$(&quot;.overlay&quot;).remove();</p>
 
-    });
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    });
 
     $(<span class="string">"#togetherjs-menu-update-color"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">var</span> picker = $(<span class="string">"#togetherjs-pick-color"</span>);
@@ -1387,20 +1398,9 @@ like this, instead of simply suppressing it</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-44">&#182;</a>
                 </div>
-                <p>remove bg overlay</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>      $(<span class="string">".overlay"</span>).remove();</pre></div></div>
-              
-            </li>
-          
-            <li id="section-45">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-45">&#182;</a>
-                </div>
-                <p>after hitting End, reset window draggin</p>
+                <p>remove bg overlay
+$(&quot;.overlay&quot;).remove();</p>
+<p>after hitting End, reset window draggin</p>
 
               </div>
               
@@ -1419,10 +1419,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-46">
+            <li id="section-45">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-46">&#182;</a>
+                  <a class="pilcrow" href="#section-45">&#182;</a>
                 </div>
                 <p>Clear out any other spurious elements:</p>
 
@@ -1488,10 +1488,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-47">
+            <li id="section-46">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-47">&#182;</a>
+                  <a class="pilcrow" href="#section-46">&#182;</a>
                 </div>
                 <p>FIXME: should bind the notification to the dock location</p>
 
@@ -1511,10 +1511,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-48">
+            <li id="section-47">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-48">&#182;</a>
+                  <a class="pilcrow" href="#section-47">&#182;</a>
                 </div>
                 <p>FIXME: should bind the notification to the dock location</p>
 
@@ -1547,10 +1547,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-49">
+            <li id="section-48">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-49">&#182;</a>
+                  <a class="pilcrow" href="#section-48">&#182;</a>
                 </div>
                 <p>FIXME: duplicating functionality in .add():</p>
 
@@ -1562,10 +1562,10 @@ like this, instead of simply suppressing it</p>
               
             </li>
           
-            <li id="section-50">
+            <li id="section-49">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-50">&#182;</a>
+                  <a class="pilcrow" href="#section-49">&#182;</a>
                 </div>
                 <p>FIXME: strip off common domain from msg.url?  E.g., if I&#39;m on
 <a href="http://example.com/foobar">http://example.com/foobar</a>, and someone goes to <a href="http://example.com/baz">http://example.com/baz</a> then
@@ -1602,10 +1602,10 @@ FIXME: truncate long titles</p>
               
             </li>
           
-            <li id="section-51">
+            <li id="section-50">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-51">&#182;</a>
+                  <a class="pilcrow" href="#section-50">&#182;</a>
                 </div>
                 <p>Don&#39;t bother showing a same-url notification, if no previous notification
 had been shown</p>
@@ -1635,10 +1635,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-52">
+            <li id="section-51">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-52">&#182;</a>
+                  <a class="pilcrow" href="#section-51">&#182;</a>
                 </div>
                 <p>FIXME: hacky way to do this:</p>
 
@@ -1685,10 +1685,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-53">
+            <li id="section-52">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-53">&#182;</a>
+                  <a class="pilcrow" href="#section-52">&#182;</a>
                 </div>
                 <p>This is the amount of time we&#39;re supposed to notify</p>
 
@@ -1811,10 +1811,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-54">
+            <li id="section-53">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-54">&#182;</a>
+                  <a class="pilcrow" href="#section-53">&#182;</a>
                 </div>
                 <p>FIXME: should have richer status:</p>
 
@@ -1826,10 +1826,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-55">
+            <li id="section-54">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-55">&#182;</a>
+                  <a class="pilcrow" href="#section-54">&#182;</a>
                 </div>
                 <p>FIXME: these could also have consistent/reliable class names:</p>
 
@@ -1866,10 +1866,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-56">
+            <li id="section-55">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-56">&#182;</a>
+                  <a class="pilcrow" href="#section-55">&#182;</a>
                 </div>
                 <p>FIXME: add some style based on following?</p>
 
@@ -1910,10 +1910,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-57">
+            <li id="section-56">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-57">&#182;</a>
+                  <a class="pilcrow" href="#section-56">&#182;</a>
                 </div>
                 <p>FIXME: do something more distinct here</p>
 
@@ -1962,10 +1962,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-58">
+            <li id="section-57">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-58">&#182;</a>
+                  <a class="pilcrow" href="#section-57">&#182;</a>
                 </div>
                 <p>Following doesn&#39;t happen until the window is closed
 FIXME: should we tell the user this?</p>
@@ -2044,7 +2044,7 @@ FIXME: should we tell the user this?</p>
     },
 
     maybeHideDetailWindow: <span class="function"><span class="keyword">function</span> <span class="params">(windows)</span> {</span>
-      <span class="keyword">if</span> (windows[<span class="number">0</span>] &amp;&amp; windows[<span class="number">0</span>][<span class="number">0</span>] === <span class="keyword">this</span>.detailElement[<span class="number">0</span>]) {
+      <span class="keyword">if</span> (<span class="keyword">this</span>.detailElement &amp;&amp; windows[<span class="number">0</span>] &amp;&amp; windows[<span class="number">0</span>][<span class="number">0</span>] === <span class="keyword">this</span>.detailElement[<span class="number">0</span>]) {
         <span class="keyword">if</span> (<span class="keyword">this</span>.followCheckbox[<span class="number">0</span>].checked) {
           <span class="keyword">this</span>.peer.follow();
         } <span class="keyword">else</span> {
@@ -2057,10 +2057,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-59">
+            <li id="section-58">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-59">&#182;</a>
+                  <a class="pilcrow" href="#section-58">&#182;</a>
                 </div>
                 <p>FIXME: scroll to person</p>
 
@@ -2076,10 +2076,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-60">
+            <li id="section-59">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-60">&#182;</a>
+                  <a class="pilcrow" href="#section-59">&#182;</a>
                 </div>
                 <p>FIXME: should I get rid of the dockElement?</p>
 
@@ -2182,10 +2182,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-61">
+            <li id="section-60">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-61">&#182;</a>
+                  <a class="pilcrow" href="#section-60">&#182;</a>
                 </div>
                 <p>FIXME: use the return value of this to give a signal that
 the invite has been successfully sent:</p>
@@ -2209,10 +2209,10 @@ the invite has been successfully sent:</p>
               
             </li>
           
-            <li id="section-62">
+            <li id="section-61">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-62">&#182;</a>
+                  <a class="pilcrow" href="#section-61">&#182;</a>
                 </div>
                 <p>Not directed to us</p>
 
