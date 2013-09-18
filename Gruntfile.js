@@ -217,7 +217,7 @@ module.exports = function (grunt) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
       var destBase = grunt.option("dest") || "build";
-      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.mozillalabs.com";
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com";
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
@@ -472,7 +472,7 @@ module.exports = function (grunt) {
     grunt.file.mkdir("togetherjs.mozillalabs.com/public");
     fs.rename(tmp, versions);
     if (! grunt.option("base-url")) {
-      grunt.option("base-url", "https://togetherjs.mozillalabs.com");
+      grunt.option("base-url", "https://togetherjs.com");
     }
     grunt.option("dest", "togetherjs.mozillalabs.com/public");
     grunt.option("exclude-tests", true);
@@ -504,7 +504,7 @@ module.exports = function (grunt) {
       grunt.fail.fatal();
       return;
     }
-    grunt.option("base-url", "https://togetherjs.mozillalabs.com/versions/" + version);
+    grunt.option("base-url", "https://togetherjs.com/versions/" + version);
     grunt.option("dest", destDir);
     grunt.option("exclude-tests", true);
     grunt.option("no-hardlink", true);
