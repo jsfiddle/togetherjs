@@ -2,7 +2,7 @@
 #togetherjs-dock {
   &.togetherjs-dock-right {
     top: 0px;
-    width: 75%;
+    width: auto;
     height: 40px !important;
     right: 0px;
     margin: 10px;
@@ -46,13 +46,15 @@
 
 .togetherjs-only-mobile {
   display: block;
+  text-align: center;
   
-  a.togetherjs-share-link {
+/*  a.togetherjs-share-link {
     padding: 6px 111px 6px;
-  }
+  }*/
   
   
 }
+
 
 .togetherjs-not-mobile {
   display: none;
@@ -63,8 +65,16 @@
   .togetherjs-menu-item {
     cursor: pointer;
     margin: 0px -14px 0px;
-    padding: 5px;
+    padding: 9px;
     border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  
+  #togetherjs-menu-feedback-button, #togetherjs-menu-update-color-button, #togetherjs-menu-help-button {
+    display: none;
+  }
+  
+  .togetherjs-menu-item img {
+    display: none;
   }
   
   .togetherjs-menu-item:first-child {
@@ -84,15 +94,15 @@
   .togetherjs-person-avatar-swatch {
     margin-left: 12px;
   }
-  
+
   .togetherjs-window {
-    width: 96%;
+    width: 100%;
     margin-left: 0;
     height: 82%;
     margin-top: 0%;
     z-index: @z-index+3 !important;
     top: 20%;
-    left: 0px;
+    left: -2px;
     
     #togetherjs-chat-messages {
      width: 105%; 
@@ -115,13 +125,17 @@
   }
   
   #togetherjs-chat-input-box {
-    width: 94%;
+    width: 100%;
     bottom: 0px;
     position: fixed;
   }
   
   #togetherjs-chat-input {
     width: 95%;
+  }
+  
+  .togetherjs-timestamp {
+   padding: 8px 45px 0px 10px;
   }
   
   #togetherjs-rtc-not-supported section.togetherjs-buttons {
@@ -147,6 +161,43 @@
   }
 }
 
+#togetherjs-dock-participants {
+  display: none;
+}
+
+#togetherjs-confirm-end section.togetherjs-buttons {
+  position: fixed;
+  bottom: 0;
+  width: 92%;
+}
+
+#togetherjs-edit-name-window section.togetherjs-buttons {
+  position: fixed;
+  bottom: 0;
+  width: 96%;
+}
+
+input.togetherjs-self-name {
+  padding: 10px;
+  width: 92%;
+  margin-top: 10px;
+}
+
+#togetherjs-avatar-edit section.togetherjs-buttons {
+  position: fixed;
+  bottom: 0;
+  width: 92%;
+}
+
+#togetherjs-avatar-edit .togetherjs-person {
+  margin: 30px auto;
+  float: none;
+}
+
+#togetherjs-avatar-edit #togetherjs-avatar-buttons {
+  float: none;
+  margin: 0 auto;
+}
 
 #togetherjs-window-pointer-right, #togetherjs-window-pointer-left {
   position: fixed;
@@ -323,4 +374,116 @@ input.togetherjs-upload-avatar {
 .togetherjs .togetherjs-save-settings {
   margin-top: 20px;
   margin-bottom: 0px;
+}
+
+// for larger devices
+
+@media (min-width: 480px) {
+  
+  .togetherjs-mobile-browser input.togetherjs-self-name {
+    width: 95%;
+    margin-top: 10px;
+  }
+  
+  .togetherjs .togetherjs-window {
+    width: 100%;
+    left: -2px !important;
+    top: 50%;
+  }
+  
+  .togetherjs-mobile-browser #togetherjs-edit-name-window section.togetherjs-buttons {
+    width: 99%;
+  }
+  
+/*  #togetherjs-dock.togetherjs-dock-right {
+    width: 27% !important; 
+  }*/
+ 
+  #togetherjs-confirm-end section.togetherjs-buttons {
+   width: 96.6%;
+   position: absolute;
+   bottom: 0;
+  }
+
+  #togetherjs-edit-name-window section.togetherjs-buttons {
+   width: 99%;
+  }
+
+  input.togetherjs-self-name {
+   width: 94%;
+   margin-top: 10px;
+  }
+
+  #togetherjs-avatar-edit section.togetherjs-buttons {
+   width: 95.3%;
+   bottom: 0;
+   background: #F2F2F2;
+   padding: 10px;
+   text-align: right;
+   border-bottom-right-radius: 4px;
+   border-bottom-left-radius: 4px;
+   border-top: 1px solid #E1E1E1;
+   position: absolute;
+  }
+  
+  .togetherjs-modal {
+    width: 74% !important;
+    height: 50% !important;
+    margin: 20% 12% !important;
+  }
+  
+  .togetherjs-mobile-browser .togetherjs .togetherjs-modal {
+    width: 76% !important;
+    margin-left: 1%;
+    height: 94%;
+    margin-top: 1%;
+    top: 0;
+    left: 0;
+    height: 41%;
+    margin: 20% 11%;
+}
+  
+  .togetherjs-modal-wide section.togetherjs-buttons {
+    width: 97.4% !important;
+  }
+  
+}
+
+//for smaller devices
+@media (max-width: 480px) {
+  .togetherjs .togetherjs-window {
+    width: 96%;
+    margin-left: 0;
+    height: 82%;
+    margin-top: 0%;
+    z-index: @z-index+3 !important;
+    top: 20%;
+    left: -2px;
+
+    #togetherjs-chat-messages {
+     width: 105%; 
+    }
+
+    .togetherjs-close {
+     display: none;
+    }
+
+    #togetherjs-chat-messages {
+      height: 62%;
+      top: -37px;
+    }
+  }
+  
+  #togetherjs-chat-input-box {
+    width: 94% !important;
+    bottom: 0px;
+    position: fixed;
+  }
+  
+  .togetherjs-timestamp {
+   padding: 8px 15px 0px 10px !important;
+  }
+  
+  input[type='text'],input[type='number'],textarea {font-size:16px !important;}
+  
 }

@@ -287,21 +287,35 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $('#togetherjs-dock #togetherjs-buttons').animate({
         opacity: 1
       });
-      $('.togetherjs-dock-right').animate({
-        width: "75%"
-      }, {
-        duration:60, easing:"linear"
-      });
+      
+      //for iphone
+      if($(window).width() < 480) {
+        $('.togetherjs-dock-right').animate({
+          width: "204px"
+        }, {
+          duration:60, easing:"linear"
+        });
+      }
+
+      //for ipad
+      else {
+        $('.togetherjs-dock-right').animate({
+          width: "27%"
+        }, {
+          duration:60, easing:"linear"
+        });
+      }
+
 
       // add bg overlay
-      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px;'></div>" );
+      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>" );
 
       //disable vertical scrolling
-      $("body").css({
-        "position": "fixed",
-        top: 0,
-        left: 0
-      });
+      // $("body").css({
+      //   "position": "fixed",
+      //   top: 0,
+      //   left: 0
+      // });
 
       //replace the anchor icon
       var src = "/togetherjs/images/togetherjs-logo-close.png";
@@ -336,7 +350,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
 
       // remove bg overlay
-      $(".overlay").remove();
+      //$(".overlay").remove();
     }
 
     // Setting the anchor button + dock mobile actions
@@ -352,14 +366,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         windowing.toggle("#togetherjs-menu-window");
       });
 
-      $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0.5); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
+      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>" );
 
       //disable vertical scrolling
-      $("body").css({
-        "position": "fixed",
-        top: 0,
-        left: 0
-      });
+      // $("body").css({
+      //   "position": "fixed",
+      //   top: 0,
+      //   left: 0
+      // });
 
       //replace the anchor icon
       var src = "/togetherjs/images/togetherjs-logo-close.png";
@@ -438,7 +452,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#togetherjs-end-session").click(function () {
       session.close();
-      $(".overlay").remove();
+      //$(".overlay").remove();
 
     });
 
@@ -744,7 +758,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     if($.browser.mobile) {
       // remove bg overlay
-      $(".overlay").remove();
+      //$(".overlay").remove();
 
       //after hitting End, reset window draggin
       $("body").css({
