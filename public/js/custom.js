@@ -118,3 +118,7 @@ $(function () {
     });
   });
 });
+
+// Keeps the invite popup from happening, since the invite will automatically
+// be sent to the Get Help developers
+window.TogetherJSConfig_suppressInvite = true;
