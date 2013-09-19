@@ -153,9 +153,7 @@ h5 {
 ----------------------------------------------- */
 
 .main-header {
-  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   background-color: #3A4349;
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   display: block;
   font-family: sans-serif;
 }
@@ -402,6 +400,11 @@ h5 {
 
 #howto-table td {
   border-top: 0px;
+}
+
+.howto-animation-01 p.smtext {
+  width: 60%;
+  float: right;
 }
 
 .how-section-imganim-01 {
