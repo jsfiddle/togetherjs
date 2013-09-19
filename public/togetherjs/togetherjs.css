@@ -510,6 +510,14 @@ input.togetherjs-upload-avatar {
   color: #333333;
   min-height: 60px;
 }
+.togetherjs #togetherjs-chat-messages .togetherjs-chat-item a.togetherjs-person-url {
+  width: 105px;
+  white-space: nowrap;
+  vertical-align: top;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .togetherjs #togetherjs-chat-messages .togetherjs-person-self {
   float: left;
   margin-bottom: 20px;
@@ -1116,6 +1124,9 @@ section.togetherjs-buttons.togetherjs-buttons-notification-diff-url {
   opacity: .5 !important;
   padding-top: 7px !important;
   padding-bottom: 7px !important;
+}
+section.togetherjs-buttons .togetherjs-same-url {
+  text-align: left;
 }
 /* Button set */
 #togetherjs-dock {

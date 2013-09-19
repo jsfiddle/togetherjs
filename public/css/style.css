@@ -195,7 +195,7 @@ h5 {
   text-transform: uppercase;
   font-weight: 100;
   color: #fff;
-  margin: 7px 0px 0px;
+  margin: 7px -2px 0px;
   letter-spacing: 1px;
 }
 
@@ -277,6 +277,7 @@ h5 {
 .hero-tagline {
   color: rgb(255, 255, 255);
   margin-bottom: 20px;
+  line-height: 24px;
 }
 
 #hero .container {
@@ -342,6 +343,10 @@ h5 {
   font-family: 'Open Sans Light',sans-serif;
   font-size: 16px;
   line-height: 27px;
+}
+
+#main-section #text-descrip {
+  margin: 0 15%;
 }
 
 #main-section h4 {
@@ -509,6 +514,10 @@ h5 {
 
 /* =tryitnow section
 ----------------------------------------------- */
+
+#tryitout pre {
+  margin-top: 50px;
+}
 
 /* =footer section
 ----------------------------------------------- */
@@ -692,7 +701,7 @@ h5 {
   .large {
     font-size: 48px;
     line-height: 48px;
-    letter-spacing: -3px;
+    letter-spacing: normal;
   }
 
   h1 {
@@ -806,13 +815,10 @@ h5 {
 
 /* Smaller devices (tablets, 480px and up) */
 @media (min-width: 480px) {
-  
-  
-  
   .large {
     font-size: 48px;
     line-height: 48px;
-    letter-spacing: -3px;
+    letter-spacing: normal;
   }
 
   h1 {
@@ -861,7 +867,7 @@ h5 {
   .large {
     font-size: 72px;
     line-height: 100%;
-    letter-spacing: -5px;
+    letter-spacing: normal;
   }
 
   h1 {
@@ -914,7 +920,7 @@ h5 {
   .large {
     font-size: 72px;
     line-height: 100%;
-    letter-spacing: -5px;
+    letter-spacing: normal;
   }
 
   h1 {
@@ -965,7 +971,7 @@ h5 {
   .large {
     font-size: 72px;
     line-height: 100%;
-    letter-spacing: -5px;
+    letter-spacing: normal;
   }
 
   h1 {
