@@ -303,6 +303,10 @@ module.exports = function (grunt) {
         grunt.log.writeln("  Found variable " + match[1] + " = " + match[2]);
         data = data.substr(match.index + match[0].length);
       }
+      tmplVars.base = path.relative(path.dirname("site/" + source), "site/");
+      if (tmplVars.base && tmplVars.base.search(/\/$/) == -1) {
+        tmplVars.base += "/";
+      }
       var tmpl = env.getTemplate(source);
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
