@@ -109,8 +109,6 @@ module.exports = function (grunt) {
           },
           optimize: "none",
           out: function writer(text) {
-            // Fix this bug: https://github.com/jrburke/requirejs/issues/813
-            // First for jQuery:
             var dest = path.join(grunt.option("dest"), "togetherjs/togetherjsPackage.js");
             grunt.file.write(dest, text);
           }
