@@ -6,12 +6,16 @@ var app = express();
 
 app.use(function (req, res, next) {
   console.log(
-    req.method, 
-    req.url, 
+    req.method,
+    req.url,
     'referer=' + (req.headers.referer || '-'),
     'ip=' + (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '-'),
     'user-agent="' + (req.headers['user-agent'] || '-').replace(/\"/g, "") + '"');
   next();
+});
+
+app.use(function (req, res, next) {
+  res.redirect(301, "https://togetherjs.com" + req.url);
 });
 
 // Gzip output
