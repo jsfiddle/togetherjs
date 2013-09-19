@@ -711,6 +711,51 @@ h5 {
 
 /* Extra small devices (phones, up to 480px) */
 @media (max-width: 480px) {
+  
+  .cursor-placement-01 {
+    top: 25% !important;
+    left: 78%;
+  }
+
+  .cursor-placement-04 {
+    top: 19%;
+    left: 69%;
+  }
+
+  .cursor-placement-02 {
+    top: 62% !important;
+    left: 42%;
+  }
+
+  .cursor-placement-03 {
+    top: 45% !important;
+    left: 50%;
+  }
+  
+  .how-section-btncollab {
+    top: 32% !important;
+  }
+
+  .how-section-btncollabpressed {
+    top: 32% !important;
+  }
+
+  .how-section-dockplacement {
+    top: 28% !important;
+  }
+  
+  .how-section-imganim-01 {
+    top: 46% !important;
+  }
+
+  .how-section-imganim-02 {
+    top: 26% !important;
+  }
+
+  .how-section-imganim-03 {
+    top: 40% !important;
+  }
+  
   .howto-animation-01 p.smtextright {
     width: auto;
     float: none;
