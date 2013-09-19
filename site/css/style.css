@@ -1001,11 +1001,27 @@ h5 {
   #main-section #examples .ex-description {
     min-height: 81px;
   }
-
+  
 }
 
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
+  
+  .howto-animation-01 p.smtextright {
+    width: 60%;
+    float: right;
+  }
+
+  .howto-animation-02 p.smtextleft {
+    width: 60%;
+    float: left;
+  }
+
+  .howto-animation-03 p.smtextright {
+    width: 60%;
+    float: right;
+  }
+  
   .large {
     font-size: 72px;
     line-height: 100%;
