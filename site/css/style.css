@@ -343,6 +343,9 @@ h5 {
   font-family: 'Open Sans Light',sans-serif;
   font-size: 16px;
   line-height: 27px;
+}
+
+#main-section #text-descrip {
   margin: 0 15%;
 }
 
@@ -511,6 +514,10 @@ h5 {
 
 /* =tryitnow section
 ----------------------------------------------- */
+
+#tryitout pre {
+  margin-top: 50px;
+}
 
 /* =footer section
 ----------------------------------------------- */
