@@ -138,7 +138,7 @@ template: docs.tmpl
   <span class="comment">// TogetherJS configuration would go here, but we'll talk about that</span>
   <span class="comment">// later</span>
 </span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
-<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"https://togetherjs.mozillalabs.com/togetherjs-min.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></pre>
+<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"https://togetherjs.com/togetherjs-min.js"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></pre>
 <p>You can put that wherever; e.g., right before <code>&lt;/body&gt;</code>.</p>
 <p>The next step is to put a button on your site that lets a user start TogetherJS:</p>
 <pre><code class="lang-html"><span class="tag">&lt;<span class="title">button</span> <span class="attribute">onclick</span>=<span class="value">"TogetherJS(this); return false;"</span>&gt;</span>Start TogetherJS<span class="tag">&lt;/<span class="title">button</span>&gt;</span></code></pre>
@@ -192,7 +192,7 @@ $(<span class="function"><span class="keyword">function</span> <span class="para
 <p><code>TogetherJSConfig_suppressInvite</code>:
     When a person starts a session, usually a window will pop open with the invite link so they can send it to someone.  If this is true then that window doesn&#39;t automatically pop open (but it is still available).</p>
 <p><code>TogetherJSConfig_inviteFromRoom</code>:
-    This adds the ability from the profile menu to invite people who are hanging out in another room (using TowTruck).  This is kind of (but not exactly) how the “Get Help” button works on this site.  This is still an experimental feature.</p>
+    This adds the ability from the profile menu to invite people who are hanging out in another room (using TogetherJS).  This is kind of (but not exactly) how the “Get Help” button works on this site.  This is still an experimental feature.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
 <h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
 <p>The button you add to your site to start TogetherJS will typically look like this:</p>
@@ -222,7 +222,7 @@ $(<span class="function"><span class="keyword">function</span> <span class="para
 <h2 id="extending-togetherjs">Extending TogetherJS</h2>
 <p>While <a href="#configuring-togetherjs">configuration</a> covers some of what you can do to customize TogetherJS, you may also need to integrate TogetherJS with your application, or sync your application data between clients.</p>
 <h3 id="configuring-events">Configuring events</h3>
-<p>Like other configuration, you can configure the event handlers and hooks we describe before <code>towtruck(-min).js</code> is loaded.  Event handlers are just a smidge different.  You&#39;d normally add even handler like <code>TogetherJS.on(&quot;ready&quot;, function () {...})</code>.  To do it as configuration:</p>
+<p>Like other configuration, you can configure the event handlers and hooks we describe before <code>togetherjs(-min).js</code> is loaded.  Event handlers are just a smidge different.  You&#39;d normally add even handler like <code>TogetherJS.on(&quot;ready&quot;, function () {...})</code>.  To do it as configuration:</p>
 <pre><code class="lang-js">TogetherJSConfig_on = {
   ready: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>}
 };</code></pre>
@@ -375,7 +375,7 @@ TogetherJS.reinitialize();</code></pre>
 <p>There is an addon for Firefox in <a href="https://github.com/mozilla/togetherjs/tree/develop/addon">addon/</a>.</p>
 <p>This isn‘t intended to be the “normal” way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn’t integrated <code>togetherjs-min.js</code> itself.  When you activate the addon (via a link in the <a href="https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons">Add-On Toolbar</a>) it simply adds <code>togetherjs-min.js</code> to every page in that tab (until you close the tab or turn it off).  Also if you open a link with <code>#&amp;togetherjs=...</code> (the code used in the share link) it will automatically turn TogetherJS on for the tab.</p>
 <h3 id="installing">Installing</h3>
-<p>A simple way to install is simply to <a href="http://togetherjs.mozillalabs.com/togetherjs.xpi">click this link</a> in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.</p>
+<p>A simple way to install is simply to <a href="https://togetherjs.com/togetherjs.xpi">click this link</a> in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.</p>
 <h3 id="building">Building</h3>
 <p>You can build the addon using the <a href="https://addons.mozilla.org/en-US/developers/builder">Addon-SDK</a>. Once you&#39;ve installed the SDK, go into the <code>addon/</code> directory and run <code>cfx xpi</code> to create an XPI (packaged addon file) or <code>cfx run</code> to start up Firefox with the addon installed (for development).</p>
 <h2 id="getting-help">Getting Help</h2>

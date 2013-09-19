@@ -95,8 +95,7 @@
 
 // Handler for the Get Help button, to check that help is actually available
 $(function () {
-  var inviteChannel = "https://hub.towtruck.mozillalabs.com/hub/developers";
-  inviteChannel = "http://localhost:8080/hub/developers";
+  var inviteChannel = "https://hub.togetherjs.com/hub/developers";
   var $help = $("#get-help");
   if (! $help.length) {
     // No button on this page
