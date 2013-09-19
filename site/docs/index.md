@@ -15,7 +15,7 @@ Get started quickly by including two things on your page.  First the Javascript:
   // TogetherJS configuration would go here, but we'll talk about that
   // later
 </script>
-<script src="https://togetherjs.mozillalabs.com/togetherjs-min.js"></script>
+<script src="https://togetherjs.com/togetherjs-min.js"></script>
 ```
 
 You can put that wherever; e.g., right before `</body>`.
@@ -112,7 +112,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     When a person starts a session, usually a window will pop open with the invite link so they can send it to someone.  If this is true then that window doesn't automatically pop open (but it is still available).
 
 `TogetherJSConfig_inviteFromRoom`:
-    This adds the ability from the profile menu to invite people who are hanging out in another room (using TowTruck).  This is kind of (but not exactly) how the "Get Help" button works on this site.  This is still an experimental feature.
+    This adds the ability from the profile menu to invite people who are hanging out in another room (using TogetherJS).  This is kind of (but not exactly) how the "Get Help" button works on this site.  This is still an experimental feature.
 
 There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
@@ -158,7 +158,7 @@ While [configuration](#configuring-togetherjs) covers some of what you can do to
 
 ### Configuring events
 
-Like other configuration, you can configure the event handlers and hooks we describe before `towtruck(-min).js` is loaded.  Event handlers are just a smidge different.  You'd normally add even handler like `TogetherJS.on("ready", function () {...})`.  To do it as configuration:
+Like other configuration, you can configure the event handlers and hooks we describe before `togetherjs(-min).js` is loaded.  Event handlers are just a smidge different.  You'd normally add even handler like `TogetherJS.on("ready", function () {...})`.  To do it as configuration:
 
 ```js
 TogetherJSConfig_on = {
@@ -409,7 +409,7 @@ This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a d
 
 ### Installing
 
-A simple way to install is simply to [click this link](http://togetherjs.mozillalabs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
+A simple way to install is simply to [click this link](https://togetherjs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
 
 ### Building
 

@@ -112,7 +112,7 @@ Use [jQuery.Deferred](http://api.jquery.com/category/deferred-object/) when poss
 
 ## Hosting the Hub Server
 
-We have a server at `https://hub.togetherjs.mozillalabs.com` which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven't really "finished" the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.
+We have a server at `https://hub.togetherjs.com` which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven't really "finished" the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.
 
 The server is located in `hub/server.js`, and is a simple Node.js application.  You can run this like `node hub/server.js`, and you can use environmental variables to control things like the port (look in `server.js` for references to `process.env`).  You will need to `npm install websocket` to get the websocket library installed.
 
