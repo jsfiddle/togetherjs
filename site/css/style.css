@@ -153,9 +153,7 @@ h5 {
 ----------------------------------------------- */
 
 .main-header {
-  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   background-color: #3A4349;
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px 0px;
   display: block;
   font-family: sans-serif;
 }
@@ -402,6 +400,21 @@ h5 {
 
 #howto-table td {
   border-top: 0px;
+}
+
+.howto-animation-01 p.smtextright {
+  width: 60%;
+  float: right;
+}
+
+.howto-animation-02 p.smtextleft {
+  width: 60%;
+  float: left;
+}
+
+.howto-animation-03 p.smtextright {
+  width: 60%;
+  float: right;
 }
 
 .how-section-imganim-01 {
@@ -698,6 +711,66 @@ h5 {
 
 /* Extra small devices (phones, up to 480px) */
 @media (max-width: 480px) {
+  
+  .cursor-placement-01 {
+    top: 25% !important;
+    left: 78%;
+  }
+
+  .cursor-placement-04 {
+    top: 19%;
+    left: 69%;
+  }
+
+  .cursor-placement-02 {
+    top: 62% !important;
+    left: 42%;
+  }
+
+  .cursor-placement-03 {
+    top: 45% !important;
+    left: 50%;
+  }
+  
+  .how-section-btncollab {
+    top: 32% !important;
+  }
+
+  .how-section-btncollabpressed {
+    top: 32% !important;
+  }
+
+  .how-section-dockplacement {
+    top: 28% !important;
+  }
+  
+  .how-section-imganim-01 {
+    top: 46% !important;
+  }
+
+  .how-section-imganim-02 {
+    top: 26% !important;
+  }
+
+  .how-section-imganim-03 {
+    top: 40% !important;
+  }
+  
+  .howto-animation-01 p.smtextright {
+    width: auto;
+    float: none;
+  }
+
+  .howto-animation-02 p.smtextleft {
+    width: auto;
+    float: none;
+  }
+
+  .howto-animation-03 p.smtextright {
+    width: auto;
+    float: none;
+  }
+  
   .large {
     font-size: 48px;
     line-height: 48px;
@@ -815,6 +888,22 @@ h5 {
 
 /* Smaller devices (tablets, 480px and up) */
 @media (min-width: 480px) {
+  
+  .howto-animation-01 p.smtextright {
+    width: auto;
+    float: none;
+  }
+
+  .howto-animation-02 p.smtextleft {
+    width: auto;
+    float: none;
+  }
+
+  .howto-animation-03 p.smtextright {
+    width: auto;
+    float: none;
+  }
+  
   .large {
     font-size: 48px;
     line-height: 48px;
