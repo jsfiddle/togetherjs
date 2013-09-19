@@ -307,6 +307,9 @@ module.exports = function (grunt) {
       if (tmplVars.base && tmplVars.base.search(/\/$/) == -1) {
         tmplVars.base += "/";
       }
+      if (tmplVars.absoluteLinks) {
+        tmplVars.base = "/";
+      }
       var tmpl = env.getTemplate(source);
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
@@ -483,6 +486,7 @@ module.exports = function (grunt) {
     grunt.task.run(["movecss"]);
     grunt.log.writeln("To actually publish you must do:");
     grunt.log.writeln("  $ cd togetherjs.mozillalabs.com/");
+    grunt.log.writeln("  $ git add -A");
     grunt.log.writeln("  $ git commit -a -m 'Publish'");
     grunt.log.writeln("  $ git push && git push staging");
   });

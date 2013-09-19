@@ -59,7 +59,6 @@
         var $el   = $(this)
         var href  = $el.data('target') || $el.attr('href')
         var $href = /^#\w/.test(href) && $(href)
-        console.log("test", href, $href[0]);
 
         return ($href
           && $href.length
