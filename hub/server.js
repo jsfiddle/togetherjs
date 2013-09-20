@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+var WebSocketServer = require('websocket').server,
+    WebSocketRouter = require('websocket').router,
+    http = require('http'),
+    parseUrl = require('url').parse;
+    crypto = require('crypto');
+
 // New Relic Server monitoring support
 if ( process.env.NEW_RELIC_HOME ) {
   require("newrelic");
@@ -9,11 +15,6 @@ if ( process.env.NEW_RELIC_HOME ) {
 
 var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
 var EMPTY_ROOM_LOG_TIMEOUT = 3*60*1000; // 3 minutes
-
-var WebSocketServer = require('websocket').server;
-var WebSocketRouter = require('websocket').router;
-var http = require('http');
-var parseUrl = require('url').parse;
 
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
@@ -37,7 +38,7 @@ var logger = {
   var level = nameLevel[1];
   logger[name] = function () {
     if (logLevel <= level) {
-      if (name != "log") {
+      if (name !== "log") {
         console.log.apply(console, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
       } else {
         console.log.apply(console, arguments);
@@ -52,10 +53,10 @@ var server = http.createServer(function(request, response) {
   var host = request.headers.host;
   var base = protocol + "//" + host;
 
-  if (url.pathname == '/status'){
+  if (url.pathname === '/status'){
     response.end("OK");
-  } else if (url.pathname == '/findroom') {
-    if (request.method == "OPTIONS") {
+  } else if (url.pathname === '/findroom') {
+    if (request.method === "OPTIONS") {
       // CORS preflight
       corsAccept(request, response);
       return;
@@ -66,7 +67,7 @@ var server = http.createServer(function(request, response) {
       write400("You must include a valid prefix=CHARS&max=NUM portion of the URL", response);
       return;
     }
-    if (prefix.search(/[^a-zA-Z0-9]/) != -1) {
+    if (prefix.search(/[^a-zA-Z0-9]/) !== -1) {
       write400("Invalid prefix", response);
       return;
     }
@@ -85,7 +86,7 @@ function corsAccept(request, response) {
 
 function write500(error, response) {
   response.writeHead(500, {"Content-Type": "text/plain"});
-  if (typeof error != "string") {
+  if (typeof error !== "string") {
     error = "\n" + JSON.stringify(error, null, "  ");
   }
   response.end("Error: " + error);
@@ -130,14 +131,21 @@ function findRoom(prefix, max, response) {
   response.end(JSON.stringify({name: room}));
 }
 
-function generateId(length) {
-  length = length || 10;
-  var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
-  var s = '';
-  for (var i=0; i<length; i++) {
-    s += letters.charAt(Math.floor(Math.random() * letters.length));
+/**
+ * Generate a random Hex string using the core Node Crypto package.
+ * 
+ * @param  {Number} len The length of the desired random hex string
+ * @return {String}     The random hex string
+ */
+function generateId(len) {
+  var len = len || 10,
+      buf;
+
+  try {
+    return crypto.randomBytes(len / 2).toString('hex');
+  } catch (e) {
+    logger.error(e);
   }
-  return s;
 }
 
 function pickRandom(seq) {
@@ -234,7 +242,7 @@ wsServer.on('request', function(request) {
                  ' connections: ' + allConnections[id].length);
     for (var i=0; i<allConnections[id].length; i++) {
       var c = allConnections[id][i];
-      if (c == connection && !parsed["server-echo"]) {
+      if (c === connection && !parsed["server-echo"]) {
         continue;
       }
       if (message.type === 'utf8') {
@@ -246,7 +254,7 @@ wsServer.on('request', function(request) {
   });
   connection.on('close', function(reasonCode, description) {
     var index = allConnections[id].indexOf(connection);
-    if (index != -1) {
+    if (index !== -1) {
       allConnections[id].splice(index, 1);
     }
     if (! allConnections[id].length) {
@@ -277,12 +285,14 @@ setInterval(function () {
   }
 }, SAMPLE_STATS_INTERVAL);
 
-function countClients(clients) {
-  var n = 0;
-  for (var clientId in clients) {
-    n++;
-  }
-  return n;
+/**
+ * Counts the members in an object, returns a integer
+ * 
+ * @param  {Object} obj The object to count
+ * @return {Number}         The number of members of specified object
+ */
+function countObj(obj) {
+  return Object.keys(obj).length;
 }
 
 function logStats(id, stats) {
@@ -290,16 +300,16 @@ function logStats(id, stats) {
     id: id,
     created: stats.created,
     sample: stats.sample,
-    totalClients: countClients(stats.clients),
+    totalClients: countObj(stats.clients),
     totalMessageChars: stats.totalMessageChars,
     totalMessages: stats.totalMessages,
     domain: stats.firstDomain || null,
-    domainCount: countClients(stats.domains),
-    urls: countClients(stats.urls)
+    domainCount: countObj(stats.domains),
+    urls: countObj(stats.urls)
   }));
 }
 
-if (require.main == module) {
+if (require.main === module) {
   var ops = require('optimist')
       .usage("Usage: $0 [--port 8080] [--host localhost]")
       .describe("port", "The port to server on (default $HUB_SERVER_PORT, $PORT, $VCAP_APP_PORT, or 8080")
