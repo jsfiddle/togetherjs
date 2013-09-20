@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+var WebSocketServer = require('websocket').server,
+    WebSocketRouter = require('websocket').router,
+    http = require('http'),
+    parseUrl = require('url').parse;
+    crypto = require('crypto');
+
 // New Relic Server monitoring support
 if ( process.env.NEW_RELIC_HOME ) {
   require("newrelic");
@@ -130,14 +136,15 @@ function findRoom(prefix, max, response) {
   response.end(JSON.stringify({name: room}));
 }
 
-function generateId(length) {
-  length = length || 10;
-  var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
-  var s = '';
-  for (var i=0; i<length; i++) {
-    s += letters.charAt(Math.floor(Math.random() * letters.length));
+function generateId(len) {
+  var len = len || 10,
+      buf;
+
+  try {
+    return crypto.randomBytes(len / 2).toString('hex');
+  } catch (e) {
+    logger.error(e);
   }
-  return s;
 }
 
 function pickRandom(seq) {
