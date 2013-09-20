@@ -52,7 +52,9 @@ var server = http.createServer(function(request, response) {
   var host = request.headers.host;
   var base = protocol + "//" + host;
 
-  if (url.pathname == '/status'){
+  if (url.pathname == '/status') {
+    response.end("OK");
+  } else if (url.pathname == '/load') {
     var sessions = 0;
     var conns = 0;
     for (var id in allConnections) {
