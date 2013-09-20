@@ -53,7 +53,11 @@ var server = http.createServer(function(request, response) {
   var base = protocol + "//" + host;
 
   if (url.pathname == '/status'){
-    response.end("OK");
+    var conns = 0;
+    for (var id in allConnections) {
+      conns++;
+    }
+    response.end("OK " + conns + " connections");
   } else if (url.pathname == '/findroom') {
     if (request.method == "OPTIONS") {
       // CORS preflight
@@ -245,6 +249,11 @@ wsServer.on('request', function(request) {
     }
   });
   connection.on('close', function(reasonCode, description) {
+    if (! allConnections[id]) {
+      // Got cleaned up entirely, somehow?
+      logger.info("Connection ID", id, "was cleaned up entirely before last connection closed");
+      return;
+    }
     var index = allConnections[id].indexOf(connection);
     if (index != -1) {
       allConnections[id].splice(index, 1);
