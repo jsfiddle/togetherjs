@@ -52,11 +52,22 @@
             //play video on mobile a device
              $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
 
-            //alert('test');
+            // turn off animations
+            // replace div with a div
+            //<td class="col-xs-6 col-sm-6">
+            //<div style="position:relative;">
+            
+            $( ".howto-animation-01 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-01-addit.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            $( ".howto-animation-02 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-02-dock-sm@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            $( ".howto-animation-03 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-03-collaborate-cursors@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            //
+            
           }
 
           else {
-
+            
+            
+            
             //Video player
             $( "#video-area" ).click(function() {
               $( "#marketing-video" ).fadeIn();
