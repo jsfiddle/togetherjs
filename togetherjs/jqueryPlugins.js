@@ -64,10 +64,10 @@ define(["jquery"], function ($) {
 
   /* Pop in window from dock button: */
   $.fn.popinWindow = function () {
-  
+
     //mobile popout window with no animation
     if($.browser.mobile) {
-      
+
        //starting position
         this.css({
           left: "0px",
@@ -116,7 +116,7 @@ define(["jquery"], function ($) {
     }
 
     else {
-      
+
       //starting position
       this.css({
         left: "+=74px",
@@ -162,7 +162,7 @@ define(["jquery"], function ($) {
       }, {
         duration:60, easing:"linear"
       });
-      
+
     }
 
   };
@@ -313,6 +313,9 @@ define(["jquery"], function ($) {
 
   // FIXME: not sure if this is legit, but at least the modern mobile devices we
   // care about should have this defined:
+  if (! $.browser) {
+    $.browser = {};
+  }
   $.browser.mobile = window.orientation !== undefined;
   if (navigator.userAgent.search(/mobile/i) != -1) {
     // FIXME: At least on the Firefox OS simulator I need this
