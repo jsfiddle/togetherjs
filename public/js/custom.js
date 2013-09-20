@@ -15,6 +15,14 @@
         //      });
 
 
+        // stop youtube from playing on btn close
+        $('.video-closebtn').click(function(){
+          //alert("tset");
+          var myPlayer = document.getElementById('youtubevid');
+          myPlayer.stopVideo();
+        });
+
+        
 
         // detect a mobile device
         var isMobile = {
@@ -42,13 +50,42 @@
           if(isMobile.any()){
 
             //play video on mobile a device
-             $("#video-area").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
+             $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
 
-            //alert('test');
+            // turn off animations
+            jQuery.fx.off = true;
+            
+            $('#video-area').css("-webkit-animation", "none");
+            $('#video-area').css("-moz-animation", "none");
+            $('#video-area').css("-ms-animation", "none");
+            $('#video-area').css("animation", "none");
+            
+            $('.hero-header-text').css("-webkit-animation", "none");
+            $('.hero-header-text').css("-moz-animation", "none");
+            $('.hero-header-text').css("-ms-animation", "none");
+            $('.hero-header-text').css("animation", "none");
+            
+            $('.hero-tagline').css("-webkit-animation", "none");
+            $('.hero-tagline').css("-moz-animation", "none");
+            $('.hero-tagline').css("-ms-animation", "none");
+            $('.hero-tagline').css("animation", "none");
+            
+            $('.main-get-started').css("-webkit-animation", "none");
+            $('.main-get-started').css("-moz-animation", "none");
+            $('.main-get-started').css("-ms-animation", "none");
+            $('.main-get-started').css("animation", "none");
+            
+            $( ".howto-animation-01 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-01-addit.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            $( ".howto-animation-02 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-02-dock-sm@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            $( ".howto-animation-03 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-03-collaborate-cursors@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            //
+            
           }
 
           else {
-
+            
+            
+            
             //Video player
             $( "#video-area" ).click(function() {
               $( "#marketing-video" ).fadeIn();

@@ -79,7 +79,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand main-logo scrollnav" href=".././"></a>
+          <a class="navbar-brand main-logo" href=".././"></a>
           <a class="navbar-brand masthead-title" href=".././">TogetherJS</a>
         </div>
 
@@ -419,11 +419,8 @@ width.  But it&#39;s still not entirely consistent.</p>
     el = $(el);
     <span class="keyword">if</span> (el.is(<span class="string">":visible"</span>)) {
       windowing.hide(el);
-      console.log(<span class="string">"close window"</span>);
-      closeDock();
     } <span class="keyword">else</span> {
       windowing.show(el);
-      console.log(<span class="string">"open window"</span>);
     }
   };
 
@@ -495,7 +492,7 @@ width.  But it&#39;s still not entirely consistent.</p>
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href=".././" class="scrollnav">Overview</a></li>
+                <li class=""><a href=".././" class="">Overview</a></li>
                 <li><a href=".././docs/" target="_blank">Docs</a></li>
                 <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
                 <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
