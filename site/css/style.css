@@ -249,9 +249,8 @@ h5 {
 ----------------------------------------------- */
 
 #hero {
-  background: url('../images/bg@2x.png')repeat fixed; /*photo credit to Yuan Wang, thanks!*/
-  background-size: contain;
-  background-position: 100% 0; 
+  background: url('../images/bg@2x.png') 100% 0 repeat fixed; /*photo credit to Yuan Wang, thanks!*/
+  background-size: 100% 100%;
 	margin: 0 auto;
   width: 100%;
   max-width: 1920px;
