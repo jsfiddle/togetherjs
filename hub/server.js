@@ -16,11 +16,6 @@ if ( process.env.NEW_RELIC_HOME ) {
 var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
 var EMPTY_ROOM_LOG_TIMEOUT = 3*60*1000; // 3 minutes
 
-var WebSocketServer = require('websocket').server;
-var WebSocketRouter = require('websocket').router;
-var http = require('http');
-var parseUrl = require('url').parse;
-
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
 
