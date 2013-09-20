@@ -8,7 +8,7 @@ TogetherJS is a service for your website that makes it surprisingly easy to coll
 
 Using TogetherJS two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TogetherJS service is included by the web site owner, and a web site can customize and configure aspects of TogetherJS's behavior on the site.
 
-For more information and to see TogetherJS in action, visit [togetherjs.mozillalabs.com](https://togetherjs.mozillalabs.com/)
+For more information and to see TogetherJS in action, visit [togetherjs.com](https://togetherjs.com/)
 
 If you want to integrate TogetherJS onto your site see [the wiki](https://github.com/mozilla/togetherjs/wiki) and specifically [Getting Started](https://github.com/mozilla/togetherjs/wiki/Developers:-Getting-Started).
 
@@ -36,7 +36,7 @@ TogetherJS has two main pieces:
 
 * The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
 
-There is a TogetherJS hub server deployed at `https://hub.togetherjs.mozillalabs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
+There is a TogetherJS hub server deployed at `https://hub.togetherjs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
 
 The files need to be lightly "built": we use [LESS](http://lesscss.org/) for styles, and a couple files are generated.  To develop you need to build the library using [Grunt](http://gruntjs.com/).
 
@@ -62,7 +62,7 @@ Now you can build TogetherJS, like:
 $ grunt build buildsite --no-hardlink
 ```
 
-This will create a copy of the entire `togetherjs.mozillalabs.com` site in `build/`.  You'll need to setup a local web server of your own pointed to the `build/` directory.
+This will create a copy of the entire `togetherjs.com` site in `build/`.  You'll need to setup a local web server of your own pointed to the `build/` directory.
 
 If you want to develop with TogetherJS you probably want the files built continually.  To do this use:
 
