@@ -75,7 +75,7 @@ Most of the actual code is in the client, which is **open source** and **easy to
 
 As mentioned there are several configuration parameters.  To see the exact list of settings and their defaults, look at `TogetherJS._defaultConfiguration` in [together.js](https://github.com/mozilla/togetherjs/blob/develop/togetherjs/togetherjs.js)
 
-There are a couple ways of configuring TogetherJS.  The one that we prefer is to set global variable before `togetherjs(-min).js` is included.  Each variable is named `TogetherJSConfig_*`.  This makes it fairly easy to add or remove variables.  Note however that once `togetherjs(-min).js)` is loaded that these variables might not be respected.
+There are a couple ways of configuring TogetherJS.  The one that we prefer is to set a global variable before `togetherjs(-min).js` is included.  Each variable is named `TogetherJSConfig_*`.  This makes it fairly easy to add or remove variables.  Note however that once `togetherjs(-min).js)` is loaded that these variables might not be respected.
 
 The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.config("variable", value)`
 
