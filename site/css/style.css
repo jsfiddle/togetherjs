@@ -1386,10 +1386,10 @@ dd {
   #sourcecode h1 {
    font-weight: normal;
   }
-  
   .affix, .affix-bottom {
     width: 263px !important;
     position: fixed !important;
+    bottom: 10px !important;
   }
   .col-md-9 h1:first-child {
     margin-top: 40px !important;

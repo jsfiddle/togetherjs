@@ -1,13 +1,16 @@
 !function ($) {
     $(function(){
       
+      
+      //var position = p.position();
+      //$("#sidenav").position.top;
+      //alert($("#sidenav").position().left);
+      
       //side nav bar
       $('#sidenav').affix({
           offset: {
             top: 100
-          , bottom: function () {
-              return (this.bottom = $('#footer').outerHeight(true))
-            }
+          , bottom: 100
           }
         })
       
