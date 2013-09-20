@@ -249,13 +249,13 @@ h5 {
 ----------------------------------------------- */
 
 #hero {
-  background: url('../images/bg@2x.png') 100% 0 repeat fixed;
-  background-size: 100% 100%;
+  background: url('../images/bg@2x.png')repeat fixed; /*photo credit to Yuan Wang, thanks!*/
+  background-size: contain;
+  background-position: 100% 0; 
 	margin: 0 auto;
   width: 100%;
   max-width: 1920px;
   position: relative;
-  //box-shadow: 0 0 50px rgba(0,0,0,0.8);
 }
 
 /*
@@ -280,6 +280,10 @@ h5 {
 
 #hero .container {
   padding-top: 20px;
+}
+
+#box-left {
+  margin-top: 3%;
 }
 
 #video-area {
