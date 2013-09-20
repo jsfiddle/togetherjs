@@ -53,11 +53,15 @@ var server = http.createServer(function(request, response) {
   var base = protocol + "//" + host;
 
   if (url.pathname == '/status'){
+    var sessions = 0;
     var conns = 0;
     for (var id in allConnections) {
-      conns++;
+      if (allConnections[id].length) {
+        sessions++;
+        conns += allConnections[id].length;
+      }
     }
-    response.end("OK " + conns + " connections");
+    response.end("OK " + conns + " connections " + sessions + " sessions");
   } else if (url.pathname == '/findroom') {
     if (request.method == "OPTIONS") {
       // CORS preflight
