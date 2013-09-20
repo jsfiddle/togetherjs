@@ -76,14 +76,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand main-logo scrollnav" href="{{base}}./"></a>
+          <a class="navbar-brand main-logo" href="{{base}}./"></a>
           <a class="navbar-brand masthead-title" href="{{base}}./">TogetherJS</a>
         </div>
 
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
-            <li><a href="{{base}}./" {% if (enableHome) %}class="scrollnav active"{% endif %} >Overview</a></li>
-            <li><a href="{{base}}./docs/" {% if (enableMarkdown) %}class="active scrollnav"{% endif %} >Documentation</a></li>
+            <li><a href="{{base}}./" {% if (enableHome) %}class="active"{% endif %} >Overview</a></li>
+            <li><a href="{{base}}./docs/" {% if (enableMarkdown) %}class="active"{% endif %} >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -106,7 +106,7 @@
             </div>
             <div class="col-xs-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="{{ base }}./" class="scrollnav">Overview</a></li>
+                <li class=""><a href="{{ base }}./" class="">Overview</a></li>
                 <li><a href="{{base}}./docs/" target="_blank">Docs</a></li>
                 <li class=""><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
                 <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
