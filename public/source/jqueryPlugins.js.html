@@ -509,7 +509,7 @@ animate the participant cursor -&gt; rotate down when they&#39;re down the page<
       }, {
         duration:<span class="number">60</span>, easing:<span class="string">"linear"</span>
       });
-      
+
     }
 
   };
@@ -762,7 +762,10 @@ care about should have this defined:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>  $.browser.mobile = window.orientation !== <span class="literal">undefined</span>;
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">if</span> (! $.browser) {
+    $.browser = {};
+  }
+  $.browser.mobile = window.orientation !== <span class="literal">undefined</span>;
   <span class="keyword">if</span> (navigator.userAgent.search(<span class="regexp">/mobile/i</span>) != -<span class="number">1</span>) {</pre></div></div>
               
             </li>
