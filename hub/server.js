@@ -43,7 +43,7 @@ var logger = {
   var level = nameLevel[1];
   logger[name] = function () {
     if (logLevel <= level) {
-      if (name !=== "log") {
+      if (name !== "log") {
         console.log.apply(console, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
       } else {
         console.log.apply(console, arguments);
@@ -72,7 +72,7 @@ var server = http.createServer(function(request, response) {
       write400("You must include a valid prefix=CHARS&max=NUM portion of the URL", response);
       return;
     }
-    if (prefix.search(/[^a-zA-Z0-9]/) !=== -1) {
+    if (prefix.search(/[^a-zA-Z0-9]/) !== -1) {
       write400("Invalid prefix", response);
       return;
     }
@@ -91,7 +91,7 @@ function corsAccept(request, response) {
 
 function write500(error, response) {
   response.writeHead(500, {"Content-Type": "text/plain"});
-  if (typeof error !=== "string") {
+  if (typeof error !== "string") {
     error = "\n" + JSON.stringify(error, null, "  ");
   }
   response.end("Error: " + error);
@@ -115,10 +115,10 @@ function findRoom(prefix, max, response) {
   var smallestNumber;
   var smallestRooms = [];
   for (var candidate in allConnections) {
-    if (candidate.indexOf(prefix + "__") ==== 0) {
+    if (candidate.indexOf(prefix + "__") === 0) {
       var count = allConnections[candidate].length;
-      if (count < max && (smallestNumber ==== undefined || count <= smallestNumber)) {
-        if (smallestNumber ==== undefined || count < smallestNumber) {
+      if (count < max && (smallestNumber === undefined || count <= smallestNumber)) {
+        if (smallestNumber === undefined || count < smallestNumber) {
           smallestNumber = count;
           smallestRooms = [candidate];
         } else {
@@ -250,16 +250,16 @@ wsServer.on('request', function(request) {
       if (c === connection && !parsed["server-echo"]) {
         continue;
       }
-      if (message.type ==== 'utf8') {
+      if (message.type === 'utf8') {
         c.sendUTF(message.utf8Data);
-      } else if (message.type ==== 'binary') {
+      } else if (message.type === 'binary') {
         c.sendBytes(message.binaryData);
       }
     }
   });
   connection.on('close', function(reasonCode, description) {
     var index = allConnections[id].indexOf(connection);
-    if (index !=== -1) {
+    if (index !== -1) {
       allConnections[id].splice(index, 1);
     }
     if (! allConnections[id].length) {
