@@ -164,11 +164,8 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     el = $(el);
     if (el.is(":visible")) {
       windowing.hide(el);
-      console.log("close window");
-      closeDock();
     } else {
       windowing.show(el);
-      console.log("open window");
     }
   };
 
