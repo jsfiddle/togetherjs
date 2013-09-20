@@ -15,6 +15,14 @@
         //      });
 
 
+        // stop youtube from playing on btn close
+        $('.video-closebtn').click(function(){
+          //alert("tset");
+          var myPlayer = document.getElementById('youtubevid');
+          myPlayer.stopVideo();
+        });
+
+        
 
         // detect a mobile device
         var isMobile = {
