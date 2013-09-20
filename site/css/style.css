@@ -1315,10 +1315,15 @@ dd {
   margin-top: 30px;
   margin-bottom: 20px;
   font-size: 36px;
+  line-height: 42px;
 }
 
 #markdownpages h3 {
   font-size: 24px;
+}
+
+#markdownpages code {
+  white-space: pre-wrap;
 }
 
 #markdownpages pre {
@@ -1373,6 +1378,15 @@ dd {
 }
 
 @media (min-width: 1200px) {
+  
+  #markdownpages h1 {
+   font-weight: normal;
+  }
+  
+  #sourcecode h1 {
+   font-weight: normal;
+  }
+  
   .affix, .affix-bottom {
     width: 263px !important;
     position: fixed !important;
@@ -1395,6 +1409,7 @@ dd {
 }
 
 @media (min-width: 768px) {
+  
   .affix {
     position: static;
   }
@@ -1404,6 +1419,13 @@ dd {
 }
 
 @media (min-width: 480px) {
+  #sourcecode h1 {
+   font-size: 48px; 
+   line-height: 52px;
+  }
+  #markdownpages h1 {
+   font-size: 48px; 
+  }
   .affix {
     position: static;
   }
@@ -1413,6 +1435,17 @@ dd {
 }
 
 @media (max-width: 480px) {
+  
+  #sourcecode h1 {
+   font-size: 48px; 
+   line-height: 52px;
+  }
+  
+  #markdownpages h1 {
+   font-size: 48px; 
+   line-height: 52px;
+  }
+  
   .affix {
     position: static;
   }
