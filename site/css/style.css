@@ -52,7 +52,7 @@ p {
 a {
   line-height: 1.38;
   font-size: 14px;
-  font-family: openSansLight, 'Open Sans', sans-serif;
+  font-family: openSansRegular, 'Open Sans', sans-serif;
 }
 
 a:hover {
@@ -341,7 +341,7 @@ h5 {
 
 #main-section p {
   color: rgb(22, 22, 22);
-  font-family: 'Open Sans Light',sans-serif;
+  font-family: 'Open Sans Regular',sans-serif;
   font-size: 16px;
   line-height: 27px;
 }
