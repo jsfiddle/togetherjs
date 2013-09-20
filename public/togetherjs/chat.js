@@ -307,6 +307,11 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
         });
         return;
       }
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+        ui.chat.system({
+          text: "Warning: variable " + variable + " is unknown"
+        });
+      }
       storage.get("configOverride").then(function (c) {
         c = c || {};
         c[variable] = value;

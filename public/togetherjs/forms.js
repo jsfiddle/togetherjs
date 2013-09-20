@@ -199,6 +199,11 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       delete change.origin;
       var next = change.next;
       delete change.next;
+      if (Array.isArray(change.text)) {
+        // This seems to be version-specific with CodeMirror, but sometimes
+        // the text is an array of lines.
+        change.text = change.text.join("\n");
+      }
       session.send({
         type: "form-update",
         tracker: this.trackerName,

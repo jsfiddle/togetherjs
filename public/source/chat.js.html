@@ -517,6 +517,11 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
         });
         <span class="keyword">return</span>;
       }
+      <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+        ui.chat.system({
+          text: <span class="string">"Warning: variable "</span> + variable + <span class="string">" is unknown"</span>
+        });
+      }
       storage.get(<span class="string">"configOverride"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(c)</span> {</span>
         c = c || {};
         c[variable] = value;

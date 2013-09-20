@@ -453,6 +453,22 @@ ACE&#39;s native delta</p>
       <span class="keyword">delete</span> change.origin;
       <span class="keyword">var</span> next = change.next;
       <span class="keyword">delete</span> change.next;
+      <span class="keyword">if</span> (Array.isArray(change.text)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>This seems to be version-specific with CodeMirror, but sometimes
+the text is an array of lines.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        change.text = change.text.join(<span class="string">"\n"</span>);
+      }
       session.send({
         type: <span class="string">"form-update"</span>,
         tracker: <span class="keyword">this</span>.trackerName,
@@ -626,10 +642,10 @@ ACE&#39;s native delta</p>
               
             </li>
           
-            <li id="section-7">
+            <li id="section-8">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-7">&#182;</a>
+                  <a class="pilcrow" href="#section-8">&#182;</a>
                 </div>
                 <p>make a real TextReplace object.</p>
 
@@ -641,10 +657,10 @@ ACE&#39;s native delta</p>
               
             </li>
           
-            <li id="section-8">
+            <li id="section-9">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-8">&#182;</a>
+                  <a class="pilcrow" href="#section-9">&#182;</a>
                 </div>
                 <p>apply this change to the history</p>
 
@@ -742,10 +758,10 @@ ACE&#39;s native delta</p>
               
             </li>
           
-            <li id="section-9">
+            <li id="section-10">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-9">&#182;</a>
+                  <a class="pilcrow" href="#section-10">&#182;</a>
                 </div>
                 <p>In a 3+-peer situation more than one client may init; in this case
 we&#39;re probably the other peer, and not the peer that needs the init
@@ -758,10 +774,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-10">
+            <li id="section-11">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-10">&#182;</a>
+                  <a class="pilcrow" href="#section-11">&#182;</a>
                 </div>
                 <p>We&#39;ve been around longer than the other person...</p>
 
@@ -773,10 +789,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-11">
+            <li id="section-12">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-11">&#182;</a>
+                  <a class="pilcrow" href="#section-12">&#182;</a>
                 </div>
                 <p>FIXME: need to figure out when to ignore inits</p>
 
@@ -809,10 +825,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-12">
+            <li id="section-13">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-12">&#182;</a>
+                  <a class="pilcrow" href="#section-13">&#182;</a>
                 </div>
                 <p>don&#39;t overwrite history if we&#39;re already up to date
 (we might have outstanding queued changes we don&#39;t want to lose)</p>
@@ -823,10 +839,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-13">
+            <li id="section-14">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
+                  <a class="pilcrow" href="#section-14">&#182;</a>
                 </div>
                 <p>if history.basis is 1, the form could have lingering
 edits from before togetherjs was launched.  that&#39;s too bad,
@@ -880,10 +896,10 @@ we just asked to join.</p>
               
             </li>
           
-            <li id="section-14">
+            <li id="section-15">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
+                  <a class="pilcrow" href="#section-15">&#182;</a>
                 </div>
                 <p>A blur</p>
 
@@ -932,10 +948,10 @@ we just asked to join.</p>
               
             </li>
           
-            <li id="section-15">
+            <li id="section-16">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-15">&#182;</a>
+                  <a class="pilcrow" href="#section-16">&#182;</a>
                 </div>
                 <p>note that textInput, keydown, and keypress aren&#39;t appropriate events
 to watch, since they fire <em>before</em> the element&#39;s value changes.</p>

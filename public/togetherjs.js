@@ -41,13 +41,19 @@
       configOverride = null;
     }
     if ((! configOverride) || configOverride.expiresAt < Date.now()) {
-      localStorage.removeItem("togetherjs.cnofigOverride");
+      localStorage.removeItem("togetherjs.configOverride");
     } else {
+      var shownAny = false;
       for (var attr in configOverride) {
         if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
           continue;
         }
+        if (! shownAny) {
+          console.warn("Using TogetherJS configOverride");
+          console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
+        }
         window["TogetherJSConfig_" + attr] = configOverride[attr];
+        console.log("Config override:", attr, "=", configOverride[attr]);
       }
     }
   }

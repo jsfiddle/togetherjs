@@ -6289,6 +6289,11 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
         });
         return;
       }
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+        ui.chat.system({
+          text: "Warning: variable " + variable + " is unknown"
+        });
+      }
       storage.get("configOverride").then(function (c) {
         c = c || {};
         c[variable] = value;
@@ -7872,6 +7877,11 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
       delete change.origin;
       var next = change.next;
       delete change.next;
+      if (Array.isArray(change.text)) {
+        // This seems to be version-specific with CodeMirror, but sometimes
+        // the text is an array of lines.
+        change.text = change.text.join("\n");
+      }
       session.send({
         type: "form-update",
         tracker: this.trackerName,
