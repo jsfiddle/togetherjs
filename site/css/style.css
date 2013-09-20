@@ -715,6 +715,14 @@ h5 {
 /* Extra small devices (phones, up to 480px) */
 @media (max-width: 480px) {
   
+  #features .media > .pull-left {
+    margin-top: 20px;
+  }
+  
+  #howto-table td {
+    width: 50%;
+  }
+  
   .cursor-placement-01 {
     top: 25% !important;
     left: 78%;
@@ -880,17 +888,33 @@ h5 {
   }
   
   #main-section #examples .ex-description {
-    min-height: 131px;
+    min-height: 0px;
   }
   
   #main-section #examples .ex-title {
-    min-height: 31px;
+    min-height: 0px;
+  }
+  
+  #tryitout pre {
+    margin-top: -26px;
   }
 
 }
 
 /* Smaller devices (tablets, 480px and up) */
 @media (min-width: 480px) {
+  
+  #features .media > .pull-left {
+    margin-top: 10px;
+  }
+  
+  #tryitout pre {
+    margin-top: -26px;
+  }
+  
+  #howto-table td {
+    width: 50%;
+  }
   
   .howto-animation-01 p.smtextright {
     width: auto;
@@ -948,7 +972,12 @@ h5 {
   }
   
   #main-section #examples .ex-description {
-    min-height: 81px;
+    min-height: 0px;
+  }
+  
+  #main-section img.why-section {
+    width: 30%;
+    height: 30%;
   }
 
 
@@ -956,6 +985,11 @@ h5 {
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
+  
+  #tryitout pre {
+    margin-top: 50px;
+  }
+  
   .large {
     font-size: 72px;
     line-height: 100%;

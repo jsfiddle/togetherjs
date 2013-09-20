@@ -42,7 +42,7 @@
           if(isMobile.any()){
 
             //play video on mobile a device
-             $("#video-area").html('<a href="http://player.vimeo.com/video/64117317?byline=0&portrait=0&title=0&autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
+             $("#video-area").html('<a href="https://www.youtube.com/v/hJEq4W0FZQ0"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
 
             //alert('test');
           }
