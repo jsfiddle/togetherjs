@@ -209,7 +209,7 @@ wsServer.on('request', function(request) {
   allConnections[id].push(connection);
   connectionStats[id].connections++;
   connectionStats[id].lastLeft = null;
-  logger.info((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
+  logger.debug((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
   connection.sendUTF(JSON.stringify({
     type: "init-connection",
     peerCount: allConnections[id].length-1
@@ -253,7 +253,7 @@ wsServer.on('request', function(request) {
       delete allConnections[id];
       connectionStats[id].lastLeft = Date.now();
     }
-    logger.info((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
+    logger.debug((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
 
