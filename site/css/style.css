@@ -1057,7 +1057,7 @@ h5 {
   }
 
   #video-area img {
-    /*margin-top: 74px;*/
+    margin-top: 7%;
   }
 
   #hero {
@@ -1076,6 +1076,11 @@ h5 {
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
+  
+  #video-area img {
+    margin-top: 0%;
+  }
+  
   .large {
     font-size: 72px;
     line-height: 100%;
