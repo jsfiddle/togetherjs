@@ -216,10 +216,6 @@
     var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
     var deps = ["session", "jquery"];
     function callback(session, jquery) {
-      // Though jquery uses requirejs, it also always also defines a
-      // global, so we have to keep it from conflicting with any
-      // previous jquery:
-      jquery.noConflict(true);
       TogetherJS._loaded = true;
       if (! min) {
         TogetherJS.require = require.config({context: "togetherjs"});
