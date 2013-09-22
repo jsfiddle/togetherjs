@@ -90,7 +90,7 @@ We try to keep most of the code that actually touches the ui in `ui.js` – thou
 
 "Templates" are just elements that are cloned out of `interface.html`.  They generally have an id like `togetherjs-template-foo`, and you'd clone them by doing `templating.sub("foo", {vars})`.
 
-You should avoid having text or markup in Javascript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.
+You should avoid having text or markup in JavaScript, and instead clone templates or hide and show different elements to represent different states.  Occasionally you do need to put markup-related stuff in code (like pixel sizes or other details).  When this is the case leave a comment in both sources (HTML/CSS and JS) pointing to the other location.
 
 ### Stateless controls
 
@@ -103,7 +103,7 @@ Instead of "toggle" controls we prefer to show and hide controls for the alterna
 
 Then use `ui.displayToggle("#togetherjs-expand-foo")` to show the expand button, and the collapse button will be automatically hidden.  Note that the selector in `data-toggles` can be inclusive of the element itself (everything matching selector will be hidden, except the element itself).
 
-This requires less state in the Javascript, as the control is always an assertion to do something specific.  Also it means that we have to do a minimum of manipulation in Javascript, and the two controls are not required to be styled identically.
+This requires less state in the JavaScript, as the control is always an assertion to do something specific.  Also it means that we have to do a minimum of manipulation in JavaScript, and the two controls are not required to be styled identically.
 
 ### Async
 
