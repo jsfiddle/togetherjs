@@ -8,7 +8,7 @@ Would you like to use TogetherJS on your site?  Great!  If you have feedback on 
 
 ## Quick Start
 
-Get started quickly by including two things on your page.  First the Javascript:
+Get started quickly by including two things on your page.  First the JavaScript:
 
 ```html
 <script>
