@@ -118,6 +118,8 @@ The server is located in `hub/server.js`, and is a simple Node.js application.  
 
 If you want to use TogetherJS on an https site you must host the hub on https.  We don't it setup in `server.js` for Node to do SSL directly, so we recommend a proxy.  [stunnel](https://www.stunnel.org/) is an example of the kind of proxy you'd want – not all proxies support websockets.
 
+If you want to change the port or interface the server binds to, simply run `node hub/server.js -h` and it will show the command-line options as well as environmental variables.
+
 Once you have the hub installed you need to configure TogetherJS to use the hub, like:
 
 ```javascript
