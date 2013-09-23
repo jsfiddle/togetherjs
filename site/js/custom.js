@@ -50,7 +50,7 @@
           if(isMobile.any()){
 
             //play video on mobile a device
-             $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
+             $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image@2x.png" class="img-responsive"></a>');
 
             // turn off animations
             jQuery.fx.off = true;
