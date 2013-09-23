@@ -32,7 +32,7 @@ Setting up a development environment
 
 TogetherJS has two main pieces:
 
-* The [server](https://github.com/mozilla/togetherjs/blob/develop/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon it's incredibly boring [history](https://github.com/mozilla/togetherjs/commits/develop/hub/server.js).
+* The [server](https://github.com/mozilla/togetherjs/blob/develop/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon its incredibly boring [history](https://github.com/mozilla/togetherjs/commits/develop/hub/server.js).
 
 * The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
 
