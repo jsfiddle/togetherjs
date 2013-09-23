@@ -249,11 +249,11 @@ h5 {
 ----------------------------------------------- */
 
 #hero {
-  background: url('../images/bg@2x.png') 100% 0 repeat fixed; /*photo credit to Yuan Wang, thanks!*/
-  background-size: 100% 100%;
-	margin: 0 auto;
+  background: url('../images/bg@2x.png') 50% 0 no-repeat fixed;
+  background-size: 2042px 606px;
+	margin: 14px auto;
   width: 100%;
-  max-width: 1920px;
+  //max-width: 1920px;
   position: relative;
 }
 
@@ -540,6 +540,12 @@ h5 {
 
 #footer a img {
   width: 50%;
+}
+
+#footer .ph-credit {
+  color: rgba(72, 72, 72, 0.5);
+  font-size: 10px;
+  margin-top: 20px;
 }
 
 
