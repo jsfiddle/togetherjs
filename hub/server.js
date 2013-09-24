@@ -225,7 +225,13 @@ wsServer.on('request', function(request) {
     peerCount: allConnections[id].length-1
   }));
   connection.on('message', function(message) {
-    var parsed = JSON.parse(message.utf8Data);
+    var parsed;
+    try {
+      parsed = JSON.parse(message.utf8Data);
+    } catch (e) {
+      logger.warn((new Date()) + ' error parsing JSON: ' + JSON.stringify(message.utf8Data) + ": " + e);
+      return;
+    }
     connectionStats[id].clients[parsed.clientId] = true;
     var domain = null;
     if (parsed.url) {
