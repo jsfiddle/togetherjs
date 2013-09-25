@@ -75,7 +75,15 @@ Most of the actual code is in the client, which is **open source** and **easy to
 
 As mentioned there are several configuration parameters.  To see the exact list of settings and their defaults, look at `TogetherJS._defaultConfiguration` in [together.js](https://github.com/mozilla/togetherjs/blob/develop/togetherjs/togetherjs.js)
 
-There are a couple ways of configuring TogetherJS.  The one that we prefer is to set a global variable before `togetherjs(-min).js` is included.  Each variable is named `TogetherJSConfig_*`.  This makes it fairly easy to add or remove variables.  Note however that once `togetherjs(-min).js)` is loaded that these variables might not be respected.
+There are a couple ways of configuring TogetherJS.  The one that we prefer is to set a global variable before `togetherjs(-min).js` is included.  Each variable is named `TogetherJSConfig_*`.  This makes it fairly easy to add or remove variables.  Note however that once `togetherjs(-min).js)` is loaded that these variables might not be respected.  So do:
+
+```js
+<script>
+var TogetherJSConfig_something = "foo";
+// more config...
+</script>
+<script src="https://togetherjs.com/togetherjs-min.js"></script>
+```
 
 The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.config("variable", value)`
 
@@ -103,7 +111,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     Typically if you use `togetherjs.js` you'll get the unminimized and uncombined code, with each module loaded lazily.  If you use `togetherjs-min.js` you get the combined code.  But if you want to override that more dynamically, you can use this setting.
 
 `TogetherJSConfig_findRoom`:
-    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
+    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users"`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
 
 `TogetherJSConfig_suppressJoinConfirmation`:
     When a person is invited to a session, they'll be asked if they want to join in browsing with the other person.  Set this to `true` and they won't be asked to confirm joining.  Useful when combined with `findRoom`.
@@ -303,8 +311,6 @@ MyApp.changeVisibility = function (el, isVisible) {
 
 There's a good chance your application has its own identity, and you know the name of the user, and perhaps have an avatar.  (If you don't have an avatar but do have an email, you might want to use that to make a Gravatar.)
 
-To see an example of this see `/example/app-integration`
-
 To do this you configure TogetherJS with some functions:
 
 `TogetherJSConfig_getUserName = function () {return 'User Name';};`
@@ -318,6 +324,8 @@ This returns a URL to the user's avatar.  It should be 40px square. Again return
 `TogetherJSConfig_getUserColor = function () {return '#ff00ff';};`
 
 This returns the user's preferred color that represents them.  This should be a CSS color.
+
+The names might confuse you: you are providing functions that TogetherJS will call to get the user's name, avatar, and color.  It doesn't return the name the user has set through TogetherJS (that would be `TogetherJS.require("peers").Self.name`).
 
 If any of these values are updated while in the page (like if you have a login process that doesn't cause a page reload) then call `TogetherJS.refreshUserData()` and the respective `getUser*` callbacks will all be called again.
 
@@ -419,7 +427,7 @@ You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/d
 
 ### IRC / Live Chat
 
-We are available on the `#togetherjs` channel on `irc.mozilla.org`
+We are available on the `#togetherjs` channel on `irc.mozilla.org`.  Logs are on [irclog.gr](http://irclog.gr/#browse/irc.mozilla.org/togetherjs)
 
 If you don't use IRC, you can quickly join the chat from the web [using kiwiirc](https://kiwiirc.com/client/irc.mozilla.org/togetherjs).
 
