@@ -1162,6 +1162,23 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     //if users hit X then show the participant button with the consol
 
     dock: deferForContainer(function () {
+      
+      // collapse the Dock if too many users
+      function CollapsedDock() {
+        //calculate number of users in the session
+        var numberOfUsers = parseInt(peers.getAllPeers().length);
+        if( numberOfUsers >= 5) {    
+          // decrease/reset dock height
+          $("#togetherjs-dock").css("height", 260);
+          //replace participant button
+          $("#togetherjs-dock-participants").replaceWith("<button class='togetherjs-button togetherjs-dock-person'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participant List</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
+          // new full participant window created on toggle
+
+
+        }
+      }
+      CollapsedDock();
+      
       if (this.dockElement) {
         return;
       }
