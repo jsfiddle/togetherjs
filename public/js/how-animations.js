@@ -53,7 +53,7 @@
         $('.howto-animation-01').waypoint(function() {
  
           
-          // 1. Add ConnectJS Javascript and HTML to your site.
+          // 1. Add ConnectJS JavaScript and HTML to your site.
           // animate in first 
           startFirstAnimation();
           function startFirstAnimation() {

@@ -61,6 +61,15 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-35433268-43', 'togetherjs.com');
+    ga('send', 'pageview');
+    </script>
+
   </head>
   <body data-spy="scroll" data-target="#markdownpages">
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
@@ -133,7 +142,7 @@ template: docs.tmpl
 
 <p>Would you like to use TogetherJS on your site?  Great!  If you have feedback on this or any other part of TogetherJS <a href="https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">we&#39;d like to hear it</a>!</p>
 <h2 id="quick-start">Quick Start</h2>
-<p>Get started quickly by including two things on your page.  First the Javascript:</p>
+<p>Get started quickly by including two things on your page.  First the JavaScript:</p>
 <pre><code class="lang-html"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript">
   <span class="comment">// TogetherJS configuration would go here, but we'll talk about that</span>
   <span class="comment">// later</span>
@@ -168,7 +177,12 @@ $(<span class="function"><span class="keyword">function</span> <span class="para
 <p>Most of the actual code is in the client, which is <strong>open source</strong> and <strong>easy to freeze</strong>.  You can easily make your own static copy of the client, and so ensure the code won‘t change out from underneath you and invalidate your own testing of the product on your site.  Almost all client updates do not involve the server, so version management and stability is very easy to achieve.  Because TogetherJS does not save anything, it’s easy to include in any development environment as well, and you can run it on an intranet or private site so long as everyone using it has access to that site; our servers.</p>
 <h2 id="configuring-togetherjs">Configuring TogetherJS</h2>
 <p>As mentioned there are several configuration parameters.  To see the exact list of settings and their defaults, look at <code>TogetherJS._defaultConfiguration</code> in <a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/togetherjs.js">together.js</a></p>
-<p>There are a couple ways of configuring TogetherJS.  The one that we prefer is to set a global variable before <code>togetherjs(-min).js</code> is included.  Each variable is named <code>TogetherJSConfig_*</code>.  This makes it fairly easy to add or remove variables.  Note however that once <code>togetherjs(-min).js)</code> is loaded that these variables might not be respected.</p>
+<p>There are a couple ways of configuring TogetherJS.  The one that we prefer is to set a global variable before <code>togetherjs(-min).js</code> is included.  Each variable is named <code>TogetherJSConfig_*</code>.  This makes it fairly easy to add or remove variables.  Note however that once <code>togetherjs(-min).js)</code> is loaded that these variables might not be respected.  So do:</p>
+<pre><code class="lang-js">&lt;script&gt;
+var TogetherJSConfig_something = "foo";
+// more config...
+&lt;/script&gt;
+&lt;script src="https://togetherjs.com/togetherjs-min.js"&gt;&lt;/script&gt;</code></pre>
 <p>The other way to set a variable <em>after</em> TogetherJS is loaded is <code>TogetherJS.config(&quot;variable&quot;, value)</code></p>
 <h3 id="the-configuration">The Configuration</h3>
 <p><code>TogetherJSConfig_siteName</code>:
@@ -186,7 +200,7 @@ $(<span class="function"><span class="keyword">function</span> <span class="para
 <p><code>TogetherJSConfig_useMinimizedCode</code>:
     Typically if you use <code>togetherjs.js</code> you&#39;ll get the unminimized and uncombined code, with each module loaded lazily.  If you use <code>togetherjs-min.js</code> you get the combined code.  But if you want to override that more dynamically, you can use this setting.</p>
 <p><code>TogetherJSConfig_findRoom</code>:
-    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code></p>
+    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users&quot;</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code></p>
 <p><code>TogetherJSConfig_suppressJoinConfirmation</code>:
     When a person is invited to a session, they&#39;ll be asked if they want to join in browsing with the other person.  Set this to <code>true</code> and they won&#39;t be asked to confirm joining.  Useful when combined with <code>findRoom</code>.</p>
 <p><code>TogetherJSConfig_suppressInvite</code>:
@@ -321,7 +335,6 @@ MyApp.changeVisibility = <span class="function"><span class="keyword">function</
 };</code></pre>
 <h3 id="setting-identity-information">Setting identity information</h3>
 <p>There‘s a good chance your application has its own identity, and you know the name of the user, and perhaps have an avatar.  (If you don’t have an avatar but do have an email, you might want to use that to make a Gravatar.)</p>
-<p>To see an example of this see <code>/example/app-integration</code></p>
 <p>To do this you configure TogetherJS with some functions:</p>
 <p><code>TogetherJSConfig_getUserName = function () {return &#39;User Name&#39;;};</code></p>
 <p>This returns the user‘s name (or nick).  Return null if you can’t determine the name.</p>
@@ -329,6 +342,7 @@ MyApp.changeVisibility = <span class="function"><span class="keyword">function</
 <p>This returns a URL to the user‘s avatar.  It should be 40px square. Again return null if you aren’t sure.</p>
 <p><code>TogetherJSConfig_getUserColor = function () {return &#39;#ff00ff&#39;;};</code></p>
 <p>This returns the user&#39;s preferred color that represents them.  This should be a CSS color.</p>
+<p>The names might confuse you: you are providing functions that TogetherJS will call to get the user‘s name, avatar, and color.  It doesn’t return the name the user has set through TogetherJS (that would be <code>TogetherJS.require(&quot;peers&quot;).Self.name</code>).</p>
 <p>If any of these values are updated while in the page (like if you have a login process that doesn&#39;t cause a page reload) then call <code>TogetherJS.refreshUserData()</code> and the respective <code>getUser*</code> callbacks will all be called again.</p>
 <p>See <a href="https://github.com/mozilla/togetherjs/issues/504">#504</a> for a bug related to improving this support.</p>
 <h3 id="togetherjsreinitialize4041">TogetherJS.reinitialize&#40;&#41;</h3>
@@ -380,7 +394,7 @@ TogetherJS.reinitialize();</code></pre>
 <p>You can build the addon using the <a href="https://addons.mozilla.org/en-US/developers/builder">Addon-SDK</a>. Once you&#39;ve installed the SDK, go into the <code>addon/</code> directory and run <code>cfx xpi</code> to create an XPI (packaged addon file) or <code>cfx run</code> to start up Firefox with the addon installed (for development).</p>
 <h2 id="getting-help">Getting Help</h2>
 <h3 id="irc--live-chat">IRC / Live Chat</h3>
-<p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code></p>
+<p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code>.  Logs are on <a href="http://irclog.gr/#browse/irc.mozilla.org/togetherjs">irclog.gr</a></p>
 <p>If you don&#39;t use IRC, you can quickly join the chat from the web <a href="https://kiwiirc.com/client/irc.mozilla.org/togetherjs">using kiwiirc</a>.</p>
 <h3 id="issues">Issues</h3>
 <p>Please submit any issues you have via <a href="https://github.com/mozilla/togetherjs/issues/new">the Github issue tracker</a>.</p>
@@ -399,10 +413,10 @@ TogetherJS.reinitialize();</code></pre>
         <footer>
 
           <section class="row" id="footer">
-            <div class="col-xs-3 text-left">
+            <div class="col-xs-12 col-sm-3 text-left">
               <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="">Overview</a></li>
                 <li><a href=".././docs/" target="_blank">Docs</a></li>
@@ -410,7 +424,7 @@ TogetherJS.reinitialize();</code></pre>
                 <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
                 <li><a href=".././docs/contributing.html">Contributing</a></li>
@@ -419,11 +433,12 @@ TogetherJS.reinitialize();</code></pre>
                 <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>
           </section>

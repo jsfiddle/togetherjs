@@ -50,7 +50,7 @@
           if(isMobile.any()){
 
             //play video on mobile a device
-             $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image-01@2x-overlay@2x.png" class="img-responsive"></a>');
+             $("#video-area").html('<a href="http://www.youtube.com/embed/hJEq4W0FZQ0?autoplay=1"><img src="images/site-hero-image@2x.png" class="img-responsive"></a>');
 
             // turn off animations
             jQuery.fx.off = true;
@@ -75,9 +75,14 @@
             $('.main-get-started').css("-ms-animation", "none");
             $('.main-get-started').css("animation", "none");
             
-            $( ".howto-animation-01 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-01-addit.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
-            $( ".howto-animation-02 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-02-dock-sm@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
-            $( ".howto-animation-03 .imagearea" ).replaceWith( "<p><img src='images/togetherjs-how-03-collaborate-cursors@2x.png' alt='...' class='img-rounded img-responsive how-section'></p>" );
+            $( ".howto-animation-01" ).replaceWith( "<div class='col-xs-12'><p><img src='images/togetherjs-how-01-addit.png' alt='...' class='img-rounded img-responsive how-section'></p><h4 class='text-left' style='margin-top:0px'>Add TogetherJS Javascript and HTML to your site.</h4><p class='text-left smtextright'>Just copy and paste TogetherJS's JS library and HTML snippet into your site or app to give it out-of-the-box collaboration tools and features.</p></div>" );
+            $( ".howto-animation-02" ).replaceWith( "<div class='col-xs-12'><p><img src='images/togetherjs-how-02-dock-sm@2x.png' alt='...' class='img-rounded img-responsive how-section'></p><h4 class='text-left' style='margin-top:0px'>Your site is now TogetherJS enabled.</h4><p class='text-left smtextleft'>If your users want to collaborate with a friend, they can click the TogetherJS button on your site.</p></div>" );
+            $( ".howto-animation-03" ).replaceWith( "<div class='col-xs-12'><p><img src='images/togetherjs-how-03-collaborate-cursors@2x.png' alt='...' class='img-rounded img-responsive how-section'></p><h4 class='text-left' style='margin-top:0px'>Your users can then collaborate in real time!</h4><p class='text-left smtextright'>Your users can send a unique TogetherJS url to a friend.  When the friend opens the link, each user sees the same page and can interact with it together in real time.</p></div>" );
+            
+            $("#features .col-xs-12.col-sm-6").first().css({
+              marginBottom: "-8px",
+              paddingBottom: "0px"
+            });
             //
             
           }

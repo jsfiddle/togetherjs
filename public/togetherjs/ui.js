@@ -1152,6 +1152,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: this.peer
       });
     },
+    
+    // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
+    // if there are X users in the session
+    // then hide the users in the dock
+    // and shrink the size of the dock
+    // and if you rollover the dock, it expands and reveals the rest of the participants in the dock
+    
+    //if users hit X then show the participant button with the consol
 
     dock: deferForContainer(function () {
       if (this.dockElement) {

@@ -64,6 +64,15 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-35433268-43', 'togetherjs.com');
+    ga('send', 'pageview');
+    </script>
+
   </head>
   <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
@@ -1926,9 +1935,36 @@ had been shown</p>
       ui.chat.joinedSession({
         peer: <span class="keyword">this</span>.peer
       });
-    },
+    },</pre></div></div>
+              
+            </li>
+          
+            <li id="section-57">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-57">&#182;</a>
+                </div>
+                <p>when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
+if there are X users in the session
+then hide the users in the dock
+and shrink the size of the dock
+and if you rollover the dock, it expands and reveals the rest of the participants in the dock</p>
 
-    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+              </div>
+              
+              
+            </li>
+          
+            <li id="section-58">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-58">&#182;</a>
+                </div>
+                <p>if users hit X then show the participant button with the consol</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">if</span> (<span class="keyword">this</span>.dockElement) {
         <span class="keyword">return</span>;
       }
@@ -1962,10 +1998,10 @@ had been shown</p>
               
             </li>
           
-            <li id="section-57">
+            <li id="section-59">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-57">&#182;</a>
+                  <a class="pilcrow" href="#section-59">&#182;</a>
                 </div>
                 <p>Following doesn&#39;t happen until the window is closed
 FIXME: should we tell the user this?</p>
@@ -2057,10 +2093,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-58">
+            <li id="section-60">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-58">&#182;</a>
+                  <a class="pilcrow" href="#section-60">&#182;</a>
                 </div>
                 <p>FIXME: scroll to person</p>
 
@@ -2076,10 +2112,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-59">
+            <li id="section-61">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-59">&#182;</a>
+                  <a class="pilcrow" href="#section-61">&#182;</a>
                 </div>
                 <p>FIXME: should I get rid of the dockElement?</p>
 
@@ -2182,10 +2218,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-60">
+            <li id="section-62">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-60">&#182;</a>
+                  <a class="pilcrow" href="#section-62">&#182;</a>
                 </div>
                 <p>FIXME: use the return value of this to give a signal that
 the invite has been successfully sent:</p>
@@ -2209,10 +2245,10 @@ the invite has been successfully sent:</p>
               
             </li>
           
-            <li id="section-61">
+            <li id="section-63">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-61">&#182;</a>
+                  <a class="pilcrow" href="#section-63">&#182;</a>
                 </div>
                 <p>Not directed to us</p>
 
@@ -2262,10 +2298,10 @@ the invite has been successfully sent:</p>
         <footer>
 
           <section class="row" id="footer">
-            <div class="col-xs-3 text-left">
+            <div class="col-xs-12 col-sm-3 text-left">
               <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="">Overview</a></li>
                 <li><a href=".././docs/" target="_blank">Docs</a></li>
@@ -2273,7 +2309,7 @@ the invite has been successfully sent:</p>
                 <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
                 <li><a href=".././docs/contributing.html">Contributing</a></li>
@@ -2282,11 +2318,12 @@ the invite has been successfully sent:</p>
                 <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>
           </section>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Drawing</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="../todo/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+  <style type="text/css" media="screen">
+    .main{
+      padding: 80px 15px;
+    }
+
+    h1 {
+      color: #e74c3c;
+    }
+
+    .navbar {
+      background: #fa6374;
+    }
+
+    .navbar-inverse .navbar-brand {
+      color: #fff;
+    }
+
+    .form-control {
+      padding: 0 12px;
+    }
+
+    /*reset Twitter Bootstrap*/
+    @media screen {
+      * {
+        -webkit-box-sizing: content-box !important;
+        -moz-box-sizing: content-box !important;
+        box-sizing: content-box !important;
+      }
+    }
+
+    .container a img {
+      width: 135px;
+      height: 34px;
+    }
+
+    .swatch {
+      display: inline-block;
+      height: 1em;
+      width: 1em;
+      margin-left: 0.4em;
+    }
+
+  </style>
+
+</head>
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <a class="navbar-brand pull-left" href="#">Draw</a>
+        <a href="#" class="navbar-btn pull-right" onclick="TogetherJS(this); return false;"><img src="/images/start-togetherjs-blue.png"></a>
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      <div class="main">
+
+        <div class="row">
+
+          <canvas id="canvas" width="600" height="600" style="border solid black 1px">
+          </canvas>
+
+          <div>
+            <span class="swatch" style="background-color: #0f0"></span>
+            <span class="swatch" style="background-color: #f00"></span>
+            <span class="swatch" style="background-color: #00f"></span>
+            <span class="swatch" style="background-color: #000"></span>
+            <span class="swatch" style="background-color: #fff"></span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- togetherjs -->
+    <script>
+      TogetherJSConfig_findRoom = {prefix: "togetherjsdraw", max: 5};
+      TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_storagePrefix = "tjs_draw";
+    </script>
+    <script src="/togetherjs.js"></script>
+
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="../todo/js/jquery-1.10.2.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../todo/js/bootstrap.min.js"></script>
+
+    <script src="js/app.js"></script>
+
+  </body>
+</html>

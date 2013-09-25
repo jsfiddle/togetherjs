@@ -64,6 +64,15 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-35433268-43', 'togetherjs.com');
+    ga('send', 'pageview');
+    </script>
+
   </head>
   <body >
     <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
@@ -681,6 +690,11 @@ handle it</p>
       }
       <span class="keyword">return</span> storage.tab.get(<span class="string">"status"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(saved)</span> {</span>
         <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"findRoom"</span>);
+        <span class="keyword">if</span> (findRoom &amp;&amp; saved) {
+          console.info(<span class="string">"Ignoring findRoom in lieu of continued session"</span>);
+        } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; TogetherJS.startup._joinShareId) {
+          console.info(<span class="string">"Ignoring findRoom in lieu of explicit invite to session"</span>);
+        }
         <span class="keyword">if</span> (findRoom &amp;&amp; <span class="keyword">typeof</span> findRoom == <span class="string">"string"</span> &amp;&amp; (! saved) &amp;&amp; (! TogetherJS.startup._joinShareId)) {
           isClient = <span class="literal">true</span>;
           shareId = findRoom;
@@ -883,10 +897,10 @@ we&#39;re already set to be running</p>
         <footer>
 
           <section class="row" id="footer">
-            <div class="col-xs-3 text-left">
+            <div class="col-xs-12 col-sm-3 text-left">
               <p><a href="https://mozillalabs.com/en-US/" target="_blank"><img src="../images/footer-mozilla-labs.png"></a></p>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href=".././" class="">Overview</a></li>
                 <li><a href=".././docs/" target="_blank">Docs</a></li>
@@ -894,7 +908,7 @@ we&#39;re already set to be running</p>
                 <li class=""><a href="mailto:togetherjs@mozilla.com" target="_blank">Contact</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://mozillalabs.com/en-US/togetherjs/" target="_blank">About</a></li>
                 <li><a href=".././docs/contributing.html">Contributing</a></li>
@@ -903,11 +917,12 @@ we&#39;re already set to be running</p>
                 <li class=""><a href="https://twitter.com/togetherjs" target="_blank">Twitter</a></li>
               </ul>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
                 <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
                 <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>
           </section>
