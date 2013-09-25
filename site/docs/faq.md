@@ -9,3 +9,5 @@
 ## Should I host my own server?
 
 ## How stable is TogetherJS?
+
+## Does it work on an intranet?
