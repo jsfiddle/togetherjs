@@ -1964,7 +1964,76 @@ and if you rollover the dock, it expands and reveals the rest of the participant
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+                <div class="content"><div class='highlight'><pre>    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-59">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-59">&#182;</a>
+                </div>
+                <p>collapse the Dock if too many users</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="function"><span class="keyword">function</span> <span class="title">CollapsedDock</span><span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-60">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-60">&#182;</a>
+                </div>
+                <p>calculate number of users in the session</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> numberOfUsers = parseInt(peers.getAllPeers().length);
+        <span class="keyword">if</span>( numberOfUsers &gt;= <span class="number">5</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-61">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-61">&#182;</a>
+                </div>
+                <p>decrease/reset dock height</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          $(<span class="string">"#togetherjs-dock"</span>).css(<span class="string">"height"</span>, <span class="number">260</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-62">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-62">&#182;</a>
+                </div>
+                <p>replace participant button</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          $(<span class="string">"#togetherjs-dock-participants"</span>).replaceWith(<span class="string">"&lt;button class='togetherjs-button togetherjs-dock-person'&gt;&lt;div class='togetherjs-tooltip togetherjs-dock-person-tooltip'&gt;&lt;span class='togetherjs-person-name'&gt;Participant List&lt;/span&gt;&lt;span class='togetherjs-person-tooltip-arrow-r'&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'&gt;&lt;/div&gt;&lt;/button&gt;"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-63">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-63">&#182;</a>
+                </div>
+                <p>new full participant window created on toggle</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        }
+      }
+      CollapsedDock();
+      
       <span class="keyword">if</span> (<span class="keyword">this</span>.dockElement) {
         <span class="keyword">return</span>;
       }
@@ -1998,10 +2067,10 @@ and if you rollover the dock, it expands and reveals the rest of the participant
               
             </li>
           
-            <li id="section-59">
+            <li id="section-64">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-59">&#182;</a>
+                  <a class="pilcrow" href="#section-64">&#182;</a>
                 </div>
                 <p>Following doesn&#39;t happen until the window is closed
 FIXME: should we tell the user this?</p>
@@ -2093,10 +2162,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-60">
+            <li id="section-65">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-60">&#182;</a>
+                  <a class="pilcrow" href="#section-65">&#182;</a>
                 </div>
                 <p>FIXME: scroll to person</p>
 
@@ -2112,10 +2181,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-61">
+            <li id="section-66">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-61">&#182;</a>
+                  <a class="pilcrow" href="#section-66">&#182;</a>
                 </div>
                 <p>FIXME: should I get rid of the dockElement?</p>
 
@@ -2218,10 +2287,10 @@ FIXME: should we tell the user this?</p>
               
             </li>
           
-            <li id="section-62">
+            <li id="section-67">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-62">&#182;</a>
+                  <a class="pilcrow" href="#section-67">&#182;</a>
                 </div>
                 <p>FIXME: use the return value of this to give a signal that
 the invite has been successfully sent:</p>
@@ -2245,10 +2314,10 @@ the invite has been successfully sent:</p>
               
             </li>
           
-            <li id="section-63">
+            <li id="section-68">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-63">&#182;</a>
+                  <a class="pilcrow" href="#section-68">&#182;</a>
                 </div>
                 <p>Not directed to us</p>
 
