@@ -8,12 +8,14 @@ if ( process.env.NEW_RELIC_HOME ) {
 }
 
 var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
+var SAMPLE_LOAD_INTERVAL = 5*60*1000; // 5 minutes
 var EMPTY_ROOM_LOG_TIMEOUT = 3*60*1000; // 3 minutes
 
 var WebSocketServer = require('websocket').server;
 var WebSocketRouter = require('websocket').router;
 var http = require('http');
 var parseUrl = require('url').parse;
+var fs = require('fs');
 
 // FIXME: not sure what logger to use
 //var logger = require('../../lib/logger');
@@ -21,30 +23,79 @@ var parseUrl = require('url').parse;
 // LOG_LEVEL values:
 // 0: show everything (including debug)
 // 1: don't show debug, do show logger.log
-// 2: don't show logger.log and debug, do show console.info (and STATS)
+// 2: don't show logger.log and debug, do show logger.info (and STATS)
 // 3: don't show info, do show warn
 // 4: don't show warn, do show error
 // 5: don't show anything
 // Stats are at level 2
-var logLevel = process.env.LOG_LEVEL || '0';
-logLevel = parseInt(logLevel, 10);
 
-var logger = {
+var Logger = function (level, filename, stdout) {
+  this.level = level;
+  this.filename = filename;
+  this.stdout = !!stdout;
+  this._open();
+  process.on("SIGUSR2", (function () {
+    this._open();
+  }).bind(this));
+};
+
+Logger.prototype = {
+
+  write: function () {
+    if (this.stdout) {
+      console.log.apply(console, arguments);
+    }
+    if (this.file) {
+      var s = [];
+      for (var i=0; i<arguments.length; i++) {
+        var a = arguments[i];
+        if (typeof a == "string") {
+          s.push(a);
+        } else {
+          s.push(JSON.stringify(a));
+        }
+      }
+      s = s.join(" ") + "\n";
+      this.file.write(this.date() + " " + s);
+    }
+  },
+
+  date: function () {
+    return (new Date()).toISOString();
+  },
+
+  _open: function () {
+    var restarted = false;
+    if (this.file) {
+      this.file.end(this.date() + " Logs rotating\n");
+      this.file = null;
+      restarted = true;
+    }
+    if (this.filename) {
+      this.file = fs.createWriteStream(this.filename, {flags: 'a', mode: parseInt('644', 8), encoding: "UTF-8"});
+      if (restarted) {
+        this.write("Reopened logging");
+      }
+    }
+  }
+
 };
 
 [["error", 4], ["warn", 3], ["info", 2], ["log", 1], ["debug", 0]].forEach(function (nameLevel) {
   var name = nameLevel[0];
   var level = nameLevel[1];
-  logger[name] = function () {
+  Logger.prototype[name] = function () {
     if (logLevel <= level) {
       if (name != "log") {
-        console.log.apply(console, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
+        this.write.apply(this, [name.toUpperCase()].concat(Array.prototype.slice.call(arguments)));
       } else {
-        console.log.apply(console, arguments);
+        this.write.apply(this, arguments);
       }
     }
   };
 });
+
+var logger = new Logger(0, null, true);
 
 var server = http.createServer(function(request, response) {
   var url = parseUrl(request.url, true);
@@ -55,15 +106,11 @@ var server = http.createServer(function(request, response) {
   if (url.pathname == '/status') {
     response.end("OK");
   } else if (url.pathname == '/load') {
-    var sessions = 0;
-    var conns = 0;
-    for (var id in allConnections) {
-      if (allConnections[id].length) {
-        sessions++;
-        conns += allConnections[id].length;
-      }
-    }
-    response.end("OK " + conns + " connections " + sessions + " sessions");
+    var load = getLoad();
+    response.end("OK " + load.connections + " connections " +
+                 load.sessions + " sessions; " +
+                 load.solo + " are single-user and " +
+                 load.empty + " not counted because they are empty");
   } else if (url.pathname == '/findroom') {
     if (request.method == "OPTIONS") {
       // CORS preflight
@@ -156,7 +203,7 @@ function pickRandom(seq) {
 
 function startServer(port, host) {
   server.listen(port, host, function() {
-    logger.info('HUB Server listening on port ' + port + " interface: " + host);
+    logger.info('HUB Server listening on port ' + port + " interface: " + host + " PID: " + process.pid);
   });
 }
 
@@ -187,7 +234,7 @@ wsServer.on('request', function(request) {
   if (!originIsAllowed(request.origin)) {
     // Make sure we only accept requests from an allowed origin
     request.reject();
-    logger.info((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+    logger.info('Connection from origin ' + request.origin + ' rejected.');
     return;
   }
 
@@ -219,7 +266,7 @@ wsServer.on('request', function(request) {
   allConnections[id].push(connection);
   connectionStats[id].connections++;
   connectionStats[id].lastLeft = null;
-  logger.debug((new Date()) + ' Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
+  logger.debug('Connection accepted to ' + JSON.stringify(id) + ' ID:' + connection.ID);
   connection.sendUTF(JSON.stringify({
     type: "init-connection",
     peerCount: allConnections[id].length-1
@@ -229,7 +276,7 @@ wsServer.on('request', function(request) {
     try {
       parsed = JSON.parse(message.utf8Data);
     } catch (e) {
-      logger.warn((new Date()) + ' error parsing JSON: ' + JSON.stringify(message.utf8Data) + ": " + e);
+      logger.warn('Error parsing JSON: ' + JSON.stringify(message.utf8Data) + ": " + e);
       return;
     }
     connectionStats[id].clients[parsed.clientId] = true;
@@ -274,7 +321,7 @@ wsServer.on('request', function(request) {
       delete allConnections[id];
       connectionStats[id].lastLeft = Date.now();
     }
-    logger.debug((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
+    logger.debug('Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
   });
 });
 
@@ -297,6 +344,34 @@ setInterval(function () {
     });
   }
 }, SAMPLE_STATS_INTERVAL);
+
+setInterval(function () {
+  logger.info("LOAD", JSON.stringify(getLoad()));
+}, SAMPLE_LOAD_INTERVAL);
+
+function getLoad() {
+  var sessions = 0;
+  var connections = 0;
+  var empty = 0;
+  var solo = 0;
+  for (var id in allConnections) {
+    if (allConnections[id].length) {
+      sessions++;
+      connections += allConnections[id].length;
+      if (allConnections[id].length == 1) {
+        solo++;
+      }
+    } else {
+      empty++;
+    }
+  }
+  return {
+    sessions: sessions,
+    connections: connections,
+    empty: empty,
+    solo: solo
+  };
+}
 
 function countClients(clients) {
   var n = 0;
@@ -322,17 +397,20 @@ function logStats(id, stats) {
 
 if (require.main == module) {
   var ops = require('optimist')
-      .usage("Usage: $0 [--port 8080] [--host localhost]")
+      .usage("Usage: $0 [--port 8080] [--host localhost] [--log filename] [--log-level N]")
       .describe("port", "The port to server on (default $HUB_SERVER_PORT, $PORT, $VCAP_APP_PORT, or 8080")
       .describe("host", "The interface to serve on (default $HUB_SERVER_HOST, $HOST, $VCAP_APP_HOST, 127.0.0.1).  Use 0.0.0.0 to make it public")
-      .describe("log-level", "The level of logging to do, from 0 (very verbose) to 5 (nothing) (default $LOG_LEVEL or 0)");
+      .describe("log-level", "The level of logging to do, from 0 (very verbose) to 5 (nothing) (default $LOG_LEVEL or 0)")
+      .describe("log", "A file to log to (default stdout)");
   var port = ops.argv.port || process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
       process.env.PORT || 8080;
   var host = ops.argv.host || process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
       process.env.HOST || '127.0.0.1';
+  var logLevel = 0;
   if (ops.argv['log-level']) {
     logLevel = parseInt(ops.argv['log-level'], 10);
   }
+  logger = new Logger(logLevel, ops.argv.log, !ops.argv.log);
   if (ops.argv.h || ops.argv.help) {
     console.log(ops.help());
     process.exit();
