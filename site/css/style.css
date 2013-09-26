@@ -543,7 +543,7 @@ h5 {
 }
 
 #footer .ph-credit {
-  color: rgba(72, 72, 72, 0.5);
+  color: rgba(72, 72, 72, 1);
   font-size: 10px;
   margin-top: 20px;
 }
@@ -992,6 +992,10 @@ h5 {
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
   
+  #features li.media {
+    min-height: 140px;
+  }
+  
   #tryitout pre {
     margin-top: 50px;
   }
@@ -1049,6 +1053,10 @@ h5 {
 
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
+  
+  #features li.media {
+    min-height: 100px;
+  }
   
   .howto-animation-01 p.smtextright {
     width: 60%;
@@ -1116,6 +1124,10 @@ h5 {
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
+  
+  #features li.media {
+    min-height: 100px;
+  }
   
   #video-area img {
     margin-top: 0%;
@@ -1326,6 +1338,12 @@ dd {
 
 #markdownpages h3 {
   font-size: 24px;
+  margin: 20px 0px;
+}
+
+#markdownpages h4 {
+  font-size: 18px;
+  margin: 20px 0px;
 }
 
 #markdownpages code {
