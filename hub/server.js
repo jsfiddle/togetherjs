@@ -397,20 +397,22 @@ function logStats(id, stats) {
 
 if (require.main == module) {
   var ops = require('optimist')
-      .usage("Usage: $0 [--port 8080] [--host localhost] [--log filename] [--log-level N]")
+      .usage("Usage: $0 [--port 8080] [--host=localhost] [--log=filename] [--log-level=N]")
       .describe("port", "The port to server on (default $HUB_SERVER_PORT, $PORT, $VCAP_APP_PORT, or 8080")
       .describe("host", "The interface to serve on (default $HUB_SERVER_HOST, $HOST, $VCAP_APP_HOST, 127.0.0.1).  Use 0.0.0.0 to make it public")
       .describe("log-level", "The level of logging to do, from 0 (very verbose) to 5 (nothing) (default $LOG_LEVEL or 0)")
-      .describe("log", "A file to log to (default stdout)");
+      .describe("log", "A file to log to (default stdout)")
+      .describe("stdout", "Log to both stdout and the log file");
   var port = ops.argv.port || process.env.HUB_SERVER_PORT || process.env.VCAP_APP_PORT ||
       process.env.PORT || 8080;
   var host = ops.argv.host || process.env.HUB_SERVER_HOST || process.env.VCAP_APP_HOST ||
       process.env.HOST || '127.0.0.1';
   var logLevel = 0;
+  var stdout = ops.argv.stdout || !ops.argv.log;
   if (ops.argv['log-level']) {
     logLevel = parseInt(ops.argv['log-level'], 10);
   }
-  logger = new Logger(logLevel, ops.argv.log, !ops.argv.log);
+  logger = new Logger(logLevel, ops.argv.log, stdout);
   if (ops.argv.h || ops.argv.help) {
     console.log(ops.help());
     process.exit();
