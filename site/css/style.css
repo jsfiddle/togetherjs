@@ -884,6 +884,11 @@ h5 {
     left: 50%;
   }
   
+  #footer .col-xs-12 {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  
   #footer a {
     font-size: 11px;
   }
