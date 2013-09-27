@@ -530,9 +530,12 @@
     }
   };
   TogetherJS.listenForHashChange = function(){
-    window.addEventListener("hashchange",function(){
-      session.synchroniseSessions();
-    },false); 
+     $(window).on("hashchange",function(){
+       if(session===null){
+         session=TogetherJS.require("session");
+       }
+       session.synchroniseSessions();
+     }); 
   };
   TogetherJS.reinitialize = function () {
     if (TogetherJS.running && typeof TogetherJS.require == "function") {

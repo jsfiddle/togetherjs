@@ -238,6 +238,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // when user clicks a link like page.com/index.html#page1 this will be called to resend hello 
   // so others would see that the user switched to another page
   session.synchroniseSessions = function(){
+    // needed because when message arives from peer this variable will be checked to 
+    // decide weather to show actions or not
+    if(includeHashInUrl){
+      currentUrl = (location.href + "").replace(/\&.*$/, "");
+    }else{
+      currentUrl = (location.href + "").replace(/\#.*$/, "");
+    }
     sendHello(false);
   }
   /****************************************
