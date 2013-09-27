@@ -1,3 +1,10 @@
+<% /*
+   This is basically all the markup and interface for TogetherJS.
+   Note all links should be like http://localhost:8080/togetherjs/*
+   these links are rewritten with the location where TogetherJS was deployed.
+
+   This file is inlined into togetherjs/templates.js
+*/ %>
 <div id="togetherjs-container" class="togetherjs">
 
   <!-- This is the main set of buttons: -->
@@ -81,7 +88,7 @@
       </div>
     </section>
   </div>
-  
+
   <!-- Participant Full List view template: -->
   <div id="togetherjs-participantlist" class="togetherjs-window"
        data-bind-to="#togetherjs-participantlist-button" style="display: none">
@@ -94,7 +101,7 @@
             <span class="tj-name togetherjs-person-name">Useronewith alongname</span>
             <span class="tj-status">&#9679;</span>
             <p class="tj-urllocation">Currently at: <a class="togetherjs-person-url togetherjs-person-url-title" href="">http://www.location.comwww.location.comwww.location.comasdfsafd</a></p>
-            <p class="tj-follow">Follow: 
+            <p class="tj-follow">Follow:
               <label class="togetherjs-follow-question" for="togetherjs-person-status-follow">
                 <input type="checkbox" id="togetherjs-person-status-follow">
               </label>
