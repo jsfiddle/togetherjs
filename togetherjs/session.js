@@ -456,7 +456,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
-
   session.on("start", function () {
     $(window).on("resize", resizeEvent);
     $(window).on("hashchange",hashchangeEvent);

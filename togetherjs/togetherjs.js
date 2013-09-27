@@ -643,7 +643,6 @@
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
   var hash = location.hash.replace(/^#/, "");
-
   var m = /&?togetherjs=([^&]*)/.exec(hash);
   if (m) {
     TogetherJS.startup._joinShareId = m[1];
