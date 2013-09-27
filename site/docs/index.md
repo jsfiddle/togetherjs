@@ -111,7 +111,10 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     Typically if you use `togetherjs.js` you'll get the unminimized and uncombined code, with each module loaded lazily.  If you use `togetherjs-min.js` you get the combined code.  But if you want to override that more dynamically, you can use this setting.
 
 `TogetherJSConfig_findRoom`:
-    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users"`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
+    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users"`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
+
+`TogetherJSConfig_autoStart`:
+    If true then start TogetherJS automatically.  Note TogetherJS already starts automatically when a session is continued, so if you just always call `TogetherJS()` then you might cause TogetherJS to stop.  Note you must set this as `TogetherJSConfig_autoStart = true`, not using `TogetherJS.config("autoStart", true)` (it must be set when TogetherJS loads).  Anyone who autostarts a session will not be considered the session creator.
 
 `TogetherJSConfig_suppressJoinConfirmation`:
     When a person is invited to a session, they'll be asked if they want to join in browsing with the other person.  Set this to `true` and they won't be asked to confirm joining.  Useful when combined with `findRoom`.

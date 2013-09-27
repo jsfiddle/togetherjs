@@ -448,10 +448,10 @@
     // "MySite's Collaboration Tool"
     toolName: null,
     // Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
-    // Implies auto-start
-    // Also with findRoom: "roomName" it will start TogetherJS automatically in the
-    // given room.
+    // Also with findRoom: "roomName" it will connect to the given room name
     findRoom: null,
+    // If true, starts TogetherJS automatically (of course!)
+    autoStart: false,
     // If true, then the "Join TogetherJS Session?" confirmation dialog
     // won't come up
     suppressJoinConfirmation: false,
@@ -683,6 +683,7 @@
       delete window._TogetherJSBookmarklet;
       TogetherJS();
     } else {
+      // FIXME: this doesn't respect storagePrefix:
       var key = "togetherjs-session.status";
       var value = sessionStorage.getItem(key);
       if (value) {
@@ -692,7 +693,8 @@
           TogetherJS.startup.reason = value.startupReason;
           TogetherJS();
         }
-      } else if (window.TogetherJSConfig_findRoom) {
+      } else if (window.TogetherJSConfig_autoStart ||
+                 (window.TogetherJSConfig && window.TogetherJSConfig.autoStart)) {
         TogetherJS.startup.reason = "joined";
         TogetherJS();
       }
