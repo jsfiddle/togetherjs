@@ -395,9 +395,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       }
     });
   }
-  function synchronizeSessions(){
-
-  }
   session.start = function () {
     initStartTarget();
     initIdentityId().then(function () {
