@@ -3,6 +3,14 @@
 {% block body_tag %}data-spy="scroll" data-target="#markdownpages"{% endblock %}
 {% block body %}
 
+<script type="text/javascript" charset="utf-8">
+  //adding active class
+  var activeurl = window.location.pathname;
+  if(activeurl == "/docs/") {
+    $( ".documentationActive" ).addClass( "active" );
+  }
+</script>
+
 <div class="container">
   <section class="row" id="markdownpages">
     <div class="col-md-3">
