@@ -36,7 +36,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /****************************************
    * URLs
    */
-  var includeHashInUrl=TogetherJS.getConfig('includeHashInUrl');
+  var includeHashInUrl = TogetherJS.getConfig('includeHashInUrl');
   session.hubUrl = function (id) {
     id = id || session.shareId;
     assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
@@ -46,11 +46,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.shareUrl = function () {
     assert(session.shareId, "Attempted to access shareUrl() before shareId is set");
     var hash = location.hash;
-    if(includeHashInUrl){
-      var m = /\?[^&]*/.exec(location.href);
-    }else{
-      var m = /\?[^#]*/.exec(location.href);
-    }
+    var m = /\?[^#]*/.exec(location.href);
     var query = "";
     if (m) {
       query = m[0];
@@ -64,7 +60,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.recordUrl = function () {
     assert(session.shareId);
     var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
-    //does includeHashInUrl has influence here??
     url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
     return url;
   };
@@ -72,8 +67,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /* location.href without the hash */
   session.currentUrl = function () {
     var returnValue;
-    if(includeHashInUrl){
-      returnValue=location.href.replace(/&.*/, "");
+    if (includeHashInUrl) {
+      returnValue=location.href;
     }else{
       returnValue=location.href.replace(/#.*/, "");
     }
@@ -142,9 +137,9 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   }
 
   // FIXME: once we start looking at window.history we need to update this:
-  
-  if(includeHashInUrl){
-    var currentUrl = (location.href + "").replace(/\&.*$/, "");
+
+  if (includeHashInUrl) {
+    var currentUrl = location.href ;
   }else{
     var currentUrl = (location.href + "").replace(/\#.*$/, "");
   }
@@ -198,7 +193,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       location.href = url;
     }
   }
-  
+
   session.timeHelloSent = null;
 
   function sendHello(helloBack) {
@@ -235,13 +230,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     session.emit("prepare-hello", msg);
     return msg;
   };
-  // when user clicks a link like page.com/index.html#page1 this will be called to resend hello 
+  // when user clicks a link like page.com/index.html#page1 this will be called to resend hello
   // so others would see that the user switched to another page
-  session.synchroniseSessions = function(){
-    // needed because when message arives from peer this variable will be checked to 
+  session.synchronizeSessions = function(){
+    // needed because when message arives from peer this variable will be checked to
     // decide weather to show actions or not
-    if(includeHashInUrl){
-      currentUrl = (location.href + "").replace(/\&.*$/, "");
+    if (includeHashInUrl) {
+      currentUrl = location.href;
     }else{
       currentUrl = (location.href + "").replace(/\#.*$/, "");
     }
@@ -307,18 +302,12 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       if (! shareId) {
         // FIXME: I'm not sure if this will ever happen, because togetherjs.js should
         // handle it
-        //
-        // maybe here there should be some change for includeHashInUrl 
-        
         var m = /&?togetherjs=([^&]*)/.exec(hash);
         if (m) {
           isClient = ! m[1];
           shareId = m[2];
           var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
-          // commented out so it does not change the hash
-          if(!includeHashInUrl){
-            location.hash = newHash;
-          }
+          location.hash = newHash;
         }
       }
       return storage.tab.get("status").then(function (saved) {
@@ -406,7 +395,9 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       }
     });
   }
+  function synchronizeSessions(){
 
+  }
   session.start = function () {
     initStartTarget();
     initIdentityId().then(function () {
@@ -471,10 +462,16 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.on("start", function () {
     $(window).on("resize", resizeEvent);
+    $(window).on("hashchange",hashchangeEvent);
   });
   session.on("close", function () {
     $(window).off("resize", resizeEvent);
+    $(window).off("hashchange",hashchangeEvent)
   });
+
+  function hashchangeEvent(){
+    session.synchronizeSessions();
+  }
   function resizeEvent() {
     session.emit("resize");
   }
