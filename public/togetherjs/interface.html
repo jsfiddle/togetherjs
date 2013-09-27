@@ -1,3 +1,10 @@
+<% /*
+   This is basically all the markup and interface for TogetherJS.
+   Note all links should be like http://localhost:8080/togetherjs/*
+   these links are rewritten with the location where TogetherJS was deployed.
+
+   This file is inlined into togetherjs/templates.js
+*/ %>
 <div id="togetherjs-container" class="togetherjs">
 
   <!-- This is the main set of buttons: -->
@@ -43,7 +50,6 @@
       </button>
       <button id="togetherjs-chat-button" class="togetherjs-button" title="Chat"></button>
       <div id="togetherjs-dock-participants"></div>
-      <div id="togetherjs-dock-participants-overload"></div>
     </div>
   </div>
 
@@ -80,6 +86,39 @@
         <input type="text" class="togetherjs-share-link">
         <!-- <a class="togetherjs-share-link" href="#">Press your thumb here.</a> -->
       </div>
+    </section>
+  </div>
+
+  <!-- Participant Full List view template: -->
+  <div id="togetherjs-participantlist" class="togetherjs-window"
+       data-bind-to="#togetherjs-participantlist-button" style="display: none">
+    <header> Participants </header>
+    <section>
+      <div class="togetherjs-not-mobile">
+        <ul>
+          <li id="togetherjs-participant-item">
+            <img class="togetherjs-person togetherjs-person-small" src="http://localhost/togetherjs/images/btn-menu-change-avatar.png">
+            <span class="tj-name togetherjs-person-name">Useronewith alongname</span>
+            <span class="tj-status">&#9679;</span>
+            <p class="tj-urllocation">Currently at: <a class="togetherjs-person-url togetherjs-person-url-title" href="">http://www.location.comwww.location.comwww.location.comasdfsafd</a></p>
+            <p class="tj-follow">Follow:
+              <label class="togetherjs-follow-question" for="togetherjs-person-status-follow">
+                <input type="checkbox" id="togetherjs-person-status-follow">
+              </label>
+            </p>
+            <section class="togetherjs-buttons">
+              <!-- Displayed when the peer is at a different URL: -->
+              <div class="togetherjs-different-url">
+                <a class="togetherjs-nudge togetherjs-default tj-btn-sm">Nudge them</a>
+                <a href="#" class="togetherjs-follow togetherjs-person-url togetherjs-primary tj-btn-sm">Join them</a>
+              </div>
+              <!-- Displayed when the peer is at your same URL: -->
+              <div class="togetherjs-same-url" style="display: none">
+                <span class="togetherjs-person-name"></span> is on the same page as you.
+              </div>
+            </section>
+          </li>
+        </ul>
     </section>
   </div>
 

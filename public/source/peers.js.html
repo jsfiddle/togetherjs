@@ -95,7 +95,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -205,6 +205,7 @@ define([<span class="string">"util"</span>, <span class="string">"session"</span
   <span class="keyword">var</span> assert = util.assert;
   <span class="keyword">var</span> CHECK_ACTIVITY_INTERVAL = <span class="number">10</span>*<span class="number">1000</span>; <span class="comment">// Every 10 seconds see if someone has gone idle</span>
   <span class="keyword">var</span> IDLE_TIME = <span class="number">3</span>*<span class="number">60</span>*<span class="number">1000</span>; <span class="comment">// Idle time is 3 minutes</span>
+  <span class="keyword">var</span> TAB_IDLE_TIME = <span class="number">2</span>*<span class="number">60</span>*<span class="number">1000</span>; <span class="comment">// When you tab away, after two minutes you'll say you are idle</span>
   <span class="keyword">var</span> BYE_TIME = <span class="number">10</span>*<span class="number">60</span>*<span class="number">1000</span>; <span class="comment">// After 10 minutes of inactivity the person is considered to be "gone"</span>
 
   <span class="keyword">var</span> ui;
@@ -773,11 +774,23 @@ We could test typeof==function to distinguish between a getter and a concrete va
     checkActivityTask = <span class="literal">null</span>;
   });
 
+  <span class="keyword">var</span> tabIdleTimeout = <span class="literal">null</span>;
+
   session.on(<span class="string">"visibility-change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(hidden)</span> {</span>
     <span class="keyword">if</span> (hidden) {
-      peers.Self.update({idle: <span class="string">"inactive"</span>});
+      <span class="keyword">if</span> (tabIdleTimeout) {
+        clearTimeout(tabIdleTimeout);
+      }
+      tabIdleTimeout = setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+        peers.Self.update({idle: <span class="string">"inactive"</span>});
+      }, TAB_IDLE_TIME);
     } <span class="keyword">else</span> {
-      peers.Self.update({idle: <span class="string">"active"</span>});
+      <span class="keyword">if</span> (tabIdleTimeout) {
+        clearTimeout(tabIdleTimeout);
+      }
+      <span class="keyword">if</span> (peers.Self.idle == <span class="string">"inactive"</span>) {
+        peers.Self.update({idle: <span class="string">"active"</span>});
+      }
     }
   });
 

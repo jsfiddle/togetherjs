@@ -287,7 +287,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $('#togetherjs-dock #togetherjs-buttons').animate({
         opacity: 1
       });
-      
+
       //for iphone
       if($(window).width() < 480) {
         $('.togetherjs-dock-right').animate({
@@ -1152,33 +1152,40 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: this.peer
       });
     },
-    
+
     // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
     // if there are X users in the session
     // then hide the users in the dock
     // and shrink the size of the dock
     // and if you rollover the dock, it expands and reveals the rest of the participants in the dock
-    
+
     //if users hit X then show the participant button with the consol
 
     dock: deferForContainer(function () {
-      
+
+      var numberOfUsers = peers.getAllPeers().length;
+
       // collapse the Dock if too many users
       function CollapsedDock() {
-        //calculate number of users in the session
-        var numberOfUsers = parseInt(peers.getAllPeers().length);
-        if( numberOfUsers >= 5) {    
-          // decrease/reset dock height
-          $("#togetherjs-dock").css("height", 260);
-          //replace participant button
-          $("#togetherjs-dock-participants").replaceWith("<button class='togetherjs-button togetherjs-dock-person'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participant List</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
-          // new full participant window created on toggle
-
-
-        }
+        // decrease/reset dock height
+        $("#togetherjs-dock").css("height", 260);
+        //replace participant button
+        $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
+        // new full participant window created on toggle
+        $("#togetherjs-participantlist-button").click(function () {
+          windowing.toggle("#togetherjs-participantlist");
+        });
       }
-      CollapsedDock();
-      
+
+      // FIXME: turned off for now
+      if( numberOfUsers >= 5 && false) {
+        CollapsedDock();
+      } else {
+        // reset
+
+      }
+
+
       if (this.dockElement) {
         return;
       }

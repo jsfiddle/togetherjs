@@ -95,7 +95,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -235,7 +235,7 @@
         } <span class="keyword">else</span> <span class="keyword">if</span> (item.nodeType == document.TEXT_NODE) {
           <span class="keyword">while</span> (<span class="literal">true</span>) {
             <span class="keyword">var</span> text = item.nodeValue;
-            <span class="keyword">var</span> regex = <span class="regexp">/\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^&lt;&gt;()\[\]]*/i</span>;
+            <span class="keyword">var</span> regex = <span class="regexp">/\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t&lt;&gt;()\[\]]*/i</span>;
             <span class="keyword">var</span> match = regex.exec(text);
             <span class="keyword">if</span> (! match) {
               <span class="keyword">break</span>;
@@ -255,6 +255,7 @@
       });
     }
     linkifyNode(el);
+    <span class="keyword">return</span> el;
   }
 
   <span class="keyword">return</span> linkify;

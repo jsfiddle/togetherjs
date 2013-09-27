@@ -95,7 +95,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -1949,9 +1949,13 @@ if there are X users in the session
 then hide the users in the dock
 and shrink the size of the dock
 and if you rollover the dock, it expands and reveals the rest of the participants in the dock</p>
+<p>if users hit X then show the participant button with the consol</p>
 
               </div>
               
+                <div class="content"><div class='highlight'><pre>    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+
+      <span class="keyword">var</span> numberOfUsers = peers.getAllPeers().length;</pre></div></div>
               
             </li>
           
@@ -1959,19 +1963,6 @@ and if you rollover the dock, it expands and reveals the rest of the participant
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-58">&#182;</a>
-                </div>
-                <p>if users hit X then show the participant button with the consol</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    dock: deferForContainer(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
-              
-            </li>
-          
-            <li id="section-59">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-59">&#182;</a>
                 </div>
                 <p>collapse the Dock if too many users</p>
 
@@ -1981,17 +1972,29 @@ and if you rollover the dock, it expands and reveals the rest of the participant
               
             </li>
           
+            <li id="section-59">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-59">&#182;</a>
+                </div>
+                <p>decrease/reset dock height</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        $(<span class="string">"#togetherjs-dock"</span>).css(<span class="string">"height"</span>, <span class="number">260</span>);</pre></div></div>
+              
+            </li>
+          
             <li id="section-60">
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-60">&#182;</a>
                 </div>
-                <p>calculate number of users in the session</p>
+                <p>replace participant button</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> numberOfUsers = parseInt(peers.getAllPeers().length);
-        <span class="keyword">if</span>( numberOfUsers &gt;= <span class="number">5</span>) {</pre></div></div>
+                <div class="content"><div class='highlight'><pre>        $(<span class="string">"#togetherjs-dock-participants"</span>).replaceWith(<span class="string">"&lt;button id='togetherjs-participantlist-button' class='togetherjs-button'&gt;&lt;div class='togetherjs-tooltip togetherjs-dock-person-tooltip'&gt;&lt;span class='togetherjs-person-name'&gt;Participants&lt;/span&gt;&lt;span class='togetherjs-person-tooltip-arrow-r'&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'&gt;&lt;/div&gt;&lt;/button&gt;"</span>);</pre></div></div>
               
             </li>
           
@@ -2000,11 +2003,14 @@ and if you rollover the dock, it expands and reveals the rest of the participant
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-61">&#182;</a>
                 </div>
-                <p>decrease/reset dock height</p>
+                <p>new full participant window created on toggle</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>          $(<span class="string">"#togetherjs-dock"</span>).css(<span class="string">"height"</span>, <span class="number">260</span>);</pre></div></div>
+                <div class="content"><div class='highlight'><pre>        $(<span class="string">"#togetherjs-participantlist-button"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          windowing.toggle(<span class="string">"#togetherjs-participantlist"</span>);
+        });
+      }</pre></div></div>
               
             </li>
           
@@ -2013,11 +2019,13 @@ and if you rollover the dock, it expands and reveals the rest of the participant
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-62">&#182;</a>
                 </div>
-                <p>replace participant button</p>
+                <p>FIXME: turned off for now</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>          $(<span class="string">"#togetherjs-dock-participants"</span>).replaceWith(<span class="string">"&lt;button class='togetherjs-button togetherjs-dock-person'&gt;&lt;div class='togetherjs-tooltip togetherjs-dock-person-tooltip'&gt;&lt;span class='togetherjs-person-name'&gt;Participant List&lt;/span&gt;&lt;span class='togetherjs-person-tooltip-arrow-r'&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/images/robot-avatar.png); border-color: rgb(255, 0, 0);'&gt;&lt;/div&gt;&lt;/button&gt;"</span>);</pre></div></div>
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span>( numberOfUsers &gt;= <span class="number">5</span> &amp;&amp; <span class="literal">false</span>) {
+        CollapsedDock();
+      } <span class="keyword">else</span> {</pre></div></div>
               
             </li>
           
@@ -2026,14 +2034,13 @@ and if you rollover the dock, it expands and reveals the rest of the participant
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-63">&#182;</a>
                 </div>
-                <p>new full participant window created on toggle</p>
+                <p>reset</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        }
-      }
-      CollapsedDock();
-      
+                <div class="content"><div class='highlight'><pre>      }
+
+
       <span class="keyword">if</span> (<span class="keyword">this</span>.dockElement) {
         <span class="keyword">return</span>;
       }

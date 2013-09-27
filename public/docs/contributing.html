@@ -92,7 +92,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -195,6 +195,7 @@ MyClass.classMethod = <span class="function"><span class="keyword">function</spa
 <p>If you want to change the port or interface the server binds to, simply run <code>node hub/server.js -h</code> and it will show the command-line options as well as environmental variables.</p>
 <p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
 <pre><code class="lang-javascript">TogetherJSConfig_hubBase = <span class="string">"https://myhub.com"</span>;</code></pre>
+<p>If you are curious about the exact version of code on the server it should be always be <a href="https://github.com/mozilla/togetherjs/blob/master/hub/server.js">server.js on master</a>, and you can double-check by fetching <a href="https://hub.togetherjs.com/server-source"><code>/server-source</code></a>.</p>
 <h2 id="the-issue-tracker-and-milestones">The Issue Tracker and Milestones</h2>
 <p>We do most of our planning in the <a href="https://github.com/mozilla/togetherjs/issues">Github issue tracker</a>, and make use of the <a href="https://github.com/mozilla/togetherjs/issues/milestones">Milestones</a> (more than labels).  You are welcome to just submit issues without worrying about this, but if you are looking at a ticket and want how it relates to our plans then you might want to know our system.</p>
 <p>Generally we have three running milestones:</p>

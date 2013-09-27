@@ -1068,6 +1068,58 @@ input.togetherjs-upload-avatar {
   border-bottom: 1px solid #0095DD;
 }
 /*Participant windows*/
+#togetherjs-participantlist.togetherjs-window {
+  padding: -1px;
+}
+#togetherjs-participantlist.togetherjs-window section {
+  overflow: scroll;
+  height: 200px;
+  margin: 0px -7px;
+}
+#togetherjs-participantlist section.togetherjs-buttons {
+  height: auto;
+  background: none;
+  text-align: left;
+  margin: auto;
+  padding-top: 0px;
+}
+#togetherjs-participantlist .togetherjs-person.togetherjs-person-small {
+  margin: 0px;
+  width: 30px;
+  height: 30px;
+}
+#togetherjs-participantlist.togetherjs-window section ul li {
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+#togetherjs-participantlist.togetherjs-window .tj-name {
+  padding-left: 5px;
+}
+#togetherjs-participantlist.togetherjs-window .tj-status {
+  float: right;
+  margin-top: 6px;
+  margin-right: 10px;
+  font-size: 24px;
+  color: green;
+}
+#togetherjs-participantlist.togetherjs-window .tj-urllocation {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#togetherjs-participantlist .togetherjs-follow-question {
+  margin-left: 0px;
+}
+#togetherjs-participantlist.togetherjs-window .tj-follow {
+  font-size: 12px;
+}
+#togetherjs-participantlist.togetherjs-window .tj-btn-sm {
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  margin: 0px 3px 0px 0px;
+}
 section.togetherjs-participant-window-main {
   margin: 0px -7px -7px !important;
 }

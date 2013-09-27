@@ -92,7 +92,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -103,6 +103,14 @@
 
 
     
+
+<script type="text/javascript" charset="utf-8">
+  //adding active class
+  var activeurl = window.location.pathname;
+  if(activeurl == "/docs/") {
+    $( ".documentationActive" ).addClass( "active" );
+  }
+</script>
 
 <div class="container">
   <section class="row" id="markdownpages">
@@ -200,7 +208,9 @@ var TogetherJSConfig_something = "foo";
 <p><code>TogetherJSConfig_useMinimizedCode</code>:
     Typically if you use <code>togetherjs.js</code> you&#39;ll get the unminimized and uncombined code, with each module loaded lazily.  If you use <code>togetherjs-min.js</code> you get the combined code.  But if you want to override that more dynamically, you can use this setting.</p>
 <p><code>TogetherJSConfig_findRoom</code>:
-    To see this in action, check out the examples.  This setting auto-starts TogetherJS, and assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users&quot;</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code></p>
+    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users&quot;</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code></p>
+<p><code>TogetherJSConfig_autoStart</code>:
+    If true then start TogetherJS automatically.  Note TogetherJS already starts automatically when a session is continued, so if you just always call <code>TogetherJS()</code> then you might cause TogetherJS to stop.  Note you must set this as <code>TogetherJSConfig_autoStart = true</code>, not using <code>TogetherJS.config(&quot;autoStart&quot;, true)</code> (it must be set when TogetherJS loads).  Anyone who autostarts a session will not be considered the session creator.</p>
 <p><code>TogetherJSConfig_suppressJoinConfirmation</code>:
     When a person is invited to a session, they&#39;ll be asked if they want to join in browsing with the other person.  Set this to <code>true</code> and they won&#39;t be asked to confirm joining.  Useful when combined with <code>findRoom</code>.</p>
 <p><code>TogetherJSConfig_suppressInvite</code>:

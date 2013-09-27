@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 define(["util", "session"], function (util, session) {
-  var appsync = util.Module("visibilityApi");
+  var appsync = util.Module("appsync");
   var assert = util.assert;
 
   var activeSyncers = [];

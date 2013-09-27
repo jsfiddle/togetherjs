@@ -26,7 +26,7 @@ define([], function () {
         } else if (item.nodeType == document.TEXT_NODE) {
           while (true) {
             var text = item.nodeValue;
-            var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^<>()\[\]]*/i;
+            var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t<>()\[\]]*/i;
             var match = regex.exec(text);
             if (! match) {
               break;
@@ -46,6 +46,7 @@ define([], function () {
       });
     }
     linkifyNode(el);
+    return el;
   }
 
   return linkify;

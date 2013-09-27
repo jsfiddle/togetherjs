@@ -95,7 +95,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right main-nav">
             <li><a href=".././"  >Overview</a></li>
-            <li><a href=".././docs/"  >Documentation</a></li>
+            <li><a class="documentationActive"href=".././docs/"  >Documentation</a></li>
             <li><a href="https://github.com/mozilla/togetherjs" target="_blank">Github</a></li>
             <li><a href="mailto:togetherjs@mozilla.com">Contact</a></li>
           </ul>
@@ -197,7 +197,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
 define([<span class="string">"util"</span>, <span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, session)</span> {</span>
-  <span class="keyword">var</span> appsync = util.Module(<span class="string">"visibilityApi"</span>);
+  <span class="keyword">var</span> appsync = util.Module(<span class="string">"appsync"</span>);
   <span class="keyword">var</span> assert = util.assert;
 
   <span class="keyword">var</span> activeSyncers = [];

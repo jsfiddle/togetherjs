@@ -7,6 +7,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   var assert = util.assert;
   var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle
   var IDLE_TIME = 3*60*1000; // Idle time is 3 minutes
+  var TAB_IDLE_TIME = 2*60*1000; // When you tab away, after two minutes you'll say you are idle
   var BYE_TIME = 10*60*1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
   var ui;
@@ -499,11 +500,23 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     checkActivityTask = null;
   });
 
+  var tabIdleTimeout = null;
+
   session.on("visibility-change", function (hidden) {
     if (hidden) {
-      peers.Self.update({idle: "inactive"});
+      if (tabIdleTimeout) {
+        clearTimeout(tabIdleTimeout);
+      }
+      tabIdleTimeout = setTimeout(function () {
+        peers.Self.update({idle: "inactive"});
+      }, TAB_IDLE_TIME);
     } else {
-      peers.Self.update({idle: "active"});
+      if (tabIdleTimeout) {
+        clearTimeout(tabIdleTimeout);
+      }
+      if (peers.Self.idle == "inactive") {
+        peers.Self.update({idle: "active"});
+      }
     }
   });
 
