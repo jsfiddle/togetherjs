@@ -350,7 +350,9 @@ setInterval(function () {
 }, SAMPLE_STATS_INTERVAL);
 
 setInterval(function () {
-  logger.info("LOAD", JSON.stringify(getLoad()));
+  var load = getLoad();
+  load.time = Date.now();
+  logger.info("LOAD", JSON.stringify(load));
 }, SAMPLE_LOAD_INTERVAL);
 
 function getLoad() {
