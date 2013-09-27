@@ -29,6 +29,11 @@ var fs = require('fs');
 // 5: don't show anything
 // Stats are at level 2
 
+var thisSource = "// What follows is the source for the server.\n" +
+    "// Obviously we can't prove this is the actual source, but if it isn't then we're \n" +
+    "// a bunch of lying liars, so at least you have us on record.\n\n" +
+    fs.readFileSync(__filename);
+
 var Logger = function (level, filename, stdout) {
   this.level = level;
   this.filename = filename;
@@ -65,17 +70,12 @@ Logger.prototype = {
   },
 
   _open: function () {
-    var restarted = false;
     if (this.file) {
       this.file.end(this.date() + " Logs rotating\n");
       this.file = null;
-      restarted = true;
     }
     if (this.filename) {
       this.file = fs.createWriteStream(this.filename, {flags: 'a', mode: parseInt('644', 8), encoding: "UTF-8"});
-      if (restarted) {
-        this.write("Reopened logging");
-      }
     }
   }
 
@@ -107,10 +107,14 @@ var server = http.createServer(function(request, response) {
     response.end("OK");
   } else if (url.pathname == '/load') {
     var load = getLoad();
+    response.writeHead(200, {"Content-Type": "text/plain"});
     response.end("OK " + load.connections + " connections " +
                  load.sessions + " sessions; " +
                  load.solo + " are single-user and " +
                  load.empty + " not counted because they are empty");
+  } else if (url.pathname == '/server-source') {
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.end(thisSource);
   } else if (url.pathname == '/findroom') {
     if (request.method == "OPTIONS") {
       // CORS preflight

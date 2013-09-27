@@ -126,6 +126,8 @@ Once you have the hub installed you need to configure TogetherJS to use the hub,
 TogetherJSConfig_hubBase = "https://myhub.com";
 ```
 
+If you are curious about the exact version of code on the server it should be always be [server.js on master](https://github.com/mozilla/togetherjs/blob/master/hub/server.js), and you can double-check by fetching [`/server-source`](https://hub.togetherjs.com/server-source).
+
 ## The Issue Tracker and Milestones
 
 We do most of our planning in the [Github issue tracker](https://github.com/mozilla/togetherjs/issues), and make use of the [Milestones](https://github.com/mozilla/togetherjs/issues/milestones) (more than labels).  You are welcome to just submit issues without worrying about this, but if you are looking at a ticket and want how it relates to our plans then you might want to know our system.
