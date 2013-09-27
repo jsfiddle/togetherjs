@@ -227,7 +227,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     } else {
       msg.type = "hello";
       msg.clientVersion = TogetherJS.version;
-    },
+    }
     if (! TogetherJS.startup.continued) {
       msg.starting = true;
     }
