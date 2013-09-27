@@ -463,7 +463,7 @@
     // domain, if for some reason you want sessions that are limited
     // to only a portion of the domain:
     storagePrefix: "togetherjs",
-    // this is the option to enable for example single page app routes 
+    // this is the option to enable for example single page app routes
     // as different pages
     // url.com/index.html#/view1 will be used as one page
     // defaults to disabled
@@ -514,9 +514,6 @@
       TogetherJS._configuration[attr] = settings[attr];
       if (TogetherJS.running && attr == "toolName") {
         TogetherJS.require("ui").updateToolName();
-      }
-      if(attr=="includeHashInUrl"){
-        TogetherJS.listenForHashChange(); 
       }
       if (attr == "enableShortcut") {
         if (settings[attr]) {
@@ -645,9 +642,7 @@
 
   // It's nice to replace this early, before the load event fires, so we conflict
   // as little as possible with the app we are embedded in:
-  if(!window.TogetherJSConfig_includeHashInUrl){
-    var hash = location.hash.replace(/^#/, "");
-  }
+  var hash = location.hash.replace(/^#/, "");
 
   var m = /&?togetherjs=([^&]*)/.exec(hash);
   if (m) {
