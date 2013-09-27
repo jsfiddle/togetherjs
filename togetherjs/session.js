@@ -36,7 +36,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /****************************************
    * URLs
    */
-
+  var includeHashInUrl=TogetherJS.getConfig('includeHashInUrl');
   session.hubUrl = function (id) {
     id = id || session.shareId;
     assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
@@ -46,7 +46,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.shareUrl = function () {
     assert(session.shareId, "Attempted to access shareUrl() before shareId is set");
     var hash = location.hash;
-    var m = /\?[^#]*/.exec(location.href);
+    if(includeHashInUrl){
+      var m = /\?[^&]*/.exec(location.href);
+    }else{
+      var m = /\?[^#]*/.exec(location.href);
+    }
     var query = "";
     if (m) {
       query = m[0];
@@ -60,13 +64,20 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.recordUrl = function () {
     assert(session.shareId);
     var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+    //does includeHashInUrl has influence here??
     url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
     return url;
   };
 
   /* location.href without the hash */
   session.currentUrl = function () {
-    return location.href.replace(/#.*/, "");
+    var returnValue;
+    if(includeHashInUrl){
+      returnValue=location.href.replace(/&.*/, "");
+    }else{
+      returnValue=location.href.replace(/#.*/, "");
+    }
+    return returnValue;
   };
 
   session.siteName = function () {
@@ -131,7 +142,12 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   }
 
   // FIXME: once we start looking at window.history we need to update this:
-  var currentUrl = (location.href + "").replace(/\#.*$/, "");
+  
+  if(includeHashInUrl){
+    var currentUrl = (location.href + "").replace(/\&.*$/, "");
+  }else{
+    var currentUrl = (location.href + "").replace(/\#.*$/, "");
+  }
 
   session.send = function (msg) {
     if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
@@ -182,7 +198,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       location.href = url;
     }
   }
-
+  
   session.timeHelloSent = null;
 
   function sendHello(helloBack) {
@@ -211,7 +227,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     } else {
       msg.type = "hello";
       msg.clientVersion = TogetherJS.version;
-    }
+    },
     if (! TogetherJS.startup.continued) {
       msg.starting = true;
     }
@@ -219,7 +235,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     session.emit("prepare-hello", msg);
     return msg;
   };
-
+  // when user clicks a link like page.com/index.html#page1 this will be called to resend hello 
+  // so others would see that the user switched to another page
+  session.synchroniseSessions = function(){
+    sendHello(false);
+  }
   /****************************************
    * Lifecycle (start and end)
    */
@@ -280,12 +300,18 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       if (! shareId) {
         // FIXME: I'm not sure if this will ever happen, because togetherjs.js should
         // handle it
+        //
+        // maybe here there should be some change for includeHashInUrl 
+        
         var m = /&?togetherjs=([^&]*)/.exec(hash);
         if (m) {
           isClient = ! m[1];
           shareId = m[2];
           var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
-          location.hash = newHash;
+          // commented out so it does not change the hash
+          if(!includeHashInUrl){
+            location.hash = newHash;
+          }
         }
       }
       return storage.tab.get("status").then(function (saved) {
