@@ -8257,7 +8257,7 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
 
   function focus(event) {
     var target = event.target;
-    if (elementFinder.ignoreElement(target)) {
+    if (elementFinder.ignoreElement(target) || elementTracked(target)) {
       blur(event);
       return;
     }

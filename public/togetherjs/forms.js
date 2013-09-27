@@ -524,7 +524,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   function focus(event) {
     var target = event.target;
-    if (elementFinder.ignoreElement(target)) {
+    if (elementFinder.ignoreElement(target) || elementTracked(target)) {
       blur(event);
       return;
     }

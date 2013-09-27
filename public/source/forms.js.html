@@ -875,7 +875,7 @@ we just asked to join.</p>
 
   <span class="function"><span class="keyword">function</span> <span class="title">focus</span><span class="params">(event)</span> {</span>
     <span class="keyword">var</span> target = event.target;
-    <span class="keyword">if</span> (elementFinder.ignoreElement(target)) {
+    <span class="keyword">if</span> (elementFinder.ignoreElement(target) || elementTracked(target)) {
       blur(event);
       <span class="keyword">return</span>;
     }
