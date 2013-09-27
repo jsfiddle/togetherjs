@@ -287,7 +287,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $('#togetherjs-dock #togetherjs-buttons').animate({
         opacity: 1
       });
-      
+
       //for iphone
       if($(window).width() < 480) {
         $('.togetherjs-dock-right').animate({
@@ -1152,21 +1152,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         peer: this.peer
       });
     },
-    
+
     // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
     // if there are X users in the session
     // then hide the users in the dock
     // and shrink the size of the dock
     // and if you rollover the dock, it expands and reveals the rest of the participants in the dock
-    
+
     //if users hit X then show the participant button with the consol
 
     dock: deferForContainer(function () {
-      
-      var numberOfUsers = parseInt(peers.getAllPeers().length);
-      
+
+      var numberOfUsers = peers.getAllPeers().length;
+
       // collapse the Dock if too many users
-      function CollapsedDock() {  
+      function CollapsedDock() {
         // decrease/reset dock height
         $("#togetherjs-dock").css("height", 260);
         //replace participant button
@@ -1176,15 +1176,16 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
           windowing.toggle("#togetherjs-participantlist");
         });
       }
-      
-      if( numberOfUsers > 5 || numberOfUsers == 5) {
+
+      // FIXME: turned off for now
+      if( numberOfUsers >= 5 && false) {
         CollapsedDock();
       } else {
         // reset
-        
+
       }
-      
-      
+
+
       if (this.dockElement) {
         return;
       }
