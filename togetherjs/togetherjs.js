@@ -463,11 +463,11 @@
     // domain, if for some reason you want sessions that are limited
     // to only a portion of the domain:
     storagePrefix: "togetherjs",
-    // this is the option to enable for example single page app routes
-    // as different pages
-    // url.com/index.html#/view1 will be used as one page
-    // defaults to disabled
-    includeHashInUrl:false
+    // When true, we treat the entire URL, including the hash, as the identifier
+    // of the page; i.e., if you one person is on `http://example.com/#view1`
+    // and another person is at `http://example.com/#view2` then these two people
+    // are considered to be at completely different URLs
+    includeHashInUrl: false
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

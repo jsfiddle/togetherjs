@@ -68,7 +68,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.currentUrl = function () {
     if (includeHashInUrl) {
       return location.href;
-    }else{
+    } else {
       return location.href.replace(/#.*/, "");
     }
   };
@@ -137,8 +137,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // FIXME: once we start looking at window.history we need to update this:
   var currentUrl = (location.href + "").replace(/\#.*$/, "");
   if (includeHashInUrl) {
-    currentUrl = location.href ;
-  } 
+    currentUrl = location.href;
+  }
 
   session.send = function (msg) {
     if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
@@ -442,23 +442,24 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.on("start", function () {
     $(window).on("resize", resizeEvent);
-    $(window).on("hashchange",hashchangeEvent);
-  });
-  session.on("close", function () {
-    $(window).off("resize", resizeEvent);
-    $(window).off("hashchange",hashchangeEvent);
+    if (includeHashInUrl) {
+      $(window).on("hashchange", hashchangeEvent);
+    }
   });
 
-  function hashchangeEvent(){
+  session.on("close", function () {
+    $(window).off("resize", resizeEvent);
+    if (includeHashInUrl) {
+      $(window).off("hashchange", hashchangeEvent);
+    }
+  });
+
+  function hashchangeEvent() {
     // needed because when message arives from peer this variable will be checked to
     // decide weather to show actions or not
-    if (includeHashInUrl) {
-      currentUrl = location.href;
-    }else{
-      currentUrl = (location.href + "").replace(/\#.*$/, "");
-    }
     sendHello(false);
   }
+
   function resizeEvent() {
     session.emit("resize");
   }

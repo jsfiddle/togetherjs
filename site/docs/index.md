@@ -125,6 +125,9 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 `TogetherJSConfig_inviteFromRoom`:
     This adds the ability from the profile menu to invite people who are hanging out in another room (using TogetherJS).  This is kind of (but not exactly) how the "Get Help" button works on this site.  This is still an experimental feature.
 
+`TogetherJSConfig_includeHashInUrl`:
+    When true (default false), TogetherJS treats the entire URL, including the hash, as the identifier of the page; i.e., if you one person is on `http://example.com/#view1` and another person is at `http://example.com/#view2` then these two people are considered to be at completely different URLs.  You'd want to use this in single-page apps where being at the same base URL doesn't mean the two people are looking at the same thing.
+
 There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
 ## Start TogetherJS Button
