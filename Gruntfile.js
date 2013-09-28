@@ -150,8 +150,13 @@ module.exports = function (grunt) {
         files: ["togetherjs/**/*", "Gruntfile.js", "site/**/*", "!**/*_flymake*", "!**/*~", "!**/.*"],
         tasks: ["build", "buildsite"]
       },
+      // FIXME: I thought I wouldn't have to watch for
+      // togetherjs/**/*.js, but because the hard links are regularly
+      // broken by git, this needs to be run often, and it's easy to
+      // forget.  Then between git action the build will be over-run,
+      // but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/**/*.html", "!**/*_flymake*"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*"],
         tasks: ["build"]
       }
     }
