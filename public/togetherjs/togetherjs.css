@@ -4,15 +4,15 @@
 /*Fonts*/
 @font-face {
   font-family: openSansRegular;
-  src: url('../fonts/OpenSans-Regular.ttf');
+  src: url('fonts/OpenSans-Regular.ttf');
 }
 @font-face {
   font-family: openSansLight;
-  src: url('../fonts/OpenSans-Light.ttf');
+  src: url('fonts/OpenSans-Light.ttf');
 }
 @font-face {
   font-family: openSansBold;
-  src: url('../fonts/OpenSans-Bold.ttf');
+  src: url('fonts/OpenSans-Bold.ttf');
 }
 /* .togetherjs reset */
 /* http://yuilibrary.com/yui/docs/cssreset/ */
@@ -39,6 +39,9 @@ http://yuilibrary.com/license/
   -webkit-box-sizing: content-box !important;
   -moz-box-sizing: content-box !important;
   box-sizing: content-box !important;
+}
+.togetherjs header {
+  width: auto;
 }
 .togetherjs div,
 .togetherjs dl,

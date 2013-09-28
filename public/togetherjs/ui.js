@@ -188,7 +188,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     //create the overlay
     if($.browser.mobile) {
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
+      // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'>\x3c/div>" );
     }
 
     // The share link:
@@ -308,7 +308,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
 
       // add bg overlay
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>" );
+      // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'>\x3c/div>" );
 
       //disable vertical scrolling
       // $("body").css({
@@ -366,7 +366,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         windowing.toggle("#togetherjs-menu-window");
       });
 
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>" );
+      // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'>\x3c/div>" );
 
       //disable vertical scrolling
       // $("body").css({
