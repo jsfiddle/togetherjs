@@ -135,12 +135,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   }
 
   // FIXME: once we start looking at window.history we need to update this:
-
+  var currentUrl = (location.href + "").replace(/\#.*$/, "");
   if (includeHashInUrl) {
-    var currentUrl = location.href ;
-  }else{
-    var currentUrl = (location.href + "").replace(/\#.*$/, "");
-  }
+    currentUrl = location.href ;
+  } 
 
   session.send = function (msg) {
     if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
@@ -448,7 +446,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   });
   session.on("close", function () {
     $(window).off("resize", resizeEvent);
-    $(window).off("hashchange",hashchangeEvent)
+    $(window).off("hashchange",hashchangeEvent);
   });
 
   function hashchangeEvent(){
