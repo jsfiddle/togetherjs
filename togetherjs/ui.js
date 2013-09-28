@@ -186,11 +186,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
     var container = ui.container;
 
-    //create the overlay
-    if($.browser.mobile) {
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'></div>" );
-    }
-
     // The share link:
     ui.prepareShareLink(container);
     container.find("input.togetherjs-share-link").on("keydown", function (event) {
@@ -306,17 +301,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         });
       }
 
-
-      // add bg overlay
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'></div>" );
-
-      //disable vertical scrolling
-      // $("body").css({
-      //   "position": "fixed",
-      //   top: 0,
-      //   left: 0
-      // });
-
       //replace the anchor icon
       var src = "/togetherjs/images/togetherjs-logo-close.png";
       $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
@@ -348,9 +332,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }, {
         duration:60, easing:"linear"
       });
-
-      // remove bg overlay
-      //$(".overlay").remove();
     }
 
     // Setting the anchor button + dock mobile actions
@@ -365,15 +346,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#togetherjs-profile-button").click(function () {
         windowing.toggle("#togetherjs-menu-window");
       });
-
-      // $("body").append( "<div class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'></div>" );
-
-      //disable vertical scrolling
-      // $("body").css({
-      //   "position": "fixed",
-      //   top: 0,
-      //   left: 0
-      // });
 
       //replace the anchor icon
       var src = "/togetherjs/images/togetherjs-logo-close.png";
@@ -452,8 +424,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     $("#togetherjs-end-session").click(function () {
       session.close();
-      //$(".overlay").remove();
-
     });
 
     $("#togetherjs-menu-update-color").click(function () {
@@ -757,9 +727,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   session.on("close", function () {
 
     if($.browser.mobile) {
-      // remove bg overlay
-      //$(".overlay").remove();
-
       //after hitting End, reset window draggin
       $("body").css({
         "position": "",
