@@ -230,18 +230,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     session.emit("prepare-hello", msg);
     return msg;
   };
-  // when user clicks a link like page.com/index.html#page1 this will be called to resend hello
-  // so others would see that the user switched to another page
-  session.synchronizeSessions = function(){
-    // needed because when message arives from peer this variable will be checked to
-    // decide weather to show actions or not
-    if (includeHashInUrl) {
-      currentUrl = location.href;
-    }else{
-      currentUrl = (location.href + "").replace(/\#.*$/, "");
-    }
-    sendHello(false);
-  }
   /****************************************
    * Lifecycle (start and end)
    */
@@ -466,7 +454,14 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   });
 
   function hashchangeEvent(){
-    session.synchronizeSessions();
+    // needed because when message arives from peer this variable will be checked to
+    // decide weather to show actions or not
+    if (includeHashInUrl) {
+      currentUrl = location.href;
+    }else{
+      currentUrl = (location.href + "").replace(/\#.*$/, "");
+    }
+    sendHello(false);
   }
   function resizeEvent() {
     session.emit("resize");
