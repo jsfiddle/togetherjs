@@ -720,15 +720,15 @@ h5 {
 
 /* Extra small devices (phones, up to 480px) */
 @media (max-width: 480px) {
-  
+
   #features .media > .pull-left {
     margin-top: 20px;
   }
-  
+
   #howto-table td {
     width: 50%;
   }
-  
+
   .cursor-placement-01 {
     top: 25% !important;
     left: 78%;
@@ -748,7 +748,7 @@ h5 {
     top: 45% !important;
     left: 50%;
   }
-  
+
   .how-section-btncollab {
     top: 32% !important;
   }
@@ -760,7 +760,7 @@ h5 {
   .how-section-dockplacement {
     top: 28% !important;
   }
-  
+
   .how-section-imganim-01 {
     top: 46% !important;
   }
@@ -772,7 +772,7 @@ h5 {
   .how-section-imganim-03 {
     top: 40% !important;
   }
-  
+
   .howto-animation-01 p.smtextright {
     width: auto;
     float: none;
@@ -787,7 +787,7 @@ h5 {
     width: auto;
     float: none;
   }
-  
+
   .large {
     font-size: 48px;
     line-height: 48px;
@@ -803,12 +803,12 @@ h5 {
     font-size: 28px;
     line-height: 30px;
   }
-  
+
   #main-section h3 {
     font-size: 24px;
     line-height: 26px;
   }
-  
+
   #main-section p {
     font-size: 14px;
     line-height: 26px;
@@ -883,29 +883,29 @@ h5 {
     top: 25%;
     left: 50%;
   }
-  
+
   #footer .col-xs-12 {
     padding-top: 0px;
     padding-bottom: 0px;
   }
-  
+
   #footer a {
     font-size: 11px;
   }
-  
+
   #footer a img {
     width: 60px;
     height: 10px;
   }
-  
+
   #main-section #examples .ex-description {
     min-height: 0px;
   }
-  
+
   #main-section #examples .ex-title {
     min-height: 0px;
   }
-  
+
   #tryitout pre {
     margin-top: -30px;
   }
@@ -914,19 +914,19 @@ h5 {
 
 /* Smaller devices (tablets, 480px and up) */
 @media (min-width: 480px) {
-  
+
   #features .media > .pull-left {
     margin-top: 10px;
   }
-  
+
   #tryitout pre {
     margin-top: -26px;
   }
-  
+
   #howto-table td {
     width: 50%;
   }
-  
+
   .howto-animation-01 p.smtextright {
     width: auto;
     float: none;
@@ -941,7 +941,7 @@ h5 {
     width: auto;
     float: none;
   }
-  
+
   .large {
     font-size: 48px;
     line-height: 48px;
@@ -976,16 +976,16 @@ h5 {
   a#tabzilla {
     display: inherit;
   }
-  
+
   #footer a img {
     width: 100px;
     height: 17px;
   }
-  
+
   #main-section #examples .ex-description {
     min-height: 0px;
   }
-  
+
   #main-section img.why-section {
     width: 30%;
     height: 30%;
@@ -996,15 +996,15 @@ h5 {
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
-  
+
   #features li.media {
     min-height: 140px;
   }
-  
+
   #tryitout pre {
     margin-top: 50px;
   }
-  
+
   .large {
     font-size: 72px;
     line-height: 100%;
@@ -1044,25 +1044,25 @@ h5 {
   a#tabzilla {
     display: inherit;
   }
-  
+
   #footer a img {
     width: 141px;
     height: 24px;
   }
-  
+
   #main-section #examples .ex-description {
     min-height: 60px;
   }
-  
+
 }
 
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
-  
+
   #features li.media {
     min-height: 100px;
   }
-  
+
   .howto-animation-01 p.smtextright {
     width: 60%;
     float: right;
@@ -1077,7 +1077,7 @@ h5 {
     width: 60%;
     float: right;
   }
-  
+
   .large {
     font-size: 72px;
     line-height: 100%;
@@ -1120,7 +1120,7 @@ h5 {
   #marketing-video #frame-video {
     padding-top: 6px;
   }
-  
+
   #main-section #examples .ex-description {
     min-height: 31px;
   }
@@ -1129,15 +1129,15 @@ h5 {
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
-  
+
   #features li.media {
     min-height: 100px;
   }
-  
+
   #video-area img {
     margin-top: 0%;
   }
-  
+
   .large {
     font-size: 72px;
     line-height: 100%;
@@ -1303,11 +1303,6 @@ h5 {
   }
 }
 
-#source-content ul.sections > li {
-  white-space: normal;
-  margin: 20px 0px;
-}
-
 #source-content ul.sections > li > div.content {
   background: #f5f5f5;
 }
@@ -1407,11 +1402,11 @@ dd {
 }
 
 @media (min-width: 1200px) {
-  
+
   #markdownpages h1 {
    font-weight: normal;
   }
-  
+
   #sourcecode h1 {
    font-weight: normal;
   }
@@ -1438,7 +1433,7 @@ dd {
 }
 
 @media (min-width: 768px) {
-  
+
   .affix {
     position: static;
   }
@@ -1449,11 +1444,11 @@ dd {
 
 @media (min-width: 480px) {
   #sourcecode h1 {
-   font-size: 48px; 
+   font-size: 48px;
    line-height: 52px;
   }
   #markdownpages h1 {
-   font-size: 48px; 
+   font-size: 48px;
   }
   .affix {
     position: static;
@@ -1464,17 +1459,17 @@ dd {
 }
 
 @media (max-width: 480px) {
-  
+
   #sourcecode h1 {
-   font-size: 48px; 
+   font-size: 48px;
    line-height: 52px;
   }
-  
+
   #markdownpages h1 {
-   font-size: 48px; 
+   font-size: 48px;
    line-height: 52px;
   }
-  
+
   .affix {
     position: static;
   }
