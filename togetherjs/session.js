@@ -66,13 +66,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   /* location.href without the hash */
   session.currentUrl = function () {
-    var returnValue;
     if (includeHashInUrl) {
-      returnValue=location.href;
+      return location.href;
     }else{
-      returnValue=location.href.replace(/#.*/, "");
+      return location.href.replace(/#.*/, "");
     }
-    return returnValue;
   };
 
   session.siteName = function () {
