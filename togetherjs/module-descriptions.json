@@ -21,8 +21,10 @@
   "togetherjs": "This is the bootstrap code.  It is included on all pages, defines the `TogetherJS` variable, and handles configuration and initial loading.",
   "ui": "This has most of the UI, meaning everything involving HTML, and reacting to that interface.",
   "util": "Lots of support code in here.  It doesn't depend on other things, and has fairly abstract general-purpose code.  It includes a pattern for creating classes, assertions, events.",
+  "videos.js": "Support for the video sync feature",
   "visibilityApi": "Handles cross-browser tab visibility events",
   "walkthrough": "Implements the walkthrough interface (content is in `walkthrough.html`).",
   "webrtc": "Handles live audio chat.",
+  "who": "Lets clients peek into rooms and invite people from those rooms without joining the room",
   "windowing": "Handles the creation of different windows, notifications, and modal windows."
 }
