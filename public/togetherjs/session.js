@@ -36,7 +36,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /****************************************
    * URLs
    */
-
+  var includeHashInUrl = TogetherJS.getConfig('includeHashInUrl');
   session.hubUrl = function (id) {
     id = id || session.shareId;
     assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
@@ -66,7 +66,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   /* location.href without the hash */
   session.currentUrl = function () {
-    return location.href.replace(/#.*/, "");
+    if (includeHashInUrl) {
+      return location.href;
+    } else {
+      return location.href.replace(/#.*/, "");
+    }
   };
 
   session.siteName = function () {
@@ -132,6 +136,9 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   // FIXME: once we start looking at window.history we need to update this:
   var currentUrl = (location.href + "").replace(/\#.*$/, "");
+  if (includeHashInUrl) {
+    currentUrl = location.href;
+  }
 
   session.send = function (msg) {
     if (DEBUG && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
@@ -219,7 +226,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     session.emit("prepare-hello", msg);
     return msg;
   };
-
   /****************************************
    * Lifecycle (start and end)
    */
@@ -373,7 +379,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       }
     });
   }
-
   session.start = function () {
     initStartTarget();
     initIdentityId().then(function () {
@@ -435,13 +440,26 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
-
   session.on("start", function () {
     $(window).on("resize", resizeEvent);
+    if (includeHashInUrl) {
+      $(window).on("hashchange", hashchangeEvent);
+    }
   });
+
   session.on("close", function () {
     $(window).off("resize", resizeEvent);
+    if (includeHashInUrl) {
+      $(window).off("hashchange", hashchangeEvent);
+    }
   });
+
+  function hashchangeEvent() {
+    // needed because when message arives from peer this variable will be checked to
+    // decide weather to show actions or not
+    sendHello(false);
+  }
+
   function resizeEvent() {
     session.emit("resize");
   }

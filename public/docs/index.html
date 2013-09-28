@@ -217,6 +217,8 @@ var TogetherJSConfig_something = "foo";
     When a person starts a session, usually a window will pop open with the invite link so they can send it to someone.  If this is true then that window doesn&#39;t automatically pop open (but it is still available).</p>
 <p><code>TogetherJSConfig_inviteFromRoom</code>:
     This adds the ability from the profile menu to invite people who are hanging out in another room (using TogetherJS).  This is kind of (but not exactly) how the “Get Help” button works on this site.  This is still an experimental feature.</p>
+<p><code>TogetherJSConfig_includeHashInUrl</code>:
+    When true (default false), TogetherJS treats the entire URL, including the hash, as the identifier of the page; i.e., if you one person is on <code>http://example.com/#view1</code> and another person is at <code>http://example.com/#view2</code> then these two people are considered to be at completely different URLs.  You‘d want to use this in single-page apps where being at the same base URL doesn’t mean the two people are looking at the same thing.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
 <h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
 <p>The button you add to your site to start TogetherJS will typically look like this:</p>

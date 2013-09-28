@@ -318,7 +318,7 @@ for us to respect a URL change:</p>
   <span class="comment">/****************************************
    * URLs
    */</span>
-
+  <span class="keyword">var</span> includeHashInUrl = TogetherJS.getConfig(<span class="string">'includeHashInUrl'</span>);
   session.hubUrl = <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
     id = id || session.shareId;
     assert(id, <span class="string">"URL cannot be resolved before TogetherJS.shareId has been initialized"</span>);
@@ -348,7 +348,11 @@ for us to respect a URL change:</p>
 
   <span class="comment">/* location.href without the hash */</span>
   session.currentUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">return</span> location.href.replace(<span class="regexp">/#.*/</span>, <span class="string">""</span>);
+    <span class="keyword">if</span> (includeHashInUrl) {
+      <span class="keyword">return</span> location.href;
+    } <span class="keyword">else</span> {
+      <span class="keyword">return</span> location.href.replace(<span class="regexp">/#.*/</span>, <span class="string">""</span>);
+    }
   };
 
   session.siteName = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -467,6 +471,9 @@ hello handlers:</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> currentUrl = (location.href + <span class="string">""</span>).replace(<span class="regexp">/\#.*$/</span>, <span class="string">""</span>);
+  <span class="keyword">if</span> (includeHashInUrl) {
+    currentUrl = location.href;
+  }
 
   session.send = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
     <span class="keyword">if</span> (DEBUG &amp;&amp; IGNORE_MESSAGES.indexOf(msg.type) == -<span class="number">1</span>) {
@@ -576,7 +583,6 @@ hello handlers:</p>
                 <div class="content"><div class='highlight'><pre>    session.emit(<span class="string">"prepare-hello"</span>, msg);
     <span class="keyword">return</span> msg;
   };
-
   <span class="comment">/****************************************
    * Lifecycle (start and end)
    */</span></pre></div></div>
@@ -795,7 +801,6 @@ we&#39;re already set to be running</p>
       }
     });
   }
-
   session.start = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     initStartTarget();
     initIdentityId().then(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -857,13 +862,37 @@ we&#39;re already set to be running</p>
     });
   };
 
-
   session.on(<span class="string">"start"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     $(window).on(<span class="string">"resize"</span>, resizeEvent);
+    <span class="keyword">if</span> (includeHashInUrl) {
+      $(window).on(<span class="string">"hashchange"</span>, hashchangeEvent);
+    }
   });
+
   session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     $(window).off(<span class="string">"resize"</span>, resizeEvent);
+    <span class="keyword">if</span> (includeHashInUrl) {
+      $(window).off(<span class="string">"hashchange"</span>, hashchangeEvent);
+    }
   });
+
+  <span class="function"><span class="keyword">function</span> <span class="title">hashchangeEvent</span><span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-22">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-22">&#182;</a>
+                </div>
+                <p>needed because when message arives from peer this variable will be checked to
+decide weather to show actions or not</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    sendHello(<span class="literal">false</span>);
+  }
+
   <span class="function"><span class="keyword">function</span> <span class="title">resizeEvent</span><span class="params">()</span> {</span>
     session.emit(<span class="string">"resize"</span>);
   }
