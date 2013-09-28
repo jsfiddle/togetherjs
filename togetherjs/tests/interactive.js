@@ -1,5 +1,15 @@
 // =SECTION Setup
 
+// Local config overrides
+var config = localStorage.getItem("interactiveOverrides");
+if (config) {
+  config = JSON.parse(config);
+  window.TogetherJSConfig = config;
+  for (var a in config) {
+    TogetherJS.config(a, config[a]);
+  }
+}
+
 Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "elementFinder");
 // => Loaded ...
 
@@ -151,7 +161,8 @@ Test.addControl($('<input placeholder="Incoming chat">').keypress(function (even
 }));
 
 var el = $('<div><label for="idle-check">Quick idle <input type="checkbox" id="idle-check"></label>' +
-           '<label for="expire-check">Quick expire <input type="checkbox" id="expire-check"></label></div>');
+           '<label for="expire-check">Quick expire <input type="checkbox" id="expire-check"></label>' +
+           '<label for="include-hash">includeHashInUrl <input type="checkbox" id="include-hash"></label></div>');
 el.find("#idle-check").change(function (event) {
   if (event.target.checked) {
     TogetherJSTestSpy.setIdleTime(100);
@@ -159,6 +170,7 @@ el.find("#idle-check").change(function (event) {
     TogetherJSTestSpy.setIdleTime(3*60*1000);
   }
 });
+
 el.find("#expire-check").change(function (event) {
   if (event.target.checked) {
     TogetherJSTestSpy.setByeTime(10*1000);
@@ -166,6 +178,22 @@ el.find("#expire-check").change(function (event) {
     TogetherJSTestSpy.setIdleTime(10*60*1000);
   }
 });
+
+el.find("#include-hash").change(function (event) {
+  var config = localStorage.getItem("interactiveOverrides");
+  if (config) {
+    config = JSON.parse(config);
+  } else {
+    config = {};
+  }
+  config.includeHashInUrl = event.target.checked;
+  localStorage.setItem("interactiveOverrides", JSON.stringify(config));
+  alert("Reload required");
+});
+if (TogetherJS.getConfig("includeHashInUrl")) {
+  el.find("#include-hash").prop("checked", true);
+}
+
 Test.addControl(el);
 
 Test.addControl(
