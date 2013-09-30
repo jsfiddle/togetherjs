@@ -4,16 +4,15 @@
 {# set absoluteLinks true #}
 {% block body %}
 
-<div class="containerbg">
-  <div class="container examples">
-
-      <div id="error">
-          <p><img src="/images/404-error.png"></p>
-          <h1>Oops, we can't find the page you're looking for!</h1>
-          <p>404 error</p>
+<div class="container">
+  <section class="body-content" id="main-section" data-speed="4" data-type="background">
+    <section class="row" id="tour">
+      <div class="col-xs-12">
+        <div id="error">
+            <p class="text-center"><img src="/images/404-image.png" class="img-responsive" style="margin: 0 auto;"></p>
+            <h1 class="text-center">Oops, we can't find the page you're looking for!</h1>
+            <p class="text-center">404 error</p>
+        </div>
       </div>
-
-   </div> <!-- /container -->
-</div>
-
+    </section>
 {% endblock %}
