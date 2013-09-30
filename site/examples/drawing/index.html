@@ -7,10 +7,10 @@
   <section class="body-content row" id="main-section" data-speed="4" data-type="background">
 
 <h1>Drawing Example</h1>
-  <a onclick="TogetherJS(this); return false;"><img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 135px"></img></a>
+<a onclick="TogetherJS(this); return false;"><img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 135px"></a>
 
   <div id="sketchContainer" style="width: 600px; height: 400px; border: 1px solid #000">
-    <canvas id="sketch">
+    <canvas id="sketch"></canvas>
   </div>
 
   <script>
@@ -55,7 +55,7 @@
             };
             draw(lastMouse, mouse);
             lastMouse = mouse;
-        };
+        }
 
         function draw(start, end, remote) {
             context.beginPath();
@@ -66,7 +66,7 @@
             if ((! remote) && TogetherJS.running) {
                 TogetherJS.send({type: "draw", start: start, end: end});
             }
-        };
+        }
 
         TogetherJS.hub.on("draw", function (msg) {
             draw(msg.start, msg.end, true);
