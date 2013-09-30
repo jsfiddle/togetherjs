@@ -387,7 +387,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         openChannel();
         require(["ui"], function (ui) {
           TogetherJS.running = true;
-          ui.prepareUI();
+          //ui.activateUI will call prepareUI if not already done
+          //calling this early will add the ui to the body ahead of
+          //the peer.Self being initialized
+          //ui.prepareUI();
           require(features, function () {
             $(function () {
               peers = require("peers");
