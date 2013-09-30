@@ -1421,6 +1421,7 @@ dd {
 }
 
 @media (min-width: 992px) {
+
   .affix, .affix-bottom {
     width: 213px;
   }
@@ -1434,6 +1435,11 @@ dd {
 
 @media (min-width: 768px) {
 
+  #sketchapp a {
+    float: right !important;
+    margin-bottom: 20px;
+  }
+
   .affix {
     position: static;
   }
@@ -1443,6 +1449,12 @@ dd {
 }
 
 @media (min-width: 480px) {
+
+  #sketchapp a {
+    float: right !important;
+    margin-bottom: 20px;
+  }
+
   #sourcecode h1 {
    font-size: 48px;
    line-height: 52px;
@@ -1459,6 +1471,11 @@ dd {
 }
 
 @media (max-width: 480px) {
+
+  #sketchapp a {
+    float: left !important;
+    margin-bottom: 20px;
+  }
 
   #sourcecode h1 {
    font-size: 48px;
