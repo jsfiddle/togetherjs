@@ -1,11 +1,17 @@
 {% extends "base.tmpl" %}
-{% block title %} Mozilla Labs : TowTruck app integration example {% endblock %}
+{% block title %} Mozilla Labs : TogetherJS app integration example {% endblock %}
 {# set enableExample true #}
 {% block body %}
 
-<p>TowTruck will pick up your login information (and gravatar):
+<div class="container">
+  <section class="body-content row" id="main-section" data-speed="4" data-type="background">
+
+<h1>Identity/Persona Example</h1>
+
+<p>TogetherJS will pick up your login information (and gravatar):
 <button id="login"><img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png"></button>
 <button id="logout" style="display: none">logout</button>
+<button onclick="TogetherJS(this); return false">Collaborate</button>
 </p>
 
 <div>
@@ -45,14 +51,14 @@ $(function () {
       $("#logout").text("Logged in: " + USER);
       $("#login").hide();
       $("#logout").show();
-      TowTruck.refreshUserData();
+      TogetherJS.refreshUserData();
     },
     onlogout: function () {
       USER = null;
       $("#login").show();
       $("#logout").hide();
-      if (TowTruck.require) {
-        TowTruck.require("session").close();
+      if (TogetherJS.require) {
+        TogetherJS.require("session").close();
       }
     }
   });
@@ -65,18 +71,22 @@ function gravatar(email, options) {
   return "https://www.gravatar.com/avatar/" + md5 + options;
 }
 
-TowTruckConfig_getUserName = function () {
+TogetherJS.config("getUserName", function () {
   return USER;
-};
+});
 
-TowTruckConfig_getUserAvatar = function () {
+TogetherJS.config("getUserAvatar", function () {
   if (! USER) {
     return null;
   }
   console.log("avatar", gravatar(USER, "?s=40&d=retro"));
   return gravatar(USER, "?s=40&d=retro");
-};
+});
 
     </script>
+
+  </section>
+
+</div><!-- /.container -->
 
 {% endblock %}
