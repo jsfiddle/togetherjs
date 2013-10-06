@@ -90,7 +90,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 ### The Configuration
 
 `TogetherJSConfig_siteName`:
-    In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  `siteName` is the name of your site as you want it to be referred to.  Should be a proper noun.
+    This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.
 
 `TogetherJSConfig_toolName`:
     This is the name that you are giving this tool.  If you use this then "TogetherJS" won't be in the UI.  So you might want to use `TogetherJSConfig_toolName = "Collaboration".
@@ -100,9 +100,6 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 
 `TogetherJSConfig_cloneClicks`:
     This should be set to a jQuery selector.  Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else's browser.  This is useful for cases when a click typically doesn't *do* anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use `TogetherJSConfig_cloneClicks = ".tab"`
-
-`TogetherJSConfig_siteName`:
-    This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.
 
 `TogetherJSConfig_enableShortcut`:
     If you want to try TogetherJS out on an application, but don't want to put up a "Start TogetherJS" button, you can use `TogetherJSConfig_enableShortcut = true` and then an event handler will be put into place that will start TogetherJS when you hit **alt-T alt-T** (twice in a row!).  TogetherJS will still automatically start when someone opens an invitation link.
