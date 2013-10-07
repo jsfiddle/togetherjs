@@ -440,6 +440,11 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         return;
       }
 
+      var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
+      if (dontShowClicks && element.nodeName.toLowerCase() === dontShowClicks) {
+        return;
+      }
+
       var location = elementFinder.elementLocation(element);
       var offset = $(element).offset();
       var offsetX = event.pageX - offset.left;

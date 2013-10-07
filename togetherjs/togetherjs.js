@@ -416,6 +416,9 @@
 
   TogetherJS._configuration = {};
   TogetherJS._defaultConfiguration = {
+    // Disables clicks for a certain element.
+    // (e.g., 'canvas' would not show clicks on canvas elements.) 
+    dontShowClicks: false,
     // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
     // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
