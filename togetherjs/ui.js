@@ -838,6 +838,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         assert(content.length);
         attrs.text = content.text() + "\n" + attrs.text;
         attrs.messageId = lastEl.attr("data-message-id");
+        lastEl.hide();
       }
       var el = templating.sub("chat-message", {
         peer: attrs.peer,
