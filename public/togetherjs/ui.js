@@ -10,6 +10,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   var $window = $(window);
   // This is also in togetherjs.less, as @button-height:
   var BUTTON_HEIGHT = 60 + 1; // 60 is button height, 1 is border
+  // chat TextArea
+  var TEXTAREA_LINE_HEIGHT = 20; // in pixels
+  var TEXTAREA_MAX_LINES = 5;
   // This is also in togetherjs.less, under .togetherjs-animated
   var ANIMATION_DURATION = 1000;
   // Time the new user window sticks around until it fades away:
@@ -204,25 +207,49 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     // The chat input element:
     var input = container.find("#togetherjs-chat-input");
-    input.bind("keyup", function (event) {
-      if (event.which == 13) { // Enter
+    input.bind("keydown", function (event) {
+      if (event.which == 13 && !event.shiftKey) { // Enter without Shift pressed
         submitChat();
+        // triggering the event manually to avoid the addition of newline character to the textarea:
+        input.trigger("input").trigger("propertychange");
         return false;
       }
       if (event.which == 27) { // Escape
         windowing.hide("#togetherjs-chat");
+        return false;
       }
-      return false;
     });
 
     function submitChat() {
       var val = input.val();
-      if (! val) {
-        return;
+      if ($.trim(val)) {
+        chat.submit(val);
+        input.val("");
       }
-      chat.submit(val);
-      input.val("");
     }
+    // auto-resize textarea:
+    input.on("input propertychange", function () {
+      var $this = $(this);            
+      var actualHeight = $this.height();
+      // reset the height of textarea to remove trailing empty space (used for shrinking):
+      $this.height(TEXTAREA_LINE_HEIGHT);
+      this.scrollTop = 0;
+      // scroll to bottom:
+      this.scrollTop = 9999;
+      var newHeight = this.scrollTop + $this.height();
+      var maxHeight = TEXTAREA_MAX_LINES * TEXTAREA_LINE_HEIGHT;
+      if (newHeight > maxHeight) {
+        newHeight = maxHeight; 
+        this.style.overflowY = "scroll";
+      } else {
+        this.style.overflowY = "hidden";         
+      }
+      this.style.height = newHeight + "px";
+      var diff = newHeight - actualHeight;
+      $("#togetherjs-chat-input-box").height($("#togetherjs-chat-input-box").height() + diff);
+      $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff); 
+      return false;
+    });
 
     util.testExpose({submitChat: submitChat});
 
@@ -811,6 +838,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         assert(content.length);
         attrs.text = content.text() + "\n" + attrs.text;
         attrs.messageId = lastEl.attr("data-message-id");
+        lastEl.remove();
       }
       var el = templating.sub("chat-message", {
         peer: attrs.peer,

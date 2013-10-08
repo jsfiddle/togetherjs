@@ -149,6 +149,22 @@ h5 {
   line-height: 16px;
 }
 
+/* =Tabzilla
+----------------------------------------------- */
+#tabzilla-panel,
+#tabzilla-panel *,
+#tabzilla-panel *:before,
+#tabzilla-panel *:after {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+#tabzilla-panel a {
+  font-size: 11px;
+  line-height: 12px;
+}
+
+
 /* =Header
 ----------------------------------------------- */
 
@@ -226,8 +242,10 @@ h5 {
   opacity: 1;
 }
 
-.navbar-inverse {
-  border-color: rgba(0,0,0,0);
+.navbar {
+  border: 0;
+  border-radius: 0;
+  margin-bottom: 0;
 }
 
 .main-header .main-nav {

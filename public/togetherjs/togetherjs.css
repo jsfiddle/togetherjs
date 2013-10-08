@@ -469,6 +469,10 @@ input.togetherjs-upload-avatar {
 }
 .togetherjs #togetherjs-chat-input {
   width: 264px;
+  height: 20px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  resize: none;
   font-size: 14px;
   padding: 4px 6px 5px;
   border-radius: 4px;
@@ -766,6 +770,7 @@ input.togetherjs-upload-avatar {
 }
 .togetherjs .togetherjs-notification .togetherjs-chat-item {
   border-bottom: 0px;
+  word-wrap: break-word;
 }
 .togetherjs .togetherjs-notification section#togetherjs-chat-notifier-message {
   margin: 0px !important;

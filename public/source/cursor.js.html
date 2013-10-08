@@ -75,7 +75,7 @@
 
   </head>
   <body >
-    <div class="navbar navbar-inverse navbar-fixed-top main-header" id="main-navbar">
+    <div class="navbar main-header" id="main-navbar">
 
       <!-- Tabzilla -->
       <a href="https://www.mozilla.org/" id="tabzilla">mozilla</a>
@@ -923,6 +923,14 @@ togetherjs&#39;s own video events</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (element.nodeName.toLowerCase() === <span class="string">'video'</span>){
+        <span class="keyword">return</span>;
+      }
+
+      <span class="keyword">var</span> dontShowClicks = TogetherJS.getConfig(<span class="string">"dontShowClicks"</span>);
+      <span class="keyword">if</span> (dontShowClicks == <span class="literal">true</span>) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(element).is(dontShowClicks)) {
         <span class="keyword">return</span>;
       }
 
