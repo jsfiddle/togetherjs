@@ -171,7 +171,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!togetherjs.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md"];
+    var pattern = ["**", "!togetherjs.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp"];
     grunt.log.writeln("Copying files from " + "togetherjs/".cyan + " to " + path.join(grunt.option("dest"), "togetherjs").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
