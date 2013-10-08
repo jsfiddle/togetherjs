@@ -222,7 +222,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
     function submitChat() {
       var val = input.val();
-      if (!!$.trim(val)) {
+      if ($.trim(val)) {
         chat.submit(val);
         input.val("");
       }
