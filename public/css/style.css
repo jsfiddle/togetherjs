@@ -1051,7 +1051,7 @@ h5 {
   }
 
   #main-section #examples .ex-description {
-    min-height: 60px;
+    min-height: 81px;
   }
 
 }
@@ -1122,7 +1122,7 @@ h5 {
   }
 
   #main-section #examples .ex-description {
-    min-height: 31px;
+    min-height: 54px;
   }
 
 }
@@ -1435,7 +1435,7 @@ dd {
 
 @media (min-width: 768px) {
 
-  #sketchapp a {
+  #sketchapp a.tjs-button {
     float: right !important;
     margin-bottom: 20px;
   }
@@ -1450,7 +1450,7 @@ dd {
 
 @media (min-width: 480px) {
 
-  #sketchapp a {
+  #sketchapp a.tjs-button {
     float: right !important;
     margin-bottom: 20px;
   }
@@ -1472,7 +1472,7 @@ dd {
 
 @media (max-width: 480px) {
 
-  #sketchapp a {
+  #sketchapp a.tjs-button {
     float: left !important;
     margin-bottom: 20px;
   }

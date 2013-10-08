@@ -156,7 +156,7 @@ $(function () {
       USER = null;
       $("#login").show();
       $("#logout").hide();
-      if (TogetherJS.require) {
+      if (TogetherJS.running) {
         TogetherJS.require("session").close();
       }
     }

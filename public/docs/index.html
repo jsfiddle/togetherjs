@@ -194,15 +194,13 @@ var TogetherJSConfig_something = "foo";
 <p>The other way to set a variable <em>after</em> TogetherJS is loaded is <code>TogetherJS.config(&quot;variable&quot;, value)</code></p>
 <h3 id="the-configuration">The Configuration</h3>
 <p><code>TogetherJSConfig_siteName</code>:
-    In the help screen the site is referred to.  By default the page title is used, but this is often over-specific.  <code>siteName</code> is the name of your site as you want it to be referred to.  Should be a proper noun.</p>
+    This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.</p>
 <p><code>TogetherJSConfig_toolName</code>:
     This is the name that you are giving this tool.  If you use this then “TogetherJS” won&#39;t be in the UI.  So you might want to use `TogetherJSConfig_toolName = “Collaboration”.</p>
 <p><code>TogetherJSConfig_hubBase</code>:
     This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It‘s the only real server component of TogetherJS (besides the statically hosted scripts).  It’s also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You&#39;ll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets.</p>
 <p><code>TogetherJSConfig_cloneClicks</code>:
     This should be set to a jQuery selector.  Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else‘s browser.  This is useful for cases when a click typically doesn’t <em>do</em> anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use <code>TogetherJSConfig_cloneClicks = &quot;.tab&quot;</code></p>
-<p><code>TogetherJSConfig_siteName</code>:
-    This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.</p>
 <p><code>TogetherJSConfig_enableShortcut</code>:
     If you want to try TogetherJS out on an application, but don&#39;t want to put up a “Start TogetherJS” button, you can use <code>TogetherJSConfig_enableShortcut = true</code> and then an event handler will be put into place that will start TogetherJS when you hit <strong>alt-T alt-T</strong> (twice in a row!).  TogetherJS will still automatically start when someone opens an invitation link.</p>
 <p><code>TogetherJSConfig_useMinimizedCode</code>:
