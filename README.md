@@ -72,7 +72,7 @@ $ grunt devwatch
 
 This will rebuild when changes are detected.  Note that Grunt is configured to create [hard links](http://en.wikipedia.org/wiki/Hard_link) instead of copying so that most changes you make to files in `togetherjs/` don't need to be rebuilt to show up in `build/togetherjs/`.  `--no-hardlink` turns this behavior off.
 
-You may with to create a static copy of the TogetherJS client to distribute and use on your website.  To do this run:
+You may wish to create a static copy of the TogetherJS client to distribute and use on your website.  To do this run:
 
 ```sh
 $ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
