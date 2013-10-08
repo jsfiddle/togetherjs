@@ -99,7 +99,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     This is where the hub lives.  The hub is a simple server that echoes messages back and forth between clients.  It's the only real server component of TogetherJS (besides the statically hosted scripts).  It's also really boring.  If you wanted to use a hub besides ours you can override it here.  The primary reason would be for privacy; though we do not look at any traffic, by hosting the hub yourself you can be more assured that it is private.  You'll find that a hub with a valid https certificate is very useful, as mixed http/https is strictly forbidden with WebSockets.
 
 `TogetherJSConfig_dontShowClicks`:
-    This should be the name of a DOM element where you want to disable the visual click display indicating that a user has clicked. For example: "canvas", "h1", "p", etc. 
+    This should be set to a jQuery selector or set to true. This will disable the visual click display indicating that a user has clicked on the defined element. For example: "canvas", "h1", "p", etc.  Setting `TogetherJSConfig_dontShowClicks = true` will globally disable all clicks.
 
 `TogetherJSConfig_cloneClicks`:
     This should be set to a jQuery selector.  Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else's browser.  This is useful for cases when a click typically doesn't *do* anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use `TogetherJSConfig_cloneClicks = ".tab"`

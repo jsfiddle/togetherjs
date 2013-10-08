@@ -441,7 +441,10 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       }
 
       var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      if (dontShowClicks && element.nodeName.toLowerCase() === dontShowClicks) {
+      if (dontShowClicks == true) {
+        return;
+      }
+      if (dontShowClicks && $(element).is(dontShowClicks)) {
         return;
       }
 
