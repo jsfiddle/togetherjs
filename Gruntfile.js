@@ -536,4 +536,16 @@ module.exports = function (grunt) {
     });
   });
 
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
+  grunt.registerTask('dev', function() {
+    grunt.util.spawn({
+      cmd: 'node',
+      args: ['devserver.js']
+    });
+    grunt.task.run('watch');
+  });
+
+  grunt.registerTask('default', 'start');
+
 };
