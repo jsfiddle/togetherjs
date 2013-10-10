@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=UTF-8>
+    <title>Multi-textarea focus</title>
+    <script>
+      TogetherJS_autoStart = true;
+    </script>
+    <script src="/togetherjs.js"></script>
+  </head>
+  <body>
+
+    <h1>Multi-textarea focus</h1>
+
+    <p>To run this test, start this session in another tab.  Focus
+    textarea #1 in the first tab, edit textarea #2 in another tab.
+    <a href="https://github.com/mozilla/togetherjs/issues/797">#797</a>
+    identifies a problem where textarea #2 will become focused in
+    the first tab.</p>
+
+    <div>
+      Textarea #1:<br>
+      <textarea id="number-1">Number 1</textarea>
+    </div>
+
+    <div>
+      Textarea #2:<br>
+      <textarea id="number-2">Number 2</textarea>
+    </div>
+
+  </body>
+</html>
