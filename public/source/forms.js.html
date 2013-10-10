@@ -585,12 +585,23 @@ the text is an array of lines.</p>
 
   <span class="function"><span class="keyword">function</span> <span class="title">setValue</span><span class="params">(el, value)</span> {</span>
     el = $(el);
+    <span class="keyword">var</span> changed = <span class="literal">false</span>;
     <span class="keyword">if</span> (isCheckable(el)) {
-      el.prop(<span class="string">"checked"</span>, value);
+      <span class="keyword">var</span> checked = !! el.prop(<span class="string">"checked"</span>);
+      value = !! value;
+      <span class="keyword">if</span> (checked != value) {
+        changed = <span class="literal">true</span>;
+        el.prop(<span class="string">"checked"</span>, value);
+      }
     } <span class="keyword">else</span> {
-      el.val(value);
+      <span class="keyword">if</span> (el.val() != value) {
+        changed = <span class="literal">true</span>;
+        el.val(value);
+      }
     }
-    eventMaker.fireChange(el);
+    <span class="keyword">if</span> (changed) {
+      eventMaker.fireChange(el);
+    }
   }
 
   <span class="comment">/* Send the top of this history queue, if it hasn't been already sent. */</span>
@@ -634,9 +645,9 @@ the text is an array of lines.</p>
       <span class="keyword">return</span>;
     }
     <span class="keyword">var</span> text = isText(el);
-    <span class="keyword">var</span> selection;
-    <span class="keyword">if</span> (text) {
-      selection = [el[<span class="number">0</span>].selectionStart, el[<span class="number">0</span>].selectionEnd];
+    <span class="keyword">var</span> elFocused = (el[<span class="number">0</span>] == el[<span class="number">0</span>].ownerDocument.activeElement);
+    <span class="keyword">if</span> (text &amp;&amp; elFocused) {
+      <span class="keyword">var</span> selection = [el[<span class="number">0</span>].selectionStart, el[<span class="number">0</span>].selectionEnd];
     }
     <span class="keyword">var</span> value;
     <span class="keyword">if</span> (msg.replace) {
@@ -645,7 +656,9 @@ the text is an array of lines.</p>
         console.warn(<span class="string">"form update received for uninitialized form element"</span>);
         <span class="keyword">return</span>;
       }
-      history.setSelection(selection);</pre></div></div>
+      <span class="keyword">if</span> (elFocused) {
+        history.setSelection(selection);
+      }</pre></div></div>
               
             </li>
           
@@ -679,14 +692,16 @@ the text is an array of lines.</p>
         <span class="keyword">return</span>;
       }
       value = history.current;
-      selection = history.getSelection();
+      <span class="keyword">if</span> (elFocused) {
+        selection = history.getSelection();
+      }
     } <span class="keyword">else</span> {
       value = msg.value;
     }
     inRemoteUpdate = <span class="literal">true</span>;
     <span class="keyword">try</span> {
       setValue(el, value);
-      <span class="keyword">if</span> (text) {
+      <span class="keyword">if</span> (text &amp;&amp; elFocused) {
         el[<span class="number">0</span>].selectionStart = selection[<span class="number">0</span>];
         el[<span class="number">0</span>].selectionEnd = selection[<span class="number">1</span>];
       }

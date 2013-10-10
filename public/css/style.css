@@ -269,7 +269,7 @@ h5 {
 #hero {
   background: url('../images/bg@2x.png') 50% 0 no-repeat fixed;
   background-size: 2042px 606px;
-	margin: 14px auto;
+	margin: 0px auto;
   width: 100%;
   //max-width: 1920px;
   position: relative;

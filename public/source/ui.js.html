@@ -649,7 +649,7 @@ everything is loaded and ready for interaction.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>    input.on(<span class="string">"input propertychange"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>);            
+      <span class="keyword">var</span> $<span class="keyword">this</span> = $(<span class="keyword">this</span>);
       <span class="keyword">var</span> actualHeight = $<span class="keyword">this</span>.height();</pre></div></div>
               
             </li>
@@ -681,15 +681,15 @@ everything is loaded and ready for interaction.</p>
       <span class="keyword">var</span> newHeight = <span class="keyword">this</span>.scrollTop + $<span class="keyword">this</span>.height();
       <span class="keyword">var</span> maxHeight = TEXTAREA_MAX_LINES * TEXTAREA_LINE_HEIGHT;
       <span class="keyword">if</span> (newHeight &gt; maxHeight) {
-        newHeight = maxHeight; 
+        newHeight = maxHeight;
         <span class="keyword">this</span>.style.overflowY = <span class="string">"scroll"</span>;
       } <span class="keyword">else</span> {
-        <span class="keyword">this</span>.style.overflowY = <span class="string">"hidden"</span>;         
+        <span class="keyword">this</span>.style.overflowY = <span class="string">"hidden"</span>;
       }
       <span class="keyword">this</span>.style.height = newHeight + <span class="string">"px"</span>;
       <span class="keyword">var</span> diff = newHeight - actualHeight;
       $(<span class="string">"#togetherjs-chat-input-box"</span>).height($(<span class="string">"#togetherjs-chat-input-box"</span>).height() + diff);
-      $(<span class="string">"#togetherjs-chat-messages"</span>).height($(<span class="string">"#togetherjs-chat-messages"</span>).height() - diff); 
+      $(<span class="string">"#togetherjs-chat-messages"</span>).height($(<span class="string">"#togetherjs-chat-messages"</span>).height() - diff);
       <span class="keyword">return</span> <span class="literal">false</span>;
     });
 
@@ -1851,6 +1851,7 @@ had been shown</p>
       container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-name-abbrev-"</span>)).text(abbrev);
       <span class="keyword">var</span> avatarEl = container.find(<span class="string">"."</span> + <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-person-"</span>));
       <span class="keyword">if</span> (<span class="keyword">this</span>.peer.avatar) {
+        util.assertValidUrl(<span class="keyword">this</span>.peer.avatar);
         avatarEl.css({
           backgroundImage: <span class="string">"url("</span> + <span class="keyword">this</span>.peer.avatar + <span class="string">")"</span>
         });

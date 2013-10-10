@@ -177,6 +177,19 @@ define(["jquery", "jqueryPlugins"], function ($) {
     return lastBase + url;
   };
 
+  util.assertValidUrl = function (url) {
+    /* This does some simple assertions that the url is valid:
+       - it must be a string
+       - it must be http(s)://... or data:...
+       - it must not contain a space, quotation, or close paren
+    */
+    util.assert(typeof url == "string", "URLs must be a string:", url);
+    util.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0,
+                "URL must have an http, https, data, or // scheme:", url);
+    util.assert(url.search(/[\)\'\"\ ]/) === -1,
+                "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
+  };
+
   util.resolver = function (deferred, func) {
     util.assert(deferred.then, "Bad deferred:", deferred);
     util.assert(typeof func == "function", "Not a function:", func);

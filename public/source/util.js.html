@@ -406,6 +406,19 @@ define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugin
     <span class="keyword">return</span> lastBase + url;
   };
 
+  util.assertValidUrl = <span class="function"><span class="keyword">function</span> <span class="params">(url)</span> {</span>
+    <span class="comment">/* This does some simple assertions that the url is valid:
+       - it must be a string
+       - it must be http(s)://... or data:...
+       - it must not contain a space, quotation, or close paren
+    */</span>
+    util.assert(<span class="keyword">typeof</span> url == <span class="string">"string"</span>, <span class="string">"URLs must be a string:"</span>, url);
+    util.assert(url.search(<span class="regexp">/^(http:\/\/|https:\/\/|\/\/|data:)/i</span>) === <span class="number">0</span>,
+                <span class="string">"URL must have an http, https, data, or // scheme:"</span>, url);
+    util.assert(url.search(<span class="regexp">/[\)\'\"\ ]/</span>) === -<span class="number">1</span>,
+                <span class="string">"URLs cannot contain ), ', \", or spaces:"</span>, JSON.stringify(url));
+  };
+
   util.resolver = <span class="function"><span class="keyword">function</span> <span class="params">(deferred, func)</span> {</span>
     util.assert(deferred.then, <span class="string">"Bad deferred:"</span>, deferred);
     util.assert(<span class="keyword">typeof</span> func == <span class="string">"function"</span>, <span class="string">"Not a function:"</span>, func);

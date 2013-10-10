@@ -229,7 +229,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     }
     // auto-resize textarea:
     input.on("input propertychange", function () {
-      var $this = $(this);            
+      var $this = $(this);
       var actualHeight = $this.height();
       // reset the height of textarea to remove trailing empty space (used for shrinking):
       $this.height(TEXTAREA_LINE_HEIGHT);
@@ -239,15 +239,15 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       var newHeight = this.scrollTop + $this.height();
       var maxHeight = TEXTAREA_MAX_LINES * TEXTAREA_LINE_HEIGHT;
       if (newHeight > maxHeight) {
-        newHeight = maxHeight; 
+        newHeight = maxHeight;
         this.style.overflowY = "scroll";
       } else {
-        this.style.overflowY = "hidden";         
+        this.style.overflowY = "hidden";
       }
       this.style.height = newHeight + "px";
       var diff = newHeight - actualHeight;
       $("#togetherjs-chat-input-box").height($("#togetherjs-chat-input-box").height() + diff);
-      $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff); 
+      $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff);
       return false;
     });
 
@@ -1058,6 +1058,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       container.find("." + this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev);
       var avatarEl = container.find("." + this.peer.className("togetherjs-person-"));
       if (this.peer.avatar) {
+        util.assertValidUrl(this.peer.avatar);
         avatarEl.css({
           backgroundImage: "url(" + this.peer.avatar + ")"
         });

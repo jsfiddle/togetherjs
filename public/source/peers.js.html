@@ -321,6 +321,7 @@ define([<span class="string">"util"</span>, <span class="string">"session"</span
         identityUpdated = <span class="literal">true</span>;
       }
       <span class="keyword">if</span> (msg.avatar &amp;&amp; msg.avatar != <span class="keyword">this</span>.avatar) {
+        util.assertValidUrl(msg.avatar);
         <span class="keyword">this</span>.avatar = msg.avatar;
         identityUpdated = <span class="literal">true</span>;
       }
@@ -515,6 +516,7 @@ that it is emitted and handled in the same module</p>
           }
         }
         <span class="keyword">if</span> (attrs.avatar &amp;&amp; attrs.avatar != <span class="keyword">this</span>.avatar) {
+          util.assertValidUrl(attrs.avatar);
           <span class="keyword">this</span>.avatar = attrs.avatar;
           updateMsg.avatar = <span class="keyword">this</span>.avatar;
           <span class="keyword">if</span> (! attrs.fromLoad) {

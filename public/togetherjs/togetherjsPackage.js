@@ -923,6 +923,19 @@ define('util',["jquery", "jqueryPlugins"], function ($) {
     return lastBase + url;
   };
 
+  util.assertValidUrl = function (url) {
+    /* This does some simple assertions that the url is valid:
+       - it must be a string
+       - it must be http(s)://... or data:...
+       - it must not contain a space, quotation, or close paren
+    */
+    util.assert(typeof url == "string", "URLs must be a string:", url);
+    util.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0,
+                "URL must have an http, https, data, or // scheme:", url);
+    util.assert(url.search(/[\)\'\"\ ]/) === -1,
+                "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
+  };
+
   util.resolver = function (deferred, func) {
     util.assert(deferred.then, "Bad deferred:", deferred);
     util.assert(typeof func == "function", "Not a function:", func);
@@ -2320,6 +2333,7 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
         identityUpdated = true;
       }
       if (msg.avatar && msg.avatar != this.avatar) {
+        util.assertValidUrl(msg.avatar);
         this.avatar = msg.avatar;
         identityUpdated = true;
       }
@@ -2471,6 +2485,7 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
           }
         }
         if (attrs.avatar && attrs.avatar != this.avatar) {
+          util.assertValidUrl(attrs.avatar);
           this.avatar = attrs.avatar;
           updateMsg.avatar = this.avatar;
           if (! attrs.fromLoad) {
@@ -4512,7 +4527,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
     }
     // auto-resize textarea:
     input.on("input propertychange", function () {
-      var $this = $(this);            
+      var $this = $(this);
       var actualHeight = $this.height();
       // reset the height of textarea to remove trailing empty space (used for shrinking):
       $this.height(TEXTAREA_LINE_HEIGHT);
@@ -4522,15 +4537,15 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       var newHeight = this.scrollTop + $this.height();
       var maxHeight = TEXTAREA_MAX_LINES * TEXTAREA_LINE_HEIGHT;
       if (newHeight > maxHeight) {
-        newHeight = maxHeight; 
+        newHeight = maxHeight;
         this.style.overflowY = "scroll";
       } else {
-        this.style.overflowY = "hidden";         
+        this.style.overflowY = "hidden";
       }
       this.style.height = newHeight + "px";
       var diff = newHeight - actualHeight;
       $("#togetherjs-chat-input-box").height($("#togetherjs-chat-input-box").height() + diff);
-      $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff); 
+      $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff);
       return false;
     });
 
@@ -5341,6 +5356,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       container.find("." + this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev);
       var avatarEl = container.find("." + this.peer.className("togetherjs-person-"));
       if (this.peer.avatar) {
+        util.assertValidUrl(this.peer.avatar);
         avatarEl.css({
           backgroundImage: "url(" + this.peer.avatar + ")"
         });
@@ -7978,12 +7994,23 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
 
   function setValue(el, value) {
     el = $(el);
+    var changed = false;
     if (isCheckable(el)) {
-      el.prop("checked", value);
+      var checked = !! el.prop("checked");
+      value = !! value;
+      if (checked != value) {
+        changed = true;
+        el.prop("checked", value);
+      }
     } else {
-      el.val(value);
+      if (el.val() != value) {
+        changed = true;
+        el.val(value);
+      }
     }
-    eventMaker.fireChange(el);
+    if (changed) {
+      eventMaker.fireChange(el);
+    }
   }
 
   /* Send the top of this history queue, if it hasn't been already sent. */
@@ -8027,9 +8054,9 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
       return;
     }
     var text = isText(el);
-    var selection;
-    if (text) {
-      selection = [el[0].selectionStart, el[0].selectionEnd];
+    var elFocused = (el[0] == el[0].ownerDocument.activeElement);
+    if (text && elFocused) {
+      var selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
     if (msg.replace) {
@@ -8038,7 +8065,9 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         console.warn("form update received for uninitialized form element");
         return;
       }
-      history.setSelection(selection);
+      if (elFocused) {
+        history.setSelection(selection);
+      }
       // make a real TextReplace object.
       msg.replace.delta = ot.TextReplace(msg.replace.delta.start,
                                          msg.replace.delta.del,
@@ -8050,14 +8079,16 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         return;
       }
       value = history.current;
-      selection = history.getSelection();
+      if (elFocused) {
+        selection = history.getSelection();
+      }
     } else {
       value = msg.value;
     }
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text) {
+      if (text && elFocused) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
       }
