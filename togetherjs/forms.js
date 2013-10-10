@@ -313,12 +313,23 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   function setValue(el, value) {
     el = $(el);
+    var changed = false;
     if (isCheckable(el)) {
-      el.prop("checked", value);
+      var checked = !! el.prop("checked");
+      value = !! value;
+      if (checked != value) {
+        changed = true;
+        el.prop("checked", value);
+      }
     } else {
-      el.val(value);
+      if (el.val() != value) {
+        changed = true;
+        el.val(value);
+      }
     }
-    eventMaker.fireChange(el);
+    if (changed) {
+      eventMaker.fireChange(el);
+    }
   }
 
   /* Send the top of this history queue, if it hasn't been already sent. */
@@ -362,7 +373,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       return;
     }
     var text = isText(el);
-    var elFocused = (el[0] == el[0].ownerDocument.activeElement); 
+    var elFocused = (el[0] == el[0].ownerDocument.activeElement);
     if (text && elFocused) {
       var selection = [el[0].selectionStart, el[0].selectionEnd];
     }
@@ -373,7 +384,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         console.warn("form update received for uninitialized form element");
         return;
       }
-      if (elFocused) {	
+      if (elFocused) {
         history.setSelection(selection);
       }
       // make a real TextReplace object.
@@ -387,7 +398,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         return;
       }
       value = history.current;
-      if (elFocused) {	
+      if (elFocused) {
         selection = history.getSelection();
       }
     } else {
@@ -396,7 +407,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text && elFocused) { 
+      if (text && elFocused) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
       }
