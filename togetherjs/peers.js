@@ -125,6 +125,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         identityUpdated = true;
       }
       if (msg.avatar && msg.avatar != this.avatar) {
+        util.assertValidUrl(msg.avatar);
         this.avatar = msg.avatar;
         identityUpdated = true;
       }
@@ -276,6 +277,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           }
         }
         if (attrs.avatar && attrs.avatar != this.avatar) {
+          util.assertValidUrl(attrs.avatar);
           this.avatar = attrs.avatar;
           updateMsg.avatar = this.avatar;
           if (! attrs.fromLoad) {
