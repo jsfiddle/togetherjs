@@ -373,8 +373,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       return;
     }
     var text = isText(el);
-    var elFocused = (el[0] == el[0].ownerDocument.activeElement);
-    if (text && elFocused) {
+    var focusedEl = el[0].ownerDocument.activeElement;
+    var focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    if (text) {
       var selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
@@ -384,9 +385,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         console.warn("form update received for uninitialized form element");
         return;
       }
-      if (elFocused) {
-        history.setSelection(selection);
-      }
+      history.setSelection(selection);
       // make a real TextReplace object.
       msg.replace.delta = ot.TextReplace(msg.replace.delta.start,
                                          msg.replace.delta.del,
@@ -398,18 +397,22 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         return;
       }
       value = history.current;
-      if (elFocused) {
-        selection = history.getSelection();
-      }
+      selection = history.getSelection();
     } else {
       value = msg.value;
     }
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text && elFocused) {
+      if (text) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
+        // return focus to original input:
+        if (focusedEl != el[0]) {
+          focusedEl.focus();
+          focusedEl.selectionStart = focusedElSelection[0];
+          focusedEl.selectionEnd = focusedElSelection[1];
+        }
       }
     } finally {
       inRemoteUpdate = false;
