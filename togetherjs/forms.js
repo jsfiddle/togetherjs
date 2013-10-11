@@ -37,10 +37,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     };
     if (isText(el)) {
       var history = el.data("togetherjsHistory");
-      if (history.current == value) {
-        return;
-      }
       if (history) {
+        if (history.current == value) {
+          return;
+        }
         var delta = ot.TextReplace.fromChange(history.current, value);
         assert(delta);
         history.add(delta);
