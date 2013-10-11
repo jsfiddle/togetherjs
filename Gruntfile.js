@@ -229,8 +229,10 @@ module.exports = function (grunt) {
         __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
-        __gitCommit__: gitCommit
-      };
+        __gitCommit__: gitCommit,
+        __ru_RU__: grunt.file.readJSON("togetherjs/locale/ru_RU.js")
+      }; 
+        grunt.log.write("__ru_tr__...................................>>>>" + subs.__ru_tr__+"<<<<\n");
       var filenames = {
         "togetherjs/templates.js": {
           src: "togetherjs/templates.js"
