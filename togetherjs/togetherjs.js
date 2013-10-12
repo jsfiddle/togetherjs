@@ -159,8 +159,8 @@
         attrName = attr.substr(("TowTruckConfig_on_").length);
         console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
         globalOns[attrName] = window[attr];
-      } else if (attr.indexOf("TogetherJSConfig_") === 0) {
-        attrName = attr.substr(("TogetherJSConfig_").length);
+      } else if (attr.indexOf("TowTruckConfig_") === 0) {
+        attrName = attr.substr(("TowTruckConfig_").length);
         console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
         TogetherJS.config(attrName, window[attr]);
       }
