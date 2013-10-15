@@ -1297,7 +1297,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         return;
       }
       pos = elementFinder.pixelForPosition(pos);
-      $(document.body).easeTo(pos);
+      $("html, body").easeTo(pos);
     },
 
     updateFollow: function () {

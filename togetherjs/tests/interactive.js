@@ -44,6 +44,16 @@ function addPeer(id) {
     left: left,
     clientId: id
   });
+  Test.incoming({
+    type: "scroll-update",
+    clientId: id,
+    position: {
+      location: "body",
+      offset: 20,
+      absoluteTop: 20,
+      documentHeight: $(document).height()
+    }
+  });
 }
 
 function pick(seq) {
@@ -57,9 +67,6 @@ addPeer();
 // => ...
 
 // =SECTION Controls
-
-
-// =SECTION Helpers
 
 Test.addControl(
 
