@@ -441,13 +441,13 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       }
 
       var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      if (dontShowClicks == true) {
+      var cloneClicks = TogetherJS.getConfig("cloneClicks");
+      // If you dont want to clone the click for this element
+      // and you dont want to show the click for this element or you dont want to show any clicks
+      // then return to avoid sending a useless click
+      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks == true)) {
         return;
       }
-      if (dontShowClicks && $(element).is(dontShowClicks)) {
-        return;
-      }
-
       var location = elementFinder.elementLocation(element);
       var offset = $(element).offset();
       var offsetX = event.pageX - offset.left;
@@ -458,6 +458,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         offsetX: offsetX,
         offsetY: offsetY
       });
+      if (dontShowClicks == true) {
+        return;
+      }
+      if (dontShowClicks && $(element).is(dontShowClicks)) {
+        return;
+      }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
     });
   }
@@ -480,11 +486,18 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
-    displayClick({top: top, left: left}, pos.peer.color);
     var cloneClicks = TogetherJS.getConfig("cloneClicks");
+    var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
     if (cloneClicks && target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
+    if (dontShowClicks == true) {
+      return;
+    }
+    if (dontShowClicks && $(target).is(dontShowClicks)) {
+      return;
+    }
+    displayClick({top: top, left: left}, pos.peer.color);
   });
 
   function displayClick(pos, color) {
