@@ -445,7 +445,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
-      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks == true)) {
+      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks === true)) {
         return;
       }
       var location = elementFinder.elementLocation(element);
@@ -458,7 +458,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         offsetX: offsetX,
         offsetY: offsetY
       });
-      if (dontShowClicks == true) {
+      if (dontShowClicks === true) {
         return;
       }
       if (dontShowClicks && $(element).is(dontShowClicks)) {
@@ -490,7 +490,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     if (cloneClicks && target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
-    if (dontShowClicks == true) {
+    if (dontShowClicks === true) {
       return;
     }
     if (dontShowClicks && $(target).is(dontShowClicks)) {
