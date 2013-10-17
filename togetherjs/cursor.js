@@ -22,7 +22,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     } else {
       // FIXME: This should be caught even before the cursor-update message,
       // when the peer goes to another URL
-      Cursor.getClient(msg.clientId).hideOtherUrl(msg);
+      Cursor.getClient(msg.clientId).hideOtherUrl();
     }
   });
 
@@ -118,7 +118,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.setPosition(top, left);
     },
 
-    hideOtherUrl: function (msg) {
+    hideOtherUrl: function () {
       if (this.atOtherUrl) {
         return;
       }
@@ -441,7 +441,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       }
 
       var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      if (dontShowClicks == true) {
+      if (dontShowClicks === true) {
         return;
       }
       if (dontShowClicks && $(element).is(dontShowClicks)) {
@@ -475,7 +475,6 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
-    var element = templating.clone("click");
     var target = $(elementFinder.findElement(pos.element));
     var offset = target.offset();
     var top = offset.top + pos.offsetY;

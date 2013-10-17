@@ -18,13 +18,13 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   var DEFAULT_NICKNAMES = [
     "Friendly Fox",
     "Brilliant Beaver",
-	"Observant Owl",
-	"Gregarious Giraffe",
-	"Wild Wolf",
-	"Silent Seal",
-	"Wacky Whale",
-	"Curious Cat",
-	"Intelligent Iguana"
+    "Observant Owl",
+    "Gregarious Giraffe",
+    "Wild Wolf",
+    "Silent Seal",
+    "Wacky Whale",
+    "Curious Cat",
+    "Intelligent Iguana"
   ];
 
   var Peer = util.Class({

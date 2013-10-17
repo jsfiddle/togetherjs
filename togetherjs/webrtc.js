@@ -94,8 +94,6 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
    * getUserMedia Avatar support
    */
 
-  var avatarEditState = {};
-
   session.on("ui-ready", function () {
     $("#togetherjs-self-avatar").click(function () {
       var avatar = peers.Self.avatar;
