@@ -22,7 +22,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     } else {
       // FIXME: This should be caught even before the cursor-update message,
       // when the peer goes to another URL
-      Cursor.getClient(msg.clientId).hideOtherUrl(msg);
+      Cursor.getClient(msg.clientId).hideOtherUrl();
     }
   });
 
@@ -118,7 +118,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       this.setPosition(top, left);
     },
 
-    hideOtherUrl: function (msg) {
+    hideOtherUrl: function () {
       if (this.atOtherUrl) {
         return;
       }
