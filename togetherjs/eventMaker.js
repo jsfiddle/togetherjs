@@ -4,7 +4,6 @@
 
 define(["jquery", "util"], function ($, util) {
   var eventMaker = util.Module("eventMaker");
-  var assert = util.assert;
 
   eventMaker.performClick = function (target) {
     // FIXME: should accept other parameters, like Ctrl/Alt/etc
@@ -50,7 +49,7 @@ define(["jquery", "util"], function ($, util) {
     target = $(target)[0];
     var event = document.createEvent("HTMLEvents");
     event.initEvent("change", true, true);
-    var cancelled = target.dispatchEvent(event);
+    target.dispatchEvent(event);
   };
 
   return eventMaker;
