@@ -111,7 +111,7 @@ var server = http.createServer(function(request, response) {
     response.end("OK " + load.connections + " connections " +
                  load.sessions + " sessions; " +
                  load.solo + " are single-user and " +
-                 load.empty + " not counted because they are empty");
+                 (load.sessions - load.solo) + " active sessions");
   } else if (url.pathname == '/server-source') {
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.end(thisSource);
