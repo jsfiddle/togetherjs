@@ -12,6 +12,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   var inRemoteUpdate = false;
 
+  function suppressSync(element) {
+    return $(element).is(":password");
+  }
+
   function maybeChange(event) {
     // Called when we get an event that may or may not indicate a real change
     // (like keyup in a textarea)
@@ -25,7 +29,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     if (inRemoteUpdate) {
       return;
     }
-    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target)) {
+    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target) ||
+        suppressSync(event.target)) {
       return;
     }
     var el = $(event.target);
@@ -430,7 +435,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     };
     var els = $("textarea, input, select");
     els.each(function () {
-      if (elementFinder.ignoreElement(this) || elementTracked(this)) {
+      if (elementFinder.ignoreElement(this) || elementTracked(this) ||
+          suppressSync(this)) {
         return;
       }
       var el = $(this);

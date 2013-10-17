@@ -4,6 +4,7 @@
 $("#fixture").append('<textarea id="textarea" style="width: 10em; height: 3em;"></textarea>');
 $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');
+$("#fixture").append('<input type="password" id="password" value="test">');
 
 Test.require("forms", "session", "ui", "windowing", "eventMaker");
 // => Loaded modules: ...
@@ -18,6 +19,7 @@ var fireChange = eventMaker.fireChange;
 var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
+var $password = $("#password");
 
 windowing.hide("#togetherjs-share");
 
@@ -44,6 +46,13 @@ send: form-update
   element: "#no",
   value: true
 */
+
+$password.val("New Password");
+fireChange($password);
+wait(100);
+
+/* =>
+ */
 
 function selection() {
   var start = $textarea[0].selectionStart;
