@@ -150,8 +150,10 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
     command_exec: function () {
       var expr = Array.prototype.slice.call(arguments).join(" ");
       var result;
+      // We use this to force global eval (not in this scope):
+      var e = eval;
       try {
-        result = eval(expr);
+        result = e(expr);
       } catch (error) {
         ui.chat.system({
           text: "Error: " + error
