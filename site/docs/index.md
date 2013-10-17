@@ -415,7 +415,7 @@ We haven't done much testing on mobile (yet!) and cannot recommend anything ther
 
 With IE 10 it is *possible* to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don't plan to address bug reports for Internet Explorer that don't come with a pull request.  If Internet Explorer support is important to you we do [welcome your feedback](https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform). No decision is set in stone, but we don't want to mislead you with respect to our current priorities and intentions.
 
-Please help us fix these Internet Explorer bugs [here](https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open)!
+We need your help!  If you're itching to help out, it would be great if you take on one of these Internet Explorer bugs [here](https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open)!
 
 ## Addons
 
