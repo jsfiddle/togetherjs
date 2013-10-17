@@ -23,7 +23,7 @@ function ($, util, session, elementFinder) {
     var videos = $('video');
     setupMirroredEvents(videos);
     setupTimeSync(videos);
-  };
+  }
 
   function setupMirroredEvents(videos) {
     var currentListener;
@@ -35,7 +35,7 @@ function ($, util, session, elementFinder) {
         listener: currentListener
       });
     });
-  };
+  }
 
   function makeEventSender(eventName) {
     return function (event, options) {
@@ -48,8 +48,8 @@ function ($, util, session, elementFinder) {
           position: element.currentTime
         });
       }
-    }
-  };
+    };
+  }
 
   function setupTimeSync(videos) {
     videos.each(function(i, video) {
@@ -60,7 +60,7 @@ function ($, util, session, elementFinder) {
         listener: onTimeUpdate
       });
     });
-  };
+  }
 
   function makeTimeUpdater() {
     var last = 0;
@@ -71,7 +71,7 @@ function ($, util, session, elementFinder) {
       }
       last = currentTime;
     };
-  };
+  }
 
   function areTooFarApart(currentTime, lastTime) {
     var secDiff = Math.abs(currentTime - lastTime);
@@ -87,7 +87,7 @@ function ($, util, session, elementFinder) {
         videos.off(event.name, event.listener);
     });
     listeners = [];
-  };
+  }
 
 
   session.hub.on('video-timeupdate', function (msg) {
@@ -98,8 +98,8 @@ function ($, util, session, elementFinder) {
     //to help throttle uneccesary position changes
     if(areTooFarApart(oldTime, newTime)){
       setTime(element, msg.position);
-    };
-  })
+    }
+  });
 
   MIRRORED_EVENTS.forEach( function (eventName) {
     session.hub.on("video-"+eventName, function (msg) {
@@ -109,7 +109,7 @@ function ($, util, session, elementFinder) {
 
       element.trigger(eventName, {silent: true});
     });
-  })
+  });
 
   //Currently does not discriminate between visible and invisible videos
   function $findElement(location) {
