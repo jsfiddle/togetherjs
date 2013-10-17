@@ -4,7 +4,6 @@
 /*jshint evil:true */
 define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
   var chat = util.Module("chat");
-  var assert = util.assert;
   var Walkabout;
 
   session.hub.on("chat", function (msg) {
@@ -151,7 +150,6 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
     command_exec: function () {
       var expr = Array.prototype.slice.call(arguments).join(" ");
       var result;
-      var e = eval;
       try {
         result = eval(expr);
       } catch (error) {

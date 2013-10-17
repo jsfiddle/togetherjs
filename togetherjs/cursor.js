@@ -475,7 +475,6 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
-    var element = templating.clone("click");
     var target = $(elementFinder.findElement(pos.element));
     var offset = target.offset();
     var top = offset.top + pos.offsetY;

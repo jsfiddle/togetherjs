@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "channels", "storage"], function ($, util, channels, storage) {
+define(["jquery", "util", "channels"], function ($, util, channels) {
   var recorder = util.Module("recorder");
   var assert = util.assert;
   var channel = null;
