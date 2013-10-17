@@ -1,10 +1,11 @@
+/*global forms, session, ui, windowing, eventMaker */
 // =SECTION Setup
 
 $("#fixture").append('<textarea id="textarea" style="width: 10em; height: 3em;"></textarea>');
 $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');
 
-Test.require("forms", "session", "ui", "windowing");
+Test.require("forms", "session", "ui", "windowing", "eventMaker");
 // => Loaded modules: ...
 
 printChained(
@@ -13,17 +14,18 @@ printChained(
   Test.closeWalkthrough());
 // =>...
 
+var fireChange = eventMaker.fireChange;
 var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
 
-windowing.hide("#togetherjs-about");
+windowing.hide("#togetherjs-share");
 
 // =SECTION Changes
 
 Test.waitMessage("form-update");
 $yes.prop("checked", true);
-$yes.change();
+fireChange($yes);
 
 /* =>
 send: form-update
@@ -34,7 +36,7 @@ send: form-update
 
 Test.waitMessage("form-update");
 $no.prop("checked", true);
-$no.change();
+fireChange($no);
 
 /* =>
 send: form-update
@@ -65,7 +67,7 @@ function select(start, end) {
 
 Test.waitMessage("form-update");
 $textarea.val("hello");
-$textarea.change();
+fireChange($textarea);
 
 /* =>
 send: form-update
@@ -88,10 +90,9 @@ selection();
 
 Test.waitMessage("form-update");
 $textarea.val("hello there");
-$textarea.change();
+fireChange($textarea);
 
 /* =>
-send: form-focus...
 selected 3 - 4
 send: form-update
   clientId: "me",
@@ -115,7 +116,7 @@ selection();
 
 Test.waitMessage("form-update");
 $textarea.val("hi there");
-$textarea.change();
+fireChange($textarea);
 
 /* =>
 selected ? - ?
@@ -142,7 +143,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: "about:blank",
+  avatar: "//" + location.host + "/togetherjs/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false
@@ -165,7 +166,6 @@ wait(100);
 /* =>
 
 send: hello-back...
-send: form-focus...
 send: form-init
   clientId: "me",
   pageAge: ?,
