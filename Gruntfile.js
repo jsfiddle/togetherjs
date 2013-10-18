@@ -204,7 +204,7 @@ module.exports = function (grunt) {
 
   function escapeString(s) {
     if (typeof s != "string") {
-      throw "Not a string";
+      throw new Error("Not a string: " + s);
     }
     var data = JSON.stringify(s);
     return data.substr(1, data.length-2);
@@ -215,28 +215,35 @@ module.exports = function (grunt) {
     "Substitute templates.js and parameters in togetherjs.js",
     function () {
       // FIXME: I could use grunt.file.copy(..., {process: function (content, path) {}}) here
-      var baseUrl = grunt.option("base-url") || "";
+      var baseUrl = grunt.option("base-url") || ""; // baseURL to be entered by the user
       if (! baseUrl) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
-      var destBase = grunt.option("dest") || "build";
-      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com";
+      var destBase = grunt.option("dest") || "build"; // where to put the built files. If not indicated then into build/
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com"; // URL of the hub server
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
-      var gitCommit = process.env.GIT_COMMIT || "";
+      var gitCommit = process.env.GIT_COMMIT || ""; // env.var for git
       var subs = {
-        __interface_html__: grunt.file.read("togetherjs/interface.html"),
-        __help_txt__: grunt.file.read("togetherjs/help.txt"),
-        __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
-        __baseUrl__: baseUrl,
+        __interface_html__: grunt.file.read("togetherjs/interface.html"),     // transfuse the content of interface into var
+        __help_txt__: grunt.file.read("togetherjs/help.txt"),                 // transfuse the content of help.txt into var
+        __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"), // transfuse the content of walkthrough into var
+        __baseUrl__: baseUrl, 
         __hubUrl__: hubUrl,
-        __gitCommit__: gitCommit,
-        __ru_RU__: grunt.file.readJSON("togetherjs/locale/ru_RU.js")
+        __gitCommit__: gitCommit
       }; 
-        grunt.log.write("__ru_tr__...................................>>>>" + subs.__ru_tr__+"<<<<\n");
+
+      function substituteContent(content, s) {
+        for (var v in s) {
+          var re = new RegExp(v, "g");
+          if (typeof s[v] != "string") {
+            grunt.log.error("Substitution variable " + v.cyan + " is not a string")
+          }
+          content = content.replace(re, escapeString(s[v]));
+        }
+        return content;
+      }
+
       var filenames = {
-        "togetherjs/templates.js": {
-          src: "togetherjs/templates.js"
-        },
         "togetherjs.js": {
           src: "togetherjs/togetherjs.js",
           extraVariables: {__min__: "no"}
@@ -246,6 +253,7 @@ module.exports = function (grunt) {
           extraVariables: {__min__: "yes"}
         }
       };
+
       for (var dest in filenames) {
         var info = filenames[dest];
         var src = info.src;
@@ -253,22 +261,81 @@ module.exports = function (grunt) {
         dest = destBase + "/" + dest;
         var content = fs.readFileSync(src, "UTF-8");
         var s = subs;
+
         if (extraVariables) {
           s = Object.create(subs);
           for (var a in extraVariables) {
             s[a] = extraVariables[a];
           }
         }
-        for (var v in s) {
-          var re = new RegExp(v, "g");
-          content = content.replace(re, escapeString(s[v]));
-        }
+        content = substituteContent(content, s);
         grunt.log.writeln("writing " + src.cyan + " to " + dest.cyan);
         grunt.file.write(dest, content);
       }
+
+      console.log("expanded", grunt.file.expand("togetherjs/locale/*.json"));
+
+
+      // for interface.html
+      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+        var templates = grunt.file.read("togetherjs/templates.js");
+        var lang = path.basename(langFilename).replace(/\.json/, "");
+        var translation = JSON.parse(grunt.file.read(langFilename));
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
+        
+        var translatedSource = translateFile("togetherjs/interface.html", translation);
+        var vars = subs;
+        subs.__interface_html__ = translatedSource;
+        templates = substituteContent(templates, subs);
+        grunt.file.write(dest, templates);
+        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
+      });
+
+
+      // for help.txt
+      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+        var templates = grunt.file.read("togetherjs/templates.js");
+        var lang = path.basename(langFilename).replace(/\.json/, "");
+        var translation = JSON.parse(grunt.file.read(langFilename));
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
+        
+        var translatedSource = translateFile("togetherjs/help.txt", translation);
+        var vars = subs;
+        subs.__help_txt__ = translatedSource;
+        templates = substituteContent(templates, subs);
+        grunt.file.write(dest, templates);
+        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
+      });
+
+      // for walkthrough.txt
+      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+        var templates = grunt.file.read("togetherjs/templates.js");
+        var lang = path.basename(langFilename).replace(/\.json/, "");
+        var translation = JSON.parse(grunt.file.read(langFilename));
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
+        
+        var translatedSource = translateFile("togetherjs/walkthrough.html", translation);
+        var vars = subs;
+        subs.__walkthrough_html__ = translatedSource;
+        templates = substituteContent(templates, subs);
+        grunt.file.write(dest, templates);
+        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
+      });
+
+
       return true;
     }
   );
+
+  function translateFile(source, translation) {
+    var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("./"));
+    var tmpl = env.getTemplate(source);
+    return tmpl.render({
+      gettext: function (string) {
+        return translation[string] || string;
+      }
+    })
+  }
 
   grunt.registerTask("maybeless", "Maybe compile togetherjs.less", function () {
     var sources = grunt.file.expand(["togetherjs/**/*.less", "site/**/*.less"]);
