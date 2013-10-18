@@ -218,6 +218,19 @@
     }
     var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
     var deps = ["session", "jquery"];
+    var lang = TogetherJS.getConfig("lang");
+    var availableTranslations = {
+      en_US: true,
+      ru_RU: true
+    }
+    if (! lang) {
+      lang = navigator.language.replace(/-/g, "_");
+      if (! availableTranslations[lang]) {
+        lang = TogetherJS.getConfig("fallbackLang");
+      }
+    }
+    var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
+    deps.push(localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
       if (! min) {
@@ -478,7 +491,8 @@
     // The language to present the tool in, such as "en-US" or "ru-RU"
     // Note this must be set as TogetherJSConfig_lang, as it effects the loader
     // and must be set as soon as this file is included
-    lang: "en_US"
+    lang: null,
+    fallbackLang: "en_US"
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

@@ -156,7 +156,8 @@ module.exports = function (grunt) {
       // forget.  Then between git action the build will be over-run,
       // but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", 
+                "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
     }
@@ -275,8 +276,6 @@ module.exports = function (grunt) {
 
       console.log("expanded", grunt.file.expand("togetherjs/locale/*.json"));
 
-
-      // for interface.html
       grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
         var templates = grunt.file.read("togetherjs/templates-localized.js");
         var lang = path.basename(langFilename).replace(/\.json/, "");
@@ -286,11 +285,15 @@ module.exports = function (grunt) {
         var translatedInterface = translateFile("togetherjs/interface.html", translation);
         var translatedHelp = translateFile("togetherjs/help.txt", translation);
         var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
+
         var vars = subs;
+
         subs.__interface_html__ = translatedInterface;
         subs.__help_txt__ = translatedHelp;
         subs.__walkthrough_html__ = translatedWalkthrough;
+
         templates = substituteContent(templates, subs);
+
         grunt.file.write(dest, templates);
         grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
       });

@@ -10,6 +10,7 @@ define(["util", "require"], function (util, require) {
     t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
     t = util.trim(t);
     t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
+    t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>')
     return t;
   }
 
