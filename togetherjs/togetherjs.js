@@ -417,7 +417,7 @@
   TogetherJS._configuration = {};
   TogetherJS._defaultConfiguration = {
     // Disables clicks for a certain element.
-    // (e.g., 'canvas' would not show clicks on canvas elements.) 
+    // (e.g., 'canvas' would not show clicks on canvas elements.)
     // Setting this to true will disable clicks globally.
     dontShowClicks: false,
     // Experimental feature to echo clicks to certain elements across clients:
@@ -471,7 +471,9 @@
     // of the page; i.e., if you one person is on `http://example.com/#view1`
     // and another person is at `http://example.com/#view2` then these two people
     // are considered to be at completely different URLs
-    includeHashInUrl: false
+    includeHashInUrl: false,
+    // When true, the WebRTC-based mic/chat will be disabled
+    disableWebRTC: false
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

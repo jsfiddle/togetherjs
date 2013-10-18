@@ -171,6 +171,11 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     ui.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
       $(this).append($('<button class="togetherjs-close"></button>'));
     });
+
+    if (TogetherJS.getConfig("disableWebRTC")) {
+      ui.container.find("#togetherjs-audio-button").hide();
+      adjustDockSize(-1);
+    }
   };
 
   // After prepareUI, this actually makes the interface live.  We have
@@ -764,6 +769,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     hideMenu();
   }
 
+  function adjustDockSize(buttons) {
+    /* Add or remove spots from the dock; positive number to
+       add button(s), negative number to remove button(s)
+       */
+    assert(typeof buttons == "number");
+    assert(buttons && Math.floor(buttons) == buttons);
+    var iface = $("#togetherjs-dock");
+    var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
+    assert(newHeight >= BUTTON_HEIGHT * 3, "Height went too low (", newHeight,
+           "), should never be less than 3 buttons high (", BUTTON_HEIGHT * 3, ")");
+    iface.css({
+      height: newHeight + "px"
+    });
+  }
+
   // Misc
 
   function updateShareLink() {
@@ -1224,10 +1244,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
       ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
       this.dockElement.find(".togetherjs-person").animateDockEntry();
-      var iface = $("#togetherjs-dock");
-      iface.css({
-        height: iface.height() + BUTTON_HEIGHT + "px"
-      });
+      adjustDockSize(1);
       this.detailElement = templating.sub("participant-window", {
         peer: this.peer
       });
@@ -1280,10 +1297,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         this.dockElement = null;
         this.detailElement.remove();
         this.detailElement = null;
-        var iface = $("#togetherjs-dock");
-        iface.css({
-         height: (iface.height() - BUTTON_HEIGHT) + "px"
-        });
+        adjustDockSize(-1);
       }).bind(this));
     },
 
