@@ -26,7 +26,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     "Curious Cat",
     "Intelligent Iguana"
   ];
-
+// console.log('DEFAULT_NICKNAMES .......... ', DEFAULT_NICKNAMES);
   var Peer = util.Class({
 
     isSelf: false,
@@ -334,6 +334,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           storage.settings.get("color")).then((function (name, avatar, defaultName, color) {
             if (! defaultName) {
               defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+              //defaultName = localized.get(defaultName);
               storage.settings.set("defaultName", defaultName);
             }
             if (! color) {
