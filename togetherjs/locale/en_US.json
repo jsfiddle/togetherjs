@@ -95,5 +95,36 @@
   "anyone": "anyone",
   "you": "you",
   "to": "to",
-  "here": "here"
+  "here": "here",
+
+  "You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!": "You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!",
+  "TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong>": "TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong>",
+  "Enter your name": "Enter your name", 
+  "Saved!": "Saved!",
+  "Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.": "Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.",
+  "Change your avatar, name and user color using the Profile button.": "Change your avatar, name and user color using the Profile button.",
+  "You can invite more friends to the session by sending the invite link in the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock.": "You can invite more friends to the session by sending the invite link in the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock.",
+  "Copy and paste this link into IM or email to invite friends.": "Copy and paste this link into IM or email to invite friends.",
+  "Send the above link to a friend so they can join your session!  You can find this invite link on the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock as well.": "Send the above link to a friend so they can join your session!  You can find this invite link on the <span class=\"togetherjs-tool-name\">TogetherJS</span> dock as well.",
+  "Friends who join your <span class=\"togetherjs-tool-name\">TogetherJS</span> session will appear here.  You can click their avatars to see more.": "Friends who join your <span class=\"togetherjs-tool-name\">TogetherJS</span> session will appear here.  You can click their avatars to see more.",
+  "When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!": "When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!",
+  "If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.": "If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.",
+  "Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!": "Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!",
+  "I'm ready!": "I'm ready!",
+
+  "this message": "this message",
+  "run an automated/randomized test (or stop one that is in progress)": "run an automated/randomized test (or stop one that is in progress)",
+  "run N times (instead of default 100)": "run N times (instead of default 100)",
+  "show what kind of actions the random test would take (or stop showing)": "show what kind of actions the random test would take (or stop showing)",
+  "describe the possible actions (instead of showing them)": "describe the possible actions (instead of showing them)",
+  "clear the chat area": "clear the chat area",
+  "open up a recorder for the session": "open up a recorder for the session",
+  "play back a session that was recorded (it's up to you to figure out how to host it)": "play back a session that was recorded (it's up to you to figure out how to host it)",
+  "play a locally saved log": "play a locally saved log",
+  "save the currently recorded logs under NAME (recorder must be open)": "save the currently recorded logs under NAME (recorder must be open)",
+  "set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.": "set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.",
+  "override some TogetherJS configuration parameters": "override some TogetherJS configuration parameters",
+  "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.": "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.",
+  "remove all overridden configuration": "remove all overridden configuration"
+
 }

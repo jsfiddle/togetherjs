@@ -110,7 +110,22 @@
   "When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!": "Rus_When your friends join you in your <span class=\"togetherjs-tool-name\">TogetherJS</span> session, you can chat with them here!",
   "If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.": "If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href=\"https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\" target=\"_blank\">here</a>.",
   "Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!": "Rus_Alright, you're ready to use <span class=\"togetherjs-tool-name\">TogetherJS</span>. Now start collaborating on <strong class=\"togetherjs-site-name\">[site name]</strong>!",
-  "I'm ready!": "Я готов!"
+  "I'm ready!": "Я готов!",
+
+  "this message": "это сообщение",
+  "run an automated/randomized test (or stop one that is in progress)": "сделать an automated/randomized test (or stop one that is in progress)",
+  "run N times (instead of default 100)": "сделать N times (вместо of default 100)",
+  "show what kind of actions the random test would take (or stop showing)": "показать what kind of actions the random test would take (or stop showing)",
+  "describe the possible actions (instead of showing them)": "описать the possible actions (instead of showing them)",
+  "clear the chat area": "очистить the chat area",
+  "open up a recorder for the session": "открыть a recorder for the session",
+  "play back a session that was recorded (it's up to you to figure out how to host it)": "воспроизвести a session that was recorded (it's up to you to figure out how to host it)",
+  "play a locally saved log": "проиграть a locally saved log",
+  "save the currently recorded logs under NAME (recorder must be open)": "сохранить the currently recorded logs under NAME (recorder must be open)",
+  "set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.": "назначить a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.",
+  "override some TogetherJS configuration parameters": "пересилить some TogetherJS configuration parameters",
+  "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.": "назначить TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.",
+  "remove all overridden configuration": "удалить all overridden configuration"
 
 
 }
