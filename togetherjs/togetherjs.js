@@ -45,6 +45,9 @@
     } else {
       var shownAny = false;
       for (var attr in configOverride) {
+        if (! configOverride.hasOwnProperty(attr)) {
+          continue;
+        }
         if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
           continue;
         }
@@ -417,7 +420,7 @@
   TogetherJS._configuration = {};
   TogetherJS._defaultConfiguration = {
     // Disables clicks for a certain element.
-    // (e.g., 'canvas' would not show clicks on canvas elements.) 
+    // (e.g., 'canvas' would not show clicks on canvas elements.)
     // Setting this to true will disable clicks globally.
     dontShowClicks: false,
     // Experimental feature to echo clicks to certain elements across clients:
@@ -471,7 +474,11 @@
     // of the page; i.e., if you one person is on `http://example.com/#view1`
     // and another person is at `http://example.com/#view2` then these two people
     // are considered to be at completely different URLs
-    includeHashInUrl: false
+    includeHashInUrl: false,
+    // The language to present the tool in, such as "en-US" or "ru-RU"
+    // Note this must be set as TogetherJSConfig_lang, as it effects the loader
+    // and must be set as soon as this file is included
+    lang: "en_US"
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

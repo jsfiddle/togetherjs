@@ -12,7 +12,7 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
 
   walkthrough.start = function (firstTime, doneCallback) {
     if (! container) {
-      container = $(templates.walkthrough);
+      container = $(templates("walkthrough"));
       container.hide();
       ui.container.append(container);
       slides = container.find(".togetherjs-walkthrough-slide");
