@@ -200,7 +200,6 @@
 <span class="comment">/*jshint evil:true */</span>
 define([<span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"ui"</span>, <span class="string">"templates"</span>, <span class="string">"playback"</span>, <span class="string">"storage"</span>, <span class="string">"peers"</span>, <span class="string">"windowing"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(require, $, util, session, ui, templates, playback, storage, peers, windowing)</span> {</span>
   <span class="keyword">var</span> chat = util.Module(<span class="string">"chat"</span>);
-  <span class="keyword">var</span> assert = util.assert;
   <span class="keyword">var</span> Walkabout;
 
   session.hub.on(<span class="string">"chat"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -367,10 +366,22 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
 
     command_exec: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">var</span> expr = Array.prototype.slice.call(arguments).join(<span class="string">" "</span>);
-      <span class="keyword">var</span> result;
-      <span class="keyword">var</span> e = eval;
+      <span class="keyword">var</span> result;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>We use this to force global eval (not in this scope):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> e = eval;
       <span class="keyword">try</span> {
-        result = eval(expr);
+        result = e(expr);
       } <span class="keyword">catch</span> (error) {
         ui.chat.system({
           text: <span class="string">"Error: "</span> + error

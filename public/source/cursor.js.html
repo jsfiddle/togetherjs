@@ -249,7 +249,7 @@ when the peer goes to another URL</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      Cursor.getClient(msg.clientId).hideOtherUrl(msg);
+                <div class="content"><div class='highlight'><pre>      Cursor.getClient(msg.clientId).hideOtherUrl();
     }
   });</pre></div></div>
               
@@ -431,7 +431,7 @@ user typing.  This should be more than MIN_KEYDOWN_TIME:</p>
       <span class="keyword">this</span>.setPosition(top, left);
     },
 
-    hideOtherUrl: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    hideOtherUrl: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">if</span> (<span class="keyword">this</span>.atOtherUrl) {
         <span class="keyword">return</span>;
       }
@@ -927,13 +927,24 @@ togetherjs&#39;s own video events</p>
       }
 
       <span class="keyword">var</span> dontShowClicks = TogetherJS.getConfig(<span class="string">"dontShowClicks"</span>);
-      <span class="keyword">if</span> (dontShowClicks == <span class="literal">true</span>) {
-        <span class="keyword">return</span>;
-      }
-      <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(element).is(dontShowClicks)) {
-        <span class="keyword">return</span>;
-      }
+      <span class="keyword">var</span> cloneClicks = TogetherJS.getConfig(<span class="string">"cloneClicks"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-28">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-28">&#182;</a>
+                </div>
+                <p>If you dont want to clone the click for this element
+and you dont want to show the click for this element or you dont want to show any clicks
+then return to avoid sending a useless click</p>
 
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (! $(element).is(cloneClicks) &amp;&amp; ($(element).is(dontShowClicks) || dontShowClicks === <span class="literal">true</span>)) {
+        <span class="keyword">return</span>;
+      }
       <span class="keyword">var</span> location = elementFinder.elementLocation(element);
       <span class="keyword">var</span> offset = $(element).offset();
       <span class="keyword">var</span> offsetX = event.pageX - offset.left;
@@ -944,6 +955,12 @@ togetherjs&#39;s own video events</p>
         offsetX: offsetX,
         offsetY: offsetY
       });
+      <span class="keyword">if</span> (dontShowClicks === <span class="literal">true</span>) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(element).is(dontShowClicks)) {
+        <span class="keyword">return</span>;
+      }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
     });
   }
@@ -954,10 +971,10 @@ togetherjs&#39;s own video events</p>
               
             </li>
           
-            <li id="section-28">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>When the click is calculated isn&#39;t always the same as how the
 last cursor update was calculated, so we force the cursor to
@@ -969,10 +986,10 @@ the last location during a click:</p>
               
             </li>
           
-            <li id="section-29">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>FIXME: if we <em>could have</em> done a local click, but we follow along
 later, we&#39;ll be in different states if that click was important.
@@ -983,26 +1000,32 @@ Mostly click cloning just won&#39;t work.</p>
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span>;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
-    <span class="keyword">var</span> element = templating.clone(<span class="string">"click"</span>);
     <span class="keyword">var</span> target = $(elementFinder.findElement(pos.element));
     <span class="keyword">var</span> offset = target.offset();
     <span class="keyword">var</span> top = offset.top + pos.offsetY;
     <span class="keyword">var</span> left = offset.left + pos.offsetX;
-    displayClick({top: top, left: left}, pos.peer.color);
     <span class="keyword">var</span> cloneClicks = TogetherJS.getConfig(<span class="string">"cloneClicks"</span>);
+    <span class="keyword">var</span> dontShowClicks = TogetherJS.getConfig(<span class="string">"dontShowClicks"</span>);
     <span class="keyword">if</span> (cloneClicks &amp;&amp; target.is(cloneClicks)) {
       eventMaker.performClick(target);
     }
+    <span class="keyword">if</span> (dontShowClicks === <span class="literal">true</span>) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(target).is(dontShowClicks)) {
+      <span class="keyword">return</span>;
+    }
+    displayClick({top: top, left: left}, pos.peer.color);
   });
 
   <span class="function"><span class="keyword">function</span> <span class="title">displayClick</span><span class="params">(pos, color)</span> {</span></pre></div></div>
               
             </li>
           
-            <li id="section-30">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-30">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
                 <p>FIXME: should we hide the local click if no one else is going to see it?
 That means tracking who might be able to see our screen.</p>
@@ -1037,10 +1060,10 @@ That means tracking who might be able to see our screen.</p>
               
             </li>
           
-            <li id="section-31">
+            <li id="section-32">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-31">&#182;</a>
+                  <a class="pilcrow" href="#section-32">&#182;</a>
                 </div>
                 <p>FIXME: is event.target interesting here?  That is, <em>what</em> the
 user is typing into, not just that the user is typing?  Also
@@ -1058,10 +1081,10 @@ as any other activity.</p>
               
             </li>
           
-            <li id="section-32">
+            <li id="section-33">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-32">&#182;</a>
+                  <a class="pilcrow" href="#section-33">&#182;</a>
                 </div>
                 <p>FIXME: when the cursor is hidden there&#39;s nothing to show with setKeydown().</p>
 

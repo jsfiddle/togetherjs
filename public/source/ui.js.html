@@ -518,6 +518,11 @@ failed.)</p>
     ui.container.find(<span class="string">".togetherjs-window &gt; header, .togetherjs-modal &gt; header"</span>).each(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       $(<span class="keyword">this</span>).append($(<span class="string">'&lt;button class="togetherjs-close"&gt;&lt;/button&gt;'</span>));
     });
+
+    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"disableWebRTC"</span>)) {
+      ui.container.find(<span class="string">"#togetherjs-audio-button"</span>).hide();
+      adjustDockSize(-<span class="number">1</span>);
+    }
   };</pre></div></div>
               
             </li>
@@ -1448,6 +1453,21 @@ like this, instead of simply suppressing it</p>
       t = t.parentNode;
     }
     hideMenu();
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">adjustDockSize</span><span class="params">(buttons)</span> {</span>
+    <span class="comment">/* Add or remove spots from the dock; positive number to
+       add button(s), negative number to remove button(s)
+       */</span>
+    assert(<span class="keyword">typeof</span> buttons == <span class="string">"number"</span>);
+    assert(buttons &amp;&amp; Math.floor(buttons) == buttons);
+    <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
+    <span class="keyword">var</span> newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
+    assert(newHeight &gt;= BUTTON_HEIGHT * <span class="number">3</span>, <span class="string">"Height went too low ("</span>, newHeight,
+           <span class="string">"), should never be less than 3 buttons high ("</span>, BUTTON_HEIGHT * <span class="number">3</span>, <span class="string">")"</span>);
+    iface.css({
+      height: newHeight + <span class="string">"px"</span>
+    });
   }</pre></div></div>
               
             </li>
@@ -2132,10 +2152,7 @@ and if you rollover the dock, it expands and reveals the rest of the participant
       <span class="keyword">this</span>.dockElement.attr(<span class="string">"id"</span>, <span class="keyword">this</span>.peer.className(<span class="string">"togetherjs-dock-element-"</span>));
       ui.container.find(<span class="string">"#togetherjs-dock-participants"</span>).append(<span class="keyword">this</span>.dockElement);
       <span class="keyword">this</span>.dockElement.find(<span class="string">".togetherjs-person"</span>).animateDockEntry();
-      <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
-      iface.css({
-        height: iface.height() + BUTTON_HEIGHT + <span class="string">"px"</span>
-      });
+      adjustDockSize(<span class="number">1</span>);
       <span class="keyword">this</span>.detailElement = templating.sub(<span class="string">"participant-window"</span>, {
         peer: <span class="keyword">this</span>.peer
       });
@@ -2199,10 +2216,7 @@ FIXME: should we tell the user this?</p>
         <span class="keyword">this</span>.dockElement = <span class="literal">null</span>;
         <span class="keyword">this</span>.detailElement.remove();
         <span class="keyword">this</span>.detailElement = <span class="literal">null</span>;
-        <span class="keyword">var</span> iface = $(<span class="string">"#togetherjs-dock"</span>);
-        iface.css({
-         height: (iface.height() - BUTTON_HEIGHT) + <span class="string">"px"</span>
-        });
+        adjustDockSize(-<span class="number">1</span>);
       }).bind(<span class="keyword">this</span>));
     },
 
@@ -2216,7 +2230,7 @@ FIXME: should we tell the user this?</p>
         <span class="keyword">return</span>;
       }
       pos = elementFinder.pixelForPosition(pos);
-      $(document.body).easeTo(pos);
+      $(<span class="string">"html, body"</span>).easeTo(pos);
     },
 
     updateFollow: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>

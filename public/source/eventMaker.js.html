@@ -200,7 +200,6 @@
 
 define([<span class="string">"jquery"</span>, <span class="string">"util"</span>], <span class="function"><span class="keyword">function</span> <span class="params">($, util)</span> {</span>
   <span class="keyword">var</span> eventMaker = util.Module(<span class="string">"eventMaker"</span>);
-  <span class="keyword">var</span> assert = util.assert;
 
   eventMaker.performClick = <span class="function"><span class="keyword">function</span> <span class="params">(target)</span> {</span></pre></div></div>
               
@@ -279,7 +278,7 @@ FIXME: should run .onclick() as well</p>
     target = $(target)[<span class="number">0</span>];
     <span class="keyword">var</span> event = document.createEvent(<span class="string">"HTMLEvents"</span>);
     event.initEvent(<span class="string">"change"</span>, <span class="literal">true</span>, <span class="literal">true</span>);
-    <span class="keyword">var</span> cancelled = target.dispatchEvent(event);
+    target.dispatchEvent(event);
   };
 
   <span class="keyword">return</span> eventMaker;

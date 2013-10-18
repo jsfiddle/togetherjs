@@ -12,6 +12,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   var inRemoteUpdate = false;
 
+  function suppressSync(element) {
+    return $(element).is(":password");
+  }
+
   function maybeChange(event) {
     // Called when we get an event that may or may not indicate a real change
     // (like keyup in a textarea)
@@ -25,7 +29,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     if (inRemoteUpdate) {
       return;
     }
-    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target)) {
+    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target) ||
+        suppressSync(event.target)) {
       return;
     }
     var el = $(event.target);
@@ -37,10 +42,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     };
     if (isText(el)) {
       var history = el.data("togetherjsHistory");
-      if (history.current == value) {
-        return;
-      }
       if (history) {
+        if (history.current == value) {
+          return;
+        }
         var delta = ot.TextReplace.fromChange(history.current, value);
         assert(delta);
         history.add(delta);
@@ -373,9 +378,11 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       return;
     }
     var text = isText(el);
-    var elFocused = (el[0] == el[0].ownerDocument.activeElement);
-    if (text && elFocused) {
-      var selection = [el[0].selectionStart, el[0].selectionEnd];
+    var focusedEl = el[0].ownerDocument.activeElement;
+    var focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    var selection;
+    if (text) {
+      selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
     if (msg.replace) {
@@ -384,9 +391,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         console.warn("form update received for uninitialized form element");
         return;
       }
-      if (elFocused) {
-        history.setSelection(selection);
-      }
+      history.setSelection(selection);
       // make a real TextReplace object.
       msg.replace.delta = ot.TextReplace(msg.replace.delta.start,
                                          msg.replace.delta.del,
@@ -398,18 +403,22 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         return;
       }
       value = history.current;
-      if (elFocused) {
-        selection = history.getSelection();
-      }
+      selection = history.getSelection();
     } else {
       value = msg.value;
     }
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text && elFocused) {
+      if (text) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
+        // return focus to original input:
+        if (focusedEl != el[0]) {
+          focusedEl.focus();
+          focusedEl.selectionStart = focusedElSelection[0];
+          focusedEl.selectionEnd = focusedElSelection[1];
+        }
       }
     } finally {
       inRemoteUpdate = false;
@@ -427,7 +436,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     };
     var els = $("textarea, input, select");
     els.each(function () {
-      if (elementFinder.ignoreElement(this) || elementTracked(this)) {
+      if (elementFinder.ignoreElement(this) || elementTracked(this) ||
+          suppressSync(this)) {
         return;
       }
       var el = $(this);

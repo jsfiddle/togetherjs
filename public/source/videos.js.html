@@ -216,7 +216,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     <span class="keyword">var</span> videos = $(<span class="string">'video'</span>);
     setupMirroredEvents(videos);
     setupTimeSync(videos);
-  };
+  }
 
   <span class="function"><span class="keyword">function</span> <span class="title">setupMirroredEvents</span><span class="params">(videos)</span> {</span>
     <span class="keyword">var</span> currentListener;
@@ -228,7 +228,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
         listener: currentListener
       });
     });
-  };
+  }
 
   <span class="function"><span class="keyword">function</span> <span class="title">makeEventSender</span><span class="params">(eventName)</span> {</span>
     <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(event, options)</span> {</span>
@@ -241,8 +241,8 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
           position: element.currentTime
         });
       }
-    }
-  };
+    };
+  }
 
   <span class="function"><span class="keyword">function</span> <span class="title">setupTimeSync</span><span class="params">(videos)</span> {</span>
     videos.each(<span class="keyword">function</span>(i, video) {
@@ -253,7 +253,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
         listener: onTimeUpdate
       });
     });
-  };
+  }
 
   <span class="function"><span class="keyword">function</span> <span class="title">makeTimeUpdater</span><span class="params">()</span> {</span>
     <span class="keyword">var</span> last = <span class="number">0</span>;
@@ -264,7 +264,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
       }
       last = currentTime;
     };
-  };
+  }
 
   <span class="function"><span class="keyword">function</span> <span class="title">areTooFarApart</span><span class="params">(currentTime, lastTime)</span> {</span>
     <span class="keyword">var</span> secDiff = Math.abs(currentTime - lastTime);
@@ -280,7 +280,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
         videos.off(event.name, event.listener);
     });
     listeners = [];
-  };
+  }
 
 
   session.hub.on(<span class="string">'video-timeupdate'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -301,8 +301,8 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               
                 <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span>(areTooFarApart(oldTime, newTime)){
       setTime(element, msg.position);
-    };
-  })
+    }
+  });
 
   MIRRORED_EVENTS.forEach( <span class="function"><span class="keyword">function</span> <span class="params">(eventName)</span> {</span>
     session.hub.on(<span class="string">"video-"</span>+eventName, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -312,7 +312,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
 
       element.trigger(eventName, {silent: <span class="literal">true</span>});
     });
-  })</pre></div></div>
+  });</pre></div></div>
               
             </li>
           

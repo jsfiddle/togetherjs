@@ -159,8 +159,8 @@
         attrName = attr.substr(("TowTruckConfig_on_").length);
         console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
         globalOns[attrName] = window[attr];
-      } else if (attr.indexOf("TogetherJSConfig_") === 0) {
-        attrName = attr.substr(("TogetherJSConfig_").length);
+      } else if (attr.indexOf("TowTruckConfig_") === 0) {
+        attrName = attr.substr(("TowTruckConfig_").length);
         console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
         TogetherJS.config(attrName, window[attr]);
       }
@@ -417,7 +417,7 @@
   TogetherJS._configuration = {};
   TogetherJS._defaultConfiguration = {
     // Disables clicks for a certain element.
-    // (e.g., 'canvas' would not show clicks on canvas elements.) 
+    // (e.g., 'canvas' would not show clicks on canvas elements.)
     // Setting this to true will disable clicks globally.
     dontShowClicks: false,
     // Experimental feature to echo clicks to certain elements across clients:
@@ -471,7 +471,9 @@
     // of the page; i.e., if you one person is on `http://example.com/#view1`
     // and another person is at `http://example.com/#view2` then these two people
     // are considered to be at completely different URLs
-    includeHashInUrl: false
+    includeHashInUrl: false,
+    // When true, the WebRTC-based mic/chat will be disabled
+    disableWebRTC: false
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

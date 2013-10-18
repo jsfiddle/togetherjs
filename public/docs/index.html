@@ -219,6 +219,8 @@ var TogetherJSConfig_something = "foo";
     This adds the ability from the profile menu to invite people who are hanging out in another room (using TogetherJS).  This is kind of (but not exactly) how the “Get Help” button works on this site.  This is still an experimental feature.</p>
 <p><code>TogetherJSConfig_includeHashInUrl</code>:
     When true (default false), TogetherJS treats the entire URL, including the hash, as the identifier of the page; i.e., if you one person is on <code>http://example.com/#view1</code> and another person is at <code>http://example.com/#view2</code> then these two people are considered to be at completely different URLs.  You‘d want to use this in single-page apps where being at the same base URL doesn’t mean the two people are looking at the same thing.</p>
+<p><code>TogetherJSConfig_disableWebRTC</code>:
+    Disables/removes the button to do audio chat via WebRTC.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
 <h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
 <p>The button you add to your site to start TogetherJS will typically look like this:</p>
@@ -397,6 +399,7 @@ TogetherJS.reinitialize();</code></pre>
 <p>We haven&#39;t done much testing on mobile (yet!) and cannot recommend anything there.</p>
 <h4 id="internet-explorer">Internet Explorer</h4>
 <p>With IE 10 it is <em>possible</em> to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don‘t plan to address bug reports for Internet Explorer that don’t come with a pull request.  If Internet Explorer support is important to you we do <a href="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">welcome your feedback</a>. No decision is set in stone, but we don&#39;t want to mislead you with respect to our current priorities and intentions.</p>
+<p>We need your help!  If you&#39;re itching to help out, it would be great if you take on one of these Internet Explorer bugs <a href="https://github.com/mozilla/togetherjs/issues?labels=IE&amp;milestone=&amp;page=1&amp;state=open">here</a>!</p>
 <h2 id="addons">Addons</h2>
 <p>There is an addon for Firefox in <a href="https://github.com/mozilla/togetherjs/tree/develop/addon">addon/</a>.</p>
 <p>This isn‘t intended to be the “normal” way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn’t integrated <code>togetherjs-min.js</code> itself.  When you activate the addon (via a link in the <a href="https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons">Add-On Toolbar</a>) it simply adds <code>togetherjs-min.js</code> to every page in that tab (until you close the tab or turn it off).  Also if you open a link with <code>#&amp;togetherjs=...</code> (the code used in the share link) it will automatically turn TogetherJS on for the tab.</p>
