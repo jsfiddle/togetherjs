@@ -156,7 +156,7 @@ module.exports = function (grunt) {
       // forget.  Then between git action the build will be over-run,
       // but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*"],
         tasks: ["build"]
       }
     }
@@ -171,7 +171,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!togetherjs.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp"];
+    var pattern = ["**", "!togetherjs.js", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
     grunt.log.writeln("Copying files from " + "togetherjs/".cyan + " to " + path.join(grunt.option("dest"), "togetherjs").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
@@ -212,7 +212,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask(
     "substitute",
-    "Substitute templates.js and parameters in togetherjs.js",
+    "Substitute templates-localized.js and parameters in togetherjs.js",
     function () {
       // FIXME: I could use grunt.file.copy(..., {process: function (content, path) {}}) here
       var baseUrl = grunt.option("base-url") || ""; // baseURL to be entered by the user
@@ -227,10 +227,10 @@ module.exports = function (grunt) {
         __interface_html__: grunt.file.read("togetherjs/interface.html"),     // transfuse the content of interface into var
         __help_txt__: grunt.file.read("togetherjs/help.txt"),                 // transfuse the content of help.txt into var
         __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"), // transfuse the content of walkthrough into var
-        __baseUrl__: baseUrl, 
+        __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
         __gitCommit__: gitCommit
-      }; 
+      };
 
       function substituteContent(content, s) {
         for (var v in s) {
@@ -278,50 +278,22 @@ module.exports = function (grunt) {
 
       // for interface.html
       grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
-        var templates = grunt.file.read("togetherjs/templates.js");
+        var templates = grunt.file.read("togetherjs/templates-localized.js");
         var lang = path.basename(langFilename).replace(/\.json/, "");
         var translation = JSON.parse(grunt.file.read(langFilename));
         var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
-        
-        var translatedSource = translateFile("togetherjs/interface.html", translation);
+
+        var translatedInterface = translateFile("togetherjs/interface.html", translation);
+        var translatedHelp = translateFile("togetherjs/help.txt", translation);
+        var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
         var vars = subs;
-        subs.__interface_html__ = translatedSource;
+        subs.__interface_html__ = translatedInterface;
+        subs.__help_txt__ = translatedHelp;
+        subs.__walkthrough_html__ = translatedWalkthrough;
         templates = substituteContent(templates, subs);
         grunt.file.write(dest, templates);
         grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
       });
-
-
-      // for help.txt
-      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
-        var templates = grunt.file.read("togetherjs/templates.js");
-        var lang = path.basename(langFilename).replace(/\.json/, "");
-        var translation = JSON.parse(grunt.file.read(langFilename));
-        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
-        
-        var translatedSource = translateFile("togetherjs/help.txt", translation);
-        var vars = subs;
-        subs.__help_txt__ = translatedSource;
-        templates = substituteContent(templates, subs);
-        grunt.file.write(dest, templates);
-        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
-      });
-
-      // for walkthrough.txt
-      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
-        var templates = grunt.file.read("togetherjs/templates.js");
-        var lang = path.basename(langFilename).replace(/\.json/, "");
-        var translation = JSON.parse(grunt.file.read(langFilename));
-        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
-        
-        var translatedSource = translateFile("togetherjs/walkthrough.html", translation);
-        var vars = subs;
-        subs.__walkthrough_html__ = translatedSource;
-        templates = substituteContent(templates, subs);
-        grunt.file.write(dest, templates);
-        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
-      });
-
 
       return true;
     }
@@ -334,7 +306,7 @@ module.exports = function (grunt) {
       gettext: function (string) {
         return translation[string] || string;
       }
-    })
+    });
   }
 
   grunt.registerTask("maybeless", "Maybe compile togetherjs.less", function () {
