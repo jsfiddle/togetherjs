@@ -380,8 +380,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     var text = isText(el);
     var focusedEl = el[0].ownerDocument.activeElement;
     var focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    var selection;
     if (text) {
-      var selection = [el[0].selectionStart, el[0].selectionEnd];
+      selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
     if (msg.replace) {
