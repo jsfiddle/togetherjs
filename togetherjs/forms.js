@@ -1,6 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ //mod: add dnt class to elements to exclude
 
 define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($, util, session, elementFinder, eventMaker, templating, ot) {
   var forms = util.Module("forms");
@@ -13,7 +15,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   var inRemoteUpdate = false;
 
   function suppressSync(element) {
-    return $(element).is(":password");
+    return $(element).is(":password,.dnt"); //add dnt class to elements to exclude
   }
 
   function maybeChange(event) {
