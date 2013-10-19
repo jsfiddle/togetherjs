@@ -5,13 +5,33 @@ var Test = {};
 /* Loads the modules that are listed as individual arguments, and adds
    them to the global scope.  Blocks on the loading.  Use like:
 
-   Test.require("foo", "bar");
-   // => ...
-   foo.someFunction()...
+       Test.require("foo", "bar");
+       // => ...
+       foo.someFunction()...
+
+   If you want to alias something, do:
+
+       Test.require({myConsole: "console"})
+       // => ...
+       myConsole.log()
 */
 Test.require = function () {
   var done = false;
-  var modules = Array.prototype.slice.call(arguments);
+  var args = Array.prototype.slice.call(arguments);
+  var modules = [];
+  var aliases = {};
+  args.forEach(function (m) {
+    if (typeof m == "object") {
+      for (var alias in m) {
+        if (m.hasOwnProperty(alias)) {
+          modules.push(m[alias]);
+          aliases[m[alias]] = alias;
+        }
+      }
+    } else {
+      modules.push(m);
+    }
+  });
 
   function loadModules() {
     if (! modules.length) {
@@ -21,7 +41,8 @@ Test.require = function () {
     }
     TogetherJS.require(modules, function () {
       for (var i=0; i<modules.length; i++) {
-        window[modules[i]] = arguments[i];
+        var localName = aliases[modules[i]] || modules[i];
+        window[localName] = arguments[i];
       }
       var msg = ["Loaded modules:"].concat(modules);
       print.apply(null, msg);
