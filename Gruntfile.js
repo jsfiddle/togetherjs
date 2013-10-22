@@ -20,7 +20,7 @@ module.exports = function (grunt) {
   }
 
   var dumpLineNumbers = false;
-  if (!! grunt.option("less-line-numbers")) {
+  if (grunt.option("less-line-numbers")) {
     grunt.verbose.writeln("Enabling LESS line numbers");
     dumpLineNumbers = true;
   }
