@@ -420,6 +420,24 @@ With IE 10 it is *possible* to support Internet Explorer (version 9 and before d
 
 We need your help!  If you're itching to help out, it would be great if you take on one of these Internet Explorer bugs [here](https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open)!
 
+## Hosting the Hub Server
+
+We have a server at `https://hub.togetherjs.com` which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven't really "finished" the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.
+
+The server is located in `hub/server.js`, and is a simple Node.js application.  You can run this like `node hub/server.js`, and you can use environmental variables to control things like the port (look in `server.js` for references to `process.env`).  You will need to `npm install websocket` to get the websocket library installed.
+
+If you want to use TogetherJS on an https site you must host the hub on https.  We don't it setup in `server.js` for Node to do SSL directly, so we recommend a proxy.  [stunnel](https://www.stunnel.org/) is an example of the kind of proxy you'd want – not all proxies support websockets.
+
+If you want to change the port or interface the server binds to, simply run `node hub/server.js -h` and it will show the command-line options as well as environmental variables.
+
+Once you have the hub installed you need to configure TogetherJS to use the hub, like:
+
+```javascript
+TogetherJSConfig_hubBase = "https://myhub.com";
+```
+
+If you are curious about the exact version of code on the server it should be always be [server.js on master](https://github.com/mozilla/togetherjs/blob/master/hub/server.js), and you can double-check by fetching [`/server-source`](https://hub.togetherjs.com/server-source).
+
 ## Addons
 
 There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
