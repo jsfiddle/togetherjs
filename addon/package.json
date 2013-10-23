@@ -4,14 +4,14 @@
             "description": "This is where to find the script to inject",
             "type": "string",
             "name": "togetherjsJs",
-            "value": "https://togetherjs.mozillalabs.com/togetherjs.js",
+            "value": "https://togetherjs.com/togetherjs.js",
             "title": "togetherjs.js location"
         },
         {
             "description": "Override the location of the hub",
             "type": "string",
             "name": "hubBase",
-            "value": "https://hub.togetherjs.mozillalabs.com",
+            "value": "https://hub.togetherjs.com",
             "title": "Hub URL"
         },
         {
