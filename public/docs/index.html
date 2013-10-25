@@ -128,6 +128,7 @@
           <li><a href="#setting-identity-information" class="scrollnavdocs">Setting Identity Information</a></li>
           <li><a href="#getting-a-static-copy-of-the-client" class="scrollnavdocs">Getting a Static Copy of the Client</a></li>
           <li><a href="#browser-support" class="scrollnavdocs">Browser Support</a></li>
+          <li><a href="#hosting-the-hub-server" class="scrollnavdocs">Hosting the Hub Server</a></li>
           <li><a href="#addons" class="scrollnavdocs">Addons</a></li>
           <li><a href="#getting-help" class="scrollnavdocs">Getting Help</a></li>
         </ul>
@@ -400,6 +401,14 @@ TogetherJS.reinitialize();</code></pre>
 <h4 id="internet-explorer">Internet Explorer</h4>
 <p>With IE 10 it is <em>possible</em> to support Internet Explorer (version 9 and before do not support WebSockets).  However we do not test at all regularly on Internet Explorer, and we know we have active issues but are not trying to fix them.  Pull requests to support Internet Explorer are welcome, but right now we don‘t plan to address bug reports for Internet Explorer that don’t come with a pull request.  If Internet Explorer support is important to you we do <a href="https://docs.google.com/a/mozilla.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform">welcome your feedback</a>. No decision is set in stone, but we don&#39;t want to mislead you with respect to our current priorities and intentions.</p>
 <p>We need your help!  If you&#39;re itching to help out, it would be great if you take on one of these Internet Explorer bugs <a href="https://github.com/mozilla/togetherjs/issues?labels=IE&amp;milestone=&amp;page=1&amp;state=open">here</a>!</p>
+<h2 id="hosting-the-hub-server">Hosting the Hub Server</h2>
+<p>We have a server at <code>https://hub.togetherjs.com</code> which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven&#39;t really “finished” the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.</p>
+<p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code> - use <code>node hub/server.js --help</code> to see the available options.  You will need to <code>npm install websocket</code> to get the websocket library installed.</p>
+<p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t it setup in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy.  <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
+<p>If you want to change the port or interface the server binds to, simply run <code>node hub/server.js -h</code> and it will show the command-line options as well as environmental variables.</p>
+<p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
+<pre><code class="lang-javascript">TogetherJSConfig_hubBase = <span class="string">"https://myhub.com"</span>;</code></pre>
+<p>If you are curious about the exact version of code on the server it should be always be <a href="https://github.com/mozilla/togetherjs/blob/master/hub/server.js">server.js on master</a>, and you can double-check by fetching <a href="https://hub.togetherjs.com/server-source"><code>/server-source</code></a>.</p>
 <h2 id="addons">Addons</h2>
 <p>There is an addon for Firefox in <a href="https://github.com/mozilla/togetherjs/tree/develop/addon">addon/</a>.</p>
 <p>This isn‘t intended to be the “normal” way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn’t integrated <code>togetherjs-min.js</code> itself.  When you activate the addon (via a link in the <a href="https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons">Add-On Toolbar</a>) it simply adds <code>togetherjs-min.js</code> to every page in that tab (until you close the tab or turn it off).  Also if you open a link with <code>#&amp;togetherjs=...</code> (the code used in the share link) it will automatically turn TogetherJS on for the tab.</p>

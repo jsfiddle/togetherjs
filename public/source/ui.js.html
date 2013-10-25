@@ -121,6 +121,8 @@
             
               <li><a href="chat.js.html">chat</a></li>
             
+              <li><a href="console.js.html">console</a></li>
+            
               <li><a href="cursor.js.html">cursor</a></li>
             
               <li><a href="elementFinder.js.html">elementFinder</a></li>
@@ -612,7 +614,19 @@ everything is loaded and ready for interaction.</p>
                 <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> input = container.find(<span class="string">"#togetherjs-chat-input"</span>);
     input.bind(<span class="string">"keydown"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
       <span class="keyword">if</span> (event.which == <span class="number">13</span> &amp;&amp; !event.shiftKey) { <span class="comment">// Enter without Shift pressed</span>
-        submitChat();</pre></div></div>
+        submitChat();
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+      <span class="keyword">if</span> (event.which == <span class="number">27</span>) { <span class="comment">// Escape</span>
+        windowing.hide(<span class="string">"#togetherjs-chat"</span>);
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+    });
+
+    <span class="function"><span class="keyword">function</span> <span class="title">submitChat</span><span class="params">()</span> {</span>
+      <span class="keyword">var</span> val = input.val();
+      <span class="keyword">if</span> ($.trim(val)) {
+        input.val(<span class="string">""</span>);</pre></div></div>
               
             </li>
           
@@ -626,19 +640,7 @@ everything is loaded and ready for interaction.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>        input.trigger(<span class="string">"input"</span>).trigger(<span class="string">"propertychange"</span>);
-        <span class="keyword">return</span> <span class="literal">false</span>;
-      }
-      <span class="keyword">if</span> (event.which == <span class="number">27</span>) { <span class="comment">// Escape</span>
-        windowing.hide(<span class="string">"#togetherjs-chat"</span>);
-        <span class="keyword">return</span> <span class="literal">false</span>;
-      }
-    });
-
-    <span class="function"><span class="keyword">function</span> <span class="title">submitChat</span><span class="params">()</span> {</span>
-      <span class="keyword">var</span> val = input.val();
-      <span class="keyword">if</span> ($.trim(val)) {
         chat.submit(val);
-        input.val(<span class="string">""</span>);
       }
     }</pre></div></div>
               
