@@ -215,8 +215,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     input.bind("keydown", function (event) {
       if (event.which == 13 && !event.shiftKey) { // Enter without Shift pressed
         submitChat();
-        // triggering the event manually to avoid the addition of newline character to the textarea:
-        input.trigger("input").trigger("propertychange");
         return false;
       }
       if (event.which == 27) { // Escape
@@ -228,8 +226,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     function submitChat() {
       var val = input.val();
       if ($.trim(val)) {
-        chat.submit(val);
         input.val("");
+        // triggering the event manually to avoid the addition of newline character to the textarea:
+        input.trigger("input").trigger("propertychange");
+        chat.submit(val);
       }
     }
     // auto-resize textarea:
