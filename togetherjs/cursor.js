@@ -445,7 +445,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
-      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks === true)) {
+      if ((cloneClicks !== true && ! $(element).is(cloneClicks)) && (dontShowClicks === true || $(element).is(dontShowClicks))) {
         return;
       }
       var location = elementFinder.elementLocation(element);
