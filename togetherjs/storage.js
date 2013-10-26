@@ -55,7 +55,6 @@ define(["util"], function (util) {
         value = JSON.stringify(value);
       }
       return Deferred(function (def) {
-        setTimeout(util.resolver(def, function () {
           key = self.prefix + key;
           if (value === undefined) {
             self.storage.removeItem(key);
@@ -68,7 +67,7 @@ define(["util"], function (util) {
               console.debug("Set storage", key, value);
             }
           }
-        }));
+          setTimeout(def.resolve);
       });
     },
 
