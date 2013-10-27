@@ -55,19 +55,19 @@ define(["util"], function (util) {
         value = JSON.stringify(value);
       }
       return Deferred(function (def) {
-          key = self.prefix + key;
-          if (value === undefined) {
-            self.storage.removeItem(key);
-            if (DEBUG_STORAGE) {
-              console.debug("Delete storage", key);
-            }
-          } else {
-            self.storage.setItem(key, value);
-            if (DEBUG_STORAGE) {
-              console.debug("Set storage", key, value);
-            }
+        key = self.prefix + key;
+        if (value === undefined) {
+          self.storage.removeItem(key);
+          if (DEBUG_STORAGE) {
+            console.debug("Delete storage", key);
           }
-          setTimeout(def.resolve);
+        } else {
+          self.storage.setItem(key, value);
+          if (DEBUG_STORAGE) {
+            console.debug("Set storage", key, value);
+          }
+        }
+        setTimeout(def.resolve);
       });
     },
 
@@ -95,7 +95,7 @@ define(["util"], function (util) {
         setTimeout(util.resolver(def, function () {
           prefix = prefix || "";
           var result = [];
-          for (var i=0; i<self.storage.length; i++) {
+          for (var i = 0; i < self.storage.length; i++) {
             var key = self.storage.key(i);
             if (key.indexOf(self.prefix + prefix) === 0) {
               var shortKey = key.substr(self.prefix.length);
