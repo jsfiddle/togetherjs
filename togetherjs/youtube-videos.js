@@ -5,8 +5,10 @@
 define(["jquery", "util", "session", "elementFinder"],
 function ($, util, session, elementFinder) {
 
-  var tag = document.createElement('script');
+  // FIXME: when a user embeds another YouTube video dynamically, I should set it up too
 
+  // call onYouTubeIframeAPIReady when the script finishes loading
+  var tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -15,16 +17,21 @@ function ($, util, session, elementFinder) {
 
   //  an array of all embedded YouTube players 
   var players = [];
-  var iframes = $('iframe#youtube-player');
+  var youTubeIframes = [];
 
   // boolean to indicate when to not publish
   var dontPublish = [];
 
-  // TODO: enablejsapi should be set as well
-  // the only thing the user has to do should be setting iframe id to "youtube-player"
-  $(function giveUniqueIdsToIframes() {
+  // give each youtube iframe a unique id and set its enablejsapi param to true
+  $(function setUpYouTubeIframes() {
+    var iframes = $('iframe');
+
     iframes.each(function (i, iframe) {
-      iframe.id = iframe.id+i;
+      if ($(iframe).attr("src").indexOf("youtube") != -1) { //look for YouTube Iframes
+        $(iframe).attr("id", "youtube-player"+i);
+        $(iframe).attr("ensablejsapi", 1);
+        youTubeIframes[i] = iframe;
+      }
     });
     console.log("Iframes are set");
   });
@@ -32,7 +39,7 @@ function ($, util, session, elementFinder) {
   // this function should be global so it can be called when API is loaded
   window.onYouTubeIframeAPIReady = function() {
     console.log("Iframe API is ready");
-    iframes.each(function (i, iframe) {
+    $(youTubeIframes).each(function (i, iframe) {
       var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
         events: {
           'onReady': insertPlayer,
@@ -80,15 +87,13 @@ function ($, util, session, elementFinder) {
         playerIndex: playerIndex, // id of iframe that changed state
         playerState: 1,
         playerTime: currentTime
-
       });
     } else if (event.data == YT.PlayerState.PAUSED) {      
       session.send({
         type: "playerStateChange",
         playerIndex: playerIndex,
         playerState: 2,
-        playerTime: currentTime,
-
+        playerTime: currentTime
       });
     } else if (event.data == YT.PlayerState.BUFFERING) {
       console.log("Im just buffering. Do nothing");
