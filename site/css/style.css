@@ -256,10 +256,15 @@ h5 {
   width: 44px;
   background: rgb(72, 72, 72);
   margin-top: 13px;
+  border: 1px solid #282a2c;
 }
 
 .main-header.navbar-inverse .navbar-collapse {
   border-color: #000;
+}
+
+.navbar-collapse {
+  border-top: 1px solid #282a2c;
 }
 
 
@@ -536,6 +541,10 @@ h5 {
   width: 100%;
   margin: 0 auto;
   background: #efefef;
+}
+
+#main-section #customers p.text-center {
+  margin: 0px 15%;
 }
 
 /* =features section
