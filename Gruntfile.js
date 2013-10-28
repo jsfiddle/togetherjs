@@ -72,8 +72,8 @@ module.exports = function (grunt) {
     less: {
       development: {
         files: {
-          "build/togetherjs/togetherjs.css": "togetherjs/togetherjs.less",
-          "build/togetherjs/recorder.css": "togetherjs/recorder.less"
+          "<%= grunt.option('dest') || 'build' %>/togetherjs/togetherjs.css": "togetherjs/togetherjs.less",
+          "<%= grunt.option('dest') || 'build' %>/togetherjs/recorder.css": "togetherjs/recorder.less"
         },
         options: {
           dumpLineNumbers: dumpLineNumbers
