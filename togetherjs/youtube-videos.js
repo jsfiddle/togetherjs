@@ -33,12 +33,12 @@ function ($, util, session, elementFinder) {
         youTubeIframes[i] = iframe;
       }
     });
-    console.log("Iframes are set");
+    // iframes are ready
   });
 
   // this function should be global so it can be called when API is loaded
   window.onYouTubeIframeAPIReady = function() {
-    console.log("Iframe API is ready");
+    // YouTube API is ready
     $(youTubeIframes).each(function (i, iframe) {
       var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
         events: {
@@ -96,10 +96,9 @@ function ($, util, session, elementFinder) {
         playerTime: currentTime
       });
     } else if (event.data == YT.PlayerState.BUFFERING) {
-      console.log("Im just buffering. Do nothing");
+      // shouldnt do anything when Im buffering
     } else if (event.data == YT.PlayerState.CUED) {
       // TODO: should I syncrhonize newly loaded videos as well?
-      //videoUrl = player.getVideoUrl();
     } else if (event.data == YT.PlayerState.ENDED) {
       session.send({
         type: "playerStateChange",
