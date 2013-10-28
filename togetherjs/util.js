@@ -316,6 +316,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
     try {
       return $(el).is(selector);
     } catch (e) {
+      console.warn("Bad selector:", selector, "error:", e);
       return false;
     }
     
