@@ -26,15 +26,7 @@ function ($, util, session, elementFinder) {
     // setup iframes first
     setupYouTubeIframes();
 
-    // load necessary API
-    // call onYouTubeIframeAPIReady when the API finishes loading
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     // this function should be global so it can be called when API is loaded
-    // FIXME: handle the case when Iframe API is already loaded
     window.onYouTubeIframeAPIReady = function() {
       // YouTube API is ready
       $(youTubeIframes).each(function (i, iframe) {
@@ -45,6 +37,19 @@ function ($, util, session, elementFinder) {
           }
         });
       });
+    }
+
+    if (window.YT === undefined) {
+      // load necessary API
+      // it calls onYouTubeIframeAPIReady automatically when the API finishes loading
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    } else {
+      alert("im called manually");
+      // manually invoke APIReady function when the API was already loaded by user
+      onYouTubeIframeAPIReady();
     }
 
     // give each youtube iframe a unique id and set its enablejsapi param to true
