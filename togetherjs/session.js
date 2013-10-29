@@ -59,7 +59,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.recordUrl = function () {
     assert(session.shareId);
-    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
     url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
     return url;
   };
