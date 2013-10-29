@@ -5,14 +5,34 @@
 define(["jquery", "util", "session", "elementFinder"],
 function ($, util, session, elementFinder) {
 
-  // if youTube config is on, load necessary API
+  // constant var to indicate whether two players are too far apart in sync
+  var TOO_FAR_APART = 3000;
+  // embedded youtube iframes
+  var youTubeIframes = [];
+
+  session.on("reinitialize", function () {
+    if (TogetherJS.getConfig("youtube")) {
+      prepareYouTube();  
+    }
+  });
+
   if (TogetherJS.getConfig("youtube")) {
+    prepareYouTube();
+  }
+
+  function prepareYouTube() {
+    // setup iframes first
+    setupYouTubeIframes();
+
+    // load necessary API
+    // call onYouTubeIframeAPIReady when the API finishes loading
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     // this function should be global so it can be called when API is loaded
+    // FIXME: handle the case when Iframe API is already loaded
     window.onYouTubeIframeAPIReady = function() {
       // YouTube API is ready
       $(youTubeIframes).each(function (i, iframe) {
@@ -24,41 +44,35 @@ function ($, util, session, elementFinder) {
         });
       });
     }
-  }
-  // call onYouTubeIframeAPIReady when the script finishes loading
 
-  var TOO_FAR_APART = 3000;
+    // give each youtube iframe a unique id and set its enablejsapi param to true
+    function setupYouTubeIframes() {
+      var iframes = $('iframe');
+      iframes.each(function (i, iframe) {
+        // look for YouTube Iframes
+        // if the iframe's unique id is already set, skip it
+        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) { 
+          $(iframe).attr("id", "youtube-player"+i);
+          $(iframe).attr("ensablejsapi", 1);
+          youTubeIframes[i] = iframe;
+        }
+      });
+    } // iframes are ready
 
-  //  an array of all embedded YouTube players 
-  var players = [];
-  var youTubeIframes = [];
+    function insertPlayer(event) {
+      // only when it is READY, attach a player to its iframe
+      var currentPlayer = event.target;
+      var currentIframe = currentPlayer.a;
+      // check if a player is already attached in case of being reinitialized
+      if (!$(currentIframe).data("togetherjs-player")) {
+        $(currentIframe).data("togetherjs-player", currentPlayer);
+        // initialize its dontPublish flag as well
+        $(currentIframe).data("dontPublish", false);
+      }      
+    }
+  } // end of prepareYouTube
 
-  // boolean to indicate when to not publish
-  var dontPublish = [];
-
-  // give each youtube iframe a unique id and set its enablejsapi param to true
-  $(function setUpYouTubeIframes() {
-    var iframes = $('iframe');
-
-    iframes.each(function (i, iframe) {
-      if ($(iframe).attr("src").indexOf("youtube") != -1) { //look for YouTube Iframes
-        $(iframe).attr("id", "youtube-player"+i);
-        $(iframe).attr("ensablejsapi", 1);
-        youTubeIframes[i] = iframe;
-      }
-    });
-    // iframes are ready
-  });
-
-  function insertPlayer(event) {
-    // only when it is READY, insert each player into the list
-    var currentPlayer = event.target;
-    // get playerIndex and insert it into that specific location
-    var playerIndex = getPlayerIndex(currentPlayer);
-    players[playerIndex] = currentPlayer;
-    dontPublish[playerIndex] = false;
-  }
-
+  /*
   function getPlayerIndex(currentPlayer) {
     // ex)element = <iframe id="youtube-player0" ...>
     var element = currentPlayer.a;
@@ -67,17 +81,19 @@ function ($, util, session, elementFinder) {
     // ex)playerIndex = 0
     var playerIndex = whichPlayer[whichPlayer.length-1];
     return playerIndex;
-  }
+  } // I probably dont need this function anymore
+  */
   
-  function publishPlayerStateChange(event) {
+  function publishPlayerStateChange(event, frame) {
     var currentPlayer = event.target;
+    var currentIframe = currentPlayer.a;
     var currentTime = currentPlayer.getCurrentTime();
-    var playerIndex = getPlayerIndex(currentPlayer);
-
+    var iframeLocation = elementFinder.elementLocation(currentIframe);
+    
     // do not publish if playerState was changed by other users
-    if (dontPublish[playerIndex]) {
+    if ($(currentIframe).data("dontPublish")) {
       // make it false again so it can start publishing events of its own state changes
-      dontPublish[playerIndex] = false;
+      $(currentIframe).data("dontPublish", false);
       return;
     }
 
@@ -85,14 +101,14 @@ function ($, util, session, elementFinder) {
     if (event.data == YT.PlayerState.PLAYING) {      
       session.send({
         type: "playerStateChange",
-        playerIndex: playerIndex, // id of iframe that changed state
+        element: iframeLocation,
         playerState: 1,
         playerTime: currentTime
       });
     } else if (event.data == YT.PlayerState.PAUSED) {      
       session.send({
         type: "playerStateChange",
-        playerIndex: playerIndex,
+        element: iframeLocation,
         playerState: 2,
         playerTime: currentTime
       });
@@ -103,19 +119,20 @@ function ($, util, session, elementFinder) {
     } else if (event.data == YT.PlayerState.ENDED) {
       session.send({
         type: "playerStateChange",
-        playerIndex: playerIndex,
+        element: iframeLocation,
         playerState: 0
       });
     }
   }
   
   session.hub.on('playerStateChange', function (msg) {
-    var player = players[msg.playerIndex];
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
     var currentTime = player.getCurrentTime();
     var currentState = player.getPlayerState();
 
     if (currentState != msg.playerState) {
-      dontPublish[msg.playerIndex] = true;
+      $(iframe).data("dontPublish", true);
     }
 
     if (msg.playerState == 1) {
@@ -130,6 +147,15 @@ function ($, util, session, elementFinder) {
       player.pauseVideo();
     }
   });
+
+  // if a new user joins a channel, synchronize his videos
+  /*
+  session.hub.on('hello', function () {
+    youTubeIframes.forEach(function (frame) {
+      publishPlayerStateChange({target: frame});
+    });
+  });
+  */
 
   function areTooFarApart(myTime, theirTime) {
     var secDiff = Math.abs(myTime - theirTime);
