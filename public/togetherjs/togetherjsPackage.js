@@ -1769,7 +1769,7 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
 
   session.recordUrl = function () {
     assert(session.shareId);
-    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
     url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
     return url;
   };
@@ -7107,7 +7107,7 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
-      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks === true)) {
+      if ((cloneClicks !== true && ! $(element).is(cloneClicks)) && (dontShowClicks === true || $(element).is(dontShowClicks))) {
         return;
       }
       var location = elementFinder.elementLocation(element);

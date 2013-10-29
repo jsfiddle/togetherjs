@@ -341,7 +341,7 @@ for us to respect a URL change:</p>
 
   session.recordUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     assert(session.shareId);
-    <span class="keyword">var</span> url = TogetherJS.baseUrl.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/recorder.html"</span>;
+    <span class="keyword">var</span> url = TogetherJS.baseUrl.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/togetherjs/recorder.html"</span>;
     url += <span class="string">"#&amp;togetherjs="</span> + session.shareId + <span class="string">"&amp;hubBase="</span> + TogetherJS.getConfig(<span class="string">"hubBase"</span>);
     <span class="keyword">return</span> url;
   };

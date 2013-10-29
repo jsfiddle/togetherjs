@@ -944,7 +944,7 @@ then return to avoid sending a useless click</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (! $(element).is(cloneClicks) &amp;&amp; ($(element).is(dontShowClicks) || dontShowClicks === <span class="literal">true</span>)) {
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> ((cloneClicks !== <span class="literal">true</span> &amp;&amp; ! $(element).is(cloneClicks)) &amp;&amp; (dontShowClicks === <span class="literal">true</span> || $(element).is(dontShowClicks))) {
         <span class="keyword">return</span>;
       }
       <span class="keyword">var</span> location = elementFinder.elementLocation(element);
