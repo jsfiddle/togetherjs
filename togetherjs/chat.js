@@ -4,6 +4,7 @@
 /*jshint evil:true */
 define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
   var chat = util.Module("chat");
+  var assert = util.assert;
   var Walkabout;
 
   session.hub.on("chat", function (msg) {
@@ -13,6 +14,12 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       // FIXME: a little unsure of trusting this (maybe I should prefix it?)
       messageId: msg.messageId,
       notify: true
+    });
+    saveChatMessage({
+      text: msg.text,
+      date: Date.now(),
+      peerId: msg.peer.id,
+      messageId: msg.messageId
     });
   });
 
@@ -45,6 +52,12 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       peer: peers.Self,
       messageId: messageId,
       notify: false
+    });
+    saveChatMessage({
+      text: message,
+      date: Date.now(),
+      peerId: peers.Self.id,
+      messageId: messageId
     });
   };
 
@@ -325,6 +338,57 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
     }
 
   };
+
+  // this section deal with saving/restoring chat history as long as session is alive
+  var chatStorageKey = "chatlog";
+  var maxLogMessages = 100;
+
+  function saveChatMessage(obj) {
+    assert(obj.peerId);
+    assert(obj.messageId);
+    assert(obj.date);
+    assert(typeof obj.text == "string");
+
+    loadChatLog().then(function (log) {
+      for (var i = log.length - 1; i >= 0; i--) {
+        if (log[i].messageId === obj.messageId) {
+          return;
+        }
+      }
+      log.push(obj);
+      if (log.length > maxLogMessages) {
+        log.splice(0, log.length - maxLogMessages);
+      }
+      storage.tab.set(chatStorageKey, log);
+    });
+  }
+
+  function loadChatLog() {
+    return storage.tab.get(chatStorageKey, []);
+  }
+
+  session.once("ui-ready", function () {
+    loadChatLog().then(function (log) {
+      if (! log) {
+        return;
+      }
+      for (var i = 0; i < log.length; i++) {
+        // peers should already be loaded from sessionStorage by the peers module
+        // maybe i should use a try catch block here
+        var currentPeer = peers.getPeer(log[i].peerId);
+        ui.chat.text({
+          text: log[i].text,
+          date: log[i].date,
+          peer: currentPeer,
+          messageId: log[i].messageId
+        });
+      }
+    });
+  });
+  //delete chat log
+  session.on("close", function(){
+    storage.tab.set(chatStorageKey, undefined);
+  });
 
   return chat;
 
