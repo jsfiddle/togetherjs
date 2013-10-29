@@ -9,6 +9,8 @@ function ($, util, session, elementFinder) {
   var TOO_FAR_APART = 3000;
   // embedded youtube iframes
   var youTubeIframes = [];
+  // youtube API load delay
+  var API_LOADING_DELAY = 2000;
 
   session.on("reinitialize", function () {
     if (TogetherJS.getConfig("youtube")) {
@@ -65,26 +67,15 @@ function ($, util, session, elementFinder) {
       var currentIframe = currentPlayer.a;
       // check if a player is already attached in case of being reinitialized
       if (!$(currentIframe).data("togetherjs-player")) {
+        console.log("player is ready: "+currentPlayer);
         $(currentIframe).data("togetherjs-player", currentPlayer);
         // initialize its dontPublish flag as well
         $(currentIframe).data("dontPublish", false);
       }      
     }
   } // end of prepareYouTube
-
-  /*
-  function getPlayerIndex(currentPlayer) {
-    // ex)element = <iframe id="youtube-player0" ...>
-    var element = currentPlayer.a;
-    // ex)whichPlayer = iframe#youtube-player0
-    var whichPlayer = elementFinder.elementLocation(element);
-    // ex)playerIndex = 0
-    var playerIndex = whichPlayer[whichPlayer.length-1];
-    return playerIndex;
-  } // I probably dont need this function anymore
-  */
   
-  function publishPlayerStateChange(event, frame) {
+  function publishPlayerStateChange(event) {
     var currentPlayer = event.target;
     var currentIframe = currentPlayer.a;
     var currentTime = currentPlayer.getCurrentTime();
@@ -148,14 +139,38 @@ function ($, util, session, elementFinder) {
     }
   });
 
-  // if a new user joins a channel, synchronize his videos
-  /*
+  // if a late user joins a channel, synchronize his videos
   session.hub.on('hello', function () {
-    youTubeIframes.forEach(function (frame) {
-      publishPlayerStateChange({target: frame});
-    });
+    // wait a couple seconds to make sure the late user has finished loading API
+    setTimeout(synchronizeVideosOfLateGuest, API_LOADING_DELAY);
   });
-  */
+
+  session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
+    // if the video is only cued, I do not have to do anything to sync
+    // FIXME: check if a new video has been loaded
+    if (msg.playerState != 5) {
+      player.seekTo(msg.playerTime, true);
+    }
+  });
+  
+  function synchronizeVideosOfLateGuest() {
+    youTubeIframes.forEach(function (iframe) {
+      var currentPlayer = $(iframe).data("togetherjs-player");
+      var currentVideoUrl = currentPlayer.getVideoUrl();
+      var currentState = currentPlayer.getPlayerState();
+      var currentTime = currentPlayer.getCurrentTime();
+      var iframeLocation = elementFinder.elementLocation(iframe);
+      session.send({
+        type: "synchronizeVideosOfLateGuest",
+        element: iframeLocation,
+        videoUrl: currentVideoUrl,
+        playerState: currentState, //this might be necessary later
+        playerTime: currentTime
+      });
+    });
+  }
 
   function areTooFarApart(myTime, theirTime) {
     var secDiff = Math.abs(myTime - theirTime);
