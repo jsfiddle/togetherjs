@@ -20,7 +20,8 @@
     "universal-analytics": "~0.1.3",
     "less-middleware": "~0.1.9",
     "newrelic": "0.9.20",
-    "grunt-amd-check": "~0.5.1"
+    "grunt-amd-check": "~0.5.1",
+    "optimist": "~0.6.0"
   },
   "devDependencies": {
     "grunt-contrib-less": "~0.5.1",

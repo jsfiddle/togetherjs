@@ -452,6 +452,22 @@ A simple way to install is simply to [click this link](https://togetherjs.com/to
 
 You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
 
+## Deploying the hub server to Heroku
+
+You need a Heroku account. If you don't have one, their [Node.js getting started guide](https://devcenter.heroku.com/articles/getting-started-with-nodejs) is a good place to start.
+
+What's about to happen: we clone the repo and create a new Heroku app within it. We need to set the HOST environment variable to get the app to bind to 0.0.0.0 instead of 127.0.0.1. It'll pick up the PORT variable automatically. We also need to enable WebSockets for the app. Then, push the code and we should be good to go!
+
+	git clone git@github.com:mozilla/togetherjs.git
+	cd togetherjs
+	heroku create
+	heroku config:add HOST=0.0.0.0
+	heroku labs:enable websockets 
+	git push heroku master
+
+Make note of the app name after running `heroku create` You can check that everything is running by going to http://your-app-name-here.herokuapp.com/status
+
+
 ## Getting Help
 
 ### IRC / Live Chat
