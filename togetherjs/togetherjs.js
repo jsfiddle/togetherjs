@@ -473,7 +473,9 @@
     // are considered to be at completely different URLs
     includeHashInUrl: false,
     // When true, the WebRTC-based mic/chat will be disabled
-    disableWebRTC: false
+    disableWebRTC: false,
+    // When true, youTube videos will synchronize
+    youtube: true
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep

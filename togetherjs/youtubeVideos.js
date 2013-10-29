@@ -5,13 +5,27 @@
 define(["jquery", "util", "session", "elementFinder"],
 function ($, util, session, elementFinder) {
 
-  // FIXME: when a user embeds another YouTube video dynamically, I should set it up too
+  // if youTube config is on, load necessary API
+  if (TogetherJS.getConfig("youtube")) {
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+    // this function should be global so it can be called when API is loaded
+    window.onYouTubeIframeAPIReady = function() {
+      // YouTube API is ready
+      $(youTubeIframes).each(function (i, iframe) {
+        var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
+          events: {
+            'onReady': insertPlayer,
+            'onStateChange': publishPlayerStateChange
+          }
+        });
+      });
+    }
+  }
   // call onYouTubeIframeAPIReady when the script finishes loading
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
   var TOO_FAR_APART = 3000;
 
@@ -35,19 +49,6 @@ function ($, util, session, elementFinder) {
     });
     // iframes are ready
   });
-
-  // this function should be global so it can be called when API is loaded
-  window.onYouTubeIframeAPIReady = function() {
-    // YouTube API is ready
-    $(youTubeIframes).each(function (i, iframe) {
-      var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
-        events: {
-          'onReady': insertPlayer,
-          'onStateChange': publishPlayerStateChange
-        }
-      });
-    });
-  }
 
   function insertPlayer(event) {
     // only when it is READY, insert each player into the list
