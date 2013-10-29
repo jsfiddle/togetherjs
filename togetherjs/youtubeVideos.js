@@ -67,11 +67,13 @@ function ($, util, session, elementFinder) {
       var currentIframe = currentPlayer.a;
       // check if a player is already attached in case of being reinitialized
       if (!$(currentIframe).data("togetherjs-player")) {
-        console.log("player is ready: "+currentPlayer);
         $(currentIframe).data("togetherjs-player", currentPlayer);
         // initialize its dontPublish flag as well
         $(currentIframe).data("dontPublish", false);
-      }      
+        // store its current video's id
+        var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
+        $(currentIframe).data("currentVideoId", currentVideoId);
+      }
     }
   } // end of prepareYouTube
   
@@ -89,13 +91,22 @@ function ($, util, session, elementFinder) {
     }
 
     // notify other people that I changed the player state
-    if (event.data == YT.PlayerState.PLAYING) {      
-      session.send({
-        type: "playerStateChange",
-        element: iframeLocation,
-        playerState: 1,
-        playerTime: currentTime
-      });
+    if (event.data == YT.PlayerState.PLAYING) { 
+
+      var currentVideoId = isDifferentVideoLoaded(currentIframe);
+      if (currentVideoId) {
+        // notify that I just loaded another video
+        publishDifferentVideoLoaded(iframeLocation, currentVideoId);
+        // update current video id
+        $(currentIframe).data("currentVideoId", currentVideoId);
+      } else {
+        session.send({
+          type: "playerStateChange",
+          element: iframeLocation,
+          playerState: 1,
+          playerTime: currentTime
+        });
+      }
     } else if (event.data == YT.PlayerState.PAUSED) {      
       session.send({
         type: "playerStateChange",
@@ -103,17 +114,18 @@ function ($, util, session, elementFinder) {
         playerState: 2,
         playerTime: currentTime
       });
-    } else if (event.data == YT.PlayerState.BUFFERING) {
-      // shouldnt do anything when Im buffering
-    } else if (event.data == YT.PlayerState.CUED) {
-      // TODO: should I syncrhonize newly loaded videos as well?
-    } else if (event.data == YT.PlayerState.ENDED) {
-      session.send({
-        type: "playerStateChange",
-        element: iframeLocation,
-        playerState: 0
-      });
+    } else {
+      // do nothing when the state is buffering, cued, or ended
+      return;
     }
+  }
+
+  function publishDifferentVideoLoaded(iframeLocation, videoId) {
+    session.send({
+      type: "differentVideoLoaded",
+      videoId: videoId,
+      element: iframeLocation
+    });
   }
   
   session.hub.on('playerStateChange', function (msg) {
@@ -148,28 +160,68 @@ function ($, util, session, elementFinder) {
   session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
     var iframe = elementFinder.findElement(msg.element);
     var player = $(iframe).data("togetherjs-player");
-    // if the video is only cued, I do not have to do anything to sync
-    // FIXME: check if a new video has been loaded
-    if (msg.playerState != 5) {
-      player.seekTo(msg.playerTime, true);
+    // check if another video had been loaded to an existing iframe before I joined
+    var currentVideoId = $(iframe).data("currentVideoId");
+    if (msg.videoId != currentVideoId) {
+      $(iframe).data("currentVideoId", msg.videoId);
+      player.loadVideoById(msg.videoId, msg.playerTime, 'default');
+    } else {
+      // if the video is only cued, I do not have to do anything to sync
+      if (msg.playerState != 5) {
+        player.seekTo(msg.playerTime, true);
+      }
     }
+  });
+
+  session.hub.on('differentVideoLoaded', function (msg) {
+    // load a new video if the host has loaded one
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
+    player.loadVideoById(msg.videoId, 0, 'default');
+    $(iframe).data("currentVideoId", msg.videoId);
+    
   });
   
   function synchronizeVideosOfLateGuest() {
     youTubeIframes.forEach(function (iframe) {
       var currentPlayer = $(iframe).data("togetherjs-player");
-      var currentVideoUrl = currentPlayer.getVideoUrl();
+      var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
       var currentState = currentPlayer.getPlayerState();
       var currentTime = currentPlayer.getCurrentTime();
       var iframeLocation = elementFinder.elementLocation(iframe);
       session.send({
         type: "synchronizeVideosOfLateGuest",
         element: iframeLocation,
-        videoUrl: currentVideoUrl,
+        videoId: currentVideoId,
         playerState: currentState, //this might be necessary later
         playerTime: currentTime
       });
     });
+  }
+
+  function isDifferentVideoLoaded(iframe) {
+    var lastVideoId = $(iframe).data("currentVideoId");
+    var currentPlayer = $(iframe).data("togetherjs-player");
+    var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
+
+    // since url forms of iframe src and player's video url are different,
+    // I have to compare the video ids
+    if (currentVideoId != lastVideoId) {
+      return currentVideoId;
+    } else {
+      return false;
+    }
+  }
+
+  // parses videoId from the url returned by getVideoUrl function
+  function getVideoIdFromUrl(videoUrl) {
+    var videoId = videoUrl.split('v=')[1];
+    //Chrome and Firefox have different positions for parameters
+    var ampersandIndex = videoId.indexOf('&');
+    if (ampersandIndex != -1) {
+      videoId = videoId.substring(0, ampersandIndex);
+    }
+    return videoId;
   }
 
   function areTooFarApart(myTime, theirTime) {
