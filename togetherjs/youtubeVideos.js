@@ -151,7 +151,12 @@ function ($, util, session, elementFinder) {
       if (areTooFarApart(currentTime, msg.playerTime)) {
         player.seekTo(msg.playerTime);
       }
-      player.pauseVideo();
+      // When Youtube videos are advanced in Chrome, their state becomes "pause, pause, play."
+      // onStateChange event is invoked when the state changes from pause to pause.
+      // The condition below prevents such behavior from making videos go out of sync.
+      if (currentState != msg.playerState) {
+        player.pauseVideo();
+      }
     }
   });
 
