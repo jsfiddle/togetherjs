@@ -143,19 +143,23 @@ function ($, util, session, elementFinder) {
     }
 
     if (msg.playerState == 1) {
-      if (areTooFarApart(currentTime, msg.playerTime)) {
-        player.seekTo(msg.playerTime);
-      }
       player.playVideo();
-    } else if (msg.playerState == 2) {
+      // seekTo() updates the video's time and plays it if it was already playing
+      // and pauses it if it was already paused
       if (areTooFarApart(currentTime, msg.playerTime)) {
-        player.seekTo(msg.playerTime);
+        player.seekTo(msg.playerTime, true);
       }
-      // When Youtube videos are advanced in Chrome, their state becomes "pause, pause, play."
-      // onStateChange event is invoked when the state changes from pause to pause.
-      // The condition below prevents such behavior from making videos go out of sync.
+    } else if (msg.playerState == 2) {
+      // When YouTube videos are advanced while playing,
+      // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause.)
+      // FireFox: buffering -> play -> buffering -> play 
+      // It is necessary to check below condition to prevent videos from going out of sync
+      // when one is advanced while it was playing on Chrome
       if (currentState != msg.playerState) {
         player.pauseVideo();
+      }
+      if (areTooFarApart(currentTime, msg.playerTime)) {
+        player.seekTo(msg.playerTime, true);
       }
     }
   });
