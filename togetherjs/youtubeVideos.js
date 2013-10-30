@@ -87,6 +87,11 @@ function ($, util, session, elementFinder) {
     var currentTime = currentPlayer.getCurrentTime();
     var iframeLocation = elementFinder.elementLocation(currentIframe);
     
+    if ($(currentPlayer).data("seek")) {
+      $(currentPlayer).removeData("seek");
+      return;
+    }
+
     // do not publish if playerState was changed by other users
     if ($(currentIframe).data("dontPublish")) {
       // make it false again so it can start publishing events of its own state changes
@@ -151,14 +156,13 @@ function ($, util, session, elementFinder) {
       }
     } else if (msg.playerState == 2) {
       // When YouTube videos are advanced while playing,
-      // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause.)
+      // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause)
       // FireFox: buffering -> play -> buffering -> play 
-      // It is necessary to check below condition to prevent videos from going out of sync
-      // when one is advanced while it was playing on Chrome
-      if (currentState != msg.playerState) {
-        player.pauseVideo();
-      }
+      // We must prevent advanced videos from going out of sync
+      player.pauseVideo();
       if (areTooFarApart(currentTime, msg.playerTime)) {
+        // "seek" flag will help supress publishing unwanted state changes
+        $(player).data("seek", true);
         player.seekTo(msg.playerTime, true);
       }
     }
