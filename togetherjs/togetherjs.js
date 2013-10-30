@@ -63,7 +63,9 @@
     // are considered to be at completely different URLs
     includeHashInUrl: false,
     // When true, the WebRTC-based mic/chat will be disabled
-    disableWebRTC: false
+    disableWebRTC: false,
+    // When true, youTube videos will synchronize
+    youtube: true
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
