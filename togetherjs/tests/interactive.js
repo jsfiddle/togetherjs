@@ -197,7 +197,7 @@ el.find("#include-hash").change(function (event) {
   localStorage.setItem("interactiveOverrides", JSON.stringify(config));
   alert("Reload required");
 });
-if (TogetherJS.getConfig("includeHashInUrl")) {
+if (TogetherJS.config.get("includeHashInUrl")) {
   el.find("#include-hash").prop("checked", true);
 }
 

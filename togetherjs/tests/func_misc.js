@@ -131,6 +131,7 @@ print($("#togetherjs-menu .togetherjs-self-name").is(":visible"));
 // => true
 $("#togetherjs-menu .togetherjs-self-name").val("Joe");
 // First we do a keyup to trigger the change event:
+
 $("#togetherjs-menu .togetherjs-self-name").trigger("keyup");
 // Then we submit:
 $("#togetherjs-menu .togetherjs-self-name").trigger($.Event("keyup", {which: 13}));

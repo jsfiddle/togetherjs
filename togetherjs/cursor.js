@@ -440,8 +440,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         return;
       }
 
-      var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      var cloneClicks = TogetherJS.getConfig("cloneClicks");
+      var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+      var cloneClicks = TogetherJS.config.get("cloneClicks");
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
@@ -482,11 +482,11 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
-    var cloneClicks = TogetherJS.getConfig("cloneClicks");
+    var cloneClicks = TogetherJS.config.get("cloneClicks");
     if (util.matchElement(target, cloneClicks)) {
       eventMaker.performClick(target);
     }
-    var dontShowClicks = TogetherJS.getConfig("dontShowClicks");    
+    var dontShowClicks = TogetherJS.config.get("dontShowClicks");
     if (util.matchElement(target, dontShowClicks)) {
       return;
     }

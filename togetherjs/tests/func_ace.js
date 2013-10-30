@@ -48,7 +48,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: "about:blank",
+  avatar: TogetherJS.baseUrl + "/togetherjs/robot-avatar.jpg",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false

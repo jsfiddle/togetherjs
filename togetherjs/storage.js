@@ -116,7 +116,8 @@ define(["util"], function (util) {
 
   });
 
-  var namePrefix = TogetherJS.getConfig("storagePrefix");
+  var namePrefix = TogetherJS.config.get("storagePrefix");
+  TogetherJS.config.close("storagePrefix");
 
   var storage = Storage('localStorage', localStorage, namePrefix + ".");
 

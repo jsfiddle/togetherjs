@@ -2,8 +2,10 @@ define(["util"], function (util) {
   var analytics = util.Module("analytics");
 
   analytics.activate = function () {
-    var enable = TogetherJS.getConfig("enableAnalytics");
-    var code = TogetherJS.getConfig("analyticsCode");
+    var enable = TogetherJS.config.get("enableAnalytics");
+    var code = TogetherJS.config.get("analyticsCode");
+    TogetherJS.config.close("enableAnalytics");
+    TogetherJS.config.close("analyticsCode");
     if (! (enable && code)) {
       return;
     }

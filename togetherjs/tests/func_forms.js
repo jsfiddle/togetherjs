@@ -102,6 +102,9 @@ $textarea.val("hello there");
 fireChange($textarea);
 
 /* =>
+send: form-focus
+  clientId: "me",
+  element: "#textarea"
 selected 3 - 4
 send: form-update
   clientId: "me",

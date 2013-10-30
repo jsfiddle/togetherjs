@@ -205,7 +205,7 @@ define(["util"], function (util) {
       // (and other pastebin sites aren't really Browser-accessible)
       return util.Deferred(function (def) {
         options = options || {};
-        var site = options.site || TogetherJS.getConfig("pasteSite") || "https://www.friendpaste.com/";
+        var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
         var req = new XMLHttpRequest();
         req.open("POST", site);
         req.setRequestHeader("Content-Type", "application/json");

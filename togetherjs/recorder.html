@@ -15,7 +15,7 @@
         require({context: "togetherjs"})(["recorder"], function (recorder) {
           recorder.start({
             baseUrl: TogetherJS.baseUrl,
-            defaultHubBase: TogetherJS.getConfig("hubBase")
+            defaultHubBase: TogetherJS.config.get("hubBase")
           });
         });
       };

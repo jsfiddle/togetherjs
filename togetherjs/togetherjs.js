@@ -18,8 +18,8 @@
     enableAnalytics: false,
     // The code to enable (this is defaulting to a Mozilla code):
     analyticsCode: "UA-35433268-28",
-    // The base URL of the hub
-    hubBase: defaultHubBase,
+    // The base URL of the hub (gets filled in below):
+    hubBase: null,
     // A function that will return the name of the user:
     getUserName: null,
     // A function that will return the color of the user:
@@ -229,7 +229,9 @@
 
     }
     // FIXME: copy existing config?
-    var ons = TogetherJS.getConfig("on");
+    // FIXME: do this directly in TogetherJS.config() ?
+    // FIXME: close these configs?
+    var ons = TogetherJS.config.get("on");
     for (attr in globalOns) {
       if (globalOns.hasOwnProperty(attr)) {
         // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -240,7 +242,7 @@
     for (attr in ons) {
       TogetherJS.on(attr, ons[attr]);
     }
-    var hubOns = TogetherJS.getConfig("hub_on");
+    var hubOns = TogetherJS.config.get("hub_on");
     if (hubOns) {
       for (attr in hubOns) {
         if (hubOns.hasOwnProperty(attr)) {
@@ -270,7 +272,8 @@
     TogetherJS.startup._launch = true;
 
     addStyle();
-    var minSetting = TogetherJS.getConfig("useMinimizedCode");
+    var minSetting = TogetherJS.config.get("useMinimizedCode");
+    TogetherJS.config.close("useMinimizedCode");
     if (minSetting !== undefined) {
       min = !! minSetting;
     }
@@ -474,11 +477,83 @@
     // Substitution wasn't made
     defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
   }
+  defaultConfiguration.hubBase = defaultHubBase;
 
   TogetherJS._configuration = {};
   TogetherJS._defaultConfiguration = defaultConfiguration;
+  TogetherJS._configTrackers = {};
+  TogetherJS._configClosed = {};
 
-  TogetherJS.getConfig = function (name) {
+  /* TogetherJS.config(configurationObject)
+     or: TogetherJS.config(configName, value)
+
+     Adds configuration to TogetherJS.  You may also set the global variable TogetherJSConfig
+     and when TogetherJS is started that configuration will be loaded.
+
+     Unknown configuration values will lead to console error messages.
+     */
+  TogetherJS.config = function (name, maybeValue) {
+    var settings;
+    if (arguments.length == 1) {
+      if (typeof name != "object") {
+        throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
+      }
+      settings = name;
+    } else {
+      settings = {};
+      settings[name] = maybeValue;
+    }
+    var i;
+    var tracker;
+    for (var attr in settings) {
+      if (settings.hasOwnProperty(attr)) {
+        if (TogetherJS._configClosed[attr]) {
+          throw new Error("The configuration " + attr + " is finalized and cannot be changed");
+        }
+      }
+    }
+    for (var attr in settings) {
+      if (! settings.hasOwnProperty(attr)) {
+        continue;
+      }
+      if (attr == "loaded" || attr == "callToStart") {
+        continue;
+      }
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
+        console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
+      }
+      var previous = TogetherJS._configuration[attr];
+      var value = settings[attr];
+      TogetherJS._configuration[attr] = value;
+      var trackers = TogetherJS._configTrackers[name] || [];
+      var failed = false;
+      for (i=0; i<trackers.length; i++) {
+        try {
+          tracker = trackers[i];
+          tracker(value, previous);
+        } catch (e) {
+          console.warn("Error setting configuration", name, "to", value,
+                       ":", e, "; reverting to", previous);
+          failed = true;
+          break;
+        }
+      }
+      if (failed) {
+        TogetherJS._configuration[attr] = previous;
+        for (i=0; i<trackers.length; i++) {
+          try {
+            tracker = trackers[i];
+            tracker(value);
+          } catch (e) {
+            console.warn("Error REsetting configuration", name, "to", previous,
+                         ":", e, "(ignoring)");
+          }
+        }
+      }
+    }
+  };
+
+  TogetherJS.config.get = function (name) {
     var value = TogetherJS._configuration[name];
     if (value === undefined) {
       if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
@@ -489,47 +564,25 @@
     return value;
   };
 
-  /* TogetherJS.config(configurationObject)
-     or: TogetherJS.config(configName, value)
-
-     Adds configuration to TogetherJS.  You may also set the global variable TogetherJSConfig
-     and when TogetherJS is started that configuration will be loaded.
-
-     Unknown configuration values will lead to console error messages.
-     */
-  TogetherJS.config = function (name, value) {
-    var settings;
-    if (arguments.length == 1) {
-      if (typeof name != "object") {
-        throw 'TogetherJS.config(value) must have an object value (not: ' + name + ')';
-      }
-      settings = name;
-    } else {
-      settings = {};
-      settings[name] = value;
+  TogetherJS.config.track = function (name, callback) {
+    if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+      throw new Error("Configuration is unknown: " + name);
     }
-    for (var attr in settings) {
-      if (attr == "loaded" || attr == "callToStart" || ! settings.hasOwnProperty(attr)) {
-        continue;
-      }
-      if (! TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
-        console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
-      }
-      TogetherJS._configuration[attr] = settings[attr];
-      if (TogetherJS.running && attr == "toolName") {
-        TogetherJS.require("ui").updateToolName();
-      }
-      if (attr == "enableShortcut") {
-        if (settings[attr]) {
-          TogetherJS.listenForShortcut();
-        } else {
-          TogetherJS.removeShortcut();
-        }
-      }
-      // FIXME: maybe run an update function when certain values are
-      // updated, especially when TogetherJS is running
+    callback(TogetherJS.config.get(name));
+    if (! TogetherJS._configTrackers[name]) {
+      TogetherJS._configTrackers[name] = [];
     }
+    TogetherJS._configTrackers[name].push(callback);
+    return callback;
   };
+
+  TogetherJS.config.close = function (name) {
+    if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+      throw new Error("Configuration is unknown: " + name);
+    }
+    TogetherJS._configClosed[name] = true;
+  };
+
   TogetherJS.reinitialize = function () {
     if (TogetherJS.running && typeof TogetherJS.require == "function") {
       TogetherJS.require(["session"], function (session) {
@@ -613,6 +666,14 @@
       listener = null;
     }
   };
+
+  TogetherJS.config.track("enableShortcut", function (enable, previous) {
+    if (enable) {
+      TogetherJS.listenForShortcut();
+    } else if (previous) {
+      TogetherJS.removeShortcut();
+    }
+  });
 
   TogetherJS.checkForUsersOnChannel = function (address, callback) {
     if (address.search(/^https?:/i) === 0) {
