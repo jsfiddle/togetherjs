@@ -13,14 +13,18 @@ function ($, util, session, elementFinder) {
   var API_LOADING_DELAY = 2000;
 
   session.on("reinitialize", function () {
-    if (TogetherJS.getConfig("youtube")) {
-      prepareYouTube();  
+    if (TogetherJS.config.get("youtube")) {
+      prepareYouTube();
     }
   });
 
-  if (TogetherJS.getConfig("youtube")) {
-    prepareYouTube();
-  }
+  TogetherJS.config.track("youtube", function (track, previous) {
+    if (track && ! previous) {
+      prepareYouTube();
+      // You can enable youtube dynamically, but can't turn it off:
+      TogetherJS.config.close("youtube");
+    }
+  });
 
   function prepareYouTube() {
     // setup iframes first
@@ -37,7 +41,7 @@ function ($, util, session, elementFinder) {
           }
         });
       });
-    }
+    };
 
     if (window.YT === undefined) {
       // load necessary API
@@ -57,7 +61,7 @@ function ($, util, session, elementFinder) {
       iframes.each(function (i, iframe) {
         // look for YouTube Iframes
         // if the iframe's unique id is already set, skip it
-        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) { 
+        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
           $(iframe).attr("ensablejsapi", 1);
           youTubeIframes[i] = iframe;
@@ -80,13 +84,13 @@ function ($, util, session, elementFinder) {
       }
     }
   } // end of prepareYouTube
-  
+
   function publishPlayerStateChange(event) {
     var currentPlayer = event.target;
     var currentIframe = currentPlayer.a;
     var currentTime = currentPlayer.getCurrentTime();
     var iframeLocation = elementFinder.elementLocation(currentIframe);
-    
+
     if ($(currentPlayer).data("seek")) {
       $(currentPlayer).removeData("seek");
       return;
@@ -100,7 +104,7 @@ function ($, util, session, elementFinder) {
     }
 
     // notify other people that I changed the player state
-    if (event.data == YT.PlayerState.PLAYING) { 
+    if (event.data == YT.PlayerState.PLAYING) {
 
       var currentVideoId = isDifferentVideoLoaded(currentIframe);
       if (currentVideoId) {
@@ -116,7 +120,7 @@ function ($, util, session, elementFinder) {
           playerTime: currentTime
         });
       }
-    } else if (event.data == YT.PlayerState.PAUSED) {      
+    } else if (event.data == YT.PlayerState.PAUSED) {
       session.send({
         type: "playerStateChange",
         element: iframeLocation,
@@ -136,7 +140,7 @@ function ($, util, session, elementFinder) {
       element: iframeLocation
     });
   }
-  
+
   session.hub.on('playerStateChange', function (msg) {
     var iframe = elementFinder.findElement(msg.element);
     var player = $(iframe).data("togetherjs-player");
@@ -157,7 +161,7 @@ function ($, util, session, elementFinder) {
     } else if (msg.playerState == 2) {
       // When YouTube videos are advanced while playing,
       // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause)
-      // FireFox: buffering -> play -> buffering -> play 
+      // FireFox: buffering -> play -> buffering -> play
       // We must prevent advanced videos from going out of sync
       player.pauseVideo();
       if (areTooFarApart(currentTime, msg.playerTime)) {
@@ -196,9 +200,9 @@ function ($, util, session, elementFinder) {
     var player = $(iframe).data("togetherjs-player");
     player.loadVideoById(msg.videoId, 0, 'default');
     $(iframe).data("currentVideoId", msg.videoId);
-    
+
   });
-  
+
   function synchronizeVideosOfLateGuest() {
     youTubeIframes.forEach(function (iframe) {
       var currentPlayer = $(iframe).data("togetherjs-player");
