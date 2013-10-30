@@ -308,6 +308,20 @@ define(["jquery", "jqueryPlugins"], function ($) {
     });
   };
 
+  util.matchElement = function(el, selector) {
+    var res = selector;
+    if (selector === true || ! selector) {
+      return !!selector;
+    }
+    try {
+      return $(el).is(selector);
+    } catch (e) {
+      console.warn("Bad selector:", selector, "error:", e);
+      return false;
+    }
+    
+  }
+
   util.testExpose = function (objs) {
     if (typeof TogetherJSTestSpy == "undefined") {
       return;

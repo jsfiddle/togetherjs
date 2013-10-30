@@ -25,6 +25,10 @@ define(["util", "jquery"], function (util, $) {
       // a jQuery element
       el = el[0];
     }
+    if (el[0] && el[0].nodeType == 1) {
+      // Or a jQuery element not made by us
+      el = el[0];
+    }
     if (el.id) {
       return "#" + el.id;
     }

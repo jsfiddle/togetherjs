@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -313,7 +315,8 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
         next();
         <span class="keyword">return</span>;
       }
-      <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"suppressJoinConfirmation"</span>)) {
+      TogetherJS.config.close(<span class="string">"suppressJoinConfirmation"</span>);
+      <span class="keyword">if</span> (TogetherJS.config.get(<span class="string">"suppressJoinConfirmation"</span>)) {
         next();
         <span class="keyword">return</span>;
       }
@@ -348,8 +351,9 @@ define([<span class="string">"util"</span>, <span class="string">"require"</span
     },
 
     share: <span class="function"><span class="keyword">function</span> <span class="params">(next)</span> {</span>
+      TogetherJS.config.close(<span class="string">"suppressInvite"</span>);
       <span class="keyword">if</span> (session.isClient || (! session.firstRun) ||
-          TogetherJS.getConfig(<span class="string">"suppressInvite"</span>)) {
+          TogetherJS.config.get(<span class="string">"suppressInvite"</span>)) {
         next();
         <span class="keyword">return</span>;
       }

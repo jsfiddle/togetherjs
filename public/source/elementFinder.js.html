@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -234,6 +236,21 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
               
                 <div class="content"><div class='highlight'><pre>      el = el[<span class="number">0</span>];
     }
+    <span class="keyword">if</span> (el[<span class="number">0</span>] &amp;&amp; el[<span class="number">0</span>].nodeType == <span class="number">1</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>Or a jQuery element not made by us</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      el = el[<span class="number">0</span>];
+    }
     <span class="keyword">if</span> (el.id) {
       <span class="keyword">return</span> <span class="string">"#"</span> + el.id;
     }
@@ -263,10 +280,10 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
               
             </li>
           
-            <li id="section-2">
+            <li id="section-3">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-2">&#182;</a>
+                  <a class="pilcrow" href="#section-3">&#182;</a>
                 </div>
                 <p>Don&#39;t count our UI</p>
 
@@ -277,10 +294,10 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
               
             </li>
           
-            <li id="section-3">
+            <li id="section-4">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-3">&#182;</a>
+                  <a class="pilcrow" href="#section-4">&#182;</a>
                 </div>
                 <p>Don&#39;t count text or comments</p>
 
@@ -318,10 +335,10 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
               
             </li>
           
-            <li id="section-4">
+            <li id="section-5">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-4">&#182;</a>
+                  <a class="pilcrow" href="#section-5">&#182;</a>
                 </div>
                 <p>FIXME: should this all just be done with document.querySelector()?
 But no!  We can&#39;t ignore togetherjs elements with querySelector.
@@ -405,10 +422,10 @@ But maybe!  We <em>could</em> make togetherjs elements less obtrusive?</p>
               
             </li>
           
-            <li id="section-5">
+            <li id="section-6">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-5">&#182;</a>
+                  <a class="pilcrow" href="#section-6">&#182;</a>
                 </div>
                 <p>this is the element</p>
 
@@ -462,10 +479,10 @@ But maybe!  We <em>could</em> make togetherjs elements less obtrusive?</p>
               
             </li>
           
-            <li id="section-6">
+            <li id="section-7">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-6">&#182;</a>
+                  <a class="pilcrow" href="#section-7">&#182;</a>
                 </div>
                 <p>There are no children, or only inapplicable children</p>
 
@@ -496,10 +513,10 @@ But maybe!  We <em>could</em> make togetherjs elements less obtrusive?</p>
               
             </li>
           
-            <li id="section-7">
+            <li id="section-8">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-7">&#182;</a>
+                  <a class="pilcrow" href="#section-8">&#182;</a>
                 </div>
                 <p>We don&#39;t trust absoluteTop to be quite right locally, so we adjust
 for the total document height differences:</p>
@@ -515,10 +532,10 @@ for the total document height differences:</p>
               
             </li>
           
-            <li id="section-8">
+            <li id="section-9">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-8">&#182;</a>
+                  <a class="pilcrow" href="#section-9">&#182;</a>
                 </div>
                 <p>FIXME: maybe here we should test for sanity, like if an element is
 hidden.  We can use position.absoluteTop to get a sense of where the

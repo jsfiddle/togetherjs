@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -264,20 +266,19 @@ async for the storage, and this simulates that much better.</p>
         value = JSON.stringify(value);
       }
       <span class="keyword">return</span> Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
-        setTimeout(util.resolver(def, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-          key = self.prefix + key;
-          <span class="keyword">if</span> (value === <span class="literal">undefined</span>) {
-            self.storage.removeItem(key);
-            <span class="keyword">if</span> (DEBUG_STORAGE) {
-              console.debug(<span class="string">"Delete storage"</span>, key);
-            }
-          } <span class="keyword">else</span> {
-            self.storage.setItem(key, value);
-            <span class="keyword">if</span> (DEBUG_STORAGE) {
-              console.debug(<span class="string">"Set storage"</span>, key, value);
-            }
+        key = self.prefix + key;
+        <span class="keyword">if</span> (value === <span class="literal">undefined</span>) {
+          self.storage.removeItem(key);
+          <span class="keyword">if</span> (DEBUG_STORAGE) {
+            console.debug(<span class="string">"Delete storage"</span>, key);
           }
-        }));
+        } <span class="keyword">else</span> {
+          self.storage.setItem(key, value);
+          <span class="keyword">if</span> (DEBUG_STORAGE) {
+            console.debug(<span class="string">"Set storage"</span>, key, value);
+          }
+        }
+        setTimeout(def.resolve);
       });
     },
 
@@ -327,7 +328,7 @@ these sets:</p>
         setTimeout(util.resolver(def, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           prefix = prefix || <span class="string">""</span>;
           <span class="keyword">var</span> result = [];
-          <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;self.storage.length; i++) {
+          <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; self.storage.length; i++) {
             <span class="keyword">var</span> key = self.storage.key(i);
             <span class="keyword">if</span> (key.indexOf(self.prefix + prefix) === <span class="number">0</span>) {
               <span class="keyword">var</span> shortKey = key.substr(self.prefix.length);
@@ -348,7 +349,8 @@ these sets:</p>
 
   });
 
-  <span class="keyword">var</span> namePrefix = TogetherJS.getConfig(<span class="string">"storagePrefix"</span>);
+  <span class="keyword">var</span> namePrefix = TogetherJS.config.get(<span class="string">"storagePrefix"</span>);
+  TogetherJS.config.close(<span class="string">"storagePrefix"</span>);
 
   <span class="keyword">var</span> storage = Storage(<span class="string">'localStorage'</span>, localStorage, namePrefix + <span class="string">"."</span>);
 

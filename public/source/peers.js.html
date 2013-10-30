@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -613,12 +615,16 @@ We could test typeof==function to distinguish between a getter and a concrete va
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> getUserName = TogetherJS.getConfig(<span class="string">"getUserName"</span>);
-        <span class="keyword">var</span> getUserColor = TogetherJS.getConfig(<span class="string">"getUserColor"</span>);
-        <span class="keyword">var</span> getUserAvatar = TogetherJS.getConfig(<span class="string">"getUserAvatar"</span>);
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> getUserName = TogetherJS.config.get(<span class="string">"getUserName"</span>);
+        <span class="keyword">var</span> getUserColor = TogetherJS.config.get(<span class="string">"getUserColor"</span>);
+        <span class="keyword">var</span> getUserAvatar = TogetherJS.config.get(<span class="string">"getUserAvatar"</span>);
         <span class="keyword">var</span> name, color, avatar;
         <span class="keyword">if</span> (getUserName) {
-          name = getUserName();
+          <span class="keyword">if</span> (<span class="keyword">typeof</span> getUserName == <span class="string">"string"</span>) {
+            name = getUserName;
+          } <span class="keyword">else</span> {
+            name = getUserName();
+          }
           <span class="keyword">if</span> (name &amp;&amp; <span class="keyword">typeof</span> name != <span class="string">"string"</span>) {</pre></div></div>
               
             </li>
@@ -638,7 +644,11 @@ We could test typeof==function to distinguish between a getter and a concrete va
           }
         }
         <span class="keyword">if</span> (getUserColor) {
-          color = getUserColor();
+          <span class="keyword">if</span> (<span class="keyword">typeof</span> getUserColor == <span class="string">"string"</span>) {
+            color = getUserColor;
+          } <span class="keyword">else</span> {
+            color = getUserColor();
+          }
           <span class="keyword">if</span> (color &amp;&amp; <span class="keyword">typeof</span> color != <span class="string">"string"</span>) {</pre></div></div>
               
             </li>
@@ -657,7 +667,11 @@ We could test typeof==function to distinguish between a getter and a concrete va
           }
         }
         <span class="keyword">if</span> (getUserAvatar) {
-          avatar = getUserAvatar();
+          <span class="keyword">if</span> (<span class="keyword">typeof</span> getUserAvatar == <span class="string">"string"</span>) {
+            avatar = getUserAvatar;
+          } <span class="keyword">else</span> {
+            avatar = getUserAvatar();
+          }
           <span class="keyword">if</span> (avatar &amp;&amp; <span class="keyword">typeof</span> avatar != <span class="string">"string"</span>) {
             console.warn(<span class="string">"Error in getUserAvatar(): should return a string (got"</span>, avatar, <span class="string">")"</span>);
             avatar = <span class="literal">null</span>;
@@ -686,6 +700,21 @@ We could test typeof==function to distinguish between a getter and a concrete va
       peers.Self._loadFromApp();
     }
   });
+
+  TogetherJS.config.track(
+    <span class="string">"getUserName"</span>,
+    TogetherJS.config.track(
+      <span class="string">"getUserColor"</span>,
+      TogetherJS.config.track(
+        <span class="string">"getUserAvatar"</span>,
+        <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">if</span> (peers.Self) {
+            peers.Self._loadFromApp();
+          }
+        }
+      )
+    )
+  );
 
   peers._SelfLoaded = util.Deferred();
 

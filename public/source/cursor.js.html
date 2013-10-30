@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -928,8 +930,8 @@ togetherjs&#39;s own video events</p>
         <span class="keyword">return</span>;
       }
 
-      <span class="keyword">var</span> dontShowClicks = TogetherJS.getConfig(<span class="string">"dontShowClicks"</span>);
-      <span class="keyword">var</span> cloneClicks = TogetherJS.getConfig(<span class="string">"cloneClicks"</span>);</pre></div></div>
+      <span class="keyword">var</span> dontShowClicks = TogetherJS.config.get(<span class="string">"dontShowClicks"</span>);
+      <span class="keyword">var</span> cloneClicks = TogetherJS.config.get(<span class="string">"cloneClicks"</span>);</pre></div></div>
               
             </li>
           
@@ -944,7 +946,7 @@ then return to avoid sending a useless click</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> ((cloneClicks !== <span class="literal">true</span> &amp;&amp; ! $(element).is(cloneClicks)) &amp;&amp; (dontShowClicks === <span class="literal">true</span> || $(element).is(dontShowClicks))) {
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> ((! util.matchElement(element, cloneClicks)) &amp;&amp; util.matchElement(element, dontShowClicks)) {
         <span class="keyword">return</span>;
       }
       <span class="keyword">var</span> location = elementFinder.elementLocation(element);
@@ -957,10 +959,7 @@ then return to avoid sending a useless click</p>
         offsetX: offsetX,
         offsetY: offsetY
       });
-      <span class="keyword">if</span> (dontShowClicks === <span class="literal">true</span>) {
-        <span class="keyword">return</span>;
-      }
-      <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(element).is(dontShowClicks)) {
+      <span class="keyword">if</span> (util.matchElement(element, dontShowClicks)) {
         <span class="keyword">return</span>;
       }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
@@ -1006,15 +1005,12 @@ Mostly click cloning just won&#39;t work.</p>
     <span class="keyword">var</span> offset = target.offset();
     <span class="keyword">var</span> top = offset.top + pos.offsetY;
     <span class="keyword">var</span> left = offset.left + pos.offsetX;
-    <span class="keyword">var</span> cloneClicks = TogetherJS.getConfig(<span class="string">"cloneClicks"</span>);
-    <span class="keyword">var</span> dontShowClicks = TogetherJS.getConfig(<span class="string">"dontShowClicks"</span>);
-    <span class="keyword">if</span> (cloneClicks &amp;&amp; target.is(cloneClicks)) {
+    <span class="keyword">var</span> cloneClicks = TogetherJS.config.get(<span class="string">"cloneClicks"</span>);
+    <span class="keyword">if</span> (util.matchElement(target, cloneClicks)) {
       eventMaker.performClick(target);
     }
-    <span class="keyword">if</span> (dontShowClicks === <span class="literal">true</span>) {
-      <span class="keyword">return</span>;
-    }
-    <span class="keyword">if</span> (dontShowClicks &amp;&amp; $(target).is(dontShowClicks)) {
+    <span class="keyword">var</span> dontShowClicks = TogetherJS.config.get(<span class="string">"dontShowClicks"</span>);
+    <span class="keyword">if</span> (util.matchElement(target, dontShowClicks)) {
       <span class="keyword">return</span>;
     }
     displayClick({top: top, left: left}, pos.peer.color);

@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -200,8 +202,10 @@
   <span class="keyword">var</span> analytics = util.Module(<span class="string">"analytics"</span>);
 
   analytics.activate = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">var</span> enable = TogetherJS.getConfig(<span class="string">"enableAnalytics"</span>);
-    <span class="keyword">var</span> code = TogetherJS.getConfig(<span class="string">"analyticsCode"</span>);
+    <span class="keyword">var</span> enable = TogetherJS.config.get(<span class="string">"enableAnalytics"</span>);
+    <span class="keyword">var</span> code = TogetherJS.config.get(<span class="string">"analyticsCode"</span>);
+    TogetherJS.config.close(<span class="string">"enableAnalytics"</span>);
+    TogetherJS.config.close(<span class="string">"analyticsCode"</span>);
     <span class="keyword">if</span> (! (enable &amp;&amp; code)) {
       <span class="keyword">return</span>;
     }</pre></div></div>

@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -264,7 +266,10 @@ define([<span class="string">"util"</span>, <span class="string">"ui"</span>, <s
         container.find(<span class="string">".togetherjs-if-creator"</span>).show();
         container.find(<span class="string">".togetherjs-ifnot-creator"</span>).remove();
       }
-      container.find(<span class="string">".togetherjs-site-name"</span>).text(session.siteName());
+      TogetherJS.config.track(<span class="string">"siteName"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(value)</span> {</span>
+        value = value || document.title;
+        container.find(<span class="string">".togetherjs-site-name"</span>).text(value);
+      });
       ui.activateAvatarEdit(container, {
         onSave: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
           container.find(<span class="string">"#togetherjs-avatar-when-saved"</span>).show();

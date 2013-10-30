@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -521,10 +523,16 @@ failed.)</p>
       $(<span class="keyword">this</span>).append($(<span class="string">'&lt;button class="togetherjs-close"&gt;&lt;/button&gt;'</span>));
     });
 
-    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"disableWebRTC"</span>)) {
-      ui.container.find(<span class="string">"#togetherjs-audio-button"</span>).hide();
-      adjustDockSize(-<span class="number">1</span>);
-    }
+    TogetherJS.config.track(<span class="string">"disableWebRTC"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(hide, previous)</span> {</span>
+      <span class="keyword">if</span> (hide &amp;&amp; ! previous) {
+        ui.container.find(<span class="string">"#togetherjs-audio-button"</span>).hide();
+        adjustDockSize(-<span class="number">1</span>);
+      } <span class="keyword">else</span> <span class="keyword">if</span> ((! hide) &amp;&amp; previous) {
+        ui.container.find(<span class="string">"#togetherjs-audio-button"</span>).show();
+        adjustDockSize(<span class="number">1</span>);
+      }
+    });
+
   };</pre></div></div>
               
             </li>
@@ -1066,12 +1074,14 @@ $(&quot;body&quot;).css({
       $(<span class="string">"#togetherjs-edit-name-window input"</span>).focus();
     });
 
-    $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).bind(<span class="string">"keyup"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+    $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).bind(<span class="string">"keyup change"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span>
+      console.log(<span class="string">"alrighty"</span>, event);
       <span class="keyword">if</span> (event.which == <span class="number">13</span>) {
         ui.displayToggle(<span class="string">"#togetherjs-self-name-display"</span>);
         <span class="keyword">return</span>;
       }
       <span class="keyword">var</span> val = $(<span class="string">"#togetherjs-menu .togetherjs-self-name"</span>).val();
+      console.log(<span class="string">"values!!"</span>, val);
       <span class="keyword">if</span> (val) {
         peers.Self.update({name: val});
       }
@@ -1212,9 +1222,13 @@ $(&quot;body&quot;).css({
       }
     });
 
-    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"inviteFromRoom"</span>)) {
-      container.find(<span class="string">"#togetherjs-invite"</span>).show();
-    }
+    TogetherJS.config.track(<span class="string">"inviteFromRoom"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(inviter, previous)</span> {</span>
+      <span class="keyword">if</span> (inviter) {
+        container.find(<span class="string">"#togetherjs-invite"</span>).show();
+      } <span class="keyword">else</span> {
+        container.find(<span class="string">"#togetherjs-invite"</span>).hide();
+      }
+    });
 
     container.find(<span class="string">"#togetherjs-menu-refresh-invite"</span>).click(refreshInvite);
     container.find(<span class="string">"#togetherjs-menu-invite-anyone"</span>).click(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -2311,7 +2325,7 @@ FIXME: should we tell the user this?</p>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">inviteHubUrl</span><span class="params">()</span> {</span>
-    <span class="keyword">var</span> base = TogetherJS.getConfig(<span class="string">"inviteFromRoom"</span>);
+    <span class="keyword">var</span> base = TogetherJS.config.get(<span class="string">"inviteFromRoom"</span>);
     assert(base);
     <span class="keyword">return</span> util.makeUrlAbsolute(base, session.hubUrl());
   }
@@ -2434,7 +2448,7 @@ the invite has been successfully sent:</p>
   });
 
   session.on(<span class="string">"new-element"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-    <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"toolName"</span>)) {
+    <span class="keyword">if</span> (TogetherJS.config.get(<span class="string">"toolName"</span>)) {
       ui.updateToolName(el);
     }
   });
@@ -2442,7 +2456,7 @@ the invite has been successfully sent:</p>
   <span class="keyword">var</span> setToolName = <span class="literal">false</span>;
   ui.updateToolName = <span class="function"><span class="keyword">function</span> <span class="params">(container)</span> {</span>
     container = container || $(document.body);
-    <span class="keyword">var</span> name = TogetherJS.getConfig(<span class="string">"toolName"</span>);
+    <span class="keyword">var</span> name = TogetherJS.config.get(<span class="string">"toolName"</span>);
     <span class="keyword">if</span> (setToolName &amp;&amp; ! name) {
       name = <span class="string">"TogetherJS"</span>;
     }
@@ -2451,6 +2465,10 @@ the invite has been successfully sent:</p>
       setToolName = <span class="literal">true</span>;
     }
   };
+
+  TogetherJS.config.track(<span class="string">"toolName"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+    ui.updateToolName(ui.container);
+  });
 
   <span class="keyword">return</span> ui;
 

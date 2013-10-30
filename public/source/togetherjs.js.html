@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -203,10 +205,7 @@
 <span class="comment">/*jshint scripturl:true */</span>
 (<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
 
-  <span class="keyword">var</span> styleSheet = <span class="string">"/togetherjs/togetherjs.css"</span>;
-
-  <span class="keyword">var</span> baseUrl = <span class="string">"__baseUrl__"</span>;
-  <span class="keyword">if</span> (baseUrl == <span class="string">"__"</span> + <span class="string">"baseUrl__"</span>) {</pre></div></div>
+  <span class="keyword">var</span> defaultConfiguration = {</pre></div></div>
               
             </li>
           
@@ -214,6 +213,325 @@
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-1">&#182;</a>
+                </div>
+                <p>Disables clicks for a certain element.
+(e.g., &#39;canvas&#39; would not show clicks on canvas elements.)
+Setting this to true will disable clicks globally.</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    dontShowClicks: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
+                <p>Experimental feature to echo clicks to certain elements across clients:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    cloneClicks: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>Enable Mozilla or Google analytics on the page when TogetherJS is activated:
+FIXME: these don&#39;t seem to be working, and probably should be removed in favor
+of the hub analytics</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    enableAnalytics: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>The code to enable (this is defaulting to a Mozilla code):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    analyticsCode: <span class="string">"UA-35433268-28"</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>The base URL of the hub (gets filled in below):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    hubBase: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>A function that will return the name of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>A function that will return the color of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserColor: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>A function that will return the avatar of the user:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    getUserAvatar: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>The siteName is used in the walkthrough (defaults to document.title):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    siteName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>Whether to use the minimized version of the code (overriding the built setting)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    useMinimizedCode: <span class="literal">undefined</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>Any events to bind to</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    on: {},</pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>Hub events to bind to</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    hub_on: {},</pre></div></div>
+              
+            </li>
+          
+            <li id="section-13">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-13">&#182;</a>
+                </div>
+                <p>Enables the alt-T alt-T TogetherJS shortcut; however, this setting
+must be enabled early as TogetherJSConfig_enableShortcut = true;</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    enableShortcut: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-14">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-14">&#182;</a>
+                </div>
+                <p>The name of this tool as provided to users.  The UI is updated to use this.
+Because of how it is used in text it should be a proper noun, e.g.,
+&quot;MySite&#39;s Collaboration Tool&quot;</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    toolName: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-15">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-15">&#182;</a>
+                </div>
+                <p>Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
+Also with findRoom: &quot;roomName&quot; it will connect to the given room name</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    findRoom: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>If true, starts TogetherJS automatically (of course!)</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    autoStart: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-17">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-17">&#182;</a>
+                </div>
+                <p>If true, then the &quot;Join TogetherJS Session?&quot; confirmation dialog
+won&#39;t come up</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    suppressJoinConfirmation: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-18">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-18">&#182;</a>
+                </div>
+                <p>If true, then the &quot;Invite a friend&quot; window won&#39;t automatically come up</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    suppressInvite: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-19">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-19">&#182;</a>
+                </div>
+                <p>A room in which to find people to invite to this session,</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    inviteFromRoom: <span class="literal">null</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-20">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-20">&#182;</a>
+                </div>
+                <p>This is used to keep sessions from crossing over on the same
+domain, if for some reason you want sessions that are limited
+to only a portion of the domain:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    storagePrefix: <span class="string">"togetherjs"</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-21">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-21">&#182;</a>
+                </div>
+                <p>When true, we treat the entire URL, including the hash, as the identifier
+of the page; i.e., if you one person is on <code>http://example.com/#view1</code>
+and another person is at <code>http://example.com/#view2</code> then these two people
+are considered to be at completely different URLs</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    includeHashInUrl: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-22">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-22">&#182;</a>
+                </div>
+                <p>When true, the WebRTC-based mic/chat will be disabled</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    disableWebRTC: <span class="literal">false</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-23">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-23">&#182;</a>
+                </div>
+                <p>When true, youTube videos will synchronize</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    youtube: <span class="literal">true</span>
+  };
+
+  <span class="keyword">var</span> styleSheet = <span class="string">"/togetherjs/togetherjs.css"</span>;
+
+  <span class="keyword">var</span> baseUrl = <span class="string">"__baseUrl__"</span>;
+  <span class="keyword">if</span> (baseUrl == <span class="string">"__"</span> + <span class="string">"baseUrl__"</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-24">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-24">&#182;</a>
                 </div>
                 <p>Reset the variable if it doesn&#39;t get substituted</p>
 
@@ -224,10 +542,10 @@
               
             </li>
           
-            <li id="section-2">
+            <li id="section-25">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-2">&#182;</a>
+                  <a class="pilcrow" href="#section-25">&#182;</a>
                 </div>
                 <p>True if this file should use minimized sub-resources:</p>
 
@@ -246,10 +564,10 @@
               
             </li>
           
-            <li id="section-3">
+            <li id="section-26">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-3">&#182;</a>
+                  <a class="pilcrow" href="#section-26">&#182;</a>
                 </div>
                 <p>Ignore because it has expired</p>
 
@@ -293,10 +611,10 @@
               
             </li>
           
-            <li id="section-4">
+            <li id="section-27">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-4">&#182;</a>
+                  <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
                 <p>FIXME: we could/should use a version from the checkout, at least
 for production</p>
@@ -312,10 +630,10 @@ for production</p>
               
             </li>
           
-            <li id="section-5">
+            <li id="section-28">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-5">&#182;</a>
+                  <a class="pilcrow" href="#section-28">&#182;</a>
                 </div>
                 <p>Make sure we have all of the console.* methods:</p>
 
@@ -377,10 +695,10 @@ for production</p>
               
             </li>
           
-            <li id="section-6">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-6">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>Probably a jQuery element</p>
 
@@ -407,10 +725,10 @@ for production</p>
               
             </li>
           
-            <li id="section-7">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-7">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>This handles loading configuration from global variables.  This
 includes TogetherJSConfig<em>on</em>*, which are attributes folded into
@@ -443,25 +761,27 @@ the &quot;on&quot; configuration value.</p>
               
             </li>
           
-            <li id="section-8">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-8">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
-                <p>FIXME: copy existing config?</p>
+                <p>FIXME: copy existing config?
+FIXME: do this directly in TogetherJS.config() ?
+FIXME: close these configs?</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> ons = TogetherJS.getConfig(<span class="string">"on"</span>);
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> ons = TogetherJS.config.get(<span class="string">"on"</span>);
     <span class="keyword">for</span> (attr <span class="keyword">in</span> globalOns) {
       <span class="keyword">if</span> (globalOns.hasOwnProperty(attr)) {</pre></div></div>
               
             </li>
           
-            <li id="section-9">
+            <li id="section-32">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-9">&#182;</a>
+                  <a class="pilcrow" href="#section-32">&#182;</a>
                 </div>
                 <p>FIXME: should we avoid overwriting?  Maybe use arrays?</p>
 
@@ -474,7 +794,7 @@ the &quot;on&quot; configuration value.</p>
     <span class="keyword">for</span> (attr <span class="keyword">in</span> ons) {
       TogetherJS.on(attr, ons[attr]);
     }
-    <span class="keyword">var</span> hubOns = TogetherJS.getConfig(<span class="string">"hub_on"</span>);
+    <span class="keyword">var</span> hubOns = TogetherJS.config.get(<span class="string">"hub_on"</span>);
     <span class="keyword">if</span> (hubOns) {
       <span class="keyword">for</span> (attr <span class="keyword">in</span> hubOns) {
         <span class="keyword">if</span> (hubOns.hasOwnProperty(attr)) {
@@ -487,10 +807,10 @@ the &quot;on&quot; configuration value.</p>
               
             </li>
           
-            <li id="section-10">
+            <li id="section-33">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-10">&#182;</a>
+                  <a class="pilcrow" href="#section-33">&#182;</a>
                 </div>
                 <p>Then a call to TogetherJS() from a button must be started TogetherJS</p>
 
@@ -501,10 +821,10 @@ the &quot;on&quot; configuration value.</p>
               
             </li>
           
-            <li id="section-11">
+            <li id="section-34">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-11">&#182;</a>
+                  <a class="pilcrow" href="#section-34">&#182;</a>
                 </div>
                 <p>FIXME: maybe I should just test for TogetherJS.require:</p>
 
@@ -523,10 +843,10 @@ the &quot;on&quot; configuration value.</p>
               
             </li>
           
-            <li id="section-12">
+            <li id="section-35">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-12">&#182;</a>
+                  <a class="pilcrow" href="#section-35">&#182;</a>
                 </div>
                 <p>A sort of signal to session.js to tell it to actually
 start itself (i.e., put up a UI and try to activate)</p>
@@ -536,7 +856,8 @@ start itself (i.e., put up a UI and try to activate)</p>
                 <div class="content"><div class='highlight'><pre>    TogetherJS.startup._launch = <span class="literal">true</span>;
 
     addStyle();
-    <span class="keyword">var</span> minSetting = TogetherJS.getConfig(<span class="string">"useMinimizedCode"</span>);
+    <span class="keyword">var</span> minSetting = TogetherJS.config.get(<span class="string">"useMinimizedCode"</span>);
+    TogetherJS.config.close(<span class="string">"useMinimizedCode"</span>);
     <span class="keyword">if</span> (minSetting !== <span class="literal">undefined</span>) {
       min = !! minSetting;
     }
@@ -558,10 +879,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-13">
+            <li id="section-36">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
+                  <a class="pilcrow" href="#section-36">&#182;</a>
                 </div>
                 <p>This is an already-configured version of require</p>
 
@@ -601,10 +922,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-14">
+            <li id="section-37">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
+                  <a class="pilcrow" href="#section-37">&#182;</a>
                 </div>
                 <p>What element, if any, was used to start the session:</p>
 
@@ -614,10 +935,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-15">
+            <li id="section-38">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-15">&#182;</a>
+                  <a class="pilcrow" href="#section-38">&#182;</a>
                 </div>
                 <p>The startReason is the reason TogetherJS was started.  One of:
   null: not started
@@ -630,10 +951,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-16">
+            <li id="section-39">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-16">&#182;</a>
+                  <a class="pilcrow" href="#section-39">&#182;</a>
                 </div>
                 <p>Also, the session may have started on &quot;this&quot; page, or maybe is continued
 from a past page.  TogetherJS.continued indicates the difference (false the
@@ -645,10 +966,10 @@ first time TogetherJS is started or joined, true on later page loads).</p>
               
             </li>
           
-            <li id="section-17">
+            <li id="section-40">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-17">&#182;</a>
+                  <a class="pilcrow" href="#section-40">&#182;</a>
                 </div>
                 <p>This is set to tell the session what shareId to use, if the boot
 code knows (mostly because the URL indicates the id).</p>
@@ -659,10 +980,10 @@ code knows (mostly because the URL indicates the id).</p>
               
             </li>
           
-            <li id="section-18">
+            <li id="section-41">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-18">&#182;</a>
+                  <a class="pilcrow" href="#section-41">&#182;</a>
                 </div>
                 <p>This tells session to start up immediately (otherwise it would wait
 for session.start() to be run)</p>
@@ -730,10 +1051,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-19">
+            <li id="section-42">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-19">&#182;</a>
+                  <a class="pilcrow" href="#section-42">&#182;</a>
                 </div>
                 <p>FIXME: maybe I should add the event name to the .once attribute:</p>
 
@@ -753,10 +1074,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-20">
+            <li id="section-43">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-20">&#182;</a>
+                  <a class="pilcrow" href="#section-43">&#182;</a>
                 </div>
                 <p>Defer the .off() call until the .emit() is done.</p>
 
@@ -811,10 +1132,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-21">
+            <li id="section-44">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-21">&#182;</a>
+                  <a class="pilcrow" href="#section-44">&#182;</a>
                 </div>
                 <p>FIXME: this doesn&#39;t clear the context for min-case</p>
 
@@ -839,10 +1160,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-22">
+            <li id="section-45">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-22">&#182;</a>
+                  <a class="pilcrow" href="#section-45">&#182;</a>
                 </div>
                 <p>Substitution wasn&#39;t made</p>
 
@@ -850,326 +1171,83 @@ for session.start() to be run)</p>
               
                 <div class="content"><div class='highlight'><pre>    defaultHubBase = <span class="string">"https://hub.togetherjs.mozillalabs.com"</span>;
   }
+  defaultConfiguration.hubBase = defaultHubBase;
 
   TogetherJS._configuration = {};
-  TogetherJS._defaultConfiguration = {</pre></div></div>
-              
-            </li>
-          
-            <li id="section-23">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-23">&#182;</a>
-                </div>
-                <p>Disables clicks for a certain element.
-(e.g., &#39;canvas&#39; would not show clicks on canvas elements.)
-Setting this to true will disable clicks globally.</p>
+  TogetherJS._defaultConfiguration = defaultConfiguration;
+  TogetherJS._configTrackers = {};
+  TogetherJS._configClosed = {};
 
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    dontShowClicks: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-24">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-24">&#182;</a>
-                </div>
-                <p>Experimental feature to echo clicks to certain elements across clients:</p>
+  <span class="comment">/* TogetherJS.config(configurationObject)
+     or: TogetherJS.config(configName, value)
 
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    cloneClicks: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-25">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-25">&#182;</a>
-                </div>
-                <p>Enable Mozilla or Google analytics on the page when TogetherJS is activated:
-FIXME: these don&#39;t seem to be working, and probably should be removed in favor
-of the hub analytics</p>
+     Adds configuration to TogetherJS.  You may also set the global variable TogetherJSConfig
+     and when TogetherJS is started that configuration will be loaded.
 
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    enableAnalytics: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-26">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-26">&#182;</a>
-                </div>
-                <p>The code to enable (this is defaulting to a Mozilla code):</p>
+     Unknown configuration values will lead to console error messages.
+     */</span>
+  TogetherJS.config = <span class="function"><span class="keyword">function</span> <span class="params">(name, maybeValue)</span> {</span>
+    <span class="keyword">var</span> settings;
+    <span class="keyword">if</span> (arguments.length == <span class="number">1</span>) {
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> name != <span class="string">"object"</span>) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'TogetherJS.config(value) must have an object value (not: '</span> + name + <span class="string">')'</span>);
+      }
+      settings = name;
+    } <span class="keyword">else</span> {
+      settings = {};
+      settings[name] = maybeValue;
+    }
+    <span class="keyword">var</span> i;
+    <span class="keyword">var</span> tracker;
+    <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> settings) {
+      <span class="keyword">if</span> (settings.hasOwnProperty(attr)) {
+        <span class="keyword">if</span> (TogetherJS._configClosed[attr]) {
+          <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"The configuration "</span> + attr + <span class="string">" is finalized and cannot be changed"</span>);
+        }
+      }
+    }
+    <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> settings) {
+      <span class="keyword">if</span> (! settings.hasOwnProperty(attr)) {
+        <span class="keyword">continue</span>;
+      }
+      <span class="keyword">if</span> (attr == <span class="string">"loaded"</span> || attr == <span class="string">"callToStart"</span>) {
+        <span class="keyword">continue</span>;
+      }
+      <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
+        console.warn(<span class="string">"Unknown configuration value passed to TogetherJS.config():"</span>, attr);
+      }
+      <span class="keyword">var</span> previous = TogetherJS._configuration[attr];
+      <span class="keyword">var</span> value = settings[attr];
+      TogetherJS._configuration[attr] = value;
+      <span class="keyword">var</span> trackers = TogetherJS._configTrackers[name] || [];
+      <span class="keyword">var</span> failed = <span class="literal">false</span>;
+      <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;trackers.length; i++) {
+        <span class="keyword">try</span> {
+          tracker = trackers[i];
+          tracker(value, previous);
+        } <span class="keyword">catch</span> (e) {
+          console.warn(<span class="string">"Error setting configuration"</span>, name, <span class="string">"to"</span>, value,
+                       <span class="string">":"</span>, e, <span class="string">"; reverting to"</span>, previous);
+          failed = <span class="literal">true</span>;
+          <span class="keyword">break</span>;
+        }
+      }
+      <span class="keyword">if</span> (failed) {
+        TogetherJS._configuration[attr] = previous;
+        <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;trackers.length; i++) {
+          <span class="keyword">try</span> {
+            tracker = trackers[i];
+            tracker(value);
+          } <span class="keyword">catch</span> (e) {
+            console.warn(<span class="string">"Error REsetting configuration"</span>, name, <span class="string">"to"</span>, previous,
+                         <span class="string">":"</span>, e, <span class="string">"(ignoring)"</span>);
+          }
+        }
+      }
+    }
+  };
 
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    analyticsCode: <span class="string">"UA-35433268-28"</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-27">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-27">&#182;</a>
-                </div>
-                <p>The base URL of the hub</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    hubBase: defaultHubBase,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-28">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
-                </div>
-                <p>A function that will return the name of the user:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    getUserName: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-29">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
-                </div>
-                <p>A function that will return the color of the user:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    getUserColor: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-30">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-30">&#182;</a>
-                </div>
-                <p>A function that will return the avatar of the user:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    getUserAvatar: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-31">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-31">&#182;</a>
-                </div>
-                <p>The siteName is used in the walkthrough (defaults to document.title):</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    siteName: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-32">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-32">&#182;</a>
-                </div>
-                <p>Whether to use the minimized version of the code (overriding the built setting)</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    useMinimizedCode: <span class="literal">undefined</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-33">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-33">&#182;</a>
-                </div>
-                <p>Any events to bind to</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    on: {},</pre></div></div>
-              
-            </li>
-          
-            <li id="section-34">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-34">&#182;</a>
-                </div>
-                <p>Hub events to bind to</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    hub_on: {},</pre></div></div>
-              
-            </li>
-          
-            <li id="section-35">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-35">&#182;</a>
-                </div>
-                <p>Enables the alt-T alt-T TogetherJS shortcut; however, this setting
-must be enabled early as TogetherJSConfig_enableShortcut = true;</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    enableShortcut: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-36">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-36">&#182;</a>
-                </div>
-                <p>The name of this tool as provided to users.  The UI is updated to use this.
-Because of how it is used in text it should be a proper noun, e.g.,
-&quot;MySite&#39;s Collaboration Tool&quot;</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    toolName: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-37">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-37">&#182;</a>
-                </div>
-                <p>Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
-Also with findRoom: &quot;roomName&quot; it will connect to the given room name</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    findRoom: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-38">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-38">&#182;</a>
-                </div>
-                <p>If true, starts TogetherJS automatically (of course!)</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    autoStart: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-39">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-39">&#182;</a>
-                </div>
-                <p>If true, then the &quot;Join TogetherJS Session?&quot; confirmation dialog
-won&#39;t come up</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    suppressJoinConfirmation: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-40">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-40">&#182;</a>
-                </div>
-                <p>If true, then the &quot;Invite a friend&quot; window won&#39;t automatically come up</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    suppressInvite: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-41">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-41">&#182;</a>
-                </div>
-                <p>A room in which to find people to invite to this session,</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    inviteFromRoom: <span class="literal">null</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-42">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-42">&#182;</a>
-                </div>
-                <p>This is used to keep sessions from crossing over on the same
-domain, if for some reason you want sessions that are limited
-to only a portion of the domain:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    storagePrefix: <span class="string">"togetherjs"</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-43">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-43">&#182;</a>
-                </div>
-                <p>When true, we treat the entire URL, including the hash, as the identifier
-of the page; i.e., if you one person is on <code>http://example.com/#view1</code>
-and another person is at <code>http://example.com/#view2</code> then these two people
-are considered to be at completely different URLs</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    includeHashInUrl: <span class="literal">false</span>,</pre></div></div>
-              
-            </li>
-          
-            <li id="section-44">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-44">&#182;</a>
-                </div>
-                <p>When true, the WebRTC-based mic/chat will be disabled</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    disableWebRTC: <span class="literal">false</span>
-  };</pre></div></div>
-              
-            </li>
-          
-            <li id="section-45">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-45">&#182;</a>
-                </div>
-                <p>FIXME: there&#39;s a point at which configuration can&#39;t be updated
-(e.g., hubBase after the TogetherJS has loaded).  We should keep
-track of these and signal an error if someone attempts to
-reconfigure too late</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>  TogetherJS.getConfig = <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+  TogetherJS.config.get = <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
     <span class="keyword">var</span> value = TogetherJS._configuration[name];
     <span class="keyword">if</span> (value === <span class="literal">undefined</span>) {
       <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
@@ -1180,58 +1258,25 @@ reconfigure too late</p>
     <span class="keyword">return</span> value;
   };
 
-  <span class="comment">/* TogetherJS.config(configurationObject)
-     or: TogetherJS.config(configName, value)
-
-     Adds configuration to TogetherJS.  You may also set the global variable TogetherJSConfig
-     and when TogetherJS is started that configuration will be loaded.
-
-     Unknown configuration values will lead to console error messages.
-     */</span>
-  TogetherJS.config = <span class="function"><span class="keyword">function</span> <span class="params">(name, value)</span> {</span>
-    <span class="keyword">var</span> settings;
-    <span class="keyword">if</span> (arguments.length == <span class="number">1</span>) {
-      <span class="keyword">if</span> (<span class="keyword">typeof</span> name != <span class="string">"object"</span>) {
-        <span class="keyword">throw</span> <span class="string">'TogetherJS.config(value) must have an object value (not: '</span> + name + <span class="string">')'</span>;
-      }
-      settings = name;
-    } <span class="keyword">else</span> {
-      settings = {};
-      settings[name] = value;
+  TogetherJS.config.track = <span class="function"><span class="keyword">function</span> <span class="params">(name, callback)</span> {</span>
+    <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Configuration is unknown: "</span> + name);
     }
-    <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> settings) {
-      <span class="keyword">if</span> (attr == <span class="string">"loaded"</span> || attr == <span class="string">"callToStart"</span> || ! settings.hasOwnProperty(attr)) {
-        <span class="keyword">continue</span>;
-      }
-      <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
-        console.warn(<span class="string">"Unknown configuration value passed to TogetherJS.config():"</span>, attr);
-      }
-      TogetherJS._configuration[attr] = settings[attr];
-      <span class="keyword">if</span> (TogetherJS.running &amp;&amp; attr == <span class="string">"toolName"</span>) {
-        TogetherJS.require(<span class="string">"ui"</span>).updateToolName();
-      }
-      <span class="keyword">if</span> (attr == <span class="string">"enableShortcut"</span>) {
-        <span class="keyword">if</span> (settings[attr]) {
-          TogetherJS.listenForShortcut();
-        } <span class="keyword">else</span> {
-          TogetherJS.removeShortcut();
-        }
-      }</pre></div></div>
-              
-            </li>
-          
-            <li id="section-46">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-46">&#182;</a>
-                </div>
-                <p>FIXME: maybe run an update function when certain values are
-updated, especially when TogetherJS is running</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>    }
+    callback(TogetherJS.config.get(name));
+    <span class="keyword">if</span> (! TogetherJS._configTrackers[name]) {
+      TogetherJS._configTrackers[name] = [];
+    }
+    TogetherJS._configTrackers[name].push(callback);
+    <span class="keyword">return</span> callback;
   };
+
+  TogetherJS.config.close = <span class="function"><span class="keyword">function</span> <span class="params">(name)</span> {</span>
+    <span class="keyword">if</span> (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Configuration is unknown: "</span> + name);
+    }
+    TogetherJS._configClosed[name] = <span class="literal">true</span>;
+  };
+
   TogetherJS.reinitialize = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     <span class="keyword">if</span> (TogetherJS.running &amp;&amp; <span class="keyword">typeof</span> TogetherJS.require == <span class="string">"function"</span>) {
       TogetherJS.require([<span class="string">"session"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(session)</span> {</span>
@@ -1241,10 +1286,10 @@ updated, especially when TogetherJS is running</p>
               
             </li>
           
-            <li id="section-47">
+            <li id="section-46">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-47">&#182;</a>
+                  <a class="pilcrow" href="#section-46">&#182;</a>
                 </div>
                 <p>If it&#39;s not set, TogetherJS has not been loaded, and reinitialization is not needed</p>
 
@@ -1262,10 +1307,10 @@ updated, especially when TogetherJS is running</p>
               
             </li>
           
-            <li id="section-48">
+            <li id="section-47">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-48">&#182;</a>
+                  <a class="pilcrow" href="#section-47">&#182;</a>
                 </div>
                 <p>This should contain the output of &quot;git describe --always --dirty&quot;
 FIXME: substitute this on the server (and update make-static-client)</p>
@@ -1320,10 +1365,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-49">
+            <li id="section-48">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-49">&#182;</a>
+                  <a class="pilcrow" href="#section-48">&#182;</a>
                 </div>
                 <p>Second hit</p>
 
@@ -1347,6 +1392,14 @@ FIXME: substitute this on the server (and update make-static-client)</p>
       listener = <span class="literal">null</span>;
     }
   };
+
+  TogetherJS.config.track(<span class="string">"enableShortcut"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(enable, previous)</span> {</span>
+    <span class="keyword">if</span> (enable) {
+      TogetherJS.listenForShortcut();
+    } <span class="keyword">else</span> <span class="keyword">if</span> (previous) {
+      TogetherJS.removeShortcut();
+    }
+  });
 
   TogetherJS.checkForUsersOnChannel = <span class="function"><span class="keyword">function</span> <span class="params">(address, callback)</span> {</span>
     <span class="keyword">if</span> (address.search(<span class="regexp">/^https?:/i</span>) === <span class="number">0</span>) {
@@ -1380,10 +1433,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-50">
+            <li id="section-49">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-50">&#182;</a>
+                  <a class="pilcrow" href="#section-49">&#182;</a>
                 </div>
                 <p>It&#39;s nice to replace this early, before the load event fires, so we conflict
 as little as possible with the app we are embedded in:</p>
@@ -1402,10 +1455,10 @@ as little as possible with the app we are embedded in:</p>
               
             </li>
           
-            <li id="section-51">
+            <li id="section-50">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-51">&#182;</a>
+                  <a class="pilcrow" href="#section-50">&#182;</a>
                 </div>
                 <p>A weird hack for something the addon does, to force a shareId.
 FIXME: probably should remove, it&#39;s a wonky feature.</p>
@@ -1423,10 +1476,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-52">
+            <li id="section-51">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-52">&#182;</a>
+                  <a class="pilcrow" href="#section-51">&#182;</a>
                 </div>
                 <p>A page can define this function to defer TogetherJS from starting</p>
 
@@ -1444,10 +1497,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-53">
+            <li id="section-52">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-53">&#182;</a>
+                  <a class="pilcrow" href="#section-52">&#182;</a>
                 </div>
                 <p>FIXME: need to document this:</p>
 
@@ -1461,10 +1514,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-54">
+            <li id="section-53">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-54">&#182;</a>
+                  <a class="pilcrow" href="#section-53">&#182;</a>
                 </div>
                 <p>FIXME: can we push this up before the load event?
 Do we need to wait at all?</p>
@@ -1481,10 +1534,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-55">
+            <li id="section-54">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-55">&#182;</a>
+                  <a class="pilcrow" href="#section-54">&#182;</a>
                 </div>
                 <p>FIXME: this doesn&#39;t respect storagePrefix:</p>
 
@@ -1511,10 +1564,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-56">
+            <li id="section-55">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-56">&#182;</a>
+                  <a class="pilcrow" href="#section-55">&#182;</a>
                 </div>
                 <p>FIXME: wait until load event to double check if this gets set?</p>
 
@@ -1526,10 +1579,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-57">
+            <li id="section-56">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-57">&#182;</a>
+                  <a class="pilcrow" href="#section-56">&#182;</a>
                 </div>
                 <p>For compatibility:</p>
 

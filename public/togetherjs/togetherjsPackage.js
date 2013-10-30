@@ -1054,6 +1054,20 @@ define('util',["jquery", "jqueryPlugins"], function ($) {
     });
   };
 
+  util.matchElement = function(el, selector) {
+    var res = selector;
+    if (selector === true || ! selector) {
+      return !!selector;
+    }
+    try {
+      return $(el).is(selector);
+    } catch (e) {
+      console.warn("Bad selector:", selector, "error:", e);
+      return false;
+    }
+    
+  }
+
   util.testExpose = function (objs) {
     if (typeof TogetherJSTestSpy == "undefined") {
       return;
@@ -1070,8 +1084,10 @@ define('analytics',["util"], function (util) {
   var analytics = util.Module("analytics");
 
   analytics.activate = function () {
-    var enable = TogetherJS.getConfig("enableAnalytics");
-    var code = TogetherJS.getConfig("analyticsCode");
+    var enable = TogetherJS.config.get("enableAnalytics");
+    var code = TogetherJS.config.get("analyticsCode");
+    TogetherJS.config.close("enableAnalytics");
+    TogetherJS.config.close("analyticsCode");
     if (! (enable && code)) {
       return;
     }
@@ -1622,20 +1638,19 @@ define('storage',["util"], function (util) {
         value = JSON.stringify(value);
       }
       return Deferred(function (def) {
-        setTimeout(util.resolver(def, function () {
-          key = self.prefix + key;
-          if (value === undefined) {
-            self.storage.removeItem(key);
-            if (DEBUG_STORAGE) {
-              console.debug("Delete storage", key);
-            }
-          } else {
-            self.storage.setItem(key, value);
-            if (DEBUG_STORAGE) {
-              console.debug("Set storage", key, value);
-            }
+        key = self.prefix + key;
+        if (value === undefined) {
+          self.storage.removeItem(key);
+          if (DEBUG_STORAGE) {
+            console.debug("Delete storage", key);
           }
-        }));
+        } else {
+          self.storage.setItem(key, value);
+          if (DEBUG_STORAGE) {
+            console.debug("Set storage", key, value);
+          }
+        }
+        setTimeout(def.resolve);
       });
     },
 
@@ -1663,7 +1678,7 @@ define('storage',["util"], function (util) {
         setTimeout(util.resolver(def, function () {
           prefix = prefix || "";
           var result = [];
-          for (var i=0; i<self.storage.length; i++) {
+          for (var i = 0; i < self.storage.length; i++) {
             var key = self.storage.key(i);
             if (key.indexOf(self.prefix + prefix) === 0) {
               var shortKey = key.substr(self.prefix.length);
@@ -1684,7 +1699,8 @@ define('storage',["util"], function (util) {
 
   });
 
-  var namePrefix = TogetherJS.getConfig("storagePrefix");
+  var namePrefix = TogetherJS.config.get("storagePrefix");
+  TogetherJS.config.close("storagePrefix");
 
   var storage = Storage('localStorage', localStorage, namePrefix + ".");
 
@@ -1746,11 +1762,19 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
   /****************************************
    * URLs
    */
-  var includeHashInUrl = TogetherJS.getConfig('includeHashInUrl');
+  var includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
+  TogetherJS.config.close("includeHashInUrl");
+  var currentUrl = (location.href + "").replace(/\#.*$/, "");
+  if (includeHashInUrl) {
+    currentUrl = location.href;
+  }
+
   session.hubUrl = function (id) {
     id = id || session.shareId;
     assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
-    return TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + id;
+    TogetherJS.config.close("hubBase");
+    var hubBase = TogetherJS.config.get("hubBase");
+    return hubBase.replace(/\/*$/, "") + "/hub/" + id;
   };
 
   session.shareUrl = function () {
@@ -1770,7 +1794,7 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
   session.recordUrl = function () {
     assert(session.shareId);
     var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
-    url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
+    url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
     return url;
   };
 
@@ -1781,10 +1805,6 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
     } else {
       return location.href.replace(/#.*/, "");
     }
-  };
-
-  session.siteName = function () {
-    return TogetherJS.getConfig("siteName") || document.title;
   };
 
   /****************************************
@@ -1842,12 +1862,6 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
     };
     channel = c;
     session.router.bindChannel(channel);
-  }
-
-  // FIXME: once we start looking at window.history we need to update this:
-  var currentUrl = (location.href + "").replace(/\#.*$/, "");
-  if (includeHashInUrl) {
-    currentUrl = location.href;
   }
 
   session.send = function (msg) {
@@ -1944,10 +1958,10 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup","videos", "forms", "visibilityApi"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
 
   function getRoomName(prefix, maxSize) {
-    var findRoom = TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
+    var findRoom = TogetherJS.config.get("hubBase").replace(/\/*$/, "") + "/findroom";
     return $.ajax({
       url: findRoom,
       dataType: "json",
@@ -2005,7 +2019,8 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        var findRoom = TogetherJS.getConfig("findRoom");
+        var findRoom = TogetherJS.config.get("findRoom");
+        TogetherJS.config.close("findRoom");
         if (findRoom && saved) {
           console.info("Ignoring findRoom in lieu of continued session");
         } else if (findRoom && TogetherJS.startup._joinShareId) {
@@ -2108,7 +2123,8 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
                 startup.start();
               });
               ui.activateUI();
-              if (TogetherJS.getConfig("enableAnalytics")) {
+              TogetherJS.config.close("enableAnalytics");
+              if (TogetherJS.config.get("enableAnalytics")) {
                 require(["analytics"], function (analytics) {
                   analytics.activate();
                 });
@@ -2569,12 +2585,16 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
       _loadFromApp: function () {
         // FIXME: I wonder if these should be optionally functions?
         // We could test typeof==function to distinguish between a getter and a concrete value
-        var getUserName = TogetherJS.getConfig("getUserName");
-        var getUserColor = TogetherJS.getConfig("getUserColor");
-        var getUserAvatar = TogetherJS.getConfig("getUserAvatar");
+        var getUserName = TogetherJS.config.get("getUserName");
+        var getUserColor = TogetherJS.config.get("getUserColor");
+        var getUserAvatar = TogetherJS.config.get("getUserAvatar");
         var name, color, avatar;
         if (getUserName) {
-          name = getUserName();
+          if (typeof getUserName == "string") {
+            name = getUserName;
+          } else {
+            name = getUserName();
+          }
           if (name && typeof name != "string") {
             // FIXME: test for HTML safe?  Not that we require it, but
             // <>'s are probably a sign something is wrong.
@@ -2583,7 +2603,11 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
           }
         }
         if (getUserColor) {
-          color = getUserColor();
+          if (typeof getUserColor == "string") {
+            color = getUserColor;
+          } else {
+            color = getUserColor();
+          }
           if (color && typeof color != "string") {
             // FIXME: would be nice to test for color-ness here.
             console.warn("Error in getUserColor(): should return a string (got", color, ")");
@@ -2591,7 +2615,11 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
           }
         }
         if (getUserAvatar) {
-          avatar = getUserAvatar();
+          if (typeof getUserAvatar == "string") {
+            avatar = getUserAvatar;
+          } else {
+            avatar = getUserAvatar();
+          }
           if (avatar && typeof avatar != "string") {
             console.warn("Error in getUserAvatar(): should return a string (got", avatar, ")");
             avatar = null;
@@ -2620,6 +2648,21 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
       peers.Self._loadFromApp();
     }
   });
+
+  TogetherJS.config.track(
+    "getUserName",
+    TogetherJS.config.track(
+      "getUserColor",
+      TogetherJS.config.track(
+        "getUserAvatar",
+        function () {
+          if (peers.Self) {
+            peers.Self._loadFromApp();
+          }
+        }
+      )
+    )
+  );
 
   peers._SelfLoaded = util.Deferred();
 
@@ -4025,6 +4068,10 @@ define('elementFinder',["util", "jquery"], function (util, $) {
       // a jQuery element
       el = el[0];
     }
+    if (el[0] && el[0].nodeType == 1) {
+      // Or a jQuery element not made by us
+      el = el[0];
+    }
     if (el.id) {
       return "#" + el.id;
     }
@@ -4469,10 +4516,16 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       $(this).append($('<button class="togetherjs-close"></button>'));
     });
 
-    if (TogetherJS.getConfig("disableWebRTC")) {
-      ui.container.find("#togetherjs-audio-button").hide();
-      adjustDockSize(-1);
-    }
+    TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-audio-button").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-audio-button").show();
+        adjustDockSize(1);
+      }
+    });
+
   };
 
   // After prepareUI, this actually makes the interface live.  We have
@@ -4758,12 +4811,14 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       $("#togetherjs-edit-name-window input").focus();
     });
 
-    $("#togetherjs-menu .togetherjs-self-name").bind("keyup", function (event) {
+    $("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
+      console.log("alrighty", event);
       if (event.which == 13) {
         ui.displayToggle("#togetherjs-self-name-display");
         return;
       }
       var val = $("#togetherjs-menu .togetherjs-self-name").val();
+      console.log("values!!", val);
       if (val) {
         peers.Self.update({name: val});
       }
@@ -4884,9 +4939,13 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       }
     });
 
-    if (TogetherJS.getConfig("inviteFromRoom")) {
-      container.find("#togetherjs-invite").show();
-    }
+    TogetherJS.config.track("inviteFromRoom", function (inviter, previous) {
+      if (inviter) {
+        container.find("#togetherjs-invite").show();
+      } else {
+        container.find("#togetherjs-invite").hide();
+      }
+    });
 
     container.find("#togetherjs-menu-refresh-invite").click(refreshInvite);
     container.find("#togetherjs-menu-invite-anyone").click(function () {
@@ -5665,7 +5724,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
   }
 
   function inviteHubUrl() {
-    var base = TogetherJS.getConfig("inviteFromRoom");
+    var base = TogetherJS.config.get("inviteFromRoom");
     assert(base);
     return util.makeUrlAbsolute(base, session.hubUrl());
   }
@@ -5766,7 +5825,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
   });
 
   session.on("new-element", function (el) {
-    if (TogetherJS.getConfig("toolName")) {
+    if (TogetherJS.config.get("toolName")) {
       ui.updateToolName(el);
     }
   });
@@ -5774,7 +5833,7 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
   var setToolName = false;
   ui.updateToolName = function (container) {
     container = container || $(document.body);
-    var name = TogetherJS.getConfig("toolName");
+    var name = TogetherJS.config.get("toolName");
     if (setToolName && ! name) {
       name = "TogetherJS";
     }
@@ -5783,6 +5842,10 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       setToolName = true;
     }
   };
+
+  TogetherJS.config.track("toolName", function (name) {
+    ui.updateToolName(ui.container);
+  });
 
   return ui;
 
@@ -5990,6 +6053,7 @@ define('playback',["jquery", "util", "session", "storage", "require"], function 
 /*jshint evil:true */
 define('chat',["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
   var chat = util.Module("chat");
+  var assert = util.assert;
   var Walkabout;
 
   session.hub.on("chat", function (msg) {
@@ -5999,6 +6063,12 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
       // FIXME: a little unsure of trusting this (maybe I should prefix it?)
       messageId: msg.messageId,
       notify: true
+    });
+    saveChatMessage({
+      text: msg.text,
+      date: Date.now(),
+      peerId: msg.peer.id,
+      messageId: msg.messageId
     });
   });
 
@@ -6031,6 +6101,12 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
       peer: peers.Self,
       messageId: messageId,
       notify: false
+    });
+    saveChatMessage({
+      text: message,
+      date: Date.now(),
+      peerId: peers.Self.id,
+      messageId: messageId
     });
   };
 
@@ -6312,6 +6388,57 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
 
   };
 
+  // this section deal with saving/restoring chat history as long as session is alive
+  var chatStorageKey = "chatlog";
+  var maxLogMessages = 100;
+
+  function saveChatMessage(obj) {
+    assert(obj.peerId);
+    assert(obj.messageId);
+    assert(obj.date);
+    assert(typeof obj.text == "string");
+
+    loadChatLog().then(function (log) {
+      for (var i = log.length - 1; i >= 0; i--) {
+        if (log[i].messageId === obj.messageId) {
+          return;
+        }
+      }
+      log.push(obj);
+      if (log.length > maxLogMessages) {
+        log.splice(0, log.length - maxLogMessages);
+      }
+      storage.tab.set(chatStorageKey, log);
+    });
+  }
+
+  function loadChatLog() {
+    return storage.tab.get(chatStorageKey, []);
+  }
+
+  session.once("ui-ready", function () {
+    loadChatLog().then(function (log) {
+      if (! log) {
+        return;
+      }
+      for (var i = 0; i < log.length; i++) {
+        // peers should already be loaded from sessionStorage by the peers module
+        // maybe i should use a try catch block here
+        var currentPeer = peers.getPeer(log[i].peerId);
+        ui.chat.text({
+          text: log[i].text,
+          date: log[i].date,
+          peer: currentPeer,
+          messageId: log[i].messageId
+        });
+      }
+    });
+  });
+  //delete chat log
+  session.on("close", function(){
+    storage.tab.set(chatStorageKey, undefined);
+  });
+
   return chat;
 
 });
@@ -6523,7 +6650,7 @@ define('console',["util"], function (util) {
       // (and other pastebin sites aren't really Browser-accessible)
       return util.Deferred(function (def) {
         options = options || {};
-        var site = options.site || TogetherJS.getConfig("pasteSite") || "https://www.friendpaste.com/";
+        var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
         var req = new XMLHttpRequest();
         req.open("POST", site);
         req.setRequestHeader("Content-Type", "application/json");
@@ -7102,12 +7229,12 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
         return;
       }
 
-      var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      var cloneClicks = TogetherJS.getConfig("cloneClicks");
+      var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+      var cloneClicks = TogetherJS.config.get("cloneClicks");
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
-      if ((cloneClicks !== true && ! $(element).is(cloneClicks)) && (dontShowClicks === true || $(element).is(dontShowClicks))) {
+      if ((! util.matchElement(element, cloneClicks)) && util.matchElement(element, dontShowClicks)) {
         return;
       }
       var location = elementFinder.elementLocation(element);
@@ -7120,10 +7247,7 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
         offsetX: offsetX,
         offsetY: offsetY
       });
-      if (dontShowClicks === true) {
-        return;
-      }
-      if (dontShowClicks && $(element).is(dontShowClicks)) {
+      if (util.matchElement(element, dontShowClicks)) {
         return;
       }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
@@ -7147,15 +7271,12 @@ define('cursor',["jquery", "ui", "util", "session", "elementFinder", "tinycolor"
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
-    var cloneClicks = TogetherJS.getConfig("cloneClicks");
-    var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-    if (cloneClicks && target.is(cloneClicks)) {
+    var cloneClicks = TogetherJS.config.get("cloneClicks");
+    if (util.matchElement(target, cloneClicks)) {
       eventMaker.performClick(target);
     }
-    if (dontShowClicks === true) {
-      return;
-    }
-    if (dontShowClicks && $(target).is(dontShowClicks)) {
+    var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+    if (util.matchElement(target, dontShowClicks)) {
       return;
     }
     displayClick({top: top, left: left}, pos.peer.color);
@@ -8727,7 +8848,8 @@ define('startup',["util", "require", "jquery", "windowing", "storage"], function
         next();
         return;
       }
-      if (TogetherJS.getConfig("suppressJoinConfirmation")) {
+      TogetherJS.config.close("suppressJoinConfirmation");
+      if (TogetherJS.config.get("suppressJoinConfirmation")) {
         next();
         return;
       }
@@ -8762,8 +8884,9 @@ define('startup',["util", "require", "jquery", "windowing", "storage"], function
     },
 
     share: function (next) {
+      TogetherJS.config.close("suppressInvite");
       if (session.isClient || (! session.firstRun) ||
-          TogetherJS.getConfig("suppressInvite")) {
+          TogetherJS.config.get("suppressInvite")) {
         next();
         return;
       }
@@ -8960,7 +9083,10 @@ define('walkthrough',["util", "ui", "jquery", "windowing", "templates", "templat
         container.find(".togetherjs-if-creator").show();
         container.find(".togetherjs-ifnot-creator").remove();
       }
-      container.find(".togetherjs-site-name").text(session.siteName());
+      TogetherJS.config.track("siteName", function (value) {
+        value = value || document.title;
+        container.find(".togetherjs-site-name").text(value);
+      });
       ui.activateAvatarEdit(container, {
         onSave: function () {
           container.find("#togetherjs-avatar-when-saved").show();
@@ -9742,6 +9868,260 @@ define('who',["util", "channels", "session", "ui"], function (util, channels, se
   });
 
   return who;
+});
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http:// mozilla.org/MPL/2.0/. */
+
+define('youtubeVideos',["jquery", "util", "session", "elementFinder"],
+function ($, util, session, elementFinder) {
+
+  // constant var to indicate whether two players are too far apart in sync
+  var TOO_FAR_APART = 3000;
+  // embedded youtube iframes
+  var youTubeIframes = [];
+  // youtube API load delay
+  var API_LOADING_DELAY = 2000;
+
+  session.on("reinitialize", function () {
+    if (TogetherJS.config.get("youtube")) {
+      prepareYouTube();
+    }
+  });
+
+  TogetherJS.config.track("youtube", function (track, previous) {
+    if (track && ! previous) {
+      prepareYouTube();
+      // You can enable youtube dynamically, but can't turn it off:
+      TogetherJS.config.close("youtube");
+    }
+  });
+
+  function prepareYouTube() {
+    // setup iframes first
+    setupYouTubeIframes();
+
+    // this function should be global so it can be called when API is loaded
+    window.onYouTubeIframeAPIReady = function() {
+      // YouTube API is ready
+      $(youTubeIframes).each(function (i, iframe) {
+        var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
+          events: {
+            'onReady': insertPlayer,
+            'onStateChange': publishPlayerStateChange
+          }
+        });
+      });
+    };
+
+    if (window.YT === undefined) {
+      // load necessary API
+      // it calls onYouTubeIframeAPIReady automatically when the API finishes loading
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    } else {
+      // manually invoke APIReady function when the API was already loaded by user
+      onYouTubeIframeAPIReady();
+    }
+
+    // give each youtube iframe a unique id and set its enablejsapi param to true
+    function setupYouTubeIframes() {
+      var iframes = $('iframe');
+      iframes.each(function (i, iframe) {
+        // look for YouTube Iframes
+        // if the iframe's unique id is already set, skip it
+        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
+          $(iframe).attr("id", "youtube-player"+i);
+          $(iframe).attr("ensablejsapi", 1);
+          youTubeIframes[i] = iframe;
+        }
+      });
+    } // iframes are ready
+
+    function insertPlayer(event) {
+      // only when it is READY, attach a player to its iframe
+      var currentPlayer = event.target;
+      var currentIframe = currentPlayer.a;
+      // check if a player is already attached in case of being reinitialized
+      if (!$(currentIframe).data("togetherjs-player")) {
+        $(currentIframe).data("togetherjs-player", currentPlayer);
+        // initialize its dontPublish flag as well
+        $(currentIframe).data("dontPublish", false);
+        // store its current video's id
+        var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
+        $(currentIframe).data("currentVideoId", currentVideoId);
+      }
+    }
+  } // end of prepareYouTube
+
+  function publishPlayerStateChange(event) {
+    var currentPlayer = event.target;
+    var currentIframe = currentPlayer.a;
+    var currentTime = currentPlayer.getCurrentTime();
+    var iframeLocation = elementFinder.elementLocation(currentIframe);
+
+    if ($(currentPlayer).data("seek")) {
+      $(currentPlayer).removeData("seek");
+      return;
+    }
+
+    // do not publish if playerState was changed by other users
+    if ($(currentIframe).data("dontPublish")) {
+      // make it false again so it can start publishing events of its own state changes
+      $(currentIframe).data("dontPublish", false);
+      return;
+    }
+
+    // notify other people that I changed the player state
+    if (event.data == YT.PlayerState.PLAYING) {
+
+      var currentVideoId = isDifferentVideoLoaded(currentIframe);
+      if (currentVideoId) {
+        // notify that I just loaded another video
+        publishDifferentVideoLoaded(iframeLocation, currentVideoId);
+        // update current video id
+        $(currentIframe).data("currentVideoId", currentVideoId);
+      } else {
+        session.send({
+          type: "playerStateChange",
+          element: iframeLocation,
+          playerState: 1,
+          playerTime: currentTime
+        });
+      }
+    } else if (event.data == YT.PlayerState.PAUSED) {
+      session.send({
+        type: "playerStateChange",
+        element: iframeLocation,
+        playerState: 2,
+        playerTime: currentTime
+      });
+    } else {
+      // do nothing when the state is buffering, cued, or ended
+      return;
+    }
+  }
+
+  function publishDifferentVideoLoaded(iframeLocation, videoId) {
+    session.send({
+      type: "differentVideoLoaded",
+      videoId: videoId,
+      element: iframeLocation
+    });
+  }
+
+  session.hub.on('playerStateChange', function (msg) {
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
+    var currentTime = player.getCurrentTime();
+    var currentState = player.getPlayerState();
+
+    if (currentState != msg.playerState) {
+      $(iframe).data("dontPublish", true);
+    }
+
+    if (msg.playerState == 1) {
+      player.playVideo();
+      // seekTo() updates the video's time and plays it if it was already playing
+      // and pauses it if it was already paused
+      if (areTooFarApart(currentTime, msg.playerTime)) {
+        player.seekTo(msg.playerTime, true);
+      }
+    } else if (msg.playerState == 2) {
+      // When YouTube videos are advanced while playing,
+      // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause)
+      // FireFox: buffering -> play -> buffering -> play
+      // We must prevent advanced videos from going out of sync
+      player.pauseVideo();
+      if (areTooFarApart(currentTime, msg.playerTime)) {
+        // "seek" flag will help supress publishing unwanted state changes
+        $(player).data("seek", true);
+        player.seekTo(msg.playerTime, true);
+      }
+    }
+  });
+
+  // if a late user joins a channel, synchronize his videos
+  session.hub.on('hello', function () {
+    // wait a couple seconds to make sure the late user has finished loading API
+    setTimeout(synchronizeVideosOfLateGuest, API_LOADING_DELAY);
+  });
+
+  session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
+    // check if another video had been loaded to an existing iframe before I joined
+    var currentVideoId = $(iframe).data("currentVideoId");
+    if (msg.videoId != currentVideoId) {
+      $(iframe).data("currentVideoId", msg.videoId);
+      player.loadVideoById(msg.videoId, msg.playerTime, 'default');
+    } else {
+      // if the video is only cued, I do not have to do anything to sync
+      if (msg.playerState != 5) {
+        player.seekTo(msg.playerTime, true);
+      }
+    }
+  });
+
+  session.hub.on('differentVideoLoaded', function (msg) {
+    // load a new video if the host has loaded one
+    var iframe = elementFinder.findElement(msg.element);
+    var player = $(iframe).data("togetherjs-player");
+    player.loadVideoById(msg.videoId, 0, 'default');
+    $(iframe).data("currentVideoId", msg.videoId);
+
+  });
+
+  function synchronizeVideosOfLateGuest() {
+    youTubeIframes.forEach(function (iframe) {
+      var currentPlayer = $(iframe).data("togetherjs-player");
+      var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
+      var currentState = currentPlayer.getPlayerState();
+      var currentTime = currentPlayer.getCurrentTime();
+      var iframeLocation = elementFinder.elementLocation(iframe);
+      session.send({
+        type: "synchronizeVideosOfLateGuest",
+        element: iframeLocation,
+        videoId: currentVideoId,
+        playerState: currentState, //this might be necessary later
+        playerTime: currentTime
+      });
+    });
+  }
+
+  function isDifferentVideoLoaded(iframe) {
+    var lastVideoId = $(iframe).data("currentVideoId");
+    var currentPlayer = $(iframe).data("togetherjs-player");
+    var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
+
+    // since url forms of iframe src and player's video url are different,
+    // I have to compare the video ids
+    if (currentVideoId != lastVideoId) {
+      return currentVideoId;
+    } else {
+      return false;
+    }
+  }
+
+  // parses videoId from the url returned by getVideoUrl function
+  function getVideoIdFromUrl(videoUrl) {
+    var videoId = videoUrl.split('v=')[1];
+    //Chrome and Firefox have different positions for parameters
+    var ampersandIndex = videoId.indexOf('&');
+    if (ampersandIndex != -1) {
+      videoId = videoId.substring(0, ampersandIndex);
+    }
+    return videoId;
+  }
+
+  function areTooFarApart(myTime, theirTime) {
+    var secDiff = Math.abs(myTime - theirTime);
+    var milliDiff = secDiff * 1000;
+    return milliDiff > TOO_FAR_APART;
+  }
 });
 TogetherJS.require = TogetherJS._requireObject = require;
 TogetherJS._loaded = true;

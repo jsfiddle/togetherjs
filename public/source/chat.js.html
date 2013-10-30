@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -202,6 +204,7 @@
 <span class="comment">/*jshint evil:true */</span>
 define([<span class="string">"require"</span>, <span class="string">"jquery"</span>, <span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"ui"</span>, <span class="string">"templates"</span>, <span class="string">"playback"</span>, <span class="string">"storage"</span>, <span class="string">"peers"</span>, <span class="string">"windowing"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(require, $, util, session, ui, templates, playback, storage, peers, windowing)</span> {</span>
   <span class="keyword">var</span> chat = util.Module(<span class="string">"chat"</span>);
+  <span class="keyword">var</span> assert = util.assert;
   <span class="keyword">var</span> Walkabout;
 
   session.hub.on(<span class="string">"chat"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -222,6 +225,12 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
               
                 <div class="content"><div class='highlight'><pre>      messageId: msg.messageId,
       notify: <span class="literal">true</span>
+    });
+    saveChatMessage({
+      text: msg.text,
+      date: Date.now(),
+      peerId: msg.peer.id,
+      messageId: msg.messageId
     });
   });</pre></div></div>
               
@@ -264,6 +273,12 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
       peer: peers.Self,
       messageId: messageId,
       notify: <span class="literal">false</span>
+    });
+    saveChatMessage({
+      text: message,
+      date: Date.now(),
+      peerId: peers.Self.id,
+      messageId: messageId
     });
   };
 
@@ -554,7 +569,90 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
       });
     }
 
-  };
+  };</pre></div></div>
+              
+            </li>
+          
+            <li id="section-4">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>this section deal with saving/restoring chat history as long as session is alive</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> chatStorageKey = <span class="string">"chatlog"</span>;
+  <span class="keyword">var</span> maxLogMessages = <span class="number">100</span>;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">saveChatMessage</span><span class="params">(obj)</span> {</span>
+    assert(obj.peerId);
+    assert(obj.messageId);
+    assert(obj.date);
+    assert(<span class="keyword">typeof</span> obj.text == <span class="string">"string"</span>);
+
+    loadChatLog().then(<span class="function"><span class="keyword">function</span> <span class="params">(log)</span> {</span>
+      <span class="keyword">for</span> (<span class="keyword">var</span> i = log.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) {
+        <span class="keyword">if</span> (log[i].messageId === obj.messageId) {
+          <span class="keyword">return</span>;
+        }
+      }
+      log.push(obj);
+      <span class="keyword">if</span> (log.length &gt; maxLogMessages) {
+        log.splice(<span class="number">0</span>, log.length - maxLogMessages);
+      }
+      storage.tab.set(chatStorageKey, log);
+    });
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">loadChatLog</span><span class="params">()</span> {</span>
+    <span class="keyword">return</span> storage.tab.get(chatStorageKey, []);
+  }
+
+  session.once(<span class="string">"ui-ready"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    loadChatLog().then(<span class="function"><span class="keyword">function</span> <span class="params">(log)</span> {</span>
+      <span class="keyword">if</span> (! log) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; log.length; i++) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>peers should already be loaded from sessionStorage by the peers module
+maybe i should use a try catch block here</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> currentPeer = peers.getPeer(log[i].peerId);
+        ui.chat.text({
+          text: log[i].text,
+          date: log[i].date,
+          peer: currentPeer,
+          messageId: log[i].messageId
+        });
+      }
+    });
+  });</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>delete chat log</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  session.on(<span class="string">"close"</span>, <span class="keyword">function</span>(){
+    storage.tab.set(chatStorageKey, <span class="literal">undefined</span>);
+  });
 
   <span class="keyword">return</span> chat;
 

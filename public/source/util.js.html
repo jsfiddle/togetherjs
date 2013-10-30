@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -549,6 +551,20 @@ define([<span class="string">"jquery"</span>, <span class="string">"jqueryPlugin
       reader.readAsArrayBuffer(el.files[<span class="number">0</span>]);
     });
   };
+
+  util.matchElement = <span class="keyword">function</span>(el, selector) {
+    <span class="keyword">var</span> res = selector;
+    <span class="keyword">if</span> (selector === <span class="literal">true</span> || ! selector) {
+      <span class="keyword">return</span> !!selector;
+    }
+    <span class="keyword">try</span> {
+      <span class="keyword">return</span> $(el).is(selector);
+    } <span class="keyword">catch</span> (e) {
+      console.warn(<span class="string">"Bad selector:"</span>, selector, <span class="string">"error:"</span>, e);
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+    
+  }
 
   util.testExpose = <span class="function"><span class="keyword">function</span> <span class="params">(objs)</span> {</span>
     <span class="keyword">if</span> (<span class="keyword">typeof</span> TogetherJSTestSpy == <span class="string">"undefined"</span>) {

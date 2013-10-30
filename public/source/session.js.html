@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -318,11 +320,19 @@ for us to respect a URL change:</p>
   <span class="comment">/****************************************
    * URLs
    */</span>
-  <span class="keyword">var</span> includeHashInUrl = TogetherJS.getConfig(<span class="string">'includeHashInUrl'</span>);
+  <span class="keyword">var</span> includeHashInUrl = TogetherJS.config.get(<span class="string">"includeHashInUrl"</span>);
+  TogetherJS.config.close(<span class="string">"includeHashInUrl"</span>);
+  <span class="keyword">var</span> currentUrl = (location.href + <span class="string">""</span>).replace(<span class="regexp">/\#.*$/</span>, <span class="string">""</span>);
+  <span class="keyword">if</span> (includeHashInUrl) {
+    currentUrl = location.href;
+  }
+
   session.hubUrl = <span class="function"><span class="keyword">function</span> <span class="params">(id)</span> {</span>
     id = id || session.shareId;
     assert(id, <span class="string">"URL cannot be resolved before TogetherJS.shareId has been initialized"</span>);
-    <span class="keyword">return</span> TogetherJS.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/hub/"</span> + id;
+    TogetherJS.config.close(<span class="string">"hubBase"</span>);
+    <span class="keyword">var</span> hubBase = TogetherJS.config.get(<span class="string">"hubBase"</span>);
+    <span class="keyword">return</span> hubBase.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/hub/"</span> + id;
   };
 
   session.shareUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
@@ -342,7 +352,7 @@ for us to respect a URL change:</p>
   session.recordUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
     assert(session.shareId);
     <span class="keyword">var</span> url = TogetherJS.baseUrl.replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/togetherjs/recorder.html"</span>;
-    url += <span class="string">"#&amp;togetherjs="</span> + session.shareId + <span class="string">"&amp;hubBase="</span> + TogetherJS.getConfig(<span class="string">"hubBase"</span>);
+    url += <span class="string">"#&amp;togetherjs="</span> + session.shareId + <span class="string">"&amp;hubBase="</span> + TogetherJS.config.get(<span class="string">"hubBase"</span>);
     <span class="keyword">return</span> url;
   };
 
@@ -353,10 +363,6 @@ for us to respect a URL change:</p>
     } <span class="keyword">else</span> {
       <span class="keyword">return</span> location.href.replace(<span class="regexp">/#.*/</span>, <span class="string">""</span>);
     }
-  };
-
-  session.siteName = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">return</span> TogetherJS.getConfig(<span class="string">"siteName"</span>) || document.title;
   };
 
   <span class="comment">/****************************************
@@ -457,22 +463,6 @@ hello handlers:</p>
     };
     channel = c;
     session.router.bindChannel(channel);
-  }</pre></div></div>
-              
-            </li>
-          
-            <li id="section-13">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
-                </div>
-                <p>FIXME: once we start looking at window.history we need to update this:</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> currentUrl = (location.href + <span class="string">""</span>).replace(<span class="regexp">/\#.*$/</span>, <span class="string">""</span>);
-  <span class="keyword">if</span> (includeHashInUrl) {
-    currentUrl = location.href;
   }
 
   session.send = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
@@ -546,10 +536,10 @@ hello handlers:</p>
               
             </li>
           
-            <li id="section-14">
+            <li id="section-13">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
+                  <a class="pilcrow" href="#section-13">&#182;</a>
                 </div>
                 <p>FIXME: titles update, we should track those changes:</p>
 
@@ -571,10 +561,10 @@ hello handlers:</p>
               
             </li>
           
-            <li id="section-15">
+            <li id="section-14">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-15">&#182;</a>
+                  <a class="pilcrow" href="#section-14">&#182;</a>
                 </div>
                 <p>This is a chance for other modules to effect the hello message:</p>
 
@@ -589,10 +579,10 @@ hello handlers:</p>
               
             </li>
           
-            <li id="section-16">
+            <li id="section-15">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-16">&#182;</a>
+                  <a class="pilcrow" href="#section-15">&#182;</a>
                 </div>
                 <p>These are Javascript files that implement features, and so must
 be injected at runtime because they aren&#39;t pulled in naturally
@@ -601,10 +591,10 @@ ui must be the first item:</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> features = [<span class="string">"peers"</span>, <span class="string">"ui"</span>, <span class="string">"chat"</span>, <span class="string">"webrtc"</span>, <span class="string">"cursor"</span>, <span class="string">"startup"</span>,<span class="string">"videos"</span>, <span class="string">"forms"</span>, <span class="string">"visibilityApi"</span>];
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> features = [<span class="string">"peers"</span>, <span class="string">"ui"</span>, <span class="string">"chat"</span>, <span class="string">"webrtc"</span>, <span class="string">"cursor"</span>, <span class="string">"startup"</span>, <span class="string">"videos"</span>, <span class="string">"forms"</span>, <span class="string">"visibilityApi"</span>, <span class="string">"youtubeVideos"</span>];
 
   <span class="function"><span class="keyword">function</span> <span class="title">getRoomName</span><span class="params">(prefix, maxSize)</span> {</span>
-    <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/findroom"</span>;
+    <span class="keyword">var</span> findRoom = TogetherJS.config.get(<span class="string">"hubBase"</span>).replace(<span class="regexp">/\/*$/</span>, <span class="string">""</span>) + <span class="string">"/findroom"</span>;
     <span class="keyword">return</span> $.ajax({
       url: findRoom,
       dataType: <span class="string">"json"</span>,
@@ -629,10 +619,10 @@ ui must be the first item:</p>
               
             </li>
           
-            <li id="section-17">
+            <li id="section-16">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-17">&#182;</a>
+                  <a class="pilcrow" href="#section-16">&#182;</a>
                 </div>
                 <p>We don&#39;t actually have to wait for the set to succede, so
 long as session.identityId is set</p>
@@ -659,10 +649,10 @@ long as session.identityId is set</p>
               
             </li>
           
-            <li id="section-18">
+            <li id="section-17">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-18">&#182;</a>
+                  <a class="pilcrow" href="#section-17">&#182;</a>
                 </div>
                 <p>Like, below, this <em>also</em> means we got the shareId from the hash
 (in togetherjs.js):</p>
@@ -676,10 +666,10 @@ long as session.identityId is set</p>
               
             </li>
           
-            <li id="section-19">
+            <li id="section-18">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-19">&#182;</a>
+                  <a class="pilcrow" href="#section-18">&#182;</a>
                 </div>
                 <p>FIXME: I&#39;m not sure if this will ever happen, because togetherjs.js should
 handle it</p>
@@ -695,7 +685,8 @@ handle it</p>
         }
       }
       <span class="keyword">return</span> storage.tab.get(<span class="string">"status"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(saved)</span> {</span>
-        <span class="keyword">var</span> findRoom = TogetherJS.getConfig(<span class="string">"findRoom"</span>);
+        <span class="keyword">var</span> findRoom = TogetherJS.config.get(<span class="string">"findRoom"</span>);
+        TogetherJS.config.close(<span class="string">"findRoom"</span>);
         <span class="keyword">if</span> (findRoom &amp;&amp; saved) {
           console.info(<span class="string">"Ignoring findRoom in lieu of continued session"</span>);
         } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; TogetherJS.startup._joinShareId) {
@@ -717,10 +708,10 @@ handle it</p>
               
             </li>
           
-            <li id="section-20">
+            <li id="section-19">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-20">&#182;</a>
+                  <a class="pilcrow" href="#section-19">&#182;</a>
                 </div>
                 <p>FIXME: duplicates code below:</p>
 
@@ -758,10 +749,10 @@ handle it</p>
               
             </li>
           
-            <li id="section-21">
+            <li id="section-20">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-21">&#182;</a>
+                  <a class="pilcrow" href="#section-20">&#182;</a>
                 </div>
                 <p>The only case when we don&#39;t need to set the storage status again is when
 we&#39;re already set to be running</p>
@@ -820,7 +811,8 @@ we&#39;re already set to be running</p>
                 startup.start();
               });
               ui.activateUI();
-              <span class="keyword">if</span> (TogetherJS.getConfig(<span class="string">"enableAnalytics"</span>)) {
+              TogetherJS.config.close(<span class="string">"enableAnalytics"</span>);
+              <span class="keyword">if</span> (TogetherJS.config.get(<span class="string">"enableAnalytics"</span>)) {
                 require([<span class="string">"analytics"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(analytics)</span> {</span>
                   analytics.activate();
                 });
@@ -880,10 +872,10 @@ we&#39;re already set to be running</p>
               
             </li>
           
-            <li id="section-22">
+            <li id="section-21">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-22">&#182;</a>
+                  <a class="pilcrow" href="#section-21">&#182;</a>
                 </div>
                 <p>needed because when message arives from peer this variable will be checked to
 decide weather to show actions or not</p>

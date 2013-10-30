@@ -173,6 +173,8 @@
             
               <li><a href="windowing.js.html">windowing</a></li>
             
+              <li><a href="youtubeVideos.js.html">youtubeVideos</a></li>
+            
           </ul>
         </div>
       </div>
@@ -501,7 +503,7 @@ it as a debugging tool; also line numbers would be preserved</p>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">return</span> util.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
         options = options || {};
-        <span class="keyword">var</span> site = options.site || TogetherJS.getConfig(<span class="string">"pasteSite"</span>) || <span class="string">"https://www.friendpaste.com/"</span>;
+        <span class="keyword">var</span> site = options.site || TogetherJS.config.get(<span class="string">"pasteSite"</span>) || <span class="string">"https://www.friendpaste.com/"</span>;
         <span class="keyword">var</span> req = <span class="keyword">new</span> XMLHttpRequest();
         req.open(<span class="string">"POST"</span>, site);
         req.setRequestHeader(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>);

@@ -203,7 +203,7 @@ var TogetherJSConfig_something = "foo";
 <p><code>TogetherJSConfig_dontShowClicks</code>:
     This should be set to a jQuery selector or set to true. This will disable the visual click display indicating that a user has clicked on the defined element. For example: “canvas”, “h1”, “p”, etc.  Setting <code>TogetherJSConfig_dontShowClicks = true</code> will globally disable all clicks.</p>
 <p><code>TogetherJSConfig_cloneClicks</code>:
-    This should be set to a jQuery selector.  Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else‘s browser.  This is useful for cases when a click typically doesn’t <em>do</em> anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use <code>TogetherJSConfig_cloneClicks = &quot;.tab&quot;</code></p>
+    This should be set to a jQuery selector or set to true. Whenever someone clicks on an element matching this selector, that click will be repeated (as an actual click) on everyone else‘s browser.  This is useful for cases when a click typically doesn’t <em>do</em> anything, but shows or hides or switches the view of the page.  Note that any control that toggles will definitely not work here!  If you have tab buttons that show different things you might use <code>TogetherJSConfig_cloneClicks = &quot;.tab&quot;</code>. Setting <code>TogetherJSConfig_cloneClicks = true</code> will globally clone clicks.</p>
 <p><code>TogetherJSConfig_enableShortcut</code>:
     If you want to try TogetherJS out on an application, but don&#39;t want to put up a “Start TogetherJS” button, you can use <code>TogetherJSConfig_enableShortcut = true</code> and then an event handler will be put into place that will start TogetherJS when you hit <strong>alt-T alt-T</strong> (twice in a row!).  TogetherJS will still automatically start when someone opens an invitation link.</p>
 <p><code>TogetherJSConfig_useMinimizedCode</code>:
@@ -403,7 +403,7 @@ TogetherJS.reinitialize();</code></pre>
 <p>We need your help!  If you&#39;re itching to help out, it would be great if you take on one of these Internet Explorer bugs <a href="https://github.com/mozilla/togetherjs/issues?labels=IE&amp;milestone=&amp;page=1&amp;state=open">here</a>!</p>
 <h2 id="hosting-the-hub-server">Hosting the Hub Server</h2>
 <p>We have a server at <code>https://hub.togetherjs.com</code> which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven&#39;t really “finished” the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.</p>
-<p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code> - use <code>node hub/server.js --help</code> to see the available options.  You will need to <code>npm install websocket</code> to get the websocket library installed.</p>
+<p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code> - use <code>node hub/server.js --help</code> to see the available options.  You will need to <code>npm install websocket optimist</code> to get the websocket library and option library installed.</p>
 <p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t it setup in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy.  <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
 <p>If you want to change the port or interface the server binds to, simply run <code>node hub/server.js -h</code> and it will show the command-line options as well as environmental variables.</p>
 <p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
@@ -416,6 +416,16 @@ TogetherJS.reinitialize();</code></pre>
 <p>A simple way to install is simply to <a href="https://togetherjs.com/togetherjs.xpi">click this link</a> in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.</p>
 <h3 id="building">Building</h3>
 <p>You can build the addon using the <a href="https://addons.mozilla.org/en-US/developers/builder">Addon-SDK</a>. Once you&#39;ve installed the SDK, go into the <code>addon/</code> directory and run <code>cfx xpi</code> to create an XPI (packaged addon file) or <code>cfx run</code> to start up Firefox with the addon installed (for development).</p>
+<h2 id="deploying-the-hub-server-to-heroku">Deploying the hub server to Heroku</h2>
+<p>You need a Heroku account. If you don&#39;t have one, their <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs">Node.js getting started guide</a> is a good place to start.</p>
+<p>What‘s about to happen: we clone the repo and create a new Heroku app within it. We need to set the HOST environment variable to get the app to bind to 0.0.0.0 instead of 127.0.0.1. It’ll pick up the PORT variable automatically. We also need to enable WebSockets for the app. Then, push the code and we should be good to go!</p>
+<pre><code><span class="title">git</span> clone git@github.com:mozilla/togetherjs.git
+<span class="title">cd</span> togetherjs
+<span class="title">heroku</span> create
+<span class="title">heroku</span> config:add <span class="type">HOST</span>=<span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span>
+<span class="title">heroku</span> labs:enable websockets 
+<span class="title">git</span> push heroku master</code></pre>
+<p>Make note of the app name after running <code>heroku create</code> You can check that everything is running by going to <a href="http://your-app-name-here.herokuapp.com/status">http://your-app-name-here.herokuapp.com/status</a></p>
 <h2 id="getting-help">Getting Help</h2>
 <h3 id="irc--live-chat">IRC / Live Chat</h3>
 <p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code>.  Logs are on <a href="http://irclog.gr/#browse/irc.mozilla.org/togetherjs">irclog.gr</a></p>
