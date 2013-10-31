@@ -85,7 +85,7 @@ var TogetherJSConfig_something = "foo";
 <script src="https://togetherjs.com/togetherjs-min.js"></script>
 ```
 
-The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.config("variable", value)`
+The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.config("variable", value)`.  Some variables cannot be updated after TogetherJS has started, but if this is the case then you should get an error.
 
 ### The Configuration
 
@@ -130,6 +130,9 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 
 `TogetherJSConfig_disableWebRTC`:
     Disables/removes the button to do audio chat via WebRTC.
+
+`TogetherJSConfig_youtube`:
+    If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.
 
 There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
@@ -462,7 +465,7 @@ What's about to happen: we clone the repo and create a new Heroku app within it.
 	cd togetherjs
 	heroku create
 	heroku config:add HOST=0.0.0.0
-	heroku labs:enable websockets 
+	heroku labs:enable websockets
 	git push heroku master
 
 Make note of the app name after running `heroku create` You can check that everything is running by going to http://your-app-name-here.herokuapp.com/status
