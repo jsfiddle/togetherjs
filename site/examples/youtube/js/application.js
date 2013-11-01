@@ -1,12 +1,14 @@
 $(function () {
   $('.embed-submit-button').click(function() {
-    var newVideoId = $('input#youtube-embed').val();
-    var newEmbedLink = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + newVideoId + '" frameborder="0" allowfullscreen>'
-    console.log(newVideoId);
-    $('iframe').replaceWith(newEmbedLink);
+    // FIXME: uncaught exception: [CannotFind #video-id-input(:nth-child(1)): container only has 0 elements in #video-id-input]
+    // I am not sure where this exception is generated. Maybe it is caused by togetherJS?
+    var newVideoId = $('video-id-input').val();
+    var newSrc = '//www.youtube.com/embed/' + newVideoId;
+    var youTubeIframe = $('iframe')[0];
+    $(youTubeIframe).attr("src", newSrc);
     TogetherJS.reinitialize();
   });
-  $('input#youtube-embed').keypress(function(event) {
+  $('video-id-input').keypress(function(event) {
     if (event.keyCode == 13)
       $('.embed-submit-button').click();
   });
