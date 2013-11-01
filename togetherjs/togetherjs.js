@@ -152,11 +152,15 @@
         baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
+      } else if (src && src.search(/togetherjs-min.js(\?.*)?$/) !== -1) { 
+        baseUrl = src.replace(/\/*togetherjs-min.js(\?.*)?$/, "");
+        console.warn("Detected baseUrl as", baseUrl);
+        break;
       }
     }
   }
   if (! baseUrl) {
-    console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js)");
+    console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
   }
 
   function addStyle() {
