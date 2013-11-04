@@ -111,7 +111,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     Typically if you use `togetherjs.js` you'll get the unminimized and uncombined code, with each module loaded lazily.  If you use `togetherjs-min.js` you get the combined code.  But if you want to override that more dynamically, you can use this setting.
 
 `TogetherJSConfig_findRoom`:
-    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users"`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}`
+    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: `TogetherJSConfig_findRoom = "my_site_com_users"`.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): `TogetherJSConfig_findRoom = {prefix: "my_site_com_users", max: 5}` **Note:** if you change this setting, test in a *new tab* (old browser tabs carry session information that will confuse you).
 
 `TogetherJSConfig_autoStart`:
     If true then start TogetherJS automatically.  Note TogetherJS already starts automatically when a session is continued, so if you just always call `TogetherJS()` then you might cause TogetherJS to stop.  Note you must set this as `TogetherJSConfig_autoStart = true`, not using `TogetherJS.config("autoStart", true)` (it must be set when TogetherJS loads).  Anyone who autostarts a session will not be considered the session creator.
@@ -429,7 +429,7 @@ We have a server at `https://hub.togetherjs.com` which you are welcome to use fo
 
 The server is located in `hub/server.js`, and is a simple Node.js application.  You can run this like `node hub/server.js` - use `node hub/server.js --help` to see the available options.  You will need to `npm install websocket optimist` to get the websocket library and option library installed.
 
-If you want to use TogetherJS on an https site you must host the hub on https.  We don't it setup in `server.js` for Node to do SSL directly, so we recommend a proxy.  [stunnel](https://www.stunnel.org/) is an example of the kind of proxy you'd want – not all proxies support websockets.
+If you want to use TogetherJS on an https site you must host the hub on https.  We don't it setup in `server.js` for Node to do SSL directly, so we recommend a proxy. [stunnel](https://www.stunnel.org/) is an example of the kind of proxy you'd want – not all proxies support websockets.
 
 If you want to change the port or interface the server binds to, simply run `node hub/server.js -h` and it will show the command-line options as well as environmental variables.
 
@@ -475,7 +475,7 @@ Make note of the app name after running `heroku create` You can check that every
 
 ### IRC / Live Chat
 
-We are available on the `#togetherjs` channel on `irc.mozilla.org`.  Logs are on [irclog.gr](http://irclog.gr/#browse/irc.mozilla.org/togetherjs)
+We are available on the `#togetherjs` channel on `irc.mozilla.org`. Logs are on [irclog.gr](http://irclog.gr/#browse/irc.mozilla.org/togetherjs)
 
 If you don't use IRC, you can quickly join the chat from the web [using kiwiirc](https://kiwiirc.com/client/irc.mozilla.org/togetherjs).
 
