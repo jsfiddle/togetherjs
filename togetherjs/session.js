@@ -232,7 +232,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos", "tinymce"];
 
   function getRoomName(prefix, maxSize) {
     var findRoom = TogetherJS.config.get("hubBase").replace(/\/*$/, "") + "/findroom";

@@ -28,5 +28,6 @@
   "webrtc": "Handles live audio chat.",
   "who": "Lets clients peek into rooms and invite people from those rooms without joining the room",
   "windowing": "Handles the creation of different windows, notifications, and modal windows.",
-  "youtubeVideos": "Support for the YouTube video sync feature"
+  "youtubeVideos": "Support for the YouTube video sync feature",
+  "tinymce": "Support for tinymce sync feature"
 }
