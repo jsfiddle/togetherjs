@@ -225,9 +225,9 @@ module.exports = function (grunt) {
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || ""; // env.var for git
       var subs = {
-        __interface_html__: grunt.file.read("togetherjs/interface.html"),     // transfuse the content of interface into var
-        __help_txt__: grunt.file.read("togetherjs/help.txt"),                 // transfuse the content of help.txt into var
-        __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"), // transfuse the content of walkthrough into var
+        __interface_html__: grunt.file.read("togetherjs/interface.html"),
+        __help_txt__: grunt.file.read("togetherjs/help.txt"), 
+        __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
         __gitCommit__: gitCommit

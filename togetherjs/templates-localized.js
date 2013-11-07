@@ -7,5 +7,6 @@ define([], function (util) {
     "interface": "__interface_html__",
     help: "__help_txt__",
     walkthrough: "__walkthrough_html__"
+    //, defaultNicknames: 
   };
 });

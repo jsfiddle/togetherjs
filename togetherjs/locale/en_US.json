@@ -1,8 +1,8 @@
 {
   "Move the dock": "Move the dock",
-  "this is you": "this is you",
+  "This is you": "This is you",
   "Add a friend": "Add a friend",
-  "turn on microphone": "turn on microphone",
+  "Turn on microphone": "Turn on microphone",
   "Chat": "Chat",
   "Update avatar": "Update avatar",
   "Cancel": "Cancel",
@@ -36,12 +36,12 @@
   "has gone to:": "has gone to:",
   "Nudge them": "Nudge them",
   "Join them": "Join them", 
-  "type your message here": "type your message here",
+  "Type your message here": "Type your message here",
   "Audio Chat": "Audio Chat",
   "Activate your <strong>browser microphone</strong> near your URL bar above.": "Activate your <strong>browser microphone</strong> near your URL bar above.",
-  "talking on your microphone through your web browser is an experimental feature.": "talking on your microphone through your web browser is an experimental feature.",
-  "read more about Audio Chat": "read more about Audio Chat",
-  "don't show again.": "don't show again.",
+  "Talking on your microphone through your web browser is an experimental feature.": "Talking on your microphone through your web browser is an experimental feature.",
+  "Read more about Audio Chat": "Read more about Audio Chat",
+  "Don't show again.": "Don't show again.",
   "Close": "Close",
   "Audio Chat": "Audio Chat",
   "Audio chat requires you to use a <a href='https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC' target='_blank'>newer browser</a>!": "Audio chat requires you to use a <a href='https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC' target='_blank'>newer browser</a>!",
@@ -96,9 +96,10 @@
   "you": "you",
   "to": "to",
   "here": "here",
+  "No one else is here.": "No one else is here.",
 
   "You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!": "You're using <span class=\"togetherjs-tool-name\">TogetherJS</span>!",
-  "TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong>": "TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class=\"togetherjs-site-name\">[site name]</strong>",
+  "TOOL_NAME is a service for your website that makes it easy to collaborate in real-time on: ": "TOOL_NAME is a service for your website that makes it easy to collaborate in real-time on: ",
   "Enter your name": "Enter your name", 
   "Saved!": "Saved!",
   "Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.": "Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.",
@@ -125,6 +126,9 @@
   "set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.": "set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.",
   "override some TogetherJS configuration parameters": "override some TogetherJS configuration parameters",
   "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.": "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.",
-  "remove all overridden configuration": "remove all overridden configuration"
+  "remove all overridden configuration": "remove all overridden configuration",
+  "default_nickname": "Friendly Fox, Brilliant Beaver, Observant Owl, Gregarious Giraffe, Wild Wolf, Silent Seal, Wacky Whale, Curious Cat, Intelligent Iguana"
+
+
 
 }

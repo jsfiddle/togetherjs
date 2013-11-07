@@ -98,7 +98,7 @@
         <ul>
           <li id="togetherjs-participant-item">
             <img class="togetherjs-person togetherjs-person-small" src="http://localhost:8080/togetherjs/images/btn-menu-change-avatar.png">
-            <span class="tj-name togetherjs-person-name">{{ gettext('Useronewith alongname') }}</span>
+            <span class="tj-name togetherjs-person-name">NAME</span>
             <span class="tj-status">&#9679;</span>
             <p class="tj-urllocation">{{ gettext('Currently at:') }} <a class="togetherjs-person-url togetherjs-person-url-title" href="">http://www.location.comwww.location.comwww.location.comasdfsafd</a></p>
             <p class="tj-follow">{{ gettext('Follow:') }}
@@ -180,7 +180,7 @@
       <!-- Template for one message: -->
       <div id="togetherjs-template-chat-message" class="togetherjs-chat-item togetherjs-chat-message">
         <div class="togetherjs-person"></div>
-        <div class="togetherjs-timestamp"><span class="togetherjs-time">{{ gettext('HH:MM') }}</span> <span class="togetherjs-ampm">{{ gettext('AM/PM') }}</span></div>
+        <div class="togetherjs-timestamp"><span class="togetherjs-time">HH:MM</span> <span class="togetherjs-ampm">AM/PM</span></div>
         <div class="togetherjs-person-name-abbrev"></div>
         <div class="togetherjs-chat-content togetherjs-sub-content"></div>
       </div>
@@ -319,8 +319,8 @@
   <div id="togetherjs-menu" class="togetherjs-menu" style="display: none">
     <div class="togetherjs-menu-item togetherjs-menu-disabled" id="togetherjs-menu-profile">
       <img id="togetherjs-menu-avatar">
-      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display" data-toggles="#togetherjs-menu .togetherjs-self-name"></span>
-      <input class="togetherjs-self-name" type="text" data-toggles="#togetherjs-self-name-display" style="display: none" placeholder="Enter your name">
+      <span class="togetherjs-person-name-self" id="togetherjs-self-name-display" data-toggles="#togetherjs-menu .togetherjs-self-name">[nickname]</span>
+      <input class="togetherjs-self-name" type="text" data-toggles="#togetherjs-self-name-display" style="display: none" placeholder="{{ gettext("Enter your name") }}">
     </div>
     <div class="togetherjs-menu-hr-avatar"></div>
     <div class="togetherjs-menu-item" id="togetherjs-menu-update-name"><img src="http://localhost:8080/togetherjs/images/button-pencil.png" alt=""> {{ gettext('Update your name') }}</div>
@@ -361,9 +361,9 @@
     <div class="togetherjs-menu-item" id="togetherjs-menu-update-color-button"><span class="togetherjs-person-bgcolor-self"></span> {{ gettext('Pick profile color') }}</div>
     <div class="togetherjs-hr"></div>
     <div class="togetherjs-menu-item" id="togetherjs-menu-help-button">{{ gettext('Help') }}</div>
-    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback-button">{{ ('Feedback') }}</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-feedback-button">{{ gettext('Feedback') }}</div>
     <div class="togetherjs-hr"></div>
-    <div class="togetherjs-menu-item" id="togetherjs-menu-end-button"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> {{ gettext('End <span class="togetherjs-tool-name">TogetherJS</span>') }}</div>
+    <div class="togetherjs-menu-item" id="togetherjs-menu-end-button"><img src="http://localhost:8080/togetherjs/images/button-end-session.png" alt=""> {{ gettext('End TOOL_NAME') }}</div>
     </section>
     <section class="togetherjs-buttons">
       <button class="togetherjs-dismiss togetherjs-primary">{{ gettext('OK') }}</button>
@@ -398,9 +398,9 @@
 
   <!-- The intro screen for someone who joins a session the first time: -->
   <div id="togetherjs-intro" class="togetherjs-modal" style="display: none">
-    <header>{{ gettext('Join <span class=\'togetherjs-tool-name\'>TogetherJS</span> session?') }}</header>
+    <header>{{ gettext('Join TOOL_NAME session?') }}</header>
     <section>
-      <p>{{('Your friend has asked you to join their <a href=\'https://togetherjs.mozillalabs.com/\' target=\'_blank\'><span class=\'togetherjs-tool-name\'>TogetherJS</span></a> browser session to collaborate in real-time!')}}</p>
+      <p>{{('Your friend has asked you to join their <a href=\'https://togetherjs.com/\' target=\'_blank\'>TOOL_NAME</a> browser session to collaborate in real-time!')}}</p>
 
       <p>{{ gettext('Would you like to join their session?') }}</p>
     </section>
@@ -417,7 +417,7 @@
 
     <section>
       <p>
-        {{ gettext('We\'re sorry, <span class=\'togetherjs-tool-name\'>TogetherJS</span> doesn`t work with this browser.  Please <a href=\'https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers\'>upgrade to a supported browser</a> to try <span class=\'togetherjs-tool-name\'>TogetherJS</span>.') }}
+        {{ gettext('We\'re sorry, TOOL_NAME doesn\'t work with this browser.  Please <a href=\'https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers\'>upgrade to a supported browser</a> to try TOOL_NAME.') }}
       </p>
 
       <p id="togetherjs-browser-broken-is-ie" style="display: none">
@@ -427,7 +427,7 @@
     </section>
 
     <section class="togetherjs-buttons">
-      <button class="togetherjs-dismiss togetherjs-primary">{{ gettext('End <span class=\'togetherjs-tool-name\'>TogetherJS</span>') }}</button>
+      <button class="togetherjs-dismiss togetherjs-primary">{{ gettext('End TOOL_NAME') }}</button>
     </section>
 
   </div>

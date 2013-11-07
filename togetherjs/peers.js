@@ -26,7 +26,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     "Curious Cat",
     "Intelligent Iguana"
   ];
-// console.log('DEFAULT_NICKNAMES .......... ', DEFAULT_NICKNAMES);
+
   var Peer = util.Class({
 
     isSelf: false,
