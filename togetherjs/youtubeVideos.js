@@ -18,6 +18,19 @@ function ($, util, session, elementFinder) {
     }
   });
 
+  session.on("close", function () {
+    $(youTubeIframes).each(function (i, iframe) {
+      // detach players from iframes
+      $(iframe).removeData("togetherjs-player");
+      $(iframe).removeData("dontPublish");
+      $(iframe).removeData("currentVideoId");
+      // disable iframeAPI
+      $(iframe).removeAttr("enablejsapi");
+      // remove unique youtube iframe indicators
+      $(iframe).removeAttr("id");
+    });
+  });
+
   TogetherJS.config.track("youtube", function (track, previous) {
     if (track && ! previous) {
       prepareYouTube();
