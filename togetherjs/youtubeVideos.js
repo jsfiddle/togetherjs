@@ -27,7 +27,12 @@ function ($, util, session, elementFinder) {
       // disable iframeAPI
       $(iframe).removeAttr("enablejsapi");
       // remove unique youtube iframe indicators
-      $(iframe).removeAttr("id");
+      var id = $(iframe).attr("id");
+      if (id.indexOf("youtube-player") === 0) {
+        // An id we added
+        $(iframe).removeAttr("id");
+      }
+      youTubeIframes = [];
     });
   });
 
