@@ -39,7 +39,7 @@ function ($, util, session, elementFinder, ot) {
   function setEventListeners(editors) {
     $(editors).each(function (i, editor) {
       // record what the user is typing
-      editor.on("keypress", function (event) {
+      editor.on("input keyup cut paste", function (event) {
         var content = editor.getContent();
         publishContent(editor, content);
       });
@@ -91,7 +91,7 @@ function ($, util, session, elementFinder, ot) {
   // get rid of event listeners upon closing togetherjs
   session.on("close", function () {
     var editors = tinymce.editors;
-    editors.off("keypress");
+    editors.off("input keyup cut paste");
     editors.off("change");
   });
 }); // END OF MODULE
