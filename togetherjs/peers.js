@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "session", "storage", "require"], function (util, session, storage, require) {
+define(["util", "session", "storage", "require", "templates"], function (util, session, storage, require, templates) {
   var peers = util.Module("peers");
   var assert = util.assert;
   var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle
@@ -14,7 +14,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   require(["ui"], function (uiModule) {
     ui = uiModule;
   });
-
+/*
   var DEFAULT_NICKNAMES = [
     "Friendly Fox",
     "Brilliant Beaver",
@@ -26,7 +26,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     "Curious Cat",
     "Intelligent Iguana"
   ];
-
+*/
+  DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
+console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
   var Peer = util.Class({
 
     isSelf: false,
@@ -39,7 +41,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       this.identityId = attrs.identityId || null;
       this.status = attrs.status || "live";
       this.idle = attrs.status || "active";
-      this.name = attrs.name || null;
+      this.name = attrs.name || null;console.log('this.name .......... '+ this.name); // <<<<<<<<<<<<<<<<<<<<<<
       this.avatar = attrs.avatar || null;
       this.color = attrs.color || "#00FF00";
       this.view = ui.PeerView(this);
@@ -264,7 +266,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
       loaded: false,
       isCreator: ! session.isClient,
 
-      update: function (attrs) {
+      update: function (attrs) { console.log('attrs .......... ', attrs);// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         var updatePeers = false;
         var updateIdle = false;
         var updateMsg = {type: "peer-update"};
@@ -292,9 +294,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
             storage.settings.set("color", this.color);
             updatePeers = true;
           }
-        }
+        } console.log('attrs.defaultName .......... '+ attrs.defaultName); // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         if (attrs.defaultName && attrs.defaultName != this.defaultName) {
-          this.defaultName = attrs.defaultName;
+          this.defaultName = attrs.defaultName; console.log('this.defaultName .......... '+ this.defaultName);
           if (! attrs.fromLoad) {
             storage.settings.set("defaultName", this.defaultName);
             updatePeers = true;
@@ -323,7 +325,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
       className: function (prefix) {
         prefix = prefix || "";
-        return prefix + "self";
+        return prefix + "self"; 
       },
 
       _loadFromSettings: function () {
@@ -333,8 +335,8 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           storage.settings.get("defaultName"),
           storage.settings.get("color")).then((function (name, avatar, defaultName, color) {
             if (! defaultName) {
-              defaultName = util.pickRandom(DEFAULT_NICKNAMES);
-              //defaultName = localized.get(defaultName);
+              defaultName = util.pickRandom(DEFAULT_NICKNAMES); // 120
+
               storage.settings.set("defaultName", defaultName);
             }
             if (! color) {

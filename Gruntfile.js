@@ -277,24 +277,25 @@ module.exports = function (grunt) {
       console.log("expanded", grunt.file.expand("togetherjs/locale/*.json"));
 
       grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
-        var templates = grunt.file.read("togetherjs/templates-localized.js");
-        var lang = path.basename(langFilename).replace(/\.json/, "");
-        var translation = JSON.parse(grunt.file.read(langFilename));
-        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
-
-        var translatedInterface = translateFile("togetherjs/interface.html", translation);
+        var templates = grunt.file.read("togetherjs/templates-localized.js"); // 10
+        var lang = path.basename(langFilename).replace(/\.json/, ""); // 20
+        var translation = JSON.parse(grunt.file.read(langFilename)); // 30
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js"); // 40
+        //45
+        var translatedInterface = translateFile("togetherjs/interface.html", translation); // 50
         var translatedHelp = translateFile("togetherjs/help.txt", translation);
         var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
 
-        var vars = subs;
-
+        var vars = subs; // 60
+        // 70
         subs.__interface_html__ = translatedInterface;
         subs.__help_txt__ = translatedHelp;
         subs.__walkthrough_html__ = translatedWalkthrough;
+        subs.__names__ = translation.names; // 110
+//grunt.log.write("\n----- subs.__names__ -----\n ", subs.__names__, "\n----- end subs.__names__ -----\n");
+        templates = substituteContent(templates, subs); // 80
 
-        templates = substituteContent(templates, subs);
-
-        grunt.file.write(dest, templates);
+        grunt.file.write(dest, templates); // 90
         grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
       });
 
@@ -302,6 +303,7 @@ module.exports = function (grunt) {
     }
   );
 
+      
   function translateFile(source, translation) {
     var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("./"));
     var tmpl = env.getTemplate(source);

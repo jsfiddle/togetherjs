@@ -221,7 +221,7 @@
     var lang = TogetherJS.getConfig("lang");
     var availableTranslations = {
       en_US: true,
-      ru_RU: true
+      ru: true
     }
     if (! lang) {
       lang = navigator.language.replace(/-/g, "_");

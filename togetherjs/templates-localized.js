@@ -6,7 +6,7 @@ define([], function (util) {
   return {
     "interface": "__interface_html__",
     help: "__help_txt__",
-    walkthrough: "__walkthrough_html__"
-    //, defaultNicknames: 
+    walkthrough: "__walkthrough_html__",
+    names: "__names__"
   };
 });

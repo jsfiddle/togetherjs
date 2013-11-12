@@ -14,7 +14,7 @@ define(["util", "require"], function (util, require) {
     return t;
   }
 
-  var lang = TogetherJS.getConfig("lang") || "en_US";
+  var lang = TogetherJS.getConfig("lang") || "en-US";
   var moduleName = "./templates-" + lang;
   var templatesLang;
   console.warn("loading lang", lang, "template name", moduleName, TogetherJS.getConfig("lang"));

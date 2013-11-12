@@ -127,8 +127,6 @@
   "override some TogetherJS configuration parameters": "пересилить some TogetherJS configuration parameters",
   "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.": "назначить TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.",
   "remove all overridden configuration": "удалить all overridden configuration",
-  "default_nickname": "Friendly Fox, Brilliant Beaver, Observant Owl, Gregarious Giraffe, Wild Wolf, Silent Seal, Wacky Whale, Curious Cat, Intelligent Iguana"
 
-
-
+  "names": "Лысый Лис, Большой Бобёр, Умная Сова, Жирный Жираф, Серый Волк, Толстый Тюлень, Рыба-кит, Кисьян Котяра, Известная Игуана"
 }

@@ -127,8 +127,6 @@
   "override some TogetherJS configuration parameters": "override some TogetherJS configuration parameters",
   "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.": "set TogetherJS.config(\"VAR\", VALUE).  VALUE must be a legal Javascript/JSON literal.",
   "remove all overridden configuration": "remove all overridden configuration",
-  "default_nickname": "Friendly Fox, Brilliant Beaver, Observant Owl, Gregarious Giraffe, Wild Wolf, Silent Seal, Wacky Whale, Curious Cat, Intelligent Iguana"
-
-
-
+  
+  "names": "Friendly Fox, Brilliant Beaver, Observant Owl, Gregarious Giraffe, Wild Wolf, Silent Seal, Wacky Whale, Curious Cat, Intelligent Iguana"
 }
