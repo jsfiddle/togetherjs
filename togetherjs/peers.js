@@ -27,7 +27,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
     "Intelligent Iguana"
   ];
 */
-  DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
+  var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
 console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
   var Peer = util.Class({
 
@@ -325,7 +325,7 @@ console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
 
       className: function (prefix) {
         prefix = prefix || "";
-        return prefix + "self"; 
+        return prefix + "self";
       },
 
       _loadFromSettings: function () {
