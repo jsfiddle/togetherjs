@@ -12,6 +12,7 @@ var Test = {};
 Test.require = function () {
   var done = false;
   var modules = Array.prototype.slice.call(arguments);
+  modules.splice(0, 0, "templates-" + (TogetherJS.getConfig("lang") || "en-US"));
 
   function loadModules() {
     if (! modules.length) {
