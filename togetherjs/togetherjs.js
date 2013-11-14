@@ -222,15 +222,18 @@
     var availableTranslations = {
       en_US: true,
       ru: true
-    }
+    };
     if (! lang) {
       lang = navigator.language.replace(/-/g, "_");
       if (! availableTranslations[lang]) {
         lang = TogetherJS.getConfig("fallbackLang");
       }
+      TogetherJS.config("lang", lang);
     }
+    TogetherJS.config("lang", "ru");
+    TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-"));
     var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
-    deps.push(localeTemplates);
+    deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
       if (! min) {
