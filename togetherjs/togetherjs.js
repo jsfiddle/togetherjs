@@ -7,15 +7,15 @@
 
   var styleSheet = "/togetherjs/togetherjs.css";
 
-  var baseUrl = "__baseUrl__";
+  var baseUrl = "__baseUrl__"; console.log('baseUrl .......... '+ baseUrl);
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
-    baseUrl = "";
+    baseUrl = "";console.log('baseUrl .......... '+ baseUrl);
   }
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
-  var baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");
+  var baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");console.log('baseUrlOverride .......... '+ baseUrlOverride);
   if (baseUrlOverride) {
     try {
       baseUrlOverride = JSON.parse(baseUrlOverride);
@@ -88,8 +88,8 @@
     var scripts = document.getElementsByTagName("script");
     for (var i=0; i<scripts.length; i++) {
       var src = scripts[i].src;
-      if (src && src.search(/togetherjs.js(\?.*)?$/) !== -1) {
-        baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
+      if (src && src.search(/togetherjs(-min)?.js(\?.*)?$/) !== -1) {
+        baseUrl = src.replace(/\/*togetherjs(-min)?.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
       }
@@ -230,7 +230,7 @@
       }
       TogetherJS.config("lang", lang);
     }
-    TogetherJS.config("lang", "ru");
+    //TogetherJS.config("lang", "ru");
     TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-"));
     var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
     deps.splice(0, 0, localeTemplates);

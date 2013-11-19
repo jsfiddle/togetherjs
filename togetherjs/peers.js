@@ -28,7 +28,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
   ];
 */
   var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
-console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
+//console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
   var Peer = util.Class({
 
     isSelf: false,
@@ -41,7 +41,7 @@ console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
       this.identityId = attrs.identityId || null;
       this.status = attrs.status || "live";
       this.idle = attrs.status || "active";
-      this.name = attrs.name || null;console.log('this.name .......... '+ this.name); // <<<<<<<<<<<<<<<<<<<<<<
+      this.name = attrs.name || null;//console.log('this.name .......... '+ this.name); // <<<<<<<<<<<<<<<<<<<<<<
       this.avatar = attrs.avatar || null;
       this.color = attrs.color || "#00FF00";
       this.view = ui.PeerView(this);
@@ -266,7 +266,7 @@ console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
       loaded: false,
       isCreator: ! session.isClient,
 
-      update: function (attrs) { console.log('attrs .......... ', attrs);// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      update: function (attrs) { //console.log('attrs .......... ', attrs);// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         var updatePeers = false;
         var updateIdle = false;
         var updateMsg = {type: "peer-update"};
@@ -294,9 +294,9 @@ console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
             storage.settings.set("color", this.color);
             updatePeers = true;
           }
-        } console.log('attrs.defaultName .......... '+ attrs.defaultName); // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        } //console.log('attrs.defaultName .......... '+ attrs.defaultName); // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         if (attrs.defaultName && attrs.defaultName != this.defaultName) {
-          this.defaultName = attrs.defaultName; console.log('this.defaultName .......... '+ this.defaultName);
+          this.defaultName = attrs.defaultName; //console.log('this.defaultName .......... '+ this.defaultName);
           if (! attrs.fromLoad) {
             storage.settings.set("defaultName", this.defaultName);
             updatePeers = true;

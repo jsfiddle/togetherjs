@@ -57,6 +57,19 @@ module.exports = function (grunt) {
     });
   }
 
+  var requirejsPaths = {
+            jquery: "libs/jquery-1.8.3.min",
+            walkabout: "libs/walkabout/walkabout",
+            esprima: "libs/walkabout/lib/esprima",
+            falafel: "libs/walkabout/lib/falafel",
+            tinycolor: "libs/tinycolor",
+            whrandom: "libs/whrandom/random",
+            jqueryui: "libs/jquery-ui.min",
+            jquerypunch: "libs/jquery.ui.touch-punch.min",
+            // Make sure we get the built form of this one:
+            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
+          };
+
   var libs = [];
   grunt.file.expand(
     ["togetherjs/*.js", "!togetherjs/randomutil.js", "!togetherjs/recorder.js", "!togetherjs/togetherjs.js"]
@@ -64,6 +77,11 @@ module.exports = function (grunt) {
     filename = filename.replace(/^togetherjs\//, "");
     filename = filename.replace(/\.js$/, "");
     libs.push(filename);
+  });
+  grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+    var lang = path.basename(langFilename).replace(/\.json/, "");
+    libs.push("templates-" + lang);
+    requirejsPaths["templates-" + lang] = "../build/togetherjs/templates-" + lang;
   });
 
   grunt.initConfig({
@@ -85,18 +103,7 @@ module.exports = function (grunt) {
       compile: {
         options: {
           baseUrl: "togetherjs/",
-          paths: {
-            jquery: "libs/jquery-1.8.3.min",
-            walkabout: "libs/walkabout/walkabout",
-            esprima: "libs/walkabout/lib/esprima",
-            falafel: "libs/walkabout/lib/falafel",
-            tinycolor: "libs/tinycolor",
-            whrandom: "libs/whrandom/random",
-            jqueryui: "libs/jquery-ui.min",
-            jquerypunch: "libs/jquery.ui.touch-punch.min",
-            // Make sure we get the built form of this one:
-            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
-          },
+          paths: requirejsPaths,
           include: ["libs/almond"].concat(libs),
           //Wrap any build bundle in a start and end text specified by wrap.
           //Use this to encapsulate the module code so that define/require are

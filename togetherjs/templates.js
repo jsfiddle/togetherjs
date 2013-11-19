@@ -32,6 +32,7 @@ define(["util", "require"], function (util, require) {
       try {
         templatesLang = require(moduleName);
       } catch (e) {
+        console.warn("Error requiring module:", e);
       }
     }
     assert(templatesLang, "Templates not yet loaded");
