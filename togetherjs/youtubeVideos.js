@@ -27,7 +27,7 @@ function ($, util, session, elementFinder) {
       // disable iframeAPI
       $(iframe).removeAttr("enablejsapi");
       // remove unique youtube iframe indicators
-      var id = $(iframe).attr("id");
+      var id = $(iframe).attr("id") || "";
       if (id.indexOf("youtube-player") === 0) {
         // An id we added
         $(iframe).removeAttr("id");
@@ -79,7 +79,7 @@ function ($, util, session, elementFinder) {
       iframes.each(function (i, iframe) {
         // look for YouTube Iframes
         // if the iframe's unique id is already set, skip it
-        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
+        if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
           $(iframe).attr("ensablejsapi", 1);
           youTubeIframes[i] = iframe;

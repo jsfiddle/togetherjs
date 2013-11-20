@@ -65,7 +65,7 @@
     // When true, the WebRTC-based mic/chat will be disabled
     disableWebRTC: false,
     // When true, youTube videos will synchronize
-    youtube: True
+    youtube: true
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
