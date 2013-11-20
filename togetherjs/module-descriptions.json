@@ -2,6 +2,7 @@
   "analytics": "A small bit of code for handling Google Analytics",
   "channels": "An abstraction over WebSockets and other communication channels (like `postMessage`).",
   "chat": "Handles the chat messages (except actual display, which is in `ui.js`).",
+  "console": "An console replacement that collects messages and allows TogetherJS-specific log levels",
   "cursor": "Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.",
   "elementFinder": "Generates something like a CSS selector for an element, and finds said elements based on selectors.  A portable description of an element.",
   "eventMaker": "Creates artificial events, like a fake click event.",
@@ -26,5 +27,6 @@
   "walkthrough": "Implements the walkthrough interface (content is in `walkthrough.html`).",
   "webrtc": "Handles live audio chat.",
   "who": "Lets clients peek into rooms and invite people from those rooms without joining the room",
-  "windowing": "Handles the creation of different windows, notifications, and modal windows."
+  "windowing": "Handles the creation of different windows, notifications, and modal windows.",
+  "youtubeVideos": "Support for the YouTube video sync feature"
 }

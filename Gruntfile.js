@@ -20,7 +20,7 @@ module.exports = function (grunt) {
   }
 
   var dumpLineNumbers = false;
-  if (!! grunt.option("less-line-numbers")) {
+  if (grunt.option("less-line-numbers")) {
     grunt.verbose.writeln("Enabling LESS line numbers");
     dumpLineNumbers = true;
   }
@@ -90,8 +90,8 @@ module.exports = function (grunt) {
     less: {
       development: {
         files: {
-          "build/togetherjs/togetherjs.css": "togetherjs/togetherjs.less",
-          "build/togetherjs/recorder.css": "togetherjs/recorder.less"
+          "<%= grunt.option('dest') || 'build' %>/togetherjs/togetherjs.css": "togetherjs/togetherjs.less",
+          "<%= grunt.option('dest') || 'build' %>/togetherjs/recorder.css": "togetherjs/recorder.less"
         },
         options: {
           dumpLineNumbers: dumpLineNumbers
@@ -513,6 +513,28 @@ module.exports = function (grunt) {
     grunt.file.write(grunt.option("dest") + "/source/index.html", tmpl.render(tmplVars));
   });
 
+  grunt.registerTask("buildaddon", "Build the Firefox addon and move the XPI into the site", function () {
+    var done = this.async();
+    grunt.util.spawn({
+      cmd: "cfx",
+      args: ["xpi"],
+      opts: {
+        cwd: "addon/"
+      }
+    }, function (error, result, code) {
+      if (error) {
+        grunt.log.error("Error running cfx xpi: " + error.toString().cyan);
+        grunt.fail.fatal("Error creating XPI");
+        done();
+        return;
+      }
+      var dest = path.join(grunt.option("dest"), "togetherjs.xpi");
+      grunt.file.copy("addon/togetherjs.xpi", dest);
+      grunt.log.writeln("Created " + dest.cyan);
+      done();
+    });
+  });
+
   grunt.registerTask("publish", "Publish to togetherjs.mozillalabs.com/public/", function () {
     if (! grunt.file.isDir("togetherjs.mozillalabs.com")) {
       grunt.log.writeln("Error: you must check out togetherjs.mozillalabs.com");
@@ -540,7 +562,7 @@ module.exports = function (grunt) {
     grunt.option("dest", "togetherjs.mozillalabs.com/public");
     grunt.option("exclude-tests", true);
     grunt.option("no-hardlink", true);
-    grunt.task.run(["build", "buildsite"]);
+    grunt.task.run(["build", "buildsite", "buildaddon"]);
     grunt.task.run(["movecss"]);
     grunt.log.writeln("To actually publish you must do:");
     grunt.log.writeln("  $ cd togetherjs.mozillalabs.com/");

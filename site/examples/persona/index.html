@@ -1,5 +1,5 @@
 {% extends "base.tmpl" %}
-{% block title %} TogetherJS app integration example {% endblock %}
+{% block title %} Mozilla Labs : TogetherJS app integration example {% endblock %}
 {# set enableExample true #}
 {% block body %}
 
@@ -11,7 +11,7 @@
 <p>TogetherJS will pick up your login information (and gravatar):
 <button id="login"><img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png"></button>
 <button id="logout" style="display: none">logout</button>
-<a onclick="TogetherJS(this); return false;"><img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 135px"></img></a>
+<button onclick="TogetherJS(this); return false">Collaborate</button>
 </p>
 
 <div>
@@ -57,7 +57,7 @@ $(function () {
       USER = null;
       $("#login").show();
       $("#logout").hide();
-      if (TogetherJS.running) {
+      if (TogetherJS.require) {
         TogetherJS.require("session").close();
       }
     }

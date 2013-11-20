@@ -36,11 +36,19 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   /****************************************
    * URLs
    */
-  var includeHashInUrl = TogetherJS.getConfig('includeHashInUrl');
+  var includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
+  TogetherJS.config.close("includeHashInUrl");
+  var currentUrl = (location.href + "").replace(/\#.*$/, "");
+  if (includeHashInUrl) {
+    currentUrl = location.href;
+  }
+
   session.hubUrl = function (id) {
     id = id || session.shareId;
     assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
-    return TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/hub/" + id;
+    TogetherJS.config.close("hubBase");
+    var hubBase = TogetherJS.config.get("hubBase");
+    return hubBase.replace(/\/*$/, "") + "/hub/" + id;
   };
 
   session.shareUrl = function () {
@@ -59,8 +67,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   session.recordUrl = function () {
     assert(session.shareId);
-    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
-    url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.getConfig("hubBase");
+    var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
+    url += "#&togetherjs=" + session.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
     return url;
   };
 
@@ -71,10 +79,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     } else {
       return location.href.replace(/#.*/, "");
     }
-  };
-
-  session.siteName = function () {
-    return TogetherJS.getConfig("siteName") || document.title;
   };
 
   /****************************************
@@ -132,12 +136,6 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     };
     channel = c;
     session.router.bindChannel(channel);
-  }
-
-  // FIXME: once we start looking at window.history we need to update this:
-  var currentUrl = (location.href + "").replace(/\#.*$/, "");
-  if (includeHashInUrl) {
-    currentUrl = location.href;
   }
 
   session.send = function (msg) {
@@ -234,10 +232,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   // be injected at runtime because they aren't pulled in naturally
   // via define().
   // ui must be the first item:
-  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup","videos", "forms", "visibilityApi"];
+  var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
 
   function getRoomName(prefix, maxSize) {
-    var findRoom = TogetherJS.getConfig("hubBase").replace(/\/*$/, "") + "/findroom";
+    var findRoom = TogetherJS.config.get("hubBase").replace(/\/*$/, "") + "/findroom";
     return $.ajax({
       url: findRoom,
       dataType: "json",
@@ -295,7 +293,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         }
       }
       return storage.tab.get("status").then(function (saved) {
-        var findRoom = TogetherJS.getConfig("findRoom");
+        var findRoom = TogetherJS.config.get("findRoom");
+        TogetherJS.config.close("findRoom");
         if (findRoom && saved) {
           console.info("Ignoring findRoom in lieu of continued session");
         } else if (findRoom && TogetherJS.startup._joinShareId) {
@@ -398,7 +397,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
                 startup.start();
               });
               ui.activateUI();
-              if (TogetherJS.getConfig("enableAnalytics")) {
+              TogetherJS.config.close("enableAnalytics");
+              if (TogetherJS.config.get("enableAnalytics")) {
                 require(["analytics"], function (analytics) {
                   analytics.activate();
                 });

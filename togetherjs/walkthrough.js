@@ -55,7 +55,10 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
         container.find(".togetherjs-if-creator").show();
         container.find(".togetherjs-ifnot-creator").remove();
       }
-      container.find(".togetherjs-site-name").text(session.siteName());
+      TogetherJS.config.track("siteName", function (value) {
+        value = value || document.title;
+        container.find(".togetherjs-site-name").text(value);
+      });
       ui.activateAvatarEdit(container, {
         onSave: function () {
           container.find("#togetherjs-avatar-when-saved").show();

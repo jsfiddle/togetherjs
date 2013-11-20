@@ -6,7 +6,7 @@
     <script>
       TogetherJSConfig_noAutoStart = true;
     </script>
-    <script src="./togetherjs.js"></script>
+    <script src="../togetherjs.js"></script>
     <script>
       var config = TogetherJS._extend(TogetherJS.requireConfig);
       config.deps = ["recorder"];
@@ -15,14 +15,14 @@
         require({context: "togetherjs"})(["recorder"], function (recorder) {
           recorder.start({
             baseUrl: TogetherJS.baseUrl,
-            defaultHubBase: TogetherJS.getConfig("hubBase")
+            defaultHubBase: TogetherJS.config.get("hubBase")
           });
         });
       };
       require = config;
       console.log("required");
     </script>
-    <script src="./togetherjs/libs/require.js"></script>
+    <script src="./libs/require.js"></script>
     <link rel="stylesheet" href="recorder.css">
   </head>
   <body>

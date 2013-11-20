@@ -33,4 +33,4 @@ setTimeout(function () {
 });
 
 printResolved(result);
-// => first second last
+// => ["first", "second", "last"]

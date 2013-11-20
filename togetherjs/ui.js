@@ -171,6 +171,17 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     ui.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
       $(this).append($('<button class="togetherjs-close"></button>'));
     });
+
+    TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-audio-button").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-audio-button").show();
+        adjustDockSize(1);
+      }
+    });
+
   };
 
   // After prepareUI, this actually makes the interface live.  We have
@@ -210,8 +221,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     input.bind("keydown", function (event) {
       if (event.which == 13 && !event.shiftKey) { // Enter without Shift pressed
         submitChat();
-        // triggering the event manually to avoid the addition of newline character to the textarea:
-        input.trigger("input").trigger("propertychange");
         return false;
       }
       if (event.which == 27) { // Escape
@@ -223,8 +232,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     function submitChat() {
       var val = input.val();
       if ($.trim(val)) {
-        chat.submit(val);
         input.val("");
+        // triggering the event manually to avoid the addition of newline character to the textarea:
+        input.trigger("input").trigger("propertychange");
+        chat.submit(val);
       }
     }
     // auto-resize textarea:
@@ -456,12 +467,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       $("#togetherjs-edit-name-window input").focus();
     });
 
-    $("#togetherjs-menu .togetherjs-self-name").bind("keyup", function (event) {
+    $("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
+      console.log("alrighty", event);
       if (event.which == 13) {
         ui.displayToggle("#togetherjs-self-name-display");
         return;
       }
       var val = $("#togetherjs-menu .togetherjs-self-name").val();
+      console.log("values!!", val);
       if (val) {
         peers.Self.update({name: val});
       }
@@ -582,9 +595,13 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       }
     });
 
-    if (TogetherJS.getConfig("inviteFromRoom")) {
-      container.find("#togetherjs-invite").show();
-    }
+    TogetherJS.config.track("inviteFromRoom", function (inviter, previous) {
+      if (inviter) {
+        container.find("#togetherjs-invite").show();
+      } else {
+        container.find("#togetherjs-invite").hide();
+      }
+    });
 
     container.find("#togetherjs-menu-refresh-invite").click(refreshInvite);
     container.find("#togetherjs-menu-invite-anyone").click(function () {
@@ -762,6 +779,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       t = t.parentNode;
     }
     hideMenu();
+  }
+
+  function adjustDockSize(buttons) {
+    /* Add or remove spots from the dock; positive number to
+       add button(s), negative number to remove button(s)
+       */
+    assert(typeof buttons == "number");
+    assert(buttons && Math.floor(buttons) == buttons);
+    var iface = $("#togetherjs-dock");
+    var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
+    assert(newHeight >= BUTTON_HEIGHT * 3, "Height went too low (", newHeight,
+           "), should never be less than 3 buttons high (", BUTTON_HEIGHT * 3, ")");
+    iface.css({
+      height: newHeight + "px"
+    });
   }
 
   // Misc
@@ -1224,10 +1256,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
       ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
       this.dockElement.find(".togetherjs-person").animateDockEntry();
-      var iface = $("#togetherjs-dock");
-      iface.css({
-        height: iface.height() + BUTTON_HEIGHT + "px"
-      });
+      adjustDockSize(1);
       this.detailElement = templating.sub("participant-window", {
         peer: this.peer
       });
@@ -1280,10 +1309,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         this.dockElement = null;
         this.detailElement.remove();
         this.detailElement = null;
-        var iface = $("#togetherjs-dock");
-        iface.css({
-         height: (iface.height() - BUTTON_HEIGHT) + "px"
-        });
+        adjustDockSize(-1);
       }).bind(this));
     },
 
@@ -1354,7 +1380,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   }
 
   function inviteHubUrl() {
-    var base = TogetherJS.getConfig("inviteFromRoom");
+    var base = TogetherJS.config.get("inviteFromRoom");
     assert(base);
     return util.makeUrlAbsolute(base, session.hubUrl());
   }
@@ -1455,7 +1481,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   });
 
   session.on("new-element", function (el) {
-    if (TogetherJS.getConfig("toolName")) {
+    if (TogetherJS.config.get("toolName")) {
       ui.updateToolName(el);
     }
   });
@@ -1463,7 +1489,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   var setToolName = false;
   ui.updateToolName = function (container) {
     container = container || $(document.body);
-    var name = TogetherJS.getConfig("toolName");
+    var name = TogetherJS.config.get("toolName");
     if (setToolName && ! name) {
       name = "TogetherJS";
     }
@@ -1472,6 +1498,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       setToolName = true;
     }
   };
+
+  TogetherJS.config.track("toolName", function (name) {
+    ui.updateToolName(ui.container);
+  });
 
   return ui;
 

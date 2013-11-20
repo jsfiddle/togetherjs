@@ -364,12 +364,16 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
       _loadFromApp: function () {
         // FIXME: I wonder if these should be optionally functions?
         // We could test typeof==function to distinguish between a getter and a concrete value
-        var getUserName = TogetherJS.getConfig("getUserName");
-        var getUserColor = TogetherJS.getConfig("getUserColor");
-        var getUserAvatar = TogetherJS.getConfig("getUserAvatar");
+        var getUserName = TogetherJS.config.get("getUserName");
+        var getUserColor = TogetherJS.config.get("getUserColor");
+        var getUserAvatar = TogetherJS.config.get("getUserAvatar");
         var name, color, avatar;
         if (getUserName) {
-          name = getUserName();
+          if (typeof getUserName == "string") {
+            name = getUserName;
+          } else {
+            name = getUserName();
+          }
           if (name && typeof name != "string") {
             // FIXME: test for HTML safe?  Not that we require it, but
             // <>'s are probably a sign something is wrong.
@@ -378,7 +382,11 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
           }
         }
         if (getUserColor) {
-          color = getUserColor();
+          if (typeof getUserColor == "string") {
+            color = getUserColor;
+          } else {
+            color = getUserColor();
+          }
           if (color && typeof color != "string") {
             // FIXME: would be nice to test for color-ness here.
             console.warn("Error in getUserColor(): should return a string (got", color, ")");
@@ -386,7 +394,11 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
           }
         }
         if (getUserAvatar) {
-          avatar = getUserAvatar();
+          if (typeof getUserAvatar == "string") {
+            avatar = getUserAvatar;
+          } else {
+            avatar = getUserAvatar();
+          }
           if (avatar && typeof avatar != "string") {
             console.warn("Error in getUserAvatar(): should return a string (got", avatar, ")");
             avatar = null;
@@ -415,6 +427,21 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
       peers.Self._loadFromApp();
     }
   });
+
+  TogetherJS.config.track(
+    "getUserName",
+    TogetherJS.config.track(
+      "getUserColor",
+      TogetherJS.config.track(
+        "getUserAvatar",
+        function () {
+          if (peers.Self) {
+            peers.Self._loadFromApp();
+          }
+        }
+      )
+    )
+  );
 
   peers._SelfLoaded = util.Deferred();
 

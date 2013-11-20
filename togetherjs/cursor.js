@@ -420,16 +420,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
+        return;
       }
       var element = event.target;
       if (element == document.documentElement) {
         // For some reason clicking on <body> gives the <html> element here
         element = document.body;
-      }
-      if (! TogetherJS.running) {
-        // This can end up running right after TogetherJS has been closed, often
-        // because TogetherJS was closed with a click...
-        return;
       }
       if (elementFinder.ignoreElement(element)) {
         return;
@@ -440,12 +436,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         return;
       }
 
-      var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-      var cloneClicks = TogetherJS.getConfig("cloneClicks");
+      var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+      var cloneClicks = TogetherJS.config.get("cloneClicks");
       // If you dont want to clone the click for this element
       // and you dont want to show the click for this element or you dont want to show any clicks
       // then return to avoid sending a useless click
-      if (! $(element).is(cloneClicks) && ($(element).is(dontShowClicks) || dontShowClicks === true)) {
+      if ((! util.matchElement(element, cloneClicks)) && util.matchElement(element, dontShowClicks)) {
         return;
       }
       var location = elementFinder.elementLocation(element);
@@ -458,10 +454,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         offsetX: offsetX,
         offsetY: offsetY
       });
-      if (dontShowClicks === true) {
-        return;
-      }
-      if (dontShowClicks && $(element).is(dontShowClicks)) {
+      if (util.matchElement(element, dontShowClicks)) {
         return;
       }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
@@ -485,15 +478,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var offset = target.offset();
     var top = offset.top + pos.offsetY;
     var left = offset.left + pos.offsetX;
-    var cloneClicks = TogetherJS.getConfig("cloneClicks");
-    var dontShowClicks = TogetherJS.getConfig("dontShowClicks");
-    if (cloneClicks && target.is(cloneClicks)) {
+    var cloneClicks = TogetherJS.config.get("cloneClicks");
+    if (util.matchElement(target, cloneClicks)) {
       eventMaker.performClick(target);
     }
-    if (dontShowClicks === true) {
-      return;
-    }
-    if (dontShowClicks && $(target).is(dontShowClicks)) {
+    var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+    if (util.matchElement(target, dontShowClicks)) {
       return;
     }
     displayClick({top: top, left: left}, pos.peer.color);

@@ -93,7 +93,8 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
         next();
         return;
       }
-      if (TogetherJS.getConfig("suppressJoinConfirmation")) {
+      TogetherJS.config.close("suppressJoinConfirmation");
+      if (TogetherJS.config.get("suppressJoinConfirmation")) {
         next();
         return;
       }
@@ -128,8 +129,9 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
     },
 
     share: function (next) {
+      TogetherJS.config.close("suppressInvite");
       if (session.isClient || (! session.firstRun) ||
-          TogetherJS.getConfig("suppressInvite")) {
+          TogetherJS.config.get("suppressInvite")) {
         next();
         return;
       }
