@@ -79,7 +79,7 @@ function ($, util, session, elementFinder) {
       iframes.each(function (i, iframe) {
         // look for YouTube Iframes
         // if the iframe's unique id is already set, skip it
-        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
+        if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
           $(iframe).attr("ensablejsapi", 1);
           youTubeIframes[i] = iframe;
