@@ -177,6 +177,10 @@
   }
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
+    if (TogetherJS.running) {
+      session.close();
+      return;
+    }
     TogetherJS.startup.button = null;
     try {
       if (event && typeof event == "object") {
@@ -261,12 +265,8 @@
     // FIXME: maybe I should just test for TogetherJS.require:
     if (TogetherJS._loaded) {
       var session = TogetherJS.require("session");
-      if (TogetherJS.running) {
-        session.close();
-      } else {
-        addStyle();
-        session.start();
-      }
+      addStyle();
+      session.start();
       return;
     }
     // A sort of signal to session.js to tell it to actually
@@ -509,7 +509,7 @@
     var tracker;
     for (var attr in settings) {
       if (settings.hasOwnProperty(attr)) {
-        if (TogetherJS._configClosed[attr]) {
+        if (TogetherJS._configClosed[attr] && TogetherJS.running) {
           throw new Error("The configuration " + attr + " is finalized and cannot be changed");
         }
       }
