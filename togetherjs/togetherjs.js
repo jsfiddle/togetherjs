@@ -178,6 +178,7 @@
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
     if (TogetherJS.running) {
+      var session = TogetherJS.require("session");
       session.close();
       return;
     }
