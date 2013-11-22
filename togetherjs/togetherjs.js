@@ -609,7 +609,6 @@
   TogetherJS.baseUrl = baseUrl;
 
   TogetherJS.hub = TogetherJS._mixinEvents({});
-  var session = null;
 
   TogetherJS._onmessage = function (msg) {
     var type = msg.type;
@@ -623,22 +622,18 @@
   };
 
   TogetherJS.send = function (msg) {
-    if (session === null) {
-      if (! TogetherJS.require) {
-        throw "You cannot use TogetherJS.send() when TogetherJS is not running";
-      }
-      session = TogetherJS.require("session");
+    if (! TogetherJS.require) {
+      throw "You cannot use TogetherJS.send() when TogetherJS is not running";
     }
+    var session = TogetherJS.require("session");
     session.appSend(msg);
   };
 
   TogetherJS.shareUrl = function () {
-    if (session === null) {
-      if (! TogetherJS.require) {
-        return null;
-      }
-      session = TogetherJS.require("session");
+    if (! TogetherJS.require) {
+      return null;
     }
+    var session = TogetherJS.require("session");
     return session.shareUrl();
   };
 
