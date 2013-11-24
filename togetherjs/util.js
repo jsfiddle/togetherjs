@@ -319,8 +319,8 @@ define(["jquery", "jqueryPlugins"], function ($) {
       console.warn("Bad selector:", selector, "error:", e);
       return false;
     }
-    
-  }
+
+  };
 
   util.testExpose = function (objs) {
     if (typeof TogetherJSTestSpy == "undefined") {
