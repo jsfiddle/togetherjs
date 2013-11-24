@@ -114,6 +114,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     },
 
     update: function (msg) {
+      if (msg.value) {
+        this.init(msg);
+        return;
+      }
       this._editor().document.getDocument().applyDeltas([msg.delta]);
     },
 
@@ -179,6 +183,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     },
 
     update: function (msg) {
+      if (msg.value) {
+        this.init(msg);
+        return;
+      }
       this._editor().replaceRange(
         msg.change.text,
         msg.change.from,
@@ -316,6 +324,20 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
   }
 
+  function getElementType(el) {
+    el = $(el)[0];
+    if (el.tagName == "TEXTAREA") {
+      return "textarea";
+    }
+    if (el.tagName == "SELECT") {
+      return "select";
+    }
+    if (el.tagName == "INPUT") {
+      return (el.getAttribute("type") || "text").toLowerCase();
+    }
+    return "?";
+  }
+
   function setValue(el, value) {
     el = $(el);
     var changed = false;
@@ -444,7 +466,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       var value = getValue(el);
       var upd = {
         element: elementFinder.elementLocation(this),
-        value: value
+        value: value,
+        elementType: getElementType(el)
       };
       if (isText(el)) {
         var history = el.data("togetherjsHistory");
