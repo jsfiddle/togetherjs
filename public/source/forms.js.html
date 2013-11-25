@@ -357,6 +357,10 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     },
 
     update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (msg.value) {
+        <span class="keyword">this</span>.init(msg);
+        <span class="keyword">return</span>;
+      }
       <span class="keyword">this</span>._editor().document.getDocument().applyDeltas([msg.delta]);
     },
 
@@ -444,6 +448,10 @@ ACE&#39;s native delta</p>
     },
 
     update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (msg.value) {
+        <span class="keyword">this</span>.init(msg);
+        <span class="keyword">return</span>;
+      }
       <span class="keyword">this</span>._editor().replaceRange(
         msg.change.text,
         msg.change.from,
@@ -592,6 +600,20 @@ the text is an array of lines.</p>
     }
   }
 
+  <span class="function"><span class="keyword">function</span> <span class="title">getElementType</span><span class="params">(el)</span> {</span>
+    el = $(el)[<span class="number">0</span>];
+    <span class="keyword">if</span> (el.tagName == <span class="string">"TEXTAREA"</span>) {
+      <span class="keyword">return</span> <span class="string">"textarea"</span>;
+    }
+    <span class="keyword">if</span> (el.tagName == <span class="string">"SELECT"</span>) {
+      <span class="keyword">return</span> <span class="string">"select"</span>;
+    }
+    <span class="keyword">if</span> (el.tagName == <span class="string">"INPUT"</span>) {
+      <span class="keyword">return</span> (el.getAttribute(<span class="string">"type"</span>) || <span class="string">"text"</span>).toLowerCase();
+    }
+    <span class="keyword">return</span> <span class="string">"?"</span>;
+  }
+
   <span class="function"><span class="keyword">function</span> <span class="title">setValue</span><span class="params">(el, value)</span> {</span>
     el = $(el);
     <span class="keyword">var</span> changed = <span class="literal">false</span>;
@@ -653,11 +675,13 @@ the text is an array of lines.</p>
       }
       <span class="keyword">return</span>;
     }
-    <span class="keyword">var</span> text = isText(el);
     <span class="keyword">var</span> focusedEl = el[<span class="number">0</span>].ownerDocument.activeElement;
-    <span class="keyword">var</span> focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    <span class="keyword">var</span> focusedElSelection;
+    <span class="keyword">if</span>(isText(focusedEl)) {
+      focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    }
     <span class="keyword">var</span> selection;
-    <span class="keyword">if</span> (text) {
+    <span class="keyword">if</span> (isText(el)) {
       selection = [el[<span class="number">0</span>].selectionStart, el[<span class="number">0</span>].selectionEnd];
     }
     <span class="keyword">var</span> value;
@@ -708,9 +732,10 @@ the text is an array of lines.</p>
     inRemoteUpdate = <span class="literal">true</span>;
     <span class="keyword">try</span> {
       setValue(el, value);
-      <span class="keyword">if</span> (text) {
+      <span class="keyword">if</span> (isText(el)) {
         el[<span class="number">0</span>].selectionStart = selection[<span class="number">0</span>];
-        el[<span class="number">0</span>].selectionEnd = selection[<span class="number">1</span>];</pre></div></div>
+        el[<span class="number">0</span>].selectionEnd = selection[<span class="number">1</span>];
+      }</pre></div></div>
               
             </li>
           
@@ -723,8 +748,9 @@ the text is an array of lines.</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (focusedEl != el[<span class="number">0</span>]) {
-          focusedEl.focus();
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (focusedEl != el[<span class="number">0</span>]) {
+        focusedEl.focus();
+        <span class="keyword">if</span> (isText(focusedEl)) {
           focusedEl.selectionStart = focusedElSelection[<span class="number">0</span>];
           focusedEl.selectionEnd = focusedElSelection[<span class="number">1</span>];
         }
@@ -753,7 +779,8 @@ the text is an array of lines.</p>
       <span class="keyword">var</span> value = getValue(el);
       <span class="keyword">var</span> upd = {
         element: elementFinder.elementLocation(<span class="keyword">this</span>),
-        value: value
+        value: value,
+        elementType: getElementType(el)
       };
       <span class="keyword">if</span> (isText(el)) {
         <span class="keyword">var</span> history = el.data(<span class="string">"togetherjsHistory"</span>);

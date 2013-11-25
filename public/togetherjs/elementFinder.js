@@ -25,7 +25,7 @@ define(["util", "jquery"], function (util, $) {
       // a jQuery element
       el = el[0];
     }
-    if (el[0] && el[0].nodeType == 1) {
+    if (el[0] && el.attr && el[0].nodeType == 1) {
       // Or a jQuery element not made by us
       el = el[0];
     }
@@ -42,14 +42,15 @@ define(["util", "jquery"], function (util, $) {
       return "document";
     }
     var parent = el.parentNode;
-    if (! parent) {
+    if ((! parent) || parent == el) {
       console.warn("elementLocation(", el, ") has null parent");
-      throw "No locatable parent found";
+      throw new Error("No locatable parent found");
     }
     var parentLocation = elementLocation(parent);
     var children = parent.childNodes;
+    var _len = children.length;
     var index = 0;
-    for (var i=0; i<children.length; i++) {
+    for (var i=0; i<_len; i++) {
       if (children[i] == el) {
         break;
       }

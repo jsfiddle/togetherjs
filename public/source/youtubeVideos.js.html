@@ -250,9 +250,8 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     }
   });
 
-  TogetherJS.config.track(<span class="string">"youtube"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(track, previous)</span> {</span>
-    <span class="keyword">if</span> (track &amp;&amp; ! previous) {
-      prepareYouTube();</pre></div></div>
+  session.on(<span class="string">"close"</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    $(youTubeIframes).each(<span class="function"><span class="keyword">function</span> <span class="params">(i, iframe)</span> {</span></pre></div></div>
               
             </li>
           
@@ -260,6 +259,69 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               <div class="annotation">
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-4">&#182;</a>
+                </div>
+                <p>detach players from iframes</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(iframe).removeData(<span class="string">"togetherjs-player"</span>);
+      $(iframe).removeData(<span class="string">"dontPublish"</span>);
+      $(iframe).removeData(<span class="string">"currentVideoId"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-5">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-5">&#182;</a>
+                </div>
+                <p>disable iframeAPI</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(iframe).removeAttr(<span class="string">"enablejsapi"</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>remove unique youtube iframe indicators</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> id = $(iframe).attr(<span class="string">"id"</span>) || <span class="string">""</span>;
+      <span class="keyword">if</span> (id.indexOf(<span class="string">"youtube-player"</span>) === <span class="number">0</span>) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>An id we added</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        $(iframe).removeAttr(<span class="string">"id"</span>);
+      }
+      youTubeIframes = [];
+    });
+  });
+
+  TogetherJS.config.track(<span class="string">"youtube"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(track, previous)</span> {</span>
+    <span class="keyword">if</span> (track &amp;&amp; ! previous) {
+      prepareYouTube();</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
                 </div>
                 <p>You can enable youtube dynamically, but can&#39;t turn it off:</p>
 
@@ -273,10 +335,10 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               
             </li>
           
-            <li id="section-5">
+            <li id="section-9">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-5">&#182;</a>
+                  <a class="pilcrow" href="#section-9">&#182;</a>
                 </div>
                 <p>setup iframes first</p>
 
@@ -286,10 +348,10 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               
             </li>
           
-            <li id="section-6">
+            <li id="section-10">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-6">&#182;</a>
+                  <a class="pilcrow" href="#section-10">&#182;</a>
                 </div>
                 <p>this function should be global so it can be called when API is loaded</p>
 
@@ -299,10 +361,10 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               
             </li>
           
-            <li id="section-7">
+            <li id="section-11">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-7">&#182;</a>
+                  <a class="pilcrow" href="#section-11">&#182;</a>
                 </div>
                 <p>YouTube API is ready</p>
 
@@ -322,10 +384,10 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
               
             </li>
           
-            <li id="section-8">
+            <li id="section-12">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-8">&#182;</a>
+                  <a class="pilcrow" href="#section-12">&#182;</a>
                 </div>
                 <p>load necessary API
 it calls onYouTubeIframeAPIReady automatically when the API finishes loading</p>
@@ -340,10 +402,10 @@ it calls onYouTubeIframeAPIReady automatically when the API finishes loading</p>
               
             </li>
           
-            <li id="section-9">
+            <li id="section-13">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-9">&#182;</a>
+                  <a class="pilcrow" href="#section-13">&#182;</a>
                 </div>
                 <p>manually invoke APIReady function when the API was already loaded by user</p>
 
@@ -354,10 +416,10 @@ it calls onYouTubeIframeAPIReady automatically when the API finishes loading</p>
               
             </li>
           
-            <li id="section-10">
+            <li id="section-14">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-10">&#182;</a>
+                  <a class="pilcrow" href="#section-14">&#182;</a>
                 </div>
                 <p>give each youtube iframe a unique id and set its enablejsapi param to true</p>
 
@@ -369,17 +431,17 @@ it calls onYouTubeIframeAPIReady automatically when the API finishes loading</p>
               
             </li>
           
-            <li id="section-11">
+            <li id="section-15">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-11">&#182;</a>
+                  <a class="pilcrow" href="#section-15">&#182;</a>
                 </div>
                 <p>look for YouTube Iframes
 if the iframe&#39;s unique id is already set, skip it</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> ($(iframe).attr(<span class="string">"src"</span>).indexOf(<span class="string">"youtube"</span>) != -<span class="number">1</span> &amp;&amp; !$(iframe).attr(<span class="string">"id"</span>)) {
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (($(iframe).attr(<span class="string">"src"</span>) || <span class="string">""</span>).indexOf(<span class="string">"youtube"</span>) != -<span class="number">1</span> &amp;&amp; !$(iframe).attr(<span class="string">"id"</span>)) {
           $(iframe).attr(<span class="string">"id"</span>, <span class="string">"youtube-player"</span>+i);
           $(iframe).attr(<span class="string">"ensablejsapi"</span>, <span class="number">1</span>);
           youTubeIframes[i] = iframe;
@@ -391,10 +453,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-12">
+            <li id="section-16">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-12">&#182;</a>
+                  <a class="pilcrow" href="#section-16">&#182;</a>
                 </div>
                 <p>only when it is READY, attach a player to its iframe</p>
 
@@ -405,10 +467,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-13">
+            <li id="section-17">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
+                  <a class="pilcrow" href="#section-17">&#182;</a>
                 </div>
                 <p>check if a player is already attached in case of being reinitialized</p>
 
@@ -419,10 +481,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-14">
+            <li id="section-18">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
+                  <a class="pilcrow" href="#section-18">&#182;</a>
                 </div>
                 <p>initialize its dontPublish flag as well</p>
 
@@ -432,10 +494,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-15">
+            <li id="section-19">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-15">&#182;</a>
+                  <a class="pilcrow" href="#section-19">&#182;</a>
                 </div>
                 <p>store its current video&#39;s id</p>
 
@@ -460,10 +522,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-16">
+            <li id="section-20">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-16">&#182;</a>
+                  <a class="pilcrow" href="#section-20">&#182;</a>
                 </div>
                 <p>do not publish if playerState was changed by other users</p>
 
@@ -473,10 +535,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-17">
+            <li id="section-21">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-17">&#182;</a>
+                  <a class="pilcrow" href="#section-21">&#182;</a>
                 </div>
                 <p>make it false again so it can start publishing events of its own state changes</p>
 
@@ -488,10 +550,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-18">
+            <li id="section-22">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-18">&#182;</a>
+                  <a class="pilcrow" href="#section-22">&#182;</a>
                 </div>
                 <p>notify other people that I changed the player state</p>
 
@@ -504,10 +566,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-19">
+            <li id="section-23">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-19">&#182;</a>
+                  <a class="pilcrow" href="#section-23">&#182;</a>
                 </div>
                 <p>notify that I just loaded another video</p>
 
@@ -517,10 +579,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-20">
+            <li id="section-24">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-20">&#182;</a>
+                  <a class="pilcrow" href="#section-24">&#182;</a>
                 </div>
                 <p>update current video id</p>
 
@@ -546,10 +608,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-21">
+            <li id="section-25">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-21">&#182;</a>
+                  <a class="pilcrow" href="#section-25">&#182;</a>
                 </div>
                 <p>do nothing when the state is buffering, cued, or ended</p>
 
@@ -582,10 +644,10 @@ if the iframe&#39;s unique id is already set, skip it</p>
               
             </li>
           
-            <li id="section-22">
+            <li id="section-26">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-22">&#182;</a>
+                  <a class="pilcrow" href="#section-26">&#182;</a>
                 </div>
                 <p>seekTo() updates the video&#39;s time and plays it if it was already playing
 and pauses it if it was already paused</p>
@@ -599,10 +661,10 @@ and pauses it if it was already paused</p>
               
             </li>
           
-            <li id="section-23">
+            <li id="section-27">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-23">&#182;</a>
+                  <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
                 <p>When YouTube videos are advanced while playing,
 Chrome: pause -&gt; pause -&gt; play (onStateChange is called even when it is from pause to pause)
@@ -616,10 +678,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-24">
+            <li id="section-28">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-24">&#182;</a>
+                  <a class="pilcrow" href="#section-28">&#182;</a>
                 </div>
                 <p>&quot;seek&quot; flag will help supress publishing unwanted state changes</p>
 
@@ -633,10 +695,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-25">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-25">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>if a late user joins a channel, synchronize his videos</p>
 
@@ -646,10 +708,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-26">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-26">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>wait a couple seconds to make sure the late user has finished loading API</p>
 
@@ -664,10 +726,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-27">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-27">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
                 <p>check if another video had been loaded to an existing iframe before I joined</p>
 
@@ -681,10 +743,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-28">
+            <li id="section-32">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
+                  <a class="pilcrow" href="#section-32">&#182;</a>
                 </div>
                 <p>if the video is only cued, I do not have to do anything to sync</p>
 
@@ -700,10 +762,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-29">
+            <li id="section-33">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
+                  <a class="pilcrow" href="#section-33">&#182;</a>
                 </div>
                 <p>load a new video if the host has loaded one</p>
 
@@ -740,10 +802,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-30">
+            <li id="section-34">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-30">&#182;</a>
+                  <a class="pilcrow" href="#section-34">&#182;</a>
                 </div>
                 <p>since url forms of iframe src and player&#39;s video url are different,
 I have to compare the video ids</p>
@@ -759,10 +821,10 @@ I have to compare the video ids</p>
               
             </li>
           
-            <li id="section-31">
+            <li id="section-35">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-31">&#182;</a>
+                  <a class="pilcrow" href="#section-35">&#182;</a>
                 </div>
                 <p>parses videoId from the url returned by getVideoUrl function</p>
 
@@ -773,10 +835,10 @@ I have to compare the video ids</p>
               
             </li>
           
-            <li id="section-32">
+            <li id="section-36">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-32">&#182;</a>
+                  <a class="pilcrow" href="#section-36">&#182;</a>
                 </div>
                 <p>Chrome and Firefox have different positions for parameters</p>
 

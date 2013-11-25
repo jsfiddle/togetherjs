@@ -236,7 +236,7 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
               
                 <div class="content"><div class='highlight'><pre>      el = el[<span class="number">0</span>];
     }
-    <span class="keyword">if</span> (el[<span class="number">0</span>] &amp;&amp; el[<span class="number">0</span>].nodeType == <span class="number">1</span>) {</pre></div></div>
+    <span class="keyword">if</span> (el[<span class="number">0</span>] &amp;&amp; el.attr &amp;&amp; el[<span class="number">0</span>].nodeType == <span class="number">1</span>) {</pre></div></div>
               
             </li>
           
@@ -264,14 +264,15 @@ define([<span class="string">"util"</span>, <span class="string">"jquery"</span>
       <span class="keyword">return</span> <span class="string">"document"</span>;
     }
     <span class="keyword">var</span> parent = el.parentNode;
-    <span class="keyword">if</span> (! parent) {
+    <span class="keyword">if</span> ((! parent) || parent == el) {
       console.warn(<span class="string">"elementLocation("</span>, el, <span class="string">") has null parent"</span>);
-      <span class="keyword">throw</span> <span class="string">"No locatable parent found"</span>;
+      <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"No locatable parent found"</span>);
     }
     <span class="keyword">var</span> parentLocation = elementLocation(parent);
     <span class="keyword">var</span> children = parent.childNodes;
+    <span class="keyword">var</span> _len = children.length;
     <span class="keyword">var</span> index = <span class="number">0</span>;
-    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;children.length; i++) {
+    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;_len; i++) {
       <span class="keyword">if</span> (children[i] == el) {
         <span class="keyword">break</span>;
       }

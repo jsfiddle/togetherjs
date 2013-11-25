@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <title> TogetherJS app integration example </title>
+    <title> Mozilla Labs : TogetherJS app integration example </title>
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
@@ -110,7 +110,7 @@
 <p>TogetherJS will pick up your login information (and gravatar):
 <button id="login"><img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png"></button>
 <button id="logout" style="display: none">logout</button>
-<a onclick="TogetherJS(this); return false;"><img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 135px"></img></a>
+<button onclick="TogetherJS(this); return false">Collaborate</button>
 </p>
 
 <div>
@@ -156,7 +156,7 @@ $(function () {
       USER = null;
       $("#login").show();
       $("#logout").hide();
-      if (TogetherJS.running) {
+      if (TogetherJS.require) {
         TogetherJS.require("session").close();
       }
     }

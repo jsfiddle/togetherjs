@@ -152,11 +152,15 @@
         baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
+      } else if (src && src.search(/togetherjs-min.js(\?.*)?$/) !== -1) { 
+        baseUrl = src.replace(/\/*togetherjs-min.js(\?.*)?$/, "");
+        console.warn("Detected baseUrl as", baseUrl);
+        break;
       }
     }
   }
   if (! baseUrl) {
-    console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js)");
+    console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
   }
 
   function addStyle() {
@@ -177,6 +181,11 @@
   }
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
+    if (TogetherJS.running) {
+      var session = TogetherJS.require("session");
+      session.close();
+      return;
+    }
     TogetherJS.startup.button = null;
     try {
       if (event && typeof event == "object") {
@@ -261,12 +270,8 @@
     // FIXME: maybe I should just test for TogetherJS.require:
     if (TogetherJS._loaded) {
       var session = TogetherJS.require("session");
-      if (TogetherJS.running) {
-        session.close();
-      } else {
-        addStyle();
-        session.start();
-      }
+      addStyle();
+      session.start();
       return;
     }
     // A sort of signal to session.js to tell it to actually
@@ -509,7 +514,7 @@
     var tracker;
     for (var attr in settings) {
       if (settings.hasOwnProperty(attr)) {
-        if (TogetherJS._configClosed[attr]) {
+        if (TogetherJS._configClosed[attr] && TogetherJS.running) {
           throw new Error("The configuration " + attr + " is finalized and cannot be changed");
         }
       }
@@ -608,7 +613,6 @@
   TogetherJS.baseUrl = baseUrl;
 
   TogetherJS.hub = TogetherJS._mixinEvents({});
-  var session = null;
 
   TogetherJS._onmessage = function (msg) {
     var type = msg.type;
@@ -622,22 +626,18 @@
   };
 
   TogetherJS.send = function (msg) {
-    if (session === null) {
-      if (! TogetherJS.require) {
-        throw "You cannot use TogetherJS.send() when TogetherJS is not running";
-      }
-      session = TogetherJS.require("session");
+    if (! TogetherJS.require) {
+      throw "You cannot use TogetherJS.send() when TogetherJS is not running";
     }
+    var session = TogetherJS.require("session");
     session.appSend(msg);
   };
 
   TogetherJS.shareUrl = function () {
-    if (session === null) {
-      if (! TogetherJS.require) {
-        return null;
-      }
-      session = TogetherJS.require("session");
+    if (! TogetherJS.require) {
+      return null;
     }
+    var session = TogetherJS.require("session");
     return session.shareUrl();
   };
 

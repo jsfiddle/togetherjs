@@ -554,6 +554,7 @@ that it is emitted and handled in the same module</p>
         }
         <span class="keyword">this</span>.view.update();
         <span class="keyword">if</span> (updatePeers &amp;&amp; ! attrs.fromLoad) {
+          session.emit(<span class="string">"self-updated"</span>);
           session.send(updateMsg);
         }
         <span class="keyword">if</span> (updateIdle &amp;&amp; ! attrs.fromLoad) {
@@ -690,8 +691,9 @@ We could test typeof==function to distinguish between a getter and a concrete va
     peers.Self.view = ui.PeerView(peers.Self);
     storage.tab.get(<span class="string">"peerCache"</span>).then(deserialize);
     peers.Self._loadFromSettings().then(<span class="keyword">function</span>() {
-        peers.Self._loadFromApp();
-        peers.Self.view.update();
+      peers.Self._loadFromApp();
+      peers.Self.view.update();
+      session.emit(<span class="string">"self-updated"</span>);
     });
   });
 

@@ -114,6 +114,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     },
 
     update: function (msg) {
+      if (msg.value) {
+        this.init(msg);
+        return;
+      }
       this._editor().document.getDocument().applyDeltas([msg.delta]);
     },
 
@@ -179,6 +183,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     },
 
     update: function (msg) {
+      if (msg.value) {
+        this.init(msg);
+        return;
+      }
       this._editor().replaceRange(
         msg.change.text,
         msg.change.from,
@@ -316,6 +324,20 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
   }
 
+  function getElementType(el) {
+    el = $(el)[0];
+    if (el.tagName == "TEXTAREA") {
+      return "textarea";
+    }
+    if (el.tagName == "SELECT") {
+      return "select";
+    }
+    if (el.tagName == "INPUT") {
+      return (el.getAttribute("type") || "text").toLowerCase();
+    }
+    return "?";
+  }
+
   function setValue(el, value) {
     el = $(el);
     var changed = false;
@@ -377,11 +399,13 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       return;
     }
-    var text = isText(el);
     var focusedEl = el[0].ownerDocument.activeElement;
-    var focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    var focusedElSelection;
+    if(isText(focusedEl)) {
+      focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    }
     var selection;
-    if (text) {
+    if (isText(el)) {
       selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
@@ -410,12 +434,14 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text) {
+      if (isText(el)) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
-        // return focus to original input:
-        if (focusedEl != el[0]) {
-          focusedEl.focus();
+      }
+      // return focus to original input:
+      if (focusedEl != el[0]) {
+        focusedEl.focus();
+        if (isText(focusedEl)) {
           focusedEl.selectionStart = focusedElSelection[0];
           focusedEl.selectionEnd = focusedElSelection[1];
         }
@@ -444,7 +470,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       var value = getValue(el);
       var upd = {
         element: elementFinder.elementLocation(this),
-        value: value
+        value: value,
+        elementType: getElementType(el)
       };
       if (isText(el)) {
         var history = el.data("togetherjsHistory");

@@ -659,11 +659,15 @@ for production</p>
         baseUrl = src.replace(<span class="regexp">/\/*togetherjs.js(\?.*)?$/</span>, <span class="string">""</span>);
         console.warn(<span class="string">"Detected baseUrl as"</span>, baseUrl);
         <span class="keyword">break</span>;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (src &amp;&amp; src.search(<span class="regexp">/togetherjs-min.js(\?.*)?$/</span>) !== -<span class="number">1</span>) { 
+        baseUrl = src.replace(<span class="regexp">/\/*togetherjs-min.js(\?.*)?$/</span>, <span class="string">""</span>);
+        console.warn(<span class="string">"Detected baseUrl as"</span>, baseUrl);
+        <span class="keyword">break</span>;
       }
     }
   }
   <span class="keyword">if</span> (! baseUrl) {
-    console.warn(<span class="string">"Could not determine TogetherJS's baseUrl (looked for a &lt;script&gt; with togetherjs.js)"</span>);
+    console.warn(<span class="string">"Could not determine TogetherJS's baseUrl (looked for a &lt;script&gt; with togetherjs.js and togetherjs-min.js)"</span>);
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">addStyle</span><span class="params">()</span> {</span>
@@ -684,6 +688,11 @@ for production</p>
   }
 
   <span class="keyword">var</span> TogetherJS = window.TogetherJS = <span class="function"><span class="keyword">function</span> <span class="title">TogetherJS</span><span class="params">(event)</span> {</span>
+    <span class="keyword">if</span> (TogetherJS.running) {
+      <span class="keyword">var</span> session = TogetherJS.require(<span class="string">"session"</span>);
+      session.close();
+      <span class="keyword">return</span>;
+    }
     TogetherJS.startup.button = <span class="literal">null</span>;
     <span class="keyword">try</span> {
       <span class="keyword">if</span> (event &amp;&amp; <span class="keyword">typeof</span> event == <span class="string">"object"</span>) {
@@ -832,12 +841,8 @@ FIXME: close these configs?</p>
               
                 <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (TogetherJS._loaded) {
       <span class="keyword">var</span> session = TogetherJS.require(<span class="string">"session"</span>);
-      <span class="keyword">if</span> (TogetherJS.running) {
-        session.close();
-      } <span class="keyword">else</span> {
-        addStyle();
-        session.start();
-      }
+      addStyle();
+      session.start();
       <span class="keyword">return</span>;
     }</pre></div></div>
               
@@ -1201,7 +1206,7 @@ for session.start() to be run)</p>
     <span class="keyword">var</span> tracker;
     <span class="keyword">for</span> (<span class="keyword">var</span> attr <span class="keyword">in</span> settings) {
       <span class="keyword">if</span> (settings.hasOwnProperty(attr)) {
-        <span class="keyword">if</span> (TogetherJS._configClosed[attr]) {
+        <span class="keyword">if</span> (TogetherJS._configClosed[attr] &amp;&amp; TogetherJS.running) {
           <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"The configuration "</span> + attr + <span class="string">" is finalized and cannot be changed"</span>);
         }
       }
@@ -1321,7 +1326,6 @@ FIXME: substitute this on the server (and update make-static-client)</p>
   TogetherJS.baseUrl = baseUrl;
 
   TogetherJS.hub = TogetherJS._mixinEvents({});
-  <span class="keyword">var</span> session = <span class="literal">null</span>;
 
   TogetherJS._onmessage = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
     <span class="keyword">var</span> type = msg.type;
@@ -1335,22 +1339,18 @@ FIXME: substitute this on the server (and update make-static-client)</p>
   };
 
   TogetherJS.send = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-    <span class="keyword">if</span> (session === <span class="literal">null</span>) {
-      <span class="keyword">if</span> (! TogetherJS.require) {
-        <span class="keyword">throw</span> <span class="string">"You cannot use TogetherJS.send() when TogetherJS is not running"</span>;
-      }
-      session = TogetherJS.require(<span class="string">"session"</span>);
+    <span class="keyword">if</span> (! TogetherJS.require) {
+      <span class="keyword">throw</span> <span class="string">"You cannot use TogetherJS.send() when TogetherJS is not running"</span>;
     }
+    <span class="keyword">var</span> session = TogetherJS.require(<span class="string">"session"</span>);
     session.appSend(msg);
   };
 
   TogetherJS.shareUrl = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-    <span class="keyword">if</span> (session === <span class="literal">null</span>) {
-      <span class="keyword">if</span> (! TogetherJS.require) {
-        <span class="keyword">return</span> <span class="literal">null</span>;
-      }
-      session = TogetherJS.require(<span class="string">"session"</span>);
+    <span class="keyword">if</span> (! TogetherJS.require) {
+      <span class="keyword">return</span> <span class="literal">null</span>;
     }
+    <span class="keyword">var</span> session = TogetherJS.require(<span class="string">"session"</span>);
     <span class="keyword">return</span> session.shareUrl();
   };
 

@@ -174,7 +174,7 @@ $(<span class="function"><span class="keyword">function</span> <span class="para
 <h2 id="technology-overview">Technology Overview</h2>
 <p>In this section we&#39;ll describe the general way that TogetherJS works, without diving into any code.  If you are ready to use TogetherJS and want to know how, skip to the next section; if you want to understand how it works, or if it can help you in a particular use case, then this section is for you.</p>
 <p>The core of TogetherJS is the <strong>hub</strong>: this is a server that everyone in a session connects to, and it echos messages to all the participants using Web Sockets.  This server does not rewrite the messages or do much of anything besides <strong>pass the messages between the participants</strong>.</p>
-<p><a href="http://www.webrtc.org/">WebRTC</a> is available for <strong>audio chat</strong>, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunatley you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets. But maybe someday.</p>
+<p><a href="http://www.webrtc.org/">WebRTC</a> is available for <strong>audio chat</strong>, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunately you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets. But maybe someday.</p>
 <p>Everything that TogetherJS does is based on these messages being passed between browsers.  It doesn&#39;t require that everyone be on the same page, all it requires is that everyone in the session know what hub URL to connect to (the URL is essentially the session name). People <em>can</em> be on different sites, but the session URL is stored in <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage#sessionStorage">sessionStorage</a> which is local to one domain (and because we use sessionStorage instead of localStorage, it is local to one tab).  We don&#39;t have any techniques implemented to share sessions across multiple sites, but the only barrier is this local storage of session information.</p>
 <p>Features are built on top of this messaging system.  For instance when you move your mouse around, a <code>cursor-update</code> message is sent giving the new mouse position.  Other clients that aren&#39;t at the same page as you see the message but ignore it.</p>
 <p><strong>Most features work directly with the DOM</strong>, and so don&#39;t require any special instrumenting of your code, or integration work.  As much as possible we anchor messages things to the most specific element possible.  When using <a href="http://en.wikipedia.org/wiki/Responsive_web_design">responsive web design</a> different clients at the same URL may see different things, but to the degree they see the same elements things like the mouse position will be “correct”.  For instance, on mobile you might put a button in a different location on the page, but because the cursor message says &quot;the mouse is over the button named <code>#submit</code>&quot; the mouse will be positioned in the equivalent position.  As a result <strong>TogetherJS is also resolution-independent</strong>.</p>
@@ -192,7 +192,7 @@ var TogetherJSConfig_something = "foo";
 // more config...
 &lt;/script&gt;
 &lt;script src="https://togetherjs.com/togetherjs-min.js"&gt;&lt;/script&gt;</code></pre>
-<p>The other way to set a variable <em>after</em> TogetherJS is loaded is <code>TogetherJS.config(&quot;variable&quot;, value)</code></p>
+<p>The other way to set a variable <em>after</em> TogetherJS is loaded is <code>TogetherJS.config(&quot;variable&quot;, value)</code>.  Some variables cannot be updated after TogetherJS has started, but if this is the case then you should get an error.</p>
 <h3 id="the-configuration">The Configuration</h3>
 <p><code>TogetherJSConfig_siteName</code>:
     This is the name of your site.  It defaults to the title of the page, but often a more abbreviated title is appropriate.  This is used in some help text.</p>
@@ -209,7 +209,7 @@ var TogetherJSConfig_something = "foo";
 <p><code>TogetherJSConfig_useMinimizedCode</code>:
     Typically if you use <code>togetherjs.js</code> you&#39;ll get the unminimized and uncombined code, with each module loaded lazily.  If you use <code>togetherjs-min.js</code> you get the combined code.  But if you want to override that more dynamically, you can use this setting.</p>
 <p><code>TogetherJSConfig_findRoom</code>:
-    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users&quot;</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code></p>
+    To see this in action, check out the examples.  This setting assigns people to a room.  If you use a single string, this will be the name of the room; for instance: <code>TogetherJSConfig_findRoom = &quot;my_site_com_users&quot;</code>.  You can also assign people to a series of rooms with maximum occupancy (what our examples do): <code>TogetherJSConfig_findRoom = {prefix: &quot;my_site_com_users&quot;, max: 5}</code> <strong>Note:</strong> if you change this setting, test in a <em>new tab</em> (old browser tabs carry session information that will confuse you).</p>
 <p><code>TogetherJSConfig_autoStart</code>:
     If true then start TogetherJS automatically.  Note TogetherJS already starts automatically when a session is continued, so if you just always call <code>TogetherJS()</code> then you might cause TogetherJS to stop.  Note you must set this as <code>TogetherJSConfig_autoStart = true</code>, not using <code>TogetherJS.config(&quot;autoStart&quot;, true)</code> (it must be set when TogetherJS loads).  Anyone who autostarts a session will not be considered the session creator.</p>
 <p><code>TogetherJSConfig_suppressJoinConfirmation</code>:
@@ -222,6 +222,8 @@ var TogetherJSConfig_something = "foo";
     When true (default false), TogetherJS treats the entire URL, including the hash, as the identifier of the page; i.e., if you one person is on <code>http://example.com/#view1</code> and another person is at <code>http://example.com/#view2</code> then these two people are considered to be at completely different URLs.  You‘d want to use this in single-page apps where being at the same base URL doesn’t mean the two people are looking at the same thing.</p>
 <p><code>TogetherJSConfig_disableWebRTC</code>:
     Disables/removes the button to do audio chat via WebRTC.</p>
+<p><code>TogetherJSConfig_youtube</code>:
+    If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
 <h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
 <p>The button you add to your site to start TogetherJS will typically look like this:</p>
@@ -404,7 +406,7 @@ TogetherJS.reinitialize();</code></pre>
 <h2 id="hosting-the-hub-server">Hosting the Hub Server</h2>
 <p>We have a server at <code>https://hub.togetherjs.com</code> which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven&#39;t really “finished” the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.</p>
 <p>The server is located in <code>hub/server.js</code>, and is a simple Node.js application.  You can run this like <code>node hub/server.js</code> - use <code>node hub/server.js --help</code> to see the available options.  You will need to <code>npm install websocket optimist</code> to get the websocket library and option library installed.</p>
-<p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t it setup in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy.  <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
+<p>If you want to use TogetherJS on an https site you must host the hub on https.  We don&#39;t have it set up in <code>server.js</code> for Node to do SSL directly, so we recommend a proxy. <a href="https://www.stunnel.org/">stunnel</a> is an example of the kind of proxy you&#39;d want – not all proxies support websockets.</p>
 <p>If you want to change the port or interface the server binds to, simply run <code>node hub/server.js -h</code> and it will show the command-line options as well as environmental variables.</p>
 <p>Once you have the hub installed you need to configure TogetherJS to use the hub, like:</p>
 <pre><code class="lang-javascript">TogetherJSConfig_hubBase = <span class="string">"https://myhub.com"</span>;</code></pre>
@@ -423,12 +425,12 @@ TogetherJS.reinitialize();</code></pre>
 <span class="title">cd</span> togetherjs
 <span class="title">heroku</span> create
 <span class="title">heroku</span> config:add <span class="type">HOST</span>=<span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span>
-<span class="title">heroku</span> labs:enable websockets 
+<span class="title">heroku</span> labs:enable websockets
 <span class="title">git</span> push heroku master</code></pre>
 <p>Make note of the app name after running <code>heroku create</code> You can check that everything is running by going to <a href="http://your-app-name-here.herokuapp.com/status">http://your-app-name-here.herokuapp.com/status</a></p>
 <h2 id="getting-help">Getting Help</h2>
 <h3 id="irc--live-chat">IRC / Live Chat</h3>
-<p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code>.  Logs are on <a href="http://irclog.gr/#browse/irc.mozilla.org/togetherjs">irclog.gr</a></p>
+<p>We are available on the <code>#togetherjs</code> channel on <code>irc.mozilla.org</code>. Logs are on <a href="http://irclog.gr/#browse/irc.mozilla.org/togetherjs">irclog.gr</a></p>
 <p>If you don&#39;t use IRC, you can quickly join the chat from the web <a href="https://kiwiirc.com/client/irc.mozilla.org/togetherjs">using kiwiirc</a>.</p>
 <h3 id="issues">Issues</h3>
 <p>Please submit any issues you have via <a href="https://github.com/mozilla/togetherjs/issues/new">the Github issue tracker</a>.</p>

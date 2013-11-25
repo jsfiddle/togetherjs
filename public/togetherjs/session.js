@@ -295,7 +295,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
       return storage.tab.get("status").then(function (saved) {
         var findRoom = TogetherJS.config.get("findRoom");
         TogetherJS.config.close("findRoom");
-        if (findRoom && saved) {
+        if (findRoom && saved && findRoom != saved.shareId) {
           console.info("Ignoring findRoom in lieu of continued session");
         } else if (findRoom && TogetherJS.startup._joinShareId) {
           console.info("Ignoring findRoom in lieu of explicit invite to session");

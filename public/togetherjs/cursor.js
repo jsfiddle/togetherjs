@@ -420,16 +420,12 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
+        return;
       }
       var element = event.target;
       if (element == document.documentElement) {
         // For some reason clicking on <body> gives the <html> element here
         element = document.body;
-      }
-      if (! TogetherJS.running) {
-        // This can end up running right after TogetherJS has been closed, often
-        // because TogetherJS was closed with a click...
-        return;
       }
       if (elementFinder.ignoreElement(element)) {
         return;

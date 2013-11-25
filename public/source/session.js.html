@@ -687,7 +687,7 @@ handle it</p>
       <span class="keyword">return</span> storage.tab.get(<span class="string">"status"</span>).then(<span class="function"><span class="keyword">function</span> <span class="params">(saved)</span> {</span>
         <span class="keyword">var</span> findRoom = TogetherJS.config.get(<span class="string">"findRoom"</span>);
         TogetherJS.config.close(<span class="string">"findRoom"</span>);
-        <span class="keyword">if</span> (findRoom &amp;&amp; saved) {
+        <span class="keyword">if</span> (findRoom &amp;&amp; saved &amp;&amp; findRoom != saved.shareId) {
           console.info(<span class="string">"Ignoring findRoom in lieu of continued session"</span>);
         } <span class="keyword">else</span> <span class="keyword">if</span> (findRoom &amp;&amp; TogetherJS.startup._joinShareId) {
           console.info(<span class="string">"Ignoring findRoom in lieu of explicit invite to session"</span>);

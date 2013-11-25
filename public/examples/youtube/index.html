@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>YouTube Together</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/application.css" />
+
+  <body>
+    <div class="container"> <!-- container -->
+      <div class="body-content row" id="youtube-example">
+        <div class="youtube-container">
+          <div id="introduction">
+            <h1>
+              YouTube Together
+              <a class="pull-right" onclick="TogetherJS(this); return false;">
+                <img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 125px"></img></a>
+                <!-- FIXME: when the button is clicked, it says a config is
+                finalized and cannot be changed -->
+            </h1>
+            <p>This is a simple YouTube example. Invite someone to watch a YouTube video together.</p>
+          </div>
+          <div id="initial-video">
+            <div class="embed-code"><iframe width="560" height="315" src="//www.youtube.com/embed/9bZkp7q19f0" frameborder="0" allowfullscreen></iframe></div>
+          </div>
+          <form role="form">
+            <div class="youtube-embed-link">
+              <div class="youtube-embed-label">Watch a different YouTube video together! (http://youtu.be/<b>9bZkp7q19f0)</b></div>
+              <input type="text" class="form-control" id="video-id-input" placeholder='9bZkp7q19f0 (enter a video id)'>
+            </div>
+            <button type="button" class="embed-submit-button btn btn-default">Submit</button>
+          </form>
+        </div> <!-- // youtube container -->
+      </div> <!-- //body-content -->
+    </div><!-- // container -->
+
+    <script>
+      var TogetherJSConfig_autoStart = true;
+      var TogetherJSConfig_suppressJoinConfirmation = true;
+      var TogetherJSConfig_dontShowClicks = true;
+      var TogetherJSConfig_youtube = true;
+    </script>
+    <script type="text/javascript" src="/togetherjs.js"></script>
+    <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="js/application.js"></script>
+  </body>
+</html>

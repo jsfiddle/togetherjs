@@ -311,6 +311,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
         }
         this.view.update();
         if (updatePeers && ! attrs.fromLoad) {
+          session.emit("self-updated");
           session.send(updateMsg);
         }
         if (updateIdle && ! attrs.fromLoad) {
@@ -414,8 +415,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     peers.Self.view = ui.PeerView(peers.Self);
     storage.tab.get("peerCache").then(deserialize);
     peers.Self._loadFromSettings().then(function() {
-        peers.Self._loadFromApp();
-        peers.Self.view.update();
+      peers.Self._loadFromApp();
+      peers.Self.view.update();
+      session.emit("self-updated");
     });
   });
 
