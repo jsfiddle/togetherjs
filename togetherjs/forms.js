@@ -399,11 +399,13 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       return;
     }
-    var text = isText(el);
     var focusedEl = el[0].ownerDocument.activeElement;
-    var focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    var focusedElSelection;
+    if(isText(focusedEl)) {
+      focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+    }
     var selection;
-    if (text) {
+    if (isText(el)) {
       selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
@@ -432,12 +434,14 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     inRemoteUpdate = true;
     try {
       setValue(el, value);
-      if (text) {
+      if (isText(el)) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
-        // return focus to original input:
-        if (focusedEl != el[0]) {
-          focusedEl.focus();
+      }
+      // return focus to original input:
+      if (focusedEl != el[0]) {
+        focusedEl.focus();
+        if (isText(focusedEl)) {
           focusedEl.selectionStart = focusedElSelection[0];
           focusedEl.selectionEnd = focusedElSelection[1];
         }
