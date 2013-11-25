@@ -13,6 +13,8 @@ define(["util", "require"], function (util, require) {
     t = util.trim(t);
     t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
     t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
+    t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
+    t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
     return t;
   }
 

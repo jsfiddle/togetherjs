@@ -5,7 +5,6 @@
 define([], function () {
   return {
     "interface": "__interface_html__",
-    help: "__help_txt__",
     walkthrough: "__walkthrough_html__",
     names: "__names__"
   };

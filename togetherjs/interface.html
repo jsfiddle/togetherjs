@@ -400,14 +400,14 @@
   <div id="togetherjs-intro" class="togetherjs-modal" style="display: none">
     <header>{{ gettext('Join TOOL_NAME session?') }}</header>
     <section>
-      <p>{{('Your friend has asked you to join their <a href=\'https://togetherjs.com/\' target=\'_blank\'>TOOL_NAME</a> browser session to collaborate in real-time!')}}</p>
+      <p>{{ gettext("Your friend has asked you to join their TOOL_SITE_LINK browser session to collaborate in real-time!")}}</p>
 
-      <p>{{ gettext('Would you like to join their session?') }}</p>
+      <p>{{ gettext("Would you like to join their session?") }}</p>
     </section>
 
     <section class="togetherjs-buttons">
-      <button class="togetherjs-destructive togetherjs-modal-dont-join">{{ gettext('No, dont join')}}</button>
-      <button class="togetherjs-primary togetherjs-dismiss">{{ gettext('Yes, join session') }}</button>
+      <button class="togetherjs-destructive togetherjs-modal-dont-join">{{ gettext( "No, don't join" ) }}</button>
+      <button class="togetherjs-primary togetherjs-dismiss">{{ gettext( "Yes, join session" ) }}</button>
     </section>
   </div>
 
@@ -417,12 +417,12 @@
 
     <section>
       <p>
-        {{ gettext('We\'re sorry, TOOL_NAME doesn\'t work with this browser.  Please <a href=\'https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers\'>upgrade to a supported browser</a> to try TOOL_NAME.') }}
+        {{ gettext("We're sorry, TOOL_NAME doesn't work with this browser.  Please <a href='https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#supported-browsers'>upgrade to a supported browser</a> to try TOOL_NAME." ) }}
       </p>
 
       <p id="togetherjs-browser-broken-is-ie" style="display: none">
-        {{ gettext('We need your help fixing TogetherJS on Internet Explorer!  Here are a list of IE <a href="https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open" target="_blank">GitHub issues</a> we need fixed that you can work on.') }}
-        {{ gettext('Internet Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is currently not supported</a>.  If you do want to try out TogetherJS, we\'d suggest using Firefox or Chrome.') }}
+        {{ gettext('We need your help fixing TogetherJS on Internet Explorer!  Here are a list of IE <a href=\"https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open\" target=\"_blank\">GitHub issues</a> we need fixed that you can work on.') }}
+        {{ gettext("Internet Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is currently not supported</a>.  If you do want to try out TogetherJS, we'd suggest using Firefox or Chrome.") }}
       </p>
     </section>
 
@@ -439,16 +439,16 @@
     <section>
       <p>
         {{ gettext('We need your help fixing TogetherJS on Internet Explorer!  Here are a list of IE <a href="https://github.com/mozilla/togetherjs/issues?labels=IE&milestone=&page=1&state=open" target="_blank">GitHub issues</a> we need fixed that you can work on.') }}
-        {{ gettext('Internet Explorer <a href="https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer">is currently not supported</a>.  If you do want to try out TogetherJS, we\'d suggest using Firefox or Chrome.') }}
+        {{ gettext("Internet Explorer <a href=\"https://github.com/mozilla/togetherjs/wiki/Supported-Browsers#internet-explorer\">is currently not supported</a>.  If you do want to try out TogetherJS, we'd suggest using Firefox or Chrome.") }}
       </p>
 
-      <p>{{ gettext('You can continue to try to use <span class=\'togetherjs-tool-name\'>TogetherJS</span>, but you are likely to hit lots of bugs.  So be warned.') }}</p>
+      <p>{{ gettext('You can continue to try to use TOOL_NAME, but you are likely to hit lots of bugs.  So be warned.') }}</p>
 
     </section>
 
     <section class="togetherjs-buttons">
-      <button class="togetherjs-dismiss togetherjs-primary">{{ gettext('End <span class=\'togetherjs-tool-name\'>TogetherJS</span>') }}</button>
-      <button class="togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway">{{ gettext('Try <span class=\'togetherjs-tool-name\'>TogetherJS</span> Anyway') }}</button>
+      <button class="togetherjs-dismiss togetherjs-primary">{{ gettext('End TOOL_NAME') }}</button>
+      <button class="togetherjs-dismiss togetherjs-secondary togetherjs-browser-unsupported-anyway">{{ gettext('Try TOOL_NAME Anyway') }}</button>
     </section>
 
   </div>
@@ -457,7 +457,7 @@
     <header> {{ gettext('End session?') }} </header>
     <section>
       <p>
-        {{ gettext('Are you sure you\'d like to end your <span class=\'togetherjs-tool-name\'>TogetherJS</span> session?') }}
+        {{ gettext("Are you sure you'd like to end your TOOL_NAME session?") }}
       </p>
     </section>
     <section class="togetherjs-buttons">
@@ -481,7 +481,7 @@
         <div class="togetherjs-person"></div>
         {{ gettext('Following') }}
         <span class="togetherjs-person-name"></span>
-        to <a href="" class="togetherjs-person-url togetherjs-person-url-title"></a>
+        {{ gettext( "to" ) }} <a href="" class="togetherjs-person-url togetherjs-person-url-title"></a>
       </section>
     </div>
 
@@ -492,7 +492,7 @@
         <span class="togetherjs-person-name"></span>
         {{ gettext('has invited') }} <strong class="togetherjs-if-forEveryone">{{ gettext('anyone') }}</strong>
         <strong class="togetherjs-ifnot-forEveryone">{{ gettext('you') }}</strong>
-        {{ gettext('to') }} <a href="" data-togetherjs-subattr-href="href" class="togetherjs-sub-hrefTitle" target="_blank"></a>
+        {{ gettext( "to" ) }} <a href="" data-togetherjs-subattr-href="href" class="togetherjs-sub-hrefTitle" target="_blank"></a>
       </div>
     </div>
 

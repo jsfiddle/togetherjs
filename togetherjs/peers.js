@@ -28,7 +28,6 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
   ];
 */
   var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
-//console.log('DEFAULT_NICKNAMES .......... '+ DEFAULT_NICKNAMES); // DELETE IT
   var Peer = util.Class({
 
     isSelf: false,
@@ -41,7 +40,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
       this.identityId = attrs.identityId || null;
       this.status = attrs.status || "live";
       this.idle = attrs.status || "active";
-      this.name = attrs.name || null;//console.log('this.name .......... '+ this.name); // <<<<<<<<<<<<<<<<<<<<<<
+      this.name = attrs.name || null;
       this.avatar = attrs.avatar || null;
       this.color = attrs.color || "#00FF00";
       this.view = ui.PeerView(this);
