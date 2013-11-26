@@ -301,7 +301,6 @@
       }
       TogetherJS.config("lang", lang);
     }
-    //TogetherJS.config("lang", "ru");
     TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-"));
     var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
     deps.splice(0, 0, localeTemplates);
