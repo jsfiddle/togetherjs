@@ -14,20 +14,8 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
   require(["ui"], function (uiModule) {
     ui = uiModule;
   });
-/*
-  var DEFAULT_NICKNAMES = [
-    "Friendly Fox",
-    "Brilliant Beaver",
-    "Observant Owl",
-    "Gregarious Giraffe",
-    "Wild Wolf",
-    "Silent Seal",
-    "Wacky Whale",
-    "Curious Cat",
-    "Intelligent Iguana"
-  ];
-*/
-  var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g); // 100
+
+  var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
   var Peer = util.Class({
 
     isSelf: false,
@@ -265,7 +253,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
       loaded: false,
       isCreator: ! session.isClient,
 
-      update: function (attrs) { //console.log('attrs .......... ', attrs);// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      update: function (attrs) {
         var updatePeers = false;
         var updateIdle = false;
         var updateMsg = {type: "peer-update"};
@@ -293,9 +281,9 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
             storage.settings.set("color", this.color);
             updatePeers = true;
           }
-        } //console.log('attrs.defaultName .......... '+ attrs.defaultName); // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        }
         if (attrs.defaultName && attrs.defaultName != this.defaultName) {
-          this.defaultName = attrs.defaultName; //console.log('this.defaultName .......... '+ this.defaultName);
+          this.defaultName = attrs.defaultName;
           if (! attrs.fromLoad) {
             storage.settings.set("defaultName", this.defaultName);
             updatePeers = true;
@@ -335,7 +323,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
           storage.settings.get("defaultName"),
           storage.settings.get("color")).then((function (name, avatar, defaultName, color) {
             if (! defaultName) {
-              defaultName = util.pickRandom(DEFAULT_NICKNAMES); // 120
+              defaultName = util.pickRandom(DEFAULT_NICKNAMES);
 
               storage.settings.set("defaultName", defaultName);
             }

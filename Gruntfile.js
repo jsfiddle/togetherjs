@@ -230,7 +230,7 @@ module.exports = function (grunt) {
       var destBase = grunt.option("dest") || "build"; // where to put the built files. If not indicated then into build/
       var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com"; // URL of the hub server
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
-      var gitCommit = process.env.GIT_COMMIT || ""; // env.var for git
+      var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
         __interface_html__: grunt.file.read("togetherjs/interface.html"),
         __help_txt__: grunt.file.read("togetherjs/help.txt"), 
@@ -281,28 +281,25 @@ module.exports = function (grunt) {
         grunt.file.write(dest, content);
       }
 
-      console.log("expanded", grunt.file.expand("togetherjs/locale/*.json"));
-
       grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
-        var templates = grunt.file.read("togetherjs/templates-localized.js"); // 10
-        var lang = path.basename(langFilename).replace(/\.json/, ""); // 20
-        var translation = JSON.parse(grunt.file.read(langFilename)); // 30
-        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js"); // 40
-        //45
-        var translatedInterface = translateFile("togetherjs/interface.html", translation); // 50
+        var templates = grunt.file.read("togetherjs/templates-localized.js");
+        var lang = path.basename(langFilename).replace(/\.json/, "");
+        var translation = JSON.parse(grunt.file.read(langFilename));
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
+        
+        var translatedInterface = translateFile("togetherjs/interface.html", translation);
         var translatedHelp = translateFile("togetherjs/help.txt", translation);
         var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
 
-        var vars = subs; // 60
-        // 70
+        var vars = subs;
+        
         subs.__interface_html__ = translatedInterface;
         subs.__help_txt__ = translatedHelp;
         subs.__walkthrough_html__ = translatedWalkthrough;
-        subs.__names__ = translation.names; // 110
-//grunt.log.write("\n----- subs.__names__ -----\n ", subs.__names__, "\n----- end subs.__names__ -----\n");
-        templates = substituteContent(templates, subs); // 80
+        subs.__names__ = translation.names;
+        templates = substituteContent(templates, subs);
 
-        grunt.file.write(dest, templates); // 90
+        grunt.file.write(dest, templates);
         grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
       });
 

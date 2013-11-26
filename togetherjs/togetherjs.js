@@ -70,15 +70,15 @@
 
   var styleSheet = "/togetherjs/togetherjs.css";
 
-  var baseUrl = "__baseUrl__"; console.log('baseUrl .......... '+ baseUrl);
+  var baseUrl = "__baseUrl__";
   if (baseUrl == "__" + "baseUrl__") {
     // Reset the variable if it doesn't get substituted
-    baseUrl = "";console.log('baseUrl .......... '+ baseUrl);
+    baseUrl = "";
   }
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
-  var baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");console.log('baseUrlOverride .......... '+ baseUrlOverride);
+  var baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");
   if (baseUrlOverride) {
     try {
       baseUrlOverride = JSON.parse(baseUrlOverride);
@@ -290,6 +290,7 @@
     var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
     var deps = ["session", "jquery"];
     var lang = TogetherJS.getConfig("lang");
+    // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
     var availableTranslations = {
       en_US: true,
       ru: true
@@ -297,12 +298,12 @@
     if (! lang) {
       lang = navigator.language.replace(/-/g, "_");
       if (! availableTranslations[lang]) {
-        lang = TogetherJS.getConfig("fallbackLang");
+        lang = TogetherJS.config.get("fallbackLang"); // [igoryen]: This needs to be updated to use TogetherJS.config.get(), and also to close those configuration values.
       }
       TogetherJS.config("lang", lang);
     }
-    TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-"));
-    var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
+    TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-")); // rename into TogetherJS.config.get()?
+    var localeTemplates = "templates-" + TogetherJS.getConfig("lang");// rename into TogetherJS.config.get()?
     deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
@@ -573,7 +574,7 @@
   // track of these and signal an error if someone attempts to
   // reconfigure too late
 
-  TogetherJS.getConfig = function (name) {
+  TogetherJS.getConfig = function (name) { // rename into TogetherJS.config.get()?
     var value = TogetherJS._configuration[name];
     if (value === undefined) {
       if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
