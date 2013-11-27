@@ -81,7 +81,7 @@ function ($, util, session, elementFinder) {
         // if the iframe's unique id is already set, skip it
         if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
-          $(iframe).attr("ensablejsapi", 1);
+          $(iframe).attr("enablejsapi", 1);
           youTubeIframes[i] = iframe;
         }
       });
