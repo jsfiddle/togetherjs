@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ACE in Action</title>
+<style type="text/css" media="screen">
+*{
+    margin: 0;
+    padding: 0;
+}
+    #editor { 
+        width:600px;
+        height:700px;
+    }
+</style>
+</head>
+<body>
+
+<div id="editor">function foo(items) {
+    var x = "All this is syntax highlighted";
+    return x;
+}</div>
+
+<button id="start-togetherjs" type="button"
+ onclick="TogetherJS(this); return false"
+ data-end-togetherjs-html="End TogetherJS">
+  Start TogetherJS
+</button>
+
+    
+<script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+  // TogetherJS configuration would go here, but we'll talk about that
+  // later
+  TogetherJSConfig_hubBase = "http://127.0.0.1:8080";
+  TogetherJSConfig_dontShowClicks = '#editor'
+
+</script>
+<script src="/togetherjs/build/togetherjs-min.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    var session = editor.getSession()
+    editor.setTheme("ace/theme/monokai");
+    session.setMode("ace/mode/javascript");
+</script>
+</body>
+</html>

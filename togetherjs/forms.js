@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($, util, session, elementFinder, eventMaker, templating, ot) {
+define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot", "peers"], function ($, util, session, elementFinder, eventMaker, templating, ot, peers) {
   var forms = util.Module("forms");
   var assert = util.assert;
 
@@ -101,8 +101,14 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     constructor: function (el) {
       this.element = $(el);
       assert(this.element.hasClass("ace_editor"));
+      this.cursorMarkers= {};
       this._change = this._change.bind(this);
+      this._changeCursor = this._changeCursor.bind(this);
       this._editor().document.on("change", this._change);
+      this._editor().document.getSelection().on("changeCursor", this._changeCursor);
+      this.peerUpdate = this.peerUpdate.bind(this);
+
+      peers.on("new-peer identity-updated status-updated", this.peerUpdate);
     },
 
     tracked: function (el) {
@@ -111,6 +117,10 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
     destroy: function (el) {
       this._editor().document.removeListener("change", this._change);
+      this._editor()
+        .document
+          .getSelection()
+            .removeListener("change", this._changeCursor);
     },
 
     update: function (msg) {
@@ -118,7 +128,54 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         this.init(msg);
         return;
       }
-      this._editor().document.getDocument().applyDeltas([msg.delta]);
+
+      if(msg.hasOwnProperty('delta')) {
+        this._editor().document.getDocument().applyDeltas([msg.delta]);
+      }
+
+      if(msg.hasOwnProperty('cursor')) {
+        this.updateCursorMarker(msg);
+      }
+    },
+
+    peerUpdate: function (peer) {
+      if( this.cursorMarkers.hasOwnProperty(peer.id)) {
+        var msg = {
+          peer: peer,
+          cursor: this.cursorMarkers[peer.id].cursor
+        };
+        this.updateCursorMarker(msg);
+      }
+    },
+
+    updateCursorMarker: function (msg) {
+      if ("undefined" == typeof msg) {
+        return;
+      }
+
+      if( this.cursorMarkers.hasOwnProperty(msg.peer.id)) {
+        this._editor()
+          .document
+          .removeMarker(this.cursorMarkers[msg.peer.id].markerId);
+      }
+
+      var Range = ace.require('ace/range').Range;
+      var range = new Range(msg.cursor.row, msg.cursor.column,
+                            msg.cursor.row, msg.cursor.column + 1);
+
+      var markerId = this._editor()
+          .document
+          .addMarker(range, "ace_selection", drawMarker, false);
+      
+      this.cursorMarkers[msg.clientId] = {
+        markerId:markerId,
+        cursor:msg.cursor
+      };
+
+      function drawMarker(stringBuilder, range, left, top, config) {
+        var color = "background-color:"+ msg.peer.color;
+        stringBuilder.push("<div class='ace_selection' style='", "left:", left, "px;", "top:", top + 2, "px;", "height:", config.lineHeight - 2, "px;", "width:", 2, "px;", color || "", "'></div>", "<div class='ace_selection' style='", "left:", left - 2, "px;", "top:", top, "px;", "height:", 5, "px;", "width:", 6, "px;", color || "", "'></div>");
+      }
     },
 
     init: function (update, msg) {
@@ -149,7 +206,24 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         type: "form-update",
         tracker: this.trackerName,
         element: elementFinder.elementLocation(this.element),
-        delta: JSON.parse(JSON.stringify(e.data))
+        delta: JSON.parse(JSON.stringify(e.data)),
+        cursor: this._editor().document.getSelection().getCursor()
+      });
+    },
+
+    _changeCursor: function (e) {
+      // FIXME: I should have an internal .send() function that automatically
+      // asserts !inRemoteUpdate, among other things
+      if (inRemoteUpdate) {
+        return;
+      }
+      // FIXME: I want to use a more normalized version of replace instead of
+      // ACE's native delta
+      session.send({
+        type: "form-update",
+        tracker: this.trackerName,
+        element: elementFinder.elementLocation(this.element),
+        cursor: this._editor().document.getSelection().getCursor()
       });
     }
   });
