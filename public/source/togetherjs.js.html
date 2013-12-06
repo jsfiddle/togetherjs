@@ -12,6 +12,9 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.ico">
 
+    <!-- use this block to set togetherjs config -->
+    
+
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/parallax.js"></script>
@@ -659,7 +662,7 @@ for production</p>
         baseUrl = src.replace(<span class="regexp">/\/*togetherjs.js(\?.*)?$/</span>, <span class="string">""</span>);
         console.warn(<span class="string">"Detected baseUrl as"</span>, baseUrl);
         <span class="keyword">break</span>;
-      } <span class="keyword">else</span> <span class="keyword">if</span> (src &amp;&amp; src.search(<span class="regexp">/togetherjs-min.js(\?.*)?$/</span>) !== -<span class="number">1</span>) { 
+      } <span class="keyword">else</span> <span class="keyword">if</span> (src &amp;&amp; src.search(<span class="regexp">/togetherjs-min.js(\?.*)?$/</span>) !== -<span class="number">1</span>) {
         baseUrl = src.replace(<span class="regexp">/\/*togetherjs-min.js(\?.*)?$/</span>, <span class="string">""</span>);
         console.warn(<span class="string">"Detected baseUrl as"</span>, baseUrl);
         <span class="keyword">break</span>;
@@ -877,6 +880,10 @@ start itself (i.e., put up a UI and try to activate)</p>
     }
     <span class="keyword">if</span> (! min) {
       <span class="keyword">if</span> (<span class="keyword">typeof</span> require == <span class="string">"function"</span>) {
+        <span class="keyword">if</span> (! require.config) {
+          console.warn(<span class="string">"The global require ("</span>, require, <span class="string">") is not requirejs; please use togetherjs-min.js"</span>);
+          <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Conflict with window.require"</span>);
+        }
         TogetherJS.require = require.config(requireConfig);
       }
     }

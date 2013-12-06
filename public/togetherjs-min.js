@@ -152,7 +152,7 @@
         baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
-      } else if (src && src.search(/togetherjs-min.js(\?.*)?$/) !== -1) { 
+      } else if (src && src.search(/togetherjs-min.js(\?.*)?$/) !== -1) {
         baseUrl = src.replace(/\/*togetherjs-min.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
@@ -295,6 +295,10 @@
     }
     if (! min) {
       if (typeof require == "function") {
+        if (! require.config) {
+          console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
+          throw new Error("Conflict with window.require");
+        }
         TogetherJS.require = require.config(requireConfig);
       }
     }

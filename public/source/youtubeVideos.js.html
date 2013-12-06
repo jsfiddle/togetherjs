@@ -12,6 +12,9 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="../images/fav-icon.ico">
 
+    <!-- use this block to set togetherjs config -->
+    
+
     <script src="../js/jquery-1.10.2.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/parallax.js"></script>
@@ -436,14 +439,15 @@ it calls onYouTubeIframeAPIReady automatically when the API finishes loading</p>
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-15">&#182;</a>
                 </div>
-                <p>look for YouTube Iframes
-if the iframe&#39;s unique id is already set, skip it</p>
+                <p>if the iframe&#39;s unique id is already set, skip it
+FIXME: what if the user manually sets an iframe&#39;s id (i.e. &quot;#my-youtube&quot;)?
+maybe we should set iframes everytime togetherjs is reinitialized?</p>
 
               </div>
               
                 <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (($(iframe).attr(<span class="string">"src"</span>) || <span class="string">""</span>).indexOf(<span class="string">"youtube"</span>) != -<span class="number">1</span> &amp;&amp; !$(iframe).attr(<span class="string">"id"</span>)) {
           $(iframe).attr(<span class="string">"id"</span>, <span class="string">"youtube-player"</span>+i);
-          $(iframe).attr(<span class="string">"ensablejsapi"</span>, <span class="number">1</span>);
+          $(iframe).attr(<span class="string">"enablejsapi"</span>, <span class="number">1</span>);
           youTubeIframes[i] = iframe;
         }
       });
@@ -510,8 +514,9 @@ if the iframe&#39;s unique id is already set, skip it</p>
   } <span class="comment">// end of prepareYouTube</span>
 
   <span class="function"><span class="keyword">function</span> <span class="title">publishPlayerStateChange</span><span class="params">(event)</span> {</span>
-    <span class="keyword">var</span> currentPlayer = event.target;
-    <span class="keyword">var</span> currentIframe = currentPlayer.a;
+    <span class="keyword">var</span> target = event.target; <span class="comment">// WEIRD: target does not return a complete player object after reinitialze. (i.e. object without all the functions)</span>
+    <span class="keyword">var</span> currentIframe = target.a;
+    <span class="keyword">var</span> currentPlayer = $(currentIframe).data(<span class="string">"togetherjs-player"</span>); <span class="comment">// retrieve the player object from data as a workaround</span>
     <span class="keyword">var</span> currentTime = currentPlayer.getCurrentTime();
     <span class="keyword">var</span> iframeLocation = elementFinder.elementLocation(currentIframe);
 
