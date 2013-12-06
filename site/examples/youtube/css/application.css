@@ -1,6 +1,6 @@
 .youtube-container {
 	margin: 0 auto;
-	width: 560px;
+	//width: 560px;
 }
 
 .youtube-embed-link {
@@ -8,5 +8,13 @@
 }
 
 .youtube-embed-link {
-	margin-top: 10px;
+	margin-top: 0px;
+}
+
+.embed-submit-button {
+  margin-top: 0px;
+}
+
+.youtube-embed-label {
+  padding-bottom: 0px;
 }
