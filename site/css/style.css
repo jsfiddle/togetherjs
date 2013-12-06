@@ -149,6 +149,11 @@ h5 {
   line-height: 16px;
 }
 
+.form-control:focus {
+  border: 1px solid #2aa08b;
+  box-shadow: none;
+}
+
 /* =Tabzilla
 ----------------------------------------------- */
 #tabzilla-panel,

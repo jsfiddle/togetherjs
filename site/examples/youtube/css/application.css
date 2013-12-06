@@ -18,3 +18,66 @@
 .youtube-embed-label {
   padding-bottom: 0px;
 }
+
+#youtube-example .row {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+#youtube-example .row .labelarea {
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+#youtube-example .row .linkarea {
+  padding-top: 0px
+}
+
+#youtube-example h1 {
+  margin-bottom: 30px;
+}
+
+#youtube-example h4 {
+  margin-top: 20px;
+  font-family: openSansBold,sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 16px;
+}
+
+#youtube-example .tjsbutton {
+  margin-top: 10px;
+}
+
+@media (min-width: 1200px) {
+  h1 {
+    font-size: 48px !important;
+  }
+
+}
+
+@media (min-width: 992px) {
+  h1 {
+    font-size: 48px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 38px !important;
+  }
+}
+
+@media (min-width: 480px) {
+  h1 {
+    font-size: 38px;
+  }
+}
+
+@media (max-width: 480px) {
+  #youtube-example .tjsbutton img {
+    width: 100px !important;
+  }
+}
