@@ -1,0 +1,160 @@
+// get the canvas element and its context
+var canvas = document.querySelector('#sketch');
+var context = canvas.getContext('2d');
+
+var sketchStyle = getComputedStyle(document.querySelector('#sketchContainer'));
+canvas.width = parseInt(sketchStyle.getPropertyValue('width'), 10);
+canvas.height = parseInt(sketchStyle.getPropertyValue('height'), 10);
+
+var lastMouse = {x: 0, y: 0};
+
+// brush settings
+context.lineWidth = 2;
+context.lineJoin = 'round';
+context.lineCap = 'round';
+context.strokeStyle = '#000';
+
+// attach the mousedown, mouseout, mousemove, mouseup event listeners.
+canvas.addEventListener('mousedown', function (e) {
+  lastMouse = {
+    x: e.pageX - this.offsetLeft,
+    y: e.pageY - this.offsetTop
+  };
+  canvas.addEventListener('mousemove', move, false);
+}, false);
+
+canvas.addEventListener('mouseout', function (e) {
+canvas.removeEventListener('mousemove', move, false);
+}, false);
+
+canvas.addEventListener('mouseup', function () {
+  canvas.removeEventListener('mousemove', move, false);
+}, false);
+
+function setSize(size) {
+  context.lineWidth = size;
+}
+
+function setColor(color) {
+  context.globalCompositeOperation = "source-over";
+  context.strokeStyle = color;
+}
+
+function eraser() {
+context.globalCompositeOperation = "destination-out";
+context.strokeStyle = "rgba(0,0,0,1)";
+}
+
+function move(e) {
+  var mouse = {
+    x: e.pageX - this.offsetLeft,
+    y: e.pageY - this.offsetTop
+  };
+  draw(lastMouse, mouse);
+  lastMouse = mouse;
+}
+
+function draw(start, end, remote) {
+  context.beginPath();
+  context.moveTo(start.x, start.y);
+  context.lineTo(end.x, end.y);
+  context.closePath();
+  context.stroke();
+  if ((! remote) && TogetherJS.running) {
+      TogetherJS.send({type: "draw", start: start, end: end});
+  }
+}
+
+TogetherJS.hub.on("draw", function (msg) {
+  draw(msg.start, msg.end, true);
+});
+
+TogetherJS.hub.on("togetherjs.hello", function () {
+  var image = canvas.toDataURL("image/png");
+  TogetherJS.send({
+    type: "init",
+    image: image
+  });
+});
+
+TogetherJS.hub.on("init", function (msg) {
+  var image = new Image();
+  image.src = msg.image;
+  context.drawImage(image, 0, 0);
+});
+
+$(document).ready(function () {
+  function changeMouse() {
+    var cursorSize = context.lineWidth;
+    if (cursorSize < 10){
+        cursorSize = 10;
+    }
+    var cursorColor = context.strokeStyle;
+    var cursorGenerator = document.createElement("canvas");
+    cursorGenerator.width = cursorSize;
+    cursorGenerator.height = cursorSize;
+    var ctx = cursorGenerator.getContext("2d");
+
+    var centerX = cursorGenerator.width/2;
+    var centerY = cursorGenerator.height/2;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, (cursorSize/2)-4, 0, 2 * Math.PI, false);
+
+    // If the user is erasing, set the fill of the cursor to white.
+    if (context.globalCompositeOperation == 'destination-over') {
+         ctx.fillStyle = 'white';
+         ctx.fill();
+    }
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = cursorColor;
+    ctx.stroke();
+    $('#sketch').css( "cursor", "url(" + cursorGenerator.toDataURL("image/png") + ") " + cursorSize/2 + " " + cursorSize/2 + ",crosshair");
+  }
+  // Init mouse
+  changeMouse();
+  // Color change functions:
+  $('.green-pick').click(function () {
+    setColor('#00ff00');
+    changeMouse();
+  });
+
+  $('.yellow-pick').click(function () {
+    setColor('#ff0');
+    changeMouse();
+  });
+
+  $('.red-pick').click(function () {
+    setColor('#ff0000');
+    changeMouse();
+  });
+
+  $('.blue-pick').click(function () {
+    setColor('#0000ff');
+    changeMouse();
+  });
+
+  $('.black-pick').click(function () {
+    setColor('#000');
+    changeMouse();
+  });
+  $('.eraser').click(function () {
+    eraser();
+    changeMouse();
+  });
+  // TogetherJS user color:
+  $('.user-color-pick').click(function() {
+    setColor(TogetherJS.require("peers").Self.color);
+    changeMouse();
+  });
+
+  // Increase/decrease brush size:
+  $('.plus-size').click(function() {
+    setSize(context.lineWidth+1);
+  });
+
+  $('.minus-size').click(function() {
+    setSize(context.lineWidth-1);
+  });          
+});
