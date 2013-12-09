@@ -1,96 +1,51 @@
 {% extends "base.tmpl" %}
 {% block title %} Mozilla Labs : TogetherJS app integration example {% endblock %}
 {# set enableExample true #}
-{% block body %}
-
-<div class="container">
-  <section class="body-content row" id="sketchapp" style="margin-left: 0px; margin-right: 0px;">
-      <h1 style="margin-bottom: 20px">Drawing Example</h1>
-      <p class="pull-left" style="margin-bottom: 20px">This is a simple drawing example.  Try drawing something with a friend in the canvas below!  Check out this code on <a href="http://jsfiddle.net/5M57n/1/" target="_blank">JSFiddle  here</a>.</p>
-      <a class="tjs-button" onclick="TogetherJS(this); return false;" class="pull-right">
-        <img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 135px"></img>
-      </a>
-      <div class="clearfix"></div>
-      <div id="sketchContainer" style="width: 100%; height: 400px; border: 1px solid rgba(0,0,0,0.2)">
-        <canvas id="sketch">
-      </div>
-
+{% block configs %}
   <script>
-
-    // Based on: http://jsfiddle.net/j3xDg/
-
-    (function() {
-
-        // get the canvas element and its context
-        var canvas = document.querySelector('#sketch');
-        var context = canvas.getContext('2d');
-
-        var sketchStyle = getComputedStyle(document.querySelector('#sketchContainer'));
-        canvas.width = parseInt(sketchStyle.getPropertyValue('width'), 10);
-        canvas.height = parseInt(sketchStyle.getPropertyValue('height'), 10);
-
-        var lastMouse = {x: 0, y: 0};
-
-        // brush settings
-        context.lineWidth = 2;
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
-        context.strokeStyle = '#000';
-
-        // attach the mousedown, mousemove, mouseup event listeners.
-        canvas.addEventListener('mousedown', function (e) {
-            lastMouse = {
-              x: e.pageX - this.offsetLeft,
-              y: e.pageY - this.offsetTop
-            };
-            canvas.addEventListener('mousemove', move, false);
-        }, false);
-
-        canvas.addEventListener('mouseup', function () {
-            canvas.removeEventListener('mousemove', move, false);
-        }, false);
-
-        function move(e) {
-            var mouse = {
-              x: e.pageX - this.offsetLeft,
-              y: e.pageY - this.offsetTop
-            };
-            draw(lastMouse, mouse);
-            lastMouse = mouse;
-        }
-
-        function draw(start, end, remote) {
-            context.beginPath();
-            context.moveTo(start.x, start.y);
-            context.lineTo(end.x, end.y);
-            context.closePath();
-            context.stroke();
-            if ((! remote) && TogetherJS.running) {
-                TogetherJS.send({type: "draw", start: start, end: end});
-            }
-        }
-
-        TogetherJS.hub.on("draw", function (msg) {
-            draw(msg.start, msg.end, true);
-        });
-
-        TogetherJS.hub.on("togetherjs.hello", function () {
-            var image = canvas.toDataURL("image/png");
-            TogetherJS.send({
-              type: "init",
-              image: image
-            });
-        });
-
-        TogetherJS.hub.on("init", function (msg) {
-            var image = new Image();
-            image.src = msg.image;
-            context.drawImage(image, 0, 0);
-        });
-
-    }());
-
+    var TogetherJSConfig_autoStart = true;
+    var TogetherJSConfig_suppressJoinConfirmation = true;
+    var TogetherJSConfig_dontShowClicks = ":not(canvas"
   </script>
-  </section>
+{% endblock %}
+{% block body %}
+  {% block styles %}
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+  {% endblock %}
 
+  <div class="container">
+    <section class="body-content row" id="sketchapp" style="margin-left: 0px; margin-right: 0px;">
+        <h1 style="margin-bottom: 20px">Drawing Example</h1>
+        <a class="pull-right tjsbutton" onclick="TogetherJS(this); return false;">
+          <img src="https://togetherjs.com/images/start-togetherjs-blue.png" style="width: 125px;"></img>
+        </a>
+        <p class="pull-left" style="margin-bottom: 20px">This is a simple drawing example.  Try drawing something with a friend in the canvas below!  Check out this code on <a href="http://jsfiddle.net/57Nbx/" target="_blank">JSFiddle  here</a>.</p>
+        <div class="btn-group btn-group-justified" style="margin-left: auto; margin-right: auto;">
+          <a class="btn btn-info color-picker upper-button">Blue</a>          
+          <a class="btn btn-success color-picker">Green</a>
+          <a class="btn btn-warning color-picker">Yellow</a>
+          <a class="btn btn-danger color-picker">Red</a>
+          <a class="btn btn-success color-picker black-pick upper-button" style="border-bottom-width: 0px;">Black</a>
+        </div>
+        <div class="clearfix"></div>
+        <div id="sketchContainer" style="width: 1140px; height: 400px; border: 1px solid rgba(0,0,0,0.2);">
+          <canvas id="sketch"></canvas>
+        </div>
+        <div class="btn-group btn-group-justified" style="margin-left: auto; margin-right: auto;">
+          <a class="btn btn-info user-color-pick bottom-button" style="width: 35%;">User Color</a>
+          <a class="btn btn-success plus-size" style="width: 15%;">
+            <i class="fa fa-plus-square"></i>
+          </a>
+          <a class="btn btn-danger minus-size" style="width: 15%;">
+            <i class="fa fa-minus-square"></i>
+          </a>
+          <a class="btn btn-default eraser bottom-button" style="width: 35%; border-top-width: 0px;">
+            <i class="fa fa-eraser"></i>
+          </a>
+       </div>
+    </section>
+  </div>
+
+  <script src="js/sketch.js"></script>
 {% endblock %}
