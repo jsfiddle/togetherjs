@@ -41,14 +41,14 @@ function setSize(size) {
 
 // Sets the brush color:
 function setColor(color) {
-  context.globalCompositeOperation = "source-over";
+  context.globalCompositeOperation = 'source-over';
   context.strokeStyle = color;
 }
 
 // Sets the brush to erase-mode:
 function eraser() {
-  context.globalCompositeOperation = "destination-out";
-  context.strokeStyle = "rgba(0,0,0,1)";
+  context.globalCompositeOperation = 'destination-out';
+  context.strokeStyle = 'rgba(0,0,0,1)';
 }
 
 // Draws the lines, called by move and the TogetherJS event listener:
@@ -74,7 +74,7 @@ function move(e) {
   draw(lastMouse, mouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation);
   if (TogetherJS.running) {
     TogetherJS.send({
-      type: "draw",
+      type: 'draw',
       start: lastMouse,
       end: mouse,
       color: context.strokeStyle,
@@ -86,7 +86,7 @@ function move(e) {
 }
 
 // Listens for draw messages, sends info about the drawn lines:
-TogetherJS.hub.on("draw", function (msg) {
+TogetherJS.hub.on('draw', function (msg) {
   if (!msg.sameUrl) {
       return;
   }
@@ -94,16 +94,16 @@ TogetherJS.hub.on("draw", function (msg) {
 });
 
 // Hello is sent from every newly connected user, this way they will receive what has already been drawn:
-TogetherJS.hub.on("togetherjs.hello", function () {
-  var image = canvas.toDataURL("image/png");
+TogetherJS.hub.on('togetherjs.hello', function () {
+  var image = canvas.toDataURL('image/png');
   TogetherJS.send({
-    type: "init",
+    type: 'init',
     image: image
   });
 });
 
 // Draw initially received drawings:
-TogetherJS.hub.on("init", function (msg) {
+TogetherJS.hub.on('init', function (msg) {
   var image = new Image();
   image.src = msg.image;
   context.drawImage(image, 0, 0);
@@ -118,10 +118,10 @@ $(document).ready(function () {
         cursorSize = 10;
     }
     var cursorColor = context.strokeStyle;
-    var cursorGenerator = document.createElement("canvas");
+    var cursorGenerator = document.createElement('canvas');
     cursorGenerator.width = cursorSize;
     cursorGenerator.height = cursorSize;
-    var ctx = cursorGenerator.getContext("2d");
+    var ctx = cursorGenerator.getContext('2d');
 
     var centerX = cursorGenerator.width/2;
     var centerY = cursorGenerator.height/2;
@@ -131,7 +131,7 @@ $(document).ready(function () {
     ctx.lineWidth = 3;
     ctx.strokeStyle = cursorColor;
     ctx.stroke();
-    $('#sketch').css( "cursor", "url(" + cursorGenerator.toDataURL("image/png") + ") " + cursorSize/2 + " " + cursorSize/2 + ",crosshair");
+    $('#sketch').css('cursor', 'url(' + cursorGenerator.toDataURL('image/png') + ') ' + cursorSize/2 + ' ' + cursorSize/2 + ',crosshair');
   }
   // Init mouse
   changeMouse();
@@ -166,7 +166,7 @@ $(document).ready(function () {
   });
   // TogetherJS user color:
   $('.user-color-pick').click(function() {
-    setColor(TogetherJS.require("peers").Self.color);
+    setColor(TogetherJS.require('peers').Self.color);
     changeMouse();
   });
 
