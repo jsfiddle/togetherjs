@@ -136,30 +136,12 @@ $(document).ready(function () {
   // Init mouse
   changeMouse();
   // Color-button functions:
-  $('.green-pick').click(function () {
-    setColor('#00ff00');
+  $(".color-picker").click(function () {
+    var $this = $(this);
+    setColor($this.css("background-color"));
     changeMouse();
   });
 
-  $('.yellow-pick').click(function () {
-    setColor('#ff0');
-    changeMouse();
-  });
-
-  $('.red-pick').click(function () {
-    setColor('#ff0000');
-    changeMouse();
-  });
-
-  $('.blue-pick').click(function () {
-    setColor('#0000ff');
-    changeMouse();
-  });
-
-  $('.black-pick').click(function () {
-    setColor('#000');
-    changeMouse();
-  });
   $('.eraser').click(function () {
     eraser();
     changeMouse();
