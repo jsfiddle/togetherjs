@@ -128,17 +128,9 @@ $(document).ready(function () {
 
     ctx.beginPath();
     ctx.arc(centerX, centerY, (cursorSize/2)-4, 0, 2 * Math.PI, false);
-
-    // If the user is erasing, set the fill of the cursor to white.
-    if (context.globalCompositeOperation == 'destination-over') {
-         ctx.fillStyle = 'white';
-         ctx.fill();
-    }
-
     ctx.lineWidth = 3;
     ctx.strokeStyle = cursorColor;
     ctx.stroke();
-    console.log(context.lineWidth, cursorSize);
     $('#sketch').css( "cursor", "url(" + cursorGenerator.toDataURL("image/png") + ") " + cursorSize/2 + " " + cursorSize/2 + ",crosshair");
   }
   // Init mouse
