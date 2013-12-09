@@ -27,7 +27,12 @@ function ($, util, session, elementFinder) {
       // disable iframeAPI
       $(iframe).removeAttr("enablejsapi");
       // remove unique youtube iframe indicators
-      $(iframe).removeAttr("id");
+      var id = $(iframe).attr("id") || "";
+      if (id.indexOf("youtube-player") === 0) {
+        // An id we added
+        $(iframe).removeAttr("id");
+      }
+      youTubeIframes = [];
     });
   });
 
@@ -72,11 +77,12 @@ function ($, util, session, elementFinder) {
     function setupYouTubeIframes() {
       var iframes = $('iframe');
       iframes.each(function (i, iframe) {
-        // look for YouTube Iframes
         // if the iframe's unique id is already set, skip it
-        if ($(iframe).attr("src").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
+        // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
+        // maybe we should set iframes everytime togetherjs is reinitialized?
+        if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
-          $(iframe).attr("ensablejsapi", 1);
+          $(iframe).attr("enablejsapi", 1);
           youTubeIframes[i] = iframe;
         }
       });
@@ -99,8 +105,9 @@ function ($, util, session, elementFinder) {
   } // end of prepareYouTube
 
   function publishPlayerStateChange(event) {
-    var currentPlayer = event.target;
-    var currentIframe = currentPlayer.a;
+    var target = event.target; // WEIRD: target does not return a complete player object after reinitialze. (i.e. object without all the functions)
+    var currentIframe = target.a;
+    var currentPlayer = $(currentIframe).data("togetherjs-player"); // retrieve the player object from data as a workaround
     var currentTime = currentPlayer.getCurrentTime();
     var iframeLocation = elementFinder.elementLocation(currentIframe);
 
