@@ -6,7 +6,10 @@ var sketchStyle = getComputedStyle(document.querySelector('#sketchContainer'));
 canvas.width = parseInt(sketchStyle.getPropertyValue('width'), 10);
 canvas.height = parseInt(sketchStyle.getPropertyValue('height'), 10);
 
-var lastMouse = {x: 0, y: 0};
+var lastMouse = {
+  x: 0,
+  y: 0
+};
 
 // brush settings
 context.lineWidth = 2;
@@ -44,50 +47,50 @@ function setColor(color) {
 
 // Sets the brush to erase-mode:
 function eraser() {
-context.globalCompositeOperation = "destination-out";
-context.strokeStyle = "rgba(0,0,0,1)";
+  context.globalCompositeOperation = "destination-out";
+  context.strokeStyle = "rgba(0,0,0,1)";
 }
 
 // Draws the lines, called by move and the TogetherJS event listener:
 function draw(start, end, color, size, compositeOperation) {
-    context.save();
-    context.strokeStyle = color;
-    context.globalCompositeOperation = compositeOperation;
-    context.lineWidth = size;
-    context.beginPath();
-    context.moveTo(start.x, start.y);
-    context.lineTo(end.x, end.y);
-    context.closePath();
-    context.stroke();
-    context.restore();
+  context.save();
+  context.strokeStyle = color;
+  context.globalCompositeOperation = compositeOperation;
+  context.lineWidth = size;
+  context.beginPath();
+  context.moveTo(start.x, start.y);
+  context.lineTo(end.x, end.y);
+  context.closePath();
+  context.stroke();
+  context.restore();
 }
 
 // Called whenever the mousemove event is fired, calls the draw function:
 function move(e) {
-    var mouse = {
-        x: e.pageX - this.offsetLeft,
-        y: e.pageY - this.offsetTop
-    };
-    draw(lastMouse, mouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation);
-    if (TogetherJS.running) {
-        TogetherJS.send({
-            type: "draw",
-            start: lastMouse,
-            end: mouse,
-            color: context.strokeStyle,
-            size: context.lineWidth,
-            compositeOperation: context.globalCompositeOperation
-        });
-    }
-    lastMouse = mouse;
+  var mouse = {
+    x: e.pageX - this.offsetLeft,
+    y: e.pageY - this.offsetTop
+  };
+  draw(lastMouse, mouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation);
+  if (TogetherJS.running) {
+    TogetherJS.send({
+      type: "draw",
+      start: lastMouse,
+      end: mouse,
+      color: context.strokeStyle,
+      size: context.lineWidth,
+      compositeOperation: context.globalCompositeOperation
+    });
+  }
+  lastMouse = mouse;
 }
 
 // Listens for draw messages, sends info about the drawn lines:
 TogetherJS.hub.on("draw", function (msg) {
-    if (!msg.sameUrl) {
-        return;
-    }
-    draw(msg.start, msg.end, msg.color, msg.size, msg.compositeOperation);
+  if (!msg.sameUrl) {
+      return;
+  }
+  draw(msg.start, msg.end, msg.color, msg.size, msg.compositeOperation);
 });
 
 // Hello is sent from every newly connected user, this way they will receive what has already been drawn:
