@@ -2,9 +2,8 @@
 var canvas = document.querySelector('#sketch');
 var context = canvas.getContext('2d');
 
-var sketchStyle = getComputedStyle(document.querySelector('#sketchContainer'));
-canvas.width = parseInt(sketchStyle.getPropertyValue('width'), 10);
-canvas.height = parseInt(sketchStyle.getPropertyValue('height'), 10);
+canvas.width = 1140;
+canvas.height = 400;
 
 var lastMouse = {
   x: 0,
@@ -138,6 +137,7 @@ $(document).ready(function () {
   // Color-button functions:
   $(".color-picker").click(function () {
     var $this = $(this);
+    console.log($this);
     setColor($this.css("background-color"));
     changeMouse();
   });
