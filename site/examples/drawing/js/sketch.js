@@ -26,8 +26,8 @@ canvas.addEventListener('mousedown', function (e) {
   canvas.addEventListener('mousemove', move, false);
 }, false);
 
-canvas.addEventListener('mouseout', function (e) {
-canvas.removeEventListener('mousemove', move, false);
+canvas.addEventListener('mouseout', function () {
+  canvas.removeEventListener('mousemove', move, false);
 }, false);
 
 canvas.addEventListener('mouseup', function () {
