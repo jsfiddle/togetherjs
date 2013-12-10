@@ -339,11 +339,13 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, function (TrackerClass) {
       var els = TrackerClass.scan();
-      $.each(els, function () {
-        var tracker = new TrackerClass(this);
-        $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
-        liveTrackers.push(tracker);
-      });
+      if (els) {
+        $.each(els, function () {
+          var tracker = new TrackerClass(this);
+          $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+          liveTrackers.push(tracker);
+        });
+      }
     });
   }
 
