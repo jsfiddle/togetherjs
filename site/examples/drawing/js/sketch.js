@@ -1,9 +1,15 @@
 // get the canvas element and its context
-var canvas = document.querySelector('#sketch');
+var canvas = document.getElementById('sketch');
 var context = canvas.getContext('2d');
 
-canvas.width = 1140;
-canvas.height = 400;
+// the aspect ratio is always based on 1140x400, height is calculated from width:
+canvas.width = $('#sketchContainer').outerWidth();
+canvas.height = (canvas.width/1140)*400;
+$('#sketchContainer').outerHeight(String(canvas.height) + "px", true);
+// scale function needs to know the width/height pre-resizing:
+var oWidth = canvas.width;
+var oHeight = canvas.height;
+var lines = [];
 
 var lastMouse = {
   x: 0,
@@ -50,9 +56,19 @@ function eraser() {
   context.strokeStyle = 'rgba(0,0,0,1)';
 }
 
+// Redraws the lines from an the lines-array:
+function reDraw(lines){
+  for (var i in lines) {
+    draw(lines[i][0], lines[i][1], lines[i][2], lines[i][3], lines[i][4], false);
+  }
+}
 // Draws the lines, called by move and the TogetherJS event listener:
-function draw(start, end, color, size, compositeOperation) {
+function draw(start, end, color, size, compositeOperation, save) {
   context.save();
+  context.lineJoin = 'round'; 
+  context.lineCap = 'round';
+  // Since the coordinates have been translated to a 1140x400 canvas, the context needs to be scaled before it can be drawn on:
+  context.scale(canvas.width/1140,canvas.height/400);
   context.strokeStyle = color;
   context.globalCompositeOperation = compositeOperation;
   context.lineWidth = size;
@@ -62,6 +78,10 @@ function draw(start, end, color, size, compositeOperation) {
   context.closePath();
   context.stroke();
   context.restore();
+  if (save) {
+    // Won't save if draw() is called from reDraw().
+    lines.push([{x: start.x, y: start.y}, {x: end.x, y: end.y}, color, size, compositeOperation]);
+  }
 }
 
 // Called whenever the mousemove event is fired, calls the draw function:
@@ -70,12 +90,21 @@ function move(e) {
     x: e.pageX - this.offsetLeft,
     y: e.pageY - this.offsetTop
   };
-  draw(lastMouse, mouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation);
+  // Translates the coordinates from the local canvas size to 1140x400:
+  sendMouse = {
+    x: (1140/canvas.width)*mouse.x,
+    y: (400/canvas.height)*mouse.y,
+  }
+  sendLastMouse = {
+    x: (1140/canvas.width)*lastMouse.x,
+    y: (400/canvas.height)*lastMouse.y
+  }
+  draw(sendLastMouse, sendMouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation, true);
   if (TogetherJS.running) {
     TogetherJS.send({
       type: 'draw',
-      start: lastMouse,
-      end: mouse,
+      start: sendLastMouse,
+      end: sendMouse,
       color: context.strokeStyle,
       size: context.lineWidth,
       compositeOperation: context.globalCompositeOperation
@@ -89,30 +118,29 @@ TogetherJS.hub.on('draw', function (msg) {
   if (!msg.sameUrl) {
       return;
   }
-  draw(msg.start, msg.end, msg.color, msg.size, msg.compositeOperation);
+  draw(msg.start, msg.end, msg.color, msg.size, msg.compositeOperation, true);
 });
 
 // Hello is sent from every newly connected user, this way they will receive what has already been drawn:
 TogetherJS.hub.on('togetherjs.hello', function () {
-  var image = canvas.toDataURL('image/png');
   TogetherJS.send({
     type: 'init',
-    image: image
+    lines: lines
   });
 });
 
 // Draw initially received drawings:
 TogetherJS.hub.on('init', function (msg) {
-  var image = new Image();
-  image.src = msg.image;
-  context.drawImage(image, 0, 0);
+  reDraw(msg.lines);
+  lines = msg.lines;
 });
 
-// JQuery to handle buttons, also changes the cursor to a dot resembling the brush size:
+// JQuery to handle buttons and resizing events, also changes the cursor to a dot resembling the brush size:
 $(document).ready(function () {
   // changeMouse creates a temporary invisible canvas that shows the cursor, which is then set as the cursor through css:
   function changeMouse() {
-    var cursorSize = context.lineWidth;
+    // Makes sure the cursorSize is scaled:
+    var cursorSize = context.lineWidth*(canvas.width/1140); 
     if (cursorSize < 10){
         cursorSize = 10;
     }
@@ -134,6 +162,22 @@ $(document).ready(function () {
   }
   // Init mouse
   changeMouse();
+
+  // Redraws the lines whenever the canvas is resized:
+  $(window).resize(function() {
+    if ($('#sketchContainer').width() != oWidth) {
+      canvas.width = $('#sketchContainer').width();
+      canvas.height = (canvas.width/1140)*400;
+      $('#sketchContainer').outerHeight(String(canvas.height)+"px", true);
+      var ratio = canvas.width/oWidth;
+      oWidth = canvas.width;
+      oHeight = canvas.height;
+      reDraw(lines);
+      context.restore();
+      changeMouse();
+    }
+  });
+
   // Color-button functions:
   $(".color-picker").click(function () {
     var $this = $(this);
