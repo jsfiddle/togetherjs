@@ -56,6 +56,17 @@ function eraser() {
   context.strokeStyle = 'rgba(0,0,0,1)';
 }
 
+// Clears the canvas and the lines-array:
+function clear(send) {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  lines = [];
+  if (send && TogetherJS.running) {
+    TogetherJS.send({
+      type: 'clear'
+    });
+  }
+}
+
 // Redraws the lines from an the lines-array:
 function reDraw(lines){
   for (var i in lines) {
@@ -93,12 +104,12 @@ function move(e) {
   // Translates the coordinates from the local canvas size to 1140x400:
   sendMouse = {
     x: (1140/canvas.width)*mouse.x,
-    y: (400/canvas.height)*mouse.y,
-  }
+    y: (400/canvas.height)*mouse.y
+  };
   sendLastMouse = {
     x: (1140/canvas.width)*lastMouse.x,
     y: (400/canvas.height)*lastMouse.y
-  }
+  };
   draw(sendLastMouse, sendMouse, context.strokeStyle, context.lineWidth, context.globalCompositeOperation, true);
   if (TogetherJS.running) {
     TogetherJS.send({
@@ -119,6 +130,15 @@ TogetherJS.hub.on('draw', function (msg) {
       return;
   }
   draw(msg.start, msg.end, msg.color, msg.size, msg.compositeOperation, true);
+});
+
+
+// Clears the canvas whenever someone presses the clear-button
+TogetherJS.hub.on('clear', function (msg) {
+  if (!msg.sameUrl) {
+    return;
+  }
+  clear(false);
 });
 
 // Hello is sent from every newly connected user, this way they will receive what has already been drawn:
@@ -178,8 +198,13 @@ $(document).ready(function () {
     }
   });
 
+  // Clears the canvas:
+  $('.clear').click(function () {
+    clear(true);
+  });
+
   // Color-button functions:
-  $(".color-picker").click(function () {
+  $('.color-picker').click(function () {
     var $this = $(this);
     console.log($this);
     setColor($this.css("background-color"));
