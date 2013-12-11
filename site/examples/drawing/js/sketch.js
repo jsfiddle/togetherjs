@@ -67,7 +67,7 @@ function clear(send) {
   }
 }
 
-// Redraws the lines from an the lines-array:
+// Redraws the lines from the lines-array:
 function reDraw(lines){
   for (var i in lines) {
     draw(lines[i][0], lines[i][1], lines[i][2], lines[i][3], lines[i][4], false);
@@ -78,7 +78,7 @@ function draw(start, end, color, size, compositeOperation, save) {
   context.save();
   context.lineJoin = 'round'; 
   context.lineCap = 'round';
-  // Since the coordinates have been translated to a 1140x400 canvas, the context needs to be scaled before it can be drawn on:
+  // Since the coordinates have been translated to an 1140x400 canvas, the context needs to be scaled before it can be drawn on:
   context.scale(canvas.width/1140,canvas.height/400);
   context.strokeStyle = color;
   context.globalCompositeOperation = compositeOperation;
@@ -193,7 +193,6 @@ $(document).ready(function () {
       oWidth = canvas.width;
       oHeight = canvas.height;
       reDraw(lines);
-      context.restore();
       changeMouse();
     }
   });
