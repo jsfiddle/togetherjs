@@ -499,7 +499,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                                          msg.replace.delta.text);
       // apply this change to the history
       var changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history, tracker);
+      maybeSendUpdate(msg.element, history, tracker.trackerName);
       if (! changed) {
         return;
       }
