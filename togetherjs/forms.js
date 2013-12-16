@@ -339,11 +339,13 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, function (TrackerClass) {
       var els = TrackerClass.scan();
-      $.each(els, function () {
-        var tracker = new TrackerClass(this);
-        $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
-        liveTrackers.push(tracker);
-      });
+      if (els) {
+        $.each(els, function () {
+          var tracker = new TrackerClass(this);
+          $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+          liveTrackers.push(tracker);
+        });
+      }
     });
   }
 
@@ -497,7 +499,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                                          msg.replace.delta.text);
       // apply this change to the history
       var changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history, tracker);
+      maybeSendUpdate(msg.element, history, tracker.trackerName);
       if (! changed) {
         return;
       }
