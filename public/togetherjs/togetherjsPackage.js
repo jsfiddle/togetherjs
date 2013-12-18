@@ -8138,21 +8138,31 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
   }
 
   function change(event) {
+    sendData({
+      element: event.target,
+      value: getValue(event.target)
+    });
+  }
+
+  function sendData(attrs) {
+    var el = $(attrs.element);
+    assert(el);
+    var tracker = attrs.tracker;
+    var value = attrs.value;
     if (inRemoteUpdate) {
       return;
     }
-    if (elementFinder.ignoreElement(event.target) || elementTracked(event.target) ||
-        suppressSync(event.target)) {
+    if (elementFinder.ignoreElement(el) ||
+        (elementTracked(el) && !tracker) ||
+        suppressSync(el)) {
       return;
     }
-    var el = $(event.target);
     var location = elementFinder.elementLocation(el);
-    var value = getValue(el);
     var msg = {
       type: "form-update",
       element: location
     };
-    if (isText(el)) {
+    if (isText(el) || tracker) {
       var history = el.data("togetherjsHistory");
       if (history) {
         if (history.current == value) {
@@ -8161,7 +8171,7 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         var delta = ot.TextReplace.fromChange(history.current, value);
         assert(delta);
         history.add(delta);
-        maybeSendUpdate(msg.element, history);
+        maybeSendUpdate(msg.element, history, tracker);
         return;
       } else {
         msg.value = value;
@@ -8211,14 +8221,14 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     trackerName: "AceEditor",
 
     constructor: function (el) {
-      this.element = $(el);
-      assert(this.element.hasClass("ace_editor"));
+      this.element = $(el)[0];
+      assert($(this.element).hasClass("ace_editor"));
       this._change = this._change.bind(this);
       this._editor().document.on("change", this._change);
     },
 
     tracked: function (el) {
-      return this.element[0] === el;
+      return this.element === $(el)[0];
     },
 
     destroy: function (el) {
@@ -8226,27 +8236,23 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     },
 
     update: function (msg) {
-      if (msg.value) {
-        this.init(msg);
-        return;
-      }
-      this._editor().document.getDocument().applyDeltas([msg.delta]);
+      this._editor().document.setValue(msg.value);
     },
 
     init: function (update, msg) {
-      this._editor().document.setValue(update.value);
+      this.update(update);
     },
 
     makeInit: function () {
       return {
-        element: elementFinder.elementLocation(this.element),
+        element: this.element,
         tracker: this.trackerName,
         value: this._editor().document.getValue()
       };
     },
 
     _editor: function () {
-      return this.element[0].env;
+      return this.element.env;
     },
 
     _change: function (e) {
@@ -8255,14 +8261,15 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
       if (inRemoteUpdate) {
         return;
       }
-      // FIXME: I want to use a more normalized version of replace instead of
-      // ACE's native delta
-      session.send({
-        type: "form-update",
+      sendData({
         tracker: this.trackerName,
-        element: elementFinder.elementLocation(this.element),
-        delta: JSON.parse(JSON.stringify(e.data))
+        element: this.element,
+        value: this.getContent()
       });
+    },
+
+    getContent: function() {
+      return this._editor().document.getValue();
     }
   });
 
@@ -8280,14 +8287,14 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     trackerName: "CodeMirrorEditor",
 
     constructor: function (el) {
-      this.element = $(el);
-      assert(this.element[0].CodeMirror);
+      this.element = $(el)[0];
+      assert(this.element.CodeMirror);
       this._change = this._change.bind(this);
       this._editor().on("change", this._change);
     },
 
     tracked: function (el) {
-      return this.element[0] === el;
+      return this.element === $(el)[0];
     },
 
     destroy: function (el) {
@@ -8295,23 +8302,18 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     },
 
     update: function (msg) {
-      if (msg.value) {
-        this.init(msg);
-        return;
-      }
-      this._editor().replaceRange(
-        msg.change.text,
-        msg.change.from,
-        msg.change.to);
+      this._editor().setValue(msg.value);
     },
 
-    init: function (update, msg) {
-      this._editor().setValue(update.value);
+    init: function (msg) {
+      if (msg.value) {
+        this.update(msg);
+      }
     },
 
     makeInit: function () {
       return {
-        element: elementFinder.elementLocation(this.element),
+        element: this.element,
         tracker: this.trackerName,
         value: this._editor().getValue()
       };
@@ -8321,27 +8323,19 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
       if (inRemoteUpdate) {
         return;
       }
-      delete change.origin;
-      var next = change.next;
-      delete change.next;
-      if (Array.isArray(change.text)) {
-        // This seems to be version-specific with CodeMirror, but sometimes
-        // the text is an array of lines.
-        change.text = change.text.join("\n");
-      }
-      session.send({
-        type: "form-update",
+      sendData({
         tracker: this.trackerName,
-        element: elementFinder.elementLocation(this.element),
-        change: change
+        element: this.element,
+        value: this.getContent()
       });
-      if (next) {
-        this._change(editor, next);
-      }
     },
 
     _editor: function () {
-      return this.element[0].CodeMirror;
+      return this.element.CodeMirror;
+    },
+
+    getContent: function() {
+      return this._editor().getValue();
     }
   });
 
@@ -8371,13 +8365,99 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
 
   TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
+
+  var CKEditor = util.Class({
+    trackerName: "CKEditor",
+
+    constructor: function (el) {
+      this.element = $(el)[0];
+      assert(CKEDITOR);
+      assert(CKEDITOR.dom.element.get(this.element));
+      this._change = this._change.bind(this);
+      // FIXME: change event is available since CKEditor 4.2
+      this._editor().on("change", this._change);
+    },
+    tracked: function (el) {
+      return this.element === $(el)[0];
+    },
+    destroy: function (el) {
+      this._editor().removeListener("change", this._change);
+    },
+
+    update: function (msg) {
+      //FIXME: use setHtml instead of setData to avoid frame reloading overhead
+      this._editor().editable().setHtml(msg.value);
+    },
+
+    init: function (update, msg) {
+      this.update(update);
+    },
+
+    makeInit: function () {
+      return {
+        element: this.element,
+        tracker: this.trackerName,
+        value: this.getContent()
+      };
+    },
+
+    _change: function (e) {
+      if (inRemoteUpdate) {
+        return;
+      }
+      sendData({
+        tracker: this.trackerName,
+        element: this.element,
+        value: this.getContent()
+      });
+    },
+
+    _editor: function () {
+      return CKEDITOR.dom.element.get(this.element).getEditor();
+    },
+    
+    getContent: function () {
+      return this._editor().getData();
+    }
+  });
+
+  CKEditor.scan = function () {
+    var result = [];
+    if (typeof CKEDITOR == "undefined") {
+      return;
+    }
+    var editorInstance;
+    for (var instanceIdentifier in CKEDITOR.instances) {
+      editorInstance = document.getElementById(instanceIdentifier) || document.getElementsByName(instanceIdentifier)[0];
+      if (editorInstance) {
+        result.push(editorInstance);
+      }
+    }
+    return $(result);
+  };
+
+  CKEditor.tracked = function (el) {
+    if (typeof CKEDITOR == "undefined") {
+      return false;
+    }
+    el = $(el)[0];
+    return !! (CKEDITOR.dom.element.get(el) && CKEDITOR.dom.element.get(el).getEditor());
+  };
+
+  TogetherJS.addTracker(CKEditor, true /* skip setInit */);
+
+
   function buildTrackers() {
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, function (TrackerClass) {
       var els = TrackerClass.scan();
-      $.each(els, function () {
-        liveTrackers.push(new TrackerClass(this));
-      });
+      if (els) {
+        $.each(els, function () {
+          var tracker = new TrackerClass(this);
+          $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+          liveTrackers.push(tracker);
+        });
+      }
     });
   }
 
@@ -8472,7 +8552,7 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
   }
 
   /* Send the top of this history queue, if it hasn't been already sent. */
-  function maybeSendUpdate(element, history) {
+  function maybeSendUpdate(element, history, tracker) {
     var change = history.getNextToSend();
     if (! change) {
       /* nothing to send */
@@ -8492,6 +8572,9 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         }
       }
     };
+    if (tracker) {
+      msg.tracker = tracker;
+    }
     session.send(msg);
   }
 
@@ -8500,20 +8583,14 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
       return;
     }
     var el = $(elementFinder.findElement(msg.element));
+    var tracker;
     if (msg.tracker) {
-      var tracker = getTracker(el, msg.tracker);
+      tracker = getTracker(el, msg.tracker);
       assert(tracker);
-      inRemoteUpdate = true;
-      try {
-        tracker.update(msg);
-      } finally {
-        inRemoteUpdate = false;
-      }
-      return;
     }
     var focusedEl = el[0].ownerDocument.activeElement;
     var focusedElSelection;
-    if(isText(focusedEl)) {
+    if (isText(focusedEl)) {
       focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
     }
     var selection;
@@ -8534,7 +8611,7 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
                                          msg.replace.delta.text);
       // apply this change to the history
       var changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history);
+      maybeSendUpdate(msg.element, history, tracker.trackerName);
       if (! changed) {
         return;
       }
@@ -8545,7 +8622,11 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     }
     inRemoteUpdate = true;
     try {
-      setValue(el, value);
+      if(tracker) {
+        tracker.update({value:value});
+      } else {
+        setValue(el, value);
+      }
       if (isText(el)) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
@@ -8596,7 +8677,13 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
     });
     liveTrackers.forEach(function (tracker) {
       var init = tracker.makeInit();
-      assert(tracker.tracked(elementFinder.findElement(init.element)));
+      assert(tracker.tracked(init.element));
+      var history = $(init.element).data("togetherjsHistory");
+      if (history) {
+        init.value = history.committed;
+        init.basis = history.basis;
+      }
+      init.element = elementFinder.elementLocation($(init.element));
       msg.updates.push(init);
     });
     if (msg.updates.length) {
@@ -8651,19 +8738,15 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         console.warn(e);
         return;
       }
-      if (update.tracker) {
-        var tracker = getTracker(el, update.tracker);
-        assert(tracker);
         inRemoteUpdate = true;
         try {
-          tracker.init(update, msg);
-        } finally {
-          inRemoteUpdate = false;
-        }
-      } else {
-        inRemoteUpdate = true;
-        try {
-          setValue(el, update.value);
+          if (update.tracker) {
+            var tracker = getTracker(el, update.tracker);
+            assert(tracker);
+            tracker.init(update, msg);
+          } else {
+            setValue(el, update.value);
+          }
           if (update.basis) {
             var history = $(el).data("togetherjsHistory");
             // don't overwrite history if we're already up to date
@@ -8680,7 +8763,6 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
         } finally {
           inRemoteUpdate = false;
         }
-      }
     });
   });
 

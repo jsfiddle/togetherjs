@@ -250,21 +250,31 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">change</span><span class="params">(event)</span> {</span>
+    sendData({
+      element: event.target,
+      value: getValue(event.target)
+    });
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">sendData</span><span class="params">(attrs)</span> {</span>
+    <span class="keyword">var</span> el = $(attrs.element);
+    assert(el);
+    <span class="keyword">var</span> tracker = attrs.tracker;
+    <span class="keyword">var</span> value = attrs.value;
     <span class="keyword">if</span> (inRemoteUpdate) {
       <span class="keyword">return</span>;
     }
-    <span class="keyword">if</span> (elementFinder.ignoreElement(event.target) || elementTracked(event.target) ||
-        suppressSync(event.target)) {
+    <span class="keyword">if</span> (elementFinder.ignoreElement(el) ||
+        (elementTracked(el) &amp;&amp; !tracker) ||
+        suppressSync(el)) {
       <span class="keyword">return</span>;
     }
-    <span class="keyword">var</span> el = $(event.target);
     <span class="keyword">var</span> location = elementFinder.elementLocation(el);
-    <span class="keyword">var</span> value = getValue(el);
     <span class="keyword">var</span> msg = {
       type: <span class="string">"form-update"</span>,
       element: location
     };
-    <span class="keyword">if</span> (isText(el)) {
+    <span class="keyword">if</span> (isText(el) || tracker) {
       <span class="keyword">var</span> history = el.data(<span class="string">"togetherjsHistory"</span>);
       <span class="keyword">if</span> (history) {
         <span class="keyword">if</span> (history.current == value) {
@@ -273,7 +283,7 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
         <span class="keyword">var</span> delta = ot.TextReplace.fromChange(history.current, value);
         assert(delta);
         history.add(delta);
-        maybeSendUpdate(msg.element, history);
+        maybeSendUpdate(msg.element, history, tracker);
         <span class="keyword">return</span>;
       } <span class="keyword">else</span> {
         msg.value = value;
@@ -345,14 +355,14 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     trackerName: <span class="string">"AceEditor"</span>,
 
     constructor: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-      <span class="keyword">this</span>.element = $(el);
-      assert(<span class="keyword">this</span>.element.hasClass(<span class="string">"ace_editor"</span>));
+      <span class="keyword">this</span>.element = $(el)[<span class="number">0</span>];
+      assert($(<span class="keyword">this</span>.element).hasClass(<span class="string">"ace_editor"</span>));
       <span class="keyword">this</span>._change = <span class="keyword">this</span>._change.bind(<span class="keyword">this</span>);
       <span class="keyword">this</span>._editor().document.on(<span class="string">"change"</span>, <span class="keyword">this</span>._change);
     },
 
     tracked: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-      <span class="keyword">return</span> <span class="keyword">this</span>.element[<span class="number">0</span>] === el;
+      <span class="keyword">return</span> <span class="keyword">this</span>.element === $(el)[<span class="number">0</span>];
     },
 
     destroy: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
@@ -360,27 +370,23 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
     },
 
     update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-      <span class="keyword">if</span> (msg.value) {
-        <span class="keyword">this</span>.init(msg);
-        <span class="keyword">return</span>;
-      }
-      <span class="keyword">this</span>._editor().document.getDocument().applyDeltas([msg.delta]);
+      <span class="keyword">this</span>._editor().document.setValue(msg.value);
     },
 
     init: <span class="function"><span class="keyword">function</span> <span class="params">(update, msg)</span> {</span>
-      <span class="keyword">this</span>._editor().document.setValue(update.value);
+      <span class="keyword">this</span>.update(update);
     },
 
     makeInit: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">return</span> {
-        element: elementFinder.elementLocation(<span class="keyword">this</span>.element),
+        element: <span class="keyword">this</span>.element,
         tracker: <span class="keyword">this</span>.trackerName,
         value: <span class="keyword">this</span>._editor().document.getValue()
       };
     },
 
     _editor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">return</span> <span class="keyword">this</span>.element[<span class="number">0</span>].env;
+      <span class="keyword">return</span> <span class="keyword">this</span>.element.env;
     },
 
     _change: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span></pre></div></div>
@@ -399,26 +405,16 @@ asserts !inRemoteUpdate, among other things</p>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (inRemoteUpdate) {
         <span class="keyword">return</span>;
-      }</pre></div></div>
-              
-            </li>
-          
-            <li id="section-6">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-6">&#182;</a>
-                </div>
-                <p>FIXME: I want to use a more normalized version of replace instead of
-ACE&#39;s native delta</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>      session.send({
-        type: <span class="string">"form-update"</span>,
+      }
+      sendData({
         tracker: <span class="keyword">this</span>.trackerName,
-        element: elementFinder.elementLocation(<span class="keyword">this</span>.element),
-        delta: JSON.parse(JSON.stringify(e.data))
+        element: <span class="keyword">this</span>.element,
+        value: <span class="keyword">this</span>.getContent()
       });
+    },
+
+    getContent: <span class="keyword">function</span>() {
+      <span class="keyword">return</span> <span class="keyword">this</span>._editor().document.getValue();
     }
   });
 
@@ -436,14 +432,14 @@ ACE&#39;s native delta</p>
     trackerName: <span class="string">"CodeMirrorEditor"</span>,
 
     constructor: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-      <span class="keyword">this</span>.element = $(el);
-      assert(<span class="keyword">this</span>.element[<span class="number">0</span>].CodeMirror);
+      <span class="keyword">this</span>.element = $(el)[<span class="number">0</span>];
+      assert(<span class="keyword">this</span>.element.CodeMirror);
       <span class="keyword">this</span>._change = <span class="keyword">this</span>._change.bind(<span class="keyword">this</span>);
       <span class="keyword">this</span>._editor().on(<span class="string">"change"</span>, <span class="keyword">this</span>._change);
     },
 
     tracked: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
-      <span class="keyword">return</span> <span class="keyword">this</span>.element[<span class="number">0</span>] === el;
+      <span class="keyword">return</span> <span class="keyword">this</span>.element === $(el)[<span class="number">0</span>];
     },
 
     destroy: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
@@ -451,23 +447,18 @@ ACE&#39;s native delta</p>
     },
 
     update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-      <span class="keyword">if</span> (msg.value) {
-        <span class="keyword">this</span>.init(msg);
-        <span class="keyword">return</span>;
-      }
-      <span class="keyword">this</span>._editor().replaceRange(
-        msg.change.text,
-        msg.change.from,
-        msg.change.to);
+      <span class="keyword">this</span>._editor().setValue(msg.value);
     },
 
-    init: <span class="function"><span class="keyword">function</span> <span class="params">(update, msg)</span> {</span>
-      <span class="keyword">this</span>._editor().setValue(update.value);
+    init: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">if</span> (msg.value) {
+        <span class="keyword">this</span>.update(msg);
+      }
     },
 
     makeInit: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
       <span class="keyword">return</span> {
-        element: elementFinder.elementLocation(<span class="keyword">this</span>.element),
+        element: <span class="keyword">this</span>.element,
         tracker: <span class="keyword">this</span>.trackerName,
         value: <span class="keyword">this</span>._editor().getValue()
       };
@@ -477,38 +468,19 @@ ACE&#39;s native delta</p>
       <span class="keyword">if</span> (inRemoteUpdate) {
         <span class="keyword">return</span>;
       }
-      <span class="keyword">delete</span> change.origin;
-      <span class="keyword">var</span> next = change.next;
-      <span class="keyword">delete</span> change.next;
-      <span class="keyword">if</span> (Array.isArray(change.text)) {</pre></div></div>
-              
-            </li>
-          
-            <li id="section-7">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-7">&#182;</a>
-                </div>
-                <p>This seems to be version-specific with CodeMirror, but sometimes
-the text is an array of lines.</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>        change.text = change.text.join(<span class="string">"\n"</span>);
-      }
-      session.send({
-        type: <span class="string">"form-update"</span>,
+      sendData({
         tracker: <span class="keyword">this</span>.trackerName,
-        element: elementFinder.elementLocation(<span class="keyword">this</span>.element),
-        change: change
+        element: <span class="keyword">this</span>.element,
+        value: <span class="keyword">this</span>.getContent()
       });
-      <span class="keyword">if</span> (next) {
-        <span class="keyword">this</span>._change(editor, next);
-      }
     },
 
     _editor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">return</span> <span class="keyword">this</span>.element[<span class="number">0</span>].CodeMirror;
+      <span class="keyword">return</span> <span class="keyword">this</span>.element.CodeMirror;
+    },
+
+    getContent: <span class="keyword">function</span>() {
+      <span class="keyword">return</span> <span class="keyword">this</span>._editor().getValue();
     }
   });
 
@@ -538,13 +510,121 @@ the text is an array of lines.</p>
 
   TogetherJS.addTracker(CodeMirrorEditor, <span class="literal">true</span> <span class="comment">/* skip setInit */</span>);
 
+
+  <span class="keyword">var</span> CKEditor = util.Class({
+    trackerName: <span class="string">"CKEditor"</span>,
+
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">this</span>.element = $(el)[<span class="number">0</span>];
+      assert(CKEDITOR);
+      assert(CKEDITOR.dom.element.get(<span class="keyword">this</span>.element));
+      <span class="keyword">this</span>._change = <span class="keyword">this</span>._change.bind(<span class="keyword">this</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>FIXME: change event is available since CKEditor 4.2</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>._editor().on(<span class="string">"change"</span>, <span class="keyword">this</span>._change);
+    },
+    tracked: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>.element === $(el)[<span class="number">0</span>];
+    },
+    destroy: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">this</span>._editor().removeListener(<span class="string">"change"</span>, <span class="keyword">this</span>._change);
+    },
+
+    update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-7">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-7">&#182;</a>
+                </div>
+                <p>FIXME: use setHtml instead of setData to avoid frame reloading overhead</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      <span class="keyword">this</span>._editor().editable().setHtml(msg.value);
+    },
+
+    init: <span class="function"><span class="keyword">function</span> <span class="params">(update, msg)</span> {</span>
+      <span class="keyword">this</span>.update(update);
+    },
+
+    makeInit: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> {
+        element: <span class="keyword">this</span>.element,
+        tracker: <span class="keyword">this</span>.trackerName,
+        value: <span class="keyword">this</span>.getContent()
+      };
+    },
+
+    _change: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
+      <span class="keyword">if</span> (inRemoteUpdate) {
+        <span class="keyword">return</span>;
+      }
+      sendData({
+        tracker: <span class="keyword">this</span>.trackerName,
+        element: <span class="keyword">this</span>.element,
+        value: <span class="keyword">this</span>.getContent()
+      });
+    },
+
+    _editor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> CKEDITOR.dom.element.get(<span class="keyword">this</span>.element).getEditor();
+    },
+    
+    getContent: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>._editor().getData();
+    }
+  });
+
+  CKEditor.scan = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">var</span> result = [];
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> CKEDITOR == <span class="string">"undefined"</span>) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">var</span> editorInstance;
+    <span class="keyword">for</span> (<span class="keyword">var</span> instanceIdentifier <span class="keyword">in</span> CKEDITOR.instances) {
+      editorInstance = document.getElementById(instanceIdentifier) || document.getElementsByName(instanceIdentifier)[<span class="number">0</span>];
+      <span class="keyword">if</span> (editorInstance) {
+        result.push(editorInstance);
+      }
+    }
+    <span class="keyword">return</span> $(result);
+  };
+
+  CKEditor.tracked = <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> CKEDITOR == <span class="string">"undefined"</span>) {
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+    el = $(el)[<span class="number">0</span>];
+    <span class="keyword">return</span> !! (CKEDITOR.dom.element.get(el) &amp;&amp; CKEDITOR.dom.element.get(el).getEditor());
+  };
+
+  TogetherJS.addTracker(CKEditor, <span class="literal">true</span> <span class="comment">/* skip setInit */</span>);
+
+
   <span class="function"><span class="keyword">function</span> <span class="title">buildTrackers</span><span class="params">()</span> {</span>
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, <span class="function"><span class="keyword">function</span> <span class="params">(TrackerClass)</span> {</span>
       <span class="keyword">var</span> els = TrackerClass.scan();
-      $.each(els, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        liveTrackers.push(<span class="keyword">new</span> TrackerClass(<span class="keyword">this</span>));
-      });
+      <span class="keyword">if</span> (els) {
+        $.each(els, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+          <span class="keyword">var</span> tracker = <span class="keyword">new</span> TrackerClass(<span class="keyword">this</span>);
+          $(<span class="keyword">this</span>).data(<span class="string">"togetherjsHistory"</span>, ot.SimpleHistory(session.clientId, tracker.getContent(), <span class="number">1</span>));
+          liveTrackers.push(tracker);
+        });
+      }
     });
   }
 
@@ -639,7 +719,7 @@ the text is an array of lines.</p>
   }
 
   <span class="comment">/* Send the top of this history queue, if it hasn't been already sent. */</span>
-  <span class="function"><span class="keyword">function</span> <span class="title">maybeSendUpdate</span><span class="params">(element, history)</span> {</span>
+  <span class="function"><span class="keyword">function</span> <span class="title">maybeSendUpdate</span><span class="params">(element, history, tracker)</span> {</span>
     <span class="keyword">var</span> change = history.getNextToSend();
     <span class="keyword">if</span> (! change) {
       <span class="comment">/* nothing to send */</span>
@@ -659,6 +739,9 @@ the text is an array of lines.</p>
         }
       }
     };
+    <span class="keyword">if</span> (tracker) {
+      msg.tracker = tracker;
+    }
     session.send(msg);
   }
 
@@ -667,20 +750,14 @@ the text is an array of lines.</p>
       <span class="keyword">return</span>;
     }
     <span class="keyword">var</span> el = $(elementFinder.findElement(msg.element));
+    <span class="keyword">var</span> tracker;
     <span class="keyword">if</span> (msg.tracker) {
-      <span class="keyword">var</span> tracker = getTracker(el, msg.tracker);
+      tracker = getTracker(el, msg.tracker);
       assert(tracker);
-      inRemoteUpdate = <span class="literal">true</span>;
-      <span class="keyword">try</span> {
-        tracker.update(msg);
-      } <span class="keyword">finally</span> {
-        inRemoteUpdate = <span class="literal">false</span>;
-      }
-      <span class="keyword">return</span>;
     }
     <span class="keyword">var</span> focusedEl = el[<span class="number">0</span>].ownerDocument.activeElement;
     <span class="keyword">var</span> focusedElSelection;
-    <span class="keyword">if</span>(isText(focusedEl)) {
+    <span class="keyword">if</span> (isText(focusedEl)) {
       focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
     }
     <span class="keyword">var</span> selection;
@@ -723,7 +800,7 @@ the text is an array of lines.</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history);
+      maybeSendUpdate(msg.element, history, tracker.trackerName);
       <span class="keyword">if</span> (! changed) {
         <span class="keyword">return</span>;
       }
@@ -734,7 +811,11 @@ the text is an array of lines.</p>
     }
     inRemoteUpdate = <span class="literal">true</span>;
     <span class="keyword">try</span> {
-      setValue(el, value);
+      <span class="keyword">if</span>(tracker) {
+        tracker.update({value:value});
+      } <span class="keyword">else</span> {
+        setValue(el, value);
+      }
       <span class="keyword">if</span> (isText(el)) {
         el[<span class="number">0</span>].selectionStart = selection[<span class="number">0</span>];
         el[<span class="number">0</span>].selectionEnd = selection[<span class="number">1</span>];
@@ -796,7 +877,13 @@ the text is an array of lines.</p>
     });
     liveTrackers.forEach(<span class="function"><span class="keyword">function</span> <span class="params">(tracker)</span> {</span>
       <span class="keyword">var</span> init = tracker.makeInit();
-      assert(tracker.tracked(elementFinder.findElement(init.element)));
+      assert(tracker.tracked(init.element));
+      <span class="keyword">var</span> history = $(init.element).data(<span class="string">"togetherjsHistory"</span>);
+      <span class="keyword">if</span> (history) {
+        init.value = history.committed;
+        init.basis = history.basis;
+      }
+      init.element = elementFinder.elementLocation($(init.element));
       msg.updates.push(init);
     });
     <span class="keyword">if</span> (msg.updates.length) {
@@ -884,19 +971,15 @@ A quick check to see if we should init...</p>
         console.warn(e);
         <span class="keyword">return</span>;
       }
-      <span class="keyword">if</span> (update.tracker) {
-        <span class="keyword">var</span> tracker = getTracker(el, update.tracker);
-        assert(tracker);
         inRemoteUpdate = <span class="literal">true</span>;
         <span class="keyword">try</span> {
-          tracker.init(update, msg);
-        } <span class="keyword">finally</span> {
-          inRemoteUpdate = <span class="literal">false</span>;
-        }
-      } <span class="keyword">else</span> {
-        inRemoteUpdate = <span class="literal">true</span>;
-        <span class="keyword">try</span> {
-          setValue(el, update.value);
+          <span class="keyword">if</span> (update.tracker) {
+            <span class="keyword">var</span> tracker = getTracker(el, update.tracker);
+            assert(tracker);
+            tracker.init(update, msg);
+          } <span class="keyword">else</span> {
+            setValue(el, update.value);
+          }
           <span class="keyword">if</span> (update.basis) {
             <span class="keyword">var</span> history = $(el).data(<span class="string">"togetherjsHistory"</span>);</pre></div></div>
               
@@ -935,7 +1018,6 @@ we just asked to join.</p>
         } <span class="keyword">finally</span> {
           inRemoteUpdate = <span class="literal">false</span>;
         }
-      }
     });
   });
 
