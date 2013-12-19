@@ -499,7 +499,11 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                                          msg.replace.delta.text);
       // apply this change to the history
       var changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history, tracker.trackerName);
+      var trackerName = null;
+      if (typeof tracker != "undefined") {
+        trackerName = tracker.trackerName;
+      }
+      maybeSendUpdate(msg.element, history, trackerName);
       if (! changed) {
         return;
       }
