@@ -8611,7 +8611,11 @@ define('forms',["jquery", "util", "session", "elementFinder", "eventMaker", "tem
                                          msg.replace.delta.text);
       // apply this change to the history
       var changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history, tracker.trackerName);
+      var trackerName = null;
+      if (typeof tracker != "undefined") {
+        trackerName = tracker.trackerName;
+      }
+      maybeSendUpdate(msg.element, history, trackerName);
       if (! changed) {
         return;
       }
@@ -10085,10 +10089,14 @@ function ($, util, session, elementFinder) {
   } // end of prepareYouTube
 
   function publishPlayerStateChange(event) {
-    var target = event.target; // WEIRD: target does not return a complete player object after reinitialze. (i.e. object without all the functions)
+    var target = event.target; 
     var currentIframe = target.a;
-    var currentPlayer = $(currentIframe).data("togetherjs-player"); // retrieve the player object from data as a workaround
-    var currentTime = currentPlayer.getCurrentTime();
+    // FIXME: player object retrieved from event.target has an incomplete set of essential functions
+    // this is most likely due to a recently-introduced problem with current YouTube API as others have been reporting the same issue (12/18/`13)
+    //var currentPlayer = target;
+    //var currentTime = currentPlayer.getCurrentTime();
+    var currentPlayer = $(currentIframe).data("togetherjs-player");
+    var currentTime = target.k.currentTime;
     var iframeLocation = elementFinder.elementLocation(currentIframe);
 
     if ($(currentPlayer).data("seek")) {

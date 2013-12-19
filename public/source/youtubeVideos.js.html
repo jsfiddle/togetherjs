@@ -514,10 +514,25 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
   } <span class="comment">// end of prepareYouTube</span>
 
   <span class="function"><span class="keyword">function</span> <span class="title">publishPlayerStateChange</span><span class="params">(event)</span> {</span>
-    <span class="keyword">var</span> target = event.target; <span class="comment">// WEIRD: target does not return a complete player object after reinitialze. (i.e. object without all the functions)</span>
-    <span class="keyword">var</span> currentIframe = target.a;
-    <span class="keyword">var</span> currentPlayer = $(currentIframe).data(<span class="string">"togetherjs-player"</span>); <span class="comment">// retrieve the player object from data as a workaround</span>
-    <span class="keyword">var</span> currentTime = currentPlayer.getCurrentTime();
+    <span class="keyword">var</span> target = event.target; 
+    <span class="keyword">var</span> currentIframe = target.a;</pre></div></div>
+              
+            </li>
+          
+            <li id="section-20">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-20">&#182;</a>
+                </div>
+                <p>FIXME: player object retrieved from event.target has an incomplete set of essential functions
+this is most likely due to a recently-introduced problem with current YouTube API as others have been reporting the same issue (12/18/`13)
+var currentPlayer = target;
+var currentTime = currentPlayer.getCurrentTime();</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> currentPlayer = $(currentIframe).data(<span class="string">"togetherjs-player"</span>);
+    <span class="keyword">var</span> currentTime = target.k.currentTime;
     <span class="keyword">var</span> iframeLocation = elementFinder.elementLocation(currentIframe);
 
     <span class="keyword">if</span> ($(currentPlayer).data(<span class="string">"seek"</span>)) {
@@ -527,10 +542,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-20">
+            <li id="section-21">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-20">&#182;</a>
+                  <a class="pilcrow" href="#section-21">&#182;</a>
                 </div>
                 <p>do not publish if playerState was changed by other users</p>
 
@@ -540,10 +555,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-21">
+            <li id="section-22">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-21">&#182;</a>
+                  <a class="pilcrow" href="#section-22">&#182;</a>
                 </div>
                 <p>make it false again so it can start publishing events of its own state changes</p>
 
@@ -555,10 +570,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-22">
+            <li id="section-23">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-22">&#182;</a>
+                  <a class="pilcrow" href="#section-23">&#182;</a>
                 </div>
                 <p>notify other people that I changed the player state</p>
 
@@ -571,10 +586,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-23">
+            <li id="section-24">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-23">&#182;</a>
+                  <a class="pilcrow" href="#section-24">&#182;</a>
                 </div>
                 <p>notify that I just loaded another video</p>
 
@@ -584,10 +599,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-24">
+            <li id="section-25">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-24">&#182;</a>
+                  <a class="pilcrow" href="#section-25">&#182;</a>
                 </div>
                 <p>update current video id</p>
 
@@ -613,10 +628,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-25">
+            <li id="section-26">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-25">&#182;</a>
+                  <a class="pilcrow" href="#section-26">&#182;</a>
                 </div>
                 <p>do nothing when the state is buffering, cued, or ended</p>
 
@@ -649,10 +664,10 @@ maybe we should set iframes everytime togetherjs is reinitialized?</p>
               
             </li>
           
-            <li id="section-26">
+            <li id="section-27">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-26">&#182;</a>
+                  <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
                 <p>seekTo() updates the video&#39;s time and plays it if it was already playing
 and pauses it if it was already paused</p>
@@ -666,10 +681,10 @@ and pauses it if it was already paused</p>
               
             </li>
           
-            <li id="section-27">
+            <li id="section-28">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-27">&#182;</a>
+                  <a class="pilcrow" href="#section-28">&#182;</a>
                 </div>
                 <p>When YouTube videos are advanced while playing,
 Chrome: pause -&gt; pause -&gt; play (onStateChange is called even when it is from pause to pause)
@@ -683,10 +698,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-28">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>&quot;seek&quot; flag will help supress publishing unwanted state changes</p>
 
@@ -700,10 +715,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-29">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>if a late user joins a channel, synchronize his videos</p>
 
@@ -713,10 +728,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-30">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-30">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
                 <p>wait a couple seconds to make sure the late user has finished loading API</p>
 
@@ -731,10 +746,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-31">
+            <li id="section-32">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-31">&#182;</a>
+                  <a class="pilcrow" href="#section-32">&#182;</a>
                 </div>
                 <p>check if another video had been loaded to an existing iframe before I joined</p>
 
@@ -748,10 +763,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-32">
+            <li id="section-33">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-32">&#182;</a>
+                  <a class="pilcrow" href="#section-33">&#182;</a>
                 </div>
                 <p>if the video is only cued, I do not have to do anything to sync</p>
 
@@ -767,10 +782,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-33">
+            <li id="section-34">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-33">&#182;</a>
+                  <a class="pilcrow" href="#section-34">&#182;</a>
                 </div>
                 <p>load a new video if the host has loaded one</p>
 
@@ -807,10 +822,10 @@ We must prevent advanced videos from going out of sync</p>
               
             </li>
           
-            <li id="section-34">
+            <li id="section-35">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-34">&#182;</a>
+                  <a class="pilcrow" href="#section-35">&#182;</a>
                 </div>
                 <p>since url forms of iframe src and player&#39;s video url are different,
 I have to compare the video ids</p>
@@ -826,10 +841,10 @@ I have to compare the video ids</p>
               
             </li>
           
-            <li id="section-35">
+            <li id="section-36">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-35">&#182;</a>
+                  <a class="pilcrow" href="#section-36">&#182;</a>
                 </div>
                 <p>parses videoId from the url returned by getVideoUrl function</p>
 
@@ -840,10 +855,10 @@ I have to compare the video ids</p>
               
             </li>
           
-            <li id="section-36">
+            <li id="section-37">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-36">&#182;</a>
+                  <a class="pilcrow" href="#section-37">&#182;</a>
                 </div>
                 <p>Chrome and Firefox have different positions for parameters</p>
 

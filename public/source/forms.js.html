@@ -800,7 +800,11 @@ asserts !inRemoteUpdate, among other things</p>
               </div>
               
                 <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> changed = history.commit(msg.replace);
-      maybeSendUpdate(msg.element, history, tracker.trackerName);
+      <span class="keyword">var</span> trackerName = <span class="literal">null</span>;
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> tracker != <span class="string">"undefined"</span>) {
+        trackerName = tracker.trackerName;
+      }
+      maybeSendUpdate(msg.element, history, trackerName);
       <span class="keyword">if</span> (! changed) {
         <span class="keyword">return</span>;
       }
