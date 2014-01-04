@@ -81,6 +81,15 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     }
   };
 
+  session.isSamePage = function (otherUrl, thisUrl) {
+    var func = TogetherJS.config.get("isSamePage");
+    if (func) {
+      return func(otherUrl, thisUrl);
+    } else {
+      return otherUrl == thisUrl;
+    }
+  };
+
   /****************************************
    * Message handling/dispatching
    */
@@ -126,7 +135,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         msg.peer.updateFromHello(msg);
       }
       if (msg.peer) {
-        msg.sameUrl = msg.peer.url == currentUrl;
+        msg.sameUrl = session.isSamePage(msg.peer.url, currentUrl);
         if (!msg.peer.isSelf) {
           msg.peer.updateMessageDate(msg);
         }

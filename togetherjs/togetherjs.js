@@ -51,6 +51,8 @@
     suppressJoinConfirmation: false,
     // If true, then the "Invite a friend" window won't automatically come up
     suppressInvite: false,
+    // If true, then the walkthrough won't be shown first time through
+    suppressWalkthrough: false,
     // A room in which to find people to invite to this session,
     inviteFromRoom: null,
     // This is used to keep sessions from crossing over on the same
@@ -64,8 +66,13 @@
     includeHashInUrl: false,
     // When true, the WebRTC-based mic/chat will be disabled
     disableWebRTC: false,
+    // When true, the invite-a-friend button won't appear
+    disableInvite: false,
     // When true, youTube videos will synchronize
-    youtube: true
+    youtube: true,
+    // This is a function isSamePage(otherUrl, currentUrl) - can be
+    // used when you want to treat different URLs as the same page
+    isSamePage: null
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
