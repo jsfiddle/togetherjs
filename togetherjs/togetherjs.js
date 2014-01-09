@@ -69,7 +69,9 @@
     // When false, disables all console logging of messages
     debugMessages: true,
     // Ignores the following console messages
-    ignoreMessages: ["cursor-update", "keydown", "scroll-update"]
+    ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
+    // Ignores the following forms (will ignore all forms if set to true):
+    ignoreForms: [":password"]
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
