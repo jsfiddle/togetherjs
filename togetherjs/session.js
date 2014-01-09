@@ -4,7 +4,8 @@
 
 define(["require", "util", "channels", "jquery", "storage"], function (require, util, channels, $, storage) {
 
-  var DEBUG = TogetherJS.config.get("debugMessages");
+  var DEBUG = true;
+
   // This is the amount of time in which a hello-back must be received after a hello
   // for us to respect a URL change:
   var HELLO_BACK_CUTOFF = 1500;
@@ -88,6 +89,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   session.hub = util.mixinEvents({});
 
   var IGNORE_MESSAGES = TogetherJS.config.get("ignoreMessages");
+  if (IGNORE_MESSAGES === true) {
+    DEBUG = false;
+    IGNORE_MESSAGES = [];
+  }
   // These are messages sent by clients who aren't "part" of the TogetherJS session:
   var MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
 

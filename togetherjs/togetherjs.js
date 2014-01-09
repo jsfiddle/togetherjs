@@ -66,9 +66,7 @@
     disableWebRTC: false,
     // When true, youTube videos will synchronize
     youtube: true,
-    // When false, disables all console logging of messages
-    debugMessages: true,
-    // Ignores the following console messages
+    // Ignores the following console messages, disables all messages if set to true
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
     ignoreForms: [":password"]
