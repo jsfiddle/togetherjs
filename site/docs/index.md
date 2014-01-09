@@ -140,6 +140,9 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 `TogetherJSConfig_ignoreMessages`:
     Contains a list of all the messages that will be ignored when console logging. Defaults to the list ["cursor-update", "keydown", "scroll-update"].
 
+`TogetherJSConfig_ignoreForms`:
+    Contains a list of all the forms that will be ignored, defaults to [":password"]. Can be set to true to ignore all forms.
+
 There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
 ## Start TogetherJS Button
