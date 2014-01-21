@@ -307,7 +307,7 @@ wsServer.on('request', function(request) {
     connectionStats[id].totalMessages++;
     logger.debug('Message on ' + id + ' bytes: ' +
                  (message.utf8Data && message.utf8Data.length) +
-                 ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20) +
+                 ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 1000) +
                  ' connections: ' + allConnections[id].length);
     for (var i=0; i<allConnections[id].length; i++) {
       var c = allConnections[id][i];
