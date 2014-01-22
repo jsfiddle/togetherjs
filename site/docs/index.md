@@ -134,6 +134,12 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
 `TogetherJSConfig_youtube`:
     If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.
 
+`TogetherJSConfig_ignoreMessages`:
+    Contains a list of all the messages that will be ignored when console logging. Defaults to the list ["cursor-update", "keydown", "scroll-update"]. Will ignore all messages if set to true. 
+
+`TogetherJSConfig_ignoreForms`:
+    Contains a list of all the forms that will be ignored, defaults to [":password"]. Will ignore all forms if set to true.
+
 There are additional hooks you can configure, which are described in [Extending TogetherJS](#extending-togetherjs).
 
 ## Start TogetherJS Button

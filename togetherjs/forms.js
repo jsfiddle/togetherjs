@@ -13,7 +13,13 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   var inRemoteUpdate = false;
 
   function suppressSync(element) {
-    return $(element).is(":password");
+    var ignoreForms = TogetherJS.config.get("ignoreForms");
+    if (ignoreForms === true) {
+      return true;
+    }
+    else {
+      return $(element).is(ignoreForms.join(",")); 
+    }
   }
 
   function maybeChange(event) {
