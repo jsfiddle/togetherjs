@@ -72,7 +72,9 @@
     youtube: true,
     // This is a function isSamePage(otherUrl, currentUrl) - can be
     // used when you want to treat different URLs as the same page
-    isSamePage: null
+    isSamePage: null,
+    forceIdentityId: null,
+    forceSessionId: null,
     // Ignores the following console messages, disables all messages if set to true
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):

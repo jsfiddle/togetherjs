@@ -265,9 +265,13 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         def.resolve();
         return;
       }
+      TogetherJS.config.close("forceIdentityId");
       storage.get("identityId").then(function (identityId) {
         if (! identityId) {
-          identityId = util.generateId();
+          identityId = TogetherJS.config.get("forceIdentityId");
+          if (! identityId) {
+            identityId = util.generateId();
+          }
           storage.set("identityId", identityId);
         }
         session.identityId = identityId;
@@ -306,6 +310,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           location.hash = newHash;
         }
       }
+      TogetherJS.config.close("forceSessionId");
       return storage.tab.get("status").then(function (saved) {
         var findRoom = TogetherJS.config.get("findRoom");
         TogetherJS.config.close("findRoom");
@@ -317,7 +322,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         if (findRoom && typeof findRoom == "string" && (! saved) && (! TogetherJS.startup._joinShareId)) {
           isClient = true;
           shareId = findRoom;
-          sessionId = util.generateId();
+          sessionId = TogetherJS.config.get("forceSessionId");
+          if (! sessionId) {
+            sessionId = util.generateId();
+          }
         } else if (findRoom && (! saved) && (! TogetherJS.startup._joinShareId)) {
           assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
           assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
