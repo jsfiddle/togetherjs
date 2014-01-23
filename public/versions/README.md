@@ -7,3 +7,4 @@ Tagged versions are available in subdirectories here, like:
 
 Versions:
 
+  * [0.1HOTDISH](./0.1HOTDISH/togetherjs.js) (Special release for Hotdish)

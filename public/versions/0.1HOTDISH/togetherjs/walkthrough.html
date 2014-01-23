@@ -1,0 +1,90 @@
+<!--
+    Any elements with .togetherjs-walkthrough-firsttime will only be
+    displayed on during the first-time experience.  Any elements with
+    .togetherjs-walkthrough-not-firsttime will only be displayed when
+    the walkthrough is accessed through the Help menu.
+
+    Note you *cannot* use <section class="togetherjs-walkthrough-slide
+    togetherjs-walkthrough-firsttime">: the number of sections must be the
+    same regardless.
+  -->
+<div id="togetherjs-walkthrough" class="togetherjs-modal togetherjs-modal-wide">
+  <header>You're using <span class="togetherjs-tool-name">TogetherJS</span>!<button class="togetherjs-close"></button></header>
+
+  <div id="togetherjs-walkthrough-previous"></div>
+  <div id="togetherjs-walkthrough-next"></div>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-intro.png"></p>
+	<p><span class="togetherjs-tool-name">TogetherJS</span> is a service for your website that makes it easy to collaborate in real-time on: <strong class="togetherjs-site-name">[site name]</strong></p>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <div class="togetherjs-walkthrough-firsttime">
+      <div class="togetherjs-walkthrough-main-image">
+        <div class="togetherjs-walkthrough-avatar-section">
+          <div class="togetherjs-avatar-preview togetherjs-person togetherjs-person-self"></div>
+          <div class="togetherjs-avatar-upload-input"><input type="file" class="togetherjs-upload-avatar"></div>
+        </div>
+        <input class="togetherjs-self-name" type="text" placeholder="Enter your name">
+        <div class="togetherjs-swatch togetherjs-person-bgcolor-self"></div>
+        <div class="togetherjs-save-settings">
+          <button class="togetherjs-avatar-save togetherjs-primary">
+            <span id="togetherjs-avatar-when-unsaved">Save</span>
+            <span id="togetherjs-avatar-when-saved" style="display: none">Saved!</span>
+          </button>
+        </div>
+      </div>
+      <p>Set up your avatar, name and user color above.  If you'd like to update it later, you can click your Profile button.</p>
+    </div>
+    <div class="togetherjs-walkthrough-not-firsttime">
+      <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-profile.png"></p>
+      <p>Change your avatar, name and user color using the Profile button.</p>
+    </div>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image togetherjs-ifnot-creator"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-invite.png">
+    </p>
+    <p class="togetherjs-ifnot-creator">You can invite more friends to the session by sending the invite link in the <span class="togetherjs-tool-name">TogetherJS</span> dock.</p>
+    <p class="togetherjs-walkthrough-main-image togetherjs-if-creator">
+      <span class="togetherjs-walkthrough-sendlink">
+        Copy and paste this link into IM or email to invite friends.
+      </span>
+      <input type="text" class="togetherjs-share-link">
+    </p>
+    <p class="togetherjs-if-creator">Send the above link to a friend so they can join your session!  You can find this invite link on the <span class="togetherjs-tool-name">TogetherJS</span> dock as well.</p>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-participant.png"></p>
+    <p>Friends who join your <span class="togetherjs-tool-name">TogetherJS</span> session will appear here.  You can click their avatars to see more.</p>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-chat.png"></p>
+    <p>When your friends join you in your <span class="togetherjs-tool-name">TogetherJS</span> session, you can chat with them here!</p>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-rtc.png"></p>
+    <p>If your browser supports it, click the microphone icon to begin a audio chat. Learn more about this experimental feature <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">here</a>.</p>
+  </section>
+
+  <section class="togetherjs-walkthrough-slide">
+    <p class="togetherjs-walkthrough-main-image"><img src="http://localhost:8080/togetherjs/images/walkthrough-images-logo.png"></p>
+    <p>Alright, you're ready to use <span class="togetherjs-tool-name">TogetherJS</span>. Now start collaborating on <strong class="togetherjs-site-name">[site name]</strong>!</p>
+  </section>
+
+  <div style="display: none">
+    <!-- There is one of these created for each slide: -->
+    <span id="togetherjs-template-walkthrough-slide-progress" class="togetherjs-walkthrough-slide-progress">&#9679;</span>
+  </div>
+  <section id="togetherjs-walkthrough-progress">
+  </section>
+
+  <section class="togetherjs-buttons">
+    <button class="togetherjs-primary togetherjs-dismiss">I'm ready!</button>
+  </section>
+
+</div><!-- /.togetherjs-modal -->

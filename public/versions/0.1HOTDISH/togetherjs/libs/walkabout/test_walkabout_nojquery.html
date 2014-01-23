@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Walkabout tests</title>
+    <link rel="stylesheet" href="http://doctestjs.org/doctest.css"></script>
+    <script src="http://doctestjs.org/doctest.js"></script>
+    <!--<script src="doctestjs/doctest.js"></script>-->
+    <script src="lib/esprima.js"></script>
+    <script src="lib/falafel.js"></script>
+    <script src="walkabout.js"></script>
+  </head>
+  <body class="autodoctest">
+
+    <div>
+      <pre class="commenttest" href="test_walkabout_nojquery.js"></pre>
+    </div>
+
+    <div id="fixture">
+      <button id="button">A button</button>
+      <input type="text" id="textinput" data-walkabout-keypress="{which: 13}">
+      <a href="#1" id="link">link</a>
+      <ul>
+        <li class="item">an item 1</li>
+        <li class="item">an item 2</li>
+      </ul>
+      <pre id="log"></pre>
+    </div>
+
+  </body>
+</html>

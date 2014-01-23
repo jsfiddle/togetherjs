@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>walkabout.js: automated randomized Javascript frontend testing</title>
+    <script src="walkabout.js"></script>
+    <script>
+
+window.addEventListener("load", function () {
+  document.getElementById("bookmarklet").href = Walkabout.makeBookmarklet();
+}, false);
+
+    </script>
+    <style>
+
+body {
+  font-family: sans-serif;
+}
+
+#page {
+  max-width: 40em;
+  position: absolute;
+  left: 50%;
+  margin-left: -20em;
+}
+
+    </style>
+  </head>
+  <body>
+
+    <div id="page">
+
+    <h1>Walkabout.js</h1>
+
+    <p>walkabout.js is a library to do automated randomized Javascript
+    testing (you might consider it "fuzz" testing).  It figures out
+    what the application is listening for the user to do, and does
+    things randomly.</p>
+
+    <p>For more information
+    see <a href="http://github.com/ianb/walkabout.js">the github
+    page</a>. </p>
+
+    <p>There is a bookmarklet for use with jQuery apps:</p>
+
+    <p style="text-align: center">
+      <a id="bookmarklet" style="font-size: 200%; border: 2px solid #000; border-radius: 3px; padding: 0.3em;" href="">walkabout</a>
+    </p>
+
+    </div>
+
+  </body>
+</html>

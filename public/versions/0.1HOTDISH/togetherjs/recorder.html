@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TogetherJS recorder</title>
+    <script>
+      TogetherJSConfig_noAutoStart = true;
+    </script>
+    <script src="../togetherjs.js"></script>
+    <script>
+      var config = TogetherJS._extend(TogetherJS.requireConfig);
+      config.deps = ["recorder"];
+      config.callback = function () {
+        console.log("got back");
+        require({context: "togetherjs"})(["recorder"], function (recorder) {
+          recorder.start({
+            baseUrl: TogetherJS.baseUrl,
+            defaultHubBase: TogetherJS.config.get("hubBase")
+          });
+        });
+      };
+      require = config;
+      console.log("required");
+    </script>
+    <script src="./libs/require.js"></script>
+    <link rel="stylesheet" href="recorder.css">
+  </head>
+  <body>
+
+<div id="connection-status">
+  <span id="not-connected" data-toggles="#connection-status span">Not Connected</span>
+  <span id="connected" data-toggles="#connection-status span" style="display: none">Connected</span>
+  <span id="no-session-id" data-toggles="#connection-status span" style="display: none">There's no <code>#&amp;togetherjs=SESSION_ID</code> in the URL.</span>
+  <button id="restart">Restart recording</button>
+  <button id="select">Select record</button>
+</div>
+
+<div>
+  <textarea id="record">/* TogetherJS session starts */
+
+</textarea>
+</div>
+
+
+  </body>
+</html>
