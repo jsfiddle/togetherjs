@@ -75,6 +75,7 @@
     isSamePage: null,
     forceIdentityId: null,
     forceSessionId: null,
+    disableSessionLoad: false,
     // Ignores the following console messages, disables all messages if set to true
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
@@ -773,7 +774,11 @@
     } else {
       // FIXME: this doesn't respect storagePrefix:
       var key = "togetherjs-session.status";
-      var value = sessionStorage.getItem(key);
+      var value;
+      if (! (window.TogetherJSConfig_disableSessionLoad ||
+             (window.TogetherJSConfig && window.TogetherJSConfig.disableSessionLoad))) {
+        value = sessionStorage.getItem(key);
+      }
       if (value) {
         value = JSON.parse(value);
         if (value && value.running) {
