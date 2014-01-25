@@ -4541,26 +4541,6 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       $(this).append($('<button class="togetherjs-close"></button>'));
     });
 
-    TogetherJS.config.track("disableWebRTC", function (hide, previous) {
-      if (hide && ! previous) {
-        ui.container.find("#togetherjs-audio-button").hide();
-        adjustDockSize(-1);
-      } else if ((! hide) && previous) {
-        ui.container.find("#togetherjs-audio-button").show();
-        adjustDockSize(1);
-      }
-    });
-
-    TogetherJS.config.track("disableInvite", function (hide, previous) {
-      if (hide && ! previous) {
-        ui.container.find("#togetherjs-share-button").hide();
-        adjustDockSize(-1);
-      } else if ((! hide) && previous) {
-        ui.container.find("#togetherjs-share-button").show();
-        adjustDockSize(1);
-      }
-    });
-
   };
 
   // After prepareUI, this actually makes the interface live.  We have
@@ -4985,6 +4965,26 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
     container.find("#togetherjs-menu-refresh-invite").click(refreshInvite);
     container.find("#togetherjs-menu-invite-anyone").click(function () {
       invite(null);
+    });
+
+    TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-audio-button").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-audio-button").show();
+        adjustDockSize(1);
+      }
+    });
+
+    TogetherJS.config.track("disableInvite", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-share-button").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-share-button").show();
+        adjustDockSize(1);
+      }
     });
 
     // The following lines should be at the end of this function
