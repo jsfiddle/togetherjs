@@ -4987,6 +4987,26 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       }
     });
 
+    TogetherJS.config.track("disableChat", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-chat-button, #togetherjs-chat-input-box").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-chat-button, #togetherjs-chat-input-box").show();
+        adjustDockSize(1);
+      }
+    });
+
+    TogetherJS.config.track("disableSelf", function (hide, previous) {
+      if (hide && ! previous) {
+        ui.container.find("#togetherjs-profile-button").hide();
+        adjustDockSize(-1);
+      } else if ((! hide) && previous) {
+        ui.container.find("#togetherjs-profile-button").show();
+        adjustDockSize(1);
+      }
+    });
+
     // The following lines should be at the end of this function
     // (new code goes above)
     session.emit("new-element", ui.container);
@@ -5168,8 +5188,8 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
     assert(buttons && Math.floor(buttons) == buttons);
     var iface = $("#togetherjs-dock");
     var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
-    assert(newHeight >= BUTTON_HEIGHT * 2, "Height went too low (", newHeight,
-           "), should never be less than 2 buttons high (", BUTTON_HEIGHT * 2, ")");
+    //assert(newHeight >= BUTTON_HEIGHT, "Height went too low (", newHeight,
+    //       "), should never be less than 1 button high (", BUTTON_HEIGHT, ")");
     iface.css({
       height: newHeight + "px"
     });
@@ -5659,25 +5679,30 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
       this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
       session.on("hide-window", this.maybeHideDetailWindow);
       ui.container.append(this.detailElement);
-      this.dockElement.click((function () {
-        if (this.detailElement.is(":visible")) {
-          windowing.hide(this.detailElement);
-        } else {
-          windowing.show(this.detailElement, {bind: this.dockElement});
-          this.scrollTo();
-          this.cursor().element.animate({
-            opacity:0.3
-          }).animate({
-            opacity:1
-          }).animate({
-            opacity:0.3
-          }).animate({
-            opacity:1
-          });
-        }
-      }).bind(this));
+      this.dockElement.click(this.dockClick.bind(this));
       this.updateFollow();
     }),
+
+    dockClick: function () {
+      var showDetail = ! TogetherJS.config.get("disablePeerDetail");
+      if (showDetail && ! this.detailElement.is(":visible")) {
+        windowing.hide(this.detailElement);
+      } else {
+        if (showDetail) {
+          windowing.show(this.detailElement, {bind: this.dockElement});
+        }
+        this.scrollTo();
+        this.cursor().element.animate({
+          opacity:0.3
+        }).animate({
+          opacity:1
+        }).animate({
+          opacity:0.3
+        }).animate({
+          opacity:1
+        });
+      }
+    },
 
     undock: function () {
       if (! this.dockElement) {
@@ -5731,10 +5756,6 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
           this.peer.unfollow();
         }
       }
-    },
-
-    dockClick: function () {
-      // FIXME: scroll to person
     },
 
     cursor: function () {
