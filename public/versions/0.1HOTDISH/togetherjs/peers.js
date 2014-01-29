@@ -562,8 +562,14 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
   window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
-    storeSerialization();
+    try {
+      storeSerialization();
+    } catch (e) {
+      // Sometimes it's too late, and that's fine
+    }
   }, false);
+
+  setInterval(storeSerialization, 1000*60);
 
   function storeSerialization() {
     storage.tab.set("peerCache", serialize());

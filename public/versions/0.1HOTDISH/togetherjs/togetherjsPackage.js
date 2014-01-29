@@ -2808,8 +2808,14 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
 
   window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
-    storeSerialization();
+    try {
+      storeSerialization();
+    } catch (e) {
+      // Sometimes it's too late, and that's fine
+    }
   }, false);
+
+  setInterval(storeSerialization, 1000*60);
 
   function storeSerialization() {
     storage.tab.set("peerCache", serialize());
@@ -10115,7 +10121,11 @@ function ($, util, session, elementFinder) {
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      if (firstScriptTag) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      } else {
+        document.head.appendChild(tag);
+      }
     } else {
       // manually invoke APIReady function when the API was already loaded by user
       onYouTubeIframeAPIReady();
