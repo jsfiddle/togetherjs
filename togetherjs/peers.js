@@ -228,7 +228,11 @@ define(["util", "session", "storage", "require"], function (util, session, stora
   // FIXME: I can't decide where this should actually go, seems weird
   // that it is emitted and handled in the same module
   session.on("follow-peer", function (peer) {
-    if (peer.url != session.currentUrl()) {
+    var samePage = peer.url == session.currentUrl();
+    if (TogetherJS.config.get("isSamePage")) {
+      samePage = TogetherJS.config.get("isSamePage")(peer.url, session.currentUrl());
+    }
+    if (! samePage) {
       var url = peer.url;
       if (peer.urlHash) {
         url += peer.urlHash;
@@ -562,8 +566,14 @@ define(["util", "session", "storage", "require"], function (util, session, stora
 
   window.addEventListener("pagehide", function () {
     // FIXME: not certain if this should be tab local or not:
-    storeSerialization();
+    try {
+      storeSerialization();
+    } catch (e) {
+      // Sometimes it's too late, and that's fine
+    }
   }, false);
+
+  setInterval(storeSerialization, 1000*60);
 
   function storeSerialization() {
     storage.tab.set("peerCache", serialize());
