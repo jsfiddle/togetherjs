@@ -2038,6 +2038,10 @@ define('session',["require", "util", "channels", "jquery", "storage"], function 
       }
       TogetherJS.config.close("forceSessionId");
       return storage.tab.get("status").then(function (saved) {
+        if (TogetherJS.config.get("disableSessionLoad")) {
+          saved = null;
+        }
+        TogetherJS.config.close("disableSessionLoad");
         var findRoom = TogetherJS.config.get("findRoom");
         TogetherJS.config.close("findRoom");
         if (findRoom && saved && findRoom != saved.shareId) {
