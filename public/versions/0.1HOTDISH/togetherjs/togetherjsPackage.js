@@ -2478,7 +2478,11 @@ define('peers',["util", "session", "storage", "require"], function (util, sessio
   // FIXME: I can't decide where this should actually go, seems weird
   // that it is emitted and handled in the same module
   session.on("follow-peer", function (peer) {
-    if (peer.url != session.currentUrl()) {
+    var samePage = peer.url == session.currentUrl();
+    if (TogetherJS.config.get("isSamePage")) {
+      samePage = TogetherJS.config.get("isSamePage")(peer.url, session.currentUrl());
+    }
+    if (! samePage) {
       var url = peer.url;
       if (peer.urlHash) {
         url += peer.urlHash;
