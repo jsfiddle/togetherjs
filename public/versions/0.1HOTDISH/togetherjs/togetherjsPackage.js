@@ -5732,7 +5732,11 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
     },
 
     scrollTo: function () {
-      if (this.peer.url != session.currentUrl()) {
+      var samePage = this.peer.url == session.currentUrl();
+      if (TogetherJS.config.get("isSamePage")) {
+        samePage = TogetherJS.config.get("isSamePage")(this.peer.url, session.currentUrl());
+      }
+      if (! samePage) {
         return;
       }
       var pos = this.peer.scrollPosition;
