@@ -57,6 +57,19 @@ module.exports = function (grunt) {
     });
   }
 
+  var requirejsPaths = {
+            jquery: "libs/jquery-1.8.3.min",
+            walkabout: "libs/walkabout/walkabout",
+            esprima: "libs/walkabout/lib/esprima",
+            falafel: "libs/walkabout/lib/falafel",
+            tinycolor: "libs/tinycolor",
+            whrandom: "libs/whrandom/random",
+            jqueryui: "libs/jquery-ui.min",
+            jquerypunch: "libs/jquery.ui.touch-punch.min",
+            // Make sure we get the built form of this one:
+            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
+          };
+
   var libs = [];
   grunt.file.expand(
     ["togetherjs/*.js", "!togetherjs/randomutil.js", "!togetherjs/recorder.js", "!togetherjs/togetherjs.js"]
@@ -64,6 +77,11 @@ module.exports = function (grunt) {
     filename = filename.replace(/^togetherjs\//, "");
     filename = filename.replace(/\.js$/, "");
     libs.push(filename);
+  });
+  grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+    var lang = path.basename(langFilename).replace(/\.json/, "");
+    libs.push("templates-" + lang);
+    requirejsPaths["templates-" + lang] = "../build/togetherjs/templates-" + lang;
   });
 
   grunt.initConfig({
@@ -85,18 +103,7 @@ module.exports = function (grunt) {
       compile: {
         options: {
           baseUrl: "togetherjs/",
-          paths: {
-            jquery: "libs/jquery-1.8.3.min",
-            walkabout: "libs/walkabout/walkabout",
-            esprima: "libs/walkabout/lib/esprima",
-            falafel: "libs/walkabout/lib/falafel",
-            tinycolor: "libs/tinycolor",
-            whrandom: "libs/whrandom/random",
-            jqueryui: "libs/jquery-ui.min",
-            jquerypunch: "libs/jquery.ui.touch-punch.min",
-            // Make sure we get the built form of this one:
-            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
-          },
+          paths: requirejsPaths,
           include: ["libs/almond"].concat(libs),
           //Wrap any build bundle in a start and end text specified by wrap.
           //Use this to encapsulate the module code so that define/require are
@@ -156,7 +163,8 @@ module.exports = function (grunt) {
       // forget.  Then between git action the build will be over-run,
       // but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", 
+                "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
     }
@@ -171,7 +179,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!togetherjs.js", "!templates.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp"];
+    var pattern = ["**", "!togetherjs.js", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
     grunt.log.writeln("Copying files from " + "togetherjs/".cyan + " to " + path.join(grunt.option("dest"), "togetherjs").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
@@ -204,7 +212,7 @@ module.exports = function (grunt) {
 
   function escapeString(s) {
     if (typeof s != "string") {
-      throw "Not a string";
+      throw new Error("Not a string: " + s);
     }
     var data = JSON.stringify(s);
     return data.substr(1, data.length-2);
@@ -212,29 +220,38 @@ module.exports = function (grunt) {
 
   grunt.registerTask(
     "substitute",
-    "Substitute templates.js and parameters in togetherjs.js",
+    "Substitute templates-localized.js and parameters in togetherjs.js",
     function () {
       // FIXME: I could use grunt.file.copy(..., {process: function (content, path) {}}) here
-      var baseUrl = grunt.option("base-url") || "";
+      var baseUrl = grunt.option("base-url") || ""; // baseURL to be entered by the user
       if (! baseUrl) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
-      var destBase = grunt.option("dest") || "build";
-      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com";
+      var destBase = grunt.option("dest") || "build"; // where to put the built files. If not indicated then into build/
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com"; // URL of the hub server
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
         __interface_html__: grunt.file.read("togetherjs/interface.html"),
-        __help_txt__: grunt.file.read("togetherjs/help.txt"),
+        __help_txt__: grunt.file.read("togetherjs/help.txt"), 
         __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
         __gitCommit__: gitCommit
       };
+
+      function substituteContent(content, s) {
+        for (var v in s) {
+          var re = new RegExp(v, "g");
+          if (typeof s[v] != "string") {
+            grunt.log.error("Substitution variable " + v.cyan + " is not a string")
+          }
+          content = content.replace(re, escapeString(s[v]));
+        }
+        return content;
+      }
+
       var filenames = {
-        "togetherjs/templates.js": {
-          src: "togetherjs/templates.js"
-        },
         "togetherjs.js": {
           src: "togetherjs/togetherjs.js",
           extraVariables: {__min__: "no"}
@@ -244,6 +261,7 @@ module.exports = function (grunt) {
           extraVariables: {__min__: "yes"}
         }
       };
+
       for (var dest in filenames) {
         var info = filenames[dest];
         var src = info.src;
@@ -251,22 +269,54 @@ module.exports = function (grunt) {
         dest = destBase + "/" + dest;
         var content = fs.readFileSync(src, "UTF-8");
         var s = subs;
+
         if (extraVariables) {
           s = Object.create(subs);
           for (var a in extraVariables) {
             s[a] = extraVariables[a];
           }
         }
-        for (var v in s) {
-          var re = new RegExp(v, "g");
-          content = content.replace(re, escapeString(s[v]));
-        }
+        content = substituteContent(content, s);
         grunt.log.writeln("writing " + src.cyan + " to " + dest.cyan);
         grunt.file.write(dest, content);
       }
+
+      grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
+        var templates = grunt.file.read("togetherjs/templates-localized.js");
+        var lang = path.basename(langFilename).replace(/\.json/, "");
+        var translation = JSON.parse(grunt.file.read(langFilename));
+        var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
+        
+        var translatedInterface = translateFile("togetherjs/interface.html", translation);
+        var translatedHelp = translateFile("togetherjs/help.txt", translation);
+        var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
+
+        var vars = subs;
+        
+        subs.__interface_html__ = translatedInterface;
+        subs.__help_txt__ = translatedHelp;
+        subs.__walkthrough_html__ = translatedWalkthrough;
+        subs.__names__ = translation.names;
+        templates = substituteContent(templates, subs);
+
+        grunt.file.write(dest, templates);
+        grunt.log.writeln("writing " + dest.cyan + " based on " + langFilename.cyan);
+      });
+
       return true;
     }
   );
+
+      
+  function translateFile(source, translation) {
+    var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("./"));
+    var tmpl = env.getTemplate(source);
+    return tmpl.render({
+      gettext: function (string) {
+        return translation[string] || string;
+      }
+    });
+  }
 
   grunt.registerTask("maybeless", "Maybe compile togetherjs.less", function () {
     var sources = grunt.file.expand(["togetherjs/**/*.less", "site/**/*.less"]);
@@ -557,5 +607,17 @@ module.exports = function (grunt) {
       grunt.log.writeln("Copying " + src.cyan + " to " + dest.cyan);
     });
   });
+
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
+  grunt.registerTask('dev', function() {
+    grunt.util.spawn({
+      cmd: 'node',
+      args: ['devserver.js']
+    });
+    grunt.task.run('watch');
+  });
+
+  grunt.registerTask('default', 'start');
 
 };
