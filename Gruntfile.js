@@ -315,6 +315,7 @@ module.exports = function (grunt) {
       if (tmplVars.absoluteLinks) {
         tmplVars.base = "/";
       }
+      tmplVars.base = tmplVars.base.replace(/\\/g, '/');
       var tmpl = env.getTemplate(source);
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
@@ -398,6 +399,7 @@ module.exports = function (grunt) {
       if (tmplVars.base && tmplVars.base.search(/\/$/) == -1) {
         tmplVars.base += "/";
       }
+      tmplVars.base = tmplVars.base.replace(/\\/g, '/');
       var result = tmpl.render(tmplVars);
       grunt.file.write(dest, result);
     });
