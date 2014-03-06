@@ -953,7 +953,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         return false;
       });
       el.find(".togetherjs-follow").click(function () {
-        var url = attrs.peers.url;
+        var url = attrs.peer.url;
         if (attrs.peer.urlHash) {
           url += attrs.peer.urlHash;
         }
