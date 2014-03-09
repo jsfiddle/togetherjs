@@ -5212,7 +5212,8 @@ define('ui',["require", "jquery", "util", "session", "templates", "templating", 
   function isDockFull() {
     var height = $("#togetherjs-dock").height();
     var winHeight = $(window).height();
-    return height + (BUTTON_HEIGHT * 2) > winHeight;
+    var FROM_BOTTOM = 150; // There is 150px of space below the dock
+    return height + (BUTTON_HEIGHT * 2 + FROM_BOTTOM) > winHeight;
   }
 
   // Misc
@@ -6507,7 +6508,12 @@ define('chat',["require", "jquery", "util", "session", "ui", "templates", "playb
       for (var i = 0; i < log.length; i++) {
         // peers should already be loaded from sessionStorage by the peers module
         // maybe i should use a try catch block here
-        var currentPeer = peers.getPeer(log[i].peerId);
+        try {
+          var currentPeer = peers.getPeer(log[i].peerId);
+        } catch (e) {
+          console.log("Could not load peer", log[i].peerId);
+          continue;
+        }
         ui.chat.text({
           text: log[i].text,
           date: log[i].date,
