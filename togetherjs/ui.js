@@ -829,7 +829,8 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   function isDockFull() {
     var height = $("#togetherjs-dock").height();
     var winHeight = $(window).height();
-    return height + (BUTTON_HEIGHT * 2) > winHeight;
+    var FROM_BOTTOM = 150; // There is 150px of space below the dock
+    return height + (BUTTON_HEIGHT * 2 + FROM_BOTTOM) > winHeight;
   }
 
   // Misc
