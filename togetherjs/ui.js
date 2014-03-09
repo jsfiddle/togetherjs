@@ -826,6 +826,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     });
   }
 
+  function isDockFull() {
+    var height = $("#togetherjs-dock").height();
+    var winHeight = $(window).height();
+    return height + (BUTTON_HEIGHT * 2) > winHeight;
+  }
+
   // Misc
 
   function updateShareLink() {
@@ -1278,6 +1284,9 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
 
 
       if (this.dockElement) {
+        return;
+      }
+      if (isDockFull()) {
         return;
       }
       this.dockElement = templating.sub("dock-person", {
