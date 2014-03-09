@@ -1,0 +1,19 @@
+<% /*
+  This is used to show the help when you type /help.  Used in
+  TogetherJS.localChatMessage().
+
+*/ %>
+/help : this message
+/test : run an automated/randomized test (or stop one that is in progress)
+  /test start N : run N times (instead of default 100)
+  /test show : show what kind of actions the random test would take (or stop showing)
+  /test describe : describe the possible actions (instead of showing them)
+/clear : clear the chat area
+/record : open up a recorder for the session
+/playback URL : play back a session that was recorded (it's up to you to figure out how to host it)
+  /playback local:NAME : play a locally saved log
+/savelogs NAME : save the currently recorded logs under NAME (recorder must be open)
+/baseurl : set a local baseUrl to load TogetherJS from, for debugging a development version of TogetherJS.
+/config : override some TogetherJS configuration parameters
+  /config VAR VALUE : set TogetherJS.config("VAR", VALUE).  VALUE must be a legal Javascript/JSON literal.
+  /config clear : remove all overridden configuration
