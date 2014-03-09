@@ -791,7 +791,6 @@
         }
       } else if (window.TogetherJSConfig_autoStart ||
                  (window.TogetherJSConfig && window.TogetherJSConfig.autoStart)) {
-        console.log("loaded autostart");
         TogetherJS.startup.reason = "joined";
         TogetherJS();
       }
