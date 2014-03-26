@@ -108,7 +108,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       return;
     }
-    var container = ui.container = $(templates["interface"]);
+    var container = ui.container = $(templates("interface"));
     assert(container.length);
     $("body").append(container);
     fixupAvatars(container);

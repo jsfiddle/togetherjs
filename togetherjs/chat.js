@@ -63,7 +63,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
 
   var commands = {
     command_help: function () {
-      var msg = util.trim(templates.help);
+      var msg = util.trim(templates("help"));
       ui.chat.system({
         text: msg
       });
@@ -101,7 +101,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
         ui.chat.system({
           text: "Testing with walkabout.js"
         });
-        var tmpl = $(templates.walkabout);
+        var tmpl = $(templates("walkabout"));
         var container = ui.container.find(".togetherjs-test-container");
         container.empty();
         container.append(tmpl);
