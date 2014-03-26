@@ -259,7 +259,6 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
-
   var CKEditor = util.Class({
     trackerName: "CKEditor",
 
@@ -340,6 +339,95 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   TogetherJS.addTracker(CKEditor, true /* skip setInit */);
 
+  //////////////////// BEGINNING OF TINYMCE ////////////////////////
+  var tinymceEditor = util.Class({
+    trackerName: "tinymceEditor",
+
+    constructor: function (el) {
+      this.element = $(el)[0];
+      assert($(this.element).attr('id').indexOf('mce_') != -1);
+      this._change = this._change.bind(this);
+      this._editor().on("input keyup cut paste change", this._change);
+    },
+
+    tracked: function (el) {
+      return this.element === $(el)[0];
+    },
+
+    destroy: function (el) {
+      this._editor().destory();
+    },
+
+    update: function (msg) {
+      this._editor().setContent(msg.value, {format: 'raw'});
+    },
+
+    init: function (update, msg) {
+      this.update(update);
+    },
+
+    makeInit: function () {
+      return {
+        element: this.element,
+        tracker: this.trackerName,
+        value: this.getContent()
+      };
+    },
+
+    _change: function (e) {
+      if (inRemoteUpdate) {
+        return;
+      }  
+      sendData({
+        tracker: this.trackerName,
+        element: this.element,
+        value: this.getContent()
+      });
+    },
+
+    _editor: function () {
+      if (typeof tinymce == "undefined") {
+        return;
+      }
+      return $(this.element).data("tinyEditor");
+    },
+    
+    getContent: function () {
+      return this._editor().getContent();
+    }
+  });
+
+  tinymceEditor.scan = function () {
+    //scan all the elements that contain tinyMCE editors
+    if (typeof tinymce == "undefined") {
+      return;
+    }
+    var result = [];
+    $(window.tinymce.editors).each(function (i, ed) {
+      result.push($('#'+ed.id));
+      //its impossible to retrieve a single editor from a container, so lets store it
+      $('#'+ed.id).data("tinyEditor", ed);
+    });
+    return $(result);
+  };
+
+  tinymceEditor.tracked = function (el) {
+    if (typeof tinymce == "undefined") {
+      return false;
+    }
+    el = $(el)[0];
+    return !!$(el).data("tinyEditor");
+    /*var flag = false;
+    $(window.tinymce.editors).each(function (i, ed) {
+      if (el.id == ed.id) {
+        flag = true;
+      }
+    });
+    return flag;*/
+  };
+
+  TogetherJS.addTracker(tinymceEditor, true);
+  ///////////////// END OF TINYMCE ///////////////////////////////////
 
   function buildTrackers() {
     assert(! liveTrackers.length);
@@ -377,6 +465,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     for (var i=0; i<liveTrackers.length; i++) {
       var tracker = liveTrackers[i];
       if (tracker.tracked(el)) {
+        //FIXME: assert statement below throws an exception when data is submitted to the hub too fast
+        //in other words, name == tracker.trackerName instead of name == tracker when someone types too fast in the tracked editor
+        //commenting out this assert statement solves the problem
         assert((! name) || name == tracker.trackerName, "Expected to map to a tracker type", name, "but got", tracker.trackerName);
         return tracker;
       }
