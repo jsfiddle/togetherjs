@@ -16,6 +16,8 @@ var lastMouse = {
   y: 0
 };
 
+var ongoingTouches = [];
+
 // brush settings
 context.lineWidth = 2;
 context.lineJoin = 'round';
@@ -38,6 +40,14 @@ canvas.addEventListener('mouseout', function () {
 canvas.addEventListener('mouseup', function () {
   canvas.removeEventListener('mousemove', move, false);
 }, false);
+
+// attach the touchstart, touchend, touchcancel, touchleave,
+// and touchmove event listeners.
+canvas.addEventListener('touchstart', touchstart, false);
+canvas.addEventListener('touchend', touchend, false);
+canvas.addEventListener('touchcancel', touchcancel, false);
+canvas.addEventListener('touchleave', touchend, false);
+canvas.addEventListener('touchmove', touchmove, false);
 
 // Sets the brush size:
 function setSize(size) {
@@ -122,6 +132,98 @@ function move(e) {
     });
   }
   lastMouse = mouse;
+}
+
+// Convenience method to convert touch position to 1140x400 position
+function convertTouch(touch) {
+  return {
+    x: (1140 / canvas.width) * (touch.pageX - canvas.offsetLeft),
+    y: (400 / canvas.height) * (touch.pageY - canvas.offsetTop),
+    identifier: touch.identifier
+  };
+}
+
+// Do a linear search for an ongoing touch with a particular identifier
+// Return the index into ongoingTouches, or -1 if not found
+function searchOngoingTouches(identifier) {
+  for (var i = 0; i < ongoingTouches.length; i++) {
+    if (ongoingTouches[i].identifier == identifier) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// Called whenever the touchstart event is fired
+function touchstart(e) {
+  e.preventDefault();
+  var touches = e.changedTouches;
+  for (var i = 0; i < touches.length; i++) {
+    var idx = searchOngoingTouches(touches[i].identifier);
+    ongoingTouches.push(convertTouch(touches[i]));
+  }
+}
+
+// Called whenever the touchmove event is fired, calls the draw function
+function touchmove(e) {
+  e.preventDefault();
+  var touches = e.changedTouches;
+  for (var i = 0; i < touches.length; i++) {
+    var idx = searchOngoingTouches(touches[i].identifier);
+    if (idx >= 0) {
+      var lastTouch = ongoingTouches[idx];
+      var touch = convertTouch(touches[i]);
+      draw(lastTouch, touch, context.strokeStyle, context.lineWidth, context.globalCompositeOperation, true);
+      if (TogetherJS.running) {
+        TogetherJS.send({
+          type: 'draw',
+          start: lastTouch,
+          end: touch,
+          color: context.strokeStyle,
+          size: context.lineWidth,
+          compositeOperation: context.globalCompositeOperation
+        });
+      }
+      ongoingTouches.splice(idx, 1, touch);
+    }
+  }
+}
+
+// Called whenever touchend or touchleave events are fired
+function touchend(e) {
+  e.preventDefault();
+  var touches = e.changedTouches;
+  for (var i = 0; i < touches.length; i++) {
+    var idx = searchOngoingTouches(touches[i].identifier);
+    if (idx >= 0) {
+      var lastTouch = ongoingTouches[idx];
+      var touch = convertTouch(touches[i]);
+      draw(lastTouch, touch, context.strokeStyle, context.lineWidth, context.globalCompositeOperation, true);
+      if (TogetherJS.running) {
+        TogetherJS.send({
+          type: 'draw',
+          start: lastTouch,
+          end: touch,
+          color: context.strokeStyle,
+          size: context.lineWidth,
+          compositeOperation: context.globalCompositeOperation
+        });
+      }
+      ongoingTouches.splice(idx, 1);
+    }
+  }
+}
+
+// Called whenever touchcancel event is fired
+function touchcancel(e) {
+  e.preventDefault();
+  var touches = e.changedTouches;
+  for (var i = 0; i < touches.length; i++) {
+    var idx = searchOngoingTouches(touches[i].identifier);
+    if (idx >= 0) {
+      ongoingTouches.splice(idx, 1);
+    }
+  }
 }
 
 // Listens for draw messages, sends info about the drawn lines:
