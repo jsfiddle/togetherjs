@@ -521,7 +521,33 @@ are considered to be at completely different URLs</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>    youtube: <span class="literal">true</span>
+                <div class="content"><div class='highlight'><pre>    youtube: <span class="literal">true</span>,</pre></div></div>
+              
+            </li>
+          
+            <li id="section-24">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-24">&#182;</a>
+                </div>
+                <p>Ignores the following console messages, disables all messages if set to true</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    ignoreMessages: [<span class="string">"cursor-update"</span>, <span class="string">"keydown"</span>, <span class="string">"scroll-update"</span>],</pre></div></div>
+              
+            </li>
+          
+            <li id="section-25">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-25">&#182;</a>
+                </div>
+                <p>Ignores the following forms (will ignore all forms if set to true):</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    ignoreForms: [<span class="string">":password"</span>]
   };
 
   <span class="keyword">var</span> styleSheet = <span class="string">"/togetherjs/togetherjs.css"</span>;
@@ -531,10 +557,10 @@ are considered to be at completely different URLs</p>
               
             </li>
           
-            <li id="section-24">
+            <li id="section-26">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-24">&#182;</a>
+                  <a class="pilcrow" href="#section-26">&#182;</a>
                 </div>
                 <p>Reset the variable if it doesn&#39;t get substituted</p>
 
@@ -545,10 +571,10 @@ are considered to be at completely different URLs</p>
               
             </li>
           
-            <li id="section-25">
+            <li id="section-27">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-25">&#182;</a>
+                  <a class="pilcrow" href="#section-27">&#182;</a>
                 </div>
                 <p>True if this file should use minimized sub-resources:</p>
 
@@ -567,10 +593,10 @@ are considered to be at completely different URLs</p>
               
             </li>
           
-            <li id="section-26">
+            <li id="section-28">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-26">&#182;</a>
+                  <a class="pilcrow" href="#section-28">&#182;</a>
                 </div>
                 <p>Ignore because it has expired</p>
 
@@ -614,10 +640,10 @@ are considered to be at completely different URLs</p>
               
             </li>
           
-            <li id="section-27">
+            <li id="section-29">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-27">&#182;</a>
+                  <a class="pilcrow" href="#section-29">&#182;</a>
                 </div>
                 <p>FIXME: we could/should use a version from the checkout, at least
 for production</p>
@@ -633,10 +659,10 @@ for production</p>
               
             </li>
           
-            <li id="section-28">
+            <li id="section-30">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-28">&#182;</a>
+                  <a class="pilcrow" href="#section-30">&#182;</a>
                 </div>
                 <p>Make sure we have all of the console.* methods:</p>
 
@@ -707,10 +733,10 @@ for production</p>
               
             </li>
           
-            <li id="section-29">
+            <li id="section-31">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-29">&#182;</a>
+                  <a class="pilcrow" href="#section-31">&#182;</a>
                 </div>
                 <p>Probably a jQuery element</p>
 
@@ -737,10 +763,10 @@ for production</p>
               
             </li>
           
-            <li id="section-30">
+            <li id="section-32">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-30">&#182;</a>
+                  <a class="pilcrow" href="#section-32">&#182;</a>
                 </div>
                 <p>This handles loading configuration from global variables.  This
 includes TogetherJSConfig<em>on</em>*, which are attributes folded into
@@ -773,10 +799,10 @@ the &quot;on&quot; configuration value.</p>
               
             </li>
           
-            <li id="section-31">
+            <li id="section-33">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-31">&#182;</a>
+                  <a class="pilcrow" href="#section-33">&#182;</a>
                 </div>
                 <p>FIXME: copy existing config?
 FIXME: do this directly in TogetherJS.config() ?
@@ -790,10 +816,10 @@ FIXME: close these configs?</p>
               
             </li>
           
-            <li id="section-32">
+            <li id="section-34">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-32">&#182;</a>
+                  <a class="pilcrow" href="#section-34">&#182;</a>
                 </div>
                 <p>FIXME: should we avoid overwriting?  Maybe use arrays?</p>
 
@@ -819,10 +845,10 @@ FIXME: close these configs?</p>
               
             </li>
           
-            <li id="section-33">
+            <li id="section-35">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-33">&#182;</a>
+                  <a class="pilcrow" href="#section-35">&#182;</a>
                 </div>
                 <p>Then a call to TogetherJS() from a button must be started TogetherJS</p>
 
@@ -833,10 +859,10 @@ FIXME: close these configs?</p>
               
             </li>
           
-            <li id="section-34">
+            <li id="section-36">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-34">&#182;</a>
+                  <a class="pilcrow" href="#section-36">&#182;</a>
                 </div>
                 <p>FIXME: maybe I should just test for TogetherJS.require:</p>
 
@@ -851,10 +877,10 @@ FIXME: close these configs?</p>
               
             </li>
           
-            <li id="section-35">
+            <li id="section-37">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-35">&#182;</a>
+                  <a class="pilcrow" href="#section-37">&#182;</a>
                 </div>
                 <p>A sort of signal to session.js to tell it to actually
 start itself (i.e., put up a UI and try to activate)</p>
@@ -891,10 +917,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-36">
+            <li id="section-38">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-36">&#182;</a>
+                  <a class="pilcrow" href="#section-38">&#182;</a>
                 </div>
                 <p>This is an already-configured version of require</p>
 
@@ -934,10 +960,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-37">
+            <li id="section-39">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-37">&#182;</a>
+                  <a class="pilcrow" href="#section-39">&#182;</a>
                 </div>
                 <p>What element, if any, was used to start the session:</p>
 
@@ -947,10 +973,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-38">
+            <li id="section-40">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-38">&#182;</a>
+                  <a class="pilcrow" href="#section-40">&#182;</a>
                 </div>
                 <p>The startReason is the reason TogetherJS was started.  One of:
   null: not started
@@ -963,10 +989,10 @@ start itself (i.e., put up a UI and try to activate)</p>
               
             </li>
           
-            <li id="section-39">
+            <li id="section-41">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-39">&#182;</a>
+                  <a class="pilcrow" href="#section-41">&#182;</a>
                 </div>
                 <p>Also, the session may have started on &quot;this&quot; page, or maybe is continued
 from a past page.  TogetherJS.continued indicates the difference (false the
@@ -978,10 +1004,10 @@ first time TogetherJS is started or joined, true on later page loads).</p>
               
             </li>
           
-            <li id="section-40">
+            <li id="section-42">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-40">&#182;</a>
+                  <a class="pilcrow" href="#section-42">&#182;</a>
                 </div>
                 <p>This is set to tell the session what shareId to use, if the boot
 code knows (mostly because the URL indicates the id).</p>
@@ -992,10 +1018,10 @@ code knows (mostly because the URL indicates the id).</p>
               
             </li>
           
-            <li id="section-41">
+            <li id="section-43">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-41">&#182;</a>
+                  <a class="pilcrow" href="#section-43">&#182;</a>
                 </div>
                 <p>This tells session to start up immediately (otherwise it would wait
 for session.start() to be run)</p>
@@ -1063,10 +1089,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-42">
+            <li id="section-44">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-42">&#182;</a>
+                  <a class="pilcrow" href="#section-44">&#182;</a>
                 </div>
                 <p>FIXME: maybe I should add the event name to the .once attribute:</p>
 
@@ -1086,10 +1112,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-43">
+            <li id="section-45">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-43">&#182;</a>
+                  <a class="pilcrow" href="#section-45">&#182;</a>
                 </div>
                 <p>Defer the .off() call until the .emit() is done.</p>
 
@@ -1144,10 +1170,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-44">
+            <li id="section-46">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-44">&#182;</a>
+                  <a class="pilcrow" href="#section-46">&#182;</a>
                 </div>
                 <p>FIXME: this doesn&#39;t clear the context for min-case</p>
 
@@ -1172,10 +1198,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-45">
+            <li id="section-47">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-45">&#182;</a>
+                  <a class="pilcrow" href="#section-47">&#182;</a>
                 </div>
                 <p>Substitution wasn&#39;t made</p>
 
@@ -1298,10 +1324,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-46">
+            <li id="section-48">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-46">&#182;</a>
+                  <a class="pilcrow" href="#section-48">&#182;</a>
                 </div>
                 <p>If it&#39;s not set, TogetherJS has not been loaded, and reinitialization is not needed</p>
 
@@ -1319,10 +1345,10 @@ for session.start() to be run)</p>
               
             </li>
           
-            <li id="section-47">
+            <li id="section-49">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-47">&#182;</a>
+                  <a class="pilcrow" href="#section-49">&#182;</a>
                 </div>
                 <p>This should contain the output of &quot;git describe --always --dirty&quot;
 FIXME: substitute this on the server (and update make-static-client)</p>
@@ -1372,10 +1398,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-48">
+            <li id="section-50">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-48">&#182;</a>
+                  <a class="pilcrow" href="#section-50">&#182;</a>
                 </div>
                 <p>Second hit</p>
 
@@ -1440,10 +1466,10 @@ FIXME: substitute this on the server (and update make-static-client)</p>
               
             </li>
           
-            <li id="section-49">
+            <li id="section-51">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-49">&#182;</a>
+                  <a class="pilcrow" href="#section-51">&#182;</a>
                 </div>
                 <p>It&#39;s nice to replace this early, before the load event fires, so we conflict
 as little as possible with the app we are embedded in:</p>
@@ -1462,10 +1488,10 @@ as little as possible with the app we are embedded in:</p>
               
             </li>
           
-            <li id="section-50">
+            <li id="section-52">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-50">&#182;</a>
+                  <a class="pilcrow" href="#section-52">&#182;</a>
                 </div>
                 <p>A weird hack for something the addon does, to force a shareId.
 FIXME: probably should remove, it&#39;s a wonky feature.</p>
@@ -1483,10 +1509,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-51">
+            <li id="section-53">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-51">&#182;</a>
+                  <a class="pilcrow" href="#section-53">&#182;</a>
                 </div>
                 <p>A page can define this function to defer TogetherJS from starting</p>
 
@@ -1504,10 +1530,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-52">
+            <li id="section-54">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-52">&#182;</a>
+                  <a class="pilcrow" href="#section-54">&#182;</a>
                 </div>
                 <p>FIXME: need to document this:</p>
 
@@ -1521,10 +1547,10 @@ FIXME: probably should remove, it&#39;s a wonky feature.</p>
               
             </li>
           
-            <li id="section-53">
+            <li id="section-55">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-53">&#182;</a>
+                  <a class="pilcrow" href="#section-55">&#182;</a>
                 </div>
                 <p>FIXME: can we push this up before the load event?
 Do we need to wait at all?</p>
@@ -1541,10 +1567,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-54">
+            <li id="section-56">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-54">&#182;</a>
+                  <a class="pilcrow" href="#section-56">&#182;</a>
                 </div>
                 <p>FIXME: this doesn&#39;t respect storagePrefix:</p>
 
@@ -1571,10 +1597,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-55">
+            <li id="section-57">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-55">&#182;</a>
+                  <a class="pilcrow" href="#section-57">&#182;</a>
                 </div>
                 <p>FIXME: wait until load event to double check if this gets set?</p>
 
@@ -1586,10 +1612,10 @@ Do we need to wait at all?</p>
               
             </li>
           
-            <li id="section-56">
+            <li id="section-58">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-56">&#182;</a>
+                  <a class="pilcrow" href="#section-58">&#182;</a>
                 </div>
                 <p>For compatibility:</p>
 

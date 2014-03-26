@@ -227,6 +227,10 @@ var TogetherJSConfig_something = "foo";
     Disables/removes the button to do audio chat via WebRTC.</p>
 <p><code>TogetherJSConfig_youtube</code>:
     If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.</p>
+<p><code>TogetherJSConfig_ignoreMessages</code>:
+    Contains a list of all the messages that will be ignored when console logging. Defaults to the list [“cursor-update”, “keydown”, “scroll-update”]. Will ignore all messages if set to true. </p>
+<p><code>TogetherJSConfig_ignoreForms</code>:
+    Contains a list of all the forms that will be ignored, defaults to [“:password”]. Will ignore all forms if set to true.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
 <h2 id="start-togetherjs-button">Start TogetherJS Button</h2>
 <p>The button you add to your site to start TogetherJS will typically look like this:</p>

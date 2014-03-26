@@ -374,7 +374,11 @@ for us to respect a URL change:</p>
 
   session.hub = util.mixinEvents({});
 
-  <span class="keyword">var</span> IGNORE_MESSAGES = [<span class="string">"cursor-update"</span>, <span class="string">"keydown"</span>, <span class="string">"scroll-update"</span>];</pre></div></div>
+  <span class="keyword">var</span> IGNORE_MESSAGES = TogetherJS.config.get(<span class="string">"ignoreMessages"</span>);
+  <span class="keyword">if</span> (IGNORE_MESSAGES === <span class="literal">true</span>) {
+    DEBUG = <span class="literal">false</span>;
+    IGNORE_MESSAGES = [];
+  }</pre></div></div>
               
             </li>
           

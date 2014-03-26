@@ -226,7 +226,13 @@ define([<span class="string">"jquery"</span>, <span class="string">"util"</span>
   <span class="keyword">var</span> inRemoteUpdate = <span class="literal">false</span>;
 
   <span class="function"><span class="keyword">function</span> <span class="title">suppressSync</span><span class="params">(element)</span> {</span>
-    <span class="keyword">return</span> $(element).is(<span class="string">":password"</span>);
+    <span class="keyword">var</span> ignoreForms = TogetherJS.config.get(<span class="string">"ignoreForms"</span>);
+    <span class="keyword">if</span> (ignoreForms === <span class="literal">true</span>) {
+      <span class="keyword">return</span> <span class="literal">true</span>;
+    }
+    <span class="keyword">else</span> {
+      <span class="keyword">return</span> $(element).is(ignoreForms.join(<span class="string">","</span>)); 
+    }
   }
 
   <span class="function"><span class="keyword">function</span> <span class="title">maybeChange</span><span class="params">(event)</span> {</span></pre></div></div>
