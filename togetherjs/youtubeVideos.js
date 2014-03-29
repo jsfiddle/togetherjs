@@ -82,7 +82,9 @@ function ($, util, session, elementFinder) {
         // maybe we should set iframes everytime togetherjs is reinitialized?
         if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
-          $(iframe).attr("enablejsapi", 1);
+          //$(iframe).attr("enablejsapi", 1);
+          var addedParam = "?enablejsapi=1&origin="+window.location.origin; //response to Google issue 5670
+          $(iframe).attr("src", $(iframe).attr("src") + addedParam); // if origin parameter is missing, onReady and playerStateChange event don't fire
           youTubeIframes[i] = iframe;
         }
       });
