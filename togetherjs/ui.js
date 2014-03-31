@@ -515,7 +515,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       peers.Self.update({
         color: color
       });
-      twoLetterAvatar(peers.Self.name);
+      ui.twoLetterAvatar(peers.Self.name);
       event.stopPropagation();
       return false;
     });
@@ -1505,39 +1505,44 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     ui.updateToolName(ui.container);
   });
 
-  ui.nameToTwoLetter = function(name) {
+  ui.nameToTwoLetter = function (name) {
     var twoLetter = "";
-    if(name.indexOf(" ") > -1){
-        twoLetter = name.substr(0,1);
-        twoLetter += name.substr(name.indexOf(" ")+1, 1);
+    if (name.indexOf(" ") > -1) {
+        twoLetter = name.substr(0, 1);
+        twoLetter += name.substr(name.indexOf(" ") + 1, 1);
+    } else {
+        twoLetter = name.substr(0, 2).toUpperCase();
     }
-    else{
-        twoLetter = name.substr(0,2).toUpperCase();
-    }
-
     return twoLetter.toUpperCase();
   }
-  ui.twoLetterAvatar = function(name) {
-    var textString = ui.nameToTwoLetter(name);
-    var canv = document.createElement("canvas");
-    canv.setAttribute("id", "canvasID");
-    canv.width = 36;
-    canv.height = 34;    
-    var ctx = canv.getContext('2d');
-    ctx.beginPath();
-    ctx.rect(0,0,canv.width, canv.height);
-    ctx.fillStyle = peers.Self.color;
-    ctx.fill();
-    ctx.closePath();
-    ctx.fillStyle = "#000000";
-    ctx.font = "12pt 'openSansBold'";
-    ctx.textAlign = "center";    
-    textWidth = ctx.measureText(textString ).width;
-    ctx.fillText(textString , canv.width/2 - 2, 22);
-    ctx.stroke();
-    var imgData = canv.toDataURL();
-    $('#togetherjs-profile-button .togetherjs-person-self').css("background-image", "url("+imgData+")");
-    peers.Self.update({avatar: imgData});
+
+  ui.twoLetterAvatar = function (name) {
+    var defaultAvatar = TogetherJS.baseUrl + '/togetherjs/images/default-avatar.png';
+    if (peers.Self.avatar === defaultAvatar || localStorage.getItem("togetherjs.settings.letterAvatar") === "yes") {
+      var textString = ui.nameToTwoLetter(name);
+      var canv = document.createElement("canvas");
+      canv.setAttribute("id", "canvasID");
+      canv.width = 36;
+      canv.height = 34;
+      var ctx = canv.getContext('2d');
+      ctx.beginPath();
+      ctx.rect(0,0,canv.width, canv.height);
+      ctx.fillStyle = peers.Self.color;
+      ctx.fill();
+      ctx.closePath();
+      ctx.fillStyle = "#000000";
+      ctx.font = "16px 'openSansBold', Helvetica, sans-serif";
+      ctx.textAlign = "center";
+      textWidth = ctx.measureText(textString ).width;
+      ctx.fillText(textString , canv.width/2 - 2, 22);
+      ctx.stroke();
+      var imgData = canv.toDataURL();      
+      peers.Self.update({avatar: imgData});      
+      localStorage.setItem("togetherjs.settings.letterAvatar", "yes");
+    }
+    if(localStorage.getItem("togetherjs.settings.letterAvatar") == null) {
+      localStorage.setItem("togetherjs.settings.letterAvatar", "yes");      
+    }
   }
 
   return ui;
