@@ -1,0 +1,42 @@
+{% extends "base.tmpl" %}
+{% block title %} Mozilla Labs : YouTube example {% endblock %}
+{% block configs %}
+  <script>
+    var TogetherJSConfig_autoStart = true;
+    var TogetherJSConfig_dontShowClicks = true;
+    var TogetherJSConfig_suppressJoinConfirmation = true;
+  </script>
+{% endblock %}
+
+{% block body %}
+  {% block styles %}
+    <link rel="stylesheet" type="text/css" href="css/application.css" />
+  {% endblock %}
+
+  <div class="container"> <!-- container -->
+    <div class="body-content row" id="youtube-example">
+      <div class="col-md-6 col-md-offset-3">
+        <div id="introduction">
+          <h1>
+            Write Together 
+            <a href="javascript:;" class="pull-right tjsbutton"><img src="https://togetherjs.com/images/start-togetherjs-blue.png"></img></a>
+          </h1>
+          <h3 class='subtitle'>TogetherJS supports built-in synchronization for popular web editors like TinyMCE, Ace, CodeMirror, CKEditor.</h3>
+        </div>
+        <div class="tinymce"></div>
+        <form role="form">
+          <div class="row">
+            <div class="col-xs-12 labelarea">
+              <h4>Invite someone to start writing together.</h4>
+              <p class="youtube-embed-label">Write a blog post with your friend, edit an essay for your student, or even draft a business proposal with your team in real-time. To invite someone, click the invite button on the right blue menu and send the url to the person you want to write together.</p>
+            </div>
+          </div>
+        </form>
+      </div> <!-- // youtube container -->
+    </div> <!-- //body-content -->
+
+  <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  <script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+  <script type="text/javascript" src="js/application.js"></script>
+
+{% endblock %}
