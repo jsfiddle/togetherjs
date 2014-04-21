@@ -69,7 +69,8 @@
     // Ignores the following console messages, disables all messages if set to true
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
-    ignoreForms: [":password"]
+    ignoreForms: [":password"],
+    fallbackLang: "en_US"
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
@@ -296,18 +297,23 @@
     var lang = TogetherJS.getConfig("lang");
     // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
     var availableTranslations = {
-      en_US: true,
-      ru: true
+      "en-US": true,
+      "ru": true,
+      "ru-RU": true
     };
-    if (! lang) {
-      lang = navigator.language.replace(/-/g, "_");
-      if (! availableTranslations[lang]) {
-        lang = TogetherJS.config.get("fallbackLang"); // [igoryen]: This needs to be updated to use TogetherJS.config.get(), and also to close those configuration values.
+
+    if(lang === undefined) {
+      var navigatorLang = navigator.language.replace(/_/g, "-");
+      if (!availableTranslations[navigatorLang]) {
+        lang = TogetherJS.config.get("fallbackLang");
+      } else {
+        lang = navigatorLang;
       }
-      TogetherJS.config("lang", lang);
+     TogetherJS.config("lang", lang);
     }
-    TogetherJS.config("lang", TogetherJS.getConfig("lang").replace(/_/g, "-")); // rename into TogetherJS.config.get()?
-    var localeTemplates = "templates-" + TogetherJS.getConfig("lang");// rename into TogetherJS.config.get()?
+
+    TogetherJS.config("lang", lang.replace(/_/g, "-")); // rename into TogetherJS.config.get()?
+    var localeTemplates = "templates-" + lang;// rename into TogetherJS.config.get()?
     deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
@@ -574,8 +580,7 @@
     // The language to present the tool in, such as "en-US" or "ru-RU"
     // Note this must be set as TogetherJSConfig_lang, as it effects the loader
     // and must be set as soon as this file is included
-    lang: null,
-    fallbackLang: "en_US"
+    lang: null
   };
   // FIXME: there's a point at which configuration can't be updated
   // (e.g., hubBase after the TogetherJS has loaded).  We should keep
