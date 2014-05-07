@@ -135,7 +135,7 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.
 
 `TogetherJSConfig_ignoreMessages`:
-    Contains a list of all the messages that will be ignored when console logging. Defaults to the list ["cursor-update", "keydown", "scroll-update"]. Will ignore all messages if set to true. 
+    Contains a list of all the messages that will be ignored when console logging. Defaults to the list ["cursor-update", "keydown", "scroll-update"]. Will ignore all messages if set to true.
 
 `TogetherJSConfig_ignoreForms`:
     Contains a list of all the forms that will be ignored, defaults to [":password"]. Will ignore all forms if set to true.
@@ -408,6 +408,19 @@ This assumes that the module has already been loaded... but that assumption woul
 You may also want a static copy of the client that you can host yourself.  Run `grunt build` to create a static copy of the TogetherJS library in `build/` (use `--dest` to control the output location, and `--exclude-tests` to avoid including the tests in your version).
 
 The hub changes quite infrequently, so if you just stability then making a static copy of the client will do it for you.  This option is highly recommended for production!
+
+## Localization Support
+
+* Check [translation file](../../togetherjs/locale/en-US.json) for template example if you want to translate into your own language
+* Adding new language inside [locale](../../togetherjs/locale/) directory should be in this format: "th-TH.json", "th.json", "pt-BR.json" or "pt.json" and enable support language in [availableTranslations](../../togetherjs/togetherjs.js#L299) inside togetherjs.js file.
+
+To get your language display you can enable it by:
+
+``` html
+<script>
+  var TogetherJSConfig_lang = "pt-BR";
+</script>
+```
 
 ## Browser Support
 
