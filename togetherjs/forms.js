@@ -10,6 +10,12 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   // (this is padding on each side)
   var FOCUS_BUFFER = 5;
 
+  //the maximum frequency we want to send an editor-position update
+  var EDITOR_CURSOR_RATE_LIMIT = 1000;
+
+  //only send these if we have a peer
+  var sendCursorUpdates = false;
+
   var inRemoteUpdate = false;
 
   function suppressSync(element) {
@@ -345,21 +351,48 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
     constructor: function (el) {
       this.element = $(el)[0];
-      assert($(this.element).attr('id').indexOf('mce_') != -1);
+      this.peerPoints = {};
+
       this._change = this._change.bind(this);
-      this._editor().on("input keyup cut paste change", this._change);
+      this._updateMyPosition = this._updateMyPosition.bind(this);
+      this._onfocus = this._onfocus.bind(this);
+
+      var ed = this._editor();
+      this.container = ed.getContainer();
+
+      ed.on("input keyup cut paste change", this._change);
+      ed.on("NodeChange", this._updateMyPosition);
+      ed.on("focus", this._onfocus);
+      $(ed.getWin()).scroll( this._updatePeersOnScroll.bind(this) );
+    },
+
+    _onfocus: function (event) {
+        focus({target: this.element});
     },
 
     tracked: function (el) {
-      return this.element === $(el)[0];
+      if (typeof tinymce == "undefined") {
+        return false;
+      }
+      var el0 = $(el)[0];
+      return (this.element === el0 || this.container.contains(el0));
     },
 
     destroy: function (el) {
+      delete this.container;
+      for (var peer in this.peerPoints) {
+        delete this.peerPoints[peer].elt;
+      }
       this._editor().destory();
     },
 
     update: function (msg) {
-      this._editor().setContent(msg.value, {format: 'raw'});
+      var ed = this._editor();
+      ed.setContent(msg.value, {format: 'raw'});
+      if (this.position) {
+        //restore cursor position after content update
+        ed.selection.moveToBookmark(this.position);
+      }
     },
 
     init: function (update, msg) {
@@ -377,12 +410,98 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     _change: function (e) {
       if (inRemoteUpdate) {
         return;
-      }  
+      }
       sendData({
         tracker: this.trackerName,
         element: this.element,
         value: this.getContent()
       });
+      this._updateMyPosition()
+    },
+
+    _updatePeersOnScroll: function() {
+      for (var peerId in this.peerPoints) {
+        this._updatePeerPosition(peerId);
+      }
+    },
+
+    updatePeerPosition: function(peer, bookmark) {
+      if ( !(peer.id in this.peerPoints)) {
+        this.peerPoints[peer.id] = {
+          color: peer.color
+        };
+      }
+      this.peerPoints[peer.id]['pos'] = bookmark;
+      this._updatePeerPosition(peer.id);
+    },
+
+    _updatePeerPosition: function(peerId) {
+        var ed = this._editor();
+        var peerMarker = this.peerPoints[peerId];
+        var pixelPos = this._pixelPosition(ed, peerMarker.pos);
+        if (pixelPos) {
+          if (!peerMarker.elt) {
+            var cont = ed.getContentAreaContainer();
+            peerMarker.elt = $('<div class="togetherjs-mce-marker" />')
+              .appendTo(cont)
+              .css({position: 'absolute',
+                    height: '12px',
+                    width: '2px',
+                    backgroundColor: peerMarker.color
+                    });
+          }
+
+          $(peerMarker.elt).css(pixelPos);
+        } else if (peerMarker.elt) {
+          $(peerMarker.elt).remove();
+          delete peerMarker.elt;
+        }
+    },
+
+    _pixelPosition: function(ed, bookmark) {
+        var sel = ed.selection;
+        this.position = sel.getBookmark(2, true);
+        if (bookmark) {
+          sel.moveToBookmark(bookmark);
+        }
+        var node = sel.getRng();
+        if (this.position) {
+          sel.moveToBookmark(this.position);
+        }
+
+        var rect = node.getBoundingClientRect();
+        var cont = ed.getContentAreaContainer();
+        var contrect = cont.getBoundingClientRect();
+        if (0 > rect.top || rect.top > contrect.height) {
+          return //not in visible range
+        } else {
+          var vertical_offset = $(cont).position().top;
+          if (node.collapsed) {
+            //0-width ranges need an exception
+            var rng = node.cloneRange();
+            if (rng.startOffset > 0) {
+              rng.setStart(rng.startContainer, rng.startOffset - 1);
+            }
+            rng.setEnd(rng.startContainer, rng.startOffset + 1);
+            rect = rng.getBoundingClientRect();
+          }
+          if (rect.top || rect.left) {
+            return {
+              top: rect.top + vertical_offset,
+              left: rect.left,
+              display: 'block'
+            }
+          }
+        }
+
+    },
+
+    _updateMyPosition: function () {
+      var ed = this._editor();
+      var sel = ed.selection;
+      this.position = sel.getBookmark(2, true);
+      //this.updatePeerPosition({id:'self', color:'blue'} ,this.position);
+      maybeSendCursorUpdate(this.element, this.position, this.trackerName);
     },
 
     _editor: function () {
@@ -391,7 +510,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       }
       return $(this.element).data("tinyEditor");
     },
-    
+
     getContent: function () {
       return this._editor().getContent();
     }
@@ -416,7 +535,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       return false;
     }
     el = $(el)[0];
-    return !!$(el).data("tinyEditor");
+    return !!($(el).data("tinyEditor") || $(el).parents('.mce-container').length);
     /*var flag = false;
     $(window.tinymce.editors).each(function (i, ed) {
       if (el.id == ed.id) {
@@ -535,6 +654,50 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       eventMaker.fireChange(el);
     }
   }
+
+  var limiter = {
+    notyet: false,
+    msg: null
+  }
+  /* Send the cursor position. */
+  function maybeSendCursorUpdate(element, pos, tracker) {
+    if (!sendCursorUpdates) {
+      return;
+    }
+    var msg = {
+      type: "editor-pos",
+      element: elementFinder.elementLocation(element),
+      tracker: tracker,
+      pos: pos
+    };
+    if (limiter.notyet) {
+      limiter.msg = msg;
+    } else {
+      session.send(msg);
+      limiter.notyet = true;
+      setTimeout(function() {
+          limiter.notyet = false;
+          if (limiter.msg) {
+            session.send(msg);
+          }
+        }, EDITOR_CURSOR_RATE_LIMIT);
+    }
+  }
+
+  session.hub.on("editor-pos", function(msg) {
+    if (! msg.sameUrl) {
+      return;
+    }
+    var el = $(elementFinder.findElement(msg.element));
+    var tracker;
+    if (msg.tracker) {
+      tracker = getTracker(el, msg.tracker);
+      assert(tracker);
+    }
+    if (tracker.updatePeerPosition) {
+      tracker.updatePeerPosition(msg.peer, msg.pos);
+    }
+  });
 
   /* Send the top of this history queue, if it hasn't been already sent. */
   function maybeSendUpdate(element, history, tracker) {
@@ -707,6 +870,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     if (! msg.sameUrl) {
       return;
     }
+
+    sendCursorUpdates = true;
+
     if (initSent) {
       // In a 3+-peer situation more than one client may init; in this case
       // we're probably the other peer, and not the peer that needs the init
@@ -759,9 +925,19 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   function focus(event) {
     var target = event.target;
-    if (elementFinder.ignoreElement(target) || elementTracked(target)) {
+    if (elementFinder.ignoreElement(target)) {
       blur(event);
       return;
+    }
+    var tracked = elementTracked(target);
+    if (tracked) {
+      var tracker = getTracker(target);
+      if (tracker && tracker.container) {
+        target = tracker.container;
+      } else {
+        blur(event);
+        return;
+      }
     }
     if (target != lastFocus) {
       lastFocus = target;
