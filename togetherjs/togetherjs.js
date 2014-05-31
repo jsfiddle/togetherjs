@@ -299,7 +299,8 @@
     var availableTranslations = {
       "en-US": true,
       "ru": true,
-      "ru-RU": true
+      "ru-RU": true,
+      "pt-BR": true
     };
 
     if(lang === undefined) {
