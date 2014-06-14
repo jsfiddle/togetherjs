@@ -1,7 +1,7 @@
 {
   "Activate your <strong>browser microphone</strong> near your URL bar above.": "Ative seu <strong>microfone do navegador</strong> próximo da barra de URL acima.",
   "Add a friend": "Adicionar um amigo",
-  "Alright, you're ready to use TOOL_NAME. Now start collaborating on SITE_NAME!": "Beleza, você está pronto para usar TOOL_NAME. Agora começe a colaborar em SITE_NAME!",
+  "Alright, you're ready to use TOOL_NAME. Now start collaborating on SITE_NAME!": "Beleza, você está pronto para usar TOOL_NAME. Agora comece a colaborar em SITE_NAME!",
   "anyone": "qualquer um",
   "Are you sure you'd like to end your TOOL_NAME session?": "Você tem certeza que quer terminar sua sessão TOOL_NAME?",
   "Audio chat requires you to use a <a href='https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC' target='_blank'>newer browser</a>!": "Conversa com áudo requer que você use um <a href='https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC' target='_blank'>navegador mais moderno</a>!",
@@ -26,7 +26,7 @@
   "Follow:": "Seguir:",
   "Following to new URL...": "Seguindo para nova URL...",
   "Following": "Seguindo",
-  "Friends who join your TOOL_NAME session will appear here.  You can click their avatars to see more.": "Amigos que entraram na sua sessão TOOL_NAME aparecerão aqui.  Você pode clicar no avatar deles para ver mais.",
+  "Friends who join your TOOL_NAME session will appear here.  You can click their avatars to see more.": "Os amigos que entrarem na sua sessão TOOL_NAME aparecerão aqui.  Você pode clicar no avatar deles para ver mais.",
   "has gone to:": "foi para:",
   "has invited": "foi convidade",
   "Help": "Ajuda",
