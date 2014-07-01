@@ -81,7 +81,7 @@ module.exports = function (grunt) {
   grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
     var lang = path.basename(langFilename).replace(/\.json/, "");
     libs.push("templates-" + lang);
-    requirejsPaths["templates-" + lang] = "../build/togetherjs/templates-" + lang;
+    requirejsPaths["templates-" + lang] = path.join("..", grunt.option("dest"), "togetherjs", "templates-" + lang);
   });
 
   grunt.initConfig({
@@ -142,7 +142,7 @@ module.exports = function (grunt) {
       options: {
         csslintrc: ".csslint.rc"
       },
-      src: ["build/togetherjs/togetherjs.css"]
+      src: [path.join(grunt.option("dest"), "togetherjs/togetherjs.css")]
     },
 
     watch: {
