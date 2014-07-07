@@ -70,6 +70,8 @@
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
     ignoreForms: [":password"],
+    // When undefined, attempts to use the browser's language
+    lang: undefined,
     fallbackLang: "en_US"
   };
 
