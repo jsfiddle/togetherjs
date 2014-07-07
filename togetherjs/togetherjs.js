@@ -80,6 +80,16 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+  // Allow override of baseUrl (this is done separately because it needs
+  // to be done very early)
+  if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+    baseUrl = window.TogetherJSConfig.baseUrl;
+  }
+  if (window.TogetherJSConfig_baseUrl) {
+    baseUrl = window.TogetherJSConfig_baseUrl;
+  }
+  defaultConfiguration.baseUrl = baseUrl;
+
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
