@@ -319,20 +319,22 @@
     // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
     var availableTranslations = {
       "en-US": true,
+      "en": "en-US",
+      "es": "es-BO",
+      "es-BO": true,
       "ru": true,
-      "ru-RU": true
+      "ru-RU": "ru"
     };
 
     if(lang === undefined) {
       // BCP 47 mandates hyphens, not underscores, to separate lang parts
-      var navigatorLang = navigator.language.replace(/_/g, "-");
-      if (!availableTranslations[navigatorLang]) {
-        lang = TogetherJS.config.get("fallbackLang");
-      } else {
-        lang = navigatorLang;
-      }
+      lang = navigator.language.replace(/_/g, "-");
     }
-    lang = lang.replace(/_/g, "-");
+    if (!availableTranslations[lang]) {
+      lang = TogetherJS.config.get("fallbackLang");
+    } else if (availableTranslations[lang] !== true) {
+      lang = availableTranslations[lang];
+    }
     TogetherJS.config("lang", lang);
 
     var localeTemplates = "templates-" + lang;
