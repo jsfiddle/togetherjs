@@ -315,8 +315,8 @@
     TogetherJS.config("lang", lang.replace(/_/g, "-")); // rename into TogetherJS.config.get()?
     //var localeTemplates = "templates-" + lang;// rename into TogetherJS.config.get()?
     //lang.replace(/_/g, "-") doesn't work for variable "lang", the "lang" doesn't change. So "lang" would be en_US. Should use the config value.
-	var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
-	deps.splice(0, 0, localeTemplates);
+    var localeTemplates = "templates-" + TogetherJS.getConfig("lang");
+    deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
       if (! min) {
