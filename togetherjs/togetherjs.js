@@ -30,6 +30,8 @@
     siteName: null,
     // Whether to use the minimized version of the code (overriding the built setting)
     useMinimizedCode: undefined,
+    // Append cache-busting queries (useful for development!)
+    cacheBust: true,
     // Any events to bind to
     on: {},
     // Hub events to bind to
@@ -189,14 +191,16 @@
       var link = document.createElement("link");
       link.id = "togetherjs-stylesheet";
       link.setAttribute("rel", "stylesheet");
-      link.href = baseUrl + styleSheet + "?bust=" + cacheBust;
+      link.href = baseUrl + styleSheet +
+	(cacheBust ? ("?bust=" + cacheBust) : '');
       document.head.appendChild(link);
     }
   }
 
   function addScript(url) {
     var script = document.createElement("script");
-    script.src = baseUrl + url + "?bust=" + cacheBust;
+    script.src = baseUrl + url +
+      (cacheBust ? ("?bust=" + cacheBust) : '');
     document.head.appendChild(script);
   }
 
@@ -281,6 +285,10 @@
           TogetherJS.hub.on(attr, hubOns[attr]);
         }
       }
+    }
+    if (!TogetherJS.config.close('cacheBust')) {
+      cacheBust = '';
+      delete TogetherJS.requireConfig.urlArgs;
     }
 
     if (! TogetherJS.startup.reason) {
@@ -712,6 +720,7 @@
       throw new Error("Configuration is unknown: " + name);
     }
     TogetherJS._configClosed[name] = true;
+    return this.get(name);
   };
 
   TogetherJS.reinitialize = function () {
