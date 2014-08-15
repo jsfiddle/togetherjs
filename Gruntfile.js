@@ -81,7 +81,7 @@ module.exports = function (grunt) {
   grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
     var lang = path.basename(langFilename).replace(/\.json/, "");
     libs.push("templates-" + lang);
-    requirejsPaths["templates-" + lang] = "../build/togetherjs/templates-" + lang;
+    requirejsPaths["templates-" + lang] = path.join("..", grunt.option("dest"), "togetherjs", "templates-" + lang);
   });
 
   grunt.initConfig({
@@ -142,7 +142,7 @@ module.exports = function (grunt) {
       options: {
         csslintrc: ".csslint.rc"
       },
-      src: ["build/togetherjs/togetherjs.css"]
+      src: [path.join(grunt.option("dest"), "togetherjs/togetherjs.css")]
     },
 
     watch: {
@@ -373,9 +373,9 @@ module.exports = function (grunt) {
   });
 
   function parseMarkdownOutput(doc) {
-    var title = (/<h1>(.*)<\/h1>/i).exec(doc);
+    var title = (/<h1[^>]*>(.*)<\/h1>/i).exec(doc);
     title = title[1];
-    var body = doc.replace(/<h1>.*<\/h1>/i, "");
+    var body = doc.replace(/<h1[^>]*>.*<\/h1>/i, "");
     return {
       title: title,
       body: body
@@ -483,7 +483,7 @@ module.exports = function (grunt) {
       var dest = grunt.option("dest") + "/source/" + source + ".html";
       grunt.log.writeln("Rendering " + source.cyan + " to " + dest.cyan);
       var code = grunt.file.read("togetherjs/" + source);
-      var sections = docco.parse(source, code);
+      var sections = docco.parse(source, code, {languages:{}});
       doccoFormat(source, sections);
       sections.forEach(function (section, i) {
         section.index = i;
