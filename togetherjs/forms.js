@@ -956,6 +956,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
   var focusElements = {};
 
   session.hub.on("form-focus", function (msg) {
+    if (! msg.sameUrl) {
+      return;
+    }
     var current = focusElements[msg.peer.id];
     if (current) {
       current.remove();
