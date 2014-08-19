@@ -40,7 +40,7 @@ function ($, util, session, elementFinder) {
   function makeEventSender(eventName) {
     return function (event, options) {
       var element = event.target;
-      options || (options = {});
+      options = options || {};
       if (!options.silent) {
         session.send({
           type: ('video-'+eventName),
