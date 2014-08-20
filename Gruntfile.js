@@ -58,7 +58,7 @@ module.exports = function (grunt) {
   }
 
   var requirejsPaths = {
-            jquery: "libs/jquery-1.8.3.min",
+            jquery: "libs/jquery-1.11.1.min",
             walkabout: "libs/walkabout/walkabout",
             esprima: "libs/walkabout/lib/esprima",
             falafel: "libs/walkabout/lib/falafel",
