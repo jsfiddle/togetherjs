@@ -374,8 +374,11 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       }
       for (var i = 0; i < log.length; i++) {
         // peers should already be loaded from sessionStorage by the peers module
-        // maybe i should use a try catch block here
-        var currentPeer = peers.getPeer(log[i].peerId);
+        var currentPeer = peers.getPeer(log[i].peerId, null, true);
+        if (!currentPeer) {
+          // sometimes peers go away
+          continue;
+        }
         ui.chat.text({
           text: log[i].text,
           date: log[i].date,

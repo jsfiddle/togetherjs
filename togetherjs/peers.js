@@ -453,7 +453,7 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
     });
   }
 
-  peers.getPeer = function getPeer(id, message) {
+  peers.getPeer = function getPeer(id, message, ignoreMissing) {
     assert(id);
     var peer = Peer.peers[id];
     if (id === session.clientId) {
@@ -462,6 +462,9 @@ define(["util", "session", "storage", "require", "templates"], function (util, s
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
       return peer;
+    }
+    if (ignoreMissing && !peer) {
+      return null;
     }
     assert(peer, "No peer with id:", id);
     if (message &&
