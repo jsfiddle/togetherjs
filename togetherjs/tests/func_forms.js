@@ -6,13 +6,10 @@ $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');
 $("#fixture").append('<input type="password" id="password" value="test">');
 
-Test.require("forms", "session", "ui", "windowing", "eventMaker");
+Test.require("forms", "session", "ui", "windowing", "eventMaker", "templates-en-US");
 // => Loaded modules: ...
 
-printChained(
-  Test.resetSettings(),
-  Test.startTogetherJS(),
-  Test.closeWalkthrough());
+Test.normalStartup();
 // =>...
 
 var fireChange = eventMaker.fireChange;
@@ -155,7 +152,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: "//" + location.host + "/togetherjs/images/robot-avatar.png",
+  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false

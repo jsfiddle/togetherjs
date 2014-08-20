@@ -1,6 +1,6 @@
 // =SECTION Setup
 
-Test.require("peers");
+Test.require("peers", "templates-en-US");
 // => Loaded modules: ...
 
 TogetherJSTestSpy.setIdleTime(100);

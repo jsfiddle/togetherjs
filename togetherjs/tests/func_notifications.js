@@ -15,7 +15,7 @@ function visible() {
   });
 }
 
-Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
+Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "templates-en-US");
 // => Loaded modules: ...
 
 Test.normalStartup();

@@ -150,7 +150,8 @@ Test.resetSettings = function () {
       storage.settings.set("color", "#00ff00"),
       storage.settings.set("seenIntroDialog", undefined),
       storage.settings.set("seenWalkthrough", undefined),
-      storage.settings.set("dontShowRtcInfo", undefined)
+      storage.settings.set("dontShowRtcInfo", undefined),
+      storage.tab.set("chatlog", undefined)
     ).then(function () {
       def.resolve("Settings reset");
     });
@@ -191,9 +192,9 @@ Test.closeWalkthrough = function () {
 
 Test.normalStartup = function () {
   printChained(
-    Test.resetSettings(),
-    Test.startTogetherJS(),
-    Test.closeWalkthrough());
+    Test.resetSettings,
+    Test.startTogetherJS,
+    Test.closeWalkthrough);
 };
 
 function printChained() {
@@ -205,7 +206,9 @@ function printChained() {
       done = true;
       return;
     }
-    args[index].then(function () {
+    var f = args[index];
+    if (!f.then) { f = f(); }
+    f.then(function () {
       if (! arguments.length) {
         print("(done)");
       } else {

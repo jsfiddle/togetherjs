@@ -27,7 +27,7 @@ var editor = ace.edit("ace-editor");
 editor.setTheme("ace/theme/textmate");
 editor.getSession().setMode("ace/mode/javascript");
 
-Test.require("forms", "session", "ui");
+Test.require("forms", "session", "ui", "templates-en-US");
 /* =>
 <pre...</pre>
 Loaded modules: ...
@@ -48,7 +48,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: TogetherJS.baseUrl + "/togetherjs/robot-avatar.jpg",
+  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false
@@ -63,6 +63,7 @@ send: form-init
   pageAge: ?,
   updates: [
    {
+      basis: 1,
       element: "#ace-editor",
       tracker: "AceEditor",
       value: "function square(x) {\n  return x * x;\n}\n"
@@ -78,21 +79,17 @@ wait(100);
 /* =>
 send: form-update
   clientId: "me",
-  delta: {
-    action: "insertText",
-    range: {
-      end: {
-        column: 14,
-        row: 0
-      },
-      start: {
-        column: 0,
-        row: 0
-      }
-    },
-    text: "Some more text"
-  },
   element: "#ace-editor",
+  replace: {
+    basis: 1,
+    delta: {
+      del: 0,
+      start: 0,
+      text: "Some more text"
+    },
+    id: "..."
+  },
+  "server-echo": true,
   tracker: "AceEditor"
 */
 
@@ -101,18 +98,21 @@ Test.incoming({
   clientId: "faker",
   element: "#ace-editor",
   tracker: "AceEditor",
-  delta: {
-    action: "insertText",
-    text: "Hey ",
-    range: {
-      start: {column: 0, row: 0}, end: {column: 4, row: 0},
-    }
-  }
+  replace: {
+    basis: 2,
+    delta: {
+      del: 0,
+      start: 5,
+      text: "Hey "
+    },
+    id: "faker.2"
+  },
+  "server-echo": true
 });
 print(editor.getValue());
 
 /* =>
-Hey Some more textfunction square(x) {
+Some Hey more textfunction square(x) {
   return x * x;
 }
 */

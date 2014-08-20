@@ -2,13 +2,10 @@
 
 $("#other").remove();
 
-Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing");
+Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "templates-en-US");
 // => Loaded modules: ...
 
-printChained(
-  Test.resetSettings(),
-  Test.startTogetherJS(),
-  Test.closeWalkthrough());
+Test.normalStartup();
 
 /* =>
 Settings reset

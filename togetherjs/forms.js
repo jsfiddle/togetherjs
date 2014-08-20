@@ -652,8 +652,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       var value = getValue(el);
       var upd = {
         element: elementFinder.elementLocation(this),
-        value: value,
-        elementType: getElementType(el)
+        //elementType: getElementType(el), // added in 5cbb88c9a but unused
+        value: value
       };
       if (isText(el)) {
         var history = el.data("togetherjsHistory");
