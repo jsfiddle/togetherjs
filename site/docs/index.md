@@ -412,7 +412,7 @@ The hub changes quite infrequently, so if you just stability then making a stati
 ## Localization Support
 
 * Check [translation file](../../togetherjs/locale/en-US.json) for template example if you want to translate into your own language
-* Adding new language inside [locale](../../togetherjs/locale/) directory should be in this format: "th-TH.json", "th.json", "pt-BR.json" or "pt.json" and enable support language in [availableTranslations](../../togetherjs/togetherjs.js#L299) inside togetherjs.js file.
+* Adding new language inside [locale](../../togetherjs/locale/) directory should be in this format: "th-TH.json", "th.json", "pt-BR.json" or "pt.json" and enable support language in [`availableTranslations`](../../togetherjs/togetherjs.js#L320) inside togetherjs.js file.  Note that your file name and language names in  your configuration should use hyphens in accord with [BCP 47](http://tools.ietf.org/html/bcp47), not underscores.
 
 To get your language display you can enable it by:
 

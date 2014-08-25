@@ -74,7 +74,7 @@
     ignoreForms: [":password"],
     // When undefined, attempts to use the browser's language
     lang: undefined,
-    fallbackLang: "en_US"
+    fallbackLang: "en-US"
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
@@ -324,17 +324,18 @@
     };
 
     if(lang === undefined) {
+      // BCP 47 mandates hyphens, not underscores, to separate lang parts
       var navigatorLang = navigator.language.replace(/_/g, "-");
       if (!availableTranslations[navigatorLang]) {
         lang = TogetherJS.config.get("fallbackLang");
       } else {
         lang = navigatorLang;
       }
-     TogetherJS.config("lang", lang);
     }
+    lang = lang.replace(/_/g, "-");
+    TogetherJS.config("lang", lang);
 
-    TogetherJS.config("lang", lang.replace(/_/g, "-")); // rename into TogetherJS.config.get()?
-    var localeTemplates = "templates-" + lang;// rename into TogetherJS.config.get()?
+    var localeTemplates = "templates-" + lang;
     deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
