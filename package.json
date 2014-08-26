@@ -31,17 +31,21 @@
     "grunt-contrib-watch": "~0.4.3",
     "grunt": "~0.4.1",
     "grunt-contrib-copy": "~0.4.1",
+    "grunt-http-server": "~0.0.5",
     "nunjucks": "~0.1.8a",
     "marked": "~0.2.9",
     "docco": "~0.6.2",
     "highlight.js": "~7.3.0",
-    "optimist": "~0.6.0"
+    "optimist": "~0.6.0",
+    "freeport": "~1.0.3",
+    "grunt-lib-phantomjs": "~0.6.0"
   },
   "engines": {
     "node": "~0.8",
     "npm": "~1.1.18"
   },
   "scripts": {
-    "start": "node hub/server.js"
+    "start": "node hub/server.js",
+    "test": "grunt test"
   }
 }

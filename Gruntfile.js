@@ -13,6 +13,8 @@ var vars = {
   base: ""
 };
 
+var TESTDIR = "test-build";
+
 module.exports = function (grunt) {
 
   if (! grunt.option("dest")) {
@@ -57,18 +59,6 @@ module.exports = function (grunt) {
     });
   }
 
-  var requirejsPaths = {
-            jquery: "libs/jquery-1.11.1.min",
-            walkabout: "libs/walkabout/walkabout",
-            esprima: "libs/walkabout/lib/esprima",
-            falafel: "libs/walkabout/lib/falafel",
-            tinycolor: "libs/tinycolor",
-            whrandom: "libs/whrandom/random",
-            jqueryui: "libs/jquery-ui.min",
-            jquerypunch: "libs/jquery.ui.touch-punch.min",
-            // Make sure we get the built form of this one:
-            templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
-          };
 
   var libs = [];
   grunt.file.expand(
@@ -78,10 +68,11 @@ module.exports = function (grunt) {
     filename = filename.replace(/\.js$/, "");
     libs.push(filename);
   });
+  var langs = [];
   grunt.file.expand("togetherjs/locale/*.json").forEach(function (langFilename) {
     var lang = path.basename(langFilename).replace(/\.json/, "");
+    langs.push(lang);
     libs.push("templates-" + lang);
-    requirejsPaths["templates-" + lang] = path.join("..", grunt.option("dest"), "togetherjs", "templates-" + lang);
   });
 
   grunt.initConfig({
@@ -103,7 +94,7 @@ module.exports = function (grunt) {
       compile: {
         options: {
           baseUrl: "togetherjs/",
-          paths: requirejsPaths,
+          //paths: requirejsPaths,
           include: ["libs/almond"].concat(libs),
           //Wrap any build bundle in a start and end text specified by wrap.
           //Use this to encapsulate the module code so that define/require are
@@ -167,7 +158,26 @@ module.exports = function (grunt) {
                 "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
-    }
+    },
+
+    'http-server': {
+      'test': {
+        // the server root directory
+        root: '.',
+        cache: 30,
+        //showDir: true,
+        //autoIndex: true,
+        // run in parallel with other tasks
+        runInBackground: true
+      }
+    },
+
+    'phantom-tests': grunt.file.expand({
+      cwd:"togetherjs/tests/"
+    }, "test_*.js", "func_*.js", "interactive.js", "!test_ot.js",
+    // disable some tests because phantomjs doesn't support modern websockets
+    "!func*.js", "!interactive.js").
+    reduce(function(o, k) { o[k] = {}; return o; }, {})
 
   });
 
@@ -177,6 +187,36 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-requirejs");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-contrib-copy');
+
+  grunt.registerTask("config-requirejs", function() {
+    // configure the requirejs paths based on the current options
+    var requirejsPaths = {
+      jquery: "libs/jquery-1.11.1.min",
+      walkabout: "libs/walkabout/walkabout",
+      esprima: "libs/walkabout/lib/esprima",
+      falafel: "libs/walkabout/lib/falafel",
+      tinycolor: "libs/tinycolor",
+      whrandom: "libs/whrandom/random",
+      jqueryui: "libs/jquery-ui.min",
+      jquerypunch: "libs/jquery.ui.touch-punch.min",
+      // Make sure we get the built form of this one:
+      templates: path.join("..", grunt.option("dest"), "togetherjs/templates")
+    };
+    langs.forEach(function(lang) {
+      requirejsPaths["templates-" + lang] =
+        path.join("..", grunt.option("dest"), "togetherjs", "templates-" + lang);
+    });
+    grunt.config.merge({
+      requirejs: {
+        compile: {
+          options: {
+            paths: requirejsPaths
+          }
+        }
+      }
+    });
+    grunt.task.run("requirejs");
+  });
 
   grunt.registerTask("copylib", "copy the library", function () {
     var pattern = ["**", "!togetherjs.js", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
@@ -202,7 +242,7 @@ module.exports = function (grunt) {
       ["**"]);
   });
 
-  grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
+  grunt.registerTask("build", ["copylib", "maybeless", "substitute", "config-requirejs"]);
   grunt.registerTask("buildsite", ["copysite", "render", "rendermd", "docco"]);
   grunt.registerTask("devwatch", ["build", "watch:minimal"]);
   // For some reason doing ["build", "buildsite", "watch:site"]
@@ -618,6 +658,131 @@ module.exports = function (grunt) {
       args: ['devserver.js']
     });
     grunt.task.run('watch');
+  });
+
+  grunt.registerTask("test", "Run jshint and test suite", ["jshint", "phantom"]);
+  grunt.loadNpmTasks('grunt-http-server');
+
+  grunt.registerTask("phantom", ["phantom-setup", "phantom-tests"]);
+
+  grunt.registerTask("phantom-setup", "Run jdoctest test suite in phantomjs",
+    function() {
+      var done = this.async();
+      // find unused ports for web server and hub
+      var freeport = require("freeport");
+      freeport(function(err1, hubPort) {
+        freeport(function(err2, webPort) {
+          if (err1 || err2) { return done(err1 || err2); }
+
+          // build togetherjs using these default ports
+          grunt.option("base-url", "http://localhost:"+webPort+"/"+TESTDIR+"/");
+          grunt.option("hub-url", "http://localhost:"+hubPort);
+          grunt.option("no-hardlink", true);
+          grunt.option("dest", TESTDIR);
+          // make sure the web server will use the right port
+          grunt.config.merge({
+            'http-server': {
+              test: {
+                port: webPort,
+                host: "localhost"
+              }
+            }
+          });
+          // spawn a hub, using the hub port
+          var hub = require("./hub/server");
+          hub.startServer(hubPort, "localhost");
+          // build & start the web server
+          grunt.task.run("build", "http-server:test");
+          // ok, now we can run the tests in phantomjs!
+          done();
+        });
+      });
+    });
+
+  // PhantomJS event handlers
+  var phantomjs = require("grunt-lib-phantomjs").init(grunt);
+  var phantomStatus;
+
+  phantomjs.on('fail.load', function(url) {
+    phantomjs.halt();
+    grunt.verbose.write('Running PhantomJS...').or.write('...');
+    grunt.log.error('PhantomJS unable to load "' + url + '" URI.');
+    phantomStatus.failed += 1;
+    phantomStatus.total += 1;
+  });
+
+  phantomjs.on('fail.timeout', function() {
+    phantomjs.halt();
+    grunt.log.writeln();
+    grunt.log.error('PhantomJS timed out.');
+    phantomStatus.failed += 1;
+    phantomStatus.total += 1;
+  });
+
+  phantomjs.on('doctestjs.pass', function(result) {
+    phantomStatus.total += 1;
+    grunt.verbose.ok("Passed: "+result.example.summary);
+  });
+
+  phantomjs.on('doctestjs.fail', function(result) {
+    phantomStatus.failed += 1;
+    phantomStatus.total += 1;
+    grunt.log.error("Failed: "+result.example.expr);
+    grunt.log.subhead("Expected:");
+    grunt.log.writeln(result.example.expected);
+    grunt.log.subhead("Got:");
+    grunt.log.writeln(result.got);
+  });
+
+  phantomjs.on('doctestjs.end', function() {
+    phantomjs.halt();
+  });
+
+  // Pass through console.log statements (when verbose)
+  phantomjs.on('console', grunt.verbose.writeln);
+
+  grunt.registerMultiTask("phantom-tests", function() {
+    grunt.task.requires('phantom-setup');
+    var url = grunt.option('base-url') +
+      "togetherjs/tests/index.html?name=" + this.target;
+    grunt.verbose.writeln("Running tests at: "+url);
+
+    // Merge task-specific and/or target-specific options with these defaults.
+    var options = this.options({
+      // PhantomJS timeout, in ms.
+      timeout: 10000,
+      // JDoctest-PhantomJS bridge file to be injected.
+      inject: path.join(__dirname, 'phantomjs', 'bridge.js'),
+      //screenshot: true,
+      page: {
+        // leave room for the togetherjs sidebar
+        viewportSize: { width: 1024, height: 1024 }
+      }
+    });
+
+    // Reset test status
+    phantomStatus = {failed: 0, passed: 0, total: 0, start: Date.now()};
+
+    // Start phantomjs on this URL
+    var done = this.async();
+    phantomjs.spawn(url, {
+      options: options,
+      done: function() {
+        var duration = Date.now() - phantomStatus.start;
+        // Log results.
+        if (phantomStatus.failed > 0) {
+          grunt.warn(phantomStatus.failed + '/' + phantomStatus.total +
+                     ' assertions failed (' + duration + 'ms)');
+        } else if (phantomStatus.total === 0) {
+          grunt.warn('0/0 assertions ran (' + duration + 'ms)');
+        } else {
+          grunt.verbose.writeln();
+          grunt.log.ok(phantomStatus.total + ' assertions passed (' + duration + 'ms)');
+        }
+        // All done!
+        done();
+      }
+    });
   });
 
   grunt.registerTask('default', 'start');
