@@ -174,9 +174,7 @@ module.exports = function (grunt) {
 
     'phantom-tests': grunt.file.expand({
       cwd:"togetherjs/tests/"
-    }, "test_*.js", "func_*.js", "interactive.js", "!test_ot.js",
-    // disable some tests because phantomjs doesn't support modern websockets
-    "!func*.js", "!interactive.js").
+    }, "test_*.js", "func_*.js", "interactive.js", "!test_ot.js").
     reduce(function(o, k) { o[k] = {}; return o; }, {})
 
   });

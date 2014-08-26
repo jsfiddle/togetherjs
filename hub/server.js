@@ -10,9 +10,11 @@ if ( process.env.NEW_RELIC_HOME ) {
 var SAMPLE_STATS_INTERVAL = 60*1000; // 1 minute
 var SAMPLE_LOAD_INTERVAL = 5*60*1000; // 5 minutes
 var EMPTY_ROOM_LOG_TIMEOUT = 3*60*1000; // 3 minutes
+var WEBSOCKET_COMPAT = true;
 
-var WebSocketServer = require('websocket').server;
-var WebSocketRouter = require('websocket').router;
+var WebSocketServer = WEBSOCKET_COMPAT ?
+  require("./websocket-compat").server :
+  require("websocket").server;
 var http = require('http');
 var parseUrl = require('url').parse;
 var fs = require('fs');
