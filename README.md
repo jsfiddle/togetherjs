@@ -1,5 +1,5 @@
-TogetherJS - Who you call when you get stuck
-===========================================
+TogetherJS - Surprisingly easy collaboration
+============================================
 
 What is TogetherJS?
 -----------------
