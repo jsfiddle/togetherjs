@@ -42,6 +42,7 @@ print(editor.getValue());
 
 // =SECTION Setup peer
 
+Test.waitMessage("form-init");
 Test.incoming({
   type: "hello",
   clientId: "faker",
@@ -53,7 +54,6 @@ Test.incoming({
   title: document.title,
   rtcSupported: false
 });
-wait(100);
 
 /* =>
 
@@ -73,8 +73,9 @@ send: form-init
 
 // =SECTION Editing
 
+Test.waitMessage("form-update");
+$("#ace-editor").focus();
 editor.insert("Some more text");
-wait(100);
 
 /* =>
 send: form-update
@@ -93,6 +94,9 @@ send: form-update
   tracker: "AceEditor"
 */
 
+var current = editor.getValue();
+wait(function() { return editor.getValue() !== current; });
+
 Test.incoming({
   type: "form-update",
   clientId: "faker",
@@ -109,6 +113,9 @@ Test.incoming({
   },
   "server-echo": true
 });
+
+// =>
+
 print(editor.getValue());
 
 /* =>

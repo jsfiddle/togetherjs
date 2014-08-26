@@ -796,16 +796,6 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
   });
 
-  session.hub.on("hello", function (msg) {
-    if (lastFocus) {
-      setTimeout(function () {
-        if (lastFocus) {
-          session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
-        }
-      });
-    }
-  });
-
   function createFocusElement(peer, around) {
     around = $(around);
     var aroundOffset = around.offset();
@@ -843,7 +833,12 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   session.hub.on("hello", function (msg) {
     if (msg.sameUrl) {
-      setTimeout(sendInit);
+      setTimeout(function () {
+	sendInit();
+        if (lastFocus) {
+          session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
+        }
+      });
     }
   });
 

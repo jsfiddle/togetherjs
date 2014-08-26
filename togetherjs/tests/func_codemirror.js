@@ -36,6 +36,7 @@ print(editor.getValue());
 
 // =SECTION Setup peer
 
+Test.waitMessage("form-init");
 Test.incoming({
   type: "hello",
   clientId: "faker",
@@ -47,7 +48,6 @@ Test.incoming({
   title: document.title,
   rtcSupported: false
 });
-wait(100);
 
 /* =>
 
@@ -67,8 +67,9 @@ send: form-init
 
 // =SECTION Editing
 
+Test.waitMessage("form-update");
+$("#cm-editor").focus();
 editor.replaceRange("Some more text", {line: 0, ch: 0});
-wait(100);
 
 /* =>
 send: form-update
@@ -87,6 +88,9 @@ send: form-update
   tracker: "CodeMirrorEditor"
 */
 
+var current = editor.getValue();
+wait(function() { return editor.getValue() !== current; });
+
 Test.incoming({
   type: "form-update",
   clientId: "faker",
@@ -103,6 +107,9 @@ Test.incoming({
   },
   "server-echo": true
 });
+
+// =>
+
 print(editor.getValue());
 
 /* =>

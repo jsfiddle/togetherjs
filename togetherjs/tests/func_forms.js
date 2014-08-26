@@ -91,6 +91,7 @@ send: form-update
   "server-echo": true
 */
 
+$textarea.focus();
 select(3, 4);
 selection();
 
@@ -146,6 +147,7 @@ send: form-update
 
 select(3, 4);
 
+Test.waitMessage("form-focus");
 Test.incoming({
   type: "hello",
   clientId: "faker",
@@ -170,7 +172,6 @@ Test.incoming({
     }
   }
 });
-wait(100);
 
 /* =>
 
@@ -193,6 +194,7 @@ send: form-init
       value: true
     }
   ]
+send: form-focus...
 */
 
 print($textarea.val());
@@ -215,7 +217,7 @@ Test.incoming({
     }
   }
 });
-wait(100);
+wait(function() { return $textarea.val()==='hELLO there'; });
 
 // =>
 
