@@ -167,7 +167,23 @@ module.exports = function (grunt) {
                 "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
+    },
+
+    uglify: {
+      compress_0: {
+        options: {
+          compress: true
+        },
+        files: [
+        {
+            expand: true,
+            cwd: grunt.option("dest"),
+            src: 'togetherjs/togetherjsPackage.js',
+            dest: grunt.option("dest")          }
+        ]
+      }
     }
+
 
   });
 
@@ -177,6 +193,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-requirejs");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.registerTask("copylib", "copy the library", function () {
     var pattern = ["**", "!togetherjs.js", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
@@ -202,7 +219,7 @@ module.exports = function (grunt) {
       ["**"]);
   });
 
-  grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs"]);
+  grunt.registerTask("build", ["copylib", "maybeless", "substitute", "requirejs","uglify"]);
   grunt.registerTask("buildsite", ["copysite", "render", "rendermd", "docco"]);
   grunt.registerTask("devwatch", ["build", "watch:minimal"]);
   // For some reason doing ["build", "buildsite", "watch:site"]
