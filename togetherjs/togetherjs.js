@@ -330,6 +330,9 @@
       // BCP 47 mandates hyphens, not underscores, to separate lang parts
       lang = navigator.language.replace(/_/g, "-");
     }
+    if (/-/.test(lang) && !availableTranslations[lang]) {
+      lang = lang.replace(/-.*$/, '');
+    }
     if (!availableTranslations[lang]) {
       lang = TogetherJS.config.get("fallbackLang");
     } else if (availableTranslations[lang] !== true) {
