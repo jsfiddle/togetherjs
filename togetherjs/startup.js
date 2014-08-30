@@ -69,23 +69,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
     },
 
     browserUnsupported: function (next) {
-      if (! $.browser.msie) {
         next();
-        return;
-      }
-      var cancel = true;
-      windowing.show("#togetherjs-browser-unsupported", {
-        onClose: function () {
-          if (cancel) {
-            session.close();
-          } else {
-            next();
-          }
-        }
-      });
-      $("#togetherjs-browser-unsupported-anyway").click(function () {
-        cancel = false;
-      });
     },
 
     sessionIntro: function (next) {
