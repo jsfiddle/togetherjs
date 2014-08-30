@@ -1222,7 +1222,7 @@ HTMLParser.prototype = {
         try {
           href = this.fillPattern(href);
         } catch (e) {
-          var text = '// Error resolving data-href-pattern"' + href + '":\n';
+          var text = '// Error resolving data-href-pattern "' + href + '":\n';
           text += '// ' + e;
           el.innerHTML = '';
           el.appendChild(document.createTextNode(text));

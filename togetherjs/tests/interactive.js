@@ -10,7 +10,7 @@ if (config) {
   }
 }
 
-Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "elementFinder");
+Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "elementFinder", "templates-en-US");
 // => Loaded ...
 
 printChained(

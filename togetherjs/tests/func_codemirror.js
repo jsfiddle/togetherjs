@@ -1,6 +1,6 @@
 // =SECTION Setup
 
-var cmSrc = "../../example/codemirror/codemirror.js";
+var cmSrc = "./codemirror4.js";
 var script = $("<script>").attr("onload", Spy("cmLoad", {wait: true})).attr("src", cmSrc);
 $(document.head).append(script);
 
@@ -8,7 +8,7 @@ $(document.head).append(script);
 
 print(CodeMirror);
 
-// => function CodeMirror(place, options) {...}
+// => function ...
 
 var div = $('<div><pre id="cm-editor" style="width: 200px; height: 200px; position: absolute; bottom: 10px; left: 10px;"></pre></div>');
 $("#fixture").append(div);
@@ -21,7 +21,7 @@ var editor = CodeMirror($("#cm-editor")[0], {
 });
 editor.setValue("function square(x) {\n  return x * x;\n}\n");
 
-Test.require("forms", "session", "ui");
+Test.require("forms", "session", "ui", "templates-en-US");
 /* =>
 <pre...
 Loaded modules: ...
@@ -36,18 +36,18 @@ print(editor.getValue());
 
 // =SECTION Setup peer
 
+Test.waitMessage("form-init");
 Test.incoming({
   type: "hello",
   clientId: "faker",
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: "about:blank",
+  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false
 });
-wait(100);
 
 /* =>
 
@@ -57,6 +57,7 @@ send: form-init
   pageAge: ?,
   updates: [
     {
+      basis: 1,
       element: "#cm-editor:nth-child(1)",
       tracker: "CodeMirrorEditor",
       value: "function square(x) {\n  return x * x;\n}\n"
@@ -66,44 +67,53 @@ send: form-init
 
 // =SECTION Editing
 
+Test.waitMessage("form-update");
+$("#cm-editor").focus();
 editor.replaceRange("Some more text", {line: 0, ch: 0});
-wait(100);
 
 /* =>
 send: form-update
-  change: {
-    from: {
-      ch: 0,
-      line: 0
-    },
-    text: [
-      "Some more text"
-    ],
-    to: {
-      ch: 0,
-      line: 0
-    }
-  },
   clientId: "me",
   element: "#cm-editor:nth-child(1)",
+  replace: {
+    basis: 1,
+    delta: {
+      del: 0,
+      start: 0,
+      text: "Some more text"
+    },
+    id: "..."
+  },
+  "server-echo": true,
   tracker: "CodeMirrorEditor"
 */
+
+var current = editor.getValue();
+wait(function() { return editor.getValue() !== current; });
 
 Test.incoming({
   type: "form-update",
   clientId: "faker",
   element: "#cm-editor:nth-child(1)",
   tracker: "CodeMirrorEditor",
-  change: {
-    text: "Hey ",
-    from: {ch: 0, line: 0},
-    to: {ch: 0, line: 0}
-  }
+  replace: {
+    basis: 2,
+    delta: {
+      del: 0,
+      start: 5,
+      text: "Hey "
+    },
+    id: "faker.2"
+  },
+  "server-echo": true
 });
+
+// =>
+
 print(editor.getValue());
 
 /* =>
-Hey Some more textfunction square(x) {
+Some Hey more textfunction square(x) {
   return x * x;
 }
 */

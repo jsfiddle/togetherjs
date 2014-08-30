@@ -30,6 +30,8 @@
     siteName: null,
     // Whether to use the minimized version of the code (overriding the built setting)
     useMinimizedCode: undefined,
+    // Append cache-busting queries (useful for development!)
+    cacheBust: true,
     // Any events to bind to
     on: {},
     // Hub events to bind to
@@ -70,6 +72,8 @@
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
     ignoreForms: [":password"],
+    // When undefined, attempts to use the browser's language
+    lang: undefined,
     fallbackLang: "en_US"
   };
 
@@ -80,6 +84,16 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+  // Allow override of baseUrl (this is done separately because it needs
+  // to be done very early)
+  if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+    baseUrl = window.TogetherJSConfig.baseUrl;
+  }
+  if (window.TogetherJSConfig_baseUrl) {
+    baseUrl = window.TogetherJSConfig_baseUrl;
+  }
+  defaultConfiguration.baseUrl = baseUrl;
+
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
@@ -177,20 +191,23 @@
       var link = document.createElement("link");
       link.id = "togetherjs-stylesheet";
       link.setAttribute("rel", "stylesheet");
-      link.href = baseUrl + styleSheet + "?bust=" + cacheBust;
+      link.href = baseUrl + styleSheet +
+	(cacheBust ? ("?bust=" + cacheBust) : '');
       document.head.appendChild(link);
     }
   }
 
   function addScript(url) {
     var script = document.createElement("script");
-    script.src = baseUrl + url + "?bust=" + cacheBust;
+    script.src = baseUrl + url +
+      (cacheBust ? ("?bust=" + cacheBust) : '');
     document.head.appendChild(script);
   }
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
+    var session;
     if (TogetherJS.running) {
-      var session = TogetherJS.require("session");
+      session = TogetherJS.require("session");
       session.close();
       return;
     }
@@ -269,6 +286,10 @@
         }
       }
     }
+    if (!TogetherJS.config.close('cacheBust')) {
+      cacheBust = '';
+      delete TogetherJS.requireConfig.urlArgs;
+    }
 
     if (! TogetherJS.startup.reason) {
       // Then a call to TogetherJS() from a button must be started TogetherJS
@@ -277,7 +298,7 @@
 
     // FIXME: maybe I should just test for TogetherJS.require:
     if (TogetherJS._loaded) {
-      var session = TogetherJS.require("session");
+      session = TogetherJS.require("session");
       addStyle();
       session.start();
       return;
@@ -390,7 +411,7 @@
     baseUrl: baseUrl + "/togetherjs",
     urlArgs: "bust=" + cacheBust,
     paths: {
-      jquery: "libs/jquery-1.8.3.min",
+      jquery: "libs/jquery-1.11.1.min",
       walkabout: "libs/walkabout/walkabout",
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
@@ -622,14 +643,15 @@
     }
     var i;
     var tracker;
-    for (var attr in settings) {
+    var attr;
+    for (attr in settings) {
       if (settings.hasOwnProperty(attr)) {
         if (TogetherJS._configClosed[attr] && TogetherJS.running) {
           throw new Error("The configuration " + attr + " is finalized and cannot be changed");
         }
       }
     }
-    for (var attr in settings) {
+    for (attr in settings) {
       if (! settings.hasOwnProperty(attr)) {
         continue;
       }
@@ -698,6 +720,7 @@
       throw new Error("Configuration is unknown: " + name);
     }
     TogetherJS._configClosed[name] = true;
+    return this.get(name);
   };
 
   TogetherJS.reinitialize = function () {

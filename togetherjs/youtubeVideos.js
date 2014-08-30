@@ -44,22 +44,32 @@ function ($, util, session, elementFinder) {
     }
   });
 
+  var youtubeHooked = false;
+
   function prepareYouTube() {
     // setup iframes first
     setupYouTubeIframes();
 
     // this function should be global so it can be called when API is loaded
-    window.onYouTubeIframeAPIReady = function() {
-      // YouTube API is ready
-      $(youTubeIframes).each(function (i, iframe) {
-        var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
-          events: {
-            'onReady': insertPlayer,
-            'onStateChange': publishPlayerStateChange
+    if (!youtubeHooked) {
+      youtubeHooked = true;
+      window.onYouTubeIframeAPIReady = (function(oldf) {
+        return function() {
+          // YouTube API is ready
+          $(youTubeIframes).each(function (i, iframe) {
+            var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
+              events: {
+                'onReady': insertPlayer,
+                'onStateChange': publishPlayerStateChange
+              }
+            });
+          });
+          if (oldf) {
+            return oldf();
           }
-        });
-      });
-    };
+        };
+      })(window.onYouTubeIframeAPIReady);
+    }
 
     if (window.YT === undefined) {
       // load necessary API
@@ -80,9 +90,16 @@ function ($, util, session, elementFinder) {
         // if the iframe's unique id is already set, skip it
         // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
         // maybe we should set iframes everytime togetherjs is reinitialized?
-        if (($(iframe).attr("src") || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
+        var src = $(iframe).attr("src");
+        if ((src || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
           $(iframe).attr("enablejsapi", 1);
+          // we also need to add ?enablejsapi to the iframe src.
+          if (!/[?&]enablejsapi=1(&|$)/.test(src)) {
+            src += (/[?]/.test(src)) ? '&' : '?';
+            src += 'enablejsapi=1';
+            $(iframe).attr("src", src);
+          }
           youTubeIframes[i] = iframe;
         }
       });
@@ -91,7 +108,7 @@ function ($, util, session, elementFinder) {
     function insertPlayer(event) {
       // only when it is READY, attach a player to its iframe
       var currentPlayer = event.target;
-      var currentIframe = currentPlayer.a;
+      var currentIframe = currentPlayer.getIframe();
       // check if a player is already attached in case of being reinitialized
       if (!$(currentIframe).data("togetherjs-player")) {
         $(currentIframe).data("togetherjs-player", currentPlayer);
@@ -105,14 +122,12 @@ function ($, util, session, elementFinder) {
   } // end of prepareYouTube
 
   function publishPlayerStateChange(event) {
-    var target = event.target; 
-    var currentIframe = target.a;
-    // FIXME: player object retrieved from event.target has an incomplete set of essential functions
-    // this is most likely due to a recently-introduced problem with current YouTube API as others have been reporting the same issue (12/18/`13)
-    //var currentPlayer = target;
-    //var currentTime = currentPlayer.getCurrentTime();
-    var currentPlayer = $(currentIframe).data("togetherjs-player");
-    var currentTime = target.k.currentTime;
+    var target = event.target;
+    var currentIframe = target.getIframe();
+    //var currentPlayer = $(currentIframe).data("togetherjs-player");
+    var currentPlayer = target;
+    var currentTime = currentPlayer.getCurrentTime();
+    //var currentTime = target.k.currentTime;
     var iframeLocation = elementFinder.elementLocation(currentIframe);
 
     if ($(currentPlayer).data("seek")) {
@@ -203,6 +218,7 @@ function ($, util, session, elementFinder) {
   });
 
   session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
+    // XXX can this message arrive before we're initialized?
     var iframe = elementFinder.findElement(msg.element);
     var player = $(iframe).data("togetherjs-player");
     // check if another video had been loaded to an existing iframe before I joined

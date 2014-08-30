@@ -652,8 +652,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       var value = getValue(el);
       var upd = {
         element: elementFinder.elementLocation(this),
-        value: value,
-        elementType: getElementType(el)
+        //elementType: getElementType(el), // added in 5cbb88c9a but unused
+        value: value
       };
       if (isText(el)) {
         var history = el.data("togetherjsHistory");
@@ -796,16 +796,6 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     }
   });
 
-  session.hub.on("hello", function (msg) {
-    if (lastFocus) {
-      setTimeout(function () {
-        if (lastFocus) {
-          session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
-        }
-      });
-    }
-  });
-
   function createFocusElement(peer, around) {
     around = $(around);
     var aroundOffset = around.offset();
@@ -843,7 +833,12 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
 
   session.hub.on("hello", function (msg) {
     if (msg.sameUrl) {
-      setTimeout(sendInit);
+      setTimeout(function () {
+	sendInit();
+        if (lastFocus) {
+          session.send({type: "form-focus", element: elementFinder.elementLocation(lastFocus)});
+        }
+      });
     }
   });
 

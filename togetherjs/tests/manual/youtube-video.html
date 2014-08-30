@@ -5,7 +5,7 @@
     <title>YouTube Video Test</title>
   </head>
   <body>
-	<iframe width="420" height="315" src="//www.youtube.com/embed/rP1zHJKpV2s" frameborder="0" allowfullscreen></iframe>
+    <iframe width="420" height="315" src="//www.youtube.com/embed/rP1zHJKpV2s" frameborder="0" allowfullscreen></iframe>
     <iframe width="420" height="315" src="//www.youtube.com/embed/rKyoq5L1YIY" frameborder="0" allowfullscreen></iframe>
 
     <button onclick="TogetherJS(this); return false;">Toggle TogetherJS</button>
@@ -16,9 +16,10 @@
       var TogetherJSConfig_suppressJoinConfirmation = true;
       var TogetherJSConfig_dontShowClicks = true;
       var TogetherJSConfig_youtube = true;
+      var TogetherJSConfig_cacheBust = false;
     </script>
 
 
-    <script type="text/javascript" src="/togetherjs.js"></script>
+    <script type="text/javascript" src="../../../togetherjs.js"></script>
   </body>
 </html>
