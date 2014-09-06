@@ -90,7 +90,7 @@ function ($, util, session, elementFinder) {
         // if the iframe's unique id is already set, skip it
         // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
         // maybe we should set iframes everytime togetherjs is reinitialized?
-        var src = $(iframe).attr("src");
+        var osrc = $(iframe).attr("src"), src = osrc;
         if ((src || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
           $(iframe).attr("enablejsapi", 1);
@@ -98,6 +98,13 @@ function ($, util, session, elementFinder) {
           if (!/[?&]enablejsapi=1(&|$)/.test(src)) {
             src += (/[?]/.test(src)) ? '&' : '?';
             src += 'enablejsapi=1';
+          }
+          // the youtube API seems to be unhappy unless the URL starts
+          // with https
+          if (!/^https[:]\/\//.test(src)) {
+            src = 'https://' + src.replace(/^(\w+[:])?\/\//, '');
+          }
+          if (src !== osrc) {
             $(iframe).attr("src", src);
           }
           youTubeIframes[i] = iframe;

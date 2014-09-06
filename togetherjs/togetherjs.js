@@ -74,7 +74,7 @@
     ignoreForms: [":password"],
     // When undefined, attempts to use the browser's language
     lang: undefined,
-    fallbackLang: "en_US"
+    fallbackLang: "en-US"
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
@@ -319,22 +319,28 @@
     // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
     var availableTranslations = {
       "en-US": true,
+      "en": "en-US",
+      "es": "es-BO",
+      "es-BO": true,
       "ru": true,
-      "ru-RU": true
+      "ru-RU": "ru"
     };
 
     if(lang === undefined) {
-      var navigatorLang = navigator.language.replace(/_/g, "-");
-      if (!availableTranslations[navigatorLang]) {
-        lang = TogetherJS.config.get("fallbackLang");
-      } else {
-        lang = navigatorLang;
-      }
-     TogetherJS.config("lang", lang);
+      // BCP 47 mandates hyphens, not underscores, to separate lang parts
+      lang = navigator.language.replace(/_/g, "-");
     }
+    if (/-/.test(lang) && !availableTranslations[lang]) {
+      lang = lang.replace(/-.*$/, '');
+    }
+    if (!availableTranslations[lang]) {
+      lang = TogetherJS.config.get("fallbackLang");
+    } else if (availableTranslations[lang] !== true) {
+      lang = availableTranslations[lang];
+    }
+    TogetherJS.config("lang", lang);
 
-    TogetherJS.config("lang", lang.replace(/_/g, "-")); // rename into TogetherJS.config.get()?
-    var localeTemplates = "templates-" + lang;// rename into TogetherJS.config.get()?
+    var localeTemplates = "templates-" + lang;
     deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
