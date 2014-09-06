@@ -231,14 +231,14 @@ function ($, util, session, elementFinder) {
     var iframe = elementFinder.findElement(msg.element);
     var player = $(iframe).data("togetherjs-player");
     // check if another video had been loaded to an existing iframe before I joined
-    var currentVideoId = $(iframe).data("currentVideoId");
+    var currentVideoId = getVideoIdFromUrl(player.getVideoUrl());
     if (msg.videoId != currentVideoId) {
       $(iframe).data("currentVideoId", msg.videoId);
       player.loadVideoById(msg.videoId, msg.playerTime, 'default');
     } else {
       // if the video is only cued, I do not have to do anything to sync
       if (msg.playerState != 5) {
-        player.seekTo(msg.playerTime, true);
+        player.seekTo(msg.playerTime, true).playVideo();
       }
     }
   });
