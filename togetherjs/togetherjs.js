@@ -323,7 +323,9 @@
       "es": "es-BO",
       "es-BO": true,
       "ru": true,
-      "ru-RU": "ru"
+      "ru-RU": "ru",
+      "pl": "pl-PL",
+      "pl-PL": true
     };
 
     if(lang === undefined) {
