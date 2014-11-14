@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <title> Mozilla Labs : TogetherJS app integration example </title>
+    <title> Mozilla Labs : YouTube example </title>
     <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta name="description" content="Real time collaboration features for your website or app.">
     <meta name="author" content="">
@@ -12,6 +12,12 @@
 
     <!-- use this block to set togetherjs config -->
     
+  <script>
+    var TogetherJSConfig_autoStart = true;
+    var TogetherJSConfig_dontShowClicks = true;
+    var TogetherJSConfig_suppressJoinConfirmation = true;
+  </script>
+
 
     <script src="../../js/jquery-1.10.2.min.js"></script>
     <script src="../../js/bootstrap.min.js"></script>
@@ -49,6 +55,8 @@
     <link href="//mozorg.cdn.mozilla.net/media/css/tabzilla-min.css" rel="stylesheet" />
 
     
+    <link rel="stylesheet" type="text/css" href="css/application.css" />
+  
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -104,92 +112,35 @@
 
 
     
+  
+    <link rel="stylesheet" type="text/css" href="css/application.css" />
+  
 
-<div class="container">
-  <section class="body-content row" id="main-section" data-speed="4" data-type="background">
+  <div class="container"> <!-- container -->
+    <div class="body-content row" id="youtube-example">
+      <div class="col-md-6 col-md-offset-3">
+        <div id="introduction">
+          <h1>
+            Write Together 
+            <a href="javascript:;" class="pull-right tjsbutton"><img src="https://togetherjs.com/images/start-togetherjs-blue.png"></img></a>
+          </h1>
+          <h3 class='subtitle'>TogetherJS supports built-in synchronization for popular web editors like TinyMCE, Ace, CodeMirror, CKEditor.</h3>
+        </div>
+        <div class="tinymce"></div>
+        <form role="form">
+          <div class="row">
+            <div class="col-xs-12 labelarea">
+              <h4>Invite someone to start writing together.</h4>
+              <p class="youtube-embed-label">Write a blog post with your friend, edit an essay for your student, or even draft a business proposal with your team in real-time. To invite someone, click the invite button on the right blue menu and send the url to the person you want to write together.</p>
+            </div>
+          </div>
+        </form>
+      </div> <!-- // youtube container -->
+    </div> <!-- //body-content -->
 
-<h1>Identity/Persona Example</h1>
-
-<p>TogetherJS will pick up your login information (and gravatar):
-<button id="login"><img src="https://developer.mozilla.org/files/3969/plain_sign_in_blue.png"></button>
-<button id="logout" style="display: none">logout</button>
-<button onclick="TogetherJS(this); return false">Collaborate</button>
-</p>
-
-<div>
-The integration code:<br>
-<pre id="main-code-dest">
-</pre>
-
-<!--
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
-   <circle cx="100" cy="50" r="40" stroke="black" stroke-width="2" fill="red" />
-</svg>
--->
-
-</div>
-
-    <script src="https://login.persona.org/include.js"></script>
-    <script src="./md5.js"></script>
-    <script id="main-code">
-var USER;
-$(function () {
-  $("#main-code-dest").text($("#main-code").text());
-
-  $("#login").click(function () {
-    navigator.id.request();
-  });
-  $("#logout").click(function () {
-    navigator.id.logout();
-  });
-
-  navigator.id.watch({
-    onlogin: function (assertion) {
-      assertion = assertion.replace(/-/g, "+");
-      assertion = assertion.replace(/_/g, "/");
-      var parts = assertion.split(/\./g);
-      var data = JSON.parse(atob(parts[1]));
-      USER = data.principal.email;
-      $("#logout").text("Logged in: " + USER);
-      $("#login").hide();
-      $("#logout").show();
-      TogetherJS.refreshUserData();
-    },
-    onlogout: function () {
-      USER = null;
-      $("#login").show();
-      $("#logout").hide();
-      if (TogetherJS.require) {
-        TogetherJS.require("session").close();
-      }
-    }
-  });
-});
-
-function gravatar(email, options) {
-  options = options || "";
-  email = email.toLowerCase().replace(/^\s+/, "").replace(/\s+$/, "");
-  var md5 = CryptoJS.MD5(email);
-  return "https://www.gravatar.com/avatar/" + md5 + options;
-}
-
-TogetherJS.config("getUserName", function () {
-  return USER;
-});
-
-TogetherJS.config("getUserAvatar", function () {
-  if (! USER) {
-    return null;
-  }
-  console.log("avatar", gravatar(USER, "?s=40&d=retro"));
-  return gravatar(USER, "?s=40&d=retro");
-});
-
-    </script>
-
-  </section>
-
-</div><!-- /.container -->
+  <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+  <script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+  <script type="text/javascript" src="js/application.js"></script>
 
 
 

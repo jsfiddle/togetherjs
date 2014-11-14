@@ -185,13 +185,10 @@
       </div>
 
       <div class="col-md-9" id="source-content">
-        <h1>who.js</h1>
-        
-          <h4><p>Lets clients peek into rooms and invite people from those rooms without joining the room</p>
-</h4>
+        <h1>templates-localized.js</h1>
         
 
-        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/who.js">See this file on Github</a></div>
+        <div class="small"><a href="https://github.com/mozilla/togetherjs/blob/develop/togetherjs/templates-localized.js">See this file on Github</a></div>
 
         <ul class="sections">
           
@@ -206,125 +203,13 @@
                 <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
-define([<span class="string">"util"</span>, <span class="string">"channels"</span>, <span class="string">"session"</span>, <span class="string">"ui"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, channels, session, ui)</span> {</span>
-  <span class="keyword">var</span> assert = util.assert;
-  <span class="keyword">var</span> who = util.Module(<span class="string">"who"</span>);
-  <span class="keyword">var</span> MAX_RESPONSE_TIME = <span class="number">5000</span>;
-  <span class="keyword">var</span> MAX_LATE_RESPONSE = <span class="number">2000</span>;
 
-  who.getList = <span class="function"><span class="keyword">function</span> <span class="params">(hubUrl)</span> {</span>
-    <span class="keyword">return</span> util.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
-      <span class="keyword">var</span> expected;
-      <span class="keyword">var</span> channel = channels.WebSocketChannel(hubUrl);
-      <span class="keyword">var</span> users = {};
-      <span class="keyword">var</span> responded = <span class="number">0</span>;
-      <span class="keyword">var</span> firstResponse = <span class="number">0</span>;
-      <span class="keyword">var</span> lateResponseTimeout;
-      channel.onmessage = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-        <span class="keyword">if</span> (msg.type == <span class="string">"init-connection"</span>) {
-          expected = msg.peerCount;
-        }
-        <span class="keyword">if</span> (msg.type == <span class="string">"who"</span>) {</pre></div></div>
-              
-            </li>
-          
-            <li id="section-1">
-              <div class="annotation">
-                <div class="pilwrap">
-                  <a class="pilcrow" href="#section-1">&#182;</a>
-                </div>
-                <p>Our message back to ourselves probably</p>
-
-              </div>
-              
-                <div class="content"><div class='highlight'><pre>          firstResponse = setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-            close();
-          }, MAX_LATE_RESPONSE);
-        }
-        <span class="keyword">if</span> (msg.type == <span class="string">"hello-back"</span>) {
-          <span class="keyword">if</span> (! users[msg.clientId]) {
-            users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
-            responded++;
-            <span class="keyword">if</span> (expected &amp;&amp; responded &gt;= expected) {
-              close();
-            } <span class="keyword">else</span> {
-              def.notify(users);
-            }
-          }
-        }
-        console.log(<span class="string">"users"</span>, users);
-      };
-      channel.send({
-        type: <span class="string">"who"</span>,
-        <span class="string">"server-echo"</span>: <span class="literal">true</span>,
-        clientId: <span class="literal">null</span>
-      });
-      <span class="keyword">var</span> timeout = setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        close();
-      }, MAX_RESPONSE_TIME);
-      <span class="function"><span class="keyword">function</span> <span class="title">close</span><span class="params">()</span> {</span>
-        <span class="keyword">if</span> (timeout) {
-          clearTimeout(timeout);
-        }
-        <span class="keyword">if</span> (lateResponseTimeout) {
-          clearTimeout(lateResponseTimeout);
-        }
-        channel.close();
-        def.resolve(users);
-      }
-    });
+define([], <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">return</span> {
+    <span class="string">"interface"</span>: <span class="string">"__interface_html__"</span>,
+    walkthrough: <span class="string">"__walkthrough_html__"</span>,
+    names: <span class="string">"__names__"</span>
   };
-
-  who.invite = <span class="function"><span class="keyword">function</span> <span class="params">(hubUrl, clientId)</span> {</span>
-    <span class="keyword">return</span> util.Deferred(<span class="function"><span class="keyword">function</span> <span class="params">(def)</span> {</span>
-      <span class="keyword">var</span> channel = channels.WebSocketChannel(hubUrl);
-      <span class="keyword">var</span> id = util.generateId();
-      channel.onmessage = <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-        <span class="keyword">if</span> (msg.type == <span class="string">"invite"</span> &amp;&amp; msg.inviteId == id) {
-          channel.close();
-          def.resolve();
-        }
-      };
-      <span class="keyword">var</span> userInfo = session.makeHelloMessage(<span class="literal">false</span>);
-      <span class="keyword">delete</span> userInfo.type;
-      userInfo.clientId = session.clientId;
-      channel.send({
-        type: <span class="string">"invite"</span>,
-        inviteId: id,
-        url: session.shareUrl(),
-        userInfo: userInfo,
-        forClientId: clientId,
-        clientId: <span class="literal">null</span>,
-        <span class="string">"server-echo"</span>: <span class="literal">true</span>
-      });
-    });
-  };
-
-  who.ExternalPeer = util.Class({
-    isSelf: <span class="literal">false</span>,
-    isExternal: <span class="literal">true</span>,
-    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(id, attrs)</span> {</span>
-      attrs = attrs || {};
-      assert(id);
-      <span class="keyword">this</span>.id = id;
-      <span class="keyword">this</span>.identityId = attrs.identityId || <span class="literal">null</span>;
-      <span class="keyword">this</span>.status = attrs.status || <span class="string">"live"</span>;
-      <span class="keyword">this</span>.idle = attrs.status || <span class="string">"active"</span>;
-      <span class="keyword">this</span>.name = attrs.name || <span class="literal">null</span>;
-      <span class="keyword">this</span>.avatar = attrs.avatar || <span class="literal">null</span>;
-      <span class="keyword">this</span>.color = attrs.color || <span class="string">"#00FF00"</span>;
-      <span class="keyword">this</span>.lastMessageDate = <span class="number">0</span>;
-      <span class="keyword">this</span>.view = ui.PeerView(<span class="keyword">this</span>);
-    },
-
-    className: <span class="function"><span class="keyword">function</span> <span class="params">(prefix)</span> {</span>
-      prefix = prefix || <span class="string">""</span>;
-      <span class="keyword">return</span> prefix + util.safeClassName(<span class="keyword">this</span>.id);
-    }
-
-  });
-
-  <span class="keyword">return</span> who;
 });</pre></div></div>
               
             </li>

@@ -154,6 +154,8 @@
             
               <li><a href="storage.js.html">storage</a></li>
             
+              <li><a href="templates-localized.js.html">templates-localized</a></li>
+            
               <li><a href="templates.js.html">templates</a></li>
             
               <li><a href="templating.js.html">templating</a></li>
@@ -287,7 +289,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
 
   <span class="keyword">var</span> commands = {
     command_help: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-      <span class="keyword">var</span> msg = util.trim(templates.help);
+      <span class="keyword">var</span> msg = util.trim(templates(<span class="string">"help"</span>));
       ui.chat.system({
         text: msg
       });
@@ -325,7 +327,7 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
         ui.chat.system({
           text: <span class="string">"Testing with walkabout.js"</span>
         });
-        <span class="keyword">var</span> tmpl = $(templates.walkabout);
+        <span class="keyword">var</span> tmpl = $(templates(<span class="string">"walkabout"</span>));
         <span class="keyword">var</span> container = ui.container.find(<span class="string">".togetherjs-test-container"</span>);
         container.empty();
         container.append(tmpl);
@@ -626,12 +628,26 @@ define([<span class="string">"require"</span>, <span class="string">"jquery"</sp
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-5">&#182;</a>
                 </div>
-                <p>peers should already be loaded from sessionStorage by the peers module
-maybe i should use a try catch block here</p>
+                <p>peers should already be loaded from sessionStorage by the peers module</p>
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> currentPeer = peers.getPeer(log[i].peerId);
+                <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> currentPeer = peers.getPeer(log[i].peerId, <span class="literal">null</span>, <span class="literal">true</span>);
+        <span class="keyword">if</span> (!currentPeer) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-6">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-6">&#182;</a>
+                </div>
+                <p>sometimes peers go away</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>          <span class="keyword">continue</span>;
+        }
         ui.chat.text({
           text: log[i].text,
           date: log[i].date,
@@ -644,10 +660,10 @@ maybe i should use a try catch block here</p>
               
             </li>
           
-            <li id="section-6">
+            <li id="section-7">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-6">&#182;</a>
+                  <a class="pilcrow" href="#section-7">&#182;</a>
                 </div>
                 <p>delete chat log</p>
 
@@ -699,9 +715,9 @@ maybe i should use a try catch block here</p>
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

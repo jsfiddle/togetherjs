@@ -154,6 +154,8 @@
             
               <li><a href="storage.js.html">storage</a></li>
             
+              <li><a href="templates-localized.js.html">templates-localized</a></li>
+            
               <li><a href="templates.js.html">templates</a></li>
             
               <li><a href="templating.js.html">templating</a></li>
@@ -440,7 +442,7 @@ loaded:</p>
       });
       <span class="keyword">return</span>;
     }
-    <span class="keyword">var</span> container = ui.container = $(templates[<span class="string">"interface"</span>]);
+    <span class="keyword">var</span> container = ui.container = $(templates(<span class="string">"interface"</span>));
     assert(container.length);
     $(<span class="string">"body"</span>).append(container);
     fixupAvatars(container);
@@ -2115,7 +2117,7 @@ and if you rollover the dock, it expands and reveals the rest of the participant
 
               </div>
               
-                <div class="content"><div class='highlight'><pre>        $(<span class="string">"#togetherjs-dock-participants"</span>).replaceWith(<span class="string">"&lt;button id='togetherjs-participantlist-button' class='togetherjs-button'&gt;&lt;div class='togetherjs-tooltip togetherjs-dock-person-tooltip'&gt;&lt;span class='togetherjs-person-name'&gt;Participants&lt;/span&gt;&lt;span class='togetherjs-person-tooltip-arrow-r'&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(http://localhost:8888/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'&gt;&lt;/div&gt;&lt;/button&gt;"</span>);</pre></div></div>
+                <div class="content"><div class='highlight'><pre>        $(<span class="string">"#togetherjs-dock-participants"</span>).replaceWith(<span class="string">"&lt;button id='togetherjs-participantlist-button' class='togetherjs-button'&gt;&lt;div class='togetherjs-tooltip togetherjs-dock-person-tooltip'&gt;&lt;span class='togetherjs-person-name'&gt;Participants&lt;/span&gt;&lt;span class='togetherjs-person-tooltip-arrow-r'&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url("</span>+TogetherJS.baseUrl+<span class="string">"/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'&gt;&lt;/div&gt;&lt;/button&gt;"</span>);</pre></div></div>
               
             </li>
           
@@ -2515,9 +2517,9 @@ the invite has been successfully sent:</p>
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

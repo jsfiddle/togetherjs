@@ -30,6 +30,8 @@
     siteName: null,
     // Whether to use the minimized version of the code (overriding the built setting)
     useMinimizedCode: undefined,
+    // Append cache-busting queries (useful for development!)
+    cacheBust: true,
     // Any events to bind to
     on: {},
     // Hub events to bind to
@@ -69,7 +71,10 @@
     // Ignores the following console messages, disables all messages if set to true
     ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
     // Ignores the following forms (will ignore all forms if set to true):
-    ignoreForms: [":password"]
+    ignoreForms: [":password"],
+    // When undefined, attempts to use the browser's language
+    lang: undefined,
+    fallbackLang: "en-US"
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
@@ -79,6 +84,16 @@
     // Reset the variable if it doesn't get substituted
     baseUrl = "";
   }
+  // Allow override of baseUrl (this is done separately because it needs
+  // to be done very early)
+  if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+    baseUrl = window.TogetherJSConfig.baseUrl;
+  }
+  if (window.TogetherJSConfig_baseUrl) {
+    baseUrl = window.TogetherJSConfig_baseUrl;
+  }
+  defaultConfiguration.baseUrl = baseUrl;
+
   // True if this file should use minimized sub-resources:
   var min = "yes" == "__" + "min__" ? false : "yes" == "yes";
 
@@ -112,6 +127,9 @@
     } else {
       var shownAny = false;
       for (var attr in configOverride) {
+        if (! configOverride.hasOwnProperty(attr)) {
+          continue;
+        }
         if (attr == "expiresAt" || ! configOverride.hasOwnProperty(attr)) {
           continue;
         }
@@ -152,8 +170,8 @@
     var scripts = document.getElementsByTagName("script");
     for (var i=0; i<scripts.length; i++) {
       var src = scripts[i].src;
-      if (src && src.search(/togetherjs.js(\?.*)?$/) !== -1) {
-        baseUrl = src.replace(/\/*togetherjs.js(\?.*)?$/, "");
+      if (src && src.search(/togetherjs(-min)?.js(\?.*)?$/) !== -1) {
+        baseUrl = src.replace(/\/*togetherjs(-min)?.js(\?.*)?$/, "");
         console.warn("Detected baseUrl as", baseUrl);
         break;
       } else if (src && src.search(/togetherjs-min.js(\?.*)?$/) !== -1) {
@@ -173,20 +191,23 @@
       var link = document.createElement("link");
       link.id = "togetherjs-stylesheet";
       link.setAttribute("rel", "stylesheet");
-      link.href = baseUrl + styleSheet + "?bust=" + cacheBust;
+      link.href = baseUrl + styleSheet +
+	(cacheBust ? ("?bust=" + cacheBust) : '');
       document.head.appendChild(link);
     }
   }
 
   function addScript(url) {
     var script = document.createElement("script");
-    script.src = baseUrl + url + "?bust=" + cacheBust;
+    script.src = baseUrl + url +
+      (cacheBust ? ("?bust=" + cacheBust) : '');
     document.head.appendChild(script);
   }
 
   var TogetherJS = window.TogetherJS = function TogetherJS(event) {
+    var session;
     if (TogetherJS.running) {
-      var session = TogetherJS.require("session");
+      session = TogetherJS.require("session");
       session.close();
       return;
     }
@@ -265,6 +286,10 @@
         }
       }
     }
+    if (!TogetherJS.config.close('cacheBust')) {
+      cacheBust = '';
+      delete TogetherJS.requireConfig.urlArgs;
+    }
 
     if (! TogetherJS.startup.reason) {
       // Then a call to TogetherJS() from a button must be started TogetherJS
@@ -273,7 +298,7 @@
 
     // FIXME: maybe I should just test for TogetherJS.require:
     if (TogetherJS._loaded) {
-      var session = TogetherJS.require("session");
+      session = TogetherJS.require("session");
       addStyle();
       session.start();
       return;
@@ -290,6 +315,33 @@
     }
     var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
     var deps = ["session", "jquery"];
+    var lang = TogetherJS.getConfig("lang");
+    // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
+    var availableTranslations = {
+      "en-US": true,
+      "en": "en-US",
+      "es": "es-BO",
+      "es-BO": true,
+      "ru": true,
+      "ru-RU": "ru"
+    };
+
+    if(lang === undefined) {
+      // BCP 47 mandates hyphens, not underscores, to separate lang parts
+      lang = navigator.language.replace(/_/g, "-");
+    }
+    if (/-/.test(lang) && !availableTranslations[lang]) {
+      lang = lang.replace(/-.*$/, '');
+    }
+    if (!availableTranslations[lang]) {
+      lang = TogetherJS.config.get("fallbackLang");
+    } else if (availableTranslations[lang] !== true) {
+      lang = availableTranslations[lang];
+    }
+    TogetherJS.config("lang", lang);
+
+    var localeTemplates = "templates-" + lang;
+    deps.splice(0, 0, localeTemplates);
     function callback(session, jquery) {
       TogetherJS._loaded = true;
       if (! min) {
@@ -365,7 +417,7 @@
     baseUrl: baseUrl + "/togetherjs",
     urlArgs: "bust=" + cacheBust,
     paths: {
-      jquery: "libs/jquery-1.8.3.min",
+      jquery: "libs/jquery-1.11.1.min",
       walkabout: "libs/walkabout/walkabout",
       esprima: "libs/walkabout/lib/esprima",
       falafel: "libs/walkabout/lib/falafel",
@@ -495,6 +547,83 @@
   defaultConfiguration.hubBase = defaultHubBase;
 
   TogetherJS._configuration = {};
+  TogetherJS._defaultConfiguration = {
+    // Disables clicks for a certain element.
+    // (e.g., 'canvas' would not show clicks on canvas elements.)
+    // Setting this to true will disable clicks globally.
+    dontShowClicks: false,
+    // Experimental feature to echo clicks to certain elements across clients:
+    cloneClicks: false,
+    // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
+    // FIXME: these don't seem to be working, and probably should be removed in favor
+    // of the hub analytics
+    enableAnalytics: false,
+    // The code to enable (this is defaulting to a Mozilla code):
+    analyticsCode: "UA-35433268-28",
+    // The base URL of the hub
+    hubBase: defaultHubBase,
+    // A function that will return the name of the user:
+    getUserName: null,
+    // A function that will return the color of the user:
+    getUserColor: null,
+    // A function that will return the avatar of the user:
+    getUserAvatar: null,
+    // The siteName is used in the walkthrough (defaults to document.title):
+    siteName: null,
+    // Whether to use the minimized version of the code (overriding the built setting)
+    useMinimizedCode: undefined,
+    // Any events to bind to
+    on: {},
+    // Hub events to bind to
+    hub_on: {},
+    // Enables the alt-T alt-T TogetherJS shortcut; however, this setting
+    // must be enabled early as TogetherJSConfig_enableShortcut = true;
+    enableShortcut: false,
+    // The name of this tool as provided to users.  The UI is updated to use this.
+    // Because of how it is used in text it should be a proper noun, e.g.,
+    // "MySite's Collaboration Tool"
+    toolName: null,
+    // Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
+    // Also with findRoom: "roomName" it will connect to the given room name
+    findRoom: null,
+    // If true, starts TogetherJS automatically (of course!)
+    autoStart: false,
+    // If true, then the "Join TogetherJS Session?" confirmation dialog
+    // won't come up
+    suppressJoinConfirmation: false,
+    // If true, then the "Invite a friend" window won't automatically come up
+    suppressInvite: false,
+    // A room in which to find people to invite to this session,
+    inviteFromRoom: null,
+    // This is used to keep sessions from crossing over on the same
+    // domain, if for some reason you want sessions that are limited
+    // to only a portion of the domain:
+    storagePrefix: "togetherjs",
+    // When true, we treat the entire URL, including the hash, as the identifier
+    // of the page; i.e., if you one person is on `http://example.com/#view1`
+    // and another person is at `http://example.com/#view2` then these two people
+    // are considered to be at completely different URLs
+    includeHashInUrl: false,
+    // The language to present the tool in, such as "en-US" or "ru-RU"
+    // Note this must be set as TogetherJSConfig_lang, as it effects the loader
+    // and must be set as soon as this file is included
+    lang: null
+  };
+  // FIXME: there's a point at which configuration can't be updated
+  // (e.g., hubBase after the TogetherJS has loaded).  We should keep
+  // track of these and signal an error if someone attempts to
+  // reconfigure too late
+
+  TogetherJS.getConfig = function (name) { // rename into TogetherJS.config.get()?
+    var value = TogetherJS._configuration[name];
+    if (value === undefined) {
+      if (! TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+        console.error("Tried to load unknown configuration value:", name);
+      }
+      value = TogetherJS._defaultConfiguration[name];
+    }
+    return value;
+  };
   TogetherJS._defaultConfiguration = defaultConfiguration;
   TogetherJS._configTrackers = {};
   TogetherJS._configClosed = {};
@@ -520,14 +649,15 @@
     }
     var i;
     var tracker;
-    for (var attr in settings) {
+    var attr;
+    for (attr in settings) {
       if (settings.hasOwnProperty(attr)) {
         if (TogetherJS._configClosed[attr] && TogetherJS.running) {
           throw new Error("The configuration " + attr + " is finalized and cannot be changed");
         }
       }
     }
-    for (var attr in settings) {
+    for (attr in settings) {
       if (! settings.hasOwnProperty(attr)) {
         continue;
       }
@@ -596,6 +726,7 @@
       throw new Error("Configuration is unknown: " + name);
     }
     TogetherJS._configClosed[name] = true;
+    return this.get(name);
   };
 
   TogetherJS.reinitialize = function () {

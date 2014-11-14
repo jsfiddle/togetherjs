@@ -154,6 +154,8 @@
             
               <li><a href="storage.js.html">storage</a></li>
             
+              <li><a href="templates-localized.js.html">templates-localized</a></li>
+            
               <li><a href="templates.js.html">templates</a></li>
             
               <li><a href="templating.js.html">templating</a></li>
@@ -205,7 +207,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
 
-define([<span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"storage"</span>, <span class="string">"require"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, session, storage, require)</span> {</span>
+define([<span class="string">"util"</span>, <span class="string">"session"</span>, <span class="string">"storage"</span>, <span class="string">"require"</span>, <span class="string">"templates"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, session, storage, require, templates)</span> {</span>
   <span class="keyword">var</span> peers = util.Module(<span class="string">"peers"</span>);
   <span class="keyword">var</span> assert = util.assert;
   <span class="keyword">var</span> CHECK_ACTIVITY_INTERVAL = <span class="number">10</span>*<span class="number">1000</span>; <span class="comment">// Every 10 seconds see if someone has gone idle</span>
@@ -218,18 +220,7 @@ define([<span class="string">"util"</span>, <span class="string">"session"</span
     ui = uiModule;
   });
 
-  <span class="keyword">var</span> DEFAULT_NICKNAMES = [
-    <span class="string">"Friendly Fox"</span>,
-    <span class="string">"Brilliant Beaver"</span>,
-    <span class="string">"Observant Owl"</span>,
-    <span class="string">"Gregarious Giraffe"</span>,
-    <span class="string">"Wild Wolf"</span>,
-    <span class="string">"Silent Seal"</span>,
-    <span class="string">"Wacky Whale"</span>,
-    <span class="string">"Curious Cat"</span>,
-    <span class="string">"Intelligent Iguana"</span>
-  ];
-
+  <span class="keyword">var</span> DEFAULT_NICKNAMES = templates(<span class="string">"names"</span>).split(<span class="regexp">/,\s*/g</span>);
   <span class="keyword">var</span> Peer = util.Class({
 
     isSelf: <span class="literal">false</span>,
@@ -581,6 +572,7 @@ that it is emitted and handled in the same module</p>
           storage.settings.get(<span class="string">"color"</span>)).then((<span class="function"><span class="keyword">function</span> <span class="params">(name, avatar, defaultName, color)</span> {</span>
             <span class="keyword">if</span> (! defaultName) {
               defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+
               storage.settings.set(<span class="string">"defaultName"</span>, defaultName);
             }
             <span class="keyword">if</span> (! color) {
@@ -742,7 +734,7 @@ We could test typeof==function to distinguish between a getter and a concrete va
     });
   }
 
-  peers.getPeer = <span class="function"><span class="keyword">function</span> <span class="title">getPeer</span><span class="params">(id, message)</span> {</span>
+  peers.getPeer = <span class="function"><span class="keyword">function</span> <span class="title">getPeer</span><span class="params">(id, message, ignoreMissing)</span> {</span>
     assert(id);
     <span class="keyword">var</span> peer = Peer.peers[id];
     <span class="keyword">if</span> (id === session.clientId) {
@@ -751,6 +743,9 @@ We could test typeof==function to distinguish between a getter and a concrete va
     <span class="keyword">if</span> (message &amp;&amp; ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
       <span class="keyword">return</span> peer;
+    }
+    <span class="keyword">if</span> (ignoreMissing &amp;&amp; !peer) {
+      <span class="keyword">return</span> <span class="literal">null</span>;
     }
     assert(peer, <span class="string">"No peer with id:"</span>, id);
     <span class="keyword">if</span> (message &amp;&amp;
@@ -934,9 +929,9 @@ We could test typeof==function to distinguish between a getter and a concrete va
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

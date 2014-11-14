@@ -63,7 +63,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
 
   var commands = {
     command_help: function () {
-      var msg = util.trim(templates.help);
+      var msg = util.trim(templates("help"));
       ui.chat.system({
         text: msg
       });
@@ -101,7 +101,7 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
         ui.chat.system({
           text: "Testing with walkabout.js"
         });
-        var tmpl = $(templates.walkabout);
+        var tmpl = $(templates("walkabout"));
         var container = ui.container.find(".togetherjs-test-container");
         container.empty();
         container.append(tmpl);
@@ -374,8 +374,11 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
       }
       for (var i = 0; i < log.length; i++) {
         // peers should already be loaded from sessionStorage by the peers module
-        // maybe i should use a try catch block here
-        var currentPeer = peers.getPeer(log[i].peerId);
+        var currentPeer = peers.getPeer(log[i].peerId, null, true);
+        if (!currentPeer) {
+          // sometimes peers go away
+          continue;
+        }
         ui.chat.text({
           text: log[i].text,
           date: log[i].date,

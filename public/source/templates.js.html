@@ -154,6 +154,8 @@
             
               <li><a href="storage.js.html">storage</a></li>
             
+              <li><a href="templates-localized.js.html">templates-localized</a></li>
+            
               <li><a href="templates.js.html">templates</a></li>
             
               <li><a href="templating.js.html">templating</a></li>
@@ -203,10 +205,7 @@
               
                 <div class="content"><div class='highlight'><pre><span class="comment">/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */</span>
-
-define([<span class="string">"util"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util)</span> {</span>
-  <span class="function"><span class="keyword">function</span> <span class="title">clean</span><span class="params">(t)</span> {</span></pre></div></div>
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */</span></pre></div></div>
               
             </li>
           
@@ -215,6 +214,23 @@ define([<span class="string">"util"</span>], <span class="function"><span class=
                 <div class="pilwrap">
                   <a class="pilcrow" href="#section-1">&#182;</a>
                 </div>
+                <p>FIXME: maybe it would be better to dynamically assemble the first
+argument to define() here to include the localized module:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>define([<span class="string">"util"</span>, <span class="string">"require"</span>], <span class="function"><span class="keyword">function</span> <span class="params">(util, require)</span> {</span>
+  <span class="keyword">var</span> assert = util.assert;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">clean</span><span class="params">(t)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-2">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-2">&#182;</a>
+                </div>
                 <p>Removes &lt;% /<em> ... </em>/ %&gt; comments:</p>
 
               </div>
@@ -222,13 +238,45 @@ define([<span class="string">"util"</span>], <span class="function"><span class=
                 <div class="content"><div class='highlight'><pre>    t = t.replace(<span class="regexp">/[&lt;][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][&gt;]/</span>, <span class="string">""</span>);
     t = util.trim(t);
     t = t.replace(<span class="regexp">/http:\/\/localhost:8080/g</span>, TogetherJS.baseUrl);
+    t = t.replace(<span class="regexp">/TOOL_NAME/g</span>, <span class="string">'&lt;span class="togetherjs-tool-name"&gt;TogetherJS&lt;/span&gt;'</span>);
+    t = t.replace(<span class="regexp">/SITE_NAME/g</span>, <span class="string">'&lt;strong class="togetherjs-site-name"&gt;[site name]&lt;/strong&gt;'</span>);
+    t = t.replace(<span class="regexp">/TOOL_SITE_LINK/g</span>, <span class="string">'&lt;a href="https://togetherjs.com/" target="_blank"&gt;&lt;span class="togetherjs-tool-name"&gt;TogetherJS&lt;/span&gt;&lt;/a&gt;'</span>);
     <span class="keyword">return</span> t;
   }
-  <span class="keyword">return</span> {
-    <span class="string">"interface"</span>: clean(<span class="string">"__interface_html__"</span>),
-    help: clean(<span class="string">"__help_txt__"</span>),
-    walkthrough: clean(<span class="string">"__walkthrough_html__"</span>)
+
+  <span class="keyword">var</span> lang = TogetherJS.getConfig(<span class="string">"lang"</span>) || <span class="string">"en-US"</span>;
+  <span class="keyword">var</span> moduleName = <span class="string">"templates-"</span> + lang;
+  <span class="keyword">var</span> templatesLang;
+  require([moduleName], <span class="function"><span class="keyword">function</span> <span class="params">(mod)</span> {</span>
+    templatesLang = mod;
+  });
+
+  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(resourceName)</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-3">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-3">&#182;</a>
+                </div>
+                <p>Sometimes require([moduleName]) doesn&#39;t return even after the
+module has been loaded, but this sync version of require() will
+pick up the module in that case:</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (! templatesLang) {
+      <span class="keyword">try</span> {
+        templatesLang = require(moduleName);
+      } <span class="keyword">catch</span> (e) {
+        console.warn(<span class="string">"Error requiring module:"</span>, e);
+      }
+    }
+    assert(templatesLang, <span class="string">"Templates not yet loaded"</span>);
+    <span class="keyword">return</span> clean(templatesLang[resourceName]);
   };
+
 });</pre></div></div>
               
             </li>
@@ -269,9 +317,9 @@ define([<span class="string">"util"</span>], <span class="function"><span class=
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

@@ -6,7 +6,7 @@
   "cursor": "Handles the shared cursors, display and capturing the events.  Also handles clicks and scrolls.  Includes UI.",
   "elementFinder": "Generates something like a CSS selector for an element, and finds said elements based on selectors.  A portable description of an element.",
   "eventMaker": "Creates artificial events, like a fake click event.",
-  "forms": "Handles synchronization of forms, including CodeMirror and ACE support.  Implements a portion of OT.",
+  "forms": "Handles synchronization of forms, including CodeMirror, ACE, CKEditor and tinyMCE Editor support.  Implements a portion of OT.",
   "jqueryPlugins": "Some plugins for jQuery; doesn't export anything, just patches `$`.",
   "linkify": "Detects and adds links to plain text.",
   "ot": "Operational transformation support: what keeps big chunks of text in sync when multiple people are simultaneously editing those fields.",

@@ -154,6 +154,8 @@
             
               <li><a href="storage.js.html">storage</a></li>
             
+              <li><a href="templates-localized.js.html">templates-localized</a></li>
+            
               <li><a href="templates.js.html">templates</a></li>
             
               <li><a href="templating.js.html">templating</a></li>
@@ -185,7 +187,7 @@
       <div class="col-md-9" id="source-content">
         <h1>forms.js</h1>
         
-          <h4><p>Handles synchronization of forms, including CodeMirror and ACE support.  Implements a portion of OT.</p>
+          <h4><p>Handles synchronization of forms, including CodeMirror, ACE, CKEditor and tinyMCE Editor support.  Implements a portion of OT.</p>
 </h4>
         
 
@@ -516,7 +518,6 @@ asserts !inRemoteUpdate, among other things</p>
 
   TogetherJS.addTracker(CodeMirrorEditor, <span class="literal">true</span> <span class="comment">/* skip setInit */</span>);
 
-
   <span class="keyword">var</span> CKEditor = util.Class({
     trackerName: <span class="string">"CKEditor"</span>,
 
@@ -617,10 +618,141 @@ asserts !inRemoteUpdate, among other things</p>
     <span class="keyword">return</span> !! (CKEDITOR.dom.element.get(el) &amp;&amp; CKEDITOR.dom.element.get(el).getEditor());
   };
 
-  TogetherJS.addTracker(CKEditor, <span class="literal">true</span> <span class="comment">/* skip setInit */</span>);
+  TogetherJS.addTracker(CKEditor, <span class="literal">true</span> <span class="comment">/* skip setInit */</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-8">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-8">&#182;</a>
+                </div>
+                <p>////////////////// BEGINNING OF TINYMCE ////////////////////////</p>
 
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> tinymceEditor = util.Class({
+    trackerName: <span class="string">"tinymceEditor"</span>,
 
-  <span class="function"><span class="keyword">function</span> <span class="title">buildTrackers</span><span class="params">()</span> {</span>
+    constructor: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">this</span>.element = $(el)[<span class="number">0</span>];
+      assert($(<span class="keyword">this</span>.element).attr(<span class="string">'id'</span>).indexOf(<span class="string">'mce_'</span>) != -<span class="number">1</span>);
+      <span class="keyword">this</span>._change = <span class="keyword">this</span>._change.bind(<span class="keyword">this</span>);
+      <span class="keyword">this</span>._editor().on(<span class="string">"input keyup cut paste change"</span>, <span class="keyword">this</span>._change);
+    },
+
+    tracked: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>.element === $(el)[<span class="number">0</span>];
+    },
+
+    destroy: <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+      <span class="keyword">this</span>._editor().destory();
+    },
+
+    update: <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+      <span class="keyword">this</span>._editor().setContent(msg.value, {format: <span class="string">'raw'</span>});
+    },
+
+    init: <span class="function"><span class="keyword">function</span> <span class="params">(update, msg)</span> {</span>
+      <span class="keyword">this</span>.update(update);
+    },
+
+    makeInit: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> {
+        element: <span class="keyword">this</span>.element,
+        tracker: <span class="keyword">this</span>.trackerName,
+        value: <span class="keyword">this</span>.getContent()
+      };
+    },
+
+    _change: <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
+      <span class="keyword">if</span> (inRemoteUpdate) {
+        <span class="keyword">return</span>;
+      }  
+      sendData({
+        tracker: <span class="keyword">this</span>.trackerName,
+        element: <span class="keyword">this</span>.element,
+        value: <span class="keyword">this</span>.getContent()
+      });
+    },
+
+    _editor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> tinymce == <span class="string">"undefined"</span>) {
+        <span class="keyword">return</span>;
+      }
+      <span class="keyword">return</span> $(<span class="keyword">this</span>.element).data(<span class="string">"tinyEditor"</span>);
+    },
+    
+    getContent: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+      <span class="keyword">return</span> <span class="keyword">this</span>._editor().getContent();
+    }
+  });
+
+  tinymceEditor.scan = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+              
+            </li>
+          
+            <li id="section-9">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-9">&#182;</a>
+                </div>
+                <p>scan all the elements that contain tinyMCE editors</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (<span class="keyword">typeof</span> tinymce == <span class="string">"undefined"</span>) {
+      <span class="keyword">return</span>;
+    }
+    <span class="keyword">var</span> result = [];
+    $(window.tinymce.editors).each(<span class="function"><span class="keyword">function</span> <span class="params">(i, ed)</span> {</span>
+      result.push($(<span class="string">'#'</span>+ed.id));</pre></div></div>
+              
+            </li>
+          
+            <li id="section-10">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-10">&#182;</a>
+                </div>
+                <p>its impossible to retrieve a single editor from a container, so lets store it</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>      $(<span class="string">'#'</span>+ed.id).data(<span class="string">"tinyEditor"</span>, ed);
+    });
+    <span class="keyword">return</span> $(result);
+  };
+
+  tinymceEditor.tracked = <span class="function"><span class="keyword">function</span> <span class="params">(el)</span> {</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> tinymce == <span class="string">"undefined"</span>) {
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+    el = $(el)[<span class="number">0</span>];
+    <span class="keyword">return</span> !!$(el).data(<span class="string">"tinyEditor"</span>);
+    <span class="comment">/*var flag = false;
+    $(window.tinymce.editors).each(function (i, ed) {
+      if (el.id == ed.id) {
+        flag = true;
+      }
+    });
+    return flag;*/</span>
+  };
+
+  TogetherJS.addTracker(tinymceEditor, <span class="literal">true</span>);</pre></div></div>
+              
+            </li>
+          
+            <li id="section-11">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-11">&#182;</a>
+                </div>
+                <p>/////////////// END OF TINYMCE ///////////////////////////////////</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>  <span class="function"><span class="keyword">function</span> <span class="title">buildTrackers</span><span class="params">()</span> {</span>
     assert(! liveTrackers.length);
     util.forEachAttr(editTrackers, <span class="function"><span class="keyword">function</span> <span class="params">(TrackerClass)</span> {</span>
       <span class="keyword">var</span> els = TrackerClass.scan();
@@ -655,8 +787,22 @@ asserts !inRemoteUpdate, among other things</p>
     el = $(el)[<span class="number">0</span>];
     <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;liveTrackers.length; i++) {
       <span class="keyword">var</span> tracker = liveTrackers[i];
-      <span class="keyword">if</span> (tracker.tracked(el)) {
-        assert((! name) || name == tracker.trackerName, <span class="string">"Expected to map to a tracker type"</span>, name, <span class="string">"but got"</span>, tracker.trackerName);
+      <span class="keyword">if</span> (tracker.tracked(el)) {</pre></div></div>
+              
+            </li>
+          
+            <li id="section-12">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-12">&#182;</a>
+                </div>
+                <p>FIXME: assert statement below throws an exception when data is submitted to the hub too fast
+in other words, name == tracker.trackerName instead of name == tracker when someone types too fast in the tracked editor
+commenting out this assert statement solves the problem</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        assert((! name) || name == tracker.trackerName, <span class="string">"Expected to map to a tracker type"</span>, name, <span class="string">"but got"</span>, tracker.trackerName);
         <span class="keyword">return</span> tracker;
       }
     }
@@ -781,10 +927,10 @@ asserts !inRemoteUpdate, among other things</p>
               
             </li>
           
-            <li id="section-8">
+            <li id="section-13">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-8">&#182;</a>
+                  <a class="pilcrow" href="#section-13">&#182;</a>
                 </div>
                 <p>make a real TextReplace object.</p>
 
@@ -796,10 +942,10 @@ asserts !inRemoteUpdate, among other things</p>
               
             </li>
           
-            <li id="section-9">
+            <li id="section-14">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-9">&#182;</a>
+                  <a class="pilcrow" href="#section-14">&#182;</a>
                 </div>
                 <p>apply this change to the history</p>
 
@@ -833,10 +979,10 @@ asserts !inRemoteUpdate, among other things</p>
               
             </li>
           
-            <li id="section-10">
+            <li id="section-15">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-10">&#182;</a>
+                  <a class="pilcrow" href="#section-15">&#182;</a>
                 </div>
                 <p>return focus to original input:</p>
 
@@ -872,9 +1018,20 @@ asserts !inRemoteUpdate, among other things</p>
       <span class="keyword">var</span> el = $(<span class="keyword">this</span>);
       <span class="keyword">var</span> value = getValue(el);
       <span class="keyword">var</span> upd = {
-        element: elementFinder.elementLocation(<span class="keyword">this</span>),
-        value: value,
-        elementType: getElementType(el)
+        element: elementFinder.elementLocation(<span class="keyword">this</span>),</pre></div></div>
+              
+            </li>
+          
+            <li id="section-16">
+              <div class="annotation">
+                <div class="pilwrap">
+                  <a class="pilcrow" href="#section-16">&#182;</a>
+                </div>
+                <p>elementType: getElementType(el), // added in 5cbb88c9a but unused</p>
+
+              </div>
+              
+                <div class="content"><div class='highlight'><pre>        value: value
       };
       <span class="keyword">if</span> (isText(el)) {
         <span class="keyword">var</span> history = el.data(<span class="string">"togetherjsHistory"</span>);
@@ -932,10 +1089,10 @@ asserts !inRemoteUpdate, among other things</p>
               
             </li>
           
-            <li id="section-11">
+            <li id="section-17">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-11">&#182;</a>
+                  <a class="pilcrow" href="#section-17">&#182;</a>
                 </div>
                 <p>In a 3+-peer situation more than one client may init; in this case
 we&#39;re probably the other peer, and not the peer that needs the init
@@ -948,10 +1105,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-12">
+            <li id="section-18">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-12">&#182;</a>
+                  <a class="pilcrow" href="#section-18">&#182;</a>
                 </div>
                 <p>We&#39;ve been around longer than the other person...</p>
 
@@ -963,10 +1120,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-13">
+            <li id="section-19">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-13">&#182;</a>
+                  <a class="pilcrow" href="#section-19">&#182;</a>
                 </div>
                 <p>FIXME: need to figure out when to ignore inits</p>
 
@@ -995,10 +1152,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-14">
+            <li id="section-20">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-14">&#182;</a>
+                  <a class="pilcrow" href="#section-20">&#182;</a>
                 </div>
                 <p>don&#39;t overwrite history if we&#39;re already up to date
 (we might have outstanding queued changes we don&#39;t want to lose)</p>
@@ -1009,10 +1166,10 @@ A quick check to see if we should init...</p>
               
             </li>
           
-            <li id="section-15">
+            <li id="section-21">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-15">&#182;</a>
+                  <a class="pilcrow" href="#section-21">&#182;</a>
                 </div>
                 <p>if history.basis is 1, the form could have lingering
 edits from before togetherjs was launched.  that&#39;s too bad,
@@ -1056,6 +1213,9 @@ we just asked to join.</p>
   <span class="keyword">var</span> focusElements = {};
 
   session.hub.on(<span class="string">"form-focus"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
+    <span class="keyword">if</span> (! msg.sameUrl) {
+      <span class="keyword">return</span>;
+    }
     <span class="keyword">var</span> current = focusElements[msg.peer.id];
     <span class="keyword">if</span> (current) {
       current.remove();
@@ -1065,10 +1225,10 @@ we just asked to join.</p>
               
             </li>
           
-            <li id="section-16">
+            <li id="section-22">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-16">&#182;</a>
+                  <a class="pilcrow" href="#section-22">&#182;</a>
                 </div>
                 <p>A blur</p>
 
@@ -1080,16 +1240,6 @@ we just asked to join.</p>
     <span class="keyword">var</span> el = createFocusElement(msg.peer, element);
     <span class="keyword">if</span> (el) {
       focusElements[msg.peer.id] = el;
-    }
-  });
-
-  session.hub.on(<span class="string">"hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
-    <span class="keyword">if</span> (lastFocus) {
-      setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-        <span class="keyword">if</span> (lastFocus) {
-          session.send({type: <span class="string">"form-focus"</span>, element: elementFinder.elementLocation(lastFocus)});
-        }
-      });
     }
   });
 
@@ -1117,10 +1267,10 @@ we just asked to join.</p>
               
             </li>
           
-            <li id="section-17">
+            <li id="section-23">
               <div class="annotation">
                 <div class="pilwrap">
-                  <a class="pilcrow" href="#section-17">&#182;</a>
+                  <a class="pilcrow" href="#section-23">&#182;</a>
                 </div>
                 <p>note that textInput, keydown, and keypress aren&#39;t appropriate events
 to watch, since they fire <em>before</em> the element&#39;s value changes.</p>
@@ -1141,7 +1291,12 @@ to watch, since they fire <em>before</em> the element&#39;s value changes.</p>
 
   session.hub.on(<span class="string">"hello"</span>, <span class="function"><span class="keyword">function</span> <span class="params">(msg)</span> {</span>
     <span class="keyword">if</span> (msg.sameUrl) {
-      setTimeout(sendInit);
+      setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+	sendInit();
+        <span class="keyword">if</span> (lastFocus) {
+          session.send({type: <span class="string">"form-focus"</span>, element: elementFinder.elementLocation(lastFocus)});
+        }
+      });
     }
   });
 
@@ -1186,9 +1341,9 @@ to watch, since they fire <em>before</em> the element&#39;s value changes.</p>
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

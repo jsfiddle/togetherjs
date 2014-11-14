@@ -228,7 +228,7 @@ var TogetherJSConfig_something = "foo";
 <p><code>TogetherJSConfig_youtube</code>:
     If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.</p>
 <p><code>TogetherJSConfig_ignoreMessages</code>:
-    Contains a list of all the messages that will be ignored when console logging. Defaults to the list [“cursor-update”, “keydown”, “scroll-update”]. Will ignore all messages if set to true. </p>
+    Contains a list of all the messages that will be ignored when console logging. Defaults to the list [“cursor-update”, “keydown”, “scroll-update”]. Will ignore all messages if set to true.</p>
 <p><code>TogetherJSConfig_ignoreForms</code>:
     Contains a list of all the forms that will be ignored, defaults to [“:password”]. Will ignore all forms if set to true.</p>
 <p>There are additional hooks you can configure, which are described in <a href="#extending-togetherjs">Extending TogetherJS</a>.</p>
@@ -400,6 +400,15 @@ TogetherJS.reinitialize();</code></pre>
 <h2 id="getting-a-static-copy-of-the-client">Getting a static copy of the client</h2>
 <p>You may also want a static copy of the client that you can host yourself.  Run <code>grunt build</code> to create a static copy of the TogetherJS library in <code>build/</code> (use <code>--dest</code> to control the output location, and <code>--exclude-tests</code> to avoid including the tests in your version).</p>
 <p>The hub changes quite infrequently, so if you just stability then making a static copy of the client will do it for you.  This option is highly recommended for production!</p>
+<h2 id="localization-support">Localization Support</h2>
+<ul>
+<li>Check <a href="../../togetherjs/locale/en-US.json">translation file</a> for template example if you want to translate into your own language</li>
+<li>Adding new language inside <a href="../../togetherjs/locale/">locale</a> directory should be in this format: “th-TH.json”, “th.json”, “pt-BR.json” or “pt.json” and enable support language in <a href="../../togetherjs/togetherjs.js#L320"><code>availableTranslations</code></a> inside togetherjs.js file.  Note that your file name and language names in  your configuration should use hyphens in accord with <a href="http://tools.ietf.org/html/bcp47">BCP 47</a>, not underscores.</li>
+</ul>
+<p>To get your language display you can enable it by:</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript">
+  <span class="keyword">var</span> TogetherJSConfig_lang = <span class="string">"pt-BR"</span>;
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></code></pre>
 <h2 id="browser-support">Browser Support</h2>
 <p>TogetherJS is intended for relatively newer browsers.  Especially as we experiment with what we&#39;re doing, supporting older browsers causes far more challenge than it is an advantage.</p>
 <p>The bare minimum that we&#39;ve identified for TogetherJS is <a href="http://caniuse.com/websockets">WebSocket support</a>.  That said, we generally only test on the most recent version of Firefox and Chrome, so bugs specific to older browsers are more likely (but please <a href="https://github.com/mozilla/togetherjs/issues/new">submit bugs</a> from those browsers anyway – we aren&#39;t deliberately not supporting them). Our next set of browsers to target will be mobile browsers.</p>
@@ -478,9 +487,9 @@ TogetherJS.reinitialize();</code></pre>
             </div>
             <div class="col-xs-12 col-sm-3">
               <ul class="list-unstyled text-left">
-                <li class=""><a href="https://www.mozilla.org/en-US/privacy-policy.html" target="_blank">Privacy Policy</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/about/legal.html" target="_blank">Legal Notices</a></li>
-                <li class=""><a href="https://www.mozilla.org/en-US/legal/fraud-report/index.html" target="_blank">Report Trademark Abuses</a></li>
+                <li class=""><a href="https://www.mozilla.org/privacy/websites/" target="_blank">Privacy Policy</a></li>
+                <li class=""><a href="https://www.mozilla.org/about/legal/" target="_blank">Legal Notices</a></li>
+                <li class=""><a href="https://www.mozilla.org/legal/fraud-report/" target="_blank">Report Trademark Abuses</a></li>
                 <li class="ph-credit">Thanks to Yuan Wang for the cover photo!</li>
               </ul>
             </div>

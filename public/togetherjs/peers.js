@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "session", "storage", "require"], function (util, session, storage, require) {
+define(["util", "session", "storage", "require", "templates"], function (util, session, storage, require, templates) {
   var peers = util.Module("peers");
   var assert = util.assert;
   var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle
@@ -15,18 +15,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     ui = uiModule;
   });
 
-  var DEFAULT_NICKNAMES = [
-    "Friendly Fox",
-    "Brilliant Beaver",
-    "Observant Owl",
-    "Gregarious Giraffe",
-    "Wild Wolf",
-    "Silent Seal",
-    "Wacky Whale",
-    "Curious Cat",
-    "Intelligent Iguana"
-  ];
-
+  var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
   var Peer = util.Class({
 
     isSelf: false,
@@ -335,6 +324,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
           storage.settings.get("color")).then((function (name, avatar, defaultName, color) {
             if (! defaultName) {
               defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+
               storage.settings.set("defaultName", defaultName);
             }
             if (! color) {
@@ -463,7 +453,7 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     });
   }
 
-  peers.getPeer = function getPeer(id, message) {
+  peers.getPeer = function getPeer(id, message, ignoreMissing) {
     assert(id);
     var peer = Peer.peers[id];
     if (id === session.clientId) {
@@ -472,6 +462,9 @@ define(["util", "session", "storage", "require"], function (util, session, stora
     if (message && ! peer) {
       peer = Peer(id, {fromHelloMessage: message});
       return peer;
+    }
+    if (ignoreMissing && !peer) {
+      return null;
     }
     assert(peer, "No peer with id:", id);
     if (message &&
