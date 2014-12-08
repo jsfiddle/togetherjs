@@ -105,12 +105,16 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       if (pos.element) {
         var target = $(elementFinder.findElement(pos.element));
         var offset = target.offset();
-        top = offset.top + pos.offsetY;
-        left = offset.left + pos.offsetX;
+        var heightRatio = target.height() / pos.elementHeight;
+        var widthRatio = target.width() / pos.elementWidth;
+        top = offset.top + pos.offsetY * heightRatio;
+        left = offset.left + pos.offsetX * widthRatio;
       } else {
         // No anchor, just an absolute position
-        top = pos.top;
-        left = pos.left;
+        var heightRatio = window.screen.availHeight / pos.documentHeight;
+        var widthRatio = window.screen.availWidth / pos.documentWidth;
+        top = pos.top * heightRatio;
+        left = pos.left * widthRatio;
       }
       // These are saved for use by .refresh():
       this.lastTop = top;
@@ -258,6 +262,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     if ((! target) || target == document.documentElement || target == document.body) {
       lastMessage = {
         type: "cursor-update",
+        documentWidth: window.screen.availWidth,
+        documentHeight: window.screen.availHeight,
         top: pageY,
         left: pageX
       };
@@ -277,6 +283,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     lastMessage = {
       type: "cursor-update",
       element: elementFinder.elementLocation(target),
+      elementWidth: target.width(),
+      elementHeight: target.height(),
       offsetX: Math.floor(offsetX),
       offsetY: Math.floor(offsetY)
     };
@@ -451,6 +459,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
       session.send({
         type: "cursor-click",
         element: location,
+        elementWidth: element.offsetWidth,
+        elementHeight: element.offsetHeight,
         offsetX: offsetX,
         offsetY: offsetY
       });
@@ -476,8 +486,10 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     Cursor.getClient(pos.clientId).updatePosition(pos);
     var target = $(elementFinder.findElement(pos.element));
     var offset = target.offset();
-    var top = offset.top + pos.offsetY;
-    var left = offset.left + pos.offsetX;
+    var heightRatio = target.height() / pos.elementHeight;
+    var widthRatio = target.width() / pos.elementWidth;
+    var top = offset.top + pos.offsetY * heightRatio;
+    var left = offset.left + pos.offsetX * widthRatio;
     var cloneClicks = TogetherJS.config.get("cloneClicks");
     if (util.matchElement(target, cloneClicks)) {
       eventMaker.performClick(target);
