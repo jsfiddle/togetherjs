@@ -470,7 +470,6 @@ What's about to happen: we clone the repo and create a new Heroku app within it.
 	cd togetherjs
 	heroku create
 	heroku config:add HOST=0.0.0.0
-	heroku labs:enable websockets
 	git push heroku master
 
 Make note of the app name after running `heroku create` You can check that everything is running by going to http://your-app-name-here.herokuapp.com/status
