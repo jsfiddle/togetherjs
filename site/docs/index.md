@@ -460,21 +460,7 @@ TogetherJSConfig_hubBase = "https://myhub.com";
 
 If you are curious about the exact version of code on the server it should be always be [server.js on master](https://github.com/mozilla/togetherjs/blob/master/hub/server.js), and you can double-check by fetching [`/server-source`](https://hub.togetherjs.com/server-source).
 
-## Addons
-
-There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
-
-This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn't integrated `togetherjs-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `togetherjs-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&togetherjs=...` (the code used in the share link) it will automatically turn TogetherJS on for the tab.
-
-### Installing
-
-A simple way to install is simply to [click this link](https://togetherjs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
-
-### Building
-
-You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
-
-## Deploying the hub server to Heroku
+### Deploying the hub server to Heroku
 
 You need a Heroku account. If you don't have one, their [Node.js getting started guide](https://devcenter.heroku.com/articles/getting-started-with-nodejs) is a good place to start.
 
@@ -489,6 +475,19 @@ What's about to happen: we clone the repo and create a new Heroku app within it.
 
 Make note of the app name after running `heroku create` You can check that everything is running by going to http://your-app-name-here.herokuapp.com/status
 
+## Addons
+
+There is an addon for Firefox in [addon/](https://github.com/mozilla/togetherjs/tree/develop/addon).
+
+This isn't intended to be the "normal" way anyone uses TogetherJS, but it is a development tool to try TogetherJS out on a site that hasn't integrated `togetherjs-min.js` itself.  When you activate the addon (via a link in the [Add-On Toolbar](https://support.mozilla.org/en-US/kb/add-on-bar-quick-access-to-add-ons)) it simply adds `togetherjs-min.js` to every page in that tab (until you close the tab or turn it off).  Also if you open a link with `#&togetherjs=...` (the code used in the share link) it will automatically turn TogetherJS on for the tab.
+
+### Installing
+
+A simple way to install is simply to [click this link](https://togetherjs.com/togetherjs.xpi) in Firefox, and install the addon.  You can turn the addon on or off via the addon manager.  No restart is required.
+
+### Building
+
+You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/developers/builder). Once you've installed the SDK, go into the `addon/` directory and run `cfx xpi` to create an XPI (packaged addon file) or `cfx run` to start up Firefox with the addon installed (for development).
 
 ## Getting Help
 
