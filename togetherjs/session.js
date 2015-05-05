@@ -329,7 +329,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           return;
         } else if (TogetherJS.startup._launch) {
           if (saved) {
-            isClient = saved.reason == "joined";
+            var isClientKey = storage.tab.prefix + "isClient";
+            isClient = JSON.parse(storage.tab.storage[isClientKey]);
             if (! shareId) {
               shareId = saved.shareId;
             }
@@ -450,6 +451,11 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     if (includeHashInUrl) {
       $(window).on("hashchange", hashchangeEvent);
     }
+    storage.tab.get("isClient").then(function(client) {
+      if (typeof (client) === "undefined") {
+        storage.tab.set("isClient", session.isClient);
+      }
+    });
   });
 
   session.on("close", function () {
