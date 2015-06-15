@@ -184,7 +184,7 @@ While [configuration](#configuring-togetherjs) covers some of what you can do to
 
 ### Configuring events
 
-Like other configuration, you can configure the event handlers and hooks we describe before `togetherjs(-min).js` is loaded.  Event handlers are just a smidge different.  You'd normally add even handler like `TogetherJS.on("ready", function () {...})`.  To do it as configuration:
+Like other configuration, you can configure the event handlers and hooks we describe before `togetherjs(-min).js` is loaded.  Event handlers are just a smidge different.  You'd normally add event handler like `TogetherJS.on("ready", function () {...})`.  To do it as configuration:
 
 ```js
 TogetherJSConfig_on = {
