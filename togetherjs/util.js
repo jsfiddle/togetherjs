@@ -84,7 +84,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
   };
 
   util.AssertionError = function (message) {
-    if (! this instanceof util.AssertionError) {
+    if (! (this instanceof util.AssertionError)) {
       return new util.AssertionError(message);
     }
     this.message = message;

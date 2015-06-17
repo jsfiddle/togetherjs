@@ -1,6 +1,5 @@
-'use strict';
-
 define(['util'], function(util) {
+  'use strict';
   describe('Util', function() {
     describe('util.trim', function() {
       var testString;
@@ -26,7 +25,7 @@ define(['util'], function(util) {
 
         expect(util.trim(longTestString)).toEqual(longTestString);
       });
-    })
+    });
   });
 });
 
