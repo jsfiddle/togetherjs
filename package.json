@@ -40,9 +40,13 @@
     "jasmine-core": "^2.3.4",
     "karma": "^0.12.36",
     "karma-jasmine": "^0.2.2",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "karma-requirejs": "^0.2.2",
     "marked": "~0.2.9",
     "nunjucks": "~0.1.8a",
-    "optimist": "~0.6.0"
+    "optimist": "~0.6.0",
+    "phantomjs": "^1.9.17",
+    "requirejs": "^2.1.18"
   },
   "engines": {
     "node": "~0.8",
