@@ -15,10 +15,11 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test-main.js',
+      {pattern: 'togetherjs/tests/jasmine/mocks/*.mock.js', included: true},
       {pattern: 'togetherjs/tests/jasmine/**/*.spec.js', included: false},
       {pattern: 'togetherjs/*.js', included: false},
-      {pattern: 'togetherjs/libs/**/*.js', included: false}
+      {pattern: 'togetherjs/libs/**/*.js', included: false},
+      'test-main.js'
     ],
 
 
