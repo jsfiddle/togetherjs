@@ -120,11 +120,13 @@ module.exports = function (grunt) {
         browser: true,
         globals: {
           define: true
-        }
+        },
+        jasmine: true
       },
       all: [
         "Gruntfile",
-        "togetherjs/*.js"
+        "togetherjs/*.js",
+        "togetherjs/tests/jasmine/*.js"
       ]
     },
 
@@ -154,7 +156,7 @@ module.exports = function (grunt) {
       // forget.  Then between git action the build will be over-run,
       // but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", 
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js",
                 "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
@@ -181,7 +183,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("grunt-contrib-less");
   grunt.loadNpmTasks("grunt-contrib-csslint");
-  grunt.loadNpmTasks("grunt-contrib-jshint");
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks("grunt-contrib-requirejs");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -271,7 +273,7 @@ module.exports = function (grunt) {
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
         __interface_html__: grunt.file.read("togetherjs/interface.html"),
-        __help_txt__: grunt.file.read("togetherjs/help.txt"), 
+        __help_txt__: grunt.file.read("togetherjs/help.txt"),
         __walkthrough_html__: grunt.file.read("togetherjs/walkthrough.html"),
         __baseUrl__: baseUrl,
         __hubUrl__: hubUrl,
@@ -324,13 +326,13 @@ module.exports = function (grunt) {
         var lang = path.basename(langFilename).replace(/\.json/, "");
         var translation = JSON.parse(grunt.file.read(langFilename));
         var dest = path.join(grunt.option("dest"), "togetherjs/templates-" + lang + ".js");
-        
+
         var translatedInterface = translateFile("togetherjs/interface.html", translation);
         var translatedHelp = translateFile("togetherjs/help.txt", translation);
         var translatedWalkthrough = translateFile("togetherjs/walkthrough.html", translation);
 
         var vars = subs;
-        
+
         subs.__interface_html__ = translatedInterface;
         subs.__help_txt__ = translatedHelp;
         subs.__walkthrough_html__ = translatedWalkthrough;
@@ -345,7 +347,7 @@ module.exports = function (grunt) {
     }
   );
 
-      
+
   function translateFile(source, translation) {
     var env = new nunjucks.Environment(new nunjucks.FileSystemLoader("./"));
     var tmpl = env.getTemplate(source);
