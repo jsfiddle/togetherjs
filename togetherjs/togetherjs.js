@@ -431,8 +431,8 @@
   TogetherJS._mixinEvents = function (proto) {
     proto.on = function on(name, callback) {
       if (typeof callback != "function") {
-        console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-        throw "Error: .once() called with non-callback";
+        console.warn("Bad callback for", this, ".on(", name, ", ", callback, ")");
+        throw "Error: .on() called with non-callback";
       }
       if (name.search(" ") != -1) {
         var names = name.split(/ +/g);
@@ -924,3 +924,7 @@
   window.TowTruck = TogetherJS;
 
 })();
+
+define(function() {
+  return window.TogetherJS;
+});
