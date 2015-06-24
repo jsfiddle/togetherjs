@@ -39,6 +39,7 @@
     "highlight.js": "~7.3.0",
     "jasmine-core": "^2.3.4",
     "karma": "^0.12.36",
+    "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.2.2",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-requirejs": "^0.2.2",
@@ -46,7 +47,8 @@
     "nunjucks": "~0.1.8a",
     "optimist": "~0.6.0",
     "phantomjs": "^1.9.17",
-    "requirejs": "^2.1.18"
+    "requirejs": "^2.1.18",
+    "squirejs": "^0.2.1"
   },
   "engines": {
     "node": "~0.8",

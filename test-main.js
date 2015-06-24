@@ -10,18 +10,15 @@ Object.keys(window.__karma__.files).forEach(function(file) {
 
 require.config({
   // Karma serves files under /base, which is the basePath from your config file
-  baseUrl: '/base/togetherjs',
+  baseUrl: '/base',
 
   // dynamically load all test files
   deps: allTestFiles,
 
   // paths to dependencies
   paths: {
-    'jquery': 'libs/jquery-1.11.1.min',
-    'almond': 'libs/almond',
-    'tinycolor': 'libs/tinycolor',
-    'mersenne': 'libs/whrandom/mersenne',
-    'random': 'libs/whrandom/random'
+    'jquery': 'togetherjs/libs/jquery-1.11.1.min',
+    'squire': 'node_modules/squirejs/src/Squire'
   },
 
   // we have to kickoff jasmine, as it is asynchronous

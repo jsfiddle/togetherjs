@@ -791,7 +791,7 @@
       if (event.which == 84 && event.altKey) {
         if (listener.pressed) {
           // Second hit
-          TogetherJS();
+          window.TogetherJS();
         } else {
           listener.pressed = true;
         }

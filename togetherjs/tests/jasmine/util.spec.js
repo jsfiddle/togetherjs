@@ -1,4 +1,4 @@
-define(['util'], function(util) {
+define(['togetherjs/util'], function(util) {
   'use strict';
   describe('Util', function() {
     describe('util.trim', function() {
@@ -28,4 +28,3 @@ define(['util'], function(util) {
     });
   });
 });
-
