@@ -3,11 +3,6 @@
 
 module.exports = function(config) {
   config.set({
-
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
-
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine', 'requirejs'],
@@ -19,13 +14,12 @@ module.exports = function(config) {
       {pattern: 'togetherjs/tests/jasmine/**/*.spec.js', included: false},
       {pattern: 'togetherjs/*.js', included: false},
       {pattern: 'togetherjs/libs/**/*.js', included: false},
+      {pattern: 'node_modules/squirejs/src/Squire.js', included: false},
       'test-main.js'
     ],
 
-
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
 
     // preprocess matching files before serving them to the browser
