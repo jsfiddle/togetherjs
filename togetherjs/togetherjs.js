@@ -324,6 +324,8 @@
       "es-BO": true,
       "ru": true,
       "ru-RU": "ru",
+      "zh-CN": true,
+      "zh": "zh-CN",
       "pl": "pl-PL",
       "pl-PL": true
     };
