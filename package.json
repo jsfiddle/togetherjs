@@ -42,8 +42,8 @@
     "grunt-lib-phantomjs": "~0.6.0"
   },
   "engines": {
-    "node": "~0.12.0",
-    "npm": "~2.7.5"
+    "node": "~0.12.7",
+    "npm": "^2.11.3"
   },
   "scripts": {
     "start": "node hub/server.js",
