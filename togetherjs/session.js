@@ -447,7 +447,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
 
   var activeTimeout;
   var pingTimeout = function() {
-    return (40 * 1000) + (Math.random() * 20 - 10); // 40 s +/- 10s
+    return (40 + Math.random() * 20 - 10) * 1000; // 40 s +/- 10s
   };
   var pingTheHub = function() {
     activeTimeout = setTimeout(pingTheHub, pingTimeout());
