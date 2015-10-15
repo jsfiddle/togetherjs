@@ -432,14 +432,17 @@ tinycolor.complement = function(color) {
 // Thanks to jQuery xColor for some of the ideas behind these
 // <https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js>
 
-tinycolor.triad = function(color) {
+function multi(color, offset1, offset2) {
     var hsl = tinycolor(color).toHsl();
     var h = hsl.h;
     return [
         tinycolor(color),
-        tinycolor({ h: (h + 120) % 360, s: hsl.s, l: hsl.l }),
-        tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l })
+        tinycolor({ h: (h + offset1) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + offset2) % 360, s: hsl.s, l: hsl.l })
     ];
+}
+tinycolor.triad = function(color) {
+    return multi(color, 120, 240);
 };
 tinycolor.tetrad = function(color) {
     var hsl = tinycolor(color).toHsl();
@@ -452,13 +455,7 @@ tinycolor.tetrad = function(color) {
     ];
 };
 tinycolor.splitcomplement = function(color) {
-    var hsl = tinycolor(color).toHsl();
-    var h = hsl.h;
-    return [
-        tinycolor(color),
-        tinycolor({ h: (h + 72) % 360, s: hsl.s, l: hsl.l}),
-        tinycolor({ h: (h + 216) % 360, s: hsl.s, l: hsl.l})
-    ];
+    return multi (color, 72, 216);
 };
 tinycolor.analogous = function(color, results, slices) {
     results = results || 6;
