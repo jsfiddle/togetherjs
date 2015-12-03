@@ -47,14 +47,14 @@ $ git clone git://github.com/mozilla/togetherjs.git
 $ cd togetherjs
 ```
 
-Then [install npm](http://nodejs.org/download/) and run:
+Then [install npm](https://nodejs.org/download/) and run:
 
 ```sh
 $ npm install
 $ npm install -g grunt-cli
 ```
 
-This will install a bunch of stuff, most of which is only used for development.  The only "server" dependency is [WebSocket-Node](https://github.com/Worlize/WebSocket-Node) (and if you use our hub then you don't need to worry about the server).  By default everything is installed locally, i.e., in `node_modules/`.  This works just fine, but it is useful to install the `grunt` command-line program globally, which `npm install -g grunt-cli` does.
+This will install a bunch of stuff, most of which is only used for development.  The only "server" dependency is [WebSocket-Node](https://github.com/theturtle32/WebSocket-Node) (and if you use our hub then you don't need to worry about the server).  By default everything is installed locally, i.e., in `node_modules/`.  This works just fine, but it is useful to install the `grunt` command-line program globally, which `npm install -g grunt-cli` does.
 
 Now you can build TogetherJS, like:
 
@@ -74,7 +74,7 @@ If you want to develop with TogetherJS you probably want the files built continu
 $ grunt devwatch
 ```
 
-This will rebuild when changes are detected.  Note that Grunt is configured to create [hard links](http://en.wikipedia.org/wiki/Hard_link) instead of copying so that most changes you make to files in `togetherjs/` don't need to be rebuilt to show up in `build/togetherjs/`.  `--no-hardlink` turns this behavior off.
+This will rebuild when changes are detected.  Note that Grunt is configured to create [hard links](https://en.wikipedia.org/wiki/Hard_link) instead of copying so that most changes you make to files in `togetherjs/` don't need to be rebuilt to show up in `build/togetherjs/`.  `--no-hardlink` turns this behavior off.
 
 You may wish to create a static copy of the TogetherJS client to distribute and use on your website.  To do this run:
 
