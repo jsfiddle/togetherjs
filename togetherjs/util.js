@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "jqueryPlugins"], function ($) {
+define(["jquery"], function ($) {
   var util = {};
 
   util.Deferred = $.Deferred;
@@ -84,7 +84,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
   };
 
   util.AssertionError = function (message) {
-    if (! this instanceof util.AssertionError) {
+    if (! (this instanceof util.AssertionError)) {
       return new util.AssertionError(message);
     }
     this.message = message;
