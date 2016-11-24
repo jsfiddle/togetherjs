@@ -445,7 +445,18 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
+  var activeTimeout;
+  var pingTimeout = function() {
+    return (40 + Math.random() * 20 - 10) * 1000; // 40 s +/- 10s
+  };
+  var pingTheHub = function() {
+    activeTimeout = setTimeout(pingTheHub, pingTimeout());
+    session.send({"server-echo": true});
+  };
+
   session.on("start", function () {
+    pingTheHub();
+
     $(window).on("resize", resizeEvent);
     if (includeHashInUrl) {
       $(window).on("hashchange", hashchangeEvent);
@@ -453,6 +464,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   });
 
   session.on("close", function () {
+    clearTimeout(activeTimeout);
+
     $(window).off("resize", resizeEvent);
     if (includeHashInUrl) {
       $(window).off("hashchange", hashchangeEvent);
