@@ -478,6 +478,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (val) {
         peers.Self.update({name: val});
       }
+      ui.twoLetterAvatar(val);
     });
 
     $("#togetherjs-menu-update-avatar, #togetherjs-menu-update-avatar-button").click(function () {
@@ -514,6 +515,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       peers.Self.update({
         color: color
       });
+      ui.twoLetterAvatar(peers.Self.name);
       event.stopPropagation();
       return false;
     });
@@ -1502,6 +1504,46 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   TogetherJS.config.track("toolName", function (name) {
     ui.updateToolName(ui.container);
   });
+
+  ui.nameToTwoLetter = function (name) {
+    var twoLetter = "";
+    if (name.indexOf(" ") > -1) {
+        twoLetter = name.substr(0, 1);
+        twoLetter += name.substr(name.indexOf(" ") + 1, 1);
+    } else {
+        twoLetter = name.substr(0, 2).toUpperCase();
+    }
+    return twoLetter.toUpperCase();
+  }
+
+  ui.twoLetterAvatar = function (name) {
+    var defaultAvatar = TogetherJS.baseUrl + '/togetherjs/images/default-avatar.png';
+    if (peers.Self.avatar === defaultAvatar || localStorage.getItem("togetherjs.settings.letterAvatar") === "yes") {
+      var textString = ui.nameToTwoLetter(name);
+      var canv = document.createElement("canvas");
+      canv.setAttribute("id", "canvasID");
+      canv.width = 36;
+      canv.height = 34;
+      var ctx = canv.getContext('2d');
+      ctx.beginPath();
+      ctx.rect(0,0,canv.width, canv.height);
+      ctx.fillStyle = peers.Self.color;
+      ctx.fill();
+      ctx.closePath();
+      ctx.fillStyle = "#000000";
+      ctx.font = "16px 'openSansBold', Helvetica, sans-serif";
+      ctx.textAlign = "center";
+      textWidth = ctx.measureText(textString ).width;
+      ctx.fillText(textString , canv.width/2 - 2, 22);
+      ctx.stroke();
+      var imgData = canv.toDataURL();      
+      peers.Self.update({avatar: imgData});      
+      localStorage.setItem("togetherjs.settings.letterAvatar", "yes");
+    }
+    if(localStorage.getItem("togetherjs.settings.letterAvatar") == null) {
+      localStorage.setItem("togetherjs.settings.letterAvatar", "yes");      
+    }
+  }
 
   return ui;
 
