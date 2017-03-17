@@ -277,6 +277,11 @@ wsServer.on('request', function(request) {
     type: "init-connection",
     peerCount: allConnections[id].length-1
   }));
+
+  // store a mapping of connection ID (monotonically increasing from 0) to 
+  // client ID (of form abcdefgh.ijklmnop).
+  connectionIDtoClientIDMap = {};
+
   connection.on('message', function(message) {
     var parsed;
     try {
@@ -286,6 +291,11 @@ wsServer.on('request', function(request) {
       return;
     }
     connectionStats[id].clients[parsed.clientId] = true;
+
+    // update the conn -> client mapping, because this might be the first time we have
+    // the chance to save this information.
+    connectionIDtoClientIDMap[connection.ID] = parsed.clientId;
+
     var domain = null;
     if (parsed.url) {
       domain = parseUrl(parsed.url).hostname;
@@ -299,7 +309,7 @@ wsServer.on('request', function(request) {
     connectionStats[id].totalMessages++;
     logger.debug('Message on ' + id + ' bytes: ' +
                  (message.utf8Data && message.utf8Data.length) +
-                 ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 20) +
+                 ' conn ID: ' + connection.ID + ' data:' + message.utf8Data.substr(0, 1000) +
                  ' connections: ' + allConnections[id].length);
     for (var i=0; i<allConnections[id].length; i++) {
       var c = allConnections[id][i];
@@ -328,6 +338,21 @@ wsServer.on('request', function(request) {
       connectionStats[id].lastLeft = Date.now();
     }
     logger.debug('Peer ' + connection.remoteAddress + ' disconnected, ID: ' + connection.ID);
+
+    if (allConnections[id] && connectionIDtoClientIDMap[connection.ID]) {
+      // Tell other users that this connection is gone.
+      bye_msg = JSON.stringify({
+        "type": "bye",
+        "clientId": connectionIDtoClientIDMap[connection.ID]
+      });
+
+      logger.info("Sending bye message: ", JSON.stringify(bye_msg))
+
+      for (var i=0; i<allConnections[id].length; i++) {
+        var c = allConnections[id][i];
+        c.sendUTF(bye_msg);
+      }
+    }
   });
 });
 
