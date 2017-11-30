@@ -1,6 +1,8 @@
 ## TogetherJS - Surprisingly easy collaboration
 
-<details><summary>Table of Contents (ToC)</summary>
+<details><summary><sub><b>README.md</summary>
+
+<details><summary><sub><b>Table of Contents (ToC)</b></sub></summary>
 
 Table of Contents (ToC)
 =========================
@@ -18,7 +20,7 @@ Table of Contents (ToC)
 
 </details>
 
-<details><summary>what is TogetherJS?</summary>
+<details><summary><sub><b>what is TogetherJS?</b></sub></summary>
 
 ### What is TogetherJS?
 
@@ -34,7 +36,7 @@ Table of Contents (ToC)
 
 </details>
 
-<details><summary>contributing</summary>
+<details><summary><sub><b>contributing</b></sub></summary>
 
 ### Contributing
 
@@ -45,7 +47,7 @@ Table of Contents (ToC)
 
 </details>
 
-<details><summary>bug reports</summary>
+<details><summary><sub><b>bug reports</b></sub></summary>
 
 ### Bug Reports
 
@@ -55,7 +57,7 @@ Table of Contents (ToC)
 
 </details>
 
-<details><summary>bug reports</summary>
+<details><summary><sub><b>bug reports</b></sub></summary>
 
 ### Roadmap & Plans
 
@@ -65,7 +67,7 @@ Table of Contents (ToC)
 
 </details>
 
-<details><summary>bug reports</summary>
+<details><summary><sub><b>bug reports</b></sub></summary>
 
 ### Setting up a development environment
 
@@ -127,7 +129,7 @@ $ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
 
 </details>
 
-<details><summary>running a local server</summary>
+<details><summary><sub><b>running a local server</b></sub></summary>
 
 ### Running a local server
 
@@ -142,7 +144,7 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 </details>
 
-<details><summary>testing</summary>
+<details><summary><sub><b>testing</b></sub></summary>
 
 ### Testing
 
@@ -156,7 +158,7 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 </details>
 
-<details><summary>license</summary>
+<details><summary><sub><b>license</b></sub></summary>
 
 ### License
 
@@ -169,3 +171,5 @@ You can obtain one at [http://mozilla.org/MPL/2.0/](http://mozilla.org/MPL/2.0/)
 </details>
 
 <img src="https://orig00.deviantart.net/5b95/f/2016/070/3/b/mit_license_logo_by_excaliburzero-d9ur2lg.png" width="70"></img> <img src="https://pbs.twimg.com/profile_images/821735271049768960/jJZXlJwZ.jpg" width="50"></img> 
+
+</details>
