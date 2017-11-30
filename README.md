@@ -1,6 +1,6 @@
 ## TogetherJS - Surprisingly easy collaboration
 
-<section><summary>Table of Contents (ToC)</summary>
+<details><summary>Table of Contents (ToC)</summary>
 
 Table of Contents (ToC)
 =========================
@@ -16,9 +16,9 @@ Table of Contents (ToC)
 
 ---
 
-</section>
+</details>
 
-<section><summary>what is TogetherJS?</summary>
+<details><summary>what is TogetherJS?</summary>
 
 ### What is TogetherJS?
 
@@ -32,9 +32,9 @@ Table of Contents (ToC)
 
 ---
 
-</section>
+</details>
 
-<section><summary>contributing</summary>
+<details><summary>contributing</summary>
 
 ### Contributing
 
@@ -43,9 +43,9 @@ Table of Contents (ToC)
 ---
 
 
-</section>
+</details>
 
-<section><summary>bug reports</summary>
+<details><summary>bug reports</summary>
 
 ### Bug Reports
 
@@ -53,9 +53,9 @@ Table of Contents (ToC)
 
 ---
 
-</section>
+</details>
 
-<section><summary>bug reports</summary>
+<details><summary>bug reports</summary>
 
 ### Roadmap & Plans
 
@@ -63,9 +63,9 @@ Table of Contents (ToC)
 
 ---
 
-</section>
+</details>
 
-<section><summary>bug reports</summary>
+<details><summary>bug reports</summary>
 
 ### Setting up a development environment
 
@@ -125,9 +125,9 @@ $ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
 
 ---
 
-</section>
+</details>
 
-<section><summary>running a local server</summary>
+<details><summary>running a local server</summary>
 
 ### Running a local server
 
@@ -140,9 +140,9 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 ---
 
-</section>
+</details>
 
-<section><summary>testing</summary>
+<details><summary>testing</summary>
 
 ### Testing
 
@@ -154,9 +154,9 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 ---
 
-</section>
+</details>
 
-<section><summary>license</summary>
+<details><summary>license</summary>
 
 ### License
 
@@ -166,6 +166,6 @@ You can obtain one at [http://mozilla.org/MPL/2.0/](http://mozilla.org/MPL/2.0/)
 
 ---
 
-</section>
+</details>
 
 <img src="https://orig00.deviantart.net/5b95/f/2016/070/3/b/mit_license_logo_by_excaliburzero-d9ur2lg.png" width="70"></img> <img src="https://pbs.twimg.com/profile_images/821735271049768960/jJZXlJwZ.jpg" width="50"></img> 
