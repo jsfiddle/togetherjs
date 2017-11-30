@@ -1,5 +1,7 @@
 ## TogetherJS - Surprisingly easy collaboration
 
+<section><summary>Table of Contents (ToC)</summary>
+
 Table of Contents (ToC)
 =========================
 
@@ -14,6 +16,10 @@ Table of Contents (ToC)
 
 ---
 
+</section>
+
+<section><summary>what is TogetherJS?</summary>
+
 ### What is TogetherJS?
 
 <sub><b>TogetherJS is a service for your website that makes it surprisingly easy to collaborate in real-time.</b></sub>
@@ -26,11 +32,20 @@ Table of Contents (ToC)
 
 ---
 
+</section>
+
+<section><summary>contributing</summary>
+
 ### Contributing
 
 <sub><b>The remainder of this document is about contributing to TogetherJS - but reports, fixes, features, etc.  Look back at those other links if you are looking for something else.</b></sub>
 
 ---
+
+
+</section>
+
+<section><summary>bug reports</summary>
 
 ### Bug Reports
 
@@ -38,11 +53,19 @@ Table of Contents (ToC)
 
 ---
 
+</section>
+
+<section><summary>bug reports</summary>
+
 ### Roadmap & Plans
 
 <sub><b>To see what we're planning or at least considering to do with TogetherJS, look at [see our bug tracker](https://github.com/mozilla/togetherjs/issues?state=open).</b></sub>
 
 ---
+
+</section>
+
+<section><summary>bug reports</summary>
 
 ### Setting up a development environment
 
@@ -102,6 +125,10 @@ $ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
 
 ---
 
+</section>
+
+<section><summary>running a local server</summary>
+
 ### Running a local server
 
 <sub><b>You shouldn't need to run your own version of the hub server.  But if you
@@ -113,6 +140,10 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 ---
 
+</section>
+
+<section><summary>testing</summary>
+
 ### Testing
 
 <sub><b>Tests are in `togetherjs/tests/` -- these are [doctest.js](http://doctestjs.org/) tests.  To actually run the tests build togetherjs, serve it up, and go to `http://localhost:PORT/togetherjs/tests/` -- from there the tests are linked to from the top of the page.  The actual tests are `*.js` files in `togetherjs/tests/`, generally `test_*.js` for unit-style tests, and `func_*.js` for functional tests.</b></sub>
@@ -123,6 +154,10 @@ $ HUB_URL=http://localhost:8080 grunt devwatch
 
 ---
 
+</section>
+
+<section><summary>license</summary>
+
 ### License
 
 <sub><b>This Source Code Form is subject to the terms of the Mozilla Public
@@ -130,5 +165,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at [http://mozilla.org/MPL/2.0/](http://mozilla.org/MPL/2.0/).</b></sub>
 
 ---
+
+</section>
 
 <img src="https://orig00.deviantart.net/5b95/f/2016/070/3/b/mit_license_logo_by_excaliburzero-d9ur2lg.png" width="70"></img> <img src="https://pbs.twimg.com/profile_images/821735271049768960/jJZXlJwZ.jpg" width="50"></img> 
