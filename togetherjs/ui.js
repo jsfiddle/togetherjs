@@ -1270,9 +1270,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         this.peer.nudge();
       }).bind(this));
       this.followCheckbox = this.detailElement.find("#" + followId);
+      var self = this;
       this.followCheckbox.change(function () {
         if (! this.checked) {
-          this.peer.unfollow();
+          self.peer.unfollow();
         }
         // Following doesn't happen until the window is closed
         // FIXME: should we tell the user this?
