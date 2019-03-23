@@ -327,6 +327,12 @@ input.togetherjs-upload-avatar {
     }
   }
 
+  #togetherjs-buttons .togetherjs-person {
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+  }
+
   #togetherjs-buttons hr {
     padding: 0;
     margin: 0;
@@ -690,13 +696,13 @@ input.togetherjs-upload-avatar {
   .togetherjs-person-small .togetherjs-person-avatar-swatch {
     border-width: 3px;
     margin-left: 14px;
-    margin-top: 0px;
+    margin-top: @avatar-size - 11;
   }
 
   .togetherjs-person-avatar-swatch {
     /* This is the element that lives inside all .togetherjs-person elements
        and is used for the triangle. */
-    @size: 7px;
+    @size: 5px;
     width: 0;
     height: 0;
     margin-left: @avatar-size - @size - 2px;
@@ -705,7 +711,12 @@ input.togetherjs-upload-avatar {
     border-left: @size solid transparent;
     border-right: @size solid transparent;
     border-bottom: @size solid transparent;
-    margin-top: 0px;
+    margin-top: @avatar-size + 1px;
+    -webkit-transform: rotate(133deg);
+    -moz-transform: rotate(133deg);
+    -ms-transform: rotate(133deg);
+    -o-transform: rotate(133deg);
+    transform: rotate(133deg);
   }
 
   .togetherjs-person-inactive {
@@ -1702,6 +1713,7 @@ section.togetherjs-buttons .togetherjs-same-url {
   background: url('./images/icn-gear.png');
   background-size: 12px 12px;
   background-repeat: no-repeat;
+  display: none;
 }
 
 #togetherjs-pick-color {
