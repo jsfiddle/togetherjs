@@ -416,7 +416,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     // really don't want to do anything at this stage of the event
     // handling (since I'm catching every click), and I'll just do
     // something real soon:
-    setTimeout(function () {
+    //setTimeout(function () {
       if (! TogetherJS.running) {
         // This can end up running right after TogetherJS has been closed, often
         // because TogetherJS was closed with a click...
@@ -458,7 +458,7 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         return;
       }
       displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
-    });
+   // });
   }
 
   var CLICK_TRANSITION_TIME = 3000;
