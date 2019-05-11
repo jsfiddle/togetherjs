@@ -159,6 +159,8 @@ return abc;
     } else if (loc.indexOf("#") === 0) {
       var id;
       loc = loc.substr(1);
+      /* RANDOM Id fix */
+	    if (false){
       if (loc.indexOf(":") === -1) {
         id = loc;
         rest = "";
@@ -167,6 +169,10 @@ return abc;
         rest = loc.substr(loc.indexOf(":"));
       }
       el = document.getElementById(id);
+      }	else {
+       el = string_to_element(loc);
+       }
+     /* RANDOM id fix end */		    
       if (! el) {
         throw elementFinder.CannotFind("#" + id, "No element by that id", container);
       }
