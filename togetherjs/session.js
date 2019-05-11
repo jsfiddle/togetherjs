@@ -131,7 +131,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
         msg.peer.updateFromHello(msg);
       }
       if (msg.peer) {
-        msg.sameUrl = msg.peer.url == currentUrl;
+        msg.sameUrl = msg.peer.url == session.currentUrl();
         if (!msg.peer.isSelf) {
           msg.peer.updateMessageDate(msg);
         }
