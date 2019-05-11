@@ -65,7 +65,8 @@ return abc;
       el = el[0];
     }
     if (el.id) {
-      return "#" + el.id;
+	    return new_id(el);
+     // return "#" + el.id;
     }
     if (el.tagName == "BODY") {
       return "body";
