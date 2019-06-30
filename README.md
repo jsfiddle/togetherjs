@@ -6,11 +6,11 @@ What is TogetherJS?
 
 TogetherJS is a service for your website that makes it surprisingly easy to collaborate in real-time.
 
-Using TogetherJS two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TogetherJS service is included by the web site owner, and a web site can customize and configure aspects of TogetherJS's behavior on the site.
+Using TogetherJS, two people can interact on the same page, seeing each other's cursors, edits, and browsing a website together. The TogetherJS service is included by the website owner, and a website can customize and configure aspects of TogetherJS's behavior on the site.
 
 For more information and to see TogetherJS in action, visit [togetherjs.com](https://togetherjs.com/)
 
-If you want to integrate TogetherJS onto your site see [the wiki](https://github.com/mozilla/togetherjs/wiki) and specifically [Getting Started](https://github.com/mozilla/togetherjs/wiki/Developers:-Getting-Started).
+If you want to integrate TogetherJS onto your site, see [the wiki](https://github.com/mozilla/togetherjs/wiki) and specifically [Getting Started](https://github.com/mozilla/togetherjs/wiki/Developers:-Getting-Started).
 
 Contributing
 ============
@@ -20,12 +20,12 @@ The remainder of this document is about contributing to TogetherJS - but reports
 Bug Reports
 -----------
 
-Please submit bug reports as [github issues](https://github.com/mozilla/togetherjs/issues/new).  Don't worry about labels or milestones.  If you use the in-app feedback to give us a bug report that's fine too.
+Please submit bug reports as [github issues](https://github.com/mozilla/togetherjs/issues/new).  Don't worry about labels or milestones.  If you use the in-app feedback to give us a bug report, that's fine too.
 
 Roadmap & Plans
 ---------------
 
-To see what we're planning or at least considering to do with TogetherJS, look at [see our bug tracker](https://github.com/mozilla/togetherjs/issues?state=open).
+To see what we're planning or at least considering to do with TogetherJS, [see our bug tracker](https://github.com/mozilla/togetherjs/issues?state=open).
 
 Setting up a development environment
 ------------------------------------
@@ -36,7 +36,7 @@ TogetherJS has two main pieces:
 
 * The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
 
-There is a TogetherJS hub server deployed at `https://hub.togetherjs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
+There is a TogetherJS hub server deployed at `https://hub.togetherjs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out, we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
 
 The files need to be lightly "built": we use [LESS](http://lesscss.org/) for styles, and a couple files are generated.  To develop you need to build the library using [Grunt](http://gruntjs.com/).
 
