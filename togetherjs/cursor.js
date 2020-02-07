@@ -103,10 +103,18 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
         this.atOtherUrl = false;
       }
       if (pos.element) {
-        var target = $(elementFinder.findElement(pos.element));
-        var offset = target.offset();
-        top = offset.top + pos.offsetY;
-        left = offset.left + pos.offsetX;
+        try {
+          var target = $(elementFinder.findElement(pos.element));
+          var offset = target.offset();
+          top = offset.top + pos.offsetY;
+          left = offset.left + pos.offsetX;
+        } catch (e) {
+          if (e instanceof elementFinder.CannotFind) {
+            top = pos.top;
+            left = pos.left;
+          } else
+            throw e;
+        }
       } else {
         // No anchor, just an absolute position
         top = pos.top;
@@ -276,6 +284,8 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     var offsetY = pageY - offset.top;
     lastMessage = {
       type: "cursor-update",
+      top: pageY,
+      left: pageX,
       element: elementFinder.elementLocation(target),
       offsetX: Math.floor(offsetX),
       offsetY: Math.floor(offsetY)

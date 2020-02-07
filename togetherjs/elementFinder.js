@@ -55,7 +55,7 @@ define(["util", "jquery"], function (util, $) {
         break;
       }
       if (children[i].nodeType == document.ELEMENT_NODE) {
-        if (children[i].className.indexOf("togetherjs") != -1) {
+        if (children[i].className.indexOf && children[i].className.indexOf("togetherjs") != -1) {
           // Don't count our UI
           continue;
         }
@@ -160,7 +160,7 @@ define(["util", "jquery"], function (util, $) {
       for (var i=0; i<children.length; i++) {
         var child = children[i];
         if (child.nodeType == document.ELEMENT_NODE) {
-          if (child.className.indexOf("togetherjs") != -1) {
+          if (children[i].className.indexOf && children[i].className.indexOf("togetherjs") != -1) {
             continue;
           }
           count--;
