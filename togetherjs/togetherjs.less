@@ -256,6 +256,10 @@ input.togetherjs-upload-avatar {
     border-radius: 4px 4px 0 0;
     position: relative;
     border-bottom:1px solid #0071A7;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   .togetherjs-share-link {
@@ -330,6 +334,21 @@ input.togetherjs-upload-avatar {
   #togetherjs-buttons hr {
     padding: 0;
     margin: 0;
+  }
+
+  .togetherjs-dock-left #togetherjs-dock-participants .togetherjs-dock-person,
+  .togetherjs-dock-right #togetherjs-dock-participants .togetherjs-dock-person {
+    margin-top: var(--offset);
+  }
+
+  .togetherjs-dock-top #togetherjs-dock-participants .togetherjs-dock-person,
+  .togetherjs-dock-bottom #togetherjs-dock-participants .togetherjs-dock-person {
+    margin-left: var(--offset);
+  }
+
+  #togetherjs-dock-participants:hover .togetherjs-dock-person {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
   }
 
   #togetherjs-dock-participants button.togetherjs-active {
@@ -507,27 +526,45 @@ input.togetherjs-upload-avatar {
     margin: 3px 15px 3px 60px;
   }
 
-  #togetherjs-window-pointer-right, #togetherjs-window-pointer-left {
+  #togetherjs-window-pointer {
     position: fixed;
+    width: 30px;
+    height: 30px;
+    z-index: 10002;
+    overflow: hidden;
+  }
+  #togetherjs-window-pointer::before {
+    position: absolute;
+    left: -5px;
+    top: 10px;
     width: 10px;
     height: 10px;
-    margin-right: -5px;
-    margin-top: -5px;
     background: #fff;
-    border-right: 1px solid rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-    z-index: @z-index + 2;
-    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    content: "";
   }
-  #togetherjs-window-pointer-right {
-    -moz-transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
+  #togetherjs-window-pointer.left::before {
+    left: 25px;
+    top: 10px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
   }
-  #togetherjs-window-pointer-left {
-    -moz-transform: rotate(135deg);
-    -webkit-transform: rotate(135deg);
+  #togetherjs-window-pointer.right::before {
+    left: -5px;
+    top: 10px;
+    box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.5);
   }
-
+  #togetherjs-window-pointer.top::before {
+    left: 10px;
+    top: 25px;
+    background: #0095dd;
+  }
+  #togetherjs-window-pointer.bottom::before {
+    left: 10px;
+    top: -5px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
   .togetherjs-window {
     .window;
     width: 286px;
@@ -744,12 +781,26 @@ input.togetherjs-upload-avatar {
   .togetherjs-dock-person-tooltip {
     font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
     position: absolute;
-    right: 70px;
+    left: 70px;
     top: 0px;
     padding: 8px;
     font-size:12px;
     text-align:left;
     min-width:30px;
+  }
+
+  .togetherjs-dock-right .togetherjs-dock-person-tooltip {
+    left: initial;
+    right: 70px;
+  }
+  .togetherjs-dock-top .togetherjs-dock-person-tooltip {
+    left: initial;
+    top: 70px;
+  }
+  .togetherjs-dock-bottom .togetherjs-dock-person-tooltip {
+    left: initial;
+    top: initial;
+    bottom: 70px;
   }
 
   .togetherjs-tooltip {
@@ -763,17 +814,34 @@ input.togetherjs-upload-avatar {
     font-size:12px;
   }
 
-  .togetherjs-person-tooltip-arrow-r {
+  .togetherjs-person-tooltip-arrow {
     position:absolute;
-    left:46px;
-  	width: 0;
-  	height: 0;
-  	border-top: 4px solid transparent;
-  	border-bottom: 4px solid transparent;
-  	border-left: 4px solid rgba(0,0,0,0.9);
-  	line-height:20px;
-  	opacity:0.9;
-  	top:20px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid rgba(0, 0, 0, 0.9);
+    line-height: 20px;
+    opacity: 0.9;
+  }
+  .togetherjs-dock-left .togetherjs-person-tooltip-arrow {
+    transform: scaleX(-1);
+    left: -4px;
+    top: 14px;
+  }
+  .togetherjs-dock-right .togetherjs-person-tooltip-arrow {
+    right: -4px;
+    top: 14px;
+  }
+  .togetherjs-dock-top .togetherjs-person-tooltip-arrow {
+    transform: rotate(-90deg);
+    left: 20px;
+    top: -6px;
+  }
+  .togetherjs-dock-bottom .togetherjs-person-tooltip-arrow {
+    transform: rotate(90deg);
+    left: 20px;
+    bottom: -6px;
   }
 
 }
@@ -1144,14 +1212,12 @@ section.togetherjs-buttons .togetherjs-same-url {
   @border-radius: 4px;
   @long-side: (@button-size + 9px) * 4 + 64px; // actual button-size * number of buttons + expand thingy
   @short-side: @button-size + 20px;
+  padding: 0;
+  border-radius: @border-radius;
   /*border:1px solid #000;*/
 
+  &.togetherjs-dock-left,
   &.togetherjs-dock-right {
-    padding: 0;
-    bottom: 150px;
-    right: 5px;
-    border-radius: @border-radius;
-    height: @long-side;
     width: @short-side;
     #togetherjs-dock-anchor-vertical {
       display: none;
@@ -1159,57 +1225,51 @@ section.togetherjs-buttons .togetherjs-same-url {
     #togetherjs-dock-anchor-horizontal {
       display: inline;
     }
-
     #togetherjs-dock-anchor-horizontal img {
       width:31px;
       height:7px;
       padding:0px 2px 2px 2px;
       pointer-events: none;
     }
-  }
-
-  &.togetherjs-dock-left {
-    padding: 0;
-    bottom: 60px;
-    left: 5px;
-    border-radius: 0 @border-radius @border-radius 0;
-    height: @long-side - 46px;
-    width: @short-side;
-    #togetherjs-dock-anchor-vertical {
-      display: none;
-    }
-    #togetherjs-dock-anchor-horizontal {
-      display: inline;
-    }
-
-    #togetherjs-dock-anchor-horizontal img {
-      width: 6px;
-      height: 6px;
-      padding: 7px 2px 2px 2px
+    #togetherjs-buttons.on .togetherjs-button:last-of-type,
+    #togetherjs-dock-participants .togetherjs-button:last-of-type {
+      border-radius: 0 0 4px 4px;
     }
   }
 
-  &.togetherjs-dock-top {
-    padding: 0;
-    top: 40px;
-    left: 50%;
-    margin-left: -(@long-side / 2);
-    border-radius: @border-radius @border-radius 0 0;
-    height: @short-side;
-    width: @long-side;
-    #togetherjs-buttons, #togetherjs-dock-anchor {
-      display: inline;
+  &.togetherjs-dock-top,
+  &.togetherjs-dock-bottom {
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    #togetherjs-dock-anchor {
+      width: 20px;
+      height: 60px;
+    }
+    #togetherjs-buttons {
+      display: flex;
+      width: auto;
+    }
+    .togetherjs-button {
+      border-left: 1px solid rgba(0, 0, 0, 0.2);
+      border-top: none;
     }
     #togetherjs-dock-anchor-vertical {
-      display: inline;
+      display: flex;
+      justify-content: center;
+      margin-top: 26px;
     }
     #togetherjs-dock-anchor-horizontal {
       display: none;
     }
     #togetherjs-dock-anchor-vertical img {
-      width: 6px;
-      height: 6px;
-      padding: 2px;
+      height: 7px;
+      transform: rotate(90deg);
+      pointer-events: none;
+    }
+    #togetherjs-buttons.on .togetherjs-button:last-of-type,
+    #togetherjs-dock-participants .togetherjs-button:last-of-type {
+      border-radius: 0 4px 4px 0;
     }
   }
 }

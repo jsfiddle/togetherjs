@@ -51,13 +51,10 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     }
     win = $(win);
     assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
-    // FIXME: hardcoding
-    var ifacePos = "right";
-    //var ifacePos = panelPosition();
+    const ifacePos = require("ui").panelPosition()
     var boundPos = bound.offset();
     boundPos.height = bound.height();
     boundPos.width = bound.width();
-    var windowHeight = $window.height();
     boundPos.top -= $window.scrollTop();
     boundPos.left -= $window.scrollLeft();
     // FIXME: I appear to have to add the padding to the width to get a "true"
@@ -65,37 +62,51 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
     var height = win.height() + 5;
     var width = win.width() + 20;
     var left, top;
-    if (ifacePos == "right") {
-      left = boundPos.left - 11 - width;
-      top = boundPos.top + (boundPos.height / 2) - (height / 2);
-    } else if (ifacePos == "left") {
+    if (ifacePos == "left") {
       left = boundPos.left + boundPos.width + 15;
       top = boundPos.top + (boundPos.height / 2) - (height / 2);
-    } else if (ifacePos == "bottom") {
+    } else if (ifacePos == "right") {
+      left = boundPos.left - 11 - width;
+      top = boundPos.top + (boundPos.height / 2) - (height / 2);
+    } else if (ifacePos == "top") {
+      left = (boundPos.left + boundPos.width / 2) - (width / 2);
+      top = boundPos.top + boundPos.width + 15;
+    } else {
       left = (boundPos.left + boundPos.width / 2) - (width / 2);
       top = boundPos.top - 10 - height;
     }
-    top = Math.min(windowHeight - 10 - height, Math.max(10, top));
     win.css({
+      left: left + "px",
+      right: "",
       top: top + "px",
-      left: left + "px"
+      bottom: ""
     });
     if (win.hasClass("togetherjs-window")) {
-      $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-      var pointer = $("#togetherjs-window-pointer-" + ifacePos);
+      $("#togetherjs-window-pointer").hide();
+      var pointer = $("#togetherjs-window-pointer")
+      pointer.removeClass()
+      pointer.addClass(ifacePos)
       pointer.show();
-      if (ifacePos == "right") {
+      if (ifacePos == "left") {
         pointer.css({
-          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-          left: left + win.width() + 9 + "px"
+          left: (left - 30) + "px",
+          top: (boundPos.top + Math.floor(boundPos.height / 2) - 13) + "px"
         });
-      } else if (ifacePos == "left") {
+      } else if (ifacePos == "right") {
         pointer.css({
-          top: boundPos.top + Math.floor(boundPos.height / 2) + "px",
-          left: (left - 5) + "px"
+          left: (left + win.width() + 14) + "px",
+          top: (boundPos.top + Math.floor(boundPos.height / 2) - 13) + "px"
         });
-      } else {
-        console.warn("don't know how to deal with position:", ifacePos);
+      } else if (ifacePos == "top") {
+        pointer.css({
+          left: (boundPos.left + Math.floor(boundPos.width / 2) - 13) + "px",
+          top: (top - 30) + "px"
+        });
+      } else if (ifacePos == "bottom") {
+        pointer.css({
+          left: (boundPos.left + Math.floor(boundPos.width / 2) - 13) + "px",
+          top: (top + win.height()) + "px"
+        });
       }
     }
     win.data("boundTo", bound.selector || "#" + bound.attr("id"));
@@ -143,7 +154,7 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
         });
       }
     });
-    $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+    $("#togetherjs-window-pointer").hide();
     if (onClose) {
       onClose();
       onClose = null;

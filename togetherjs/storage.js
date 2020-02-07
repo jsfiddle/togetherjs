@@ -6,6 +6,7 @@ define(["util"], function (util) {
   var assert = util.assert;
   var Deferred = util.Deferred;
   var DEFAULT_SETTINGS = {
+    dockConfig: null,
     name: "",
     defaultName: "",
     avatar: null,

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi) {
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi", "storage"], function (require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi, storage) {
   var ui = util.Module('ui');
   var assert = util.assert;
   var AssertionError = util.AssertionError;
@@ -48,12 +48,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     el.show();
   };
 
-  function panelPosition() {
+  ui.panelPosition = function () {
     var iface = $("#togetherjs-dock");
     if (iface.hasClass("togetherjs-dock-right")) {
       return "right";
     } else if (iface.hasClass("togetherjs-dock-left")) {
       return "left";
+    } else if (iface.hasClass("togetherjs-dock-top")) {
+      return "top";
     } else if (iface.hasClass("togetherjs-dock-bottom")) {
       return "bottom";
     } else {
@@ -111,6 +113,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     var container = ui.container = $(templates("interface"));
     assert(container.length);
     $("body").append(container);
+    const iface = container.find("#togetherjs-dock")
+    iface.css("visibility", "hidden")
+    storage.settings.get("dockConfig").then(s => {
+      if (s) {
+        s.pos.visibility = ""
+        iface.addClass(s["class"])
+        iface.css(s.pos)
+      } else {
+        iface.addClass("togetherjs-dock-right")
+        iface.css({right: "5px", top: "5px", visibility: ""})
+      }
+    })
+    $("#togetherjs-buttons").addClass("on")
     fixupAvatars(container);
     if (session.firstRun && TogetherJS.startTarget) {
       // Time at which the UI will be fully ready:
@@ -122,7 +137,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
       setTimeout(function () {
         finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
-        var iface = container.find("#togetherjs-dock");
         var start = iface.offset();
         var pos = $(TogetherJS.startTarget).offset();
         pos.top = Math.floor(pos.top - start.top);
@@ -175,10 +189,10 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     TogetherJS.config.track("disableWebRTC", function (hide, previous) {
       if (hide && ! previous) {
         ui.container.find("#togetherjs-audio-button").hide();
-        adjustDockSize(-1);
+        adjustDockPos();
       } else if ((! hide) && previous) {
         ui.container.find("#togetherjs-audio-button").show();
-        adjustDockSize(1);
+        adjustDockPos();
       }
     });
 
@@ -269,37 +283,94 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     // so abruptly
     var anchor = container.find("#togetherjs-dock-anchor");
     assert(anchor.length);
-    // FIXME: This is in place to temporarily disable dock dragging:
-    anchor = container.find("#togetherjs-dock-anchor-disabled");
     anchor.mousedown(function (event) {
-      var iface = $("#togetherjs-dock");
-      // FIXME: switch to .offset() and pageX/Y
-      var startPos = panelPosition();
+      const iface = $("#togetherjs-dock");
+      const startLeft= parseInt(iface.css("left"))
+      const startTop = parseInt(iface.css("top"))
+
+      $("#togetherjs-menu").hide()
+      windowing.hide();
+
       function selectoff() {
         return false;
       }
       function mousemove(event2) {
-        var fromRight = $window.width() + window.pageXOffset - event2.pageX;
-        var fromLeft = event2.pageX - window.pageXOffset;
-        var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
-        // FIXME: this is to temporarily disable the bottom view:
-        fromBottom = 10000;
-
-        var pos;
-        if (fromLeft < fromRight && fromLeft < fromBottom) {
-          pos = "left";
-        } else if (fromRight < fromLeft && fromRight < fromBottom) {
-          pos = "right";
+        let left = startLeft + event2.screenX - event.screenX
+        let right
+        let top = startTop + event2.screenY - event.screenY
+        let bottom
+        iface.css({ right: "", bottom: "" })
+        if (iface.lockedHor) {
+          if (left < 5) {
+            left = "5px"
+            right = ""
+          } else {
+            iface.css("left", left + "px")
+            if (parseInt(iface.css("right")) < 5) {
+              left = ""
+              right = "5px"
+            }
+          }
         } else {
-          pos = "bottom";
+          if (left < 50) {
+            iface.lockedVert = true
+            left = "5px"
+            right = ""
+          } else {
+            iface.css("left", left + "px")
+            if (parseInt(iface.css("right")) < 50) {
+              iface.lockedVert = true
+              left = ""
+              right = "5px"
+            } else
+              iface.lockedVert = false
+          }
         }
-        iface.removeClass("togetherjs-dock-left");
-        iface.removeClass("togetherjs-dock-right");
-        iface.removeClass("togetherjs-dock-bottom");
-        iface.addClass("togetherjs-dock-" + pos);
-        if (startPos && pos != startPos) {
-          windowing.hide();
-          startPos = null;
+        if (iface.lockedVert) {
+          if (top < 5) {
+            top = "5px"
+            bottom = ""
+          } else {
+            iface.css("top", top + "px")
+            if (parseInt(iface.css("bottom")) < 5) {
+              top = ""
+              bottom = "5px"
+            }
+          }
+        } else {
+          if (top < 50) {
+            iface.lockedHor = true
+            top = "5px"
+            bottom = ""
+          } else {
+            iface.css("top", top + "px")
+            if ((iface.threshold && (top > iface.threshold)) || (!iface.threshold && (parseInt(iface.css("bottom")) < 50))) {
+                iface.lockedHor = true
+                top = ""
+                bottom = "5px"
+            } else {
+              iface.lockedHor = false
+              delete iface.threshold
+            }
+          }
+        }
+        iface.css({ left: left, right: right, top: top, bottom: bottom })
+        if (iface.lockedHor) {
+          if (iface.css("bottom") == "5px") {
+            if (!iface.threshold)
+              iface.threshold = parseInt(iface.css("top")) - 50
+            iface.removeClass("togetherjs-dock-left togetherjs-dock-right togetherjs-dock-top")
+            iface.addClass("togetherjs-dock-bottom")
+          } else {
+            iface.removeClass("togetherjs-dock-left togetherjs-dock-right togetherjs-dock-bottom")
+            iface.addClass("togetherjs-dock-top")
+          }
+        } else if (parseInt(iface.css("right")) < 330) {
+          iface.removeClass("togetherjs-dock-left togetherjs-dock-top togetherjs-dock-bottom")
+          iface.addClass("togetherjs-dock-right")
+        } else {
+          iface.removeClass("togetherjs-dock-right togetherjs-dock-top togetherjs-dock-bottom")
+          iface.addClass("togetherjs-dock-left")
         }
       }
       $(document).bind("mousemove", mousemove);
@@ -309,6 +380,22 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       // FIXME: it seems like sometimes we lose the mouseup event, and it's as though
       // the mouse is stuck down:
       $(document).one("mouseup", function () {
+        // const iface = $("#togetherjs-dock")
+        const style = iface[0].style
+        const pos = {}
+        if (style.left)
+          pos.left = style.left
+        else
+          pos.right = style.right
+        if (style.top)
+          pos.top = style.top
+        else
+          pos.bottom = style.bottom
+        storage.settings.set("dockConfig", {pos: pos,
+                                            "class": iface.hasClass("togetherjs-dock-right") ? "togetherjs-dock-right"
+                                                   : iface.hasClass("togetherjs-dock-top") ? "togetherjs-dock-top"
+                                                   : iface.hasClass("togetherjs-dock-bottom") ? "togetherjs-dock-bottom"
+                                                   : "togetherjs-dock-left"})
         $(document).unbind("mousemove", mousemove);
         $(document).unbind("selectstart", selectoff);
       });
@@ -727,12 +814,26 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
   function bindMenu() {
     var el = $("#togetherjs-menu:visible");
     if (el.length) {
+      const ifacePos = ui.panelPosition()
       var bound = $("#togetherjs-profile-button");
       var boundOffset = bound.offset();
-      el.css({
-        top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
-        left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
-      });
+      el.css((ifacePos == "bottom") ? {
+        left: (boundOffset.left + 10 - $window.scrollLeft()) + "px",
+        top: "",
+        bottom: (bound.height() + 5) + "px"
+      } : {
+        left: (ifacePos == "right") ? (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
+                                    : (boundOffset.left + 10 - $window.scrollLeft()) + "px",
+        top: (boundOffset.top + bound.height() - $window.scrollTop()) + "px",
+        bottom: ""
+		  });
+      if (parseInt(el.css("bottom")) < 5)
+        el.css({
+          left: (ifacePos == "right") ? (boundOffset.left - el.width() - $window.scrollLeft()) + "px"
+                                      : (boundOffset.left + bound.width() - $window.scrollLeft()) + "px",
+          top: "",
+          bottom: "5px"
+        })
     }
   }
 
@@ -781,19 +882,21 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     hideMenu();
   }
 
-  function adjustDockSize(buttons) {
-    /* Add or remove spots from the dock; positive number to
-       add button(s), negative number to remove button(s)
-       */
-    assert(typeof buttons == "number");
-    assert(buttons && Math.floor(buttons) == buttons);
-    var iface = $("#togetherjs-dock");
-    var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
-    assert(newHeight >= BUTTON_HEIGHT * 3, "Height went too low (", newHeight,
-           "), should never be less than 3 buttons high (", BUTTON_HEIGHT * 3, ")");
-    iface.css({
-      height: newHeight + "px"
-    });
+  function adjustDockPos() {
+    const iface = $("#togetherjs-dock")
+    const right = parseInt(iface.css("right"))
+    const bottom = parseInt(iface.css("bottom"))
+    if (right < 5)
+      iface.css("left", (parseInt(iface.css("left")) - 5 + right) + "px")
+    else if (bottom < 5)
+      iface.css("top", (parseInt(iface.css("top")) - 5 + bottom) + "px")
+    else
+      storage.settings.get("dockConfig").then(s => iface.css(s ? s.pos : {right: "5px", top: "5px"}))
+    const buttonContainer = $("#togetherjs-buttons")
+    if ($("#togetherjs-dock-participants").children().length)
+      buttonContainer.removeClass("on")
+    else
+      buttonContainer.addClass("on")
   }
 
   // Misc
@@ -1046,6 +1149,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     if (id == "togetherjs-chat") {
       ui.chat.scroll();
       windowing.hide("#togetherjs-chat-notifier");
+      $("#togetherjs-window-pointer").show();
     }
   });
 
@@ -1223,30 +1327,6 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
     //if users hit X then show the participant button with the consol
 
     dock: deferForContainer(function () {
-
-      var numberOfUsers = peers.getAllPeers().length;
-
-      // collapse the Dock if too many users
-      function CollapsedDock() {
-        // decrease/reset dock height
-        $("#togetherjs-dock").css("height", 260);
-        //replace participant button
-        $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url("+TogetherJS.baseUrl+"/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
-        // new full participant window created on toggle
-        $("#togetherjs-participantlist-button").click(function () {
-          windowing.toggle("#togetherjs-participantlist");
-        });
-      }
-
-      // FIXME: turned off for now
-      if( numberOfUsers >= 5 && false) {
-        CollapsedDock();
-      } else {
-        // reset
-
-      }
-
-
       if (this.dockElement) {
         return;
       }
@@ -1256,7 +1336,19 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
       ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
       this.dockElement.find(".togetherjs-person").animateDockEntry();
-      adjustDockSize(1);
+      const numberOfUsers = peers.getAllPeers(true).length;
+      if (numberOfUsers > 4) {
+        $("#togetherjs-dock-participants .togetherjs-dock-person:not(:first-of-type").each(function () {
+          this.style.setProperty("--offset", (((numberOfUsers - 4) * -BUTTON_HEIGHT) / (numberOfUsers - 1)) + "px")
+        })
+        const persons = $("#togetherjs-dock-participants")
+        if (!persons[0].hasListener) {
+          persons.mouseenter(adjustDockPos)
+          persons.mouseleave(adjustDockPos)
+          persons[0].hasListener = true
+        }
+      }
+      adjustDockPos();
       this.detailElement = templating.sub("participant-window", {
         peer: this.peer
       });
@@ -1279,7 +1371,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       });
       this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
       session.on("hide-window", this.maybeHideDetailWindow);
-      ui.container.append(this.detailElement);
+      $("#togetherjs-feedback-form").after(this.detailElement);
       this.dockElement.click((function () {
         if (this.detailElement.is(":visible")) {
           windowing.hide(this.detailElement);
@@ -1304,12 +1396,23 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       if (! this.dockElement) {
         return;
       }
-      this.dockElement.animateDockExit().promise().then((function () {
+      if (peers.getAllPeers(true).length <= 4) {
+        $("#togetherjs-dock-participants .togetherjs-dock-person:not(:first-of-type").each(function () {
+          this.style.removeProperty("--offset")
+        })
+        const persons = $("#togetherjs-dock-participants")
+        if (persons[0].hasListener) {
+          persons.off("mouseenter")
+          persons.off("mouseleave")
+          delete persons[0].hasListener
+        }
+      }
+      this.dockElement.find(".togetherjs-person").animateDockExit().promise().then((function () {
         this.dockElement.remove();
         this.dockElement = null;
         this.detailElement.remove();
         this.detailElement = null;
-        adjustDockSize(-1);
+        adjustDockPos();
       }).bind(this));
     },
 
