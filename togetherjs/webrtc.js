@@ -44,7 +44,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
     // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
     if (window.webkitRTCPeerConnection) {
       return new webkitRTCPeerConnection({
-        "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
+        "iceServers": [{"urls": "stun:stun.l.google.com:19302"}]
       }, {
         "optional": [{"DtlsSrtpKeyAgreement": true}]
       });
@@ -52,7 +52,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
     if (window.mozRTCPeerConnection) {
       return new mozRTCPeerConnection({
         // Or stun:124.124.124..2 ?
-        "iceServers": [{"url": "stun:23.21.150.121"}]
+        "iceServers": [{"urls": "stun:23.21.150.121"}]
       }, {
         "optional": []
       });
@@ -144,21 +144,29 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
 
     var streaming = false;
     function startStreaming() {
-      getUserMedia({
-          video: true,
-          audio: false
-        },
-        function(stream) {
+    	const constraints = {
+        video: true,
+        audio: false
+      }
+      if (navigator.mediaDevices)
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
           streaming = true;
           $video[0].src = URL.createObjectURL(stream);
           $video[0].play();
-        },
-        function(err) {
-          // FIXME: should pop up help or something in the case of a user
-          // cancel
-          console.error("getUserMedia error:", err);
-        }
-      );
+        }).catch(e => { throw new Error(e) })
+      else
+        getUserMedia(constraints,
+          function(stream) {
+            streaming = true;
+            $video[0].src = URL.createObjectURL(stream);
+            $video[0].play();
+          },
+          function(err) {
+            // FIXME: should pop up help or something in the case of a user
+            // cancel
+            console.error("getUserMedia error:", err);
+          }
+        );
     }
 
     function takePicture() {
@@ -310,27 +318,36 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
     }
 
     function startStreaming(callback) {
-      getUserMedia(
-        {
-          video: false,
-          audio: true
-        },
-        function (stream) {
+    	const constraints = {
+        video: false,
+        audio: true
+      }
+      if (navigator.mediaDevices)
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
           audioStream = stream;
           attachMedia("#togetherjs-local-audio", stream);
           if (callback) {
             callback();
           }
-        },
-        function (err) {
-          // FIXME: handle cancel case
-          if (err && err.code == 1) {
-            // User cancel
-            return;
+        }).catch(e => { throw new Error(e) })
+      else
+        getUserMedia(constraints,
+          function (stream) {
+            audioStream = stream;
+            attachMedia("#togetherjs-local-audio", stream);
+            if (callback) {
+              callback();
+            }
+          },
+          function (err) {
+            // FIXME: handle cancel case
+            if (err && err.code == 1) {
+              // User cancel
+              return;
+            }
+            error("getUserMedia error:", err);
           }
-          error("getUserMedia error:", err);
-        }
-      );
+        );
     }
 
     function attachMedia(element, media) {
@@ -358,7 +375,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       }
       _connection.onaddstream = function (event) {
         console.log("got event", event, event.type);
-        attachMedia($audio, event.stream);
+        attachMedia($audio, event.streams[0]);
         audioButton("#togetherjs-audio-active");
       };
       _connection.onstatechange = function () {
