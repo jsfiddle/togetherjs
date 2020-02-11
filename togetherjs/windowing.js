@@ -81,6 +81,11 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       top: top + "px",
       bottom: ""
     });
+    if (parseInt(win.css("bottom")) < 5)
+      win.css({
+        top: "",
+        bottom: "5px"
+      })
     if (win.hasClass("togetherjs-window")) {
       $("#togetherjs-window-pointer").hide();
       var pointer = $("#togetherjs-window-pointer")
