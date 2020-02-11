@@ -81,7 +81,20 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
       top: top + "px",
       bottom: ""
     });
-    if (parseInt(win.css("bottom")) < 5)
+    if (parseInt(win.css("left")) < 5)
+      win.css({
+        left: "5px"
+      })
+    else if (parseInt(win.css("right")) < 5)
+      win.css({
+        left: "",
+        right: "5px"
+      })
+    if (parseInt(win.css("top")) < 5)
+      win.css({
+        top: "5px"
+      })
+    else if (parseInt(win.css("bottom")) < 5)
       win.css({
         top: "",
         bottom: "5px"
