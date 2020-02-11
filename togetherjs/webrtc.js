@@ -375,7 +375,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       }
       _connection.onaddstream = function (event) {
         console.log("got event", event, event.type);
-        attachMedia($audio, event.streams[0]);
+        attachMedia($audio, event.stream);
         audioButton("#togetherjs-audio-active");
       };
       _connection.onstatechange = function () {
