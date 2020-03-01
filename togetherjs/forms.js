@@ -257,7 +257,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     return false;
   };
 
-  TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+  if (!window.disableCodeMirrorSync) {
+   TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+  }
 
   var CKEditor = util.Class({
     trackerName: "CKEditor",
