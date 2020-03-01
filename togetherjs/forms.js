@@ -523,7 +523,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       value = !! value;
       if (checked != value) {
         changed = true;
-        el.prop("checked", value);
+        //Commenting Bellow line as click event (cursor-click) doing the check & uncheck Operation
+        //el.prop("checked", value);
       }
     } else {
       if (el.val() != value) {
@@ -576,11 +577,21 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     var focusedEl = el[0].ownerDocument.activeElement;
     var focusedElSelection;
     if (isText(focusedEl)) {
-      focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+     	try {
+                focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+            }
+            catch (e) {//This exception is currently thrown in Chrome, Hence setting to 0,0
+                focusedElSelection = [0, 0];
+            }
     }
     var selection;
     if (isText(el)) {
-      selection = [el[0].selectionStart, el[0].selectionEnd];
+    	try {
+      		selection = [el[0].selectionStart, el[0].selectionEnd];
+    	}
+	catch (e) {//This exception is currently thrown in Chrome, Hence setting to 0,0
+		selection = [0, 0];
+	}
     }
     var value;
     if (msg.replace) {
@@ -617,15 +628,26 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         setValue(el, value);
       }
       if (isText(el)) {
-        el[0].selectionStart = selection[0];
-        el[0].selectionEnd = selection[1];
+      		try {
+        		el[0].selectionStart = selection[0];
+        		el[0].selectionEnd = selection[1];
+      		}
+      		catch(e){
+      		//This exception is currently thrown in Chrome, Do nothing
+      		}
+      	}
       }
       // return focus to original input:
       if (focusedEl != el[0]) {
         focusedEl.focus();
         if (isText(focusedEl)) {
-          focusedEl.selectionStart = focusedElSelection[0];
-          focusedEl.selectionEnd = focusedElSelection[1];
+        	try {
+        		focusedEl.selectionStart = focusedElSelection[0];
+          		focusedEl.selectionEnd = focusedElSelection[1];
+        	}
+        	catch(e){
+        		//This exception is currently thrown in Chrome, Do nothing
+        	}
         }
       }
     } finally {
