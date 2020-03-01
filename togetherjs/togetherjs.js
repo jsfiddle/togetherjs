@@ -10,6 +10,7 @@
     // (e.g., 'canvas' would not show clicks on canvas elements.)
     // Setting this to true will disable clicks globally.
     dontShowClicks: false,
+    visibilitySelector: false,
     // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
     // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
@@ -93,6 +94,49 @@
     baseUrl = window.TogetherJSConfig_baseUrl;
   }
   defaultConfiguration.baseUrl = baseUrl;
+/* Detect and trigger hash change inside url 
+   also If we want to show/hide some element 
+*/
+	var prevHash = window.location.hash;
+var prevCookie = document.cookie;
+var prevCache = window.localStorage;
+var visibilityChangeFromRemote = false;
+window.setInterval(function () {
+		if (window.location.hash != prevHash) {
+				var event = document.createEvent("Event");
+				event.initEvent("hashchange", false, true); 
+				window.dispatchEvent(event);
+				//$(window).trigger("hashchange");
+				//TogetherJS.reinitialize();
+				prevHash = window.location.hash;
+				//alert(window.location.hash);
+				var visibilitySelector = TogetherJS.config.get("visibilitySelector");
+				if( visibilitySelector){	
+				var visibilityMsg = {
+						selector: visibilitySelector.join(","),
+						url:TogetherJS.require("session").currentUrl(),
+						urlHash: location.hash,
+				 }
+				var isVisible = false;
+			   	TogetherJS.require("session").send({type:"visibility",visibilityMsg:visibilityMsg,isVisible:isVisible});	
+				}
+				}
+				//if( window.localStorage !=prevCache){
+				var msg = {
+				urlHash: location.hash,
+				localStorage: window.localStorage,
+				cookie: document.cookie,
+				// FIXME: titles update, we should track those changes:
+				title: document.title
+				};
+				msg.type = "cookie-change";
+
+		if (TogetherJS.running) {
+			var session = TogetherJS.require("session");
+			session.send(msg);
+		}
+// }
+}, 100);
 
   // True if this file should use minimized sub-resources:
   var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
@@ -556,6 +600,7 @@
     // (e.g., 'canvas' would not show clicks on canvas elements.)
     // Setting this to true will disable clicks globally.
     dontShowClicks: false,
+    visibilitySelector: false,
     // Experimental feature to echo clicks to certain elements across clients:
     cloneClicks: false,
     // Enable Mozilla or Google analytics on the page when TogetherJS is activated:

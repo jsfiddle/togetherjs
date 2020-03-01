@@ -18,7 +18,42 @@ define(["util", "jquery"], function (util, $) {
     }
     return false;
   };
+/*RANDOM ID fix start 
+ Web Browsrs doesn't provide same element id for dynamically generated elements every time.It will become difficult to access same element 
+ if the id is diffrent. To handle this we generated unique id of the elemnt which is kind of travesed path in DOM tree using jquery index
+ and on receiving side just inverted the same
+*/
+var getNodeIdentifier = function(element) {
+    return element.nodeName.toLowerCase() + "." + $(element).index();
+};
+ var new_id =function( element) {
+    var current = element;
+    var xpath = getNodeIdentifier(element);
 
+    while (current.parentNode != null) {
+        xpath = getNodeIdentifier(current.parentNode) + "/" + xpath;
+        current = current.parentNode;
+    }
+
+    console.log(xpath);
+   return xpath;
+};
+var indexCalculator = function(str,splitcount) {
+     return parseInt(str[splitcount].split(".")[1]);
+};
+
+var string_to_element = function (string) { 
+var abc = document.body;
+var str = string.split("/");
+
+for( i= 2; i<str.length -1 ; i++)
+{ 
+	abc = abc.children[indexCalculator(str,i+1)]; 
+}
+console.log(abc);
+return abc;
+};
+/*RANDOM ID Fix End */  
   elementFinder.elementLocation = function elementLocation(el) {
     assert(el !== null, "Got null element");
     if (el instanceof $) {
@@ -30,7 +65,8 @@ define(["util", "jquery"], function (util, $) {
       el = el[0];
     }
     if (el.id) {
-      return "#" + el.id;
+	    return new_id(el);
+     // return "#" + el.id;
     }
     if (el.tagName == "BODY") {
       return "body";
@@ -123,6 +159,8 @@ define(["util", "jquery"], function (util, $) {
     } else if (loc.indexOf("#") === 0) {
       var id;
       loc = loc.substr(1);
+      /* RANDOM Id fix */
+	    if (false){
       if (loc.indexOf(":") === -1) {
         id = loc;
         rest = "";
@@ -131,6 +169,10 @@ define(["util", "jquery"], function (util, $) {
         rest = loc.substr(loc.indexOf(":"));
       }
       el = document.getElementById(id);
+      }	else {
+       el = string_to_element(loc);
+       }
+     /* RANDOM id fix end */		    
       if (! el) {
         throw elementFinder.CannotFind("#" + id, "No element by that id", container);
       }

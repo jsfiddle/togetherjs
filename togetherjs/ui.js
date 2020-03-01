@@ -1273,7 +1273,15 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       this.followCheckbox.change(function () {
         if (! this.checked) {
           this.peer.unfollow();
-        }
+        }else{
+	   var msg = {
+		urlHash: location.hash,
+		title: document.title,
+	   };
+		   msg.type = "started-following";
+	session.send(msg);
+          this.peer.follow();
+	}
         // Following doesn't happen until the window is closed
         // FIXME: should we tell the user this?
       });
