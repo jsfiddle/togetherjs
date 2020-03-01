@@ -492,7 +492,7 @@ You can build the addon using the [Addon-SDK](https://addons.mozilla.org/en-US/d
 
 ### IRC / Live Chat
 
-We are available on the `#togetherjs` channel on `irc.mozilla.org`. Logs are on [irclog.gr](http://irclog.gr/#browse/irc.mozilla.org/togetherjs)
+We are available on the `#togetherjs` channel on `irc.mozilla.org`.
 
 If you don't use IRC, you can quickly join the chat from the web [using kiwiirc](https://kiwiirc.com/client/irc.mozilla.org/togetherjs).
 
