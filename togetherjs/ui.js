@@ -1021,6 +1021,14 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         } else if (! popup.is(":visible")) {
           windowing.show(popup);
         }
+        var notifyConfig = TogetherJS.config.get("autoCloseNotifications");
+        if (typeof notifyConfig === "number") {
+          notify = notifyConfig;
+        } else if (notifyConfig === false) {
+          notify = false;
+        } else if (notifyConfig === true) {
+          notify = 4000;
+        }
         if (typeof notify == "number") {
           // This is the amount of time we're supposed to notify
           if (this.hideTimeout) {
