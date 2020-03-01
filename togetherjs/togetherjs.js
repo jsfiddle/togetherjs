@@ -325,7 +325,9 @@
       "ru": true,
       "ru-RU": "ru",
       "pl": "pl-PL",
-      "pl-PL": true
+      "pl-PL": true,
+      "de-DE": true,
+      "de": "de-DE"
     };
 
     if(lang === undefined) {
