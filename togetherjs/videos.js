@@ -91,6 +91,10 @@ function ($, util, session, elementFinder) {
 
 
   session.hub.on('video-timeupdate', function (msg) {
+    if(!msg.sameUrl) {
+      return;
+    }  
+
     var element = $findElement(msg.location);
     var oldTime = element.prop('currentTime');
     var newTime = msg.position;
@@ -103,6 +107,10 @@ function ($, util, session, elementFinder) {
 
   MIRRORED_EVENTS.forEach( function (eventName) {
     session.hub.on("video-"+eventName, function (msg) {
+      if(!msg.sameUrl) {
+        return;
+      }  
+
       var element = $findElement(msg.location);
 
       setTime(element, msg.position);
