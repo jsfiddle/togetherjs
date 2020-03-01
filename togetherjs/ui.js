@@ -883,6 +883,12 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
         .attr("data-message-id", attrs.messageId);
       ui.chat.add(el, attrs.messageId, attrs.notify);
     },
+    updateTextWithTranslation: function(attrs){
+      assert(typeof attrs.translation == "string");
+      assert(attrs.messageId);
+
+      $("[data-message-id='" + attrs.messageId + "'] .togetherjs-chat-content").text(attrs.translation);
+    },
 
     joinedSession: function (attrs) {
       assert(attrs.peer);

@@ -2,12 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*jshint evil:true */
-define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
+define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing", "translator"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing, translator) {
   var chat = util.Module("chat");
   var assert = util.assert;
   var Walkabout;
 
   session.hub.on("chat", function (msg) {
+    // FIXME: Currently forcing translation from en -> pt
+    translator.translate(msg.text, 'en', 'pt', function(translation){
+      msg.translation = translation;
+      ui.chat.updateTextWithTranslation(msg);
+    });
     ui.chat.text({
       text: msg.text,
       peer: msg.peer,
