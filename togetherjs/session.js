@@ -419,6 +419,10 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
     });
   };
 
+  session._getChannel = function () {
+      return channel;
+    };
+
   session.close = function (reason) {
     TogetherJS.running = false;
     var msg = {type: "bye"};
