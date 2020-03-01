@@ -5,6 +5,18 @@
 define(["jquery"], function ($) {
   // This isn't really a "module" since it just patches jQuery itself
 
+  function step(now, fx, transform) {
+    if (fx.prop == "borderSpacing") {
+      $(this).css('-webkit-transform', transform+now+'deg)')
+        .css('-moz-transform', transform+now+'deg)')
+        .css('-ms-transform', transform+now+'deg)')
+        .css('-o-transform', transform+now+'deg)')
+        .css('transform', transform+now+'deg)');
+    } else {
+      $(this).css(fx.prop, now);
+    }
+  }
+
   // FIX ME Animations TO DO
   // walkthrough animations go here
   // animate participant cursor and box popping in when they enter the session
@@ -38,15 +50,7 @@ define(["jquery"], function ($) {
   $.fn.rotateCursorDown = function () {
     $('.togetherjs-cursor svg').animate({borderSpacing: 0, opacity: 1}, {
       step: function(now, fx) {
-        if (fx.prop == "borderSpacing") {
-          $(this).css('-webkit-transform', 'rotate('+now+'deg)')
-            .css('-moz-transform', 'rotate('+now+'deg)')
-            .css('-ms-transform', 'rotate('+now+'deg)')
-            .css('-o-transform', 'rotate('+now+'deg)')
-            .css('transform', 'rotate('+now+'deg)');
-        } else {
-          $(this).css(fx.prop, now);
-        }
+        step(now, fx, 'rotate(');
       },
       duration: 500
     }, 'linear').promise().then(function () {
@@ -186,15 +190,7 @@ define(["jquery"], function ($) {
   $.fn.fadeOut = function () {
     this.animate({borderSpacing: -90, opacity: 0.5}, {
       step: function(now, fx) {
-        if (fx.prop == "borderSpacing") {
-          $(this).css('-webkit-transform', 'perspective( 600px ) rotateX('+now+'deg)')
-            .css('-moz-transform', 'perspective( 600px ) rotateX('+now+'deg)')
-            .css('-ms-transform', 'perspective( 600px ) rotateX('+now+'deg)')
-            .css('-o-transform', 'perspective( 600px ) rotateX('+now+'deg)')
-            .css('transform', 'perspective( 600px ) rotateX('+now+'deg)');
-        } else {
-          $(this).css(fx.prop, now);
-        }
+        step(now, fx, 'perspective( 600px ) rotateX(');
       },
       duration: 500
     }, 'linear').promise().then(function () {
