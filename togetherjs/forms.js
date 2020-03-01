@@ -133,6 +133,21 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       this._editor().document.setValue(msg.value);
     },
 
+    getSelection: function () {
+      range = this._editor().editor.selection.getRange()
+      startIndex = this._editor().editor.session.doc.positionToIndex(range.start, 0)
+      endIndex = this._editor().editor.session.doc.positionToIndex(range.end, 0)
+      return [startIndex, endIndex]
+    },
+
+    setSelection: function (selection) {
+      startIndex = selection[0]
+      endIndex = selection[1]
+      startPos = this._editor().editor.session.doc.indexToPosition(startIndex, 0)
+      endPos = this._editor().editor.session.doc.indexToPosition(endIndex, 0)
+      this._editor().editor.selection.setSelectionRange(range, false);
+    },
+
     init: function (update, msg) {
       this.update(update);
     },
@@ -579,7 +594,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
     }
     var selection;
-    if (isText(el)) {
+    if (tracker && tracker.getSelection) {
+      selection = tracker.getSelection()
+    }else if (isText(el)) {
       selection = [el[0].selectionStart, el[0].selectionEnd];
     }
     var value;
@@ -616,7 +633,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
       } else {
         setValue(el, value);
       }
-      if (isText(el)) {
+      if (tracker && tracker.setSelection) {
+        tracker.setSelection(selection)
+      }else if (isText(el)) {
         el[0].selectionStart = selection[0];
         el[0].selectionEnd = selection[1];
       }
