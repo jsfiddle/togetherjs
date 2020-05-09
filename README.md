@@ -20,21 +20,21 @@ The remainder of this document is about contributing to TogetherJS - but reports
 Bug Reports
 -----------
 
-Please submit bug reports as [github issues](https://github.com/mozilla/togetherjs/issues/new).  Don't worry about labels or milestones.  If you use the in-app feedback to give us a bug report that's fine too.
+Please submit bug reports as [github issues](https://github.com/jsfiddle/togetherjs/issues/new).  Don't worry about labels or milestones.  If you use the in-app feedback to give us a bug report that's fine too.
 
 Roadmap & Plans
 ---------------
 
-To see what we're planning or at least considering to do with TogetherJS, look at [see our bug tracker](https://github.com/mozilla/togetherjs/issues?state=open).
+To see what we're planning or at least considering to do with TogetherJS, look at [see our bug tracker](https://github.com/jsfiddle/togetherjs/issues?state=open).
 
 Setting up a development environment
 ------------------------------------
 
 TogetherJS has two main pieces:
 
-* The [server](https://github.com/mozilla/togetherjs/blob/develop/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon its incredibly boring [history](https://github.com/mozilla/togetherjs/commits/develop/hub/server.js).
+* The [server](https://github.com/jsfiddle/togetherjs/blob/develop/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon its incredibly boring [history](https://github.com/jsfiddle/togetherjs/commits/develop/hub/server.js).
 
-* The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
+* The client in [`togetherjs/`](https://github.com/jsfiddle/togetherjs/tree/develop/togetherjs) which does all the real work.
 
 There is a TogetherJS hub server deployed at `https://hub.togetherjs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
 
@@ -43,7 +43,7 @@ The files need to be lightly "built": we use [LESS](http://lesscss.org/) for sty
 To build a copy of the library, check out TogetherJS:
 
 ```sh
-$ git clone git://github.com/mozilla/togetherjs.git
+$ git clone git://github.com/jsfiddle/togetherjs.git
 $ cd togetherjs
 ```
 
