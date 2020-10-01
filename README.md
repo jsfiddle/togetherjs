@@ -1,3 +1,4 @@
+An Amazing Project
 TogetherJS - Surprisingly easy collaboration
 ============================================
 
