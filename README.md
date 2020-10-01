@@ -4,9 +4,9 @@ TogetherJS - Surprisingly easy collaboration
 What is TogetherJS?
 -----------------
 
-TogetherJS is a service for your website that makes it surprisingly easy to collaborate in real-time.
+TogetherJS is a service for your website that makes your Website surprisingly easy to collaborate in real-time.
 
-Using TogetherJS two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TogetherJS service is included by the web site owner, and a web site can customize and configure aspects of TogetherJS's behavior on the site.
+Using TogetherJS two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together. The TogetherJS service is included by the website owner, and a website can customize and configure aspects of TogetherJS's behavior on the site.
 
 For more information and to see TogetherJS in action, visit [togetherjs.com](https://togetherjs.com/)
 
