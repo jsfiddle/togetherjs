@@ -6,7 +6,7 @@ What is TogetherJS?
 
 TogetherJS is a service for your website that makes it surprisingly easy to collaborate in real-time.
 
-Using TogetherJS two people can interact on the same page, seeing each other's cursors, edits, and browsing a site together.  The TogetherJS service is included by the web site owner, and a web site can customize and configure aspects of TogetherJS's behavior on the site.
+Two people can interact on the same page Using TogetherJS, seeing each other's cursors, edits, and browsing a site together.  The TogetherJS service is included by the web site owner, and a web site can customize and configure aspects of TogetherJS's behavior on the site.
 
 For more information and to see TogetherJS in action, visit [togetherjs.com](https://togetherjs.com/)
 
@@ -54,7 +54,7 @@ $ npm install
 $ npm install -g grunt-cli
 ```
 
-This will install a bunch of stuff, most of which is only used for development.  The only "server" dependency is [WebSocket-Node](https://github.com/Worlize/WebSocket-Node) (and if you use our hub then you don't need to worry about the server).  By default everything is installed locally, i.e., in `node_modules/`.  This works just fine, but it is useful to install the `grunt` command-line program globally, which `npm install -g grunt-cli` does.
+This will install a bunch of stuff, most of which is only used for development.  The only "server" dependency is [WebSocket-Node](https://github.com/Worlize/WebSocket-Node) (and if you use our hub then you don't need to worry about the server).Everything is installed locally by default, i.e., in `node_modules/`.  This works just fine, but it is useful to install the `grunt` command-line program globally, which `npm install -g grunt-cli` does.
 
 Now you can build TogetherJS, like:
 
