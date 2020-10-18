@@ -1,3 +1,4 @@
+Logr-An amazing project
 TogetherJS - Surprisingly easy collaboration
 ============================================
 
