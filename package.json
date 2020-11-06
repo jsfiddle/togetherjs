@@ -9,6 +9,8 @@
     "url": "https://github.com/mozilla/togetherjs.git"
   },
   "dependencies": {
+    "@types/jquery": "^1.10.31",
+    "@types/requirejs": "^2.1.26",
     "ejs": "~2.5.5",
     "ejs-locals": "~1.0.2",
     "express": "~3.0.6",
