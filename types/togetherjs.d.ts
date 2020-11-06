@@ -39,6 +39,7 @@ declare namespace TogetherJS {
         removeShortcut(): void;
         checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
         startupReason: Reason;
+        $: JQuery;
     }
 
     interface KeyboardListener {
@@ -268,6 +269,14 @@ declare namespace TogetherJS {
     interface Session {
         start(): void;
         close(): void;
+    }
+}
+
+declare namespace TogetherJS.Util {
+    type ObjectWithName = Named & object & { prototype: any };
+    
+    interface Named {
+        _name?: string;
     }
 }
 

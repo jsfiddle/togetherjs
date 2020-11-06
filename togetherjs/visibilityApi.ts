@@ -15,13 +15,16 @@ define(["util", "session"], function (util, session) {
   if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
     hidden = "hidden";
     visibilityChange = "visibilitychange";
-  } else if (document.mozHidden !== undefined) {
+  }
+  else if (document.mozHidden !== undefined) {
     hidden = "mozHidden";
     visibilityChange = "mozvisibilitychange";
-  } else if (document.msHidden !== undefined) {
+  }
+  else if (document.msHidden !== undefined) {
     hidden = "msHidden";
     visibilityChange = "msvisibilitychange";
-  } else if (document.webkitHidden !== undefined) {
+  }
+  else if (document.webkitHidden !== undefined) {
     hidden = "webkitHidden";
     visibilityChange = "webkitvisibilitychange";
   }
