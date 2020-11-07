@@ -1,82 +1,41 @@
 "use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/*jshint scripturl:true */
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
 (function () {
-    let defaultConfiguration = {
-        // Disables clicks for a certain element.
-        // (e.g., 'canvas' would not show clicks on canvas elements.)
-        // Setting this to true will disable clicks globally.
+    var defaultConfiguration = {
         dontShowClicks: false,
-        // Experimental feature to echo clicks to certain elements across clients:
         cloneClicks: false,
-        // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
-        // FIXME: these don't seem to be working, and probably should be removed in favor
-        // of the hub analytics
         enableAnalytics: false,
-        // The code to enable (this is defaulting to a Mozilla code):
         analyticsCode: "UA-35433268-28",
-        // The base URL of the hub (gets filled in below):
         hubBase: null,
-        // A function that will return the name of the user:
         getUserName: null,
-        // A function that will return the color of the user:
         getUserColor: null,
-        // A function that will return the avatar of the user:
         getUserAvatar: null,
-        // The siteName is used in the walkthrough (defaults to document.title):
         siteName: null,
-        // Whether to use the minimized version of the code (overriding the built setting)
         useMinimizedCode: undefined,
-        // Append cache-busting queries (useful for development!)
         cacheBust: true,
-        // Any events to bind to
         on: {},
-        // Hub events to bind to
         hub_on: {},
-        // Enables the alt-T alt-T TogetherJS shortcut; however, this setting
-        // must be enabled early as TogetherJSConfig_enableShortcut = true;
         enableShortcut: false,
-        // The name of this tool as provided to users.  The UI is updated to use this.
-        // Because of how it is used in text it should be a proper noun, e.g.,
-        // "MySite's Collaboration Tool"
         toolName: null,
-        // Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
-        // Also with findRoom: "roomName" it will connect to the given room name
         findRoom: null,
-        // If true, starts TogetherJS automatically (of course!)
         autoStart: false,
-        // If true, then the "Join TogetherJS Session?" confirmation dialog
-        // won't come up
         suppressJoinConfirmation: false,
-        // If true, then the "Invite a friend" window won't automatically come up
         suppressInvite: false,
-        // A room in which to find people to invite to this session,
         inviteFromRoom: null,
-        // This is used to keep sessions from crossing over on the same
-        // domain, if for some reason you want sessions that are limited
-        // to only a portion of the domain:
         storagePrefix: "togetherjs",
-        // When true, we treat the entire URL, including the hash, as the identifier
-        // of the page; i.e., if you one person is on `http://example.com/#view1`
-        // and another person is at `http://example.com/#view2` then these two people
-        // are considered to be at completely different URLs
         includeHashInUrl: false,
-        // When true, the WebRTC-based mic/chat will be disabled
         disableWebRTC: false,
-        // When true, youTube videos will synchronize
         youtube: true,
-        // Ignores the following console messages, disables all messages if set to true
         ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
-        // Ignores the following forms (will ignore all forms if set to true):
         ignoreForms: [":password"],
-        // When undefined, attempts to use the browser's language
         lang: undefined,
         fallbackLang: "en-US"
     };
-    let styleSheet = "/togetherjs/togetherjs.css";
-    let baseUrl = "__baseUrl__";
+    var styleSheet = "/togetherjs/togetherjs.css";
+    var baseUrl = "__baseUrl__";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -91,11 +50,12 @@
     }
     defaultConfiguration.baseUrl = baseUrl;
     // True if this file should use minimized sub-resources:
-    let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
-    let baseUrlOverride = localStorage.getItem("togetherjs.baseUrlOverride");
-    if (baseUrlOverride) {
+    var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+    var baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
+    var baseUrlOverride;
+    if (baseUrlOverrideString) {
         try {
-            baseUrlOverride = JSON.parse(baseUrlOverride);
+            baseUrlOverride = JSON.parse(baseUrlOverrideString);
         }
         catch (e) {
             baseUrlOverride = null;
@@ -106,15 +66,34 @@
         }
         else {
             baseUrl = baseUrlOverride.baseUrl;
-            let logger = console.warn || console.log;
+            var logger = console.warn || console.log;
             logger.call(console, "Using TogetherJS baseUrlOverride:", baseUrl);
             logger.call(console, "To undo run: localStorage.removeItem('togetherjs.baseUrlOverride')");
         }
     }
-    let configOverride = localStorage.getItem("togetherjs.configOverride");
-    if (configOverride) {
+    function copyConfigInWindow(configOverride) {
+        var shownAny = false;
+        for (var _attr in configOverride) {
+            var attr = _attr;
+            if (!configOverride.hasOwnProperty(attr)) {
+                continue;
+            }
+            if (attr == "expiresAt" || !configOverride.hasOwnProperty(attr)) {
+                continue;
+            }
+            if (!shownAny) {
+                console.warn("Using TogetherJS configOverride");
+                console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
+            }
+            window["TogetherJSConfig_" + attr] = configOverride[attr];
+            console.log("Config override:", attr, "=", configOverride[attr]);
+        }
+    }
+    var configOverrideString = localStorage.getItem("togetherjs.configOverride");
+    var configOverride;
+    if (configOverrideString) {
         try {
-            configOverride = JSON.parse(configOverride);
+            configOverride = JSON.parse(configOverrideString);
         }
         catch (e) {
             configOverride = null;
@@ -123,49 +102,37 @@
             localStorage.removeItem("togetherjs.configOverride");
         }
         else {
-            let shownAny = false;
-            for (let attr in configOverride) {
-                if (!configOverride.hasOwnProperty(attr)) {
-                    continue;
-                }
-                if (attr == "expiresAt" || !configOverride.hasOwnProperty(attr)) {
-                    continue;
-                }
-                if (!shownAny) {
-                    console.warn("Using TogetherJS configOverride");
-                    console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
-                }
-                window["TogetherJSConfig_" + attr] = configOverride[attr];
-                console.log("Config override:", attr, "=", configOverride[attr]);
-            }
+            copyConfigInWindow(configOverride);
         }
     }
-    let version = "unknown";
-    // FIXME: we could/should use a version from the checkout, at least
-    // for production
-    let cacheBust = "__gitCommit__";
+    var version = "unknown";
+    // FIXME: we could/should use a version from the checkout, at least for production
+    var cacheBust = "__gitCommit__";
     if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
         version = cacheBust;
     }
-    // Make sure we have all of the console.* methods:
-    if (typeof console == "undefined") {
-        console = {};
-    }
-    if (!console.log) {
-        console.log = function () { };
-    }
-    ["debug", "info", "warn", "error"].forEach(function (method) {
-        if (!console[method]) {
-            console[method] = console.log;
+    function polyfillConsole() {
+        // Make sure we have all of the console.* methods:
+        if (typeof console == "undefined") {
+            console = {};
         }
-    });
+        if (!console.log) {
+            console.log = function () { };
+        }
+        ["debug", "info", "warn", "error"].forEach(function (method) {
+            if (!console[method]) {
+                console[method] = console.log;
+            }
+        });
+    }
+    polyfillConsole();
     if (!baseUrl) {
-        let scripts = document.getElementsByTagName("script");
-        for (let i = 0; i < scripts.length; i++) {
-            let src = scripts[i].src;
+        var scripts = document.getElementsByTagName("script");
+        for (var i = 0; i < scripts.length; i++) {
+            var src = scripts[i].src;
             if (src && src.search(/togetherjs(-min)?.js(\?.*)?$/) !== -1) {
                 baseUrl = src.replace(/\/*togetherjs(-min)?.js(\?.*)?$/, "");
                 console.warn("Detected baseUrl as", baseUrl);
@@ -182,9 +149,9 @@
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
     function addStyle() {
-        let existing = document.getElementById("togetherjs-stylesheet");
+        var existing = document.getElementById("togetherjs-stylesheet");
         if (!existing) {
-            let link = document.createElement("link");
+            var link = document.createElement("link");
             link.id = "togetherjs-stylesheet";
             link.setAttribute("rel", "stylesheet");
             link.href = baseUrl + styleSheet +
@@ -193,13 +160,13 @@
         }
     }
     function addScript(url) {
-        let script = document.createElement("script");
+        var script = document.createElement("script");
         script.src = baseUrl + url +
             (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
-    let TogetherJS = window.TogetherJS = function TogetherJS(event) {
-        let session;
+    var TogetherJS = function (event) {
+        var session;
         if (TogetherJS.running) {
             session = TogetherJS.require("session");
             session.close();
@@ -208,13 +175,14 @@
         TogetherJS.startup.button = null;
         try {
             if (event && typeof event == "object") {
-                if (event.target && typeof event) {
+                if ("target" in event && event.target && typeof event) {
                     TogetherJS.startup.button = event.target;
                 }
-                else if (event.nodeType == 1) {
+                else if ("nodeType" in event && event.nodeType == 1) {
                     TogetherJS.startup.button = event;
                 }
-                else if (event[0] && event[0].nodeType == 1) {
+                else if (Array.isArray(event) && event[0] && event[0].nodeType == 1) {
+                    // TODO What?
                     // Probably a jQuery element
                     TogetherJS.startup.button = event[0];
                 }
@@ -229,7 +197,7 @@
                 console.warn("Ignoring TowTruckConfig in favor of TogetherJSConfig");
             }
             else {
-                window.TogetherJSConfig = TowTruckConfig;
+                window.TogetherJSConfig = window.TowTruckConfig;
             }
         }
         if (window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
@@ -239,12 +207,13 @@
         // This handles loading configuration from global variables.  This
         // includes TogetherJSConfig_on_*, which are attributes folded into
         // the "on" configuration value.
-        let attr;
-        let attrName;
-        let globalOns = {};
+        var attr;
+        var attrName;
+        var globalOns = {};
         for (attr in window) {
             if (attr.indexOf("TogetherJSConfig_on_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_on_").length);
+                var a = window[attr];
                 globalOns[attrName] = window[attr];
             }
             else if (attr.indexOf("TogetherJSConfig_") === 0) {
@@ -265,7 +234,7 @@
         // FIXME: copy existing config?
         // FIXME: do this directly in TogetherJS.config() ?
         // FIXME: close these configs?
-        let ons = TogetherJS.config.get("on");
+        var ons = TogetherJS.config.get("on");
         for (attr in globalOns) {
             if (globalOns.hasOwnProperty(attr)) {
                 // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -276,7 +245,7 @@
         for (attr in ons) {
             TogetherJS.on(attr, ons[attr]);
         }
-        let hubOns = TogetherJS.config.get("hub_on");
+        var hubOns = TogetherJS.config.get("hub_on");
         if (hubOns) {
             for (attr in hubOns) {
                 if (hubOns.hasOwnProperty(attr)) {
@@ -303,16 +272,16 @@
         // start itself (i.e., put up a UI and try to activate)
         TogetherJS.startup._launch = true;
         addStyle();
-        let minSetting = TogetherJS.config.get("useMinimizedCode");
+        var minSetting = TogetherJS.config.get("useMinimizedCode");
         TogetherJS.config.close("useMinimizedCode");
         if (minSetting !== undefined) {
             min = !!minSetting;
         }
-        let requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
-        let deps = ["session", "jquery"];
-        let lang = TogetherJS.getConfig("lang");
+        var requireConfig = TogetherJS._extend(TogetherJS.requireConfig);
+        var deps = ["session", "jquery"];
+        var lang = TogetherJS.getConfig("lang");
         // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-        let availableTranslations = {
+        var availableTranslations = {
             "en-US": true,
             "en": "en-US",
             "es": "es-BO",
@@ -324,21 +293,25 @@
             "de-DE": true,
             "de": "de-DE"
         };
-        if (lang === undefined) {
+        if (!lang) {
             // BCP 47 mandates hyphens, not underscores, to separate lang parts
             lang = navigator.language.replace(/_/g, "-");
         }
-        if (/-/.test(lang) && !availableTranslations[lang]) {
+        // TODO check if the updates of those conditions is right
+        // if(/-/.test(lang) && !availableTranslations[lang]) {
+        if (/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
             lang = lang.replace(/-.*$/, '');
         }
-        if (!availableTranslations[lang]) {
+        // if(!availableTranslations[lang]) {
+        if (!("lang" in availableTranslations) || !availableTranslations[lang]) {
             lang = TogetherJS.config.get("fallbackLang");
         }
+        // else if(availableTranslations[lang] !== true) {
         else if (availableTranslations[lang] !== true) {
             lang = availableTranslations[lang];
         }
         TogetherJS.config("lang", lang);
-        let localeTemplates = "templates-" + lang;
+        var localeTemplates = "templates-" + lang;
         deps.splice(0, 0, localeTemplates);
         function callback(session, jquery) {
             TogetherJS._loaded = true;
@@ -374,13 +347,14 @@
             addScript("/togetherjs/libs/require.js");
         }
     };
+    window.TogetherJS = TogetherJS;
     TogetherJS.pageLoaded = Date.now();
     TogetherJS._extend = function (base, extensions) {
         if (!extensions) {
             extensions = base;
             base = {};
         }
-        for (let a in extensions) {
+        for (var a in extensions) {
             if (extensions.hasOwnProperty(a)) {
                 base[a] = extensions[a];
             }
@@ -423,19 +397,20 @@
     };
     TogetherJS._mixinEvents = function (proto) {
         proto.on = function on(name, callback) {
+            var _this = this;
             if (typeof callback != "function") {
                 console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
                 throw "Error: .once() called with non-callback";
             }
             if (name.search(" ") != -1) {
-                let names = name.split(/ +/g);
+                var names = name.split(/ +/g);
                 names.forEach(function (n) {
-                    this.on(n, callback);
+                    _this.on(n, callback);
                 }, this);
                 return;
             }
             if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
-                let thisString = "" + this;
+                var thisString = "" + this;
                 if (thisString.length > 20) {
                     thisString = thisString.substr(0, 20) + "...";
                 }
@@ -459,7 +434,7 @@
                 console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
                 throw "Error: .once() called with non-callback";
             }
-            let attr = "onceCallback_" + name;
+            var attr = "onceCallback_" + name;
             // FIXME: maybe I should add the event name to the .once attribute:
             if (!callback[attr]) {
                 callback[attr] = function onceCallback() {
@@ -477,7 +452,7 @@
                 return;
             }
             if (name.search(" ") != -1) {
-                let names = name.split(/ +/g);
+                var names = name.split(/ +/g);
                 names.forEach(function (n) {
                     this.off(n, callback);
                 }, this);
@@ -486,8 +461,8 @@
             if ((!this._listeners) || !this._listeners[name]) {
                 return;
             }
-            let l = this._listeners[name], _len = l.length;
-            for (let i = 0; i < _len; i++) {
+            var l = this._listeners[name], _len = l.length;
+            for (var i = 0; i < _len; i++) {
                 if (l[i] == callback) {
                     l.splice(i, 1);
                     break;
@@ -495,12 +470,12 @@
             }
         };
         proto.emit = function emit(name) {
-            let offs = this._listenerOffs = [];
+            var offs = this._listenerOffs = [];
             if ((!this._listeners) || !this._listeners[name]) {
                 return;
             }
-            let args = Array.prototype.slice.call(arguments, 1);
-            let l = this._listeners[name];
+            var args = Array.prototype.slice.call(arguments, 1);
+            var l = this._listeners[name];
             l.forEach(function (callback) {
                 callback.apply(this, args);
             }, this);
@@ -515,7 +490,7 @@
     };
     /* This finalizes the unloading of TogetherJS, including unloading modules */
     TogetherJS._teardown = function () {
-        let requireObject = TogetherJS._requireObject || window.require;
+        var requireObject = TogetherJS._requireObject || window.require;
         // FIXME: this doesn't clear the context for min-case
         if (requireObject.s && requireObject.s.contexts) {
             delete requireObject.s.contexts.togetherjs;
@@ -529,7 +504,7 @@
     TogetherJS.toString = function () {
         return "TogetherJS";
     };
-    let defaultHubBase = "__hubUrl__";
+    var defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
@@ -537,65 +512,27 @@
     defaultConfiguration.hubBase = defaultHubBase;
     TogetherJS._configuration = {};
     TogetherJS._defaultConfiguration = {
-        // Disables clicks for a certain element.
-        // (e.g., 'canvas' would not show clicks on canvas elements.)
-        // Setting this to true will disable clicks globally.
         dontShowClicks: false,
-        // Experimental feature to echo clicks to certain elements across clients:
         cloneClicks: false,
-        // Enable Mozilla or Google analytics on the page when TogetherJS is activated:
-        // FIXME: these don't seem to be working, and probably should be removed in favor
-        // of the hub analytics
         enableAnalytics: false,
-        // The code to enable (this is defaulting to a Mozilla code):
         analyticsCode: "UA-35433268-28",
-        // The base URL of the hub
         hubBase: defaultHubBase,
-        // A function that will return the name of the user:
         getUserName: null,
-        // A function that will return the color of the user:
         getUserColor: null,
-        // A function that will return the avatar of the user:
         getUserAvatar: null,
-        // The siteName is used in the walkthrough (defaults to document.title):
         siteName: null,
-        // Whether to use the minimized version of the code (overriding the built setting)
         useMinimizedCode: undefined,
-        // Any events to bind to
         on: {},
-        // Hub events to bind to
         hub_on: {},
-        // Enables the alt-T alt-T TogetherJS shortcut; however, this setting
-        // must be enabled early as TogetherJSConfig_enableShortcut = true;
         enableShortcut: false,
-        // The name of this tool as provided to users.  The UI is updated to use this.
-        // Because of how it is used in text it should be a proper noun, e.g.,
-        // "MySite's Collaboration Tool"
         toolName: null,
-        // Used to auto-start TogetherJS with a {prefix: pageName, max: participants}
-        // Also with findRoom: "roomName" it will connect to the given room name
         findRoom: null,
-        // If true, starts TogetherJS automatically (of course!)
         autoStart: false,
-        // If true, then the "Join TogetherJS Session?" confirmation dialog
-        // won't come up
         suppressJoinConfirmation: false,
-        // If true, then the "Invite a friend" window won't automatically come up
         suppressInvite: false,
-        // A room in which to find people to invite to this session,
         inviteFromRoom: null,
-        // This is used to keep sessions from crossing over on the same
-        // domain, if for some reason you want sessions that are limited
-        // to only a portion of the domain:
         storagePrefix: "togetherjs",
-        // When true, we treat the entire URL, including the hash, as the identifier
-        // of the page; i.e., if you one person is on `http://example.com/#view1`
-        // and another person is at `http://example.com/#view2` then these two people
-        // are considered to be at completely different URLs
         includeHashInUrl: false,
-        // The language to present the tool in, such as "en-US" or "ru-RU"
-        // Note this must be set as TogetherJSConfig_lang, as it effects the loader
-        // and must be set as soon as this file is included
         lang: null
     };
     // FIXME: there's a point at which configuration can't be updated
@@ -603,7 +540,7 @@
     // track of these and signal an error if someone attempts to
     // reconfigure too late
     TogetherJS.getConfig = function (name) {
-        let value = TogetherJS._configuration[name];
+        var value = TogetherJS._configuration[name];
         if (value === undefined) {
             if (!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
                 console.error("Tried to load unknown configuration value:", name);
@@ -624,7 +561,7 @@
        Unknown configuration values will lead to console error messages.
        */
     TogetherJS.config = function (name, maybeValue) {
-        let settings: Partial<TogetherJS.Config>;
+        var settings;
         if (arguments.length == 1) {
             if (typeof name != "object") {
                 throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
@@ -635,9 +572,9 @@
             settings = {};
             settings[name] = maybeValue;
         }
-        let i;
-        let tracker;
-        let attr;
+        var i;
+        var tracker;
+        var attr;
         for (attr in settings) {
             if (settings.hasOwnProperty(attr)) {
                 if (TogetherJS._configClosed[attr] && TogetherJS.running) {
@@ -655,11 +592,11 @@
             if (!TogetherJS._defaultConfiguration.hasOwnProperty(attr)) {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
-            let previous = TogetherJS._configuration[attr];
-            let value = settings[attr];
+            var previous = TogetherJS._configuration[attr];
+            var value = settings[attr];
             TogetherJS._configuration[attr] = value;
-            let trackers = TogetherJS._configTrackers[name] || [];
-            let failed = false;
+            var trackers = TogetherJS._configTrackers[name] || [];
+            var failed = false;
             for (i = 0; i < trackers.length; i++) {
                 try {
                     tracker = trackers[i];
@@ -686,7 +623,7 @@
         }
     };
     TogetherJS.config.get = function (name) {
-        let value = TogetherJS._configuration[name];
+        var value = TogetherJS._configuration[name];
         if (value === undefined) {
             if (!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
                 console.error("Tried to load unknown configuration value:", name);
@@ -734,7 +671,7 @@
     TogetherJS.baseUrl = baseUrl;
     TogetherJS.hub = TogetherJS._mixinEvents({});
     TogetherJS._onmessage = function (msg) {
-        let type = msg.type;
+        var type = msg.type;
         if (type.search(/^app\./) === 0) {
             type = type.substr("app.".length);
         }
@@ -748,17 +685,17 @@
         if (!TogetherJS.require) {
             throw "You cannot use TogetherJS.send() when TogetherJS is not running";
         }
-        let session = TogetherJS.require("session");
+        var session = TogetherJS.require("session");
         session.appSend(msg);
     };
     TogetherJS.shareUrl = function () {
         if (!TogetherJS.require) {
             return null;
         }
-        let session = TogetherJS.require("session");
+        var session = TogetherJS.require("session");
         return session.shareUrl();
     };
-    let listener = null;
+    var listener = null;
     TogetherJS.listenForShortcut = function () {
         console.warn("Listening for alt-T alt-T to start TogetherJS");
         TogetherJS.removeShortcut();
@@ -797,10 +734,10 @@
         if (address.search(/^https?:/i) === 0) {
             address = address.replace(/^http/i, 'ws');
         }
-        let socket = new WebSocket(address);
-        let gotAnswer = false;
+        var socket = new WebSocket(address);
+        var gotAnswer = false;
         socket.onmessage = function (event) {
-            let msg = JSON.parse(event.data);
+            var msg = JSON.parse(event.data);
             if (msg.type != "init-connection") {
                 console.warn("Got unexpected first message (should be init-connection):", msg);
                 return;
@@ -824,12 +761,12 @@
     };
     // It's nice to replace this early, before the load event fires, so we conflict
     // as little as possible with the app we are embedded in:
-    let hash = location.hash.replace(/^#/, "");
-    let m = /&?togetherjs=([^&]*)/.exec(hash);
+    var hash = location.hash.replace(/^#/, "");
+    var m = /&?togetherjs=([^&]*)/.exec(hash);
     if (m) {
         TogetherJS.startup._joinShareId = m[1];
         TogetherJS.startup.reason = "joined";
-        let newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+        var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
         location.hash = newHash;
     }
     if (window._TogetherJSShareId) {
@@ -843,7 +780,7 @@
             return;
         }
         // A page can define this function to defer TogetherJS from starting
-        let callToStart = window.TogetherJSConfig_callToStart;
+        var callToStart = window.TogetherJSConfig_callToStart;
         if (!callToStart && window.TowTruckConfig_callToStart) {
             callToStart = window.TowTruckConfig_callToStart;
             console.warn("Please rename TowTruckConfig_callToStart to TogetherJSConfig_callToStart");
@@ -871,10 +808,10 @@
         }
         else {
             // FIXME: this doesn't respect storagePrefix:
-            let key = "togetherjs-session.status";
-            let value = sessionStorage.getItem(key);
-            if (value) {
-                value = JSON.parse(value);
+            var key = "togetherjs-session.status";
+            var valueString = sessionStorage.getItem(key);
+            if (valueString) {
+                var value = JSON.parse(valueString);
                 if (value && value.running) {
                     TogetherJS.startup.continued = true;
                     TogetherJS.startup.reason = value.startupReason;

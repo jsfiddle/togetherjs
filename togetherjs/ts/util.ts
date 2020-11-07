@@ -1,8 +1,10 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
 
- class AssertionError extends Error {
+class AssertionError extends Error {
     public constructor(message?: string) {
         super();
         this.message = message || "";
@@ -17,7 +19,7 @@ class Module {
     }
 }
 
- class Util {
+class Util {
 
     public Deferred: any;
     extend: { (conf: RequireConfig): RequireConfig; (base: unknown, extensions: unknown): unknown; };
