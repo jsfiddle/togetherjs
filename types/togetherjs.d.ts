@@ -297,6 +297,15 @@ declare namespace TogetherJS.Util {
     type ClassObject = ClassWithName & object & WithPrototype;
 }
 
+declare namespace TogetherJS.ElementFinder {
+    interface Position {
+        location: string,
+        offset: number,
+        absoluteTop: number,
+        documentHeight: number
+    }
+}
+
 interface Window {
     TogetherJSConfig: TogetherJS.Config;
     TogetherJSConfig_baseUrl?: string;
