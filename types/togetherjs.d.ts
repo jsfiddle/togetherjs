@@ -39,7 +39,7 @@ declare namespace TogetherJS {
         removeShortcut(): void;
         checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
         startupReason: Reason;
-        $: JQuery;
+        $: JQueryStatic;
     }
 
     interface KeyboardListener {
@@ -273,11 +273,28 @@ declare namespace TogetherJS {
 }
 
 declare namespace TogetherJS.Util {
-    type ObjectWithName = Named & object & { prototype: any };
+    interface PrototypeAux {
+        classMethods: unknown[];
+    }
+
+    type Prototype = PrototypeAux & object;
+
+    interface WithPrototype {
+        prototype: Prototype;
+    }
     
     interface Named {
         _name?: string;
     }
+
+    type ObjectWithName = Named & object & WithPrototype;
+
+    interface ClassWithName {
+        className?: string;
+        classMethods?: unknown;
+    }
+
+    type ClassObject = ClassWithName & object & WithPrototype;
 }
 
 interface Window {
@@ -294,8 +311,17 @@ interface Window {
     TogetherJSConfig_autoStart?: boolean;
     TogetherJSConfig_enableShortcut?: boolean;
     TowTruck: TogetherJS.TogetherJS;
+    TogetherJSTestSpy?: {[k: string]: unknown};
 }
 
 interface EventHtmlElement extends Event {
     target: HTMLElement | null;
 }
+
+// Only in ES6 apparently
+interface Function {
+    name: string;
+}
+
+// TODO type this object
+//declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;

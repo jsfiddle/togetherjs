@@ -9,13 +9,14 @@
     "url": "https://github.com/mozilla/togetherjs.git"
   },
   "dependencies": {
-    "@types/jquery": "^1.10.31",
+    "@types/jquery": "^1.10.36",
     "@types/requirejs": "^2.1.26",
     "ejs": "~2.5.5",
     "ejs-locals": "~1.0.2",
     "express": "~3.0.6",
     "grunt-amd-check": "~0.5.1",
     "habitat": "~0.4.0",
+    "jquery": "^1.11.1",
     "less": "~1.3.1",
     "less-middleware": "~0.1.9",
     "newrelic": "0.9.20",
