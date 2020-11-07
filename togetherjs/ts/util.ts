@@ -25,17 +25,15 @@ class Util {
     extend: { (conf: RequireConfig): RequireConfig; (base: unknown, extensions: unknown): unknown; };
     AssertionError: typeof AssertionError;
     mixinEvents: TogetherJS.TogetherJS["_mixinEvents"];
-    Module: typeof Module;
+    Module = (name: string) => new Module(name);
+    Class!: (superClass: Object, prototype?: Object) => any;
 
     public constructor($: JQueryStatic, tjs: TogetherJS.TogetherJS) {
         this.Deferred = $.Deferred; // TODO defered is of an type because it does not exists
         tjs.$ = $;
         this.extend = tjs._extend;
         this.AssertionError = AssertionError;
-
         this.mixinEvents = tjs._mixinEvents;
-
-        this.Module = Module;
     }
 
     public forEachAttr<T extends object>(obj: T, callback: (o: T[Extract<keyof T, string>], k: keyof T) => void, context?: unknown) {
@@ -92,7 +90,7 @@ class Util {
             bytes = enc.encode(blob);
         }
         else {
-           bytes = new Uint8Array(blob);
+            bytes = new Uint8Array(blob);
         }
         let len = bytes.byteLength;
         for(let i = 0; i < len; i++) {
@@ -300,47 +298,114 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
     Instantiation does not require "new"
     */
     // TODO find and modernize all usage
-    /*
-    util.Class = function(superClass, prototype) {
-        let a;
-        if(prototype === undefined) {
-            prototype = superClass;
+    /**/
+
+    //function classFun(superClassOrPrototype1: TogetherJS.Util.WithPrototype): any;
+    //function classFun(superClassOrPrototype1: TogetherJS.Util.ClassForCreation, prototype1: TogetherJS.Util.WithPrototype): any;
+    function classFun2(
+        superClassOrPrototypeArg: TogetherJS.Util.ClassForCreation | TogetherJS.Util.WithPrototype,
+        prototypeArg?: TogetherJS.Util.WithPrototype
+    ) {
+        let superClass: TogetherJS.Util.ClassForCreation | null = null;
+        let proto: TogetherJS.Util.Prototype;
+
+        if(prototypeArg === undefined) {
+            proto = <TogetherJS.Util.Prototype>superClassOrPrototypeArg;
+        }
+        else {
+            proto = prototypeArg;
+            if("prototype" in superClassOrPrototypeArg && superClassOrPrototypeArg.prototype) {
+                superClass = superClassOrPrototypeArg.prototype;
+            }
+            let newPrototype = Object.create(superClass);
+            for(const a in proto) {
+                if(proto.hasOwnProperty(a)) {
+                    newPrototype[a] = proto[a];
+                }
+            }
+            proto = newPrototype;
+        }
+
+        let ClassObject = <TogetherJS.Util.ClassObject>function() {
+            let obj = Object.create(proto);
+            obj.constructor.apply(obj, arguments);
+            obj.constructor = ClassObject;
+            return obj;
+        };
+        ClassObject.prototype = proto;
+
+        if(proto.constructor.name) {
+            ClassObject.className = proto.constructor.name;
+            ClassObject.toString = function() {
+                return '[Class ' + this.className + ']';
+            };
+        }
+
+        if(proto.classMethods) {
+            for(const a in proto.classMethods) {
+                if(proto.classMethods.hasOwnProperty(a)) {
+                    ClassObject[a] = proto.classMethods[a];
+                }
+            }
+        }
+
+        return ClassObject;
+    };
+
+    function classFun(superClassOrProtoArg: TogetherJS.Util.ClassForCreation | TogetherJS.Util.Prototype, protoArg?: TogetherJS.Util.ClassForCreation) {
+        let superClass: TogetherJS.Util.Prototype = superClassOrProtoArg;
+        let proto: TogetherJS.Util.ClassForCreation; // = protoArg;
+        if(protoArg === undefined) {
+            proto = superClassOrProtoArg as TogetherJS.Util.ClassForCreation;
         }
         else {
             if(superClass.prototype) {
                 superClass = superClass.prototype;
             }
-            let newPrototype = Object.create(superClass);
-            for(a in prototype) {
-                if(prototype.hasOwnProperty(a)) {
-                    newPrototype[a] = prototype[a];
+            var newPrototype = Object.create(superClass);
+            for(const a in proto) {
+                if(proto.hasOwnProperty(a)) {
+                    newPrototype[a] = proto[a];
                 }
             }
-            prototype = newPrototype;
+            proto = newPrototype;
         }
-        let ClassObject = function() {
-            let obj = Object.create(prototype);
+        var ClassObject = function() {
+            var obj = Object.create(proto);
             obj.constructor.apply(obj, arguments);
             obj.constructor = ClassObject;
             return obj;
         };
-        ClassObject.prototype = prototype;
-        if(prototype.constructor.name) {
-            ClassObject.className = prototype.constructor.name;
+        ClassObject.prototype = proto;
+        if(proto.constructor.name) {
+            ClassObject.className = proto.constructor.name;
             ClassObject.toString = function() {
                 return '[Class ' + this.className + ']';
             };
         }
-        if(prototype.classMethods) {
-            for(a in prototype.classMethods) {
-                if(prototype.classMethods.hasOwnProperty(a)) {
-                    ClassObject[a] = prototype.classMethods[a];
+        if(proto.classMethods) {
+            for(const a in proto.classMethods) {
+                if(proto.classMethods.hasOwnProperty(a)) {
+                    ClassObject[a] = proto.classMethods[a];
                 }
             }
         }
         return ClassObject;
     };
-    */
+
+    util.Class = classFun;
+    /**/
+
+    /**
+    (util as any).Module = (util as any).Class({
+        constructor: function(name: string) {
+            this._name = name;
+        },
+        toString: function() {
+            return '[Module ' + this._name + ']';
+        }
+    });
+    /**/
 
     return util;
 });
