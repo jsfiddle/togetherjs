@@ -6,18 +6,18 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
     let assert = util.assert;
 
     class ElementFinder {
-        public ignoreElement(element: HTMLElement) {
-            let el: HTMLElement | null = element;
+        public ignoreElement(element: HTMLElement): boolean {
+            let el: Node | null = element;
             while(el) {
                 if($(el).hasClass("togetherjs")) {
                     return true;
                 }
-                el = el.parentElement;
+                el = el.parentNode;
             }
             return false;
         }
 
-        public elementLocation(el: HTMLElement): string {
+        public static elementLocation(el: HTMLElement): string {
             if(el === document.documentElement) {
                 return "document";
             }
@@ -60,18 +60,32 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
             constructor(
                 private location: string,
                 private reason: string,
-                private context: Element
+                private context: HTMLElement
             ) {
                 this.prefix = "";
             }
+
+            toString() {
+                let loc;
+                try {
+                  loc = ElementFinder.elementLocation(this.context);
+                } catch (e) {
+                  loc = this.context;
+                }
+                return (
+                  "[CannotFind " + this.prefix +
+                    "(" + this.location + "): " +
+                    this.reason + " in " +
+                    loc + "]");
+              }
         }
 
-        public findElement(loc: string, container?: Element): Element {
+        public findElement(loc: string, container?: HTMLElement): HTMLElement {
             // FIXME: should this all just be done with document.querySelector()?
             // But no!  We can't ignore togetherjs elements with querySelector.
             // But maybe!  We *could* make togetherjs elements less obtrusive?
             container = container || document.documentElement;
-            let el : Element | null = null;
+            let el : HTMLElement | null = null;
             let rest: string;
             if(loc === "body") {
                 return document.body;
@@ -148,7 +162,7 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
                 let children = container.children;
                 el = null;
                 for(let i = 0; i < children.length; i++) {
-                    let child = children[i];
+                    let child = children[i] as HTMLElement;
                     if(child.nodeType == document.ELEMENT_NODE) {
                         if(child.className.indexOf("togetherjs") != -1) {
                             continue;
@@ -210,7 +224,7 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
                     // There are no children, or only inapplicable children
                     const offset = start.offset();
                     return {
-                        location: self.elementLocation(start[0]),
+                        location: ElementFinder.elementLocation(start[0]),
                         offset: height - offset!.top,
                         absoluteTop: height,
                         documentHeight: $(document).height()

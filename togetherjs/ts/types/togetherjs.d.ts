@@ -273,12 +273,10 @@ declare namespace TogetherJS {
 }
 
 declare namespace TogetherJS.Util {
-    type Prototype = {
-        __prototypebrand: "__prototype_brand";
-    };
+    type Prototype = Methods;
 
     interface WithMethods {
-        classMethods?: ((...args: any[]) => any)[]
+        classMethods?: {[methodName: string]: (...args: any[]) => any}
     }
 
     interface WithPrototype {
@@ -289,12 +287,12 @@ declare namespace TogetherJS.Util {
         className: string;
     }
 
-    type ClassObject = object & WithPrototype & CustomClass;
+    type ClassObject = object & WithPrototype & CustomClass & Methods;
 
     
-    interface ClassForCreation {
-        constructor: (...args: any[]) => any,
-        [methodName: string]: (...args: any[]) => any,
+    interface Methods {
+        //constructor: (...args: any[]) => any,
+        //[methodName: string]: (...args: any[]) => any,
     }
 }
 

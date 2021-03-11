@@ -50,6 +50,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
     }
     defaultConfiguration.baseUrl = baseUrl;
     // True if this file should use minimized sub-resources:
+    //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in code
     var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
     var baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     var baseUrlOverride;
