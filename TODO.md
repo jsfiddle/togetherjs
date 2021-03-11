@@ -26,7 +26,7 @@ Functional tests:
 
 Unit tests:
 - storage 6/6
-- resolves 2/4, 2 failures
+- resolves 3/4, 1 failures
 - elementFinder 2/2
 - ot text 26/26
 - linkify 4/4
