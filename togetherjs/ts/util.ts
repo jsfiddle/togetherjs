@@ -300,58 +300,6 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
     // TODO find and modernize all usage
     /**/
 
-    //function classFun(superClassOrPrototype1: TogetherJS.Util.WithPrototype): any;
-    //function classFun(superClassOrPrototype1: TogetherJS.Util.ClassForCreation, prototype1: TogetherJS.Util.WithPrototype): any;
-    function classFun2(
-        superClassOrPrototypeArg: TogetherJS.Util.Methods | TogetherJS.Util.WithPrototype,
-        prototypeArg?: TogetherJS.Util.WithPrototype
-    ) {
-        let superClass: TogetherJS.Util.Methods | null = null;
-        let proto: TogetherJS.Util.Prototype;
-
-        if(prototypeArg === undefined) {
-            proto = <TogetherJS.Util.Prototype>superClassOrPrototypeArg;
-        }
-        else {
-            proto = prototypeArg;
-            if("prototype" in superClassOrPrototypeArg && superClassOrPrototypeArg.prototype) {
-                superClass = superClassOrPrototypeArg.prototype;
-            }
-            let newPrototype = Object.create(superClass);
-            for(const a in proto) {
-                if(proto.hasOwnProperty(a)) {
-                    newPrototype[a] = proto[a];
-                }
-            }
-            proto = newPrototype;
-        }
-
-        let ClassObject = <TogetherJS.Util.ClassObject>function() {
-            let obj = Object.create(proto);
-            obj.constructor.apply(obj, arguments);
-            obj.constructor = ClassObject;
-            return obj;
-        };
-        ClassObject.prototype = proto;
-
-        if(proto.constructor.name) {
-            ClassObject.className = proto.constructor.name;
-            ClassObject.toString = function() {
-                return '[Class ' + this.className + ']';
-            };
-        }
-
-        if(proto.classMethods) {
-            for(const a in proto.classMethods) {
-                if(proto.classMethods.hasOwnProperty(a)) {
-                    ClassObject[a] = proto.classMethods[a];
-                }
-            }
-        }
-
-        return ClassObject;
-    };
-
     function classFunOriginal(superClass, prototype) {
       var a;
       if (prototype === undefined) {
@@ -389,54 +337,6 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
         }
       }
       return ClassObject;
-    };
-
-    function classFun(superClassOrProtoArg: TogetherJS.Util.Methods | TogetherJS.Util.Prototype, protoArg?: TogetherJS.Util.Methods) {
-        let superClass: TogetherJS.Util.Prototype = superClassOrProtoArg;
-        let proto: TogetherJS.Util.Methods; // = protoArg;
-        if(protoArg === undefined) {
-            proto = superClassOrProtoArg as TogetherJS.Util.Methods;
-        }
-        else {
-            proto = protoArg;
-            if(superClass.prototype) {
-                superClass = superClass.prototype;
-            }
-            var newPrototype = Object.create(superClass);
-            for(const a in proto) {
-                if(proto.hasOwnProperty(a)) {
-                    newPrototype[a] = proto[a];
-                }
-            }
-            proto = newPrototype;
-        }
-        
-        var ClassObject = <TogetherJS.Util.ClassObject> function() {
-            var obj = Object.create(proto);
-            obj.constructor.apply(obj, arguments);
-            obj.constructor = ClassObject;
-            return obj;
-        };
-        ClassObject.prototype = proto;
-
-        if(proto.constructor.name) {
-            ClassObject.className = proto.constructor.name;
-            ClassObject.toString = function() {
-                return '[Class ' + this.className + ']';
-            };
-        }
-        /*
-        if(proto.classMethods) {
-            for(const a in proto.classMethods) {
-                if(proto.classMethods.hasOwnProperty(a)) {
-                    let x = proto.classMethods;
-                    let xx = ClassObject[a];
-                    ClassObject[a] = proto.classMethods[a];
-                }
-            }
-        }
-        */
-        return ClassObject;
     };
 
     util.Class = classFunOriginal;
