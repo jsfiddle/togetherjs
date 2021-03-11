@@ -8,39 +8,50 @@
    it.
    */
 
-define(["util", "session"], function (util, session) {
-  var visibilityApi = util.Module("visibilityApi");
-  var hidden;
-  var visibilityChange;
-  if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
-    hidden = "hidden";
-    visibilityChange = "visibilitychange";
-  } else if (document.mozHidden !== undefined) {
-    hidden = "mozHidden";
-    visibilityChange = "mozvisibilitychange";
-  } else if (document.msHidden !== undefined) {
-    hidden = "msHidden";
-    visibilityChange = "msvisibilitychange";
-  } else if (document.webkitHidden !== undefined) {
-    hidden = "webkitHidden";
-    visibilityChange = "webkitvisibilitychange";
-  }
+interface Document {
+    mozHidden?: boolean;
+    msHidden?: boolean;
+    webkitHidden?: boolean;
+}
 
-  session.on("start", function () {
-    document.addEventListener(visibilityChange, change, false);
-  });
+define(["util", "session"], function(util: Util, session: TogetherJS.On) {
+    let hidden: "hidden" | "mozHidden" | "msHidden" | "webkitHidden";
+    let visibilityChange: "visibilitychange" | "mozvisibilitychange" | "msvisibilitychange" | "webkitvisibilitychange";
 
-  session.on("close", function () {
-    document.removeEventListener(visibilityChange, change, false);
-  });
+    if(document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+    }
+    else if(document.mozHidden !== undefined) {
+        hidden = "mozHidden";
+        visibilityChange = "mozvisibilitychange";
+    }
+    else if(document.msHidden !== undefined) {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+    }
+    else if(document.webkitHidden !== undefined) {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+    }
 
-  function change() {
-    session.emit("visibility-change", document[hidden]);
-  }
+    session.on("start", function() {
+        document.addEventListener(visibilityChange, change, false);
+    });
 
-  visibilityApi.hidden = function () {
-    return document[hidden];
-  };
+    session.on("close", function() {
+        document.removeEventListener(visibilityChange, change, false);
+    });
 
-  return visibilityApi;
+    function change() {
+        session.emit("visibility-change", document[hidden]);
+    }
+
+    let visibilityApi = {
+        hidden: function() {
+            return document[hidden];
+        }
+    }
+
+    return visibilityApi;
 });

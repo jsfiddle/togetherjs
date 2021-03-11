@@ -161,7 +161,7 @@ declare namespace TogetherJS {
 
     interface CallbackForOn<T> {
         (msg: Message & T): void;
-        [name: string]: CallbackForOn<T>;
+        //[name: string]: CallbackForOn<T>; // TODO weird field for once callbacks
     }
 
     interface Ons<T> {
@@ -173,7 +173,7 @@ declare namespace TogetherJS {
         once<T>(eventName: string, cb: CallbackForOn<T>): void;
         off<T>(eventName: string, cb: CallbackForOn<T>): void;
         removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
-        emit(eventName: string): void;
+        emit(eventName: string, msg?: unknown): void;
         _knownEvents?: string[];
         _listeners: {[name: string]: CallbackForOn<any>[]}; // TODO any
         _listenerOffs?: [string, CallbackForOn<any>][];
