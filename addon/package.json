@@ -11,7 +11,7 @@
             "title": "Hub URL", 
             "type": "string", 
             "description": "Override the location of the hub", 
-            "value": "https://hub.togetherjs.com", 
+            "value": "https://ks3371053.kimsufi.com:7071", 
             "name": "hubBase"
         }, 
         {

@@ -123,8 +123,7 @@ module.exports = function (grunt) {
         }
       },
       all: [
-        "Gruntfile",
-        "togetherjs/*.js"
+        "Gruntfile"
       ]
     },
 
@@ -266,7 +265,7 @@ module.exports = function (grunt) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
       var destBase = grunt.option("dest") || "build"; // where to put the built files. If not indicated then into build/
-      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://hub.togetherjs.com"; // URL of the hub server
+      var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://ks3371053.kimsufi.com:7071"; // URL of the hub server
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
       var subs = {
