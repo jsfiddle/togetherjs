@@ -1,79 +1,81 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this file,
-* You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 function isJQuery(o: unknown): o is JQuery {
     return o instanceof jQuery;
 }
 
-define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
-    let assert: typeof util.assert = util.assert;
-    
-    let CannotFind = class CannotFind {
-        public prefix: string = "";
-        
-        constructor(
-            private location: string,
-            private reason: string,
-            private context: HTMLElement | Document) { }
-            
+define(
+    ["util", "jquery"],
+    function(util: Util, $: JQueryStatic) {
+        let assert: typeof util.assert = util.assert;
+
+        class CannotFind {
+            public prefix: string = "";
+
+            constructor(
+                private location: string,
+                private reason: string,
+                private context: HTMLElement | Document,
+            ) {
+            }
+
             toString() {
                 var loc;
                 try {
                     loc = "loc"; //elementFinder.elementLocation(this.context);
-                } catch (e) {
+                } catch(e) {
                     loc = this.context;
                 }
-                return ( "[CannotFind " + this.prefix + "(" + this.location + "): " + this.reason + " in " + loc + "]");
+                return ("[CannotFind " + this.prefix + "(" + this.location + "): " + this.reason + " in " + loc + "]");
             }
-        };
-        
-        let elementFinder = class ElementFinder {
-            
+        }
+
+        class ElementFinder {
+
             ignoreElement(element: HTMLElement | JQuery) {
                 let el: Node | JQuery | null = element;
-                if (isJQuery(el)) {
+                if(isJQuery(el)) {
                     el = el[0];
                 }
-                while (el) {
-                    if ($(el).hasClass("togetherjs")) {
+                while(el) {
+                    if($(el).hasClass("togetherjs")) {
                         return true;
                     }
                     el = el.parentNode;
                 }
                 return false;
             }
-            
+
             elementLocation(element: HTMLElement | JQuery | Document): string {
                 assert(element !== null, "Got null element");
                 let el: HTMLElement | JQuery | Document = element;
-                
-                if (0 in el && "attr" in el && el[0].nodeType == 1) {
+
+                if(0 in el && "attr" in el && el[0].nodeType == 1) {
                     // Or a jQuery element not made by us
                     el = el[0];
                 }
-                
-                if (isJQuery(el)) {
+
+                if(isJQuery(el)) {
                     // a jQuery element
                     el = el[0];
                 }
-                
-                if (el === document || el instanceof Document) {
+
+                if(el === document || el instanceof Document) {
                     return "document";
                 }
-                
-                if (el.id) {
+
+                if(el.id) {
                     return "#" + el.id;
                 }
-                if (el.tagName == "BODY") {
+                if(el.tagName == "BODY") {
                     return "body";
                 }
-                if (el.tagName == "HEAD") {
+                if(el.tagName == "HEAD") {
                     return "head";
                 }
-                
+
                 let parent = el.parentNode as HTMLElement;
-                if ((! parent) || parent == el) {
+                if((!parent) || parent == el) {
                     console.warn("elementLocation(", el, ") has null parent");
                     throw new Error("No locatable parent found");
                 }
@@ -81,13 +83,13 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                 let children = parent.childNodes;
                 let _len = children.length;
                 let index = 0;
-                for (let i=0; i<_len; i++) {
+                for(let i = 0; i < _len; i++) {
                     let child = children[i] as HTMLElement;
-                    if (child == el) {
+                    if(child == el) {
                         break;
                     }
-                    if (child.nodeType == document.ELEMENT_NODE) {
-                        if (child.className.indexOf("togetherjs") != -1) {
+                    if(child.nodeType == document.ELEMENT_NODE) {
+                        if(child.className.indexOf("togetherjs") != -1) {
                             // Don't count our UI
                             continue;
                         }
@@ -95,47 +97,47 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                         index++;
                     }
                 }
-                return parentLocation + ":nth-child(" + (index+1) + ")";
+                return parentLocation + ":nth-child(" + (index + 1) + ")";
             }
-            
-            findElement(loc: string, container?: HTMLElement | Document) {
+
+            findElement(loc: string, container?: HTMLElement | Document): HTMLElement {
                 // FIXME: should this all just be done with document.querySelector()?
                 // But no!  We can't ignore togetherjs elements with querySelector.
                 // But maybe!  We *could* make togetherjs elements less obtrusive?
                 container = container || document;
                 let el;
                 let rest;
-                if (loc === "body") {
+                if(loc === "body") {
                     return document.body;
                 }
-                else if (loc === "head") {
+                else if(loc === "head") {
                     return document.head;
-                } else if (loc === "document") {
-                    return document;
-                } else if (loc.indexOf("body") === 0) {
+                } else if(loc === "document") {
+                    return document.documentElement;
+                } else if(loc.indexOf("body") === 0) {
                     el = document.body;
                     try {
                         return this.findElement(loc.substr(("body").length), el);
-                    } catch (e) {
-                        if (e instanceof CannotFind) {
+                    } catch(e) {
+                        if(e instanceof CannotFind) {
                             e.prefix = "body" + e.prefix;
                         }
                         throw e;
                     }
-                } else if (loc.indexOf("head") === 0) {
+                } else if(loc.indexOf("head") === 0) {
                     el = document.head;
                     try {
                         return this.findElement(loc.substr(("head").length), el);
-                    } catch (e) {
-                        if (e instanceof CannotFind) {
+                    } catch(e) {
+                        if(e instanceof CannotFind) {
                             e.prefix = "head" + e.prefix;
                         }
                         throw e;
                     }
-                } else if (loc.indexOf("#") === 0) {
+                } else if(loc.indexOf("#") === 0) {
                     var id;
                     loc = loc.substr(1);
-                    if (loc.indexOf(":") === -1) {
+                    if(loc.indexOf(":") === -1) {
                         id = loc;
                         rest = "";
                     } else {
@@ -143,14 +145,14 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                         rest = loc.substr(loc.indexOf(":"));
                     }
                     el = document.getElementById(id);
-                    if (! el) {
+                    if(!el) {
                         throw new CannotFind("#" + id, "No element by that id", container);
                     }
-                    if (rest) {
+                    if(rest) {
                         try {
                             return this.findElement(rest, el);
-                        } catch (e) {
-                            if (e instanceof CannotFind) {
+                        } catch(e) {
+                            if(e instanceof CannotFind) {
                                 e.prefix = "#" + id + e.prefix;
                             }
                             throw e;
@@ -158,9 +160,9 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                     } else {
                         return el;
                     }
-                } else if (loc.indexOf(":nth-child(") === 0) {
+                } else if(loc.indexOf(":nth-child(") === 0) {
                     loc = loc.substr((":nth-child(").length);
-                    if (loc.indexOf(")") == -1) {
+                    if(loc.indexOf(")") == -1) {
                         throw "Invalid location, missing ): " + loc;
                     }
                     let num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
@@ -168,28 +170,28 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                     loc = loc.substr(loc.indexOf(")") + 1);
                     var children = container.childNodes;
                     el = null;
-                    for (var i=0; i<children.length; i++) {
+                    for(var i = 0; i < children.length; i++) {
                         var child = children[i] as HTMLElement;
-                        if (child.nodeType == document.ELEMENT_NODE) {
-                            if (child.className.indexOf("togetherjs") != -1) {
+                        if(child.nodeType == document.ELEMENT_NODE) {
+                            if(child.className.indexOf("togetherjs") != -1) {
                                 continue;
                             }
                             count--;
-                            if (count === 0) {
+                            if(count === 0) {
                                 // this is the element
                                 el = child;
                                 break;
                             }
                         }
                     }
-                    if (! el) {
+                    if(!el) {
                         throw new CannotFind(":nth-child(" + num + ")", "container only has " + (num - count) + " elements", container);
                     }
-                    if (loc) {
+                    if(loc) {
                         try {
                             return this.findElement(loc, el);
-                        } catch (e) {
-                            if (e instanceof CannotFind) {
+                        } catch(e) {
+                            if(e instanceof CannotFind) {
                                 e.prefix = ":nth-child(" + num + ")" + e.prefix;
                             }
                             throw e;
@@ -201,7 +203,7 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                     throw new CannotFind(loc, "Malformed location", container);
                 }
             };
-            
+
             elementByPixel(height: number) {
                 let self = this;
                 /* Returns {location: "...", offset: pixels}
@@ -209,20 +211,20 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                 To get the pixel position back, you'd do:
                 $(location).offset().top + offset
                 */
-                function search(start: JQuery, height: number) {
+                function search(start: JQuery, height: number): TogetherJS.ElementFinder.Position {
                     var last = null;
                     var children = start.children();
-                    children.each(function () {
+                    children.each(function() {
                         var el = $(this);
-                        if (el.hasClass("togetherjs") || el.css("position") == "fixed" || ! el.is(":visible")) {
+                        if(el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                             return;
                         }
-                        if (el.offset().top > height) {
+                        if(el.offset().top > height) {
                             return false;
                         }
                         last = el;
                     });
-                    if ((! children.length) || (! last)) {
+                    if((!children.length) || (!last)) {
                         // There are no children, or only inapplicable children
                         return {
                             location: self.elementLocation(start[0]),
@@ -235,17 +237,17 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                 }
                 return search($(document.body), height);
             }
-            
-            pixelForPosition(position) {
+
+            pixelForPosition(position: TogetherJS.ElementFinder.Position) {
                 /* Inverse of elementFinder.elementByPixel */
-                if (position.location == "body") {
+                if(position.location == "body") {
                     return position.offset;
                 }
                 var el;
                 try {
                     el = this.findElement(position.location);
-                } catch (e) {
-                    if (e instanceof CannotFind && position.absoluteTop) {
+                } catch(e) {
+                    if(e instanceof CannotFind && position.absoluteTop) {
                         // We don't trust absoluteTop to be quite right locally, so we adjust
                         // for the total document height differences:
                         var percent = position.absoluteTop / position.documentHeight;
@@ -261,7 +263,7 @@ define(["util", "jquery"], function (util: Util, $: JQueryStatic) {
                 return top + position.offset;
             }
         }
-        
-        return new elementFinder();
-    });
-    
+
+        return new ElementFinder();
+    }
+);
