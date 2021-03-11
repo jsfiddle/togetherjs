@@ -540,7 +540,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
   let defaultHubBase = "__hubUrl__";
   if(defaultHubBase == "__" + "hubUrl" + "__") {
     // Substitution wasn't made
-    defaultHubBase = "https://hub.togetherjs.mozillalabs.com";
+    defaultHubBase = "https://ks3371053.kimsufi.com:7071";
   }
   defaultConfiguration.hubBase = defaultHubBase;
 
