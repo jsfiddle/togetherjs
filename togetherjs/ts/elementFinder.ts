@@ -214,21 +214,23 @@ define(
                 function search(start: JQuery, height: number): TogetherJS.ElementFinder.Position {
                     var last = null;
                     var children = start.children();
-                    children.each(function() {
+                    children.each(function(this: HTMLElement) {
                         var el = $(this);
                         if(el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                             return;
                         }
-                        if(el.offset().top > height) {
+                        let offset = el.offset();
+                        if(offset && offset.top > height) {
                             return false;
                         }
                         last = el;
                     });
-                    if((!children.length) || (!last)) {
+                    if ((!children.length) || (!last)) {
                         // There are no children, or only inapplicable children
+                        let start_offset_top = start.offset()?.top ?? 0;
                         return {
                             location: self.elementLocation(start[0]),
-                            offset: height - start.offset().top,
+                            offset: height - start_offset_top,
                             absoluteTop: height,
                             documentHeight: $(document).height()
                         };
@@ -238,7 +240,7 @@ define(
                 return search($(document.body), height);
             }
 
-            pixelForPosition(position: TogetherJS.ElementFinder.Position) {
+            pixelForPosition(position: TogetherJS.ElementFinder.Position): number {
                 /* Inverse of elementFinder.elementByPixel */
                 if(position.location == "body") {
                     return position.offset;
@@ -246,6 +248,15 @@ define(
                 var el;
                 try {
                     el = this.findElement(position.location);
+                    var el_offset = $(el).offset();
+                    if(el_offset === undefined) {
+                        throw new Error("pixelForPosition called on element without offset");
+                    }
+                    // FIXME: maybe here we should test for sanity, like if an element is
+                    // hidden.  We can use position.absoluteTop to get a sense of where the
+                    // element roughly should be.  If the sanity check failed we'd use
+                    // absoluteTop
+                    return el_offset.top + position.offset;
                 } catch(e) {
                     if(e instanceof CannotFind && position.absoluteTop) {
                         // We don't trust absoluteTop to be quite right locally, so we adjust
@@ -255,12 +266,6 @@ define(
                     }
                     throw e;
                 }
-                var top = $(el).offset().top;
-                // FIXME: maybe here we should test for sanity, like if an element is
-                // hidden.  We can use position.absoluteTop to get a sense of where the
-                // element roughly should be.  If the sanity check failed we'd use
-                // absoluteTop
-                return top + position.offset;
             }
         }
 
