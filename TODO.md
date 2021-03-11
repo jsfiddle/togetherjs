@@ -20,12 +20,12 @@ Functional tests:
 - notifications 16/16
 - walkthrough 2/2
 - peer status 7/7
-- forms 10/16, 10 failures
-- ace 10/12, 5 failures
-- codemirror 10/11, 4 failures
+- forms 16/16
+- ace 12/12
+- codemirror 11/11
 
 Unit tests:
-- storage 5/6, 2 failures
+- storage 6/6
 - resolves 2/4, 2 failures
 - elementFinder 2/2
 - ot text 26/26
