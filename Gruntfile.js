@@ -593,7 +593,7 @@ module.exports = function (grunt) {
     grunt.file.mkdir("togetherjs.mozillalabs.com/public");
     fs.rename(tmp, versions);
     if (! grunt.option("base-url")) {
-      grunt.option("base-url", "https://togetherjs.com");
+      grunt.option("base-url", "https://ks3371053.kimsufi.com:7071");
     }
     grunt.option("dest", "togetherjs.mozillalabs.com/public");
     grunt.option("exclude-tests", true);
