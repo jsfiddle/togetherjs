@@ -2,12 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
-    let assert = util.assert;
+function isJQuery(o: any): o is JQuery {
+    return o instanceof jQuery;
+}
 
-    class ElementFinder {
-        public ignoreElement(element: HTMLElement): boolean {
-            let el: Node | null = element;
+define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
+
+
+    let elementFinder = class ElementFinder {
+        public ignoreElement(element: HTMLElement | JQuery): boolean {
+            let el: Node | JQuery | null = element;
+            if (isJQuery(el)) {
+                el = el[0];
+            }
             while(el) {
                 if($(el).hasClass("togetherjs")) {
                     return true;
@@ -17,8 +24,19 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
             return false;
         }
 
-        public static elementLocation(el: HTMLElement): string {
-            if(el === document.documentElement) {
+        public static elementLocation(el: HTMLElement | Document | JQuery): string {
+
+            if (isJQuery(el)) {
+                // a jQuery element
+                el = el[0];
+            }
+
+            if ("0" in el && "attr" in el && (el[0] as HTMLElement).nodeType == 1) {
+                // Or a jQuery element not made by us
+                el = el[0];
+            }
+
+            if(el instanceof Document) {
                 return "document";
             }
             if(el.id) {
@@ -30,6 +48,7 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
             if(el.tagName == "HEAD") {
                 return "head";
             }
+
             let parent = el.parentElement;
             if((!parent) || parent == el) {
                 console.warn("elementLocation(", el, ") has null parent");
@@ -44,7 +63,7 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
                     break;
                 }
                 if(children[i].nodeType == document.ELEMENT_NODE) {
-                    if(children[i].className.indexOf("togetherjs") != -1) {
+                    if(children[i].classList.contains("togetherjs")) {
                         // Don't count our UI
                         continue;
                     }
@@ -56,7 +75,7 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
         }
 
         public CannotFind = class CannotFind {
-            public prefix;
+            public prefix = "";
             constructor(
                 private location: string,
                 private reason: string,
@@ -210,7 +229,10 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
                 let children = start.children();
                 children.each(function() {
                     let el = $(self);
-                    if(el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
+                    let a = el.hasClass("togetherjs");
+                    let b = el.css("position") == "fixed";
+                    let c = !el.is(":visible");
+                    if(a || b || c) {
                         return;
                     }
                     const offset = el.offset();
@@ -262,6 +284,6 @@ define(["util", "jquery"], function(util: Util, $: JQueryStatic) {
         }
     }
 
-    return new ElementFinder();
+    return new elementFinder();
 
 });
