@@ -514,7 +514,8 @@ var TogetherJSClass = /** @class */ (function (_super) {
         return base;
     };
     ;
-    TogetherJSClass.prototype._mixinEvents = function (proto) {
+    TogetherJSClass.prototype._mixinEvents = function (cls) {
+        // TODO this function is a way to make the cls arg inherit of the On features, its use should be reworked to use TS inheritance, so fat this implementation does nothing so FIX IT
         return proto;
     };
     ;

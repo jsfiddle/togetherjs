@@ -524,8 +524,8 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         return base;
     };
 
-    _mixinEvents(proto: TogetherJSNS.On) {
-
+    _mixinEvents(cls: TogetherJSNS.On) {
+        // TODO this function is a way to make the cls arg inherit of the On features, its use should be reworked to use TS inheritance, so fat this implementation does nothing so FIX IT
         return proto;
     };
 
