@@ -1,4 +1,4 @@
-declare namespace TogetherJS {
+declare namespace TogetherJSNS {
 
     type ValueOf<T> = T[keyof T];
 
@@ -32,8 +32,8 @@ declare namespace TogetherJS {
         _configClosed: Partial<Config>;
         version: string;
         baseUrl: string;
-        _onmessage(msg: TogetherJS.Message): void;
-        send(msg: TogetherJS.Message): void;
+        _onmessage(msg: TogetherJSNS.Message): void;
+        send(msg: TogetherJSNS.Message): void;
         shareUrl(): string | null;
         listenForShortcut(): void;
         removeShortcut(): void;
@@ -180,9 +180,9 @@ declare namespace TogetherJS {
     }
 
     interface ConfigFunObj extends ConfigGetter {
-        (config: TogetherJS.Config): void;
+        (config: TogetherJSNS.Config): void;
         (attributeName: string, attributeValue: unknown): void;
-        (configOrAttributeName: TogetherJS.Config | string, attributeValue?: unknown): void;
+        (configOrAttributeName: TogetherJSNS.Config | string, attributeValue?: unknown): void;
         //get<T>(thing: "on"): Ons<T>;
         //get<T>(thing: "hub_on"): Ons<T>;
         //get(thing: "useMinimizedCode"): true | undefined;
@@ -272,7 +272,7 @@ declare namespace TogetherJS {
     }
 }
 
-declare namespace TogetherJS.Util {
+declare namespace TogetherJSNS.Util {
     type Prototype = Methods;
 
     interface WithMethods {
@@ -296,7 +296,7 @@ declare namespace TogetherJS.Util {
     }
 }
 
-declare namespace TogetherJS.ElementFinder {
+declare namespace TogetherJSNS.ElementFinder {
     interface Position {
         location: string,
         offset: number,
@@ -306,19 +306,19 @@ declare namespace TogetherJS.ElementFinder {
 }
 
 interface Window {
-    TogetherJSConfig: TogetherJS.Config;
+    TogetherJSConfig: TogetherJSNS.Config;
     TogetherJSConfig_baseUrl?: string;
-    TogetherJS: TogetherJS.TogetherJS;
-    TowTruckConfig?: TogetherJS.Config;
+    TogetherJS: TogetherJSNS.TogetherJS;
+    TowTruckConfig?: TogetherJSNS.Config;
     TogetherJSConfig_noAutoStart?: boolean;
-    TogetherJSConfig_callToStart?: TogetherJS.CallToStart;
-    TowTruckConfig_callToStart?: TogetherJS.CallToStart;
+    TogetherJSConfig_callToStart?: TogetherJSNS.CallToStart;
+    TowTruckConfig_callToStart?: TogetherJSNS.CallToStart;
     _TogetherJSBookmarklet: unknown;
     //require?: RequireConfig;
     _TogetherJSShareId: unknown;
     TogetherJSConfig_autoStart?: boolean;
     TogetherJSConfig_enableShortcut?: boolean;
-    TowTruck: TogetherJS.TogetherJS;
+    TowTruck: TogetherJSNS.TogetherJS;
     TogetherJSTestSpy?: {[k: string]: unknown};
 }
 
@@ -333,3 +333,5 @@ interface Function {
 
 // TODO type this object
 //declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;
+
+declare var TogetherJS: TogetherJSNS.TogetherJS;

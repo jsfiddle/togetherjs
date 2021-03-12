@@ -211,7 +211,7 @@ define(
                 To get the pixel position back, you'd do:
                 $(location).offset().top + offset
                 */
-                function search(start: JQuery, height: number): TogetherJS.ElementFinder.Position {
+                function search(start: JQuery, height: number): TogetherJSNS.ElementFinder.Position {
                     var last = null;
                     var children = start.children();
                     children.each(function(this: HTMLElement) {
@@ -240,7 +240,7 @@ define(
                 return search($(document.body), height);
             }
 
-            pixelForPosition(position: TogetherJS.ElementFinder.Position): number {
+            pixelForPosition(position: TogetherJSNS.ElementFinder.Position): number {
                 /* Inverse of elementFinder.elementByPixel */
                 if(position.location == "body") {
                     return position.offset;

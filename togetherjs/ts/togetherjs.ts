@@ -18,7 +18,7 @@ function polyfillConsole() {
     });
 }
 
-const defaultStartupInit: TogetherJS.StartupInit = {
+const defaultStartupInit: TogetherJSNS.StartupInit = {
     // What element, if any, was used to start the session:
     button: null,
     // The startReason is the reason TogetherJS was started.  One of:
@@ -38,7 +38,7 @@ const defaultStartupInit: TogetherJS.StartupInit = {
     _launch: false
 }
 
-const defaultConfiguration: TogetherJS.Config = {
+const defaultConfiguration: TogetherJSNS.Config = {
     dontShowClicks: false,
     cloneClicks: false,
     enableAnalytics: false,
@@ -69,7 +69,7 @@ const defaultConfiguration: TogetherJS.Config = {
     fallbackLang: "en-US"
 };
 
-const defaultConfiguration2: TogetherJS.Config = {
+const defaultConfiguration2: TogetherJSNS.Config = {
     dontShowClicks: false,
     cloneClicks: false,
     enableAnalytics: false,
@@ -95,8 +95,8 @@ const defaultConfiguration2: TogetherJS.Config = {
 };
 
 class ConfigClass {
-    constructor(tjsInstance: TogetherJSClass, name: keyof TogetherJS.Config, maybeValue: unknown) {
-        let settings: Partial<TogetherJS.Config>;
+    constructor(tjsInstance: TogetherJSClass, name: keyof TogetherJSNS.Config, maybeValue: unknown) {
+        let settings: Partial<TogetherJSNS.Config>;
         if(arguments.length == 1) {
             if(typeof name != "object") {
                 throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
@@ -109,7 +109,7 @@ class ConfigClass {
         }
         let i: number;
         let tracker;
-        let attr: keyof TogetherJS.Config;
+        let attr: keyof TogetherJSNS.Config;
         for(attr in settings) {
             if(settings.hasOwnProperty(attr)) {
                 if(tjsInstance._configClosed[attr] && tjsInstance.running) {
@@ -160,7 +160,7 @@ class ConfigClass {
         }
     };
 
-    get(name: keyof TogetherJS.Config) {
+    get(name: keyof TogetherJSNS.Config) {
         let value = TogetherJS._configuration[name];
         if(value === undefined) {
             if(!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
@@ -171,7 +171,7 @@ class ConfigClass {
         return value;
     };
 
-    track(name: keyof TogetherJS.Config, callback: Function) {
+    track(name: keyof TogetherJSNS.Config, callback: Function) {
         if(!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
@@ -192,12 +192,12 @@ class ConfigClass {
     };
 }
 
-class OnClass implements TogetherJS.On {
+class OnClass implements TogetherJSNS.On {
     _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJS.CallbackForOn<any>[] } = {}; // TODO any
-    _listenerOffs?: [string, TogetherJS.CallbackForOn<any>][];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
 
-    on<T>(name: string, callback: TogetherJS.CallbackForOn<T>) {
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -230,7 +230,7 @@ class OnClass implements TogetherJS.On {
         }
     };
 
-    once<T>(name: string, callback: TogetherJS.CallbackForOn<T>) {
+    once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -238,7 +238,7 @@ class OnClass implements TogetherJS.On {
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!callback[attr]) {
-            callback[attr] = function onceCallback(this: TogetherJS.On) {
+            callback[attr] = function onceCallback(this: TogetherJSNS.On) {
                 callback.apply(this, arguments);
                 this.off(name, onceCallback);
                 delete callback[attr];
@@ -247,7 +247,7 @@ class OnClass implements TogetherJS.On {
         this.on(name, callback[attr]);
     };
 
-    off<T>(name: string, callback: TogetherJS.CallbackForOn<T>) {
+    off<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
             this._listenerOffs.push([name, callback]);
@@ -255,7 +255,7 @@ class OnClass implements TogetherJS.On {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach(function(this: TogetherJS.On, n) {
+            names.forEach(function(this: TogetherJSNS.On, n) {
                 this.off(n, callback);
             }, this);
             return;
@@ -272,7 +272,7 @@ class OnClass implements TogetherJS.On {
         }
     };
 
-    removeListener<T>(eventName: string, cb: TogetherJS.CallbackForOn<T>) {
+    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>) {
         this.off(eventName, cb);
     }
 
@@ -283,12 +283,12 @@ class OnClass implements TogetherJS.On {
         }
         let args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
-        l.forEach(function(this: TogetherJS.On, callback) {
+        l.forEach(function(this: TogetherJSNS.On, callback) {
             callback.apply(this, args);
         }, this);
         delete this._listenerOffs;
         if(offs.length) {
-            offs.forEach(function(this: TogetherJS.On, item) {
+            offs.forEach(function(this: TogetherJSNS.On, item) {
                 this.off(item[0], item[1]);
             }, this);
         }
@@ -296,23 +296,23 @@ class OnClass implements TogetherJS.On {
     };
 }
 
-class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
+class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public running: boolean = false;
     private require: Require;
-    private config: TogetherJS.ConfigFunObj;
-    private hub: TogetherJS.Hub;
+    private config: TogetherJSNS.ConfigFunObj;
+    private hub: TogetherJSNS.Hub;
     private requireConfig: RequireConfig;
     private _loaded: boolean;
     private _extend(conf: RequireConfig): RequireConfig;
     private _extend(base: unknown, extensions: unknown): unknown;
     private _requireObject: Require;
     private pageLoaded: number = Date.now();
-    private _startupInit: TogetherJS.StartupInit = defaultStartupInit;
-    public startup: TogetherJS.Startup = this._extend(this._startupInit);
-    public _configuration: Partial<TogetherJS.Config> = {};
-    public _defaultConfiguration: TogetherJS.Config = defaultConfiguration2;
-    private _configTrackers: TogetherJS.Config = {};
-    public _configClosed: Partial<TogetherJS.Config> = {};
+    private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
+    public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
+    public _configuration: Partial<TogetherJSNS.Config> = {};
+    public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
+    private _configTrackers: TogetherJSNS.Config = {};
+    public _configClosed: Partial<TogetherJSNS.Config> = {};
     private version: string;
     private baseUrl: string;
 
@@ -364,12 +364,12 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
         // the "on" configuration value.
         let attr;
         let attrName;
-        let globalOns: TogetherJS.Ons<unknown> = {};
+        let globalOns: TogetherJSNS.Ons<unknown> = {};
         for(attr in window) {
             if(attr.indexOf("TogetherJSConfig_on_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_on_").length);
                 let a = window[attr];
-                globalOns[attrName] = window[attr] as unknown as TogetherJS.CallbackForOn<unknown>;
+                globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
             }
             else if(attr.indexOf("TogetherJSConfig_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_").length);
@@ -378,7 +378,7 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
             else if(attr.indexOf("TowTruckConfig_on_") === 0) {
                 attrName = attr.substr(("TowTruckConfig_on_").length);
                 console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
-                globalOns[attrName] = window[attr] as unknown as TogetherJS.CallbackForOn<unknown>;
+                globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
             }
             else if(attr.indexOf("TowTruckConfig_") === 0) {
                 attrName = attr.substr(("TowTruckConfig_").length);
@@ -391,7 +391,7 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
         // FIXME: copy existing config?
         // FIXME: do this directly in TogetherJS.config() ?
         // FIXME: close these configs?
-        let ons: TogetherJS.Ons<unknown> = TogetherJS.config.get("on");
+        let ons: TogetherJSNS.Ons<unknown> = TogetherJS.config.get("on");
         for(attr in globalOns) {
             if(globalOns.hasOwnProperty(attr)) {
                 // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -476,7 +476,7 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
 
         let localeTemplates = "templates-" + lang;
         deps.splice(0, 0, localeTemplates);
-        function callback(session: TogetherJS.Session, jquery: JQuery) {
+        function callback(session: TogetherJSNS.Session, jquery: JQuery) {
             TogetherJS._loaded = true;
             if(!min) {
                 TogetherJS.require = require.config({ context: "togetherjs" });
@@ -524,7 +524,7 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
         return base;
     };
 
-    _mixinEvents(proto: TogetherJS.On) {
+    _mixinEvents(proto: TogetherJSNS.On) {
 
         return proto;
     };
@@ -546,14 +546,14 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
 
     reinitialize() {
         if(this.running && typeof this.require == "function") {
-            this.require(["session"], function(session: TogetherJS.On) {
+            this.require(["session"], function(session: TogetherJSNS.On) {
                 session.emit("reinitialize");
             });
         }
         // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
     };
 
-    getConfig(name: keyof TogetherJS.Config) { // rename into TogetherJS.config.get()?
+    getConfig(name: keyof TogetherJSNS.Config) { // rename into TogetherJS.config.get()?
         let value = this._configuration[name];
         if(value === undefined) {
             if(!this._defaultConfiguration.hasOwnProperty(name)) {
@@ -566,13 +566,13 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
 
     refreshUserData() {
         if(this.running && typeof this.require == "function") {
-            this.require(["session"], function(session: TogetherJS.On) {
+            this.require(["session"], function(session: TogetherJSNS.On) {
                 session.emit("refresh-user-data");
             });
         }
     };
 
-    _onmessage(msg: TogetherJS.Message) {
+    _onmessage(msg: TogetherJSNS.Message) {
         let type = msg.type;
         if(type.search(/^app\./) === 0) {
             type = type.substr("app.".length);
@@ -584,7 +584,7 @@ class TogetherJSClass extends OnClass implements TogetherJS.TogetherJS {
         this.hub.emit(msg.type, msg);
     };
 
-    send(msg: TogetherJS.Message) {
+    send(msg: TogetherJSNS.Message) {
         if(!this.require) {
             throw "You cannot use TogetherJS.send() when TogetherJS is not running";
         }
@@ -706,7 +706,7 @@ function baseUrl1() {
     let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
     let baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
-    let baseUrlOverride: TogetherJS.BaseUrlOverride | null;
+    let baseUrlOverride: TogetherJSNS.BaseUrlOverride | null;
     if(baseUrlOverrideString) {
         try {
             baseUrlOverride = JSON.parse(baseUrlOverrideString);
@@ -726,7 +726,7 @@ function baseUrl1() {
         }
     }
 
-    function copyConfigInWindow(configOverride: TogetherJS.WithExpiration<TogetherJS.Config> | null) {
+    function copyConfigInWindow(configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null) {
         let shownAny = false;
         for(const _attr in configOverride) {
             const attr = _attr as keyof typeof configOverride;
@@ -746,7 +746,7 @@ function baseUrl1() {
     }
 
     let configOverrideString = localStorage.getItem("togetherjs.configOverride");
-    let configOverride: TogetherJS.WithExpiration<TogetherJS.Config> | null;
+    let configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null;
     if(configOverrideString) {
         try {
             configOverride = JSON.parse(configOverrideString);
@@ -853,7 +853,7 @@ function baseUrl1() {
 
 
 
-    let listener: TogetherJS.KeyboardListener | null = null;
+    let listener: TogetherJSNS.KeyboardListener | null = null;
 
 
 
@@ -922,7 +922,7 @@ function baseUrl1() {
             let key = "togetherjs-session.status";
             let valueString = sessionStorage.getItem(key);
             if(valueString) {
-                let value = JSON.parse(valueString) as TogetherJS.TogetherJS;
+                let value = JSON.parse(valueString) as TogetherJSNS.TogetherJS;
                 if(value && value.running) {
                     TogetherJS.startup.continued = true;
                     TogetherJS.startup.reason = value.startupReason;

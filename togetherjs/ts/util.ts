@@ -24,11 +24,11 @@ class Util {
     public Deferred: any;
     extend: { (conf: RequireConfig): RequireConfig; (base: unknown, extensions: unknown): unknown; };
     AssertionError: typeof AssertionError;
-    mixinEvents: TogetherJS.TogetherJS["_mixinEvents"];
+    mixinEvents: TogetherJSNS.TogetherJS["_mixinEvents"];
     Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
 
-    public constructor($: JQueryStatic, tjs: TogetherJS.TogetherJS) {
+    public constructor($: JQueryStatic, tjs: TogetherJSNS.TogetherJS) {
         this.Deferred = $.Deferred; // TODO defered is of an type because it does not exists
         tjs.$ = $;
         this.extend = tjs._extend;
