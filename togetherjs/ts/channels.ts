@@ -117,7 +117,7 @@ define(["util"], function(util: Util) {
         maxBackoffTime = 1500;
         backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
         address: string;
-        socket: unknown | null = null;
+        socket: WebSocket | null = null;
         _reopening: boolean = false;
         _lastConnectTime = 0;
         _backoff = 0;
@@ -170,13 +170,13 @@ define(["util"], function(util: Util) {
             }
             this._lastConnectTime = Date.now();
             this.socket = new WebSocket(this.address);
-            this.socket.onopen = (function() {
+            this.socket.onopen = () => {
                 this._flush();
                 this._reopening = false;
-            }).bind(this);
-            this.socket.onclose = (function(event) {
+            };
+            this.socket.onclose = event => {
                 this.socket = null;
-                var method = "error";
+                var method: keyof Console = "error";
                 if(event.wasClean) {
                     // FIXME: should I even log clean closes?
                     method = "log";
@@ -191,40 +191,41 @@ define(["util"], function(util: Util) {
                         this._backoff++;
                     }
                     var time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
-                    setTimeout((function() {
+                    setTimeout(() => {
                         this._setupConnection();
-                    }).bind(this), time);
+                    }, time);
                 }
-            }).bind(this);
-            this.socket.onmessage = (function(event) {
+            };
+            this.socket.onmessage = (event) => {
                 this._incoming(event.data);
-            }).bind(this);
-            this.socket.onerror = (function(event) {
+            };
+            this.socket.onerror = event => {
                 console.error('WebSocket error:', event.data);
-            }).bind(this);
+            };
         }
 
     } // /WebSocketChannel
 
 
     /* Sends TO a window or iframe */
-    channels.PostMessageChannel = util.Class(AbstractChannel, {
-        _pingPollPeriod: 100, // milliseconds
-        _pingPollIncrease: 100, // +100 milliseconds for each failure
-        _pingMax: 2000, // up to a max of 2000 milliseconds
+    channels.PostMessageChannel = class PostMessageChannel extends AbstractChannel {
+        _pingPollPeriod = 100 // milliseconds
+        _pingPollIncrease = 100 // +100 milliseconds for each failure
+        _pingMax: 2000 = // up to a max of 2000 milliseconds
+        expectedOrigin;
+        _pingReceived: boolean = false;
+        _pingFailures = 0;
 
-        constructor: function(win, expectedOrigin) {
+        constructor(win, expectedOrigin) {
+            super();
             this.expectedOrigin = expectedOrigin;
-            this._pingReceived = false;
             this._receiveMessage = this._receiveMessage.bind(this);
             if(win) {
                 this.bindWindow(win, true);
             }
-            this._pingFailures = 0;
-            this.baseConstructor();
-        },
+        }
 
-        toString: function() {
+        toString() {
             var s = '[PostMessageChannel';
             if(this.window) {
                 s += ' to window ' + this.window;
@@ -235,9 +236,9 @@ define(["util"], function(util: Util) {
                 s += ' still establishing';
             }
             return s + ']';
-        },
+        }
 
-        bindWindow: function(win, noSetup) {
+        bindWindow(win, noSetup) {
             if(this.window) {
                 this.close();
                 // Though we deinitialized everything, we aren't exactly closed:
@@ -260,17 +261,17 @@ define(["util"], function(util: Util) {
             if(!noSetup) {
                 this._setupConnection();
             }
-        },
+        }
 
-        _send: function(data) {
+        _send(data) {
             this.window.postMessage(data, this.expectedOrigin || "*");
-        },
+        }
 
-        _ready: function() {
+        _ready() {
             return this.window && this._pingReceived;
-        },
+        }
 
-        _setupConnection: function() {
+        _setupConnection() {
             if(this.closed || this._pingReceived || (!this.window)) {
                 return;
             }
@@ -282,7 +283,7 @@ define(["util"], function(util: Util) {
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         },
 
-        _receiveMessage: function(event) {
+        _receiveMessage(event) {
             if(event.source !== this.window) {
                 return;
             }
@@ -304,9 +305,9 @@ define(["util"], function(util: Util) {
                 return;
             }
             this._incoming(event.data);
-        },
+        }
 
-        close: function() {
+        close() {
             this.closed = true;
             this._pingReceived = false;
             if(this._pingTimeout) {
@@ -318,8 +319,7 @@ define(["util"], function(util: Util) {
             }
             this.emit("close");
         }
-
-    }); // /PostMessageChannel
+    } // /PostMessageChannel
 
 
     /* Handles message FROM an exterior window/parent */
