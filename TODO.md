@@ -10,6 +10,7 @@
 - Configuration options seriously need to be reduced
 - check all uses of Function
 - search all "!." and "!;" and "!)"
+- check all unknown types
 
 # Tests
 
