@@ -45,7 +45,7 @@ interface MessageFromChannel {
     close: boolean;
 }
 
-define(["util"], function(util: Util) {
+function ChannelsMain(util: Util) {
     /* Subclasses must define:
 	
     - ._send(string)
@@ -119,7 +119,6 @@ define(["util"], function(util: Util) {
         abstract onmessage(jsonData: string): void;
         abstract onclose(): void;
     }
-
 
     class WebSocketChannel extends AbstractChannel {
         backoffTime = 50; // Milliseconds to add to each reconnect time
@@ -218,7 +217,6 @@ define(["util"], function(util: Util) {
         onmessage() {}
 
     } // /WebSocketChannel
-
 
     /* Sends TO a window or iframe */
     class PostMessageChannel extends AbstractChannel {
@@ -341,7 +339,6 @@ define(["util"], function(util: Util) {
         onclose() {}
         onmessage() {}
     } // /PostMessageChannel
-
 
     /* Handles message FROM an exterior window/parent */
     class PostMessageIncomingChannel extends AbstractChannel {
@@ -519,4 +516,6 @@ define(["util"], function(util: Util) {
     }
 
     return channels;
-});
+}
+
+define(["util"], ChannelsMain);
