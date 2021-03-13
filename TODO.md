@@ -11,6 +11,7 @@
 - check all uses of Function
 - search all "!." and "!;" and "!)"
 - check all unknown types
+- check all assert that are used for type checking
 
 # Tests
 
