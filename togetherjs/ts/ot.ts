@@ -1,97 +1,109 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["util"], function (util) {
-    var assert = util.assert;
+
+define(["util"], function(util: Util) {
+    const assert: typeof util.assert = util.assert;
+
     /** Set that only supports string items */
-    var StringSet = /** @class */ (function () {
-        function StringSet() {
-            this._items = {};
-            this._count = 0;
-        }
-        StringSet.prototype.contains = function (k) {
+    class StringSet {
+        private _items: { [key: string]: null } = {};
+        private _count = 0;
+
+        contains(k: string) {
             assert(typeof k == "string");
             return this._items.hasOwnProperty(k);
-        };
-        StringSet.prototype.add = function (k) {
+        }
+        add(k: string) {
             assert(typeof k == "string");
-            if (this.contains(k)) {
+            if(this.contains(k)) {
                 return;
             }
             this._items[k] = null;
             this._count++;
-        };
-        StringSet.prototype.remove = function (k) {
+        }
+        remove(k: string) {
             assert(typeof k == "string");
-            if (!this.contains(k)) {
+            if(!this.contains(k)) {
                 return;
             }
             delete this._items[k];
             this._count++;
-        };
-        StringSet.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this._count === 0;
-        };
-        return StringSet;
-    }());
-    ;
-    var Queue = /** @class */ (function () {
-        function Queue(size) {
-            this._q = [];
-            this._deleted = 0;
+        }
+    };
+
+    class Queue<T> {
+        private _q: T[] = [];
+        private _deleted = 0;
+        private _size: number;
+
+        constructor(size: number) {
             this._size = size;
         }
-        Queue.prototype._trim = function () {
-            if (this._size) {
-                if (this._q.length > this._size) {
+
+        _trim() {
+            if(this._size) {
+                if(this._q.length > this._size) {
                     this._q.splice(0, this._q.length - this._size);
                     this._deleted += this._q.length - this._size;
                 }
             }
-        };
-        Queue.prototype.push = function (item) {
+        }
+
+        push(item: T) {
             this._q.push(item);
             this._trim();
-        };
-        Queue.prototype.last = function () {
+        }
+
+        last() {
             return this._q[this._q.length - 1];
-        };
-        Queue.prototype.walkBack = function (callback, thisArg) {
+        }
+
+        walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
             var result = true;
-            for (var i = this._q.length - 1; i >= 0; i--) {
+            for(var i = this._q.length - 1; i >= 0; i--) {
                 var item = this._q[i];
                 result = callback.call(thisArg, item, i + this._deleted);
-                if (result === false) {
+                if(result === false) {
                     return result;
-                }
-                else if (!result) {
+                } else if(!result) {
                     result = true;
                 }
             }
             return result;
-        };
-        Queue.prototype.walkForward = function (index, callback, thisArg) {
+        }
+
+        walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
             var result = true;
-            for (var i = index; i < this._q.length; i++) {
+            for(var i = index; i < this._q.length; i++) {
                 var item = this._q[i - this._deleted];
                 result = callback.call(thisArg, item, i);
-                if (result === false) {
+                if(result === false) {
                     return result;
-                }
-                else if (!result) {
+                } else if(!result) {
                     result = true;
                 }
             }
             return result;
-        };
-        Queue.prototype.insert = function (index, item) {
+        }
+
+        insert(index: number, item: T) {
             this._q.splice(index - this._deleted, 0, item);
-        };
-        return Queue;
-    }());
-    var Change = /** @class */ (function () {
-        function Change(version, clientId, delta, known, outOfOrder) {
+        }
+
+    }
+
+    class Change {
+        private version;
+        private clientId;
+        private delta;
+        private known;
+        private outOfOrder;
+
+        constructor(version, clientId, delta, known, outOfOrder) {
             this.version = version;
             this.clientId = clientId;
             this.delta = delta;
@@ -99,77 +111,83 @@ define(["util"], function (util) {
             this.outOfOrder = !!outOfOrder;
             assert(typeof version == "number" && typeof clientId == "string", "Bad Change():", version, clientId);
         }
-        Change.prototype.toString = function () {
+
+        toString() {
             var s = "[Change " + this.version + "." + this.clientId + ": ";
             s += this.delta + " ";
-            if (this.outOfOrder) {
+            if(this.outOfOrder) {
                 s += "(out of order) ";
             }
             var cids = [];
-            for (var a in this.known) {
-                if (this.known.hasOwnProperty(a)) {
+            for(var a in this.known) {
+                if(this.known.hasOwnProperty(a)) {
                     cids.push(a);
                 }
             }
             cids.sort();
             s += "{";
-            if (!cids.length) {
+            if(!cids.length) {
                 s += "nothing known";
-            }
-            else {
-                cids.forEach(function (a, index) {
-                    if (index) {
+            } else {
+                cids.forEach(function(a, index) {
+                    if(index) {
                         s += ";";
                     }
                     s += a + ":" + this.known[a];
                 }, this);
             }
             return s + "}]";
-        };
-        Change.prototype.clone = function () {
+        }
+
+        clone() {
             return new Change(this.version, this.clientId, this.delta.clone(), util.extend(this.known), this.outOfOrder);
-        };
-        Change.prototype.isBefore = function (otherChange) {
+        }
+
+        isBefore(otherChange: Change) {
             assert(otherChange !== this, "Tried to compare a change to itself", this);
             return otherChange.version > this.version || (otherChange.version == this.version && otherChange.clientId > this.clientId);
-        };
-        Change.prototype.knowsAboutAll = function (versions) {
-            for (var clientId in versions) {
-                if (!versions.hasOwnProperty(clientId)) {
+        }
+
+        knowsAboutAll(versions) {
+            for(var clientId in versions) {
+                if(!versions.hasOwnProperty(clientId)) {
                     continue;
                 }
-                if (!versions[clientId]) {
+                if(!versions[clientId]) {
                     continue;
                 }
-                if ((!this.known[clientId]) || this.known[clientId] < versions[clientId]) {
+                if((!this.known[clientId]) || this.known[clientId] < versions[clientId]) {
                     return false;
                 }
             }
             return true;
-        };
-        Change.prototype.knowsAboutChange = function (change) {
+        }
+
+        knowsAboutChange(change) {
             return change.clientId == this.clientId || (this.known[change.clientId] && this.known[change.clientId] >= change.version);
-        };
-        Change.prototype.knowsAboutVersion = function (version, clientId) {
-            if ((!version) || clientId == this.clientId) {
+        }
+
+        knowsAboutVersion(version, clientId) {
+            if((!version) || clientId == this.clientId) {
                 return true;
             }
             return this.known[clientId] && this.known[clientId] >= version;
-        };
-        Change.prototype.maybeMissingChanges = function (mostRecentVersion, clientId) {
-            if (!mostRecentVersion) {
+        }
+
+        maybeMissingChanges(mostRecentVersion, clientId) {
+            if(!mostRecentVersion) {
                 // No actual changes for clientId exist
                 return false;
             }
-            if (!this.known[clientId]) {
+            if(!this.known[clientId]) {
                 // We don't even know about clientId, so we are definitely missing something
                 return true;
             }
-            if (this.known[clientId] >= mostRecentVersion) {
+            if(this.known[clientId] >= mostRecentVersion) {
                 // We know about all versions through mostRecentVersion
                 return false;
             }
-            if ((clientId > this.clientId && this.known[clientId] >= this.version - 1) ||
+            if((clientId > this.clientId && this.known[clientId] >= this.version - 1) ||
                 (clientId < this.clientId && this.known[clientId] == this.version)) {
                 // We know about all versions from clientId that could exist before this
                 // version
@@ -177,9 +195,9 @@ define(["util"], function (util) {
             }
             // We may or may not be missing something
             return true;
-        };
-        return Change;
-    }());
+        }
+    }
+
     /** SimpleHistory synchronizes peers by relying on the server to serialize
      * the order of all updates.  Each client maintains a queue of patches
      * which have not yet been 'committed' (by being echoed back from the
@@ -218,67 +236,79 @@ define(["util"], function (util) {
      * which is the main difference with ot.History.  Everyone applies
      * the same patches in the same order.
      */
-    var SimpleHistory = /** @class */ (function () {
-        function SimpleHistory(clientId, initState, initBasis) {
-            this.queue = [];
-            this.deltaId = 1;
-            this.selection = null;
+    class SimpleHistory {
+        private clientId;
+        private committed;
+        private current;
+        private basis;
+        private queue = [];
+        private deltaId = 1;
+        private selection = null;
+
+        constructor(clientId, initState, initBasis) {
             this.clientId = clientId;
             this.committed = initState;
             this.current = initState;
             this.basis = initBasis;
         }
+
         /** Use a fake change to represent the selection. (This is the only bit that hard codes ot.TextReplace as the delta representation; override this in a subclass (or don't set the selection) if you are using a different delta representation. */
-        SimpleHistory.prototype.setSelection = function (selection) {
-            if (selection) {
-                this.selection = new TextReplace(selection[0], selection[1] - selection[0], '@');
-            }
-            else {
+        setSelection(selection) {
+            if(selection) {
+                this.selection = new TextReplace(selection[0],
+                    selection[1] - selection[0], '@');
+            } else {
                 this.selection = null;
             }
-        };
+        }
+
         /** Decode the fake change to reconstruct the updated selection. */
-        SimpleHistory.prototype.getSelection = function () {
-            if (!this.selection) {
+        getSelection() {
+            if(!this.selection) {
                 return null;
             }
             return [this.selection.start, this.selection.start + this.selection.del];
-        };
+        }
+
         /** Add this delta to this client's queue. */
-        SimpleHistory.prototype.add = function (delta) {
+        add(delta) {
             var change = {
                 id: this.clientId + '.' + (this.deltaId++),
                 delta: delta
             };
-            if (!this.queue.length) {
+            if(!this.queue.length) {
                 change.basis = this.basis;
             }
             this.queue.push(change);
             this.current = delta.apply(this.current);
             return !!change.basis;
-        };
+        }
+
         /** Apply a delta received from the server. Return true iff the current text changed as a result. */
-        SimpleHistory.prototype.commit = function (change) {
+        commit(change) {
+
             // ignore it if the basis doesn't match (this patch doesn't apply)
             // if so, this delta is out of order; we expect the original client
             // to retransmit an updated delta.
-            if (change.basis !== this.basis) {
+            if(change.basis !== this.basis) {
                 return false; // 'current' text did not change
             }
+
             // is this the first thing on the queue?
-            if (this.queue.length && this.queue[0].id === change.id) {
+            if(this.queue.length && this.queue[0].id === change.id) {
                 assert(change.basis === this.queue[0].basis);
                 // good, apply this to commit state & remove it from queue
                 this.committed = this.queue.shift().delta.apply(this.committed);
                 this.basis++;
-                if (this.queue.length) {
+                if(this.queue.length) {
                     this.queue[0].basis = this.basis;
                 }
                 return false; // 'current' text did not change
             }
+
             // Transpose all bits on the queue to put this patch first.
             var inserted = change.delta;
-            this.queue = this.queue.map(function (qchange) {
+            this.queue = this.queue.map(function(qchange) {
                 var tt = qchange.delta.transpose(inserted);
                 inserted = tt[1];
                 return {
@@ -286,41 +316,42 @@ define(["util"], function (util) {
                     delta: tt[0]
                 };
             });
-            if (this.selection) {
+            if(this.selection) {
                 // update the selection!
                 this.selection = this.selection.transpose(inserted)[0];
             }
             this.committed = change.delta.apply(this.committed);
             this.basis++;
-            if (this.queue.length) {
+            if(this.queue.length) {
                 this.queue[0].basis = this.basis;
             }
             // Update current by replaying queued changes starting from 'committed'
             this.current = this.committed;
-            this.queue.forEach(function (qchange) {
+            this.queue.forEach(function(qchange) {
                 this.current = qchange.delta.apply(this.current);
             }.bind(this));
             return true; // The 'current' text changed.
-        };
+        }
+
         /** Return the next change to transmit to the server, or null if there isn't one. */
-        SimpleHistory.prototype.getNextToSend = function () {
+        getNextToSend() {
             var qchange = this.queue[0];
-            if (!qchange) {
+            if(!qchange) {
                 /* nothing to send */
                 return null;
             }
-            if (qchange.sent) {
+            if(qchange.sent) {
                 /* already sent */
                 return null;
             }
             assert(qchange.basis);
             qchange.sent = true;
             return qchange;
-        };
-        return SimpleHistory;
-    }());
-    var History = /** @class */ (function () {
-        function History(clientId, initState) {
+        }
+    }
+
+    class History {
+        constructor(clientId, initState) {
             this._history = Queue();
             this._history.push({
                 clientId: "init", state: initState
@@ -329,18 +360,20 @@ define(["util"], function (util) {
             this.known = {};
             this.mostRecentLocalChange = null;
         }
-        History.prototype.add = function (change) {
+
+        add(change) {
             // Simplest cast, it is our change:
-            if (change.clientId == this.clientId) {
+            if(change.clientId == this.clientId) {
                 this._history.push(change);
                 this.mostRecentLocalChange = change.version;
                 return change.delta;
             }
-            assert((!this.known[change.clientId]) || this.known[change.clientId] < change.version, "Got a change", change, "that appears older (or same as) a known change", this.known[change.clientId]);
+            assert((!this.known[change.clientId]) || this.known[change.clientId] < change.version,
+                "Got a change", change, "that appears older (or same as) a known change", this.known[change.clientId]);
             // Second simplest case, we get a change that we can add to our
             // history without modification:
             var last = this._history.last();
-            if ((last.clientId == "init" || last.isBefore(change)) &&
+            if((last.clientId == "init" || last.isBefore(change)) &&
                 change.knowsAboutAll(this.known) &&
                 change.knowsAboutVersion(this.mostRecentLocalChange, this.clientId)) {
                 this._history.push(change);
@@ -348,51 +381,53 @@ define(["util"], function (util) {
                 return change.delta;
             }
             // We must do work!
+
             this.logHistory("//");
+
             // First we check if we need to modify this change because we
             // know about changes that it should know about (changes that
             // preceed it that are in our local history).
             var clientsToCheck = StringSet();
-            for (var clientId in this.known) {
-                if (!this.known.hasOwnProperty(clientId)) {
+            for(var clientId in this.known) {
+                if(!this.known.hasOwnProperty(clientId)) {
                     continue;
                 }
-                if (change.maybeMissingChanges(this.known[clientId], clientId)) {
+                if(change.maybeMissingChanges(this.known[clientId], clientId)) {
                     clientsToCheck.add(clientId);
                 }
             }
-            if (change.maybeMissingChanges(this.mostRecentLocalChange, this.clientId)) {
+            if(change.maybeMissingChanges(this.mostRecentLocalChange, this.clientId)) {
                 clientsToCheck.add(this.clientId);
             }
-            if (!clientsToCheck.isEmpty()) {
+            if(!clientsToCheck.isEmpty()) {
                 var indexToCheckFrom = null;
-                this._history.walkBack(function (c, index) {
+                this._history.walkBack(function(c, index) {
                     indexToCheckFrom = index;
-                    if (c.clientId == "init") {
+                    if(c.clientId == "init") {
                         return false;
                     }
-                    if (clientsToCheck.contains(c.clientId) &&
+                    if(clientsToCheck.contains(c.clientId) &&
                         !change.maybeMissingChanges(c.version, c.clientId)) {
                         clientsToCheck.remove(c.clientId);
-                        if (clientsToCheck.isEmpty()) {
+                        if(clientsToCheck.isEmpty()) {
                             return false;
                         }
                     }
                     return true;
                 }, this);
-                this._history.walkForward(indexToCheckFrom, function (c, index) {
-                    if (c.clientId == "init") {
+                this._history.walkForward(indexToCheckFrom, function(c, index) {
+                    if(c.clientId == "init") {
                         return true;
                     }
-                    if (change.isBefore(c)) {
+                    if(change.isBefore(c)) {
                         return false;
                     }
-                    if (!change.knowsAboutChange(c)) {
+                    if(!change.knowsAboutChange(c)) {
                         var presentDelta = this.promoteDelta(c.delta, index, change);
-                        if (!presentDelta.equals(c.delta)) {
+                        if(!presentDelta.equals(c.delta)) {
                             //console.log("->rebase delta rewrite", presentDelta+"");
                         }
-                        this.logChange("->rebase", change, function () {
+                        this.logChange("->rebase", change, function() {
                             var result = change.delta.transpose(presentDelta);
                             change.delta = result[0];
                             change.known[c.clientId] = c.version;
@@ -401,10 +436,11 @@ define(["util"], function (util) {
                     return true;
                 }, this);
             }
+
             // Next we insert the change into its proper location
             var indexToInsert = null;
-            this._history.walkBack(function (c, index) {
-                if (c.clientId == "init" || c.isBefore(change)) {
+            this._history.walkBack(function(c, index) {
+                if(c.clientId == "init" || c.isBefore(change)) {
                     indexToInsert = index + 1;
                     return false;
                 }
@@ -412,12 +448,13 @@ define(["util"], function (util) {
             }, this);
             assert(indexToInsert);
             this._history.insert(indexToInsert, change);
+
             // Now we fix up any forward changes
             var fixupDelta = change.delta;
-            this._history.walkForward(indexToInsert + 1, function (c, index) {
-                if (!c.knowsAboutChange(change)) {
+            this._history.walkForward(indexToInsert + 1, function(c, index) {
+                if(!c.knowsAboutChange(change)) {
                     var origChange = c.clone();
-                    this.logChange("^^fix", c, function () {
+                    this.logChange("^^fix", c, function() {
                         var fixupResult = c.delta.transpose(fixupDelta);
                         console.log("  ^^real");
                         var result = c.delta.transpose(fixupDelta);
@@ -429,158 +466,168 @@ define(["util"], function (util) {
                     assert(c.knowsAboutChange(change));
                 }
             }, this);
+
             // Finally we return the transformed delta that represents
             // changes that should be made to the state:
+
             this.logHistory("!!");
             return fixupDelta;
-        };
-        History.prototype.promoteDelta = function (delta, deltaIndex, untilChange) {
-            this._history.walkForward(deltaIndex + 1, function (c, index) {
-                if (untilChange.isBefore(c)) {
+        }
+
+        promoteDelta(delta, deltaIndex, untilChange) {
+            this._history.walkForward(deltaIndex + 1, function(c, index) {
+                if(untilChange.isBefore(c)) {
                     return false;
                 }
                 // FIXME: not sure if this clientId check here is right.  Maybe
                 // if untilChange.knowsAbout(c)?
-                if (untilChange.knowsAboutChange(c)) {
+                if(untilChange.knowsAboutChange(c)) {
                     var result = c.delta.transpose(delta);
                     delta = result[1];
                 }
                 return true;
             });
             return delta;
-        };
-        History.prototype.logHistory = function (prefix) {
+        }
+
+        logHistory(prefix) {
             prefix = prefix || "";
             var postfix = Array.prototype.slice.call(arguments, 1);
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
             var hstate;
-            this._history.walkForward(0, function (c, index) {
-                if (!index) {
+            this._history.walkForward(0, function(c, index) {
+                if(!index) {
                     assert(c.clientId == "init");
                     console.log(prefix + " init:", JSON.stringify(c.state));
                     hstate = c.state;
-                }
-                else {
+                } else {
                     try {
                         hstate = c.delta.apply(hstate);
-                    }
-                    catch (e) {
+                    } catch(e) {
                         hstate = "Error: " + e;
                     }
                     console.log(prefix + "  ", index, c + "", JSON.stringify(hstate));
                 }
             });
-        };
-        History.prototype.logChange = function (prefix, change, callback) {
+        }
+
+        logChange(prefix, change, callback) {
             prefix = prefix || "before";
             var postfix = Array.prototype.slice.call(arguments, 3);
-            console.log.apply(console, [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe(true))]));
+            console.log.apply(
+                console,
+                [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe(true))]));
             try {
                 callback();
-            }
-            finally {
+            } finally {
                 console.log(prefix + " after:", change + "", JSON.stringify(this.getStateSafe()));
             }
-        };
-        History.prototype.addDelta = function (delta) {
+        }
+
+        addDelta(delta) {
             var version = this._createVersion();
             var change = Change(version, this.clientId, delta, util.extend(this.knownVersions));
             this.add(change);
             return change;
-        };
-        History.prototype._createVersion = function () {
+        }
+
+        _createVersion() {
             var max = 1;
-            for (var id in this.knownVersions) {
+            for(var id in this.knownVersions) {
                 max = Math.max(max, this.knownVersions[id]);
             }
             max = Math.max(max, this.mostRecentLocalChange);
             return max + 1;
-        };
-        History.prototype.fault = function (change) {
+        }
+
+        fault(change) {
             throw new Error('Fault');
-        };
-        History.prototype.getState = function () {
+        }
+
+        getState() {
             var state;
-            this._history.walkForward(0, function (c) {
-                if (c.clientId == "init") {
+            this._history.walkForward(0, function(c) {
+                if(c.clientId == "init") {
                     // Initialization, has the state
                     state = c.state;
-                }
-                else {
+                } else {
                     state = c.delta.apply(state);
                 }
             }, this);
             return state;
-        };
-        History.prototype.getStateSafe = function () {
+        }
+
+        getStateSafe() {
             try {
                 return this.getState();
-            }
-            catch (e) {
+            } catch(e) {
                 return 'Error: ' + e;
             }
-        };
-        return History;
-    }());
-    ;
-    var TextReplace = /** @class */ (function () {
-        function TextReplace(start, del, text) {
+        }
+    };
+
+    class TextReplace {
+        constructor(start, del, text) {
             assert(typeof start == "number" && typeof del == "number" && typeof text == "string", start, del, text);
             assert(start >= 0 && del >= 0, start, del);
             this.start = start;
             this.del = del;
             this.text = text;
         }
-        TextReplace.prototype.toString = function () {
-            if (this.empty()) {
+
+        toString() {
+            if(this.empty()) {
                 return '[no-op]';
             }
-            if (!this.del) {
+            if(!this.del) {
                 return '[insert ' + JSON.stringify(this.text) + ' @' + this.start + ']';
-            }
-            else if (!this.text) {
+            } else if(!this.text) {
                 return '[delete ' + this.del + ' chars @' + this.start + ']';
-            }
-            else {
+            } else {
                 return '[replace ' + this.del + ' chars with ' + JSON.stringify(this.text) + ' @' + this.start + ']';
             }
-        };
-        TextReplace.prototype.equals = function (other) {
+        }
+
+        equals(other) {
             return other.constructor === this.constructor &&
                 other.del === this.del &&
                 other.start === this.start &&
                 other.text === this.text;
-        };
-        TextReplace.prototype.clone = function (start, del, text) {
-            if (start === undefined) {
+        }
+
+        clone(start, del, text) {
+            if(start === undefined) {
                 start = this.start;
             }
-            if (del === undefined) {
+            if(del === undefined) {
                 del = this.del;
             }
-            if (text === undefined) {
+            if(text === undefined) {
                 text = this.text;
             }
             return ot.TextReplace(start, del, text);
-        };
-        TextReplace.prototype.empty = function () {
+        }
+
+        empty() {
             return (!this.del) && (!this.text);
-        };
-        TextReplace.prototype.apply = function (text) {
-            if (this.empty()) {
+        }
+
+        apply(text) {
+            if(this.empty()) {
                 return text;
             }
-            if (this.start > text.length) {
+            if(this.start > text.length) {
                 console.trace();
                 throw new util.AssertionError("Start after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
             }
-            if (this.start + this.del > text.length) {
+            if(this.start + this.del > text.length) {
                 throw new util.AssertionError("Start+del after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
             }
             return text.substr(0, this.start) + this.text + text.substr(this.start + this.del);
-        };
-        TextReplace.prototype.transpose = function (delta) {
+        }
+
+        transpose(delta) {
             /* Transform this delta as though the other delta had come before it.
                Returns a [new_version_of_this, transformed_delta], where transformed_delta
                satisfies:
@@ -593,125 +640,123 @@ define(["util"], function (util) {
             */
             var overlap;
             assert(delta instanceof ot.TextReplace, "Transposing with non-TextReplace:", delta);
-            if (this.empty()) {
+            if(this.empty()) {
                 //console.log("  =this is empty");
                 return [this.clone(), delta.clone()];
             }
-            if (delta.empty()) {
+            if(delta.empty()) {
                 //console.log("  =other is empty");
                 return [this.clone(), delta.clone()];
             }
-            if (delta.before(this)) {
+            if(delta.before(this)) {
                 //console.log("  =this after other");
                 return [this.clone(this.start + delta.text.length - delta.del),
-                    delta.clone()];
-            }
-            else if (this.before(delta)) {
+                delta.clone()];
+            } else if(this.before(delta)) {
                 //console.log("  =this before other");
                 return [this.clone(), delta.clone(delta.start + this.text.length - this.del)];
-            }
-            else if (delta.sameRange(this)) {
+            } else if(delta.sameRange(this)) {
                 //console.log("  =same range");
                 return [this.clone(this.start + delta.text.length, 0),
-                    delta.clone(undefined, 0)];
-            }
-            else if (delta.contains(this)) {
+                delta.clone(undefined, 0)];
+            } else if(delta.contains(this)) {
                 //console.log("  =other contains this");
                 return [this.clone(delta.start + delta.text.length, 0, this.text),
-                    delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
-            }
-            else if (this.contains(delta)) {
+                delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
+            } else if(this.contains(delta)) {
                 //console.log("  =this contains other");
                 return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text),
-                    delta.clone(this.start, 0, delta.text)];
-            }
-            else if (this.overlapsStart(delta)) {
+                delta.clone(this.start, 0, delta.text)];
+            } else if(this.overlapsStart(delta)) {
                 //console.log("  =this overlaps start of other");
                 overlap = this.start + this.del - delta.start;
                 return [this.clone(undefined, this.del - overlap),
-                    delta.clone(this.start + this.text.length, delta.del - overlap)];
-            }
-            else {
+                delta.clone(this.start + this.text.length, delta.del - overlap)];
+            } else {
                 //console.log("  =this overlaps end of other");
                 assert(delta.overlapsStart(this), delta + "", "does not overlap start of", this + "", delta.before(this));
                 overlap = delta.start + delta.del - this.start;
                 return [this.clone(delta.start + delta.text.length, this.del - overlap),
-                    delta.clone(undefined, delta.del - overlap)];
+                delta.clone(undefined, delta.del - overlap)];
             }
             throw 'Should not happen';
-        };
-        TextReplace.prototype.before = function (other) {
+        }
+
+        before(other) {
             return this.start + this.del <= other.start;
-        };
-        TextReplace.prototype.contains = function (other) {
+        }
+
+        contains(other) {
             return other.start >= this.start && other.start + other.del < this.start + this.del;
-        };
-        TextReplace.prototype.sameRange = function (other) {
+        }
+
+        sameRange(other) {
             return other.start == this.start && other.del == this.del;
-        };
-        TextReplace.prototype.overlapsStart = function (other) {
+        }
+
+        overlapsStart(other) {
             return this.start < other.start && this.start + this.del > other.start;
-        };
+        }
+
         /* Make a new ot.TextReplace that converts oldValue to newValue. */
-        TextReplace.fromChange = function (oldValue, newValue) {
+        static fromChange(oldValue, newValue) {
             assert(typeof oldValue == "string");
             assert(typeof newValue == "string");
             var commonStart = 0;
-            while (commonStart < newValue.length &&
+            while(commonStart < newValue.length &&
                 newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
                 commonStart++;
             }
             var commonEnd = 0;
-            while (commonEnd < (newValue.length - commonStart) &&
+            while(commonEnd < (newValue.length - commonStart) &&
                 commonEnd < (oldValue.length - commonStart) &&
                 newValue.charAt(newValue.length - commonEnd - 1) ==
-                    oldValue.charAt(oldValue.length - commonEnd - 1)) {
+                oldValue.charAt(oldValue.length - commonEnd - 1)) {
                 commonEnd++;
             }
             var removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
             var inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
-            if (!(removed.length || inserted)) {
+            if(!(removed.length || inserted)) {
                 return null;
             }
             return this(commonStart, removed.length, inserted);
-        };
-        TextReplace.random = function (source, generator) {
+        }
+
+        static random(source, generator) {
             var text, start, len;
             var ops = ["ins", "del", "repl"];
-            if (!source.length) {
+            if(!source.length) {
                 ops = ["ins"];
             }
-            switch (generator.pick(ops)) {
+            switch(generator.pick(ops)) {
                 case "ins":
-                    if (!generator.number(2)) {
+                    if(!generator.number(2)) {
                         text = generator.string(1);
-                    }
-                    else {
+                    } else {
                         text = generator.string(generator.number(3) + 1);
                     }
-                    if (!generator.number(4)) {
+                    if(!generator.number(4)) {
                         start = 0;
-                    }
-                    else if (!generator.number(3)) {
+                    } else if(!generator.number(3)) {
                         start = source.length - 1;
-                    }
-                    else {
+                    } else {
                         start = generator.number(source.length);
                     }
                     return this(start, 0, text);
+
                 case "del":
-                    if (!generator.number(20)) {
+                    if(!generator.number(20)) {
                         return this(0, source.length, "");
                     }
                     start = generator.number(source.length - 1);
-                    if (!generator.number(2)) {
+                    if(!generator.number(2)) {
                         len = 1;
-                    }
-                    else {
+                    } else {
                         len = generator.number(5) + 1;
                     }
                     len = Math.min(len, source.length - start);
                     return this(start, len, "");
+
                 case "repl":
                     start = generator.number(source.length - 1);
                     len = generator.number(5);
@@ -720,13 +765,14 @@ define(["util"], function (util) {
                     return this(start, len, text);
             }
             throw 'Unreachable';
-        };
-        return TextReplace;
-    }());
-    var ot = {
-        SimpleHistory: function () { return new SimpleHistory(); },
-        History: function () { return new History(); },
-        TextReplace: function () { return new TextReplace(); },
-    };
+        }
+    }
+
+    const ot = {
+        SimpleHistory: () => new SimpleHistory(),
+        History: () => new History(),
+        TextReplace: () => new TextReplace(),
+    }
+
     return ot;
 });
