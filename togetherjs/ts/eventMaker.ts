@@ -15,53 +15,53 @@ function createTogetherjsMouseEvent() {
     return event;
 }
 
-define(["jquery", "util"], function($: JQueryStatic, util: Util) {
-    let eventMaker = class EventMaker {
+class EventMaker {
+    performClick(target: HTMLElement | JQuery) {
+        // FIXME: should accept other parameters, like Ctrl/Alt/etc
+        var event = createTogetherjsMouseEvent();
+        event.initMouseEvent(
+            "click", // type
+            true, // canBubble
+            true, // cancelable
+            window, // view
+            0, // detail
+            0, // screenX
+            0, // screenY
+            0, // clientX
+            0, // clientY
+            false, // ctrlKey
+            false, // altKey
+            false, // shiftKey
+            false, // metaKey
+            0, // button
+            null // relatedTarget
+        );
 
-        performClick(target: HTMLElement | JQuery) {
-            // FIXME: should accept other parameters, like Ctrl/Alt/etc
-            var event = createTogetherjsMouseEvent();
-            event.initMouseEvent(
-                "click", // type
-                true, // canBubble
-                true, // cancelable
-                window, // view
-                0, // detail
-                0, // screenX
-                0, // screenY
-                0, // clientX
-                0, // clientY
-                false, // ctrlKey
-                false, // altKey
-                false, // shiftKey
-                false, // metaKey
-                0, // button
-                null // relatedTarget
-            );
-
-            target = $(target)[0];
-            var cancelled = target.dispatchEvent(event);
-            if(cancelled) {
+        target = $(target)[0];
+        var cancelled = target.dispatchEvent(event);
+        if(cancelled) {
+            return;
+        }
+        if(target.tagName == "A") {
+            var href = (target as HTMLAnchorElement).href;
+            if(href) {
+                location.href = href;
                 return;
             }
-            if(target.tagName == "A") {
-                var href = (target as HTMLAnchorElement).href;
-                if(href) {
-                    location.href = href;
-                    return;
-                }
-            }
-            // FIXME: should do button clicks (like a form submit)
-            // FIXME: should run .onclick() as well
         }
-
-        static fireChange(target: HTMLElement | JQuery) {
-            target = $(target)[0];
-            var event = document.createEvent("HTMLEvents");
-            event.initEvent("change", true, true);
-            target.dispatchEvent(event);
-        }
+        // FIXME: should do button clicks (like a form submit)
+        // FIXME: should run .onclick() as well
     }
 
+    static fireChange(target: HTMLElement | JQuery) {
+        target = $(target)[0];
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent("change", true, true);
+        target.dispatchEvent(event);
+    }
+}
+
+define(["jquery", "util"], function($: JQueryStatic, util: Util) {
+    let eventMaker = EventMaker;
     return eventMaker;
 });
