@@ -276,12 +276,11 @@ class OnClass implements TogetherJSNS.On {
         this.off(eventName, cb);
     }
 
-    emit(name: string) {
+    emit(name: string, ...args: any[]) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        let args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
         l.forEach(function(this: TogetherJSNS.On, callback) {
             callback.apply(this, args);

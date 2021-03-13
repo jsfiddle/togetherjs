@@ -66,8 +66,7 @@ class Util {
     }
 
     /** Generates a random ID */
-    public generateId(length: number) {
-        length = length || 10;
+    public generateId(length: number = 10) {
         let letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
         let s = '';
         for(let i = 0; i < length; i++) {

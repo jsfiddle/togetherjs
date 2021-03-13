@@ -34,9 +34,18 @@ is not fully established yet.
 
 */
 
-define(["util"], function(util: Util) {
+type Origin = string;
 
-    var channels = util.Module("channels");
+type WindowLike = HTMLIFrameElement | WindowProxy | Window;
+
+interface MessageFromChannel {
+    message: TogetherJSNS.Message;
+    routeId: string;
+    type: string;
+    close: boolean;
+}
+
+define(["util"], function(util: Util) {
     /* Subclasses must define:
 	
     - ._send(string)
@@ -53,19 +62,17 @@ define(["util"], function(util: Util) {
     */
 
     abstract class AbstractChannel extends OnClass {
-        onmessage = null;
-        onclose = null;
         rawdata = false;
         closed = false;
-
-        _buffer = [];
+        _buffer: string[] = [];
 
         constructor() {
             super();
             this._setupConnection();
         }
 
-        send(data) {
+        // TODO should only take string
+        send(data: string | any) {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -86,7 +93,8 @@ define(["util"], function(util: Util) {
             this._buffer = [];
         }
 
-        _incoming(data) {
+        // TODO any to remove
+        _incoming(data: string) {
             if(!this.rawdata) {
                 try {
                     data = JSON.parse(data);
@@ -101,23 +109,25 @@ define(["util"], function(util: Util) {
             this.emit("message", data);
         }
 
-        abstract _send(a: string);
+        abstract _send(a: string): void;
 
-        abstract _setupConnection();
-        abstract _ready();
+        abstract _setupConnection(): void;
+        abstract _ready(): boolean;
 
         /** must set this.closed to true */
-        abstract close();
+        abstract close(): void;
+
+        abstract onmessage(jsonData: string): void;
+        abstract onclose(): void;
     }
 
 
-    channels.WebSocketChannel = class WebSocketChannel extends AbstractChannel {
-
+    class WebSocketChannel extends AbstractChannel {
         backoffTime = 50; // Milliseconds to add to each reconnect time
         maxBackoffTime = 1500;
         backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
         address: string;
-        socket: WebSocket | null = null;
+        socket!: WebSocket | null; // initialized in _setupConnection
         _reopening: boolean = false;
         _lastConnectTime = 0;
         _backoff = 0;
@@ -156,13 +166,13 @@ define(["util"], function(util: Util) {
             }
         }
 
-        _send(data) {
+        _send(data: string) {
             this.socket.send(data);
         }
 
         _ready() {
-            return this.socket && this.socket.readyState == this.socket.OPEN;
-        },
+            return this.socket != null && this.socket.readyState == this.socket.OPEN;
+        }
 
         _setupConnection() {
             if(this.closed) {
@@ -200,23 +210,28 @@ define(["util"], function(util: Util) {
                 this._incoming(event.data);
             };
             this.socket.onerror = event => {
-                console.error('WebSocket error:', event.data);
+                console.error('WebSocket error:', (event as MessageEvent).data);
             };
         }
+
+        onclose() {}
+        onmessage() {}
 
     } // /WebSocketChannel
 
 
     /* Sends TO a window or iframe */
-    channels.PostMessageChannel = class PostMessageChannel extends AbstractChannel {
-        _pingPollPeriod = 100 // milliseconds
-        _pingPollIncrease = 100 // +100 milliseconds for each failure
-        _pingMax: 2000 = // up to a max of 2000 milliseconds
-        expectedOrigin;
+    class PostMessageChannel extends AbstractChannel {
+        _pingPollPeriod = 100; // milliseconds
+        _pingPollIncrease = 100; // +100 milliseconds for each failure
+        _pingMax= 2000; // up to a max of 2000 milliseconds
+        expectedOrigin: Origin;
         _pingReceived: boolean = false;
         _pingFailures = 0;
+        _pingTimeout: number | null = null;
+        window: Window | null = null;
 
-        constructor(win, expectedOrigin) {
+        constructor(win: WindowProxy, expectedOrigin: Origin) {
             super();
             this.expectedOrigin = expectedOrigin;
             this._receiveMessage = this._receiveMessage.bind(this);
@@ -238,16 +253,18 @@ define(["util"], function(util: Util) {
             return s + ']';
         }
 
-        bindWindow(win, noSetup) {
+        bindWindow(win: WindowLike, noSetup: boolean) {
             if(this.window) {
                 this.close();
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if(win && win.contentWindow) {
-                win = win.contentWindow;
+            if(win && "contentWindow" in win) {
+                this.window = win.contentWindow;
             }
-            this.window = win;
+            else {
+                this.window = win;
+            }
             // FIXME: The distinction between this.window and window seems unimportant
             // in the case of postMessage
             var w = this.window;
@@ -263,12 +280,12 @@ define(["util"], function(util: Util) {
             }
         }
 
-        _send(data) {
+        _send(data: string) {
             this.window.postMessage(data, this.expectedOrigin || "*");
         }
 
         _ready() {
-            return this.window && this._pingReceived;
+            return this.window != null && this._pingReceived;
         }
 
         _setupConnection() {
@@ -281,9 +298,9 @@ define(["util"], function(util: Util) {
             var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
             time = time > this._pingPollMax ? this._pingPollMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
-        },
+        }
 
-        _receiveMessage(event) {
+        _receiveMessage(event: MessageEvent) {
             if(event.source !== this.window) {
                 return;
             }
@@ -319,21 +336,26 @@ define(["util"], function(util: Util) {
             }
             this.emit("close");
         }
+
+        onclose() {}
+        onmessage() {}
     } // /PostMessageChannel
 
 
     /* Handles message FROM an exterior window/parent */
-    channels.PostMessageIncomingChannel = util.Class(AbstractChannel, {
+    class PostMessageIncomingChannel extends AbstractChannel {
+        expectedOrigin: Origin;
+        _pingTimeout: number | null = null;
+        source: Window | MessagePort | null = null;
 
-        constructor: function(expectedOrigin) {
-            this.source = null;
+        constructor(expectedOrigin: Origin) {
+            super();
             this.expectedOrigin = expectedOrigin;
             this._receiveMessage = this._receiveMessage.bind(this);
             window.addEventListener("message", this._receiveMessage, false);
-            this.baseConstructor();
-        },
+        }
 
-        toString: function() {
+        toString() {
             var s = '[PostMessageIncomingChannel';
             if(this.source) {
                 s += ' bound to source ' + s;
@@ -341,25 +363,23 @@ define(["util"], function(util: Util) {
                 s += ' awaiting source';
             }
             return s + ']';
-        },
+        }
 
-        _send: function(data) {
+        _send(data: any) {
             this.source.postMessage(data, this.expectedOrigin);
-        },
+        }
 
-        _ready: function() {
+        _ready() {
             return !!this.source;
-        },
+        }
 
-        _setupConnection: function() {
-        },
+        _setupConnection() {
+        }
 
-        _receiveMessage: function(event) {
-            if(this.expectedOrigin && this.expectedOrigin != "*" &&
-                event.origin != this.expectedOrigin) {
+        _receiveMessage(event: MessageEvent) { // TODO MessageEvent takes a T
+            if(this.expectedOrigin && this.expectedOrigin != "*" && event.origin != this.expectedOrigin) {
                 // FIXME: Maybe not worth mentioning?
-                console.info("Expected message from", this.expectedOrigin,
-                    "but got message from", event.origin);
+                console.info("Expected message from", this.expectedOrigin, "but got message from", event.origin);
                 return;
             }
             if(!this.expectedOrigin) {
@@ -374,9 +394,9 @@ define(["util"], function(util: Util) {
                 return;
             }
             this._incoming(event.data);
-        },
+        }
 
-        close: function() {
+        close() {
             this.closed = true;
             window.removeEventListener("message", this._receiveMessage, false);
             if(this._pingTimeout) {
@@ -388,20 +408,24 @@ define(["util"], function(util: Util) {
             this.emit("close");
         }
 
-    }); // /PostMessageIncomingChannel
+        onclose() {}
+        onmessage() {}
+    }; // /PostMessageIncomingChannel
 
-    channels.Router = util.Class(util.mixinEvents({
+    class Router extends OnClass {
+        _routes: {[key: string]: Route} = Object.create(null);
+        channel: AbstractChannel;
 
-        constructor: function(channel) {
+        constructor(channel?: AbstractChannel) {
+            super();
             this._channelMessage = this._channelMessage.bind(this);
             this._channelClosed = this._channelClosed.bind(this);
-            this._routes = Object.create(null);
             if(channel) {
                 this.bindChannel(channel);
             }
-        },
+        }
 
-        bindChannel: function(channel) {
+        bindChannel(channel: AbstractChannel) {
             if(this.channel) {
                 this.channel.removeListener("message", this._channelMessage);
                 this.channel.removeListener("close", this._channelClosed);
@@ -409,9 +433,9 @@ define(["util"], function(util: Util) {
             this.channel = channel;
             this.channel.on("message", this._channelMessage.bind(this));
             this.channel.on("close", this._channelClosed.bind(this));
-        },
+        }
 
-        _channelMessage: function(msg) {
+        _channelMessage(msg: MessageFromChannel) {
             if(msg.type == "route") {
                 var id = msg.routeId;
                 var route = this._routes[id];
@@ -421,53 +445,60 @@ define(["util"], function(util: Util) {
                 }
                 if(msg.close) {
                     this._closeRoute(route.id);
-                } else {
+                }
+                else {
                     if(route.onmessage) {
                         route.onmessage(msg.message);
                     }
                     route.emit("message", msg.message);
                 }
             }
-        },
+        }
 
-        _channelClosed: function() {
-            for(var id in this._routes) {
+        _channelClosed() {
+            for(let id in this._routes) {
                 this._closeRoute(id);
             }
-        },
+        }
 
-        _closeRoute: function(id) {
+        _closeRoute(id: string) {
             var route = this._routes[id];
             if(route.onclose) {
                 route.onclose();
             }
             route.emit("close");
             delete this._routes[id];
-        },
+        }
 
-        makeRoute: function(id) {
+        makeRoute(id: string) {
             id = id || util.generateId();
-            var route = Route(this, id);
+            var route = new Route(this, id);
             this._routes[id] = route;
             return route;
         }
-    })); // /Router
+    } // /Router
 
-    var Route = util.Class(util.mixinEvents({
-        constructor: function(router, id) {
+    class Route extends OnClass {
+        private router: Router;
+        public readonly id: string;
+        public readonly onmessage: ((msg: TogetherJSNS.Message) => void) | undefined;
+        public readonly onclose: (() => void) | undefined;
+
+        constructor(router: Router, id: string) {
+            super();
             this.router = router;
             this.id = id;
-        },
+        }
 
-        send: function(msg) {
+        send(msg: TogetherJSNS.Message) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
                 message: msg
             });
-        },
+        }
 
-        close: function() {
+        close() {
             if(this.router._routes[this.id] !== this) {
                 // This route instance has been overwritten, so ignore
                 return;
@@ -475,8 +506,14 @@ define(["util"], function(util: Util) {
             delete this.router._routes[this.id];
         }
 
-    })); // /Route
+    } // /Route
+
+    let channels = {
+        "WebSocketChannel": WebSocketChannel,
+        "PostMessageChannel": PostMessageChannel,
+        "PostMessageIncomingChannel": PostMessageIncomingChannel,
+        "Router": Router,
+    }
 
     return channels;
-
 });

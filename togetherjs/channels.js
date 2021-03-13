@@ -17,39 +17,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/* Channel abstraction.  Supported channels:
-
-- WebSocket to an address
-- postMessage between windows
-
-In the future:
-
-- XMLHttpRequest to a server (with some form of queuing)
-
-The interface:
-
-  channel = new ChannelName(parameters)
-
-The instantiation is specific to the kind of channel
-
-Methods:
-
-  onmessage: set to function (jsonData)
-  rawdata: set to true if you want onmessage to receive raw string data
-  onclose: set to function ()
-  send: function (string or jsonData)
-  close: function ()
-
-.send() will encode the data if it is not a string.
-
-(should I include readyState as an attribute?)
-
-Channels must accept messages immediately, caching if the connection
-is not fully established yet.
-
-*/
 define(["util"], function (util) {
-    var channels = util.Module("channels");
     /* Subclasses must define:
     
     - ._send(string)
@@ -68,14 +36,13 @@ define(["util"], function (util) {
         __extends(AbstractChannel, _super);
         function AbstractChannel() {
             var _this = _super.call(this) || this;
-            _this.onmessage = null;
-            _this.onclose = null;
             _this.rawdata = false;
             _this.closed = false;
             _this._buffer = [];
             _this._setupConnection();
             return _this;
         }
+        // TODO should only take string
         AbstractChannel.prototype.send = function (data) {
             if (this.closed) {
                 throw 'Cannot send to a closed connection';
@@ -95,6 +62,7 @@ define(["util"], function (util) {
             }
             this._buffer = [];
         };
+        // TODO any to remove
         AbstractChannel.prototype._incoming = function (data) {
             if (!this.rawdata) {
                 try {
@@ -112,14 +80,13 @@ define(["util"], function (util) {
         };
         return AbstractChannel;
     }(OnClass));
-    channels.WebSocketChannel = /** @class */ (function (_super) {
+    var WebSocketChannel = /** @class */ (function (_super) {
         __extends(WebSocketChannel, _super);
         function WebSocketChannel(address) {
             var _this = _super.call(this) || this;
             _this.backoffTime = 50; // Milliseconds to add to each reconnect time
             _this.maxBackoffTime = 1500;
             _this.backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
-            _this.socket = null;
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
@@ -159,7 +126,7 @@ define(["util"], function (util) {
             this.socket.send(data);
         };
         WebSocketChannel.prototype._ready = function () {
-            return this.socket && this.socket.readyState == this.socket.OPEN;
+            return this.socket != null && this.socket.readyState == this.socket.OPEN;
         };
         WebSocketChannel.prototype._setupConnection = function () {
             var _this = this;
@@ -201,18 +168,22 @@ define(["util"], function (util) {
                 console.error('WebSocket error:', event.data);
             };
         };
+        WebSocketChannel.prototype.onclose = function () { };
+        WebSocketChannel.prototype.onmessage = function () { };
         return WebSocketChannel;
     }(AbstractChannel)); // /WebSocketChannel
     /* Sends TO a window or iframe */
-    channels.PostMessageChannel = /** @class */ (function (_super) {
+    var PostMessageChannel = /** @class */ (function (_super) {
         __extends(PostMessageChannel, _super);
         function PostMessageChannel(win, expectedOrigin) {
             var _this = _super.call(this) || this;
             _this._pingPollPeriod = 100; // milliseconds
             _this._pingPollIncrease = 100; // +100 milliseconds for each failure
-            _this._pingMax = expectedOrigin;
+            _this._pingMax = 2000; // up to a max of 2000 milliseconds
             _this._pingReceived = false;
             _this._pingFailures = 0;
+            _this._pingTimeout = null;
+            _this.window = null;
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             if (win) {
@@ -239,10 +210,12 @@ define(["util"], function (util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if (win && win.contentWindow) {
-                win = win.contentWindow;
+            if (win && "contentWindow" in win) {
+                this.window = win.contentWindow;
             }
-            this.window = win;
+            else {
+                this.window = win;
+            }
             // FIXME: The distinction between this.window and window seems unimportant
             // in the case of postMessage
             var w = this.window;
@@ -261,7 +234,7 @@ define(["util"], function (util) {
             this.window.postMessage(data, this.expectedOrigin || "*");
         };
         PostMessageChannel.prototype._ready = function () {
-            return this.window && this._pingReceived;
+            return this.window != null && this._pingReceived;
         };
         PostMessageChannel.prototype._setupConnection = function () {
             if (this.closed || this._pingReceived || (!this.window)) {
@@ -308,18 +281,23 @@ define(["util"], function (util) {
             }
             this.emit("close");
         };
+        PostMessageChannel.prototype.onclose = function () { };
+        PostMessageChannel.prototype.onmessage = function () { };
         return PostMessageChannel;
     }(AbstractChannel)); // /PostMessageChannel
     /* Handles message FROM an exterior window/parent */
-    channels.PostMessageIncomingChannel = util.Class(AbstractChannel, {
-        constructor: function (expectedOrigin) {
-            this.source = null;
-            this.expectedOrigin = expectedOrigin;
-            this._receiveMessage = this._receiveMessage.bind(this);
-            window.addEventListener("message", this._receiveMessage, false);
-            this.baseConstructor();
-        },
-        toString: function () {
+    var PostMessageIncomingChannel = /** @class */ (function (_super) {
+        __extends(PostMessageIncomingChannel, _super);
+        function PostMessageIncomingChannel(expectedOrigin) {
+            var _this = _super.call(this) || this;
+            _this._pingTimeout = null;
+            _this.source = null;
+            _this.expectedOrigin = expectedOrigin;
+            _this._receiveMessage = _this._receiveMessage.bind(_this);
+            window.addEventListener("message", _this._receiveMessage, false);
+            return _this;
+        }
+        PostMessageIncomingChannel.prototype.toString = function () {
             var s = '[PostMessageIncomingChannel';
             if (this.source) {
                 s += ' bound to source ' + s;
@@ -328,18 +306,17 @@ define(["util"], function (util) {
                 s += ' awaiting source';
             }
             return s + ']';
-        },
-        _send: function (data) {
+        };
+        PostMessageIncomingChannel.prototype._send = function (data) {
             this.source.postMessage(data, this.expectedOrigin);
-        },
-        _ready: function () {
+        };
+        PostMessageIncomingChannel.prototype._ready = function () {
             return !!this.source;
-        },
-        _setupConnection: function () {
-        },
-        _receiveMessage: function (event) {
-            if (this.expectedOrigin && this.expectedOrigin != "*" &&
-                event.origin != this.expectedOrigin) {
+        };
+        PostMessageIncomingChannel.prototype._setupConnection = function () {
+        };
+        PostMessageIncomingChannel.prototype._receiveMessage = function (event) {
+            if (this.expectedOrigin && this.expectedOrigin != "*" && event.origin != this.expectedOrigin) {
                 // FIXME: Maybe not worth mentioning?
                 console.info("Expected message from", this.expectedOrigin, "but got message from", event.origin);
                 return;
@@ -356,8 +333,8 @@ define(["util"], function (util) {
                 return;
             }
             this._incoming(event.data);
-        },
-        close: function () {
+        };
+        PostMessageIncomingChannel.prototype.close = function () {
             this.closed = true;
             window.removeEventListener("message", this._receiveMessage, false);
             if (this._pingTimeout) {
@@ -367,18 +344,25 @@ define(["util"], function (util) {
                 this.onclose();
             }
             this.emit("close");
-        }
-    }); // /PostMessageIncomingChannel
-    channels.Router = util.Class(util.mixinEvents({
-        constructor: function (channel) {
-            this._channelMessage = this._channelMessage.bind(this);
-            this._channelClosed = this._channelClosed.bind(this);
-            this._routes = Object.create(null);
+        };
+        PostMessageIncomingChannel.prototype.onclose = function () { };
+        PostMessageIncomingChannel.prototype.onmessage = function () { };
+        return PostMessageIncomingChannel;
+    }(AbstractChannel));
+    ; // /PostMessageIncomingChannel
+    var Router = /** @class */ (function (_super) {
+        __extends(Router, _super);
+        function Router(channel) {
+            var _this = _super.call(this) || this;
+            _this._routes = Object.create(null);
+            _this._channelMessage = _this._channelMessage.bind(_this);
+            _this._channelClosed = _this._channelClosed.bind(_this);
             if (channel) {
-                this.bindChannel(channel);
+                _this.bindChannel(channel);
             }
-        },
-        bindChannel: function (channel) {
+            return _this;
+        }
+        Router.prototype.bindChannel = function (channel) {
             if (this.channel) {
                 this.channel.removeListener("message", this._channelMessage);
                 this.channel.removeListener("close", this._channelClosed);
@@ -386,8 +370,8 @@ define(["util"], function (util) {
             this.channel = channel;
             this.channel.on("message", this._channelMessage.bind(this));
             this.channel.on("close", this._channelClosed.bind(this));
-        },
-        _channelMessage: function (msg) {
+        };
+        Router.prototype._channelMessage = function (msg) {
             if (msg.type == "route") {
                 var id = msg.routeId;
                 var route = this._routes[id];
@@ -405,46 +389,57 @@ define(["util"], function (util) {
                     route.emit("message", msg.message);
                 }
             }
-        },
-        _channelClosed: function () {
+        };
+        Router.prototype._channelClosed = function () {
             for (var id in this._routes) {
                 this._closeRoute(id);
             }
-        },
-        _closeRoute: function (id) {
+        };
+        Router.prototype._closeRoute = function (id) {
             var route = this._routes[id];
             if (route.onclose) {
                 route.onclose();
             }
             route.emit("close");
             delete this._routes[id];
-        },
-        makeRoute: function (id) {
+        };
+        Router.prototype.makeRoute = function (id) {
             id = id || util.generateId();
-            var route = Route(this, id);
+            var route = new Route(this, id);
             this._routes[id] = route;
             return route;
+        };
+        return Router;
+    }(OnClass)); // /Router
+    var Route = /** @class */ (function (_super) {
+        __extends(Route, _super);
+        function Route(router, id) {
+            var _this = _super.call(this) || this;
+            _this.router = router;
+            _this.id = id;
+            return _this;
         }
-    })); // /Router
-    var Route = util.Class(util.mixinEvents({
-        constructor: function (router, id) {
-            this.router = router;
-            this.id = id;
-        },
-        send: function (msg) {
+        Route.prototype.send = function (msg) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
                 message: msg
             });
-        },
-        close: function () {
+        };
+        Route.prototype.close = function () {
             if (this.router._routes[this.id] !== this) {
                 // This route instance has been overwritten, so ignore
                 return;
             }
             delete this.router._routes[this.id];
-        }
-    })); // /Route
+        };
+        return Route;
+    }(OnClass)); // /Route
+    var channels = {
+        "WebSocketChannel": WebSocketChannel,
+        "PostMessageChannel": PostMessageChannel,
+        "PostMessageIncomingChannel": PostMessageIncomingChannel,
+        "Router": Router,
+    };
     return channels;
 });
