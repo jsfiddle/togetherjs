@@ -55,7 +55,7 @@ define(["jquery", "util"], function($: JQueryStatic, util: Util) {
             // FIXME: should run .onclick() as well
         }
 
-        fireChange(target: HTMLElement | JQuery) {
+        static fireChange(target: HTMLElement | JQuery) {
             target = $(target)[0];
             var event = document.createEvent("HTMLEvents");
             event.initEvent("change", true, true);

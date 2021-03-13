@@ -4,6 +4,109 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+class OnClass implements TogetherJSNS.On {
+    _knownEvents?: string[];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
+
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach((n) => {
+                this.on(n, callback);
+            }, this);
+            return;
+        }
+        if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+            let thisString = "" + this;
+            if(thisString.length > 20) {
+                thisString = thisString.substr(0, 20) + "...";
+            }
+            console.warn(thisString + ".on('" + name + "', ...): unknown event");
+            if(console.trace) {
+                console.trace();
+            }
+        }
+        if(!this._listeners) {
+            this._listeners = {};
+        }
+        if(!this._listeners[name]) {
+            this._listeners[name] = [];
+        }
+        if(this._listeners[name].indexOf(callback) == -1) {
+            this._listeners[name].push(callback);
+        }
+    };
+
+    once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        let attr = "onceCallback_" + name;
+        // FIXME: maybe I should add the event name to the .once attribute:
+        if(!callback[attr]) {
+            callback[attr] = function onceCallback(this: TogetherJSNS.On) {
+                callback.apply(this, arguments);
+                this.off(name, onceCallback);
+                delete callback[attr];
+            };
+        }
+        this.on(name, callback[attr]);
+    };
+
+    off<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(this._listenerOffs) {
+            // Defer the .off() call until the .emit() is done.
+            this._listenerOffs.push([name, callback]);
+            return;
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach(function(this: TogetherJSNS.On, n) {
+                this.off(n, callback);
+            }, this);
+            return;
+        }
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        let l = this._listeners[name], _len = l.length;
+        for(let i = 0; i < _len; i++) {
+            if(l[i] == callback) {
+                l.splice(i, 1);
+                break;
+            }
+        }
+    };
+
+    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>) {
+        this.off(eventName, cb);
+    }
+
+    emit(name: string, ...args: any[]) {
+        let offs = this._listenerOffs = [];
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        let l = this._listeners[name];
+        l.forEach(function(this: TogetherJSNS.On, callback) {
+            callback.apply(this, args);
+        }, this);
+        delete this._listenerOffs;
+        if(offs.length) {
+            offs.forEach(function(this: TogetherJSNS.On, item) {
+                this.off(item[0], item[1]);
+            }, this);
+        }
+
+    };
+}
+
 class AssertionError extends Error {
     public constructor(message?: string) {
         super();

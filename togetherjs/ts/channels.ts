@@ -68,7 +68,6 @@ define(["util"], function(util: Util) {
 
         constructor() {
             super();
-            this._setupConnection();
         }
 
         // TODO should only take string
@@ -138,6 +137,7 @@ define(["util"], function(util: Util) {
                 address = address.replace(/^http/i, 'ws');
             }
             this.address = address;
+            this._setupConnection();
         }
 
         toString() {
@@ -238,6 +238,7 @@ define(["util"], function(util: Util) {
             if(win) {
                 this.bindWindow(win, true);
             }
+            this._setupConnection();
         }
 
         toString() {
@@ -353,6 +354,7 @@ define(["util"], function(util: Util) {
             this.expectedOrigin = expectedOrigin;
             this._receiveMessage = this._receiveMessage.bind(this);
             window.addEventListener("message", this._receiveMessage, false);
+            this._setupConnection();
         }
 
         toString() {
@@ -418,8 +420,9 @@ define(["util"], function(util: Util) {
 
         constructor(channel?: AbstractChannel) {
             super();
-            this._channelMessage = this._channelMessage.bind(this);
-            this._channelClosed = this._channelClosed.bind(this);
+            // TODO check calls of _channelMessage and _channelClosed bevause of this weird bindong that has been removed
+            //this._channelMessage = this._channelMessage.bind(this);
+            //this._channelClosed = this._channelClosed.bind(this);
             if(channel) {
                 this.bindChannel(channel);
             }
@@ -509,10 +512,10 @@ define(["util"], function(util: Util) {
     } // /Route
 
     let channels = {
-        "WebSocketChannel": WebSocketChannel,
-        "PostMessageChannel": PostMessageChannel,
-        "PostMessageIncomingChannel": PostMessageIncomingChannel,
-        "Router": Router,
+        "WebSocketChannel": (address: string) => new WebSocketChannel(address),
+        "PostMessageChannel": (win: WindowProxy, expectedOrigin: Origin) => new PostMessageChannel(win, expectedOrigin),
+        "PostMessageIncomingChannel": (expectedOrigin: Origin) => new PostMessageIncomingChannel(expectedOrigin),
+        "Router": () => new Router(),
     }
 
     return channels;

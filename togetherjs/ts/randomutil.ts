@@ -71,5 +71,5 @@ define(["util", "whrandom"], function(util: Util, RandomStream: RandomStreamModu
         }
     }
 
-    return Randomizer;
+    return (seed: unknown) => new Randomizer(seed);
 });

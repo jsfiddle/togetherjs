@@ -55,5 +55,5 @@ define(["util", "whrandom"], function (util, RandomStream) {
         };
         return Randomizer;
     }());
-    return Randomizer;
+    return function (seed) { return new Randomizer(seed); };
 });

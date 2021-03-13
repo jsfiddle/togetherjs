@@ -39,7 +39,6 @@ define(["util"], function (util) {
             _this.rawdata = false;
             _this.closed = false;
             _this._buffer = [];
-            _this._setupConnection();
             return _this;
         }
         // TODO should only take string
@@ -94,6 +93,7 @@ define(["util"], function (util) {
                 address = address.replace(/^http/i, 'ws');
             }
             _this.address = address;
+            _this._setupConnection();
             return _this;
         }
         WebSocketChannel.prototype.toString = function () {
@@ -189,6 +189,7 @@ define(["util"], function (util) {
             if (win) {
                 _this.bindWindow(win, true);
             }
+            _this._setupConnection();
             return _this;
         }
         PostMessageChannel.prototype.toString = function () {
@@ -295,6 +296,7 @@ define(["util"], function (util) {
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             window.addEventListener("message", _this._receiveMessage, false);
+            _this._setupConnection();
             return _this;
         }
         PostMessageIncomingChannel.prototype.toString = function () {
@@ -355,8 +357,9 @@ define(["util"], function (util) {
         function Router(channel) {
             var _this = _super.call(this) || this;
             _this._routes = Object.create(null);
-            _this._channelMessage = _this._channelMessage.bind(_this);
-            _this._channelClosed = _this._channelClosed.bind(_this);
+            // TODO check calls of _channelMessage and _channelClosed bevause of this weird bindong that has been removed
+            //this._channelMessage = this._channelMessage.bind(this);
+            //this._channelClosed = this._channelClosed.bind(this);
             if (channel) {
                 _this.bindChannel(channel);
             }
@@ -436,10 +439,10 @@ define(["util"], function (util) {
         return Route;
     }(OnClass)); // /Route
     var channels = {
-        "WebSocketChannel": WebSocketChannel,
-        "PostMessageChannel": PostMessageChannel,
-        "PostMessageIncomingChannel": PostMessageIncomingChannel,
-        "Router": Router,
+        "WebSocketChannel": function (address) { return new WebSocketChannel(address); },
+        "PostMessageChannel": function (win, expectedOrigin) { return new PostMessageChannel(win, expectedOrigin); },
+        "PostMessageIncomingChannel": function (expectedOrigin) { return new PostMessageIncomingChannel(expectedOrigin); },
+        "Router": function () { return new Router(); },
     };
     return channels;
 });
