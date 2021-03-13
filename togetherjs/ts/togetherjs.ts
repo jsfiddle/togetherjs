@@ -3,6 +3,109 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+class OnClass implements TogetherJSNS.On {
+    _knownEvents?: string[];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
+
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach((n) => {
+                this.on(n, callback);
+            }, this);
+            return;
+        }
+        if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+            let thisString = "" + this;
+            if(thisString.length > 20) {
+                thisString = thisString.substr(0, 20) + "...";
+            }
+            console.warn(thisString + ".on('" + name + "', ...): unknown event");
+            if(console.trace) {
+                console.trace();
+            }
+        }
+        if(!this._listeners) {
+            this._listeners = {};
+        }
+        if(!this._listeners[name]) {
+            this._listeners[name] = [];
+        }
+        if(this._listeners[name].indexOf(callback) == -1) {
+            this._listeners[name].push(callback);
+        }
+    };
+
+    once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        let attr = "onceCallback_" + name;
+        // FIXME: maybe I should add the event name to the .once attribute:
+        if(!callback[attr]) {
+            callback[attr] = function onceCallback(this: TogetherJSNS.On) {
+                callback.apply(this, arguments);
+                this.off(name, onceCallback);
+                delete callback[attr];
+            };
+        }
+        this.on(name, callback[attr]);
+    };
+
+    off<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(this._listenerOffs) {
+            // Defer the .off() call until the .emit() is done.
+            this._listenerOffs.push([name, callback]);
+            return;
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach(function(this: TogetherJSNS.On, n) {
+                this.off(n, callback);
+            }, this);
+            return;
+        }
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        let l = this._listeners[name], _len = l.length;
+        for(let i = 0; i < _len; i++) {
+            if(l[i] == callback) {
+                l.splice(i, 1);
+                break;
+            }
+        }
+    };
+
+    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>) {
+        this.off(eventName, cb);
+    }
+
+    emit(name: string, ...args: any[]) {
+        let offs = this._listenerOffs = [];
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        let l = this._listeners[name];
+        l.forEach(function(this: TogetherJSNS.On, callback) {
+            callback.apply(this, args);
+        }, this);
+        delete this._listenerOffs;
+        if(offs.length) {
+            offs.forEach(function(this: TogetherJSNS.On, item) {
+                this.off(item[0], item[1]);
+            }, this);
+        }
+
+    };
+}
+
 function polyfillConsole() {
     // Make sure we have all of the console.* methods:
     if(typeof console == "undefined") {
@@ -74,7 +177,7 @@ const defaultConfiguration2: TogetherJSNS.Config = {
     cloneClicks: false,
     enableAnalytics: false,
     analyticsCode: "UA-35433268-28",
-    hubBase: defaultHubBase,
+    hubBase: "",
     getUserName: null,
     getUserColor: null,
     getUserAvatar: null,
@@ -95,7 +198,11 @@ const defaultConfiguration2: TogetherJSNS.Config = {
 };
 
 class ConfigClass {
-    constructor(tjsInstance: TogetherJSClass, name: keyof TogetherJSNS.Config, maybeValue: unknown) {
+    constructor(private tjsInstance: TogetherJSClass) {
+
+    }
+    
+    call(name: keyof TogetherJSNS.Config, maybeValue: unknown) {
         let settings: Partial<TogetherJSNS.Config>;
         if(arguments.length == 1) {
             if(typeof name != "object") {
@@ -112,7 +219,7 @@ class ConfigClass {
         let attr: keyof TogetherJSNS.Config;
         for(attr in settings) {
             if(settings.hasOwnProperty(attr)) {
-                if(tjsInstance._configClosed[attr] && tjsInstance.running) {
+                if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
                     throw new Error("The configuration " + attr + " is finalized and cannot be changed");
                 }
             }
@@ -124,13 +231,13 @@ class ConfigClass {
             if(attr == "loaded" || attr == "callToStart") {
                 continue;
             }
-            if(!tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
+            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
-            let previous = tjsInstance._configuration[attr];
+            let previous = this.tjsInstance._configuration[attr];
             let value = settings[attr];
-            tjsInstance._configuration[attr] = value;
-            let trackers = tjsInstance._configTrackers[name] || [];
+            this.tjsInstance._configuration[attr] = value;
+            let trackers = this.tjsInstance._configTrackers[name] || [];
             let failed = false;
             for(i = 0; i < trackers.length; i++) {
                 try {
@@ -145,7 +252,7 @@ class ConfigClass {
                 }
             }
             if(failed) {
-                tjsInstance._configuration[attr] = previous;
+                this.tjsInstance._configuration[attr] = previous;
                 for(i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
@@ -161,33 +268,33 @@ class ConfigClass {
     };
 
     get(name: keyof TogetherJSNS.Config) {
-        let value = TogetherJS._configuration[name];
+        let value = this.tjsInstance._configuration[name];
         if(value === undefined) {
-            if(!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
                 console.error("Tried to load unknown configuration value:", name);
             }
-            value = TogetherJS._defaultConfiguration[name];
+            value = this.tjsInstance._defaultConfiguration[name];
         }
         return value;
     };
 
     track(name: keyof TogetherJSNS.Config, callback: Function) {
-        if(!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+        if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
-        callback(TogetherJS.config.get(name));
-        if(!TogetherJS._configTrackers[name]) {
-            TogetherJS._configTrackers[name] = [];
+        callback(this.tjsInstance.config.get(name));
+        if(!this.tjsInstance._configTrackers[name]) {
+            this.tjsInstance._configTrackers[name] = [];
         }
-        TogetherJS._configTrackers[name].push(callback);
+        this.tjsInstance._configTrackers[name].push(callback);
         return callback;
     };
 
     close(name) {
-        if(!TogetherJS._defaultConfiguration.hasOwnProperty(name)) {
+        if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
-        TogetherJS._configClosed[name] = true;
+        this.tjsInstance._configClosed[name] = true;
         return this.get(name);
     };
 }
@@ -195,6 +302,7 @@ class ConfigClass {
 class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public running: boolean = false;
     private require: Require;
+    private configObject = new ConfigClass(this);
     private config: TogetherJSNS.ConfigFunObj;
     private hub: TogetherJSNS.Hub;
     private requireConfig: RequireConfig;
@@ -215,6 +323,11 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     constructor(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
         super();
         this._knownEvents = ["ready", "close"];
+
+        this.config = (name, maybeValue) => { this.configObject.call(name, maybeValue) };
+        this.config.get = name => this.configObject.get(name);
+        this.config.close = name => this.configObject.close(name);
+
 
         let session;
         if(this.running) {
@@ -269,7 +382,7 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
             }
             else if(attr.indexOf("TogetherJSConfig_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_").length);
-                TogetherJS.config(attrName, window[attr]);
+                this.config(attrName, window[attr]);
             }
             else if(attr.indexOf("TowTruckConfig_on_") === 0) {
                 attrName = attr.substr(("TowTruckConfig_on_").length);
@@ -279,63 +392,63 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
             else if(attr.indexOf("TowTruckConfig_") === 0) {
                 attrName = attr.substr(("TowTruckConfig_").length);
                 console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
-                TogetherJS.config(attrName, window[attr]);
+                this.config(attrName, window[attr]);
             }
 
 
         }
         // FIXME: copy existing config?
-        // FIXME: do this directly in TogetherJS.config() ?
+        // FIXME: do this directly in this.config() ?
         // FIXME: close these configs?
-        let ons: TogetherJSNS.Ons<unknown> = TogetherJS.config.get("on");
+        let ons: TogetherJSNS.Ons<unknown> = this.config.get("on");
         for(attr in globalOns) {
             if(globalOns.hasOwnProperty(attr)) {
                 // FIXME: should we avoid overwriting?  Maybe use arrays?
                 ons[attr] = globalOns[attr];
             }
         }
-        TogetherJS.config("on", ons);
+        this.config("on", ons);
         for(attr in ons) {
-            TogetherJS.on(attr, ons[attr]);
+            this.on(attr, ons[attr]);
         }
-        let hubOns = TogetherJS.config.get("hub_on");
+        let hubOns = this.config.get("hub_on");
         if(hubOns) {
             for(attr in hubOns) {
                 if(hubOns.hasOwnProperty(attr)) {
-                    TogetherJS.hub.on(attr, hubOns[attr]);
+                    this.hub.on(attr, hubOns[attr]);
                 }
             }
         }
-        if(!TogetherJS.config.close('cacheBust')) {
+        if(!this.config.close('cacheBust')) {
             cacheBust = '';
-            delete TogetherJS.requireConfig.urlArgs;
+            delete this.requireConfig.urlArgs;
         }
 
-        if(!TogetherJS.startup.reason) {
+        if(!this.startup.reason) {
             // Then a call to TogetherJS() from a button must be started TogetherJS
-            TogetherJS.startup.reason = "started";
+            this.startup.reason = "started";
         }
 
-        // FIXME: maybe I should just test for TogetherJS.require:
-        if(TogetherJS._loaded) {
-            session = TogetherJS.require("session");
+        // FIXME: maybe I should just test for this.require:
+        if(this._loaded) {
+            session = this.require("session");
             addStyle();
             session.start();
             return;
         }
         // A sort of signal to session.js to tell it to actually
         // start itself (i.e., put up a UI and try to activate)
-        TogetherJS.startup._launch = true;
+        this.startup._launch = true;
 
         addStyle();
-        let minSetting = TogetherJS.config.get("useMinimizedCode");
-        TogetherJS.config.close("useMinimizedCode");
+        let minSetting = this.config.get("useMinimizedCode");
+        this.config.close("useMinimizedCode");
         if(minSetting !== undefined) {
             min = !!minSetting;
         }
-        let requireConfig: RequireConfig = TogetherJS._extend(TogetherJS.requireConfig);
+        let requireConfig: RequireConfig = this._extend(this.requireConfig);
         let deps = ["session", "jquery"];
-        let lang = TogetherJS.getConfig("lang");
+        let lang = this.getConfig("lang");
         // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
         let availableTranslations = {
             "en-US": true,
@@ -362,21 +475,21 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         }
         // if(!availableTranslations[lang]) {
         if(!("lang" in availableTranslations) || !availableTranslations[lang]) {
-            lang = TogetherJS.config.get("fallbackLang");
+            lang = this.config.get("fallbackLang");
         }
         // else if(availableTranslations[lang] !== true) {
         else if(availableTranslations[lang] !== true) {
             lang = availableTranslations[lang];
         }
-        TogetherJS.config("lang", lang);
+        this.config("lang", lang);
 
         let localeTemplates = "templates-" + lang;
         deps.splice(0, 0, localeTemplates);
         function callback(session: TogetherJSNS.Session, jquery: JQuery) {
-            TogetherJS._loaded = true;
+            this._loaded = true;
             if(!min) {
-                TogetherJS.require = require.config({ context: "togetherjs" });
-                TogetherJS._requireObject = require;
+                this.require = require.config({ context: "togetherjs" });
+                this._requireObject = require;
             }
         }
         if(!min) {
@@ -385,12 +498,12 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
                     console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
                     throw new Error("Conflict with window.require");
                 }
-                TogetherJS.require = require.config(requireConfig);
+                this.require = require.config(requireConfig);
             }
         }
-        if(typeof TogetherJS.require == "function") {
+        if(typeof this.require == "function") {
             // This is an already-configured version of require
-            TogetherJS.require(deps, callback);
+            this.require(deps, callback);
         }
         else {
             requireConfig.deps = deps;

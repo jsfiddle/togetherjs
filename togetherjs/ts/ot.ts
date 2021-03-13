@@ -336,7 +336,7 @@ class TJSHistory {
         }, null);
     }
 
-    logChange(prefix: string, change:, callback: () => void) {
+    logChange(prefix: string, change, callback: () => void) {
         prefix = prefix || "before";
         var postfix = Array.prototype.slice.call(arguments, 3);
         console.log.apply(
