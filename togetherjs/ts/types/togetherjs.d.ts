@@ -189,6 +189,7 @@ declare namespace TogetherJSNS {
         //get(thing: "fallbackLang"): string;
         close(thing: 'cacheBust'): boolean;
         close(thing: "useMinimizedCode"): void;
+        close(thing: "storagePrefix"): void;
         track(name: string, f: Function): void;
     }
 

@@ -124,7 +124,7 @@ class Module {
 
 class Util {
 
-    public Deferred: any;
+    public Deferred;
     extend: { (conf: RequireConfig): RequireConfig; (base: unknown, extensions: unknown): unknown; };
     AssertionError: typeof AssertionError;
     mixinEvents: TogetherJSNS.TogetherJS["_mixinEvents"];

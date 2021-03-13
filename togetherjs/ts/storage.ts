@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 function StorageMain(util: Util) {
-    var assert = util.assert;
+    var assert: typeof util.assert = util.assert;
     var Deferred = util.Deferred;
     var DEFAULT_SETTINGS = {
         name: "",
@@ -18,16 +18,39 @@ function StorageMain(util: Util) {
 
     var DEBUG_STORAGE = false;
 
-    var Storage = util.Class({
-        constructor: function(name, storage, prefix) {
-            this.name = name;
-            this.storage = storage;
-            this.prefix = prefix;
-        },
+    class StorageSettings extends OnClass {
+        defaults = DEFAULT_SETTINGS;
 
-        get: function(key, defaultValue) {
+        constructor(private storageInstance: TJSStorage) {
+            super();
+        }
+
+        get(name: keyof typeof DEFAULT_SETTINGS) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.get("settings." + name, "" + this.storageInstance.settings.defaults[name]);
+        }
+
+        set(name: string, value: string | undefined) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.set("settings." + name, value);
+        }
+    }
+
+    class TJSStorage {
+        public readonly settings: StorageSettings;
+
+        constructor(
+            private name: string,
+            private storage: Storage,
+            private prefix: string,
+            public readonly tab?: TJSStorage
+        ) {
+            this.settings = new StorageSettings(this);
+        }
+
+        get(key: string, defaultValue: string) {
             var self = this;
-            return Deferred(function(def) {
+            return Deferred(function(def: JQueryDeferred<unknown>) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
@@ -47,57 +70,51 @@ function StorageMain(util: Util) {
                     return value;
                 }));
             });
-        },
+        }
 
-        set: function(key, value) {
+        set(key: string, value: string | undefined) {
             var self = this;
             if(value !== undefined) {
                 value = JSON.stringify(value);
             }
-            return Deferred(function(def) {
+            return Deferred(def => {
                 key = self.prefix + key;
                 if(value === undefined) {
                     self.storage.removeItem(key);
-                    if(DEBUG_STORAGE) {
-                        console.debug("Delete storage", key);
-                    }
-                } else {
+                }
+                else {
                     self.storage.setItem(key, value);
-                    if(DEBUG_STORAGE) {
-                        console.debug("Set storage", key, value);
-                    }
                 }
                 setTimeout(def.resolve);
             });
-        },
+        }
 
-        clear: function() {
+        clear() {
             var self = this;
-            var promises = [];
-            return Deferred((function(def) {
+            var promises: JQueryDeferred<unknown>[] = [];
+            return Deferred((def => {
                 this.keys().then(function(keys) {
+                    assert(keys !== undefined);
                     keys.forEach(function(key) {
-                        // FIXME: technically we're ignoring the promise returned by all
-                        // these sets:
+                        // FIXME: technically we're ignoring the promise returned by all these sets:
                         promises.push(self.set(key, undefined));
                     });
                     util.resolveMany(promises).then(function() {
                         def.resolve();
                     });
                 });
-            }).bind(this));
-        },
+            }));
+        }
 
-        keys: function(prefix, excludePrefix) {
+        keys(prefix: string = "", excludePrefix: boolean = false) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
-            return Deferred(function(def) {
+            return Deferred<string[]>(function(def) {
                 setTimeout(util.resolver(def, function() {
-                    prefix = prefix || "";
-                    var result = [];
+                    let result: string[] = [];
                     for(var i = 0; i < self.storage.length; i++) {
-                        var key = self.storage.key(i);
-                        if(key.indexOf(self.prefix + prefix) === 0) {
+                        let key = self.storage.key(i);
+                        if(key && key.indexOf(self.prefix + prefix) === 0) {
                             var shortKey = key.substr(self.prefix.length);
                             if(excludePrefix) {
                                 shortKey = shortKey.substr(prefix.length);
@@ -108,35 +125,18 @@ function StorageMain(util: Util) {
                     return result;
                 }));
             });
-        },
-
-        toString: function() {
-            return '[storage for ' + this.name + ']';
         }
 
-    });
+        toString() {
+            return '[storage for ' + this.name + ']';
+        }
+    }
 
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
 
-    var storage = Storage('localStorage', localStorage, namePrefix + ".");
-
-    storage.settings = util.mixinEvents({
-        defaults: DEFAULT_SETTINGS,
-
-        get: function(name) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, storage.settings.defaults[name]);
-        },
-
-        set: function(name, value) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        }
-
-    });
-
-    storage.tab = Storage('sessionStorage', sessionStorage, namePrefix + "-session.");
+    const tabStorage = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
+    const storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tabStorage);
 
     return storage;
 }
