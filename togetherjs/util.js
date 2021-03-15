@@ -311,6 +311,42 @@ var Util = /** @class */ (function () {
        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
     */
+    // work for form
+    Util.prototype.resolveMany1 = function (args1) {
+        var args = args1;
+        return this.Deferred(function (def) {
+            if (!("length" in args)) {
+                def.resolve();
+                return;
+            }
+            var count = args.length;
+            var allResults = [];
+            var anyError = false;
+            args.forEach(function (arg, index) {
+                arg.then(function (result) {
+                    allResults[index] = result;
+                    count--;
+                    check();
+                }, function (error) {
+                    allResults[index] = error;
+                    anyError = true;
+                    count--;
+                    check();
+                });
+            });
+            function check() {
+                if (!count) {
+                    if (anyError) {
+                        def.reject.apply(def, allResults);
+                    }
+                    else {
+                        def.resolve.apply(def, allResults);
+                    }
+                }
+            }
+        });
+    };
+    // work for storage
     Util.prototype.resolveMany = function (args1) {
         var args;
         var oneArg = false;
@@ -321,7 +357,7 @@ var Util = /** @class */ (function () {
         else {
             args = Array.prototype.slice.call(arguments);
         }
-        return util.Deferred(function (def) {
+        return this.Deferred(function (def) {
             var count = args.length;
             if (!count) {
                 def.resolve();

@@ -308,22 +308,60 @@ class Util {
        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
     */
+// work for form
+public resolveMany1<T>(args1: JQueryDeferred<T>[]) {
+    let args: JQueryDeferred<T>[] = args1;
+    return this.Deferred(function(def: JQueryDeferred<T>) {
+        if(!("length" in args)) {
+            def.resolve();
+            return;
+        }
+        let count = args.length;
+        let allResults: (T | undefined)[] = [];
+        let anyError = false;
+        args.forEach(function(arg, index) {
+            arg.then(function(result) {
+                allResults[index] = result;
+                count--;
+                check();
+            }, function(error) {
+                allResults[index] = error;
+                anyError = true;
+                count--;
+                check();
+            });
+        });
+        function check() {
+            if(!count) {
+                if(anyError) {
+                    def.reject.apply(def, allResults);
+                }
+                else {
+                    def.resolve.apply(def, allResults);
+                }
+            }
+        }
+    });
+}
+
+// work for storage
 public resolveMany<T>(args1: JQueryDeferred<T>[]) {
-    var args;
+    var args: JQueryDeferred<T>[];
     var oneArg = false;
     if(arguments.length == 1 && Array.isArray(arguments[0])) {
         oneArg = true;
         args = arguments[0];
-    } else {
+    }
+    else {
         args = Array.prototype.slice.call(arguments);
     }
-    return util.Deferred(function(def) {
+    return this.Deferred(function(def) {
         var count = args.length;
         if(!count) {
             def.resolve();
             return;
         }
-        var allResults = [];
+        var allResults: (T | undefined)[] = [];
         var anyError = false;
         args.forEach(function(arg, index) {
             arg.then(function(result) {
