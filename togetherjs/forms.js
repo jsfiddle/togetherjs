@@ -520,7 +520,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
             }
             history.setSelection(selection);
             // make a real TextReplace object.
-            msg.replace.delta = ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            msg.replace.delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             // apply this change to the history
             var changed = history.commit(msg.replace);
             var trackerName = null;
