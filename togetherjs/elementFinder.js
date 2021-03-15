@@ -39,7 +39,7 @@ var ElementFinder = /** @class */ (function () {
         return false;
     };
     ElementFinder.prototype.elementLocation = function (element) {
-        assert(element !== null, "Got null element");
+        //assert(element !== null, "Got null element");
         var el = element;
         if (0 in el && "attr" in el && el[0].nodeType == 1) {
             // Or a jQuery element not made by us

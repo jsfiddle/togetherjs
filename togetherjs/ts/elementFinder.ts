@@ -42,7 +42,7 @@ class ElementFinder {
     }
 
     elementLocation(element: HTMLElement | JQuery | Document): string {
-        assert(element !== null, "Got null element");
+        //assert(element !== null, "Got null element");
         let el: HTMLElement | JQuery | Document = element;
 
         if(0 in el && "attr" in el && el[0].nodeType == 1) {
