@@ -312,13 +312,21 @@ var Util = /** @class */ (function () {
        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
     */
     Util.prototype.resolveMany = function (args1) {
-        var args = args1;
-        return this.Deferred(function (def) {
-            if (!("length" in args)) {
+        var args;
+        var oneArg = false;
+        if (arguments.length == 1 && Array.isArray(arguments[0])) {
+            oneArg = true;
+            args = arguments[0];
+        }
+        else {
+            args = Array.prototype.slice.call(arguments);
+        }
+        return util.Deferred(function (def) {
+            var count = args.length;
+            if (!count) {
                 def.resolve();
                 return;
             }
-            var count = args.length;
             var allResults = [];
             var anyError = false;
             args.forEach(function (arg, index) {
@@ -336,10 +344,20 @@ var Util = /** @class */ (function () {
             function check() {
                 if (!count) {
                     if (anyError) {
-                        def.reject.apply(def, allResults);
+                        if (oneArg) {
+                            def.reject(allResults);
+                        }
+                        else {
+                            def.reject.apply(def, allResults);
+                        }
                     }
                     else {
-                        def.resolve.apply(def, allResults);
+                        if (oneArg) {
+                            def.resolve(allResults);
+                        }
+                        else {
+                            def.resolve.apply(def, allResults);
+                        }
                     }
                 }
             }

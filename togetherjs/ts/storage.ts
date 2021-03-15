@@ -38,7 +38,7 @@ function StorageMain(util: Util) {
     }
 
     class TJSStorage {
-        public readonly settings: StorageSettings = new StorageSettings(this);;
+        public readonly settings: StorageSettings;
 
         constructor(
             private name: string,
@@ -46,7 +46,7 @@ function StorageMain(util: Util) {
             private prefix: string,
             public readonly tab?: TJSStorage
         ) {
-            //this.settings = new StorageSettings(this);
+            this.settings = new StorageSettings(this);
         }
 
         get(key: string, defaultValue: string) {
@@ -99,8 +99,8 @@ function StorageMain(util: Util) {
         clear() {
             var self = this;
             var promises: JQueryDeferred<unknown>[] = [];
-            return Deferred((def => {
-                this.keys().then(function(keys) {
+            return Deferred((function(def: JQueryDeferred<unknown>) {
+                self.keys().then(function(keys) {
                     assert(keys !== undefined);
                     keys.forEach(function(key) {
                         // FIXME: technically we're ignoring the promise returned by all these sets:
@@ -110,10 +110,10 @@ function StorageMain(util: Util) {
                         def.resolve();
                     });
                 });
-            }));
+            }).bind(this));
         }
 
-        keys(prefix: string, excludePrefix: boolean = false) {
+        keys(prefix?: string, excludePrefix: boolean = false) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
             return Deferred<string[]>(function(def) {

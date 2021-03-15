@@ -57,9 +57,7 @@ function StorageMain(util) {
             this.prefix = prefix;
             this.tab = tab;
             this.settings = new StorageSettings(this);
-            //this.settings = new StorageSettings(this);
         }
-        ;
         TJSStorage.prototype.get = function (key, defaultValue) {
             var self = this;
             return Deferred(function (def) {
@@ -107,11 +105,10 @@ function StorageMain(util) {
             });
         };
         TJSStorage.prototype.clear = function () {
-            var _this = this;
             var self = this;
             var promises = [];
             return Deferred((function (def) {
-                _this.keys().then(function (keys) {
+                self.keys().then(function (keys) {
                     assert(keys !== undefined);
                     keys.forEach(function (key) {
                         // FIXME: technically we're ignoring the promise returned by all these sets:
@@ -121,7 +118,7 @@ function StorageMain(util) {
                         def.resolve();
                     });
                 });
-            }));
+            }).bind(this));
         };
         TJSStorage.prototype.keys = function (prefix, excludePrefix) {
             if (excludePrefix === void 0) { excludePrefix = false; }
