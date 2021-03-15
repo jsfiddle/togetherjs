@@ -324,6 +324,7 @@ interface Window {
     TogetherJSConfig_enableShortcut?: boolean;
     TowTruck: TogetherJSNS.TogetherJS;
     TogetherJSTestSpy?: {[k: string]: unknown};
+    _gaq?: [string, string?][];
 }
 
 interface EventHtmlElement extends Event {
