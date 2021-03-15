@@ -444,12 +444,6 @@ function ChannelsMain(util) {
         "PostMessageIncomingChannel": function (expectedOrigin) { return new PostMessageIncomingChannel(expectedOrigin); },
         "Router": function () { return new Router(); },
     };
-    channels = {
-        "WebSocketChannel": function (address) { return new WebSocketChannel(address); },
-        "PostMessageChannel": function (win, expectedOrigin) { return new PostMessageChannel(win, expectedOrigin); },
-        "PostMessageIncomingChannel": function (expectedOrigin) { return new PostMessageIncomingChannel(expectedOrigin); },
-        "Router": function () { return new Router(); },
-    };
     return channels;
 }
 define(["util"], ChannelsMain);

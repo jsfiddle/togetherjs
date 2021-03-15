@@ -101,10 +101,6 @@ var OnClass = /** @class */ (function () {
         this.off(eventName, cb);
     };
     OnClass.prototype.emit = function (name) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
         var offs = this._listenerOffs = [];
         if ((!this._listeners) || !this._listeners[name]) {
             return;

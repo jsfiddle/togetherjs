@@ -90,7 +90,7 @@ class OnClass {
         this.off(eventName, cb);
     }
 
-    emit(name: string, ...args: any[]) {
+    emit(name: string) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;

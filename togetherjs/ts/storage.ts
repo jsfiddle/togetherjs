@@ -18,24 +18,6 @@ function StorageMain(util: Util) {
 
     var DEBUG_STORAGE = false;
 
-    class StorageSettings extends OnClass {
-        defaults = DEFAULT_SETTINGS;
-
-        constructor(private storageInstance: TJSStorage) {
-            super();
-        }
-
-        get(name: keyof typeof DEFAULT_SETTINGS) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, "" + this.storageInstance.settings.defaults[name]);
-        }
-
-        set(name: string, value: string | undefined) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        }
-    }
-
     class TJSStorage {
         public readonly settings: StorageSettings;
 
@@ -45,7 +27,7 @@ function StorageMain(util: Util) {
             private prefix: string,
             public readonly tab?: TJSStorage
         ) {
-            this.settings = new StorageSettings(this);
+            //this.settings = new StorageSettings(this);
         }
 
         get(key: string, defaultValue: string) {
@@ -81,9 +63,15 @@ function StorageMain(util: Util) {
                 key = self.prefix + key;
                 if(value === undefined) {
                     self.storage.removeItem(key);
+                    if(DEBUG_STORAGE) {
+                        console.debug("Delete storage", key);
+                    }
                 }
                 else {
                     self.storage.setItem(key, value);
+                    if(DEBUG_STORAGE) {
+                        console.debug("Set storage", key, value);
+                    }
                 }
                 setTimeout(def.resolve);
             });
@@ -106,15 +94,16 @@ function StorageMain(util: Util) {
             }));
         }
 
-        keys(prefix: string = "", excludePrefix: boolean = false) {
+        keys(prefix: string, excludePrefix: boolean = false) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
             return Deferred<string[]>(function(def) {
                 setTimeout(util.resolver(def, function() {
+                    prefix = prefix || "";
                     let result: string[] = [];
                     for(var i = 0; i < self.storage.length; i++) {
                         let key = self.storage.key(i);
-                        if(key && key.indexOf(self.prefix + prefix) === 0) {
+                        if(key.indexOf(self.prefix + prefix) === 0) {
                             var shortKey = key.substr(self.prefix.length);
                             if(excludePrefix) {
                                 shortKey = shortKey.substr(prefix.length);
@@ -135,8 +124,43 @@ function StorageMain(util: Util) {
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
 
-    const tabStorage = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
-    const storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tabStorage);
+    const storage = new TJSStorage('localStorage', localStorage, namePrefix + ".");
+
+    class StorageSettings extends OnClass {
+        defaults = DEFAULT_SETTINGS;
+
+        constructor(private storageInstance: TJSStorage) {
+            super();
+        }
+
+        get(name: keyof typeof DEFAULT_SETTINGS) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.get("settings." + name, "" + this.storageInstance.settings.defaults[name]);
+        }
+
+        set(name: string, value: string | undefined) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.set("settings." + name, value);
+        }
+    }
+
+    storage.settings = util.mixinEvents({
+        defaults: DEFAULT_SETTINGS,
+
+        get: function(name) {
+            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.get("settings." + name, storage.settings.defaults[name]);
+        },
+
+        set: function(name, value) {
+            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.set("settings." + name, value);
+        }
+
+    });
+
+    storage.tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
+    
 
     return storage;
 }
