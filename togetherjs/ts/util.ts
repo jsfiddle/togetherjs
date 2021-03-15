@@ -18,7 +18,7 @@ class OnClass {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach((n) => {
+            names.forEach(function(n) {
                 this.on(n, callback);
             }, this);
             return;
@@ -53,7 +53,7 @@ class OnClass {
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!callback[attr]) {
             callback[attr] = function onceCallback(this: OnClass, msg: TogetherJSNS.Message & T) {
-                callback.apply(this, [msg]);
+                callback.apply(this, arguments);
                 this.off(name, onceCallback);
                 delete callback[attr];
             };
@@ -95,9 +95,10 @@ class OnClass {
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
+        var args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
         l.forEach(function(this: OnClass, callback) {
-            callback.apply(this, arguments);
+            callback.apply(this, args);
         }, this);
         delete this._listenerOffs;
         if(offs.length) {

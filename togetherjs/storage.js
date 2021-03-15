@@ -131,7 +131,8 @@ function StorageMain(util) {
     }());
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
-    var storage = new TJSStorage('localStorage', localStorage, namePrefix + ".");
+    var tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
+    var storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tab);
     var StorageSettings = /** @class */ (function (_super) {
         __extends(StorageSettings, _super);
         function StorageSettings(storageInstance) {
@@ -150,6 +151,7 @@ function StorageMain(util) {
         };
         return StorageSettings;
     }(OnClass));
+    storage.settings2 = new StorageSettings(storage);
     storage.settings = util.mixinEvents({
         defaults: DEFAULT_SETTINGS,
         get: function (name) {
@@ -161,7 +163,6 @@ function StorageMain(util) {
             return storage.set("settings." + name, value);
         }
     });
-    storage.tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     return storage;
 }
 define(["util"], StorageMain);

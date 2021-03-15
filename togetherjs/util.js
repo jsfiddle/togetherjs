@@ -25,7 +25,6 @@ var OnClass = /** @class */ (function () {
         this._listeners = {}; // TODO any
     }
     OnClass.prototype.on = function (name, callback) {
-        var _this = this;
         if (typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -33,7 +32,7 @@ var OnClass = /** @class */ (function () {
         if (name.search(" ") != -1) {
             var names = name.split(/ +/g);
             names.forEach(function (n) {
-                _this.on(n, callback);
+                this.on(n, callback);
             }, this);
             return;
         }
@@ -66,7 +65,7 @@ var OnClass = /** @class */ (function () {
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!callback[attr]) {
             callback[attr] = function onceCallback(msg) {
-                callback.apply(this, [msg]);
+                callback.apply(this, arguments);
                 this.off(name, onceCallback);
                 delete callback[attr];
             };
@@ -105,9 +104,10 @@ var OnClass = /** @class */ (function () {
         if ((!this._listeners) || !this._listeners[name]) {
             return;
         }
+        var args = Array.prototype.slice.call(arguments, 1);
         var l = this._listeners[name];
         l.forEach(function (callback) {
-            callback.apply(this, arguments);
+            callback.apply(this, args);
         }, this);
         delete this._listenerOffs;
         if (offs.length) {
