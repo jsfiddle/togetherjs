@@ -18,8 +18,27 @@ function StorageMain(util: Util) {
 
     var DEBUG_STORAGE = false;
 
+    class StorageSettings extends OnClass {
+        defaults = DEFAULT_SETTINGS;
+
+        constructor(private storageInstance: TJSStorage) {
+            super();
+        }
+
+        get(name: keyof typeof DEFAULT_SETTINGS) {
+            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
+        }
+
+        set(name: string, value: string | undefined) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.set("settings." + name, value);
+        }
+    }
+
     class TJSStorage {
-        public readonly settings: StorageSettings;
+        public readonly settings: StorageSettings = new StorageSettings(this);;
 
         constructor(
             private name: string,
@@ -126,40 +145,6 @@ function StorageMain(util: Util) {
 
     const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     const storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tab);
-
-    class StorageSettings extends OnClass {
-        defaults = DEFAULT_SETTINGS;
-
-        constructor(private storageInstance: TJSStorage) {
-            super();
-        }
-
-        get(name: keyof typeof DEFAULT_SETTINGS) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, "" + this.storageInstance.settings.defaults[name]);
-        }
-
-        set(name: string, value: string | undefined) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        }
-    }
-
-    storage.settings2 = new StorageSettings(storage);
-    storage.settings = util.mixinEvents({
-        defaults: DEFAULT_SETTINGS,
-
-        get: function(name) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, storage.settings.defaults[name]);
-        },
-
-        set: function(name, value) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        }
-
-    });
 
     return storage;
 }

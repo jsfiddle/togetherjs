@@ -31,14 +31,35 @@ function StorageMain(util) {
         dontShowRtcInfo: false
     };
     var DEBUG_STORAGE = false;
+    var StorageSettings = /** @class */ (function (_super) {
+        __extends(StorageSettings, _super);
+        function StorageSettings(storageInstance) {
+            var _this = _super.call(this) || this;
+            _this.storageInstance = storageInstance;
+            _this.defaults = DEFAULT_SETTINGS;
+            return _this;
+        }
+        StorageSettings.prototype.get = function (name) {
+            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
+        };
+        StorageSettings.prototype.set = function (name, value) {
+            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+            return storage.set("settings." + name, value);
+        };
+        return StorageSettings;
+    }(OnClass));
     var TJSStorage = /** @class */ (function () {
         function TJSStorage(name, storage, prefix, tab) {
             this.name = name;
             this.storage = storage;
             this.prefix = prefix;
             this.tab = tab;
+            this.settings = new StorageSettings(this);
             //this.settings = new StorageSettings(this);
         }
+        ;
         TJSStorage.prototype.get = function (key, defaultValue) {
             var self = this;
             return Deferred(function (def) {
@@ -133,36 +154,6 @@ function StorageMain(util) {
     TogetherJS.config.close("storagePrefix");
     var tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     var storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tab);
-    var StorageSettings = /** @class */ (function (_super) {
-        __extends(StorageSettings, _super);
-        function StorageSettings(storageInstance) {
-            var _this = _super.call(this) || this;
-            _this.storageInstance = storageInstance;
-            _this.defaults = DEFAULT_SETTINGS;
-            return _this;
-        }
-        StorageSettings.prototype.get = function (name) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, "" + this.storageInstance.settings.defaults[name]);
-        };
-        StorageSettings.prototype.set = function (name, value) {
-            assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        };
-        return StorageSettings;
-    }(OnClass));
-    storage.settings2 = new StorageSettings(storage);
-    storage.settings = util.mixinEvents({
-        defaults: DEFAULT_SETTINGS,
-        get: function (name) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, storage.settings.defaults[name]);
-        },
-        set: function (name, value) {
-            assert(storage.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
-        }
-    });
     return storage;
 }
 define(["util"], StorageMain);

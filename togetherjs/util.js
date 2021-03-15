@@ -19,17 +19,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 var assert;
 var OnClass = /** @class */ (function () {
     function OnClass() {
         this._listeners = {}; // TODO any
+        this.removeListener = this.off.bind(this);
     }
     OnClass.prototype.on = function (name, callback) {
+        console.log("on_class", this);
         if (typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -101,22 +98,19 @@ var OnClass = /** @class */ (function () {
             }
         }
     };
-    OnClass.prototype.removeListener = function (eventName, cb) {
+    OnClass.prototype.removeListener2 = function (eventName, cb) {
         var args = [];
         for (var _i = 2; _i < arguments.length; _i++) {
             args[_i - 2] = arguments[_i];
         }
-        this.off.apply(this, __spreadArray([eventName, cb], args));
+        this.off(arguments);
     };
     OnClass.prototype.emit = function (name) {
-        var args = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            args[_i - 1] = arguments[_i];
-        }
         var offs = this._listenerOffs = [];
         if ((!this._listeners) || !this._listeners[name]) {
             return;
         }
+        var args = Array.prototype.slice.call(arguments, 1);
         var l = this._listeners[name];
         l.forEach(function (callback) {
             callback.apply(this, args);

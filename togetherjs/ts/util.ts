@@ -12,6 +12,7 @@ class OnClass {
     _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
 
     on<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+        console.log("on_class", this);
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -86,15 +87,18 @@ class OnClass {
         }
     }
 
-    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
-        this.off(eventName, cb, ...args);
+    removeListener2<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
+        this.off(arguments);
     }
 
-    emit(name: string, ...args: any[]) {
+    removeListener = this.off.bind(this);
+
+    emit(name: string) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
+        var args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
         l.forEach(function(this: OnClass, callback) {
             callback.apply(this, args);
