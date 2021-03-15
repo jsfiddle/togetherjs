@@ -519,8 +519,8 @@ class TextReplace {
 
     /* Make a new ot.TextReplace that converts oldValue to newValue. */
     static fromChange(oldValue: string, newValue: string) {
-        assert(typeof oldValue == "string");
-        assert(typeof newValue == "string");
+        //assert(typeof oldValue == "string");
+        //assert(typeof newValue == "string");
         var commonStart = 0;
         while(commonStart < newValue.length &&
             newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
@@ -783,11 +783,12 @@ class Change {
 define(["util"], function(util: Util) {
     const assert: typeof util.assert = util.assert;
 
-    const ot: Ot = {
+    const ot = {
         SimpleHistory: (clientId, initState, initBasis) => new SimpleHistory(clientId, initState, initBasis),
-        History: (clientId, initState) => new History(clientId, initState),
-        TextReplace: (start, del, text) => new TextReplace(start, del, text),
+        History: () => new History(),
+        TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
     }
+
 
     return ot;
 });

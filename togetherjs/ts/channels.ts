@@ -515,6 +515,13 @@ function ChannelsMain(util: Util) {
         "Router": () => new Router(),
     }
 
+    channels = {
+        "WebSocketChannel": (address: string) => new WebSocketChannel(address),
+        "PostMessageChannel": (win: WindowProxy, expectedOrigin: Origin) => new PostMessageChannel(win, expectedOrigin),
+        "PostMessageIncomingChannel": (expectedOrigin: Origin) => new PostMessageIncomingChannel(expectedOrigin),
+        "Router": () => new Router(),
+    }
+
     return channels;
 }
 

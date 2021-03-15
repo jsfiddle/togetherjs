@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { removeData } from "jquery";
+
 define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels) {
     let recorder = util.Module("recorder");
     let assert: typeof util.assert = util.assert;
@@ -110,6 +112,6 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
         });
     });
 
-    return recorder;
+    return new Recorder();
 
 });

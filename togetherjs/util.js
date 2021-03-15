@@ -19,6 +19,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var assert;
 var OnClass = /** @class */ (function () {
     function OnClass() {
         this._listeners = {}; // TODO any
@@ -383,6 +384,7 @@ var Util = /** @class */ (function () {
 define(["jquery", "jqueryPlugins"], function ($) {
     // =================================================================================================
     var util = new Util($, window.TogetherJS);
+    assert = util.assert;
     util.Deferred = $.Deferred;
     window.TogetherJS.$ = $;
     /* A simple class pattern, use like:

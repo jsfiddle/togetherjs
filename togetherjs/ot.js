@@ -468,8 +468,8 @@ var TextReplace = /** @class */ (function () {
     };
     /* Make a new ot.TextReplace that converts oldValue to newValue. */
     TextReplace.fromChange = function (oldValue, newValue) {
-        assert(typeof oldValue == "string");
-        assert(typeof newValue == "string");
+        //assert(typeof oldValue == "string");
+        //assert(typeof newValue == "string");
         var commonStart = 0;
         while (commonStart < newValue.length &&
             newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
@@ -717,8 +717,8 @@ define(["util"], function (util) {
     var assert = util.assert;
     var ot = {
         SimpleHistory: function (clientId, initState, initBasis) { return new SimpleHistory(clientId, initState, initBasis); },
-        History: function (clientId, initState) { return new History(clientId, initState); },
-        TextReplace: function (start, del, text) { return new TextReplace(start, del, text); },
+        History: function () { return new History(); },
+        TextReplace: TextReplace, //(start, del, text) => new TextReplace(start, del, text),
     };
     return ot;
 });

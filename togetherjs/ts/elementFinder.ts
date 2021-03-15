@@ -11,8 +11,7 @@ class CannotFind {
         private location: string,
         private reason: string,
         private context: HTMLElement | Document,
-    ) {
-    }
+    ) { }
 
     toString() {
         var loc;
