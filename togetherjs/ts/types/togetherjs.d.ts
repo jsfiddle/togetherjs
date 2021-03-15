@@ -28,8 +28,8 @@ declare namespace TogetherJSNS {
         _teardown: unknown,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,
-        _configTrackers: Config;
-        _configClosed: Partial<Config>;
+        _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: unknown[]}>;
+        _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean};
         version: string;
         baseUrl: string;
         _onmessage(msg: TogetherJSNS.Message): void;
@@ -159,42 +159,44 @@ declare namespace TogetherJSNS {
         type: string;
     }
 
-    interface CallbackForOn<T> {
+    interface CallbackForOnce<T> {
         (msg: Message & T): void;
-        //[name: string]: CallbackForOn<T>; // TODO weird field for once callbacks
+    }
+
+    interface CallbackForOn<T> extends CallbackForOnce<T> {
+        [name: string]: CallbackForOnce<T>; // TODO weird field for once callbacks
     }
 
     interface Ons<T> {
         [key: string]: CallbackForOn<T>;
     }
 
-    interface On {
-        on<T>(eventName: string, cb: CallbackForOn<T>): void;
+    interface On_2 {
+        on<T>(eventName: string, cb: CallbackForOnce<T>): void;
         once<T>(eventName: string, cb: CallbackForOn<T>): void;
-        off<T>(eventName: string, cb: CallbackForOn<T>): void;
+        off<T>(eventName: string, cb: CallbackForOnce<T>): void;
         removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
         emit(eventName: string, msg?: unknown): void;
         _knownEvents?: string[];
-        _listeners: {[name: string]: CallbackForOn<any>[]}; // TODO any
-        _listenerOffs?: [string, CallbackForOn<any>][];
+        _listeners: {[name: string]: CallbackForOnce<any>[]}; // TODO any
+        _listenerOffs?: [string, CallbackForOnce<any>][];
     }
 
     interface ConfigFunObj extends ConfigGetter {
-        (config: TogetherJSNS.Config): void;
-        (attributeName: string, attributeValue: unknown): void;
-        (configOrAttributeName: TogetherJSNS.Config | string, attributeValue?: unknown): void;
+        //(config: Config): void;
+        <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
+        (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
         //get<T>(thing: "on"): Ons<T>;
         //get<T>(thing: "hub_on"): Ons<T>;
         //get(thing: "useMinimizedCode"): true | undefined;
         //get(thing: "fallbackLang"): string;
-        close(thing: 'cacheBust'): boolean;
-        close(thing: "useMinimizedCode"): void;
-        close(thing: "storagePrefix"): void;
-        track(name: string, f: Function): void;
+        close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
+        track<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any): void;
     }
 
     interface ConfigGetter {
-        get(name: keyof Config): ValueOf<Config>;
+        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
+        /*
         get(name: "dontShowClicks"): Config["dontShowClicks"],
         get(name: "cloneClicks"): Config["cloneClicks"],
         get(name: "enableAnalytics"): Config["enableAnalytics"],
@@ -226,6 +228,7 @@ declare namespace TogetherJSNS {
         get(name: "baseUrl"): Config["baseUrl"],
         get(name: "loaded"): Config["loaded"],
         get(name: "callToStart"): Config["callToStart"],
+        */
     }
 
     interface ConfigGetter2 {

@@ -55,7 +55,6 @@ var OnClass = /** @class */ (function () {
             this._listeners[name].push(callback);
         }
     };
-    ;
     OnClass.prototype.once = function (name, callback) {
         if (typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
@@ -64,15 +63,14 @@ var OnClass = /** @class */ (function () {
         var attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!callback[attr]) {
-            callback[attr] = function onceCallback() {
-                callback.apply(this, arguments);
+            callback[attr] = function onceCallback(msg) {
+                callback.apply(this, [msg]);
                 this.off(name, onceCallback);
                 delete callback[attr];
             };
         }
         this.on(name, callback[attr]);
     };
-    ;
     OnClass.prototype.off = function (name, callback) {
         if (this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
@@ -97,7 +95,6 @@ var OnClass = /** @class */ (function () {
             }
         }
     };
-    ;
     OnClass.prototype.removeListener = function (eventName, cb) {
         this.off(eventName, cb);
     };
@@ -112,7 +109,7 @@ var OnClass = /** @class */ (function () {
         }
         var l = this._listeners[name];
         l.forEach(function (callback) {
-            callback.apply(this, args);
+            callback.apply(this, arguments);
         }, this);
         delete this._listenerOffs;
         if (offs.length) {
@@ -121,7 +118,6 @@ var OnClass = /** @class */ (function () {
             }, this);
         }
     };
-    ;
     return OnClass;
 }());
 function polyfillConsole() {
@@ -217,7 +213,7 @@ var ConfigClass = /** @class */ (function () {
     }
     ConfigClass.prototype.call = function (name, maybeValue) {
         var settings;
-        if (arguments.length == 1) {
+        if (maybeValue === undefined) {
             if (typeof name != "object") {
                 throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
             }
@@ -227,7 +223,6 @@ var ConfigClass = /** @class */ (function () {
             settings = {};
             settings[name] = maybeValue;
         }
-        var i;
         var tracker;
         var attr;
         for (attr in settings) {
@@ -248,11 +243,16 @@ var ConfigClass = /** @class */ (function () {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
             var previous = this.tjsInstance._configuration[attr];
-            var value = settings[attr];
+            var o = { a: 1, b: "b", c: true };
+            var key = "b";
+            var a = o[key];
+            var b = o[key];
+            o[key] = o[key];
+            var value = settings[attr]; // TODO any
             this.tjsInstance._configuration[attr] = value;
-            var trackers = this.tjsInstance._configTrackers[name] || [];
+            var trackers = this.tjsInstance._configTrackers[name];
             var failed = false;
-            for (i = 0; i < trackers.length; i++) {
+            for (var i = 0; i < trackers.length; i++) {
                 try {
                     tracker = trackers[i];
                     tracker(value, previous);
@@ -265,7 +265,7 @@ var ConfigClass = /** @class */ (function () {
             }
             if (failed) {
                 this.tjsInstance._configuration[attr] = previous;
-                for (i = 0; i < trackers.length; i++) {
+                for (var i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
                         tracker(value);
@@ -277,7 +277,6 @@ var ConfigClass = /** @class */ (function () {
             }
         }
     };
-    ;
     ConfigClass.prototype.get = function (name) {
         var value = this.tjsInstance._configuration[name];
         if (value === undefined) {
@@ -288,7 +287,6 @@ var ConfigClass = /** @class */ (function () {
         }
         return value;
     };
-    ;
     ConfigClass.prototype.track = function (name, callback) {
         if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
@@ -300,7 +298,6 @@ var ConfigClass = /** @class */ (function () {
         this.tjsInstance._configTrackers[name].push(callback);
         return callback;
     };
-    ;
     ConfigClass.prototype.close = function (name) {
         if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
@@ -308,9 +305,16 @@ var ConfigClass = /** @class */ (function () {
         this.tjsInstance._configClosed[name] = true;
         return this.get(name);
     };
-    ;
     return ConfigClass;
 }());
+// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
+function createConfigFunObj(confObj) {
+    var config = (function (name, maybeValue) { return confObj.call(name, maybeValue); });
+    config.get = function (name) { return confObj.get(name); };
+    config.close = function (name) { return confObj.close(name); };
+    config.track = function (name, callback) { return confObj.track(name, callback); };
+    return config;
+}
 var TogetherJSClass = /** @class */ (function (_super) {
     __extends(TogetherJSClass, _super);
     function TogetherJSClass(event) {
@@ -325,9 +329,7 @@ var TogetherJSClass = /** @class */ (function (_super) {
         _this._configTrackers = {};
         _this._configClosed = {};
         _this._knownEvents = ["ready", "close"];
-        _this.config = function (name, maybeValue) { _this.configObject.call(name, maybeValue); };
-        _this.config.get = function (name) { return _this.configObject.get(name); };
-        _this.config.close = function (name) { return _this.configObject.close(name); };
+        _this.config = createConfigFunObj(_this.configObject);
         var session;
         if (_this.running) {
             session = _this.require("session");

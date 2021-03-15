@@ -2,6 +2,7 @@
 - use tslint to find useless nullchecks
 - clean the require stuff
 - check all TODO comments
+- check all TODO any comments
 - check all FIXME comments?
 - check all uses of any
 - check all uses of unknown

@@ -3,12 +3,12 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-class OnClass implements TogetherJSNS.On {
+class OnClass {
     _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
-    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
 
-    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -39,7 +39,7 @@ class OnClass implements TogetherJSNS.On {
         if(this._listeners[name].indexOf(callback) == -1) {
             this._listeners[name].push(callback);
         }
-    };
+    }
 
     once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
         if(typeof callback != "function") {
@@ -49,16 +49,16 @@ class OnClass implements TogetherJSNS.On {
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!callback[attr]) {
-            callback[attr] = function onceCallback(this: TogetherJSNS.On) {
-                callback.apply(this, arguments);
+            callback[attr] = function onceCallback(this: OnClass, msg: TogetherJSNS.Message & T) {
+                callback.apply(this, [msg]);
                 this.off(name, onceCallback);
                 delete callback[attr];
             };
         }
         this.on(name, callback[attr]);
-    };
+    }
 
-    off<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+    off<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
             this._listenerOffs.push([name, callback]);
@@ -66,7 +66,7 @@ class OnClass implements TogetherJSNS.On {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach(function(this: TogetherJSNS.On, n) {
+            names.forEach(function(this: OnClass, n) {
                 this.off(n, callback);
             }, this);
             return;
@@ -81,7 +81,7 @@ class OnClass implements TogetherJSNS.On {
                 break;
             }
         }
-    };
+    }
 
     removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>) {
         this.off(eventName, cb);
@@ -93,17 +93,17 @@ class OnClass implements TogetherJSNS.On {
             return;
         }
         let l = this._listeners[name];
-        l.forEach(function(this: TogetherJSNS.On, callback) {
-            callback.apply(this, args);
+        l.forEach(function(this: OnClass, callback) {
+            callback.apply(this, arguments);
         }, this);
         delete this._listenerOffs;
         if(offs.length) {
-            offs.forEach(function(this: TogetherJSNS.On, item) {
+            offs.forEach(function(this: OnClass, item) {
                 this.off(item[0], item[1]);
             }, this);
         }
 
-    };
+    }
 }
 
 function polyfillConsole() {
@@ -172,7 +172,7 @@ const defaultConfiguration: TogetherJSNS.Config = {
     fallbackLang: "en-US"
 };
 
-const defaultConfiguration2: TogetherJSNS.Config = {
+const defaultConfiguration2: Partial<TogetherJSNS.Config> = {
     dontShowClicks: false,
     cloneClicks: false,
     enableAnalytics: false,
@@ -198,13 +198,11 @@ const defaultConfiguration2: TogetherJSNS.Config = {
 };
 
 class ConfigClass {
-    constructor(private tjsInstance: TogetherJSClass) {
-
-    }
+    constructor(public tjsInstance: TogetherJSClass) { }
     
-    call(name: keyof TogetherJSNS.Config, maybeValue: unknown) {
+    call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) { // TODO any
         let settings: Partial<TogetherJSNS.Config>;
-        if(arguments.length == 1) {
+        if(maybeValue === undefined) {
             if(typeof name != "object") {
                 throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
             }
@@ -214,9 +212,8 @@ class ConfigClass {
             settings = {};
             settings[name] = maybeValue;
         }
-        let i: number;
         let tracker;
-        let attr: keyof TogetherJSNS.Config;
+        let attr: keyof typeof settings;
         for(attr in settings) {
             if(settings.hasOwnProperty(attr)) {
                 if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
@@ -235,39 +232,44 @@ class ConfigClass {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
             let previous = this.tjsInstance._configuration[attr];
-            let value = settings[attr];
+
+            let o = {a: 1, b: "b", c: true};
+            let key: keyof typeof o = "b" as "a" | "b" | "c";
+            let a = o[key];
+            let b = o[key];
+            o[key] = o[key];
+
+            let value = settings[attr]; // TODO any
             this.tjsInstance._configuration[attr] = value;
-            let trackers = this.tjsInstance._configTrackers[name] || [];
+            let trackers = this.tjsInstance._configTrackers[name]!;
             let failed = false;
-            for(i = 0; i < trackers.length; i++) {
+            for(let i = 0; i < trackers.length; i++) {
                 try {
                     tracker = trackers[i];
                     tracker(value, previous);
                 }
                 catch(e) {
-                    console.warn("Error setting configuration", name, "to", value,
-                        ":", e, "; reverting to", previous);
+                    console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
                     failed = true;
                     break;
                 }
             }
             if(failed) {
                 this.tjsInstance._configuration[attr] = previous;
-                for(i = 0; i < trackers.length; i++) {
+                for(let i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
                         tracker(value);
                     }
                     catch(e) {
-                        console.warn("Error REsetting configuration", name, "to", previous,
-                            ":", e, "(ignoring)");
+                        console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
                     }
                 }
             }
         }
-    };
+    }
 
-    get(name: keyof TogetherJSNS.Config) {
+    get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
         let value = this.tjsInstance._configuration[name];
         if(value === undefined) {
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
@@ -276,9 +278,9 @@ class ConfigClass {
             value = this.tjsInstance._defaultConfiguration[name];
         }
         return value;
-    };
+    }
 
-    track(name: keyof TogetherJSNS.Config, callback: Function) {
+    track<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any) {
         if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
@@ -288,22 +290,31 @@ class ConfigClass {
         }
         this.tjsInstance._configTrackers[name].push(callback);
         return callback;
-    };
+    }
 
-    close(name) {
+    close<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
         if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
         this.tjsInstance._configClosed[name] = true;
         return this.get(name);
-    };
+    }
+}
+
+// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
+function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
+    let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
+    config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
+    config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
+    config.track = <K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any) => confObj.track(name, callback);
+    return config;
 }
 
 class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public running: boolean = false;
     private require: Require;
     private configObject = new ConfigClass(this);
-    private config: TogetherJSNS.ConfigFunObj;
+    public readonly config: TogetherJSNS.ConfigFunObj;
     private hub: TogetherJSNS.Hub;
     private requireConfig: RequireConfig;
     private _loaded: boolean;
@@ -315,8 +326,8 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
     public _configuration: Partial<TogetherJSNS.Config> = {};
     public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
-    private _configTrackers: TogetherJSNS.Config = {};
-    public _configClosed: Partial<TogetherJSNS.Config> = {};
+    public readonly _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[]}> = {};
+    public _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean} = {};
     private version: string;
     private baseUrl: string;
 
@@ -324,10 +335,7 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         super();
         this._knownEvents = ["ready", "close"];
 
-        this.config = (name, maybeValue) => { this.configObject.call(name, maybeValue) };
-        this.config.get = name => this.configObject.get(name);
-        this.config.close = name => this.configObject.close(name);
-
+        this.config = createConfigFunObj(this.configObject);
 
         let session;
         if(this.running) {
@@ -372,25 +380,25 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         // includes TogetherJSConfig_on_*, which are attributes folded into
         // the "on" configuration value.
         let attr;
-        let attrName;
+        let attrName: keyof TogetherJSNS.Config;
         let globalOns: TogetherJSNS.Ons<unknown> = {};
         for(attr in window) {
             if(attr.indexOf("TogetherJSConfig_on_") === 0) {
-                attrName = attr.substr(("TogetherJSConfig_on_").length);
+                attrName = attr.substr(("TogetherJSConfig_on_").length) as keyof TogetherJSNS.Config;
                 let a = window[attr];
                 globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
             }
             else if(attr.indexOf("TogetherJSConfig_") === 0) {
-                attrName = attr.substr(("TogetherJSConfig_").length);
+                attrName = attr.substr(("TogetherJSConfig_").length) as keyof TogetherJSNS.Config;
                 this.config(attrName, window[attr]);
             }
             else if(attr.indexOf("TowTruckConfig_on_") === 0) {
-                attrName = attr.substr(("TowTruckConfig_on_").length);
+                attrName = attr.substr(("TowTruckConfig_on_").length) as keyof TogetherJSNS.Config;
                 console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
                 globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
             }
             else if(attr.indexOf("TowTruckConfig_") === 0) {
-                attrName = attr.substr(("TowTruckConfig_").length);
+                attrName = attr.substr(("TowTruckConfig_").length) as keyof TogetherJSNS.Config;
                 console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
                 this.config(attrName, window[attr]);
             }
