@@ -18,7 +18,7 @@ class OnClass {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach(function(n) {
+            names.forEach(function(this: OnClass, n) {
                 this.on(n, callback);
             }, this);
             return;
@@ -86,16 +86,15 @@ class OnClass {
         }
     }
 
-    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>) {
-        this.off(eventName, cb);
+    removeListener<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
+        this.off(eventName, cb, ...args);
     }
 
-    emit(name: string) {
+    emit(name: string, ...args: any[]) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        var args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
         l.forEach(function(this: OnClass, callback) {
             callback.apply(this, args);

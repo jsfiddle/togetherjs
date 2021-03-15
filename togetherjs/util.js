@@ -19,6 +19,11 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 var assert;
 var OnClass = /** @class */ (function () {
     function OnClass() {
@@ -97,14 +102,21 @@ var OnClass = /** @class */ (function () {
         }
     };
     OnClass.prototype.removeListener = function (eventName, cb) {
-        this.off(eventName, cb);
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        this.off.apply(this, __spreadArray([eventName, cb], args));
     };
     OnClass.prototype.emit = function (name) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         var offs = this._listenerOffs = [];
         if ((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        var args = Array.prototype.slice.call(arguments, 1);
         var l = this._listeners[name];
         l.forEach(function (callback) {
             callback.apply(this, args);
