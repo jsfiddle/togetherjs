@@ -53,7 +53,7 @@ class EventMaker {
         // FIXME: should run .onclick() as well
     }
 
-    static fireChange(target: HTMLElement | JQuery) {
+    fireChange(target: HTMLElement | JQuery) {
         target = $(target)[0];
         var event = document.createEvent("HTMLEvents");
         event.initEvent("change", true, true);

@@ -47,7 +47,7 @@ var EventMaker = /** @class */ (function () {
         // FIXME: should do button clicks (like a form submit)
         // FIXME: should run .onclick() as well
     };
-    EventMaker.fireChange = function (target) {
+    EventMaker.prototype.fireChange = function (target) {
         target = $(target)[0];
         var event = document.createEvent("HTMLEvents");
         event.initEvent("change", true, true);
