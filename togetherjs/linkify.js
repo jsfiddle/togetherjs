@@ -4,7 +4,7 @@ define([], function () {
     /* Finds any links in the text of an element (or its children) and turns them
        into anchors (with target=_blank) */
     function linkify(el) {
-        if (el.jquery) {
+        if ("jquery" in el) {
             el = el[0];
         }
         el.normalize();
@@ -28,6 +28,9 @@ define([], function () {
                 else if (item.nodeType == document.TEXT_NODE) {
                     while (true) {
                         var text = item.nodeValue;
+                        if (text == null) {
+                            continue;
+                        }
                         var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t<>()\[\]]*/i;
                         var match = regex.exec(text);
                         if (!match) {
