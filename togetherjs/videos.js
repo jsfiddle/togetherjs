@@ -30,9 +30,9 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
     }
     function makeEventSender(eventName) {
         return function (event, options) {
+            if (options === void 0) { options = {}; }
             var element = event.target;
-            options = options || {};
-            if (!options.silent) {
+            if (!options.silent && element) {
                 session.send({
                     type: ('video-' + eventName),
                     location: elementFinder.elementLocation(element),
