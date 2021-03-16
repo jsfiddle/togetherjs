@@ -89,6 +89,7 @@ function ChannelsMain(util) {
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
+            _this.onmessage = function (jsonData) { };
             if (address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }
@@ -169,7 +170,6 @@ function ChannelsMain(util) {
             };
         };
         WebSocketChannel.prototype.onclose = function () { };
-        WebSocketChannel.prototype.onmessage = function () { };
         return WebSocketChannel;
     }(AbstractChannel)); // /WebSocketChannel
     /* Sends TO a window or iframe */
@@ -184,6 +184,7 @@ function ChannelsMain(util) {
             _this._pingFailures = 0;
             _this._pingTimeout = null;
             _this.window = null;
+            _this.onmessage = function () { };
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             if (win) {
@@ -283,7 +284,6 @@ function ChannelsMain(util) {
             this.emit("close");
         };
         PostMessageChannel.prototype.onclose = function () { };
-        PostMessageChannel.prototype.onmessage = function () { };
         return PostMessageChannel;
     }(AbstractChannel)); // /PostMessageChannel
     /* Handles message FROM an exterior window/parent */

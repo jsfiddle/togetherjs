@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["util", "session", "storage", "require", "templates"], function (util, session, storage, require, templates) {
+define(["util", "session", "storage", "require", "templates"], function (util: Utils, session: ReturnType<typeof sessionMain>, storage: ReturnType<typeof StorageMain>, require: Require, templates) {
   var peers = util.Module("peers");
   var assert = util.assert;
   var CHECK_ACTIVITY_INTERVAL = 10*1000; // Every 10 seconds see if someone has gone idle

@@ -4,7 +4,7 @@ declare namespace TogetherJSNS {
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
@@ -115,7 +115,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: Messages[],
+        ignoreMessages: Messages[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[],
         /** When undefined, attempts to use the browser's language */
@@ -156,7 +156,7 @@ declare namespace TogetherJSNS {
         sameUrl: boolean;
         clientId: string;
         peer: Peer;
-        type: string;
+        type: TogetherJSNS.Messages;
     }
 
     interface CallbackForOnce<T> {
@@ -195,7 +195,7 @@ declare namespace TogetherJSNS {
     }
 
     interface ConfigGetter {
-        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
+        get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K];
         /*
         get(name: "dontShowClicks"): Config["dontShowClicks"],
         get(name: "cloneClicks"): Config["cloneClicks"],

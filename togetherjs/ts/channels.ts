@@ -116,7 +116,7 @@ function ChannelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        abstract onmessage(jsonData: string): void;
+        public onmessage?: (jsonData: string) => void;
         abstract onclose(): void;
     }
 
@@ -214,7 +214,7 @@ function ChannelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = (jsonData: string) => {};
 
     } // /WebSocketChannel
 
@@ -337,7 +337,7 @@ function ChannelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = () => {};
     } // /PostMessageChannel
 
     /* Handles message FROM an exterior window/parent */
