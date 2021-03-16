@@ -49,21 +49,23 @@ function StorageMain(util: Util) {
             this.settings = new StorageSettings(this);
         }
 
-        get(key: string, defaultValue: string) {
+        get<T>(key: string, defaultValue: T | null = null) {
             var self = this;
-            return Deferred(function(def: JQueryDeferred<unknown>) {
+            return Deferred(function(def: JQueryDeferred<T>) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
                     key = self.prefix + key;
-                    var value = self.storage.getItem(key);
-                    if(!value) {
+                    let value: T | null;
+                    var valueAsString = self.storage.getItem(key);
+                    if(!valueAsString) {
                         value = defaultValue;
                         if(DEBUG_STORAGE) {
                             console.debug("Get storage", key, "defaults to", value);
                         }
-                    } else {
-                        value = JSON.parse(value);
+                    }
+                    else {
+                        value = JSON.parse(valueAsString);
                         if(DEBUG_STORAGE) {
                             console.debug("Get storage", key, "=", value);
                         }
@@ -73,23 +75,24 @@ function StorageMain(util: Util) {
             });
         }
 
-        set(key: string, value: string | undefined) {
+        set(key: string, value?: unknown) {
             var self = this;
+            let stringyfiedValue: string | undefined;
             if(value !== undefined) {
-                value = JSON.stringify(value);
+                stringyfiedValue = JSON.stringify(value);
             }
             return Deferred(def => {
                 key = self.prefix + key;
-                if(value === undefined) {
+                if(stringyfiedValue === undefined) {
                     self.storage.removeItem(key);
                     if(DEBUG_STORAGE) {
                         console.debug("Delete storage", key);
                     }
                 }
                 else {
-                    self.storage.setItem(key, value);
+                    self.storage.setItem(key, stringyfiedValue);
                     if(DEBUG_STORAGE) {
-                        console.debug("Set storage", key, value);
+                        console.debug("Set storage", key, stringyfiedValue);
                     }
                 }
                 setTimeout(def.resolve);
