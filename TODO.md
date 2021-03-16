@@ -13,6 +13,7 @@
 - search all "!." and "!;" and "!)"
 - check all unknown types
 - check all assert that are used for type checking
+- there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 
 # Tests
 
