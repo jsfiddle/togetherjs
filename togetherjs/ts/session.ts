@@ -25,13 +25,14 @@
         /** This is the hub we connect to: */
         private shareId: string | null = null;
         /** This is the ID that identifies this client: */
-        private clientId: string | null = null;
+        public readonly clientId: string | null = null;
         public readonly router = channels.Router();
         /** Indicates if TogetherJS has just started (not continuing from a saved session): */
         private firstRun = false;
         /** Setting, essentially global: */
         private AVATAR_SIZE = 90;
         timeHelloSent = null;
+        public identityId?: string;
 
         public readonly hub = new OnClass();
 
@@ -74,11 +75,11 @@
             }
         }
 
-        send(msg: TogetherJSNS.Message) {
+        send(msg: TogetherJSNS.MessageToSend) {
             if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            msg.clientId = session.clientId;
+            msg.clientId = session.clientId || undefined;
             channel.send(msg);
         }
     

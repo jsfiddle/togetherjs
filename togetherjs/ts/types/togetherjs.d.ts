@@ -4,7 +4,7 @@ declare namespace TogetherJSNS {
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
@@ -147,9 +147,11 @@ declare namespace TogetherJSNS {
         continued: boolean;
     }
 
+    type PeerStatus = "live" | "active" | "inactive" | "bye";
+
     interface Peer {
         id: string;
-        status: "live";
+        status: PeerStatus;
     }
 
     interface Message {
@@ -157,6 +159,16 @@ declare namespace TogetherJSNS {
         clientId: string;
         peer: Peer;
         type: TogetherJSNS.Messages;
+        url: string;
+        to: string;
+    }
+
+    interface MessageToSend {
+        type: TogetherJSNS.Messages;
+        url?: string;
+        to?: string;
+        clientId?: string;
+        idle?: PeerStatus;
     }
 
     interface CallbackForOnce<T> {

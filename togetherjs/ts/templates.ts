@@ -8,9 +8,7 @@ interface Template {
     names: string;
 }
 
-// FIXME: maybe it would be better to dynamically assemble the first
-// argument to define() here to include the localized module:
-define(["util", "require"], function(util: Util, require: Require) {
+function templatesMain(util: Util, require: Require) {
     let assert: typeof util.assert = util.assert;
 
     function clean(t: string) {
@@ -46,4 +44,8 @@ define(["util", "require"], function(util: Util, require: Require) {
         return clean(templatesLang[resourceName]);
     };
 
-});
+}
+
+// FIXME: maybe it would be better to dynamically assemble the first
+// argument to define() here to include the localized module:
+define(["util", "require"], templatesMain);

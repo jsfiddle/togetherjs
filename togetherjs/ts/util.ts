@@ -93,7 +93,7 @@ class OnClass {
 
     removeListener = this.off.bind(this);
 
-    emit(name: string) {
+    emit(name: string, ...args2: unknown[]) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;

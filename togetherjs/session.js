@@ -87,7 +87,7 @@ function sessionMain(require, util, channels, $, storage) {
             if (DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            msg.clientId = session.clientId;
+            msg.clientId = session.clientId || undefined;
             channel.send(msg);
         };
         Session.prototype.appSend = function (msg) {
