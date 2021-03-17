@@ -80,19 +80,20 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private id: string;
         private identityId;
         public status: TogetherJSNS.PeerStatus;
-        private idle: TogetherJSNS.PeerStatus;
-        private name: string | null;
-        private avatar: string | null;
-        private color: string;
+        public readonly idle: TogetherJSNS.PeerStatus;
+        public readonly name: string | null;
+        public readonly avatar: string | null;
+        public readonly color: string;
         private view;
         private lastMessageDate: number = 0;
-        private following: boolean;
+        public readonly following: boolean;
 
-        private url: string;
+        public readonly url: string;
         private hash: string | null = null;
-        private title: string | null = null;
+        public readonly title: string | null = null;
         private rtcSupported: boolean;
-        private isCreator: boolean;
+        public readonly isCreator: boolean;
+        public readonly urlHash: string;
 
         public static peers: {[id: string]: PeerClass} = {};
 
@@ -470,6 +471,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     }
 
     class Peers extends OnClass {
+        private PeerClassExport: PeerClass; // TODO very ugly way to export the class
         public Self?: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
 

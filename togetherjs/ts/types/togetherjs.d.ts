@@ -13,6 +13,8 @@ declare namespace TogetherJSNS {
     type Playback = ReturnType<typeof playbackMain>;
     type Chat = ReturnType<typeof chatMain>;
     type Ui = ReturnType<typeof uiMain>;
+
+    type PeerClass = Peers["PeerClassExport"];
     
 
     type ValueOf<T> = T[keyof T];
