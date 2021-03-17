@@ -101,7 +101,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     let editTrackers: {[trackerName: string]: TrackerClass} = {};
     let liveTrackers: Tracker[] = [];
 
-    TogetherJS.addTracker = function(TrackerClass: Tracker, skipSetInit: boolean) {
+    TogetherJS.addTracker = function(TrackerClass: TrackerClass, skipSetInit: boolean) {
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
@@ -141,6 +141,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     // TODO factorize code between editors
     class AceEditor extends Editor<TogetherJSNS.AceEditorElement & HTMLElement> {
+        public static readonly trackerName = "AceEditor";
+
         constructor(el: JQuery) {
             super("AceEditor", $(el)[0] as TogetherJSNS.AceEditorElement & HTMLElement);
             assert($(this.element).hasClass("ace_editor"));
@@ -210,6 +212,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     TogetherJS.addTracker(AceEditor, true /* skip setInit */);
 
     class CodeMirrorEditor extends Editor<TogetherJSNS.CodeMirrorElement & HTMLElement> {
+        public static readonly trackerName = "CodeMirrorEditor";
+
         constructor(el: JQuery) {
             super("CodeMirrorEditor", $(el)[0] as TogetherJSNS.CodeMirrorElement & HTMLElement);
             assert("CodeMirror" in this.element);
@@ -295,6 +299,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
     class CKEditor extends Editor {
+        public static readonly trackerName = "CKEditor";
+
         constructor(el: JQuery) {
             super("CKEditor", $(el)[0]);
             assert(CKEDITOR);
@@ -381,6 +387,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
     class tinymceEditor extends Editor {
+        public static readonly trackerName = "tinymceEditor";
 
         constructor(el: JQuery) {
             super("tinymceEditor", $(el)[0]);

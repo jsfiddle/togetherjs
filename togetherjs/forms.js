@@ -177,6 +177,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         AceEditor.tracked = function (el) {
             return !!$(el).closest(".ace_editor").length;
         };
+        AceEditor.trackerName = "AceEditor";
         return AceEditor;
     }(Editor));
     TogetherJS.addTracker(AceEditor, true /* skip setInit */);
@@ -252,6 +253,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             return false;
         };
+        CodeMirrorEditor.trackerName = "CodeMirrorEditor";
         return CodeMirrorEditor;
     }(Editor));
     TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
@@ -327,6 +329,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var elem = $(el)[0];
             return !!(CKEDITOR.dom.element.get(elem) && CKEDITOR.dom.element.get(elem).getEditor());
         };
+        CKEditor.trackerName = "CKEditor";
         return CKEditor;
     }(Editor));
     TogetherJS.addTracker(CKEditor, true /* skip setInit */);
@@ -409,6 +412,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             });
             return flag;*/
         };
+        tinymceEditor.trackerName = "tinymceEditor";
         return tinymceEditor;
     }(Editor));
     TogetherJS.addTracker(tinymceEditor, true);
