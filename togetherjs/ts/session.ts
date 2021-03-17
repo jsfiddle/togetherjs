@@ -121,7 +121,7 @@
             return msg;
         }
 
-        session() {
+        start() {
             initStartTarget();
             initIdentityId().then(function() {
                 initShareId().then(function() {

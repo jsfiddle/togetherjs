@@ -127,7 +127,7 @@ function sessionMain(require, util, channels, $, storage) {
             session.emit("prepare-hello", msg);
             return msg;
         };
-        Session.prototype.session = function () {
+        Session.prototype.start = function () {
             initStartTarget();
             initIdentityId().then(function () {
                 initShareId().then(function () {
