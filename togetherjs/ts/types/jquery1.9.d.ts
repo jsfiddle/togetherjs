@@ -1,5 +1,6 @@
 interface JQueryStatic {
     browser : { mobile: boolean };
+    msie: boolean;
 }
 
 // Plugins introduced by TogetherJS

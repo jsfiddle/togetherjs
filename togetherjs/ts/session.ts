@@ -28,7 +28,7 @@
         public readonly clientId: string | null = null;
         public readonly router = channels.Router();
         /** Indicates if TogetherJS has just started (not continuing from a saved session): */
-        private firstRun = false;
+        public firstRun = false;
         /** Setting, essentially global: */
         private AVATAR_SIZE = 90;
         timeHelloSent = null;

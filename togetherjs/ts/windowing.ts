@@ -17,7 +17,7 @@ function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, s
     /* Displays one window.  A window must already exist.  This hides other windows, and
        positions the window according to its data-bound-to attributes */
     class Windowing {
-        show(el: HTMLElement | JQuery, options: Partial<ShowOptions> = {}) {
+        show(el: HTMLElement | JQuery | string, options: Partial<ShowOptions> = {}) {
             const element = $(el);
             options.bind = options.bind || element.attr("data-bind-to");
             var notification = element.hasClass("togetherjs-notification");
