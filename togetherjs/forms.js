@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($, util, session, elementFinder, eventMaker, templating, ot) {
+function formsMain($, util, session, elementFinder, eventMaker, templating, ot) {
     var forms = util.Module("forms");
     var assert = util.assert;
     // This is how much larger the focus element is than the element it surrounds
@@ -19,9 +19,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
     }
     function maybeChange(event) {
-        // Called when we get an event that may or may not indicate a real change
-        // (like keyup in a textarea)
-        var tag = event.target.tagName;
+        // Called when we get an event that may or may not indicate a real change (like keyup in a textarea)
+        var tag = event.target.tagName; // TODO may be null
         if (tag == "TEXTAREA" || tag == "INPUT") {
             change(event);
         }
@@ -48,7 +47,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         var location = elementFinder.elementLocation(el);
         var msg = {
             type: "form-update",
-            element: location
+            element: location,
         };
         if (isText(el) || tracker) {
             var history = el.data("togetherjsHistory");
@@ -73,8 +72,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
         session.send(msg);
     }
-    function isCheckable(el) {
-        el = $(el);
+    function isCheckable(element) {
+        var el = $(element);
         var type = (el.prop("type") || "text").toLowerCase();
         if (el.prop("tagName") == "INPUT" && ["radio", "checkbox"].indexOf(type) != -1) {
             return true;
@@ -99,37 +98,37 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
             setInit();
         }
     };
-    var AceEditor = util.Class({
-        trackerName: "AceEditor",
-        constructor: function (el) {
+    var AceEditor = /** @class */ (function () {
+        function AceEditor(el) {
+            this.trackerName = "AceEditor";
             this.element = $(el)[0];
             assert($(this.element).hasClass("ace_editor"));
             this._change = this._change.bind(this);
             this._editor().document.on("change", this._change);
-        },
-        tracked: function (el) {
+        }
+        AceEditor.prototype.tracked2 = function (el) {
             return this.element === $(el)[0];
-        },
-        destroy: function (el) {
+        };
+        AceEditor.prototype.destroy = function (el) {
             this._editor().document.removeListener("change", this._change);
-        },
-        update: function (msg) {
+        };
+        AceEditor.prototype.update = function (msg) {
             this._editor().document.setValue(msg.value);
-        },
-        init: function (update, msg) {
+        };
+        AceEditor.prototype.init = function (update, msg) {
             this.update(update);
-        },
-        makeInit: function () {
+        };
+        AceEditor.prototype.makeInit = function () {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this._editor().document.getValue()
             };
-        },
-        _editor: function () {
+        };
+        AceEditor.prototype._editor = function () {
             return this.element.env;
-        },
-        _change: function (e) {
+        };
+        AceEditor.prototype._change = function (e) {
             // FIXME: I should have an internal .send() function that automatically
             // asserts !inRemoteUpdate, among other things
             if (inRemoteUpdate) {
@@ -140,48 +139,49 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                 element: this.element,
                 value: this.getContent()
             });
-        },
-        getContent: function () {
+        };
+        AceEditor.prototype.getContent = function () {
             return this._editor().document.getValue();
-        }
-    });
-    AceEditor.scan = function () {
-        return $(".ace_editor");
-    };
-    AceEditor.tracked = function (el) {
-        return !!$(el).closest(".ace_editor").length;
-    };
+        };
+        AceEditor.scan = function () {
+            return $(".ace_editor");
+        };
+        AceEditor.prototype.tracked = function (el) {
+            return !!$(el).closest(".ace_editor").length;
+        };
+        return AceEditor;
+    }());
     TogetherJS.addTracker(AceEditor, true /* skip setInit */);
-    var CodeMirrorEditor = util.Class({
-        trackerName: "CodeMirrorEditor",
-        constructor: function (el) {
+    var CodeMirrorEditor = /** @class */ (function () {
+        function CodeMirrorEditor(el) {
+            this.trackerName = "CodeMirrorEditor";
             this.element = $(el)[0];
             assert(this.element.CodeMirror);
             this._change = this._change.bind(this);
             this._editor().on("change", this._change);
-        },
-        tracked: function (el) {
+        }
+        CodeMirrorEditor.prototype.tracked2 = function (el) {
             return this.element === $(el)[0];
-        },
-        destroy: function (el) {
+        };
+        CodeMirrorEditor.prototype.destroy = function (el) {
             this._editor().off("change", this._change);
-        },
-        update: function (msg) {
+        };
+        CodeMirrorEditor.prototype.update = function (msg) {
             this._editor().setValue(msg.value);
-        },
-        init: function (msg) {
+        };
+        CodeMirrorEditor.prototype.init = function (msg) {
             if (msg.value) {
                 this.update(msg);
             }
-        },
-        makeInit: function () {
+        };
+        CodeMirrorEditor.prototype.makeInit = function () {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this._editor().getValue()
             };
-        },
-        _change: function (editor, change) {
+        };
+        CodeMirrorEditor.prototype._change = function (editor, change) {
             if (inRemoteUpdate) {
                 return;
             }
@@ -190,68 +190,69 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                 element: this.element,
                 value: this.getContent()
             });
-        },
-        _editor: function () {
+        };
+        CodeMirrorEditor.prototype._editor = function () {
             return this.element.CodeMirror;
-        },
-        getContent: function () {
+        };
+        CodeMirrorEditor.prototype.getContent = function () {
             return this._editor().getValue();
-        }
-    });
-    CodeMirrorEditor.scan = function () {
-        var result = [];
-        var els = document.body.getElementsByTagName("*");
-        var _len = els.length;
-        for (var i = 0; i < _len; i++) {
-            var el = els[i];
-            if (el.CodeMirror) {
-                result.push(el);
+        };
+        CodeMirrorEditor.scan = function () {
+            var result = [];
+            var els = document.body.getElementsByTagName("*");
+            var _len = els.length;
+            for (var i = 0; i < _len; i++) {
+                var el = els[i];
+                if (el.CodeMirror) {
+                    result.push(el);
+                }
             }
-        }
-        return $(result);
-    };
-    CodeMirrorEditor.tracked = function (el) {
-        el = $(el)[0];
-        while (el) {
-            if (el.CodeMirror) {
-                return true;
+            return $(result);
+        };
+        CodeMirrorEditor.prototype.tracked = function (el) {
+            el = $(el)[0];
+            while (el) {
+                if (el.CodeMirror) {
+                    return true;
+                }
+                el = el.parentNode;
             }
-            el = el.parentNode;
-        }
-        return false;
-    };
+            return false;
+        };
+        return CodeMirrorEditor;
+    }());
     TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
-    var CKEditor = util.Class({
-        trackerName: "CKEditor",
-        constructor: function (el) {
+    var CKEditor = /** @class */ (function () {
+        function CKEditor(el) {
+            this.trackerName = "CKEditor";
             this.element = $(el)[0];
             assert(CKEDITOR);
             assert(CKEDITOR.dom.element.get(this.element));
             this._change = this._change.bind(this);
             // FIXME: change event is available since CKEditor 4.2
             this._editor().on("change", this._change);
-        },
-        tracked: function (el) {
+        }
+        CKEditor.prototype.tracked2 = function (el) {
             return this.element === $(el)[0];
-        },
-        destroy: function (el) {
+        };
+        CKEditor.prototype.destroy = function (el) {
             this._editor().removeListener("change", this._change);
-        },
-        update: function (msg) {
+        };
+        CKEditor.prototype.update = function (msg) {
             //FIXME: use setHtml instead of setData to avoid frame reloading overhead
             this._editor().editable().setHtml(msg.value);
-        },
-        init: function (update, msg) {
+        };
+        CKEditor.prototype.init = function (update, msg) {
             this.update(update);
-        },
-        makeInit: function () {
+        };
+        CKEditor.prototype.makeInit = function () {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this.getContent()
             };
-        },
-        _change: function (e) {
+        };
+        CKEditor.prototype._change = function (e) {
             if (inRemoteUpdate) {
                 return;
             }
@@ -260,65 +261,66 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                 element: this.element,
                 value: this.getContent()
             });
-        },
-        _editor: function () {
+        };
+        CKEditor.prototype._editor = function () {
             return CKEDITOR.dom.element.get(this.element).getEditor();
-        },
-        getContent: function () {
+        };
+        CKEditor.prototype.getContent = function () {
             return this._editor().getData();
-        }
-    });
-    CKEditor.scan = function () {
-        var result = [];
-        if (typeof CKEDITOR == "undefined") {
-            return;
-        }
-        var editorInstance;
-        for (var instanceIdentifier in CKEDITOR.instances) {
-            editorInstance = document.getElementById(instanceIdentifier) || document.getElementsByName(instanceIdentifier)[0];
-            if (editorInstance) {
-                result.push(editorInstance);
+        };
+        CKEditor.scan = function () {
+            var result = [];
+            if (typeof CKEDITOR == "undefined") {
+                return;
             }
-        }
-        return $(result);
-    };
-    CKEditor.tracked = function (el) {
-        if (typeof CKEDITOR == "undefined") {
-            return false;
-        }
-        el = $(el)[0];
-        return !!(CKEDITOR.dom.element.get(el) && CKEDITOR.dom.element.get(el).getEditor());
-    };
+            var editorInstance;
+            for (var instanceIdentifier in CKEDITOR.instances) {
+                editorInstance = document.getElementById(instanceIdentifier) || document.getElementsByName(instanceIdentifier)[0];
+                if (editorInstance) {
+                    result.push(editorInstance);
+                }
+            }
+            return $(result);
+        };
+        CKEditor.prototype.tracked = function (el) {
+            if (typeof CKEDITOR == "undefined") {
+                return false;
+            }
+            el = $(el)[0];
+            return !!(CKEDITOR.dom.element.get(el) && CKEDITOR.dom.element.get(el).getEditor());
+        };
+        return CKEditor;
+    }());
     TogetherJS.addTracker(CKEditor, true /* skip setInit */);
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
-    var tinymceEditor = util.Class({
-        trackerName: "tinymceEditor",
-        constructor: function (el) {
+    var tinymceEditor = /** @class */ (function () {
+        function tinymceEditor(el) {
+            this.trackerName = "tinymceEditor";
             this.element = $(el)[0];
             assert($(this.element).attr('id').indexOf('mce_') != -1);
             this._change = this._change.bind(this);
             this._editor().on("input keyup cut paste change", this._change);
-        },
-        tracked: function (el) {
+        }
+        tinymceEditor.prototype.tracked2 = function (el) {
             return this.element === $(el)[0];
-        },
-        destroy: function (el) {
+        };
+        tinymceEditor.prototype.destroy = function (el) {
             this._editor().destory();
-        },
-        update: function (msg) {
+        };
+        tinymceEditor.prototype.update = function (msg) {
             this._editor().setContent(msg.value, { format: 'raw' });
-        },
-        init: function (update, msg) {
+        };
+        tinymceEditor.prototype.init = function (update, msg) {
             this.update(update);
-        },
-        makeInit: function () {
+        };
+        tinymceEditor.prototype.makeInit = function () {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this.getContent()
             };
-        },
-        _change: function (e) {
+        };
+        tinymceEditor.prototype._change = function (e) {
             if (inRemoteUpdate) {
                 return;
             }
@@ -327,44 +329,45 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
                 element: this.element,
                 value: this.getContent()
             });
-        },
-        _editor: function () {
+        };
+        tinymceEditor.prototype._editor = function () {
             if (typeof tinymce == "undefined") {
                 return;
             }
             return $(this.element).data("tinyEditor");
-        },
-        getContent: function () {
+        };
+        tinymceEditor.prototype.getContent = function () {
             return this._editor().getContent();
-        }
-    });
-    tinymceEditor.scan = function () {
-        //scan all the elements that contain tinyMCE editors
-        if (typeof tinymce == "undefined") {
-            return;
-        }
-        var result = [];
-        $(window.tinymce.editors).each(function (i, ed) {
-            result.push($('#' + ed.id));
-            //its impossible to retrieve a single editor from a container, so lets store it
-            $('#' + ed.id).data("tinyEditor", ed);
-        });
-        return $(result);
-    };
-    tinymceEditor.tracked = function (el) {
-        if (typeof tinymce == "undefined") {
-            return false;
-        }
-        el = $(el)[0];
-        return !!$(el).data("tinyEditor");
-        /*var flag = false;
-        $(window.tinymce.editors).each(function (i, ed) {
-          if (el.id == ed.id) {
-            flag = true;
-          }
-        });
-        return flag;*/
-    };
+        };
+        tinymceEditor.scan = function () {
+            //scan all the elements that contain tinyMCE editors
+            if (typeof tinymce == "undefined") {
+                return;
+            }
+            var result = [];
+            $(window.tinymce.editors).each(function (i, ed) {
+                result.push($('#' + ed.id));
+                //its impossible to retrieve a single editor from a container, so lets store it
+                $('#' + ed.id).data("tinyEditor", ed);
+            });
+            return $(result);
+        };
+        tinymceEditor.prototype.tracked = function (el) {
+            if (typeof tinymce == "undefined") {
+                return false;
+            }
+            el = $(el)[0];
+            return !!$(el).data("tinyEditor");
+            /*var flag = false;
+            $(window.tinymce.editors).each(function (i, ed) {
+              if (el.id == ed.id) {
+                flag = true;
+              }
+            });
+            return flag;*/
+        };
+        return tinymceEditor;
+    }());
     TogetherJS.addTracker(tinymceEditor, true);
     ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
@@ -395,8 +398,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         });
         return result;
     }
-    function getTracker(el, name) {
-        el = $(el)[0];
+    function getTracker(e, name) {
+        var el = $(e)[0];
         for (var i = 0; i < liveTrackers.length; i++) {
             var tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
@@ -409,10 +412,9 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
         return null;
     }
-    var TEXT_TYPES = ("color date datetime datetime-local email " +
-        "tel text time week").split(/ /g);
-    function isText(el) {
-        el = $(el);
+    var TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
+    function isText(e) {
+        var el = $(e);
         var tag = el.prop("tagName");
         var type = (el.prop("type") || "text").toLowerCase();
         if (tag == "TEXTAREA") {
@@ -423,8 +425,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
         return false;
     }
-    function getValue(el) {
-        el = $(el);
+    function getValue(e) {
+        var el = $(e);
         if (isCheckable(el)) {
             return el.prop("checked");
         }
@@ -432,8 +434,8 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
             return el.val();
         }
     }
-    function getElementType(el) {
-        el = $(el)[0];
+    function getElementType(e) {
+        var el = $(e)[0];
         if (el.tagName == "TEXTAREA") {
             return "textarea";
         }
@@ -445,15 +447,15 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
         return "?";
     }
-    function setValue(el, value) {
-        el = $(el);
+    function setValue(e, value) {
+        var el = $(e);
         var changed = false;
         if (isCheckable(el)) {
             var checked = !!el.prop("checked");
-            value = !!value;
-            if (checked != value) {
+            var boolValue = !!value;
+            if (checked != boolValue) {
                 changed = true;
-                el.prop("checked", value);
+                el.prop("checked", boolValue);
             }
         }
         else {
@@ -466,7 +468,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
             eventMaker.fireChange(el);
         }
     }
-    /* Send the top of this history queue, if it hasn't been already sent. */
+    /** Send the top of this history queue, if it hasn't been already sent. */
     function maybeSendUpdate(element, history, tracker) {
         var change = history.getNextToSend();
         if (!change) {
@@ -762,4 +764,5 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
         }
     });
     return forms;
-});
+}
+define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

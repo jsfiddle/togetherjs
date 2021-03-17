@@ -2,12 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface Ot {
-    SimpleHistory: (clientId, initState, initBasis) => SimpleHistory,
-    History: (clientId, initState) => History,
-    TextReplace: (start, del, text) => TextReplace,
-}
-
 interface Change2 {
     id: string,
     delta,
@@ -780,7 +774,7 @@ class Change {
     }
 }
 
-define(["util"], function(util: Util) {
+function otMain(util: Util) {
     const assert: typeof util.assert = util.assert;
 
     const ot = {
@@ -789,6 +783,7 @@ define(["util"], function(util: Util) {
         TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
     }
 
-
     return ot;
-});
+}
+
+define(["util"], otMain);

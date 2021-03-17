@@ -7,6 +7,7 @@ declare namespace TogetherJSNS {
     type Peers = ReturnType<typeof peersMain>;
     type Windowing = ReturnType<typeof windowingMain>;
     type Templating = ReturnType<typeof templatingMain>;
+    type Ot = ReturnType<typeof otMain>;
 
     type ValueOf<T> = T[keyof T];
 
@@ -125,7 +126,7 @@ declare namespace TogetherJSNS {
         /** Ignores the following console messages, disables all messages if set to true */
         ignoreMessages: Messages[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
-        ignoreForms: JQuerySelector[],
+        ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
         lang?: string | null,
         fallbackLang: string,
@@ -162,6 +163,7 @@ declare namespace TogetherJSNS {
         status: PeerStatus;
     }
 
+    // TODO there seems to be many types of messages, there may be one for every event like form-update
     interface Message {
         sameUrl: boolean;
         clientId: string;
@@ -169,6 +171,10 @@ declare namespace TogetherJSNS {
         type: TogetherJSNS.Messages;
         url: string;
         to: string;
+    }
+
+    interface FormUpdateMessage {
+        tracker;
     }
 
     interface MessageToSend {
