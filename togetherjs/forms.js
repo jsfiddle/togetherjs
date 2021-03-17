@@ -170,7 +170,11 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         AceEditor.scan = function () {
             return $(".ace_editor");
         };
+        /** Non-static version */
         AceEditor.prototype.tracked = function (el) {
+            return AceEditor.tracked(el);
+        };
+        AceEditor.tracked = function (el) {
             return !!$(el).closest(".ace_editor").length;
         };
         return AceEditor;
@@ -234,7 +238,11 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             return $(result);
         };
-        CodeMirrorEditor.prototype.tracked = function (e) {
+        /** Non-static version */
+        CodeMirrorEditor.prototype.tracked = function (el) {
+            return CodeMirrorEditor.tracked(el);
+        };
+        CodeMirrorEditor.tracked = function (e) {
             var el = $(e)[0];
             while (el) {
                 if ("CodeMirror" in el) {
@@ -308,7 +316,11 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             return $(result);
         };
+        /** Non-static version */
         CKEditor.prototype.tracked = function (el) {
+            return CKEditor.tracked(el);
+        };
+        CKEditor.tracked = function (el) {
             if (typeof CKEDITOR == "undefined") {
                 return false;
             }
@@ -379,7 +391,11 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             });
             return $(result);
         };
+        /** Non-static version */
         tinymceEditor.prototype.tracked = function (el) {
+            return tinymceEditor.tracked(el);
+        };
+        tinymceEditor.tracked = function (el) {
             if (typeof tinymce == "undefined") {
                 return false;
             }
@@ -537,9 +553,9 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
         }
         var selection;
-        if (isText(el[0])) {
-            assert(el[0].selectionStart);
-            assert(el[0].selectionEnd);
+        if (isText(el)) {
+            //assert(el[0].selectionStart);
+            //assert(el[0].selectionEnd);
             selection = [el[0].selectionStart, el[0].selectionEnd];
         }
         var value;
@@ -576,7 +592,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             else {
                 setValue(el, value);
             }
-            if (isText(el[0])) {
+            if (isText(el)) {
                 el[0].selectionStart = selection[0];
                 el[0].selectionEnd = selection[1];
             }
@@ -614,7 +630,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
             };
-            if (isText(el[0])) {
+            if (isText(el)) {
                 var history = el.data("togetherjsHistory");
                 if (history) {
                     upd.value = history.committed;

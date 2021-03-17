@@ -12,7 +12,6 @@ class OnClass {
     _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
 
     on<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
-        console.log("on_class", this);
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";

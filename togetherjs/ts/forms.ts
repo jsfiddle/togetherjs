@@ -196,8 +196,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         static scan() {
             return $(".ace_editor");
         }
+
+        /** Non-static version */
+        tracked(el: JQuery | HTMLElement) {
+            return AceEditor.tracked(el);
+        }
     
-        tracked(el: HTMLElement | JQuery): boolean {
+        static tracked(el: HTMLElement | JQuery): boolean {
             return !!$(el).closest(".ace_editor").length;
         }
     }
@@ -269,8 +274,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             return $(result);
         }
+
+        /** Non-static version */
+        tracked(el: JQuery | HTMLElement) {
+            return CodeMirrorEditor.tracked(el);
+        }
     
-        tracked(e: JQuery | HTMLElement): boolean {
+        static tracked(e: JQuery | HTMLElement): boolean {
             let el: Node | null = $(e)[0];
             while(el) {
                 if("CodeMirror" in el) {
@@ -352,8 +362,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             return $(result);
         }
-    
+
+        /** Non-static version */
         tracked(el: JQuery | HTMLElement) {
+            return CKEditor.tracked(el);
+        }
+    
+        static tracked(el: JQuery | HTMLElement) {
             if(typeof CKEDITOR == "undefined") {
                 return false;
             }
@@ -433,8 +448,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             });
             return $(result);
         }
-    
+
+        /** Non-static version */
         tracked(el: JQuery | HTMLElement) {
+            return tinymceEditor.tracked(el);
+        }
+    
+        static tracked(el: JQuery | HTMLElement) {
             if(typeof tinymce == "undefined") {
                 return false;
             }
@@ -605,9 +625,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
         }
         let selection: [number, number];
-        if(isText(el[0])) {
-            assert(el[0].selectionStart);
-            assert(el[0].selectionEnd);
+        if(isText(el)) {
+            //assert(el[0].selectionStart);
+            //assert(el[0].selectionEnd);
             selection = [el[0].selectionStart, el[0].selectionEnd];
         }
         var value;
@@ -644,7 +664,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             else {
                 setValue(el, value);
             }
-            if(isText(el[0])) {
+            if(isText(el)) {
                 el[0].selectionStart = selection[0];
                 el[0].selectionEnd = selection[1];
             }
@@ -684,7 +704,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
             };
-            if(isText(el[0])) {
+            if(isText(el)) {
                 var history = el.data("togetherjsHistory");
                 if(history) {
                     upd.value = history.committed;

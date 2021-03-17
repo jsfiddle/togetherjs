@@ -26,7 +26,6 @@ var OnClass = /** @class */ (function () {
         this.removeListener = this.off.bind(this);
     }
     OnClass.prototype.on = function (name, callback) {
-        console.log("on_class", this);
         if (typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
