@@ -6,7 +6,7 @@ interface MapOfVariables {
     [key: string]: string | JQuery;
 };
 
-define(["jquery", "util", "peers", "windowing", "session"], function($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, windowing, session: TogetherJSNS.Session) {
+function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
 
     class Templating {
@@ -86,4 +86,6 @@ define(["jquery", "util", "peers", "windowing", "session"], function($: JQuerySt
     }
 
     return new Templating();
-});
+}
+
+define(["jquery", "util", "peers", "windowing", "session"], templatingMain);

@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "peers", "session"], function ($, util, peers, session) {
+function windowingMain($, util, peers, session) {
     var assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
@@ -221,4 +221,5 @@ define(["jquery", "util", "peers", "session"], function ($, util, peers, session
         bindEvents(el);
     });
     return windowing;
-});
+}
+define(["jquery", "util", "peers", "session"], windowingMain);

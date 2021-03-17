@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($: JQueryStatic, util: Util, session, elementFinder: ElementFinder, eventMaker: EventMaker, templating, ot: Ot) {
+define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], function ($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: Ot) {
   var forms = util.Module("forms");
-  var assert = util.assert;
+  const assert: typeof util.assert = util.assert;
 
   // This is how much larger the focus element is than the element it surrounds
   // (this is padding on each side)

@@ -5,6 +5,8 @@ declare namespace TogetherJSNS {
     type Session = ReturnType<typeof sessionMain>;
     type Templates = ReturnType<typeof templatesMain>;
     type Peers = ReturnType<typeof peersMain>;
+    type Windowing = ReturnType<typeof windowingMain>;
+    type Templating = ReturnType<typeof templatingMain>;
 
     type ValueOf<T> = T[keyof T];
 

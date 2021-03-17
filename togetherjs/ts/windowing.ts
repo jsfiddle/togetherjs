@@ -8,7 +8,7 @@ interface ShowOptions {
     onClose: null | (() => any);
 }
 
-define(["jquery", "util", "peers", "session"], function($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
@@ -226,4 +226,6 @@ define(["jquery", "util", "peers", "session"], function($: JQueryStatic, util: U
     });
 
     return windowing;
-});
+}
+
+define(["jquery", "util", "peers", "session"], windowingMain);

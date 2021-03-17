@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 ;
-define(["jquery", "util", "peers", "windowing", "session"], function ($, util, peers, windowing, session) {
+function templatingMain($, util, peers, windowing, session) {
     var assert = util.assert;
     var Templating = /** @class */ (function () {
         function Templating() {
@@ -83,4 +83,5 @@ define(["jquery", "util", "peers", "windowing", "session"], function ($, util, p
         return Templating;
     }());
     return new Templating();
-});
+}
+define(["jquery", "util", "peers", "windowing", "session"], templatingMain);
