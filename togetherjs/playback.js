@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "session", "storage", "require"], function ($, util, session, storage, require) {
+function playbackMain($, util, session, storage, require) {
     var ALWAYS_REPLAY = {
         "cursor-update": true,
         "scroll-update": true
@@ -182,4 +182,5 @@ define(["jquery", "util", "session", "storage", "require"], function ($, util, s
         return Playback;
     }());
     return new Playback();
-});
+}
+define(["jquery", "util", "session", "storage", "require"], playbackMain);

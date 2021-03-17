@@ -8,6 +8,12 @@ declare namespace TogetherJSNS {
     type Windowing = ReturnType<typeof windowingMain>;
     type Templating = ReturnType<typeof templatingMain>;
     type Ot = ReturnType<typeof otMain>;
+    type Linkify = ReturnType<typeof linkifyMain>;
+    type VisibilityApi = ReturnType<typeof visibilityApiMain>;
+    type Playback = ReturnType<typeof playbackMain>;
+    type Chat = ReturnType<typeof chatMain>;
+    type Ui = ReturnType<typeof uiMain>;
+    
 
     type ValueOf<T> = T[keyof T];
 

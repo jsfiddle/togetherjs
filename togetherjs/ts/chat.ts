@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*jshint evil:true */
-define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], function (require, $, util, session, ui, templates, playback, storage, peers, windowing) {
+
+function chatMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templating, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
   var chat = util.Module("chat");
   var assert = util.assert;
   var Walkabout;
@@ -395,4 +396,6 @@ define(["require", "jquery", "util", "session", "ui", "templates", "playback", "
 
   return chat;
 
-});
+}
+
+define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], chatMain);

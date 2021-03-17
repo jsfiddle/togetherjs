@@ -14,7 +14,7 @@ interface Document {
     webkitHidden?: boolean;
 }
 
-define(["util", "session"], function(util: Util, session: TogetherJSNS.On) {
+function visibilityApiMain(util: Util, session: TogetherJSNS.On) {
     let hidden: "hidden" | "mozHidden" | "msHidden" | "webkitHidden";
     let visibilityChange: "visibilitychange" | "mozvisibilitychange" | "msvisibilitychange" | "webkitvisibilitychange";
 
@@ -54,4 +54,6 @@ define(["util", "session"], function(util: Util, session: TogetherJSNS.On) {
     }
 
     return visibilityApi;
-});
+}
+
+define(["util", "session"], visibilityApiMain);
