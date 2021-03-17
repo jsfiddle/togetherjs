@@ -52,7 +52,7 @@ type Delta = unknown;
 class SimpleHistory {
     private clientId;
     private committed;
-    private current;
+    public current;
     private basis;
     private queue: Change2[] = [];
     private deltaId = 1;
@@ -75,7 +75,7 @@ class SimpleHistory {
     }
 
     /** Decode the fake change to reconstruct the updated selection. */
-    getSelection() {
+    getSelection(): [number, number] | null {
         if(!this.selection) {
             return null;
         }
@@ -389,7 +389,7 @@ class TextReplace {
     constructor(
         public readonly start: number,
         public readonly del: number,
-        private text: string
+        public readonly text: string
     ) {
         assert(typeof start == "number" && typeof del == "number" && typeof text == "string", start, del, text);
         assert(start >= 0 && del >= 0, start, del);

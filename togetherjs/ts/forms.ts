@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
+declare var CKEDITOR: TogetherJSNS.CKEditor | undefined;
+declare var tinymce: TogetherJSNS.Tinymce | undefined;
+
+function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
     var forms = util.Module("forms");
     const assert: typeof util.assert = util.assert;
 
@@ -40,8 +43,8 @@
     interface SendDataAttributes {
         /** a selector */
         element: string | HTMLElement;
-        tracker?;
-        value;
+        tracker?: string;
+        value: string | boolean;
     }
 
     function sendData(attrs: SendDataAttributes) {
@@ -58,11 +61,11 @@
             return;
         }
         var location = elementFinder.elementLocation(el);
-        let msg = {
+        let msg: Partial<TogetherJSNS.FormUpdateMessage> = {
             type: "form-update",
             element: location,
         };
-        if(isText(el) || tracker) {
+        if(isText(el[0]) || tracker) {
             var history = el.data("togetherjsHistory");
             if(history) {
                 if(history.current == value) {
@@ -79,7 +82,8 @@
                 msg.basis = 1;
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
-        } else {
+        }
+        else {
             msg.value = value;
         }
         session.send(msg);
@@ -94,57 +98,73 @@
         return false;
     }
 
-    let editTrackers = {};
+    let editTrackers: {[trackerName: string]: TrackerClass} = {};
     let liveTrackers: Tracker[] = [];
 
-    TogetherJS.addTracker = function(TrackerClass, skipSetInit) {
-        assert(typeof TrackerClass === "function", "You must pass in a class");
-        assert(typeof TrackerClass.prototype.trackerName === "string",
-            "Needs a .prototype.trackerName string");
+    TogetherJS.addTracker = function(TrackerClass: Tracker, skipSetInit: boolean) {
+        //assert(typeof TrackerClass === "function", "You must pass in a class");
+        //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
         "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
-            assert(typeof TrackerClass.prototype[m] === "function",
-                "Missing required tracker method: " + m);
+            //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
         });
         // Test for required class methods.
         "scan tracked".split(/ /).forEach(function(m) {
-            assert(typeof TrackerClass[m] === "function",
-                "Missing required tracker class method: " + m);
+            //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
         });
-        editTrackers[TrackerClass.prototype.trackerName] = TrackerClass;
+        editTrackers[TrackerClass.trackerName] = TrackerClass;
         if(!skipSetInit) {
             setInit();
         }
     };
 
-    class AceEditor {
 
-        private trackerName = "AceEditor";
+    interface MessageForEditor {
+        element: HTMLElement;
+        tracker: string;
+        value: string;
+    }
 
-        constructor(el) {
-            this.element = $(el)[0];
+    abstract class Editor<T = HTMLElement> {
+        constructor(public trackerName: string, protected element: T) { }
+        /*
+        abstract destroy(el): void;
+        abstract update(msg): void;
+        abstract init(update, msg): void;
+        abstract makeInit();
+        abstract _editor();
+        abstract _change(e);
+        abstract getContent();
+        abstract tracked(el);
+        */
+    }
+
+    // TODO factorize code between editors
+    class AceEditor extends Editor<TogetherJSNS.AceEditorElement & HTMLElement> {
+        constructor(el: JQuery) {
+            super("AceEditor", $(el)[0] as TogetherJSNS.AceEditorElement & HTMLElement);
             assert($(this.element).hasClass("ace_editor"));
             this._change = this._change.bind(this);
             this._editor().document.on("change", this._change);
         }
 
-        tracked2(el) { // TODO this function is set in the original js file but is overwritten
+        tracked2(el: JQuery): boolean { // TODO this function is set in the original js file but is overwritten
             return this.element === $(el)[0];
         }
 
-        destroy(el) {
+        destroy(): void {
             this._editor().document.removeListener("change", this._change);
         }
 
-        update(msg) {
+        update(msg: MessageForEditor) {
             this._editor().document.setValue(msg.value);
         }
 
-        init(update, msg) {
+        init(update: MessageForEditor): void {
             this.update(update);
         }
 
-        makeInit() {
+        makeInit(): MessageForEditor {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -156,7 +176,7 @@
             return this.element.env;
         }
 
-        _change(e) {
+        _change() {
             // FIXME: I should have an internal .send() function that automatically
             // asserts !inRemoteUpdate, among other things
             if(inRemoteUpdate) {
@@ -169,7 +189,7 @@
             });
         }
 
-        getContent() {
+        getContent(): string {
             return this._editor().document.getValue();
         }
 
@@ -177,42 +197,40 @@
             return $(".ace_editor");
         }
     
-        tracked(el) {
+        tracked(el: HTMLElement | JQuery): boolean {
             return !!$(el).closest(".ace_editor").length;
         }
     }
 
     TogetherJS.addTracker(AceEditor, true /* skip setInit */);
 
-    class CodeMirrorEditor {
-        private trackerName = "CodeMirrorEditor";
-
-        constructor(el) {
-            this.element = $(el)[0];
-            assert(this.element.CodeMirror);
+    class CodeMirrorEditor extends Editor<TogetherJSNS.CodeMirrorElement & HTMLElement> {
+        constructor(el: JQuery) {
+            super("CodeMirrorEditor", $(el)[0] as TogetherJSNS.CodeMirrorElement & HTMLElement);
+            assert("CodeMirror" in this.element);
             this._change = this._change.bind(this);
             this._editor().on("change", this._change);
         }
 
-        tracked2(el) { // was in original js but was also overwritten
+        tracked2(el: JQuery) { // was in original js but was also overwritten
             return this.element === $(el)[0];
         }
 
-        destroy(el) {
+        destroy() {
             this._editor().off("change", this._change);
         }
 
-        update(msg) {
+        update(msg: MessageForEditor) {
             this._editor().setValue(msg.value);
         }
 
-        init(msg) {
+        init(msg: MessageForEditor) {
             if(msg.value) {
                 this.update(msg);
             }
         }
 
-        makeInit() {
+        makeInit(): MessageForEditor {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -220,7 +238,7 @@
             };
         }
 
-        _change(editor, change) {
+        _change() {
             if(inRemoteUpdate) {
                 return;
             }
@@ -235,27 +253,27 @@
             return this.element.CodeMirror;
         }
 
-        getContent() {
+        getContent(): string {
             return this._editor().getValue();
         }
 
         static scan() {
-            var result = [];
+            var result: HTMLElement[] = [];
             var els = document.body.getElementsByTagName("*");
             var _len = els.length;
             for(var i = 0; i < _len; i++) {
                 var el = els[i];
-                if(el.CodeMirror) {
+                if("CodeMirror" in el) {
                     result.push(el);
                 }
             }
             return $(result);
         }
     
-        tracked(el) {
-            el = $(el)[0];
+        tracked(e: JQuery | HTMLElement): boolean {
+            let el: Node | null = $(e)[0];
             while(el) {
-                if(el.CodeMirror) {
+                if("CodeMirror" in el) {
                     return true;
                 }
                 el = el.parentNode;
@@ -264,15 +282,11 @@
         }
     }
 
-
-
     TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
-    class CKEditor {
-        trackerName = "CKEditor";
-
-        constructor(el) {
-            this.element = $(el)[0];
+    class CKEditor extends Editor {
+        constructor(el: JQuery) {
+            super("CKEditor", $(el)[0]);
             assert(CKEDITOR);
             assert(CKEDITOR.dom.element.get(this.element));
             this._change = this._change.bind(this);
@@ -280,24 +294,24 @@
             this._editor().on("change", this._change);
         }
 
-        tracked2(el) { // TODO was in original JS but was overridden
+        tracked2(el: JQuery) { // TODO was in original JS but was overridden
             return this.element === $(el)[0];
         }
 
-        destroy(el) {
+        destroy() {
             this._editor().removeListener("change", this._change);
         }
 
-        update(msg) {
+        update(msg: MessageForEditor) {
             //FIXME: use setHtml instead of setData to avoid frame reloading overhead
             this._editor().editable().setHtml(msg.value);
         }
 
-        init(update, msg) {
+        init(update: MessageForEditor) {
             this.update(update);
         }
 
-        makeInit() {
+        makeInit(): MessageForEditor {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -305,7 +319,7 @@
             };
         }
 
-        _change(e) {
+        _change() {
             if(inRemoteUpdate) {
                 return;
             }
@@ -320,7 +334,7 @@
             return CKEDITOR.dom.element.get(this.element).getEditor();
         }
 
-        getContent() {
+        getContent(): string {
             return this._editor().getData();
         }
 
@@ -339,43 +353,40 @@
             return $(result);
         }
     
-        tracked(el) {
+        tracked(el: JQuery | HTMLElement) {
             if(typeof CKEDITOR == "undefined") {
                 return false;
             }
-            el = $(el)[0];
-            return !!(CKEDITOR.dom.element.get(el) && CKEDITOR.dom.element.get(el).getEditor());
+            const elem = $(el)[0];
+            return !!(CKEDITOR.dom.element.get(elem) && CKEDITOR.dom.element.get(elem).getEditor());
         }
     }
-
-
 
     TogetherJS.addTracker(CKEditor, true /* skip setInit */);
 
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
-    class tinymceEditor {
-        trackerName = "tinymceEditor";
+    class tinymceEditor extends Editor {
 
-        constructor(el) {
-            this.element = $(el)[0];
+        constructor(el: JQuery) {
+            super("tinymceEditor", $(el)[0]);
             assert($(this.element).attr('id').indexOf('mce_') != -1);
             this._change = this._change.bind(this);
             this._editor().on("input keyup cut paste change", this._change);
         }
 
-        tracked2(el) { // TODO was in original js but was overriden
+        tracked2(el: JQuery) { // TODO was in original js but was overriden
             return this.element === $(el)[0];
         }
 
-        destroy(el) {
+        destroy() {
             this._editor().destory();
         }
 
-        update(msg) {
+        update(msg: MessageForEditor) {
             this._editor().setContent(msg.value, { format: 'raw' });
         }
 
-        init(update, msg) {
+        init(update: MessageForEditor) {
             this.update(update);
         }
 
@@ -387,7 +398,7 @@
             };
         }
 
-        _change(e) {
+        _change() {
             if(inRemoteUpdate) {
                 return;
             }
@@ -405,7 +416,7 @@
             return $(this.element).data("tinyEditor");
         }
 
-        getContent() {
+        getContent(): string {
             return this._editor().getContent();
         }
 
@@ -414,7 +425,7 @@
             if(typeof tinymce == "undefined") {
                 return;
             }
-            var result = [];
+            var result: JQuery[] = [];
             $(window.tinymce.editors).each(function(i, ed) {
                 result.push($('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
@@ -423,12 +434,12 @@
             return $(result);
         }
     
-        tracked(el) {
+        tracked(el: JQuery | HTMLElement) {
             if(typeof tinymce == "undefined") {
                 return false;
             }
-            el = $(el)[0];
-            return !!$(el).data("tinyEditor");
+            const elem = $(el)[0];
+            return !!$(elem).data("tinyEditor");
             /*var flag = false;
             $(window.tinymce.editors).each(function (i, ed) {
               if (el.id == ed.id) {
@@ -466,7 +477,7 @@
         liveTrackers = [];
     }
 
-    function elementTracked(el) {
+    function elementTracked(el: JQuery) {
         var result = false;
         util.forEachAttr(editTrackers, function(TrackerClass) {
             if(TrackerClass.tracked(el)) {
@@ -493,7 +504,7 @@
 
     var TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
 
-    function isText(e: HTMLElement | JQuery) {
+    function isText(e: HTMLElement): e is (HTMLTextAreaElement | HTMLInputElement) {
         const el = $(e);
         var tag = el.prop("tagName");
         var type = (el.prop("type") || "text").toLowerCase();
@@ -529,7 +540,7 @@
         return "?";
     }
 
-    function setValue(e: HTMLElement, value) {
+    function setValue(e: HTMLElement | JQuery, value: string) {
         const el = $(e);
         var changed = false;
         if(isCheckable(el)) {
@@ -552,13 +563,13 @@
     }
 
     /** Send the top of this history queue, if it hasn't been already sent. */
-    function maybeSendUpdate(element: HTMLElement, history: SimpleHistory, tracker?) {
+    function maybeSendUpdate(element: string, history: SimpleHistory, tracker?) {
         var change = history.getNextToSend();
         if(!change) {
             /* nothing to send */
             return;
         }
-        var msg = {
+        var msg: TogetherJSNS.FormUpdateMessage = {
             type: "form-update",
             element: element,
             "server-echo": true,
@@ -589,17 +600,19 @@
             assert(tracker);
         }
         var focusedEl = el[0].ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
-        let focusedElSelection;
+        let focusedElSelection: [number, number];
         if(isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
         }
-        var selection;
-        if(isText(el)) {
+        let selection: [number, number];
+        if(isText(el[0])) {
+            assert(el[0].selectionStart);
+            assert(el[0].selectionEnd);
             selection = [el[0].selectionStart, el[0].selectionEnd];
         }
         var value;
         if(msg.replace) {
-            var history = el.data("togetherjsHistory");
+            let history: SimpleHistory = el.data("togetherjsHistory");
             if(!history) {
                 console.warn("form update received for uninitialized form element");
                 return;
@@ -619,17 +632,19 @@
             }
             value = history.current;
             selection = history.getSelection();
-        } else {
+        }
+        else {
             value = msg.value;
         }
         inRemoteUpdate = true;
         try {
             if(tracker) {
                 tracker.update({ value: value });
-            } else {
+            }
+            else {
                 setValue(el, value);
             }
-            if(isText(el)) {
+            if(isText(el[0])) {
                 el[0].selectionStart = selection[0];
                 el[0].selectionEnd = selection[1];
             }
@@ -641,7 +656,8 @@
                     focusedEl.selectionEnd = focusedElSelection[1];
                 }
             }
-        } finally {
+        }
+        finally {
             inRemoteUpdate = false;
         }
     });
@@ -668,7 +684,7 @@
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
             };
-            if(isText(el)) {
+            if(isText(el[0])) {
                 var history = el.data("togetherjsHistory");
                 if(history) {
                     upd.value = history.committed;
@@ -695,7 +711,7 @@
 
     function setInit() {
         var els = $("textarea, input, select");
-        els.each(function() {
+        els.each(function(this: JQuery) {
             if(elementTracked(this)) {
                 return;
             }
@@ -703,7 +719,7 @@
                 return;
             }
             var el = $(this);
-            var value = getValue(el);
+            var value = getValue(el[0]);
             el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
         });
         destroyTrackers();
@@ -716,7 +732,7 @@
 
     session.on("close", destroyTrackers);
 
-    session.hub.on("form-init", function(msg) {
+    session.hub.on<TogetherJSNS.FormInitMessage>("form-init", function(msg) {
         if(!msg.sameUrl) {
             return;
         }
@@ -762,7 +778,8 @@
                         $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
                     }
                 }
-            } finally {
+            }
+            finally {
                 inRemoteUpdate = false;
             }
         });
@@ -782,7 +799,7 @@
         }
     }
 
-    function blur(event) {
+    function blur(event: Event) {
         var target = event.target;
         if(lastFocus) {
             lastFocus = null;
@@ -790,13 +807,13 @@
         }
     }
 
-    var focusElements = {};
+    var focusElements: {[peerId: string]: JQuery} = {};
 
-    session.hub.on("form-focus", function(msg) {
+    session.hub.on<TogetherJSNS.FormFocusMessage>("form-focus", function(msg) {
         if(!msg.sameUrl) {
             return;
         }
-        var current = focusElements[msg.peer.id];
+        let current: JQuery | null = focusElements[msg.peer.id];
         if(current) {
             current.remove();
             current = null;
@@ -812,7 +829,7 @@
         }
     });
 
-    function createFocusElement(peer: TogetherJSNS.Peer, around) {
+    function createFocusElement(peer: TogetherJSNS.Peer, around: JQuery) {
         around = $(around);
         var aroundOffset = around.offset();
         if(!aroundOffset) {
@@ -847,7 +864,7 @@
         $(document).off("focusout", blur);
     });
 
-    session.hub.on("hello", function(msg) {
+    session.hub.on<TogetherJSNS.Message>("hello", function(msg) {
         if(msg.sameUrl) {
             setTimeout(function() {
                 sendInit();

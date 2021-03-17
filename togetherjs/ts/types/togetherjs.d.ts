@@ -13,7 +13,7 @@ declare namespace TogetherJSNS {
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
@@ -49,6 +49,7 @@ declare namespace TogetherJSNS {
         checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
         startupReason: Reason;
         $: JQueryStatic;
+        addTracker(TrackerClass: Tracker, skipSetInit: boolean): void;
     }
 
     interface KeyboardListener {
@@ -173,8 +174,37 @@ declare namespace TogetherJSNS {
         to: string;
     }
 
+    interface FormFocusMessage {
+        sameUrl: boolean | undefined;
+        type: "form-focus";
+        peer: Peer;
+        element;
+    }
+
+    interface FormInitMessage {
+        sameUrl: boolean | undefined;
+        type: "form-init";
+        pageAge: number;
+        updates: {
+            element;
+            tracker;
+            value;
+            basis;
+        }[]
+    }
+
     interface FormUpdateMessage {
-        tracker;
+        sameUrl: boolean | undefined;
+        type: "form-update";
+        /** a selector */
+        element: string;
+        "server-echo": boolean;
+        tracker?;
+        replace: {
+            id;
+            basis;
+            delta: TextReplace;
+        }
     }
 
     interface MessageToSend {
@@ -186,7 +216,7 @@ declare namespace TogetherJSNS {
     }
 
     interface CallbackForOnce<T> {
-        (msg: Message & T): void;
+        (msg: T): void;
     }
 
     interface CallbackForOn<T> extends CallbackForOnce<T> {
@@ -294,6 +324,24 @@ declare namespace TogetherJSNS {
 
     interface Require2 {
         (module: "session"): Session;
+    }
+
+    interface CodeMirrorElement {
+        CodeMirror;
+    }
+
+    interface AceEditorElement {
+        env;
+    }
+
+    interface CKEditor {
+        dom : {
+            element;
+        }
+    }
+
+    interface Tinymce {
+
     }
 }
 
