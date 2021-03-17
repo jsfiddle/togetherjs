@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- function sessionMain(require: Require, util: Util, channels: ReturnType<typeof ChannelsMain>, $: JQueryStatic, storage: ReturnType<typeof StorageMain>) {
+ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
     var DEBUG = true;
 

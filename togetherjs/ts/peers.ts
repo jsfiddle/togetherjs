@@ -60,7 +60,7 @@ interface Message2 {
     color: string;
 }
 
-function peersMain(util: Util, session: ReturnType<typeof sessionMain>, storage: ReturnType<typeof StorageMain>, require: Require, templates: ReturnType<typeof templatesMain>) {
+function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert: typeof util.assert = util.assert;
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
     var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes

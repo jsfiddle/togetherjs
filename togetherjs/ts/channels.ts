@@ -45,7 +45,7 @@ interface MessageFromChannel {
     close: boolean;
 }
 
-function ChannelsMain(util: Util) {
+function channelsMain(util: Util) {
     /* Subclasses must define:
 	
     - ._send(string)
@@ -518,4 +518,4 @@ function ChannelsMain(util: Util) {
     return channels;
 }
 
-define(["util"], ChannelsMain);
+define(["util"], channelsMain);

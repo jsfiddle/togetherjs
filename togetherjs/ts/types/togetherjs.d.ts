@@ -1,5 +1,11 @@
 declare namespace TogetherJSNS {
 
+    type Channels = ReturnType<typeof channelsMain>;
+    type Storage = ReturnType<typeof StorageMain>;
+    type Session = ReturnType<typeof sessionMain>;
+    type Templates = ReturnType<typeof templatesMain>;
+    type Peers = ReturnType<typeof peersMain>;
+
     type ValueOf<T> = T[keyof T];
 
     type FunctionReturningString = () => string;
@@ -280,11 +286,6 @@ declare namespace TogetherJSNS {
 
     interface Require2 {
         (module: "session"): Session;
-    }
-
-    interface Session {
-        start(): void;
-        close(): void;
     }
 }
 

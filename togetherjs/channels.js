@@ -17,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function ChannelsMain(util) {
+function channelsMain(util) {
     /* Subclasses must define:
     
     - ._send(string)
@@ -446,4 +446,4 @@ function ChannelsMain(util) {
     };
     return channels;
 }
-define(["util"], ChannelsMain);
+define(["util"], channelsMain);
