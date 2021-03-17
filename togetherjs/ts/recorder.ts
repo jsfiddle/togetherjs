@@ -4,10 +4,10 @@
 
 import { removeData } from "jquery";
 
-define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels) {
+define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels: TogetherJSNS.Channels) {
     let recorder = util.Module("recorder");
     let assert: typeof util.assert = util.assert;
-    let channel = null;
+    let channel: typeof channels.WebSocketChannel = null;
     let baseUrl = null;
     let clientId = "recorder";
 

@@ -8,7 +8,7 @@ interface LogItem {
     url: string,
 }
 
-define(["jquery", "util", "session", "storage", "require"], function($: JQueryStatic, util: Util, session, storage: TogetherJSNS.Storage, require: Require) {
+define(["jquery", "util", "session", "storage", "require"], function($: JQueryStatic, util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require) {
 
     var ALWAYS_REPLAY = {
         "cursor-update": true,
