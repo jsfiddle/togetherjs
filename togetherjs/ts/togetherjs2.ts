@@ -159,7 +159,7 @@ class ConfigClass {
         }
     }
 
-    get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
+    get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
         let value = this.tjsInstance._configuration[name];
         if(value === undefined) {
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
