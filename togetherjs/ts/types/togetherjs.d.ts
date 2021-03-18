@@ -14,6 +14,7 @@ declare namespace TogetherJSNS {
     type Chat = ReturnType<typeof chatMain>;
     type Ui = ReturnType<typeof uiMain>;
     type Who = ReturnType<typeof whoMain>;
+    type Console = ReturnType<typeof consoleMain>;
     
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
