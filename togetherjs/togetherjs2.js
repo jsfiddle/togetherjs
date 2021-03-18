@@ -141,11 +141,6 @@ var ConfigClass = /** @class */ (function () {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
             var previous = this.tjsInstance._configuration[attr];
-            var o = { a: 1, b: "b", c: true };
-            var key = "b";
-            var a = o[key];
-            var b = o[key];
-            o[key] = o[key];
             var value = settings[attr]; // TODO any
             this.tjsInstance._configuration[attr] = value;
             var trackers = this.tjsInstance._configTrackers[name];
@@ -576,7 +571,7 @@ function baseUrl1() {
     }
     return baseUrl;
 }
-(function () {
+function togetherjsMain() {
     var styleSheet = "/togetherjs/togetherjs.css";
     function addStyle() {
         var existing = document.getElementById("togetherjs-stylesheet");
@@ -805,4 +800,5 @@ function baseUrl1() {
     }
     // For compatibility:
     window.TowTruck = TogetherJS;
-})();
+}
+togetherjsMain();

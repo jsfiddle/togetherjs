@@ -130,12 +130,6 @@ class ConfigClass {
             }
             let previous = this.tjsInstance._configuration[attr];
 
-            let o = {a: 1, b: "b", c: true};
-            let key: keyof typeof o = "b" as "a" | "b" | "c";
-            let a = o[key];
-            let b = o[key];
-            o[key] = o[key];
-
             let value = settings[attr]; // TODO any
             this.tjsInstance._configuration[attr] = value;
             let trackers = this.tjsInstance._configTrackers[name]!;
@@ -590,7 +584,7 @@ function baseUrl1() {
     return baseUrl;
 }
 
-(function() {
+function togetherjsMain() {
     let styleSheet = "/togetherjs/togetherjs.css";
 
     function addStyle() {
@@ -861,4 +855,6 @@ function baseUrl1() {
     // For compatibility:
     window.TowTruck = TogetherJS;
 
-})();
+}
+
+togetherjsMain();
