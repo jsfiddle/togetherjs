@@ -91,7 +91,7 @@ function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, s
             assert(false);
         }
     
-        toggle(el: HTMLElement) {
+        toggle(el: HTMLElement | string) {
             const element = $(el);
             if(element.is(":visible")) {
                 this.hide(element);

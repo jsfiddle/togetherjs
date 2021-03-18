@@ -10,7 +10,7 @@ interface ChatTextAttributes {
     notify;
     declinedJoin;
     url: string;
-    sameUrl: string;
+    sameUrl: boolean;
     title: string;
     forEveryone;
 }
@@ -250,10 +250,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
     class PeerView {
-        private peer: TogetherJSNS.PeerClass;
         private followCheckbox;
         private _lastUpdateUrlDisplay: string;
-        private dockElement: JQuery;
+        private dockElement: JQuery | null = null;
+        private detailElement: JQuery | null = null;
 
         constructor(
             private ui: Ui,
@@ -283,9 +283,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.updateDisplay(el);
         }
 
-        updateDisplay(container) {
+        updateDisplay(container?) {
             deferForContainer(() => {
-                container = container || ui.container;
+                container = container || this.ui.container;
                 var abbrev = this.peer.name;
                 if(this.peer.isSelf) {
                     abbrev = "me";
@@ -447,7 +447,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
                 }
 
-
                 if(this.dockElement) {
                     return;
                 }
@@ -506,13 +505,13 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             if(!this.dockElement) {
                 return;
             }
-            this.dockElement.animateDockExit().promise().then((function() {
+            this.dockElement.animateDockExit().promise().then(() => {
                 this.dockElement.remove();
                 this.dockElement = null;
                 this.detailElement.remove();
                 this.detailElement = null;
                 adjustDockSize(-1);
-            }).bind(this));
+            });
         }
 
         scrollTo() {
@@ -573,7 +572,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     class Ui {
         private container = null;
         public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
-        private chat = new Chat(this);
+        public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
         data-toggles attribute that indicates what other elements should

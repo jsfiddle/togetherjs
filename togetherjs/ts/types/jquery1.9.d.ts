@@ -9,7 +9,7 @@ interface JQuery {
     rotateCursorDown: () => void;
     popinWindow: () => void;
     slideIn: () => void;
-    easeTo: () => void;
+    easeTo: (y: number) => void;
     animateDockEntry: () => void;
     animateDockExit: () => void;
     animateCursorEntry: () => void;

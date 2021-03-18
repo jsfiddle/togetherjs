@@ -235,6 +235,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         function PeerView(ui, peer) {
             this.ui = ui;
             this.peer = peer;
+            this.dockElement = null;
+            this.detailElement = null;
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
             this.dockClick = this.dockClick.bind(this);
         }
@@ -260,7 +262,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         PeerView.prototype.updateDisplay = function (container) {
             var _this = this;
             deferForContainer(function () {
-                container = container || ui.container;
+                container = container || _this.ui.container;
                 var abbrev = _this.peer.name;
                 if (_this.peer.isSelf) {
                     abbrev = "me";
@@ -475,16 +477,17 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             })();
         };
         PeerView.prototype.undock = function () {
+            var _this = this;
             if (!this.dockElement) {
                 return;
             }
-            this.dockElement.animateDockExit().promise().then((function () {
-                this.dockElement.remove();
-                this.dockElement = null;
-                this.detailElement.remove();
-                this.detailElement = null;
+            this.dockElement.animateDockExit().promise().then(function () {
+                _this.dockElement.remove();
+                _this.dockElement = null;
+                _this.detailElement.remove();
+                _this.detailElement = null;
                 adjustDockSize(-1);
-            }).bind(this));
+            });
         };
         PeerView.prototype.scrollTo = function () {
             if (this.peer.url != session.currentUrl()) {

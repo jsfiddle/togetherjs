@@ -77,7 +77,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     class PeerClass {
         public readonly isSelf = false;
 
-        private id: string;
+        public readonly id: string;
         private identityId;
         public status: TogetherJSNS.PeerStatus;
         public readonly idle: TogetherJSNS.PeerStatus;
