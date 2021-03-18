@@ -1,3 +1,5 @@
+- Switch to a better import system
+
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff
 - use tslint to find useless nullchecks
 - clean the require stuff
