@@ -39,7 +39,7 @@ function consoleMain(util) {
                 _this.maxLevel = Math.max(_this.maxLevel, value);
             });
             util.forEachAttr(Console.levels, function (value, name) {
-                Console.prototype.levelNames[value] = name;
+                _this.levelNames[value] = name;
             });
         }
         Console.prototype.setLevel = function (l) {
@@ -79,7 +79,7 @@ function consoleMain(util) {
                 this.messages.push([
                     Date.now(),
                     level,
-                    this._stringify(Array.prototype.slice.call(arguments, 1))
+                    this._stringify.apply(this, args)
                 ]);
             }
             catch (e) {
@@ -94,7 +94,7 @@ function consoleMain(util) {
                 else {
                     method = console.log;
                 }
-                method.apply(console, Array.prototype.slice.call(arguments, 1));
+                method.apply(console, args);
             }
         };
         Console.prototype.suppressedWrite = function () {
@@ -120,7 +120,7 @@ function consoleMain(util) {
                 stack = stack.replace(/^[^\n]*\n/, "");
                 this[level](stack);
             }
-            if (console.trace) {
+            if ("trace" in console) {
                 console.trace();
             }
         };

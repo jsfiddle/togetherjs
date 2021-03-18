@@ -64,7 +64,7 @@ function consoleMain(util: Util) {
             });
         
             util.forEachAttr(Console.levels, (value, name) => {
-                Console.prototype.levelNames[value] = name;
+                this.levelNames[value] = name;
             });
         }
 
@@ -102,7 +102,7 @@ function consoleMain(util: Util) {
                 this.messages.push([
                     Date.now(),
                     level,
-                    this._stringify(Array.prototype.slice.call(arguments, 1))
+                    this._stringify(...args)
                 ]);
             }
             catch(e) {
@@ -117,7 +117,7 @@ function consoleMain(util: Util) {
                 else {
                     method = console.log;
                 }
-                method.apply(console, Array.prototype.slice.call(arguments, 1));
+                method.apply(console, args);
             }
         }
 
@@ -142,7 +142,7 @@ function consoleMain(util: Util) {
                 this[level](stack);
             }
 
-            if(console.trace) {
+            if("trace" in console) {
                 console.trace();
             }
         }
