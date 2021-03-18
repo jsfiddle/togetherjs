@@ -145,6 +145,7 @@ declare namespace TogetherJSNS {
         baseUrl?: string,
         loaded?: boolean,
         callToStart?: CallToStart,
+        pasteSite?: string,
     }
 
     type CallToStart = (cb: () => void) => void;
