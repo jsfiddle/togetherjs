@@ -89,9 +89,9 @@ declare namespace TogetherJSNS {
 
     interface Config {
         /** Disables clicks for a certain element. (e.g., 'canvas' would not show clicks on canvas elements.) Setting this to true will disable clicks globally. */
-        dontShowClicks: boolean | CssSelector,
+        dontShowClicks: true | CssSelector,
         /** Experimental feature to echo clicks to certain elements across clients */
-        cloneClicks: boolean | CssSelector,
+        cloneClicks: true | CssSelector,
         /** Enable Mozilla or Google analytics on the page when TogetherJS is activated: FIXME: these don't seem to be working, and probably should be removed in favor of the hub analytics */
         enableAnalytics: boolean,
         /** The code to enable (this is defaulting to a Mozilla code) */

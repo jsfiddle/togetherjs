@@ -5,7 +5,6 @@
 // Cursor viewing support
 function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
     var assert = util.assert;
-    var cursor = util.Module("cursor");
     var FOREGROUND_COLORS = ["#111", "#eee"];
     var CURSOR_HEIGHT = 50;
     var CURSOR_ANGLE = (35 / 180) * Math.PI;
@@ -24,24 +23,24 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
         }
     });
     // FIXME: should check for a peer leaving and remove the cursor object
-    var Cursor = util.Class({
-        constructor: function (clientId) {
+    var Cursor = /** @class */ (function () {
+        function Cursor(clientId) {
             this.clientId = clientId;
+            // How long after receiving a setKeydown call that we should show the user typing.  This should be more than MIN_KEYDOWN_TIME:
+            this.KEYDOWN_WAIT_TIME = 2000;
+            this.lastTop = null;
+            this.lastLeft = null;
+            this.keydownTimeout = null;
+            this.atOtherUrl = false;
             this.element = templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
             this.updatePeer(peers.getPeer(clientId));
-            this.lastTop = this.lastLeft = null;
             $(document.body).append(this.element);
             this.element.animateCursorEntry();
-            this.keydownTimeout = null;
-            this.clearKeydown = this.clearKeydown.bind(this);
-            this.atOtherUrl = false;
-        },
-        // How long after receiving a setKeydown call that we should show the
-        // user typing.  This should be more than MIN_KEYDOWN_TIME:
-        KEYDOWN_WAIT_TIME: 2000,
-        updatePeer: function (peer) {
+            this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
+        }
+        Cursor.prototype.updatePeer = function (peer) {
             // FIXME: can I use peer.setElement()?
             this.element.css({ color: peer.color });
             var img = this.element.find("img.togetherjs-cursor-img");
@@ -49,10 +48,10 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
             var name = this.element.find(".togetherjs-cursor-name");
             var nameContainer = this.element.find(".togetherjs-cursor-container");
             assert(name.length);
-            name.text(peer.name);
+            name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO adding .toString() fixes the error but is it really what we want to do
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -82,14 +81,14 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                     opacity: 1
                 });
             }
-        },
-        setClass: function (name) {
+        };
+        Cursor.prototype.setClass = function (name) {
             if (name != this.elementClass) {
                 this.element.removeClass(this.elementClass).addClass(name);
                 this.elementClass = name;
             }
-        },
-        updatePosition: function (pos) {
+        };
+        Cursor.prototype.updatePosition = function (pos) {
             var top, left;
             if (this.atOtherUrl) {
                 this.element.show();
@@ -110,17 +109,17 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
             this.lastTop = top;
             this.lastLeft = left;
             this.setPosition(top, left);
-        },
-        hideOtherUrl: function () {
+        };
+        Cursor.prototype.hideOtherUrl = function () {
             if (this.atOtherUrl) {
                 return;
             }
             this.atOtherUrl = true;
             // FIXME: should show away status better:
             this.element.hide();
-        },
+        };
         // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
-        rotateCursorDown: function () {
+        Cursor.prototype.rotateCursorDown = function () {
             var e = $(this.element).find('svg');
             e.animate({ borderSpacing: -150, opacity: 1 }, {
                 step: function (now, fx) {
@@ -136,16 +135,12 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                     }
                 },
                 duration: 500
-            }, 'linear').promise().then(function () {
-                e.css('-webkit-transform', '')
-                    .css('-moz-transform', '')
-                    .css('-ms-transform', '')
-                    .css('-o-transform', '')
-                    .css('transform', '')
-                    .css("opacity", "");
+            }, 'linear' // TODO removing 'linear' fixes the error, but is that really what must be done?
+            ).promise().then(function () {
+                e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
             });
-        },
-        setPosition: function (top, left) {
+        };
+        Cursor.prototype.setPosition = function (top, left) {
             var wTop = $(window).scrollTop();
             var height = $(window).height();
             if (top < wTop) {
@@ -165,13 +160,13 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                 top: top,
                 left: left
             });
-        },
-        refresh: function () {
-            if (this.lastTop !== null) {
+        };
+        Cursor.prototype.refresh = function () {
+            if (this.lastTop !== null && this.lastLeft !== null) {
                 this.setPosition(this.lastTop, this.lastLeft);
             }
-        },
-        setKeydown: function () {
+        };
+        Cursor.prototype.setKeydown = function () {
             if (this.keydownTimeout) {
                 clearTimeout(this.keydownTimeout);
             }
@@ -179,36 +174,46 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                 this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
             }
             this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
-        },
-        clearKeydown: function () {
+        };
+        Cursor.prototype.clearKeydown = function () {
             this.keydownTimeout = null;
             this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
-        },
-        _destroy: function () {
+        };
+        Cursor.prototype._destroy = function () {
             this.element.remove();
             this.element = null;
-        }
-    });
-    Cursor._cursors = {};
-    cursor.getClient = Cursor.getClient = function (clientId) {
-        var c = Cursor._cursors[clientId];
-        if (!c) {
-            c = Cursor._cursors[clientId] = Cursor(clientId);
-        }
-        return c;
-    };
-    Cursor.forEach = function (callback, context) {
-        context = context || null;
-        for (var a in Cursor._cursors) {
-            if (Cursor._cursors.hasOwnProperty(a)) {
-                callback.call(context, Cursor._cursors[a], a);
+        };
+        Cursor.getClient = function (clientId) {
+            return cursor.getClient(clientId);
+        };
+        Cursor.forEach = function (callback, context) {
+            context = context || null;
+            for (var a in Cursor._cursors) {
+                if (Cursor._cursors.hasOwnProperty(a)) {
+                    callback.call(context, Cursor._cursors[a], a);
+                }
             }
+        };
+        Cursor.destroy = function (clientId) {
+            Cursor._cursors[clientId]._destroy();
+            delete Cursor._cursors[clientId];
+        };
+        Cursor._cursors = {};
+        return Cursor;
+    }());
+    var cursor2 = /** @class */ (function () {
+        function cursor2() {
         }
-    };
-    Cursor.destroy = function (clientId) {
-        Cursor._cursors[clientId]._destroy();
-        delete Cursor._cursors[clientId];
-    };
+        cursor2.prototype.getClient = function (clientId) {
+            var c = Cursor._cursors[clientId];
+            if (!c) {
+                c = Cursor._cursors[clientId] = new Cursor(clientId);
+            }
+            return c;
+        };
+        return cursor2;
+    }());
+    var cursor = new cursor2();
     peers.on("new-peer identity-updated status-updated", function (peer) {
         var c = Cursor.getClient(peer.id);
         c.updatePeer(peer);
@@ -249,19 +254,19 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
             session.send(lastMessage);
             return;
         }
-        target = $(target);
-        var offset = target.offset();
+        var $target = $(target);
+        var offset = $target.offset();
         if (!offset) {
             // FIXME: this really is walkabout.js's problem to fire events on the
             // document instead of a specific element
-            console.warn("Could not get offset of element:", target[0]);
+            console.warn("Could not get offset of element:", $target[0]);
             return;
         }
         var offsetX = pageX - offset.left;
         var offsetY = pageY - offset.top;
         lastMessage = {
             type: "cursor-update",
-            element: elementFinder.elementLocation(target),
+            element: elementFinder.elementLocation($target),
             offsetX: Math.floor(offsetX),
             offsetY: Math.floor(offsetY)
         };
@@ -271,7 +276,8 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
         var canvas = $("<canvas></canvas>");
         canvas.attr("height", CURSOR_HEIGHT);
         canvas.attr("width", CURSOR_WIDTH);
-        var context = canvas[0].getContext('2d');
+        var canvas0 = canvas[0];
+        var context = canvas0.getContext('2d'); // TODO !
         context.fillStyle = color;
         context.moveTo(0, 0);
         context.beginPath();
@@ -286,7 +292,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
         context.strokeStyle = "#ffffff";
         context.stroke();
         context.fill();
-        return canvas[0].toDataURL("image/png");
+        return canvas0.toDataURL("image/png");
     }
     var scrollTimeout = null;
     var scrollTimeoutSet = 0;
@@ -321,8 +327,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
         };
         session.send(lastScrollMessage);
     }
-    // FIXME: do the same thing for cursor position?  And give up on the
-    // ad hoc update-on-hello?
+    // FIXME: do the same thing for cursor position?  And give up on the ad hoc update-on-hello?
     session.on("prepare-hello", function (helloMessage) {
         if (lastScrollMessage) {
             helloMessage.scrollPosition = lastScrollMessage.position;
@@ -417,7 +422,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                 return;
             }
             var location = elementFinder.elementLocation(element);
-            var offset = $(element).offset();
+            var offset = $(element).offset(); // TODO !
             var offsetX = event.pageX - offset.left;
             var offsetY = event.pageY - offset.top;
             session.send({
@@ -445,7 +450,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
         }
         Cursor.getClient(pos.clientId).updatePosition(pos);
         var target = $(elementFinder.findElement(pos.element));
-        var offset = target.offset();
+        var offset = target.offset(); // TODO !
         var top = offset.top + pos.offsetY;
         var left = offset.left + pos.offsetX;
         var cloneClicks = TogetherJS.config.get("cloneClicks");
@@ -484,11 +489,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
                 return;
             }
             lastKeydown = now;
-            // FIXME: is event.target interesting here?  That is, *what* the
-            // user is typing into, not just that the user is typing?  Also
-            // I'm assuming we don't care if the user it typing into a
-            // togetherjs-related field, since chat activity is as interesting
-            // as any other activity.
+            // FIXME: is event.target interesting here?  That is, *what* the user is typing into, not just that the user is typing? Also I'm assuming we don't care if the user it typing into a togetherjs-related field, since chat activity is as interesting as any other activity.
             session.send({ type: "keydown" });
         });
     }

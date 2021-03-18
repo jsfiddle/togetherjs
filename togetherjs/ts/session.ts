@@ -31,7 +31,7 @@
         public firstRun = false;
         /** Setting, essentially global: */
         public readonly AVATAR_SIZE = 90;
-        timeHelloSent = null;
+        timeHelloSent: number | null = null;
         public identityId?: string;
         public RTCSupported: boolean | undefined;
 
