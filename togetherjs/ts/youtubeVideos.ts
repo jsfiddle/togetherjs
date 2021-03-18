@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
 
-function youtubeVideosMain($, util, session, elementFinder) {
+function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
 
     // constant var to indicate whether two players are too far apart in sync
     var TOO_FAR_APART = 3000;
     // embedded youtube iframes
-    var youTubeIframes = [];
+    var youTubeIframes: HTMLElement[] = [];
     // youtube API load delay
     var API_LOADING_DELAY = 2000;
 
@@ -77,8 +77,8 @@ function youtubeVideosMain($, util, session, elementFinder) {
             // it calls onYouTubeIframeAPIReady automatically when the API finishes loading
             var tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            var firstScriptTag = document.getElementsByTagName('script')[0]!; // TODO !
+            firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag); // TODO !
         } else {
             // manually invoke APIReady function when the API was already loaded by user
             onYouTubeIframeAPIReady();
@@ -87,7 +87,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {
             var iframes = $('iframe');
-            iframes.each(function(i, iframe) {
+            iframes.each(function(i, iframe: HTMLIFrameElement) { // TODO .each is used just for one element here apparently
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?
@@ -115,7 +115,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
 
         function insertPlayer(event) {
             // only when it is READY, attach a player to its iframe
-            var currentPlayer = event.target;
+            var currentPlayer = event.target as HTMLElement;
             var currentIframe = currentPlayer.getIframe();
             // check if a player is already attached in case of being reinitialized
             if(!$(currentIframe).data("togetherjs-player")) {
@@ -129,9 +129,9 @@ function youtubeVideosMain($, util, session, elementFinder) {
         }
     } // end of prepareYouTube
 
-    function publishPlayerStateChange(event) {
-        var target = event.target;
-        var currentIframe = target.getIframe();
+    function publishPlayerStateChange(event: Event) {
+        var target = event.target as HTMLElement;
+        var currentIframe = target.getIframe(); // TODO what is getIframe???
         //var currentPlayer = $(currentIframe).data("togetherjs-player");
         var currentPlayer = target;
         var currentTime = currentPlayer.getCurrentTime();
@@ -293,7 +293,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
         return videoId;
     }
 
-    function areTooFarApart(myTime, theirTime) {
+    function areTooFarApart(myTime: number, theirTime: number) {
         var secDiff = Math.abs(myTime - theirTime);
         var milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;

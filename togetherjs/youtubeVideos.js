@@ -69,8 +69,8 @@ function youtubeVideosMain($, util, session, elementFinder) {
             // it calls onYouTubeIframeAPIReady automatically when the API finishes loading
             var tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            var firstScriptTag = document.getElementsByTagName('script')[0]; // TODO !
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); // TODO !
         }
         else {
             // manually invoke APIReady function when the API was already loaded by user
@@ -121,7 +121,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
     } // end of prepareYouTube
     function publishPlayerStateChange(event) {
         var target = event.target;
-        var currentIframe = target.getIframe();
+        var currentIframe = target.getIframe(); // TODO what is getIframe???
         //var currentPlayer = $(currentIframe).data("togetherjs-player");
         var currentPlayer = target;
         var currentTime = currentPlayer.getCurrentTime();

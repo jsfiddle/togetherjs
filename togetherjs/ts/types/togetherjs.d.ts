@@ -407,6 +407,7 @@ interface Window {
     TowTruck: TogetherJSNS.TogetherJS;
     TogetherJSTestSpy?: {[k: string]: unknown};
     _gaq?: [string, string?][];
+    onYouTubeIframeAPIReady?: unknown;
 }
 
 interface EventHtmlElement extends Event {
