@@ -141,8 +141,8 @@ var ConfigClass = /** @class */ (function () {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
             var previous = this.tjsInstance._configuration[attr];
-            var value = settings[attr]; // TODO any
-            this.tjsInstance._configuration[attr] = value;
+            var value = settings[attr];
+            this.tjsInstance._configuration[attr] = value; // TODO any, how to remove this any
             var trackers = this.tjsInstance._configTrackers[name];
             var failed = false;
             for (var i = 0; i < trackers.length; i++) {
@@ -157,7 +157,7 @@ var ConfigClass = /** @class */ (function () {
                 }
             }
             if (failed) {
-                this.tjsInstance._configuration[attr] = previous;
+                this.tjsInstance._configuration[attr] = previous; // TODO any, how to remove this any?
                 for (var i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
@@ -188,7 +188,9 @@ var ConfigClass = /** @class */ (function () {
         if (!this.tjsInstance._configTrackers[name]) {
             this.tjsInstance._configTrackers[name] = [];
         }
-        this.tjsInstance._configTrackers[name].push(callback);
+        // TODO any how to make callback typecheck?
+        this.tjsInstance._configTrackers[name].push(callback); // TODO !
+        var a = this.tjsInstance._configTrackers["hubBase"];
         return callback;
     };
     ConfigClass.prototype.close = function (name) {
@@ -219,6 +221,7 @@ var TogetherJSClass = /** @class */ (function (_super) {
         _this.startup = _this._extend(_this._startupInit);
         _this._configuration = {};
         _this._defaultConfiguration = defaultConfiguration2;
+        //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         _this._configTrackers = {};
         _this._configClosed = {};
         _this._knownEvents = ["ready", "close"];
@@ -270,7 +273,6 @@ var TogetherJSClass = /** @class */ (function (_super) {
         for (attr in window) {
             if (attr.indexOf("TogetherJSConfig_on_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_on_").length);
-                var a = window[attr];
                 globalOns[attrName] = window[attr];
             }
             else if (attr.indexOf("TogetherJSConfig_") === 0) {

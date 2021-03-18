@@ -260,7 +260,7 @@ declare namespace TogetherJSNS {
         //get(thing: "useMinimizedCode"): true | undefined;
         //get(thing: "fallbackLang"): string;
         close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
-        track<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any): void;
+        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any): void;
     }
 
     interface ConfigGetter {

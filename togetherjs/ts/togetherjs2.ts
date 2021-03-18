@@ -129,9 +129,8 @@ class ConfigClass {
                 console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
             }
             let previous = this.tjsInstance._configuration[attr];
-
-            let value = settings[attr]; // TODO any
-            this.tjsInstance._configuration[attr] = value;
+            let value = settings[attr];
+            this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
             let trackers = this.tjsInstance._configTrackers[name]!;
             let failed = false;
             for(let i = 0; i < trackers.length; i++) {
@@ -146,7 +145,7 @@ class ConfigClass {
                 }
             }
             if(failed) {
-                this.tjsInstance._configuration[attr] = previous;
+                this.tjsInstance._configuration[attr] = previous as any; // TODO any, how to remove this any?
                 for(let i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
@@ -160,7 +159,7 @@ class ConfigClass {
         }
     }
 
-    get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
+    get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
         let value = this.tjsInstance._configuration[name];
         if(value === undefined) {
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
@@ -171,7 +170,7 @@ class ConfigClass {
         return value;
     }
 
-    track<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any) {
+    track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) { // TODO unknown
         if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
             throw new Error("Configuration is unknown: " + name);
         }
@@ -179,7 +178,9 @@ class ConfigClass {
         if(!this.tjsInstance._configTrackers[name]) {
             this.tjsInstance._configTrackers[name] = [];
         }
-        this.tjsInstance._configTrackers[name].push(callback);
+        // TODO any how to make callback typecheck?
+        this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO !
+        let a = this.tjsInstance._configTrackers["hubBase"];
         return callback;
     }
 
@@ -197,9 +198,11 @@ function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
     let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
     config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
     config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
-    config.track = <K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any) => confObj.track(name, callback);
+    config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
     return config;
 }
+
+
 
 class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public running: boolean = false;
@@ -217,6 +220,7 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
     public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
     public _configuration: Partial<TogetherJSNS.Config> = {};
     public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
+    //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
     public readonly _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[]}> = {};
     public _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean} = {};
     private version: string;
@@ -276,7 +280,6 @@ class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         for(attr in window) {
             if(attr.indexOf("TogetherJSConfig_on_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_on_").length) as keyof TogetherJSNS.Config;
-                let a = window[attr];
                 globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
             }
             else if(attr.indexOf("TogetherJSConfig_") === 0) {
