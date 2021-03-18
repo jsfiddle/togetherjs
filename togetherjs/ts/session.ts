@@ -23,14 +23,14 @@
 
     class Session extends OnClass {
         /** This is the hub we connect to: */
-        private shareId: string | null = null;
+        public shareId: string | null = null;
         /** This is the ID that identifies this client: */
         public readonly clientId: string | null = null;
         public readonly router = channels.Router();
         /** Indicates if TogetherJS has just started (not continuing from a saved session): */
         public firstRun = false;
         /** Setting, essentially global: */
-        private AVATAR_SIZE = 90;
+        public readonly AVATAR_SIZE = 90;
         timeHelloSent = null;
         public identityId?: string;
 
@@ -157,7 +157,7 @@
             });
         }
 
-        close(reason: string) {
+        close(reason?: string) {
             TogetherJS.running = false;
             var msg = { type: "bye" };
             if(reason) {

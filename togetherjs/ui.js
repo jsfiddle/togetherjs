@@ -551,8 +551,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         /* Displays some toggleable element; toggleable elements have a
         data-toggles attribute that indicates what other elements should
         be hidden when this element is shown. */
-        Ui.prototype.displayToggle = function (el) {
-            el = $(el);
+        Ui.prototype.displayToggle = function (elem) {
+            var el = $(elem);
             assert(el.length, "No element", arguments[0]);
             var other = $(el.attr("data-toggles"));
             assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
@@ -1109,23 +1109,23 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 setToolName = true;
             }
         };
-        Ui.prototype.panelPosition = function () {
-            var iface = $("#togetherjs-dock");
-            if (iface.hasClass("togetherjs-dock-right")) {
-                return "right";
-            }
-            else if (iface.hasClass("togetherjs-dock-left")) {
-                return "left";
-            }
-            else if (iface.hasClass("togetherjs-dock-bottom")) {
-                return "bottom";
-            }
-            else {
-                throw new AssertionError("#togetherjs-dock doesn't have positioning class");
-            }
-        };
         return Ui;
     }());
+    function panelPosition() {
+        var iface = $("#togetherjs-dock");
+        if (iface.hasClass("togetherjs-dock-right")) {
+            return "right";
+        }
+        else if (iface.hasClass("togetherjs-dock-left")) {
+            return "left";
+        }
+        else if (iface.hasClass("togetherjs-dock-bottom")) {
+            return "bottom";
+        }
+        else {
+            throw new AssertionError("#togetherjs-dock doesn't have positioning class");
+        }
+    }
     var ui = new Ui();
     // This is used for some signalling when ui.prepareUI and/or
     // ui.activateUI is called before the DOM is fully loaded:
@@ -1150,10 +1150,10 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     }
     function sizeDownImage(imageUrl) {
         return util.Deferred(function (def) {
-            var $canvas = $("<canvas>");
-            $canvas[0].height = session.AVATAR_SIZE;
-            $canvas[0].width = session.AVATAR_SIZE;
-            var context = $canvas[0].getContext("2d");
+            var canvas = document.createElement("canvas");
+            canvas.height = session.AVATAR_SIZE;
+            canvas.width = session.AVATAR_SIZE;
+            var context = canvas.getContext("2d");
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -1165,7 +1165,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 width = width * (session.AVATAR_SIZE / height);
                 height = session.AVATAR_SIZE;
                 context.drawImage(img, 0, 0, width, height);
-                def.resolve($canvas[0].toDataURL("image/png"));
+                def.resolve(canvas.toDataURL("image/png"));
             });
         });
     }
@@ -1181,7 +1181,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         });
     }
     // Menu
-    function showMenu(event) {
+    function showMenu() {
         var el = $("#togetherjs-menu");
         assert(el.length);
         el.show();

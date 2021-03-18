@@ -570,15 +570,15 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     }
 
     class Ui {
-        private container = null;
+        public container = null;
         public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
         data-toggles attribute that indicates what other elements should
         be hidden when this element is shown. */
-        displayToggle(el) {
-            el = $(el);
+        displayToggle(elem: HTMLElement | string) {
+            const el = $(elem);
             assert(el.length, "No element", arguments[0]);
             var other = $(el.attr("data-toggles"));
             assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
@@ -620,7 +620,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
                     var start = iface.offset();
-                    var pos = $(TogetherJS.startTarget).offset();
+                    let pos = $(TogetherJS.startTarget).offset();
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -664,7 +664,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
                 el.addClass("togetherjs-started");
             }
-            this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function() {
+            this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function(this: HTMLElement) {
                 $(this).append($('<button class="togetherjs-close"></button>'));
             });
 
@@ -700,7 +700,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
             // The share link:
             this.prepareShareLink(container);
-            container.find("input.togetherjs-share-link").on("keydown", function(event) {
+            container.find("input.togetherjs-share-link").on("keydown", function(event: KeyboardEvent) {
                 if(event.which == 27) {
                     windowing.hide("#togetherjs-share");
                     return false;
@@ -732,7 +732,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             }
             // auto-resize textarea:
-            input.on("input propertychange", function() {
+            input.on("input propertychange", function(this: HTMLInputElement) {
                 var $this = $(this);
                 var actualHeight = $this.height();
                 // reset the height of textarea to remove trailing empty space (used for shrinking):
@@ -767,11 +767,11 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             anchor.mousedown(function(event) {
                 var iface = $("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
-                var startPos = panelPosition();
+                let startPos: string | null = panelPosition();
                 function selectoff() {
                     return false;
                 }
-                function mousemove(event2) {
+                function mousemove(event2: JQueryEventObject) {
                     var fromRight = $window.width() + window.pageXOffset - event2.pageX;
                     var fromLeft = event2.pageX - window.pageXOffset;
                     var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
@@ -910,11 +910,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var src = "/togetherjs/images/togetherjs-logo-close.png";
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
-                $("#togetherjs-dock-anchor").toggle(function() {
-                    closeDock();
-                }, function() {
-                    openDock();
-                });
+                $("#togetherjs-dock-anchor").toggle(
+                    function() {
+                        closeDock();
+                    },
+                    function() {
+                        openDock();
+                    }
+                );
             }
 
             $("#togetherjs-share-button").click(function() {
@@ -1045,8 +1048,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             });
 
-            container.find("#togetherjs-chat-notifier").click(function(event) {
-                if($(event.target).is("a") || container.is(".togetherjs-close")) {
+            container.find("#togetherjs-chat-notifier").click(function(event: MouseEvent) {
+                if($(event.target as HTMLElement).is("a") || container.is(".togetherjs-close")) {
                     return;
                 }
                 windowing.show("#togetherjs-chat");
@@ -1150,7 +1153,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
 
         prepareShareLink(container) {
-            container.find("input.togetherjs-share-link").click(function() {
+            container.find("input.togetherjs-share-link").click(function(this: HTMLElement) {
                 $(this).select();
             }).change(function() {
                 updateShareLink();
@@ -1173,7 +1176,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             updateShareLink();
         }
 
-        showUrlChangeMessage(peer, url) {
+        showUrlChangeMessage(peer: TogetherJSNS.Peer, url: string) {
             deferForContainer(() => {
                 var window = templating.sub("url-change", { peer: peer });
                 this.container.append(window);
@@ -1181,7 +1184,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             })();
         }
 
-        updateToolName(container) {
+        updateToolName(container: JQuery) {
             container = container || $(document.body);
             var name = TogetherJS.config.get("toolName");
             if(setToolName && !name) {
@@ -1192,18 +1195,21 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 setToolName = true;
             }
         }
+    }
 
-        panelPosition() {
-            var iface = $("#togetherjs-dock");
-            if(iface.hasClass("togetherjs-dock-right")) {
-                return "right";
-            } else if(iface.hasClass("togetherjs-dock-left")) {
-                return "left";
-            } else if(iface.hasClass("togetherjs-dock-bottom")) {
-                return "bottom";
-            } else {
-                throw new AssertionError("#togetherjs-dock doesn't have positioning class");
-            }
+    function panelPosition() {
+        var iface = $("#togetherjs-dock");
+        if(iface.hasClass("togetherjs-dock-right")) {
+            return "right";
+        }
+        else if(iface.hasClass("togetherjs-dock-left")) {
+            return "left";
+        }
+        else if(iface.hasClass("togetherjs-dock-bottom")) {
+            return "bottom";
+        }
+        else {
+            throw new AssertionError("#togetherjs-dock doesn't have positioning class");
         }
     }
 
@@ -1211,9 +1217,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     // This is used for some signalling when ui.prepareUI and/or
     // ui.activateUI is called before the DOM is fully loaded:
-    var deferringPrepareUI = null;
+    let deferringPrepareUI: string | null = null;
 
-    function deferForContainer(func) {
+    function deferForContainer<A extends any[]>(func: (...args: A) => void) {
         /* Defers any calls to func() until after ui.container is set
            Function cannot have a return value (as sometimes the call will
            become async).  Use like:
@@ -1232,12 +1238,12 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         };
     }
 
-    function sizeDownImage(imageUrl) {
+    function sizeDownImage(imageUrl: string) {
         return util.Deferred(function(def) {
-            var $canvas = $("<canvas>");
-            $canvas[0].height = session.AVATAR_SIZE;
-            $canvas[0].width = session.AVATAR_SIZE;
-            var context = $canvas[0].getContext("2d");
+            let canvas = document.createElement("canvas");
+            canvas.height = session.AVATAR_SIZE;
+            canvas.width = session.AVATAR_SIZE;
+            let context = canvas.getContext("2d");
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -1249,15 +1255,15 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 width = width * (session.AVATAR_SIZE / height);
                 height = session.AVATAR_SIZE;
                 context.drawImage(img, 0, 0, width, height);
-                def.resolve($canvas[0].toDataURL("image/png"));
+                def.resolve(canvas.toDataURL("image/png"));
             });
         });
     }
 
-    function fixupAvatars(container) {
+    function fixupAvatars(container: JQuery) {
         /* All <div class="togetherjs-person" /> elements need an element inside,
            so we add that element here */
-        container.find(".togetherjs-person").each(function() {
+        container.find(".togetherjs-person").each(function(this: HTMLElement) {
             var $this = $(this);
             var inner = $this.find(".togetherjs-person-avatar-swatch");
             if(!inner.length) {
@@ -1268,7 +1274,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     // Menu
 
-    function showMenu(event) {
+    function showMenu() {
         var el = $("#togetherjs-menu");
         assert(el.length);
         el.show();
@@ -1308,7 +1314,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     function toggleMenu() {
         if($("#togetherjs-menu").is(":visible")) {
             hideMenu();
-        } else {
+        }
+        else {
             showMenu();
         }
     }
@@ -1333,7 +1340,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         hideMenu();
     }
 
-    function adjustDockSize(buttons) {
+    function adjustDockSize(buttons: number) {
         /* Add or remove spots from the dock; positive number to
            add button(s), negative number to remove button(s)
            */
@@ -1358,7 +1365,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             input.val("");
             link.attr("href", "#");
             display.text("(none)");
-        } else {
+        }
+        else {
             input.val(session.shareUrl());
             link.attr("href", session.shareUrl());
             display.text(session.shareId);
@@ -1432,7 +1440,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             return;
         }
         inRefresh = true;
-        require(["who"], function(who) {
+        require(["who"], function(who: TogetherJSNS.Who) {
             var def = who.getList(inviteHubUrl());
             function addUser(user, before) {
                 var item = templating.sub("invite-user-item", { peer: user });
@@ -1530,4 +1538,4 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
 }
 
- define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], uiMain);
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], uiMain);

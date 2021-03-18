@@ -13,6 +13,7 @@ declare namespace TogetherJSNS {
     type Playback = ReturnType<typeof playbackMain>;
     type Chat = ReturnType<typeof chatMain>;
     type Ui = ReturnType<typeof uiMain>;
+    type Who = ReturnType<typeof whoMain>;
 
     type PeerClass = Peers["PeerClassExport"];
     
@@ -58,6 +59,7 @@ declare namespace TogetherJSNS {
         startupReason: Reason;
         $: JQueryStatic;
         addTracker(TrackerClass: Tracker, skipSetInit: boolean): void;
+        startTarget: HTMLElement;
     }
 
     interface KeyboardListener {
