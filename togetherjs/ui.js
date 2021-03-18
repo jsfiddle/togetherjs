@@ -36,7 +36,6 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     var Chat = /** @class */ (function () {
         function Chat(ui) {
             this.ui = ui;
-            this.hideTimeout = null;
         }
         Chat.prototype.text = function (attrs) {
             assert(typeof attrs.text == "string");
@@ -69,7 +68,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             el.attr("data-person", attrs.peer.id)
                 .attr("data-date", date)
                 .attr("data-message-id", attrs.messageId);
-            this.ui.chat.add(el, attrs.messageId, attrs.notify);
+            this.add(el, attrs.messageId, attrs.notify);
         };
         Chat.prototype.joinedSession = function (attrs) {
             assert(attrs.peer);
@@ -79,7 +78,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 date: date
             });
             // FIXME: should bind the notification to the dock location
-            this.ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
+            this.add(el, attrs.peer.className("join-message-"), 4000);
         };
         Chat.prototype.leftSession = function (attrs) {
             assert(attrs.peer);
@@ -90,7 +89,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 declinedJoin: attrs.declinedJoin
             });
             // FIXME: should bind the notification to the dock location
-            this.ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
+            this.add(el, attrs.peer.className("join-message-"), 4000);
         };
         Chat.prototype.system = function (attrs) {
             assert(!attrs.peer);
@@ -100,11 +99,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 content: attrs.text,
                 date: date
             });
-            this.ui.chat.add(el, undefined, true);
+            this.add(el, undefined, true);
         };
         Chat.prototype.clear = function () {
+            var _this = this;
             deferForContainer(function () {
-                var container = this.ui.container.find("#togetherjs-chat-messages");
+                var container = _this.ui.container.find("#togetherjs-chat-messages");
                 container.empty();
             })();
         };
@@ -151,7 +151,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 // had been shown
                 return;
             }
-            this.ui.chat.add(el, messageId, notify);
+            this.add(el, messageId, notify);
         };
         Chat.prototype.invite = function (attrs) {
             assert(attrs.peer);
@@ -172,10 +172,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     chat.submit("Followed link to " + attrs.url);
                 });
             }
-            this.ui.chat.add(el, messageId, true);
+            this.add(el, messageId, true);
         };
         Chat.prototype.add = function (el, id, notify) {
             var _this = this;
+            if (notify === void 0) { notify = false; }
             deferForContainer(function () {
                 if (id) {
                     el.attr("id", "togetherjs-chat-" + util.safeClassName(id));
@@ -184,7 +185,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 assert(container.length);
                 var popup = _this.ui.container.find("#togetherjs-chat-notifier");
                 container.append(el);
-                _this.ui.chat.scroll();
+                _this.scroll();
                 var doNotify = !!notify;
                 var section = popup.find("#togetherjs-chat-notifier-message");
                 if (notify && visibilityApi.hidden()) {
@@ -210,11 +211,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                         // This is the amount of time we're supposed to notify
                         if (_this.hideTimeout) {
                             clearTimeout(_this.hideTimeout);
-                            _this.hideTimeout = null;
+                            _this.hideTimeout = undefined;
                         }
                         _this.hideTimeout = setTimeout((function () {
                             windowing.hide(popup);
-                            this.hideTimeout = null;
+                            this.hideTimeout = undefined;
                         }).bind(_this), notify);
                     }
                 }

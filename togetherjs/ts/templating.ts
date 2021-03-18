@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 interface MapOfVariables {
-    [key: string]: string | JQuery;
+    [key: string]: string | number | JQuery;
 };
 
 function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {

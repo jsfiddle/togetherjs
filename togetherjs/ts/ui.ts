@@ -2,6 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+interface ChatTextAttributes {
+    text: string;
+    peer;
+    messageId;
+    date: number;
+    notify;
+    declinedJoin;
+    url: string;
+    sameUrl: string;
+    title: string;
+    forEveryone;
+}
+
 function uiMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, tinycolor: tinycolor, elementFinder: ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
     var assert: typeof util.assert = util.assert;
     var AssertionError = util.AssertionError;
@@ -36,11 +49,11 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     });
 
     class Chat {
-        private hideTimeout = null;
+        private hideTimeout: number | undefined;
 
         constructor(private ui: Ui) { }
 
-        text(attrs) {
+        text(attrs: ChatTextAttributes) {
             assert(typeof attrs.text == "string");
             assert(attrs.peer);
             assert(attrs.messageId);
@@ -71,10 +84,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             el.attr("data-person", attrs.peer.id)
                 .attr("data-date", date)
                 .attr("data-message-id", attrs.messageId);
-            this.ui.chat.add(el, attrs.messageId, attrs.notify);
+            this.add(el, attrs.messageId, attrs.notify);
         }
 
-        joinedSession(attrs) {
+        joinedSession(attrs: ChatTextAttributes) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-joined", {
@@ -82,10 +95,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 date: date
             });
             // FIXME: should bind the notification to the dock location
-            this.ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
+            this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        leftSession(attrs) {
+        leftSession(attrs: ChatTextAttributes) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-left", {
@@ -94,10 +107,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 declinedJoin: attrs.declinedJoin
             });
             // FIXME: should bind the notification to the dock location
-            this.ui.chat.add(el, attrs.peer.className("join-message-"), 4000);
+            this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        system(attrs) {
+        system(attrs: ChatTextAttributes) {
             assert(!attrs.peer);
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
@@ -105,17 +118,17 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 content: attrs.text,
                 date: date
             });
-            this.ui.chat.add(el, undefined, true);
+            this.add(el, undefined, true);
         }
 
         clear() {
-            deferForContainer(function() {
+            deferForContainer(() => {
                 var container = this.ui.container.find("#togetherjs-chat-messages");
                 container.empty();
             })();
         }
 
-        urlChange(attrs) {
+        urlChange(attrs: ChatTextAttributes) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             assert(typeof attrs.sameUrl == "boolean");
@@ -157,10 +170,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 // had been shown
                 return;
             }
-            this.ui.chat.add(el, messageId, notify);
+            this.add(el, messageId, notify);
         }
 
-        invite(attrs) {
+        invite(attrs: ChatTextAttributes) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
@@ -179,10 +192,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     chat.submit("Followed link to " + attrs.url);
                 });
             }
-            this.ui.chat.add(el, messageId, true);
+            this.add(el, messageId, true);
         }
 
-        add(el, id, notify) {
+        add(el: JQuery, id?: string, notify: boolean = false) {
             deferForContainer(() => {
                 if(id) {
                     el.attr("id", "togetherjs-chat-" + util.safeClassName(id));
@@ -191,7 +204,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 assert(container.length);
                 var popup = this.ui.container.find("#togetherjs-chat-notifier");
                 container.append(el);
-                this.ui.chat.scroll();
+                this.scroll();
                 var doNotify = !!notify;
                 var section = popup.find("#togetherjs-chat-notifier-message");
                 if(notify && visibilityApi.hidden()) {
@@ -216,11 +229,11 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                         // This is the amount of time we're supposed to notify
                         if(this.hideTimeout) {
                             clearTimeout(this.hideTimeout);
-                            this.hideTimeout = null;
+                            this.hideTimeout = undefined;
                         }
                         this.hideTimeout = setTimeout((function() {
                             windowing.hide(popup);
-                            this.hideTimeout = null;
+                            this.hideTimeout = undefined;
                         }).bind(this), notify);
                     }
                 }
