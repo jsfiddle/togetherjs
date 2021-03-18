@@ -264,7 +264,7 @@ declare namespace TogetherJSNS {
     }
 
     interface ConfigGetter {
-        get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K];
+        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         /*
         get(name: "dontShowClicks"): Config["dontShowClicks"],
         get(name: "cloneClicks"): Config["cloneClicks"],
