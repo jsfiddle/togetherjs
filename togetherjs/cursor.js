@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // Cursor viewing support
-define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], function ($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
+function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
     var assert = util.assert;
     var cursor = util.Module("cursor");
     var FOREGROUND_COLORS = ["#111", "#eee"];
@@ -499,4 +499,5 @@ define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventM
     });
     util.testExpose({ Cursor: Cursor });
     return cursor;
-});
+}
+define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], cursorMain);

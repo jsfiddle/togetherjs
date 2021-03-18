@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
-define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], function (require, $, util, session, ui, peers, storage, windowing) {
+function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
     var webrtc = util.Module("webrtc");
     var assert = util.assert;
     session.RTCSupported = !!(window.mozRTCPeerConnection ||
@@ -510,4 +510,5 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
         }
     });
     return webrtc;
-});
+}
+define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], webrtcMain);

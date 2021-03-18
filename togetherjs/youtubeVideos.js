@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "session", "elementFinder"], function ($, util, session, elementFinder) {
+function youtubeVideosMain($, util, session, elementFinder) {
     // constant var to indicate whether two players are too far apart in sync
     var TOO_FAR_APART = 3000;
     // embedded youtube iframes
@@ -277,4 +277,5 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
         var milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;
     }
-});
+}
+define(["jquery", "util", "session", "elementFinder"], youtubeVideosMain);
