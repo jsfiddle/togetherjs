@@ -198,7 +198,7 @@ var Util = /** @class */ (function () {
     Util.prototype.pickRandom = function (array) {
         return array[Math.floor(Math.random() * array.length)];
     };
-    Util.blobToBase64 = function (blob) {
+    Util.prototype.blobToBase64 = function (blob) {
         // TODO
         // Oh this is just terrible
         var binary = '';

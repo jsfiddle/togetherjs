@@ -33,6 +33,7 @@
         public readonly AVATAR_SIZE = 90;
         timeHelloSent = null;
         public identityId?: string;
+        public RTCSupported: boolean | undefined;
 
         public readonly hub = new OnClass();
 

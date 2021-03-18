@@ -187,7 +187,7 @@ class Util {
         return array[Math.floor(Math.random() * array.length)];
     }
 
-    public static blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string) {
+    public blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string) {
         // TODO
         // Oh this is just terrible
         let binary = '';

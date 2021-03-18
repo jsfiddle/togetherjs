@@ -314,7 +314,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private status: TogetherJSNS.PeerStatus = "live";
         private idle: TogetherJSNS.PeerStatus = "active";
         private name: string | null = null;
-        private avatar: string | null = null;
+        public avatar: string | null = null;
         private color: string | null = null;
         private defaultName: string | null = null;
         private loaded = false;
@@ -472,7 +472,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
     class Peers extends OnClass {
         private PeerClassExport: PeerClass; // TODO very ugly way to export the class
-        public Self?: PeersSelf;
+        public Self: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
 
         getPeer(id: string, message: MessageWithUrlHash, ignoreMissing: boolean) {

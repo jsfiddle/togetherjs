@@ -31,7 +31,7 @@ function StorageMain(util: Util) {
             return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
         }
 
-        set(name: string, value: string | undefined) {
+        set(name: string, value: string | boolean | undefined) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.set("settings." + name, value);
         }

@@ -2,13 +2,10 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-// WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
     var webrtc = util.Module("webrtc");
     var assert = util.assert;
-    session.RTCSupported = !!(window.mozRTCPeerConnection ||
-        window.webkitRTCPeerConnection ||
-        window.RTCPeerConnection);
+    session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
     if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
         // In a few versions of Firefox (18 and 19) these APIs are present but
         // not actually usable
@@ -26,7 +23,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
     var mediaConstraints = {
         mandatory: {
             OfferToReceiveAudio: true,
-            OfferToReceiveVideo: false
+            OfferToReceiveVideo: false,
         }
     };
     if (window.mozRTCPeerConnection) {
@@ -45,7 +42,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             });
         }
         if (window.mozRTCPeerConnection) {
-            return new mozRTCPeerConnection({
+            return new window.mozRTCPeerConnection({
                 // Or stun:124.124.124..2 ?
                 "iceServers": [{ "url": "stun:23.21.150.121" }]
             }, {
@@ -74,10 +71,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
         failure = failure || function (error) {
             console.error("Error in getUserMedia:", error);
         };
-        (navigator.getUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.msGetUserMedia).call(navigator, options, success, failure);
+        (navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia).call(navigator, options, success, failure);
     }
     /****************************************
      * getUserMedia Avatar support
@@ -93,12 +87,13 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
         if (!session.RTCSupported) {
             $("#togetherjs-avatar-edit-rtc").hide();
         }
-        var avatarData = null;
+        var avatarData;
         var $preview = $("#togetherjs-self-avatar-preview");
         var $accept = $("#togetherjs-self-avatar-accept");
         var $cancel = $("#togetherjs-self-avatar-cancel");
         var $takePic = $("#togetherjs-avatar-use-camera");
         var $video = $("#togetherjs-avatar-video");
+        var video0 = $video[0];
         var $upload = $("#togetherjs-avatar-upload");
         $takePic.click(function () {
             if (!streaming) {
@@ -131,8 +126,8 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 audio: false
             }, function (stream) {
                 streaming = true;
-                $video[0].src = URL.createObjectURL(stream);
-                $video[0].play();
+                video0.src = URL.createObjectURL(stream);
+                video0.play();
             }, function (err) {
                 // FIXME: should pop up help or something in the case of a user
                 // cancel
@@ -141,26 +136,26 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
         }
         function takePicture() {
             assert(streaming);
-            var height = $video[0].videoHeight;
-            var width = $video[0].videoWidth;
+            var height = video0.videoHeight;
+            var width = video0.videoWidth;
             width = width * (session.AVATAR_SIZE / height);
             height = session.AVATAR_SIZE;
-            var $canvas = $("<canvas>");
-            $canvas[0].height = session.AVATAR_SIZE;
-            $canvas[0].width = session.AVATAR_SIZE;
-            var context = $canvas[0].getContext("2d");
+            var canvas0 = document.createElement("canvas");
+            canvas0.height = session.AVATAR_SIZE;
+            canvas0.width = session.AVATAR_SIZE;
+            var context = canvas0.getContext("2d"); // TODO null?
             context.arc(session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, 0, Math.PI * 2);
             context.closePath();
             context.clip();
-            context.drawImage($video[0], (session.AVATAR_SIZE - width) / 2, 0, width, height);
-            savePicture($canvas[0].toDataURL("image/png"));
+            context.drawImage(video0, (session.AVATAR_SIZE - width) / 2, 0, width, height);
+            savePicture(canvas0.toDataURL("image/png"));
         }
         $upload.on("change", function () {
             var reader = new FileReader();
             reader.onload = function () {
                 // FIXME: I don't actually know it's JPEG, but it's probably a
                 // good enough guess:
-                var url = "data:image/jpeg;base64," + util.blobToBase64(this.result);
+                var url = "data:image/jpeg;base64," + util.blobToBase64(this.result); // TODO !
                 convertImage(url, function (result) {
                     savePicture(result);
                 });
@@ -171,10 +166,10 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             reader.readAsArrayBuffer(this.files[0]);
         });
         function convertImage(imageUrl, callback) {
-            var $canvas = $("<canvas>");
-            $canvas[0].height = session.AVATAR_SIZE;
-            $canvas[0].width = session.AVATAR_SIZE;
-            var context = $canvas[0].getContext("2d");
+            var canvas = document.createElement("canvas");
+            canvas.height = session.AVATAR_SIZE;
+            canvas.width = session.AVATAR_SIZE;
+            var context = canvas.getContext("2d"); // TODO !
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -186,7 +181,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 width = width * (session.AVATAR_SIZE / height);
                 height = session.AVATAR_SIZE;
                 context.drawImage(img, 0, 0, width, height);
-                callback($canvas[0].toDataURL("image/png"));
+                callback(canvas.toDataURL("image/png"));
             });
         }
     });
@@ -252,7 +247,11 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             storage.settings.set("dontShowRtcInfo", this.checked);
         });
         function error() {
-            console.warn.apply(console, arguments);
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.warn.apply(console, arguments); // TODO why not console.warn directly ?
             var s = "";
             for (var i = 0; i < arguments.length; i++) {
                 if (s) {
@@ -291,7 +290,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 }
             }, function (err) {
                 // FIXME: handle cancel case
-                if (err && err.code == 1) {
+                if (err && err.code == 1) { // TODO does code actually exists? Maybe it's a MediaError and not a MediaStreamError
                     // User cancel
                     return;
                 }
@@ -362,7 +361,9 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 connection.setRemoteDescription(new RTCSessionDescription({
                     type: "offer",
                     sdp: offerReceived
-                }), function () {
+                }), // TODO setRemoteDescription returns a promise so the 2 callbacks should probably be used in a .then()
+                //).then( // TODO TRY like this for example
+                function () {
                     offerDescription = true;
                     addIceCandidate();
                     connect();
@@ -390,8 +391,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 });
             }
             else if (!(answerSent || answerReceived)) {
-                // FIXME: I might have only needed this due to my own bugs, this might
-                // not actually time out
+                // FIXME: I might have only needed this due to my own bugs, this might not actually time out
                 var timeout = setTimeout(function () {
                     if (!answerSent) {
                         error("createAnswer Timed out; reload or restart browser");
@@ -434,7 +434,8 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 connection.setRemoteDescription(new RTCSessionDescription({
                     type: "offer",
                     sdp: offerReceived
-                }), function () {
+                }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
+                function () {
                     offerDescription = true;
                     addIceCandidate();
                     connect();
@@ -464,7 +465,8 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             connection.setRemoteDescription(new RTCSessionDescription({
                 type: "answer",
                 sdp: answerReceived
-            }), function () {
+            }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
+            function () {
                 answerDescription = true;
                 // FIXME: I don't think this connect is ever needed?
                 connect();

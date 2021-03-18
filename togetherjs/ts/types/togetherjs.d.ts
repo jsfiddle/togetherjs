@@ -24,7 +24,7 @@ declare namespace TogetherJSNS {
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
@@ -422,3 +422,44 @@ interface Function {
 //declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;
 
 declare var TogetherJS: TogetherJSNS.TogetherJS;
+
+
+
+// RTC Patches
+interface Window {
+    /** @deprecated */
+    mozRTCPeerConnection?: typeof RTCPeerConnection;
+    /** @deprecated */
+    mozRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    webkitRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    mozRTCIceCandidate?: typeof RTCIceCandidate;
+    /** @deprecated */
+    webkitRTCIceCandidate?: typeof RTCIceCandidate;
+}
+
+interface Navigator {
+    /** @deprecated */
+    mozGetUserMedia?: Navigator["getUserMedia"];
+    /** @deprecated */
+    webkitGetUserMedia?: Navigator["getUserMedia"];
+    /** @deprecated */
+    msGetUserMedia?: Navigator["getUserMedia"];
+}
+
+interface RTCPeerConnection {
+    /** @deprecated */
+    onaddstream: (event: MediaStreamEvent) => void;
+    /** @deprecated */
+    onstatechange: () => void;
+    /** @deprecated */
+    addStream(stream: MediaStream): void;
+    /** @deprecated */
+    addIceCandidate(iceCandidate: RTCIceCandidate): void;
+}
+
+interface HTMLMediaElement {
+    /** @deprecated */
+    mozSrcObject: string;
+}

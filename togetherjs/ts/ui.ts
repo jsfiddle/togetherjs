@@ -570,7 +570,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     }
 
     class Ui {
-        public container = null;
+        public container: JQuery | null = null;
         public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
