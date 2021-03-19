@@ -201,99 +201,99 @@ class Util {
        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
     */
-// work for form
-public resolveMany1<T>(args1: JQueryDeferred<T>[]) {
-    let args: JQueryDeferred<T>[] = args1;
-    return this.Deferred(function(def: JQueryDeferred<T>) {
-        if(!("length" in args)) {
-            def.resolve();
-            return;
-        }
-        let count = args.length;
-        let allResults: (T | undefined)[] = [];
-        let anyError = false;
-        args.forEach(function(arg, index) {
-            arg.then(function(result) {
-                allResults[index] = result;
-                count--;
-                check();
-            }, function(error) {
-                allResults[index] = error;
-                anyError = true;
-                count--;
-                check();
-            });
-        });
-        function check() {
-            if(!count) {
-                if(anyError) {
-                    def.reject.apply(def, allResults);
-                }
-                else {
-                    def.resolve.apply(def, allResults);
-                }
+    // work for form
+    public resolveMany1<T>(args1: JQueryDeferred<T>[]) {
+        let args: JQueryDeferred<T>[] = args1;
+        return this.Deferred(function(def: JQueryDeferred<T>) {
+            if(!("length" in args)) {
+                def.resolve();
+                return;
             }
-        }
-    });
-}
-
-// work for storage
-public resolveMany<T>(args1: JQueryDeferred<T>[]) {
-    var args: JQueryDeferred<T>[];
-    var oneArg = false;
-    if(arguments.length == 1 && Array.isArray(arguments[0])) {
-        oneArg = true;
-        args = arguments[0];
-    }
-    else {
-        args = Array.prototype.slice.call(arguments);
-    }
-    return this.Deferred(function(def) {
-        var count = args.length;
-        if(!count) {
-            def.resolve();
-            return;
-        }
-        var allResults: (T | undefined)[] = [];
-        var anyError = false;
-        args.forEach(function(arg, index) {
-            arg.then(function(result) {
-                allResults[index] = result;
-                count--;
-                check();
-            }, function(error) {
-                allResults[index] = error;
-                anyError = true;
-                count--;
-                check();
+            let count = args.length;
+            let allResults: (T | undefined)[] = [];
+            let anyError = false;
+            args.forEach(function(arg, index) {
+                arg.then(function(result) {
+                    allResults[index] = result;
+                    count--;
+                    check();
+                }, function(error) {
+                    allResults[index] = error;
+                    anyError = true;
+                    count--;
+                    check();
+                });
             });
-        });
-        function check() {
-            if(!count) {
-                if(anyError) {
-                    if(oneArg) {
-                        def.reject(allResults);
-                    } else {
+            function check() {
+                if(!count) {
+                    if(anyError) {
                         def.reject.apply(def, allResults);
                     }
-                } else {
-                    if(oneArg) {
-                        def.resolve(allResults);
-                    } else {
+                    else {
                         def.resolve.apply(def, allResults);
                     }
                 }
             }
+        });
+    }
+
+    // work for storage
+    public resolveMany<T>(args1: JQueryDeferred<T>[]) {
+        var args: JQueryDeferred<T>[];
+        var oneArg = false;
+        if(arguments.length == 1 && Array.isArray(arguments[0])) {
+            oneArg = true;
+            args = arguments[0];
         }
-    });
-}
+        else {
+            args = Array.prototype.slice.call(arguments);
+        }
+        return this.Deferred(function(def) {
+            var count = args.length;
+            if(!count) {
+                def.resolve();
+                return;
+            }
+            var allResults: (T | undefined)[] = [];
+            var anyError = false;
+            args.forEach(function(arg, index) {
+                arg.then(function(result) {
+                    allResults[index] = result;
+                    count--;
+                    check();
+                }, function(error) {
+                    allResults[index] = error;
+                    anyError = true;
+                    count--;
+                    check();
+                });
+            });
+            function check() {
+                if(!count) {
+                    if(anyError) {
+                        if(oneArg) {
+                            def.reject(allResults);
+                        } else {
+                            def.reject.apply(def, allResults);
+                        }
+                    } else {
+                        if(oneArg) {
+                            def.resolve(allResults);
+                        } else {
+                            def.resolve.apply(def, allResults);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     public readFileImage(file: File) {
         return this.Deferred(function(def: JQueryDeferred<unknown>) {
             let reader = new FileReader();
             reader.onload = function() {
                 if(this.result) {
-                    def.resolve("data:image/jpeg;base64," + Util.blobToBase64(this.result));
+                    def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
                 }
             };
             reader.onerror = function() {
@@ -353,43 +353,44 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
     // TODO find and modernize all usage
     /**/
 
-    function classFunOriginal(superClass, prototype) {
-      var a;
-      if (prototype === undefined) {
-        prototype = superClass;
-      } else {
-        if (superClass.prototype) {
-          superClass = superClass.prototype;
+    // TODO once conversion to TS is finished it should be removable
+    function classFunOriginal(superClass: any, prototype: any) {
+        var a;
+        if(prototype === undefined) {
+            prototype = superClass;
+        } else {
+            if(superClass.prototype) {
+                superClass = superClass.prototype;
+            }
+            var newPrototype = Object.create(superClass);
+            for(a in prototype) {
+                if(prototype.hasOwnProperty(a)) {
+                    newPrototype[a] = prototype[a];
+                }
+            }
+            prototype = newPrototype;
         }
-        var newPrototype = Object.create(superClass);
-        for (a in prototype) {
-          if (prototype.hasOwnProperty(a)) {
-            newPrototype[a] = prototype[a];
-          }
+        var ClassObject = function() {
+            var obj = Object.create(prototype);
+            obj.constructor.apply(obj, arguments);
+            obj.constructor = ClassObject;
+            return obj;
+        } as { (): any; className: string; [field: string]: any };
+        ClassObject.prototype = prototype;
+        if(prototype.constructor.name) {
+            ClassObject.className = prototype.constructor.name;
+            ClassObject.toString = function() {
+                return '[Class ' + this.className + ']';
+            };
         }
-        prototype = newPrototype;
-      }
-      var ClassObject = function () {
-        var obj = Object.create(prototype);
-        obj.constructor.apply(obj, arguments);
-        obj.constructor = ClassObject;
-        return obj;
-      };
-      ClassObject.prototype = prototype;
-      if (prototype.constructor.name) {
-        ClassObject.className = prototype.constructor.name;
-        ClassObject.toString = function () {
-          return '[Class ' + this.className + ']';
-        };
-      }
-      if (prototype.classMethods) {
-        for (a in prototype.classMethods) {
-          if (prototype.classMethods.hasOwnProperty(a)) {
-            ClassObject[a] = prototype.classMethods[a];
-          }
+        if(prototype.classMethods) {
+            for(a in prototype.classMethods) {
+                if(prototype.classMethods.hasOwnProperty(a)) {
+                    ClassObject[a] = prototype.classMethods[a];
+                }
+            }
         }
-      }
-      return ClassObject;
+        return ClassObject;
     };
 
     util.Class = classFunOriginal;

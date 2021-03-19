@@ -8,7 +8,7 @@ interface ShowOptions {
     onClose: null | (() => any);
 }
 
-function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+function windowingMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
@@ -55,7 +55,7 @@ function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, s
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
             var windows: JQuery[] = [];
-            els.each(function(index, el) {
+            els.each(function(_index, el) {
                 const element = $(el);
                 windows.push(element);
                 var bound = element.data("boundTo");
@@ -83,12 +83,6 @@ function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, s
             if(windows.length) {
                 session.emit("hide-window", windows);
             }
-        }
-    
-        showNotification(el: HTMLElement, options = {}) { // TODO what does this function do? It seems to do nothing.
-            const element = $(el);
-            options = options || {};
-            assert(false);
         }
     
         toggle(el: HTMLElement | string) {

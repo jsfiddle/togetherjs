@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function windowingMain($, util, peers, session) {
+function windowingMain($, util, session) {
     var assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
@@ -53,7 +53,7 @@ function windowingMain($, util, peers, session) {
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
             var windows = [];
-            els.each(function (index, el) {
+            els.each(function (_index, el) {
                 var element = $(el);
                 windows.push(element);
                 var bound = element.data("boundTo");
@@ -81,12 +81,6 @@ function windowingMain($, util, peers, session) {
             if (windows.length) {
                 session.emit("hide-window", windows);
             }
-        };
-        Windowing.prototype.showNotification = function (el, options) {
-            if (options === void 0) { options = {}; }
-            var element = $(el);
-            options = options || {};
-            assert(false);
         };
         Windowing.prototype.toggle = function (el) {
             var element = $(el);

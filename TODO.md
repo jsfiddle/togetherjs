@@ -4,6 +4,7 @@
 - look at all usage of session.hub.on and set a message type for each event
     - same for session.on
     - same for session.send(
+    - same for calls to .off
 - remove JQuery
 
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff

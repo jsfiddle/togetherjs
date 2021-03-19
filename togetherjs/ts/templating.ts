@@ -6,7 +6,7 @@ interface MapOfVariables {
     [key: string]: string | number | JQuery;
 };
 
-function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
+function templatingMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
 
     class Templating {
@@ -30,7 +30,7 @@ function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, 
                         subs.text(value);
                     }
                     else if(value instanceof $) {
-                        subs.append(value);
+                        subs.append(value as JQuery); // TODO instanceof check does not constrains value as JQuery so we need this cast, can we remove it?
                     }
                     else {
                         // TODO should probably replace with console.error

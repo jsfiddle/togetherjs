@@ -8,7 +8,7 @@ interface LogItem {
     url: string,
 }
 
-function playbackMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require) {
+function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage) {
 
     var ALWAYS_REPLAY = {
         "cursor-update": true,
@@ -42,6 +42,7 @@ function playbackMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session
 
     class Logs {
         public pos: number;
+        //@ts-expect-error this field is just for debug so its main usage is in the console
         private start: number | null = null;
         private playTimer: number | null = null;
 

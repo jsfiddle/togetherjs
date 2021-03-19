@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 ;
-function templatingMain($, util, peers, windowing, session) {
+function templatingMain($, util, session) {
     var assert = util.assert;
     var Templating = /** @class */ (function () {
         function Templating() {
@@ -28,7 +28,7 @@ function templatingMain($, util, peers, windowing, session) {
                         subs.text(value);
                     }
                     else if (value instanceof $) {
-                        subs.append(value);
+                        subs.append(value); // TODO instanceof check does not constrains value as JQuery so we need this cast, can we remove it?
                     }
                     else {
                         // TODO should probably replace with console.error

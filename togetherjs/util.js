@@ -300,7 +300,7 @@ var Util = /** @class */ (function () {
             var reader = new FileReader();
             reader.onload = function () {
                 if (this.result) {
-                    def.resolve("data:image/jpeg;base64," + Util.blobToBase64(this.result));
+                    def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
                 }
             };
             reader.onerror = function () {
@@ -354,6 +354,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
     */
     // TODO find and modernize all usage
     /**/
+    // TODO once conversion to TS is finished it should be removable
     function classFunOriginal(superClass, prototype) {
         var a;
         if (prototype === undefined) {

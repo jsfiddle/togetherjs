@@ -1,5 +1,5 @@
 "use strict";
-define(["util"], function (util) {
+define(["util"], function (_util) {
     var Analytics = /** @class */ (function () {
         function Analytics() {
         }
@@ -23,7 +23,7 @@ define(["util"], function (util) {
                 ga.async = true;
                 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
                 var s = document.getElementsByTagName('script')[0];
-                s.parentNode.insertBefore(ga, s);
+                s.parentNode.insertBefore(ga, s); // TODO !
             })();
         };
         ;

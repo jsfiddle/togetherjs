@@ -13,10 +13,10 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
     var assert: typeof util.assert = util.assert;
 
     // We will load this module later (there's a circular import):
-    var peers;
+    var peers: TogetherJSNS.Peer;
 
     // This is the channel to the hub:
-    var channel = null;
+    let channel: TogetherJSNS.WebSocketChannel | null = null;
 
     // This is the key we use for localStorage:
     var localStoragePrefix = "togetherjs.";
@@ -184,6 +184,9 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             });
         }
 
+        _getChannel() {
+            return channel!; // TODO !
+        }
     }
 
     const session = new Session();

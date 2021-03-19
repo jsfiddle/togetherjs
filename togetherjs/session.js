@@ -188,6 +188,9 @@ function sessionMain(require, util, channels, $, storage) {
                 TogetherJS._teardown();
             });
         };
+        Session.prototype._getChannel = function () {
+            return channel; // TODO !
+        };
         return Session;
     }(OnClass));
     var session = new Session();

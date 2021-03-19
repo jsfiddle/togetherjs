@@ -4,7 +4,7 @@
 
 interface Listener {
     name: string,
-    listener: unknown,
+    listener: (eventObject: JQueryEventObject, ...args: any[]) => any,
 }
 
 interface Options {
@@ -17,7 +17,7 @@ interface VideoTimeupdateMessage {
 }
 
 define(["jquery", "util", "session", "elementFinder"],
-    function($: JQueryStatic, util: Util, session: unknown, elementFinder: ElementFinder) {
+    function($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
 
         var listeners: Listener[] = [];
 
@@ -56,7 +56,7 @@ define(["jquery", "util", "session", "elementFinder"],
                 var element = event.target as HTMLMediaElement;
                 if(!options.silent && element) {
                     session.send({
-                        type: ('video-' + eventName),
+                        type: ('video-' + eventName) as TogetherJSNS.Messages,
                         location: elementFinder.elementLocation(element),
                         position: element.currentTime
                     });
@@ -65,7 +65,7 @@ define(["jquery", "util", "session", "elementFinder"],
         }
 
         function setupTimeSync(videos: JQuery) {
-            videos.each(function(i, video) {
+            videos.each(function(_i, video) {
                 var onTimeUpdate = makeTimeUpdater();
                 $(video).on(TIME_UPDATE, onTimeUpdate);
                 listeners.push({

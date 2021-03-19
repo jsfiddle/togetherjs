@@ -89,7 +89,7 @@ function channelsMain(util) {
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
-            _this.onmessage = function (jsonData) { };
+            _this.onmessage = function (_jsonData) { };
             if (address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }

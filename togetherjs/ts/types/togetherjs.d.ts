@@ -16,6 +16,8 @@ declare namespace TogetherJSNS {
     type Who = ReturnType<typeof whoMain>;
     type Console = ReturnType<typeof consoleMain>;
     type TogetherJSClass = ReturnType<typeof togetherjsMain>;
+    type On = OnClass;
+    type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
     
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
@@ -228,13 +230,15 @@ declare namespace TogetherJSNS {
         to?: string;
         clientId?: string;
         idle?: PeerStatus;
+        location?: string;
+        position?: number;
     }
 
-    interface CallbackForOnce<T> {
+    interface CallbackForOn<T> {
         (msg: T): void;
     }
 
-    interface CallbackForOn<T> extends CallbackForOnce<T> {
+    interface CallbackForOnce<T> extends CallbackForOn<T> {
         [name: string]: CallbackForOnce<T>; // TODO weird field for once callbacks
     }
 

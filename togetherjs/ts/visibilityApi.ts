@@ -14,7 +14,7 @@ interface Document {
     webkitHidden?: boolean;
 }
 
-function visibilityApiMain(util: Util, session: TogetherJSNS.On) {
+function visibilityApiMain(_util: Util, session: TogetherJSNS.On) {
     let hidden: "hidden" | "mozHidden" | "msHidden" | "webkitHidden";
     let visibilityChange: "visibilitychange" | "mozvisibilitychange" | "msvisibilitychange" | "webkitvisibilitychange";
 

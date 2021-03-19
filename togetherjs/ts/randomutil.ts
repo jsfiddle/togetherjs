@@ -6,7 +6,7 @@ interface RandomStreamObject {
     (): number;
 }
 
-define(["util", "whrandom"], function(util: Util, RandomStream: RandomStreamModule) {
+define(["util", "whrandom"], function(_util: Util, RandomStream: RandomStreamModule) {
 
     class Randomizer {
         private stream: RandomStreamObject;

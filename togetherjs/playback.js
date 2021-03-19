@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function playbackMain($, util, session, storage, require) {
+function playbackMain($, _util, session, storage) {
     var ALWAYS_REPLAY = {
         "cursor-update": true,
         "scroll-update": true
@@ -36,6 +36,7 @@ function playbackMain($, util, session, storage, require) {
             if (fromStorage === void 0) { fromStorage = false; }
             this.logs = logs;
             this.fromStorage = fromStorage;
+            //@ts-expect-error this field is just for debug so its main usage is in the console
             this.start = null;
             this.playTimer = null;
             this.pos = 0;

@@ -224,6 +224,7 @@ class ElementFinder {
                     return false;
                 }
                 last = el;
+                return;
             });
             if ((!children.length) || (!last)) {
                 // There are no children, or only inapplicable children
@@ -269,11 +270,6 @@ class ElementFinder {
     }
 }
 
-define(
-    ["util", "jquery"],
-    function(util: Util, $: JQueryStatic) {
-        let assert: typeof util.assert = util.assert;
-
-        return new ElementFinder();
-    }
-);
+define(["util", "jquery"], function(_util: Util) {
+    return new ElementFinder();
+});

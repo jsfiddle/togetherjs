@@ -17,9 +17,6 @@ function consoleMain(util: Util) {
     var console = window.console || { log: function() { } };
 
     class Console {
-
-        private static ConsoleClass = Console;
-
         public static levels: {[ll in LogLevelString]: number} = {
             debug: 1,
             // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved
@@ -34,7 +31,6 @@ function consoleMain(util: Util) {
 
         private messages: LogMessage[] = [];
         private level = Console.levels.log;
-        private messageLimit = 100;
         // Gets set below:
         private maxLevel = 0;
         public levelNames: {[lln: number]: LogLevelString} = {};
@@ -59,7 +55,7 @@ function consoleMain(util: Util) {
         ];
 
         constructor() {
-            util.forEachAttr(Console.levels, (value, name) => {
+            util.forEachAttr(Console.levels, (value, _name) => {
                 this.maxLevel = Math.max(this.maxLevel, value);
             });
         
@@ -243,7 +239,7 @@ function consoleMain(util: Util) {
 
         submit(options: Partial<ConsoleSubmitOptions> = {}) {
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util.Deferred(function(this: object, def) {
+            return util.Deferred(function(this: object) {
                 var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
@@ -255,7 +251,8 @@ function consoleMain(util: Util) {
                 }));
                 req.onreadystatechange = function() {
                     if(req.readyState === 4) {
-                        var data = JSON.parse(req.responseText);
+                        JSON.parse(req.responseText);
+                        // TODO what is this function supposed to do?
                     }
                 };
             });
@@ -297,7 +294,7 @@ function consoleMain(util: Util) {
     }
 
     // This is a factory that creates `Console.prototype.debug`, `.error` etc:
-    function logFunction(name: LogLevelString, level: number) {
+    function logFunction(_name: LogLevelString, level: number) {
         return function(this: Console) {
             const args = Array.prototype.slice.call(arguments);
             const a: Parameters<typeof this.write> = [level as number | "suppress", ...args];

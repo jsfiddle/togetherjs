@@ -116,7 +116,7 @@ function channelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        public onmessage?: (jsonData: string) => void;
+        public onmessage?: <T>(jsonData: T) => void;
         abstract onclose(): void;
     }
 
@@ -214,7 +214,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = (jsonData: string) => {};
+        onmessage = (_jsonData: unknown) => {};
 
     } // /WebSocketChannel
 

@@ -132,7 +132,7 @@ function StorageMain(util) {
                     prefix = prefix || "";
                     var result = [];
                     for (var i = 0; i < self.storage.length; i++) {
-                        var key = self.storage.key(i);
+                        var key = self.storage.key(i); // TODO !
                         if (key.indexOf(self.prefix + prefix) === 0) {
                             var shortKey = key.substr(self.prefix.length);
                             if (excludePrefix) {

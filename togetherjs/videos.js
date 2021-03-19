@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "session", "elementFinder"], function ($, util, session, elementFinder) {
+define(["jquery", "util", "session", "elementFinder"], function ($, _util, session, elementFinder) {
     var listeners = [];
     var TIME_UPDATE = 'timeupdate';
     var MIRRORED_EVENTS = ['play', 'pause'];
@@ -42,7 +42,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, util, sessio
         };
     }
     function setupTimeSync(videos) {
-        videos.each(function (i, video) {
+        videos.each(function (_i, video) {
             var onTimeUpdate = makeTimeUpdater();
             $(video).on(TIME_UPDATE, onTimeUpdate);
             listeners.push({

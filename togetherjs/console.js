@@ -14,7 +14,6 @@ function consoleMain(util) {
             var _this = this;
             this.messages = [];
             this.level = Console.levels.log;
-            this.messageLimit = 100;
             // Gets set below:
             this.maxLevel = 0;
             this.levelNames = {};
@@ -35,7 +34,7 @@ function consoleMain(util) {
                 "error" in console ? console.error : [],
                 "fatal" in console ? console.fatal : []
             ];
-            util.forEachAttr(Console.levels, function (value, name) {
+            util.forEachAttr(Console.levels, function (value, _name) {
                 _this.maxLevel = Math.max(_this.maxLevel, value);
             });
             util.forEachAttr(Console.levels, function (value, name) {
@@ -218,7 +217,7 @@ function consoleMain(util) {
         Console.prototype.submit = function (options) {
             if (options === void 0) { options = {}; }
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util.Deferred(function (def) {
+            return util.Deferred(function () {
                 var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
@@ -230,12 +229,12 @@ function consoleMain(util) {
                 }));
                 req.onreadystatechange = function () {
                     if (req.readyState === 4) {
-                        var data = JSON.parse(req.responseText);
+                        JSON.parse(req.responseText);
+                        // TODO what is this function supposed to do?
                     }
                 };
             });
         };
-        Console.ConsoleClass = Console;
         Console.levels = {
             debug: 1,
             // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved
@@ -284,7 +283,7 @@ function consoleMain(util) {
         return lines.join("\n");
     }
     // This is a factory that creates `Console.prototype.debug`, `.error` etc:
-    function logFunction(name, level) {
+    function logFunction(_name, level) {
         return function () {
             var args = Array.prototype.slice.call(arguments);
             var a = __spreadArray([level], args);
