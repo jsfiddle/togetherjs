@@ -24,11 +24,11 @@ declare namespace TogetherJSNS {
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
-    interface TogetherJS extends On, ConfigGetter2 {
+    interface TogetherJS extends OnClass, ConfigGetter2 {
         (event?: Event): TogetherJS;
         running: boolean;
         require: Require;
@@ -65,11 +65,11 @@ declare namespace TogetherJSNS {
     }
 
     interface KeyboardListener {
-        (event: KeyboardListener): void;
-        pressed: boolean;
+        (event: KeyboardEvent): void;
+        pressed?: boolean;
     }
 
-    interface Hub extends On { }
+    interface Hub extends OnClass { }
 
     interface StartupInit {
         /** What element, if any, was used to start the session */
@@ -185,6 +185,7 @@ declare namespace TogetherJSNS {
         type: TogetherJSNS.Messages;
         url: string;
         to: string;
+        peerCount?;
     }
 
     interface FormFocusMessage {
@@ -241,8 +242,8 @@ declare namespace TogetherJSNS {
     }
 
     interface On_2 {
-        on<T>(eventName: string, cb: CallbackForOnce<T>): void;
-        once<T>(eventName: string, cb: CallbackForOn<T>): void;
+        on<T>(eventName: string, cb: CallbackForOn<T>): void;
+        once<T>(eventName: string, cb: CallbackForOnce<T>): void;
         off<T>(eventName: string, cb: CallbackForOnce<T>): void;
         removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
         emit(eventName: string, msg?: unknown): void;
@@ -260,7 +261,7 @@ declare namespace TogetherJSNS {
         //get(thing: "useMinimizedCode"): true | undefined;
         //get(thing: "fallbackLang"): string;
         close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
-        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any): void;
+        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any): void;
     }
 
     interface ConfigGetter {
@@ -302,6 +303,7 @@ declare namespace TogetherJSNS {
 
     interface ConfigGetter2 {
         getConfig(name: keyof Config): ValueOf<Config>;
+        /*
         getConfig(name: "dontShowClicks"): Config["dontShowClicks"],
         getConfig(name: "cloneClicks"): Config["cloneClicks"],
         getConfig(name: "enableAnalytics"): Config["enableAnalytics"],
@@ -333,6 +335,7 @@ declare namespace TogetherJSNS {
         getConfig(name: "baseUrl"): Config["baseUrl"],
         getConfig(name: "loaded"): Config["loaded"],
         getConfig(name: "callToStart"): Config["callToStart"],
+        */
     }
 
     interface Require2 {

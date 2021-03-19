@@ -3,592 +3,595 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-function polyfillConsole() {
-    // Make sure we have all of the console.* methods:
-    if(typeof console == "undefined") {
-        (console as unknown) = {};
-    }
-    if(!console.log) {
-        console.log = function() { };
-    }
-    ["debug", "info", "warn", "error"].forEach(function(method) {
-        if(!(console as any)[method]) {
-            (console as any)[method] = console.log;
+function togetherjsMain() {
+    let styleSheet = "/togetherjs/togetherjs.css";
+
+    function polyfillConsole() {
+        // Make sure we have all of the console.* methods:
+        if(typeof console == "undefined") {
+            (console as unknown) = {};
         }
-    });
-}
-
-const defaultStartupInit: TogetherJSNS.StartupInit = {
-    // What element, if any, was used to start the session:
-    button: null,
-    // The startReason is the reason TogetherJS was started.  One of:
-    //   null: not started
-    //   started: hit the start button (first page view)
-    //   joined: joined the session (first page view)
-    reason: null,
-    // Also, the session may have started on "this" page, or maybe is continued
-    // from a past page.  TogetherJS.continued indicates the difference (false the
-    // first time TogetherJS is started or joined, true on later page loads).
-    continued: false,
-    // This is set to tell the session what shareId to use, if the boot
-    // code knows (mostly because the URL indicates the id).
-    _joinShareId: null,
-    // This tells session to start up immediately (otherwise it would wait
-    // for session.start() to be run)
-    _launch: false
-}
-
-const defaultConfiguration: TogetherJSNS.Config = {
-    dontShowClicks: false,
-    cloneClicks: false,
-    enableAnalytics: false,
-    analyticsCode: "UA-35433268-28",
-    hubBase: null,
-    getUserName: null,
-    getUserColor: null,
-    getUserAvatar: null,
-    siteName: null,
-    useMinimizedCode: undefined,
-    cacheBust: true,
-    on: {},
-    hub_on: {},
-    enableShortcut: false,
-    toolName: null,
-    findRoom: null,
-    autoStart: false,
-    suppressJoinConfirmation: false,
-    suppressInvite: false,
-    inviteFromRoom: null,
-    storagePrefix: "togetherjs",
-    includeHashInUrl: false,
-    disableWebRTC: false,
-    youtube: true,
-    ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
-    ignoreForms: [":password"],
-    lang: undefined,
-    fallbackLang: "en-US"
-};
-
-const defaultConfiguration2: Partial<TogetherJSNS.Config> = {
-    dontShowClicks: false,
-    cloneClicks: false,
-    enableAnalytics: false,
-    analyticsCode: "UA-35433268-28",
-    hubBase: "",
-    getUserName: null,
-    getUserColor: null,
-    getUserAvatar: null,
-    siteName: null,
-    useMinimizedCode: undefined,
-    on: {},
-    hub_on: {},
-    enableShortcut: false,
-    toolName: null,
-    findRoom: null,
-    autoStart: false,
-    suppressJoinConfirmation: false,
-    suppressInvite: false,
-    inviteFromRoom: null,
-    storagePrefix: "togetherjs",
-    includeHashInUrl: false,
-    lang: null
-};
-
-class ConfigClass {
-    constructor(public tjsInstance: TogetherJSClass) { }
+        if(!console.log) {
+            console.log = function() { };
+        }
+        ["debug", "info", "warn", "error"].forEach(function(method) {
+            if(!(console as any)[method]) {
+                (console as any)[method] = console.log;
+            }
+        });
+    }
     
-    call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) { // TODO any
-        let settings: Partial<TogetherJSNS.Config>;
-        if(maybeValue === undefined) {
-            if(typeof name != "object") {
-                throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
+    const defaultStartupInit: TogetherJSNS.StartupInit = {
+        // What element, if any, was used to start the session:
+        button: null,
+        // The startReason is the reason TogetherJS was started.  One of:
+        //   null: not started
+        //   started: hit the start button (first page view)
+        //   joined: joined the session (first page view)
+        reason: null,
+        // Also, the session may have started on "this" page, or maybe is continued
+        // from a past page.  TogetherJS.continued indicates the difference (false the
+        // first time TogetherJS is started or joined, true on later page loads).
+        continued: false,
+        // This is set to tell the session what shareId to use, if the boot
+        // code knows (mostly because the URL indicates the id).
+        _joinShareId: null,
+        // This tells session to start up immediately (otherwise it would wait
+        // for session.start() to be run)
+        _launch: false
+    }
+    
+    const defaultConfiguration: TogetherJSNS.Config = {
+        dontShowClicks: false,
+        cloneClicks: false,
+        enableAnalytics: false,
+        analyticsCode: "UA-35433268-28",
+        hubBase: null,
+        getUserName: null,
+        getUserColor: null,
+        getUserAvatar: null,
+        siteName: null,
+        useMinimizedCode: undefined,
+        cacheBust: true,
+        on: {},
+        hub_on: {},
+        enableShortcut: false,
+        toolName: null,
+        findRoom: null,
+        autoStart: false,
+        suppressJoinConfirmation: false,
+        suppressInvite: false,
+        inviteFromRoom: null,
+        storagePrefix: "togetherjs",
+        includeHashInUrl: false,
+        disableWebRTC: false,
+        youtube: true,
+        ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
+        ignoreForms: [":password"],
+        lang: undefined,
+        fallbackLang: "en-US"
+    };
+    
+    const defaultConfiguration2: Partial<TogetherJSNS.Config> = {
+        dontShowClicks: false,
+        cloneClicks: false,
+        enableAnalytics: false,
+        analyticsCode: "UA-35433268-28",
+        hubBase: "",
+        getUserName: null,
+        getUserColor: null,
+        getUserAvatar: null,
+        siteName: null,
+        useMinimizedCode: undefined,
+        on: {},
+        hub_on: {},
+        enableShortcut: false,
+        toolName: null,
+        findRoom: null,
+        autoStart: false,
+        suppressJoinConfirmation: false,
+        suppressInvite: false,
+        inviteFromRoom: null,
+        storagePrefix: "togetherjs",
+        includeHashInUrl: false,
+        lang: null
+    };
+    
+    class ConfigClass {
+        constructor(public tjsInstance: TogetherJSClass) { }
+        
+        call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) { // TODO any
+            let settings: Partial<TogetherJSNS.Config>;
+            if(maybeValue === undefined) {
+                if(typeof name != "object") {
+                    throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
+                }
+                settings = name;
             }
-            settings = name;
-        }
-        else {
-            settings = {};
-            settings[name] = maybeValue;
-        }
-        let tracker;
-        let attr: keyof typeof settings;
-        for(attr in settings) {
-            if(settings.hasOwnProperty(attr)) {
-                if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
-                    throw new Error("The configuration " + attr + " is finalized and cannot be changed");
+            else {
+                settings = {};
+                settings[name] = maybeValue;
+            }
+            let tracker;
+            let attr: keyof typeof settings;
+            for(attr in settings) {
+                if(settings.hasOwnProperty(attr)) {
+                    if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
+                        throw new Error("The configuration " + attr + " is finalized and cannot be changed");
+                    }
                 }
             }
-        }
-        for(attr in settings) {
-            if(!settings.hasOwnProperty(attr)) {
-                continue;
-            }
-            if(attr == "loaded" || attr == "callToStart") {
-                continue;
-            }
-            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
-                console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
-            }
-            let previous = this.tjsInstance._configuration[attr];
-            let value = settings[attr];
-            this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
-            let trackers = this.tjsInstance._configTrackers[name]!;
-            let failed = false;
-            for(let i = 0; i < trackers.length; i++) {
-                try {
-                    tracker = trackers[i];
-                    tracker(value, previous);
+            for(attr in settings) {
+                if(!settings.hasOwnProperty(attr)) {
+                    continue;
                 }
-                catch(e) {
-                    console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
-                    failed = true;
-                    break;
+                if(attr == "loaded" || attr == "callToStart") {
+                    continue;
                 }
-            }
-            if(failed) {
-                this.tjsInstance._configuration[attr] = previous as any; // TODO any, how to remove this any?
+                if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
+                    console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
+                }
+                let previous = this.tjsInstance._configuration[attr];
+                let value = settings[attr];
+                this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
+                let trackers = this.tjsInstance._configTrackers[name]!;
+                let failed = false;
                 for(let i = 0; i < trackers.length; i++) {
                     try {
                         tracker = trackers[i];
-                        tracker(value);
+                        tracker(value, previous);
                     }
                     catch(e) {
-                        console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
+                        console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
+                        failed = true;
+                        break;
+                    }
+                }
+                if(failed) {
+                    this.tjsInstance._configuration[attr] = previous as any; // TODO any, how to remove this any?
+                    for(let i = 0; i < trackers.length; i++) {
+                        try {
+                            tracker = trackers[i];
+                            tracker(value);
+                        }
+                        catch(e) {
+                            console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
+                        }
                     }
                 }
             }
         }
-    }
-
-    get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
-        let value = this.tjsInstance._configuration[name];
-        if(value === undefined) {
+    
+        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
+            let value = this.tjsInstance._configuration[name];
+            if(value === undefined) {
+                if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+                    console.error("Tried to load unknown configuration value:", name);
+                }
+                value = this.tjsInstance._defaultConfiguration[name];
+            }
+            return value;
+        }
+    
+        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) { // TODO unknown
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
-                console.error("Tried to load unknown configuration value:", name);
+                throw new Error("Configuration is unknown: " + name);
             }
-            value = this.tjsInstance._defaultConfiguration[name];
+            const v = this.tjsInstance.config.get(name);
+            callback(v);
+            if(!this.tjsInstance._configTrackers[name]) {
+                this.tjsInstance._configTrackers[name] = [];
+            }
+            // TODO any how to make callback typecheck?
+            this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO !
+            let a = this.tjsInstance._configTrackers["hubBase"];
+            return callback;
         }
-        return value;
+    
+        close<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
+            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+                throw new Error("Configuration is unknown: " + name);
+            }
+            this.tjsInstance._configClosed[name] = true;
+            return this.get(name);
+        }
     }
-
-    track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) { // TODO unknown
-        if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
-            throw new Error("Configuration is unknown: " + name);
-        }
-        callback(this.tjsInstance.config.get(name));
-        if(!this.tjsInstance._configTrackers[name]) {
-            this.tjsInstance._configTrackers[name] = [];
-        }
-        // TODO any how to make callback typecheck?
-        this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO !
-        let a = this.tjsInstance._configTrackers["hubBase"];
-        return callback;
+    
+    // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
+    function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
+        let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
+        config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
+        config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
+        config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
+        return config;
     }
-
-    close<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
-        if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
-            throw new Error("Configuration is unknown: " + name);
+    
+    class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
+        public running: boolean = false;
+        private require: Require;
+        private configObject = new ConfigClass(this);
+        public readonly config: TogetherJSNS.ConfigFunObj;
+        private hub: TogetherJSNS.Hub = new OnClass();
+        public requireConfig: RequireConfig;
+        private _loaded: boolean;
+        private _extend(conf: RequireConfig): RequireConfig;
+        private _extend(base: unknown, extensions: unknown): unknown;
+        private _requireObject: Require;
+        private pageLoaded: number = Date.now();
+        private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
+        public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
+        public _configuration: Partial<TogetherJSNS.Config> = {};
+        public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
+        //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
+        public readonly _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[]}> = {};
+        public _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean} = {};
+        private version: string;
+        private baseUrl: string;
+    
+        constructor() {
+            super();
         }
-        this.tjsInstance._configClosed[name] = true;
-        return this.get(name);
-    }
-}
 
-// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
-function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
-    let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
-    config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
-    config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
-    config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
-    return config;
-}
-
-
-
-class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
-    public running: boolean = false;
-    private require: Require;
-    private configObject = new ConfigClass(this);
-    public readonly config: TogetherJSNS.ConfigFunObj;
-    private hub: TogetherJSNS.Hub;
-    private requireConfig: RequireConfig;
-    private _loaded: boolean;
-    private _extend(conf: RequireConfig): RequireConfig;
-    private _extend(base: unknown, extensions: unknown): unknown;
-    private _requireObject: Require;
-    private pageLoaded: number = Date.now();
-    private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
-    public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
-    public _configuration: Partial<TogetherJSNS.Config> = {};
-    public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
-    //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
-    public readonly _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[]}> = {};
-    public _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean} = {};
-    private version: string;
-    private baseUrl: string;
-
-    constructor(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
-        super();
-        this._knownEvents = ["ready", "close"];
-
-        this.config = createConfigFunObj(this.configObject);
-
-        let session;
-        if(this.running) {
-            session = this.require("session");
-            session.close();
-            return;
-        }
-        this.startup.button = null;
-        try {
-            if(event && typeof event == "object") {
-                if("target" in event && event.target && typeof event) {
-                    this.startup.button = event.target;
-                }
-                else if("nodeType" in event && event.nodeType == 1) {
-                    this.startup.button = event;
-                }
-                else if(Array.isArray(event) && event[0] && event[0].nodeType == 1) {
-                    // TODO What?
-                    // Probably a jQuery element
-                    this.startup.button = event[0];
+        start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
+            this._knownEvents = ["ready", "close"];
+    
+            this.config = createConfigFunObj(this.configObject);
+    
+            let session;
+            if(this.running) {
+                session = this.require("session");
+                session.close();
+                return;
+            }
+            this.startup.button = null;
+            try {
+                if(event && typeof event == "object") {
+                    if("target" in event && event.target && typeof event) {
+                        this.startup.button = event.target;
+                    }
+                    else if("nodeType" in event && event.nodeType == 1) {
+                        this.startup.button = event;
+                    }
+                    else if(Array.isArray(event) && event[0] && event[0].nodeType == 1) {
+                        // TODO What?
+                        // Probably a jQuery element
+                        this.startup.button = event[0];
+                    }
                 }
             }
-        }
-        catch(e) {
-            console.warn("Error determining starting button:", e);
-        }
-        if(window.TowTruckConfig) {
-            console.warn("TowTruckConfig is deprecated; please use TogetherJSConfig");
-            if(window.TogetherJSConfig) {
-                console.warn("Ignoring TowTruckConfig in favor of TogetherJSConfig");
+            catch(e) {
+                console.warn("Error determining starting button:", e);
             }
-            else {
-                window.TogetherJSConfig = window.TowTruckConfig;
-            }
-        }
-        if(window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
-            this.config(window.TogetherJSConfig);
-            window.TogetherJSConfig.loaded = true;
-        }
-
-        // This handles loading configuration from global variables.  This
-        // includes TogetherJSConfig_on_*, which are attributes folded into
-        // the "on" configuration value.
-        let attr;
-        let attrName: keyof TogetherJSNS.Config;
-        let globalOns: TogetherJSNS.Ons<unknown> = {};
-        for(attr in window) {
-            if(attr.indexOf("TogetherJSConfig_on_") === 0) {
-                attrName = attr.substr(("TogetherJSConfig_on_").length) as keyof TogetherJSNS.Config;
-                globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
-            }
-            else if(attr.indexOf("TogetherJSConfig_") === 0) {
-                attrName = attr.substr(("TogetherJSConfig_").length) as keyof TogetherJSNS.Config;
-                this.config(attrName, window[attr]);
-            }
-            else if(attr.indexOf("TowTruckConfig_on_") === 0) {
-                attrName = attr.substr(("TowTruckConfig_on_").length) as keyof TogetherJSNS.Config;
-                console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
-                globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
-            }
-            else if(attr.indexOf("TowTruckConfig_") === 0) {
-                attrName = attr.substr(("TowTruckConfig_").length) as keyof TogetherJSNS.Config;
-                console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
-                this.config(attrName, window[attr]);
-            }
-
-
-        }
-        // FIXME: copy existing config?
-        // FIXME: do this directly in this.config() ?
-        // FIXME: close these configs?
-        let ons: TogetherJSNS.Ons<unknown> = this.config.get("on");
-        for(attr in globalOns) {
-            if(globalOns.hasOwnProperty(attr)) {
-                // FIXME: should we avoid overwriting?  Maybe use arrays?
-                ons[attr] = globalOns[attr];
-            }
-        }
-        this.config("on", ons);
-        for(attr in ons) {
-            this.on(attr, ons[attr]);
-        }
-        let hubOns = this.config.get("hub_on");
-        if(hubOns) {
-            for(attr in hubOns) {
-                if(hubOns.hasOwnProperty(attr)) {
-                    this.hub.on(attr, hubOns[attr]);
-                }
-            }
-        }
-        if(!this.config.close('cacheBust')) {
-            cacheBust = '';
-            delete this.requireConfig.urlArgs;
-        }
-
-        if(!this.startup.reason) {
-            // Then a call to TogetherJS() from a button must be started TogetherJS
-            this.startup.reason = "started";
-        }
-
-        // FIXME: maybe I should just test for this.require:
-        if(this._loaded) {
-            session = this.require("session");
-            addStyle();
-            session.start();
-            return;
-        }
-        // A sort of signal to session.js to tell it to actually
-        // start itself (i.e., put up a UI and try to activate)
-        this.startup._launch = true;
-
-        addStyle();
-        let minSetting = this.config.get("useMinimizedCode");
-        this.config.close("useMinimizedCode");
-        if(minSetting !== undefined) {
-            min = !!minSetting;
-        }
-        let requireConfig: RequireConfig = this._extend(this.requireConfig);
-        let deps = ["session", "jquery"];
-        let lang = this.getConfig("lang");
-        // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-        let availableTranslations = {
-            "en-US": true,
-            "en": "en-US",
-            "es": "es-BO",
-            "es-BO": true,
-            "ru": true,
-            "ru-RU": "ru",
-            "pl": "pl-PL",
-            "pl-PL": true,
-            "de-DE": true,
-            "de": "de-DE"
-        };
-
-        if(!lang) {
-            // BCP 47 mandates hyphens, not underscores, to separate lang parts
-            lang = navigator.language.replace(/_/g, "-");
-        }
-
-        // TODO check if the updates of those conditions is right
-        // if(/-/.test(lang) && !availableTranslations[lang]) {
-        if(/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
-            lang = lang.replace(/-.*$/, '');
-        }
-        // if(!availableTranslations[lang]) {
-        if(!("lang" in availableTranslations) || !availableTranslations[lang]) {
-            lang = this.config.get("fallbackLang");
-        }
-        // else if(availableTranslations[lang] !== true) {
-        else if(availableTranslations[lang] !== true) {
-            lang = availableTranslations[lang];
-        }
-        this.config("lang", lang);
-
-        let localeTemplates = "templates-" + lang;
-        deps.splice(0, 0, localeTemplates);
-        function callback(session: TogetherJSNS.Session, jquery: JQuery) {
-            this._loaded = true;
-            if(!min) {
-                this.require = require.config({ context: "togetherjs" });
-                this._requireObject = require;
-            }
-        }
-        if(!min) {
-            if(typeof require == "function") {
-                if(!require.config) {
-                    console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
-                    throw new Error("Conflict with window.require");
-                }
-                this.require = require.config(requireConfig);
-            }
-        }
-        if(typeof this.require == "function") {
-            // This is an already-configured version of require
-            this.require(deps, callback);
-        }
-        else {
-            requireConfig.deps = deps;
-            requireConfig.callback = callback;
-            if(!min) {
-                window.require = requireConfig;
-            }
-        }
-        if(min) {
-            addScript("/togetherjs/togetherjsPackage.js");
-        }
-        else {
-            addScript("/togetherjs/libs/require.js");
-        }
-    };
-
-    _extend(base: { [key: string]: unknown }, extensions?: any) {
-        if(!extensions) {
-            extensions = base;
-            base = {};
-        }
-        for(let a in extensions) {
-            if(extensions.hasOwnProperty(a)) {
-                base[a] = extensions[a];
-            }
-        }
-        return base;
-    };
-
-    _mixinEvents(cls: TogetherJSNS.On) {
-        // TODO this function is a way to make the cls arg inherit of the On features, its use should be reworked to use TS inheritance, so fat this implementation does nothing so FIX IT
-        return proto;
-    };
-
-    _teardown() {
-        let requireObject = this._requireObject || window.require;
-        // FIXME: this doesn't clear the context for min-case
-        if(requireObject.s && requireObject.s.contexts) {
-            delete requireObject.s.contexts.togetherjs;
-        }
-        this._loaded = false;
-        this.startup = this._extend(this._startupInit);
-        this.running = false;
-    };
-
-    toString() {
-        return "TogetherJS";
-    };
-
-    reinitialize() {
-        if(this.running && typeof this.require == "function") {
-            this.require(["session"], function(session: TogetherJSNS.On) {
-                session.emit("reinitialize");
-            });
-        }
-        // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
-    };
-
-    getConfig(name: keyof TogetherJSNS.Config) { // rename into TogetherJS.config.get()?
-        let value = this._configuration[name];
-        if(value === undefined) {
-            if(!this._defaultConfiguration.hasOwnProperty(name)) {
-                console.error("Tried to load unknown configuration value:", name);
-            }
-            value = this._defaultConfiguration[name];
-        }
-        return value;
-    };
-
-    refreshUserData() {
-        if(this.running && typeof this.require == "function") {
-            this.require(["session"], function(session: TogetherJSNS.On) {
-                session.emit("refresh-user-data");
-            });
-        }
-    };
-
-    _onmessage(msg: TogetherJSNS.Message) {
-        let type = msg.type;
-        if(type.search(/^app\./) === 0) {
-            type = type.substr("app.".length);
-        }
-        else {
-            type = "togetherjs." + type;
-        }
-        msg.type = type;
-        this.hub.emit(msg.type, msg);
-    };
-
-    send(msg: TogetherJSNS.Message) {
-        if(!this.require) {
-            throw "You cannot use TogetherJS.send() when TogetherJS is not running";
-        }
-        let session = this.require("session");
-        session.appSend(msg);
-    };
-
-    shareUrl() {
-        if(!this.require) {
-            return null;
-        }
-        let session = this.require("session");
-        return session.shareUrl();
-    };
-
-    listenForShortcut() {
-        console.warn("Listening for alt-T alt-T to start TogetherJS");
-        this.removeShortcut();
-        listener = function listener(event: KeyboardEvent) {
-            if(event.which == 84 && event.altKey) {
-                if(listener.pressed) {
-                    // Second hit
-                    TogetherJS();
+            if(window.TowTruckConfig) {
+                console.warn("TowTruckConfig is deprecated; please use TogetherJSConfig");
+                if(window.TogetherJSConfig) {
+                    console.warn("Ignoring TowTruckConfig in favor of TogetherJSConfig");
                 }
                 else {
-                    listener.pressed = true;
+                    window.TogetherJSConfig = window.TowTruckConfig;
                 }
             }
+            if(window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
+                this.config(window.TogetherJSConfig);
+                window.TogetherJSConfig.loaded = true;
+            }
+    
+            // This handles loading configuration from global variables.  This
+            // includes TogetherJSConfig_on_*, which are attributes folded into
+            // the "on" configuration value.
+            let attr;
+            let attrName: keyof TogetherJSNS.Config;
+            let globalOns: TogetherJSNS.Ons<unknown> = {};
+            for(attr in window) {
+                if(attr.indexOf("TogetherJSConfig_on_") === 0) {
+                    attrName = attr.substr(("TogetherJSConfig_on_").length) as keyof TogetherJSNS.Config;
+                    globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
+                }
+                else if(attr.indexOf("TogetherJSConfig_") === 0) {
+                    attrName = attr.substr(("TogetherJSConfig_").length) as keyof TogetherJSNS.Config;
+                    this.config(attrName, window[attr]);
+                }
+                else if(attr.indexOf("TowTruckConfig_on_") === 0) {
+                    attrName = attr.substr(("TowTruckConfig_on_").length) as keyof TogetherJSNS.Config;
+                    console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
+                    globalOns[attrName] = window[attr] as unknown as TogetherJSNS.CallbackForOn<unknown>;
+                }
+                else if(attr.indexOf("TowTruckConfig_") === 0) {
+                    attrName = attr.substr(("TowTruckConfig_").length) as keyof TogetherJSNS.Config;
+                    console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
+                    this.config(attrName, window[attr]);
+                }
+    
+    
+            }
+            // FIXME: copy existing config?
+            // FIXME: do this directly in this.config() ?
+            // FIXME: close these configs?
+            let ons: TogetherJSNS.Ons<unknown> = this.config.get("on");
+            for(attr in globalOns) {
+                if(globalOns.hasOwnProperty(attr)) {
+                    // FIXME: should we avoid overwriting?  Maybe use arrays?
+                    ons[attr] = globalOns[attr];
+                }
+            }
+            this.config("on", ons);
+            for(attr in ons) {
+                this.on(attr, ons[attr]);
+            }
+            let hubOns = this.config.get("hub_on");
+            if(hubOns) {
+                for(attr in hubOns) {
+                    if(hubOns.hasOwnProperty(attr)) {
+                        this.hub.on(attr, hubOns[attr]);
+                    }
+                }
+            }
+            if(!this.config.close('cacheBust')) {
+                cacheBust = '';
+                delete this.requireConfig.urlArgs;
+            }
+    
+            if(!this.startup.reason) {
+                // Then a call to TogetherJS() from a button must be started TogetherJS
+                this.startup.reason = "started";
+            }
+    
+            // FIXME: maybe I should just test for this.require:
+            if(this._loaded) {
+                session = this.require("session");
+                addStyle();
+                session.start();
+                return;
+            }
+            // A sort of signal to session.js to tell it to actually
+            // start itself (i.e., put up a UI and try to activate)
+            this.startup._launch = true;
+    
+            addStyle();
+            let minSetting = this.config.get("useMinimizedCode");
+            this.config.close("useMinimizedCode");
+            if(minSetting !== undefined) {
+                min = !!minSetting;
+            }
+            let requireConfig: RequireConfig = this._extend(this.requireConfig);
+            let deps = ["session", "jquery"];
+            let lang = this.getConfig("lang");
+            // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
+            let availableTranslations = {
+                "en-US": true,
+                "en": "en-US",
+                "es": "es-BO",
+                "es-BO": true,
+                "ru": true,
+                "ru-RU": "ru",
+                "pl": "pl-PL",
+                "pl-PL": true,
+                "de-DE": true,
+                "de": "de-DE"
+            };
+    
+            if(!lang) {
+                // BCP 47 mandates hyphens, not underscores, to separate lang parts
+                lang = navigator.language.replace(/_/g, "-");
+            }
+    
+            // TODO check if the updates of those conditions is right
+            // if(/-/.test(lang) && !availableTranslations[lang]) {
+            if(/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
+                lang = lang.replace(/-.*$/, '');
+            }
+            // if(!availableTranslations[lang]) {
+            if(!("lang" in availableTranslations) || !availableTranslations[lang]) {
+                lang = this.config.get("fallbackLang");
+            }
+            // else if(availableTranslations[lang] !== true) {
+            else if(availableTranslations[lang] !== true) {
+                lang = availableTranslations[lang];
+            }
+            this.config("lang", lang);
+    
+            let localeTemplates = "templates-" + lang;
+            deps.splice(0, 0, localeTemplates);
+            function callback(session: TogetherJSNS.Session, jquery: JQuery) {
+                this._loaded = true;
+                if(!min) {
+                    this.require = require.config({ context: "togetherjs" });
+                    this._requireObject = require;
+                }
+            }
+            if(!min) {
+                if(typeof require == "function") {
+                    if(!require.config) {
+                        console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
+                        throw new Error("Conflict with window.require");
+                    }
+                    this.require = require.config(requireConfig);
+                }
+            }
+            if(typeof this.require == "function") {
+                // This is an already-configured version of require
+                this.require(deps, callback);
+            }
             else {
-                listener.pressed = false;
+                requireConfig.deps = deps;
+                requireConfig.callback = callback;
+                if(!min) {
+                    window.require = requireConfig;
+                }
+            }
+            if(min) {
+                addScript("/togetherjs/togetherjsPackage.js");
+            }
+            else {
+                addScript("/togetherjs/libs/require.js");
             }
         };
-        this.once("ready", this.removeShortcut);
-        document.addEventListener("keyup", listener, false);
-    };
-
-    removeShortcut() {
-        if(listener) {
+    
+        _extend(base: { [key: string]: unknown }, extensions?: any) {
+            if(!extensions) {
+                extensions = base;
+                base = {};
+            }
+            for(let a in extensions) {
+                if(extensions.hasOwnProperty(a)) {
+                    base[a] = extensions[a];
+                }
+            }
+            return base;
+        };
+    
+        _mixinEvents(cls: TogetherJSNS.On) {
+            // TODO this function is a way to make the cls arg inherit of the On features, its use should be reworked to use TS inheritance, so fat this implementation does nothing so FIX IT
+            return proto;
+        };
+    
+        _teardown() {
+            let requireObject = this._requireObject || window.require;
+            // FIXME: this doesn't clear the context for min-case
+            if(requireObject.s && requireObject.s.contexts) {
+                delete requireObject.s.contexts.togetherjs;
+            }
+            this._loaded = false;
+            this.startup = this._extend(this._startupInit);
+            this.running = false;
+        };
+    
+        toString() {
+            return "TogetherJS";
+        };
+    
+        reinitialize() {
+            if(this.running && typeof this.require == "function") {
+                this.require(["session"], function(session: TogetherJSNS.On) {
+                    session.emit("reinitialize");
+                });
+            }
+            // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
+        };
+    
+        getConfig(name: keyof TogetherJSNS.Config) { // rename into TogetherJS.config.get()?
+            let value = this._configuration[name];
+            if(value === undefined) {
+                if(!this._defaultConfiguration.hasOwnProperty(name)) {
+                    console.error("Tried to load unknown configuration value:", name);
+                }
+                value = this._defaultConfiguration[name];
+            }
+            return value;
+        }
+    
+        refreshUserData() {
+            if(this.running && typeof this.require == "function") {
+                this.require(["session"], function(session: TogetherJSNS.On) {
+                    session.emit("refresh-user-data");
+                });
+            }
+        };
+    
+        _onmessage(msg: TogetherJSNS.Message) {
+            let type = msg.type;
+            let type2: string = type;
+            if(type.search(/^app\./) === 0) {
+                type2 = type2.substr("app.".length);
+            }
+            else {
+                type2 = "togetherjs." + type2;
+            }
+            msg.type = type2;
+            this.hub.emit(msg.type, msg);
+        };
+    
+        send(msg: TogetherJSNS.Message) {
+            if(!this.require) {
+                throw "You cannot use TogetherJS.send() when TogetherJS is not running";
+            }
+            let session = this.require("session");
+            session.appSend(msg);
+        };
+    
+        shareUrl() {
+            if(!this.require) {
+                return null;
+            }
+            let session = this.require("session");
+            return session.shareUrl();
+        };
+    
+        listenForShortcut() {
+            console.warn("Listening for alt-T alt-T to start TogetherJS");
+            this.removeShortcut();
+            listener = function(event: KeyboardEvent) {
+                if(event.which == 84 && event.altKey) {
+                    if(listener.pressed) {
+                        // Second hit
+                        TogetherJS();
+                    }
+                    else {
+                        listener.pressed = true;
+                    }
+                }
+                else {
+                    listener.pressed = false;
+                }
+            } as any as TogetherJSNS.KeyboardListener;
+            this.once("ready", this.removeShortcut);
             document.addEventListener("keyup", listener, false);
-            listener = null;
-        }
-    };
-
-    checkForUsersOnChannel(address, callback) {
-        if(address.search(/^https?:/i) === 0) {
-            address = address.replace(/^http/i, 'ws');
-        }
-        let socket = new WebSocket(address);
-        let gotAnswer = false;
-        socket.onmessage = function(event) {
-            let msg = JSON.parse(event.data);
-            if(msg.type != "init-connection") {
-                console.warn("Got unexpected first message (should be init-connection):", msg);
-                return;
-            }
-            if(gotAnswer) {
-                console.warn("Somehow received two responses from channel; ignoring second");
-                socket.close();
-                return;
-            }
-            gotAnswer = true;
-            socket.close();
-            callback(msg.peerCount);
         };
-        socket.onclose = socket.onerror = function() {
-            if(!gotAnswer) {
-                console.warn("Socket was closed without receiving answer");
+    
+        removeShortcut() {
+            if(listener) {
+                document.addEventListener("keyup", listener, false);
+                listener = null;
+            }
+        };
+    
+        checkForUsersOnChannel(address: string, callback) {
+            if(address.search(/^https?:/i) === 0) {
+                address = address.replace(/^http/i, 'ws');
+            }
+            let socket = new WebSocket(address);
+            let gotAnswer = false;
+            socket.onmessage = function(event) {
+                let msg = JSON.parse(event.data) as TogetherJSNS.Message;
+                if(msg.type != "init-connection") {
+                    console.warn("Got unexpected first message (should be init-connection):", msg);
+                    return;
+                }
+                if(gotAnswer) {
+                    console.warn("Somehow received two responses from channel; ignoring second");
+                    socket.close();
+                    return;
+                }
                 gotAnswer = true;
-                callback(undefined);
-            }
+                socket.close();
+                callback(msg.peerCount);
+            };
+            socket.onclose = socket.onerror = function() {
+                if(!gotAnswer) {
+                    console.warn("Socket was closed without receiving answer");
+                    gotAnswer = true;
+                    callback(undefined);
+                }
+            };
         };
-    };
-}
-
-function baseUrl1() {
-    let baseUrl = "__baseUrl__";
-    if(baseUrl == "__" + "baseUrl__") {
-        // Reset the variable if it doesn't get substituted
-        baseUrl = "";
     }
-    // Allow override of baseUrl (this is done separately because it needs
-    // to be done very early)
-    if(window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
-        baseUrl = window.TogetherJSConfig.baseUrl;
+    
+    function baseUrl1() {
+        let baseUrl = "__baseUrl__";
+        if(baseUrl == "__" + "baseUrl__") {
+            // Reset the variable if it doesn't get substituted
+            baseUrl = "";
+        }
+        // Allow override of baseUrl (this is done separately because it needs
+        // to be done very early)
+        if(window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+            baseUrl = window.TogetherJSConfig.baseUrl;
+        }
+        if(window.TogetherJSConfig_baseUrl) {
+            baseUrl = window.TogetherJSConfig_baseUrl;
+        }
+        return baseUrl;
     }
-    if(window.TogetherJSConfig_baseUrl) {
-        baseUrl = window.TogetherJSConfig_baseUrl;
-    }
-    return baseUrl;
-}
-
-function togetherjsMain() {
-    let styleSheet = "/togetherjs/togetherjs.css";
 
     function addStyle() {
         var existing = document.getElementById("togetherjs-stylesheet");
@@ -706,10 +709,12 @@ function togetherjsMain() {
     }
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    let TogetherJS = new TogetherJSClass();
+    const tjsInstance = new TogetherJSClass();
+    let TogetherJS = () => { tjsInstance.start(); return tjsInstance; }
+    
     window["TogetherJS"] = TogetherJS;
 
-    TogetherJS.requireConfig = {
+    tjsInstance.requireConfig = {
         context: "togetherjs",
         baseUrl: baseUrl + "/togetherjs",
         urlArgs: "bust=" + cacheBust,
@@ -725,8 +730,6 @@ function togetherjsMain() {
 
     // !!!!!!!!!!!!!!!!!
 
-    TogetherJS._mixinEvents(TogetherJS);
-
 
     let defaultHubBase = "__hubUrl__";
     if(defaultHubBase == "__" + "hubUrl" + "__") {
@@ -738,7 +741,7 @@ function togetherjsMain() {
     // FIXME: there's a point at which configuration can't be updated (e.g., hubBase after the TogetherJS has loaded).  We should keep track of these and signal an error if someone attempts to reconfigure too late
 
 
-    TogetherJS._defaultConfiguration = defaultConfiguration;
+    tjsInstance._defaultConfiguration = defaultConfiguration;
 
     /* TogetherJS.config(configurationObject)
        or: TogetherJS.config(configName, value)
@@ -752,47 +755,36 @@ function togetherjsMain() {
     //Config !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-
-
-
     // This should contain the output of "git describe --always --dirty"
     // FIXME: substitute this on the server (and update make-static-client)
-    TogetherJS.version = version;
-    TogetherJS.baseUrl = baseUrl;
-
-    TogetherJS.hub = TogetherJS._mixinEvents({});
-
-
+    tjsInstance.version = version;
+    tjsInstance.baseUrl = baseUrl;
 
     let listener: TogetherJSNS.KeyboardListener | null = null;
 
-
-
-    TogetherJS.config.track("enableShortcut", function(enable: boolean, previous: unknown) {
+    tjsInstance.config.track("enableShortcut", function(enable: boolean, previous: unknown) {
         if(enable) {
-            TogetherJS.listenForShortcut();
+            tjsInstance.listenForShortcut();
         }
         else if(previous) {
-            TogetherJS.removeShortcut();
+            tjsInstance.removeShortcut();
         }
     });
-
-
 
     // It's nice to replace this early, before the load event fires, so we conflict
     // as little as possible with the app we are embedded in:
     let hash = location.hash.replace(/^#/, "");
     let m = /&?togetherjs=([^&]*)/.exec(hash);
     if(m) {
-        TogetherJS.startup._joinShareId = m[1];
-        TogetherJS.startup.reason = "joined";
+        tjsInstance.startup._joinShareId = m[1];
+        tjsInstance.startup.reason = "joined";
         let newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
         location.hash = newHash;
     }
     if(window._TogetherJSShareId) {
         // A weird hack for something the addon does, to force a shareId.
         // FIXME: probably should remove, it's a wonky feature.
-        TogetherJS.startup._joinShareId = window._TogetherJSShareId;
+        tjsInstance.startup._joinShareId = window._TogetherJSShareId;
         delete window._TogetherJSShareId;
     }
 
@@ -821,7 +813,7 @@ function togetherjsMain() {
     // FIXME: can we push this up before the load event?
     // Do we need to wait at all?
     function onload() {
-        if(TogetherJS.startup._joinShareId) {
+        if(tjsInstance.startup._joinShareId) {
             TogetherJS();
         }
         else if(window._TogetherJSBookmarklet) {
@@ -835,14 +827,14 @@ function togetherjsMain() {
             if(valueString) {
                 let value = JSON.parse(valueString) as TogetherJSNS.TogetherJS;
                 if(value && value.running) {
-                    TogetherJS.startup.continued = true;
-                    TogetherJS.startup.reason = value.startupReason;
+                    tjsInstance.startup.continued = true;
+                    tjsInstance.startup.reason = value.startupReason;
                     TogetherJS();
                 }
             }
             else if(window.TogetherJSConfig_autoStart ||
                 (window.TogetherJSConfig && window.TogetherJSConfig.autoStart)) {
-                TogetherJS.startup.reason = "joined";
+                tjsInstance.startup.reason = "joined";
                 TogetherJS();
             }
         }
@@ -852,7 +844,7 @@ function togetherjsMain() {
 
     // FIXME: wait until load event to double check if this gets set?
     if(window.TogetherJSConfig_enableShortcut) {
-        TogetherJS.listenForShortcut();
+        tjsInstance.listenForShortcut();
     }
 
     // For compatibility:

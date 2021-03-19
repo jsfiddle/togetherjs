@@ -11,7 +11,7 @@ class OnClass {
     _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
     _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
 
-    on<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -44,7 +44,7 @@ class OnClass {
         }
     }
 
-    once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+    once<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";

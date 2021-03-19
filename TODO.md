@@ -1,5 +1,6 @@
 - Switch to a better import system
 
+- remove types for tjs.d.ts and use classes
 - look at all usage of session.hub.on and set a message type for each event
     - same for session.on
     - same for session.send(
