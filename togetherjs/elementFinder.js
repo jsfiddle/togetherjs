@@ -270,6 +270,6 @@ var ElementFinder = /** @class */ (function () {
     };
     return ElementFinder;
 }());
-define(["util", "jquery"], function (_util) {
+define(["util", "jquery"], function (_util, $) {
     return new ElementFinder();
 });

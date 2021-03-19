@@ -8,7 +8,7 @@ interface LogItem {
     url: string,
 }
 
-function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage) {
+function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require) {
 
     var ALWAYS_REPLAY = {
         "cursor-update": true,
