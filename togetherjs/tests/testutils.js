@@ -167,7 +167,7 @@ Test.startTogetherJS = function () {
       def.resolve("TogetherJS started");
     });
     TogetherJS.startup._launch = true;
-    TogetherJS();
+    TogetherJS.start();
   });
 };
 

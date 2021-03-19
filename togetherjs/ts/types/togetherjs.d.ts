@@ -15,6 +15,7 @@ declare namespace TogetherJSNS {
     type Ui = ReturnType<typeof uiMain>;
     type Who = ReturnType<typeof whoMain>;
     type Console = ReturnType<typeof consoleMain>;
+    type TogetherJSClass = ReturnType<typeof togetherjsMain>;
     
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];

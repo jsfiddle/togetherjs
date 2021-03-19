@@ -3,6 +3,241 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+let globalTjs;
+
+function compatibilityFix(TogetherJS: any, tjsInstance: TogetherJSNS.TogetherJSClass) {
+    TogetherJS._mixinEvents = function(proto) {
+        proto.on = function on(name, callback) {
+            if(typeof callback != "function") {
+                console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+                throw "Error: .once() called with non-callback";
+            }
+            if(name.search(" ") != -1) {
+                var names = name.split(/ +/g);
+                names.forEach(function(n) {
+                    this.on(n, callback);
+                }, this);
+                return;
+            }
+            if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+                var thisString = "" + this;
+                if(thisString.length > 20) {
+                    thisString = thisString.substr(0, 20) + "...";
+                }
+                console.warn(thisString + ".on('" + name + "', ...): unknown event");
+                if(console.trace) {
+                    console.trace();
+                }
+            }
+            if(!this._listeners) {
+                this._listeners = {};
+            }
+            if(!this._listeners[name]) {
+                this._listeners[name] = [];
+            }
+            if(this._listeners[name].indexOf(callback) == -1) {
+                this._listeners[name].push(callback);
+            }
+        };
+        proto.once = function once(name, callback) {
+            if(typeof callback != "function") {
+                console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+                throw "Error: .once() called with non-callback";
+            }
+            var attr = "onceCallback_" + name;
+            // FIXME: maybe I should add the event name to the .once attribute:
+            if(!callback[attr]) {
+                callback[attr] = function onceCallback() {
+                    callback.apply(this, arguments);
+                    this.off(name, onceCallback);
+                    delete callback[attr];
+                };
+            }
+            this.on(name, callback[attr]);
+        };
+        proto.off = proto.removeListener = function off(name, callback) {
+            if(this._listenerOffs) {
+                // Defer the .off() call until the .emit() is done.
+                this._listenerOffs.push([name, callback]);
+                return;
+            }
+            if(name.search(" ") != -1) {
+                var names = name.split(/ +/g);
+                names.forEach(function(n) {
+                    this.off(n, callback);
+                }, this);
+                return;
+            }
+            if((!this._listeners) || !this._listeners[name]) {
+                return;
+            }
+            var l = this._listeners[name], _len = l.length;
+            for(var i = 0; i < _len; i++) {
+                if(l[i] == callback) {
+                    l.splice(i, 1);
+                    break;
+                }
+            }
+        };
+        proto.emit = function emit(name) {
+            var offs = this._listenerOffs = [];
+            if((!this._listeners) || !this._listeners[name]) {
+                return;
+            }
+            var args = Array.prototype.slice.call(arguments, 1);
+            var l = this._listeners[name];
+            l.forEach(function(callback) {
+
+                callback.apply(this, args);
+            }, this);
+            delete this._listenerOffs;
+            if(offs.length) {
+                offs.forEach(function(item) {
+                    this.off(item[0], item[1]);
+                }, this);
+            }
+
+        };
+        return proto;
+    }
+}
+
+class OnClass {
+    _knownEvents?: string[];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
+
+    on<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach(function(this: OnClass, n) {
+                this.on(n, callback);
+            }, this);
+            return;
+        }
+        if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+            let thisString = "" + this;
+            if(thisString.length > 20) {
+                thisString = thisString.substr(0, 20) + "...";
+            }
+            console.warn(thisString + ".on('" + name + "', ...): unknown event");
+            if(console.trace) {
+                console.trace();
+            }
+        }
+        if(!this._listeners) {
+            this._listeners = {};
+        }
+        if(!this._listeners[name]) {
+            this._listeners[name] = [];
+        }
+        if(this._listeners[name].indexOf(callback) == -1) {
+            this._listeners[name].push(callback);
+        }
+    }
+
+    once<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+        if(typeof callback != "function") {
+            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+            throw "Error: .once() called with non-callback";
+        }
+        let attr = "onceCallback_" + name;
+        // FIXME: maybe I should add the event name to the .once attribute:
+        if(!callback[attr]) {
+            callback[attr] = function onceCallback(this: OnClass, msg: TogetherJSNS.Message & T) {
+                callback.apply(this, arguments);
+                this.off(name, onceCallback);
+                delete callback[attr];
+            };
+        }
+        this.on(name, callback[attr]);
+    }
+
+    off<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+        if(this._listenerOffs) {
+            // Defer the .off() call until the .emit() is done.
+            this._listenerOffs.push([name, callback]);
+            return;
+        }
+        if(name.search(" ") != -1) {
+            let names = name.split(/ +/g);
+            names.forEach(function(this: OnClass, n) {
+                this.off(n, callback);
+            }, this);
+            return;
+        }
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        let l = this._listeners[name], _len = l.length;
+        for(let i = 0; i < _len; i++) {
+            if(l[i] == callback) {
+                l.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    removeListener2<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
+        this.off(arguments);
+    }
+
+    removeListener = this.off.bind(this);
+
+    emit(name: string, ...args2: unknown[]) {
+        let offs = this._listenerOffs = [];
+        if((!this._listeners) || !this._listeners[name]) {
+            return;
+        }
+        var args = Array.prototype.slice.call(arguments, 1);
+        let l = this._listeners[name];
+        l.forEach(function(this: OnClass, callback) {
+            callback.apply(this, args);
+        }, this);
+        delete this._listenerOffs;
+        if(offs.length) {
+            offs.forEach(function(this: OnClass, item) {
+                this.off(item[0], item[1]);
+            }, this);
+        }
+
+    }
+}
+
+function baseUrl1() {
+    let baseUrl = "__baseUrl__";
+    if(baseUrl == "__" + "baseUrl__") {
+        // Reset the variable if it doesn't get substituted
+        baseUrl = "";
+    }
+    // Allow override of baseUrl (this is done separately because it needs
+    // to be done very early)
+    if(window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+        baseUrl = window.TogetherJSConfig.baseUrl;
+    }
+    if(window.TogetherJSConfig_baseUrl) {
+        baseUrl = window.TogetherJSConfig_baseUrl;
+    }
+    return baseUrl;
+}
+
+// True if this file should use minimized sub-resources:
+//@ts-expect-error _min_ is replaced in packaging so comparison always looks false in code
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+
+const baseUrl = baseUrl1();
+const cacheBust = Date.now() + "";
+
+function addScript(url: string) {
+    var script = document.createElement("script");
+    script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
+    document.head.appendChild(script);
+}
+
 function togetherjsMain() {
     let styleSheet = "/togetherjs/togetherjs.css";
 
@@ -20,7 +255,7 @@ function togetherjsMain() {
             }
         });
     }
-    
+
     const defaultStartupInit: TogetherJSNS.StartupInit = {
         // What element, if any, was used to start the session:
         button: null,
@@ -40,7 +275,7 @@ function togetherjsMain() {
         // for session.start() to be run)
         _launch: false
     }
-    
+
     const defaultConfiguration: TogetherJSNS.Config = {
         dontShowClicks: false,
         cloneClicks: false,
@@ -71,7 +306,7 @@ function togetherjsMain() {
         lang: undefined,
         fallbackLang: "en-US"
     };
-    
+
     const defaultConfiguration2: Partial<TogetherJSNS.Config> = {
         dontShowClicks: false,
         cloneClicks: false,
@@ -96,10 +331,10 @@ function togetherjsMain() {
         includeHashInUrl: false,
         lang: null
     };
-    
+
     class ConfigClass {
         constructor(public tjsInstance: TogetherJSClass) { }
-        
+
         call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) { // TODO any
             let settings: Partial<TogetherJSNS.Config>;
             if(maybeValue === undefined) {
@@ -134,7 +369,7 @@ function togetherjsMain() {
                 let previous = this.tjsInstance._configuration[attr];
                 let value = settings[attr];
                 this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
-                let trackers = this.tjsInstance._configTrackers[name]!;
+                let trackers = this.tjsInstance._configTrackers[name] || [];
                 let failed = false;
                 for(let i = 0; i < trackers.length; i++) {
                     try {
@@ -161,7 +396,7 @@ function togetherjsMain() {
                 }
             }
         }
-    
+
         get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
             let value = this.tjsInstance._configuration[name];
             if(value === undefined) {
@@ -172,7 +407,7 @@ function togetherjsMain() {
             }
             return value;
         }
-    
+
         track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) { // TODO unknown
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
                 throw new Error("Configuration is unknown: " + name);
@@ -187,7 +422,7 @@ function togetherjsMain() {
             let a = this.tjsInstance._configTrackers["hubBase"];
             return callback;
         }
-    
+
         close<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
                 throw new Error("Configuration is unknown: " + name);
@@ -196,7 +431,7 @@ function togetherjsMain() {
             return this.get(name);
         }
     }
-    
+
     // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
     function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
         let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
@@ -205,17 +440,15 @@ function togetherjsMain() {
         config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
         return config;
     }
-    
+
     class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
         public running: boolean = false;
-        private require: Require;
+        public require: Require;
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         private hub: TogetherJSNS.Hub = new OnClass();
         public requireConfig: RequireConfig;
         private _loaded: boolean;
-        private _extend(conf: RequireConfig): RequireConfig;
-        private _extend(base: unknown, extensions: unknown): unknown;
         private _requireObject: Require;
         private pageLoaded: number = Date.now();
         private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
@@ -223,27 +456,26 @@ function togetherjsMain() {
         public _configuration: Partial<TogetherJSNS.Config> = {};
         public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
-        public readonly _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[]}> = {};
-        public _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean} = {};
+        public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
+        public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
         private version: string;
         private baseUrl: string;
-    
+
         constructor() {
             super();
+            this._knownEvents = ["ready", "close"];
+            this.config = createConfigFunObj(this.configObject);
+            this.startup.button = null;
         }
 
         start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
-            this._knownEvents = ["ready", "close"];
-    
-            this.config = createConfigFunObj(this.configObject);
-    
             let session;
             if(this.running) {
                 session = this.require("session");
                 session.close();
                 return;
             }
-            this.startup.button = null;
+
             try {
                 if(event && typeof event == "object") {
                     if("target" in event && event.target && typeof event) {
@@ -275,7 +507,7 @@ function togetherjsMain() {
                 this.config(window.TogetherJSConfig);
                 window.TogetherJSConfig.loaded = true;
             }
-    
+
             // This handles loading configuration from global variables.  This
             // includes TogetherJSConfig_on_*, which are attributes folded into
             // the "on" configuration value.
@@ -301,8 +533,6 @@ function togetherjsMain() {
                     console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
                     this.config(attrName, window[attr]);
                 }
-    
-    
             }
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
@@ -330,12 +560,12 @@ function togetherjsMain() {
                 cacheBust = '';
                 delete this.requireConfig.urlArgs;
             }
-    
+
             if(!this.startup.reason) {
                 // Then a call to TogetherJS() from a button must be started TogetherJS
                 this.startup.reason = "started";
             }
-    
+
             // FIXME: maybe I should just test for this.require:
             if(this._loaded) {
                 session = this.require("session");
@@ -346,7 +576,7 @@ function togetherjsMain() {
             // A sort of signal to session.js to tell it to actually
             // start itself (i.e., put up a UI and try to activate)
             this.startup._launch = true;
-    
+
             addStyle();
             let minSetting = this.config.get("useMinimizedCode");
             this.config.close("useMinimizedCode");
@@ -369,12 +599,12 @@ function togetherjsMain() {
                 "de-DE": true,
                 "de": "de-DE"
             };
-    
+
             if(!lang) {
                 // BCP 47 mandates hyphens, not underscores, to separate lang parts
                 lang = navigator.language.replace(/_/g, "-");
             }
-    
+
             // TODO check if the updates of those conditions is right
             // if(/-/.test(lang) && !availableTranslations[lang]) {
             if(/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
@@ -389,7 +619,7 @@ function togetherjsMain() {
                 lang = availableTranslations[lang];
             }
             this.config("lang", lang);
-    
+
             let localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
             function callback(session: TogetherJSNS.Session, jquery: JQuery) {
@@ -420,13 +650,13 @@ function togetherjsMain() {
                 }
             }
             if(min) {
-                addScript("/togetherjs/togetherjsPackage.js");
+                addScriptInner("/togetherjs/togetherjsPackage.js");
             }
             else {
-                addScript("/togetherjs/libs/require.js");
+                addScriptInner("/togetherjs/libs/require.js");
             }
-        };
-    
+        }
+
         _extend(base: { [key: string]: unknown }, extensions?: any) {
             if(!extensions) {
                 extensions = base;
@@ -438,13 +668,13 @@ function togetherjsMain() {
                 }
             }
             return base;
-        };
-    
+        }
+
         _mixinEvents(cls: TogetherJSNS.On) {
             // TODO this function is a way to make the cls arg inherit of the On features, its use should be reworked to use TS inheritance, so fat this implementation does nothing so FIX IT
             return proto;
-        };
-    
+        }
+
         _teardown() {
             let requireObject = this._requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
@@ -454,12 +684,12 @@ function togetherjsMain() {
             this._loaded = false;
             this.startup = this._extend(this._startupInit);
             this.running = false;
-        };
-    
+        }
+
         toString() {
             return "TogetherJS";
-        };
-    
+        }
+
         reinitialize() {
             if(this.running && typeof this.require == "function") {
                 this.require(["session"], function(session: TogetherJSNS.On) {
@@ -467,8 +697,8 @@ function togetherjsMain() {
                 });
             }
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
-        };
-    
+        }
+
         getConfig(name: keyof TogetherJSNS.Config) { // rename into TogetherJS.config.get()?
             let value = this._configuration[name];
             if(value === undefined) {
@@ -479,15 +709,15 @@ function togetherjsMain() {
             }
             return value;
         }
-    
+
         refreshUserData() {
             if(this.running && typeof this.require == "function") {
                 this.require(["session"], function(session: TogetherJSNS.On) {
                     session.emit("refresh-user-data");
                 });
             }
-        };
-    
+        }
+
         _onmessage(msg: TogetherJSNS.Message) {
             let type = msg.type;
             let type2: string = type;
@@ -499,24 +729,24 @@ function togetherjsMain() {
             }
             msg.type = type2;
             this.hub.emit(msg.type, msg);
-        };
-    
+        }
+
         send(msg: TogetherJSNS.Message) {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
             let session = this.require("session");
             session.appSend(msg);
-        };
-    
+        }
+
         shareUrl() {
             if(!this.require) {
                 return null;
             }
             let session = this.require("session");
             return session.shareUrl();
-        };
-    
+        }
+
         listenForShortcut() {
             console.warn("Listening for alt-T alt-T to start TogetherJS");
             this.removeShortcut();
@@ -524,7 +754,7 @@ function togetherjsMain() {
                 if(event.which == 84 && event.altKey) {
                     if(listener.pressed) {
                         // Second hit
-                        TogetherJS();
+                        TogetherJS.start();
                     }
                     else {
                         listener.pressed = true;
@@ -536,15 +766,15 @@ function togetherjsMain() {
             } as any as TogetherJSNS.KeyboardListener;
             this.once("ready", this.removeShortcut);
             document.addEventListener("keyup", listener, false);
-        };
-    
+        }
+
         removeShortcut() {
             if(listener) {
                 document.addEventListener("keyup", listener, false);
                 listener = null;
             }
-        };
-    
+        }
+
         checkForUsersOnChannel(address: string, callback) {
             if(address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
@@ -573,10 +803,10 @@ function togetherjsMain() {
                     callback(undefined);
                 }
             };
-        };
+        }
     }
-    
-    function baseUrl1() {
+
+    function baseUrl1Inner() {
         let baseUrl = "__baseUrl__";
         if(baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
@@ -605,19 +835,14 @@ function togetherjsMain() {
         }
     }
 
-    function addScript(url: string) {
+    function addScriptInner(url: string) {
         var script = document.createElement("script");
-        script.src = baseUrl + url +
-            (cacheBust ? ("?bust=" + cacheBust) : '');
+        script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
 
-    let baseUrl = baseUrl1();
+    let baseUrl = baseUrl1Inner();
     defaultConfiguration.baseUrl = baseUrl;
-
-    // True if this file should use minimized sub-resources:
-    //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in code
-    let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
     let baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride: TogetherJSNS.BaseUrlOverride | null;
@@ -709,9 +934,11 @@ function togetherjsMain() {
     }
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    const tjsInstance = new TogetherJSClass();
-    let TogetherJS = () => { tjsInstance.start(); return tjsInstance; }
-    
+    const tjsInstance = globalTjs = new TogetherJSClass();
+    const TogetherJS = tjsInstance;//() => { tjsInstance.start(); return tjsInstance; }
+
+    compatibilityFix(TogetherJS, tjsInstance);
+
     window["TogetherJS"] = TogetherJS;
 
     tjsInstance.requireConfig = {
@@ -814,11 +1041,11 @@ function togetherjsMain() {
     // Do we need to wait at all?
     function onload() {
         if(tjsInstance.startup._joinShareId) {
-            TogetherJS();
+            TogetherJS.start();
         }
         else if(window._TogetherJSBookmarklet) {
             delete window._TogetherJSBookmarklet;
-            TogetherJS();
+            TogetherJS.start();
         }
         else {
             // FIXME: this doesn't respect storagePrefix:
@@ -829,13 +1056,13 @@ function togetherjsMain() {
                 if(value && value.running) {
                     tjsInstance.startup.continued = true;
                     tjsInstance.startup.reason = value.startupReason;
-                    TogetherJS();
+                    TogetherJS.start();
                 }
             }
             else if(window.TogetherJSConfig_autoStart ||
                 (window.TogetherJSConfig && window.TogetherJSConfig.autoStart)) {
                 tjsInstance.startup.reason = "joined";
-                TogetherJS();
+                TogetherJS.start();
             }
         }
     }
@@ -849,7 +1076,8 @@ function togetherjsMain() {
 
     // For compatibility:
     window.TowTruck = TogetherJS;
-
+    return tjsInstance;
 }
 
-togetherjsMain();
+globalTjs = togetherjsMain();
+
