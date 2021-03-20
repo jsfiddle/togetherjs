@@ -79,6 +79,14 @@ declare namespace TogetherJSNS {
         }
     }
 
+    namespace SessionSend {
+        interface Chat {
+            type: "chat",
+            text: message,
+            messageId: messageId
+        }
+    }
+
     type Channels = ReturnType<typeof channelsMain>;
     type Storage = ReturnType<typeof StorageMain>;
     type Session = ReturnType<typeof sessionMain>;

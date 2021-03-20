@@ -18,6 +18,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 function formsMain($, util, session, elementFinder, eventMaker, templating, ot) {
+    // TODO this is apparently an empty module object
     var forms = util.Module("forms");
     var assert = util.assert;
     // This is how much larger the focus element is than the element it surrounds

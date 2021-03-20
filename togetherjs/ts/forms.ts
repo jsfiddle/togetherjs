@@ -6,6 +6,7 @@ declare var CKEDITOR: TogetherJSNS.CKEditor | undefined;
 declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
 function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
+    // TODO this is apparently an empty module object
     var forms = util.Module("forms");
     const assert: typeof util.assert = util.assert;
 

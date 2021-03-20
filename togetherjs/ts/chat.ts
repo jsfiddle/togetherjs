@@ -32,7 +32,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
         });
     });
 
-    chat.submit = function(message) {
+    chat.submit = function(message: string) {
         var parts = message.split(/ /);
         if(parts[0].charAt(0) == "/") {
             var name = parts[0].substr(1).toLowerCase();
