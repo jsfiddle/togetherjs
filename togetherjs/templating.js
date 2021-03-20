@@ -18,7 +18,6 @@ function templatingMain($, util, peers, windowing, session) {
             return template;
         };
         Templating.prototype.sub = function (templateId, variables) {
-            if (variables === void 0) { variables = {}; }
             var template = this.clone(templateId);
             util.forEachAttr(variables, function (value, attr) {
                 // FIXME: do the substitution... somehow?

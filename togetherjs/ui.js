@@ -953,7 +953,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 return false;
             });
             COLORS.forEach(function (color) {
-                var el = templating.sub("swatch");
+                var el = templating.sub("swatch", {});
                 el.attr("data-color", color);
                 var darkened = tinycolor.darken(color);
                 el.css({

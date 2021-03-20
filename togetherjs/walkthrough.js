@@ -17,7 +17,7 @@ function walkthroughMain(util, ui, $, windowing, templates, templating, session,
             slides.hide();
             var progress = $("#togetherjs-walkthrough-progress");
             slides.each(function (index) {
-                var bullet = templating.sub("walkthrough-slide-progress");
+                var bullet = templating.sub("walkthrough-slide-progress", {});
                 progress.append(bullet);
                 bullet.click(function () {
                     show(index);

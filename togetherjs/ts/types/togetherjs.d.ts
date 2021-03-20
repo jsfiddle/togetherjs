@@ -24,10 +24,10 @@ declare namespace TogetherJSNS {
         }
 
         /** "swatch" */
-        type Swatch = never;
+        type Swatch = {};
 
         /** "walkthrough-slide-progress" */
-        type WalkthroughSlideProgress = never;
+        type WalkthroughSlideProgress = {};
         
         /** "focus" */
         interface Focus {

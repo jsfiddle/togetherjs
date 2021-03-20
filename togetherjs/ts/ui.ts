@@ -1021,7 +1021,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             });
 
             COLORS.forEach(function(color) {
-                var el = templating.sub("swatch");
+                var el = templating.sub("swatch", {});
                 el.attr("data-color", color);
                 var darkened = tinycolor.darken(color);
                 el.css({

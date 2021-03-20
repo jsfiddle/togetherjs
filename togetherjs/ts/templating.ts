@@ -20,19 +20,7 @@ function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, 
             return template;
         }
 
-        sub(templateId: "focus", variables: TogetherJSNS.TemplatingSub.Focus): JQuery;
-        sub(templateId: "chat-message", variables: TogetherJSNS.TemplatingSub.ChatMessage): JQuery;
-        sub(templateId: "chat-joined", variables: TogetherJSNS.TemplatingSub.ChatJoined): JQuery;
-        sub(templateId: "chat-left", variables: TogetherJSNS.TemplatingSub.ChatLeft): JQuery;
-        sub(templateId: "chat-system", variables: TogetherJSNS.TemplatingSub.ChatSystem): JQuery;
-        sub(templateId: "url-change", variables: TogetherJSNS.TemplatingSub.UrlChange): JQuery;
-        sub(templateId: "invite", variables: TogetherJSNS.TemplatingSub.Invite): JQuery;
-        sub(templateId: "dock-person", variables: TogetherJSNS.TemplatingSub.DockPerson): JQuery;
-        sub(templateId: "participant-window", variables: TogetherJSNS.TemplatingSub.ParticipantWindow): JQuery;
-        sub(templateId: "swatch"): JQuery;
-        sub(templateId: "walkthrough-slide-progress"): JQuery;
-        sub(templateId: "invite-user-item", variables: TogetherJSNS.TemplatingSub.InviteUserItem): JQuery;
-        sub(templateId: TogetherJSNS.TemplatingSub.TemplateId, variables: Partial<TogetherJSNS.TemplatingSub.All> = {}) {
+        sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]) {
             let template = this.clone(templateId);
             util.forEachAttr(variables, function(value, attr) {
                 // FIXME: do the substitution... somehow?
