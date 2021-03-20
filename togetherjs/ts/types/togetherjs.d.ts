@@ -2,12 +2,6 @@ declare namespace TogetherJSNS {
 
     /** Types for Templating.sub */
     namespace TemplatingSub {
-        type Any = Focus | ChatMessage | ChatJoined | ChatLeft | ChatSystem | UrlChange | Invite | DockPerson | ParticipantWindow | InviteUserItem;
-
-        type All = Focus & ChatMessage & ChatJoined & ChatLeft & ChatSystem & UrlChange & Invite & DockPerson & ParticipantWindow & InviteUserItem;
-
-        type TemplateId = keyof Map;
-
         interface Map {
             "swatch": Swatch,
             "walkthrough-slide-progress": WalkthroughSlideProgress,
@@ -95,10 +89,6 @@ declare namespace TogetherJSNS {
     }
 
     namespace SessionSend {
-        type Any = Chat | GetLogs | CursorClick | Keydown | ForFocus | PingBack | PeerUpdate | VideoEventName | RTCIceCandidate | RTCOffer | RTCAnswer | RTCAbort | PlayerStateChange | SynchronizeVideosOfLateGuest;
-
-        type Types = "chat" | "get-logs" | "cursor-click" | "keydown" | "form-focus" | "ping-back" | "peer-update" | "video-something" | "rtc-ice-candidate" | "rtc-offer" | "rtc-answer" | "rtc-abort" | "playerStateChange" | "synchronizeVideosOfLateGuest";
-
         interface Map {
             "chat": Chat,
             "get-logs": GetLogs,
@@ -201,8 +191,6 @@ declare namespace TogetherJSNS {
         interface WithClientId {
             clientId: string;
         }
-
-        type Any = Route | Who | Invite;
 
         interface Map {
             "route": Route,
@@ -372,7 +360,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: TogetherJSNS.SessionSend.Types[] | true,
+        ignoreMessages: keyof TogetherJSNS.SessionSend.Map[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
