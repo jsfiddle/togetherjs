@@ -92,7 +92,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             this.add(el, attrs.peer.className("join-message-"), 4000);
         };
         Chat.prototype.system = function (attrs) {
-            assert(!attrs.peer);
+            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a pee field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-system", {

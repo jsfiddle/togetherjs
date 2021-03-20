@@ -8,7 +8,7 @@
     - X same for templating.sub
     - same for emit
         - check all TODO emit error (only 2 remaining that will be solved later)
-    - same for ui.chat.system
+    - X same for ui.chat.system
 - remove JQuery
 
 - maybe I should convert the libs? Like walkabout?

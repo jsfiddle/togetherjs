@@ -110,8 +110,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        system(attrs: ChatTextAttributes) {
-            assert(!attrs.peer);
+        system(attrs: {text: string, date?: number}) {
+            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a pee field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-system", {
