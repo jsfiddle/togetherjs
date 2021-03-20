@@ -111,7 +111,7 @@ function channelsMain(util: Util) {
                 if(this.onmessage) {
                     this.onmessage(data);
                 }
-                this.emit("message", data); // TODO emit error
+                this.emit("message", data);
             }
         }
 

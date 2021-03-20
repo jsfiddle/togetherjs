@@ -250,7 +250,8 @@ declare namespace TogetherJSNS {
         "close": () => void;
 
         // channel.on
-        "message": (msg: MessageFromChannel) => void;
+        /** msg can be of type string if rawData is activated */
+        "message": (msg: MessageFromChannel | string) => void;
 
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
