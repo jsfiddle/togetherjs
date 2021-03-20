@@ -96,7 +96,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly urlHash: string;
 
         public static peers: {[id: string]: PeerClass} = {};
-        public scrollPosition;
+        public scrollPosition: TogetherJSNS.ElementFinder.Position;
 
         constructor(id: string, attrs: Partial<PeerClassAttributes> = {}) {
             assert(id);
@@ -590,7 +590,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         peer.bye();
     });
 
-    var checkActivityTask = null;
+    var checkActivityTask: number | null = null;
 
     session.on("start", function() {
         if(checkActivityTask) {

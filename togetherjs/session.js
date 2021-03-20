@@ -274,7 +274,7 @@ function sessionMain(require, util, channels, $, storage) {
             processFirstHello(msg);
         }
     });
-    session.hub.on("who", function (msg) {
+    session.hub.on("who", function () {
         sendHello(true);
     });
     function processFirstHello(msg) {

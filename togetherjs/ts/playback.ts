@@ -154,6 +154,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
     }
 
     class Playback {
+        LogsExport = Logs; // TODO ugly export;
         getLogs(url: string) {
             if(url.search(/^local:/) === 0) {
                 return $.Deferred(function(def) {

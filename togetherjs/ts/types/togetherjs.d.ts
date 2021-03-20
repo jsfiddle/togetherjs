@@ -22,7 +22,7 @@ declare namespace TogetherJSNS {
 
         /** "walkthrough-slide-progress" */
         type WalkthroughSlideProgress = {};
-        
+
         /** "focus" */
         interface Focus {
             peer: TogetherJSNS.PeerClass
@@ -97,7 +97,7 @@ declare namespace TogetherJSNS {
             "form-focus": ForFocus,
             "ping-back": PingBack,
             "peer-update": PeerUpdate,
-            "video-something": VideoEventName,
+            "video-something": VideoEventName, // TODO something can be any video event, try to list them with string lits
             "rtc-ice-candidate": RTCIceCandidate,
             "rtc-offer": RTCOffer,
             "rtc-answer": RTCAnswer,
@@ -112,7 +112,7 @@ declare namespace TogetherJSNS {
             messageId: string
         }
 
-        interface GetLogs {
+        interface saveAs {
             type: "get-logs",
             forClient: string,
             saveAs: string
@@ -128,7 +128,7 @@ declare namespace TogetherJSNS {
         interface Keydown {
             type: "keydown"
         }
-        
+
         interface ForFocus {
             type: "form-focus",
             element: string | null
@@ -137,11 +137,11 @@ declare namespace TogetherJSNS {
         interface PingBack {
             type: "ping-back"
         }
-        
+
         interface PeerUpdate {
             type: "peer-update"
         }
-        
+
         interface VideoEventName {
             type: "video-something", // TODO string lit
             location: string,
@@ -220,33 +220,51 @@ declare namespace TogetherJSNS {
     }
 
     interface OnMap {
+        // channel.on & session.on
+        "close": () => void;
+
         // channel.on
         "message": (msg: MessageFromChannel) => void;
-        "close": () => void;
 
         // session.hub.on
-        "chat";
-        "bye": (msg: {clientId: string}) => void;
-        "logs";
-        "cursor-update";
-        "scroll-update": (msg: {peer: PeerClass, position}) => void;
-        "hello-back hello": (msg: {type: "hello", scrollPosition, sameUrl, peer: PeerClass}) => void;
-        "hello": (msg: {sameUrl: boolean}) => void;
-        "cursor-click": (msg: {sameUrl: boolean, clientId: string, element, offsetY: number, offsetX: number}) => void;
-        "keydown": (msg: {clientId: string}) => void;
-        "form-update": (msg: {sameUrl: boolean, element, tracker, replace: Change2}) => void
-        "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: {element: string, value: string, tracker: string, basis: number}[] }) => void;
-        "form-focus": (msg: {sameUrl: boolean, peer: PeerClass, element: string}) => void;
+        "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
+        "bye": (msg: { clientId: string }) => void;
+        "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: Logs }) => void; // TODO parameter similar to GetLogs
+        // TODO logs may be of type Logs[], we shoud check
+        "cursor-update": (msg: { sameUrl: boolean, clientId: string }) => void;
+        "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
+        "hello-back hello": (msg: { type: "hello", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
+        "hello": (msg: { sameUrl: boolean }) => void;
+        "cursor-click": (msg: { sameUrl: boolean, clientId: string, element: string, offsetY: number, offsetX: number }) => void;
+        "keydown": (msg: { clientId: string }) => void;
+        "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2 }) => void
+        "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
+        "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
+        "idle-status": (msg: { idle: boolean }) => void;
+        "ping": () => void;
+        "hello hello-back": (msg: { type: keyof OnMap, isClient: boolean }) => void;
+        "who": () => void;
+        "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string) => void;
+        "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
+        "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
+        "synchronizeVideosOfLateGuest": (msg: { element: string, videoId: string, playerTime: number }) => void;
+        "differentVideoLoaded": (msg: { videoId: string }) => void;
 
         // session.on
-        "close": () => void;
-        "prepare-hello";
+        "prepare-hello": (msg: {scrollPosition: ElementFinder.Position}) => void;
         "ui-ready": () => void;
         "reinitialize": () => void;
         "follow-peer": (peer: PeerClass) => void;
         "start": () => void;
         "refresh-user-data": (peer: PeerClass) => void;
-        
+        "visibility-change": (hidden: boolean) => void;
+        "hide-window": (window: JQuery[]) => void; // TODO check type of window
+        "shareId": () => void;
+        "display-window": (id: string, element: JQuery) => void
+        "resize": () => void;
+        "new-element": (element: JQuery) => void;
+        "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
+        "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
 
         // peers.on
         "new-peer identity-updated status-updated": (peer: PeerClass) => void;
@@ -272,10 +290,12 @@ declare namespace TogetherJSNS {
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
     type Walkabout = unknown;
     type UtilAlias = Util;
-    
+    type PeerView = ReturnType<Ui["PeerView"]>;
+
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
-    
+    type Logs = Playback["LogsExport"];
+
 
     type ValueOf<T> = T[keyof T];
 
@@ -306,8 +326,8 @@ declare namespace TogetherJSNS {
         _teardown: unknown,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,
-        _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: unknown[]}>;
-        _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean};
+        _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: unknown[] }>;
+        _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean };
         version: string;
         baseUrl: string;
         _onmessage(msg: TogetherJSNS.Message): void;
@@ -371,7 +391,7 @@ declare namespace TogetherJSNS {
         /** Any events to bind to */
         on: {},
         /** Hub events to bind to */
-        hub_on: {[name: string]: CallbackForOn<unknown>},
+        hub_on: { [name: string]: CallbackForOn<unknown> },
         /** Enables the alt-T alt-T TogetherJS shortcut; however, this setting must be enabled early as TogetherJSConfig_enableShortcut = true; */
         enableShortcut: boolean,
         /** The name of this tool as provided to users.  The UI is updated to use this. Because of how it is used in text it should be a proper noun, e.g., "MySite's Collaboration Tool" */
@@ -508,7 +528,7 @@ declare namespace TogetherJSNS {
         removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
         emit(eventName: string, msg?: unknown): void;
         _knownEvents?: string[];
-        _listeners: {[name: string]: CallbackForOnce<any>[]}; // TODO any
+        _listeners: { [name: string]: CallbackForOnce<any>[] }; // TODO any
         _listenerOffs?: [string, CallbackForOnce<any>][];
     }
 
@@ -537,7 +557,7 @@ declare namespace TogetherJSNS {
     }
 
     interface CKEditor {
-        dom : {
+        dom: {
             element;
         }
     }
@@ -551,7 +571,7 @@ declare namespace TogetherJSNS.Util {
     type Prototype = Methods;
 
     interface WithMethods {
-        classMethods?: {[methodName: string]: (...args: any[]) => any}
+        classMethods?: { [methodName: string]: (...args: any[]) => any }
     }
 
     interface WithPrototype {
@@ -564,7 +584,7 @@ declare namespace TogetherJSNS.Util {
 
     type ClassObject = object & WithPrototype & CustomClass & Methods;
 
-    
+
     interface Methods {
         //constructor: (...args: any[]) => any,
         //[methodName: string]: (...args: any[]) => any,
@@ -594,7 +614,7 @@ interface Window {
     TogetherJSConfig_autoStart?: boolean;
     TogetherJSConfig_enableShortcut?: boolean;
     TowTruck: TogetherJSNS.TogetherJS;
-    TogetherJSTestSpy?: {[k: string]: unknown};
+    TogetherJSTestSpy?: { [k: string]: unknown };
     _gaq?: [string, string?][];
     onYouTubeIframeAPIReady?: unknown;
 }

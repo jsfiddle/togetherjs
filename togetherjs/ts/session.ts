@@ -282,7 +282,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         }
     });
 
-    session.hub.on("who", function(msg) {
+    session.hub.on("who", function() {
         sendHello(true);
     });
 

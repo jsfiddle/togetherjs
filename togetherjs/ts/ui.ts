@@ -1035,7 +1035,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 windowing.toggle("#togetherjs-chat");
             });
 
-            session.on("display-window", function(id, element) {
+            session.on("display-window", function(id: string, element: JQuery) {
                 if(id == "togetherjs-chat") {
                     if(!$.browser.mobile) {
                         $("#togetherjs-chat-input").focus();

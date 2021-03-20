@@ -140,6 +140,7 @@ function playbackMain($, _util, session, storage, require) {
     }());
     var Playback = /** @class */ (function () {
         function Playback() {
+            this.LogsExport = Logs; // TODO ugly export;
         }
         Playback.prototype.getLogs = function (url) {
             if (url.search(/^local:/) === 0) {

@@ -237,7 +237,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 forClient: session.clientId,
                 saveAs: name
             });
-            function save(msg) {
+            function save(msg: { request: { forClient: string | undefined, saveAs: string }, logs: TogetherJSNS.Logs }) {
                 if(msg.request.forClient == session.clientId && msg.request.saveAs == name) {
                     storage.set("recording." + name, msg.logs).then(function() {
                         session.hub.off("logs", save);
