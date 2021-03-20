@@ -7,7 +7,7 @@
     - X same for calls to .off
     - X same for templating.sub
     - same for emit
-        check all TODO emit error
+        - check all TODO emit error (only 2 remaining that will be solved later)
     - same for ui.chat.system
 - remove JQuery
 
