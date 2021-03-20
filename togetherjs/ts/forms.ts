@@ -856,7 +856,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     });
 
-    function createFocusElement(peer: TogetherJSNS.Peer, around: JQuery) {
+    function createFocusElement(peer: TogetherJSNS.PeerClass, around: JQuery) {
         around = $(around);
         var aroundOffset = around.offset();
         if(!aroundOffset) {

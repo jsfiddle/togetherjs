@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templating, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
+function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
     var assert = util.assert;
     var walkthrough = util.Module("walkthrough");
     var onHideAll = null;

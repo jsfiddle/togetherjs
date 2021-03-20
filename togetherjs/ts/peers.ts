@@ -84,7 +84,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly name: string | null;
         public readonly avatar: string | null;
         public readonly color: string;
-        private view;
+        public readonly view;
         private lastMessageDate: number = 0;
         public readonly following: boolean;
 

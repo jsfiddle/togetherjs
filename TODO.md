@@ -5,6 +5,7 @@
     - same for session.on
     - same for session.send(
     - same for calls to .off
+    - same for templating.sub
 - remove JQuery
 
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff

@@ -1,5 +1,84 @@
 declare namespace TogetherJSNS {
 
+    /** Types for Templating.sub */
+    namespace TemplatingSub {
+        type Any = Focus | ChatMessage | ChatJoined | ChatLeft | ChatSystem | UrlChange | Invite | DockPerson | ParticipantWindow | InviteUserItem;
+
+        type All = Focus & ChatMessage & ChatJoined & ChatLeft & ChatSystem & UrlChange & Invite & DockPerson & ParticipantWindow & InviteUserItem;
+
+        type TemplateId = "swatch" | "walkthrough-slide-progress" | "focus" | "dock-person" | "participant-window" | "invite-user-item" | "chat-message" | "chat-joined" | "chat-left" | "chat-system" | "url-change" | "invite";
+
+        /** "swatch" */
+        type Swatch = never;
+
+        /** "walkthrough-slide-progress" */
+        type WalkthroughSlideProgress = never;
+        
+        /** "focus" */
+        interface Focus {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "dock-person" */
+        interface DockPerson {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "participant-window" */
+        interface ParticipantWindow {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "invite-user-item" */
+        interface InviteUserItem {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "chat-message" */
+        interface ChatMessage {
+            peer: TogetherJSNS.PeerClass,
+            content: string,
+            date: number
+        }
+
+        /** "chat-joined" */
+        interface ChatJoined {
+            peer: TogetherJSNS.PeerClass,
+            date: number
+        }
+
+        /** "chat-left" */
+        interface ChatLeft {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            declinedJoin
+        }
+
+        /** "chat-system" */
+        interface ChatSystem {
+            content: string,
+            date: number
+        }
+
+        /** "url-change" */
+        interface UrlChange {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            href: string,
+            title: string,
+            sameUrl: boolean
+        }
+
+        /** "invite" */
+        interface Invite {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            href: string,
+            hrefTitle: string,
+            forEveryone
+        }
+    }
+
     type Channels = ReturnType<typeof channelsMain>;
     type Storage = ReturnType<typeof StorageMain>;
     type Session = ReturnType<typeof sessionMain>;

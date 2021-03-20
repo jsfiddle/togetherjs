@@ -43,7 +43,6 @@ function templatesMain(util: Util, require: Require) {
         assert(templatesLang, "Templates not yet loaded");
         return clean(templatesLang[resourceName]);
     };
-
 }
 
 // FIXME: maybe it would be better to dynamically assemble the first
