@@ -71,8 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string, ot not?
-        //send<T extends keyof TogetherJSNS.ChannelMap>(data: (TogetherJSNS.ChannelMap[T] & TogetherJSNS.ChannelSend.WithClientId) | string) {
-        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: (TogetherJSNS.SessionSend.Map[T1] & TogetherJSNS.ChannelSend.WithClientId) | (TogetherJSNS.ChannelSend.Map[T2] & TogetherJSNS.ChannelSend.WithClientId) | string) {
+        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: (TogetherJSNS.SessionSend.Map[T1] & TogetherJSNS.ChannelSend.WithClientId) | (TogetherJSNS.ChannelSend.Map[T2] & TogetherJSNS.ChannelSend.WithClientId) | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }

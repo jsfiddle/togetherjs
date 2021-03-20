@@ -42,7 +42,6 @@ function channelsMain(util) {
             return _this;
         }
         // TODO should only take string, ot not?
-        //send<T extends keyof TogetherJSNS.ChannelMap>(data: (TogetherJSNS.ChannelMap[T] & TogetherJSNS.ChannelSend.WithClientId) | string) {
         AbstractChannel.prototype.send = function (data) {
             if (this.closed) {
                 throw 'Cannot send to a closed connection';
