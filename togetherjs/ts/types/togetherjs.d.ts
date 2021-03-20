@@ -249,9 +249,13 @@ declare namespace TogetherJSNS {
         "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
         "synchronizeVideosOfLateGuest": (msg: { element: string, videoId: string, playerTime: number }) => void;
         "differentVideoLoaded": (msg: { videoId: string }) => void;
+        "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
+        "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
+        "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
+        "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
 
         // session.on
-        "prepare-hello": (msg: {scrollPosition: ElementFinder.Position}) => void;
+        "prepare-hello": (msg: { scrollPosition: ElementFinder.Position }) => void;
         "ui-ready": () => void;
         "reinitialize": () => void;
         "follow-peer": (peer: PeerClass) => void;

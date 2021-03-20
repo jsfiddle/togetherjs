@@ -140,7 +140,7 @@ class OnClass {
         }
     }
 
-    once<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+    once<T extends keyof TogetherJSNS.OnMap>(name: T, callback: TogetherJSNS.OnMap[T]) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -157,7 +157,7 @@ class OnClass {
         this.on(name, callback[attr]);
     }
 
-    off<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
+    off<T extends keyof TogetherJSNS.OnMap>(name: T, callback: TogetherJSNS.OnMap[T]) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
             this._listenerOffs.push([name, callback]);
@@ -188,7 +188,7 @@ class OnClass {
 
     removeListener = this.off.bind(this);
 
-    emit(name: string, ...args2: unknown[]) {
+    emit<T extends keyof TogetherJSNS.OnMap>(name: T, ...args2: Parameters<TogetherJSNS.OnMap[T]>) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;

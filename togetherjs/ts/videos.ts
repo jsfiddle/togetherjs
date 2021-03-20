@@ -114,6 +114,7 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
     });
 
     MIRRORED_EVENTS.forEach(function(eventName) {
+        // TODO fix this call to .on
         session.hub.on("video-" + eventName, function(msg: VideoTimeupdateMessage) {
             var element = $findElement(msg.location);
 
