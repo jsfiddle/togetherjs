@@ -226,12 +226,12 @@ declare namespace TogetherJSNS {
 
         // session.hub.on
         "chat";
-        "bye";
+        "bye": (msg: {clientId: string}) => void;
         "logs";
         "cursor-update";
         "scroll-update": (msg: {peer: PeerClass, position}) => void;
         "hello-back hello": (msg: {type: "hello", scrollPosition, sameUrl, peer: PeerClass}) => void;
-        "hello";
+        "hello": (msg: {sameUrl: boolean}) => void;
         "cursor-click": (msg: {sameUrl: boolean, clientId: string, element, offsetY: number, offsetX: number}) => void;
         "keydown": (msg: {clientId: string}) => void;
         "form-update": (msg: {sameUrl: boolean, element, tracker, replace: Change2}) => void
@@ -243,6 +243,9 @@ declare namespace TogetherJSNS {
         "prepare-hello";
         "ui-ready": () => void;
         "reinitialize": () => void;
+        "follow-peer": (peer: PeerClass) => void;
+        "start": () => void;
+        "refresh-user-data": (peer: PeerClass) => void;
         
 
         // peers.on

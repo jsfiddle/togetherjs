@@ -476,7 +476,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public Self: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
 
-        getPeer(id: string, message: MessageWithUrlHash, ignoreMissing: boolean) {
+        getPeer(id: string, message?: MessageWithUrlHash, ignoreMissing: boolean = false) {
             assert(id);
             var peer = Peer.peers[id];
             if(id === session.clientId) {

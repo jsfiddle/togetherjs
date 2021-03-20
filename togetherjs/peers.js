@@ -402,6 +402,7 @@ function peersMain(util, session, storage, require, templates) {
             return _this;
         }
         Peers.prototype.getPeer = function (id, message, ignoreMissing) {
+            if (ignoreMissing === void 0) { ignoreMissing = false; }
             assert(id);
             var peer = Peer.peers[id];
             if (id === session.clientId) {
