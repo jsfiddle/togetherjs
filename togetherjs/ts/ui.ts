@@ -1111,10 +1111,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             if(finishedAt && finishedAt > Date.now()) {
                 setTimeout(function() {
                     finishedAt = null;
-                    session.emit("ui-ready", ui); // TODO emit error
+                    session.emit("ui-ready", ui);
                 }, finishedAt - Date.now());
             } else {
-                session.emit("ui-ready", ui); // TODO emit error
+                session.emit("ui-ready", ui);
             }
 
         } // End ui.activateUI()
@@ -1176,7 +1176,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             updateShareLink();
         }
 
-        showUrlChangeMessage(peer: TogetherJSNS.Peer, url: string) {
+        showUrlChangeMessage(peer: TogetherJSNS.PeerClass, url: string) {
             deferForContainer(() => {
                 var window = templating.sub("url-change", { peer: peer });
                 this.container.append(window);

@@ -251,7 +251,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 }
                 return;
             }
-            if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
+            if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("In:", msg);
             }
             if(!peers) {

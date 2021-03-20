@@ -282,11 +282,11 @@ declare namespace TogetherJSNS {
 
         // session.on
         "prepare-hello": (msg: On.HelloMessage | On.HelloBackMessage) => void;
-        "ui-ready": () => void;
+        "ui-ready": (ui: Ui) => void;
         "reinitialize": () => void;
         "follow-peer": (peer: PeerClass) => void;
         "start": () => void;
-        "refresh-user-data": (peer: PeerClass) => void;
+        "refresh-user-data": () => void;
         "visibility-change": (hidden: boolean) => void;
         "hide-window": (window: JQuery[]) => void; // TODO check type of window
         "shareId": () => void;
@@ -493,16 +493,11 @@ declare namespace TogetherJSNS {
 
     type PeerStatus = "live" | "active" | "inactive" | "bye";
 
-    interface Peer {
-        id: string;
-        status: PeerStatus;
-    }
-
     // TODO there seems to be many types of messages, there may be one for every event like form-update
     interface Message {
         sameUrl: boolean;
         clientId: string;
-        peer: Peer;
+        peer: TogetherJSNS.PeerClass;
         type: TogetherJSNS.Messages;
         url: string;
         to: string;

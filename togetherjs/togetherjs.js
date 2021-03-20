@@ -691,7 +691,7 @@ function togetherjsMain() {
         TogetherJSClass.prototype.refreshUserData = function () {
             if (this.running && typeof this.require == "function") {
                 this.require(["session"], function (session) {
-                    session.emit("refresh-user-data"); // TODO emit error
+                    session.emit("refresh-user-data");
                 });
             }
         };
