@@ -2,10 +2,12 @@
 
 - remove types for tjs.d.ts and use classes
 - look at all usage of session.hub.on and set a message type for each event
-    - same for session.on
+    - X same for session.on
     - X same for session.send
-    - same for calls to .off
+    - X same for calls to .off
     - X same for templating.sub
+    - same for emit
+        check all TODO emit error
     - same for ui.chat.system
 - remove JQuery
 

@@ -272,6 +272,19 @@ declare namespace TogetherJSNS {
 
         // peers.on
         "new-peer identity-updated status-updated": (peer: PeerClass) => void;
+
+        // TogetherJS.once
+        "ready": () => void;
+
+        // .emit
+        "new-peer": (peer: PeerClass) => void;
+        "status-updated": (peer: PeerClass | PeerSelf) => void;
+        "idle-updated": (peer: PeerClass | PeerSelf) => void;
+        "rtc-supported": (peer: PeerClass) => void;
+        "url-updated": (peer: PeerClass) => void;
+        "identity-updated": (peer: PeerClass) => void;
+        "self-updated": () => void;
+        "startup-ready": () => void;
     }
 
     type Channels = ReturnType<typeof channelsMain>;
@@ -299,6 +312,7 @@ declare namespace TogetherJSNS {
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
     type Logs = Playback["LogsExport"];
+    type PeerSelf = Peers["Self"];
 
 
     type ValueOf<T> = T[keyof T];

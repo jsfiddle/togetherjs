@@ -92,20 +92,27 @@ function channelsMain(util: Util) {
             this._buffer = [];
         }
 
-        // TODO any to remove
         _incoming(data: string) {
+            // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if(!this.rawdata) {
                 try {
-                    data = JSON.parse(data);
-                } catch(e) {
+                    const dataAsObject = JSON.parse(data);
+                    if(this.onmessage) {
+                        this.onmessage(dataAsObject);
+                    }
+                    this.emit("message", dataAsObject);
+                }
+                catch(e) {
                     console.error("Got invalid JSON data:", data.substr(0, 40));
                     throw e;
                 }
             }
-            if(this.onmessage) {
-                this.onmessage(data);
+            else {
+                if(this.onmessage) {
+                    this.onmessage(data);
+                }
+                this.emit("message", data); // TODO emit error
             }
-            this.emit("message", data);
         }
 
         protected abstract _send(a: string): void;

@@ -713,7 +713,7 @@ function togetherjsMain() {
         refreshUserData() {
             if(this.running && typeof this.require == "function") {
                 this.require(["session"], function(session: TogetherJSNS.On) {
-                    session.emit("refresh-user-data");
+                    session.emit("refresh-user-data"); // TODO emit error
                 });
             }
         }
@@ -728,7 +728,7 @@ function togetherjsMain() {
                 type2 = "togetherjs." + type2;
             }
             msg.type = type2;
-            this.hub.emit(msg.type, msg);
+            this.hub.emit(msg.type, msg); // TODO emit error
         }
 
         send(msg: TogetherJSNS.Message) {

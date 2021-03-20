@@ -125,7 +125,7 @@ function sessionMain(require, util, channels, $, storage) {
                 msg.starting = true;
             }
             // This is a chance for other modules to effect the hello message:
-            session.emit("prepare-hello", msg);
+            session.emit("prepare-hello", msg); // TODO emit error
             return msg;
         };
         Session.prototype.start = function () {
@@ -254,7 +254,7 @@ function sessionMain(require, util, channels, $, storage) {
                     msg.peer.updateMessageDate(msg);
                 }
             }
-            session.hub.emit(msg.type, msg);
+            session.hub.emit(msg.type, msg); // TODO emit error
             TogetherJS._onmessage(msg);
         };
         channel = c;

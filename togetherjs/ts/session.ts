@@ -119,7 +119,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 msg.starting = true;
             }
             // This is a chance for other modules to effect the hello message:
-            session.emit("prepare-hello", msg);
+            session.emit("prepare-hello", msg); // TODO emit error
             return msg;
         }
 
@@ -259,7 +259,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     msg.peer.updateMessageDate(msg);
                 }
             }
-            session.hub.emit(msg.type, msg);
+            session.hub.emit(msg.type, msg); // TODO emit error
             TogetherJS._onmessage(msg);
         };
         channel = c;

@@ -80,7 +80,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly id: string;
         private identityId;
         public status: TogetherJSNS.PeerStatus;
-        public readonly idle: TogetherJSNS.PeerStatus;
+        public idle: TogetherJSNS.PeerStatus;
         public readonly name: string | null;
         public readonly avatar: string | null;
         public readonly color: string;

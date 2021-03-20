@@ -28,7 +28,7 @@ function visibilityApiMain(_util, session) {
         document.removeEventListener(visibilityChange, change, false);
     });
     function change() {
-        session.emit("visibility-change", document[hidden]);
+        session.emit("visibility-change", document[hidden]); // TODO emit error
     }
     var visibilityApi = {
         hidden: function () {

@@ -44,7 +44,7 @@ function visibilityApiMain(_util: Util, session: TogetherJSNS.On) {
     });
 
     function change() {
-        session.emit("visibility-change", document[hidden]);
+        session.emit("visibility-change", document[hidden]); // TODO emit error
     }
 
     let visibilityApi = {

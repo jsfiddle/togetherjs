@@ -1106,15 +1106,15 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
             // The following lines should be at the end of this function
             // (new code goes above)
-            session.emit("new-element", this.container);
+            session.emit("new-element", this.container!); // TODO !
 
             if(finishedAt && finishedAt > Date.now()) {
                 setTimeout(function() {
                     finishedAt = null;
-                    session.emit("ui-ready", ui);
+                    session.emit("ui-ready", ui); // TODO emit error
                 }, finishedAt - Date.now());
             } else {
-                session.emit("ui-ready", ui);
+                session.emit("ui-ready", ui); // TODO emit error
             }
 
         } // End ui.activateUI()

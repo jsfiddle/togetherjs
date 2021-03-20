@@ -1028,15 +1028,15 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             });
             // The following lines should be at the end of this function
             // (new code goes above)
-            session.emit("new-element", this.container);
+            session.emit("new-element", this.container); // TODO !
             if (finishedAt && finishedAt > Date.now()) {
                 setTimeout(function () {
                     finishedAt = null;
-                    session.emit("ui-ready", ui);
+                    session.emit("ui-ready", ui); // TODO emit error
                 }, finishedAt - Date.now());
             }
             else {
-                session.emit("ui-ready", ui);
+                session.emit("ui-ready", ui); // TODO emit error
             }
         }; // End ui.activateUI()
         Ui.prototype.activateAvatarEdit = function (container, options) {
