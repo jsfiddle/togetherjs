@@ -238,6 +238,7 @@ declare namespace TogetherJSNS {
     type On = OnClass;
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
     type Walkabout = unknown;
+    type UtilAlias = Util;
     
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
@@ -251,7 +252,8 @@ declare namespace TogetherJSNS {
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
-    interface TogetherJS extends OnClass, ConfigGetter2 {
+    interface TogetherJS extends OnClass {
+        getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         (event?: Event): TogetherJS;
         running: boolean;
         require: Require;
@@ -477,90 +479,16 @@ declare namespace TogetherJSNS {
         _listenerOffs?: [string, CallbackForOnce<any>][];
     }
 
-    interface ConfigFunObj extends ConfigGetter {
-        //(config: Config): void;
+    interface ConfigFunObj {
         <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
-        //get<T>(thing: "on"): Ons<T>;
-        //get<T>(thing: "hub_on"): Ons<T>;
-        //get(thing: "useMinimizedCode"): true | undefined;
-        //get(thing: "fallbackLang"): string;
+        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
         track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any): void;
     }
 
     interface ConfigGetter {
-        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
-        /*
-        get(name: "dontShowClicks"): Config["dontShowClicks"],
-        get(name: "cloneClicks"): Config["cloneClicks"],
-        get(name: "enableAnalytics"): Config["enableAnalytics"],
-        get(name: "analyticsCode"): Config["analyticsCode"],
-        get(name: "hubBase"): Config["hubBase"],
-        get(name: "getUserName"): Config["getUserName"],
-        get(name: "getUserColor"): Config["getUserColor"],
-        get(name: "getUserAvatar"): Config["getUserAvatar"],
-        get(name: "siteName"): Config["siteName"],
-        get(name: "useMinimizedCode"): Config["useMinimizedCode"],
-        get(name: "cacheBust"): Config["cacheBust"],
-        get(name: "on"): Config["on"],
-        get(name: "hub_on"): Config["hub_on"],
-        get(name: "enableShortcut"): Config["enableShortcut"],
-        get(name: "toolName"): Config["toolName"],
-        get(name: "findRoom"): Config["findRoom"],
-        get(name: "autoStart"): Config["autoStart"],
-        get(name: "suppressJoinConfirmation"): Config["suppressJoinConfirmation"],
-        get(name: "suppressInvite"): Config["suppressInvite"],
-        get(name: "inviteFromRoom"): Config["inviteFromRoom"],
-        get(name: "storagePrefix"): Config["storagePrefix"],
-        get(name: "includeHashInUrl"): Config["includeHashInUrl"],
-        get(name: "disableWebRTC"): Config["disableWebRTC"],
-        get(name: "youtube"): Config["youtube"],
-        get(name: "ignoreMessages"): Config["ignoreMessages"],
-        get(name: "ignoreForms"): Config["ignoreForms"],
-        get(name: "lang"): Config["lang"],
-        get(name: "fallbackLang"): Config["fallbackLang"],
-        get(name: "baseUrl"): Config["baseUrl"],
-        get(name: "loaded"): Config["loaded"],
-        get(name: "callToStart"): Config["callToStart"],
-        */
-    }
-
-    interface ConfigGetter2 {
-        getConfig(name: keyof Config): ValueOf<Config>;
-        /*
-        getConfig(name: "dontShowClicks"): Config["dontShowClicks"],
-        getConfig(name: "cloneClicks"): Config["cloneClicks"],
-        getConfig(name: "enableAnalytics"): Config["enableAnalytics"],
-        getConfig(name: "analyticsCode"): Config["analyticsCode"],
-        getConfig(name: "hubBase"): Config["hubBase"],
-        getConfig(name: "getUserName"): Config["getUserName"],
-        getConfig(name: "getUserColor"): Config["getUserColor"],
-        getConfig(name: "getUserAvatar"): Config["getUserAvatar"],
-        getConfig(name: "siteName"): Config["siteName"],
-        getConfig(name: "useMinimizedCode"): Config["useMinimizedCode"],
-        getConfig(name: "cacheBust"): Config["cacheBust"],
-        getConfig(name: "on"): Config["on"],
-        getConfig(name: "hub_on"): Config["hub_on"],
-        getConfig(name: "enableShortcut"): Config["enableShortcut"],
-        getConfig(name: "toolName"): Config["toolName"],
-        getConfig(name: "findRoom"): Config["findRoom"],
-        getConfig(name: "autoStart"): Config["autoStart"],
-        getConfig(name: "suppressJoinConfirmation"): Config["suppressJoinConfirmation"],
-        getConfig(name: "suppressInvite"): Config["suppressInvite"],
-        getConfig(name: "inviteFromRoom"): Config["inviteFromRoom"],
-        getConfig(name: "storagePrefix"): Config["storagePrefix"],
-        getConfig(name: "includeHashInUrl"): Config["includeHashInUrl"],
-        getConfig(name: "disableWebRTC"): Config["disableWebRTC"],
-        getConfig(name: "youtube"): Config["youtube"],
-        getConfig(name: "ignoreMessages"): Config["ignoreMessages"],
-        getConfig(name: "ignoreForms"): Config["ignoreForms"],
-        getConfig(name: "lang"): Config["lang"],
-        getConfig(name: "fallbackLang"): Config["fallbackLang"],
-        getConfig(name: "baseUrl"): Config["baseUrl"],
-        getConfig(name: "loaded"): Config["loaded"],
-        getConfig(name: "callToStart"): Config["callToStart"],
-        */
+        get<K extends keyof Config>(name: K): Partial<Config>[K];
     }
 
     interface Require2 {

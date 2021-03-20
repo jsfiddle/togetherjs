@@ -220,13 +220,13 @@ function channelsMain(util: Util) {
 
     /* Sends TO a window or iframe */
     class PostMessageChannel extends AbstractChannel {
-        _pingPollPeriod = 100; // milliseconds
-        _pingPollIncrease = 100; // +100 milliseconds for each failure
-        _pingMax= 2000; // up to a max of 2000 milliseconds
+        private _pingPollPeriod = 100; // milliseconds
+        private _pingPollIncrease = 100; // +100 milliseconds for each failure
+        private _pingMax= 2000; // up to a max of 2000 milliseconds
         expectedOrigin: Origin;
-        _pingReceived: boolean = false;
-        _pingFailures = 0;
-        _pingTimeout: number | null = null;
+        private _pingReceived: boolean = false;
+        private _pingFailures = 0;
+        private _pingTimeout: number | null = null;
         window: Window | null = null;
 
         constructor(win: WindowProxy, expectedOrigin: Origin) {
@@ -295,7 +295,7 @@ function channelsMain(util: Util) {
             this._send("hello");
             // We'll keep sending ping messages until we get a reply
             var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
-            time = time > this._pingPollMax ? this._pingPollMax : time;
+            time = time > this._pingMax ? this._pingMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         }
 

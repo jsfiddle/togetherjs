@@ -246,7 +246,7 @@ function channelsMain(util) {
             this._send("hello");
             // We'll keep sending ping messages until we get a reply
             var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
-            time = time > this._pingPollMax ? this._pingPollMax : time;
+            time = time > this._pingMax ? this._pingMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         };
         PostMessageChannel.prototype._receiveMessage = function (event) {

@@ -202,7 +202,6 @@ var ElementFinder = /** @class */ (function () {
             throw new CannotFind(loc, "Malformed location", container);
         }
     };
-    ;
     ElementFinder.prototype.elementByPixel = function (height) {
         var self = this;
         /* Returns {location: "...", offset: pixels}

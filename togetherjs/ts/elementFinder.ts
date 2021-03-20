@@ -25,7 +25,6 @@ class CannotFind {
 }
 
 class ElementFinder {
-
     ignoreElement(element: HTMLElement | JQuery) {
         let el: Node | JQuery | null = element;
         if(isJQuery(el)) {
@@ -202,7 +201,7 @@ class ElementFinder {
         else {
             throw new CannotFind(loc, "Malformed location", container);
         }
-    };
+    }
 
     elementByPixel(height: number) {
         let self = this;

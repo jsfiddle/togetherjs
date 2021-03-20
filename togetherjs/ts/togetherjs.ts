@@ -699,7 +699,7 @@ function togetherjsMain() {
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
         }
 
-        getConfig(name: keyof TogetherJSNS.Config) { // rename into TogetherJS.config.get()?
+        getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] { // rename into TogetherJS.config.get()?
             let value = this._configuration[name];
             if(value === undefined) {
                 if(!this._defaultConfiguration.hasOwnProperty(name)) {
