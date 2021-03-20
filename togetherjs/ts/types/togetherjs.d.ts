@@ -84,7 +84,7 @@ declare namespace TogetherJSNS {
             date: number,
             href: string,
             hrefTitle: string,
-            forEveryone
+            forEveryone: boolean,
         }
     }
 

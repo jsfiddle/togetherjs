@@ -53,7 +53,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(private ui: Ui) { }
 
-        text(attrs: ChatTextAttributes) {
+        text(attrs: {text: string, peer: TogetherJSNS.PeerClass, messageId: string, date?: number, notify: boolean}) {
             assert(typeof attrs.text == "string");
             assert(attrs.peer);
             assert(attrs.messageId);
@@ -87,7 +87,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.messageId, attrs.notify);
         }
 
-        joinedSession(attrs: ChatTextAttributes) {
+        joinedSession(attrs: {peer: TogetherJSNS.PeerClass, date?: number}) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-joined", {
@@ -98,7 +98,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        leftSession(attrs: ChatTextAttributes) {
+        leftSession(attrs: {peer: TogetherJSNS.PeerClass, date?: number, declinedJoin: boolean}) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-left", {
@@ -128,7 +128,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             })();
         }
 
-        urlChange(attrs: ChatTextAttributes) {
+        urlChange(attrs: {peer: TogetherJSNS.PeerClass, url: string, sameUrl: boolean, date?: number, title: string}) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             assert(typeof attrs.sameUrl == "boolean");
@@ -173,7 +173,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, messageId, notify);
         }
 
-        invite(attrs: ChatTextAttributes) {
+        invite(attrs: {peer: TogetherJSNS.PeerClass, url: string, date?: number, forEveryone: boolean}) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
