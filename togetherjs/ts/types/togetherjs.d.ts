@@ -271,7 +271,7 @@ declare namespace TogetherJSNS {
         "ping": () => void;
         "hello hello-back": (msg: { type: keyof OnMap, isClient: boolean }) => void;
         "who": () => void;
-        "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string) => void;
+        "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
         "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
         "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
         "synchronizeVideosOfLateGuest": (msg: { element: string, videoId: string, playerTime: number }) => void;

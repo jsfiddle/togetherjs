@@ -9,7 +9,7 @@
     - same for emit
         - check all TODO emit error (only 2 remaining that will be solved later)
     - X same for ui.chat.system
-    - same for ui.chat.leftSession and others
+    - X same for ui.chat.leftSession and others
 - remove JQuery
 
 - maybe I should convert the libs? Like walkabout?
