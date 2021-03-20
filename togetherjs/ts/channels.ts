@@ -71,7 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string
-        send<T extends TogetherJSNS.SessionSend.Any | TogetherJSNS.ChannelSend.Any>(data: T | string) {
+        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map)>(data: TogetherJSNS.SessionSend.Map[T1] | TogetherJSNS.ChannelSend.Map[T2] | string) {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }

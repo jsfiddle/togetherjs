@@ -204,6 +204,12 @@ declare namespace TogetherJSNS {
 
         type Any = Route | Who | Invite;
 
+        interface Map {
+            "route": Route,
+            "who": Who,
+            "invite": Invite,
+        }
+
         interface Route {
             type: "route",
             routeId: string,
