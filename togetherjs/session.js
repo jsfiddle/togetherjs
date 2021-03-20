@@ -42,7 +42,7 @@ function sessionMain(require, util, channels, $, storage) {
             _this.firstRun = false;
             /** Setting, essentially global: */
             _this.AVATAR_SIZE = 90;
-            _this.timeHelloSent = null;
+            _this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
             _this.hub = new OnClass();
             return _this;
         }

@@ -31,7 +31,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         public firstRun = false;
         /** Setting, essentially global: */
         public readonly AVATAR_SIZE = 90;
-        timeHelloSent: number | null = null;
+        timeHelloSent: number = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
         public identityId?: string;
         public RTCSupported: boolean | undefined;
 

@@ -219,6 +219,31 @@ declare namespace TogetherJSNS {
         }
     }
 
+    interface OnMap {
+        // channel.on
+        "message": (msg: MessageFromChannel) => void;
+        "close": () => void;
+
+        // session.hub.on
+        "chat";
+        "bye";
+        "logs";
+        "cursor-update";
+        "scroll-update": (msg: {peer: PeerClass, position}) => void;
+        "hello-back hello": (msg: {type: "hello", scrollPosition, sameUrl, peer: PeerClass}) => void;
+        "hello";
+        "cursor-click": (msg: {sameUrl: boolean, clientId: string, element, offsetY: number, offsetX: number}) => void;
+        "keydown": (msg: {clientId: string}) => void;
+
+        // session.on
+        "close": () => void;
+        "prepare-hello";
+        "ui-ready": () => void;
+
+        // peers.on
+        "new-peer identity-updated status-updated": (peer: PeerClass) => void;
+    }
+
     type Channels = ReturnType<typeof channelsMain>;
     type Storage = ReturnType<typeof StorageMain>;
     type Session = ReturnType<typeof sessionMain>;

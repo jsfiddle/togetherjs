@@ -96,6 +96,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly urlHash: string;
 
         public static peers: {[id: string]: PeerClass} = {};
+        public scrollPosition;
 
         constructor(id: string, attrs: Partial<PeerClassAttributes> = {}) {
             assert(id);
