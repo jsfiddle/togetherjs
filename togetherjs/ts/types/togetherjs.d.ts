@@ -105,6 +105,7 @@ declare namespace TogetherJSNS {
     type TogetherJSClass = ReturnType<typeof togetherjsMain>;
     type On = OnClass;
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
+    type Walkabout = unknown;
     
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];

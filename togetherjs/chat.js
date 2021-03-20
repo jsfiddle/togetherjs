@@ -4,7 +4,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*jshint evil:true */
 function chatMain(require, $, util, session, ui, templates, playback, storage, peers, windowing) {
-    var chat = util.Module("chat");
     var assert = util.assert;
     var Walkabout;
     session.hub.on("chat", function (msg) {
@@ -29,43 +28,54 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             declinedJoin: msg.reason == "declined-join"
         });
     });
-    chat.submit = function (message) {
-        var parts = message.split(/ /);
-        if (parts[0].charAt(0) == "/") {
-            var name = parts[0].substr(1).toLowerCase();
-            var method = commands["command_" + name];
-            if (method) {
-                method.apply(null, parts.slice(1));
-                return;
-            }
+    var Chat = /** @class */ (function () {
+        function Chat() {
         }
-        var messageId = session.clientId + "-" + Date.now();
-        session.send({
-            type: "chat",
-            text: message,
-            messageId: messageId
-        });
-        ui.chat.text({
-            text: message,
-            peer: peers.Self,
-            messageId: messageId,
-            notify: false
-        });
-        saveChatMessage({
-            text: message,
-            date: Date.now(),
-            peerId: peers.Self.id,
-            messageId: messageId
-        });
-    };
-    var commands = {
-        command_help: function () {
+        Chat.prototype.submit = function (message) {
+            var parts = message.split(/ /);
+            if (parts[0].charAt(0) == "/") {
+                var name = parts[0].substr(1).toLowerCase();
+                var method = commands[("command_" + name)]; // TODO this cas could maybe be removed with string litteral
+                if (method) {
+                    method.apply(null, parts.slice(1));
+                    return;
+                }
+            }
+            var messageId = session.clientId + "-" + Date.now();
+            session.send({
+                type: "chat",
+                text: message,
+                messageId: messageId
+            });
+            ui.chat.text({
+                text: message,
+                peer: peers.Self,
+                messageId: messageId,
+                notify: false
+            });
+            saveChatMessage({
+                text: message,
+                date: Date.now(),
+                peerId: peers.Self.id,
+                messageId: messageId
+            });
+        };
+        return Chat;
+    }());
+    var chat = new Chat();
+    var Commands = /** @class */ (function () {
+        function Commands() {
+            this._testCancel = null;
+            this._testShow = [];
+            this.playing = null;
+        }
+        Commands.prototype.command_help = function () {
             var msg = util.trim(templates("help"));
             ui.chat.system({
                 text: msg
             });
-        },
-        command_test: function (args) {
+        };
+        Commands.prototype.command_test = function (args) {
             if (!Walkabout) {
                 require(["walkabout"], (function (WalkaboutModule) {
                     Walkabout = WalkaboutModule;
@@ -149,13 +159,11 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             ui.chat.system({
                 text: "Did not understand: " + args.join(" ")
             });
-        },
-        _testCancel: null,
-        _testShow: [],
-        command_clear: function () {
+        };
+        Commands.prototype.command_clear = function () {
             ui.chat.clear();
-        },
-        command_exec: function () {
+        };
+        Commands.prototype.command_exec = function () {
             var expr = Array.prototype.slice.call(arguments).join(" ");
             var result;
             // We use this to force global eval (not in this scope):
@@ -173,15 +181,14 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     text: "" + result
                 });
             }
-        },
-        command_record: function () {
+        };
+        Commands.prototype.command_record = function () {
             ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
             window.open(session.recordUrl(), "_blank", "left,width=" + ($(window).width() / 2));
-        },
-        playing: null,
-        command_playback: function (url) {
+        };
+        Commands.prototype.command_playback = function (url) {
             if (this.playing) {
                 this.playing.cancel();
                 this.playing.unload();
@@ -214,8 +221,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 });
             });
             windowing.hide("#togetherjs-chat");
-        },
-        command_savelogs: function (name) {
+        };
+        Commands.prototype.command_savelogs = function (name) {
             session.send({
                 type: "get-logs",
                 forClient: session.clientId,
@@ -232,8 +239,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 }
             }
             session.hub.on("logs", save);
-        },
-        command_baseurl: function (url) {
+        };
+        Commands.prototype.command_baseurl = function (url) {
             if (!url) {
                 storage.get("baseUrlOverride").then(function (b) {
                     if (b) {
@@ -261,8 +268,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     text: "baseUrl overridden (to " + url + "), will last for one day."
                 });
             });
-        },
-        command_config: function (variable, value) {
+        };
+        Commands.prototype.command_config = function (variable, value) {
             if (!(variable || value)) {
                 storage.get("configOverride").then(function (c) {
                     if (c) {
@@ -324,8 +331,10 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     });
                 });
             });
-        }
-    };
+        };
+        return Commands;
+    }());
+    var commands = new Commands();
     // this section deal with saving/restoring chat history as long as session is alive
     var chatStorageKey = "chatlog";
     var maxLogMessages = 100;

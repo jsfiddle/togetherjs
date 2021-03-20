@@ -1498,7 +1498,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         if(msg.forClientId && msg.clientId != peers.Self.id) {
             return;
         }
-        require(["who"], function(who) {
+        require(["who"], function(who: TogetherJSNS.Who) {
             var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
             ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
         });

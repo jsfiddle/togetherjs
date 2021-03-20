@@ -6,7 +6,10 @@
     - same for session.send(
     - same for calls to .off
     - X same for templating.sub
+    - same for ui.chat.system
 - remove JQuery
+
+- maybe I should convert the libs? Like walkabout?
 
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff
 - use tslint to find useless nullchecks

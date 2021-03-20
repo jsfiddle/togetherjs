@@ -6,6 +6,8 @@ interface Template {
     interface: string;
     walkthrough: string;
     names: string;
+    help: string;
+    walkabout: string;
 }
 
 function templatesMain(util: Util, require: Require) {

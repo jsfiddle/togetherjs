@@ -4,9 +4,8 @@
 /*jshint evil:true */
 
 function chatMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
-    var chat = util.Module("chat");
     var assert = util.assert;
-    var Walkabout;
+    var Walkabout: TogetherJSNS.Walkabout;
 
     session.hub.on("chat", function(msg) {
         ui.chat.text({
@@ -32,47 +31,55 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
         });
     });
 
-    chat.submit = function(message: string) {
-        var parts = message.split(/ /);
-        if(parts[0].charAt(0) == "/") {
-            var name = parts[0].substr(1).toLowerCase();
-            var method = commands["command_" + name];
-            if(method) {
-                method.apply(null, parts.slice(1));
-                return;
+    class Chat {
+        submit(message: string) {
+            var parts = message.split(/ /);
+            if(parts[0].charAt(0) == "/") {
+                var name = parts[0].substr(1).toLowerCase();
+                var method = commands[("command_" + name) as keyof typeof commands]; // TODO this cas could maybe be removed with string litteral
+                if(method) {
+                    method.apply(null, parts.slice(1));
+                    return;
+                }
             }
+            var messageId = session.clientId + "-" + Date.now();
+            session.send({
+                type: "chat",
+                text: message,
+                messageId: messageId
+            });
+            ui.chat.text({
+                text: message,
+                peer: peers.Self,
+                messageId: messageId,
+                notify: false
+            });
+            saveChatMessage({
+                text: message,
+                date: Date.now(),
+                peerId: peers.Self.id,
+                messageId: messageId
+            });
         }
-        var messageId = session.clientId + "-" + Date.now();
-        session.send({
-            type: "chat",
-            text: message,
-            messageId: messageId
-        });
-        ui.chat.text({
-            text: message,
-            peer: peers.Self,
-            messageId: messageId,
-            notify: false
-        });
-        saveChatMessage({
-            text: message,
-            date: Date.now(),
-            peerId: peers.Self.id,
-            messageId: messageId
-        });
-    };
+    }
 
-    var commands = {
-        command_help: function() {
+    const chat = new Chat();
+
+    class Commands {
+        _testCancel: unknown | null = null;
+        _testShow = [];
+        playing: unknown | null = null;
+
+        command_help() {
             var msg = util.trim(templates("help"));
             ui.chat.system({
                 text: msg
             });
-        },
+        }
 
-        command_test: function(args) {
+        command_test(args: string[]) {
             if(!Walkabout) {
-                require(["walkabout"], (function(WalkaboutModule) {
+                require(["walkabout"], (function(WalkaboutModule: TogetherJSNS.Walkabout) {
                     Walkabout = WalkaboutModule;
                     this.command_test(args);
                 }).bind(this));
@@ -152,16 +159,13 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             ui.chat.system({
                 text: "Did not understand: " + args.join(" ")
             });
-        },
+        }
 
-        _testCancel: null,
-        _testShow: [],
-
-        command_clear: function() {
+        command_clear() {
             ui.chat.clear();
-        },
+        }
 
-        command_exec: function() {
+        command_exec() {
             var expr = Array.prototype.slice.call(arguments).join(" ");
             var result;
             // We use this to force global eval (not in this scope):
@@ -178,20 +182,18 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     text: "" + result
                 });
             }
-        },
+        }
 
-        command_record: function() {
+        command_record() {
             ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
             window.open(
                 session.recordUrl(), "_blank",
                 "left,width=" + ($(window).width() / 2));
-        },
+        }
 
-        playing: null,
-
-        command_playback: function(url) {
+        command_playback(url) {
             if(this.playing) {
                 this.playing.cancel();
                 this.playing.unload();
@@ -226,9 +228,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     });
                 });
             windowing.hide("#togetherjs-chat");
-        },
+        }
 
-        command_savelogs: function(name) {
+        command_savelogs(name: string) {
             session.send({
                 type: "get-logs",
                 forClient: session.clientId,
@@ -245,9 +247,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 }
             }
             session.hub.on("logs", save);
-        },
+        }
 
-        command_baseurl: function(url) {
+        command_baseurl(url: string) {
             if(!url) {
                 storage.get("baseUrlOverride").then(function(b) {
                     if(b) {
@@ -274,9 +276,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     text: "baseUrl overridden (to " + url + "), will last for one day."
                 });
             });
-        },
+        }
 
-        command_config: function(variable, value) {
+        command_config(variable, value) {
             if(!(variable || value)) {
                 storage.get("configOverride").then(function(c) {
                     if(c) {
@@ -337,8 +339,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 });
             });
         }
+    }
 
-    };
+    const commands = new Commands();
 
     // this section deal with saving/restoring chat history as long as session is alive
     var chatStorageKey = "chatlog";
@@ -395,7 +398,6 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
     });
 
     return chat;
-
 }
 
 define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], chatMain);
