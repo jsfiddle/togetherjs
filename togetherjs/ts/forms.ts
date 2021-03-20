@@ -617,7 +617,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         session.send(msg);
     }
 
-    session.hub.on<TogetherJSNS.FormUpdateMessage>("form-update", function(msg) {
+    session.hub.on("form-update", function(msg) {
         if(!msg.sameUrl) {
             return;
         }
@@ -760,7 +760,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     session.on("close", destroyTrackers);
 
-    session.hub.on<TogetherJSNS.FormInitMessage>("form-init", function(msg) {
+    session.hub.on("form-init", function(msg) {
         if(!msg.sameUrl) {
             return;
         }
@@ -837,7 +837,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     var focusElements: {[peerId: string]: JQuery} = {};
 
-    session.hub.on<TogetherJSNS.FormFocusMessage>("form-focus", function(msg) {
+    session.hub.on("form-focus", function(msg) {
         if(!msg.sameUrl) {
             return;
         }
@@ -892,7 +892,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         $(document).off("focusout", blur);
     });
 
-    session.hub.on<TogetherJSNS.Message>("hello", function(msg) {
+    session.hub.on("hello", function(msg) {
         if(msg.sameUrl) {
             setTimeout(function() {
                 sendInit();

@@ -4,12 +4,16 @@
 
 interface Change2 {
     id: string,
-    delta,
+    delta: TextReplace,
     basis?,
     sent?: boolean,
 }
 
-type Delta = unknown;
+type Delta = {
+    start: number,
+    del: number,
+    text: number
+};
 
 /** SimpleHistory synchronizes peers by relying on the server to serialize
  * the order of all updates.  Each client maintains a queue of patches
@@ -53,12 +57,12 @@ class SimpleHistory {
     private clientId;
     private committed;
     public current;
-    private basis;
+    private basis: number;
     private queue: Change2[] = [];
     private deltaId = 1;
     private selection: TextReplace | null = null;
 
-    constructor(clientId: string, initState, initBasis) {
+    constructor(clientId: string, initState, initBasis: number) {
         this.clientId = clientId;
         this.committed = initState;
         this.current = initState;

@@ -234,11 +234,16 @@ declare namespace TogetherJSNS {
         "hello";
         "cursor-click": (msg: {sameUrl: boolean, clientId: string, element, offsetY: number, offsetX: number}) => void;
         "keydown": (msg: {clientId: string}) => void;
+        "form-update": (msg: {sameUrl: boolean, element, tracker, replace: Change2}) => void
+        "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: {element: string, value: string, tracker: string, basis: number}[] }) => void;
+        "form-focus": (msg: {sameUrl: boolean, peer: PeerClass, element: string}) => void;
 
         // session.on
         "close": () => void;
         "prepare-hello";
         "ui-ready": () => void;
+        "reinitialize": () => void;
+        
 
         // peers.on
         "new-peer identity-updated status-updated": (peer: PeerClass) => void;
