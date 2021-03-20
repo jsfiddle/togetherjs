@@ -362,7 +362,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: keyof TogetherJSNS.SessionSend.Map[] | true,
+        ignoreMessages: (keyof TogetherJSNS.SessionSend.Map)[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
@@ -482,9 +482,9 @@ declare namespace TogetherJSNS {
     interface ConfigFunObj {
         <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
-        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
-        close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
-        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any): void;
+        get<K extends keyof Config>(name: K): Partial<Config>[K];
+        close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
+        track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): void;
     }
 
     interface ConfigGetter {
