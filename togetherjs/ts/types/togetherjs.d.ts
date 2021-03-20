@@ -219,6 +219,32 @@ declare namespace TogetherJSNS {
         }
     }
 
+    namespace On {
+        /** Do not use this in your own code, it's just here to be inherited */
+        interface HelloMessageBase {
+            name: string,
+            avatar: string,
+            color: string,
+            url: string,
+            urlHash: string,
+            title: string,
+            rtcSupported: boolean,
+            isClient: boolean,
+            starting: boolean,
+            scrollPosition?: ElementFinder.Position
+        }
+
+        interface HelloMessage extends HelloMessageBase {
+            type: "hello";
+            clientVersion: string;
+            /** optional because it is set during the prepare-hello event */
+        }
+
+        interface HelloBackMessage extends HelloMessageBase {
+            type: "hello-back"
+        }
+    }
+
     interface OnMap {
         // channel.on & session.on
         "close": () => void;
@@ -255,7 +281,7 @@ declare namespace TogetherJSNS {
         "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
 
         // session.on
-        "prepare-hello": (msg: { scrollPosition: ElementFinder.Position }) => void;
+        "prepare-hello": (msg: On.HelloMessage | On.HelloBackMessage) => void;
         "ui-ready": () => void;
         "reinitialize": () => void;
         "follow-peer": (peer: PeerClass) => void;
@@ -313,7 +339,6 @@ declare namespace TogetherJSNS {
     type PeerClass = Peers["PeerClassExport"];
     type Logs = Playback["LogsExport"];
     type PeerSelf = Peers["Self"];
-
 
     type ValueOf<T> = T[keyof T];
 

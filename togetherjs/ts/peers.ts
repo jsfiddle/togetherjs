@@ -314,10 +314,10 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private identityId = session.identityId;
         private status: TogetherJSNS.PeerStatus = "live";
         private idle: TogetherJSNS.PeerStatus = "active";
-        private name: string | null = null;
+        public name: string | null = null;
         public avatar: string | null = null;
-        private color: string | null = null;
-        private defaultName: string | null = null;
+        public color: string | null = null;
+        public defaultName: string = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         private loaded = false;
         private isCreator = !session.isClient;
 

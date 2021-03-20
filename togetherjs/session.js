@@ -103,30 +103,47 @@ function sessionMain(require, util, channels, $, storage) {
             session.send(msg);
         };
         Session.prototype.makeHelloMessage = function (helloBack) {
-            var msg = {
-                name: peers.Self.name || peers.Self.defaultName,
-                avatar: peers.Self.avatar,
-                color: peers.Self.color,
-                url: session.currentUrl(),
-                urlHash: location.hash,
-                // FIXME: titles update, we should track those changes:
-                title: document.title,
-                rtcSupported: session.RTCSupported,
-                isClient: session.isClient
-            };
+            var starting = false;
+            if (!TogetherJS.startup.continued) {
+                starting = true;
+            }
             if (helloBack) {
-                msg.type = "hello-back";
+                var msg = {
+                    type: "hello-back",
+                    name: peers.Self.name || peers.Self.defaultName,
+                    avatar: peers.Self.avatar || "",
+                    color: peers.Self.color || "",
+                    url: session.currentUrl(),
+                    urlHash: location.hash,
+                    // FIXME: titles update, we should track those changes:
+                    title: document.title,
+                    rtcSupported: !!session.RTCSupported,
+                    isClient: session.isClient,
+                    starting: starting
+                };
+                // This is a chance for other modules to effect the hello message:
+                session.emit("prepare-hello", msg); // TODO emit error
+                return msg;
             }
             else {
-                msg.type = "hello";
-                msg.clientVersion = TogetherJS.version;
+                var msg = {
+                    type: "hello",
+                    name: peers.Self.name || peers.Self.defaultName,
+                    avatar: peers.Self.avatar || "",
+                    color: peers.Self.color || "",
+                    url: session.currentUrl(),
+                    urlHash: location.hash,
+                    // FIXME: titles update, we should track those changes:
+                    title: document.title,
+                    rtcSupported: !!session.RTCSupported,
+                    isClient: session.isClient,
+                    starting: starting,
+                    clientVersion: TogetherJS.version
+                };
+                // This is a chance for other modules to effect the hello message:
+                session.emit("prepare-hello", msg); // TODO emit error
+                return msg;
             }
-            if (!TogetherJS.startup.continued) {
-                msg.starting = true;
-            }
-            // This is a chance for other modules to effect the hello message:
-            session.emit("prepare-hello", msg); // TODO emit error
-            return msg;
         };
         Session.prototype.start = function () {
             initStartTarget();

@@ -13,7 +13,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
     var assert: typeof util.assert = util.assert;
 
     // We will load this module later (there's a circular import):
-    var peers: TogetherJSNS.Peer;
+    var peers: TogetherJSNS.Peers;
 
     // This is the channel to the hub:
     let channel: TogetherJSNS.WebSocketChannel | null = null;
@@ -36,6 +36,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         public RTCSupported: boolean | undefined;
 
         public readonly hub = new OnClass();
+        public isClient: boolean;
 
         hubUrl(id: string | null = null) {
             id = id || this.shareId;
@@ -97,30 +98,47 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         }
 
         makeHelloMessage(helloBack: boolean) {
-            let msg: TogetherJSNS.Message = {
-                name: peers.Self.name || peers.Self.defaultName,
-                avatar: peers.Self.avatar,
-                color: peers.Self.color,
-                url: session.currentUrl(),
-                urlHash: location.hash,
-                // FIXME: titles update, we should track those changes:
-                title: document.title,
-                rtcSupported: session.RTCSupported,
-                isClient: session.isClient
-            };
+            let starting: boolean = false;
+            if(!TogetherJS.startup.continued) {
+                starting = true;
+            }
             if(helloBack) {
-                msg.type = "hello-back";
+                let msg: TogetherJSNS.On.HelloBackMessage = {
+                    type: "hello-back",
+                    name: peers.Self.name || peers.Self.defaultName,
+                    avatar: peers.Self.avatar || "", // TODO find a way to remove this || "", maybe the value in self should be non-null (other occurences of this below)
+                    color: peers.Self.color || "", // same as above
+                    url: session.currentUrl(),
+                    urlHash: location.hash,
+                    // FIXME: titles update, we should track those changes:
+                    title: document.title,
+                    rtcSupported: !!session.RTCSupported,
+                    isClient: session.isClient,
+                    starting: starting
+                };
+                // This is a chance for other modules to effect the hello message:
+                session.emit("prepare-hello", msg); // TODO emit error
+                return msg;
             }
             else {
-                msg.type = "hello";
-                msg.clientVersion = TogetherJS.version;
+                let msg: TogetherJSNS.On.HelloMessage = {
+                    type: "hello",
+                    name: peers.Self.name || peers.Self.defaultName,
+                    avatar: peers.Self.avatar || "", // same as above
+                    color: peers.Self.color || "", // same as above
+                    url: session.currentUrl(),
+                    urlHash: location.hash,
+                    // FIXME: titles update, we should track those changes:
+                    title: document.title,
+                    rtcSupported: !!session.RTCSupported,
+                    isClient: session.isClient,
+                    starting: starting,
+                    clientVersion: TogetherJS.version
+                };
+                // This is a chance for other modules to effect the hello message:
+                session.emit("prepare-hello", msg); // TODO emit error
+                return msg;
             }
-            if(!TogetherJS.startup.continued) {
-                msg.starting = true;
-            }
-            // This is a chance for other modules to effect the hello message:
-            session.emit("prepare-hello", msg); // TODO emit error
-            return msg;
         }
 
         start() {

@@ -243,7 +243,7 @@ function peersMain(util, session, storage, require, templates) {
             _this.name = null;
             _this.avatar = null;
             _this.color = null;
-            _this.defaultName = null;
+            _this.defaultName = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
             _this.loaded = false;
             _this.isCreator = !session.isClient;
             return _this;
