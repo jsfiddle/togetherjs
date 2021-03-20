@@ -88,6 +88,26 @@ declare namespace TogetherJSNS {
         }
     }
 
+    interface ChannelMap {
+        "chat": SessionSend.Chat,
+        "get-logs": SessionSend.GetLogs,
+        "cursor-click": SessionSend.CursorClick,
+        "keydown": SessionSend.Keydown,
+        "form-focus": SessionSend.ForFocus,
+        "ping-back": SessionSend.PingBack,
+        "peer-update": SessionSend.PeerUpdate,
+        "video-something": SessionSend.VideoEventName,
+        "rtc-ice-candidate": SessionSend.RTCIceCandidate,
+        "rtc-offer": SessionSend.RTCOffer,
+        "rtc-answer": SessionSend.RTCAnswer,
+        "rtc-abort": SessionSend.RTCAbort,
+        "playerStateChange": SessionSend.PlayerStateChange,
+        "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
+        "route": ChannelSend.Route,
+        "who": ChannelSend.Who,
+        "invite": ChannelSend.Invite,
+    }
+
     namespace SessionSend {
         interface Map {
             "chat": Chat,
@@ -189,7 +209,7 @@ declare namespace TogetherJSNS {
 
     namespace ChannelSend {
         interface WithClientId {
-            clientId: string;
+            clientId: string | null;
         }
 
         interface Map {

@@ -75,13 +75,14 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 return location.href.replace(/#.*/, "");
             }
         }
-        
+
         send<K extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[K]) {
             if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            msg.clientId = session.clientId || undefined;
-            channel.send(msg);
+            const msg2 = msg as TogetherJSNS.SessionSend.Map[K] & TogetherJSNS.ChannelSend.WithClientId;
+            msg2.clientId = session.clientId;
+            channel.send<K, never>(msg2);
         }
     
         appSend(msg: TogetherJSNS.Message) {
