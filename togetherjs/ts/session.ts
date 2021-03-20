@@ -75,9 +75,9 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 return location.href.replace(/#.*/, "");
             }
         }
-
-        send(msg: TogetherJSNS.MessageToSend) {
-            if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
+        
+        send<K extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[K]) {
+            if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
             msg.clientId = session.clientId || undefined;

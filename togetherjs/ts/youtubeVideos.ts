@@ -283,7 +283,7 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
     }
 
     // parses videoId from the url returned by getVideoUrl function
-    function getVideoIdFromUrl(videoUrl) {
+    function getVideoIdFromUrl(videoUrl: string) {
         var videoId = videoUrl.split('v=')[1];
         //Chrome and Firefox have different positions for parameters
         var ampersandIndex = videoId.indexOf('&');

@@ -223,6 +223,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             windowing.hide("#togetherjs-chat");
         };
         Commands.prototype.command_savelogs = function (name) {
+            document.createElement("a");
             session.send({
                 type: "get-logs",
                 forClient: session.clientId,

@@ -231,6 +231,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
         }
 
         command_savelogs(name: string) {
+            document.createElement("a");
             session.send({
                 type: "get-logs",
                 forClient: session.clientId,

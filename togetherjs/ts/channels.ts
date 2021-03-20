@@ -71,7 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string
-        send(data: string | any) {
+        send<T extends TogetherJSNS.SessionSend.Any | TogetherJSNS.ChannelSend.Any>(data: T | string) {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -108,7 +108,7 @@ function channelsMain(util: Util) {
             this.emit("message", data);
         }
 
-        abstract _send(a: string): void;
+        protected abstract _send(a: string): void;
 
         abstract _setupConnection(): void;
         abstract _ready(): boolean;

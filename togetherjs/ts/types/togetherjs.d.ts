@@ -6,7 +6,22 @@ declare namespace TogetherJSNS {
 
         type All = Focus & ChatMessage & ChatJoined & ChatLeft & ChatSystem & UrlChange & Invite & DockPerson & ParticipantWindow & InviteUserItem;
 
-        type TemplateId = "swatch" | "walkthrough-slide-progress" | "focus" | "dock-person" | "participant-window" | "invite-user-item" | "chat-message" | "chat-joined" | "chat-left" | "chat-system" | "url-change" | "invite";
+        type TemplateId = keyof Map;
+
+        interface Map {
+            "swatch": Swatch,
+            "walkthrough-slide-progress": WalkthroughSlideProgress,
+            "focus": Focus,
+            "dock-person": DockPerson,
+            "participant-window": ParticipantWindow,
+            "invite-user-item": InviteUserItem,
+            "chat-message": ChatMessage,
+            "chat-joined": ChatJoined,
+            "chat-left": ChatLeft,
+            "chat-system": ChatSystem,
+            "url-change": UrlChange,
+            "invite": Invite,
+        }
 
         /** "swatch" */
         type Swatch = never;
@@ -80,10 +95,133 @@ declare namespace TogetherJSNS {
     }
 
     namespace SessionSend {
+        type Any = Chat | GetLogs | CursorClick | Keydown | ForFocus | PingBack | PeerUpdate | VideoEventName | RTCIceCandidate | RTCOffer | RTCAnswer | RTCAbort | PlayerStateChange | SynchronizeVideosOfLateGuest;
+
+        type Types = "chat" | "get-logs" | "cursor-click" | "keydown" | "form-focus" | "ping-back" | "peer-update" | "video-something" | "rtc-ice-candidate" | "rtc-offer" | "rtc-answer" | "rtc-abort" | "playerStateChange" | "synchronizeVideosOfLateGuest";
+
+        interface Map {
+            "chat": Chat,
+            "get-logs": GetLogs,
+            "cursor-click": CursorClick,
+            "keydown": Keydown,
+            "form-focus": ForFocus,
+            "ping-back": PingBack,
+            "peer-update": PeerUpdate,
+            "video-something": VideoEventName,
+            "rtc-ice-candidate": RTCIceCandidate,
+            "rtc-offer": RTCOffer,
+            "rtc-answer": RTCAnswer,
+            "rtc-abort": RTCAbort,
+            "playerStateChange": PlayerStateChange,
+            "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
+        }
+
         interface Chat {
             type: "chat",
-            text: message,
-            messageId: messageId
+            text: string,
+            messageId: string
+        }
+
+        interface GetLogs {
+            type: "get-logs",
+            forClient: string,
+            saveAs: string
+        }
+
+        interface CursorClick {
+            type: "cursor-click",
+            element: string,
+            offsetX: number,
+            offsetY: number
+        }
+
+        interface Keydown {
+            type: "keydown"
+        }
+        
+        interface ForFocus {
+            type: "form-focus",
+            element: string | null
+        }
+
+        interface PingBack {
+            type: "ping-back"
+        }
+        
+        interface PeerUpdate {
+            type: "peer-update"
+        }
+        
+        interface VideoEventName {
+            type: "video-something", // TODO string lit
+            location: string,
+            position: number
+        }
+
+        interface RTCIceCandidate {
+            type: "rtc-ice-candidate",
+            candidate: {
+                sdpMLineIndex: number,
+                sdpMid: number,
+                candidate: string
+            }
+        }
+
+        interface RTCOffer {
+            type: "rtc-offer",
+            offer: string
+        }
+
+        interface RTCAnswer {
+            type: "rtc-answer",
+            answer: string
+        }
+
+        interface RTCAbort {
+            type: "rtc-abort"
+        }
+
+        interface PlayerStateChange {
+            type: "playerStateChange",
+            element: string,
+            playerState: 1 | 2,
+            playerTime: number
+        }
+
+        interface SynchronizeVideosOfLateGuest {
+            type: "synchronizeVideosOfLateGuest",
+            element: string,
+            videoId: string,
+            playerState: 1 | 2, //this might be necessary later
+            playerTime: number
+        }
+    }
+
+    namespace ChannelSend {
+        interface WithClientId {
+            clientId: string;
+        }
+
+        type Any = Route | Who | Invite;
+
+        interface Route {
+            type: "route",
+            routeId: string,
+            message
+        }
+        interface Who {
+            type: "who",
+            "server-echo": boolean,
+            clientId: null
+        }
+        interface Invite {
+            type: "invite",
+            inviteId: string,
+            url: string,
+            userInfo,
+            forClientId: string,
+            clientId: null,
+            "server-echo": boolean
         }
     }
 
@@ -228,7 +366,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: Messages[] | true,
+        ignoreMessages: TogetherJSNS.SessionSend.Types[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
