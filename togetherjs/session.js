@@ -122,7 +122,7 @@ function sessionMain(require, util, channels, $, storage) {
                     starting: starting
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg); // TODO emit error
+                session.emit("prepare-hello", msg);
                 return msg;
             }
             else {
@@ -141,7 +141,7 @@ function sessionMain(require, util, channels, $, storage) {
                     clientVersion: TogetherJS.version
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg); // TODO emit error
+                session.emit("prepare-hello", msg);
                 return msg;
             }
         };

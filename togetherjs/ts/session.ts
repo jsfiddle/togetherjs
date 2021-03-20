@@ -117,7 +117,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     starting: starting
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg); // TODO emit error
+                session.emit("prepare-hello", msg);
                 return msg;
             }
             else {
@@ -136,7 +136,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     clientVersion: TogetherJS.version
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg); // TODO emit error
+                session.emit("prepare-hello", msg);
                 return msg;
             }
         }
