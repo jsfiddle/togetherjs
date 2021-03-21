@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 interface ExternalPeerAttributes {
-    identityId;
-    status;
-    name;
-    avatar;
-    color;
+    identityId: string;
+    status: string;
+    name: string;
+    avatar: string;
+    color: string;
 }
 
 function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
