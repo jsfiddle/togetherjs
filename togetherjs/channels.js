@@ -219,7 +219,7 @@ function channelsMain(util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if (win && "contentWindow" in win) {
+            if (win && "contentWindow" in win && win.contentWindow) {
                 this.window = win.contentWindow;
             }
             else {

@@ -96,7 +96,7 @@ function channelsMain(util: Util) {
             // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if(!this.rawdata) {
                 try {
-                    const dataAsObject = JSON.parse(data);
+                    const dataAsObject = JSON.parse(data) as unknown;
                     if(this.onmessage) {
                         this.onmessage(dataAsObject);
                     }
@@ -266,7 +266,7 @@ function channelsMain(util: Util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if(win && "contentWindow" in win) {
+            if(win && "contentWindow" in win && win.contentWindow) {
                 this.window = win.contentWindow;
             }
             else {
@@ -372,7 +372,7 @@ function channelsMain(util: Util) {
             return s + ']';
         }
 
-        _send(data: any) {
+        _send(data) {
             this.source.postMessage(data, this.expectedOrigin);
         }
 
@@ -421,7 +421,7 @@ function channelsMain(util: Util) {
 
     class Router extends OnClass {
         _routes: {[key: string]: Route} = Object.create(null);
-        channel: AbstractChannel;
+        channel!: AbstractChannel; // TODO !
 
         constructor(channel?: AbstractChannel) {
             super();

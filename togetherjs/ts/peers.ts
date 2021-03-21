@@ -67,7 +67,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
     var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
-    var ui;
+    var ui: TogetherJSNS.Ui;
     require(["ui"], function(uiModule) {
         ui = uiModule;
     });
