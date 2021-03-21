@@ -213,7 +213,6 @@ var Util = /** @class */ (function () {
         }
     */
     Util.prototype.resolveMany = function (defs) {
-        var oneArg = true;
         return this.Deferred(function (def) {
             var count = defs.length;
             if (!count) {
@@ -221,7 +220,6 @@ var Util = /** @class */ (function () {
                 return;
             }
             var allResults = [];
-            ;
             var anyError = false;
             defs.forEach(function (arg, index) {
                 arg.then(function (result) {

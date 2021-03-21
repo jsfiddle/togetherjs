@@ -207,14 +207,13 @@ class Util {
         }
     */
     public resolveMany<T extends readonly any[]>(defs: { [I in keyof T]: JQueryDeferred<T[I]> }): JQueryDeferred<T> {
-        var oneArg = true;
         return this.Deferred<T>(function(def) {
             var count = defs.length;
             if(!count) {
                 def.resolve();
                 return;
             }
-            var allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };;
+            var allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };
             var anyError = false;
             defs.forEach(function(arg, index) {
                 arg.then(function(result) {
@@ -223,7 +222,8 @@ class Util {
                     }
                     count--;
                     check();
-                }, function(error) {
+                },
+                function(error) {
                     allResults[index] = error;
                     anyError = true;
                     count--;
