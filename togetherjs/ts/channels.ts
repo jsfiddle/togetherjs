@@ -222,7 +222,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = (_jsonData: TogetherJSNS.ChannelSend.Any) => {};
+        onmessage = <T extends keyof TogetherJSNS.ChannelOnMessage.Map>(_jsonData: TogetherJSNS.ChannelOnMessage.Map[T]) => {};
 
     } // /WebSocketChannel
 

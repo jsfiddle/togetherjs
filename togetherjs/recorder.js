@@ -51,6 +51,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
             });
         };
         Recorder.prototype.activate = function (options) {
+            var _this = this;
             var match;
             baseUrl = options.baseUrl;
             this.shareId = TogetherJS.startup._joinShareId;
@@ -81,7 +82,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
                     sendLogs(msg);
                     return;
                 }
-                this.logMessage(msg);
+                _this.logMessage(msg);
             };
             sendHello(false);
         };

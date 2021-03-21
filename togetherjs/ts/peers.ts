@@ -491,8 +491,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             }
             assert(peer, "No peer with id:", id);
             if(message &&
-                (message.type == "hello" || message.type == "hello-back" ||
-                    message.type == "peer-update")) {
+                (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
                 peer.updateFromHello(message);
                 peer.view.update();
             }

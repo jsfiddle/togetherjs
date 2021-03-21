@@ -417,8 +417,7 @@ function peersMain(util, session, storage, require, templates) {
             }
             assert(peer, "No peer with id:", id);
             if (message &&
-                (message.type == "hello" || message.type == "hello-back" ||
-                    message.type == "peer-update")) {
+                (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
                 peer.updateFromHello(message);
                 peer.view.update();
             }

@@ -54,12 +54,12 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
 
         getList(hubUrl: string) {
             return util.Deferred(function(def) {
-                var expected;
+                var expected: number;
                 var channel = channels.WebSocketChannel(hubUrl);
-                var users = {};
+                var users: { [user: string]: ExternalPeer } = {};
                 var responded = 0;
                 var firstResponse = 0;
-                var lateResponseTimeout;
+                var lateResponseTimeout: number;
                 channel.onmessage = function(msg) {
                     if(msg.type == "init-connection") {
                         expected = msg.peerCount;
@@ -103,7 +103,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                 }
             });
         }
-    
+
         invite(hubUrl: string, clientId: string) {
             return util.Deferred(function(def) {
                 var channel = channels.WebSocketChannel(hubUrl);

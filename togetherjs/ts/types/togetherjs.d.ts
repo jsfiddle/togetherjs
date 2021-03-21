@@ -114,13 +114,6 @@ declare namespace TogetherJSNS {
 
         interface GetLogs {
             type: "get-logs",
-
-        }
-
-        interface saveAs {
-            type: "get-logs",
-            forClient: string,
-            saveAs: string
         }
 
         interface CursorClick {
@@ -266,6 +259,16 @@ declare namespace TogetherJSNS {
         }
     }
 
+    namespace ChannelOnMessage {
+        interface Map {
+            "hello": {type: "hello"};
+            "hello-back": {type: "hello-back", clientId: string};
+            "get-logs": TogetherJSNS.Message;
+            "peer-update";
+            "init-connection": { type: "init-connection", peerCount: number };
+        }
+    }
+
     namespace On {
         /** Do not use this in your own code, it's just here to be inherited */
         interface HelloMessageBase {
@@ -284,7 +287,6 @@ declare namespace TogetherJSNS {
         interface HelloMessage extends HelloMessageBase {
             type: "hello";
             clientVersion: string;
-            /** optional because it is set during the prepare-hello event */
         }
 
         interface HelloBackMessage extends HelloMessageBase {

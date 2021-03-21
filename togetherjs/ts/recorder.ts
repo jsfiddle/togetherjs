@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels: TogetherJSNS.Channels) {
-    let channel: TogetherJSNS.WebSocketChannel | null= null;
+    let channel: TogetherJSNS.WebSocketChannel | null = null;
     let baseUrl = null;
     let clientId = "recorder";
 
@@ -75,7 +75,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
             channel = channels.WebSocketChannel(url);
-            channel.onmessage = function(msg: TogetherJSNS.Message) {
+            channel.onmessage = (msg: TogetherJSNS.Message) => {
                 if(msg.type == "hello-back") {
                     display("#connected");
                 }
