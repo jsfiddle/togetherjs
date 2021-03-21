@@ -196,6 +196,7 @@ class Util {
         }
     }
 
+    // TODO should we just replace resolveMany with promises and promise.all?
     /** Resolves several promises givent as one argument as an array of promises.
         Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
         FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
