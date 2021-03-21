@@ -1,3 +1,15 @@
+A New Beginning for TogetherJS ... TogetherTS!
+==============================
+
+In this project I try to convert TogetherJS to Typescript. At first we will change the logic as little as possible to have a drop in replacement for the Together**JS**.
+
+In the long run many changes are planned, some of them are:
+
+- Removing JQuery
+- Use a true import system
+- Reduce the amount of captured variables that make the code difficult to maintain
+- Improve the dock
+
 TogetherJS - Surprisingly easy collaboration
 ============================================
 

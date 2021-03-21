@@ -238,7 +238,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             this.dockElement = null;
             this.detailElement = null;
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            this.dockClick = this.dockClick.bind(this);
+            this.dockClick = this.dockClick.bind(this); // TODO ugly
         }
         /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
         PeerView.prototype.setElement = function (el) {

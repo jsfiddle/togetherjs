@@ -247,7 +247,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             private peer: TogetherJSNS.PeerClass
         ) {
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            this.dockClick = this.dockClick.bind(this);
+            this.dockClick = this.dockClick.bind(this); // TODO ugly
         }
 
         /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
@@ -558,7 +558,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     class Ui {
         public container: JQuery | null = null;
-        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) => new PeerView(this, peer);
+        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
