@@ -266,7 +266,7 @@ declare namespace TogetherJSNS {
             "hello": { type: "hello" };
             "hello-back": { type: "hello-back", clientId: string };
             "get-logs": TogetherJSNS.Message;
-            "peer-update";
+            "peer-update": {type: "peer-update", name: string, avatar: string, color: string};
             "init-connection": { type: "init-connection", peerCount: number };
         }
     }
