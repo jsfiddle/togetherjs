@@ -114,9 +114,21 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                         def.resolve();
                     }
                 };
-                var userInfo = session.makeHelloMessage(false);
-                delete userInfo.type;
-                userInfo.clientId = session.clientId;
+                var hello = session.makeHelloMessage(false);
+
+                const userInfo = {
+                    name: hello.name,
+                    avatar: hello.avatar,
+                    color: hello.color,
+                    url: hello.url,
+                    urlHash: hello.urlHash,
+                    title: hello.title,
+                    rtcSupported: hello.rtcSupported,
+                    isClient: hello.isClient,
+                    starting: hello.starting,
+                    clientId: session.clientId!, // TODO !
+                };
+
                 channel.send({
                     type: "invite",
                     inviteId: id,

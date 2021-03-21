@@ -80,7 +80,8 @@ function channelsMain(util) {
                 if (this.onmessage) {
                     this.onmessage(data);
                 }
-                this.emit("message", data);
+                //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
+                this.emit("message", data); // TODO if this is not used maybe we should remove it?
             }
         };
         return AbstractChannel;
@@ -299,6 +300,7 @@ function channelsMain(util) {
             var _this = _super.call(this) || this;
             _this._pingTimeout = null;
             _this.source = null;
+            _this.onmessage = function () { };
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             window.addEventListener("message", _this._receiveMessage, false);
@@ -354,7 +356,6 @@ function channelsMain(util) {
             this.emit("close");
         };
         PostMessageIncomingChannel.prototype.onclose = function () { };
-        PostMessageIncomingChannel.prototype.onmessage = function () { };
         return PostMessageIncomingChannel;
     }(AbstractChannel));
     ; // /PostMessageIncomingChannel

@@ -5,7 +5,7 @@
 interface Change2 {
     id: string,
     delta: TextReplace,
-    basis?,
+    basis?: number,
     sent?: boolean,
 }
 

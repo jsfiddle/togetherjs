@@ -7,7 +7,6 @@ declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
 function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
     // TODO this is apparently an empty module object
-    var forms = util.Module("forms");
     const assert: typeof util.assert = util.assert;
 
     // This is how much larger the focus element is than the element it surrounds
@@ -903,7 +902,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     });
 
-    return forms;
+    return {trackerClassExport: null} as unknown as {trackerClassExport: TrackerClass}; // TODO ugly export
 }
 
 define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

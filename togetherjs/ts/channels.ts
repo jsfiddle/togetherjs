@@ -111,7 +111,8 @@ function channelsMain(util: Util) {
                 if(this.onmessage) {
                     this.onmessage(data);
                 }
-                this.emit("message", data);
+                //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
+                this.emit("message", data); // TODO if this is not used maybe we should remove it?
             }
         }
 
@@ -123,7 +124,7 @@ function channelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        public onmessage?: <T>(jsonData: T) => void;
+        public onmessage?: (jsonData: any) => void;
         abstract onclose(): void;
     }
 
@@ -221,7 +222,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = (_jsonData: unknown) => {};
+        onmessage = (_jsonData: TogetherJSNS.ChannelSend.Any) => {};
 
     } // /WebSocketChannel
 
@@ -415,7 +416,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = () => {}
     }; // /PostMessageIncomingChannel
 
     class Router extends OnClass {

@@ -97,6 +97,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             session.send(msg);
         }
 
+        makeHelloMessage(helloBack: true): TogetherJSNS.On.HelloBackMessage;
+        makeHelloMessage(helloBack: false): TogetherJSNS.On.HelloMessage;
         makeHelloMessage(helloBack: boolean) {
             let starting: boolean = false;
             if(!TogetherJS.startup.continued) {

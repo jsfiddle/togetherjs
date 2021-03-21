@@ -60,7 +60,7 @@ declare namespace TogetherJSNS {
         interface ChatLeft {
             peer: TogetherJSNS.PeerClass,
             date: number,
-            declinedJoin
+            declinedJoin: boolean
         }
 
         /** "chat-system" */
@@ -110,6 +110,11 @@ declare namespace TogetherJSNS {
             type: "chat",
             text: string,
             messageId: string
+        }
+
+        interface GetLogs {
+            type: "get-logs",
+
         }
 
         interface saveAs {
@@ -192,6 +197,22 @@ declare namespace TogetherJSNS {
             clientId: string | null;
         }
 
+        /** Not a message, it's a field */
+        interface UserInfo {
+            name: string,
+            avatar: string,
+            color: string,
+            url: string,
+            urlHash: string,
+            title: string,
+            rtcSupported: boolean,
+            isClient: boolean,
+            starting: boolean,
+            clientId: string,
+        }
+
+        type Any = Route | Who | Invite;
+
         interface Map {
             "route": Route,
             "who": Who,
@@ -201,21 +222,23 @@ declare namespace TogetherJSNS {
         interface Route {
             type: "route",
             routeId: string,
-            message
+            message: TogetherJSNS.Message
         }
+
         interface Who {
             type: "who",
             "server-echo": boolean,
             clientId: null
         }
+        
         interface Invite {
             type: "invite",
             inviteId: string,
             url: string,
-            userInfo,
             forClientId: string,
             clientId: null,
-            "server-echo": boolean
+            "server-echo": boolean,
+            userInfo: UserInfo
         }
     }
 
@@ -250,8 +273,8 @@ declare namespace TogetherJSNS {
         "close": () => void;
 
         // channel.on
-        /** msg can be of type string if rawData is activated */
-        "message": (msg: MessageFromChannel | string) => void;
+        /** msg can be of type string if rawData is activated but we don't put it here */
+        "message": (msg: MessageFromChannel) => void;
 
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
@@ -340,12 +363,13 @@ declare namespace TogetherJSNS {
     type PeerClass = Peers["PeerClassExport"];
     type Logs = Playback["LogsExport"];
     type PeerSelf = Peers["Self"];
+    type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
 
     type ValueOf<T> = T[keyof T];
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection" | "get-logs";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
@@ -382,7 +406,7 @@ declare namespace TogetherJSNS {
         checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
         startupReason: Reason;
         $: JQueryStatic;
-        addTracker(TrackerClass: Tracker, skipSetInit: boolean): void;
+        addTracker(TrackerClass: TrackerClass, skipSetInit: boolean): void;
         startTarget: HTMLElement;
     }
 
@@ -502,14 +526,14 @@ declare namespace TogetherJSNS {
         type: TogetherJSNS.Messages;
         url: string;
         to: string;
-        peerCount?;
+        peerCount?: number;
     }
 
     interface FormFocusMessage {
         sameUrl: boolean | undefined;
         type: "form-focus";
-        peer: Peer;
-        element;
+        peer: PeerClass;
+        element: string;
     }
 
     interface FormInitMessage {
@@ -517,10 +541,10 @@ declare namespace TogetherJSNS {
         type: "form-init";
         pageAge: number;
         updates: {
-            element;
-            tracker;
-            value;
-            basis;
+            element: string;
+            tracker: string;
+            value: string;
+            basis: number;
         }[]
     }
 
@@ -530,10 +554,10 @@ declare namespace TogetherJSNS {
         /** a selector */
         element: string;
         "server-echo": boolean;
-        tracker?;
+        tracker?: string;
         replace: {
-            id;
-            basis;
+            id: string;
+            basis: number;
             delta: TextReplace;
         }
     }
@@ -588,16 +612,20 @@ declare namespace TogetherJSNS {
     }
 
     interface CodeMirrorElement {
-        CodeMirror;
+        CodeMirror: unknown;
     }
 
     interface AceEditorElement {
-        env;
+        env: unknown;
     }
 
     interface CKEditor {
-        dom: {
-            element;
+        dom: { // TODO better style?
+            element: {
+                get: (elem: HTMLElement) => {
+                    getEditor: () => unknown;
+                }
+            };
         }
     }
 
