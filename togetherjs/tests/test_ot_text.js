@@ -41,7 +41,7 @@ function run() {
 // =SECTION Simple Test Setup expand-on-failure
 
 function r(start, length, text) {
-  return ot.TextReplace(start, length, text);
+  return new ot.TextReplace(start, length, text);
 }
 
 function trans(text, d1, d2) {

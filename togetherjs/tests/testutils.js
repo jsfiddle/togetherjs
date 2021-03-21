@@ -142,7 +142,7 @@ Test.resetSettings = function () {
   var util = TogetherJS.require("util");
   var storage = TogetherJS.require("storage");
   return $.Deferred(function (def) {
-    util.resolveMany(
+    util.resolveMany([
       storage.settings.set("name", ""),
       storage.settings.set("defaultName", "Jane Doe"),
       storage.settings.set("avatar", undefined),
@@ -152,7 +152,7 @@ Test.resetSettings = function () {
       storage.settings.set("seenWalkthrough", undefined),
       storage.settings.set("dontShowRtcInfo", undefined),
       storage.tab.set("chatlog", undefined)
-    ).then(function () {
+    ]).then(function () {
       def.resolve("Settings reset");
     });
   });
@@ -167,7 +167,7 @@ Test.startTogetherJS = function () {
       def.resolve("TogetherJS started");
     });
     TogetherJS.startup._launch = true;
-    TogetherJS();
+    TogetherJS.start();
   });
 };
 
