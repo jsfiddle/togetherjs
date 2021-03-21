@@ -15,7 +15,6 @@ interface PeerClassAttributes {
     name: string;
     avatar: string | null;
     color: string;
-    view;
     lastMessageDate: number;
     following: boolean;
     joined: boolean;
@@ -51,7 +50,7 @@ interface MessageWithUrlHash {
 interface Message2 {
     sameUrl: boolean;
     clientId: string;
-    peer: TogetherJSNS.Peer;
+    peer: TogetherJSNS.PeerClass;
     type: TogetherJSNS.Messages;
     url: string;
     to: string;
@@ -68,7 +67,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
     var ui: TogetherJSNS.Ui;
-    require(["ui"], function(uiModule) {
+    require(["ui"], function(uiModule: TogetherJSNS.Ui) {
         ui = uiModule;
     });
 
@@ -88,11 +87,11 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private lastMessageDate: number = 0;
         public readonly following: boolean;
 
-        public readonly url: string;
+        public readonly url?: string;
         private hash: string | null = null;
         public readonly title: string | null = null;
-        private rtcSupported: boolean;
-        public readonly isCreator: boolean;
+        private rtcSupported?: boolean;
+        public readonly isCreator?: boolean;
         public readonly urlHash: string;
 
         public static peers: {[id: string]: PeerClass} = {};
