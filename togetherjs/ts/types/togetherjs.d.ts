@@ -217,6 +217,30 @@ declare namespace TogetherJSNS {
             "route": Route,
             "who": Who,
             "invite": Invite,
+            "bye": { type: "bye", clientId: string },
+            "logs": { type: "logs", clientId: string, logs: string, request: TogetherJSNS.Message },
+            "hello": Hello,
+            "hello-back": HelloBack,
+        }
+
+        interface Hello {
+            type: "hello",
+            name: string,
+            avatar: string,
+            color: string,
+            rtcSupported: boolean,
+            clientId: string,
+            url: string
+        }
+
+        interface HelloBack {
+            type: "hello-back",
+            name: string,
+            avatar: string,
+            color: string,
+            rtcSupported: boolean,
+            clientId: string,
+            url: string
         }
 
         interface Route {

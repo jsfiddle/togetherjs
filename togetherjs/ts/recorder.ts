@@ -2,12 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { removeData } from "jquery";
-
 define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels: TogetherJSNS.Channels) {
     let recorder = util.Module("recorder");
     let assert: typeof util.assert = util.assert;
-    let channel: typeof channels.WebSocketChannel = null;
+    let channel: TogetherJSNS.WebSocketChannel | null= null;
     let baseUrl = null;
     let clientId = "recorder";
 
@@ -21,7 +19,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
     }
 
     function sendHello(helloBack: boolean) {
-        var msg = {
+        channel.send({
             type: helloBack ? "hello-back" : "hello",
             name: "Recorder 'bot",
             // FIXME: replace with robot:
@@ -30,18 +28,16 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
             rtcSupported: false,
             clientId: clientId,
             url: "about:blank"
-        };
-        channel.send(msg);
+        });
     }
 
-    function sendLogs(req) {
-        var msg: TogetherJSNS.Message = {
+    function sendLogs(req: TogetherJSNS.Message) {
+        channel.send({
             type: "logs",
             clientId: clientId,
             logs: $("#record").val(),
             request: req
-        };
-        channel.send(msg);
+        });
     }
 
     class Recorder {
