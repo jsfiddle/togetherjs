@@ -383,11 +383,11 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         }
 
         _loadFromSettings() {
-            return util.resolveMany(
+            return util.resolveMany([
                 storage.settings.get("name"),
                 storage.settings.get("avatar"),
                 storage.settings.get("defaultName"),
-                storage.settings.get("color")).then((function(this: PeersSelf, name, avatar, defaultName, color) {
+                storage.settings.get("color")]).then((function(this: PeersSelf, name, avatar, defaultName, color) {
                     if(!defaultName) {
                         defaultName = util.pickRandom(DEFAULT_NICKNAMES);
 

@@ -238,17 +238,9 @@ class Util {
     }
 
     // work for storage
-    public resolveMany<T>(...args1: JQueryDeferred<T>[]) {
-        var args: JQueryDeferred<T>[];
-        var oneArg = false;
-        if(arguments.length == 1 && Array.isArray(arguments[0])) {
-            oneArg = true;
-            args = arguments[0];
-        }
-        else {
-            args = Array.prototype.slice.call(arguments);
-        }
-        return this.Deferred(function(def) {
+    public resolveMany<T>(args: JQueryDeferred<T>[]) {
+        var oneArg = true;
+        return this.Deferred<(T | undefined)[]>(function(def) {
             var count = args.length;
             if(!count) {
                 def.resolve();
@@ -271,17 +263,9 @@ class Util {
             function check() {
                 if(!count) {
                     if(anyError) {
-                        if(oneArg) {
-                            def.reject(allResults);
-                        } else {
-                            def.reject.apply(def, allResults);
-                        }
+                        def.reject(allResults);
                     } else {
-                        if(oneArg) {
-                            def.resolve(allResults);
-                        } else {
-                            def.resolve.apply(def, allResults);
-                        }
+                        def.resolve(allResults);
                     }
                 }
             }

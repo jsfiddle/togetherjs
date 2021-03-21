@@ -309,7 +309,12 @@ function peersMain(util, session, storage, require, templates) {
             return prefix + "self";
         };
         PeersSelf.prototype._loadFromSettings = function () {
-            return util.resolveMany(storage.settings.get("name"), storage.settings.get("avatar"), storage.settings.get("defaultName"), storage.settings.get("color")).then((function (name, avatar, defaultName, color) {
+            return util.resolveMany([
+                storage.settings.get("name"),
+                storage.settings.get("avatar"),
+                storage.settings.get("defaultName"),
+                storage.settings.get("color")
+            ]).then((function (name, avatar, defaultName, color) {
                 if (!defaultName) {
                     defaultName = util.pickRandom(DEFAULT_NICKNAMES);
                     storage.settings.set("defaultName", defaultName);
