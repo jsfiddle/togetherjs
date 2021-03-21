@@ -2,19 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface ChatTextAttributes {
-    text: string;
-    peer;
-    messageId;
-    date: number;
-    notify;
-    declinedJoin;
-    url: string;
-    sameUrl: boolean;
-    title: string;
-    forEveryone;
-}
-
 function uiMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, tinycolor: tinycolor, elementFinder: ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
     var assert: typeof util.assert = util.assert;
     var AssertionError = util.AssertionError;

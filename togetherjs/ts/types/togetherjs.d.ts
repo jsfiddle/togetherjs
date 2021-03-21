@@ -302,7 +302,7 @@ declare namespace TogetherJSNS {
 
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
-        "bye": (msg: { clientId: string }) => void;
+        "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
         "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: Logs }) => void; // TODO parameter similar to GetLogs
         // TODO logs may be of type Logs[], we shoud check
         "cursor-update": (msg: { sameUrl: boolean, clientId: string }) => void;

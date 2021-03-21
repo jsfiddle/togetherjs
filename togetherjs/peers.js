@@ -494,7 +494,7 @@ function peersMain(util, session, storage, require, templates) {
     }
     session.hub.on("bye", function (msg) {
         var peer = peers.getPeer(msg.clientId);
-        peer.bye();
+        peer.bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
     });
     var checkActivityTask = null;
     session.on("start", function () {

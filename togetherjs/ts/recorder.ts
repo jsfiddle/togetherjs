@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels: TogetherJSNS.Channels) {
-    let recorder = util.Module("recorder");
-    let assert: typeof util.assert = util.assert;
     let channel: TogetherJSNS.WebSocketChannel | null= null;
     let baseUrl = null;
     let clientId = "recorder";
@@ -109,5 +107,4 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
     });
 
     return new Recorder();
-
 });

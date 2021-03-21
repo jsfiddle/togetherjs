@@ -587,7 +587,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
     session.hub.on("bye", function(msg) {
         var peer = peers.getPeer(msg.clientId);
-        peer.bye();
+        (peer as PeerClass).bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
     });
 
     var checkActivityTask: number | null = null;
