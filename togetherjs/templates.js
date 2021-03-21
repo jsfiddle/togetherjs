@@ -2,9 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-// FIXME: maybe it would be better to dynamically assemble the first
-// argument to define() here to include the localized module:
-define(["util", "require"], function (util, require) {
+function templatesMain(util, require) {
     var assert = util.assert;
     function clean(t) {
         // Removes <% /* ... */ %> comments:
@@ -37,4 +35,7 @@ define(["util", "require"], function (util, require) {
         assert(templatesLang, "Templates not yet loaded");
         return clean(templatesLang[resourceName]);
     };
-});
+}
+// FIXME: maybe it would be better to dynamically assemble the first
+// argument to define() here to include the localized module:
+define(["util", "require"], templatesMain);

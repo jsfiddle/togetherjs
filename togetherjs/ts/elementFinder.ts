@@ -25,7 +25,6 @@ class CannotFind {
 }
 
 class ElementFinder {
-
     ignoreElement(element: HTMLElement | JQuery) {
         let el: Node | JQuery | null = element;
         if(isJQuery(el)) {
@@ -106,9 +105,11 @@ class ElementFinder {
         }
         else if(loc === "head") {
             return document.head;
-        } else if(loc === "document") {
+        }
+        else if(loc === "document") {
             return document.documentElement;
-        } else if(loc.indexOf("body") === 0) {
+        }
+        else if(loc.indexOf("body") === 0) {
             el = document.body;
             try {
                 return this.findElement(loc.substr(("body").length), el);
@@ -118,7 +119,8 @@ class ElementFinder {
                 }
                 throw e;
             }
-        } else if(loc.indexOf("head") === 0) {
+        }
+        else if(loc.indexOf("head") === 0) {
             el = document.head;
             try {
                 return this.findElement(loc.substr(("head").length), el);
@@ -128,7 +130,8 @@ class ElementFinder {
                 }
                 throw e;
             }
-        } else if(loc.indexOf("#") === 0) {
+        }
+        else if(loc.indexOf("#") === 0) {
             var id;
             loc = loc.substr(1);
             if(loc.indexOf(":") === -1) {
@@ -154,7 +157,8 @@ class ElementFinder {
             } else {
                 return el;
             }
-        } else if(loc.indexOf(":nth-child(") === 0) {
+        }
+        else if(loc.indexOf(":nth-child(") === 0) {
             loc = loc.substr((":nth-child(").length);
             if(loc.indexOf(")") == -1) {
                 throw "Invalid location, missing ): " + loc;
@@ -193,10 +197,11 @@ class ElementFinder {
             } else {
                 return el;
             }
-        } else {
+        }
+        else {
             throw new CannotFind(loc, "Malformed location", container);
         }
-    };
+    }
 
     elementByPixel(height: number) {
         let self = this;
@@ -218,6 +223,7 @@ class ElementFinder {
                     return false;
                 }
                 last = el;
+                return;
             });
             if ((!children.length) || (!last)) {
                 // There are no children, or only inapplicable children
@@ -263,11 +269,6 @@ class ElementFinder {
     }
 }
 
-define(
-    ["util", "jquery"],
-    function(util: Util, $: JQueryStatic) {
-        let assert: typeof util.assert = util.assert;
-
-        return new ElementFinder();
-    }
-);
+define(["util", "jquery"], function(_util: Util, $: JQueryStatic) {
+    return new ElementFinder();
+});

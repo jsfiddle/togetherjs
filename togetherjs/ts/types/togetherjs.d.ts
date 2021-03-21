@@ -1,14 +1,409 @@
 declare namespace TogetherJSNS {
 
+    /** Types for Templating.sub */
+    namespace TemplatingSub {
+        interface Map {
+            "swatch": Swatch,
+            "walkthrough-slide-progress": WalkthroughSlideProgress,
+            "focus": Focus,
+            "dock-person": DockPerson,
+            "participant-window": ParticipantWindow,
+            "invite-user-item": InviteUserItem,
+            "chat-message": ChatMessage,
+            "chat-joined": ChatJoined,
+            "chat-left": ChatLeft,
+            "chat-system": ChatSystem,
+            "url-change": UrlChange,
+            "invite": Invite,
+        }
+
+        /** "swatch" */
+        type Swatch = {};
+
+        /** "walkthrough-slide-progress" */
+        type WalkthroughSlideProgress = {};
+
+        /** "focus" */
+        interface Focus {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "dock-person" */
+        interface DockPerson {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "participant-window" */
+        interface ParticipantWindow {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "invite-user-item" */
+        interface InviteUserItem {
+            peer: TogetherJSNS.PeerClass
+        }
+
+        /** "chat-message" */
+        interface ChatMessage {
+            peer: TogetherJSNS.PeerClass,
+            content: string,
+            date: number
+        }
+
+        /** "chat-joined" */
+        interface ChatJoined {
+            peer: TogetherJSNS.PeerClass,
+            date: number
+        }
+
+        /** "chat-left" */
+        interface ChatLeft {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            declinedJoin: boolean
+        }
+
+        /** "chat-system" */
+        interface ChatSystem {
+            content: string,
+            date: number
+        }
+
+        /** "url-change" */
+        interface UrlChange {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            href: string,
+            title: string,
+            sameUrl: boolean
+        }
+
+        /** "invite" */
+        interface Invite {
+            peer: TogetherJSNS.PeerClass,
+            date: number,
+            href: string,
+            hrefTitle: string,
+            forEveryone: boolean,
+        }
+    }
+
+    namespace SessionSend {
+        interface Map {
+            "chat": Chat,
+            "get-logs": GetLogs,
+            "cursor-click": CursorClick,
+            "keydown": Keydown,
+            "form-focus": ForFocus,
+            "ping-back": PingBack,
+            "peer-update": PeerUpdate,
+            "video-something": VideoEventName, // TODO something can be any video event, try to list them with string lits
+            "rtc-ice-candidate": RTCIceCandidate,
+            "rtc-offer": RTCOffer,
+            "rtc-answer": RTCAnswer,
+            "rtc-abort": RTCAbort,
+            "playerStateChange": PlayerStateChange,
+            "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
+            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
+            "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus }
+        }
+
+        interface Chat {
+            type: "chat",
+            text: string,
+            messageId: string
+        }
+
+        interface GetLogs {
+            type: "get-logs",
+        }
+
+        interface CursorClick {
+            type: "cursor-click",
+            element: string,
+            offsetX: number,
+            offsetY: number
+        }
+
+        interface Keydown {
+            type: "keydown"
+        }
+
+        interface ForFocus {
+            type: "form-focus",
+            element: string | null
+        }
+
+        interface PingBack {
+            type: "ping-back"
+        }
+
+        interface PeerUpdate {
+            type: "peer-update"
+        }
+
+        interface VideoEventName {
+            type: "video-something", // TODO string lit
+            location: string,
+            position: number
+        }
+
+        interface RTCIceCandidate {
+            type: "rtc-ice-candidate",
+            candidate: {
+                sdpMLineIndex: number,
+                sdpMid: number,
+                candidate: string
+            }
+        }
+
+        interface RTCOffer {
+            type: "rtc-offer",
+            offer: string
+        }
+
+        interface RTCAnswer {
+            type: "rtc-answer",
+            answer: string
+        }
+
+        interface RTCAbort {
+            type: "rtc-abort"
+        }
+
+        interface PlayerStateChange {
+            type: "playerStateChange",
+            element: string,
+            playerState: 1 | 2,
+            playerTime: number
+        }
+
+        interface SynchronizeVideosOfLateGuest {
+            type: "synchronizeVideosOfLateGuest",
+            element: string,
+            videoId: string,
+            playerState: 1 | 2, //this might be necessary later
+            playerTime: number
+        }
+    }
+
+    namespace ChannelSend {
+        interface WithClientId {
+            clientId: string | null;
+        }
+
+        /** Not a message, it's a field */
+        interface UserInfo {
+            name: string,
+            avatar: string,
+            color: string,
+            url: string,
+            urlHash: string,
+            title: string,
+            rtcSupported: boolean,
+            isClient: boolean,
+            starting: boolean,
+            clientId: string,
+        }
+
+        type Any = Route | Who | Invite;
+
+        interface Map {
+            "route": Route,
+            "who": Who,
+            "invite": Invite,
+            "bye": { type: "bye", clientId: string },
+            "logs": { type: "logs", clientId: string, logs: string, request: TogetherJSNS.Message },
+            "hello": Hello,
+            "hello-back": HelloBack,
+        }
+
+        interface Hello {
+            type: "hello",
+            name: string,
+            avatar: string,
+            color: string,
+            rtcSupported: boolean,
+            clientId: string,
+            url: string
+        }
+
+        interface HelloBack {
+            type: "hello-back",
+            name: string,
+            avatar: string,
+            color: string,
+            rtcSupported: boolean,
+            clientId: string,
+            url: string
+        }
+
+        interface Route {
+            type: "route",
+            routeId: string,
+            message: TogetherJSNS.Message
+        }
+
+        interface Who {
+            type: "who",
+            "server-echo": boolean,
+            clientId: null
+        }
+
+        interface Invite {
+            type: "invite",
+            inviteId: string,
+            url: string,
+            forClientId: string,
+            clientId: null,
+            "server-echo": boolean,
+            userInfo: UserInfo
+        }
+    }
+
+    namespace ChannelOnMessage {
+        interface Map {
+            "hello": { type: "hello" };
+            "hello-back": { type: "hello-back", clientId: string };
+            "get-logs": TogetherJSNS.Message;
+            "peer-update": {type: "peer-update", name: string, avatar: string, color: string};
+            "init-connection": { type: "init-connection", peerCount: number };
+        }
+    }
+
+    namespace On {
+        /** Do not use this in your own code, it's just here to be inherited */
+        interface HelloMessageBase {
+            name: string,
+            avatar: string,
+            color: string,
+            url: string,
+            urlHash: string,
+            title: string,
+            rtcSupported: boolean,
+            isClient: boolean,
+            starting: boolean,
+            scrollPosition?: ElementFinder.Position
+        }
+
+        interface HelloMessage extends HelloMessageBase {
+            type: "hello";
+            clientVersion: string;
+        }
+
+        interface HelloBackMessage extends HelloMessageBase {
+            type: "hello-back"
+        }
+    }
+
+    interface OnMap {
+        // channel.on & session.on
+        "close": () => void;
+
+        // channel.on
+        /** msg can be of type string if rawData is activated but we don't put it here */
+        "message": (msg: MessageFromChannel) => void;
+
+        // session.hub.on
+        "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
+        "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
+        "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: Logs }) => void; // TODO parameter similar to GetLogs
+        // TODO logs may be of type Logs[], we shoud check
+        "cursor-update": (msg: { sameUrl: boolean, clientId: string }) => void;
+        "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
+        "hello-back hello": (msg: { type: "hello", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
+        "hello": (msg: { sameUrl: boolean }) => void;
+        "cursor-click": (msg: { sameUrl: boolean, clientId: string, element: string, offsetY: number, offsetX: number }) => void;
+        "keydown": (msg: { clientId: string }) => void;
+        "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2 }) => void
+        "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
+        "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
+        "idle-status": (msg: { idle: boolean }) => void;
+        "ping": () => void;
+        "hello hello-back": (msg: { type: keyof OnMap, isClient: boolean }) => void;
+        "who": () => void;
+        "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
+        "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
+        "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
+        "synchronizeVideosOfLateGuest": (msg: { element: string, videoId: string, playerTime: number }) => void;
+        "differentVideoLoaded": (msg: { videoId: string }) => void;
+        "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
+        "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
+        "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
+        "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
+
+        // session.on
+        "prepare-hello": (msg: On.HelloMessage | On.HelloBackMessage) => void;
+        "ui-ready": (ui: Ui) => void;
+        "reinitialize": () => void;
+        "follow-peer": (peer: PeerClass) => void;
+        "start": () => void;
+        "refresh-user-data": () => void;
+        "visibility-change": (hidden: boolean) => void;
+        "hide-window": (window: JQuery[]) => void; // TODO check type of window
+        "shareId": () => void;
+        "display-window": (id: string, element: JQuery) => void
+        "resize": () => void;
+        "new-element": (element: JQuery) => void;
+        "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
+        "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
+
+        // peers.on
+        "new-peer identity-updated status-updated": (peer: PeerClass) => void;
+
+        // TogetherJS.once
+        "ready": () => void;
+
+        // .emit
+        "new-peer": (peer: PeerClass) => void;
+        "status-updated": (peer: PeerClass | PeerSelf) => void;
+        "idle-updated": (peer: PeerClass | PeerSelf) => void;
+        "rtc-supported": (peer: PeerClass) => void;
+        "url-updated": (peer: PeerClass) => void;
+        "identity-updated": (peer: PeerClass) => void;
+        "self-updated": () => void;
+        "startup-ready": () => void;
+    }
+
+    type Channels = ReturnType<typeof channelsMain>;
+    type Storage = ReturnType<typeof StorageMain>;
+    type Session = ReturnType<typeof sessionMain>;
+    type Templates = ReturnType<typeof templatesMain>;
+    type Peers = ReturnType<typeof peersMain>;
+    type Windowing = ReturnType<typeof windowingMain>;
+    type Templating = ReturnType<typeof templatingMain>;
+    type Ot = ReturnType<typeof otMain>;
+    type Linkify = ReturnType<typeof linkifyMain>;
+    type VisibilityApi = ReturnType<typeof visibilityApiMain>;
+    type Playback = ReturnType<typeof playbackMain>;
+    type Chat = ReturnType<typeof chatMain>;
+    type Ui = ReturnType<typeof uiMain>;
+    type Who = ReturnType<typeof whoMain>;
+    type Console = ReturnType<typeof consoleMain>;
+    type TogetherJSClass = ReturnType<typeof togetherjsMain>;
+    type On = OnClass;
+    type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
+    type Walkabout = unknown;
+    type UtilAlias = Util;
+    type PeerView = ReturnType<Ui["PeerView"]>;
+    type Walkthrough = ReturnType<typeof walkthroughMain>;
+
+    type ExternalPeer = Who["ExternalPeerExport"];
+    type PeerClass = Peers["PeerClassExport"];
+    type Logs = Playback["LogsExport"];
+    type PeerSelf = Peers["Self"];
+    type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
+
     type ValueOf<T> = T[keyof T];
 
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection" | "get-logs";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
-    interface TogetherJS extends On, ConfigGetter2 {
+    interface TogetherJS extends OnClass {
+        getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         (event?: Event): TogetherJS;
         running: boolean;
         require: Require;
@@ -28,8 +423,8 @@ declare namespace TogetherJSNS {
         _teardown: unknown,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,
-        _configTrackers: Partial<{[key in keyof TogetherJSNS.Config]: unknown[]}>;
-        _configClosed: {[P in keyof TogetherJSNS.Config]?: boolean};
+        _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: unknown[] }>;
+        _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean };
         version: string;
         baseUrl: string;
         _onmessage(msg: TogetherJSNS.Message): void;
@@ -40,14 +435,16 @@ declare namespace TogetherJSNS {
         checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
         startupReason: Reason;
         $: JQueryStatic;
+        addTracker(TrackerClass: TrackerClass, skipSetInit: boolean): void;
+        startTarget: HTMLElement;
     }
 
     interface KeyboardListener {
-        (event: KeyboardListener): void;
-        pressed: boolean;
+        (event: KeyboardEvent): void;
+        pressed?: boolean;
     }
 
-    interface Hub extends On { }
+    interface Hub extends OnClass { }
 
     interface StartupInit {
         /** What element, if any, was used to start the session */
@@ -91,7 +488,7 @@ declare namespace TogetherJSNS {
         /** Any events to bind to */
         on: {},
         /** Hub events to bind to */
-        hub_on: {[name: string]: CallbackForOn<unknown>},
+        hub_on: { [name: string]: CallbackForOn<unknown> },
         /** Enables the alt-T alt-T TogetherJS shortcut; however, this setting must be enabled early as TogetherJSConfig_enableShortcut = true; */
         enableShortcut: boolean,
         /** The name of this tool as provided to users.  The UI is updated to use this. Because of how it is used in text it should be a proper noun, e.g., "MySite's Collaboration Tool" */
@@ -115,15 +512,16 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: Messages[],
+        ignoreMessages: (keyof TogetherJSNS.SessionSend.Map)[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
-        ignoreForms: JQuerySelector[],
+        ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
         lang?: string | null,
         fallbackLang: string,
         baseUrl?: string,
         loaded?: boolean,
         callToStart?: CallToStart,
+        pasteSite?: string,
     }
 
     type CallToStart = (cb: () => void) => void;
@@ -147,23 +545,67 @@ declare namespace TogetherJSNS {
         continued: boolean;
     }
 
-    interface Peer {
-        id: string;
-        status: "live";
-    }
+    type PeerStatus = "live" | "active" | "inactive" | "bye";
 
+    // TODO there seems to be many types of messages, there may be one for every event like form-update
     interface Message {
         sameUrl: boolean;
         clientId: string;
-        peer: Peer;
-        type: string;
+        peer: TogetherJSNS.PeerClass;
+        type: TogetherJSNS.Messages;
+        url: string;
+        to: string;
+        peerCount?: number;
     }
 
-    interface CallbackForOnce<T> {
-        (msg: Message & T): void;
+    interface FormFocusMessage {
+        sameUrl: boolean | undefined;
+        type: "form-focus";
+        peer: PeerClass;
+        element: string;
     }
 
-    interface CallbackForOn<T> extends CallbackForOnce<T> {
+    interface FormInitMessage {
+        sameUrl: boolean | undefined;
+        type: "form-init";
+        pageAge: number;
+        updates: {
+            element: string;
+            tracker: string;
+            value: string;
+            basis: number;
+        }[]
+    }
+
+    interface FormUpdateMessage {
+        sameUrl: boolean | undefined;
+        type: "form-update";
+        /** a selector */
+        element: string;
+        "server-echo": boolean;
+        tracker?: string;
+        replace: {
+            id: string;
+            basis: number;
+            delta: TextReplace;
+        }
+    }
+
+    interface MessageToSend {
+        type: TogetherJSNS.Messages;
+        url?: string;
+        to?: string;
+        clientId?: string;
+        idle?: PeerStatus;
+        location?: string;
+        position?: number;
+    }
+
+    interface CallbackForOn<T> {
+        (msg: T): void;
+    }
+
+    interface CallbackForOnce<T> extends CallbackForOn<T> {
         [name: string]: CallbackForOnce<T>; // TODO weird field for once callbacks
     }
 
@@ -172,107 +614,52 @@ declare namespace TogetherJSNS {
     }
 
     interface On_2 {
-        on<T>(eventName: string, cb: CallbackForOnce<T>): void;
-        once<T>(eventName: string, cb: CallbackForOn<T>): void;
+        on<T>(eventName: string, cb: CallbackForOn<T>): void;
+        once<T>(eventName: string, cb: CallbackForOnce<T>): void;
         off<T>(eventName: string, cb: CallbackForOnce<T>): void;
         removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
         emit(eventName: string, msg?: unknown): void;
         _knownEvents?: string[];
-        _listeners: {[name: string]: CallbackForOnce<any>[]}; // TODO any
+        _listeners: { [name: string]: CallbackForOnce<any>[] }; // TODO any
         _listenerOffs?: [string, CallbackForOnce<any>][];
     }
 
-    interface ConfigFunObj extends ConfigGetter {
-        //(config: Config): void;
+    interface ConfigFunObj {
         <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
-        //get<T>(thing: "on"): Ons<T>;
-        //get<T>(thing: "hub_on"): Ons<T>;
-        //get(thing: "useMinimizedCode"): true | undefined;
-        //get(thing: "fallbackLang"): string;
-        close<K extends keyof TogetherJSNS.Config>(thing: K): Partial<TogetherJSNS.Config>[K]; // TODO is the return type it boolean?
-        track<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, callback: (arg: V) => any): void;
+        get<K extends keyof Config>(name: K): Partial<Config>[K];
+        close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
+        track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): void;
     }
 
     interface ConfigGetter {
-        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
-        /*
-        get(name: "dontShowClicks"): Config["dontShowClicks"],
-        get(name: "cloneClicks"): Config["cloneClicks"],
-        get(name: "enableAnalytics"): Config["enableAnalytics"],
-        get(name: "analyticsCode"): Config["analyticsCode"],
-        get(name: "hubBase"): Config["hubBase"],
-        get(name: "getUserName"): Config["getUserName"],
-        get(name: "getUserColor"): Config["getUserColor"],
-        get(name: "getUserAvatar"): Config["getUserAvatar"],
-        get(name: "siteName"): Config["siteName"],
-        get(name: "useMinimizedCode"): Config["useMinimizedCode"],
-        get(name: "cacheBust"): Config["cacheBust"],
-        get(name: "on"): Config["on"],
-        get(name: "hub_on"): Config["hub_on"],
-        get(name: "enableShortcut"): Config["enableShortcut"],
-        get(name: "toolName"): Config["toolName"],
-        get(name: "findRoom"): Config["findRoom"],
-        get(name: "autoStart"): Config["autoStart"],
-        get(name: "suppressJoinConfirmation"): Config["suppressJoinConfirmation"],
-        get(name: "suppressInvite"): Config["suppressInvite"],
-        get(name: "inviteFromRoom"): Config["inviteFromRoom"],
-        get(name: "storagePrefix"): Config["storagePrefix"],
-        get(name: "includeHashInUrl"): Config["includeHashInUrl"],
-        get(name: "disableWebRTC"): Config["disableWebRTC"],
-        get(name: "youtube"): Config["youtube"],
-        get(name: "ignoreMessages"): Config["ignoreMessages"],
-        get(name: "ignoreForms"): Config["ignoreForms"],
-        get(name: "lang"): Config["lang"],
-        get(name: "fallbackLang"): Config["fallbackLang"],
-        get(name: "baseUrl"): Config["baseUrl"],
-        get(name: "loaded"): Config["loaded"],
-        get(name: "callToStart"): Config["callToStart"],
-        */
-    }
-
-    interface ConfigGetter2 {
-        getConfig(name: keyof Config): ValueOf<Config>;
-        getConfig(name: "dontShowClicks"): Config["dontShowClicks"],
-        getConfig(name: "cloneClicks"): Config["cloneClicks"],
-        getConfig(name: "enableAnalytics"): Config["enableAnalytics"],
-        getConfig(name: "analyticsCode"): Config["analyticsCode"],
-        getConfig(name: "hubBase"): Config["hubBase"],
-        getConfig(name: "getUserName"): Config["getUserName"],
-        getConfig(name: "getUserColor"): Config["getUserColor"],
-        getConfig(name: "getUserAvatar"): Config["getUserAvatar"],
-        getConfig(name: "siteName"): Config["siteName"],
-        getConfig(name: "useMinimizedCode"): Config["useMinimizedCode"],
-        getConfig(name: "cacheBust"): Config["cacheBust"],
-        getConfig(name: "on"): Config["on"],
-        getConfig(name: "hub_on"): Config["hub_on"],
-        getConfig(name: "enableShortcut"): Config["enableShortcut"],
-        getConfig(name: "toolName"): Config["toolName"],
-        getConfig(name: "findRoom"): Config["findRoom"],
-        getConfig(name: "autoStart"): Config["autoStart"],
-        getConfig(name: "suppressJoinConfirmation"): Config["suppressJoinConfirmation"],
-        getConfig(name: "suppressInvite"): Config["suppressInvite"],
-        getConfig(name: "inviteFromRoom"): Config["inviteFromRoom"],
-        getConfig(name: "storagePrefix"): Config["storagePrefix"],
-        getConfig(name: "includeHashInUrl"): Config["includeHashInUrl"],
-        getConfig(name: "disableWebRTC"): Config["disableWebRTC"],
-        getConfig(name: "youtube"): Config["youtube"],
-        getConfig(name: "ignoreMessages"): Config["ignoreMessages"],
-        getConfig(name: "ignoreForms"): Config["ignoreForms"],
-        getConfig(name: "lang"): Config["lang"],
-        getConfig(name: "fallbackLang"): Config["fallbackLang"],
-        getConfig(name: "baseUrl"): Config["baseUrl"],
-        getConfig(name: "loaded"): Config["loaded"],
-        getConfig(name: "callToStart"): Config["callToStart"],
+        get<K extends keyof Config>(name: K): Partial<Config>[K];
     }
 
     interface Require2 {
         (module: "session"): Session;
     }
 
-    interface Session {
-        start(): void;
-        close(): void;
+    interface CodeMirrorElement {
+        CodeMirror: unknown;
+    }
+
+    interface AceEditorElement {
+        env: unknown;
+    }
+
+    interface CKEditor {
+        dom: { // TODO better style?
+            element: {
+                get: (elem: HTMLElement) => {
+                    getEditor: () => unknown;
+                }
+            };
+        }
+    }
+
+    interface Tinymce {
+
     }
 }
 
@@ -280,7 +667,7 @@ declare namespace TogetherJSNS.Util {
     type Prototype = Methods;
 
     interface WithMethods {
-        classMethods?: {[methodName: string]: (...args: any[]) => any}
+        classMethods?: { [methodName: string]: (...args: any[]) => any }
     }
 
     interface WithPrototype {
@@ -293,7 +680,7 @@ declare namespace TogetherJSNS.Util {
 
     type ClassObject = object & WithPrototype & CustomClass & Methods;
 
-    
+
     interface Methods {
         //constructor: (...args: any[]) => any,
         //[methodName: string]: (...args: any[]) => any,
@@ -323,7 +710,9 @@ interface Window {
     TogetherJSConfig_autoStart?: boolean;
     TogetherJSConfig_enableShortcut?: boolean;
     TowTruck: TogetherJSNS.TogetherJS;
-    TogetherJSTestSpy?: {[k: string]: unknown};
+    TogetherJSTestSpy?: { [k: string]: unknown };
+    _gaq?: [string, string?][];
+    onYouTubeIframeAPIReady?: unknown;
 }
 
 interface EventHtmlElement extends Event {
@@ -339,3 +728,44 @@ interface Function {
 //declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;
 
 declare var TogetherJS: TogetherJSNS.TogetherJS;
+
+
+
+// RTC Patches
+interface Window {
+    /** @deprecated */
+    mozRTCPeerConnection?: typeof RTCPeerConnection;
+    /** @deprecated */
+    mozRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    webkitRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    mozRTCIceCandidate?: typeof RTCIceCandidate;
+    /** @deprecated */
+    webkitRTCIceCandidate?: typeof RTCIceCandidate;
+}
+
+interface Navigator {
+    /** @deprecated */
+    mozGetUserMedia?: Navigator["getUserMedia"];
+    /** @deprecated */
+    webkitGetUserMedia?: Navigator["getUserMedia"];
+    /** @deprecated */
+    msGetUserMedia?: Navigator["getUserMedia"];
+}
+
+interface RTCPeerConnection {
+    /** @deprecated */
+    onaddstream: (event: MediaStreamEvent) => void;
+    /** @deprecated */
+    onstatechange: () => void;
+    /** @deprecated */
+    addStream(stream: MediaStream): void;
+    /** @deprecated */
+    addIceCandidate(iceCandidate: RTCIceCandidate): void;
+}
+
+interface HTMLMediaElement {
+    /** @deprecated */
+    mozSrcObject: string;
+}

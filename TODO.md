@@ -1,3 +1,19 @@
+- Switch to a better import system
+
+- remove types for tjs.d.ts and use classes
+- look at all usage of session.hub.on and set a message type for each event
+    - X same for session.on
+    - X same for session.send
+    - X same for calls to .off
+    - X same for templating.sub
+    - same for emit
+        - check all TODO emit error (only 2 remaining that will be solved later)
+    - X same for ui.chat.system
+    - X same for ui.chat.leftSession and others
+- remove JQuery
+
+- maybe I should convert the libs? Like walkabout?
+
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff
 - use tslint to find useless nullchecks
 - clean the require stuff
@@ -13,6 +29,8 @@
 - search all "!." and "!;" and "!)"
 - check all unknown types
 - check all assert that are used for type checking
+- there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
+- replace all "} else"
 
 # Tests
 

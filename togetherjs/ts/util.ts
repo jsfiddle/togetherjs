@@ -4,114 +4,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-let assert;
-
-class OnClass {
-    _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
-    _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
-
-    on<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
-        console.log("on_class", this);
-        if(typeof callback != "function") {
-            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-            throw "Error: .once() called with non-callback";
-        }
-        if(name.search(" ") != -1) {
-            let names = name.split(/ +/g);
-            names.forEach(function(this: OnClass, n) {
-                this.on(n, callback);
-            }, this);
-            return;
-        }
-        if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
-            let thisString = "" + this;
-            if(thisString.length > 20) {
-                thisString = thisString.substr(0, 20) + "...";
-            }
-            console.warn(thisString + ".on('" + name + "', ...): unknown event");
-            if(console.trace) {
-                console.trace();
-            }
-        }
-        if(!this._listeners) {
-            this._listeners = {};
-        }
-        if(!this._listeners[name]) {
-            this._listeners[name] = [];
-        }
-        if(this._listeners[name].indexOf(callback) == -1) {
-            this._listeners[name].push(callback);
-        }
-    }
-
-    once<T>(name: string, callback: TogetherJSNS.CallbackForOn<T>) {
-        if(typeof callback != "function") {
-            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-            throw "Error: .once() called with non-callback";
-        }
-        let attr = "onceCallback_" + name;
-        // FIXME: maybe I should add the event name to the .once attribute:
-        if(!callback[attr]) {
-            callback[attr] = function onceCallback(this: OnClass, msg: TogetherJSNS.Message & T) {
-                callback.apply(this, arguments);
-                this.off(name, onceCallback);
-                delete callback[attr];
-            };
-        }
-        this.on(name, callback[attr]);
-    }
-
-    off<T>(name: string, callback: TogetherJSNS.CallbackForOnce<T>) {
-        if(this._listenerOffs) {
-            // Defer the .off() call until the .emit() is done.
-            this._listenerOffs.push([name, callback]);
-            return;
-        }
-        if(name.search(" ") != -1) {
-            let names = name.split(/ +/g);
-            names.forEach(function(this: OnClass, n) {
-                this.off(n, callback);
-            }, this);
-            return;
-        }
-        if((!this._listeners) || !this._listeners[name]) {
-            return;
-        }
-        let l = this._listeners[name], _len = l.length;
-        for(let i = 0; i < _len; i++) {
-            if(l[i] == callback) {
-                l.splice(i, 1);
-                break;
-            }
-        }
-    }
-
-    removeListener2<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
-        this.off(arguments);
-    }
-
-    removeListener = this.off.bind(this);
-
-    emit(name: string) {
-        let offs = this._listenerOffs = [];
-        if((!this._listeners) || !this._listeners[name]) {
-            return;
-        }
-        var args = Array.prototype.slice.call(arguments, 1);
-        let l = this._listeners[name];
-        l.forEach(function(this: OnClass, callback) {
-            callback.apply(this, args);
-        }, this);
-        delete this._listenerOffs;
-        if(offs.length) {
-            offs.forEach(function(this: OnClass, item) {
-                this.off(item[0], item[1]);
-            }, this);
-        }
-
-    }
-}
+let assert: TogetherJSNS.UtilAlias["assert"];
 
 class AssertionError extends Error {
     public constructor(message?: string) {
@@ -188,7 +81,7 @@ class Util {
         return array[Math.floor(Math.random() * array.length)];
     }
 
-    public static blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string) {
+    public blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string) {
         // TODO
         // Oh this is just terrible
         let binary = '';
@@ -303,104 +196,60 @@ class Util {
         }
     }
 
-    // TODO update doc to say that function does not takes multiples arguments now
-    /** Resolves several promises (the promises are the arguments to the function) or the first argument may be an array of promises.
-       Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
-       FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+    // TODO should we just replace resolveMany with promises and promise.all?
+    /** Resolves several promises givent as one argument as an array of promises.
+        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
+        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+        Use like this:
+        const s = storage.settings;
+        util.resolveMany([s.get("name"), s.get("avatar"), s.get("defaultName"), s.get("color")] as const).then(args => {
+            let [name, avatar, defaultName, color] = args!; // for this example "!" is used because args can be undefined
+            // ...
+        }
     */
-// work for form
-public resolveMany1<T>(args1: JQueryDeferred<T>[]) {
-    let args: JQueryDeferred<T>[] = args1;
-    return this.Deferred(function(def: JQueryDeferred<T>) {
-        if(!("length" in args)) {
-            def.resolve();
-            return;
-        }
-        let count = args.length;
-        let allResults: (T | undefined)[] = [];
-        let anyError = false;
-        args.forEach(function(arg, index) {
-            arg.then(function(result) {
-                allResults[index] = result;
-                count--;
-                check();
-            }, function(error) {
-                allResults[index] = error;
-                anyError = true;
-                count--;
-                check();
-            });
-        });
-        function check() {
+    public resolveMany<T extends readonly any[]>(defs: { [I in keyof T]: JQueryDeferred<T[I]> }): JQueryDeferred<T> {
+        return this.Deferred<T>(function(def) {
+            var count = defs.length;
             if(!count) {
-                if(anyError) {
-                    def.reject.apply(def, allResults);
-                }
-                else {
-                    def.resolve.apply(def, allResults);
-                }
+                def.resolve();
+                return;
             }
-        }
-    });
-}
-
-// work for storage
-public resolveMany<T>(args1: JQueryDeferred<T>[]) {
-    var args: JQueryDeferred<T>[];
-    var oneArg = false;
-    if(arguments.length == 1 && Array.isArray(arguments[0])) {
-        oneArg = true;
-        args = arguments[0];
-    }
-    else {
-        args = Array.prototype.slice.call(arguments);
-    }
-    return this.Deferred(function(def) {
-        var count = args.length;
-        if(!count) {
-            def.resolve();
-            return;
-        }
-        var allResults: (T | undefined)[] = [];
-        var anyError = false;
-        args.forEach(function(arg, index) {
-            arg.then(function(result) {
-                allResults[index] = result;
-                count--;
-                check();
-            }, function(error) {
-                allResults[index] = error;
-                anyError = true;
-                count--;
-                check();
+            var allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };
+            var anyError = false;
+            defs.forEach(function(arg, index) {
+                arg.then(function(result) {
+                    if(result) {
+                        allResults[index] = result;
+                    }
+                    count--;
+                    check();
+                },
+                function(error) {
+                    allResults[index] = error;
+                    anyError = true;
+                    count--;
+                    check();
+                });
             });
-        });
-        function check() {
-            if(!count) {
-                if(anyError) {
-                    if(oneArg) {
+            function check() {
+                if(!count) {
+                    if(anyError) {
                         def.reject(allResults);
-                    } else {
-                        def.reject.apply(def, allResults);
                     }
-                } else {
-                    if(oneArg) {
+                    else {
                         def.resolve(allResults);
-                    } else {
-                        def.resolve.apply(def, allResults);
                     }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
     public readFileImage(file: File) {
         return this.Deferred(function(def: JQueryDeferred<unknown>) {
             let reader = new FileReader();
             reader.onload = function() {
                 if(this.result) {
-                    def.resolve("data:image/jpeg;base64," + Util.blobToBase64(this.result));
+                    def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
                 }
             };
             reader.onerror = function() {
@@ -460,43 +309,44 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
     // TODO find and modernize all usage
     /**/
 
-    function classFunOriginal(superClass, prototype) {
-      var a;
-      if (prototype === undefined) {
-        prototype = superClass;
-      } else {
-        if (superClass.prototype) {
-          superClass = superClass.prototype;
+    // TODO once conversion to TS is finished it should be removable
+    function classFunOriginal(superClass: any, prototype: any) {
+        var a;
+        if(prototype === undefined) {
+            prototype = superClass;
+        } else {
+            if(superClass.prototype) {
+                superClass = superClass.prototype;
+            }
+            var newPrototype = Object.create(superClass);
+            for(a in prototype) {
+                if(prototype.hasOwnProperty(a)) {
+                    newPrototype[a] = prototype[a];
+                }
+            }
+            prototype = newPrototype;
         }
-        var newPrototype = Object.create(superClass);
-        for (a in prototype) {
-          if (prototype.hasOwnProperty(a)) {
-            newPrototype[a] = prototype[a];
-          }
+        var ClassObject = function() {
+            var obj = Object.create(prototype);
+            obj.constructor.apply(obj, arguments);
+            obj.constructor = ClassObject;
+            return obj;
+        } as { (): any; className: string; [field: string]: any };
+        ClassObject.prototype = prototype;
+        if(prototype.constructor.name) {
+            ClassObject.className = prototype.constructor.name;
+            ClassObject.toString = function() {
+                return '[Class ' + this.className + ']';
+            };
         }
-        prototype = newPrototype;
-      }
-      var ClassObject = function () {
-        var obj = Object.create(prototype);
-        obj.constructor.apply(obj, arguments);
-        obj.constructor = ClassObject;
-        return obj;
-      };
-      ClassObject.prototype = prototype;
-      if (prototype.constructor.name) {
-        ClassObject.className = prototype.constructor.name;
-        ClassObject.toString = function () {
-          return '[Class ' + this.className + ']';
-        };
-      }
-      if (prototype.classMethods) {
-        for (a in prototype.classMethods) {
-          if (prototype.classMethods.hasOwnProperty(a)) {
-            ClassObject[a] = prototype.classMethods[a];
-          }
+        if(prototype.classMethods) {
+            for(a in prototype.classMethods) {
+                if(prototype.classMethods.hasOwnProperty(a)) {
+                    ClassObject[a] = prototype.classMethods[a];
+                }
+            }
         }
-      }
-      return ClassObject;
+        return ClassObject;
     };
 
     util.Class = classFunOriginal;

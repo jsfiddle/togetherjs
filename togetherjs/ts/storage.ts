@@ -2,10 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+interface Settings {
+    name: string,
+    defaultName: string,
+    avatar: string | null,
+    stickyShare: null,
+    color: string | null,
+    seenIntroDialog: boolean,
+    seenWalkthrough: boolean,
+    dontShowRtcInfo: boolean
+}
+
 function StorageMain(util: Util) {
     var assert: typeof util.assert = util.assert;
     var Deferred = util.Deferred;
-    var DEFAULT_SETTINGS = {
+    var DEFAULT_SETTINGS: Settings = {
         name: "",
         defaultName: "",
         avatar: null,
@@ -25,13 +36,12 @@ function StorageMain(util: Util) {
             super();
         }
 
-        get(name: keyof typeof DEFAULT_SETTINGS) {
-            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
+        get<K extends keyof Settings>(name: K): JQueryDeferred<Settings[K]> {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
         }
 
-        set(name: string, value: string | undefined) {
+        set(name: string, value: string | boolean | undefined) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.set("settings." + name, value);
         }
@@ -49,21 +59,23 @@ function StorageMain(util: Util) {
             this.settings = new StorageSettings(this);
         }
 
-        get(key: string, defaultValue: string) {
+        get<T>(key: string, defaultValue: T | null = null) {
             var self = this;
-            return Deferred(function(def: JQueryDeferred<unknown>) {
+            return Deferred(function(def: JQueryDeferred<T>) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
                     key = self.prefix + key;
-                    var value = self.storage.getItem(key);
-                    if(!value) {
+                    let value: T | null;
+                    var valueAsString = self.storage.getItem(key);
+                    if(!valueAsString) {
                         value = defaultValue;
                         if(DEBUG_STORAGE) {
                             console.debug("Get storage", key, "defaults to", value);
                         }
-                    } else {
-                        value = JSON.parse(value);
+                    }
+                    else {
+                        value = JSON.parse(valueAsString);
                         if(DEBUG_STORAGE) {
                             console.debug("Get storage", key, "=", value);
                         }
@@ -73,23 +85,24 @@ function StorageMain(util: Util) {
             });
         }
 
-        set(key: string, value: string | undefined) {
+        set(key: string, value?: unknown) {
             var self = this;
+            let stringyfiedValue: string | undefined;
             if(value !== undefined) {
-                value = JSON.stringify(value);
+                stringyfiedValue = JSON.stringify(value);
             }
             return Deferred(def => {
                 key = self.prefix + key;
-                if(value === undefined) {
+                if(stringyfiedValue === undefined) {
                     self.storage.removeItem(key);
                     if(DEBUG_STORAGE) {
                         console.debug("Delete storage", key);
                     }
                 }
                 else {
-                    self.storage.setItem(key, value);
+                    self.storage.setItem(key, stringyfiedValue);
                     if(DEBUG_STORAGE) {
-                        console.debug("Set storage", key, value);
+                        console.debug("Set storage", key, stringyfiedValue);
                     }
                 }
                 setTimeout(def.resolve);
@@ -121,7 +134,7 @@ function StorageMain(util: Util) {
                     prefix = prefix || "";
                     let result: string[] = [];
                     for(var i = 0; i < self.storage.length; i++) {
-                        let key = self.storage.key(i);
+                        let key = self.storage.key(i)!; // TODO !
                         if(key.indexOf(self.prefix + prefix) === 0) {
                             var shortKey = key.substr(self.prefix.length);
                             if(excludePrefix) {

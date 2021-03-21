@@ -46,7 +46,7 @@ send: form-update
 
 $password.val("New Password");
 fireChange($password);
-wait(100);
+wait(500);
 
 /* =>
  */
@@ -217,7 +217,7 @@ Test.incoming({
     }
   }
 });
-wait(function() { return $textarea.val()==='hELLO there'; });
+wait(function() { return $textarea.val()==='hELLO there'; }, 500);
 
 // =>
 
@@ -241,7 +241,7 @@ Test.incoming({
     }
   ]
 });
-wait(100);
+wait(500);
 
 // => true
 

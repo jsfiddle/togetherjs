@@ -713,7 +713,7 @@ var Change = /** @class */ (function () {
     };
     return Change;
 }());
-define(["util"], function (util) {
+function otMain(util) {
     var assert = util.assert;
     var ot = {
         SimpleHistory: function (clientId, initState, initBasis) { return new SimpleHistory(clientId, initState, initBasis); },
@@ -721,4 +721,5 @@ define(["util"], function (util) {
         TextReplace: TextReplace, //(start, del, text) => new TextReplace(start, del, text),
     };
     return ot;
-});
+}
+define(["util"], otMain);

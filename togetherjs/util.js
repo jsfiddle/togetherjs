@@ -20,110 +20,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var assert;
-var OnClass = /** @class */ (function () {
-    function OnClass() {
-        this._listeners = {}; // TODO any
-        this.removeListener = this.off.bind(this);
-    }
-    OnClass.prototype.on = function (name, callback) {
-        console.log("on_class", this);
-        if (typeof callback != "function") {
-            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-            throw "Error: .once() called with non-callback";
-        }
-        if (name.search(" ") != -1) {
-            var names = name.split(/ +/g);
-            names.forEach(function (n) {
-                this.on(n, callback);
-            }, this);
-            return;
-        }
-        if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
-            var thisString = "" + this;
-            if (thisString.length > 20) {
-                thisString = thisString.substr(0, 20) + "...";
-            }
-            console.warn(thisString + ".on('" + name + "', ...): unknown event");
-            if (console.trace) {
-                console.trace();
-            }
-        }
-        if (!this._listeners) {
-            this._listeners = {};
-        }
-        if (!this._listeners[name]) {
-            this._listeners[name] = [];
-        }
-        if (this._listeners[name].indexOf(callback) == -1) {
-            this._listeners[name].push(callback);
-        }
-    };
-    OnClass.prototype.once = function (name, callback) {
-        if (typeof callback != "function") {
-            console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-            throw "Error: .once() called with non-callback";
-        }
-        var attr = "onceCallback_" + name;
-        // FIXME: maybe I should add the event name to the .once attribute:
-        if (!callback[attr]) {
-            callback[attr] = function onceCallback(msg) {
-                callback.apply(this, arguments);
-                this.off(name, onceCallback);
-                delete callback[attr];
-            };
-        }
-        this.on(name, callback[attr]);
-    };
-    OnClass.prototype.off = function (name, callback) {
-        if (this._listenerOffs) {
-            // Defer the .off() call until the .emit() is done.
-            this._listenerOffs.push([name, callback]);
-            return;
-        }
-        if (name.search(" ") != -1) {
-            var names = name.split(/ +/g);
-            names.forEach(function (n) {
-                this.off(n, callback);
-            }, this);
-            return;
-        }
-        if ((!this._listeners) || !this._listeners[name]) {
-            return;
-        }
-        var l = this._listeners[name], _len = l.length;
-        for (var i = 0; i < _len; i++) {
-            if (l[i] == callback) {
-                l.splice(i, 1);
-                break;
-            }
-        }
-    };
-    OnClass.prototype.removeListener2 = function (eventName, cb) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
-        this.off(arguments);
-    };
-    OnClass.prototype.emit = function (name) {
-        var offs = this._listenerOffs = [];
-        if ((!this._listeners) || !this._listeners[name]) {
-            return;
-        }
-        var args = Array.prototype.slice.call(arguments, 1);
-        var l = this._listeners[name];
-        l.forEach(function (callback) {
-            callback.apply(this, args);
-        }, this);
-        delete this._listenerOffs;
-        if (offs.length) {
-            offs.forEach(function (item) {
-                this.off(item[0], item[1]);
-            }, this);
-        }
-    };
-    return OnClass;
-}());
 var AssertionError = /** @class */ (function (_super) {
     __extends(AssertionError, _super);
     function AssertionError(message) {
@@ -195,7 +91,7 @@ var Util = /** @class */ (function () {
     Util.prototype.pickRandom = function (array) {
         return array[Math.floor(Math.random() * array.length)];
     };
-    Util.blobToBase64 = function (blob) {
+    Util.prototype.blobToBase64 = function (blob) {
         // TODO
         // Oh this is just terrible
         var binary = '';
@@ -306,68 +202,31 @@ var Util = /** @class */ (function () {
             });
         }
     };
-    // TODO update doc to say that function does not takes multiples arguments now
-    /** Resolves several promises (the promises are the arguments to the function) or the first argument may be an array of promises.
-       Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
-       FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+    // TODO should we just replace resolveMany with promises and promise.all?
+    /** Resolves several promises givent as one argument as an array of promises.
+        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
+        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+        Use like this:
+        const s = storage.settings;
+        util.resolveMany([s.get("name"), s.get("avatar"), s.get("defaultName"), s.get("color")] as const).then(args => {
+            let [name, avatar, defaultName, color] = args!; // for this example "!" is used because args can be undefined
+            // ...
+        }
     */
-    // work for form
-    Util.prototype.resolveMany1 = function (args1) {
-        var args = args1;
+    Util.prototype.resolveMany = function (defs) {
         return this.Deferred(function (def) {
-            if (!("length" in args)) {
-                def.resolve();
-                return;
-            }
-            var count = args.length;
-            var allResults = [];
-            var anyError = false;
-            args.forEach(function (arg, index) {
-                arg.then(function (result) {
-                    allResults[index] = result;
-                    count--;
-                    check();
-                }, function (error) {
-                    allResults[index] = error;
-                    anyError = true;
-                    count--;
-                    check();
-                });
-            });
-            function check() {
-                if (!count) {
-                    if (anyError) {
-                        def.reject.apply(def, allResults);
-                    }
-                    else {
-                        def.resolve.apply(def, allResults);
-                    }
-                }
-            }
-        });
-    };
-    // work for storage
-    Util.prototype.resolveMany = function (args1) {
-        var args;
-        var oneArg = false;
-        if (arguments.length == 1 && Array.isArray(arguments[0])) {
-            oneArg = true;
-            args = arguments[0];
-        }
-        else {
-            args = Array.prototype.slice.call(arguments);
-        }
-        return this.Deferred(function (def) {
-            var count = args.length;
+            var count = defs.length;
             if (!count) {
                 def.resolve();
                 return;
             }
             var allResults = [];
             var anyError = false;
-            args.forEach(function (arg, index) {
+            defs.forEach(function (arg, index) {
                 arg.then(function (result) {
-                    allResults[index] = result;
+                    if (result) {
+                        allResults[index] = result;
+                    }
                     count--;
                     check();
                 }, function (error) {
@@ -380,20 +239,10 @@ var Util = /** @class */ (function () {
             function check() {
                 if (!count) {
                     if (anyError) {
-                        if (oneArg) {
-                            def.reject(allResults);
-                        }
-                        else {
-                            def.reject.apply(def, allResults);
-                        }
+                        def.reject(allResults);
                     }
                     else {
-                        if (oneArg) {
-                            def.resolve(allResults);
-                        }
-                        else {
-                            def.resolve.apply(def, allResults);
-                        }
+                        def.resolve(allResults);
                     }
                 }
             }
@@ -404,7 +253,7 @@ var Util = /** @class */ (function () {
             var reader = new FileReader();
             reader.onload = function () {
                 if (this.result) {
-                    def.resolve("data:image/jpeg;base64," + Util.blobToBase64(this.result));
+                    def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
                 }
             };
             reader.onerror = function () {
@@ -458,6 +307,7 @@ define(["jquery", "jqueryPlugins"], function ($) {
     */
     // TODO find and modernize all usage
     /**/
+    // TODO once conversion to TS is finished it should be removable
     function classFunOriginal(superClass, prototype) {
         var a;
         if (prototype === undefined) {

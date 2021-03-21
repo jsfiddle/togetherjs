@@ -45,7 +45,7 @@ interface MessageFromChannel {
     close: boolean;
 }
 
-function ChannelsMain(util: Util) {
+function channelsMain(util: Util) {
     /* Subclasses must define:
 	
     - ._send(string)
@@ -70,8 +70,8 @@ function ChannelsMain(util: Util) {
             super();
         }
 
-        // TODO should only take string
-        send(data: string | any) {
+        // TODO should only take string, ot not?
+        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: (TogetherJSNS.SessionSend.Map[T1] & TogetherJSNS.ChannelSend.WithClientId) | (TogetherJSNS.ChannelSend.Map[T2] & TogetherJSNS.ChannelSend.WithClientId) | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -92,23 +92,31 @@ function ChannelsMain(util: Util) {
             this._buffer = [];
         }
 
-        // TODO any to remove
         _incoming(data: string) {
+            // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if(!this.rawdata) {
                 try {
-                    data = JSON.parse(data);
-                } catch(e) {
+                    const dataAsObject = JSON.parse(data) as unknown;
+                    if(this.onmessage) {
+                        this.onmessage(dataAsObject);
+                    }
+                    this.emit("message", dataAsObject);
+                }
+                catch(e) {
                     console.error("Got invalid JSON data:", data.substr(0, 40));
                     throw e;
                 }
             }
-            if(this.onmessage) {
-                this.onmessage(data);
+            else {
+                if(this.onmessage) {
+                    this.onmessage(data);
+                }
+                //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
+                this.emit("message", data); // TODO if this is not used maybe we should remove it?
             }
-            this.emit("message", data);
         }
 
-        abstract _send(a: string): void;
+        protected abstract _send(a: string): void;
 
         abstract _setupConnection(): void;
         abstract _ready(): boolean;
@@ -116,7 +124,7 @@ function ChannelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        abstract onmessage(jsonData: string): void;
+        public onmessage?: (jsonData: any) => void;
         abstract onclose(): void;
     }
 
@@ -125,7 +133,7 @@ function ChannelsMain(util: Util) {
         maxBackoffTime = 1500;
         backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
         address: string;
-        socket!: WebSocket | null; // initialized in _setupConnection
+        socket: WebSocket | null = null; // TODO ! initialized in _setupConnection
         _reopening: boolean = false;
         _lastConnectTime = 0;
         _backoff = 0;
@@ -214,20 +222,20 @@ function ChannelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = <T extends keyof TogetherJSNS.ChannelOnMessage.Map>(_jsonData: TogetherJSNS.ChannelOnMessage.Map[T]) => {};
 
     } // /WebSocketChannel
 
     /* Sends TO a window or iframe */
     class PostMessageChannel extends AbstractChannel {
-        _pingPollPeriod = 100; // milliseconds
-        _pingPollIncrease = 100; // +100 milliseconds for each failure
-        _pingMax= 2000; // up to a max of 2000 milliseconds
+        private _pingPollPeriod = 100; // milliseconds
+        private _pingPollIncrease = 100; // +100 milliseconds for each failure
+        private _pingMax= 2000; // up to a max of 2000 milliseconds
         expectedOrigin: Origin;
-        _pingReceived: boolean = false;
-        _pingFailures = 0;
-        _pingTimeout: number | null = null;
-        window: Window | null = null;
+        private _pingReceived: boolean = false;
+        private _pingFailures = 0;
+        private _pingTimeout: number | null = null;
+        window!: Window; // TODO !
 
         constructor(win: WindowProxy, expectedOrigin: Origin) {
             super();
@@ -258,7 +266,7 @@ function ChannelsMain(util: Util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if(win && "contentWindow" in win) {
+            if(win && "contentWindow" in win && win.contentWindow) {
                 this.window = win.contentWindow;
             }
             else {
@@ -295,7 +303,7 @@ function ChannelsMain(util: Util) {
             this._send("hello");
             // We'll keep sending ping messages until we get a reply
             var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
-            time = time > this._pingPollMax ? this._pingPollMax : time;
+            time = time > this._pingMax ? this._pingMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         }
 
@@ -337,7 +345,7 @@ function ChannelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = () => {};
     } // /PostMessageChannel
 
     /* Handles message FROM an exterior window/parent */
@@ -364,7 +372,7 @@ function ChannelsMain(util: Util) {
             return s + ']';
         }
 
-        _send(data: any) {
+        _send(data) {
             this.source.postMessage(data, this.expectedOrigin);
         }
 
@@ -408,12 +416,12 @@ function ChannelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage() {}
+        onmessage = () => {}
     }; // /PostMessageIncomingChannel
 
     class Router extends OnClass {
         _routes: {[key: string]: Route} = Object.create(null);
-        channel: AbstractChannel;
+        channel!: AbstractChannel; // TODO !
 
         constructor(channel?: AbstractChannel) {
             super();
@@ -494,7 +502,8 @@ function ChannelsMain(util: Util) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
-                message: msg
+                message: msg,
+                clientId: null // TODO added this, does it introduce a bug?
             });
         }
 
@@ -518,4 +527,4 @@ function ChannelsMain(util: Util) {
     return channels;
 }
 
-define(["util"], ChannelsMain);
+define(["util"], channelsMain);

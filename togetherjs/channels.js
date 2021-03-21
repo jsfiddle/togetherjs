@@ -17,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function ChannelsMain(util) {
+function channelsMain(util) {
     /* Subclasses must define:
     
     - ._send(string)
@@ -41,7 +41,7 @@ function ChannelsMain(util) {
             _this._buffer = [];
             return _this;
         }
-        // TODO should only take string
+        // TODO should only take string, ot not?
         AbstractChannel.prototype.send = function (data) {
             if (this.closed) {
                 throw 'Cannot send to a closed connection';
@@ -61,21 +61,28 @@ function ChannelsMain(util) {
             }
             this._buffer = [];
         };
-        // TODO any to remove
         AbstractChannel.prototype._incoming = function (data) {
+            // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if (!this.rawdata) {
                 try {
-                    data = JSON.parse(data);
+                    var dataAsObject = JSON.parse(data);
+                    if (this.onmessage) {
+                        this.onmessage(dataAsObject);
+                    }
+                    this.emit("message", dataAsObject);
                 }
                 catch (e) {
                     console.error("Got invalid JSON data:", data.substr(0, 40));
                     throw e;
                 }
             }
-            if (this.onmessage) {
-                this.onmessage(data);
+            else {
+                if (this.onmessage) {
+                    this.onmessage(data);
+                }
+                //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
+                this.emit("message", data); // TODO if this is not used maybe we should remove it?
             }
-            this.emit("message", data);
         };
         return AbstractChannel;
     }(OnClass));
@@ -86,9 +93,11 @@ function ChannelsMain(util) {
             _this.backoffTime = 50; // Milliseconds to add to each reconnect time
             _this.maxBackoffTime = 1500;
             _this.backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
+            _this.socket = null; // TODO ! initialized in _setupConnection
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
+            _this.onmessage = function (_jsonData) { };
             if (address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }
@@ -169,7 +178,6 @@ function ChannelsMain(util) {
             };
         };
         WebSocketChannel.prototype.onclose = function () { };
-        WebSocketChannel.prototype.onmessage = function () { };
         return WebSocketChannel;
     }(AbstractChannel)); // /WebSocketChannel
     /* Sends TO a window or iframe */
@@ -183,7 +191,7 @@ function ChannelsMain(util) {
             _this._pingReceived = false;
             _this._pingFailures = 0;
             _this._pingTimeout = null;
-            _this.window = null;
+            _this.onmessage = function () { };
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             if (win) {
@@ -211,7 +219,7 @@ function ChannelsMain(util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if (win && "contentWindow" in win) {
+            if (win && "contentWindow" in win && win.contentWindow) {
                 this.window = win.contentWindow;
             }
             else {
@@ -245,7 +253,7 @@ function ChannelsMain(util) {
             this._send("hello");
             // We'll keep sending ping messages until we get a reply
             var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
-            time = time > this._pingPollMax ? this._pingPollMax : time;
+            time = time > this._pingMax ? this._pingMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         };
         PostMessageChannel.prototype._receiveMessage = function (event) {
@@ -283,7 +291,6 @@ function ChannelsMain(util) {
             this.emit("close");
         };
         PostMessageChannel.prototype.onclose = function () { };
-        PostMessageChannel.prototype.onmessage = function () { };
         return PostMessageChannel;
     }(AbstractChannel)); // /PostMessageChannel
     /* Handles message FROM an exterior window/parent */
@@ -293,6 +300,7 @@ function ChannelsMain(util) {
             var _this = _super.call(this) || this;
             _this._pingTimeout = null;
             _this.source = null;
+            _this.onmessage = function () { };
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
             window.addEventListener("message", _this._receiveMessage, false);
@@ -348,7 +356,6 @@ function ChannelsMain(util) {
             this.emit("close");
         };
         PostMessageIncomingChannel.prototype.onclose = function () { };
-        PostMessageIncomingChannel.prototype.onmessage = function () { };
         return PostMessageIncomingChannel;
     }(AbstractChannel));
     ; // /PostMessageIncomingChannel
@@ -426,7 +433,8 @@ function ChannelsMain(util) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
-                message: msg
+                message: msg,
+                clientId: null // TODO added this, does it introduce a bug?
             });
         };
         Route.prototype.close = function () {
@@ -446,4 +454,4 @@ function ChannelsMain(util) {
     };
     return channels;
 }
-define(["util"], ChannelsMain);
+define(["util"], channelsMain);

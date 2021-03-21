@@ -202,7 +202,6 @@ var ElementFinder = /** @class */ (function () {
             throw new CannotFind(loc, "Malformed location", container);
         }
     };
-    ;
     ElementFinder.prototype.elementByPixel = function (height) {
         var self = this;
         /* Returns {location: "...", offset: pixels}
@@ -224,6 +223,7 @@ var ElementFinder = /** @class */ (function () {
                     return false;
                 }
                 last = el;
+                return;
             });
             if ((!children.length) || (!last)) {
                 // There are no children, or only inapplicable children
@@ -269,7 +269,6 @@ var ElementFinder = /** @class */ (function () {
     };
     return ElementFinder;
 }());
-define(["util", "jquery"], function (util, $) {
-    var assert = util.assert;
+define(["util", "jquery"], function (_util, $) {
     return new ElementFinder();
 });

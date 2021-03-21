@@ -40,7 +40,6 @@ function StorageMain(util) {
             return _this;
         }
         StorageSettings.prototype.get = function (name) {
-            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
         };
@@ -59,21 +58,23 @@ function StorageMain(util) {
             this.settings = new StorageSettings(this);
         }
         TJSStorage.prototype.get = function (key, defaultValue) {
+            if (defaultValue === void 0) { defaultValue = null; }
             var self = this;
             return Deferred(function (def) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function () {
                     key = self.prefix + key;
-                    var value = self.storage.getItem(key);
-                    if (!value) {
+                    var value;
+                    var valueAsString = self.storage.getItem(key);
+                    if (!valueAsString) {
                         value = defaultValue;
                         if (DEBUG_STORAGE) {
                             console.debug("Get storage", key, "defaults to", value);
                         }
                     }
                     else {
-                        value = JSON.parse(value);
+                        value = JSON.parse(valueAsString);
                         if (DEBUG_STORAGE) {
                             console.debug("Get storage", key, "=", value);
                         }
@@ -84,21 +85,22 @@ function StorageMain(util) {
         };
         TJSStorage.prototype.set = function (key, value) {
             var self = this;
+            var stringyfiedValue;
             if (value !== undefined) {
-                value = JSON.stringify(value);
+                stringyfiedValue = JSON.stringify(value);
             }
             return Deferred(function (def) {
                 key = self.prefix + key;
-                if (value === undefined) {
+                if (stringyfiedValue === undefined) {
                     self.storage.removeItem(key);
                     if (DEBUG_STORAGE) {
                         console.debug("Delete storage", key);
                     }
                 }
                 else {
-                    self.storage.setItem(key, value);
+                    self.storage.setItem(key, stringyfiedValue);
                     if (DEBUG_STORAGE) {
-                        console.debug("Set storage", key, value);
+                        console.debug("Set storage", key, stringyfiedValue);
                     }
                 }
                 setTimeout(def.resolve);
@@ -129,7 +131,7 @@ function StorageMain(util) {
                     prefix = prefix || "";
                     var result = [];
                     for (var i = 0; i < self.storage.length; i++) {
-                        var key = self.storage.key(i);
+                        var key = self.storage.key(i); // TODO !
                         if (key.indexOf(self.prefix + prefix) === 0) {
                             var shortKey = key.substr(self.prefix.length);
                             if (excludePrefix) {

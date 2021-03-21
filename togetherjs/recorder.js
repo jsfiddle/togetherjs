@@ -2,10 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-Object.defineProperty(exports, "__esModule", { value: true });
 define(["jquery", "util", "channels"], function ($, util, channels) {
-    var recorder = util.Module("recorder");
-    var assert = util.assert;
     var channel = null;
     var baseUrl = null;
     var clientId = "recorder";
@@ -18,7 +15,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
         el.show();
     }
     function sendHello(helloBack) {
-        var msg = {
+        channel.send({
             type: helloBack ? "hello-back" : "hello",
             name: "Recorder 'bot",
             // FIXME: replace with robot:
@@ -27,17 +24,15 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
             rtcSupported: false,
             clientId: clientId,
             url: "about:blank"
-        };
-        channel.send(msg);
+        });
     }
     function sendLogs(req) {
-        var msg = {
+        channel.send({
             type: "logs",
             clientId: clientId,
             logs: $("#record").val(),
             request: req
-        };
-        channel.send(msg);
+        });
     }
     var Recorder = /** @class */ (function () {
         function Recorder() {
@@ -56,6 +51,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
             });
         };
         Recorder.prototype.activate = function (options) {
+            var _this = this;
             var match;
             baseUrl = options.baseUrl;
             this.shareId = TogetherJS.startup._joinShareId;
@@ -86,7 +82,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
                     sendLogs(msg);
                     return;
                 }
-                this.logMessage(msg);
+                _this.logMessage(msg);
             };
             sendHello(false);
         };

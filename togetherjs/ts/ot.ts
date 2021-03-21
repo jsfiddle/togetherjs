@@ -2,20 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface Ot {
-    SimpleHistory: (clientId, initState, initBasis) => SimpleHistory,
-    History: (clientId, initState) => History,
-    TextReplace: (start, del, text) => TextReplace,
-}
-
 interface Change2 {
     id: string,
-    delta,
-    basis?,
+    delta: TextReplace,
+    basis?: number,
     sent?: boolean,
 }
 
-type Delta = unknown;
+type Delta = {
+    start: number,
+    del: number,
+    text: number
+};
 
 /** SimpleHistory synchronizes peers by relying on the server to serialize
  * the order of all updates.  Each client maintains a queue of patches
@@ -58,13 +56,13 @@ type Delta = unknown;
 class SimpleHistory {
     private clientId;
     private committed;
-    private current;
-    private basis;
+    public current;
+    private basis: number;
     private queue: Change2[] = [];
     private deltaId = 1;
     private selection: TextReplace | null = null;
 
-    constructor(clientId: string, initState, initBasis) {
+    constructor(clientId: string, initState, initBasis: number) {
         this.clientId = clientId;
         this.committed = initState;
         this.current = initState;
@@ -81,7 +79,7 @@ class SimpleHistory {
     }
 
     /** Decode the fake change to reconstruct the updated selection. */
-    getSelection() {
+    getSelection(): [number, number] | null {
         if(!this.selection) {
             return null;
         }
@@ -395,7 +393,7 @@ class TextReplace {
     constructor(
         public readonly start: number,
         public readonly del: number,
-        private text: string
+        public readonly text: string
     ) {
         assert(typeof start == "number" && typeof del == "number" && typeof text == "string", start, del, text);
         assert(start >= 0 && del >= 0, start, del);
@@ -780,7 +778,7 @@ class Change {
     }
 }
 
-define(["util"], function(util: Util) {
+function otMain(util: Util) {
     const assert: typeof util.assert = util.assert;
 
     const ot = {
@@ -789,6 +787,7 @@ define(["util"], function(util: Util) {
         TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
     }
 
-
     return ot;
-});
+}
+
+define(["util"], otMain);

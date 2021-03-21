@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["util", "session"], function (util, session) {
+function visibilityApiMain(_util, session) {
     var hidden;
     var visibilityChange;
     if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
@@ -28,7 +28,7 @@ define(["util", "session"], function (util, session) {
         document.removeEventListener(visibilityChange, change, false);
     });
     function change() {
-        session.emit("visibility-change", document[hidden]);
+        session.emit("visibility-change", !!document[hidden]);
     }
     var visibilityApi = {
         hidden: function () {
@@ -36,4 +36,5 @@ define(["util", "session"], function (util, session) {
         }
     };
     return visibilityApi;
-});
+}
+define(["util", "session"], visibilityApiMain);
