@@ -387,10 +387,10 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 storage.settings.get("name"),
                 storage.settings.get("avatar"),
                 storage.settings.get("defaultName"),
-                storage.settings.get("color")]).then((function(this: PeersSelf, name, avatar, defaultName, color) {
+                storage.settings.get("color")] as const).then(args => {
+                    let [name, avatar, defaultName, color] = args!;
                     if(!defaultName) {
                         defaultName = util.pickRandom(DEFAULT_NICKNAMES);
-
                         storage.settings.set("defaultName", defaultName);
                     }
                     if(!color) {
@@ -412,7 +412,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                         fromLoad: true
                     });
                     peers._SelfLoaded.resolve();
-                }).bind(this)); // FIXME: ignoring error
+                }); // FIXME: ignoring error
         }
 
         _loadFromApp() {

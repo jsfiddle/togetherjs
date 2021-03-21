@@ -309,12 +309,14 @@ function peersMain(util, session, storage, require, templates) {
             return prefix + "self";
         };
         PeersSelf.prototype._loadFromSettings = function () {
+            var _this = this;
             return util.resolveMany([
                 storage.settings.get("name"),
                 storage.settings.get("avatar"),
                 storage.settings.get("defaultName"),
                 storage.settings.get("color")
-            ]).then((function (name, avatar, defaultName, color) {
+            ]).then(function (args) {
+                var _a = args, name = _a[0], avatar = _a[1], defaultName = _a[2], color = _a[3];
                 if (!defaultName) {
                     defaultName = util.pickRandom(DEFAULT_NICKNAMES);
                     storage.settings.set("defaultName", defaultName);
@@ -330,7 +332,7 @@ function peersMain(util, session, storage, require, templates) {
                 if (!avatar) {
                     avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
                 }
-                this.update({
+                _this.update({
                     name: name,
                     avatar: avatar,
                     defaultName: defaultName,
@@ -338,7 +340,7 @@ function peersMain(util, session, storage, require, templates) {
                     fromLoad: true
                 });
                 peers._SelfLoaded.resolve();
-            }).bind(this)); // FIXME: ignoring error
+            }); // FIXME: ignoring error
         };
         PeersSelf.prototype._loadFromApp = function () {
             // FIXME: I wonder if these should be optionally functions?

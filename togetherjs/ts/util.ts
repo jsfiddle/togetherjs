@@ -196,61 +196,31 @@ class Util {
         }
     }
 
-    // TODO update doc to say that function does not takes multiples arguments now
-    /** Resolves several promises (the promises are the arguments to the function) or the first argument may be an array of promises.
-       Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
-       FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+    /** Resolves several promises givent as one argument as an array of promises.
+        Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
+        FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+        Use like this:
+        const s = storage.settings;
+        util.resolveMany([s.get("name"), s.get("avatar"), s.get("defaultName"), s.get("color")] as const).then(args => {
+            let [name, avatar, defaultName, color] = args!; // for this example "!" is used because args can be undefined
+            // ...
+        }
     */
-    // work for form
-    public resolveMany1<T>(args1: JQueryDeferred<T>[]) {
-        let args: JQueryDeferred<T>[] = args1;
-        return this.Deferred(function(def: JQueryDeferred<T>) {
-            if(!("length" in args)) {
-                def.resolve();
-                return;
-            }
-            let count = args.length;
-            let allResults: (T | undefined)[] = [];
-            let anyError = false;
-            args.forEach(function(arg, index) {
-                arg.then(function(result) {
-                    allResults[index] = result;
-                    count--;
-                    check();
-                }, function(error) {
-                    allResults[index] = error;
-                    anyError = true;
-                    count--;
-                    check();
-                });
-            });
-            function check() {
-                if(!count) {
-                    if(anyError) {
-                        def.reject.apply(def, allResults);
-                    }
-                    else {
-                        def.resolve.apply(def, allResults);
-                    }
-                }
-            }
-        });
-    }
-
-    // work for storage
-    public resolveMany<T>(args: JQueryDeferred<T>[]) {
+    public resolveMany<T extends readonly any[]>(defs: { [I in keyof T]: JQueryDeferred<T[I]> }): JQueryDeferred<T> {
         var oneArg = true;
-        return this.Deferred<(T | undefined)[]>(function(def) {
-            var count = args.length;
+        return this.Deferred<T>(function(def) {
+            var count = defs.length;
             if(!count) {
                 def.resolve();
                 return;
             }
-            var allResults: (T | undefined)[] = [];
+            var allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };;
             var anyError = false;
-            args.forEach(function(arg, index) {
+            defs.forEach(function(arg, index) {
                 arg.then(function(result) {
-                    allResults[index] = result;
+                    if(result) {
+                        allResults[index] = result;
+                    }
                     count--;
                     check();
                 }, function(error) {
@@ -264,7 +234,8 @@ class Util {
                 if(!count) {
                     if(anyError) {
                         def.reject(allResults);
-                    } else {
+                    }
+                    else {
                         def.resolve(allResults);
                     }
                 }
