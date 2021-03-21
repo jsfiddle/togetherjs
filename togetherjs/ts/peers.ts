@@ -80,22 +80,22 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private identityId;
         public status: TogetherJSNS.PeerStatus;
         public idle: TogetherJSNS.PeerStatus;
-        public readonly name: string | null;
-        public readonly avatar: string | null;
-        public readonly color: string;
+        public name: string | null;
+        public avatar: string | null;
+        public color: string;
         public readonly view;
         private lastMessageDate: number = 0;
-        public readonly following: boolean;
+        public following: boolean;
 
-        public readonly url?: string;
+        public url?: string;
         private hash: string | null = null;
-        public readonly title: string | null = null;
+        public title: string | null = null;
         private rtcSupported?: boolean;
-        public readonly isCreator?: boolean;
-        public readonly urlHash: string;
+        public isCreator?: boolean;
+        public readonly urlHash?: string;
 
-        public static peers: {[id: string]: PeerClass} = {};
-        public scrollPosition: TogetherJSNS.ElementFinder.Position;
+        public static peers: { [id: string]: PeerClass } = {};
+        public scrollPosition?: TogetherJSNS.ElementFinder.Position;
 
         constructor(id: string, attrs: Partial<PeerClassAttributes> = {}) {
             assert(id);
@@ -295,8 +295,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
     const Peer = PeerClass;
 
-    // FIXME: I can't decide where this should actually go, seems weird
-    // that it is emitted and handled in the same module
+    // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session.on("follow-peer", function(peer) {
         if(peer.url != session.currentUrl()) {
             var url = peer.url;
@@ -319,6 +318,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public defaultName: string = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         private loaded = false;
         private isCreator = !session.isClient;
+        public view?: TogetherJSNS.PeerView;
 
         update(attrs: Partial<PeerSelfAttributes>) {
             var updatePeers = false;
@@ -516,7 +516,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             return;
         }
         /* Same interface as Peer, represents oneself (local user): */
-        
+
         // peer.Self init
         peers.Self = new PeersSelf();
 
@@ -672,4 +672,4 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     return peers;
 }
 
- define(["util", "session", "storage", "require", "templates"], peersMain);
+define(["util", "session", "storage", "require", "templates"], peersMain);

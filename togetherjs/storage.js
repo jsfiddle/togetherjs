@@ -40,7 +40,6 @@ function StorageMain(util) {
             return _this;
         }
         StorageSettings.prototype.get = function (name) {
-            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
         };

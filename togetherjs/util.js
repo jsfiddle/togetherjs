@@ -243,7 +243,11 @@ var Util = /** @class */ (function () {
         });
     };
     // work for storage
-    Util.prototype.resolveMany = function (args1) {
+    Util.prototype.resolveMany = function () {
+        var args1 = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args1[_i] = arguments[_i];
+        }
         var args;
         var oneArg = false;
         if (arguments.length == 1 && Array.isArray(arguments[0])) {

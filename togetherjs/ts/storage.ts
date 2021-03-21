@@ -2,10 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+interface Settings {
+    name: string,
+    defaultName: string,
+    avatar: string | null,
+    stickyShare: null,
+    color: string | null,
+    seenIntroDialog: boolean,
+    seenWalkthrough: boolean,
+    dontShowRtcInfo: boolean
+}
+
 function StorageMain(util: Util) {
     var assert: typeof util.assert = util.assert;
     var Deferred = util.Deferred;
-    var DEFAULT_SETTINGS = {
+    var DEFAULT_SETTINGS: Settings = {
         name: "",
         defaultName: "",
         avatar: null,
@@ -25,8 +36,7 @@ function StorageMain(util: Util) {
             super();
         }
 
-        get(name: keyof typeof DEFAULT_SETTINGS) {
-            console.log("get_settings_class", name, this.storageInstance.settings.defaults[name]);
+        get<K extends keyof Settings>(name: K): JQueryDeferred<Settings[K]> {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
         }

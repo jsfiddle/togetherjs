@@ -238,7 +238,7 @@ class Util {
     }
 
     // work for storage
-    public resolveMany<T>(args1: JQueryDeferred<T>[]) {
+    public resolveMany<T>(...args1: JQueryDeferred<T>[]) {
         var args: JQueryDeferred<T>[];
         var oneArg = false;
         if(arguments.length == 1 && Array.isArray(arguments[0])) {

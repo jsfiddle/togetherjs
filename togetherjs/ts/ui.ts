@@ -558,7 +558,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     class Ui {
         public container: JQuery | null = null;
-        public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
+        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a

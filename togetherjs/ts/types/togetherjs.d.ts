@@ -104,6 +104,8 @@ declare namespace TogetherJSNS {
             "rtc-abort": RTCAbort,
             "playerStateChange": PlayerStateChange,
             "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
+            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
+            "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus }
         }
 
         interface Chat {
@@ -247,7 +249,7 @@ declare namespace TogetherJSNS {
             "server-echo": boolean,
             clientId: null
         }
-        
+
         interface Invite {
             type: "invite",
             inviteId: string,
@@ -261,8 +263,8 @@ declare namespace TogetherJSNS {
 
     namespace ChannelOnMessage {
         interface Map {
-            "hello": {type: "hello"};
-            "hello-back": {type: "hello-back", clientId: string};
+            "hello": { type: "hello" };
+            "hello-back": { type: "hello-back", clientId: string };
             "get-logs": TogetherJSNS.Message;
             "peer-update";
             "init-connection": { type: "init-connection", peerCount: number };

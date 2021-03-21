@@ -220,8 +220,7 @@ function peersMain(util, session, storage, require, templates) {
         return PeerClass;
     }());
     var Peer = PeerClass;
-    // FIXME: I can't decide where this should actually go, seems weird
-    // that it is emitted and handled in the same module
+    // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session.on("follow-peer", function (peer) {
         if (peer.url != session.currentUrl()) {
             var url = peer.url;
