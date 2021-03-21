@@ -13,8 +13,7 @@
    When everything is done it fires session.emit("startup-ready")
 
 */
-define(["util", "require", "jquery", "windowing", "storage"], function (util, require, $, windowing, storage) {
-    var assert = util.assert;
+function startupMain(util, require, $, windowing, storage) {
     // Avoid circular import:
     var session = null;
     var STEPS = [
@@ -127,4 +126,5 @@ define(["util", "require", "jquery", "windowing", "storage"], function (util, re
     }());
     var handlers = new Handlers();
     return startup;
-});
+}
+define(["util", "require", "jquery", "windowing", "storage"], startupMain);

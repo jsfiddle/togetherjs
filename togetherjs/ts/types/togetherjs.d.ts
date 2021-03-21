@@ -358,6 +358,7 @@ declare namespace TogetherJSNS {
     type Walkabout = unknown;
     type UtilAlias = Util;
     type PeerView = ReturnType<Ui["PeerView"]>;
+    type Walkthrough = ReturnType<typeof walkthroughMain>;
 
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];

@@ -3,8 +3,8 @@ interface JQueryStatic {
         mobile?: boolean,
         mozilla?: boolean,
         version: string;
+        msie?: boolean;
     };
-    msie: boolean;
 }
 
 // Plugins introduced by TogetherJS

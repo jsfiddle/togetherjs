@@ -133,7 +133,7 @@ function channelsMain(util: Util) {
         maxBackoffTime = 1500;
         backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
         address: string;
-        socket!: WebSocket | null; // initialized in _setupConnection
+        socket: WebSocket | null = null; // TODO ! initialized in _setupConnection
         _reopening: boolean = false;
         _lastConnectTime = 0;
         _backoff = 0;
@@ -235,7 +235,7 @@ function channelsMain(util: Util) {
         private _pingReceived: boolean = false;
         private _pingFailures = 0;
         private _pingTimeout: number | null = null;
-        window: Window | null = null;
+        window!: Window; // TODO !
 
         constructor(win: WindowProxy, expectedOrigin: Origin) {
             super();
@@ -502,7 +502,8 @@ function channelsMain(util: Util) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
-                message: msg
+                message: msg,
+                clientId: null // TODO added this, does it introduce a bug?
             });
         }
 

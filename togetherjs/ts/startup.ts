@@ -13,8 +13,8 @@
    When everything is done it fires session.emit("startup-ready")
 
 */
-define(["util", "require", "jquery", "windowing", "storage"], function(util: Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
-    var assert = util.assert;
+
+function startupMain (util: Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
     var session: TogetherJSNS.Session | null = null;
 
@@ -107,7 +107,7 @@ define(["util", "require", "jquery", "windowing", "storage"], function(util: Uti
                     next();
                     return;
                 }
-                require(["walkthrough"], function(walkthrough) {
+                require(["walkthrough"], function(walkthrough: TogetherJSNS.Walkthrough) {
                     walkthrough.start(true, function() {
                         storage.settings.set("seenIntroDialog", true);
                         next();
@@ -134,4 +134,6 @@ define(["util", "require", "jquery", "windowing", "storage"], function(util: Uti
     const handlers = new Handlers();
 
     return startup;
-});
+}
+
+define(["util", "require", "jquery", "windowing", "storage"], startupMain);

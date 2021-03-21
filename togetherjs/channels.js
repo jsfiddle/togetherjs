@@ -93,6 +93,7 @@ function channelsMain(util) {
             _this.backoffTime = 50; // Milliseconds to add to each reconnect time
             _this.maxBackoffTime = 1500;
             _this.backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
+            _this.socket = null; // TODO ! initialized in _setupConnection
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
@@ -190,7 +191,6 @@ function channelsMain(util) {
             _this._pingReceived = false;
             _this._pingFailures = 0;
             _this._pingTimeout = null;
-            _this.window = null;
             _this.onmessage = function () { };
             _this.expectedOrigin = expectedOrigin;
             _this._receiveMessage = _this._receiveMessage.bind(_this);
@@ -433,7 +433,8 @@ function channelsMain(util) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
-                message: msg
+                message: msg,
+                clientId: null // TODO added this, does it introduce a bug?
             });
         };
         Route.prototype.close = function () {
