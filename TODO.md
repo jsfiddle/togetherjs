@@ -11,6 +11,7 @@
     - X same for ui.chat.system
     - X same for ui.chat.leftSession and others
 - remove JQuery
+- Browse PR on original repo to implement them
 
 - maybe I should convert the libs? Like walkabout?
 
