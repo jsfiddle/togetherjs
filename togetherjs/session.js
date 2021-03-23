@@ -91,6 +91,7 @@ function sessionMain(require, util, channels, $, storage) {
             msg2.clientId = session.clientId;
             channel.send(msg2);
         };
+        // TODO this function appears to never been used, and it does weird things
         Session.prototype.appSend = function (msg) {
             var type = msg.type;
             if (type.search(/^togetherjs\./) === 0) {
@@ -253,16 +254,15 @@ function sessionMain(require, util, channels, $, storage) {
                 console.warn("Message received before all modules loaded (ignoring):", msg);
                 return;
             }
-            if ((!msg.clientId) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
+            if ((!("clientId" in msg)) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
             }
-            if (msg.clientId) {
+            if ("clientId" in msg && msg.clientId) {
                 msg.peer = peers.getPeer(msg.clientId, msg);
             }
             if (msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
-                // We do this here to make sure this is run before any other
-                // hello handlers:
+                // We do this here to make sure this is run before any other hello handlers:
                 msg.peer.updateFromHello(msg);
             }
             if (msg.peer) {

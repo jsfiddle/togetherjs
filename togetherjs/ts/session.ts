@@ -86,11 +86,13 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             channel.send<K, never>(msg2);
         }
     
-        appSend(msg: TogetherJSNS.Message) {
+        // TODO this function appears to never been used, and it does weird things
+        appSend<T extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[T]) {
             let type = msg.type;
             if(type.search(/^togetherjs\./) === 0) {
                 type = type.substr("togetherjs.".length);
-            } else if(type.search(/^app\./) === -1) {
+            }
+            else if(type.search(/^app\./) === -1) {
                 type = "app." + type;
             }
             msg.type = type;
@@ -149,7 +151,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 initShareId().then(function() {
                     readyForMessages = false;
                     openChannel();
-                    require(["ui"], function(ui) {
+                    require(["ui"], function(ui: TogetherJSNS.Ui) {
                         TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function() {
@@ -164,7 +166,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                                 ui.activateUI();
                                 TogetherJS.config.close("enableAnalytics");
                                 if(TogetherJS.config.get("enableAnalytics")) {
-                                    require(["analytics"], function(analytics) {
+                                    require(["analytics"], function(analytics: TogetherJSNS.Analytics) {
                                         analytics.activate();
                                     });
                                 }
@@ -181,7 +183,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
 
         close(reason?: string) {
             TogetherJS.running = false;
-            var msg = { type: "bye" };
+            var msg: TogetherJSNS.SessionSend.Map["bye"] = { type: "bye" };
             if(reason) {
                 msg.reason = reason;
             }
@@ -211,7 +213,6 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
     }
 
     const session = new Session();
-
 
     var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -246,7 +247,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         assert(!channel, "Attempt to re-open channel");
         console.info("Connecting to", session.hubUrl(), location.href);
         var c = channels.WebSocketChannel(session.hubUrl());
-        c.onmessage = function(msg: TogetherJSNS.Message) {
+        c.onmessage = function(msg) {
             if(!readyForMessages) {
                 if(DEBUG) {
                     console.info("In (but ignored for being early):", msg);
@@ -261,16 +262,15 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 console.warn("Message received before all modules loaded (ignoring):", msg);
                 return;
             }
-            if((!msg.clientId) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
+            if((!("clientId" in msg)) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
             }
-            if(msg.clientId) {
+            if("clientId" in msg && msg.clientId) {
                 msg.peer = peers.getPeer(msg.clientId, msg);
             }
             if(msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
-                // We do this here to make sure this is run before any other
-                // hello handlers:
+                // We do this here to make sure this is run before any other hello handlers:
                 msg.peer.updateFromHello(msg);
             }
             if(msg.peer) {
@@ -399,14 +399,16 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 TogetherJS.config.close("findRoom");
                 if(findRoom && saved && findRoom != saved.shareId) {
                     console.info("Ignoring findRoom in lieu of continued session");
-                } else if(findRoom && TogetherJS.startup._joinShareId) {
+                }
+                else if(findRoom && TogetherJS.startup._joinShareId) {
                     console.info("Ignoring findRoom in lieu of explicit invite to session");
                 }
                 if(findRoom && typeof findRoom == "string" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     isClient = true;
                     shareId = findRoom;
                     sessionId = util.generateId();
-                } else if(findRoom && (!saved) && (!TogetherJS.startup._joinShareId)) {
+                }
+                else if(findRoom && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
                     assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
                         "Bad findRoom.max", findRoom);
@@ -424,7 +426,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                         def.resolve(session.shareId);
                     });
                     return;
-                } else if(TogetherJS.startup._launch) {
+                }
+                else if(TogetherJS.startup._launch) {
                     if(saved) {
                         isClient = saved.reason == "joined";
                         if(!shareId) {
@@ -439,7 +442,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     if(!shareId) {
                         shareId = util.generateId();
                     }
-                } else if(saved) {
+                }
+                else if(saved) {
                     isClient = saved.reason == "joined";
                     TogetherJS.startup.reason = saved.reason;
                     TogetherJS.startup.continued = true;

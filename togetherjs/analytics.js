@@ -1,5 +1,5 @@
 "use strict";
-define(["util"], function (_util) {
+function analyticsMain(_util) {
     var Analytics = /** @class */ (function () {
         function Analytics() {
         }
@@ -30,4 +30,5 @@ define(["util"], function (_util) {
         return Analytics;
     }());
     return new Analytics();
-});
+}
+define(["util"], analyticsMain);

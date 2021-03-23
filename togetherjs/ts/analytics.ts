@@ -1,4 +1,4 @@
-define(["util"], function(_util: Util) {
+function analyticsMain(_util: Util) {
     class Analytics {
         activate() {
             var enable = TogetherJS.config.get("enableAnalytics");
@@ -24,4 +24,6 @@ define(["util"], function(_util: Util) {
     }
 
     return new Analytics();
-});
+}
+
+define(["util"], analyticsMain);

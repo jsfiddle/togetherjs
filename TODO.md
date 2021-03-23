@@ -10,6 +10,7 @@
         - check all TODO emit error (only 2 remaining that will be solved later)
     - X same for ui.chat.system
     - X same for ui.chat.leftSession and others
+    - same for storage.tab.get
 - remove JQuery
 - Browse PR on original repo to implement them
 

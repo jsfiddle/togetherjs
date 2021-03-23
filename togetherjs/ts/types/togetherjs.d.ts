@@ -1,5 +1,12 @@
 declare namespace TogetherJSNS {
 
+    /** Types for storage.get */
+    namespace StorageGet {
+        interface Map {
+            "status": {running: boolean, date: number}
+        }
+    }
+
     /** Types for Templating.sub */
     namespace TemplatingSub {
         interface Map {
@@ -105,7 +112,8 @@ declare namespace TogetherJSNS {
             "playerStateChange": PlayerStateChange,
             "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
             "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus }
+            "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus },
+            "bye": {type: "bye", reason?: string},
         }
 
         interface Chat {
@@ -389,6 +397,7 @@ declare namespace TogetherJSNS {
     type UtilAlias = Util;
     type PeerView = ReturnType<Ui["PeerView"]>;
     type Walkthrough = ReturnType<typeof walkthroughMain>;
+    type Analytics = ReturnType<typeof analyticsMain>;
 
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
@@ -404,6 +413,7 @@ declare namespace TogetherJSNS {
     type JQuerySelector = ":password";
     type Reason = "started" | "joined";
 
+    // TODO this should be removed in favor of TogetherJSClass
     interface TogetherJS extends OnClass {
         getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         (event?: Event): TogetherJS;
@@ -422,7 +432,7 @@ declare namespace TogetherJSNS {
         pageLoaded: number;
         _startupInit: StartupInit;
         _mixinEvents(some: unknown): Hub,
-        _teardown: unknown,
+        _teardown: () => void,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,
         _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: unknown[] }>;

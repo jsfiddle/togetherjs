@@ -63,19 +63,19 @@ function StorageMain(util) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function () {
-                    key = self.prefix + key;
+                    var prefixedKey = self.prefix + key;
                     var value;
-                    var valueAsString = self.storage.getItem(key);
+                    var valueAsString = self.storage.getItem(prefixedKey);
                     if (!valueAsString) {
                         value = defaultValue;
                         if (DEBUG_STORAGE) {
-                            console.debug("Get storage", key, "defaults to", value);
+                            console.debug("Get storage", prefixedKey, "defaults to", value);
                         }
                     }
                     else {
                         value = JSON.parse(valueAsString);
                         if (DEBUG_STORAGE) {
-                            console.debug("Get storage", key, "=", value);
+                            console.debug("Get storage", prefixedKey, "=", value);
                         }
                     }
                     return value;

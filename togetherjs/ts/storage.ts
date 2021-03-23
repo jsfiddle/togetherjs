@@ -58,25 +58,25 @@ function StorageMain(util: Util) {
             this.settings = new StorageSettings(this);
         }
 
-        get<T>(key: string, defaultValue: T | null = null) {
+        get<T extends keyof TogetherJSNS.StorageGet.Map>(key: T, defaultValue: TogetherJSNS.StorageGet.Map[T] | null = null) {
             var self = this;
-            return Deferred<T>(function(def: JQueryDeferred<T>) {
+            return Deferred<TogetherJSNS.StorageGet.Map[T]>(function(def: JQueryDeferred<TogetherJSNS.StorageGet.Map[T]>) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
-                    key = self.prefix + key;
-                    let value: T | null;
-                    var valueAsString = self.storage.getItem(key);
+                    const prefixedKey = self.prefix + key;
+                    let value: TogetherJSNS.StorageGet.Map[T] | null;
+                    var valueAsString = self.storage.getItem(prefixedKey);
                     if(!valueAsString) {
                         value = defaultValue;
                         if(DEBUG_STORAGE) {
-                            console.debug("Get storage", key, "defaults to", value);
+                            console.debug("Get storage", prefixedKey, "defaults to", value);
                         }
                     }
                     else {
                         value = JSON.parse(valueAsString);
                         if(DEBUG_STORAGE) {
-                            console.debug("Get storage", key, "=", value);
+                            console.debug("Get storage", prefixedKey, "=", value);
                         }
                     }
                     return value;
