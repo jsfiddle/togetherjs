@@ -221,7 +221,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     logs.save();
                     this.playing = logs;
                     logs.play();
-                }),
+                },
                 function(error) {
                     ui.chat.system({
                         text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
