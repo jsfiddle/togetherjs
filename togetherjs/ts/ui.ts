@@ -40,7 +40,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(private ui: Ui) { }
 
-        text(attrs: {text: string, peer: TogetherJSNS.PeerClass, messageId: string, date?: number, notify: boolean}) {
+        text(attrs: {text: string, peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf, messageId: string, date?: number, notify?: boolean}) {
             assert(typeof attrs.text == "string");
             assert(attrs.peer);
             assert(attrs.messageId);
@@ -606,8 +606,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 setTimeout(function() {
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
-                    var start = iface.offset();
-                    let pos = $(TogetherJS.startTarget).offset();
+                    var start = iface.offset()!; // TODO !
+                    let pos = $(TogetherJS.startTarget).offset()!; // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -1372,7 +1372,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 top: "",
                 left: ""
             });
-
         }
 
         if(ui.container) {

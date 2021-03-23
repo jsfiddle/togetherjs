@@ -4,7 +4,7 @@
 /*jshint evil:true */
 
 function chatMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
-    var assert = util.assert;
+    var assert: typeof util.assert = util.assert;
     var Walkabout: TogetherJSNS.Walkabout;
 
     session.hub.on("chat", function(msg) {
@@ -36,9 +36,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             var parts = message.split(/ /);
             if(parts[0].charAt(0) == "/") {
                 var name = parts[0].substr(1).toLowerCase();
-                var method = commands[("command_" + name) as keyof typeof commands]; // TODO this cast could maybe be removed with string litteral
+                var method = commands[("command_" + name) as keyof typeof commands] as Function; // TODO this cast could maybe be removed with string litteral
                 if(method) {
-                    method.apply(null, parts.slice(1));
+                    method.apply(commands, parts.slice(1));
                     return;
                 }
             }
@@ -66,9 +66,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
     const chat = new Chat();
 
     class Commands {
-        _testCancel: unknown | null = null;
-        _testShow = [];
-        playing: unknown | null = null;
+        _testCancel: (() => void) | null = null;
+        _testShow: WalkaboutNS.Action[] = [];
+        playing: TogetherJSNS.Logs | null = null;
 
         command_help() {
             var msg = util.trim(templates("help"));
@@ -77,23 +77,25 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             });
         }
 
-        command_test(args: string[]) {
+        command_test(argString: string) {
             if(!Walkabout) {
                 require(["walkabout"], (WalkaboutModule: TogetherJSNS.Walkabout) => {
                     Walkabout = WalkaboutModule;
-                    this.command_test(args);
+                    this.command_test(argString);
                 });
                 return;
             }
-            args = util.trim(args || "").split(/\s+/g);
+            let args = util.trim(argString || "").split(/\s+/g);
             if(args[0] === "" || !args.length) {
                 if(this._testCancel) {
                     args = ["cancel"];
-                } else {
+                }
+                else {
                     args = ["start"];
                 }
             }
             if(args[0] == "cancel") {
+                util.assert(this._testCancel !== null);
                 ui.chat.system({
                     text: "Aborting test"
                 });
@@ -116,13 +118,14 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 container.show();
                 var statusContainer = container.find(".togetherjs-status");
                 statusContainer.text("starting...");
+                const self = this;
                 this._testCancel = Walkabout.runManyActions({
                     ondone: function() {
                         statusContainer.text("done");
                         statusContainer.one("click", function() {
                             container.hide();
                         });
-                        this._testCancel = null;
+                        self._testCancel = null;
                     },
                     onstatus: function(status) {
                         var note = "actions: " + status.actions.length + " running: " +
@@ -140,9 +143,10 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                         }
                     }, this);
                     this._testShow = [];
-                } else {
+                }
+                else {
                     var actions = Walkabout.findActions();
-                    actions.forEach(function(action) {
+                    actions.forEach(function(this: Commands, action) {
                         this._testShow.push(action.show());
                     }, this);
                 }
@@ -252,7 +256,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
 
         command_baseurl(url: string) {
             if(!url) {
-                storage.get("baseUrlOverride").then(function(b) {
+                storage.get<TogetherJSNS.BaseUrlOverride>("baseUrlOverride").then(function(b) {
                     if(b) {
                         ui.chat.system({
                             text: "Set to: " + b.baseUrl
@@ -279,9 +283,9 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             });
         }
 
-        command_config(variable, value) {
+        command_config(variable: string, value: string) {
             if(!(variable || value)) {
-                storage.get("configOverride").then(function(c) {
+                storage.get<TogetherJSNS.WithExpiration<unknown>>("configOverride").then(function(c) {
                     if(c) {
                         util.forEachAttr(c, function(value, attr) {
                             if(attr == "expiresAt") {
@@ -329,8 +333,10 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     text: "Warning: variable " + variable + " is unknown"
                 });
             }
-            storage.get("configOverride").then(function(c) {
-                c = c || {};
+            // TODO find better types
+            storage.get<TogetherJSNS.WithExpiration<Record<string, unknown>>>("configOverride").then(function(c) {
+                const expire = Date.now() + (1000 * 60 * 60 * 24);
+                c = c || {expiresAt: expire};
                 c[variable] = value;
                 c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
                 storage.set("configOverride", c).then(function() {
@@ -348,28 +354,30 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
     var chatStorageKey = "chatlog";
     var maxLogMessages = 100;
 
-    function saveChatMessage(obj) {
+    function saveChatMessage(obj: {text: string, peerId: string, messageId: string, date: number}) {
         assert(obj.peerId);
         assert(obj.messageId);
         assert(obj.date);
         assert(typeof obj.text == "string");
 
-        loadChatLog().then(function(log) {
-            for(var i = log.length - 1; i >= 0; i--) {
-                if(log[i].messageId === obj.messageId) {
-                    return;
+        loadChatLog().then(function(logs) {
+            if(logs) {
+                for(var i = logs.length - 1; i >= 0; i--) {
+                    if(logs[i].messageId === obj.messageId) {
+                        return;
+                    }
                 }
+                logs.push(obj);
+                if(logs.length > maxLogMessages) {
+                    logs.splice(0, logs.length - maxLogMessages);
+                }
+                storage.tab.set(chatStorageKey, logs);
             }
-            log.push(obj);
-            if(log.length > maxLogMessages) {
-                log.splice(0, log.length - maxLogMessages);
-            }
-            storage.tab.set(chatStorageKey, log);
         });
     }
 
     function loadChatLog() {
-        return storage.tab.get(chatStorageKey, []);
+        return storage.tab.get<TogetherJSNS.ChatLogs>(chatStorageKey, []);
     }
 
     session.once("ui-ready", function() {
@@ -379,7 +387,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             }
             for(var i = 0; i < log.length; i++) {
                 // peers should already be loaded from sessionStorage by the peers module
-                var currentPeer = peers.getPeer(log[i].peerId, null, true);
+                var currentPeer = peers.getPeer(log[i].peerId, undefined, true);
                 if(!currentPeer) {
                     // sometimes peers go away
                     continue;

@@ -33,7 +33,7 @@ function templatesMain(util, require) {
             }
         }
         assert(templatesLang, "Templates not yet loaded");
-        return clean(templatesLang[resourceName]);
+        return clean(templatesLang[resourceName] || "");
     };
 }
 // FIXME: maybe it would be better to dynamically assemble the first

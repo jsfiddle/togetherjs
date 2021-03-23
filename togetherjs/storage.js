@@ -50,11 +50,10 @@ function StorageMain(util) {
         return StorageSettings;
     }(OnClass));
     var TJSStorage = /** @class */ (function () {
-        function TJSStorage(name, storage, prefix, tab) {
+        function TJSStorage(name, storage, prefix) {
             this.name = name;
             this.storage = storage;
             this.prefix = prefix;
-            this.tab = tab;
             this.settings = new StorageSettings(this);
         }
         TJSStorage.prototype.get = function (key, defaultValue) {
@@ -149,10 +148,19 @@ function StorageMain(util) {
         };
         return TJSStorage;
     }());
+    var TJSStorageWithTab = /** @class */ (function (_super) {
+        __extends(TJSStorageWithTab, _super);
+        function TJSStorageWithTab(name, storage, prefix, tab) {
+            var _this = _super.call(this, name, storage, prefix) || this;
+            _this.tab = tab;
+            return _this;
+        }
+        return TJSStorageWithTab;
+    }(TJSStorage));
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
     var tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
-    var storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tab);
+    var storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
     return storage;
 }
 define(["util"], StorageMain);

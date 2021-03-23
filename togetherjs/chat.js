@@ -35,9 +35,9 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             var parts = message.split(/ /);
             if (parts[0].charAt(0) == "/") {
                 var name = parts[0].substr(1).toLowerCase();
-                var method = commands[("command_" + name)]; // TODO this cas could maybe be removed with string litteral
+                var method = commands[("command_" + name)]; // TODO this cast could maybe be removed with string litteral
                 if (method) {
-                    method.apply(null, parts.slice(1));
+                    method.apply(commands, parts.slice(1));
                     return;
                 }
             }
@@ -75,15 +75,16 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 text: msg
             });
         };
-        Commands.prototype.command_test = function (args) {
+        Commands.prototype.command_test = function (argString) {
+            var _this = this;
             if (!Walkabout) {
-                require(["walkabout"], (function (WalkaboutModule) {
+                require(["walkabout"], function (WalkaboutModule) {
                     Walkabout = WalkaboutModule;
-                    this.command_test(args);
-                }).bind(this));
+                    _this.command_test(argString);
+                });
                 return;
             }
-            args = util.trim(args || "").split(/\s+/g);
+            var args = util.trim(argString || "").split(/\s+/g);
             if (args[0] === "" || !args.length) {
                 if (this._testCancel) {
                     args = ["cancel"];
@@ -93,6 +94,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 }
             }
             if (args[0] == "cancel") {
+                util.assert(this._testCancel !== null);
                 ui.chat.system({
                     text: "Aborting test"
                 });
@@ -115,13 +117,14 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 container.show();
                 var statusContainer = container.find(".togetherjs-status");
                 statusContainer.text("starting...");
+                var self_1 = this;
                 this._testCancel = Walkabout.runManyActions({
                     ondone: function () {
                         statusContainer.text("done");
                         statusContainer.one("click", function () {
                             container.hide();
                         });
-                        this._testCancel = null;
+                        self_1._testCancel = null;
                     },
                     onstatus: function (status) {
                         var note = "actions: " + status.actions.length + " running: " +
@@ -189,6 +192,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             window.open(session.recordUrl(), "_blank", "left,width=" + ($(window).width() / 2));
         };
         Commands.prototype.command_playback = function (url) {
+            var _this = this;
             if (this.playing) {
                 this.playing.cancel();
                 this.playing.unload();
@@ -205,7 +209,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 return;
             }
             var logLoader = playback.getLogs(url);
-            logLoader.then((function (logs) {
+            logLoader.then(function (logs) {
                 if (!logs) {
                     ui.chat.system({
                         text: "No logs found."
@@ -213,9 +217,9 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     return;
                 }
                 logs.save();
-                this.playing = logs;
+                _this.playing = logs;
                 logs.play();
-            }).bind(this), function (error) {
+            }, function (error) {
                 ui.chat.system({
                     text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
                 });
@@ -322,8 +326,10 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     text: "Warning: variable " + variable + " is unknown"
                 });
             }
+            // TODO find better types
             storage.get("configOverride").then(function (c) {
-                c = c || {};
+                var expire = Date.now() + (1000 * 60 * 60 * 24);
+                c = c || { expiresAt: expire };
                 c[variable] = value;
                 c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
                 storage.set("configOverride", c).then(function () {
@@ -344,17 +350,19 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
         assert(obj.messageId);
         assert(obj.date);
         assert(typeof obj.text == "string");
-        loadChatLog().then(function (log) {
-            for (var i = log.length - 1; i >= 0; i--) {
-                if (log[i].messageId === obj.messageId) {
-                    return;
+        loadChatLog().then(function (logs) {
+            if (logs) {
+                for (var i = logs.length - 1; i >= 0; i--) {
+                    if (logs[i].messageId === obj.messageId) {
+                        return;
+                    }
                 }
+                logs.push(obj);
+                if (logs.length > maxLogMessages) {
+                    logs.splice(0, logs.length - maxLogMessages);
+                }
+                storage.tab.set(chatStorageKey, logs);
             }
-            log.push(obj);
-            if (log.length > maxLogMessages) {
-                log.splice(0, log.length - maxLogMessages);
-            }
-            storage.tab.set(chatStorageKey, log);
         });
     }
     function loadChatLog() {
@@ -367,7 +375,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             }
             for (var i = 0; i < log.length; i++) {
                 // peers should already be loaded from sessionStorage by the peers module
-                var currentPeer = peers.getPeer(log[i].peerId, null, true);
+                var currentPeer = peers.getPeer(log[i].peerId, undefined, true);
                 if (!currentPeer) {
                     // sometimes peers go away
                     continue;

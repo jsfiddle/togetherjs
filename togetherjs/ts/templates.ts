@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 interface Template {
-    interface: string;
-    walkthrough: string;
-    names: string;
-    help: string;
-    walkabout: string;
+    interface?: string;
+    walkthrough?: string;
+    names?: string;
+    help?: string;
+    walkabout?: string;
 }
 
 function templatesMain(util: Util, require: Require) {
@@ -43,7 +43,7 @@ function templatesMain(util: Util, require: Require) {
             }
         }
         assert(templatesLang, "Templates not yet loaded");
-        return clean(templatesLang[resourceName]);
+        return clean(templatesLang[resourceName] || "");
     };
 }
 

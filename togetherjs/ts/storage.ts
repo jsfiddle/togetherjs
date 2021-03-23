@@ -54,14 +54,13 @@ function StorageMain(util: Util) {
             private name: string,
             private storage: Storage,
             private prefix: string,
-            public readonly tab?: TJSStorage
         ) {
             this.settings = new StorageSettings(this);
         }
 
         get<T>(key: string, defaultValue: T | null = null) {
             var self = this;
-            return Deferred(function(def: JQueryDeferred<T>) {
+            return Deferred<T>(function(def: JQueryDeferred<T>) {
                 // Strictly this isn't necessary, but eventually I want to move to something more
                 // async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
@@ -153,11 +152,22 @@ function StorageMain(util: Util) {
         }
     }
 
+    class TJSStorageWithTab extends TJSStorage {
+        constructor(
+            name: string,
+            storage: Storage,
+            prefix: string,
+            public readonly tab: TJSStorage
+        ) {
+            super(name, storage, prefix);
+        }
+    }
+
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
 
     const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
-    const storage = new TJSStorage('localStorage', localStorage, namePrefix + ".", tab);
+    const storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
 
     return storage;
 }

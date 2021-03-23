@@ -116,6 +116,8 @@ declare namespace TogetherJSNS {
 
         interface GetLogs {
             type: "get-logs",
+            forClient: string,
+            saveAs: string
         }
 
         interface CursorClick {
@@ -660,6 +662,16 @@ declare namespace TogetherJSNS {
 
     interface Tinymce {
 
+    }
+
+    /** type for storage.tab.set(chatStorageKey, log); */
+    interface ChatLogs extends Array<ChatLog> { }
+
+    interface ChatLog {
+        messageId: string,
+        peerId: string,
+        text: string,
+        date: number
     }
 }
 

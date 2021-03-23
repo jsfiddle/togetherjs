@@ -593,8 +593,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 setTimeout(function () {
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
-                    var start = iface.offset();
-                    var pos = $(TogetherJS.startTarget).offset();
+                    var start = iface.offset(); // TODO !
+                    var pos = $(TogetherJS.startTarget).offset(); // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
