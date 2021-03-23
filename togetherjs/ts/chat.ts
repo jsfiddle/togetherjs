@@ -36,7 +36,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             var parts = message.split(/ /);
             if(parts[0].charAt(0) == "/") {
                 var name = parts[0].substr(1).toLowerCase();
-                var method = commands[("command_" + name) as keyof typeof commands]; // TODO this cas could maybe be removed with string litteral
+                var method = commands[("command_" + name) as keyof typeof commands]; // TODO this cast could maybe be removed with string litteral
                 if(method) {
                     method.apply(null, parts.slice(1));
                     return;
@@ -79,10 +79,10 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
 
         command_test(args: string[]) {
             if(!Walkabout) {
-                require(["walkabout"], (function(WalkaboutModule: TogetherJSNS.Walkabout) {
+                require(["walkabout"], (WalkaboutModule: TogetherJSNS.Walkabout) => {
                     Walkabout = WalkaboutModule;
                     this.command_test(args);
-                }).bind(this));
+                });
                 return;
             }
             args = util.trim(args || "").split(/\s+/g);
@@ -193,7 +193,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 "left,width=" + ($(window).width() / 2));
         }
 
-        command_playback(url) {
+        command_playback(url?: string) {
             if(this.playing) {
                 this.playing.cancel();
                 this.playing.unload();
@@ -211,7 +211,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             }
             var logLoader = playback.getLogs(url);
             logLoader.then(
-                (function(logs) {
+                (logs) => {
                     if(!logs) {
                         ui.chat.system({
                             text: "No logs found."
@@ -221,7 +221,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                     logs.save();
                     this.playing = logs;
                     logs.play();
-                }).bind(this),
+                }),
                 function(error) {
                     ui.chat.system({
                         text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")

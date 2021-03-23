@@ -157,7 +157,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
         LogsExport = Logs; // TODO ugly export;
         getLogs(url: string) {
             if(url.search(/^local:/) === 0) {
-                return $.Deferred(function(def) {
+                return $.Deferred<Logs>(function(def) {
                     storage.get<string>("recording." + url.substr("local:".length)).then(function(logs) {
                         if(!logs) {
                             def.resolve(null);
@@ -170,7 +170,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
                     });
                 });
             }
-            return $.Deferred(function(def: JQueryDeferred<unknown>) {
+            return $.Deferred<Logs>(function(def) {
                 $.ajax({
                     url: url,
                     dataType: "text"
