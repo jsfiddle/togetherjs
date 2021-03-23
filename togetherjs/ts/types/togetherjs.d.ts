@@ -383,7 +383,7 @@ declare namespace TogetherJSNS {
     type TogetherJSClass = ReturnType<typeof togetherjsMain>;
     type On = OnClass;
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
-    type Walkabout = unknown;
+    type Walkabout = WalkaboutModule;
     type UtilAlias = Util;
     type PeerView = ReturnType<Ui["PeerView"]>;
     type Walkthrough = ReturnType<typeof walkthroughMain>;

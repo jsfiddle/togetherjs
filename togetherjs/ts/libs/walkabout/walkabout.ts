@@ -1,3 +1,22 @@
+interface WalkaboutModule {
+    runManyActions(options: RunManyActionsOptions): void;
+}
+
+interface RunManyActionsOptions {
+    element?: HTMLElement | Document,
+    speed?: number, whileTrue?: () => void,
+    ondone: () => void,
+    onstatus: (arg: {actions: Actions, action: Action, times: number, remaining: number}) => void,
+    times?: number,
+    startAtRemaining?: number
+}
+
+interface Actions extends Array<Action> {
+}
+
+interface Action {
+}
+
 (function() {
     function init(Walkabout) {
 
@@ -79,7 +98,7 @@
 
         Walkabout.actionFinders = [];
 
-        Walkabout.findActions = function(el, actions) {
+        Walkabout.findActions = function(el?: HTMLElement, actions: Actions) {
             el = el || document;
             actions = actions || new Walkabout.Actions();
             if(!(Array.isArray(el) ||
@@ -109,7 +128,7 @@
 
         Walkabout.DEFAULT_TIMES = 100;
 
-        Walkabout.runManyActions = function runManyActions(options) {
+        Walkabout.runManyActions = function runManyActions(options: RunManyActionsOptions) {
             options = options || {};
             var el = options.element || document;
             var speed = options.speed || 100;
@@ -118,7 +137,7 @@
             var onstatus = options.onstatus;
             var cancelled = false;
             var totalTimes = options.times;
-            var remaining;
+            var remaining: number | undefined;
             function cancel() {
                 cancelled = true;
             }
