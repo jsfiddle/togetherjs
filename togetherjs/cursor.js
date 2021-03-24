@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // Cursor viewing support
-function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
+function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
     var assert = util.assert;
     var FOREGROUND_COLORS = ["#111", "#eee"];
     var CURSOR_HEIGHT = 50;
@@ -51,7 +51,7 @@ function cursorMain($, ui, util, session, elementFinder, tinycolor, eventMaker, 
             name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO adding .toString() fixes the error but is it really what we want to do
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toString() //TODO we use a very old version of tinycolors
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);

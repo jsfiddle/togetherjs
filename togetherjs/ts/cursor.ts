@@ -4,7 +4,7 @@
 
 // Cursor viewing support
 
-function cursorMain($: JQueryStatic, ui: TogetherJSNS.Ui, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, tinycolor: tinycolor, eventMaker: EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
+function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, tinycolor: tinycolor, eventMaker: EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
     var assert: typeof util.assert = util.assert;
 
     var FOREGROUND_COLORS = ["#111", "#eee"];
@@ -58,7 +58,7 @@ function cursorMain($: JQueryStatic, ui: TogetherJSNS.Ui, util: Util, session: T
             name.text(peer.name!); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)//TODO adding .toString() fixes the error but is it really what we want to do
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toString() //TODO we use a very old version of tinycolors
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
