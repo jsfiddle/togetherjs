@@ -87,6 +87,7 @@ interface tinycolor {
      * @param color - the base color.
      * @param colorsToCompare - array of colors to pick the most readable one from.
      */
+    mostReadable(color: string, colorsToCompare: string[]): string; // v0.9.13
     mostReadable(color: tinycolorInstance, colorsToCompare: tinycolorInstance[]): tinycolorInstance;
 
     /**/

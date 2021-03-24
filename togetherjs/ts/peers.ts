@@ -324,7 +324,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private isSelf = true;
         public readonly id = session.clientId;
         private identityId = session.identityId;
-        private status: TogetherJSNS.PeerStatus = "live";
+        public status: TogetherJSNS.PeerStatus = "live";
         private idle: TogetherJSNS.PeerStatus = "active";
         public name: string | null = null;
         public avatar: string | null = null;

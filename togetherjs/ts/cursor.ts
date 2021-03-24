@@ -58,7 +58,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             name.text(peer.name!); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toString() //TODO we use a very old version of tinycolors
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO we use a very old version of tinycolors
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -79,7 +79,8 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
                     padding: 0,
                     opacity: 0
                 }, 200);
-            } else {
+            }
+            else {
                 //this.element.show();
                 this.element.animate({
                     opacity: 0.3
@@ -131,21 +132,24 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
         rotateCursorDown() {
             var e = $(this.element).find('svg');
-            e.animate({borderSpacing: -150, opacity: 1}, {
-                step: function(now, fx) {
-                    if(fx.prop == "borderSpacing") {
-                        e.css('-webkit-transform', 'rotate(' + now + 'deg)')
-                            .css('-moz-transform', 'rotate(' + now + 'deg)')
-                            .css('-ms-transform', 'rotate(' + now + 'deg)')
-                            .css('-o-transform', 'rotate(' + now + 'deg)')
-                            .css('transform', 'rotate(' + now + 'deg)');
-                    }
-                    else {
-                        e.css(fx.prop, now);
-                    }
+            e.animate(
+                {borderSpacing: -150, opacity: 1},
+                {
+                    step: function(now, fx) {
+                        if(fx.prop == "borderSpacing") {
+                            e.css('-webkit-transform', 'rotate(' + now + 'deg)')
+                                .css('-moz-transform', 'rotate(' + now + 'deg)')
+                                .css('-ms-transform', 'rotate(' + now + 'deg)')
+                                .css('-o-transform', 'rotate(' + now + 'deg)')
+                                .css('transform', 'rotate(' + now + 'deg)');
+                        }
+                        else {
+                            e.css(fx.prop, now);
+                        }
+                    },
+                    duration: 500
                 },
-                duration: 500
-            }, 'linear' // TODO removing 'linear' fixes the error, but is that really what must be done?
+                'linear' // TODO removing 'linear' fixes the error, but is that really what must be done?
             ).promise().then(function() {
                 e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
             });
