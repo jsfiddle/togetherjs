@@ -415,10 +415,10 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     shareId = findRoom;
                     sessionId = util.generateId();
                 }
-                else if(findRoom && (!saved) && (!TogetherJS.startup._joinShareId)) {
+                // TODO added 'typeof findRoom == "object"' check
+                else if(findRoom && typeof findRoom == "object" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
-                    assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0,
-                        "Bad findRoom.max", findRoom);
+                    assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0, "Bad findRoom.max", findRoom);
                     sessionId = util.generateId();
                     if(findRoom.prefix.search(/[^a-zA-Z0-9]/) != -1) {
                         console.warn("Bad value for findRoom.prefix:", JSON.stringify(findRoom.prefix));
@@ -485,9 +485,11 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             return;
         }
         storage.get("startTarget").then(function(id) {
-            var el = document.getElementById(id);
-            if(el) {
-                TogetherJS.startup.button = el;
+            if(id) {
+                var el = document.getElementById(id);
+                if(el) {
+                    TogetherJS.startup.button = el;
+                }
             }
         });
     }

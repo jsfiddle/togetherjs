@@ -3,7 +3,7 @@ declare namespace TogetherJSNS {
     /** Types for storage.get */
     namespace StorageGet {
         interface MapRaw {
-            "status": { reason: string, shareId: string, sessionId: string, running: boolean, date: number },
+            "status": { reason: Reason, shareId: string, sessionId: string, running: boolean, date: number },
             "identityId": string,
             "baseUrlOverride": BaseUrlOverride,
             "configOverride": WithExpiration<Record<string, unknown>>, // TODO unknown
@@ -536,7 +536,7 @@ declare namespace TogetherJSNS {
         /** The name of this tool as provided to users.  The UI is updated to use this. Because of how it is used in text it should be a proper noun, e.g., "MySite's Collaboration Tool" */
         toolName: string | null,
         /** Used to auto-start TogetherJS with a {prefix: pageName, max: participants} Also with findRoom: "roomName" it will connect to the given room name */
-        findRoom: null,
+        findRoom: string | { max: number, prefix: string }, // TODO something seems to be wrong with findRoom, sometimes it's a string and sometimes it's an object, also it's never set as far as I can see
         /** If true, starts TogetherJS automatically (of course!) */
         autoStart: boolean,
         /** If true, then the "Join TogetherJS Session?" confirmation dialog won't come up */
