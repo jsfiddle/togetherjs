@@ -29,7 +29,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
         });
     }
 
-    function sendLogs(req: TogetherJSNS.Message) {
+    function sendLogs(req: TogetherJSNS.SessionSend.GetLogs) {
         channel.send({
             type: "logs",
             clientId: clientId,
@@ -75,7 +75,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
             channel = channels.WebSocketChannel(url);
-            channel.onmessage = (msg: TogetherJSNS.Message) => {
+            channel.onmessage = msg => {
                 if(msg.type == "hello-back") {
                     display("#connected");
                 }

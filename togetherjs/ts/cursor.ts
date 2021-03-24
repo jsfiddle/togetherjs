@@ -47,7 +47,7 @@ function cursorMain($: JQueryStatic, ui: TogetherJSNS.Ui, util: Util, session: T
             this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
         }
 
-        updatePeer(peer: TogetherJSNS.PeerClass) {
+        updatePeer(peer: TogetherJSNS.AnyPeer) {
             // FIXME: can I use peer.setElement()?
             this.element.css({color: peer.color});
             var img = this.element.find("img.togetherjs-cursor-img");

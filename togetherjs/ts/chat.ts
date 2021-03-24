@@ -256,7 +256,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
 
         command_baseurl(url: string) {
             if(!url) {
-                storage.get<TogetherJSNS.BaseUrlOverride>("baseUrlOverride").then(function(b) {
+                storage.get("baseUrlOverride").then(function(b) {
                     if(b) {
                         ui.chat.system({
                             text: "Set to: " + b.baseUrl
@@ -285,7 +285,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
 
         command_config(variable: string, value: string) {
             if(!(variable || value)) {
-                storage.get<TogetherJSNS.WithExpiration<unknown>>("configOverride").then(function(c) {
+                storage.get("configOverride").then(function(c) {
                     if(c) {
                         util.forEachAttr(c, function(value, attr) {
                             if(attr == "expiresAt") {
@@ -334,7 +334,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                 });
             }
             // TODO find better types
-            storage.get<TogetherJSNS.WithExpiration<Record<string, unknown>>>("configOverride").then(function(c) {
+            storage.get("configOverride").then(function(c) {
                 const expire = Date.now() + (1000 * 60 * 60 * 24);
                 c = c || {expiresAt: expire};
                 c[variable] = value;
@@ -351,7 +351,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
     const commands = new Commands();
 
     // this section deal with saving/restoring chat history as long as session is alive
-    var chatStorageKey = "chatlog";
+    const chatStorageKey = "chatlog";
     var maxLogMessages = 100;
 
     function saveChatMessage(obj: {text: string, peerId: string, messageId: string, date: number}) {
@@ -377,7 +377,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
     }
 
     function loadChatLog() {
-        return storage.tab.get<TogetherJSNS.ChatLogs>(chatStorageKey, []);
+        return storage.tab.get(chatStorageKey, []);
     }
 
     session.once("ui-ready", function() {

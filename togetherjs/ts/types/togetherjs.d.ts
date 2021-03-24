@@ -2,8 +2,33 @@ declare namespace TogetherJSNS {
 
     /** Types for storage.get */
     namespace StorageGet {
-        interface Map {
-            "status": {running: boolean, date: number}
+        interface MapRaw {
+            "status": { reason: string, shareId: string, sessionId: string, running: boolean, date: number },
+            "identityId": string,
+            "baseUrlOverride": BaseUrlOverride,
+            "configOverride": WithExpiration<Record<string, unknown>>, // TODO unknown
+            "chatlog": ChatLogs,
+            "peerCache": { peers: SerializedPeer[] },
+            "playback.logs": LogItem[],
+            "playback.pos": number,
+            "startTarget": string,
+        }
+
+        type MapForSettings = {
+            [P in keyof Settings & string as `settings.${P}`]: Settings[P]
+        }
+
+        type Map = MapRaw & MapForSettings;
+
+        interface Settings {
+            name: string,
+            defaultName: string,
+            avatar: string | null,
+            stickyShare: null,
+            color: string | null,
+            seenIntroDialog: boolean,
+            seenWalkthrough: boolean,
+            dontShowRtcInfo: boolean
         }
     }
 
@@ -113,7 +138,9 @@ declare namespace TogetherJSNS {
             "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
             "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
             "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus },
-            "bye": {type: "bye", reason?: string},
+            "bye": { type: "bye", reason?: string },
+            "hello": TogetherJSNS.On.HelloMessage,
+            "hello-back": TogetherJSNS.On.HelloBackMessage
         }
 
         interface Chat {
@@ -223,7 +250,7 @@ declare namespace TogetherJSNS {
             "who": Who,
             "invite": Invite,
             "bye": { type: "bye", clientId: string },
-            "logs": { type: "logs", clientId: string, logs: string, request: TogetherJSNS.Message },
+            "logs": { type: "logs", clientId: string, logs: string, request: TogetherJSNS.SessionSend.GetLogs },
             "hello": Hello,
             "hello-back": HelloBack,
         }
@@ -273,10 +300,10 @@ declare namespace TogetherJSNS {
 
     namespace ChannelOnMessage {
         interface Map {
-            "hello": { type: "hello" };
-            "hello-back": { type: "hello-back", clientId: string };
-            "get-logs": TogetherJSNS.Message;
-            "peer-update": {type: "peer-update", name: string, avatar: string, color: string};
+            "hello": { type: "hello", peer: PeerClass };
+            "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
+            "get-logs": TogetherJSNS.SessionSend.GetLogs;
+            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
             "init-connection": { type: "init-connection", peerCount: number };
         }
     }
@@ -398,12 +425,15 @@ declare namespace TogetherJSNS {
     type PeerView = ReturnType<Ui["PeerView"]>;
     type Walkthrough = ReturnType<typeof walkthroughMain>;
     type Analytics = ReturnType<typeof analyticsMain>;
-
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
     type Logs = Playback["LogsExport"];
     type PeerSelf = Peers["Self"];
     type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
+
+    type AnyPeer = PeerSelf | PeerClass;
+    /** Those are often called an "hello message" in TJS even if it can be a peer-update */
+    type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.ChannelOnMessage.Map["peer-update"];
 
     type ValueOf<T> = T[keyof T];
 
@@ -524,7 +554,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: (keyof TogetherJSNS.SessionSend.Map)[] | true,
+        ignoreMessages: (keyof TogetherJSNS.SessionSend.Map | keyof TogetherJSNS.ChannelOnMessage.Map)[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
@@ -553,7 +583,7 @@ declare namespace TogetherJSNS {
         button: HTMLElement | null;
         reason: Reason;
         _launch: boolean;
-        _joinShareId: unknown;
+        _joinShareId: string;
         continued: boolean;
     }
 

@@ -240,6 +240,7 @@ function sessionMain(require, util, channels, $, storage) {
         console.info("Connecting to", session.hubUrl(), location.href);
         var c = channels.WebSocketChannel(session.hubUrl());
         c.onmessage = function (msg) {
+            var _a;
             if (!readyForMessages) {
                 if (DEBUG) {
                     console.info("In (but ignored for being early):", msg);
@@ -258,17 +259,24 @@ function sessionMain(require, util, channels, $, storage) {
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
             }
-            if ("clientId" in msg && msg.clientId) {
-                msg.peer = peers.getPeer(msg.clientId, msg);
+            if ("clientId" in msg) {
+                var msg2 = msg;
+                if (msg2.clientId) {
+                    msg2.peer = (_a = peers.getPeer(msg2.clientId, msg2)) !== null && _a !== void 0 ? _a : undefined;
+                }
             }
             if (msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
                 // We do this here to make sure this is run before any other hello handlers:
-                msg.peer.updateFromHello(msg);
+                var msg2 = msg;
+                msg2.peer.updateFromHello(msg2);
             }
-            if (msg.peer) {
-                msg.sameUrl = msg.peer.url == currentUrl;
-                if (!msg.peer.isSelf) {
-                    msg.peer.updateMessageDate(msg);
+            if ("peer" in msg) {
+                var msg2 = msg;
+                if (msg2.peer) {
+                    msg2.sameUrl = msg2.peer.url == currentUrl;
+                    if (!msg2.peer.isSelf) {
+                        msg2.peer.updateMessageDate(msg);
+                    }
                 }
             }
             session.hub.emit(msg.type, msg); // TODO emit error
@@ -315,13 +323,12 @@ function sessionMain(require, util, channels, $, storage) {
     /****************************************
      * Lifecycle (start and end)
      */
-    // These are Javascript files that implement features, and so must
-    // be injected at runtime because they aren't pulled in naturally
-    // via define().
-    // ui must be the first item:
+    // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
     var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     function getRoomName(prefix, maxSize) {
-        var findRoom = TogetherJS.config.get("hubBase").replace(/\/*$/, "") + "/findroom";
+        var hubBase = TogetherJS.config.get("hubBase");
+        util.assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
+        var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
         return $.ajax({
             url: findRoom,
             dataType: "json",

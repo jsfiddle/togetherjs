@@ -46,7 +46,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             assert(hubBase != null);
             return hubBase.replace(/\/*$/, "") + "/hub/" + id;
         }
-    
+
         shareUrl() {
             assert(this.shareId, "Attempted to access shareUrl() before shareId is set");
             var hash = location.hash;
@@ -60,14 +60,14 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             return location.protocol + "//" + location.host + location.pathname + query +
                 hash + "&togetherjs=" + this.shareId;
         }
-    
+
         recordUrl() {
             assert(this.shareId);
             var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
             url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
             return url;
         }
-    
+
         /* location.href without the hash */
         currentUrl() {
             if(includeHashInUrl) {
@@ -85,7 +85,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             msg2.clientId = session.clientId;
             channel.send<K, never>(msg2);
         }
-    
+
         // TODO this function appears to never been used, and it does weird things
         appSend<T extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[T]) {
             let type = msg.type;
@@ -101,6 +101,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
 
         makeHelloMessage(helloBack: true): TogetherJSNS.On.HelloBackMessage;
         makeHelloMessage(helloBack: false): TogetherJSNS.On.HelloMessage;
+        makeHelloMessage(helloBack: boolean): TogetherJSNS.On.HelloBackMessage | TogetherJSNS.On.HelloMessage;
         makeHelloMessage(helloBack: boolean) {
             let starting: boolean = false;
             if(!TogetherJS.startup.continued) {
@@ -266,17 +267,24 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
             }
-            if("clientId" in msg && msg.clientId) {
-                msg.peer = peers.getPeer(msg.clientId, msg);
+            if("clientId" in msg) {
+                const msg2 = msg as typeof msg & { clientId: string, peer?: TogetherJSNS.AnyPeer };
+                if(msg2.clientId) {
+                    msg2.peer = peers.getPeer(msg2.clientId, msg2) ?? undefined;
+                }
             }
             if(msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
                 // We do this here to make sure this is run before any other hello handlers:
-                msg.peer.updateFromHello(msg);
+                const msg2 = msg as TogetherJSNS.HelloMessageLike;
+                msg2.peer.updateFromHello(msg2);
             }
-            if(msg.peer) {
-                msg.sameUrl = msg.peer.url == currentUrl;
-                if(!msg.peer.isSelf) {
-                    msg.peer.updateMessageDate(msg);
+            if("peer" in msg) {
+                const msg2 = msg as (typeof msg & { peer: TogetherJSNS.PeerClass, sameUrl?: boolean });
+                if(msg2.peer) {
+                    msg2.sameUrl = msg2.peer.url == currentUrl;
+                    if(!msg2.peer.isSelf) {
+                        msg2.peer.updateMessageDate(msg);
+                    }
                 }
             }
             session.hub.emit(msg.type, msg); // TODO emit error
@@ -306,7 +314,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         sendHello(true);
     });
 
-    function processFirstHello(msg) {
+    function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer}) {
         if(!msg.sameUrl) {
             var url = msg.url;
             if(msg.urlHash) {
@@ -317,7 +325,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         }
     }
 
-    function sendHello(helloBack) {
+    function sendHello(helloBack: boolean) {
         var msg = session.makeHelloMessage(helloBack);
         if(!helloBack) {
             session.timeHelloSent = Date.now();
@@ -330,14 +338,13 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
      * Lifecycle (start and end)
      */
 
-    // These are Javascript files that implement features, and so must
-    // be injected at runtime because they aren't pulled in naturally
-    // via define().
-    // ui must be the first item:
+    // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
     var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
 
-    function getRoomName(prefix, maxSize) {
-        var findRoom = TogetherJS.config.get("hubBase").replace(/\/*$/, "") + "/findroom";
+    function getRoomName(prefix: string, maxSize: number) {
+        const hubBase = TogetherJS.config.get("hubBase");
+        util.assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
+        var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
         return $.ajax({
             url: findRoom,
             dataType: "json",

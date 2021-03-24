@@ -186,12 +186,12 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
         }
 
         getRunningLogs() {
-            return storage.get<LogItem[]>("playback.logs").then(function(value) {
+            return storage.get("playback.logs").then(function(value) {
                 if(!value) {
                     return null;
                 }
                 var logs = new Logs(value, true);
-                return storage.get<number>("playback.pos").then(function(pos) {
+                return storage.get("playback.pos").then(function(pos) {
                     logs.pos = pos || 0;
                     return logs;
                 });

@@ -18,7 +18,7 @@ interface PeerClassAttributes {
     lastMessageDate: number;
     following: boolean;
     joined: boolean;
-    fromHelloMessage: MessageWithUrlHash;
+    fromHelloMessage: TogetherJSNS.HelloMessageLike;
     fromStorage?: boolean;
 }
 
@@ -31,7 +31,6 @@ interface PeerSelfAttributes {
     status: TogetherJSNS.PeerStatus,
     idle: TogetherJSNS.PeerStatus,
 }
-
 
 interface MessageWithUrlHash {
     url: string;
@@ -57,6 +56,21 @@ interface Message2 {
     name: string;
     avatar: string;
     color: string;
+}
+
+interface SerializedPeer {
+    id: string;
+    status: TogetherJSNS.PeerStatus;
+    idle: TogetherJSNS.PeerStatus;
+    url: string | undefined;
+    hash: string | null;
+    title: string | null;
+    identityId: string | null;
+    rtcSupported?: boolean,
+    name: string | null,
+    avatar: string | null,
+    color: string,
+    following: boolean;
 }
 
 function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
@@ -128,7 +142,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             return "Peer(" + JSON.stringify(this.id) + ")";
         }
 
-        serialize() {
+        serialize(): SerializedPeer {
             return {
                 id: this.id,
                 status: this.status,
@@ -160,7 +174,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             this.lastMessageDate = Date.now();
         }
 
-        updateFromHello(msg: MessageWithUrlHash) {
+        updateFromHello(msg: TogetherJSNS.HelloMessageLike) {
             var urlUpdated = false;
             var activeRTC = false;
             var identityUpdated = false;
@@ -314,11 +328,12 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         private idle: TogetherJSNS.PeerStatus = "active";
         public name: string | null = null;
         public avatar: string | null = null;
-        public color: string | null = null;
+        public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
         public defaultName: string = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         private loaded = false;
         private isCreator = !session.isClient;
         public view?: TogetherJSNS.PeerView;
+        public url?: string;
 
         update(attrs: Partial<PeerSelfAttributes>) {
             var updatePeers = false;
@@ -489,8 +504,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 return null;
             }
             assert(peer, "No peer with id:", id);
-            if(message &&
-                (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+            if(message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
                 peer.updateFromHello(message);
                 peer.view.update();
             }
@@ -552,7 +566,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     );
 
     function serialize() {
-        var peers = [];
+        var peers: SerializedPeer[] = [];
         util.forEachAttr(Peer.peers, function(peer) {
             peers.push(peer.serialize());
         });

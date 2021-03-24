@@ -41,11 +41,14 @@ function StorageMain(util) {
         }
         StorageSettings.prototype.get = function (name) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
+            var key = "settings." + name; // as keyof TogetherJSNS.StorageGet.MapForSettings;
+            var value = this.storageInstance.settings.defaults[name]; // TODO is it possible to avoid the as unknown?
+            return storage.get(key, value);
         };
         StorageSettings.prototype.set = function (name, value) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
+            var key = "settings." + name;
+            return storage.set(key, value);
         };
         return StorageSettings;
     }(OnClass));
@@ -89,17 +92,17 @@ function StorageMain(util) {
                 stringyfiedValue = JSON.stringify(value);
             }
             return Deferred(function (def) {
-                key = self.prefix + key;
+                var prefixedKey = self.prefix + key;
                 if (stringyfiedValue === undefined) {
-                    self.storage.removeItem(key);
+                    self.storage.removeItem(prefixedKey);
                     if (DEBUG_STORAGE) {
-                        console.debug("Delete storage", key);
+                        console.debug("Delete storage", prefixedKey);
                     }
                 }
                 else {
-                    self.storage.setItem(key, stringyfiedValue);
+                    self.storage.setItem(prefixedKey, stringyfiedValue);
                     if (DEBUG_STORAGE) {
-                        console.debug("Set storage", key, stringyfiedValue);
+                        console.debug("Set storage", prefixedKey, stringyfiedValue);
                     }
                 }
                 setTimeout(def.resolve);

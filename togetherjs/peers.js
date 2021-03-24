@@ -241,7 +241,7 @@ function peersMain(util, session, storage, require, templates) {
             _this.idle = "active";
             _this.name = null;
             _this.avatar = null;
-            _this.color = null;
+            _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
             _this.defaultName = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
             _this.loaded = false;
             _this.isCreator = !session.isClient;
@@ -422,8 +422,7 @@ function peersMain(util, session, storage, require, templates) {
                 return null;
             }
             assert(peer, "No peer with id:", id);
-            if (message &&
-                (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+            if (message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
                 peer.updateFromHello(message);
                 peer.view.update();
             }

@@ -2,21 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface Settings {
-    name: string,
-    defaultName: string,
-    avatar: string | null,
-    stickyShare: null,
-    color: string | null,
-    seenIntroDialog: boolean,
-    seenWalkthrough: boolean,
-    dontShowRtcInfo: boolean
-}
-
 function StorageMain(util: Util) {
     var assert: typeof util.assert = util.assert;
     var Deferred = util.Deferred;
-    var DEFAULT_SETTINGS: Settings = {
+    var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
         name: "",
         defaultName: "",
         avatar: null,
@@ -36,14 +25,17 @@ function StorageMain(util: Util) {
             super();
         }
 
-        get<K extends keyof Settings>(name: K): JQueryDeferred<Settings[K]> {
+        get<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K): JQueryDeferred<TogetherJSNS.StorageGet.Map[`settings.${K}`]> {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.get("settings." + name, this.storageInstance.settings.defaults[name]);
+            const key = `settings.${name}` as const; // as keyof TogetherJSNS.StorageGet.MapForSettings;
+            const value = this.storageInstance.settings.defaults[name] as unknown as TogetherJSNS.StorageGet.Map[`settings.${K}`]; // TODO is it possible to avoid the as unknown?
+            return storage.get(key, value);
         }
 
-        set(name: string, value: string | boolean | undefined) {
+        set<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K, value: TogetherJSNS.StorageGet.Map[`settings.${K}`]) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
-            return storage.set("settings." + name, value);
+            const key = `settings.${name}` as const;
+            return storage.set(key, value);
         }
     }
 
@@ -84,24 +76,24 @@ function StorageMain(util: Util) {
             });
         }
 
-        set(key: string, value?: unknown) {
+        set<T extends keyof TogetherJSNS.StorageGet.Map>(key: T, value?: TogetherJSNS.StorageGet.Map[T]) {
             var self = this;
             let stringyfiedValue: string | undefined;
             if(value !== undefined) {
                 stringyfiedValue = JSON.stringify(value);
             }
             return Deferred(def => {
-                key = self.prefix + key;
+                const prefixedKey = self.prefix + key;
                 if(stringyfiedValue === undefined) {
-                    self.storage.removeItem(key);
+                    self.storage.removeItem(prefixedKey);
                     if(DEBUG_STORAGE) {
-                        console.debug("Delete storage", key);
+                        console.debug("Delete storage", prefixedKey);
                     }
                 }
                 else {
-                    self.storage.setItem(key, stringyfiedValue);
+                    self.storage.setItem(prefixedKey, stringyfiedValue);
                     if(DEBUG_STORAGE) {
-                        console.debug("Set storage", key, stringyfiedValue);
+                        console.debug("Set storage", prefixedKey, stringyfiedValue);
                     }
                 }
                 setTimeout(def.resolve);
