@@ -82,7 +82,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 console.info("Send:", msg);
             }
             const msg2 = msg as TogetherJSNS.SessionSend.Map[K] & TogetherJSNS.ChannelSend.WithClientId;
-            msg2.clientId = session.clientId;
+            msg2.clientId = session.clientId!; // TODO !
             channel.send<K, never>(msg2);
         }
 

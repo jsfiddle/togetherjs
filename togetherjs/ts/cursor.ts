@@ -18,7 +18,8 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     session.hub.on("cursor-update", function(msg) {
         if(msg.sameUrl) {
             Cursor.getClient(msg.clientId).updatePosition(msg);
-        } else {
+        }
+        else {
             // FIXME: This should be caught even before the cursor-update message,
             // when the peer goes to another URL
             Cursor.getClient(msg.clientId).hideOtherUrl();
@@ -33,15 +34,18 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         elementClass: string;
         lastTop: number | null = null;
         lastLeft: number | null = null;
-        keydownTimeout = null;
+        keydownTimeout: number | null = null;
         atOtherUrl = false;
-        static _cursors: {[id: string]: Cursor} = {};
+        static _cursors: { [id: string]: Cursor } = {};
 
         constructor(private clientId: string) {
             this.element = templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            this.updatePeer(peers.getPeer(clientId));
+            const peer = peers.getPeer(clientId);
+            if(peer !== null) {
+                this.updatePeer(peer);
+            } // TODO we should probably show a warning if this peer does not exist
             $(document.body).append(this.element);
             this.element.animateCursorEntry();
             this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
@@ -49,7 +53,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
 
         updatePeer(peer: TogetherJSNS.AnyPeer) {
             // FIXME: can I use peer.setElement()?
-            this.element.css({color: peer.color});
+            this.element.css({ color: peer.color });
             var img = this.element.find("img.togetherjs-cursor-img");
             img.attr("src", makeCursor(peer.color));
             var name = this.element.find(".togetherjs-cursor-name");
@@ -97,15 +101,15 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             }
         }
 
-        updatePosition(pos) {
+        updatePosition(pos: TogetherJSNS.SessionSend.CursorClick | TogetherJSNS.On.CursorUpdate) {
             var top, left;
             if(this.atOtherUrl) {
                 this.element.show();
                 this.atOtherUrl = false;
             }
-            if(pos.element) {
+            if("element" in pos) {
                 var target = $(elementFinder.findElement(pos.element));
-                var offset = target.offset();
+                var offset = target.offset()!; // TODO !
                 top = offset.top + pos.offsetY;
                 left = offset.left + pos.offsetX;
             }
@@ -133,9 +137,9 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         rotateCursorDown() {
             var e = $(this.element).find('svg');
             e.animate(
-                {borderSpacing: -150, opacity: 1},
+                { borderSpacing: -150, opacity: 1 },
                 {
-                    step: function(now, fx) {
+                    step: function(now: number, fx) {
                         if(fx.prop == "borderSpacing") {
                             e.css('-webkit-transform', 'rotate(' + now + 'deg)')
                                 .css('-moz-transform', 'rotate(' + now + 'deg)')
@@ -164,10 +168,12 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
                 // to keep the cursor name from being off the top of the screen.
                 top = 25;
                 this.setClass("togetherjs-scrolled-above");
-            } else if(top > wTop + height - CURSOR_HEIGHT) {
+            }
+            else if(top > wTop + height - CURSOR_HEIGHT) {
                 top = height - CURSOR_HEIGHT - 5;
                 this.setClass("togetherjs-scrolled-below");
-            } else {
+            }
+            else {
                 this.setClass("togetherjs-scrolled-normal");
             }
             this.element.css({
@@ -185,7 +191,8 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         setKeydown() {
             if(this.keydownTimeout) {
                 clearTimeout(this.keydownTimeout);
-            } else {
+            }
+            else {
                 this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
             }
             this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
@@ -198,15 +205,14 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
 
         _destroy() {
             this.element.remove();
-            this.element = null;
+            //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
         }
 
         static getClient(clientId: string) {
             return cursor.getClient(clientId);
         }
 
-        static forEach(callback: (c: Cursor, id: string) => void, context?) {
-            context = context || null;
+        static forEach(callback: (c: Cursor, id: string) => void, context: Cursor | null = null) {
             for(var a in Cursor._cursors) {
                 if(Cursor._cursors.hasOwnProperty(a)) {
                     callback.call(context, Cursor._cursors[a], a);
@@ -241,7 +247,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     var MIN_TIME = 100;
     var lastPosX = -1;
     var lastPosY = -1;
-    var lastMessage: TogetherJSNS.MessageToSend | null = null;
+    var lastMessage: TogetherJSNS.On.CursorUpdate | null = null;
     function mousemove(event: JQueryMouseEventObject) {
         var now = Date.now();
         if(now - lastTime < MIN_TIME) {
@@ -292,7 +298,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         session.send(lastMessage);
     }
 
-    function makeCursor(color) {
+    function makeCursor(color: string) {
         var canvas = $("<canvas></canvas>");
         canvas.attr("height", CURSOR_HEIGHT);
         canvas.attr("width", CURSOR_WIDTH);
@@ -325,7 +331,8 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         if(scrollTimeout) {
             if(now - scrollTimeoutSet < SCROLL_DELAY_LIMIT) {
                 clearTimeout(scrollTimeout);
-            } else {
+            }
+            else {
                 // Just let it progress anyway
                 return;
             }
@@ -336,12 +343,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         }
     }
 
-    interface ScrollMessage {
-        type: "scroll-update",
-        position: TogetherJSNS.ElementFinder.Position,
-    }
-
-    var lastScrollMessage: ScrollMessage | null = null;
+    var lastScrollMessage: TogetherJSNS.SessionSend.Map["scroll-update"] | null = null;
     function _scrollRefresh() {
         scrollTimeout = null;
         scrollTimeoutSet = 0;
@@ -419,7 +421,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         }
     });
 
-    function documentClick(event: MouseEvent) {
+    function documentClick(event: MouseEvent & { togetherjsInternal?: boolean }) {
         if(event.togetherjsInternal) {
             // This is an artificial internal event
             return;
@@ -469,7 +471,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             if(util.matchElement(element, dontShowClicks)) {
                 return;
             }
-            displayClick({top: event.pageY, left: event.pageX}, peers.Self.color);
+            displayClick({ top: event.pageY, left: event.pageX }, peers.Self.color);
         });
     }
 
@@ -498,10 +500,10 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         if(util.matchElement(target, dontShowClicks)) {
             return;
         }
-        displayClick({top: top, left: left}, pos.peer.color);
+        displayClick({ top: top, left: left }, pos.peer.color);
     });
 
-    function displayClick(pos, color: string) {
+    function displayClick(pos: { top: number, left: number }, color: string) {
         // FIXME: should we hide the local click if no one else is going to see it?
         // That means tracking who might be able to see our screen.
         var element = templating.clone("click");
@@ -522,7 +524,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     var lastKeydown = 0;
     var MIN_KEYDOWN_TIME = 500;
 
-    function documentKeydown(event) {
+    function documentKeydown(event: Event) {
         setTimeout(function() {
             var now = Date.now();
             if(now - lastKeydown < MIN_KEYDOWN_TIME) {
@@ -530,7 +532,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             }
             lastKeydown = now;
             // FIXME: is event.target interesting here?  That is, *what* the user is typing into, not just that the user is typing? Also I'm assuming we don't care if the user it typing into a togetherjs-related field, since chat activity is as interesting as any other activity.
-            session.send({type: "keydown"});
+            session.send({ type: "keydown" });
         });
     }
 
@@ -540,7 +542,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         cursor.setKeydown();
     });
 
-    util.testExpose({Cursor: Cursor});
+    util.testExpose({ Cursor: Cursor });
 
     return cursor;
 

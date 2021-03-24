@@ -259,7 +259,7 @@ class Util {
         });
     }
 
-    public matchElement(el: HTMLElement, selector?: string | true) {
+    public matchElement(el: HTMLElement | JQuery, selector?: string | boolean) {
         if(selector === true || !selector) {
             return !!selector;
         }

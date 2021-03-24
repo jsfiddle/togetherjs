@@ -140,7 +140,9 @@ declare namespace TogetherJSNS {
             "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus },
             "bye": { type: "bye", reason?: string },
             "hello": TogetherJSNS.On.HelloMessage,
-            "hello-back": TogetherJSNS.On.HelloBackMessage
+            "hello-back": TogetherJSNS.On.HelloBackMessage,
+            "cursor-update": On.CursorUpdate,
+            "scroll-update": { type: "scroll-update", position: TogetherJSNS.ElementFinder.Position },
         }
 
         interface Chat {
@@ -226,7 +228,12 @@ declare namespace TogetherJSNS {
 
     namespace ChannelSend {
         interface WithClientId {
-            clientId: string | null;
+            clientId: string;
+            peer: AnyPeer; // TODO check that peer always goes with clientId, according to code in session.ts/openChannel it seems to be the case
+        }
+
+        interface WithSameUrl {
+            sameUrl: boolean;
         }
 
         /** Not a message, it's a field */
@@ -331,6 +338,25 @@ declare namespace TogetherJSNS {
         interface HelloBackMessage extends HelloMessageBase {
             type: "hello-back"
         }
+
+        // TODO is this mergeable with CursorClick?
+        // TODO clienId is always added by session.send
+        interface CursorUpdateTopLeft {
+            type: "cursor-update",
+            sameUrl?: boolean,
+            top: number,
+            left: number
+        }
+
+        interface CursorUpdateOffset {
+            type: "cursor-update",
+            sameUrl?: boolean,
+            offsetX: number,
+            offsetY: number,
+            element: string
+        }
+
+        type CursorUpdate = CursorUpdateOffset | CursorUpdateTopLeft;
     }
 
     interface OnMap {
@@ -346,11 +372,11 @@ declare namespace TogetherJSNS {
         "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
         "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: Logs }) => void; // TODO parameter similar to GetLogs
         // TODO logs may be of type Logs[], we shoud check
-        "cursor-update": (msg: { sameUrl: boolean, clientId: string }) => void;
+        "cursor-update": (msg: On.CursorUpdate & ChannelSend.WithClientId) => void;
         "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
         "hello-back hello": (msg: { type: "hello", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
         "hello": (msg: { sameUrl: boolean }) => void;
-        "cursor-click": (msg: { sameUrl: boolean, clientId: string, element: string, offsetY: number, offsetX: number }) => void;
+        "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
         "keydown": (msg: { clientId: string }) => void;
         "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2 }) => void
         "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
