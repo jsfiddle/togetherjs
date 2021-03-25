@@ -88,7 +88,7 @@ function sessionMain(require, util, channels, $, storage) {
                 console.info("Send:", msg);
             }
             var msg2 = msg;
-            msg2.clientId = session.clientId;
+            msg2.clientId = session.clientId; // TODO !
             channel.send(msg2);
         };
         // TODO this function appears to never been used, and it does weird things

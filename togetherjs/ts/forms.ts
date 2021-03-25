@@ -20,6 +20,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         if(ignoreForms === true) {
             return true;
         }
+        else if(ignoreForms === undefined) {
+            return false;
+        }
         else {
             return $(element).is(ignoreForms.join(","));
         }
@@ -61,10 +64,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             return;
         }
         var location = elementFinder.elementLocation(el);
-        let msg: Partial<TogetherJSNS.FormUpdateMessage> = {
+        let msg: TogetherJSNS.FormUpdateMessage = {
             type: "form-update",
             element: location,
         };
+
         if(isText(el[0]) || tracker) {
             var history = el.data("togetherjsHistory");
             if(history) {
@@ -74,7 +78,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 var delta = ot.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
-                maybeSendUpdate(msg.element, history, tracker);
+                maybeSendUpdate(location, history, tracker);
                 return;
             }
             else {
@@ -504,7 +508,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         liveTrackers = [];
     }
 
-    function elementTracked(el: JQuery) {
+    function elementTracked(el: HTMLElement | JQuery) {
         var result = false;
         util.forEachAttr(editTrackers, function(TrackerClass) {
             if(TrackerClass.tracked(el)) {
@@ -590,7 +594,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     }
 
     /** Send the top of this history queue, if it hasn't been already sent. */
-    function maybeSendUpdate(element: string, history: SimpleHistory, tracker?) {
+    function maybeSendUpdate(element: string, history: SimpleHistory, tracker?: string) {
         var change = history.getNextToSend();
         if(!change) {
             /* nothing to send */
@@ -621,21 +625,22 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             return;
         }
         const el = $(elementFinder.findElement(msg.element));
+        const el0 = el[0] as HTMLInputElement | HTMLTextAreaElement; // TODO is this cast right?
         var tracker;
         if(msg.tracker) {
             tracker = getTracker(el, msg.tracker);
             assert(tracker);
         }
-        var focusedEl = el[0].ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
+        var focusedEl = el0.ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
         let focusedElSelection: [number, number];
         if(isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
         }
-        let selection: [number, number];
-        if(isText(el)) {
-            //assert(el[0].selectionStart);
-            //assert(el[0].selectionEnd);
-            selection = [el[0].selectionStart, el[0].selectionEnd];
+        let selection: [number | null, number | null] | null;
+        if(isText(el0)) {
+            //assert(el0.selectionStart);
+            //assert(el0.selectionEnd);
+            selection = [el0.selectionStart, el0.selectionEnd];
         }
         var value;
         if(msg.replace) {
@@ -649,7 +654,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             msg.replace.delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             // apply this change to the history
             var changed = history.commit(msg.replace);
-            var trackerName = null;
+            var trackerName = undefined;
             if(typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
             }
@@ -672,11 +677,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 setValue(el, value);
             }
             if(isText(el)) {
-                el[0].selectionStart = selection[0];
-                el[0].selectionEnd = selection[1];
+                el0.selectionStart = selection[0];
+                el0.selectionEnd = selection[1];
             }
             // return focus to original input:
-            if(focusedEl != el[0]) {
+            if(focusedEl != el0) {
                 focusedEl.focus();
                 if(isText(focusedEl)) {
                     focusedEl.selectionStart = focusedElSelection[0];
@@ -693,7 +698,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     function sendInit() {
         initSent = true;
-        var msg = {
+        var msg: TogetherJSNS.FormInitMessage = {
             type: "form-init",
             pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
@@ -705,13 +710,14 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             var el = $(this);
-            var value = getValue(el);
+            const el0 = el[0];
+            var value = getValue(el0);
             var upd = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
             };
-            if(isText(el)) {
+            if(isText(el0)) {
                 var history = el.data("togetherjsHistory");
                 if(history) {
                     upd.value = history.committed;
@@ -856,7 +862,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     });
 
-    function createFocusElement(peer: TogetherJSNS.PeerClass, around: JQuery) {
+    function createFocusElement(peer: TogetherJSNS.PeerClass, around: HTMLElement | JQuery) {
         around = $(around);
         var aroundOffset = around.offset();
         if(!aroundOffset) {

@@ -4,7 +4,7 @@
 
 interface Change2 {
     id: string,
-    delta: TextReplace,
+    delta: TogetherJSNS.TextReplaceStruct,
     basis?: number,
     sent?: boolean,
 }

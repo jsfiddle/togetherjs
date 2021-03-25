@@ -29,6 +29,9 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (ignoreForms === true) {
             return true;
         }
+        else if (ignoreForms === undefined) {
+            return false;
+        }
         else {
             return $(element).is(ignoreForms.join(","));
         }
@@ -73,7 +76,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 var delta = ot.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
-                maybeSendUpdate(msg.element, history, tracker);
+                maybeSendUpdate(location, history, tracker);
                 return;
             }
             else {
@@ -546,21 +549,22 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return;
         }
         var el = $(elementFinder.findElement(msg.element));
+        var el0 = el[0]; // TODO is this cast right?
         var tracker;
         if (msg.tracker) {
             tracker = getTracker(el, msg.tracker);
             assert(tracker);
         }
-        var focusedEl = el[0].ownerDocument.activeElement;
+        var focusedEl = el0.ownerDocument.activeElement;
         var focusedElSelection;
         if (isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
         }
         var selection;
-        if (isText(el)) {
-            //assert(el[0].selectionStart);
-            //assert(el[0].selectionEnd);
-            selection = [el[0].selectionStart, el[0].selectionEnd];
+        if (isText(el0)) {
+            //assert(el0.selectionStart);
+            //assert(el0.selectionEnd);
+            selection = [el0.selectionStart, el0.selectionEnd];
         }
         var value;
         if (msg.replace) {
@@ -574,7 +578,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             msg.replace.delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             // apply this change to the history
             var changed = history_1.commit(msg.replace);
-            var trackerName = null;
+            var trackerName = undefined;
             if (typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
             }
@@ -597,11 +601,11 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 setValue(el, value);
             }
             if (isText(el)) {
-                el[0].selectionStart = selection[0];
-                el[0].selectionEnd = selection[1];
+                el0.selectionStart = selection[0];
+                el0.selectionEnd = selection[1];
             }
             // return focus to original input:
-            if (focusedEl != el[0]) {
+            if (focusedEl != el0) {
                 focusedEl.focus();
                 if (isText(focusedEl)) {
                     focusedEl.selectionStart = focusedElSelection[0];
@@ -628,13 +632,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             var el = $(this);
-            var value = getValue(el);
+            var el0 = el[0];
+            var value = getValue(el0);
             var upd = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
             };
-            if (isText(el)) {
+            if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
                 if (history) {
                     upd.value = history.committed;

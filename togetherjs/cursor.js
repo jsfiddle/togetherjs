@@ -35,7 +35,10 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             this.element = templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            this.updatePeer(peers.getPeer(clientId));
+            var peer = peers.getPeer(clientId);
+            if (peer !== null) {
+                this.updatePeer(peer);
+            } // TODO we should probably show a warning if this peer does not exist
             $(document.body).append(this.element);
             this.element.animateCursorEntry();
             this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
@@ -51,7 +54,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toString() //TODO we use a very old version of tinycolors
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO we use a very old version of tinycolors
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -94,9 +97,9 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
                 this.element.show();
                 this.atOtherUrl = false;
             }
-            if (pos.element) {
+            if ("element" in pos) {
                 var target = $(elementFinder.findElement(pos.element));
-                var offset = target.offset();
+                var offset = target.offset(); // TODO !
                 top = offset.top + pos.offsetY;
                 left = offset.left + pos.offsetX;
             }
@@ -181,13 +184,13 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
         };
         Cursor.prototype._destroy = function () {
             this.element.remove();
-            this.element = null;
+            //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
         };
         Cursor.getClient = function (clientId) {
             return cursor.getClient(clientId);
         };
         Cursor.forEach = function (callback, context) {
-            context = context || null;
+            if (context === void 0) { context = null; }
             for (var a in Cursor._cursors) {
                 if (Cursor._cursors.hasOwnProperty(a)) {
                     callback.call(context, Cursor._cursors[a], a);

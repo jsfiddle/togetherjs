@@ -143,6 +143,7 @@ declare namespace TogetherJSNS {
             "hello-back": TogetherJSNS.On.HelloBackMessage,
             "cursor-update": On.CursorUpdate,
             "scroll-update": { type: "scroll-update", position: TogetherJSNS.ElementFinder.Position },
+            "form-update": FormUpdateMessage,
         }
 
         interface Chat {
@@ -460,6 +461,12 @@ declare namespace TogetherJSNS {
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */
     type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.ChannelOnMessage.Map["peer-update"];
+    
+    interface TextReplaceStruct {
+        start: number,
+        del: number,
+        text: string
+    }
 
     type ValueOf<T> = T[keyof T];
 
@@ -646,8 +653,8 @@ declare namespace TogetherJSNS {
     }
 
     interface FormUpdateMessage {
-        sameUrl: boolean | undefined;
         type: "form-update";
+        sameUrl?: boolean;
         /** a selector */
         element: string;
         "server-echo": boolean;
@@ -655,7 +662,7 @@ declare namespace TogetherJSNS {
         replace: {
             id: string;
             basis: number;
-            delta: TextReplace;
+            delta: TextReplaceStruct;
         }
     }
 
@@ -709,25 +716,49 @@ declare namespace TogetherJSNS {
     }
 
     interface CodeMirrorElement {
-        CodeMirror: unknown;
+        CodeMirror: {
+            getValue: () => string,
+            on: (eventName: "change", cb: () => void) => void,
+            off: (eventName: "change", cb: () => void) => void,
+            setValue: (text: string) => void,
+        };
     }
 
     interface AceEditorElement {
-        env: unknown;
+        env: {
+            document: {
+                setValue: (text: string) => void,
+                getValue: () => string,
+                on: (eventName: "change", cb: () => void) => void,
+                removeListener: (eventName: "change", cb: () => void) => void,
+            }
+        }
     }
 
     interface CKEditor {
+        /** List of selector */
+        instances: string[],
         dom: { // TODO better style?
             element: {
                 get: (elem: HTMLElement) => {
-                    getEditor: () => unknown;
+                    getEditor: () => {
+                        setValue: (text: string) => void,
+                        getData: () => string,
+                        on: (eventName: "change", cb: () => void) => void,
+                        removeListener: (eventName: "change", cb: () => void) => void,
+                        editable: () => {
+                            setHtml: (html: string) => void,
+                        },
+                    },
                 }
-            };
+            },
         }
     }
 
     interface Tinymce {
-
+        editors: {
+            id: string,
+        }
     }
 
     /** type for storage.tab.set(chatStorageKey, log); */

@@ -219,18 +219,20 @@ function channelsMain(util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if (win && "contentWindow" in win && win.contentWindow) {
-                this.window = win.contentWindow;
+            if (win && "contentWindow" in win) {
+                if (win.contentWindow) {
+                    this.window = win.contentWindow;
+                }
+                else {
+                    throw new Error("Can't bind to an iframe without contentWindow, probably because the iframe hasn't loaded yet"); // TODO can we do something better here?
+                }
             }
             else {
                 this.window = win;
             }
-            // FIXME: The distinction between this.window and window seems unimportant
-            // in the case of postMessage
+            // FIXME: The distinction between this.window and window seems unimportant in the case of postMessage
             var w = this.window;
-            // In a Content context we add the listener to the local window
-            // object, but in the addon context we add the listener to some
-            // other window, like the one we were given:
+            // In a Content context we add the listener to the local window object, but in the addon context we add the listener to some other window, like the one we were given:
             if (typeof window != "undefined") {
                 w = window;
             }
@@ -335,7 +337,7 @@ function channelsMain(util) {
                 this.expectedOrigin = event.origin;
             }
             if (!this.source) {
-                this.source = event.source;
+                this.source = event.source; // TODO theoratically event.source could be other types in the union but since we only only use Window I don't think it's possible
             }
             if (event.data == "hello") {
                 // Just a ping
