@@ -46,7 +46,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function change(event) {
         sendData({
             element: event.target,
-            value: getValue(event.target)
+            value: getValue(event.target).toString() // TODO check that this .toString() does not cause any problem
         });
     }
     function sendData(attrs) {
@@ -601,14 +601,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 setValue(el, value);
             }
             if (isText(el0)) {
-                el0.selectionStart = selection[0];
+                el0.selectionStart = selection[0]; // TODO ! these are in a try block so we are probably good. It's kind of a ugly way to deal with the problem, we should change it (similar comment below)
                 el0.selectionEnd = selection[1];
             }
             // return focus to original input:
             if (focusedEl != el0) {
                 focusedEl.focus();
                 if (isText(focusedEl)) {
-                    focusedEl.selectionStart = focusedElSelection[0];
+                    focusedEl.selectionStart = focusedElSelection[0]; // TODO ! same remark as above
                     focusedEl.selectionEnd = focusedElSelection[1];
                 }
             }
@@ -637,7 +637,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var upd = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value
+                value: value.toString() // TODO check that this .toString() does not cause bug
             };
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");

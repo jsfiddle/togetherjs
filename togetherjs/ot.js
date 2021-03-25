@@ -82,9 +82,7 @@ var SimpleHistory = /** @class */ (function () {
     /** Apply a delta received from the server. Return true iff the current text changed as a result. */
     SimpleHistory.prototype.commit = function (change) {
         var _this = this;
-        // ignore it if the basis doesn't match (this patch doesn't apply)
-        // if so, this delta is out of order; we expect the original client
-        // to retransmit an updated delta.
+        // ignore it if the basis doesn't match (this patch doesn't apply) if so, this delta is out of order; we expect the original client to retransmit an updated delta.
         if (change.basis !== this.basis) {
             return false; // 'current' text did not change
         }
@@ -138,7 +136,7 @@ var SimpleHistory = /** @class */ (function () {
         }
         assert(qchange.basis);
         qchange.sent = true;
-        return qchange;
+        return qchange; // TODO is there any way to avoid this cast?
     };
     return SimpleHistory;
 }());

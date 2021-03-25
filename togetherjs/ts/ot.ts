@@ -9,6 +9,13 @@ interface Change2 {
     sent?: boolean,
 }
 
+interface Change2Mandatory {
+    id: string,
+    delta: TextReplace,
+    basis: number,
+    sent: boolean,
+}
+
 /** SimpleHistory synchronizes peers by relying on the server to serialize
  * the order of all updates.  Each client maintains a queue of patches
  * which have not yet been 'committed' (by being echoed back from the
@@ -96,10 +103,7 @@ class SimpleHistory {
 
     /** Apply a delta received from the server. Return true iff the current text changed as a result. */
     commit(change: Change2) {
-
-        // ignore it if the basis doesn't match (this patch doesn't apply)
-        // if so, this delta is out of order; we expect the original client
-        // to retransmit an updated delta.
+        // ignore it if the basis doesn't match (this patch doesn't apply) if so, this delta is out of order; we expect the original client to retransmit an updated delta.
         if(change.basis !== this.basis) {
             return false; // 'current' text did not change
         }
@@ -144,7 +148,7 @@ class SimpleHistory {
     }
 
     /** Return the next change to transmit to the server, or null if there isn't one. */
-    getNextToSend() {
+    getNextToSend(): Change2Mandatory | null {
         let qchange = this.queue[0];
         if(!qchange) {
             /* nothing to send */
@@ -156,7 +160,7 @@ class SimpleHistory {
         }
         assert(qchange.basis);
         qchange.sent = true;
-        return qchange;
+        return qchange as Change2Mandatory; // TODO is there any way to avoid this cast?
     }
 }
 

@@ -39,7 +39,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     function change(event: Event) {
         sendData({
             element: event.target as HTMLElement,
-            value: getValue(event.target as HTMLElement)
+            value: getValue(event.target as HTMLElement).toString() // TODO check that this .toString() does not cause any problem
         });
     }
 
@@ -47,7 +47,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         /** a selector */
         element: string | HTMLElement;
         tracker?: string;
-        value: string | boolean;
+        value: string;
     }
 
     function sendData(attrs: SendDataAttributes) {
@@ -102,7 +102,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         return false;
     }
 
-    let editTrackers: {[trackerName: string]: TrackerClass} = {};
+    let editTrackers: { [trackerName: string]: TrackerClass } = {};
     let liveTrackers: Tracker[] = [];
 
     TogetherJS.addTracker = function(TrackerClass: TrackerClass, skipSetInit: boolean) {
@@ -124,9 +124,10 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
 
     interface MessageForEditor {
-        element: HTMLElement;
+        element: HTMLElement | string;
         tracker: string;
         value: string;
+        basis?: number;
     }
 
     abstract class Editor<T = HTMLElement> {
@@ -162,7 +163,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().document.removeListener("change", this._change);
         }
 
-        update(msg: MessageForEditor) {
+        update(msg: { value?: string }) {
             this._editor().document.setValue(msg.value);
         }
 
@@ -204,11 +205,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         /** Non-static version */
-        tracked(el: JQuery | HTMLElement) {
+        tracked(el: JQuery | HTMLElement | string) {
             return AceEditor.tracked(el);
         }
-    
-        static tracked(el: HTMLElement | JQuery): boolean {
+
+        static tracked(el: HTMLElement | JQuery | string): boolean {
             return !!$(el).closest(".ace_editor").length;
         }
     }
@@ -233,7 +234,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().off("change", this._change);
         }
 
-        update(msg: MessageForEditor) {
+        update(msg: { value: string | undefined }) {
             this._editor().setValue(msg.value);
         }
 
@@ -284,11 +285,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         /** Non-static version */
-        tracked(el: JQuery | HTMLElement) {
+        tracked(el: JQuery | HTMLElement | string) {
             return CodeMirrorEditor.tracked(el);
         }
-    
-        static tracked(e: JQuery | HTMLElement): boolean {
+
+        static tracked(e: JQuery | HTMLElement | string): boolean {
             let el: Node | null = $(e)[0];
             while(el) {
                 if("CodeMirror" in el) {
@@ -322,7 +323,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().removeListener("change", this._change);
         }
 
-        update(msg: MessageForEditor) {
+        update(msg: { value: string | undefined }) {
             //FIXME: use setHtml instead of setData to avoid frame reloading overhead
             this._editor().editable().setHtml(msg.value);
         }
@@ -351,6 +352,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         _editor() {
+            assert(CKEDITOR); // TODO assert added
             return CKEDITOR.dom.element.get(this.element).getEditor();
         }
 
@@ -374,11 +376,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         /** Non-static version */
-        tracked(el: JQuery | HTMLElement) {
+        tracked(el: JQuery | HTMLElement | string) {
             return CKEditor.tracked(el);
         }
-    
-        static tracked(el: JQuery | HTMLElement) {
+
+        static tracked(el: JQuery | HTMLElement | string) {
             if(typeof CKEDITOR == "undefined") {
                 return false;
             }
@@ -408,15 +410,15 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().destory();
         }
 
-        update(msg: MessageForEditor) {
+        update(msg: { value: string | undefined }) {
             this._editor().setContent(msg.value, { format: 'raw' });
         }
 
-        init(update: MessageForEditor) {
+        init(update: { value: string }) {
             this.update(update);
         }
 
-        makeInit() {
+        makeInit(): MessageForEditor {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -461,11 +463,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         /** Non-static version */
-        tracked(el: JQuery | HTMLElement) {
+        tracked(el: JQuery | HTMLElement | string) {
             return tinymceEditor.tracked(el);
         }
-    
-        static tracked(el: JQuery | HTMLElement) {
+
+        static tracked(el: JQuery | HTMLElement | string) {
             if(typeof tinymce == "undefined") {
                 return false;
             }
@@ -633,7 +635,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             assert(tracker);
         }
         var focusedEl = el0.ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
-        let focusedElSelection: [number, number];
+        let focusedElSelection: [number, number] | undefined;
         if(isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart || 0, focusedEl.selectionEnd || 0];
         }
@@ -670,6 +672,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             value = msg.value;
         }
         inRemoteUpdate = true;
+
         try {
             if(tracker) {
                 tracker.update({ value: value });
@@ -677,16 +680,18 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             else {
                 setValue(el, value);
             }
+
             if(isText(el0)) {
-                el0.selectionStart = selection[0];
-                el0.selectionEnd = selection[1];
+                el0.selectionStart = selection![0]; // TODO ! these are in a try block so we are probably good. It's kind of a ugly way to deal with the problem, we should change it (similar comment below)
+                el0.selectionEnd = selection![1];
             }
+
             // return focus to original input:
             if(focusedEl != el0) {
                 focusedEl.focus();
                 if(isText(focusedEl)) {
-                    focusedEl.selectionStart = focusedElSelection[0];
-                    focusedEl.selectionEnd = focusedElSelection[1];
+                    focusedEl.selectionStart = focusedElSelection![0]; // TODO ! same remark as above
+                    focusedEl.selectionEnd = focusedElSelection![1];
                 }
             }
         }
@@ -713,10 +718,10 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var el = $(this);
             const el0 = el[0];
             var value = getValue(el0);
-            var upd = {
+            var upd: TogetherJSNS.FormInitMessage["updates"][0] = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value
+                value: value.toString() // TODO check that this .toString() does not cause bug
             };
             if(isText(el0)) {
                 var history = el.data("togetherjsHistory");
@@ -754,7 +759,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value.toString(), 1)); // TODO !
+            // TODO check .toString() is ok
         });
         destroyTrackers();
         buildTrackers();
@@ -795,7 +801,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 if(update.tracker) {
                     var tracker = getTracker(el, update.tracker);
                     assert(tracker);
-                    tracker.init(update, msg);
+                    tracker.init(update); // TODO remove arg msg that was unused in the called function
                 } else {
                     setValue(el, update.value);
                 }
@@ -841,7 +847,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     }
 
-    var focusElements: {[peerId: string]: JQuery} = {};
+    var focusElements: { [peerId: string]: JQuery } = {};
 
     session.hub.on("form-focus", function(msg) {
         if(!msg.sameUrl) {
@@ -909,7 +915,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     });
 
-    return {trackerClassExport: null} as unknown as {trackerClassExport: TrackerClass}; // TODO ugly export
+    return { trackerClassExport: null } as unknown as { trackerClassExport: TrackerClass }; // TODO ugly export
 }
 
 define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

@@ -379,7 +379,7 @@ declare namespace TogetherJSNS {
         "hello": (msg: { sameUrl: boolean }) => void;
         "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
         "keydown": (msg: { clientId: string }) => void;
-        "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2 }) => void
+        "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void
         "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
         "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
         "idle-status": (msg: { idle: boolean }) => void;
@@ -646,9 +646,9 @@ declare namespace TogetherJSNS {
         pageAge: number;
         updates: {
             element: string;
-            tracker: string;
+            tracker?: string; // TODO this field does not seem to be used
             value: string;
-            basis: number;
+            basis?: number;
         }[]
     }
 
@@ -663,7 +663,9 @@ declare namespace TogetherJSNS {
             id: string;
             basis: number;
             delta: TextReplaceStruct;
-        }
+        };
+        value?: string; // TODO seems to be unused
+        basis?: number; // TODO seems to be unused
     }
 
     interface MessageToSend {
@@ -720,14 +722,14 @@ declare namespace TogetherJSNS {
             getValue: () => string,
             on: (eventName: "change", cb: () => void) => void,
             off: (eventName: "change", cb: () => void) => void,
-            setValue: (text: string) => void,
+            setValue: (text: string | undefined) => void,
         };
     }
 
     interface AceEditorElement {
         env: {
             document: {
-                setValue: (text: string) => void,
+                setValue: (text: string | undefined) => void,
                 getValue: () => string,
                 on: (eventName: "change", cb: () => void) => void,
                 removeListener: (eventName: "change", cb: () => void) => void,
@@ -742,12 +744,12 @@ declare namespace TogetherJSNS {
             element: {
                 get: (elem: HTMLElement) => {
                     getEditor: () => {
-                        setValue: (text: string) => void,
+                        setValue: (text: string | undefined) => void,
                         getData: () => string,
                         on: (eventName: "change", cb: () => void) => void,
                         removeListener: (eventName: "change", cb: () => void) => void,
                         editable: () => {
-                            setHtml: (html: string) => void,
+                            setHtml: (html: string | undefined) => void,
                         },
                     },
                 }
