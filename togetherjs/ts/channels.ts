@@ -71,7 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string, ot not?
-        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: (TogetherJSNS.SessionSend.Map[T1] & TogetherJSNS.ChannelSend.WithClientId) | (TogetherJSNS.ChannelSend.Map[T2] & TogetherJSNS.ChannelSend.WithClientId) | string): void {
+        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: TogetherJSNS.SessionSend.Map[T1] | TogetherJSNS.ChannelSend.Map[T2] | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -266,18 +266,20 @@ function channelsMain(util: Util) {
                 // Though we deinitialized everything, we aren't exactly closed:
                 this.closed = false;
             }
-            if(win && "contentWindow" in win && win.contentWindow) {
-                this.window = win.contentWindow;
+            if(win && "contentWindow" in win) {
+                if(win.contentWindow) {
+                    this.window = win.contentWindow;
+                }
+                else {
+                    throw new Error("Can't bind to an iframe without contentWindow, probably because the iframe hasn't loaded yet"); // TODO can we do something better here?
+                }
             }
             else {
                 this.window = win;
             }
-            // FIXME: The distinction between this.window and window seems unimportant
-            // in the case of postMessage
+            // FIXME: The distinction between this.window and window seems unimportant in the case of postMessage
             var w = this.window;
-            // In a Content context we add the listener to the local window
-            // object, but in the addon context we add the listener to some
-            // other window, like the one we were given:
+            // In a Content context we add the listener to the local window object, but in the addon context we add the listener to some other window, like the one we were given:
             if(typeof window != "undefined") {
                 w = window;
             }
@@ -352,7 +354,7 @@ function channelsMain(util: Util) {
     class PostMessageIncomingChannel extends AbstractChannel {
         expectedOrigin: Origin;
         _pingTimeout: number | null = null;
-        source: Window | MessagePort | null = null;
+        source: WindowProxy | null = null;
 
         constructor(expectedOrigin: Origin) {
             super();
@@ -372,7 +374,7 @@ function channelsMain(util: Util) {
             return s + ']';
         }
 
-        _send(data) {
+        _send(data: string) {
             this.source.postMessage(data, this.expectedOrigin);
         }
 
@@ -393,11 +395,11 @@ function channelsMain(util: Util) {
                 this.expectedOrigin = event.origin;
             }
             if(!this.source) {
-                this.source = event.source;
+                this.source = event.source as WindowProxy; // TODO theoratically event.source could be other types in the union but since we only only use Window I don't think it's possible
             }
             if(event.data == "hello") {
                 // Just a ping
-                this.source.postMessage("hello", this.expectedOrigin);
+                this.source!.postMessage("hello", this.expectedOrigin);
                 return;
             }
             this._incoming(event.data);

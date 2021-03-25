@@ -17,16 +17,31 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
     }
 
     function sendHello(helloBack: boolean) {
-        channel.send({
-            type: helloBack ? "hello-back" : "hello",
-            name: "Recorder 'bot",
-            // FIXME: replace with robot:
-            avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
-            color: "#888888",
-            rtcSupported: false,
-            clientId: clientId,
-            url: "about:blank"
-        });
+        if(helloBack) {
+            channel.send({
+                type: "hello-back",
+                name: "Recorder 'bot",
+                // FIXME: replace with robot:
+                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                color: "#888888",
+                rtcSupported: false,
+                clientId: clientId,
+                url: "about:blank"
+            });
+        }
+        else {
+            channel.send({
+                type: helloBack ? "hello-back" : "hello",
+                name: "Recorder 'bot",
+                // FIXME: replace with robot:
+                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                color: "#888888",
+                rtcSupported: false,
+                clientId: clientId,
+                url: "about:blank"
+            });
+        }
+
     }
 
     function sendLogs(req: TogetherJSNS.SessionSend.GetLogs) {
