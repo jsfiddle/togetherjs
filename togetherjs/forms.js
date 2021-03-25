@@ -80,9 +80,9 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             else {
-                msg.value = value;
+                msg.value = value; // TODO these 2 fields don't seem to be used anywhere
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO ! on clientId
             }
         }
         else {
@@ -386,7 +386,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         };
         tinymceEditor.scan = function () {
             //scan all the elements that contain tinyMCE editors
-            if (typeof tinymce == "undefined") {
+            if (typeof window.tinymce == "undefined") {
                 return;
             }
             var result = [];
@@ -478,7 +478,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function getValue(e) {
         var el = $(e);
         if (isCheckable(el)) {
-            return el.prop("checked");
+            return el.prop("checked"); // "as boolean" serves as a reminder of the type of the value
         }
         else {
             return el.val();
@@ -558,13 +558,13 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         var focusedEl = el0.ownerDocument.activeElement;
         var focusedElSelection;
         if (isText(focusedEl)) {
-            focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+            focusedElSelection = [focusedEl.selectionStart || 0, focusedEl.selectionEnd || 0];
         }
         var selection;
         if (isText(el0)) {
             //assert(el0.selectionStart);
             //assert(el0.selectionEnd);
-            selection = [el0.selectionStart, el0.selectionEnd];
+            selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
         var value;
         if (msg.replace) {
@@ -587,7 +587,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             value = history_1.current;
-            selection = history_1.getSelection();
+            selection = history_1.getSelection() || undefined;
         }
         else {
             value = msg.value;
@@ -600,7 +600,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             else {
                 setValue(el, value);
             }
-            if (isText(el)) {
+            if (isText(el0)) {
                 el0.selectionStart = selection[0];
                 el0.selectionEnd = selection[1];
             }
@@ -674,7 +674,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
         });
         destroyTrackers();
         buildTrackers();

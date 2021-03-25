@@ -4,16 +4,10 @@
 
 interface Change2 {
     id: string,
-    delta: TogetherJSNS.TextReplaceStruct,
+    delta: TextReplace,
     basis?: number,
     sent?: boolean,
 }
-
-type Delta = {
-    start: number,
-    del: number,
-    text: number
-};
 
 /** SimpleHistory synchronizes peers by relying on the server to serialize
  * the order of all updates.  Each client maintains a queue of patches
@@ -55,14 +49,14 @@ type Delta = {
  */
 class SimpleHistory {
     private clientId;
-    private committed;
+    private committed: string;
     public current;
     private basis: number;
     private queue: Change2[] = [];
     private deltaId = 1;
     private selection: TextReplace | null = null;
 
-    constructor(clientId: string, initState, initBasis: number) {
+    constructor(clientId: string, initState: string, initBasis: number) {
         this.clientId = clientId;
         this.committed = initState;
         this.current = initState;
@@ -70,7 +64,7 @@ class SimpleHistory {
     }
 
     /** Use a fake change to represent the selection. (This is the only bit that hard codes ot.TextReplace as the delta representation; override this in a subclass (or don't set the selection) if you are using a different delta representation. */
-    setSelection(selection: [number, number]) {
+    setSelection(selection?: [number, number]) {
         if(selection) {
             this.selection = new TextReplace(selection[0], selection[1] - selection[0], '@');
         } else {
@@ -87,7 +81,7 @@ class SimpleHistory {
     }
 
     /** Add this delta to this client's queue. */
-    add(delta: Delta) {
+    add(delta: TogetherJSNS.TextReplaceStruct) {
         let change: Change2 = {
             id: this.clientId + '.' + (this.deltaId++),
             delta: delta,
@@ -297,7 +291,7 @@ class TJSHistory {
         return fixupDelta;
     }
 
-    promoteDelta(delta: Delta, deltaIndex: number, untilChange: Change) {
+    promoteDelta(delta: TogetherJSNS.TextReplaceStruct, deltaIndex: number, untilChange: Change) {
         this._history.walkForward(deltaIndex + 1, function(c, index) {
             if(untilChange.isBefore(c)) {
                 return false;
@@ -347,7 +341,7 @@ class TJSHistory {
         }
     }
 
-    addDelta(delta: Delta) {
+    addDelta(delta: TogetherJSNS.TextReplaceStruct) {
         var version = this._createVersion();
         var change = new Change(version, this.clientId, delta, util.extend(this.knownVersions));
         this.add(change);
@@ -782,7 +776,7 @@ function otMain(util: Util) {
     const assert: typeof util.assert = util.assert;
 
     const ot = {
-        SimpleHistory: (clientId, initState, initBasis) => new SimpleHistory(clientId, initState, initBasis),
+        SimpleHistory: (clientId: string, initState: string, initBasis: number) => new SimpleHistory(clientId, initState, initBasis),
         History: () => new History(),
         TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
     }

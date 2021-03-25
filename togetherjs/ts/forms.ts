@@ -82,9 +82,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             else {
-                msg.value = value;
+                msg.value = value; // TODO these 2 fields don't seem to be used anywhere
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO ! on clientId
             }
         }
         else {
@@ -448,7 +448,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
         static scan() {
             //scan all the elements that contain tinyMCE editors
-            if(typeof tinymce == "undefined") {
+            if(typeof window.tinymce == "undefined") {
                 return;
             }
             var result: JQuery[] = [];
@@ -551,8 +551,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     function getValue(e: HTMLElement): boolean | string {
         const el = $(e);
         if(isCheckable(el)) {
-            return el.prop("checked");
-        } else {
+            return el.prop("checked") as boolean; // "as boolean" serves as a reminder of the type of the value
+        }
+        else {
             return el.val();
         }
     }
@@ -634,13 +635,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         var focusedEl = el0.ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
         let focusedElSelection: [number, number];
         if(isText(focusedEl)) {
-            focusedElSelection = [focusedEl.selectionStart, focusedEl.selectionEnd];
+            focusedElSelection = [focusedEl.selectionStart || 0, focusedEl.selectionEnd || 0];
         }
-        let selection: [number | null, number | null] | null;
+        let selection: [number, number] | undefined;
         if(isText(el0)) {
             //assert(el0.selectionStart);
             //assert(el0.selectionEnd);
-            selection = [el0.selectionStart, el0.selectionEnd];
+            selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
         var value;
         if(msg.replace) {
@@ -663,7 +664,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             value = history.current;
-            selection = history.getSelection();
+            selection = history.getSelection() || undefined;
         }
         else {
             value = msg.value;
@@ -676,7 +677,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             else {
                 setValue(el, value);
             }
-            if(isText(el)) {
+            if(isText(el0)) {
                 el0.selectionStart = selection[0];
                 el0.selectionEnd = selection[1];
             }
@@ -753,7 +754,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
         });
         destroyTrackers();
         buildTrackers();
