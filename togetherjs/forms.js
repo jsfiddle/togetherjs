@@ -46,7 +46,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function change(event) {
         sendData({
             element: event.target,
-            value: getValue(event.target).toString() // TODO check that this .toString() does not cause any problem
+            value: getValue(event.target) // TODO check that this .toString() does not cause any problem
         });
     }
     function sendData(attrs) {
@@ -302,6 +302,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             });
         };
         CKEditor.prototype._editor = function () {
+            assert(CKEDITOR); // TODO assert added
             return CKEDITOR.dom.element.get(this.element).getEditor();
         };
         CKEditor.prototype.getContent = function () {
@@ -637,7 +638,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var upd = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value.toString() // TODO check that this .toString() does not cause bug
+                value: value // TODO check that this .toString() does not cause bug
             };
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
@@ -675,6 +676,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var el = $(this);
             var value = getValue(el[0]);
             el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
+            // TODO check .toString() is ok
         });
         destroyTrackers();
         buildTrackers();
@@ -712,7 +714,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 if (update.tracker) {
                     var tracker = getTracker(el, update.tracker);
                     assert(tracker);
-                    tracker.init(update, msg);
+                    tracker.init(update); // TODO remove arg msg that was unused in the called function
                 }
                 else {
                     setValue(el, update.value);

@@ -457,6 +457,8 @@ declare namespace TogetherJSNS {
     type Logs = Playback["LogsExport"];
     type PeerSelf = Peers["Self"];
     type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
+    type TextReplace = ReturnType<typeof otMain>["TextReplaceExport"];
+    type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
 
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */

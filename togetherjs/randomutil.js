@@ -1,5 +1,5 @@
 "use strict";
-define(["util", "whrandom"], function (_util, RandomStream) {
+function randomutilMain(_util, RandomStream) {
     var Randomizer = /** @class */ (function () {
         function Randomizer(seed) {
             this.lower = "abcdefghijklmnopqrstuvwxyz";
@@ -56,4 +56,5 @@ define(["util", "whrandom"], function (_util, RandomStream) {
         return Randomizer;
     }());
     return function (seed) { return new Randomizer(seed); };
-});
+}
+define(["util", "whrandom"], randomutilMain);

@@ -6,7 +6,7 @@ interface RandomStreamObject {
     (): number;
 }
 
-define(["util", "whrandom"], function(_util: Util, RandomStream: RandomStreamModule) {
+function randomutilMain(_util: Util, RandomStream: RandomStreamModule) {
 
     class Randomizer {
         private stream: RandomStreamObject;
@@ -57,7 +57,7 @@ define(["util", "whrandom"], function(_util: Util, RandomStream: RandomStreamMod
             return last;
         }
 
-        string(len: number, chars: string) {
+        string(len: number, chars?: string) {
             var s = "";
             for(var i = 0; i < len; i++) {
                 s += this.character(chars);
@@ -72,4 +72,6 @@ define(["util", "whrandom"], function(_util: Util, RandomStream: RandomStreamMod
     }
 
     return (seed: unknown) => new Randomizer(seed);
-});
+}
+
+define(["util", "whrandom"], randomutilMain);

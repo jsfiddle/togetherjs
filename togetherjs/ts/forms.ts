@@ -39,7 +39,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     function change(event: Event) {
         sendData({
             element: event.target as HTMLElement,
-            value: getValue(event.target as HTMLElement).toString() // TODO check that this .toString() does not cause any problem
+            value: getValue(event.target as HTMLElement) // TODO check that this .toString() does not cause any problem
         });
     }
 
@@ -721,7 +721,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var upd: TogetherJSNS.FormInitMessage["updates"][0] = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value.toString() // TODO check that this .toString() does not cause bug
+                value: value // TODO check that this .toString() does not cause bug
             };
             if(isText(el0)) {
                 var history = el.data("togetherjsHistory");
@@ -759,7 +759,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value.toString(), 1)); // TODO !
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
             // TODO check .toString() is ok
         });
         destroyTrackers();
