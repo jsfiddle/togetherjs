@@ -47,11 +47,13 @@ Receiving methods:
 - .emit(
 - session.hub.on
 - peers.updateFromHello
+- .onmessage
 - channel.onmessage
 - channel.on
 - session.on
 - peers.on
 - TogetherJS.once
+- route.onmessage
 
 Other methods:
 - session.makeHelloMessage

@@ -117,7 +117,7 @@ function channelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        public onmessage?: (jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.AnyForReceiving>) => void;
+        public onmessage?: (data: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) => void;
         abstract onclose(): void;
     }
 
@@ -215,7 +215,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.AnyForReceiving>) => {};
+        onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) => {};
 
     } // /WebSocketChannel
 
@@ -484,7 +484,7 @@ function channelsMain(util: Util) {
     class Route extends OnClass {
         private router: Router;
         public readonly id: string;
-        public readonly onmessage: ((msg: TogetherJSNS.Message) => void) | undefined;
+        public readonly onmessage: ((msg: TogetherJSNS.AnyMessage.AnyForReceiving) => void) | undefined;
         public readonly onclose: (() => void) | undefined;
 
         constructor(router: Router, id: string) {

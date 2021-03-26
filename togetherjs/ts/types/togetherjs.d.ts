@@ -286,7 +286,7 @@ declare namespace TogetherJSNS {
         interface Route {
             type: "route",
             routeId: string,
-            message: TogetherJSNS.Message,
+            message: AnyMessage.AnyForReceiving,
             close: boolean
         }
 
@@ -430,6 +430,14 @@ declare namespace TogetherJSNS {
         "identity-updated": (peer: PeerClass) => void;
         "self-updated": () => void;
         "startup-ready": () => void;
+
+        // only for typecheck session.hub.emit(msg.type, msg); in session.ts
+        "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
+        "get-logs": (msg: { type: "get-logs" }) => void; // TODO may be wrong
+        "ping-back": (msg: { type: "ping-back" }) => void; // TODO may be wrong
+        "peer-update": (msg: { type: "peer-update" }) => void; // TODO may be wrong
+        "route": (msg: { type: "route" }) => void; // TODO may be wrong
+        "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
     }
 
     namespace AnyMessage {
@@ -580,6 +588,7 @@ declare namespace TogetherJSNS {
     type TextReplace = ReturnType<typeof otMain>["TextReplaceExport"];
     type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
     type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
+    type TogetherJS = ReturnType<typeof togetherjsMain>;
 
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */
@@ -600,7 +609,7 @@ declare namespace TogetherJSNS {
     type Reason = "started" | "joined";
 
     // TODO this should be removed in favor of TogetherJSClass
-    interface TogetherJS extends OnClass {
+    interface TogetherJS2 extends OnClass {
         getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
         (event?: Event): TogetherJS;
         running: boolean;
@@ -625,7 +634,7 @@ declare namespace TogetherJSNS {
         _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean };
         version: string;
         baseUrl: string;
-        _onmessage(msg: TogetherJSNS.Message): void;
+        _onmessage(msg: TogetherJSNS.AnyMessage.AnyForReceiving): void;
         send(msg: TogetherJSNS.Message): void;
         shareUrl(): string | null;
         listenForShortcut(): void;
@@ -636,7 +645,7 @@ declare namespace TogetherJSNS {
         addTracker(TrackerClass: TrackerClass, skipSetInit: boolean): void;
         startTarget: HTMLElement;
     }
-
+    */
     interface KeyboardListener {
         (event: KeyboardEvent): void;
         pressed?: boolean;

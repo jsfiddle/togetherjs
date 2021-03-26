@@ -24,7 +24,7 @@ class Module {
 class Util {
 
     public Deferred;
-    extend: { (conf: RequireConfig): RequireConfig; (base: unknown, extensions: unknown): unknown; };
+    extend: (base: { [key: string]: unknown; }, extensions?: any) => { [key: string]: unknown; }
     AssertionError: typeof AssertionError;
     mixinEvents: TogetherJSNS.TogetherJS["_mixinEvents"];
     Module = (name: string) => new Module(name);
@@ -224,12 +224,12 @@ class Util {
                     count--;
                     check();
                 },
-                function(error) {
-                    allResults[index] = error;
-                    anyError = true;
-                    count--;
-                    check();
-                });
+                    function(error) {
+                        allResults[index] = error;
+                        anyError = true;
+                        count--;
+                        check();
+                    });
             });
             function check() {
                 if(!count) {
@@ -331,7 +331,7 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
             obj.constructor.apply(obj, arguments);
             obj.constructor = ClassObject;
             return obj;
-        } as { (): any; className: string; [field: string]: any };
+        } as { (): any; className: string;[field: string]: any };
         ClassObject.prototype = prototype;
         if(prototype.constructor.name) {
             ClassObject.className = prototype.constructor.name;

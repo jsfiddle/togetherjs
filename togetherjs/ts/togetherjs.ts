@@ -442,7 +442,8 @@ function togetherjsMain() {
         return config;
     }
 
-    class TogetherJSClass extends OnClass implements TogetherJSNS.TogetherJS {
+    class TogetherJSClass extends OnClass {
+        public $: JQueryStatic;
         public running: boolean = false;
         public require: Require;
         private configObject = new ConfigClass(this);
@@ -719,7 +720,7 @@ function togetherjsMain() {
             }
         }
 
-        _onmessage(msg: TogetherJSNS.Message) {
+        _onmessage(msg: TogetherJSNS.AnyMessage.AnyForTransit) {
             let type = msg.type;
             let type2: string = type;
             if(type.search(/^app\./) === 0) {
@@ -732,11 +733,11 @@ function togetherjsMain() {
             this.hub.emit(msg.type, msg); // TODO emit error
         }
 
-        send(msg: TogetherJSNS.Message) {
+        send(msg: TogetherJSNS.AnyMessage.AnyForSending) {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            let session = this.require("session");
+            let session = this.require("session") as TogetherJSNS.Session;
             session.appSend(msg);
         }
 
