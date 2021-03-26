@@ -11,7 +11,7 @@ interface PeerClassAttributes {
     avatar: string | null;
     color: string;
     following: boolean;
-    fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.Map>;
+    fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapInTransit>;
     fromStorage?: boolean;
     id: string;
     identityId: string;
@@ -488,7 +488,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public Self: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
 
-        getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>, ignoreMissing: boolean = false) {
+        getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>, ignoreMissing: boolean = false) {
             assert(id);
             var peer = Peer.peers[id];
             if(id === session.clientId) {

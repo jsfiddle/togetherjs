@@ -37,15 +37,15 @@
 # Message Architecture
 
 Send methods:
-- session.send
-- session.appSend
-- channel.send
+- X session.send
+- X session.appSend
+- X channel.send
 
 Receiving methods:
-- .on(
-- .once(
-- .emit(
-- session.hub.on
+- X .on(
+- X .once(
+- X .emit(
+- x session.hub.on
 - peers.updateFromHello
 - .onmessage
 - channel.onmessage
