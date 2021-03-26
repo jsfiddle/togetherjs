@@ -47,7 +47,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
         // this function should be global so it can be called when API is loaded
         if (!youtubeHooked) {
             youtubeHooked = true;
-            window.onYouTubeIframeAPIReady = (function (oldf) {
+            window.onYouTubeIframeAPIReady = function (oldf) {
                 return function () {
                     // YouTube API is ready
                     $(youTubeIframes).each(function (i, iframe) {
@@ -62,7 +62,8 @@ function youtubeVideosMain($, util, session, elementFinder) {
                         return oldf();
                     }
                 };
-            })(window.onYouTubeIframeAPIReady);
+            };
+            window.onYouTubeIframeAPIReady(window.onYouTubeIframeAPIReady);
         }
         if (window.YT === undefined) {
             // load necessary API

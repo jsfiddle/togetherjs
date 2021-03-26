@@ -949,7 +949,6 @@ interface Window {
     TowTruck: TogetherJSNS.TogetherJS;
     TogetherJSTestSpy?: { [k: string]: unknown };
     _gaq?: [string, string?][];
-    onYouTubeIframeAPIReady?: unknown;
 }
 
 interface EventHtmlElement extends Event {
@@ -965,6 +964,7 @@ interface Function {
 //declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;
 
 declare var TogetherJS: TogetherJSNS.TogetherJS;
+declare var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
 
 
 
