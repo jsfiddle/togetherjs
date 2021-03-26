@@ -645,7 +645,7 @@ declare namespace TogetherJSNS {
         addTracker(TrackerClass: TrackerClass, skipSetInit: boolean): void;
         startTarget: HTMLElement;
     }
-    */
+    
     interface KeyboardListener {
         (event: KeyboardEvent): void;
         pressed?: boolean;
