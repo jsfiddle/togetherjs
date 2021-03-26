@@ -10,6 +10,8 @@ In the long run many changes are planned, some of them are:
 - Reduce the amount of captured variables that make the code difficult to maintain
 - Improve the dock
 
+You can see other plan changes in [DEV.md]
+
 TogetherJS - Surprisingly easy collaboration
 ============================================
 
