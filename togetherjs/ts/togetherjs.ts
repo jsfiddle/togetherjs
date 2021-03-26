@@ -460,7 +460,7 @@ function togetherjsMain() {
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
         public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
         private version: string;
-        private baseUrl: string;
+        public baseUrl: string;
 
         constructor() {
             super();

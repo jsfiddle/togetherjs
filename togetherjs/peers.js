@@ -510,7 +510,9 @@ function peersMain(util, session, storage, require, templates) {
             peer.destroy();
         });
         storage.tab.set("peerCache", undefined);
-        clearTimeout(checkActivityTask);
+        if (checkActivityTask !== null) {
+            clearTimeout(checkActivityTask);
+        }
         checkActivityTask = null;
     });
     var tabIdleTimeout = null;
@@ -564,7 +566,9 @@ function peersMain(util, session, storage, require, templates) {
             BYE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
             if (TogetherJS.running) {
-                clearTimeout(checkActivityTask);
+                if (checkActivityTask !== null) {
+                    clearTimeout(checkActivityTask);
+                }
                 checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
             }
         }

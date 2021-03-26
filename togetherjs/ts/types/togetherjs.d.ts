@@ -385,7 +385,7 @@ declare namespace TogetherJSNS {
         "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void
         "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
         "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
-        "idle-status": (msg: { idle: boolean }) => void;
+        "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
         "ping": () => void;
         "hello hello-back": (msg: { type: keyof OnMap, isClient: boolean }) => void;
         "who": () => void;
@@ -535,7 +535,7 @@ declare namespace TogetherJSNS {
             "playerStateChange": SessionSend.PlayerStateChange,
             "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
             "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: PeerStatus },
+            "idle-status": { type: "idle-status", idle: PeerStatus, peer?: AnyPeer },
             //"bye": { type: "bye", reason?: string },
             //"hello": On.HelloMessage,
             //"hello-back": On.HelloBackMessage,
@@ -839,7 +839,7 @@ declare namespace TogetherJSNS {
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
         get<K extends keyof Config>(name: K): Partial<Config>[K];
         close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
-        track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): void;
+        track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): (value: Config[K], previous?: Config[K]) => any;
     }
 
     interface ConfigGetter {

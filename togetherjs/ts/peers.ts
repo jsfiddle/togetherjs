@@ -298,7 +298,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly id = session.clientId;
         private identityId = session.identityId;
         public status: TogetherJSNS.PeerStatus = "live";
-        private idle: TogetherJSNS.PeerStatus = "active";
+        public idle: TogetherJSNS.PeerStatus = "active";
         public name: string | null = null;
         public avatar: string | null = null;
         public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
@@ -588,11 +588,13 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             peer.destroy();
         });
         storage.tab.set("peerCache", undefined);
-        clearTimeout(checkActivityTask);
+        if(checkActivityTask !== null) {
+            clearTimeout(checkActivityTask);
+        }
         checkActivityTask = null;
     });
 
-    var tabIdleTimeout = null;
+    var tabIdleTimeout: number | null = null;
 
     session.on("visibility-change", function(hidden) {
         if(hidden) {
@@ -646,11 +648,13 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     });
 
     util.testExpose({
-        setByeTime: function(time) {
+        setByeTime: function(time: number) {
             BYE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
             if(TogetherJS.running) {
-                clearTimeout(checkActivityTask);
+                if(checkActivityTask !== null) {
+                    clearTimeout(checkActivityTask);
+                }
                 checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
             }
         }
