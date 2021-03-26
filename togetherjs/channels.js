@@ -77,11 +77,15 @@ function channelsMain(util) {
                 }
             }
             else {
-                if (this.onmessage) {
+                // TODO we disable rawdata support for now
+                console.error("rawdata support disabled", data);
+                /*
+                if(this.onmessage) {
                     this.onmessage(data);
                 }
                 //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
                 this.emit("message", data); // TODO if this is not used maybe we should remove it?
+                */
             }
         };
         return AbstractChannel;
@@ -132,6 +136,10 @@ function channelsMain(util) {
             }
         };
         WebSocketChannel.prototype._send = function (data) {
+            if (this.socket == null) {
+                console.error("cannot send with an unitialized socket:", data);
+                return;
+            }
             this.socket.send(data);
         };
         WebSocketChannel.prototype._ready = function () {
@@ -320,6 +328,10 @@ function channelsMain(util) {
             return s + ']';
         };
         PostMessageIncomingChannel.prototype._send = function (data) {
+            if (this.source == null) {
+                console.error("Cannot send with uninitialized channel:", data);
+                return;
+            }
             this.source.postMessage(data, this.expectedOrigin);
         };
         PostMessageIncomingChannel.prototype._ready = function () {

@@ -287,7 +287,7 @@ declare namespace TogetherJSNS {
             type: "route",
             routeId: string,
             message: AnyMessage.AnyForReceiving,
-            close: boolean
+            close?: boolean
         }
 
         interface Who {

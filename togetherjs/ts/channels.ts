@@ -101,11 +101,15 @@ function channelsMain(util: Util) {
                 }
             }
             else {
+                // TODO we disable rawdata support for now
+                console.error("rawdata support disabled", data);
+                /*
                 if(this.onmessage) {
                     this.onmessage(data);
                 }
                 //@ts-expect-error this is only relevant in rawdata mode which is not used in production (I think?)
                 this.emit("message", data); // TODO if this is not used maybe we should remove it?
+                */
             }
         }
 
@@ -144,7 +148,8 @@ function channelsMain(util: Util) {
             var s = '[WebSocketChannel to ' + this.address;
             if(!this.socket) {
                 s += ' (socket unopened)';
-            } else {
+            }
+            else {
                 s += ' readyState: ' + this.socket.readyState;
             }
             if(this.closed) {
@@ -158,7 +163,8 @@ function channelsMain(util: Util) {
             if(this.socket) {
                 // socket.onclose will call this.onclose:
                 this.socket.close();
-            } else {
+            }
+            else {
                 if(this.onclose) {
                     this.onclose();
                 }
@@ -167,6 +173,10 @@ function channelsMain(util: Util) {
         }
 
         _send(data: string) {
+            if(this.socket == null) {
+                console.error("cannot send with an unitialized socket:", data);
+                return;
+            }
             this.socket.send(data);
         }
 
@@ -191,13 +201,13 @@ function channelsMain(util: Util) {
                     // FIXME: should I even log clean closes?
                     method = "log";
                 }
-                console[method]('WebSocket close', event.wasClean ? 'clean' : 'unclean',
-                    'code:', event.code, 'reason:', event.reason || 'none');
+                console[method]('WebSocket close', event.wasClean ? 'clean' : 'unclean', 'code:', event.code, 'reason:', event.reason || 'none');
                 if(!this.closed) {
                     this._reopening = true;
                     if(Date.now() - this._lastConnectTime > this.backoffDetection) {
                         this._backoff = 0;
-                    } else {
+                    }
+                    else {
                         this._backoff++;
                     }
                     var time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
@@ -244,7 +254,8 @@ function channelsMain(util: Util) {
             var s = '[PostMessageChannel';
             if(this.window) {
                 s += ' to window ' + this.window;
-            } else {
+            }
+            else {
                 s += ' not bound to a window';
             }
             if(this.window && !this._pingReceived) {
@@ -361,13 +372,18 @@ function channelsMain(util: Util) {
             var s = '[PostMessageIncomingChannel';
             if(this.source) {
                 s += ' bound to source ' + s;
-            } else {
+            }
+            else {
                 s += ' awaiting source';
             }
             return s + ']';
         }
 
         _send(data: string) {
+            if(this.source == null) {
+                console.error("Cannot send with uninitialized channel:", data);
+                return;
+            }
             this.source.postMessage(data, this.expectedOrigin);
         }
 
@@ -493,7 +509,7 @@ function channelsMain(util: Util) {
             this.id = id;
         }
 
-        send(msg: TogetherJSNS.Message) {
+        send(msg: TogetherJSNS.AnyMessage.AnyForReceiving) {
             this.router.channel.send({
                 type: "route",
                 routeId: this.id,
