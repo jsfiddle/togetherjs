@@ -5,8 +5,8 @@
 function walkthroughMain(util, ui, $, windowing, templates, templating, session, peers) {
     var assert = util.assert;
     var onHideAll = null;
-    var container = null;
-    var slides = null;
+    var container; // TODO init
+    var slides; // TODO init
     function show(index) {
         slides.hide();
         $(slides[index]).show();
@@ -84,7 +84,7 @@ function walkthroughMain(util, ui, $, windowing, templates, templating, session,
                     picker.show();
                     picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
                     picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
-                    var location = container.find(".togetherjs-swatch").offset();
+                    var location = container.find(".togetherjs-swatch").offset(); // TODO !
                     picker.css({
                         top: location.top,
                         // The -7 comes out of thin air, but puts it in the right place:

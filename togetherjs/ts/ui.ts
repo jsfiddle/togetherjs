@@ -40,7 +40,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(private ui: Ui) { }
 
-        text(attrs: {text: string, peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf, messageId: string, date?: number, notify?: boolean}) {
+        text(attrs: { text: string, peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf, messageId: string, date?: number, notify?: boolean }) {
             assert(typeof attrs.text == "string");
             assert(attrs.peer);
             assert(attrs.messageId);
@@ -74,7 +74,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.messageId, attrs.notify);
         }
 
-        joinedSession(attrs: {peer: TogetherJSNS.PeerClass, date?: number}) {
+        joinedSession(attrs: { peer: TogetherJSNS.PeerClass, date?: number }) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-joined", {
@@ -85,7 +85,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        leftSession(attrs: {peer: TogetherJSNS.PeerClass, date?: number, declinedJoin: boolean}) {
+        leftSession(attrs: { peer: TogetherJSNS.PeerClass, date?: number, declinedJoin: boolean }) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-left", {
@@ -97,7 +97,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, attrs.peer.className("join-message-"), 4000);
         }
 
-        system(attrs: {text: string, date?: number}) {
+        system(attrs: { text: string, date?: number }) {
             assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a pee field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
@@ -115,7 +115,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             })();
         }
 
-        urlChange(attrs: {peer: TogetherJSNS.PeerClass, url: string, sameUrl: boolean, date?: number, title: string}) {
+        urlChange(attrs: { peer: TogetherJSNS.PeerClass, url: string, sameUrl: boolean, date?: number, title: string }) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             assert(typeof attrs.sameUrl == "boolean");
@@ -162,7 +162,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, messageId, notify);
         }
 
-        invite(attrs: {peer: TogetherJSNS.AnyPeer | TogetherJSNS.ExternalPeer, url: string, date?: number, forEveryone: boolean}) {
+        invite(attrs: { peer: TogetherJSNS.AnyPeer | TogetherJSNS.ExternalPeer, url: string, date?: number, forEveryone: boolean }) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
@@ -1102,7 +1102,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         } // End ui.activateUI()
 
-        activateAvatarEdit(container: JQuery, options: {onSave?: () => void} = {}) {
+        activateAvatarEdit(container: JQuery, options: { onSave?: () => void, onPending?: () => void } = {}) {
             var pendingImage: string | null = null;
 
             container.find(".togetherjs-avatar-save").prop("disabled", true);

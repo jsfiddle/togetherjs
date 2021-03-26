@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-    var assert = util.assert;
-    var onHideAll = null;
-    var container = null;
+function walkthroughMain(util: Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
+    let assert: typeof util.assert = util.assert;
+    let onHideAll: (() => void) | null = null;
+    let container: JQuery; // TODO init
+    let slides: JQuery; // TODO init
 
-    var slides = null;
-
-    function show(index) {
+    function show(index: number) {
         slides.hide();
         $(slides[index]).show();
         var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
@@ -19,7 +18,8 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
         var $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
         if(index == slides.length - 1) {
             $next.addClass("togetherjs-disabled");
-        } else if(index === 0) {
+        }
+        else if(index === 0) {
             $previous.addClass("togetherjs-disabled");
         }
     }
@@ -57,7 +57,7 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
 
     class Walkthrough {
 
-        start(firstTime: boolean, doneCallback) {
+        start(firstTime: boolean, doneCallback: () => void) {
             if(!container) {
                 container = $(templates("walkthrough"));
                 container.hide();
@@ -88,7 +88,7 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
                     picker.show();
                     picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
                     picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
-                    var location = container.find(".togetherjs-swatch").offset();
+                    var location = container.find(".togetherjs-swatch").offset()!; // TODO !
                     picker.css({
                         top: location.top,
                         // The -7 comes out of thin air, but puts it in the right place:
@@ -98,7 +98,8 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
                 if(session.isClient) {
                     container.find(".togetherjs-if-creator").remove();
                     container.find(".togetherjs-ifnot-creator").show();
-                } else {
+                }
+                else {
                     container.find(".togetherjs-if-creator").show();
                     container.find(".togetherjs-ifnot-creator").remove();
                 }
@@ -124,7 +125,8 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
             if(firstTime) {
                 container.find(".togetherjs-walkthrough-firsttime").show();
                 container.find(".togetherjs-walkthrough-not-firsttime").hide();
-            } else {
+            }
+            else {
                 container.find(".togetherjs-walkthrough-firsttime").hide();
                 container.find(".togetherjs-walkthrough-not-firsttime").show();
             }
