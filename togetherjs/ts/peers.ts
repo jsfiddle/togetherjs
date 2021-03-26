@@ -32,45 +32,20 @@ interface PeerSelfAttributes {
     idle: TogetherJSNS.PeerStatus,
 }
 
-interface MessageWithUrlHash {
-    url: string;
-    avatar: string;
-    color: string;
-    hash: string;
-    identityId: string;
-    isClient: boolean;
-    name: string;
-    rtcSupported: boolean;
-    title: string;
-    urlHash: string;
-    type: TogetherJSNS.Messages;
-}
-
-interface Message2 {
-    sameUrl: boolean;
-    clientId: string;
-    peer: TogetherJSNS.PeerClass;
-    type: TogetherJSNS.Messages;
-    url: string;
-    to: string;
-    name: string;
-    avatar: string;
-    color: string;
-}
-
 interface SerializedPeer {
     avatar: string | null,
     color: string,
     following: boolean;
     hash: string | null;
     id: string;
-    identityId: string | null;
+    identityId: string | undefined;
     idle: TogetherJSNS.PeerStatus;
-    name: string | null,
+    name?: string,
     rtcSupported?: boolean,
     status: TogetherJSNS.PeerStatus;
     title: string | null;
     url: string | undefined;
+    fromStorage?: boolean;
 }
 
 function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
@@ -98,7 +73,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public avatar: string | null;
         public color: string;
         public readonly view;
-        private lastMessageDate: number = 0;
+        public lastMessageDate: number = 0;
         public following: boolean;
 
         public url?: string;
@@ -150,9 +125,9 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 url: this.url,
                 hash: this.hash,
                 title: this.title,
-                identityId: this.identityId,
+                identityId: this.identityId || undefined,
                 rtcSupported: this.rtcSupported,
-                name: this.name,
+                name: this.name || undefined,
                 avatar: this.avatar,
                 color: this.color,
                 following: this.following
@@ -184,12 +159,12 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 this.title = null;
                 urlUpdated = true;
             }
-            if("hash" in msg && msg.hash != this.hash) {
-                this.hash = msg.urlHash;
+            if("urlHash" in msg && msg.urlHash != this.hash) {
+                this.hash = msg.urlHash ?? null; // TODO there was a weird mix of hash and urlHash here (see original), check that it's ok
                 urlUpdated = true;
             }
             if("title" in msg && msg.title != this.title) {
-                this.title = msg.title;
+                this.title = msg.title || null;
                 urlUpdated = true;
             }
             if("rtcSupported" in msg && msg.rtcSupported !== undefined) {
@@ -298,7 +273,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             this.view.update();
         }
 
-        static deserialize(obj: PeerClassAttributes) {
+        static deserialize(obj: SerializedPeer) {
             obj.fromStorage = true;
             var peer = new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
@@ -309,7 +284,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session.on("follow-peer", function(peer) {
-        if(peer.url != session.currentUrl()) {
+        if(peer.url && peer.url != session.currentUrl()) {
             var url = peer.url;
             if(peer.urlHash) {
                 url += peer.urlHash;
@@ -568,9 +543,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         util.forEachAttr(Peer.peers, function(peer) {
             peers.push(peer.serialize());
         });
-        return {
-            peers: peers
-        };
+        return { peers: peers };
     }
 
     function deserialize(obj?: { peers: SerializedPeer[] }) {
@@ -660,11 +633,13 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     util.mixinEvents(peers);
 
     util.testExpose({
-        setIdleTime: function(time) {
+        setIdleTime: function(time: number) {
             IDLE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = time / 2;
             if(TogetherJS.running) {
-                clearTimeout(checkActivityTask);
+                if(checkActivityTask !== null) {
+                    clearTimeout(checkActivityTask);
+                }
                 checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
             }
         }

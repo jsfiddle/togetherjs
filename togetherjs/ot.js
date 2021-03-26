@@ -740,7 +740,8 @@ function otMain(util) {
         SimpleHistory: function (clientId, initState, initBasis) { return new SimpleHistory(clientId, initState, initBasis); },
         //History: () => new TJSHistory(), // TODO does not seem to be used
         TextReplace: TextReplace,
-        TextReplaceExport: new TextReplace(0, 0, ""), // TODO ugly export
+        TextReplaceExport: new TextReplace(0, 0, ""),
+        SimpleHistoryExport: new SimpleHistory("", "", 0),
     };
     return ot;
 }

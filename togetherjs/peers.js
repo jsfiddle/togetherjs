@@ -71,9 +71,9 @@ function peersMain(util, session, storage, require, templates) {
                 url: this.url,
                 hash: this.hash,
                 title: this.title,
-                identityId: this.identityId,
+                identityId: this.identityId || undefined,
                 rtcSupported: this.rtcSupported,
-                name: this.name,
+                name: this.name || undefined,
                 avatar: this.avatar,
                 color: this.color,
                 following: this.following
@@ -93,6 +93,7 @@ function peersMain(util, session, storage, require, templates) {
             this.lastMessageDate = Date.now();
         };
         PeerClass.prototype.updateFromHello = function (msg) {
+            var _a;
             var urlUpdated = false;
             var activeRTC = false;
             var identityUpdated = false;
@@ -102,12 +103,12 @@ function peersMain(util, session, storage, require, templates) {
                 this.title = null;
                 urlUpdated = true;
             }
-            if ("hash" in msg && msg.hash != this.hash) {
-                this.hash = msg.urlHash;
+            if ("urlHash" in msg && msg.urlHash != this.hash) {
+                this.hash = (_a = msg.urlHash) !== null && _a !== void 0 ? _a : null; // TODO there was a weird mix of hash and urlHash here (see original), check that it's ok
                 urlUpdated = true;
             }
             if ("title" in msg && msg.title != this.title) {
-                this.title = msg.title;
+                this.title = msg.title || null;
                 urlUpdated = true;
             }
             if ("rtcSupported" in msg && msg.rtcSupported !== undefined) {
@@ -220,7 +221,7 @@ function peersMain(util, session, storage, require, templates) {
     var Peer = PeerClass;
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session.on("follow-peer", function (peer) {
-        if (peer.url != session.currentUrl()) {
+        if (peer.url && peer.url != session.currentUrl()) {
             var url = peer.url;
             if (peer.urlHash) {
                 url += peer.urlHash;
@@ -248,7 +249,7 @@ function peersMain(util, session, storage, require, templates) {
         PeersSelf.prototype.update = function (attrs) {
             var updatePeers = false;
             var updateIdle = false;
-            var updateMsg = { type: "peer-update" };
+            var updateMsg = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
             if (typeof attrs.name == "string" && attrs.name != this.name) {
                 this.name = attrs.name;
                 updateMsg.name = this.name;
@@ -470,9 +471,7 @@ function peersMain(util, session, storage, require, templates) {
         util.forEachAttr(Peer.peers, function (peer) {
             peers.push(peer.serialize());
         });
-        return {
-            peers: peers
-        };
+        return { peers: peers };
     }
     function deserialize(obj) {
         if (!obj) {
@@ -553,7 +552,9 @@ function peersMain(util, session, storage, require, templates) {
             IDLE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = time / 2;
             if (TogetherJS.running) {
-                clearTimeout(checkActivityTask);
+                if (checkActivityTask !== null) {
+                    clearTimeout(checkActivityTask);
+                }
                 checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
             }
         }

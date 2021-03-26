@@ -19,6 +19,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var globalTjs;
+// TODO remove that
 function compatibilityFix(TogetherJS, tjsInstance) {
     TogetherJS._mixinEvents = function (proto) {
         proto.on = function on(name, callback) {
@@ -119,6 +120,7 @@ var OnClass = /** @class */ (function () {
         this.removeListener = this.off.bind(this);
     }
     OnClass.prototype.on = function (name, callback) {
+        var _this = this;
         if (typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -126,8 +128,8 @@ var OnClass = /** @class */ (function () {
         if (name.search(" ") != -1) {
             var names = name.split(/ +/g);
             names.forEach(function (n) {
-                this.on(n, callback);
-            }, this);
+                _this.on(n, callback);
+            });
             return;
         }
         if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
@@ -421,7 +423,6 @@ function togetherjsMain() {
             }
             // TODO any how to make callback typecheck?
             this.tjsInstance._configTrackers[name].push(callback); // TODO !
-            var a = this.tjsInstance._configTrackers["hubBase"];
             return callback;
         };
         ConfigClass.prototype.close = function (name) {

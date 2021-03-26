@@ -29,7 +29,7 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
         }
         else {
             channel.send({
-                type: helloBack ? "hello-back" : "hello",
+                type: "hello",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
                 avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",

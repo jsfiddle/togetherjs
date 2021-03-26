@@ -1142,7 +1142,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 func.apply(this, arguments);
             }
             var self = this;
-            var args = Array.prototype.slice.call(arguments);
+            var args = Array.prototype.slice.call(arguments); // TODO use args
             session.once("ui-ready", function () {
                 func.apply(self, args);
             });

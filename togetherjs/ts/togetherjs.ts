@@ -409,7 +409,7 @@ function togetherjsMain() {
             return value;
         }
 
-        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) { // TODO unknown
+        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) {
             if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
@@ -420,7 +420,6 @@ function togetherjsMain() {
             }
             // TODO any how to make callback typecheck?
             this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO !
-            let a = this.tjsInstance._configTrackers["hubBase"];
             return callback;
         }
 

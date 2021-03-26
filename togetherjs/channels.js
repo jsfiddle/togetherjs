@@ -436,7 +436,6 @@ function channelsMain(util) {
                 type: "route",
                 routeId: this.id,
                 message: msg,
-                clientId: null // TODO added this, does it introduce a bug?
             });
         };
         Route.prototype.close = function () {

@@ -546,6 +546,7 @@ declare namespace TogetherJSNS {
             // other
             "form-init": FormInitMessage,
             "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element },
+            "identityId": { type: "identityId", identityId: string }, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet
         }
 
         type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & InTransit }

@@ -67,7 +67,6 @@ function whoMain(util, channels, session, ui) {
                 channel.send({
                     type: "who",
                     "server-echo": true,
-                    clientId: null
                 });
                 var timeout = setTimeout(function () {
                     close();
@@ -113,7 +112,6 @@ function whoMain(util, channels, session, ui) {
                     url: session.shareUrl(),
                     userInfo: userInfo,
                     forClientId: clientId,
-                    clientId: null,
                     "server-echo": true
                 });
             });
