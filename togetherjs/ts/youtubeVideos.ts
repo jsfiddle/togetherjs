@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
 
-function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
+function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
 
     // constant var to indicate whether two players are too far apart in sync
     var TOO_FAR_APART = 3000;
@@ -18,7 +18,7 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
     });
 
     session.on("close", function() {
-        $(youTubeIframes).each(function(i, iframe) {
+        $(youTubeIframes).each(function(_i, iframe) {
             // detach players from iframes
             $(iframe).removeData("togetherjs-player");
             $(iframe).removeData("dontPublish");
@@ -57,7 +57,7 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
             window.onYouTubeIframeAPIReady = function(oldf?: () => void) {
                 return function() {
                     // YouTube API is ready
-                    $(youTubeIframes).each(function(i, iframe) {
+                    $(youTubeIframes).each(function(_i, iframe) {
                         var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
                             events: {
                                 'onReady': insertPlayer,
@@ -82,13 +82,14 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
             firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag); // TODO !
         } else {
             // manually invoke APIReady function when the API was already loaded by user
-            onYouTubeIframeAPIReady();
+            onYouTubeIframeAPIReady!(); // TODO !
         }
 
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {
             var iframes = $('iframe');
-            iframes.each(function(i, iframe: HTMLIFrameElement) { // TODO .each is used just for one element here apparently
+            iframes.each(function(i, f: Element) {
+                const iframe = f as HTMLIFrameElement;
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?
@@ -114,9 +115,9 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
             });
         } // iframes are ready
 
-        function insertPlayer(event) {
+        function insertPlayer(event: YT.PlayerEvent) {
             // only when it is READY, attach a player to its iframe
-            var currentPlayer = event.target as HTMLElement;
+            var currentPlayer = event.target;
             var currentIframe = currentPlayer.getIframe();
             // check if a player is already attached in case of being reinitialized
             if(!$(currentIframe).data("togetherjs-player")) {
@@ -130,8 +131,8 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
         }
     } // end of prepareYouTube
 
-    function publishPlayerStateChange(event: Event) {
-        var target = event.target as HTMLElement;
+    function publishPlayerStateChange(event: YT.OnStateChangeEvent) {
+        var target = event.target;
         var currentIframe = target.getIframe(); // TODO what is getIframe???
         //var currentPlayer = $(currentIframe).data("togetherjs-player");
         var currentPlayer = target;
@@ -181,7 +182,7 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
         }
     }
 
-    function publishDifferentVideoLoaded(iframeLocation, videoId) {
+    function publishDifferentVideoLoaded(iframeLocation: string, videoId: string) {
         session.send({
             type: "differentVideoLoaded",
             videoId: videoId,
@@ -269,7 +270,7 @@ function youtubeVideosMain($: JQueryStatic, util: Util, session: TogetherJSNS.Se
         });
     }
 
-    function isDifferentVideoLoaded(iframe) {
+    function isDifferentVideoLoaded(iframe: HTMLElement) {
         var lastVideoId = $(iframe).data("currentVideoId");
         var currentPlayer = $(iframe).data("togetherjs-player");
         var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());

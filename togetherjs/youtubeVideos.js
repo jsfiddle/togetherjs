@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
-function youtubeVideosMain($, util, session, elementFinder) {
+function youtubeVideosMain($, _util, session, elementFinder) {
     // constant var to indicate whether two players are too far apart in sync
     var TOO_FAR_APART = 3000;
     // embedded youtube iframes
@@ -15,7 +15,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
         }
     });
     session.on("close", function () {
-        $(youTubeIframes).each(function (i, iframe) {
+        $(youTubeIframes).each(function (_i, iframe) {
             // detach players from iframes
             $(iframe).removeData("togetherjs-player");
             $(iframe).removeData("dontPublish");
@@ -50,7 +50,7 @@ function youtubeVideosMain($, util, session, elementFinder) {
             window.onYouTubeIframeAPIReady = function (oldf) {
                 return function () {
                     // YouTube API is ready
-                    $(youTubeIframes).each(function (i, iframe) {
+                    $(youTubeIframes).each(function (_i, iframe) {
                         var player = new YT.Player(iframe.id, {
                             events: {
                                 'onReady': insertPlayer,
@@ -75,12 +75,13 @@ function youtubeVideosMain($, util, session, elementFinder) {
         }
         else {
             // manually invoke APIReady function when the API was already loaded by user
-            onYouTubeIframeAPIReady();
+            onYouTubeIframeAPIReady(); // TODO !
         }
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {
             var iframes = $('iframe');
-            iframes.each(function (i, iframe) {
+            iframes.each(function (i, f) {
+                var iframe = f;
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?

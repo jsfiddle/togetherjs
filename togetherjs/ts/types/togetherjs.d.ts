@@ -222,7 +222,7 @@ declare namespace TogetherJSNS {
             type: "synchronizeVideosOfLateGuest",
             element: string,
             videoId: string,
-            playerState: 1 | 2, //this might be necessary later
+            playerState: 1 | 2 | 5, //this might be necessary later
             playerTime: number
         }
     }
@@ -392,8 +392,8 @@ declare namespace TogetherJSNS {
         "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
         "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
         "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
-        "synchronizeVideosOfLateGuest": (msg: { element: string, videoId: string, playerTime: number }) => void;
-        "differentVideoLoaded": (msg: { videoId: string }) => void;
+        "synchronizeVideosOfLateGuest": (msg: SessionSend.SynchronizeVideosOfLateGuest) => void;
+        "differentVideoLoaded": (msg: { videoId: string, element: string }) => void;
         "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
         "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
         "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
@@ -545,7 +545,7 @@ declare namespace TogetherJSNS {
 
             // other
             "form-init": FormInitMessage,
-            "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element },
+            "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element: string },
             "identityId": { type: "identityId", identityId: string }, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet
         }
 
