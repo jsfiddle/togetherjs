@@ -55,8 +55,6 @@ Receiving methods:
     - X channel.onmessage
     - x route.onmessage
 
-
-
 Other methods:
 - session.makeHelloMessage
 
