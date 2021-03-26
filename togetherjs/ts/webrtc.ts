@@ -47,19 +47,15 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
     function makePeerConnection() {
         // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
         if(window.webkitRTCPeerConnection) {
-            return new webkitRTCPeerConnection({
-                "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
-            }, {
-                "optional": [{"DtlsSrtpKeyAgreement": true}]
-            });
+            return new webkitRTCPeerConnection(
+                { "iceServers": [{"url": "stun:stun.l.google.com:19302"}] },
+                { "optional": [{"DtlsSrtpKeyAgreement": true}] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
+            );
         }
         if(window.mozRTCPeerConnection) {
-            return new window.mozRTCPeerConnection({
-                // Or stun:124.124.124..2 ?
-                "iceServers": [{"url": "stun:23.21.150.121"}]
-            }, {
-                "optional": []
-            });
+            return new window.mozRTCPeerConnection(
+                { /* Or stun:124.124.124..2 ? */ "iceServers": [{"url": "stun:23.21.150.121"}] },
+                { "optional": [] });
         }
         throw new util.AssertionError("Called makePeerConnection() without supported connection");
     }
@@ -285,7 +281,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
         });
 
         function error(...args: any[]) {
-            console.warn.apply(console, arguments); // TODO why not console.warn directly ?
+            console.warn(arguments);
             var s = "";
             for(var i = 0; i < arguments.length; i++) {
                 if(s) {
@@ -335,7 +331,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             );
         }
 
-        function attachMedia(element: HTMLMediaElement | JQuery | string, media: string) {
+        function attachMedia(element: HTMLMediaElement | JQuery | string, media: string | MediaStream) {
             element = $(element)[0] as HTMLMediaElement;
             console.log("Attaching", media, "to", element);
             if(window.mozRTCPeerConnection) {
@@ -360,14 +356,18 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                 throw e;
             }
             _connection.onaddstream = function(event: MediaStreamEvent) {
-                console.log("got event", event, event.type);
+                console.log("got event", event.type, event);
+                if(event.stream == null) {
+                    console.error("stream was null in the event", event);
+                    return;
+                }
                 attachMedia($audio, event.stream);
                 audioButton("#togetherjs-audio-active");
             };
             _connection.onstatechange = function() {
                 // FIXME: this doesn't seem to work:
                 // Actually just doesn't work on Firefox
-                console.log("state change", _connection.readyState);
+                console.log("state change", _connection?.readyState);
                 if(_connection.readyState == "closed") {
                     audioButton("#togetherjs-audio-ready");
                 }

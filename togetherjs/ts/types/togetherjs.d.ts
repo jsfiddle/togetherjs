@@ -1004,5 +1004,5 @@ interface RTCPeerConnection {
 
 interface HTMLMediaElement {
     /** @deprecated */
-    mozSrcObject: string;
+    mozSrcObject: string | MediaStream;
 }
