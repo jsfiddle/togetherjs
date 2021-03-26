@@ -43,17 +43,19 @@ Send methods:
 
 Receiving methods:
 - X .on(
+    - x channel.on
+    - x session.on
+    - x peers.on
+    - x session.hub.on
 - X .once(
+    - x TogetherJS.once
 - X .emit(
-- x session.hub.on
-- peers.updateFromHello
-- .onmessage
-- channel.onmessage
-- channel.on
-- session.on
-- peers.on
-- TogetherJS.once
-- route.onmessage
+- X peers.updateFromHello
+- X .onmessage
+    - X channel.onmessage
+    - x route.onmessage
+
+
 
 Other methods:
 - session.makeHelloMessage
