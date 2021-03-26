@@ -81,9 +81,9 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            const msg2 = msg as TogetherJSNS.SessionSend.Map[K] & TogetherJSNS.ChannelSend.WithClientId;
+            const msg2 = msg as TogetherJSNS.AnyMessage.MapInTransit[K];
             msg2.clientId = session.clientId!; // TODO !
-            channel.send<K, never>(msg2);
+            channel.send(msg2);
         }
 
         // TODO this function appears to never been used, and it does weird things

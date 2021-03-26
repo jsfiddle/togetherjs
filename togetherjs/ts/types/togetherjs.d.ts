@@ -243,11 +243,11 @@ declare namespace TogetherJSNS {
             avatar: string,
             color: string,
             url: string,
-            urlHash: string,
-            title: string,
+            urlHash: string | undefined,
+            title: string | undefined,
             rtcSupported: boolean,
-            isClient: boolean,
-            starting: boolean,
+            isClient: boolean | undefined,
+            starting: boolean | undefined,
             clientId: string,
         }
 
@@ -325,17 +325,17 @@ declare namespace TogetherJSNS {
             avatar: string,
             color: string,
             url: string,
-            urlHash: string,
-            title: string,
+            urlHash?: string, // TODO check that these optionals are correct
+            title?: string,
             rtcSupported: boolean,
-            isClient: boolean,
-            starting: boolean,
+            isClient?: boolean,
+            starting?: boolean,
             scrollPosition?: ElementFinder.Position
         }
 
         interface HelloMessage extends HelloMessageBase {
             type: "hello";
-            clientVersion: string;
+            clientVersion?: string; // TODO check that this optional is correct
         }
 
         interface HelloBackMessage extends HelloMessageBase {
@@ -494,12 +494,12 @@ declare namespace TogetherJSNS {
             //"hello": { type: "hello", peer: PeerClass }; // old version
             "hello": TogetherJSNS.On.HelloMessage;
             //"hello-back": { type: "hello-back", peer: PeerClass };
-            "hello-back": TogetherJSNS.On.HelloMessage;
+            "hello-back": TogetherJSNS.On.HelloBackMessage;
             "get-logs": TogetherJSNS.SessionSend.GetLogs;
             "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
             "init-connection": { type: "init-connection", peerCount: number };
-            "who": { type: "who" };
-            "invite": { type: "invite" };
+            "who": { type: "who", "server-echo": boolean };
+            "invite": { type: "invite", inviteId: string, url: string, userInfo: ChannelSend.UserInfo, forClientId: string, "server-echo": boolean };
 
             //ChannelSend
             "route": ChannelSend.Route,
@@ -539,7 +539,7 @@ declare namespace TogetherJSNS {
             "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element },
         }
 
-        type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
+        type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & InTransit }
 
         type MapForReceiving = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
 

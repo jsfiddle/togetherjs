@@ -86,7 +86,6 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                 channel.send({
                     type: "who",
                     "server-echo": true,
-                    clientId: null
                 });
                 var timeout = setTimeout(function() {
                     close();
@@ -116,7 +115,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                 };
                 var hello = session.makeHelloMessage(false);
 
-                const userInfo = {
+                const userInfo: TogetherJSNS.ChannelSend.UserInfo = {
                     name: hello.name,
                     avatar: hello.avatar,
                     color: hello.color,
@@ -135,7 +134,6 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                     url: session.shareUrl(),
                     userInfo: userInfo,
                     forClientId: clientId,
-                    clientId: null,
                     "server-echo": true
                 });
             });

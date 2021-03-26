@@ -71,7 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string, ot not?
-        send<K extends keyof TogetherJSNS.AnyMessage.MapForSending>(data: TogetherJSNS.AnyMessage.MapForSending[K] | string): void {
+        send<K extends keyof TogetherJSNS.AnyMessage.MapInTransit>(data: TogetherJSNS.AnyMessage.MapInTransit[K] | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -505,7 +505,6 @@ function channelsMain(util: Util) {
                 type: "route",
                 routeId: this.id,
                 message: msg,
-                clientId: null // TODO added this, does it introduce a bug?
             });
         }
 
