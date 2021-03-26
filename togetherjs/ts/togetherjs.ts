@@ -775,7 +775,8 @@ function togetherjsMain() {
             }
         }
 
-        checkForUsersOnChannel(address: string, callback) {
+        // TODO can peerCount (in the callback) really be undefined?
+        checkForUsersOnChannel(address: string, callback: (peerCount?: number) => void) {
             if(address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }

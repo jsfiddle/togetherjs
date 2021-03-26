@@ -96,7 +96,7 @@ function channelsMain(util: Util) {
             // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if(!this.rawdata) {
                 try {
-                    const dataAsObject = JSON.parse(data) as unknown;
+                    const dataAsObject = JSON.parse(data) as TogetherJSNS.ValueOf<TogetherJSNS.SessionSend.Map> | TogetherJSNS.ValueOf<TogetherJSNS.ChannelSend.Map>;
                     if(this.onmessage) {
                         this.onmessage(dataAsObject);
                     }
@@ -222,7 +222,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = <T extends keyof TogetherJSNS.ChannelOnMessage.Map>(_jsonData: TogetherJSNS.ChannelOnMessage.Map[T]) => {};
+        onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>) => {};
 
     } // /WebSocketChannel
 

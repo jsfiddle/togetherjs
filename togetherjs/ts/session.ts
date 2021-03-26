@@ -269,14 +269,14 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             }
             if("clientId" in msg) {
                 const msg2 = msg as typeof msg & { clientId: string, peer?: TogetherJSNS.AnyPeer };
-                if(msg2.clientId) {
-                    msg2.peer = peers.getPeer(msg2.clientId, msg2) ?? undefined;
+                const peer = peers.getPeer(msg2.clientId, msg2);
+                if(peer) {
+                    msg2.peer = peer
                 }
             }
             if(msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
                 // We do this here to make sure this is run before any other hello handlers:
-                const msg2 = msg as TogetherJSNS.HelloMessageLike;
-                msg2.peer.updateFromHello(msg2);
+                msg.peer.updateFromHello(msg);
             }
             if("peer" in msg) {
                 const msg2 = msg as (typeof msg & { peer: TogetherJSNS.PeerClass, sameUrl?: boolean });

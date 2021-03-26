@@ -49,7 +49,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
     }
 
     class Who {
-        ExternalPeerExport = ExternalPeer; // TODO ugly export
+        ExternalPeerExport!: ExternalPeer; // TODO ugly export
         ExternalPeer = (id: string, attrs: ExternalPeerAttributes) => new ExternalPeer(id, attrs);
 
         getList(hubUrl: string) {

@@ -96,40 +96,40 @@ function peersMain(util, session, storage, require, templates) {
             var urlUpdated = false;
             var activeRTC = false;
             var identityUpdated = false;
-            if (msg.url && msg.url != this.url) {
+            if ("url" in msg && msg.url && msg.url != this.url) {
                 this.url = msg.url;
                 this.hash = null;
                 this.title = null;
                 urlUpdated = true;
             }
-            if (msg.hash != this.hash) {
+            if ("hash" in msg && msg.hash != this.hash) {
                 this.hash = msg.urlHash;
                 urlUpdated = true;
             }
-            if (msg.title != this.title) {
+            if ("title" in msg && msg.title != this.title) {
                 this.title = msg.title;
                 urlUpdated = true;
             }
-            if (msg.rtcSupported !== undefined) {
+            if ("rtcSupported" in msg && msg.rtcSupported !== undefined) {
                 this.rtcSupported = msg.rtcSupported;
             }
-            if (msg.identityId !== undefined) {
+            if ("identityId" in msg && msg.identityId !== undefined) {
                 this.identityId = msg.identityId;
             }
-            if (msg.name && msg.name != this.name) {
+            if ("name" in msg && msg.name && msg.name != this.name) {
                 this.name = msg.name;
                 identityUpdated = true;
             }
-            if (msg.avatar && msg.avatar != this.avatar) {
+            if ("avatar" in msg && msg.avatar && msg.avatar != this.avatar) {
                 util.assertValidUrl(msg.avatar);
                 this.avatar = msg.avatar;
                 identityUpdated = true;
             }
-            if (msg.color && msg.color != this.color) {
+            if ("color" in msg && msg.color && msg.color != this.color) {
                 this.color = msg.color;
                 identityUpdated = true;
             }
-            if (msg.isClient !== undefined) {
+            if ("isClient" in msg && msg.isClient !== undefined) {
                 this.isCreator = !msg.isClient;
             }
             if (this.status != "live") {
@@ -140,7 +140,7 @@ function peersMain(util, session, storage, require, templates) {
                 this.idle = "active";
                 peers.emit("idle-updated", this);
             }
-            if (msg.rtcSupported) {
+            if ("rtcSupported" in msg && msg.rtcSupported) {
                 peers.emit("rtc-supported", this);
             }
             if (urlUpdated) {
@@ -149,15 +149,13 @@ function peersMain(util, session, storage, require, templates) {
             if (identityUpdated) {
                 peers.emit("identity-updated", this);
             }
-            // FIXME: I can't decide if this is the only time we need to emit
-            // this message (and not .update() or other methods)
+            // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
             if (this.following) {
                 session.emit("follow-peer", this);
             }
         };
         PeerClass.prototype.update = function (attrs) {
-            // FIXME: should probably test that only a couple attributes are settable
-            // particularly status and idle
+            // FIXME: should probably test that only a couple attributes are settable particularly status and idle
             if (attrs.idle) {
                 this.idle = attrs.idle;
             }
@@ -211,7 +209,7 @@ function peersMain(util, session, storage, require, templates) {
             storeSerialization();
             this.view.update();
         };
-        PeerClass.prototype.deserialize = function (obj) {
+        PeerClass.deserialize = function (obj) {
             obj.fromStorage = true;
             var peer = new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers

@@ -8,18 +8,18 @@ interface IdleAndStatus {
 }
 
 interface PeerClassAttributes {
-    id: string;
-    identityId: string;
-    status: TogetherJSNS.PeerStatus;
-    idle: TogetherJSNS.PeerStatus;
-    name: string;
     avatar: string | null;
     color: string;
-    lastMessageDate: number;
     following: boolean;
-    joined: boolean;
-    fromHelloMessage: TogetherJSNS.HelloMessageLike;
+    fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>;
     fromStorage?: boolean;
+    id: string;
+    identityId: string;
+    idle: TogetherJSNS.PeerStatus;
+    joined: boolean;
+    lastMessageDate: number;
+    name: string;
+    status: TogetherJSNS.PeerStatus;
 }
 
 interface PeerSelfAttributes {
@@ -59,18 +59,18 @@ interface Message2 {
 }
 
 interface SerializedPeer {
-    id: string;
-    status: TogetherJSNS.PeerStatus;
-    idle: TogetherJSNS.PeerStatus;
-    url: string | undefined;
-    hash: string | null;
-    title: string | null;
-    identityId: string | null;
-    rtcSupported?: boolean,
-    name: string | null,
     avatar: string | null,
     color: string,
     following: boolean;
+    hash: string | null;
+    id: string;
+    identityId: string | null;
+    idle: TogetherJSNS.PeerStatus;
+    name: string | null,
+    rtcSupported?: boolean,
+    status: TogetherJSNS.PeerStatus;
+    title: string | null;
+    url: string | undefined;
 }
 
 function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
@@ -174,44 +174,44 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             this.lastMessageDate = Date.now();
         }
 
-        updateFromHello(msg: TogetherJSNS.HelloMessageLike) {
+        updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>) {
             var urlUpdated = false;
             var activeRTC = false;
             var identityUpdated = false;
-            if(msg.url && msg.url != this.url) {
+            if("url" in msg && msg.url && msg.url != this.url) {
                 this.url = msg.url;
                 this.hash = null;
                 this.title = null;
                 urlUpdated = true;
             }
-            if(msg.hash != this.hash) {
+            if("hash" in msg && msg.hash != this.hash) {
                 this.hash = msg.urlHash;
                 urlUpdated = true;
             }
-            if(msg.title != this.title) {
+            if("title" in msg && msg.title != this.title) {
                 this.title = msg.title;
                 urlUpdated = true;
             }
-            if(msg.rtcSupported !== undefined) {
+            if("rtcSupported" in msg && msg.rtcSupported !== undefined) {
                 this.rtcSupported = msg.rtcSupported;
             }
-            if(msg.identityId !== undefined) {
+            if("identityId" in msg && msg.identityId !== undefined) {
                 this.identityId = msg.identityId;
             }
-            if(msg.name && msg.name != this.name) {
+            if("name" in msg && msg.name && msg.name != this.name) {
                 this.name = msg.name;
                 identityUpdated = true;
             }
-            if(msg.avatar && msg.avatar != this.avatar) {
+            if("avatar" in msg && msg.avatar && msg.avatar != this.avatar) {
                 util.assertValidUrl(msg.avatar);
                 this.avatar = msg.avatar;
                 identityUpdated = true;
             }
-            if(msg.color && msg.color != this.color) {
+            if("color" in msg && msg.color && msg.color != this.color) {
                 this.color = msg.color;
                 identityUpdated = true;
             }
-            if(msg.isClient !== undefined) {
+            if("isClient" in msg && msg.isClient !== undefined) {
                 this.isCreator = !msg.isClient;
             }
             if(this.status != "live") {
@@ -222,7 +222,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 this.idle = "active";
                 peers.emit("idle-updated", this);
             }
-            if(msg.rtcSupported) {
+            if("rtcSupported" in msg && msg.rtcSupported) {
                 peers.emit("rtc-supported", this);
             }
             if(urlUpdated) {
@@ -231,16 +231,14 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             if(identityUpdated) {
                 peers.emit("identity-updated", this);
             }
-            // FIXME: I can't decide if this is the only time we need to emit
-            // this message (and not .update() or other methods)
+            // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
             if(this.following) {
                 session.emit("follow-peer", this);
             }
         }
 
         update(attrs: Partial<IdleAndStatus>) {
-            // FIXME: should probably test that only a couple attributes are settable
-            // particularly status and idle
+            // FIXME: should probably test that only a couple attributes are settable particularly status and idle
             if(attrs.idle) {
                 this.idle = attrs.idle;
             }
@@ -300,7 +298,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             this.view.update();
         }
 
-        deserialize(obj: PeerClassAttributes) {
+        static deserialize(obj: PeerClassAttributes) {
             obj.fromStorage = true;
             var peer = new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
@@ -486,11 +484,11 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     }
 
     class Peers extends OnClass {
-        private PeerClassExport: PeerClass; // TODO very ugly way to export the class
+        private PeerClassExport!: PeerClass; // TODO very ugly way to export the class
         public Self: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
 
-        getPeer(id: string, message?: MessageWithUrlHash, ignoreMissing: boolean = false) {
+        getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>, ignoreMissing: boolean = false) {
             assert(id);
             var peer = Peer.peers[id];
             if(id === session.clientId) {
@@ -575,7 +573,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         };
     }
 
-    function deserialize(obj) {
+    function deserialize(obj: { peers: SerializedPeer[] }) {
         if(!obj) {
             return;
         }

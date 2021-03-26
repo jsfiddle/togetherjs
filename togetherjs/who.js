@@ -30,7 +30,6 @@ function whoMain(util, channels, session, ui) {
     }());
     var Who = /** @class */ (function () {
         function Who() {
-            this.ExternalPeerExport = ExternalPeer; // TODO ugly export
             this.ExternalPeer = function (id, attrs) { return new ExternalPeer(id, attrs); };
         }
         Who.prototype.getList = function (hubUrl) {

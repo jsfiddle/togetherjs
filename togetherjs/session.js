@@ -240,7 +240,6 @@ function sessionMain(require, util, channels, $, storage) {
         console.info("Connecting to", session.hubUrl(), location.href);
         var c = channels.WebSocketChannel(session.hubUrl());
         c.onmessage = function (msg) {
-            var _a;
             if (!readyForMessages) {
                 if (DEBUG) {
                     console.info("In (but ignored for being early):", msg);
@@ -261,14 +260,14 @@ function sessionMain(require, util, channels, $, storage) {
             }
             if ("clientId" in msg) {
                 var msg2 = msg;
-                if (msg2.clientId) {
-                    msg2.peer = (_a = peers.getPeer(msg2.clientId, msg2)) !== null && _a !== void 0 ? _a : undefined;
+                var peer = peers.getPeer(msg2.clientId, msg2);
+                if (peer) {
+                    msg2.peer = peer;
                 }
             }
             if (msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
                 // We do this here to make sure this is run before any other hello handlers:
-                var msg2 = msg;
-                msg2.peer.updateFromHello(msg2);
+                msg.peer.updateFromHello(msg);
             }
             if ("peer" in msg) {
                 var msg2 = msg;

@@ -313,6 +313,8 @@ declare namespace TogetherJSNS {
             "get-logs": TogetherJSNS.SessionSend.GetLogs;
             "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
             "init-connection": { type: "init-connection", peerCount: number };
+            "who": { type: "who" };
+            "invite": { type: "invite" };
         }
     }
 
@@ -463,7 +465,7 @@ declare namespace TogetherJSNS {
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */
     type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.ChannelOnMessage.Map["peer-update"];
-    
+
     interface TextReplaceStruct {
         start: number,
         del: number,
