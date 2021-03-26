@@ -8,6 +8,7 @@ interface ExternalPeerAttributes {
     name: string;
     avatar: string;
     color: string;
+    clientId: string; // TODO is it the same thing as identityId?
 }
 
 function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
@@ -53,7 +54,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
         ExternalPeer = (id: string, attrs: ExternalPeerAttributes) => new ExternalPeer(id, attrs);
 
         getList(hubUrl: string) {
-            return util.Deferred(function(def) {
+            return util.Deferred<{ [user: string]: ExternalPeer }>(function(def) {
                 var expected: number;
                 var channel = channels.WebSocketChannel(hubUrl);
                 var users: { [user: string]: ExternalPeer } = {};

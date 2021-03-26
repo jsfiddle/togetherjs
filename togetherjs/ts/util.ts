@@ -101,8 +101,7 @@ class Util {
     }
 
     public truncateCommonDomain(url: string, base: string) {
-        /* Remove the scheme and domain from url, if it matches the scheme and domain
-           of base */
+        /* Remove the scheme and domain from url, if it matches the scheme and domain of base */
         if(!base) {
             return url;
         }

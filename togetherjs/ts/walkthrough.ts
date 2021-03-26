@@ -57,7 +57,7 @@ function walkthroughMain(util: Util, ui, $: JQueryStatic, windowing: TogetherJSN
 
     class Walkthrough {
 
-        start(firstTime, doneCallback) {
+        start(firstTime: boolean, doneCallback) {
             if(!container) {
                 container = $(templates("walkthrough"));
                 container.hide();

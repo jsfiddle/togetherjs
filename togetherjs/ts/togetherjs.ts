@@ -442,7 +442,7 @@ function togetherjsMain() {
     }
 
     class TogetherJSClass extends OnClass {
-        public $: JQueryStatic;
+        public $!: JQueryStatic; // TODO !
         public running: boolean = false;
         public require: Require;
         private configObject = new ConfigClass(this);
@@ -462,6 +462,7 @@ function togetherjsMain() {
         private version: string;
         public baseUrl: string;
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
+        public startTarget?: HTMLElement;
 
         constructor() {
             super();

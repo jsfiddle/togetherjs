@@ -149,7 +149,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 if(attrs.peer.urlHash) {
                     url += attrs.peer.urlHash;
                 }
-                location.href = url;
+                if(url !== undefined) {
+                    location.href = url;
+                }
             });
             var notify = !attrs.sameUrl;
             if(attrs.sameUrl && !$("#" + realId).length) {
@@ -160,7 +162,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, messageId, notify);
         }
 
-        invite(attrs: {peer: TogetherJSNS.PeerClass, url: string, date?: number, forEveryone: boolean}) {
+        invite(attrs: {peer: TogetherJSNS.AnyPeer | TogetherJSNS.ExternalPeer, url: string, date?: number, forEveryone: boolean}) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
@@ -182,7 +184,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, messageId, true);
         }
 
-        add(el: JQuery, id?: string, notify: boolean = false) {
+        add(el: JQuery, id?: string, notify: boolean | number = false) {
             deferForContainer(() => {
                 if(id) {
                     el.attr("id", "togetherjs-chat-" + util.safeClassName(id));
@@ -195,7 +197,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var doNotify = !!notify;
                 var section = popup.find("#togetherjs-chat-notifier-message");
                 if(notify && visibilityApi.hidden()) {
-                    this.ui.container.find("#togetherjs-notification")[0].play();
+                    const mediaElement = this.ui.container.find("#togetherjs-notification")[0] as HTMLMediaElement;
+                    mediaElement.play();
                 }
                 if(id && section.data("message-id") == id) {
                     doNotify = true;
@@ -218,10 +221,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                             clearTimeout(this.hideTimeout);
                             this.hideTimeout = undefined;
                         }
-                        this.hideTimeout = setTimeout((function() {
+                        this.hideTimeout = setTimeout(() => {
                             windowing.hide(popup);
                             this.hideTimeout = undefined;
-                        }).bind(this), notify);
+                        }, notify);
                     }
                 }
             })();
@@ -237,8 +240,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
     class PeerView {
-        private followCheckbox;
-        private _lastUpdateUrlDisplay: string;
+        private followCheckbox?: JQuery;
+        private _lastUpdateUrlDisplay?: string;
         private dockElement: JQuery | null = null;
         private detailElement: JQuery | null = null;
 
@@ -270,7 +273,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.updateDisplay(el);
         }
 
-        updateDisplay(container?) {
+        updateDisplay(container?: JQuery) {
             deferForContainer(() => {
                 container = container || this.ui.container;
                 var abbrev = this.peer.name;
@@ -278,7 +281,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     abbrev = "me";
                 }
                 container.find("." + this.peer.className("togetherjs-person-name-")).text(this.peer.name || "");
-                container.find("." + this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev);
+                container.find("." + this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev!); // TODO !
                 var avatarEl = container.find("." + this.peer.className("togetherjs-person-"));
                 if(this.peer.avatar) {
                     util.assertValidUrl(this.peer.avatar);
@@ -317,7 +320,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 if(this.peer.title) {
                     urlName += " (";
                 }
-                urlName += util.truncateCommonDomain(this.peer.url, location.href);
+                urlName += util.truncateCommonDomain(this.peer.url!, location.href); // TODO !
                 if(this.peer.title) {
                     urlName += ")";
                 }
@@ -327,7 +330,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 if(this.peer.urlHash) {
                     url += this.peer.urlHash;
                 }
-                container.find("." + this.peer.className("togetherjs-person-url-")).attr("href", url);
+                container.find("." + this.peer.className("togetherjs-person-url-")).attr("href", url!); // TODO !
                 // FIXME: should have richer status:
                 container.find("." + this.peer.className("togetherjs-person-status-")).text(this.peer.idle == "active" ? "Active" : "Inactive");
                 if(this.peer.isSelf) {
@@ -336,7 +339,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     selfName.each((function(this: PeerView, index: number, elem: Element) {
                         const el = $(elem);
                         if(el.val() != this.peer.name) {
-                            el.val(this.peer.name);
+                            el.val(this.peer.name!); // TODO !
                         }
                     }).bind(this));
                     $("#togetherjs-menu-avatar").attr("src", this.peer.avatar);
@@ -387,8 +390,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             var sameUrl = url == session.currentUrl();
             this.ui.chat.urlChange({
                 peer: this.peer,
-                url: this.peer.url,
-                title: this.peer.title,
+                url: this.peer.url!, // TODO !
+                title: this.peer.title!, // TODO !
                 sameUrl: sameUrl
             });
         }
@@ -450,12 +453,12 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var followId = this.peer.className("togetherjs-person-status-follow-");
                 this.detailElement.find('[for="togetherjs-person-status-follow"]').attr("for", followId);
                 this.detailElement.find('#togetherjs-person-status-follow').attr("id", followId);
-                this.detailElement.find(".togetherjs-follow").click(function() {
+                this.detailElement.find(".togetherjs-follow").click(function(this: JQuery) {
                     location.href = $(this).attr("href");
                 });
-                this.detailElement.find(".togetherjs-nudge").click((function() {
+                this.detailElement.find(".togetherjs-nudge").click(() => {
                     this.peer.nudge();
-                }).bind(this));
+                });
                 this.followCheckbox = this.detailElement.find("#" + followId);
                 this.followCheckbox.change(function() {
                     if(!this.checked) {
@@ -467,11 +470,11 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
                 session.on("hide-window", this.maybeHideDetailWindow);
                 this.ui.container.append(this.detailElement);
-                this.dockElement.click((function() {
-                    if(this.detailElement.is(":visible")) {
-                        windowing.hide(this.detailElement);
+                this.dockElement.click(() => {
+                    if(this.detailElement!.is(":visible")) { // TODO ! detailElement is probably set when we click on the dock, we should find a way to signify that more clearly
+                        windowing.hide(this.detailElement!); // TODO !
                     } else {
-                        windowing.show(this.detailElement, { bind: this.dockElement });
+                        windowing.show(this.detailElement!, { bind: this.dockElement ?? undefined }); // TODO !
                         this.scrollTo();
                         this.cursor().element.animate({
                             opacity: 0.3
@@ -483,7 +486,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                             opacity: 1
                         });
                     }
-                }).bind(this));
+                });
                 this.updateFollow();
             })();
         }
@@ -492,10 +495,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             if(!this.dockElement) {
                 return;
             }
-            this.dockElement.animateDockExit().promise().then(() => {
-                this.dockElement.remove();
+            this.dockElement.animateDockExit().promise().then(() => { // TODO I don't know where this ".promise()" call comes from
+                this.dockElement!.remove(); // TODO !
                 this.dockElement = null;
-                this.detailElement.remove();
+                this.detailElement!.remove(); // TODO !
                 this.detailElement = null;
                 adjustDockSize(-1);
             });
@@ -510,8 +513,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 console.warn("Peer has no scroll position:", this.peer);
                 return;
             }
-            pos = elementFinder.pixelForPosition(pos);
-            $("html, body").easeTo(pos);
+            $("html, body").easeTo(elementFinder.pixelForPosition(pos));
         }
 
         updateFollow() {
@@ -532,9 +534,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             }
         }
 
-        maybeHideDetailWindow(windows) {
+        maybeHideDetailWindow(windows: JQuery[]) {
             if(this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
-                if(this.followCheckbox[0].checked) {
+                if(this.followCheckbox && (this.followCheckbox[0] as HTMLInputElement).checked) {
                     this.peer.follow();
                 } else {
                     this.peer.unfollow();
@@ -557,7 +559,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     }
 
     class Ui {
-        public container: JQuery | null = null;
+        public container!: JQuery; // TODO !
         public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
@@ -808,20 +810,20 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
                 //for iphone
                 if($(window).width() < 480) {
-                    $('.togetherjs-dock-right').animate({
-                        width: "204px"
-                    }, {
-                        duration: 60, easing: "linear"
-                    });
+                    $('.togetherjs-dock-right').animate(
+                        { width: "204px" },
+                        { duration: 60, easing: "linear" },
+                        // "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
+                    );
                 }
 
                 //for ipad
                 else {
-                    $('.togetherjs-dock-right').animate({
-                        width: "27%"
-                    }, {
-                        duration: 60, easing: "linear"
-                    });
+                    $('.togetherjs-dock-right').animate(
+                        { width: "27%" },
+                        { duration: 60, easing: "linear" },
+                        // "linear" // TODO see above
+                    );
                 }
 
 
@@ -852,20 +854,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var src = "/togetherjs/images/togetherjs-logo-open.png";
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
-                $('.togetherjs-window').animate({
-                    opacity: 0
-                });
-                $('#togetherjs-dock-participants').animate({
-                    opacity: 0
-                });
-                $('#togetherjs-dock #togetherjs-buttons').animate({
-                    opacity: 0
-                });
-                $('.togetherjs-dock-right').animate({
-                    width: "40px"
-                }, {
-                    duration: 60, easing: "linear"
-                });
+                $('.togetherjs-window').animate({ opacity: 0 });
+                $('#togetherjs-dock-participants').animate({ opacity: 0 });
+                $('#togetherjs-dock #togetherjs-buttons').animate({ opacity: 0 });
+                $('.togetherjs-dock-right').animate(
+                    { width: "40px" },
+                    { duration: 60, easing: "linear" },
+                    // "linear" // TODO see above
+                );
 
                 // remove bg overlay
                 //$(".overlay").remove();
@@ -930,7 +926,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function() {
                 windowing.hide();
                 hideMenu();
-                require(["walkthrough"], function(walkthrough) {
+                require(["walkthrough"], function(walkthrough: TogetherJSNS.Walkthrough) {
                     windowing.hide();
                     walkthrough.start(false);
                 });
@@ -1052,7 +1048,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 $(item).append(button);
             });
 
-            $("#togetherjs-avatar-done").click(function() {
+            $("#togetherjs-avatar-done").click(() => {
                 this.displayToggle("#togetherjs-no-avatar-edit");
             });
 
@@ -1106,9 +1102,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         } // End ui.activateUI()
 
-        activateAvatarEdit(container, options) {
-            options = options || {};
-            var pendingImage = null;
+        activateAvatarEdit(container: JQuery, options: {onSave?: () => void} = {}) {
+            var pendingImage: string | null = null;
 
             container.find(".togetherjs-avatar-save").prop("disabled", true);
 
@@ -1124,6 +1119,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
             container.find(".togetherjs-upload-avatar").on("change", function(this: File) {
                 util.readFileImage(this).then(function(url) {
+                    if(!url) { return }
                     sizeDownImage(url).then(function(smallUrl) {
                         pendingImage = smallUrl;
                         container.find(".togetherjs-avatar-preview").css({
@@ -1226,7 +1222,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     }
 
     function sizeDownImage(imageUrl: string) {
-        return util.Deferred(function(def) {
+        return util.Deferred<string>(function(def) {
             let canvas = document.createElement("canvas");
             canvas.height = session.AVATAR_SIZE;
             canvas.width = session.AVATAR_SIZE;
@@ -1273,7 +1269,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         var el = $("#togetherjs-menu:visible");
         if(el.length) {
             var bound = $("#togetherjs-profile-button");
-            var boundOffset = bound.offset();
+            var boundOffset = bound.offset()!; // TODO !
             el.css({
                 top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
                 left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
@@ -1285,7 +1281,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         var picker = $("#togetherjs-pick-color:visible");
         if(picker.length) {
             var menu = $("#togetherjs-menu-update-color");
-            var menuOffset = menu.offset();
+            var menuOffset = menu.offset()!; // TODO !
             picker.css({
                 top: menuOffset.top + menu.height(),
                 left: menuOffset.left
@@ -1395,7 +1391,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
     });
 
-    session.on("display-window", function(id, win) {
+    session.on("display-window", function(id, _win) {
         if(id == "togetherjs-chat") {
             ui.chat.scroll();
             windowing.hide("#togetherjs-chat-notifier");
@@ -1428,30 +1424,31 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         inRefresh = true;
         require(["who"], function(who: TogetherJSNS.Who) {
             var def = who.getList(inviteHubUrl());
-            function addUser(user, before) {
+            function addUser(user: TogetherJSNS.AnyPeer, before?: JQuery) {
                 var item = templating.sub("invite-user-item", { peer: user });
                 item.attr("data-clientid", user.id);
                 if(before) {
                     item.insertBefore(before);
-                } else {
+                }
+                else {
                     $("#togetherjs-invite-users").append(item);
                 }
                 item.click(function() {
                     invite(user.clientId);
                 });
             }
-            function refresh(users, finished) {
-                var sorted = [];
+            function refresh(users: { [user: string]: TogetherJSNS.ExternalPeer }, finished: boolean) {
+                var sorted: TogetherJSNS.ExternalPeer[] = [];
                 for(var id in users) {
                     if(users.hasOwnProperty(id)) {
                         sorted.push(users[id]);
                     }
                 }
                 sorted.sort(function(a, b) {
-                    return a.name < b.name ? -1 : 1;
+                    return (a.name || "") < (b.name || "") ? -1 : 1;
                 });
                 var pos = 0;
-                ui.container.find("#togetherjs-invite-users .togetherjs-menu-item").each(function() {
+                ui.container.find("#togetherjs-invite-users .togetherjs-menu-item").each(function(this: HTMLElement) {
                     var $this = $(this);
                     if(finished && !users[$this.attr("data-clientid")]) {
                         $this.remove();
@@ -1473,6 +1470,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             }
             def.then(function(users) {
+                if(users === undefined) {
+                    console.error("users was", users);
+                    return;
+                }
                 refresh(users, true);
                 inRefresh = false;
             });
@@ -1490,8 +1491,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         });
     });
 
-    function invite(clientId) {
-        require(["who"], function(who) {
+    function invite(clientId: string) {
+        require(["who"], function(who: TogetherJSNS.Who) {
             // FIXME: use the return value of this to give a signal that
             // the invite has been successfully sent:
             who.invite(inviteHubUrl(), clientId).then(function() {

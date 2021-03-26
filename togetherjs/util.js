@@ -110,8 +110,7 @@ var Util = /** @class */ (function () {
         return btoa(binary);
     };
     Util.prototype.truncateCommonDomain = function (url, base) {
-        /* Remove the scheme and domain from url, if it matches the scheme and domain
-           of base */
+        /* Remove the scheme and domain from url, if it matches the scheme and domain of base */
         if (!base) {
             return url;
         }

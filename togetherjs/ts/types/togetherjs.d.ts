@@ -77,7 +77,7 @@ declare namespace TogetherJSNS {
 
         /** "chat-message" */
         interface ChatMessage {
-            peer: TogetherJSNS.PeerClass,
+            peer: AnyPeer,
             content: string,
             date: number
         }
@@ -112,7 +112,7 @@ declare namespace TogetherJSNS {
 
         /** "invite" */
         interface Invite {
-            peer: TogetherJSNS.PeerClass,
+            peer: AnyPeer,
             date: number,
             href: string,
             hrefTitle: string,

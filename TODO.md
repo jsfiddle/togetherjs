@@ -34,6 +34,8 @@
 - there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 - replace all "} else"
 
+- Find the logic for PeerSelf, PeerClass, ExternalPeer
+
 # Message Architecture
 
 Send methods:
