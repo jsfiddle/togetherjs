@@ -114,9 +114,9 @@ class OnClass {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach(function(this: OnClass, n) {
+            names.forEach((n) => {
                 this.on(n, callback);
-            }, this);
+            });
             return;
         }
         if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {

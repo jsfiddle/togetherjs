@@ -647,7 +647,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
         var value;
         if(msg.replace) {
-            let history: SimpleHistory = el.data("togetherjsHistory");
+            let history: TogetherJSNS.SimpleHistory = el.data("togetherjsHistory");
             if(!history) {
                 console.warn("form update received for uninitialized form element");
                 return;

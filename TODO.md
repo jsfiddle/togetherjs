@@ -42,9 +42,16 @@ Send methods:
 - channel.send
 
 Receiving methods:
+- .on(
+- .once(
+- .emit(
 - session.hub.on
 - peers.updateFromHello
 - channel.onmessage
+- channel.on
+- session.on
+- peers.on
+- TogetherJS.once
 
 Other methods:
 - session.makeHelloMessage

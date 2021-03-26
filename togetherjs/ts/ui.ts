@@ -687,7 +687,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
             // The share link:
             this.prepareShareLink(container);
-            container.find("input.togetherjs-share-link").on("keydown", function(event: KeyboardEvent) {
+            container.find("input.togetherjs-share-link").on("keydown", function(event: JQueryEventObject) {
                 if(event.which == 27) {
                     windowing.hide("#togetherjs-share");
                     return false;
@@ -1122,7 +1122,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             });
 
-            container.find(".togetherjs-upload-avatar").on("change", function() {
+            container.find(".togetherjs-upload-avatar").on("change", function(this: File) {
                 util.readFileImage(this).then(function(url) {
                     sizeDownImage(url).then(function(smallUrl) {
                         pendingImage = smallUrl;

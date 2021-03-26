@@ -528,6 +528,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     type: "answer",
                     sdp: answerReceived
                 }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
+            //).then(
                 function() {
                     answerDescription = true;
                     // FIXME: I don't think this connect is ever needed?

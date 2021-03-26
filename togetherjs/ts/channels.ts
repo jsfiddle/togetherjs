@@ -38,13 +38,6 @@ type Origin = string;
 
 type WindowLike = HTMLIFrameElement | WindowProxy | Window;
 
-interface MessageFromChannel {
-    message: TogetherJSNS.Message;
-    routeId: string;
-    type: string;
-    close: boolean;
-}
-
 function channelsMain(util: Util) {
     /* Subclasses must define:
 	
@@ -445,7 +438,7 @@ function channelsMain(util: Util) {
             this.channel.on("close", this._channelClosed.bind(this));
         }
 
-        _channelMessage(msg: MessageFromChannel) {
+        _channelMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
             if(msg.type == "route") {
                 var id = msg.routeId;
                 var route = this._routes[id];

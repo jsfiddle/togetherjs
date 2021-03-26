@@ -245,7 +245,7 @@ class Util {
     }
 
     public readFileImage(file: File) {
-        return this.Deferred(function(def: JQueryDeferred<unknown>) {
+        return this.Deferred(function(def: JQueryDeferred<string>) {
             let reader = new FileReader();
             reader.onload = function() {
                 if(this.result) {

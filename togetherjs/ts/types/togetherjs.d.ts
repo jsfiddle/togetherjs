@@ -286,7 +286,8 @@ declare namespace TogetherJSNS {
         interface Route {
             type: "route",
             routeId: string,
-            message: TogetherJSNS.Message
+            message: TogetherJSNS.Message,
+            close: boolean
         }
 
         interface Who {
@@ -368,7 +369,7 @@ declare namespace TogetherJSNS {
 
         // channel.on
         /** msg can be of type string if rawData is activated but we don't put it here */
-        "message": (msg: ValueOf<AnyMessage.Map>) => void;
+        "message": (msg: ValueOf<AnyMessage.MapForReceiving>) => void;
 
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
@@ -578,6 +579,7 @@ declare namespace TogetherJSNS {
     type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
     type TextReplace = ReturnType<typeof otMain>["TextReplaceExport"];
     type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
+    type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
 
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */

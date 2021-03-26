@@ -800,6 +800,7 @@ function otMain(util: Util) {
         //History: () => new TJSHistory(), // TODO does not seem to be used
         TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
         TextReplaceExport: new TextReplace(0, 0, ""), // TODO ugly export
+        SimpleHistoryExport: new SimpleHistory("", "", 0),
     }
 
     return ot;
