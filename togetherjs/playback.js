@@ -144,7 +144,8 @@ function playbackMain($, _util, session, storage, require) {
         Playback.prototype.getLogs = function (url) {
             if (url.search(/^local:/) === 0) {
                 return $.Deferred(function (def) {
-                    storage.get("recording." + url.substr("local:".length)).then(function (logs) {
+                    var name = url.substr("local:".length);
+                    storage.get("recording." + name).then(function (logs) {
                         if (!logs) {
                             def.resolve(null);
                             return;

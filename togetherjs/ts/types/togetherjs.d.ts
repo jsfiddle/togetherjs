@@ -1,5 +1,4 @@
 declare namespace TogetherJSNS {
-
     /** Types for storage.get */
     namespace StorageGet {
         interface MapRaw {
@@ -18,7 +17,11 @@ declare namespace TogetherJSNS {
             [P in keyof Settings & string as `settings.${P}`]: Settings[P]
         }
 
-        type Map = MapRaw & MapForSettings;
+        type MapForRecording = {
+            [P in string as `recording.${P}`]: Logs
+        };
+
+        type Map = MapRaw & MapForSettings & MapForRecording;
 
         interface Settings {
             name: string,

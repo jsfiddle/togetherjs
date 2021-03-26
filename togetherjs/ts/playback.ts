@@ -158,7 +158,8 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
         getLogs(url: string) {
             if(url.search(/^local:/) === 0) {
                 return $.Deferred<Logs>(function(def) {
-                    storage.get<string>("recording." + url.substr("local:".length)).then(function(logs) {
+                    const name = url.substr("local:".length);
+                    storage.get(`recording.${name}` as const).then(function(logs) {
                         if(!logs) {
                             def.resolve(null);
                             return;

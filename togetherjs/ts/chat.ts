@@ -243,7 +243,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             });
             function save(msg: { request: { forClient: string | undefined, saveAs: string }, logs: TogetherJSNS.Logs }) {
                 if(msg.request.forClient == session.clientId && msg.request.saveAs == name) {
-                    storage.set("recording." + name, msg.logs).then(function() {
+                    storage.set(`recording.${name}` as const, msg.logs).then(function() {
                         session.hub.off("logs", save);
                         ui.chat.system({
                             text: "Saved as local:" + name
