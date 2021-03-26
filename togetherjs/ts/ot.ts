@@ -181,14 +181,14 @@ function otMain(util: Util) {
             return change.clientId == this.clientId || (this.known[change.clientId] && this.known[change.clientId] >= change.version);
         }
 
-        knowsAboutVersion(version: number, clientId: string) {
+        knowsAboutVersion(version: number | undefined, clientId: string) {
             if((!version) || clientId == this.clientId) {
                 return true;
             }
             return this.known[clientId] && this.known[clientId] >= version;
         }
 
-        maybeMissingChanges(mostRecentVersion: number, clientId: string) {
+        maybeMissingChanges(mostRecentVersion: number | undefined, clientId: string) {
             if(!mostRecentVersion) {
                 // No actual changes for clientId exist
                 return false;
@@ -572,7 +572,7 @@ function otMain(util: Util) {
         private _history = new Queue<StateForClientId | Change>();
         /** version number for known clients */
         private known: { [clientId: string]: number } = {};
-        private mostRecentLocalChange?: number;
+        private mostRecentLocalChange: number = -1; // TODO check, considering how mostRecentLocalChange is used (in a max function) using -1 seems like a good value
         private clientId: string;
 
         constructor(clientId: string, initState: Change) {
@@ -624,7 +624,7 @@ function otMain(util: Util) {
                 clientsToCheck.add(this.clientId);
             }
             if(!clientsToCheck.isEmpty()) {
-                let indexToCheckFrom: number | null = null;
+                let indexToCheckFrom: number = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
                 this._history.walkBack(function(c: Change | StateForClientId, index) {
                     indexToCheckFrom = index;
                     if("init" in c && c.clientId == "init") {
@@ -675,7 +675,7 @@ function otMain(util: Util) {
 
             // Now we fix up any forward changes
             var fixupDelta = change.delta;
-            this._history.walkForward(indexToInsert + 1, function(c, index) {
+            this._history.walkForward(indexToInsert + 1, function(c, _index) {
                 if(!("init" in c) && !c.knowsAboutChange(change)) {
                     var origChange = c.clone();
                     this.logChange("^^fix", c, function() {
@@ -699,7 +699,7 @@ function otMain(util: Util) {
         }
 
         promoteDelta(delta: TogetherJSNS.TextReplace, deltaIndex: number, untilChange: Change) {
-            this._history.walkForward(deltaIndex + 1, function(c, index) {
+            this._history.walkForward(deltaIndex + 1, function(c) {
                 if(!("init" in c)) {
                     if(untilChange.isBefore(c)) {
                         return false;
@@ -719,7 +719,7 @@ function otMain(util: Util) {
             var postfix = Array.prototype.slice.call(arguments, 1);
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
-            let hstate: Change;
+            let hstate: Change | string;
             this._history.walkForward(0, function(c, index) {
                 if("init" in c) { // index == 0
                     assert(c.clientId == "init");
@@ -728,7 +728,7 @@ function otMain(util: Util) {
                 }
                 else {
                     try {
-                        hstate = c.delta.apply(hstate);
+                        hstate = c.delta.apply(hstate); // TODO really don't know what the type of hstate is supposed to be
                     }
                     catch(e) {
                         hstate = "Error: " + e;
@@ -767,6 +767,7 @@ function otMain(util: Util) {
             return max + 1;
         }
 
+        // TODO seems to be unused
         fault(change: Change) {
             throw new Error('Fault');
         }
@@ -774,7 +775,7 @@ function otMain(util: Util) {
         getState() {
             let state: Change;
             this._history.walkForward(0, function(c) {
-                if("init" in c && c.clientId == "init") {
+                if("init" in c && c.clientId == "init") { // TODO the same kin of logic than in logHistory, there must be some sense to it...
                     // Initialization, has the state
                     state = c.state;
                 }

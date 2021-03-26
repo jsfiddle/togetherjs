@@ -530,6 +530,7 @@ function otMain(util) {
             this._history = new Queue();
             /** version number for known clients */
             this.known = {};
+            this.mostRecentLocalChange = -1; // TODO check, considering how mostRecentLocalChange is used (in a max function) using -1 seems like a good value
             this._history.push({
                 init: true,
                 clientId: "init",
@@ -573,7 +574,7 @@ function otMain(util) {
                 clientsToCheck.add(this.clientId);
             }
             if (!clientsToCheck.isEmpty()) {
-                var indexToCheckFrom_1 = null;
+                var indexToCheckFrom_1 = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
                 this._history.walkBack(function (c, index) {
                     indexToCheckFrom_1 = index;
                     if ("init" in c && c.clientId == "init") {
@@ -622,7 +623,7 @@ function otMain(util) {
             this._history.insert(indexToInsert, change);
             // Now we fix up any forward changes
             var fixupDelta = change.delta;
-            this._history.walkForward(indexToInsert + 1, function (c, index) {
+            this._history.walkForward(indexToInsert + 1, function (c, _index) {
                 if (!("init" in c) && !c.knowsAboutChange(change)) {
                     var origChange = c.clone();
                     this.logChange("^^fix", c, function () {
@@ -643,7 +644,7 @@ function otMain(util) {
             return fixupDelta;
         };
         TJSHistory.prototype.promoteDelta = function (delta, deltaIndex, untilChange) {
-            this._history.walkForward(deltaIndex + 1, function (c, index) {
+            this._history.walkForward(deltaIndex + 1, function (c) {
                 if (!("init" in c)) {
                     if (untilChange.isBefore(c)) {
                         return false;
@@ -672,7 +673,7 @@ function otMain(util) {
                 }
                 else {
                     try {
-                        hstate = c.delta.apply(hstate);
+                        hstate = c.delta.apply(hstate); // TODO really don't know what the type of hstate is supposed to be
                     }
                     catch (e) {
                         hstate = "Error: " + e;
@@ -710,13 +711,14 @@ function otMain(util) {
             max = Math.max(max, this.mostRecentLocalChange);
             return max + 1;
         };
+        // TODO seems to be unused
         TJSHistory.prototype.fault = function (change) {
             throw new Error('Fault');
         };
         TJSHistory.prototype.getState = function () {
             var state;
             this._history.walkForward(0, function (c) {
-                if ("init" in c && c.clientId == "init") {
+                if ("init" in c && c.clientId == "init") { // TODO the same kin of logic than in logHistory, there must be some sense to it...
                     // Initialization, has the state
                     state = c.state;
                 }
