@@ -61,7 +61,7 @@
 		"noErrorTruncation": true,
 		"typeRoots": [
 			"./node_modules/@types",
-			"./togetherjs/types/"
+			"./togetherjs/ts/types/"
 		],
 		"outDir": "togetherjs/",
 	},
