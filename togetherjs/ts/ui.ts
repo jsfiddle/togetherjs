@@ -1218,7 +1218,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 func.apply(this, arguments);
             }
             var self = this;
-            var args = Array.prototype.slice.call(arguments);
+            var args = Array.prototype.slice.call(arguments) as A; // TODO use args
             session.once("ui-ready", function() {
                 func.apply(self, args);
             });

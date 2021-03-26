@@ -5,6 +5,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 let globalTjs;
 
+// TODO remove that
 function compatibilityFix(TogetherJS: any, tjsInstance: TogetherJSNS.TogetherJSClass) {
     TogetherJS._mixinEvents = function(proto) {
         proto.on = function on(name, callback) {
