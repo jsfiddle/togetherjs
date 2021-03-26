@@ -719,7 +719,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var el = $(this);
             const el0 = el[0];
             var value = getValue(el0);
-            var upd: TogetherJSNS.FormInitMessage["updates"][0] = {
+            var upd: MessageForEditor = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
