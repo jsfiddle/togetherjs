@@ -25,7 +25,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         /** This is the hub we connect to: */
         public shareId: string | null = null;
         /** This is the ID that identifies this client: */
-        public clientId: string | null = null;
+        public clientId!: string; // TODO !
         public readonly router = channels.Router();
         /** Indicates if TogetherJS has just started (not continuing from a saved session): */
         public firstRun = false;

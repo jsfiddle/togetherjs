@@ -35,8 +35,6 @@ function sessionMain(require, util, channels, $, storage) {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             /** This is the hub we connect to: */
             _this.shareId = null;
-            /** This is the ID that identifies this client: */
-            _this.clientId = null;
             _this.router = channels.Router();
             /** Indicates if TogetherJS has just started (not continuing from a saved session): */
             _this.firstRun = false;

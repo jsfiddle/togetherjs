@@ -5,6 +5,13 @@
 declare var CKEDITOR: TogetherJSNS.CKEditor | undefined;
 declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
+interface MessageForEditor {
+    element: HTMLElement | string;
+    tracker: string;
+    value: string;
+    basis?: number;
+}
+
 function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
     // TODO this is apparently an empty module object
     const assert: typeof util.assert = util.assert;
@@ -39,7 +46,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     function change(event: Event) {
         sendData({
             element: event.target as HTMLElement,
-            value: getValue(event.target as HTMLElement) // TODO check that this .toString() does not cause any problem
+            value: getValue(event.target as HTMLElement) // TODO I tried to put toString here but it makes some tests fail so I don't really know what type value is supposed to be...
         });
     }
 
@@ -84,7 +91,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             else {
                 msg.value = value; // TODO these 2 fields don't seem to be used anywhere
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO ! on clientId
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
         }
         else {
@@ -109,6 +116,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
+        /*
         "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
             //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
         });
@@ -116,19 +124,12 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         "scan tracked".split(/ /).forEach(function(m) {
             //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
         });
+        */
         editTrackers[TrackerClass.trackerName] = TrackerClass;
         if(!skipSetInit) {
             setInit();
         }
     };
-
-
-    interface MessageForEditor {
-        element: HTMLElement | string;
-        tracker: string;
-        value: string;
-        basis?: number;
-    }
 
     abstract class Editor<T = HTMLElement> {
         constructor(public trackerName: string, protected element: T) { }
@@ -454,7 +455,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             var result: JQuery[] = [];
-            $(window.tinymce.editors).each(function(i, ed) {
+            $(window.tinymce.editors).each(function(_i, ed) {
                 result.push($('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
                 $('#' + ed.id).data("tinyEditor", ed);
@@ -597,7 +598,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     }
 
     /** Send the top of this history queue, if it hasn't been already sent. */
-    function maybeSendUpdate(element: string, history: SimpleHistory, tracker?: string) {
+    function maybeSendUpdate(element: string, history: TogetherJSNS.SimpleHistory, tracker?: string) {
         var change = history.getNextToSend();
         if(!change) {
             /* nothing to send */
@@ -645,7 +646,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             //assert(el0.selectionEnd);
             selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
-        var value;
+        let value: string;
         if(msg.replace) {
             let history: TogetherJSNS.SimpleHistory = el.data("togetherjsHistory");
             if(!history) {
@@ -721,7 +722,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var upd: TogetherJSNS.FormInitMessage["updates"][0] = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value // TODO check that this .toString() does not cause bug
+                value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
             };
             if(isText(el0)) {
                 var history = el.data("togetherjsHistory");
@@ -839,8 +840,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     }
 
-    function blur(event: Event) {
-        var target = event.target;
+    function blur(_event: Event) {
         if(lastFocus) {
             lastFocus = null;
             session.send({ type: "form-focus", element: null });

@@ -457,6 +457,7 @@ function togetherjsMain() {
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             _this._configTrackers = {};
             _this._configClosed = {};
+            _this.editTrackers = {};
             _this._knownEvents = ["ready", "close"];
             _this.config = createConfigFunObj(_this.configObject);
             _this.startup.button = null;

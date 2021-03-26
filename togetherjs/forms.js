@@ -46,7 +46,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function change(event) {
         sendData({
             element: event.target,
-            value: getValue(event.target) // TODO check that this .toString() does not cause any problem
+            value: getValue(event.target) // TODO I tried to put toString here but it makes some tests fail so I don't really know what type value is supposed to be...
         });
     }
     function sendData(attrs) {
@@ -82,7 +82,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             else {
                 msg.value = value; // TODO these 2 fields don't seem to be used anywhere
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO ! on clientId
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
         }
         else {
@@ -104,13 +104,15 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
-        "destroy update init makeInit tracked".split(/ /).forEach(function (m) {
+        /*
+        "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
             //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
         });
         // Test for required class methods.
-        "scan tracked".split(/ /).forEach(function (m) {
+        "scan tracked".split(/ /).forEach(function(m) {
             //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
         });
+        */
         editTrackers[TrackerClass.trackerName] = TrackerClass;
         if (!skipSetInit) {
             setInit();
@@ -391,7 +393,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             var result = [];
-            $(window.tinymce.editors).each(function (i, ed) {
+            $(window.tinymce.editors).each(function (_i, ed) {
                 result.push($('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
                 $('#' + ed.id).data("tinyEditor", ed);
@@ -638,7 +640,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var upd = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value // TODO check that this .toString() does not cause bug
+                value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
             };
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
@@ -750,8 +752,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             session.send({ type: "form-focus", element: elementFinder.elementLocation(target) });
         }
     }
-    function blur(event) {
-        var target = event.target;
+    function blur(_event) {
         if (lastFocus) {
             lastFocus = null;
             session.send({ type: "form-focus", element: null });

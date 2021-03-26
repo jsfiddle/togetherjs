@@ -774,25 +774,18 @@ declare namespace TogetherJSNS {
     }
 
     interface FormInitMessage {
-        sameUrl: boolean | undefined;
         type: "form-init";
         pageAge: number;
-        updates: {
-            element: string;
-            tracker?: string; // TODO this field does not seem to be used
-            value: string;
-            basis?: number;
-        }[]
+        updates: MessageForEditor[]
     }
 
     interface FormUpdateMessage {
         type: "form-update";
-        sameUrl?: boolean;
         /** a selector */
         element: string;
-        "server-echo": boolean;
+        "server-echo"?: boolean;
         tracker?: string;
-        replace: {
+        replace?: {
             id: string;
             basis: number;
             delta: TextReplaceStruct;

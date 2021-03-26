@@ -451,7 +451,7 @@ function togetherjsMain() {
         public requireConfig: RequireConfig;
         private _loaded: boolean;
         private _requireObject: Require;
-        private pageLoaded: number = Date.now();
+        public pageLoaded: number = Date.now();
         private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
         public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
         public _configuration: Partial<TogetherJSNS.Config> = {};
@@ -461,6 +461,7 @@ function togetherjsMain() {
         public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
         private version: string;
         public baseUrl: string;
+        public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
 
         constructor() {
             super();
@@ -806,6 +807,9 @@ function togetherjsMain() {
                 }
             };
         }
+
+        // TODO put the function here maybe? So far it's too integrated with the form.js logic to be possible
+        public addTracker: (TrackerClass: TogetherJSNS.TrackerClass, skipSetInit: boolean) => void;
     }
 
     function baseUrl1Inner() {
