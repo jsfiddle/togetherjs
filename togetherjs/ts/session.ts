@@ -77,7 +77,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             }
         }
 
-        send<K extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[K]) {
+        send<K extends keyof TogetherJSNS.AnyMessage.MapForSending>(msg: TogetherJSNS.AnyMessage.MapForSending[K]) {
             if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
@@ -87,7 +87,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         }
 
         // TODO this function appears to never been used, and it does weird things
-        appSend<T extends keyof TogetherJSNS.SessionSend.Map>(msg: TogetherJSNS.SessionSend.Map[T]) {
+        appSend<T extends keyof TogetherJSNS.AnyMessage.MapForSending>(msg: TogetherJSNS.AnyMessage.MapForSending[T]) {
             let type = msg.type;
             if(type.search(/^togetherjs\./) === 0) {
                 type = type.substr("togetherjs.".length);
@@ -99,9 +99,9 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             session.send(msg);
         }
 
-        makeHelloMessage(helloBack: true): TogetherJSNS.On.HelloBackMessage;
-        makeHelloMessage(helloBack: false): TogetherJSNS.On.HelloMessage;
-        makeHelloMessage(helloBack: boolean): TogetherJSNS.On.HelloBackMessage | TogetherJSNS.On.HelloMessage;
+        makeHelloMessage(helloBack: true): TogetherJSNS.AnyMessage.MapForSending["hello-back"];
+        makeHelloMessage(helloBack: false): TogetherJSNS.AnyMessage.MapForSending["hello"];
+        makeHelloMessage(helloBack: boolean): TogetherJSNS.AnyMessage.MapForSending["hello-back"] | TogetherJSNS.AnyMessage.MapForSending["hello"];
         makeHelloMessage(helloBack: boolean) {
             let starting: boolean = false;
             if(!TogetherJS.startup.continued) {

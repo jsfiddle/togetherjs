@@ -377,8 +377,8 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     session.send({
                         type: "rtc-ice-candidate",
                         candidate: {
-                            sdpMLineIndex: event.candidate.sdpMLineIndex,
-                            sdpMid: event.candidate.sdpMid,
+                            sdpMLineIndex: event.candidate.sdpMLineIndex!, // TODO !
+                            sdpMid: event.candidate.sdpMid!, // TODO !
                             candidate: event.candidate.candidate
                         }
                     });
@@ -421,10 +421,11 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     offer.sdp = ensureCryptoLine(offer.sdp);
                     connection.setLocalDescription(
                         offer,
+                    //).then( // TODO toggle to switch to promise mode (the new api)
                         function() { // TODO this returns a promise so the 2 callbacks should probably be used in a .then(), see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer
                             session.send({
                                 type: "rtc-offer",
-                                offer: offer.sdp
+                                offer: offer.sdp! // TODO !
                             });
                             offerSent = offer;
                             audioButton("#togetherjs-audio-outgoing");
@@ -449,7 +450,8 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     answer.sdp = ensureCryptoLine(answer.sdp);
                     clearTimeout(timeout);
                     connection.setLocalDescription(
-                        answer, 
+                        answer,
+                    //).then(
                         function() { // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
                             session.send({
                                 type: "rtc-answer",

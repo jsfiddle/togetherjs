@@ -11,7 +11,7 @@ interface PeerClassAttributes {
     avatar: string | null;
     color: string;
     following: boolean;
-    fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>;
+    fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.Map>;
     fromStorage?: boolean;
     id: string;
     identityId: string;
@@ -174,7 +174,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             this.lastMessageDate = Date.now();
         }
 
-        updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>) {
+        updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForSending>) {
             var urlUpdated = false;
             var activeRTC = false;
             var identityUpdated = false;

@@ -192,7 +192,7 @@ declare namespace TogetherJSNS {
             type: "rtc-ice-candidate",
             candidate: {
                 sdpMLineIndex: number,
-                sdpMid: number,
+                sdpMid: string,
                 candidate: string
             }
         }
@@ -368,7 +368,7 @@ declare namespace TogetherJSNS {
 
         // channel.on
         /** msg can be of type string if rawData is activated but we don't put it here */
-        "message": (msg: MessageFromChannel) => void;
+        "message": (msg: ValueOf<AnyMessage.Map>) => void;
 
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
@@ -429,6 +429,123 @@ declare namespace TogetherJSNS {
         "identity-updated": (peer: PeerClass) => void;
         "self-updated": () => void;
         "startup-ready": () => void;
+    }
+
+    namespace AnyMessage {
+        /** While a message in in the send process or in the receiving process some fields will be set, they can be undefined for a short time */
+        interface InTransit {
+            sameUrl?: boolean,
+            peer?: AnyPeer,
+            clientId?: string
+        }
+
+        /** After a message has been sent some field must have been set */
+        type AfterTransit = {
+            [P in keyof InTransit]-?: InTransit[P]
+        }
+
+        /** @deprecated */
+        interface Map {
+            // ChannelOnMessage
+            "hello": { type: "hello", peer: PeerClass };
+            "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
+            "get-logs": TogetherJSNS.SessionSend.GetLogs;
+            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
+            "init-connection": { type: "init-connection", peerCount: number };
+            "who": { type: "who" };
+            "invite": { type: "invite" };
+
+            //ChannelSend
+            "route": ChannelSend.Route,
+            //"who": Who,
+            //"invite": ChannelSend.Invite,
+            "bye": { type: "bye", clientId: string },
+            "logs": { type: "logs", clientId: string, logs: string, request: SessionSend.GetLogs },
+            //"hello": ChannelSend.Hello,
+            //"hello-back": ChannelSend.HelloBack,
+
+            //SessionSend
+            "chat": SessionSend.Chat,
+            //"get-logs": SessionSend.GetLogs,
+            "cursor-click": SessionSend.CursorClick,
+            "keydown": SessionSend.Keydown,
+            "form-focus": SessionSend.ForFocus,
+            "ping-back": SessionSend.PingBack,
+            //"peer-update": SessionSend.PeerUpdate,
+            "video-something": SessionSend.VideoEventName, // TODO something can be any video event, try to list them with string lits
+            "rtc-ice-candidate": SessionSend.RTCIceCandidate,
+            "rtc-offer": SessionSend.RTCOffer,
+            "rtc-answer": SessionSend.RTCAnswer,
+            "rtc-abort": SessionSend.RTCAbort,
+            "playerStateChange": SessionSend.PlayerStateChange,
+            "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
+            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
+            "idle-status": { type: "idle-status", idle: PeerStatus },
+            //"bye": { type: "bye", reason?: string },
+            //"hello": On.HelloMessage,
+            //"hello-back": On.HelloBackMessage,
+            "cursor-update": On.CursorUpdate,
+            "scroll-update": { type: "scroll-update", position: ElementFinder.Position },
+            "form-update": FormUpdateMessage,
+        }
+
+        interface MapForSending {
+            // ChannelOnMessage
+            //"hello": { type: "hello", peer: PeerClass }; // old version
+            "hello": TogetherJSNS.On.HelloMessage;
+            //"hello-back": { type: "hello-back", peer: PeerClass };
+            "hello-back": TogetherJSNS.On.HelloMessage;
+            "get-logs": TogetherJSNS.SessionSend.GetLogs;
+            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
+            "init-connection": { type: "init-connection", peerCount: number };
+            "who": { type: "who" };
+            "invite": { type: "invite" };
+
+            //ChannelSend
+            "route": ChannelSend.Route,
+            //"who": Who,
+            //"invite": ChannelSend.Invite,
+            "bye": { type: "bye" },
+            "logs": { type: "logs", logs: string, request: SessionSend.GetLogs },
+            //"hello": ChannelSend.Hello,
+            //"hello-back": ChannelSend.HelloBack,
+
+            //SessionSend
+            "chat": SessionSend.Chat,
+            //"get-logs": SessionSend.GetLogs,
+            "cursor-click": SessionSend.CursorClick,
+            "keydown": SessionSend.Keydown,
+            "form-focus": SessionSend.ForFocus,
+            "ping-back": SessionSend.PingBack,
+            //"peer-update": SessionSend.PeerUpdate,
+            "video-something": SessionSend.VideoEventName, // TODO something can be any video event, try to list them with string lits
+            "rtc-ice-candidate": SessionSend.RTCIceCandidate,
+            "rtc-offer": SessionSend.RTCOffer,
+            "rtc-answer": SessionSend.RTCAnswer,
+            "rtc-abort": SessionSend.RTCAbort,
+            "playerStateChange": SessionSend.PlayerStateChange,
+            "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
+            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
+            "idle-status": { type: "idle-status", idle: PeerStatus },
+            //"bye": { type: "bye", reason?: string },
+            //"hello": On.HelloMessage,
+            //"hello-back": On.HelloBackMessage,
+            "cursor-update": On.CursorUpdate,
+            "scroll-update": { type: "scroll-update", position: ElementFinder.Position },
+            "form-update": FormUpdateMessage,
+
+            // other
+            "form-init": FormInitMessage,
+            "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element },
+        }
+
+        type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
+
+        type MapForReceiving = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
+
+        type AnyForSending = ValueOf<MapForSending>;
+        type AnyForTransit = ValueOf<MapForSending> & InTransit;
+        type AnyForReceiving = ValueOf<MapForSending> & AfterTransit;
     }
 
     type Channels = ReturnType<typeof channelsMain>;
@@ -591,7 +708,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: (keyof TogetherJSNS.SessionSend.Map | keyof TogetherJSNS.ChannelOnMessage.Map)[] | true,
+        ignoreMessages: (keyof TogetherJSNS.AnyMessage.MapForSending)[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */

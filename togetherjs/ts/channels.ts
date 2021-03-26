@@ -71,7 +71,7 @@ function channelsMain(util: Util) {
         }
 
         // TODO should only take string, ot not?
-        send<T1 extends keyof TogetherJSNS.SessionSend.Map, T2 extends keyof TogetherJSNS.ChannelSend.Map>(data: TogetherJSNS.SessionSend.Map[T1] | TogetherJSNS.ChannelSend.Map[T2] | string): void {
+        send<K extends keyof TogetherJSNS.AnyMessage.MapForSending>(data: TogetherJSNS.AnyMessage.MapForSending[K] | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
             }
@@ -96,7 +96,7 @@ function channelsMain(util: Util) {
             // TODO the logic of this function has been changed a little, this should be equivalent but a check should be done
             if(!this.rawdata) {
                 try {
-                    const dataAsObject = JSON.parse(data) as TogetherJSNS.ValueOf<TogetherJSNS.SessionSend.Map> | TogetherJSNS.ValueOf<TogetherJSNS.ChannelSend.Map>;
+                    const dataAsObject = JSON.parse(data) as TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>;
                     if(this.onmessage) {
                         this.onmessage(dataAsObject);
                     }
@@ -124,7 +124,7 @@ function channelsMain(util: Util) {
         /** must set this.closed to true */
         abstract close(): void;
 
-        public onmessage?: (jsonData: any) => void;
+        public onmessage?: (jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.AnyForReceiving>) => void;
         abstract onclose(): void;
     }
 
@@ -222,7 +222,7 @@ function channelsMain(util: Util) {
         }
 
         onclose() {}
-        onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.ChannelOnMessage.Map>) => {};
+        onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.AnyForReceiving>) => {};
 
     } // /WebSocketChannel
 

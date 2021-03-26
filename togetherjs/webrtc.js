@@ -376,10 +376,12 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 connection.createOffer(function (offer) {
                     console.log("made offer", offer);
                     offer.sdp = ensureCryptoLine(offer.sdp);
-                    connection.setLocalDescription(offer, function () {
+                    connection.setLocalDescription(offer, 
+                    //).then( // TODO toggle to switch to promise mode (the new api)
+                    function () {
                         session.send({
                             type: "rtc-offer",
-                            offer: offer.sdp
+                            offer: offer.sdp // TODO !
                         });
                         offerSent = offer;
                         audioButton("#togetherjs-audio-outgoing");
@@ -400,7 +402,9 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 connection.createAnswer(function (answer) {
                     answer.sdp = ensureCryptoLine(answer.sdp);
                     clearTimeout(timeout);
-                    connection.setLocalDescription(answer, function () {
+                    connection.setLocalDescription(answer, 
+                    //).then(
+                    function () {
                         session.send({
                             type: "rtc-answer",
                             answer: answer.sdp

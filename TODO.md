@@ -34,6 +34,21 @@
 - there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 - replace all "} else"
 
+# Message Architecture
+
+Send methods:
+- session.send
+- session.appSend
+- channel.send
+
+Receiving methods:
+- session.hub.on
+- peers.updateFromHello
+- channel.onmessage
+
+Other methods:
+- session.makeHelloMessage
+
 # Tests
 
 run `node devserver.js` and go to [http://localhost:8080/togetherjs/tests/]
