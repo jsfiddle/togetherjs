@@ -63,8 +63,7 @@ function StorageMain(util) {
             if (defaultValue === void 0) { defaultValue = null; }
             var self = this;
             return Deferred(function (def) {
-                // Strictly this isn't necessary, but eventually I want to move to something more
-                // async for the storage, and this simulates that much better.
+                // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function () {
                     var prefixedKey = self.prefix + key;
                     var value;

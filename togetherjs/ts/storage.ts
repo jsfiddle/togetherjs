@@ -53,8 +53,7 @@ function StorageMain(util: Util) {
         get<T extends keyof TogetherJSNS.StorageGet.Map>(key: T, defaultValue: TogetherJSNS.StorageGet.Map[T] | null = null) {
             var self = this;
             return Deferred<TogetherJSNS.StorageGet.Map[T]>(function(def) {
-                // Strictly this isn't necessary, but eventually I want to move to something more
-                // async for the storage, and this simulates that much better.
+                // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
                     const prefixedKey = self.prefix + key;
                     let value: TogetherJSNS.StorageGet.Map[T] | null;
@@ -120,7 +119,7 @@ function StorageMain(util: Util) {
         keys(prefix?: string, excludePrefix: boolean = false) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
-            return Deferred<string[]>(function(def) {
+            return Deferred<(keyof TogetherJSNS.StorageGet.Map)[]>(function(def) {
                 setTimeout(util.resolver(def, function() {
                     prefix = prefix || "";
                     let result: string[] = [];

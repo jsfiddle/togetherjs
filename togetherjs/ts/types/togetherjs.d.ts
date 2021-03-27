@@ -18,8 +18,8 @@ declare namespace TogetherJSNS {
         }
 
         type MapForRecording = {
-            [P in string as `recording.${P}`]: Logs
-        };
+            [P in `recording.${string}`]: Logs
+        }
 
         type Map = MapRaw & MapForSettings & MapForRecording;
 
