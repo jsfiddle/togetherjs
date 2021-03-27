@@ -1,0 +1,57 @@
+// RTC Patches
+
+interface Window {
+    /** @deprecated */
+    mozRTCPeerConnection?: mozRTCPeerConnection;
+    /** @deprecated */
+    mozRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    webkitRTCSessionDescription?: typeof RTCSessionDescription;
+    /** @deprecated */
+    mozRTCIceCandidate?: typeof RTCIceCandidate;
+    /** @deprecated */
+    webkitRTCIceCandidate?: typeof RTCIceCandidate;
+}
+
+interface RTCPeerConnection {
+    /** @deprecated */
+    onaddstream: (event: MediaStreamEvent) => void;
+    /** @deprecated */
+    onstatechange: () => void;
+    /** @deprecated */
+    addStream(stream: MediaStream): void;
+    /** @deprecated */
+    addIceCandidate(iceCandidate: RTCIceCandidate): void;
+}
+
+interface HTMLMediaElement {
+    /** @deprecated */
+    mozSrcObject: string | MediaStream;
+}
+
+interface RTCPeerConnection extends EventTarget {
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription */
+    setRemoteDescription(description: RTCSessionDescriptionInit, successCallback: () => void, errorCallback: RTCPeerConnectionErrorCallback): void;
+
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription */
+    setLocalDescription(sessionDescription: RTCSessionDescriptionInit, successCallback: () => void, errorCallback: RTCPeerConnectionErrorCallback): void;
+}
+
+/**
+This interface can't do what it's supposed to do because of the way `webkitRTCPeerConnection` is declared (declare var webkitRTCPeerConnection) in lib.dom.d.ts (typescript v4.2.3) and because var declarations can't be merged (https://www.typescriptlang.org/docs/handbook/declaration-merging.html)
+The only way to remove the error you might get in webrtc.ts is to edit you lib.dom.ts and add the line starting with new below to the var declaration.
+*/
+interface webkitRTCPeerConnection extends RTCPeerConnection {
+    /** @deprecated Not even sure this is a valid constructor, there is some notes about it here https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling */
+    new(configuration: RTCConfiguration, options: { "optional": [{"DtlsSrtpKeyAgreement"?: boolean}] }): webkitRTCPeerConnection;
+}
+
+interface mozRTCPeerConnection extends RTCPeerConnection {
+    /** @deprecated */
+    new(configuration?: RTCConfiguration, options?: { "optional": [] }): mozRTCPeerConnection;
+}
+
+interface RTCIceServer {
+    /** @deprecated should be replaced by urls https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer Since we can't mark the urls field as optional adding this would not remove the type error so we update the "url" field to "urls" in the code */
+    //url: string | string[];
+}

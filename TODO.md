@@ -4,6 +4,7 @@
 
 # Things to check to validate full typing
 - check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, lie deleting a lne
+- check all @deprecated tags and see if some are still used (some tags are in the middle of sentences so search for "@deprecated" and not for "/** @deprecated"
 - check all TODO comments
     TODO ! in particular
 - check all TODO any comments

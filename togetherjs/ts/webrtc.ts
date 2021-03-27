@@ -47,14 +47,16 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
     function makePeerConnection() {
         // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
         if(window.webkitRTCPeerConnection) {
+            // If you have a type error here read the comment at webkitRTCPeerConnection in ts/types/backward-compat.ts
             return new webkitRTCPeerConnection(
-                { "iceServers": [{"url": "stun:stun.l.google.com:19302"}] },
+                // TODO the key was "url" but the doc and the typing says it should be "urls", we would have liked to not update it (in the spirit of not changing the code) but it's not really possible to remove the error any other way (see backward-compat.d.ts for more explanation)
+                { "iceServers": [{"urls": "stun:stun.l.google.com:19302"}] },
                 { "optional": [{"DtlsSrtpKeyAgreement": true}] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
             );
         }
         if(window.mozRTCPeerConnection) {
             return new window.mozRTCPeerConnection(
-                { /* Or stun:124.124.124..2 ? */ "iceServers": [{"url": "stun:23.21.150.121"}] },
+                { /* Or stun:124.124.124..2 ? */ "iceServers": [{"urls": "stun:23.21.150.121"}] }, // TODO changed url to urls
                 { "optional": [] });
         }
         throw new util.AssertionError("Called makePeerConnection() without supported connection");
@@ -401,7 +403,8 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                 connection.setRemoteDescription(
                     new RTCSessionDescription({
                         type: "offer",
-                        sdp: offerReceived
+                        sdp: offerReceived.toString() // TODO added toString to follow rules here https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription/RTCSessionDescription
+                        // using RTCSessionDescription constructor is @deprecated
                     }), // TODO setRemoteDescription returns a promise so the 2 callbacks should probably be used in a .then()
                 //).then( // TODO TRY like this for example
                     function() {

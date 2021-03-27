@@ -974,22 +974,6 @@ interface Function {
 declare var TogetherJS: TogetherJSNS.TogetherJS;
 declare var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
 
-
-
-// RTC Patches
-interface Window {
-    /** @deprecated */
-    mozRTCPeerConnection?: typeof RTCPeerConnection;
-    /** @deprecated */
-    mozRTCSessionDescription?: typeof RTCSessionDescription;
-    /** @deprecated */
-    webkitRTCSessionDescription?: typeof RTCSessionDescription;
-    /** @deprecated */
-    mozRTCIceCandidate?: typeof RTCIceCandidate;
-    /** @deprecated */
-    webkitRTCIceCandidate?: typeof RTCIceCandidate;
-}
-
 interface Navigator {
     /** @deprecated */
     mozGetUserMedia?: Navigator["getUserMedia"];
@@ -997,20 +981,4 @@ interface Navigator {
     webkitGetUserMedia?: Navigator["getUserMedia"];
     /** @deprecated */
     msGetUserMedia?: Navigator["getUserMedia"];
-}
-
-interface RTCPeerConnection {
-    /** @deprecated */
-    onaddstream: (event: MediaStreamEvent) => void;
-    /** @deprecated */
-    onstatechange: () => void;
-    /** @deprecated */
-    addStream(stream: MediaStream): void;
-    /** @deprecated */
-    addIceCandidate(iceCandidate: RTCIceCandidate): void;
-}
-
-interface HTMLMediaElement {
-    /** @deprecated */
-    mozSrcObject: string | MediaStream;
 }
