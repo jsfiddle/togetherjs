@@ -524,6 +524,7 @@ function otMain(util) {
         return TextReplace;
     }());
     // TODO this class seems to be unused
+    //@ts-expect-error unused but we don't removed things for now
     var TJSHistory = /** @class */ (function () {
         function TJSHistory(clientId, initState) {
             /** Contains the changes, the 0th element is a different type (@link StateForClientId) */

@@ -269,6 +269,6 @@ class ElementFinder {
     }
 }
 
-define(["util", "jquery"], function(_util: Util, $: JQueryStatic) {
+define(["util", "jquery"], function(_util: Util, _$: JQueryStatic) {
     return new ElementFinder();
 });

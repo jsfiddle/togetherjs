@@ -269,6 +269,6 @@ var ElementFinder = /** @class */ (function () {
     };
     return ElementFinder;
 }());
-define(["util", "jquery"], function (_util, $) {
+define(["util", "jquery"], function (_util, _$) {
     return new ElementFinder();
 });

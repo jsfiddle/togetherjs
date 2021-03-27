@@ -402,7 +402,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     });
 
     session.on("close", function() {
-        Cursor.forEach(function(c, clientId) {
+        Cursor.forEach(function(_c, clientId) {
             Cursor.destroy(clientId);
         });
         $(document).unbind("mousemove", mousemove);
@@ -411,7 +411,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         $(window).unbind("scroll", scroll);
     });
 
-    session.hub.on("hello", function(msg) {
+    session.hub.on("hello", function() {
         // Immediately get our cursor onto this new person's screen:
         if(lastMessage) {
             session.send(lastMessage);
@@ -524,7 +524,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     var lastKeydown = 0;
     var MIN_KEYDOWN_TIME = 500;
 
-    function documentKeydown(event: Event) {
+    function documentKeydown(_event: Event) {
         setTimeout(function() {
             var now = Date.now();
             if(now - lastKeydown < MIN_KEYDOWN_TIME) {

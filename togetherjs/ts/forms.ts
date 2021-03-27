@@ -561,6 +561,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
     }
 
+    // TODO not used
+    //@ts-expect-error unused but we don't remove functions for now
     function getElementType(e: HTMLElement) {
         const el = $(e)[0];
         if(el.tagName == "TEXTAREA") {

@@ -55,7 +55,7 @@ var EventMaker = /** @class */ (function () {
     };
     return EventMaker;
 }());
-define(["jquery", "util"], function (_util, $) {
+define(["jquery", "util"], function (_util, _$) {
     var eventMaker = new EventMaker();
     return eventMaker;
 });

@@ -567,6 +567,7 @@ function otMain(util: Util) {
     type StateForClientId = { init: true, clientId: "init", state: Change };
 
     // TODO this class seems to be unused
+    //@ts-expect-error unused but we don't removed things for now
     class TJSHistory {
         /** Contains the changes, the 0th element is a different type (@link StateForClientId) */
         private _history = new Queue<StateForClientId | Change>();

@@ -371,7 +371,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
         scroll();
     });
     session.on("close", function () {
-        Cursor.forEach(function (c, clientId) {
+        Cursor.forEach(function (_c, clientId) {
             Cursor.destroy(clientId);
         });
         $(document).unbind("mousemove", mousemove);
@@ -379,7 +379,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
         document.removeEventListener("keydown", documentKeydown, true);
         $(window).unbind("scroll", scroll);
     });
-    session.hub.on("hello", function (msg) {
+    session.hub.on("hello", function () {
         // Immediately get our cursor onto this new person's screen:
         if (lastMessage) {
             session.send(lastMessage);
@@ -485,7 +485,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
     }
     var lastKeydown = 0;
     var MIN_KEYDOWN_TIME = 500;
-    function documentKeydown(event) {
+    function documentKeydown(_event) {
         setTimeout(function () {
             var now = Date.now();
             if (now - lastKeydown < MIN_KEYDOWN_TIME) {

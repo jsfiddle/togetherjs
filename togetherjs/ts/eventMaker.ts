@@ -61,7 +61,7 @@ class EventMaker {
     }
 }
 
-define(["jquery", "util"], function(_util: Util, $: JQueryStatic) {
+define(["jquery", "util"], function(_util: Util, _$: JQueryStatic) {
     let eventMaker = new EventMaker();
     return eventMaker;
 });

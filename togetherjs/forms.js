@@ -487,6 +487,8 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return el.val();
         }
     }
+    // TODO not used
+    //@ts-expect-error unused but we don't remove functions for now
     function getElementType(e) {
         var el = $(e)[0];
         if (el.tagName == "TEXTAREA") {
