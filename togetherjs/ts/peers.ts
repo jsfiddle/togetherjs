@@ -275,7 +275,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
         static deserialize(obj: SerializedPeer) {
             obj.fromStorage = true;
-            var peer = new Peer(obj.id, obj);
+            new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
         }
     }

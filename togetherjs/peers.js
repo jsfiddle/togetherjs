@@ -212,7 +212,7 @@ function peersMain(util, session, storage, require, templates) {
         };
         PeerClass.deserialize = function (obj) {
             obj.fromStorage = true;
-            var peer = new Peer(obj.id, obj);
+            new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
         };
         PeerClass.peers = {};

@@ -12,6 +12,7 @@ interface Options {
 }
 
 interface VideoTimeupdateMessage {
+    type: "video-timeupdate",
     location: string,
     position: number,
 }
@@ -55,7 +56,7 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
             var element = event.target as HTMLMediaElement;
             if(!options.silent && element) {
                 session.send({
-                    type: ('video-' + eventName) as TogetherJSNS.Messages,
+                    type: ('video-' + eventName) as "video-something", // TODO abusive cast
                     location: elementFinder.elementLocation(element),
                     position: element.currentTime
                 });
@@ -114,8 +115,8 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
     });
 
     MIRRORED_EVENTS.forEach(function(eventName) {
-        // TODO fix this call to .on
-        session.hub.on("video-" + eventName, function(msg: VideoTimeupdateMessage) {
+        // TODO fix this call to .on, abuse cast to "video-something"
+        session.hub.on("video-" + eventName as "video-something", function(msg: VideoTimeupdateMessage) {
             var element = $findElement(msg.location);
 
             setTime(element, msg.position);
