@@ -340,7 +340,7 @@ declare namespace TogetherJSNS {
             rtcSupported: boolean,
             isClient?: boolean,
             starting?: boolean,
-            scrollPosition?: ElementFinder.Position
+            scrollPosition?: ElementFinder.Position,
         }
 
         interface HelloMessage extends HelloMessageBase {
@@ -349,7 +349,9 @@ declare namespace TogetherJSNS {
         }
 
         interface HelloBackMessage extends HelloMessageBase {
-            type: "hello-back"
+            type: "hello-back",
+            identityId: string,
+            status: PeerStatus, // TODO check if it's peer status or string
         }
 
         // TODO is this mergeable with CursorClick?

@@ -679,7 +679,7 @@ function otMain(util: Util) {
             var fixupDelta = change.delta;
             this._history.walkForward(indexToInsert + 1, function(c, _index) {
                 if(!("init" in c) && !c.knowsAboutChange(change)) {
-                    var origChange = c.clone();
+                    //var origChange = c.clone(); // TODO not used
                     this.logChange("^^fix", c, function() {
                         var fixupResult = c.delta.transpose(fixupDelta);
                         console.log("  ^^real");

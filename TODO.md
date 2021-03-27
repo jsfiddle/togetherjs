@@ -21,6 +21,7 @@
 - check all assert that are used for type checking
 - check for @ts- comments
 - search for all variables for which the unused status was hidden by prefixing them by underscore the regex might be something like [(,]_[a-zA-Z]
+- check all // tslint- comments (maybe even without the //)
 
 # High priority towards full typing without logic change:
 - Find the logic for PeerSelf, PeerClass, ExternalPeer

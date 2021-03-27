@@ -4,7 +4,7 @@
 
 interface ExternalPeerAttributes {
     identityId: string;
-    status: string;
+    status: TogetherJSNS.PeerStatus;
     name: string;
     avatar: string;
     color: string;
@@ -21,7 +21,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
         isExternal = true;
         id;
         identityId;
-        status;
+        status: TogetherJSNS.PeerStatus;
         idle;
         name;
         avatar;
@@ -43,8 +43,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
             this.view = ui.PeerView(this);
         }
 
-        className(prefix) {
-            prefix = prefix || "";
+        className(prefix: string = "") {
             return prefix + util.safeClassName(this.id);
         }
     }
@@ -59,6 +58,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                 var channel = channels.WebSocketChannel(hubUrl);
                 var users: { [user: string]: ExternalPeer } = {};
                 var responded = 0;
+                // tslint:disable-next-line unused var
                 var firstResponse = 0;
                 var lateResponseTimeout: number;
                 channel.onmessage = function(msg) {
