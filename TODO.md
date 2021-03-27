@@ -16,6 +16,7 @@
 - check all usages of object
 - Configuration options seriously need to be reduced
 - check all assert that are used for type checking
+- check for @ts- comments
 
 # High priority towards full typing without logic change:
 - Find the logic for PeerSelf, PeerClass, ExternalPeer
