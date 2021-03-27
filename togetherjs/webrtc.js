@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
+function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
     var webrtc = util.Module("webrtc");
     var assert = util.assert;
     session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
@@ -13,6 +13,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
         // Because they could be pref'd on we'll do a quick check:
         try {
             (function () {
+                //@ts-ignore this var is unused but we don't remove code
                 var conn = new window.mozRTCPeerConnection();
             })();
         }
@@ -35,11 +36,15 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
     function makePeerConnection() {
         // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
         if (window.webkitRTCPeerConnection) {
-            return new webkitRTCPeerConnection({ "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] }, { "optional": [{ "DtlsSrtpKeyAgreement": true }] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
+            // If you have a type error here read the comment at webkitRTCPeerConnection in ts/types/backward-compat.ts
+            return new webkitRTCPeerConnection(
+            // TODO the key was "url" but the doc and the typing says it should be "urls", we would have liked to not update it (in the spirit of not changing the code) but it's not really possible to remove the error any other way (see backward-compat.d.ts for more explanation)
+            { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }, { "optional": [{ "DtlsSrtpKeyAgreement": true }] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
             );
         }
         if (window.mozRTCPeerConnection) {
-            return new window.mozRTCPeerConnection({ /* Or stun:124.124.124..2 ? */ "iceServers": [{ "url": "stun:23.21.150.121" }] }, { "optional": [] });
+            return new window.mozRTCPeerConnection({ /* Or stun:124.124.124..2 ? */ "iceServers": [{ "urls": "stun:23.21.150.121" }] }, // TODO changed url to urls
+            { "optional": [] });
         }
         throw new util.AssertionError("Called makePeerConnection() without supported connection");
     }
@@ -243,13 +248,13 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            console.warn(arguments);
+            console.warn(args);
             var s = "";
-            for (var i = 0; i < arguments.length; i++) {
+            for (var i = 0; i < args.length; i++) {
                 if (s) {
                     s += " ";
                 }
-                var a = arguments[i];
+                var a = args[i];
                 if (typeof a == "string") {
                     s += a;
                 }
@@ -271,6 +276,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             $("#togetherjs-audio-error").attr("title", s);
         }
         function startStreaming(callback) {
+            /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
             getUserMedia({
                 video: false,
                 audio: true
@@ -281,6 +287,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                     callback();
                 }
             }, function (err) {
+                // TODO this code can't work. getUserMedia gets a MediaStreamError but this callback act as if it was receiving a MediaError (https://developer.mozilla.org/en-US/docs/Web/API/MediaError) where a code of 1 would mean "The fetching of the associated resource was aborted by the user's request". I know that it can't work because MediaStreamError doesn't have a `code` field.
                 // FIXME: handle cancel case
                 if (err && err.code == 1) { // TODO does code actually exists? Maybe it's a MediaError and not a MediaStreamError
                     // User cancel
@@ -325,6 +332,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             _connection.onstatechange = function () {
                 // FIXME: this doesn't seem to work:
                 // Actually just doesn't work on Firefox
+                assert(_connection !== null); // TODO assert added
                 console.log("state change", _connection === null || _connection === void 0 ? void 0 : _connection.readyState);
                 if (_connection.readyState == "closed") {
                     audioButton("#togetherjs-audio-ready");
@@ -348,6 +356,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
         function addIceCandidate() {
             if (iceCandidate) {
                 console.log("adding ice", iceCandidate);
+                assert(_connection !== null); // TODO assert added
                 _connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
             }
         }
@@ -356,7 +365,8 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             if (offerReceived && (!offerDescription)) {
                 connection.setRemoteDescription(new RTCSessionDescription({
                     type: "offer",
-                    sdp: offerReceived
+                    sdp: offerReceived.toString() // TODO added toString to follow rules here https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription/RTCSessionDescription
+                    // using RTCSessionDescription constructor is @deprecated
                 }), // TODO setRemoteDescription returns a promise so the 2 callbacks should probably be used in a .then()
                 //).then( // TODO TRY like this for example
                 function () {
@@ -371,7 +381,9 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             if (!(offerSent || offerReceived)) {
                 connection.createOffer(function (offer) {
                     console.log("made offer", offer);
-                    offer.sdp = ensureCryptoLine(offer.sdp);
+                    if (offer.sdp !== undefined) { // TODO if add for typecheck
+                        offer.sdp = ensureCryptoLine(offer.sdp);
+                    }
                     connection.setLocalDescription(offer, 
                     //).then( // TODO toggle to switch to promise mode (the new api)
                     function () {
@@ -396,14 +408,17 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                     }
                 }, 2000);
                 connection.createAnswer(function (answer) {
-                    answer.sdp = ensureCryptoLine(answer.sdp);
+                    if (answer.sdp !== undefined) { // TODO if add for typecheck
+                        answer.sdp = ensureCryptoLine(answer.sdp);
+                    }
                     clearTimeout(timeout);
                     connection.setLocalDescription(answer, 
                     //).then(
                     function () {
+                        var _a;
                         session.send({
                             type: "rtc-answer",
-                            answer: answer.sdp
+                            answer: (_a = answer.sdp) !== null && _a !== void 0 ? _a : "" // TODO added ?? ""
                         });
                         answerSent = answer;
                     }, function (err) {
@@ -433,7 +448,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 var connection = getConnection();
                 connection.setRemoteDescription(new RTCSessionDescription({
                     type: "offer",
-                    sdp: offerReceived
+                    sdp: offerReceived === null || offerReceived === void 0 ? void 0 : offerReceived.toString() // TODO check that the .toString() that was added does not cause any problem
                 }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
                 function () {
                     offerDescription = true;
@@ -464,7 +479,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
             var connection = getConnection();
             connection.setRemoteDescription(new RTCSessionDescription({
                 type: "answer",
-                sdp: answerReceived
+                sdp: answerReceived.toString() // TODO check that the .toString() that was added does not cause any problem
             }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
             //).then(
             function () {
@@ -481,7 +496,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 addIceCandidate();
             }
         });
-        session.hub.on("rtc-abort", function (msg) {
+        session.hub.on("rtc-abort", function (_msg) {
             abort();
             if (!accepted) {
                 return;
@@ -495,7 +510,7 @@ function webrtcMain(require, $, util, session, ui, peers, storage, windowing) {
                 connect();
             }
         });
-        session.hub.on("hello", function (msg) {
+        session.hub.on("hello", function (_msg) {
             // FIXME: displayToggle should be set due to
             // _connection.onstatechange, but that's not working, so
             // instead:

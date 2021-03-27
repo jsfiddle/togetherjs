@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, channels: TogetherJSNS.Channels) {
+define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, channels: TogetherJSNS.Channels) {
     let channel: TogetherJSNS.WebSocketChannel | null = null;
     let baseUrl = null;
     let clientId = "recorder";
@@ -54,10 +54,8 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
     }
 
     class Recorder {
-        
-        private shareId;
-
-        start(options) {
+        private shareId?: string;
+        start(options: Partial<TogetherJSNS.Config & { defaultHubBase: string }>) {
             $(() => {
                 $("#record").css({ height: $(window).height() - 50 });
                 $("#restart").click(function() {
@@ -70,7 +68,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
             });
         }
 
-        activate(options) {
+        activate(options: Partial<TogetherJSNS.Config & { defaultHubBase: string }>) {
             var match;
             baseUrl = options.baseUrl;
             this.shareId = TogetherJS.startup._joinShareId;
@@ -106,11 +104,10 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, util: Util, cha
             sendHello(false);
         }
 
-        logMessage(msg) {
-            msg.date = Date.now();
-            msg = JSON.stringify(msg);
+        logMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
+            (msg as any).date = Date.now(); // TODO as any
             var $record = $("#record");
-            $record.val($record.val() + msg + "\n\n");
+            $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         }
     }
 

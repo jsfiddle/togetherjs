@@ -58,7 +58,7 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
                 return function() {
                     // YouTube API is ready
                     $(youTubeIframes).each(function(_i, iframe) {
-                        var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
+                        new YT.Player(iframe.id, { // get the reference to the already existing iframe
                             events: {
                                 'onReady': insertPlayer,
                                 'onStateChange': publishPlayerStateChange

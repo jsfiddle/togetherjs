@@ -35,7 +35,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             this.element = templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            var peer = peers.getPeer(clientId);
+            var peer = peers.getPeer(this.clientId);
             if (peer !== null) {
                 this.updatePeer(peer);
             } // TODO we should probably show a warning if this peer does not exist

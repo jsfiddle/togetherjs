@@ -2,7 +2,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "channels"], function ($, util, channels) {
+define(["jquery", "util", "channels"], function ($, _util, channels) {
     var channel = null;
     var baseUrl = null;
     var clientId = "recorder";
@@ -101,10 +101,9 @@ define(["jquery", "util", "channels"], function ($, util, channels) {
             sendHello(false);
         };
         Recorder.prototype.logMessage = function (msg) {
-            msg.date = Date.now();
-            msg = JSON.stringify(msg);
+            msg.date = Date.now(); // TODO as any
             var $record = $("#record");
-            $record.val($record.val() + msg + "\n\n");
+            $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         };
         return Recorder;
     }());

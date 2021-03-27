@@ -8,7 +8,7 @@ interface LogItem {
     url: string,
 }
 
-function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require) {
+function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
 
     var ALWAYS_REPLAY = {
         "cursor-update": true,
@@ -162,7 +162,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
                     const name = url.substr("local:".length);
                     storage.get(`recording.${name}` as const).then(function(logs) {
                         if(!logs) {
-                            def.resolve(null);
+                            def.resolve(undefined);
                             return;
                         }
                         const logs2 = parseLogs(logs);

@@ -42,7 +42,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             this.element = templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            const peer = peers.getPeer(clientId);
+            const peer = peers.getPeer(this.clientId);
             if(peer !== null) {
                 this.updatePeer(peer);
             } // TODO we should probably show a warning if this peer does not exist
@@ -139,7 +139,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             e.animate(
                 { borderSpacing: -150, opacity: 1 },
                 {
-                    step: function(now: number, fx) {
+                    step: function(now: number, fx: Tween) {
                         if(fx.prop == "borderSpacing") {
                             e.css('-webkit-transform', 'rotate(' + now + 'deg)')
                                 .css('-moz-transform', 'rotate(' + now + 'deg)')
