@@ -121,6 +121,7 @@ function otMain(util: Util) {
             public known: { [clientId: string]: number },
             private outOfOrder: boolean = false
         ) {
+            // TODO since we use TS we can remove this assert
             assert(typeof version == "number" && typeof clientId == "string", "Bad Change():", version, clientId);
         }
 

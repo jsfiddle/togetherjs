@@ -129,7 +129,8 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
             }
             try {
                 session._getChannel().onmessage(item);
-            } catch(e) {
+            }
+            catch(e) {
                 console.warn("Could not play back message:", item, "error:", e);
             }
         }

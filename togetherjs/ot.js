@@ -110,6 +110,7 @@ function otMain(util) {
             this.delta = delta;
             this.known = known;
             this.outOfOrder = outOfOrder;
+            // TODO since we use TS we can remove this assert
             assert(typeof version == "number" && typeof clientId == "string", "Bad Change():", version, clientId);
         }
         Change.prototype.toString = function () {
