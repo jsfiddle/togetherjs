@@ -46,7 +46,6 @@ var Util = /** @class */ (function () {
         tjs.$ = $;
         this.extend = tjs._extend;
         this.AssertionError = AssertionError;
-        this.mixinEvents = tjs._mixinEvents;
     }
     Util.prototype.forEachAttr = function (obj, callback, context) {
         context = context || obj;

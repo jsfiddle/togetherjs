@@ -548,7 +548,6 @@ function peersMain(util, session, storage, require, templates) {
     function storeSerialization() {
         storage.tab.set("peerCache", serialize());
     }
-    util.mixinEvents(peers);
     util.testExpose({
         setIdleTime: function (time) {
             IDLE_TIME = time;

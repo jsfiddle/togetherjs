@@ -636,7 +636,6 @@ declare namespace TogetherJSNS {
         /** Timestamp */
         pageLoaded: number;
         _startupInit: StartupInit;
-        _mixinEvents(some: unknown): Hub,
         _teardown: () => void,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,

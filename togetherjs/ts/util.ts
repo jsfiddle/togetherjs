@@ -26,7 +26,6 @@ class Util {
     public Deferred;
     extend: (base: { [key: string]: unknown; }, extensions?: any) => { [key: string]: unknown; }
     AssertionError: typeof AssertionError;
-    mixinEvents: TogetherJSNS.TogetherJS["_mixinEvents"];
     Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
 
@@ -35,7 +34,7 @@ class Util {
         tjs.$ = $;
         this.extend = tjs._extend;
         this.AssertionError = AssertionError;
-        this.mixinEvents = tjs._mixinEvents;
+        
     }
 
     public forEachAttr<T extends object>(obj: T, callback: (o: T[Extract<keyof T, string>], k: keyof T) => void, context?: unknown) {

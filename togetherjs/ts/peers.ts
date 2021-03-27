@@ -631,9 +631,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     function storeSerialization() {
         storage.tab.set("peerCache", serialize());
     }
-
-    util.mixinEvents(peers);
-
+    
     util.testExpose({
         setIdleTime: function(time: number) {
             IDLE_TIME = time;
