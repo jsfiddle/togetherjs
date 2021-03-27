@@ -10,6 +10,7 @@
 - check all TODO any comments
 - check all FIXME comments?
 - check all uses of any
+    - "as any"
 - check all uses of unknown
 - check all type with "undefined | null" or "null | undefined"
 - check all uses of Function
@@ -19,6 +20,7 @@
 - Configuration options seriously need to be reduced
 - check all assert that are used for type checking
 - check for @ts- comments
+- search for all variables for which the unused status was hidden by prefixing them by underscore the regex might be something like [(,]_[a-zA-Z]
 
 # High priority towards full typing without logic change:
 - Find the logic for PeerSelf, PeerClass, ExternalPeer

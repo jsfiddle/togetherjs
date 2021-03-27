@@ -10,7 +10,7 @@ interface MediaConstraintsMandatory {
     MozDontOfferDataChannel?: boolean,
 }
 
-function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
+function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
     var webrtc = util.Module("webrtc");
     var assert: typeof util.assert = util.assert;
 
@@ -23,6 +23,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
         // Because they could be pref'd on we'll do a quick check:
         try {
             (function() {
+                //@ts-ignore this var is unused but we don't remove code
                 var conn = new window.mozRTCPeerConnection!();
             })();
         } catch(e) {
@@ -283,13 +284,13 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
         });
 
         function error(...args: any[]) {
-            console.warn(arguments);
+            console.warn(args);
             var s = "";
-            for(var i = 0; i < arguments.length; i++) {
+            for(var i = 0; i < args.length; i++) {
                 if(s) {
                     s += " ";
                 }
-                var a = arguments[i];
+                var a = args[i];
                 if(typeof a == "string") {
                     s += a;
                 } else {
@@ -310,6 +311,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
         }
 
         function startStreaming(callback: () => void) {
+            /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
             getUserMedia(
                 {
                     video: false,
@@ -323,8 +325,9 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     }
                 },
                 function(err) {
+                    // TODO this code can't work. getUserMedia gets a MediaStreamError but this callback act as if it was receiving a MediaError (https://developer.mozilla.org/en-US/docs/Web/API/MediaError) where a code of 1 would mean "The fetching of the associated resource was aborted by the user's request". I know that it can't work because MediaStreamError doesn't have a `code` field.
                     // FIXME: handle cancel case
-                    if(err && err.code == 1) { // TODO does code actually exists? Maybe it's a MediaError and not a MediaStreamError
+                    if(err && (err as any).code == 1) { // TODO does code actually exists? Maybe it's a MediaError and not a MediaStreamError
                         // User cancel
                         return;
                     }
@@ -369,6 +372,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             _connection.onstatechange = function() {
                 // FIXME: this doesn't seem to work:
                 // Actually just doesn't work on Firefox
+                assert(_connection !== null); // TODO assert added
                 console.log("state change", _connection?.readyState);
                 if(_connection.readyState == "closed") {
                     audioButton("#togetherjs-audio-ready");
@@ -393,6 +397,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
         function addIceCandidate() {
             if(iceCandidate) {
                 console.log("adding ice", iceCandidate);
+                assert(_connection !== null); // TODO assert added
                 _connection.addIceCandidate(new RTCIceCandidate(iceCandidate));
             }
         }
@@ -421,7 +426,9 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             if(!(offerSent || offerReceived)) {
                 connection.createOffer(function(offer: RTCSessionDescriptionInit) {
                     console.log("made offer", offer);
-                    offer.sdp = ensureCryptoLine(offer.sdp);
+                    if(offer.sdp !== undefined) { // TODO if add for typecheck
+                        offer.sdp = ensureCryptoLine(offer.sdp);
+                    }
                     connection.setLocalDescription(
                         offer,
                     //).then( // TODO toggle to switch to promise mode (the new api)
@@ -450,7 +457,9 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                     }
                 }, 2000);
                 connection.createAnswer(function(answer) {
-                    answer.sdp = ensureCryptoLine(answer.sdp);
+                    if(answer.sdp !== undefined) { // TODO if add for typecheck
+                        answer.sdp = ensureCryptoLine(answer.sdp);
+                    }
                     clearTimeout(timeout);
                     connection.setLocalDescription(
                         answer,
@@ -458,7 +467,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                         function() { // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
                             session.send({
                                 type: "rtc-answer",
-                                answer: answer.sdp
+                                answer: answer.sdp ?? "" // TODO added ?? ""
                             });
                             answerSent = answer;
                         },
@@ -494,7 +503,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
                 connection.setRemoteDescription(
                     new RTCSessionDescription({
                         type: "offer",
-                        sdp: offerReceived
+                        sdp: offerReceived?.toString() // TODO check that the .toString() that was added does not cause any problem
                     }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
                     function() {
                         offerDescription = true;
@@ -529,7 +538,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             connection.setRemoteDescription(
                 new RTCSessionDescription({
                     type: "answer",
-                    sdp: answerReceived
+                    sdp: answerReceived.toString() // TODO check that the .toString() that was added does not cause any problem
                 }), // TODO this returns a promise so the 2 callbacks should probably be used in a .then()
             //).then(
                 function() {
@@ -550,7 +559,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             }
         });
 
-        session.hub.on("rtc-abort", function(msg) {
+        session.hub.on("rtc-abort", function(_msg) {
             abort();
             if(!accepted) {
                 return;
@@ -564,7 +573,7 @@ function webrtcMain(require: Require, $: JQueryStatic, util: Util, session: Toge
             }
         });
 
-        session.hub.on("hello", function(msg) {
+        session.hub.on("hello", function(_msg) {
             // FIXME: displayToggle should be set due to
             // _connection.onstatechange, but that's not working, so
             // instead:

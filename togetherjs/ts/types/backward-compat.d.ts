@@ -22,6 +22,8 @@ interface RTCPeerConnection {
     addStream(stream: MediaStream): void;
     /** @deprecated */
     addIceCandidate(iceCandidate: RTCIceCandidate): void;
+    /** @deprecated some traces of this field can be found here https://github.com/aquavit/DefinitelyTyped/blob/master/webrtc/RTCPeerConnection.d.ts */
+    readyState: ReadyState;
 }
 
 interface HTMLMediaElement {
@@ -33,8 +35,17 @@ interface RTCPeerConnection extends EventTarget {
     /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription */
     setRemoteDescription(description: RTCSessionDescriptionInit, successCallback: () => void, errorCallback: RTCPeerConnectionErrorCallback): void;
 
-    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription */
-    setLocalDescription(sessionDescription: RTCSessionDescriptionInit, successCallback: () => void, errorCallback: RTCPeerConnectionErrorCallback): void;
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription
+    the mediaConstraints argument can only be found in the german mdn: https://developer.mozilla.org/de/docs/Web/API/RTCPeerConnection (2021/03/27)
+    */
+    setLocalDescription(sessionDescription: RTCSessionDescriptionInit, successCallback: () => void, errorCallback: RTCPeerConnectionErrorCallback, mediaConstraints?: { mandatory: MediaConstraintsMandatory }): void;
+
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer */
+    createOffer(successCallback: RTCSessionDescriptionCallback, errorCallback: RTCPeerConnectionErrorCallback, options?: RTCOfferOptions): void;
+
+    /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer */
+    createAnswer(successCallback: RTCSessionDescriptionCallback, errorCallback: RTCPeerConnectionErrorCallback,options?: RTCOfferOptions): void;
+
 }
 
 /**
@@ -43,7 +54,7 @@ The only way to remove the error you might get in webrtc.ts is to edit you lib.d
 */
 interface webkitRTCPeerConnection extends RTCPeerConnection {
     /** @deprecated Not even sure this is a valid constructor, there is some notes about it here https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling */
-    new(configuration: RTCConfiguration, options: { "optional": [{"DtlsSrtpKeyAgreement"?: boolean}] }): webkitRTCPeerConnection;
+    new(configuration: RTCConfiguration, options: { "optional": [{ "DtlsSrtpKeyAgreement"?: boolean }] }): webkitRTCPeerConnection;
 }
 
 interface mozRTCPeerConnection extends RTCPeerConnection {
