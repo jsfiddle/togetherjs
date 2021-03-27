@@ -8,7 +8,7 @@ interface ShowOptions {
     onClose: null | (() => any);
 }
 
-function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
@@ -215,7 +215,7 @@ function windowingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, s
         modalEscape.unbind();
     });
 
-    session.on<JQuery>("new-element", function(el) {
+    session.on("new-element", function(el) {
         bindEvents(el);
     });
 
