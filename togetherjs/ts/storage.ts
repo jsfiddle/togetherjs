@@ -25,14 +25,14 @@ function StorageMain(util: Util) {
             super();
         }
 
-        get<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K): JQueryDeferred<TogetherJSNS.StorageGet.Map[`settings.${K}`]> {
+        get<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K): JQueryDeferred<TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>> {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             const key = `settings.${name}` as const; // as keyof TogetherJSNS.StorageGet.MapForSettings;
-            const value = this.storageInstance.settings.defaults[name] as unknown as TogetherJSNS.StorageGet.Map[`settings.${K}`]; // TODO is it possible to avoid the as unknown?
+            const value = this.storageInstance.settings.defaults[name] as unknown as TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>; // TODO is it possible to avoid the as unknown?
             return storage.get(key, value);
         }
 
-        set<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K, value: TogetherJSNS.StorageGet.Map[`settings.${K}`]) {
+        set<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K, value: TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             const key = `settings.${name}` as const;
             return storage.set(key, value);
@@ -50,13 +50,13 @@ function StorageMain(util: Util) {
             this.settings = new StorageSettings(this);
         }
 
-        get<T extends keyof TogetherJSNS.StorageGet.Map>(key: T, defaultValue: TogetherJSNS.StorageGet.Map[T] | null = null) {
+        get<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, defaultValue: TogetherJSNS.StorageGet.StorageValue<T> | null = null) {
             var self = this;
-            return Deferred<TogetherJSNS.StorageGet.Map[T]>(function(def) {
+            return Deferred<TogetherJSNS.StorageGet.StorageValue<T>>(function(def) {
                 // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
                 setTimeout(util.resolver(def, function() {
                     const prefixedKey = self.prefix + key;
-                    let value: TogetherJSNS.StorageGet.Map[T] | null;
+                    let value: TogetherJSNS.StorageGet.StorageValue<T> | null;
                     var valueAsString = self.storage.getItem(prefixedKey);
                     if(!valueAsString) {
                         value = defaultValue;
@@ -75,13 +75,13 @@ function StorageMain(util: Util) {
             });
         }
 
-        set<T extends keyof TogetherJSNS.StorageGet.Map>(key: T, value?: TogetherJSNS.StorageGet.Map[T]) {
+        set<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, value?: TogetherJSNS.StorageGet.StorageValue<T>) {
             var self = this;
             let stringyfiedValue: string | undefined;
             if(value !== undefined) {
                 stringyfiedValue = JSON.stringify(value);
             }
-            return Deferred<TogetherJSNS.StorageGet.Map[T]>(def => {
+            return Deferred<TogetherJSNS.StorageGet.StorageValue<T>>(def => {
                 const prefixedKey = self.prefix + key;
                 if(stringyfiedValue === undefined) {
                     self.storage.removeItem(prefixedKey);
@@ -119,7 +119,7 @@ function StorageMain(util: Util) {
         keys(prefix?: string, excludePrefix: boolean = false) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
-            return Deferred<(keyof TogetherJSNS.StorageGet.Map)[]>(function(def) {
+            return Deferred<TogetherJSNS.StorageGet.StorageKey[]>(function(def) {
                 setTimeout(util.resolver(def, function() {
                     prefix = prefix || "";
                     let result: string[] = [];
