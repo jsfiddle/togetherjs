@@ -3,6 +3,7 @@
 - there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 
 # Things to check to validate full typing
+- check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, lie deleting a lne
 - check all TODO comments
     TODO ! in particular
 - check all TODO any comments
@@ -94,3 +95,9 @@ Unit tests:
 - linkify 4/4
 - console 2/2
 - misc (small) 8/8
+
+# JQuery
+
+For legacy reasons we use JQuery 1.11.1 which is apparently the last version of JQuery in the branch 1.x.
+It was released on May 1st 2014 according to [this](https://blog.jquery.com/2014/05/01/jquery-1-11-1-and-2-1-1-released/)
+The api at this date can be browsed here: https://web.archive.org/web/20140520215629/http://api.jquery.com/

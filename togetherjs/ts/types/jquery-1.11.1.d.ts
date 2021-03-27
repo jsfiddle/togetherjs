@@ -1,4 +1,4 @@
-// Adapted from type definitions for jQuery 1.10
+// JQuery 1.11.1, adapted from type definitions for jQuery 1.10, changes are marked with a "// Change:" explaning what was changed
 // Project: http://jquery.com/
 // Definitions by: Boris Yankov <https://github.com/borisyankov/>
 //                 Christian Hoffmeister <https://github.com/choffmeister>
@@ -38,6 +38,29 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+// Change: added this interface, see here for more info https://stackoverflow.com/questions/16541206/jquery-what-is-a-tween-object
+interface Tween {
+    /** The element being animated */
+    elem: JQuery;
+    /** The property being animated */
+    prop: string;
+    /** The easing used */
+    easing: unknown;
+    /** A reference to the animation options */
+    options: unknown;
+    /** The starting value of the tween */
+    start: unknown;
+    /** The current value of the tween */
+    now: unknown;
+    /** The ending value of the tween */
+    end: unknown;
+    /** The CSS unit for the tween */
+    unit: unknown;
+    /** Reads the current value for property from the element */
+    cur: unknown;
+    /** progress is a number from 0 to 1. Updates the value for the property on the animated element. */
+    run: (progress: unknown) => unknown;
+}
 
 /**
  * Interface for the AJAX setting that will configure the AJAX request
@@ -740,7 +763,8 @@ interface JQueryAnimationOptions {
     /**
      * A function to be called for each animated property of each animated element. This function provides an opportunity to modify the Tween object to change the value of the property before it is set.
      */
-    step?: (now: number, tween: any) => any;
+    // Change: tween was any, it's now of type Tween
+    step?: (now: number, tween: Tween) => any;
     /**
      * A function to be called after each step of the animation, only once per animated element regardless of the number of animated properties. (version added: 1.8)
      */
@@ -1974,7 +1998,8 @@ interface JQuery {
      * @param options A map of additional options to pass to the method.
      * @see {@link https://api.jquery.com/animate/#animate-properties-options}
      */
-    animate(properties: Object, options: JQueryAnimationOptions, easing: string): JQuery;
+    // Change: easing has been marked optional
+    animate(properties: Object, options: JQueryAnimationOptions, easing?: string): JQuery;
 
     /**
      * Set a timer to delay execution of subsequent items in the queue.

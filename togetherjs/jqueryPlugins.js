@@ -50,7 +50,9 @@ define(["jquery"], function ($) {
                 }
             },
             duration: 500
-        }).promise().then(function () {
+        }
+        //,'linear' // TODO this last argument should not be here according to JQuery prototypes
+        ).promise().then(function () {
             this.css('-webkit-transform', '');
             this.css('-moz-transform', '');
             this.css('-ms-transform', '');
@@ -233,9 +235,11 @@ define(["jquery"], function ($) {
     // avatar animate out, reverse of above
     $.fn.animateDockExit = function () {
         // get the current avatar dimenensions
-        var height = this.height();
+        // TODO qw height was commented because it was unused
+        //var height = this.height();
         var width = this.width();
-        var backgroundSize = height + 4;
+        // TODO qw background size has been commented out because it was unused, maybe it was intended to be used
+        //var backgroundSize = height + 4;
         var margin = parseInt(this.css("marginLeft"), 10);
         //then animate avatar to shrink to nothing, and reset the values again
         // FIXME this needs to animate from the CENTER
@@ -285,7 +289,7 @@ define(["jquery"], function ($) {
     // FIXME: not sure if this is legit, but at least the modern mobile devices we
     // care about should have this defined:
     if (!$.browser) {
-        $.browser = {};
+        $.browser = { version: "unknown" };
     }
     $.browser.mobile = window.orientation !== undefined;
     if (navigator.userAgent.search(/mobile/i) != -1) {
