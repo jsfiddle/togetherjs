@@ -991,6 +991,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     windowing.hide("#togetherjs-avatar-edit");
                 }
             });
+            // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
             TogetherJS.config.track("inviteFromRoom", function (inviter, previous) {
                 if (inviter) {
                     container.find("#togetherjs-invite").show();

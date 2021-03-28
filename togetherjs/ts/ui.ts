@@ -1078,6 +1078,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             });
 
+            // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
             TogetherJS.config.track("inviteFromRoom", function(inviter, previous) {
                 if(inviter) {
                     container.find("#togetherjs-invite").show();
