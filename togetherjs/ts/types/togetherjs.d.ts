@@ -726,7 +726,7 @@ declare namespace TogetherJSNS {
         /** The name of this tool as provided to users.  The UI is updated to use this. Because of how it is used in text it should be a proper noun, e.g., "MySite's Collaboration Tool" */
         toolName: string | null,
         /** Used to auto-start TogetherJS with a {prefix: pageName, max: participants} Also with findRoom: "roomName" it will connect to the given room name */
-        findRoom: string | { max: number, prefix: string }, // TODO something seems to be wrong with findRoom, sometimes it's a string and sometimes it's an object, also it's never set as far as I can see
+        findRoom: null | string | { max: number, prefix: string }, // used when doing TogetherJS.config.get("findRoom")
         /** If true, starts TogetherJS automatically (of course!) */
         autoStart: boolean,
         /** If true, then the "Join TogetherJS Session?" confirmation dialog won't come up */

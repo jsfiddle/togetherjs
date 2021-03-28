@@ -243,6 +243,7 @@ function togetherjsMain() {
             this.tjsInstance = tjsInstance;
         }
         ConfigClass.prototype.call = function (name, maybeValue) {
+            var _a;
             var settings;
             if (maybeValue === undefined) {
                 if (typeof name != "object") {
@@ -276,7 +277,7 @@ function togetherjsMain() {
                 var previous = this.tjsInstance._configuration[attr];
                 var value = settings[attr];
                 this.tjsInstance._configuration[attr] = value; // TODO any, how to remove this any
-                var trackers = this.tjsInstance._configTrackers[name] || [];
+                var trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
                 var failed = false;
                 for (var i = 0; i < trackers.length; i++) {
                     try {
@@ -347,6 +348,7 @@ function togetherjsMain() {
         __extends(TogetherJSClass, _super);
         function TogetherJSClass() {
             var _this = _super.call(this) || this;
+            _this.startupReason = null;
             _this.running = false;
             _this.configObject = new ConfigClass(_this);
             _this.hub = new OnClass();
@@ -365,6 +367,7 @@ function togetherjsMain() {
             return _this;
         }
         TogetherJSClass.prototype.start = function (event) {
+            var _this = this;
             var session;
             if (this.running) {
                 session = this.require("session");
@@ -431,7 +434,7 @@ function togetherjsMain() {
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
             // FIXME: close these configs?
-            var ons = this.config.get("on");
+            var ons = this.config.get("on") || ;
             for (attr in globalOns) {
                 if (globalOns.hasOwnProperty(attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -510,13 +513,13 @@ function togetherjsMain() {
             this.config("lang", lang);
             var localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            function callback(session, jquery) {
-                this._loaded = true;
+            var callback = function (session, jquery) {
+                _this._loaded = true;
                 if (!min) {
-                    this.require = require.config({ context: "togetherjs" });
-                    this._requireObject = require;
+                    _this.require = require.config({ context: "togetherjs" });
+                    _this._requireObject = require;
                 }
-            }
+            };
             if (!min) {
                 if (typeof require == "function") {
                     if (!require.config) {
@@ -544,6 +547,7 @@ function togetherjsMain() {
                 addScriptInner("/togetherjs/libs/require.js");
             }
         };
+        /** Can also be used to clone an object */
         TogetherJSClass.prototype._extend = function (base, extensions) {
             if (!extensions) {
                 extensions = base;
@@ -625,16 +629,16 @@ function togetherjsMain() {
             this.removeShortcut();
             listener = function (event) {
                 if (event.which == 84 && event.altKey) {
-                    if (listener.pressed) {
+                    if (this.pressed) {
                         // Second hit
                         TogetherJS.start();
                     }
                     else {
-                        listener.pressed = true;
+                        this.pressed = true;
                     }
                 }
                 else {
-                    listener.pressed = false;
+                    this.pressed = false;
                 }
             };
             this.once("ready", this.removeShortcut);

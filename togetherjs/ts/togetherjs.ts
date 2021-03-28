@@ -267,7 +267,7 @@ function togetherjsMain() {
                 let previous = this.tjsInstance._configuration[attr];
                 let value = settings[attr];
                 this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
-                let trackers = this.tjsInstance._configTrackers[name] || [];
+                let trackers = this.tjsInstance._configTrackers[name] ?? [];
                 let failed = false;
                 for(let i = 0; i < trackers.length; i++) {
                     try {
@@ -339,15 +339,16 @@ function togetherjsMain() {
     }
 
     class TogetherJSClass extends OnClass {
+        public startupReason: TogetherJSNS.Reason | null = null;
         public $!: JQueryStatic; // TODO !
         public running: boolean = false;
-        public require: Require;
+        public require!: Require; // TODO !
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         private hub: TogetherJSNS.Hub = new OnClass();
-        public requireConfig: RequireConfig;
-        private _loaded: boolean;
-        private _requireObject: Require;
+        public requireConfig!: RequireConfig; // TODO !
+        private _loaded?: boolean;
+        private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
         private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
         public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
@@ -356,8 +357,8 @@ function togetherjsMain() {
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
         public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
-        public version: string;
-        public baseUrl: string;
+        public version!: string; // TODO !
+        public baseUrl!: string; // TODO !
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
 
@@ -437,7 +438,7 @@ function togetherjsMain() {
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
             // FIXME: close these configs?
-            let ons: TogetherJSNS.Ons<unknown> = this.config.get("on");
+            let ons: TogetherJSNS.Ons<unknown> = this.config.get("on") ||;
             for(attr in globalOns) {
                 if(globalOns.hasOwnProperty(attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -522,7 +523,7 @@ function togetherjsMain() {
 
             let localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            function callback(session: TogetherJSNS.Session, jquery: JQuery) {
+            const callback = (session: TogetherJSNS.Session, jquery: JQuery) => {
                 this._loaded = true;
                 if(!min) {
                     this.require = require.config({ context: "togetherjs" });
@@ -557,6 +558,7 @@ function togetherjsMain() {
             }
         }
 
+        /** Can also be used to clone an object */
         _extend(base: { [key: string]: unknown }, extensions?: any) {
             if(!extensions) {
                 extensions = base;
@@ -645,20 +647,20 @@ function togetherjsMain() {
         listenForShortcut() {
             console.warn("Listening for alt-T alt-T to start TogetherJS");
             this.removeShortcut();
-            listener = function(event: KeyboardEvent) {
+            listener = function(this: TogetherJSNS.KeyboardListener, event: KeyboardEvent) {
                 if(event.which == 84 && event.altKey) {
-                    if(listener.pressed) {
+                    if(this.pressed) {
                         // Second hit
                         TogetherJS.start();
                     }
                     else {
-                        listener.pressed = true;
+                        this.pressed = true;
                     }
                 }
                 else {
-                    listener.pressed = false;
+                    this.pressed = false;
                 }
-            } as any as TogetherJSNS.KeyboardListener;
+            };
             this.once("ready", this.removeShortcut);
             document.addEventListener("keyup", listener, false);
         }
