@@ -294,7 +294,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     });
 
     class PeersSelf extends OnClass {
-        private isSelf = true;
+        public isSelf = true;
         public readonly id = session.clientId;
         public identityId = session.identityId;
         public status: TogetherJSNS.PeerStatus = "live";
@@ -304,7 +304,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
         public defaultName: string = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         private loaded = false;
-        private isCreator = !session.isClient;
+        public isCreator = !session.isClient;
         public view?: TogetherJSNS.PeerView;
         public url?: string;
 

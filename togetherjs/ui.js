@@ -265,6 +265,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         PeerView.prototype.updateDisplay = function (container) {
             var _this = this;
             deferForContainer(function () {
+                alert("lala");
                 container = container || _this.ui.container;
                 var abbrev = _this.peer.name;
                 if (_this.peer.isSelf) {
@@ -306,18 +307,18 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     });
                 }
                 container.find("." + _this.peer.className("togetherjs-person-role-")).text(_this.peer.isCreator ? "Creator" : "Participant");
-                var urlName = _this.peer.title || "";
-                if (_this.peer.title) {
-                    urlName += " (";
+                var urlName;
+                var domain = util.truncateCommonDomain(_this.peer.url, location.href); // TODO !
+                // TODO code change
+                if ("title" in _this.peer && _this.peer.title) {
+                    urlName = _this.peer.title + " (" + domain + ")";
                 }
-                urlName += util.truncateCommonDomain(_this.peer.url, location.href); // TODO !
-                if (_this.peer.title) {
-                    urlName += ")";
+                else {
+                    urlName = domain;
                 }
-                container.find("." + _this.peer.className("togetherjs-person-url-title-"))
-                    .text(urlName);
+                container.find("." + _this.peer.className("togetherjs-person-url-title-")).text(urlName);
                 var url = _this.peer.url;
-                if (_this.peer.urlHash) {
+                if ("urlHash" in _this.peer && _this.peer.urlHash) {
                     url += _this.peer.urlHash;
                 }
                 container.find("." + _this.peer.className("togetherjs-person-url-")).attr("href", url); // TODO !
@@ -338,14 +339,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     }
                 }
                 if (_this.peer.url != session.currentUrl()) {
-                    container.find("." + _this.peer.className("togetherjs-person-"))
-                        .addClass("togetherjs-person-other-url");
+                    container.find("." + _this.peer.className("togetherjs-person-")).addClass("togetherjs-person-other-url");
                 }
                 else {
-                    container.find("." + _this.peer.className("togetherjs-person-"))
-                        .removeClass("togetherjs-person-other-url");
+                    container.find("." + _this.peer.className("togetherjs-person-")).removeClass("togetherjs-person-other-url");
                 }
-                if (_this.peer.following) {
+                if ("following" in _this.peer && _this.peer.following) {
                     if (_this.followCheckbox) {
                         _this.followCheckbox.prop("checked", true);
                     }
@@ -1005,8 +1004,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             container.find("#togetherjs-menu-invite-anyone").click(function () {
                 invite(null);
             });
-            // The following lines should be at the end of this function
-            // (new code goes above)
+            // The following lines should be at the end of this function (new code goes above)
             session.emit("new-element", this.container); // TODO !
             if (finishedAt && finishedAt > Date.now()) {
                 setTimeout(function () {
