@@ -277,7 +277,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         updateDisplay(container?: JQuery) {
             deferForContainer(() => {
-                alert("lala");
                 container = container || this.ui.container;
                 var abbrev = this.peer.name;
                 if(this.peer.isSelf) {

@@ -265,7 +265,6 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         PeerView.prototype.updateDisplay = function (container) {
             var _this = this;
             deferForContainer(function () {
-                alert("lala");
                 container = container || _this.ui.container;
                 var abbrev = _this.peer.name;
                 if (_this.peer.isSelf) {
