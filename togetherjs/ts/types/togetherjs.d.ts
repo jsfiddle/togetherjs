@@ -389,7 +389,7 @@ declare namespace TogetherJSNS {
         // session.hub.on
         "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
         "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
-        "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: Logs }) => void; // TODO parameter similar to GetLogs
+        "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: string }) => void; // TODO parameter similar to GetLogs
         // TODO logs may be of type Logs[], we shoud check
         "cursor-update": (msg: On.CursorUpdate & ChannelSend.WithClientId) => void;
         "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
