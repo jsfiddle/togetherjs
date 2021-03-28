@@ -314,8 +314,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                         borderColor: this.peer.color
                     });
                 }
-                container.find("." + this.peer.className("togetherjs-person-role-"))
-                    .text(this.peer.isCreator ? "Creator" : "Participant");
+                container.find("." + this.peer.className("togetherjs-person-role-")).text(this.peer.isCreator ? "Creator" : "Participant");
                 var urlName = this.peer.title || "";
                 if(this.peer.title) {
                     urlName += " (";

@@ -305,8 +305,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                         borderColor: _this.peer.color
                     });
                 }
-                container.find("." + _this.peer.className("togetherjs-person-role-"))
-                    .text(_this.peer.isCreator ? "Creator" : "Participant");
+                container.find("." + _this.peer.className("togetherjs-person-role-")).text(_this.peer.isCreator ? "Creator" : "Participant");
                 var urlName = _this.peer.title || "";
                 if (_this.peer.title) {
                     urlName += " (";

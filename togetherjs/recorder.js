@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 define(["jquery", "util", "channels"], function ($, _util, channels) {
-    var channel = null;
+    var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var baseUrl = null;
     var clientId = "recorder";
     function display(elOrSelector) {
@@ -79,6 +79,7 @@ define(["jquery", "util", "channels"], function ($, _util, channels) {
                 }
                 this.shareId = match[1];
             }
+            assert(options.defaultHubBase != undefined); // TODO add assert for easier typechecking
             var hubBase = options.defaultHubBase;
             match = /\&hubBase=([^&]+)/.exec(location.hash);
             if (match) {

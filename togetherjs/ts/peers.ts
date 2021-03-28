@@ -151,7 +151,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
 
         updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForSending>) {
             var urlUpdated = false;
-            var activeRTC = false;
+            // var activeRTC = false; // TODO code change, unused
             var identityUpdated = false;
             if("url" in msg && msg.url && msg.url != this.url) {
                 this.url = msg.url;

@@ -658,6 +658,7 @@ function otMain(util) {
                     }
                     return true;
                 }
+                return;
             }, null);
             return delta;
         };
@@ -690,7 +691,7 @@ function otMain(util) {
                 args[_i - 3] = arguments[_i];
             }
             prefix = prefix || "before";
-            var postfix = Array.prototype.slice.call(arguments, 3);
+            var postfix = args; // TODO was Array.prototype.slice.call(arguments, 3);
             console.log.apply(console, [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe())]));
             try {
                 callback();
@@ -714,9 +715,11 @@ function otMain(util) {
             return max + 1;
         };
         // TODO seems to be unused
-        TJSHistory.prototype.fault = function (change) {
+        /*
+        fault(change: Change) {
             throw new Error('Fault');
-        };
+        }
+        */
         TJSHistory.prototype.getState = function () {
             var state;
             this._history.walkForward(0, function (c) {

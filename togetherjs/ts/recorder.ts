@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, channels: TogetherJSNS.Channels) {
-    let channel: TogetherJSNS.WebSocketChannel | null = null;
+    let channel: TogetherJSNS.WebSocketChannel; // TODO potentially not initialized, why does TSC doesn't catch that?
     let baseUrl = null;
     let clientId = "recorder";
 
@@ -82,6 +82,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
                 }
                 this.shareId = match[1];
             }
+            assert(options.defaultHubBase != undefined); // TODO add assert for easier typechecking
             var hubBase = options.defaultHubBase;
             match = /\&hubBase=([^&]+)/.exec(location.hash);
             if(match) {

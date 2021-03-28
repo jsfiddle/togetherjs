@@ -713,6 +713,7 @@ function otMain(util: Util) {
                     }
                     return true;
                 }
+                return;
             }, null);
             return delta;
         }
@@ -742,7 +743,7 @@ function otMain(util: Util) {
 
         logChange(prefix: string, change: Change, callback: () => void, ...args: any[]) { // TODO use args intead of postfix, also, is any ok?
             prefix = prefix || "before";
-            var postfix = Array.prototype.slice.call(arguments, 3);
+            var postfix = args; // TODO was Array.prototype.slice.call(arguments, 3);
             console.log.apply(
                 console,
                 [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe())]));
@@ -770,9 +771,11 @@ function otMain(util: Util) {
         }
 
         // TODO seems to be unused
+        /*
         fault(change: Change) {
             throw new Error('Fault');
         }
+        */
 
         getState() {
             let state: Change;

@@ -95,7 +95,7 @@ function peersMain(util, session, storage, require, templates) {
         PeerClass.prototype.updateFromHello = function (msg) {
             var _a;
             var urlUpdated = false;
-            var activeRTC = false;
+            // var activeRTC = false; // TODO code change, unused
             var identityUpdated = false;
             if ("url" in msg && msg.url && msg.url != this.url) {
                 this.url = msg.url;
