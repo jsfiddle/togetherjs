@@ -26,7 +26,9 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
-                url: "about:blank"
+                url: "about:blank",
+                identityId: "_robot", // TODO added this field, check that it's ok
+                status: "live" // TODO added this field, check that it's ok
             });
         }
         else {
