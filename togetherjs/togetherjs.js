@@ -434,7 +434,7 @@ function togetherjsMain() {
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
             // FIXME: close these configs?
-            var ons = this.config.get("on") || ;
+            var ons = this.config.get("on") || {};
             for (attr in globalOns) {
                 if (globalOns.hasOwnProperty(attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
