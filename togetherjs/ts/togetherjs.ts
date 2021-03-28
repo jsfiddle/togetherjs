@@ -5,6 +5,24 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 let globalTjs;
 
+function clone<T>(o: T): T {
+    return extend(o as any) as unknown as T; // TODO all those casts!!!!!
+}
+
+/** Can also be used to clone an object */
+function extend(base: { [key: string]: unknown }, extensions?: any) {
+    if(!extensions) {
+        extensions = base;
+        base = {};
+    }
+    for(let a in extensions) {
+        if(extensions.hasOwnProperty(a)) {
+            base[a] = extensions[a];
+        }
+    }
+    return base;
+}
+
 class OnClass {
     _knownEvents?: string[];
     _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
@@ -154,7 +172,7 @@ function togetherjsMain() {
         });
     }
 
-    const defaultStartupInit: TogetherJSNS.StartupInit = {
+    const defaultStartupInit: TogetherJSNS.Startup = {
         // What element, if any, was used to start the session:
         button: null,
         // The startReason is the reason TogetherJS was started.  One of:
@@ -178,7 +196,7 @@ function togetherjsMain() {
         dontShowClicks: false,
         cloneClicks: false,
         enableAnalytics: false,
-        analyticsCode: "UA-35433268-28",
+        analyticsCode: "UA-", // No code
         hubBase: null,
         getUserName: null,
         getUserColor: null,
@@ -203,31 +221,6 @@ function togetherjsMain() {
         ignoreForms: [":password"],
         lang: undefined,
         fallbackLang: "en-US"
-    };
-
-    const defaultConfiguration2: Partial<TogetherJSNS.Config> = {
-        dontShowClicks: false,
-        cloneClicks: false,
-        enableAnalytics: false,
-        analyticsCode: "UA-35433268-28",
-        hubBase: "",
-        getUserName: null,
-        getUserColor: null,
-        getUserAvatar: null,
-        siteName: null,
-        useMinimizedCode: undefined,
-        on: {},
-        hub_on: {},
-        enableShortcut: false,
-        toolName: null,
-        findRoom: null,
-        autoStart: false,
-        suppressJoinConfirmation: false,
-        suppressInvite: false,
-        inviteFromRoom: null,
-        storagePrefix: "togetherjs",
-        includeHashInUrl: false,
-        lang: null
     };
 
     class ConfigClass {
@@ -295,15 +288,13 @@ function togetherjsMain() {
             }
         }
 
-        get<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
-            let value = this.tjsInstance._configuration[name];
-            if(value === undefined) {
-                if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
-                    console.error("Tried to load unknown configuration value:", name);
-                }
-                value = this.tjsInstance._defaultConfiguration[name];
-            }
-            return value;
+        // We need this for this weird reason: https://github.com/microsoft/TypeScript/issues/31675
+        private getValueOrDefault<K extends keyof T, T>(obj: Partial<T>, key: K, defaultValue: T[K]): T[K] {
+            return obj[key] ?? defaultValue;
+        }
+
+        get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
+            return this.getValueOrDefault(this.tjsInstance._configuration, name, this.tjsInstance._defaultConfiguration[name]);
         }
 
         track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) {
@@ -350,10 +341,10 @@ function togetherjsMain() {
         private _loaded?: boolean;
         private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
-        private _startupInit: TogetherJSNS.StartupInit = defaultStartupInit;
-        public startup: TogetherJSNS.Startup = this._extend(this._startupInit);
+        private _startupInit: TogetherJSNS.Startup = defaultStartupInit;
+        public startup: TogetherJSNS.Startup = clone(this._startupInit);
         public _configuration: Partial<TogetherJSNS.Config> = {};
-        public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration2;
+        public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration;
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
         public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
@@ -447,13 +438,13 @@ function togetherjsMain() {
             }
             this.config("on", ons);
             for(attr in ons) {
-                this.on(attr, ons[attr]);
+                this.on(attr as keyof TogetherJSNS.OnMap, ons[attr]); // TODO check cast
             }
             let hubOns = this.config.get("hub_on");
             if(hubOns) {
                 for(attr in hubOns) {
                     if(hubOns.hasOwnProperty(attr)) {
-                        this.hub.on(attr, hubOns[attr]);
+                        this.hub.on(attr as keyof TogetherJSNS.OnMap, hubOns[attr]); // TODO check cast
                     }
                 }
             }
@@ -484,7 +475,7 @@ function togetherjsMain() {
             if(minSetting !== undefined) {
                 min = !!minSetting;
             }
-            let requireConfig: RequireConfig = this._extend(this.requireConfig);
+            let requireConfig: RequireConfig = clone(this.requireConfig);
             let deps = ["session", "jquery"];
             let lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
@@ -560,16 +551,7 @@ function togetherjsMain() {
 
         /** Can also be used to clone an object */
         _extend(base: { [key: string]: unknown }, extensions?: any) {
-            if(!extensions) {
-                extensions = base;
-                base = {};
-            }
-            for(let a in extensions) {
-                if(extensions.hasOwnProperty(a)) {
-                    base[a] = extensions[a];
-                }
-            }
-            return base;
+            return extend(base, extensions);
         }
 
         _teardown() {
@@ -579,7 +561,7 @@ function togetherjsMain() {
                 delete requireObject.s.contexts.togetherjs;
             }
             this._loaded = false;
-            this.startup = this._extend(this._startupInit);
+            this.startup = clone(this._startupInit);
             this.running = false;
         }
 
@@ -624,7 +606,7 @@ function togetherjsMain() {
             else {
                 type2 = "togetherjs." + type2;
             }
-            msg.type = type2;
+            msg.type = type2 as typeof msg.type; // TODO cast!!!
             this.hub.emit(msg.type, msg); // TODO emit error
         }
 
@@ -704,7 +686,7 @@ function togetherjsMain() {
         }
 
         // TODO put the function here maybe? So far it's too integrated with the form.js logic to be possible
-        public addTracker: (TrackerClass: TogetherJSNS.TrackerClass, skipSetInit: boolean) => void;
+        public addTracker: undefined | ((TrackerClass: TogetherJSNS.TrackerClass, skipSetInit: boolean) => void);
     }
 
     function baseUrl1Inner() {

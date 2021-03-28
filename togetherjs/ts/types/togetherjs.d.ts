@@ -632,7 +632,7 @@ declare namespace TogetherJSNS {
     type CssSelector = string;
     type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection" | "get-logs";
     type JQuerySelector = ":password";
-    type Reason = "started" | "joined";
+    type Reason = "started" | "joined" | null;
 
     // TODO this should be removed in favor of TogetherJSClass
     interface TogetherJS2 extends OnClass {
@@ -651,7 +651,7 @@ declare namespace TogetherJSNS {
         _requireObject: Require;
         /** Timestamp */
         pageLoaded: number;
-        _startupInit: StartupInit;
+        _startupInit: Startup;
         _teardown: () => void,
         _configuration: Partial<Config>,
         _defaultConfiguration: Config,
@@ -678,20 +678,12 @@ declare namespace TogetherJSNS {
 
     interface Hub extends OnClass { }
 
-    interface StartupInit {
-        /** What element, if any, was used to start the session */
-        button: null,
-        /** The startReason is the reason TogetherJS was started.  One of:
-            null: not started
-            started: hit the start button (first page view)
-            joined: joined the session (first page view) */
-        reason: null,
-        /** Also, the session may have started on "this" page, or maybe is continued from a past page.  TogetherJS.continued indicates the difference (false the first time TogetherJS is started or joined, true on later page loads). */
-        continued: false,
-        /** This is set to tell the session what shareId to use, if the boot code knows (mostly because the URL indicates the id). */
-        _joinShareId: null,
-        /** This tells session to start up immediately (otherwise it would wait for session.start() to be run) */
-        _launch: false
+    interface Startup {
+        button: HTMLElement | null;
+        reason: Reason;
+        _launch: boolean;
+        _joinShareId: string | null;
+        continued: boolean;
     }
 
     interface Config {
@@ -767,14 +759,6 @@ declare namespace TogetherJSNS {
 
     interface Expiration {
         expiresAt: number,
-    }
-
-    interface Startup {
-        button: HTMLElement | null;
-        reason: Reason;
-        _launch: boolean;
-        _joinShareId: string;
-        continued: boolean;
     }
 
     type PeerStatus = "live" | "active" | "inactive" | "bye";
@@ -926,7 +910,7 @@ declare namespace TogetherJSNS {
     interface ConfigFunObj {
         <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
-        get<K extends keyof Config>(name: K): Partial<Config>[K];
+        get<K extends keyof Config>(name: K): Config[K];
         close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
         track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): (value: Config[K], previous?: Config[K]) => any;
     }
@@ -1045,7 +1029,7 @@ interface Window {
     TowTruckConfig_callToStart?: TogetherJSNS.CallToStart;
     _TogetherJSBookmarklet: unknown;
     //require?: RequireConfig;
-    _TogetherJSShareId: unknown;
+    _TogetherJSShareId?: string;
     TogetherJSConfig_autoStart?: boolean;
     TogetherJSConfig_enableShortcut?: boolean;
     TowTruck: TogetherJSNS.TogetherJS;
@@ -1075,4 +1059,12 @@ interface Navigator {
     webkitGetUserMedia?: Navigator["getUserMedia"];
     /** @deprecated */
     msGetUserMedia?: Navigator["getUserMedia"];
+}
+
+interface Require {
+    s?: {
+        contexts?: {
+            togetherjs?: never;
+        }
+    }
 }

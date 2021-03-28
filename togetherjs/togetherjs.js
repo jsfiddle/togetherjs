@@ -19,6 +19,22 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var globalTjs;
+function clone(o) {
+    return extend(o); // TODO all those casts!!!!!
+}
+/** Can also be used to clone an object */
+function extend(base, extensions) {
+    if (!extensions) {
+        extensions = base;
+        base = {};
+    }
+    for (var a in extensions) {
+        if (extensions.hasOwnProperty(a)) {
+            base[a] = extensions[a];
+        }
+    }
+    return base;
+}
 var OnClass = /** @class */ (function () {
     function OnClass() {
         this._listeners = {}; // TODO any
@@ -188,7 +204,7 @@ function togetherjsMain() {
         dontShowClicks: false,
         cloneClicks: false,
         enableAnalytics: false,
-        analyticsCode: "UA-35433268-28",
+        analyticsCode: "UA-",
         hubBase: null,
         getUserName: null,
         getUserColor: null,
@@ -213,30 +229,6 @@ function togetherjsMain() {
         ignoreForms: [":password"],
         lang: undefined,
         fallbackLang: "en-US"
-    };
-    var defaultConfiguration2 = {
-        dontShowClicks: false,
-        cloneClicks: false,
-        enableAnalytics: false,
-        analyticsCode: "UA-35433268-28",
-        hubBase: "",
-        getUserName: null,
-        getUserColor: null,
-        getUserAvatar: null,
-        siteName: null,
-        useMinimizedCode: undefined,
-        on: {},
-        hub_on: {},
-        enableShortcut: false,
-        toolName: null,
-        findRoom: null,
-        autoStart: false,
-        suppressJoinConfirmation: false,
-        suppressInvite: false,
-        inviteFromRoom: null,
-        storagePrefix: "togetherjs",
-        includeHashInUrl: false,
-        lang: null
     };
     var ConfigClass = /** @class */ (function () {
         function ConfigClass(tjsInstance) {
@@ -304,15 +296,13 @@ function togetherjsMain() {
                 }
             }
         };
+        // We need this for this weird reason: https://github.com/microsoft/TypeScript/issues/31675
+        ConfigClass.prototype.getValueOrDefault = function (obj, key, defaultValue) {
+            var _a;
+            return (_a = obj[key]) !== null && _a !== void 0 ? _a : defaultValue;
+        };
         ConfigClass.prototype.get = function (name) {
-            var value = this.tjsInstance._configuration[name];
-            if (value === undefined) {
-                if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
-                    console.error("Tried to load unknown configuration value:", name);
-                }
-                value = this.tjsInstance._defaultConfiguration[name];
-            }
-            return value;
+            return this.getValueOrDefault(this.tjsInstance._configuration, name, this.tjsInstance._defaultConfiguration[name]);
         };
         ConfigClass.prototype.track = function (name, callback) {
             if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
@@ -354,9 +344,9 @@ function togetherjsMain() {
             _this.hub = new OnClass();
             _this.pageLoaded = Date.now();
             _this._startupInit = defaultStartupInit;
-            _this.startup = _this._extend(_this._startupInit);
+            _this.startup = clone(_this._startupInit);
             _this._configuration = {};
-            _this._defaultConfiguration = defaultConfiguration2;
+            _this._defaultConfiguration = defaultConfiguration;
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             _this._configTrackers = {};
             _this._configClosed = {};
@@ -443,13 +433,13 @@ function togetherjsMain() {
             }
             this.config("on", ons);
             for (attr in ons) {
-                this.on(attr, ons[attr]);
+                this.on(attr, ons[attr]); // TODO check cast
             }
             var hubOns = this.config.get("hub_on");
             if (hubOns) {
                 for (attr in hubOns) {
                     if (hubOns.hasOwnProperty(attr)) {
-                        this.hub.on(attr, hubOns[attr]);
+                        this.hub.on(attr, hubOns[attr]); // TODO check cast
                     }
                 }
             }
@@ -477,7 +467,7 @@ function togetherjsMain() {
             if (minSetting !== undefined) {
                 min = !!minSetting;
             }
-            var requireConfig = this._extend(this.requireConfig);
+            var requireConfig = clone(this.requireConfig);
             var deps = ["session", "jquery"];
             var lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
@@ -549,16 +539,7 @@ function togetherjsMain() {
         };
         /** Can also be used to clone an object */
         TogetherJSClass.prototype._extend = function (base, extensions) {
-            if (!extensions) {
-                extensions = base;
-                base = {};
-            }
-            for (var a in extensions) {
-                if (extensions.hasOwnProperty(a)) {
-                    base[a] = extensions[a];
-                }
-            }
-            return base;
+            return extend(base, extensions);
         };
         TogetherJSClass.prototype._teardown = function () {
             var requireObject = this._requireObject || window.require;
@@ -567,7 +548,7 @@ function togetherjsMain() {
                 delete requireObject.s.contexts.togetherjs;
             }
             this._loaded = false;
-            this.startup = this._extend(this._startupInit);
+            this.startup = clone(this._startupInit);
             this.running = false;
         };
         TogetherJSClass.prototype.toString = function () {
@@ -607,7 +588,7 @@ function togetherjsMain() {
             else {
                 type2 = "togetherjs." + type2;
             }
-            msg.type = type2;
+            msg.type = type2; // TODO cast!!!
             this.hub.emit(msg.type, msg); // TODO emit error
         };
         TogetherJSClass.prototype.send = function (msg) {
