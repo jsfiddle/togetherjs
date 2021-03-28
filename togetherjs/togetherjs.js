@@ -85,7 +85,7 @@ var OnClass = /** @class */ (function () {
         if (name.search(" ") != -1) {
             var names = name.split(/ +/g);
             names.forEach(function (n) {
-                this.off(n, callback);
+                this.off(n, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
             }, this);
             return;
         }
@@ -99,13 +99,6 @@ var OnClass = /** @class */ (function () {
                 break;
             }
         }
-    };
-    OnClass.prototype.removeListener2 = function (eventName, cb) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
-        }
-        this.off(arguments);
     };
     OnClass.prototype.emit = function (name) {
         var args2 = [];

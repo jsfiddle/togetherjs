@@ -63,13 +63,13 @@ class OnClass {
     off<T extends keyof TogetherJSNS.OnMap>(name: T, callback: TogetherJSNS.OnMap[T]) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
-            this._listenerOffs.push([name, callback]);
+            this._listenerOffs.push([name, callback as TogetherJSNS.CallbackForOnce<any>]);
             return;
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
             names.forEach(function(this: OnClass, n) {
-                this.off(n, callback);
+                this.off(n as keyof TogetherJSNS.OnMap, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
             }, this);
             return;
         }
@@ -83,10 +83,6 @@ class OnClass {
                 break;
             }
         }
-    }
-
-    removeListener2<T>(eventName: string, cb: TogetherJSNS.CallbackForOn<T>, ...args: any[]) {
-        this.off(arguments);
     }
 
     removeListener = this.off.bind(this);
@@ -107,7 +103,6 @@ class OnClass {
                 this.off(item[0], item[1]);
             }, this);
         }
-
     }
 }
 
