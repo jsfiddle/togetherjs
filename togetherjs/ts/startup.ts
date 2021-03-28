@@ -14,9 +14,9 @@
 
 */
 
-function startupMain (util: Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
+function startupMain (_util: Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
-    var session: TogetherJSNS.Session | null = null;
+    let session: TogetherJSNS.Session; // TODO potentially uninitialized, why does TSC doesn't catch that?
 
     type StepKind = "browserBroken" | "browserUnsupported" | "sessionIntro" | "walkthrough" | "share";
     var STEPS: StepKind[] = [

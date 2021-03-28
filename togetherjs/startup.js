@@ -13,9 +13,9 @@
    When everything is done it fires session.emit("startup-ready")
 
 */
-function startupMain(util, require, $, windowing, storage) {
+function startupMain(_util, require, $, windowing, storage) {
     // Avoid circular import:
-    var session = null;
+    var session; // TODO potentially uninitialized, why does TSC doesn't catch that?
     var STEPS = [
         "browserBroken",
         "browserUnsupported",
