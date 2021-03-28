@@ -188,7 +188,11 @@ declare namespace TogetherJSNS {
         }
 
         interface PeerUpdate {
-            type: "peer-update"
+            type: "peer-update",
+            name?: string,
+            avatar?: string,
+            color?: string,
+            //peer: PeerClass // TODO should be added after transit
         }
 
         interface VideoEventName {
@@ -321,7 +325,7 @@ declare namespace TogetherJSNS {
             "hello": { type: "hello", peer: PeerClass };
             "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
             "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
+            "peer-update": SessionSend.PeerUpdate;
             "init-connection": { type: "init-connection", peerCount: number };
             "who": { type: "who" };
             "invite": { type: "invite" };
@@ -446,12 +450,14 @@ declare namespace TogetherJSNS {
         "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
         "get-logs": (msg: { type: "get-logs" }) => void; // TODO may be wrong
         "ping-back": (msg: { type: "ping-back" }) => void; // TODO may be wrong
-        "peer-update": (msg: { type: "peer-update" }) => void; // TODO may be wrong
+        "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
         "route": (msg: { type: "route" }) => void; // TODO may be wrong
         "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
     }
 
     namespace AnyMessage {
+        type PartialWithType<T extends {type: keyof MapForSending}> = Partial<Exclude<T, "type">> & Pick<T, "type">;
+
         /** While a message in in the send process or in the receiving process some fields will be set, they can be undefined for a short time */
         interface InTransit {
             sameUrl?: boolean,
@@ -470,7 +476,7 @@ declare namespace TogetherJSNS {
             "hello": { type: "hello", peer: PeerClass };
             "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
             "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
+            "peer-update": SessionSend.PeerUpdate;
             "init-connection": { type: "init-connection", peerCount: number };
             "who": { type: "who" };
             "invite": { type: "invite" };
@@ -516,7 +522,7 @@ declare namespace TogetherJSNS {
             //"hello-back": { type: "hello-back", peer: PeerClass };
             "hello-back": TogetherJSNS.On.HelloBackMessage;
             "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": { type: "peer-update", name: string, avatar: string, color: string, peer: PeerClass };
+            "peer-update": SessionSend.PeerUpdate;
             "init-connection": { type: "init-connection", peerCount: number };
             "who": { type: "who", "server-echo": boolean };
             "invite": { type: "invite", inviteId: string, url: string, userInfo: ChannelSend.UserInfo, forClientId: string, "server-echo": boolean };
@@ -604,7 +610,7 @@ declare namespace TogetherJSNS {
 
     type AnyPeer = PeerSelf | PeerClass;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */
-    type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.ChannelOnMessage.Map["peer-update"];
+    type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.SessionSend.PeerUpdate;
 
     interface TextReplaceStruct {
         start: number,

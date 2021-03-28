@@ -311,7 +311,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         update(attrs: Partial<PeerSelfAttributes>) {
             var updatePeers = false;
             var updateIdle = false;
-            var updateMsg: TogetherJSNS.AnyMessage.MapForSending["peer-update"] = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
+            var updateMsg: TogetherJSNS.SessionSend.PeerUpdate = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
             if(typeof attrs.name == "string" && attrs.name != this.name) {
                 this.name = attrs.name;
                 updateMsg.name = this.name;
@@ -459,6 +459,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     }
 
     class Peers extends OnClass {
+        //@ts-expect-error export
         private PeerClassExport!: PeerClass; // TODO very ugly way to export the class
         public Self: PeersSelf;
         public readonly _SelfLoaded = util.Deferred();
