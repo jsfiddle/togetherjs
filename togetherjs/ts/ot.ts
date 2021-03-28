@@ -253,9 +253,9 @@ function otMain(util: Util) {
      */
     class SimpleHistory {
         private clientId;
-        private committed: string;
+        public committed: string;
         public current;
-        private basis: number;
+        public basis: number;
         private queue: Change2[] = [];
         private deltaId = 1;
         private selection: TogetherJSNS.TextReplace | null = null;
@@ -493,8 +493,8 @@ function otMain(util: Util) {
 
         /* Make a new ot.TextReplace that converts oldValue to newValue. */
         static fromChange(oldValue: string, newValue: string) {
-            //assert(typeof oldValue == "string");
-            //assert(typeof newValue == "string");
+            assert(typeof oldValue == "string");
+            assert(typeof newValue == "string");
             var commonStart = 0;
             while(commonStart < newValue.length &&
                 newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {

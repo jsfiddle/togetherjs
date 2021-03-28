@@ -397,8 +397,9 @@ declare namespace TogetherJSNS {
         "hello": (msg: { sameUrl: boolean }) => void;
         "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
         "keydown": (msg: { clientId: string }) => void;
-        "form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void
-        "form-init": (msg: { sameUrl: boolean, pageAge: number, updates: { element: string, value: string, tracker: string, basis: number }[] }) => void;
+        //"form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void // TODO old version, trying below with FormUpdateMessage
+        "form-update": (msg: FormUpdateMessage & AnyMessage.AfterTransit) => void
+        "form-init": (msg: FormInitMessage & AnyMessage.AfterTransit) => void;
         "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
         "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
         "ping": () => void;
@@ -795,7 +796,7 @@ declare namespace TogetherJSNS {
     interface FormInitMessage {
         type: "form-init";
         pageAge: number;
-        updates: MessageForEditor[]
+        updates: MessageForEditor2[]
     }
 
     interface FormUpdateMessage {
@@ -809,7 +810,7 @@ declare namespace TogetherJSNS {
             basis: number;
             delta: TextReplaceStruct;
         };
-        value?: string; // TODO seems to be unused
+        value?: string | boolean;
         basis?: number; // TODO seems to be unused
     }
 

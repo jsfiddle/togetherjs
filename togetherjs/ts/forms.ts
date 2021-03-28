@@ -7,7 +7,15 @@ declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
 interface MessageForEditor {
     element: HTMLElement | string;
-    tracker: string;
+    tracker?: string;
+    value: string;
+    basis?: number;
+}
+
+/** Same as MessageForEditor except element is of type string */
+interface MessageForEditor2 {
+    element: string;
+    tracker?: string;
     value: string;
     basis?: number;
 }
@@ -54,7 +62,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         /** a selector */
         element: string | HTMLElement;
         tracker?: string;
-        value: string;
+        value: string | boolean;
     }
 
     function sendData(attrs: SendDataAttributes) {
@@ -74,10 +82,12 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         let msg: TogetherJSNS.FormUpdateMessage = {
             type: "form-update",
             element: location,
+            value: value,
         };
 
-        if(isText(el[0]) || tracker) {
-            var history = el.data("togetherjsHistory");
+        // TODO I added this typeof value == "string" check because normally  value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
+        if(typeof value == "string" && (isText(el[0]) || tracker)) {
+            var history = el.data("togetherjsHistory") as TogetherJSNS.SimpleHistory;
             if(history) {
                 if(history.current == value) {
                     return;
@@ -89,14 +99,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             else {
-                msg.value = value; // TODO these 2 fields don't seem to be used anywhere
-                msg.basis = 1;
+                msg.basis = 1; // TODO these 2 fields don't seem to be used anywhere
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
         }
-        else {
-            msg.value = value;
-        }
+
         session.send(msg);
     }
 
@@ -577,18 +584,19 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         return "?";
     }
 
-    function setValue(e: HTMLElement | JQuery, value: string) {
+    function setValue(e: HTMLElement | JQuery, value: string | boolean) {
         const el = $(e);
         var changed = false;
         if(isCheckable(el)) {
+            assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
             var checked = !!el.prop("checked");
-            const boolValue = !!value;
-            if(checked != boolValue) {
+            if(checked != value) {
                 changed = true;
-                el.prop("checked", boolValue);
+                el.prop("checked", value);
             }
         }
         else {
+            assert(typeof value == "string"); // see above
             if(el.val() != value) {
                 changed = true;
                 el.val(value);
@@ -648,7 +656,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             //assert(el0.selectionEnd);
             selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
-        let value: string;
+        let value: string | boolean;
         if(msg.replace) {
             let history: TogetherJSNS.SimpleHistory = el.data("togetherjsHistory");
             if(!history) {
@@ -657,9 +665,10 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             history.setSelection(selection);
             // make a real TextReplace object.
-            msg.replace.delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            const delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            const change: Change2 = {id: msg.replace.id, delta: delta, basis: msg.replace.basis};
             // apply this change to the history
-            var changed = history.commit(msg.replace);
+            var changed = history.commit(change);
             var trackerName = undefined;
             if(typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
@@ -721,13 +730,14 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var el = $(this);
             const el0 = el[0];
             var value = getValue(el0);
-            var upd: MessageForEditor = {
+            let upd: MessageForEditor2 = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
             };
+            // TODO added this typeof check because isText(el0) implies that value is of type string but TS doesn't know that
             if(isText(el0)) {
-                var history = el.data("togetherjsHistory");
+                var history = el.data("togetherjsHistory") as TogetherJSNS.SimpleHistory;
                 if(history) {
                     upd.value = history.committed;
                     upd.basis = history.basis;
@@ -736,14 +746,20 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             msg.updates.push(upd);
         });
         liveTrackers.forEach(function(tracker) {
-            var init = tracker.makeInit();
-            assert(tracker.tracked(init.element));
-            var history = $(init.element).data("togetherjsHistory");
+            var init0 = tracker.makeInit();
+            
+            assert(tracker.tracked(init0.element));
+            var history = $(init0.element).data("togetherjsHistory");
+            // TODO logic change
+            let init: MessageForEditor2 = {
+                element: elementFinder.elementLocation($(init0.element)),
+                tracker: init0.tracker,
+                value: init0.value,
+            };
             if(history) {
                 init.value = history.committed;
                 init.basis = history.basis;
             }
-            init.element = elementFinder.elementLocation($(init.element));
             msg.updates.push(init);
         });
         if(msg.updates.length) {
@@ -762,8 +778,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
-            // TODO check .toString() is ok
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value.toString(), 1)); // TODO !
+            // TODO check value.toString() is ok
         });
         destroyTrackers();
         buildTrackers();
@@ -805,7 +821,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                     var tracker = getTracker(el, update.tracker);
                     assert(tracker);
                     tracker.init(update); // TODO remove arg msg that was unused in the called function
-                } else {
+                }
+                else {
                     setValue(el, update.value);
                 }
                 if(update.basis) {

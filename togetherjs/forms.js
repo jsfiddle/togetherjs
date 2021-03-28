@@ -66,8 +66,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         var msg = {
             type: "form-update",
             element: location,
+            value: value,
         };
-        if (isText(el[0]) || tracker) {
+        // TODO I added this typeof value == "string" check because normally  value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
+        if (typeof value == "string" && (isText(el[0]) || tracker)) {
             var history = el.data("togetherjsHistory");
             if (history) {
                 if (history.current == value) {
@@ -80,13 +82,9 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             else {
-                msg.value = value; // TODO these 2 fields don't seem to be used anywhere
-                msg.basis = 1;
+                msg.basis = 1; // TODO these 2 fields don't seem to be used anywhere
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
-        }
-        else {
-            msg.value = value;
         }
         session.send(msg);
     }
@@ -506,14 +504,15 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         var el = $(e);
         var changed = false;
         if (isCheckable(el)) {
+            assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
             var checked = !!el.prop("checked");
-            var boolValue = !!value;
-            if (checked != boolValue) {
+            if (checked != value) {
                 changed = true;
-                el.prop("checked", boolValue);
+                el.prop("checked", value);
             }
         }
         else {
+            assert(typeof value == "string"); // see above
             if (el.val() != value) {
                 changed = true;
                 el.val(value);
@@ -580,9 +579,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             history_1.setSelection(selection);
             // make a real TextReplace object.
-            msg.replace.delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            var delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            var change_1 = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
-            var changed = history_1.commit(msg.replace);
+            var changed = history_1.commit(change_1);
             var trackerName = undefined;
             if (typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
@@ -644,6 +644,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
             };
+            // TODO added this typeof check because isText(el0) implies that value is of type string but TS doesn't know that
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
                 if (history) {
@@ -654,14 +655,19 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             msg.updates.push(upd);
         });
         liveTrackers.forEach(function (tracker) {
-            var init = tracker.makeInit();
-            assert(tracker.tracked(init.element));
-            var history = $(init.element).data("togetherjsHistory");
+            var init0 = tracker.makeInit();
+            assert(tracker.tracked(init0.element));
+            var history = $(init0.element).data("togetherjsHistory");
+            // TODO logic change
+            var init = {
+                element: elementFinder.elementLocation($(init0.element)),
+                tracker: init0.tracker,
+                value: init0.value,
+            };
             if (history) {
                 init.value = history.committed;
                 init.basis = history.basis;
             }
-            init.element = elementFinder.elementLocation($(init.element));
             msg.updates.push(init);
         });
         if (msg.updates.length) {
@@ -679,8 +685,8 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
-            // TODO check .toString() is ok
+            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value.toString(), 1)); // TODO !
+            // TODO check value.toString() is ok
         });
         destroyTrackers();
         buildTrackers();

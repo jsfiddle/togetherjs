@@ -137,7 +137,8 @@ class ElementFinder {
             if(loc.indexOf(":") === -1) {
                 id = loc;
                 rest = "";
-            } else {
+            }
+            else {
                 id = loc.substr(0, loc.indexOf(":"));
                 rest = loc.substr(loc.indexOf(":"));
             }
@@ -154,7 +155,8 @@ class ElementFinder {
                     }
                     throw e;
                 }
-            } else {
+            }
+            else {
                 return el;
             }
         }
@@ -194,7 +196,8 @@ class ElementFinder {
                     }
                     throw e;
                 }
-            } else {
+            }
+            else {
                 return el;
             }
         }

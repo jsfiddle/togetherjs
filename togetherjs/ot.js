@@ -455,8 +455,8 @@ function otMain(util) {
         };
         /* Make a new ot.TextReplace that converts oldValue to newValue. */
         TextReplace.fromChange = function (oldValue, newValue) {
-            //assert(typeof oldValue == "string");
-            //assert(typeof newValue == "string");
+            assert(typeof oldValue == "string");
+            assert(typeof newValue == "string");
             var commonStart = 0;
             while (commonStart < newValue.length &&
                 newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
