@@ -651,7 +651,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var value = getValue(el0);
             // TODO old code in /**/
             /*
-            let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
+            let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value

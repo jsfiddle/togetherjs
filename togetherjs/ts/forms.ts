@@ -169,11 +169,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().document.setValue(msg.value);
         }
 
-        init(update: TogetherJSNS.MessageForEditor_StringElement_WithTracker): void {
+        init(update: TogetherJSNS.MessageForEditor.StringElement_WithTracker): void {
             this.update(update);
         }
 
-        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
+        makeInit(): TogetherJSNS.MessageForEditor.AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -239,13 +239,13 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().setValue(msg.value);
         }
 
-        init(msg: TogetherJSNS.MessageForEditor_WithTracker) {
+        init(msg: TogetherJSNS.MessageForEditor.WithTracker) {
             if(msg.value) {
                 this.update(msg);
             }
         }
 
-        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
+        makeInit(): TogetherJSNS.MessageForEditor.AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -329,11 +329,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().editable().setHtml(msg.value);
         }
 
-        init(update: TogetherJSNS.MessageForEditor_WithTracker) {
+        init(update: TogetherJSNS.MessageForEditor.WithTracker) {
             this.update(update);
         }
 
-        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
+        makeInit(): TogetherJSNS.MessageForEditor.AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -419,7 +419,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this.update(update);
         }
 
-        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
+        makeInit(): TogetherJSNS.MessageForEditor.AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -738,7 +738,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var value = getValue(el0);
             // TODO old code in /**/
             /*
-            let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
+            let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
                 value: value
@@ -749,7 +749,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             if(isText(el0)) {
                 var history = el.data("togetherjsHistory") as TogetherJSNS.SimpleHistory;
                 if(history) {
-                    let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
+                    let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker = {
                         element: elementFinder.elementLocation(this),
                         value: history.committed,
                         basis: history.basis,
@@ -757,7 +757,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                     msg.updates.push(upd);
                 }
                 else {
-                    let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker_WithoutBasis = {
+                    let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker_WithoutBasis = {
                         element: elementFinder.elementLocation(this),
                         value: value,
                     };
@@ -765,7 +765,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 }
             }
             else {
-                let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker_WithoutBasis = {
+                let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker_WithoutBasis = {
                     element: elementFinder.elementLocation(this),
                     value: value,
                 };
@@ -777,7 +777,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             assert(tracker.tracked(init0.element));
             var history = $(init0.element).data("togetherjsHistory");
             // TODO check the logic change
-            let init: TogetherJSNS.MessageForEditor_StringElement_WithTracker = {
+            let init: TogetherJSNS.MessageForEditor.StringElement_WithTracker = {
                 element: elementFinder.elementLocation($(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,

@@ -796,47 +796,67 @@ declare namespace TogetherJSNS {
     interface FormInitMessage {
         type: "form-init";
         pageAge: number;
-        updates: TogetherJSNS.MessageForEditor_StringElement[]
+        updates: TogetherJSNS.MessageForEditor.StringElement[]
     }
 
-    type MessageForEditor = MessageForEditor_StringElement | MessageForEditor_AnyElement;
-    type MessageForEditor_StringElement = MessageForEditor_StringElement_WithTracker | MessageForEditor_StringElement_WithoutTracker;
-    type MessageForEditor_AnyElement = MessageForEditor_AnyElement_WithTracker | MessageForEditor_AnyElement_WithoutTracker;
-    type MessageForEditor_WithTracker = MessageForEditor_AnyElement_WithTracker | MessageForEditor_StringElement_WithTracker;
-    type MessageForEditor_WithoutTracker = MessageForEditor_AnyElement_WithoutTracker | MessageForEditor_StringElement_WithoutTracker;
-
-    interface MessageForEditor_AnyElement_WithTracker {
-        element: HTMLElement | string;
-        tracker: string;
-        basis?: number;
-        value: string;
-    }
-
-    interface MessageForEditor_AnyElement_WithoutTracker {
-        element: HTMLElement | string;
-        basis?: number;
-        value: string | boolean;
-    }
+    /** This namespace contains interfaces that transcribe the constraints that apply on Forms
     
-    /** Same as MessageForEditor except element is of type string */
-    interface MessageForEditor_StringElement_WithTracker {
-        element: string;
-        tracker: string;
-        basis?: number;
-        value: string;
-    }
+    __AnyElement__: the `element` field can be either HTMLElement or string. It is used when the message has not gone through the network (because going through the network means that the HTMLElement must be translated into its css selector).
+        
+    __WithTracker__: the `tracker` field is present which means that it represents a change in a text editor (augmented textarea like tinymceEditor) because trackers are used only for such textarea, in this case the field `value` is always of type string.
 
-    type MessageForEditor_StringElement_WithoutTracker = MessageForEditor_StringElement_WithoutTracker_WithBasis | MessageForEditor_StringElement_WithoutTracker_WithoutBasis;
+    __WithBasis__: the `basis` field means that we have an history (like SimpleHistory) implemented which only happens for textarea, that is why the type of the `value` field is always string in this case.
 
-    interface MessageForEditor_StringElement_WithoutTracker_WithBasis {
-        element: string;
-        basis: number;
-        value: string;
-    }
+    Note that it would make many possible configurations but only 6 are meaningful since WithBasis and WithoutBasis are only important on the StringElement_WithoutTracker variants.
+    */
+    namespace MessageForEditor {
+        /** Any possible combination of (meaningful) constraints */
+        type Any = StringElement | AnyElement;
 
-    interface MessageForEditor_StringElement_WithoutTracker_WithoutBasis {
-        element: string;
-        value: string | boolean;
+        /** The `element` field is of type string */
+        type StringElement = StringElement_WithTracker | StringElement_WithoutTracker;
+
+        /** The `element` field can be either HTMLElement or string */
+        type AnyElement = AnyElement_WithTracker | AnyElement_WithoutTracker;
+
+        /** The tracker field is present and valued */
+        type WithTracker = AnyElement_WithTracker | StringElement_WithTracker;
+        
+        /** The tracker field is not present */
+        type WithoutTracker = AnyElement_WithoutTracker | StringElement_WithoutTracker;
+    
+        interface AnyElement_WithTracker {
+            element: HTMLElement | string;
+            tracker: string;
+            basis?: number;
+            value: string;
+        }
+    
+        interface AnyElement_WithoutTracker {
+            element: HTMLElement | string;
+            basis?: number;
+            value: string | boolean;
+        }
+        
+        interface StringElement_WithTracker {
+            element: string;
+            tracker: string;
+            basis?: number;
+            value: string;
+        }
+    
+        type StringElement_WithoutTracker = StringElement_WithoutTracker_WithBasis | StringElement_WithoutTracker_WithoutBasis;
+    
+        interface StringElement_WithoutTracker_WithBasis {
+            element: string;
+            basis: number;
+            value: string;
+        }
+    
+        interface StringElement_WithoutTracker_WithoutBasis {
+            element: string;
+            value: string | boolean;
+        }
     }
 
     type FormUpdateMessage = FormUpdateMessage1a | FormUpdateMessage1b | FormUpdateMessage2;
