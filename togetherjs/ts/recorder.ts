@@ -105,7 +105,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
         }
 
         logMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
-            (msg as any).date = Date.now(); // TODO as any
+            (msg as typeof msg & TogetherJSNS.WithDate).date = Date.now(); // TODO as any
             var $record = $("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         }
