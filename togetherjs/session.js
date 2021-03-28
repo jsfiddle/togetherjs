@@ -118,7 +118,9 @@ function sessionMain(require, util, channels, $, storage) {
                     title: document.title,
                     rtcSupported: !!session.RTCSupported,
                     isClient: session.isClient,
-                    starting: starting
+                    starting: starting,
+                    identityId: peers.Self.identityId,
+                    status: peers.Self.status,
                 };
                 // This is a chance for other modules to effect the hello message:
                 session.emit("prepare-hello", msg);
@@ -252,6 +254,7 @@ function sessionMain(require, util, channels, $, storage) {
                 console.warn("Message received before all modules loaded (ignoring):", msg);
                 return;
             }
+            // TODO I feel that this error is "normal" since this checs the consistency at runtime
             if ((!("clientId" in msg)) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
@@ -346,8 +349,7 @@ function sessionMain(require, util, channels, $, storage) {
                     storage.set("identityId", identityId);
                 }
                 session.identityId = identityId;
-                // We don't actually have to wait for the set to succede, so
-                // long as session.identityId is set
+                // We don't actually have to wait for the set to succede, so long as session.identityId is set
                 def.resolve();
             });
         });

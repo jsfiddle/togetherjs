@@ -361,7 +361,7 @@ function togetherjsMain() {
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
         public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
-        private version: string;
+        public version: string;
         public baseUrl: string;
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;

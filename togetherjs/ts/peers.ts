@@ -296,7 +296,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     class PeersSelf extends OnClass {
         private isSelf = true;
         public readonly id = session.clientId;
-        private identityId = session.identityId;
+        public identityId = session.identityId;
         public status: TogetherJSNS.PeerStatus = "live";
         public idle: TogetherJSNS.PeerStatus = "active";
         public name: string | null = null;

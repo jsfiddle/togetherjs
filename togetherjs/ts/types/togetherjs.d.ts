@@ -453,6 +453,9 @@ declare namespace TogetherJSNS {
         "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
         "route": (msg: { type: "route" }) => void; // TODO may be wrong
         "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
+        
+        // other
+        "identityId": { type: "identityId", identityId: string }, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
     }
 
     namespace AnyMessage {
