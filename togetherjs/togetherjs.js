@@ -33,7 +33,7 @@ var OnClass = /** @class */ (function () {
         if (name.search(" ") != -1) {
             var names = name.split(/ +/g);
             names.forEach(function (n) {
-                _this.on(n, callback);
+                _this.on(n, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
             });
             return;
         }
@@ -47,14 +47,12 @@ var OnClass = /** @class */ (function () {
                 console.trace();
             }
         }
-        if (!this._listeners) {
-            this._listeners = {};
-        }
         if (!this._listeners[name]) {
             this._listeners[name] = [];
         }
-        if (this._listeners[name].indexOf(callback) == -1) {
-            this._listeners[name].push(callback);
+        var cb = callback; // TODO how to avoid this cast?
+        if (this._listeners[name].indexOf(cb) == -1) {
+            this._listeners[name].push(cb);
         }
     };
     OnClass.prototype.once = function (name, callback) {
@@ -62,16 +60,21 @@ var OnClass = /** @class */ (function () {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
+        var cb = callback;
         var attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
-        if (!callback[attr]) {
-            callback[attr] = function onceCallback(msg) {
-                callback.apply(this, arguments);
+        if (!cb[attr]) {
+            cb[attr] = function onceCallback() {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                cb.apply(this, args);
                 this.off(name, onceCallback);
-                delete callback[attr];
+                delete cb[attr];
             };
         }
-        this.on(name, callback[attr]);
+        this.on(name, cb[attr]);
     };
     OnClass.prototype.off = function (name, callback) {
         if (this._listenerOffs) {
@@ -86,7 +89,7 @@ var OnClass = /** @class */ (function () {
             }, this);
             return;
         }
-        if ((!this._listeners) || !this._listeners[name]) {
+        if (!this._listeners[name]) {
             return;
         }
         var l = this._listeners[name], _len = l.length;

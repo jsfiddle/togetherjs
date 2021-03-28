@@ -18,7 +18,7 @@ class OnClass {
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
             names.forEach((n) => {
-                this.on(n, callback);
+                this.on(n as keyof TogetherJSNS.OnMap, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
             });
             return;
         }
@@ -32,14 +32,13 @@ class OnClass {
                 console.trace();
             }
         }
-        if(!this._listeners) {
-            this._listeners = {};
-        }
+
         if(!this._listeners[name]) {
             this._listeners[name] = [];
         }
-        if(this._listeners[name].indexOf(callback) == -1) {
-            this._listeners[name].push(callback);
+        const cb = callback as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
+        if(this._listeners[name].indexOf(cb) == -1) {
+            this._listeners[name].push(cb);
         }
     }
 
@@ -48,16 +47,17 @@ class OnClass {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
+        const cb = callback as TogetherJSNS.CallbackForOnce<any>;
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
-        if(!callback[attr]) {
-            callback[attr] = function onceCallback(this: OnClass, msg: TogetherJSNS.Message & T) {
-                callback.apply(this, arguments);
+        if(!cb[attr]) {
+            cb[attr] = function onceCallback(this: OnClass, ...args: any[]) {
+                cb.apply(this, args);
                 this.off(name, onceCallback);
-                delete callback[attr];
-            };
+                delete cb[attr];
+            } as TogetherJSNS.CallbackForOnce<any>;
         }
-        this.on(name, callback[attr]);
+        this.on(name, cb[attr]);
     }
 
     off<T extends keyof TogetherJSNS.OnMap>(name: T, callback: TogetherJSNS.OnMap[T]) {
@@ -73,7 +73,7 @@ class OnClass {
             }, this);
             return;
         }
-        if((!this._listeners) || !this._listeners[name]) {
+        if(!this._listeners[name]) {
             return;
         }
         let l = this._listeners[name], _len = l.length;

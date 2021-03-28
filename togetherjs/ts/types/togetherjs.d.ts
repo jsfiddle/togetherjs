@@ -460,7 +460,7 @@ declare namespace TogetherJSNS {
         "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
         
         // other
-        "identityId": { type: "identityId", identityId: string }, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
+        "identityId": (msg: { type: "identityId", identityId: string }) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
     }
 
     namespace AnyMessage {
@@ -912,7 +912,7 @@ declare namespace TogetherJSNS {
     }
 
     interface CallbackForOn<T> {
-        (msg: T): void;
+        (...args: any[]): void;
     }
 
     interface CallbackForOnce<T> extends CallbackForOn<T> {
@@ -921,17 +921,6 @@ declare namespace TogetherJSNS {
 
     interface Ons<T> {
         [key: string]: CallbackForOn<T>;
-    }
-
-    interface On_2 {
-        on<T>(eventName: string, cb: CallbackForOn<T>): void;
-        once<T>(eventName: string, cb: CallbackForOnce<T>): void;
-        off<T>(eventName: string, cb: CallbackForOnce<T>): void;
-        removeListener<T>(eventName: string, cb: CallbackForOn<T>): void;
-        emit(eventName: string, msg?: unknown): void;
-        _knownEvents?: string[];
-        _listeners: { [name: string]: CallbackForOnce<any>[] }; // TODO any
-        _listenerOffs?: [string, CallbackForOnce<any>][];
     }
 
     interface ConfigFunObj {
@@ -944,10 +933,6 @@ declare namespace TogetherJSNS {
 
     interface ConfigGetter {
         get<K extends keyof Config>(name: K): Partial<Config>[K];
-    }
-
-    interface Require2 {
-        (module: "session"): Session;
     }
 
     interface CodeMirrorElement {
