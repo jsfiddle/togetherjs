@@ -261,7 +261,8 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                         ui.chat.system({
                             text: "Set to: " + b.baseUrl
                         });
-                    } else {
+                    }
+                    else {
                         ui.chat.system({
                             text: "No baseUrl override set"
                         });
@@ -298,7 +299,8 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
                         ui.chat.system({
                             text: "Config expires at " + (new Date(c.expiresAt))
                         });
-                    } else {
+                    }
+                    else {
                         ui.chat.system({
                             text: "No config override"
                         });

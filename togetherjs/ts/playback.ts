@@ -2,12 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface LogItem {
-    type: "cursor-update" | "scroll-update" | "hello" | "hello-back",
-    date: number,
-    url: string,
-}
-
 function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
 
     var ALWAYS_REPLAY = {
@@ -34,7 +28,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
             if(!line) {
                 continue;
             }
-            const logItem = JSON.parse(line) as LogItem;
+            const logItem = JSON.parse(line) as TogetherJSNS.LogItem;
             result.push(logItem);
         }
         return new Logs(result);
@@ -46,7 +40,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
         private start: number | null = null;
         private playTimer: number | null = null;
 
-        constructor(private logs: LogItem[], private fromStorage: boolean = false) {
+        constructor(private logs: TogetherJSNS.LogItem[], private fromStorage: boolean = false) {
             this.pos = 0;
         }
 
@@ -120,7 +114,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
             }
         }
 
-        playItem(item: LogItem) {
+        playItem(item: TogetherJSNS.LogItem) {
             if(item.type == "hello") {
                 // We may need to pause here
                 if(item.url != (location.href + "").replace(/\#.*/, "")) {
@@ -165,7 +159,7 @@ function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Sessio
                             def.resolve(undefined);
                             return;
                         }
-                        const logs2 = parseLogs(logs);
+                        const logs2 = parseLogs(logs); // TODO I thing the tjs team forgot that storage.get was not returning a string but the actual object so there is no need to parse the logs, but a test would be nice
                         def.resolve(logs2);
                     }, function(error) {
                         def.reject(error);

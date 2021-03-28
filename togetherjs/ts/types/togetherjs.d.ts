@@ -22,7 +22,7 @@ declare namespace TogetherJSNS {
         type StorageKey = keyof MapRaw | keyof MapForSettings | RecordingKey | OtherKey;
 
         type StorageValue<K extends string> =
-              K extends RecordingKey ? Logs
+              K extends RecordingKey ? string
             : K extends OtherKey     ? never // this line is just to show how to extends this type
             : K extends keyof MapForSettings ? MapForSettings[K]
             : K extends keyof MapRaw ? MapRaw[K] : never;
@@ -914,6 +914,9 @@ declare namespace TogetherJSNS {
         text: string,
         date: number
     }
+
+    interface WithDate { date: number }
+    type LogItem = ValueOf<AnyMessage.MapForReceiving> & WithDate;
 }
 
 declare namespace TogetherJSNS.Util {

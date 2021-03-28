@@ -75,7 +75,7 @@ function StorageMain(util) {
                         }
                     }
                     else {
-                        value = JSON.parse(valueAsString);
+                        value = JSON.parse(valueAsString); // the storage apparently contains a string that has been stringified so parsing it is still a string
                         if (DEBUG_STORAGE) {
                             console.debug("Get storage", prefixedKey, "=", value);
                         }

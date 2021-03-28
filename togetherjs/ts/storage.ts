@@ -50,7 +50,7 @@ function StorageMain(util: Util) {
             this.settings = new StorageSettings(this);
         }
 
-        get<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, defaultValue: TogetherJSNS.StorageGet.StorageValue<T> | null = null) {
+        get<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, defaultValue: TogetherJSNS.StorageGet.StorageValue<T> | null = null): JQueryDeferred<TogetherJSNS.StorageGet.StorageValue<T>> {
             var self = this;
             return Deferred<TogetherJSNS.StorageGet.StorageValue<T>>(function(def) {
                 // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
@@ -65,7 +65,7 @@ function StorageMain(util: Util) {
                         }
                     }
                     else {
-                        value = JSON.parse(valueAsString);
+                        value = JSON.parse(valueAsString); // the storage apparently contains a string that has been stringified so parsing it is still a string
                         if(DEBUG_STORAGE) {
                             console.debug("Get storage", prefixedKey, "=", value);
                         }
