@@ -447,6 +447,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
         _editor(): TogetherJSNS.TinyEditor {
             if(typeof tinymce == "undefined") {
+                throw new Error("TinyEditor is undefined");
                 //return; // TODO was returning undefined, remove for now for easier typechecking
             }
             return $(this.element).data("tinyEditor");

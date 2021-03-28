@@ -378,6 +378,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         };
         tinymceEditor.prototype._editor = function () {
             if (typeof tinymce == "undefined") {
+                throw new Error("TinyEditor is undefined");
                 //return; // TODO was returning undefined, remove for now for easier typechecking
             }
             return $(this.element).data("tinyEditor");
