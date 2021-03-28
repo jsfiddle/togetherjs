@@ -5,21 +5,6 @@
 declare var CKEDITOR: TogetherJSNS.CKEditor | undefined;
 declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
-interface MessageForEditor {
-    element: HTMLElement | string;
-    tracker?: string;
-    value: string;
-    basis?: number;
-}
-
-/** Same as MessageForEditor except element is of type string */
-interface MessageForEditor2 {
-    element: string;
-    tracker?: string;
-    value: string;
-    basis?: number;
-}
-
 function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
     // TODO this is apparently an empty module object
     const assert: typeof util.assert = util.assert;
@@ -58,17 +43,26 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         });
     }
 
-    interface SendDataAttributes {
+    interface SendDataAttributesWithoutTracker {
         /** a selector */
         element: string | HTMLElement;
-        tracker?: string;
         value: string | boolean;
     }
+
+    /** With tracker means it from an editor and that value is a string */
+    interface SendDataAttributesWithTracker {
+        /** a selector */
+        element: string | HTMLElement;
+        tracker: string;
+        value: string;
+    }
+
+    type SendDataAttributes = SendDataAttributesWithoutTracker | SendDataAttributesWithTracker;
 
     function sendData(attrs: SendDataAttributes) {
         const el = $(attrs.element);
         assert(el);
-        var tracker = attrs.tracker;
+        const tracker: string | undefined = "tracker" in attrs ? attrs.tracker : undefined;
         var value = attrs.value;
         if(inRemoteUpdate) {
             return;
@@ -85,7 +79,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             value: value,
         };
 
-        // TODO I added this typeof value == "string" check because normally  value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
+        // TODO I added this typeof value == "string" check because normally value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
         if(typeof value == "string" && (isText(el[0]) || tracker)) {
             var history = el.data("togetherjsHistory") as TogetherJSNS.SimpleHistory;
             if(history) {
@@ -99,7 +93,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
                 return;
             }
             else {
-                msg.basis = 1; // TODO these 2 fields don't seem to be used anywhere
+                msg.basis = 1;
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
         }
@@ -171,15 +165,15 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().document.removeListener("change", this._change);
         }
 
-        update(msg: { value?: string }) {
+        update(msg: { value: string }) {
             this._editor().document.setValue(msg.value);
         }
 
-        init(update: MessageForEditor): void {
+        init(update: TogetherJSNS.MessageForEditor_StringElement_WithTracker): void {
             this.update(update);
         }
 
-        makeInit(): MessageForEditor {
+        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -192,8 +186,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         _change() {
-            // FIXME: I should have an internal .send() function that automatically
-            // asserts !inRemoteUpdate, among other things
+            // FIXME: I should have an internal .send() function that automatically asserts !inRemoteUpdate, among other things
             if(inRemoteUpdate) {
                 return;
             }
@@ -242,17 +235,17 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().off("change", this._change);
         }
 
-        update(msg: { value: string | undefined }) {
+        update(msg: { value: string }) {
             this._editor().setValue(msg.value);
         }
 
-        init(msg: MessageForEditor) {
+        init(msg: TogetherJSNS.MessageForEditor_WithTracker) {
             if(msg.value) {
                 this.update(msg);
             }
         }
 
-        makeInit(): MessageForEditor {
+        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -336,11 +329,11 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().editable().setHtml(msg.value);
         }
 
-        init(update: MessageForEditor) {
+        init(update: TogetherJSNS.MessageForEditor_WithTracker) {
             this.update(update);
         }
 
-        makeInit(): MessageForEditor {
+        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -426,7 +419,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this.update(update);
         }
 
-        makeInit(): MessageForEditor {
+        makeInit(): TogetherJSNS.MessageForEditor_AnyElement_WithTracker {
             return {
                 element: this.element,
                 tracker: this.trackerName,
@@ -529,11 +522,15 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         return result;
     }
 
-    function getTracker(e: HTMLElement | JQuery, name: string) {
+    function getTracker(e: HTMLElement | JQuery, name: string | null) {
+        if(name === null) {
+            return null;
+        }
         const el = $(e)[0];
         for(var i = 0; i < liveTrackers.length; i++) {
             var tracker = liveTrackers[i];
             if(tracker.tracked(el)) {
+                // TODO read the comment below, weird!
                 //FIXME: assert statement below throws an exception when data is submitted to the hub too fast
                 //in other words, name == tracker.trackerName instead of name == tracker when someone types too fast in the tracked editor
                 //commenting out this assert statement solves the problem
@@ -615,7 +612,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             /* nothing to send */
             return;
         }
-        var msg: TogetherJSNS.FormUpdateMessage = {
+        var msg: TogetherJSNS.FormUpdateMessage2 = {
             type: "form-update",
             element: element,
             "server-echo": true,
@@ -641,11 +638,20 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
         const el = $(elementFinder.findElement(msg.element));
         const el0 = el[0] as HTMLInputElement | HTMLTextAreaElement; // TODO is this cast right?
-        var tracker;
-        if(msg.tracker) {
-            tracker = getTracker(el, msg.tracker);
-            assert(tracker);
+
+        if(typeof msg.value === "boolean") {
+            setValue(el, msg.value);
+            return;
         }
+
+        let tracker: Tracker | undefined;
+        if("tracker" in msg) {
+            // TODO weird gymnastic with tmp var here
+            const tracker0 = getTracker(el, msg.tracker ?? null);
+            assert(tracker0);
+            tracker = tracker0;
+        }
+
         var focusedEl = el0.ownerDocument.activeElement as HTMLInputElement | HTMLTextAreaElement;
         let focusedElSelection: [number, number] | undefined;
         if(isText(focusedEl)) {
@@ -657,8 +663,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             //assert(el0.selectionEnd);
             selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
-        let value: string | boolean;
-        if(msg.replace) {
+        let value: string;
+        if("replace" in msg) {
             let history: TogetherJSNS.SimpleHistory = el.data("togetherjsHistory");
             if(!history) {
                 console.warn("form update received for uninitialized form element");
@@ -687,7 +693,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         inRemoteUpdate = true;
 
         try {
-            if(tracker) {
+            if("tracker" in msg && tracker) {
                 tracker.update({ value: value });
             }
             else {
@@ -724,35 +730,54 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         };
         var els = $("textarea, input, select");
         els.each(function(this: JQuery) {
-            if(elementFinder.ignoreElement(this) || elementTracked(this) ||
-                suppressSync(this)) {
+            if(elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
             var el = $(this);
             const el0 = el[0];
             var value = getValue(el0);
-            let upd: MessageForEditor2 = {
+            // TODO old code in /**/
+            /*
+            let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
+                value: value
             };
+            */
             // TODO added this typeof check because isText(el0) implies that value is of type string but TS doesn't know that
+            // TODO logic has been changed to typecheck reasons, we need to verify that the behavior is the same
             if(isText(el0)) {
                 var history = el.data("togetherjsHistory") as TogetherJSNS.SimpleHistory;
                 if(history) {
-                    upd.value = history.committed;
-                    upd.basis = history.basis;
+                    let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
+                        element: elementFinder.elementLocation(this),
+                        value: history.committed,
+                        basis: history.basis,
+                    };
+                    msg.updates.push(upd);
+                }
+                else {
+                    let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker_WithoutBasis = {
+                        element: elementFinder.elementLocation(this),
+                        value: value,
+                    };
+                    msg.updates.push(upd);
                 }
             }
-            msg.updates.push(upd);
+            else {
+                let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker_WithoutBasis = {
+                    element: elementFinder.elementLocation(this),
+                    value: value,
+                };
+                msg.updates.push(upd);
+            }
         });
         liveTrackers.forEach(function(tracker) {
             var init0 = tracker.makeInit();
-            
             assert(tracker.tracked(init0.element));
             var history = $(init0.element).data("togetherjsHistory");
-            // TODO logic change
-            let init: MessageForEditor2 = {
+            // TODO check the logic change
+            let init: TogetherJSNS.MessageForEditor_StringElement_WithTracker = {
                 element: elementFinder.elementLocation($(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
@@ -811,31 +836,28 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var el;
             try {
                 el = elementFinder.findElement(update.element);
-            } catch(e) {
+            }
+            catch(e) {
                 /* skip missing element */
                 console.warn(e);
                 return;
             }
             inRemoteUpdate = true;
             try {
-                if(update.tracker) {
-                    var tracker = getTracker(el, update.tracker);
+                if("tracker" in update && update.tracker) {
+                    const tracker = getTracker(el, update.tracker);
                     assert(tracker);
                     tracker.init(update); // TODO remove arg msg that was unused in the called function
                 }
                 else {
                     setValue(el, update.value);
                 }
-                if(update.basis) {
+                if("basis" in update && update.basis) {
                     var history = $(el).data("togetherjsHistory");
                     // don't overwrite history if we're already up to date
                     // (we might have outstanding queued changes we don't want to lose)
-                    if(!(history && history.basis === update.basis &&
-                        // if history.basis is 1, the form could have lingering
-                        // edits from before togetherjs was launched.  that's too bad,
-                        // we need to erase them to resynchronize with the peer
-                        // we just asked to join.
-                        history.basis !== 1)) {
+                    if(!(history && history.basis === update.basis && history.basis !== 1)) {
+                        // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
                         $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
                     }
                 }

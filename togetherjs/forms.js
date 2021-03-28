@@ -52,7 +52,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function sendData(attrs) {
         var el = $(attrs.element);
         assert(el);
-        var tracker = attrs.tracker;
+        var tracker = "tracker" in attrs ? attrs.tracker : undefined;
         var value = attrs.value;
         if (inRemoteUpdate) {
             return;
@@ -68,7 +68,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             element: location,
             value: value,
         };
-        // TODO I added this typeof value == "string" check because normally  value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
+        // TODO I added this typeof value == "string" check because normally value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
         if (typeof value == "string" && (isText(el[0]) || tracker)) {
             var history = el.data("togetherjsHistory");
             if (history) {
@@ -82,7 +82,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             else {
-                msg.basis = 1; // TODO these 2 fields don't seem to be used anywhere
+                msg.basis = 1;
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
             }
         }
@@ -156,8 +156,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return this.element.env;
         };
         AceEditor.prototype._change = function () {
-            // FIXME: I should have an internal .send() function that automatically
-            // asserts !inRemoteUpdate, among other things
+            // FIXME: I should have an internal .send() function that automatically asserts !inRemoteUpdate, among other things
             if (inRemoteUpdate) {
                 return;
             }
@@ -451,10 +450,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         return result;
     }
     function getTracker(e, name) {
+        if (name === null) {
+            return null;
+        }
         var el = $(e)[0];
         for (var i = 0; i < liveTrackers.length; i++) {
             var tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
+                // TODO read the comment below, weird!
                 //FIXME: assert statement below throws an exception when data is submitted to the hub too fast
                 //in other words, name == tracker.trackerName instead of name == tracker when someone types too fast in the tracked editor
                 //commenting out this assert statement solves the problem
@@ -550,15 +553,22 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         session.send(msg);
     }
     session.hub.on("form-update", function (msg) {
+        var _a;
         if (!msg.sameUrl) {
             return;
         }
         var el = $(elementFinder.findElement(msg.element));
         var el0 = el[0]; // TODO is this cast right?
+        if (typeof msg.value === "boolean") {
+            setValue(el, msg.value);
+            return;
+        }
         var tracker;
-        if (msg.tracker) {
-            tracker = getTracker(el, msg.tracker);
-            assert(tracker);
+        if ("tracker" in msg) {
+            // TODO weird gymnastic with tmp var here
+            var tracker0 = getTracker(el, (_a = msg.tracker) !== null && _a !== void 0 ? _a : null);
+            assert(tracker0);
+            tracker = tracker0;
         }
         var focusedEl = el0.ownerDocument.activeElement;
         var focusedElSelection;
@@ -572,7 +582,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
         var value;
-        if (msg.replace) {
+        if ("replace" in msg) {
             var history_1 = el.data("togetherjsHistory");
             if (!history_1) {
                 console.warn("form update received for uninitialized form element");
@@ -600,7 +610,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         }
         inRemoteUpdate = true;
         try {
-            if (tracker) {
+            if ("tracker" in msg && tracker) {
                 tracker.update({ value: value });
             }
             else {
@@ -633,33 +643,53 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         };
         var els = $("textarea, input, select");
         els.each(function () {
-            if (elementFinder.ignoreElement(this) || elementTracked(this) ||
-                suppressSync(this)) {
+            if (elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
             var el = $(this);
             var el0 = el[0];
             var value = getValue(el0);
-            var upd = {
+            // TODO old code in /**/
+            /*
+            let upd: TogetherJSNS.MessageForEditor_StringElement_WithoutTracker = {
                 element: elementFinder.elementLocation(this),
                 //elementType: getElementType(el), // added in 5cbb88c9a but unused
-                value: value // TODO adding .toString was causing a bug in some tests so what is the type of value?
+                value: value
             };
+            */
             // TODO added this typeof check because isText(el0) implies that value is of type string but TS doesn't know that
+            // TODO logic has been changed to typecheck reasons, we need to verify that the behavior is the same
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
                 if (history) {
-                    upd.value = history.committed;
-                    upd.basis = history.basis;
+                    var upd = {
+                        element: elementFinder.elementLocation(this),
+                        value: history.committed,
+                        basis: history.basis,
+                    };
+                    msg.updates.push(upd);
+                }
+                else {
+                    var upd = {
+                        element: elementFinder.elementLocation(this),
+                        value: value,
+                    };
+                    msg.updates.push(upd);
                 }
             }
-            msg.updates.push(upd);
+            else {
+                var upd = {
+                    element: elementFinder.elementLocation(this),
+                    value: value,
+                };
+                msg.updates.push(upd);
+            }
         });
         liveTrackers.forEach(function (tracker) {
             var init0 = tracker.makeInit();
             assert(tracker.tracked(init0.element));
             var history = $(init0.element).data("togetherjsHistory");
-            // TODO logic change
+            // TODO check the logic change
             var init = {
                 element: elementFinder.elementLocation($(init0.element)),
                 tracker: init0.tracker,
@@ -722,7 +752,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             inRemoteUpdate = true;
             try {
-                if (update.tracker) {
+                if ("tracker" in update && update.tracker) {
                     var tracker = getTracker(el, update.tracker);
                     assert(tracker);
                     tracker.init(update); // TODO remove arg msg that was unused in the called function
@@ -730,16 +760,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 else {
                     setValue(el, update.value);
                 }
-                if (update.basis) {
+                if ("basis" in update && update.basis) {
                     var history = $(el).data("togetherjsHistory");
                     // don't overwrite history if we're already up to date
                     // (we might have outstanding queued changes we don't want to lose)
-                    if (!(history && history.basis === update.basis &&
-                        // if history.basis is 1, the form could have lingering
-                        // edits from before togetherjs was launched.  that's too bad,
-                        // we need to erase them to resynchronize with the peer
-                        // we just asked to join.
-                        history.basis !== 1)) {
+                    if (!(history && history.basis === update.basis && history.basis !== 1)) {
+                        // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
                         $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
                     }
                 }

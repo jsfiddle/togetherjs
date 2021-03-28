@@ -796,16 +796,79 @@ declare namespace TogetherJSNS {
     interface FormInitMessage {
         type: "form-init";
         pageAge: number;
-        updates: MessageForEditor2[]
+        updates: TogetherJSNS.MessageForEditor_StringElement[]
     }
 
-    interface FormUpdateMessage {
+    type MessageForEditor = MessageForEditor_StringElement | MessageForEditor_AnyElement;
+    type MessageForEditor_StringElement = MessageForEditor_StringElement_WithTracker | MessageForEditor_StringElement_WithoutTracker;
+    type MessageForEditor_AnyElement = MessageForEditor_AnyElement_WithTracker | MessageForEditor_AnyElement_WithoutTracker;
+    type MessageForEditor_WithTracker = MessageForEditor_AnyElement_WithTracker | MessageForEditor_StringElement_WithTracker;
+    type MessageForEditor_WithoutTracker = MessageForEditor_AnyElement_WithoutTracker | MessageForEditor_StringElement_WithoutTracker;
+
+    interface MessageForEditor_AnyElement_WithTracker {
+        element: HTMLElement | string;
+        tracker: string;
+        basis?: number;
+        value: string;
+    }
+
+    interface MessageForEditor_AnyElement_WithoutTracker {
+        element: HTMLElement | string;
+        basis?: number;
+        value: string | boolean;
+    }
+    
+    /** Same as MessageForEditor except element is of type string */
+    interface MessageForEditor_StringElement_WithTracker {
+        element: string;
+        tracker: string;
+        basis?: number;
+        value: string;
+    }
+
+    type MessageForEditor_StringElement_WithoutTracker = MessageForEditor_StringElement_WithoutTracker_WithBasis | MessageForEditor_StringElement_WithoutTracker_WithoutBasis;
+
+    interface MessageForEditor_StringElement_WithoutTracker_WithBasis {
+        element: string;
+        basis: number;
+        value: string;
+    }
+
+    interface MessageForEditor_StringElement_WithoutTracker_WithoutBasis {
+        element: string;
+        value: string | boolean;
+    }
+
+    type FormUpdateMessage = FormUpdateMessage1a | FormUpdateMessage1b | FormUpdateMessage2;
+
+    /** without tracker */
+    interface FormUpdateMessage1a {
+        type: "form-update";
+        /** a selector */
+        element: string;
+        "server-echo"?: boolean;
+        value: string | boolean;
+        basis?: number; // TODO seems to be unused
+    }
+
+    /** a tracker means that value is of type string */
+    interface FormUpdateMessage1b {
+        type: "form-update";
+        /** a selector */
+        element: string;
+        "server-echo"?: boolean;
+        tracker: string;
+        value: string;
+        basis?: number; // TODO seems to be unused
+    }
+
+    interface FormUpdateMessage2 {
         type: "form-update";
         /** a selector */
         element: string;
         "server-echo"?: boolean;
         tracker?: string;
-        replace?: {
+        replace: {
             id: string;
             basis: number;
             delta: TextReplaceStruct;
@@ -875,7 +938,7 @@ declare namespace TogetherJSNS {
     interface AceEditorElement {
         env: {
             document: {
-                setValue: (text: string | undefined) => void,
+                setValue: (text: string) => void,
                 getValue: () => string,
                 on: (eventName: "change", cb: () => void) => void,
                 removeListener: (eventName: "change", cb: () => void) => void,
