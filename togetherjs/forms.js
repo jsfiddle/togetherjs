@@ -351,7 +351,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return this.element === $(el)[0];
         };
         tinymceEditor.prototype.destroy = function () {
-            this._editor().destory();
+            this._editor().destroy(); // TODO was "destory", probably a typo, fixed
         };
         tinymceEditor.prototype.update = function (msg) {
             this._editor().setContent(msg.value, { format: 'raw' });
@@ -378,7 +378,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         };
         tinymceEditor.prototype._editor = function () {
             if (typeof tinymce == "undefined") {
-                return;
+                //return; // TODO was returning undefined, remove for now for easier typechecking
             }
             return $(this.element).data("tinyEditor");
         };

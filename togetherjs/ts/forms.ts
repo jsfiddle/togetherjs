@@ -415,10 +415,10 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         }
 
         destroy() {
-            this._editor().destory();
+            this._editor().destroy(); // TODO was "destory", probably a typo, fixed
         }
 
-        update(msg: { value: string | undefined }) {
+        update(msg: { value: string }) {
             this._editor().setContent(msg.value, { format: 'raw' });
         }
 
@@ -445,9 +445,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             });
         }
 
-        _editor() {
+        _editor(): TogetherJSNS.TinyEditor {
             if(typeof tinymce == "undefined") {
-                return;
+                //return; // TODO was returning undefined, remove for now for easier typechecking
             }
             return $(this.element).data("tinyEditor");
         }

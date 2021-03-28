@@ -909,6 +909,13 @@ declare namespace TogetherJSNS {
         }
     }
 
+    interface TinyEditor {
+        getContent: () => string;
+        destroy: () => void;
+        setContent: (content: string, options: { format: "raw" }) => void;
+        on: (events: string, cb: () => void) => void;
+    }
+
     /** type for storage.tab.set(chatStorageKey, log); */
     interface ChatLogs extends Array<ChatLog> { }
 
