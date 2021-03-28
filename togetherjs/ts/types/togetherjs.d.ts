@@ -533,7 +533,7 @@ declare namespace TogetherJSNS {
             "peer-update": SessionSend.PeerUpdate;
             "init-connection": { type: "init-connection", peerCount: number };
             "who": { type: "who", "server-echo": boolean };
-            "invite": { type: "invite", inviteId: string, url: string, userInfo: ChannelSend.UserInfo, forClientId: string, "server-echo": boolean };
+            "invite": { type: "invite", inviteId: string, url: string, userInfo: ChannelSend.UserInfo, forClientId: string | null, "server-echo": boolean };
 
             //ChannelSend
             "route": ChannelSend.Route,

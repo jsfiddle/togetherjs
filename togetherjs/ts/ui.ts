@@ -459,9 +459,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     this.peer.nudge();
                 });
                 this.followCheckbox = this.detailElement.find("#" + followId);
-                this.followCheckbox.change(function() {
+                const self = this;
+                this.followCheckbox.change(function(this: HTMLInputElement) {
                     if(!this.checked) {
-                        this.peer.unfollow();
+                        self.peer.unfollow();
                     }
                     // Following doesn't happen until the window is closed
                     // FIXME: should we tell the user this?
@@ -494,7 +495,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             if(!this.dockElement) {
                 return;
             }
-            this.dockElement.animateDockExit().promise().then(() => { // TODO I don't know where this ".promise()" call comes from
+            this.dockElement.animateDockExit().promise().then(() => {
                 this.dockElement!.remove(); // TODO !
                 this.dockElement = null;
                 this.detailElement!.remove(); // TODO !
@@ -597,18 +598,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             $("body").append(container);
             fixupAvatars(container);
             if(session.firstRun && TogetherJS.startTarget) {
-                // Time at which the UI will be fully ready:
-                // (We have to do this because the offset won't be quite right
-                // until the animation finishes - attempts to calculate the
-                // offset without taking into account CSS transforms have so far
-                // failed.)
+                // Time at which the UI will be fully ready: (We have to do this because the offset won't be quite right until the animation finishes - attempts to calculate the offset without taking into account CSS transforms have so far failed.)
                 var timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
                 finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
                 setTimeout(function() {
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
                     var start = iface.offset()!; // TODO !
-                    let pos = $(TogetherJS.startTarget).offset()!; // TODO !
+                    let pos = $(TogetherJS.startTarget!).offset()!; // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -842,6 +839,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             }
 
             function closeDock() {
+                console.log("close dock");
                 //enable vertical scrolling
                 $("body").css({
                     "position": "",
@@ -892,14 +890,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var src = "/togetherjs/images/togetherjs-logo-close.png";
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
-                $("#togetherjs-dock-anchor").toggle(
-                    function() {
-                        closeDock();
-                    },
-                    function() {
-                        openDock();
-                    }
-                );
+                // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
+                //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
+                $("#togetherjs-dock-anchor").click(closeDock);
             }
 
             $("#togetherjs-share-button").click(function() {
@@ -1490,7 +1483,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         });
     });
 
-    function invite(clientId: string) {
+    function invite(clientId: string | null) {
         require(["who"], function(who: TogetherJSNS.Who) {
             // FIXME: use the return value of this to give a signal that
             // the invite has been successfully sent:

@@ -54,6 +54,7 @@ function walkthroughMain(util, ui, $, windowing, templates, templating, session,
         function Walkthrough() {
         }
         Walkthrough.prototype.start = function (firstTime, doneCallback) {
+            if (doneCallback === void 0) { doneCallback = null; }
             if (!container) {
                 container = $(templates("walkthrough"));
                 container.hide();

@@ -447,9 +447,10 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     _this.peer.nudge();
                 });
                 _this.followCheckbox = _this.detailElement.find("#" + followId);
+                var self = _this;
                 _this.followCheckbox.change(function () {
                     if (!this.checked) {
-                        this.peer.unfollow();
+                        self.peer.unfollow();
                     }
                     // Following doesn't happen until the window is closed
                     // FIXME: should we tell the user this?
@@ -584,11 +585,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             $("body").append(container);
             fixupAvatars(container);
             if (session.firstRun && TogetherJS.startTarget) {
-                // Time at which the UI will be fully ready:
-                // (We have to do this because the offset won't be quite right
-                // until the animation finishes - attempts to calculate the
-                // offset without taking into account CSS transforms have so far
-                // failed.)
+                // Time at which the UI will be fully ready: (We have to do this because the offset won't be quite right until the animation finishes - attempts to calculate the offset without taking into account CSS transforms have so far failed.)
                 var timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
                 finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
                 setTimeout(function () {
@@ -807,6 +804,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
             }
             function closeDock() {
+                console.log("close dock");
                 //enable vertical scrolling
                 $("body").css({
                     "position": "",
@@ -843,11 +841,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 //replace the anchor icon
                 var src = "/togetherjs/images/togetherjs-logo-close.png";
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
-                $("#togetherjs-dock-anchor").toggle(function () {
-                    closeDock();
-                }, function () {
-                    openDock();
-                });
+                // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
+                //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
+                $("#togetherjs-dock-anchor").click(closeDock);
             }
             $("#togetherjs-share-button").click(function () {
                 windowing.toggle("#togetherjs-share");

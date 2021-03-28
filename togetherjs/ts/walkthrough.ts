@@ -57,7 +57,7 @@ function walkthroughMain(util: Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windo
 
     class Walkthrough {
 
-        start(firstTime: boolean, doneCallback: () => void) {
+        start(firstTime: boolean, doneCallback: (() => void) | null = null) {
             if(!container) {
                 container = $(templates("walkthrough"));
                 container.hide();

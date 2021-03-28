@@ -104,7 +104,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
             });
         }
 
-        invite(hubUrl: string, clientId: string) {
+        invite(hubUrl: string, clientId: string | null) {
             return util.Deferred(function(def) {
                 var channel = channels.WebSocketChannel(hubUrl);
                 var id = util.generateId();
