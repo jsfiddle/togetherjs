@@ -65,7 +65,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             var el = templating.sub("chat-message", {
                 peer: attrs.peer,
                 content: attrs.text,
-                date: date
+                date: date,
             });
             linkify(el.find(".togetherjs-chat-content"));
             el.attr("data-person", attrs.peer.id)
@@ -103,7 +103,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-system", {
                 content: attrs.text,
-                date: date
+                date: date,
             });
             this.add(el, undefined, true);
         }

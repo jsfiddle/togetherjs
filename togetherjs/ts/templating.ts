@@ -6,7 +6,7 @@ interface MapOfVariables {
     [key: string]: string | number | JQuery;
 };
 
-function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
+function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
 
     class Templating {
@@ -20,7 +20,9 @@ function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, 
             return template;
         }
 
-        sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]) {
+        // TODO find if there is another way to do that. Using a restrictive prototype and a less restrictibe implementation because "in" check in if only works with union types which TogetherJSNS.TemplatingSub.Any is but TogetherJSNS.TemplatingSub.Map[K] is not
+        sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery;
+        sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
             let template = this.clone(templateId);
             util.forEachAttr(variables, function(value, attr) {
                 // FIXME: do the substitution... somehow?
@@ -55,10 +57,10 @@ function templatingMain($: JQueryStatic, util: Util, peers: TogetherJSNS.Peers, 
                     $element.attr(subAttribute, value);
                 });
             });
-            if(variables.peer) {
+            if("peer" in variables && variables.peer) {
                 variables.peer.view.setElement(template);
             }
-            if(variables.date) {
+            if("date" in variables && variables.date) {
                 let date: Date | number = variables.date;
                 if(typeof date == "number") {
                     date = new Date(date);

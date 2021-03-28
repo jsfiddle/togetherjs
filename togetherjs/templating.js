@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 ;
-function templatingMain($, util, peers, windowing, session) {
+function templatingMain($, util, _peers, _windowing, session) {
     var assert = util.assert;
     var Templating = /** @class */ (function () {
         function Templating() {
@@ -52,10 +52,10 @@ function templatingMain($, util, peers, windowing, session) {
                     $element.attr(subAttribute, value);
                 });
             });
-            if (variables.peer) {
+            if ("peer" in variables && variables.peer) {
                 variables.peer.view.setElement(template);
             }
-            if (variables.date) {
+            if ("date" in variables && variables.date) {
                 var date = variables.date;
                 if (typeof date == "number") {
                     date = new Date(date);

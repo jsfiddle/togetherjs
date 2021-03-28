@@ -43,6 +43,10 @@ declare namespace TogetherJSNS {
 
     /** Types for Templating.sub */
     namespace TemplatingSub {
+        type Any = ValueOf<Map>;
+        // TODO find a better way to do that base on Map
+        type All = Swatch & WalkthroughSlideProgress & Focus & DockPerson & ParticipantWindow & InviteUserItem & ChatMessage & ChatJoined & ChatLeft & ChatSystem & UrlChange & Invite;
+
         interface Map {
             "swatch": Swatch,
             "walkthrough-slide-progress": WalkthroughSlideProgress,
