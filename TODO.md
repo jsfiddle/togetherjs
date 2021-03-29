@@ -3,6 +3,7 @@
 - there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 
 # Things to check to validate full typing
+- split all .on("event1 event2") as multiple commands to have a good typechecking, the anonymous function would need to be named to be reused obviously
 - check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, lie deleting a lne
 - check all @deprecated tags and see if some are still used (some tags are in the middle of sentences so search for "@deprecated" and not for "/** @deprecated"
 - check all TODO comments

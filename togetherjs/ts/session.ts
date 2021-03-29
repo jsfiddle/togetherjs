@@ -309,9 +309,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         if(msg.type == "hello") {
             sendHello(true);
         }
-        if(session.isClient && (!msg.isClient) &&
-            session.firstRun && session.timeHelloSent &&
-            Date.now() - session.timeHelloSent < HELLO_BACK_CUTOFF) {
+        if(session.isClient && (!msg.isClient) && session.firstRun && session.timeHelloSent && Date.now() - session.timeHelloSent < HELLO_BACK_CUTOFF) {
             processFirstHello(msg);
         }
     });

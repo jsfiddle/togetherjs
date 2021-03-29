@@ -407,7 +407,7 @@ declare namespace TogetherJSNS {
         "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
         "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
         "ping": () => void;
-        "hello hello-back": (msg: { type: keyof OnMap, isClient: boolean }) => void;
+        "hello hello-back": (msg: {type: "hello" | "hello-back", sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer, isClient: boolean}) => void;
         "who": () => void;
         "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
         "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
