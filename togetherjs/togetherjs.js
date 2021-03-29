@@ -526,6 +526,8 @@ function togetherjsMain() {
                 requireConfig.deps = deps;
                 requireConfig.callback = callback;
                 if (!min) {
+                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/togetherjs/libs/require.js"); (see below) will be executed
+                    //@ts-expect-error weird stuff
                     window.require = requireConfig;
                 }
             }
