@@ -232,6 +232,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         };
         return Chat;
     }());
+    /** */
+    var BasePeerView = /** @class */ (function () {
+        function BasePeerView() {
+        }
+        return BasePeerView;
+    }());
     /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
     var PeerView = /** @class */ (function () {
         function PeerView(ui, peer) {

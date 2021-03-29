@@ -239,6 +239,11 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
     }
 
+    /** */
+    class BasePeerView {
+
+    }
+
     /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
     class PeerView {
         private followCheckbox?: JQuery;
