@@ -28,7 +28,7 @@ function sessionMain(require, util, channels, $, storage) {
     // This is the channel to the hub:
     var channel = null;
     // This is the key we use for localStorage:
-    var localStoragePrefix = "togetherjs.";
+    //var localStoragePrefix = "togetherjs."; // TODO not used
     var Session = /** @class */ (function (_super) {
         __extends(Session, _super);
         function Session() {
@@ -213,7 +213,7 @@ function sessionMain(require, util, channels, $, storage) {
         return Session;
     }(OnClass));
     var session = new Session();
-    var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+    //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************
      * URLs
      */

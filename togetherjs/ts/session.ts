@@ -19,7 +19,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
     let channel: TogetherJSNS.WebSocketChannel | null = null;
 
     // This is the key we use for localStorage:
-    var localStoragePrefix = "togetherjs.";
+    //var localStoragePrefix = "togetherjs."; // TODO not used
 
     class Session extends OnClass {
         /** This is the hub we connect to: */
@@ -217,7 +217,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
 
     const session = new Session();
 
-    var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+    //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
 
     /****************************************
      * URLs
