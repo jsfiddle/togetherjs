@@ -36,7 +36,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         public RTCSupported: boolean | undefined;
 
         public readonly hub = new OnClass();
-        public isClient: boolean;
+        public isClient?: boolean;
 
         hubUrl(id: string | null = null) {
             id = id || this.shareId;
@@ -83,17 +83,17 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             }
             const msg2 = msg as TogetherJSNS.AnyMessage.MapInTransit[K];
             msg2.clientId = session.clientId!; // TODO !
-            channel.send(msg2);
+            channel!.send(msg2); // TODO !
         }
 
-        // TODO this function appears to never been used, and it does weird things
+        // TODO this function appears to never been used (since it's only caller never is), and it does weird things. Tried with a "type MapForAppSending = { [P in keyof MapForSending & string as `app.${P}`]: MapForSending[P] }" but it doesn't change the type of the `type` field and hence doesn't work
         appSend<T extends keyof TogetherJSNS.AnyMessage.MapForSending>(msg: TogetherJSNS.AnyMessage.MapForSending[T]) {
             let type = msg.type;
             if(type.search(/^togetherjs\./) === 0) {
-                type = type.substr("togetherjs.".length);
+                type = type.substr("togetherjs.".length) as typeof type;
             }
             else if(type.search(/^app\./) === -1) {
-                type = "app." + type;
+                type = "app." + type as typeof type; // TODO very abusive typing, I don't really see how to fix that except by duplicating MapForSending and all the types it uses which is a lot for a function that isn't used...
             }
             msg.type = type;
             session.send(msg);
@@ -201,7 +201,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     saved.date = Date.now();
                     storage.tab.set("status", saved);
                 }
-                channel.close();
+                channel!.close(); // TODO !
                 channel = null;
                 session.shareId = null;
                 session.emit("shareId");
@@ -266,20 +266,23 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 return;
             }
             // TODO I feel that this error is "normal" since this checs the consistency at runtime
-            if((!("clientId" in msg)) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
+            //@ts-expect-error I feel that this error is "normal" since this checs the consistency at runtime
+            if(!("clientId" in msg) && MESSAGES_WITHOUT_CLIENTID.indexOf(msg.type) == -1) {
                 console.warn("Got message without clientId, where clientId is required", msg);
                 return;
             }
             if("clientId" in msg) {
-                const msg2 = msg as typeof msg & { clientId: string }; // TODO cast
-                const peer = peers.getPeer(msg2.clientId, msg2);
+                const peer = peers.getPeer(msg.clientId, msg);
                 if(peer) {
-                    msg2.peer = peer
+                    msg.peer = peer
                 }
             }
             if(msg.type == "hello" || msg.type == "hello-back" || msg.type == "peer-update") {
                 // We do this here to make sure this is run before any other hello handlers:
-                msg.peer.updateFromHello(msg);
+                // TODO code change, added the "if(peer.isSelf === false)", is it ok?
+                if(msg.peer.isSelf === false) {
+                    msg.peer.updateFromHello(msg);
+                }
             }
             if("peer" in msg) {
                 const msg2 = msg as (typeof msg & { peer: TogetherJSNS.PeerClass, sameUrl?: boolean });
