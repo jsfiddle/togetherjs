@@ -37,9 +37,10 @@ class Util {
         
     }
 
-    public forEachAttr<T extends object>(obj: T, callback: (o: T[Extract<keyof T, string>], k: keyof T) => void, context?: unknown) {
+    public forEachAttr<T extends object>(obj: T, callback: (o: T[keyof T], k: keyof T) => void, context?: unknown) {
         context = context || obj;
-        for(let a in obj) {
+        let a: keyof typeof obj;
+        for(a in obj) {
             if(obj.hasOwnProperty(a)) {
                 callback.call(context, obj[a], a);
             }

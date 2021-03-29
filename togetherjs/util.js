@@ -49,7 +49,8 @@ var Util = /** @class */ (function () {
     }
     Util.prototype.forEachAttr = function (obj, callback, context) {
         context = context || obj;
-        for (var a in obj) {
+        var a;
+        for (a in obj) {
             if (obj.hasOwnProperty(a)) {
                 callback.call(context, obj[a], a);
             }

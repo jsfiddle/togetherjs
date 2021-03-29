@@ -29,7 +29,7 @@ function templatingMain($, util, _peers, _windowing, session) {
                     if (typeof value == "string") {
                         subs.text(value);
                     }
-                    else if (value instanceof $) {
+                    else if (value instanceof $) { // TODO check cast, because TogetherJSNS.TemplatingSub.Any is reduced to never (or is it for another reason?), value is of type never which is not ok with in checks
                         subs.append(value); // TODO instanceof check does not constrains value as JQuery so we need this cast, can we remove it?
                     }
                     else {

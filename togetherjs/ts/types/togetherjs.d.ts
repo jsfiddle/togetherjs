@@ -63,10 +63,10 @@ declare namespace TogetherJSNS {
         }
 
         /** "swatch" */
-        type Swatch = {};
+        interface Swatch { }
 
         /** "walkthrough-slide-progress" */
-        type WalkthroughSlideProgress = {};
+        interface WalkthroughSlideProgress { }
 
         /** "focus" */
         interface Focus {
@@ -427,6 +427,8 @@ declare namespace TogetherJSNS {
             scrollPosition: ElementFinder.Position,
             peer: PeerClass,
             isClient?: boolean,
+            url: string,
+            urlHash: string
         }
 
         interface Hello2 extends Hello2Base {

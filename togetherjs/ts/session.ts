@@ -320,7 +320,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         sendHello(true);
     });
 
-    function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer}) {
+    function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf}) {
         if(!msg.sameUrl) {
             var url = msg.url;
             if(msg.urlHash) {

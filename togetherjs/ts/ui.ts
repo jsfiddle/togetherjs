@@ -743,6 +743,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
             // The chat input element:
             var input = container.find("#togetherjs-chat-input");
+            //@
             input.bind("keydown", function(event) {
                 if(event.which == 13 && !event.shiftKey) { // Enter without Shift pressed
                     submitChat();
@@ -752,6 +753,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     windowing.hide("#togetherjs-chat");
                     return false;
                 }
+                return; // just for the lint rule saying "not all path return a value"
             });
 
             function submitChat() {
@@ -1193,6 +1195,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             container.find("a.togetherjs-share-link").click(function(this: HTMLElement) {
                 // FIXME: this is currently opening up Bluetooth, not sharing a link
                 if(false && window.MozActivity) {
+                    //@ts-expect-error unused
                     var activity = new MozActivity({
                         name: "share",
                         data: {
