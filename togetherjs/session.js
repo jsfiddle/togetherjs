@@ -292,14 +292,15 @@ function sessionMain(require, util, channels, $, storage) {
      * Standard message responses
      */
     /* Always say hello back, and keep track of peers: */
-    session.hub.on("hello hello-back", function (msg) {
+    function cbHelloHelloback(msg) {
         if (msg.type == "hello") {
             sendHello(true);
         }
         if (session.isClient && (!msg.isClient) && session.firstRun && session.timeHelloSent && Date.now() - session.timeHelloSent < HELLO_BACK_CUTOFF) {
             processFirstHello(msg);
         }
-    });
+    }
+    session.hub.on("hello hello-back", cbHelloHelloback);
     session.hub.on("who", function () {
         sendHello(true);
     });

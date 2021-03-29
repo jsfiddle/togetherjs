@@ -337,6 +337,89 @@ declare namespace TogetherJSNS {
     }
 
     namespace On {
+        interface Map {
+            // channel.on & session.on
+            "close": () => void;
+    
+            // channel.on
+            /** msg can be of type string if rawData is activated but we don't put it here */
+            "message": (msg: ValueOf<AnyMessage.MapForReceiving>) => void;
+    
+            // session.hub.on
+            "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
+            "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
+            "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: string }) => void; // TODO parameter similar to GetLogs
+            // TODO logs may be of type Logs[], we shoud check
+            "cursor-update": (msg: On.CursorUpdate & ChannelSend.WithClientId) => void;
+            "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
+            "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
+            "keydown": (msg: { clientId: string }) => void;
+            //"form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void // TODO old version, trying below with FormUpdateMessage
+            "form-update": (msg: FormUpdateMessage & AnyMessage.AfterTransit) => void
+            "form-init": (msg: FormInitMessage & AnyMessage.AfterTransit) => void;
+            "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
+            "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
+            "ping": () => void;
+            "who": () => void;
+            "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
+            "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
+            "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
+            "synchronizeVideosOfLateGuest": (msg: SessionSend.SynchronizeVideosOfLateGuest) => void;
+            "differentVideoLoaded": (msg: { videoId: string, element: string }) => void;
+            "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
+            "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
+            "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
+            "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
+    
+            // session.on
+            "prepare-hello": (msg: HelloMessage | HelloBackMessage) => void;
+            "ui-ready": (ui: Ui) => void;
+            "reinitialize": () => void;
+            "follow-peer": (peer: PeerClass) => void;
+            "start": () => void;
+            "refresh-user-data": () => void;
+            "visibility-change": (hidden: boolean) => void;
+            "hide-window": (window: JQuery[]) => void; // TODO check type of window
+            "shareId": () => void;
+            "display-window": (id: string, element: JQuery) => void
+            "resize": () => void;
+            "new-element": (element: JQuery) => void;
+            "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
+            "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
+    
+            // peers.on
+            "new-peer identity-updated status-updated": (peer: PeerClass) => void;
+    
+            // TogetherJS.once
+            "ready": () => void;
+    
+            // .emit
+            "new-peer": (peer: PeerClass) => void;
+            "status-updated": (peer: PeerClass | PeerSelf) => void;
+            "idle-updated": (peer: PeerClass | PeerSelf) => void;
+            "rtc-supported": (peer: PeerClass) => void;
+            "url-updated": (peer: PeerClass) => void;
+            "identity-updated": (peer: PeerClass) => void;
+            "self-updated": () => void;
+            "startup-ready": () => void;
+    
+            // only for typecheck session.hub.emit(msg.type, msg); in session.ts
+            "get-logs": (msg: { type: "get-logs" }) => void; // TODO may be wrong
+            "ping-back": (msg: { type: "ping-back" }) => void; // TODO may be wrong
+            "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
+            "route": (msg: { type: "route" }) => void; // TODO may be wrong
+            "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
+            
+            // other
+            "identityId": (msg: { type: "identityId", identityId: string }) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
+
+            // hello
+            "hello": (msg: { type: "hello", sameUrl: boolean }) => void;
+            "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
+            "hello-back hello": (msg: { type: "hello" | "hello-back", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
+            "hello hello-back": (msg: {type: "hello" | "hello-back", sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer, isClient: boolean}) => void;
+        }
+
         /** Do not use this in your own code, it's just here to be inherited */
         interface HelloMessageBase {
             name: string,
@@ -380,87 +463,6 @@ declare namespace TogetherJSNS {
         }
 
         type CursorUpdate = CursorUpdateOffset | CursorUpdateTopLeft;
-    }
-
-    interface OnMap {
-        // channel.on & session.on
-        "close": () => void;
-
-        // channel.on
-        /** msg can be of type string if rawData is activated but we don't put it here */
-        "message": (msg: ValueOf<AnyMessage.MapForReceiving>) => void;
-
-        // session.hub.on
-        "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
-        "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
-        "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: string }) => void; // TODO parameter similar to GetLogs
-        // TODO logs may be of type Logs[], we shoud check
-        "cursor-update": (msg: On.CursorUpdate & ChannelSend.WithClientId) => void;
-        "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
-        "hello-back hello": (msg: { type: "hello", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
-        "hello": (msg: { sameUrl: boolean }) => void;
-        "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
-        "keydown": (msg: { clientId: string }) => void;
-        //"form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void // TODO old version, trying below with FormUpdateMessage
-        "form-update": (msg: FormUpdateMessage & AnyMessage.AfterTransit) => void
-        "form-init": (msg: FormInitMessage & AnyMessage.AfterTransit) => void;
-        "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
-        "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
-        "ping": () => void;
-        "hello hello-back": (msg: {type: "hello" | "hello-back", sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer, isClient: boolean}) => void;
-        "who": () => void;
-        "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
-        "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
-        "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
-        "synchronizeVideosOfLateGuest": (msg: SessionSend.SynchronizeVideosOfLateGuest) => void;
-        "differentVideoLoaded": (msg: { videoId: string, element: string }) => void;
-        "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
-        "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
-        "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
-        "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
-
-        // session.on
-        "prepare-hello": (msg: On.HelloMessage | On.HelloBackMessage) => void;
-        "ui-ready": (ui: Ui) => void;
-        "reinitialize": () => void;
-        "follow-peer": (peer: PeerClass) => void;
-        "start": () => void;
-        "refresh-user-data": () => void;
-        "visibility-change": (hidden: boolean) => void;
-        "hide-window": (window: JQuery[]) => void; // TODO check type of window
-        "shareId": () => void;
-        "display-window": (id: string, element: JQuery) => void
-        "resize": () => void;
-        "new-element": (element: JQuery) => void;
-        "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
-        "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
-
-        // peers.on
-        "new-peer identity-updated status-updated": (peer: PeerClass) => void;
-
-        // TogetherJS.once
-        "ready": () => void;
-
-        // .emit
-        "new-peer": (peer: PeerClass) => void;
-        "status-updated": (peer: PeerClass | PeerSelf) => void;
-        "idle-updated": (peer: PeerClass | PeerSelf) => void;
-        "rtc-supported": (peer: PeerClass) => void;
-        "url-updated": (peer: PeerClass) => void;
-        "identity-updated": (peer: PeerClass) => void;
-        "self-updated": () => void;
-        "startup-ready": () => void;
-
-        // only for typecheck session.hub.emit(msg.type, msg); in session.ts
-        "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
-        "get-logs": (msg: { type: "get-logs" }) => void; // TODO may be wrong
-        "ping-back": (msg: { type: "ping-back" }) => void; // TODO may be wrong
-        "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
-        "route": (msg: { type: "route" }) => void; // TODO may be wrong
-        "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
-        
-        // other
-        "identityId": (msg: { type: "identityId", identityId: string }) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
     }
 
     namespace AnyMessage {
