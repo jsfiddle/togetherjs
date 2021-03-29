@@ -238,10 +238,14 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
 
     const cursor = new cursor2();
 
-    peers.on("new-peer identity-updated status-updated", function(peer: TogetherJSNS.PeerClass) {
+    function cbCursor(peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) {
         var c = Cursor.getClient(peer.id);
         c.updatePeer(peer);
-    });
+    }
+
+    peers.on("new-peer", cbCursor);
+    peers.on("identity-updated", cbCursor);
+    peers.on("status-updated", cbCursor);
 
     var lastTime = 0;
     var MIN_TIME = 100;
@@ -343,7 +347,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
         }
     }
 
-    var lastScrollMessage: TogetherJSNS.SessionSend.Map["scroll-update"] | null = null;
+    var lastScrollMessage: TogetherJSNS.SessionSend.ScrollUpdate | null = null;
     function _scrollRefresh() {
         scrollTimeout = null;
         scrollTimeoutSet = 0;

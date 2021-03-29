@@ -3,8 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 interface ExternalPeerAttributes {
-    identityId: string;
-    status: TogetherJSNS.PeerStatus;
+    identityId?: string;
+    status?: TogetherJSNS.PeerStatus;
     name: string;
     avatar: string;
     color: string;

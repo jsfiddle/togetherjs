@@ -186,7 +186,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
 
         close(reason?: string) {
             TogetherJS.running = false;
-            var msg: TogetherJSNS.SessionSend.Map["bye"] = { type: "bye" };
+            var msg: TogetherJSNS.SessionSend.Bye = { type: "bye" };
             if(reason) {
                 msg.reason = reason;
             }

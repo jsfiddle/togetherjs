@@ -1,4 +1,7 @@
 declare namespace TogetherJSNS {
+    // Utility types
+    type ValueOf<T> = T[keyof T];
+
     /** Types for storage.get */
     namespace StorageGet {
         interface MapRaw {
@@ -27,8 +30,6 @@ declare namespace TogetherJSNS {
             : K extends keyof MapForSettings ? MapForSettings[K]
             : K extends keyof MapRaw ? MapRaw[K] : never;
 
-        //type Map = MapRaw & MapForSettings & MapForRecording;
-
         interface Settings {
             name: string,
             defaultName: string,
@@ -44,7 +45,6 @@ declare namespace TogetherJSNS {
     /** Types for Templating.sub */
     namespace TemplatingSub {
         type Any = ValueOf<Map>;
-        // TODO find a better way to do that base on Map
         type All = Swatch & WalkthroughSlideProgress & Focus & DockPerson & ParticipantWindow & InviteUserItem & ChatMessage & ChatJoined & ChatLeft & ChatSystem & UrlChange & Invite;
 
         interface Map {
@@ -134,29 +134,27 @@ declare namespace TogetherJSNS {
     }
 
     namespace SessionSend {
-        interface Map {
-            "chat": Chat,
-            "get-logs": GetLogs,
-            "cursor-click": CursorClick,
-            "keydown": Keydown,
-            "form-focus": ForFocus,
-            "ping-back": PingBack,
-            "peer-update": PeerUpdate,
-            "video-something": VideoEventName, // TODO something can be any video event, try to list them with string lits
-            "rtc-ice-candidate": RTCIceCandidate,
-            "rtc-offer": RTCOffer,
-            "rtc-answer": RTCAnswer,
-            "rtc-abort": RTCAbort,
-            "playerStateChange": PlayerStateChange,
-            "synchronizeVideosOfLateGuest": SynchronizeVideosOfLateGuest,
-            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: TogetherJSNS.PeerStatus },
-            "bye": { type: "bye", reason?: string },
-            "hello": TogetherJSNS.On.HelloMessage,
-            "hello-back": TogetherJSNS.On.HelloBackMessage,
-            "cursor-update": On.CursorUpdate,
-            "scroll-update": { type: "scroll-update", position: TogetherJSNS.ElementFinder.Position },
-            "form-update": FormUpdateMessage,
+        interface InitConnection { type: "init-connection", peerCount: number }
+
+        interface IdleStatus {
+            type: "idle-status",
+            idle: PeerStatus
+        }
+
+        interface UrlChangeNudge {
+            type: "url-change-nudge",
+            url: string,
+            to: string
+        }
+
+        interface ScrollUpdate {
+            type: "scroll-update",
+            position: ElementFinder.Position
+        }
+
+        interface Bye {
+            type: "bye",
+            reason?: string
         }
 
         interface Chat {
@@ -165,10 +163,13 @@ declare namespace TogetherJSNS {
             messageId: string
         }
 
-        interface GetLogs {
-            type: "get-logs",
-            forClient: string,
+        interface GetLogsBase {
+            forClient: string | undefined //id of the client or nothing if destined to everyone
             saveAs: string
+        }
+
+        interface GetLogs extends GetLogsBase {
+            type: "get-logs",
         }
 
         interface CursorClick {
@@ -245,15 +246,6 @@ declare namespace TogetherJSNS {
     }
 
     namespace ChannelSend {
-        interface WithClientId {
-            clientId: string;
-            peer: AnyPeer; // TODO check that peer always goes with clientId, according to code in session.ts/openChannel it seems to be the case
-        }
-
-        interface WithSameUrl {
-            sameUrl: boolean;
-        }
-
         /** Not a message, it's a field */
         interface UserInfo {
             name: string,
@@ -266,18 +258,6 @@ declare namespace TogetherJSNS {
             isClient: boolean | undefined,
             starting: boolean | undefined,
             clientId: string,
-        }
-
-        type Any = Route | Who | Invite;
-
-        interface Map {
-            "route": Route,
-            "who": Who,
-            "invite": Invite,
-            "bye": { type: "bye", clientId: string },
-            "logs": { type: "logs", clientId: string, logs: string, request: TogetherJSNS.SessionSend.GetLogs },
-            "hello": Hello,
-            "hello-back": HelloBack,
         }
 
         interface Hello {
@@ -307,10 +287,10 @@ declare namespace TogetherJSNS {
             close?: boolean
         }
 
+        // { type: "who", "server-echo": boolean }
         interface Who {
             type: "who",
             "server-echo": boolean,
-            clientId: null
         }
 
         interface Invite {
@@ -324,18 +304,6 @@ declare namespace TogetherJSNS {
         }
     }
 
-    namespace ChannelOnMessage {
-        interface Map {
-            "hello": { type: "hello", peer: PeerClass };
-            "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
-            "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": SessionSend.PeerUpdate;
-            "init-connection": { type: "init-connection", peerCount: number };
-            "who": { type: "who" };
-            "invite": { type: "invite" };
-        }
-    }
-
     namespace On {
         interface Map {
             // channel.on & session.on
@@ -346,33 +314,66 @@ declare namespace TogetherJSNS {
             "message": (msg: ValueOf<AnyMessage.MapForReceiving>) => void;
     
             // session.hub.on
-            "chat": (msg: { text: string, peer: PeerClass, messageId: string }) => void;
-            "bye": (msg: { clientId: string, peer: PeerClass, reason: string }) => void;
-            "logs": (msg: { request: { forClient: string | undefined /** id of the client or nothing if destined to everyone */, saveAs: string }, logs: string }) => void; // TODO parameter similar to GetLogs
+            "chat": (msg: Chat) => void;
+            "bye": (msg: Bye) => void;
+            "logs": (msg: Logs) => void; // TODO parameter similar to GetLogs
             // TODO logs may be of type Logs[], we shoud check
-            "cursor-update": (msg: On.CursorUpdate & ChannelSend.WithClientId) => void;
-            "scroll-update": (msg: { peer: PeerClass, position: ElementFinder.Position }) => void;
-            "cursor-click": (msg: SessionSend.CursorClick & ChannelSend.WithClientId & ChannelSend.WithSameUrl) => void;
-            "keydown": (msg: { clientId: string }) => void;
+            "cursor-update": (msg: On.CursorUpdate & AnyMessage.AfterTransit) => void;
+            "scroll-update": (msg: ScrollUpdate) => void;
+            "cursor-click": (msg: SessionSend.CursorClick & AnyMessage.AfterTransit) => void;
+            "keydown": (msg: Keydown) => void;
             //"form-update": (msg: { sameUrl: boolean, element: string, tracker: string, replace: Change2, value?: string }) => void // TODO old version, trying below with FormUpdateMessage
             "form-update": (msg: FormUpdateMessage & AnyMessage.AfterTransit) => void
-            "form-init": (msg: FormInitMessage & AnyMessage.AfterTransit) => void;
-            "form-focus": (msg: { sameUrl: boolean, peer: PeerClass, element: string }) => void;
-            "idle-status": (msg: AnyMessage.MapForReceiving["idle-status"]) => void;
+            "form-init": (msg: AnyMessage.FormInitMessage & AnyMessage.AfterTransit) => void;
+            "form-focus": (msg: FormFocus) => void;
+            "idle-status": (msg: AnyMessage.IdleStatus & AnyMessage.AfterTransit) => void;
             "ping": () => void;
-            "who": () => void;
-            "invite": (msg: { forClientId: boolean, clientId: string, userInfo: ExternalPeerAttributes, url: string }) => void;
-            "url-change-nudge": (msg: { to: string, peer: PeerView }) => void;
-            "playerStateChange": (msg: { element: string, playerState: 1 | 2, playerTime: number }) => void;
+            "who": (msg: ChannelSend.Who) => void;
+            "invite": (msg: Invite) => void;
+            "url-change-nudge": (msg: UrlChangeNudge) => void;
+            "playerStateChange": (msg: SessionSend.PlayerStateChange) => void;
             "synchronizeVideosOfLateGuest": (msg: SessionSend.SynchronizeVideosOfLateGuest) => void;
-            "differentVideoLoaded": (msg: { videoId: string, element: string }) => void;
-            "rtc-offer": (msg: { offer: RTCSessionDescriptionInit }) => void;
-            "rtc-answer": (msg: { answer: RTCSessionDescriptionInit }) => void;
-            "rtc-ice-candidate": (msg: { candidate: RTCIceCandidateInit }) => void;
-            "rtc-abort": (msg: unknown) => void; // TODO what is this unknown?
+            "differentVideoLoaded": (msg: DifferentVideoLoaded) => void;
+            "rtc-offer": (msg: RtcOffer) => void;
+            "rtc-answer": (msg: RtcAnswer) => void;
+            "rtc-ice-candidate": (msg: RtcIceCandidate) => void;
+            "rtc-abort": (msg: RtcAbort) => void; // TODO what is this unknown?
     
             // session.on
             "prepare-hello": (msg: HelloMessage | HelloBackMessage) => void;
+            "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
+            "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
+    
+            // TogetherJS.once
+            "ready": () => void;
+    
+            // only for typecheck session.hub.emit(msg.type, msg); in session.ts
+            "get-logs": (msg: SessionSend.GetLogs) => void; // TODO may be wrong
+            "ping-back": (msg: SessionSend.PingBack) => void; // TODO may be wrong
+            "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
+            "route": (msg: ChannelSend.Route) => void; // TODO may be wrong
+            "init-connection": (msg: SessionSend.InitConnection) => void; // TODO may be wrong
+            
+            // other
+            "identityId": (msg: IdentityId) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
+
+            "hello": (msg: Hello2) => void;
+            "hello-back": (msg: HelloBack2) => void; // TODO may be wrong
+
+            // === === ===
+            // === NOT MESSAGES
+
+            // .emit
+            "new-peer": (peer: PeerClass) => void;
+            "status-updated": (peer: PeerClass | PeerSelf) => void;
+            "idle-updated": (peer: PeerClass | PeerSelf) => void;
+            "rtc-supported": (peer: PeerClass) => void;
+            "url-updated": (peer: PeerClass) => void;
+            "identity-updated": (peer: PeerClass) => void;
+            "self-updated": () => void;
+            "startup-ready": () => void;
+
+            // session.on
             "ui-ready": (ui: Ui) => void;
             "reinitialize": () => void;
             "follow-peer": (peer: PeerClass) => void;
@@ -384,42 +385,22 @@ declare namespace TogetherJSNS {
             "display-window": (id: string, element: JQuery) => void
             "resize": () => void;
             "new-element": (element: JQuery) => void;
-            "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
-            "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
-    
-            // peers.on
-            "new-peer identity-updated status-updated": (peer: PeerClass) => void;
-    
-            // TogetherJS.once
-            "ready": () => void;
-    
-            // .emit
-            "new-peer": (peer: PeerClass) => void;
-            "status-updated": (peer: PeerClass | PeerSelf) => void;
-            "idle-updated": (peer: PeerClass | PeerSelf) => void;
-            "rtc-supported": (peer: PeerClass) => void;
-            "url-updated": (peer: PeerClass) => void;
-            "identity-updated": (peer: PeerClass) => void;
-            "self-updated": () => void;
-            "startup-ready": () => void;
-    
-            // only for typecheck session.hub.emit(msg.type, msg); in session.ts
-            "get-logs": (msg: { type: "get-logs" }) => void; // TODO may be wrong
-            "ping-back": (msg: { type: "ping-back" }) => void; // TODO may be wrong
-            "peer-update": (msg: SessionSend.PeerUpdate) => void; // TODO may be wrong
-            "route": (msg: { type: "route" }) => void; // TODO may be wrong
-            "init-connection": (msg: { type: "init-connection" }) => void; // TODO may be wrong
-            
-            // other
-            "identityId": (msg: { type: "identityId", identityId: string }) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
-
-            // hello
-            // transit: sameUrl? peer? clientId?
-            "hello": (msg: Hello2) => void;
-            "hello-back": (msg: HelloBack2) => void; // TODO may be wrong
-            "hello-back hello": (msg: { type: "hello" | "hello-back", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
-            "hello hello-back": (msg: {type: "hello" | "hello-back", sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer, isClient: boolean}) => void;
         }
+
+        interface IdentityId { type: "identityId", identityId: string }
+        interface Chat { type: "chat", text: string, peer: PeerClass, messageId: string }
+        interface Bye { type: "bye", clientId: string, peer: PeerClass, reason: string }
+        interface Logs { type: "logs", request: SessionSend.GetLogsBase, logs: string }
+        interface ScrollUpdate { type: "scroll-update", peer: PeerClass, position: ElementFinder.Position }
+        interface Keydown { type: "keydown", clientId: string }
+        interface Invite { type: "invite", inviteId: string, url: string, userInfo: ExternalPeerAttributes, forClientId: string | null, "server-echo": boolean, clientId?: string }
+        interface FormFocus { type: "form-focus", sameUrl: boolean, peer: PeerClass, element: string }
+        interface DifferentVideoLoaded { type: "differentVideoLoaded", videoId: string, element: string }
+        interface UrlChangeNudge { type: "url-change-nudge", to: string, peer: PeerView }
+        interface RtcAbort { } // TODO find why type: "rtc-abort" in this type cause an error
+        interface RtcOffer { type: "rtc-offer", offer: RTCSessionDescriptionInit }
+        interface RtcAnswer { type: "rtc-answer", answer: RTCSessionDescriptionInit }
+        interface RtcIceCandidate { type: "rtc-ice-candidate", candidate: RTCIceCandidateInit }
 
         // TODO this should be done with (In|After)Transit and other Hello interface, no need to introduce new ones
         interface Hello2Base {
@@ -485,8 +466,6 @@ declare namespace TogetherJSNS {
     }
 
     namespace AnyMessage {
-        type PartialWithType<T extends {type: keyof MapForSending}> = Partial<Exclude<T, "type">> & Pick<T, "type">;
-
         /** While a message in in the send process or in the receiving process some fields will be set, they can be undefined for a short time */
         interface InTransit {
             sameUrl?: boolean,
@@ -499,69 +478,24 @@ declare namespace TogetherJSNS {
             [P in keyof InTransit]-?: InTransit[P]
         }
 
-        /** @deprecated */
-        interface Map {
-            // ChannelOnMessage
-            "hello": { type: "hello", peer: PeerClass };
-            "hello-back": { type: "hello-back", clientId: string, peer: PeerClass };
-            "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": SessionSend.PeerUpdate;
-            "init-connection": { type: "init-connection", peerCount: number };
-            "who": { type: "who" };
-            "invite": { type: "invite" };
-
-            //ChannelSend
-            "route": ChannelSend.Route,
-            //"who": Who,
-            //"invite": ChannelSend.Invite,
-            "bye": { type: "bye", clientId: string },
-            "logs": { type: "logs", clientId: string, logs: string, request: SessionSend.GetLogs },
-            //"hello": ChannelSend.Hello,
-            //"hello-back": ChannelSend.HelloBack,
-
-            //SessionSend
-            "chat": SessionSend.Chat,
-            //"get-logs": SessionSend.GetLogs,
-            "cursor-click": SessionSend.CursorClick,
-            "keydown": SessionSend.Keydown,
-            "form-focus": SessionSend.ForFocus,
-            "ping-back": SessionSend.PingBack,
-            //"peer-update": SessionSend.PeerUpdate,
-            "video-something": SessionSend.VideoEventName, // TODO something can be any video event, try to list them with string lits
-            "rtc-ice-candidate": SessionSend.RTCIceCandidate,
-            "rtc-offer": SessionSend.RTCOffer,
-            "rtc-answer": SessionSend.RTCAnswer,
-            "rtc-abort": SessionSend.RTCAbort,
-            "playerStateChange": SessionSend.PlayerStateChange,
-            "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
-            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: PeerStatus },
-            //"bye": { type: "bye", reason?: string },
-            //"hello": On.HelloMessage,
-            //"hello-back": On.HelloBackMessage,
-            "cursor-update": On.CursorUpdate,
-            "scroll-update": { type: "scroll-update", position: ElementFinder.Position },
-            "form-update": FormUpdateMessage,
-        }
-
         interface MapForSending {
             // ChannelOnMessage
-            //"hello": { type: "hello", peer: PeerClass }; // old version
-            "hello": TogetherJSNS.On.HelloMessage;
-            //"hello-back": { type: "hello-back", peer: PeerClass };
-            "hello-back": TogetherJSNS.On.HelloBackMessage;
-            "get-logs": TogetherJSNS.SessionSend.GetLogs;
-            "peer-update": SessionSend.PeerUpdate;
-            "init-connection": { type: "init-connection", peerCount: number };
-            "who": { type: "who", "server-echo": boolean };
-            "invite": { type: "invite", inviteId: string, url: string, userInfo: ChannelSend.UserInfo, forClientId: string | null, "server-echo": boolean };
+            //"hello": { type: "hello", peer: PeerClass }, // old version
+            "hello": On.HelloMessage,
+            //"hello-back": { type: "hello-back", peer: PeerClass },
+            "hello-back": On.HelloBackMessage,
+            "get-logs": SessionSend.GetLogs,
+            "peer-update": SessionSend.PeerUpdate,
+            "init-connection": SessionSend.InitConnection,
+            "who": ChannelSend.Who,
+            "invite": On.Invite,
 
             //ChannelSend
             "route": ChannelSend.Route,
             //"who": Who,
             //"invite": ChannelSend.Invite,
-            "bye": { type: "bye" },
-            "logs": { type: "logs", logs: string, request: SessionSend.GetLogs },
+            "bye": SessionSend.Bye,
+            "logs": On.Logs,
             //"hello": ChannelSend.Hello,
             //"hello-back": ChannelSend.HelloBack,
 
@@ -580,28 +514,34 @@ declare namespace TogetherJSNS {
             "rtc-abort": SessionSend.RTCAbort,
             "playerStateChange": SessionSend.PlayerStateChange,
             "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
-            "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: PeerStatus, peer?: PeerClass },
+            "url-change-nudge": SessionSend.UrlChangeNudge,
+            "idle-status": IdleStatus,
             //"bye": { type: "bye", reason?: string },
             //"hello": On.HelloMessage,
             //"hello-back": On.HelloBackMessage,
             "cursor-update": On.CursorUpdate,
-            "scroll-update": { type: "scroll-update", position: ElementFinder.Position },
+            "scroll-update": SessionSend.ScrollUpdate,
             "form-update": FormUpdateMessage,
 
             // other
-            "form-init": FormInitMessage,
-            "differentVideoLoaded": { type: "differentVideoLoaded", videoId: string, element: string },
-            "identityId": { type: "identityId", identityId: string }, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet
+            "form-init": AnyMessage.FormInitMessage,
+            "differentVideoLoaded": On.DifferentVideoLoaded,
+            "identityId": On.IdentityId, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet
         }
 
         type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & InTransit }
-
         type MapForReceiving = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
-
         type AnyForSending = ValueOf<MapForSending>;
         type AnyForTransit = ValueOf<MapForSending> & InTransit;
         type AnyForReceiving = ValueOf<MapForSending> & AfterTransit;
+
+        type IdleStatus = { type: "idle-status", idle: PeerStatus, peer?: PeerClass }
+
+        interface FormInitMessage {
+            type: "form-init";
+            pageAge: number;
+            updates: MessageForEditor.StringElement[]
+        }
     }
 
     type Channels = ReturnType<typeof channelsMain>;
@@ -639,8 +579,6 @@ declare namespace TogetherJSNS {
     type TogetherJS = ReturnType<typeof togetherjsMain>;
 
     type AnyPeer = PeerSelf | PeerClass | ExternalPeer | SerializedPeer;
-    /** Those are often called an "hello message" in TJS even if it can be a peer-update */
-    type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.SessionSend.PeerUpdate;
 
     interface TextReplaceStruct {
         start: number,
@@ -648,50 +586,11 @@ declare namespace TogetherJSNS {
         text: string
     }
 
-    type ValueOf<T> = T[keyof T];
-
     type FunctionReturningString = () => string;
     type CssSelector = string;
-    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection" | "get-logs";
+    type Messages = "cursor-update" | "keydown" | "scroll-update" | "hello" | "hello-back" | "peer-update" | "url-change-nudge" | "idle-status" | "form-focus" | "rtc-ice-candidate" | "init-connection" | "get-logs" | "who";
     type JQuerySelector = ":password";
     type Reason = "started" | "joined" | null;
-
-    // TODO this should be removed in favor of TogetherJSClass
-    interface TogetherJS2 extends OnClass {
-        getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K];
-        (event?: Event): TogetherJS;
-        running: boolean;
-        require: Require;
-        startup: Startup;
-        config: ConfigFunObj;
-        hub: Hub;
-        requireConfig: RequireConfig;
-        _loaded: boolean;
-        _extend(conf: RequireConfig): RequireConfig;
-        _extend(base: unknown, extensions: unknown): unknown;
-        //getConfig(key: keyof Config): ValueOf<Config>;
-        _requireObject: Require;
-        /** Timestamp */
-        pageLoaded: number;
-        _startupInit: Startup;
-        _teardown: () => void,
-        _configuration: Partial<Config>,
-        _defaultConfiguration: Config,
-        _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: unknown[] }>;
-        _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean };
-        version: string;
-        baseUrl: string;
-        _onmessage(msg: TogetherJSNS.AnyMessage.AnyForReceiving): void;
-        send(msg: TogetherJSNS.Message): void;
-        shareUrl(): string | null;
-        listenForShortcut(): void;
-        removeShortcut(): void;
-        checkForUsersOnChannel(address: string, callback: (a?: unknown) => void): void;
-        startupReason: Reason;
-        $: JQueryStatic;
-        addTracker(TrackerClass: TrackerClass, skipSetInit: boolean): void;
-        startTarget: HTMLElement;
-    }
     
     interface KeyboardListener {
         (event: KeyboardEvent): void;
@@ -758,7 +657,7 @@ declare namespace TogetherJSNS {
         /** When true, youTube videos will synchronize */
         youtube: boolean,
         /** Ignores the following console messages, disables all messages if set to true */
-        ignoreMessages: (keyof TogetherJSNS.AnyMessage.MapForSending)[] | true,
+        ignoreMessages: (keyof AnyMessage.MapForSending)[] | true,
         /** Ignores the following forms (will ignore all forms if set to true) */
         ignoreForms: JQuerySelector[] | true,
         /** When undefined, attempts to use the browser's language */
@@ -789,24 +688,11 @@ declare namespace TogetherJSNS {
     interface Message {
         sameUrl: boolean;
         clientId: string;
-        peer: TogetherJSNS.PeerClass;
-        type: TogetherJSNS.Messages;
+        peer: PeerClass;
+        type: Messages;
         url: string;
         to: string;
         peerCount?: number;
-    }
-
-    interface FormFocusMessage {
-        sameUrl: boolean | undefined;
-        type: "form-focus";
-        peer: PeerClass;
-        element: string;
-    }
-
-    interface FormInitMessage {
-        type: "form-init";
-        pageAge: number;
-        updates: TogetherJSNS.MessageForEditor.StringElement[]
     }
 
     /** This namespace contains interfaces that transcribe the constraints that apply on Forms
@@ -869,10 +755,10 @@ declare namespace TogetherJSNS {
         }
     }
 
-    type FormUpdateMessage = FormUpdateMessage1a | FormUpdateMessage1b | FormUpdateMessage2;
+    type FormUpdateMessage = FormUpdateMessage_WithoutTracker | FormUpdateMessage_WithTracker | FormUpdateMessage_WithReplace;
 
     /** without tracker */
-    interface FormUpdateMessage1a {
+    interface FormUpdateMessage_WithoutTracker {
         type: "form-update";
         /** a selector */
         element: string;
@@ -882,7 +768,7 @@ declare namespace TogetherJSNS {
     }
 
     /** a tracker means that value is of type string */
-    interface FormUpdateMessage1b {
+    interface FormUpdateMessage_WithTracker {
         type: "form-update";
         /** a selector */
         element: string;
@@ -892,7 +778,7 @@ declare namespace TogetherJSNS {
         basis?: number; // TODO seems to be unused
     }
 
-    interface FormUpdateMessage2 {
+    interface FormUpdateMessage_WithReplace {
         type: "form-update";
         /** a selector */
         element: string;
@@ -905,16 +791,6 @@ declare namespace TogetherJSNS {
         };
         value?: string | boolean;
         basis?: number; // TODO seems to be unused
-    }
-
-    interface MessageToSend {
-        type: TogetherJSNS.Messages;
-        url?: string;
-        to?: string;
-        clientId?: string;
-        idle?: PeerStatus;
-        location?: string;
-        position?: number;
     }
 
     interface CallbackForOn<T> {
@@ -935,10 +811,6 @@ declare namespace TogetherJSNS {
         get<K extends keyof Config>(name: K): Config[K];
         close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
         track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): (value: Config[K], previous?: Config[K]) => any;
-    }
-
-    interface ConfigGetter {
-        get<K extends keyof Config>(name: K): Partial<Config>[K];
     }
 
     interface CodeMirrorElement {
@@ -1006,38 +878,14 @@ declare namespace TogetherJSNS {
 
     interface WithDate { date: number }
     type LogItem = ValueOf<AnyMessage.MapForReceiving> & WithDate;
-}
 
-declare namespace TogetherJSNS.Util {
-    type Prototype = Methods;
-
-    interface WithMethods {
-        classMethods?: { [methodName: string]: (...args: any[]) => any }
-    }
-
-    interface WithPrototype {
-        prototype: Prototype;
-    }
-
-    interface CustomClass {
-        className: string;
-    }
-
-    type ClassObject = object & WithPrototype & CustomClass & Methods;
-
-
-    interface Methods {
-        //constructor: (...args: any[]) => any,
-        //[methodName: string]: (...args: any[]) => any,
-    }
-}
-
-declare namespace TogetherJSNS.ElementFinder {
-    interface Position {
-        location: string,
-        offset: number,
-        absoluteTop: number,
-        documentHeight: number
+    namespace ElementFinder {
+        interface Position {
+            location: string,
+            offset: number,
+            absoluteTop: number,
+            documentHeight: number
+        }
     }
 }
 

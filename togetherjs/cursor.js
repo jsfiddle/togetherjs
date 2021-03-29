@@ -217,10 +217,13 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
         return cursor2;
     }());
     var cursor = new cursor2();
-    peers.on("new-peer identity-updated status-updated", function (peer) {
+    function cbCursor(peer) {
         var c = Cursor.getClient(peer.id);
         c.updatePeer(peer);
-    });
+    }
+    peers.on("new-peer", cbCursor);
+    peers.on("identity-updated", cbCursor);
+    peers.on("status-updated", cbCursor);
     var lastTime = 0;
     var MIN_TIME = 100;
     var lastPosX = -1;

@@ -612,7 +612,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             /* nothing to send */
             return;
         }
-        var msg: TogetherJSNS.FormUpdateMessage2 = {
+        var msg: TogetherJSNS.FormUpdateMessage_WithReplace = {
             type: "form-update",
             element: element,
             "server-echo": true,
@@ -723,7 +723,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     function sendInit() {
         initSent = true;
-        var msg: TogetherJSNS.FormInitMessage = {
+        var msg: TogetherJSNS.AnyMessage.FormInitMessage = {
             type: "form-init",
             pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
