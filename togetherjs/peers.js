@@ -243,7 +243,7 @@ function peersMain(util, session, storage, require, templates) {
             _this.avatar = null;
             _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
             _this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
-            _this.loaded = false;
+            // private loaded = false;// TODO unused
             _this.isCreator = !session.isClient;
             return _this;
         }

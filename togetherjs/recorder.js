@@ -4,7 +4,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 define(["jquery", "util", "channels"], function ($, _util, channels) {
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
-    var baseUrl = null;
+    //let baseUrl = null; // TODO unused
     var clientId = "recorder";
     function display(elOrSelector) {
         var el = $(elOrSelector);
@@ -68,9 +68,10 @@ define(["jquery", "util", "channels"], function ($, _util, channels) {
         };
         Recorder.prototype.activate = function (options) {
             var _this = this;
+            var _a;
             var match;
-            baseUrl = options.baseUrl;
-            this.shareId = TogetherJS.startup._joinShareId;
+            //baseUrl = options.baseUrl; // TODO baseUrl was never read
+            this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
             if (!this.shareId) {
                 match = /\&togetherjs=([^&]+)/.exec(location.hash);
                 if (!match) {

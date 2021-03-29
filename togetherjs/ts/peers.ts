@@ -304,9 +304,9 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public avatar: string | null = null;
         public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
         public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
-        private loaded = false;
+        // private loaded = false;// TODO unused
         public isCreator = !session.isClient;
-        public view?: TogetherJSNS.PeerView;
+        public view!: TogetherJSNS.PeerView; // TODO !
         public url?: string;
 
         update(attrs: Partial<PeerSelfAttributes>) {
@@ -462,7 +462,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     class Peers extends OnClass {
         //@ts-expect-error export
         private PeerClassExport!: PeerClass; // TODO very ugly way to export the class
-        public Self: PeersSelf;
+        public Self!: PeersSelf; // TODO !
         public readonly _SelfLoaded = util.Deferred();
 
         getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>, ignoreMissing: boolean = false) {

@@ -560,7 +560,7 @@ declare namespace TogetherJSNS {
             "playerStateChange": SessionSend.PlayerStateChange,
             "synchronizeVideosOfLateGuest": SessionSend.SynchronizeVideosOfLateGuest,
             "url-change-nudge": { type: "url-change-nudge", url: string, to: string },
-            "idle-status": { type: "idle-status", idle: PeerStatus, peer?: AnyPeer },
+            "idle-status": { type: "idle-status", idle: PeerStatus, peer?: PeerClass },
             //"bye": { type: "bye", reason?: string },
             //"hello": On.HelloMessage,
             //"hello-back": On.HelloBackMessage,
