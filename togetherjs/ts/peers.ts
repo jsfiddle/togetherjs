@@ -75,6 +75,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly view;
         public lastMessageDate: number = 0;
         public following: boolean;
+        public readonly defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug
 
         public url?: string;
         private hash: string | null = null;
@@ -302,7 +303,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public name: string | null = null;
         public avatar: string | null = null;
         public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
-        public defaultName: string = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
+        public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         private loaded = false;
         public isCreator = !session.isClient;
         public view?: TogetherJSNS.PeerView;
@@ -376,7 +377,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
                 storage.settings.get("avatar"),
                 storage.settings.get("defaultName"),
                 storage.settings.get("color")] as const).then(args => {
-                    let [name, avatar, defaultName, color] = args!;
+                    let [name, avatar, defaultName, color] = args!; // TODO !
                     if(!defaultName) {
                         defaultName = util.pickRandom(DEFAULT_NICKNAMES);
                         storage.settings.set("defaultName", defaultName);

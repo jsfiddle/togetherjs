@@ -70,22 +70,22 @@ declare namespace TogetherJSNS {
 
         /** "focus" */
         interface Focus {
-            peer: TogetherJSNS.PeerClass
+            peer: PeerClass
         }
 
         /** "dock-person" */
         interface DockPerson {
-            peer: TogetherJSNS.PeerClass
+            peer: PeerClass
         }
 
         /** "participant-window" */
         interface ParticipantWindow {
-            peer: TogetherJSNS.PeerClass
+            peer: PeerClass
         }
 
         /** "invite-user-item" */
         interface InviteUserItem {
-            peer: TogetherJSNS.PeerClass
+            peer: PeerClass | ExternalPeer
         }
 
         /** "chat-message" */
@@ -117,10 +117,10 @@ declare namespace TogetherJSNS {
         /** "url-change" */
         interface UrlChange {
             peer: TogetherJSNS.PeerClass,
-            date: number,
-            href: string,
-            title: string,
-            sameUrl: boolean
+            date?: number,
+            href?: string,
+            title?: string,
+            sameUrl?: boolean
         }
 
         /** "invite" */
@@ -616,7 +616,7 @@ declare namespace TogetherJSNS {
     type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
     type TogetherJS = ReturnType<typeof togetherjsMain>;
 
-    type AnyPeer = PeerSelf | PeerClass;
+    type AnyPeer = PeerSelf | PeerClass | ExternalPeer | SerializedPeer;
     /** Those are often called an "hello message" in TJS even if it can be a peer-update */
     type HelloMessageLike = TogetherJSNS.ChannelOnMessage.Map["hello"] | TogetherJSNS.ChannelOnMessage.Map["hello-back"] | TogetherJSNS.SessionSend.PeerUpdate;
 
@@ -1068,3 +1068,7 @@ interface Require {
         }
     }
 }
+
+// TODO the code using this in ui.ts should probably ve removed since it does not work
+type MozActivity = any;
+declare var MozActivity: MozActivity;

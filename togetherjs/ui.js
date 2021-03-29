@@ -13,9 +13,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     var TEXTAREA_LINE_HEIGHT = 20; // in pixels
     var TEXTAREA_MAX_LINES = 5;
     // This is also in togetherjs.less, under .togetherjs-animated
-    var ANIMATION_DURATION = 1000;
+    //var ANIMATION_DURATION = 1000; // TODO unused
     // Time the new user window sticks around until it fades away:
-    var NEW_USER_FADE_TIMEOUT = 5000;
+    //var NEW_USER_FADE_TIMEOUT = 5000; // TODO unused
     // This is set when an animation will keep the UI from being ready
     // (until this time):
     var finishedAt = null;
@@ -326,7 +326,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 if (_this.peer.isSelf) {
                     // FIXME: these could also have consistent/reliable class names:
                     var selfName = $(".togetherjs-self-name");
-                    selfName.each((function (index, elem) {
+                    selfName.each((function (_index, elem) {
                         var el = $(elem);
                         if (el.val() != this.peer.name) {
                             el.val(this.peer.name); // TODO !
@@ -727,7 +727,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             assert(anchor.length);
             // FIXME: This is in place to temporarily disable dock dragging:
             anchor = container.find("#togetherjs-dock-anchor-disabled");
-            anchor.mousedown(function (event) {
+            anchor.mousedown(function (_event) {
                 var iface = $("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
                 var startPos = panelPosition();
@@ -802,7 +802,6 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
             }
             function closeDock() {
-                console.log("close dock");
                 //enable vertical scrolling
                 $("body").css({
                     "position": "",
@@ -841,7 +840,10 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
                 // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
                 //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
-                $("#togetherjs-dock-anchor").click(closeDock);
+                $("#togetherjs-dock-anchor").click(function () {
+                    closeDock();
+                    setTimeout(openDock, 1000); // TODO change: this is obviously not what should happen, it should close the dock on the 2n+1 click and open it again on the 2n click but since openDock and closeDock don't work yet I can't test it.
+                });
             }
             $("#togetherjs-share-button").click(function () {
                 windowing.toggle("#togetherjs-share");
@@ -935,7 +937,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 var darkened = tinycolor.darken(color);
                 el.css({
                     backgroundColor: color,
-                    borderColor: darkened
+                    borderColor: darkened.toHex()
                 });
                 $("#togetherjs-pick-color").append(el);
             });
@@ -962,9 +964,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 windowing.show("#togetherjs-chat");
             });
             // FIXME: Don't think this makes sense
-            $(".togetherjs header.togetherjs-title").each(function (index, item) {
+            $(".togetherjs header.togetherjs-title").each(function (_index, item) {
                 var button = $('<button class="togetherjs-minimize"></button>');
-                button.click(function (event) {
+                button.click(function (_event) {
                     var window = button.closest(".togetherjs-window");
                     windowing.hide(window);
                 });
@@ -992,7 +994,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
             });
             // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
-            TogetherJS.config.track("inviteFromRoom", function (inviter, previous) {
+            // TODO also inviter is always null apparently???
+            TogetherJS.config.track("inviteFromRoom", function (inviter) {
                 if (inviter) {
                     container.find("#togetherjs-invite").show();
                 }
@@ -1035,7 +1038,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                         return;
                     }
                     sizeDownImage(url).then(function (smallUrl) {
-                        pendingImage = smallUrl;
+                        pendingImage = smallUrl !== null && smallUrl !== void 0 ? smallUrl : null;
                         container.find(".togetherjs-avatar-preview").css({
                             backgroundImage: 'url(' + pendingImage + ')'
                         });
@@ -1053,6 +1056,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }).change(function () {
                 updateShareLink();
             });
+            // TODO qw this do not work, remove?
             container.find("a.togetherjs-share-link").click(function () {
                 // FIXME: this is currently opening up Bluetooth, not sharing a link
                 if (false && window.MozActivity) {
@@ -1070,7 +1074,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             });
             updateShareLink();
         };
-        Ui.prototype.showUrlChangeMessage = function (peer, url) {
+        Ui.prototype.showUrlChangeMessage = function (peer, _url) {
             var _this = this;
             deferForContainer(function () {
                 var window = templating.sub("url-change", { peer: peer });
@@ -1118,13 +1122,17 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
            method: deferForContainer(function (args) {...})
            */
         return function () {
-            if (ui.container) {
-                func.apply(this, arguments);
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
             }
-            var self = this;
-            var args = Array.prototype.slice.call(arguments); // TODO use args
+            // TODO I made some tests and this is always undefined apparently so no need to pretend it's usable. all "null" here were "this".
+            if (ui.container) {
+                func.apply(null, args);
+            }
+            //var args = Array.prototype.slice.call(arguments) as A; // TODO use args
             session.once("ui-ready", function () {
-                func.apply(self, args);
+                func.apply(null, args);
             });
         };
     }
@@ -1133,7 +1141,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             var canvas = document.createElement("canvas");
             canvas.height = session.AVATAR_SIZE;
             canvas.width = session.AVATAR_SIZE;
-            var context = canvas.getContext("2d");
+            var context = canvas.getContext("2d"); // TODO !
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -1216,7 +1224,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 // Click inside the menu, ignore this
                 return;
             }
-            t = t.parentNode;
+            t = t.parentElement;
         }
         hideMenu();
     }
@@ -1319,7 +1327,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     $("#togetherjs-invite-users").append(item);
                 }
                 item.click(function () {
-                    invite(user.clientId);
+                    invite(user.id); // TODO was user.clientId but it does not exist on any peer-like class so it was changed to id
                 });
             }
             function refresh(users, finished) {
@@ -1396,7 +1404,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         }
     });
     var setToolName = false;
-    TogetherJS.config.track("toolName", function (name) {
+    TogetherJS.config.track("toolName", function () {
         ui.updateToolName(ui.container);
     });
     return ui;

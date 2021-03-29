@@ -1,4 +1,4 @@
-// Type definitions for tinycolor v1.1.1
+// Type definitions for tinycolor v0.9.13 based on v1.1.1 changes are marked with a "// Change:" explaning what was changed
 // Project: https://github.com/bgrins/TinyColor
 // Definitions by: Mordechai Zuber <https://github.com/M-Zuber>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
@@ -109,6 +109,9 @@ interface tinycolor {
      * value: hex value ex. names["red"] --> "f00"
      */
     names: { [key: string]: string };
+
+    // Change: add darken
+    darken: (color: string, amount?: number) => tinycolorInstance;
 }
 
 interface tinycolorInstance {

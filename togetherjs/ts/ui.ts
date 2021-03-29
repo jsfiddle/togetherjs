@@ -13,9 +13,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     var TEXTAREA_LINE_HEIGHT = 20; // in pixels
     var TEXTAREA_MAX_LINES = 5;
     // This is also in togetherjs.less, under .togetherjs-animated
-    var ANIMATION_DURATION = 1000;
+    //var ANIMATION_DURATION = 1000; // TODO unused
     // Time the new user window sticks around until it fades away:
-    var NEW_USER_FADE_TIMEOUT = 5000;
+    //var NEW_USER_FADE_TIMEOUT = 5000; // TODO unused
     // This is set when an animation will keep the UI from being ready
     // (until this time):
     var finishedAt: number | null = null;
@@ -163,7 +163,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             this.add(el, messageId, notify);
         }
 
-        invite(attrs: { peer: TogetherJSNS.AnyPeer | TogetherJSNS.ExternalPeer, url: string, date?: number, forEveryone: boolean }) {
+        invite(attrs: { peer: TogetherJSNS.PeerClass | TogetherJSNS.ExternalPeer, url: string, date?: number, forEveryone: boolean }) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
@@ -249,7 +249,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(
             private ui: Ui,
-            private peer: TogetherJSNS.PeerSelf | TogetherJSNS.PeerClass
+            private peer: TogetherJSNS.PeerClass
         ) {
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
             this.dockClick = this.dockClick.bind(this); // TODO ugly
@@ -338,7 +338,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 if(this.peer.isSelf) {
                     // FIXME: these could also have consistent/reliable class names:
                     var selfName = $(".togetherjs-self-name");
-                    selfName.each((function(this: PeerView, index: number, elem: Element) {
+                    selfName.each((function(this: PeerView, _index: number, elem: Element) {
                         const el = $(elem);
                         if(el.val() != this.peer.name) {
                             el.val(this.peer.name!); // TODO !
@@ -568,7 +568,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     class Ui {
         public container!: JQuery; // TODO !
-        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerView(this, peer);
+        public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
@@ -758,7 +758,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             assert(anchor.length);
             // FIXME: This is in place to temporarily disable dock dragging:
             anchor = container.find("#togetherjs-dock-anchor-disabled");
-            anchor.mousedown(function(event) {
+            anchor.mousedown(function(_event) {
                 var iface = $("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
                 let startPos: string | null = panelPosition();
@@ -850,7 +850,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             }
 
             function closeDock() {
-                console.log("close dock");
                 //enable vertical scrolling
                 $("body").css({
                     "position": "",
@@ -903,7 +902,10 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
                 // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
                 //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
-                $("#togetherjs-dock-anchor").click(closeDock);
+                $("#togetherjs-dock-anchor").click(() => {
+                    closeDock();
+                    setTimeout(openDock, 1000); // TODO change: this is obviously not what should happen, it should close the dock on the 2n+1 click and open it again on the 2n click but since openDock and closeDock don't work yet I can't test it.
+                });
             }
 
             $("#togetherjs-share-button").click(function() {
@@ -1012,7 +1014,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 var darkened = tinycolor.darken(color);
                 el.css({
                     backgroundColor: color,
-                    borderColor: darkened
+                    borderColor: darkened.toHex()
                 });
                 $("#togetherjs-pick-color").append(el);
             });
@@ -1043,9 +1045,9 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             });
 
             // FIXME: Don't think this makes sense
-            $(".togetherjs header.togetherjs-title").each(function(index, item) {
+            $(".togetherjs header.togetherjs-title").each(function(_index, item) {
                 var button = $('<button class="togetherjs-minimize"></button>');
-                button.click(function(event) {
+                button.click(function(_event) {
                     var window = button.closest(".togetherjs-window");
                     windowing.hide(window);
                 });
@@ -1079,7 +1081,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             });
 
             // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
-            TogetherJS.config.track("inviteFromRoom", function(inviter, previous) {
+            // TODO also inviter is always null apparently???
+            TogetherJS.config.track("inviteFromRoom", function(inviter) {
                 if(inviter) {
                     container.find("#togetherjs-invite").show();
                 }
@@ -1127,7 +1130,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 util.readFileImage(this).then(function(url) {
                     if(!url) { return }
                     sizeDownImage(url).then(function(smallUrl) {
-                        pendingImage = smallUrl;
+                        pendingImage = smallUrl ?? null;
                         container.find(".togetherjs-avatar-preview").css({
                             backgroundImage: 'url(' + pendingImage + ')'
                         });
@@ -1141,13 +1144,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         }
 
-        prepareShareLink(container) {
+        prepareShareLink(container: JQuery) {
             container.find("input.togetherjs-share-link").click(function(this: HTMLElement) {
                 $(this).select();
             }).change(function() {
                 updateShareLink();
             });
-            container.find("a.togetherjs-share-link").click(function() {
+            // TODO qw this do not work, remove?
+            container.find("a.togetherjs-share-link").click(function(this: HTMLElement) {
                 // FIXME: this is currently opening up Bluetooth, not sharing a link
                 if(false && window.MozActivity) {
                     var activity = new MozActivity({
@@ -1165,7 +1169,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             updateShareLink();
         }
 
-        showUrlChangeMessage(peer: TogetherJSNS.PeerClass, url: string) {
+        showUrlChangeMessage(peer: TogetherJSNS.PeerClass, _url: string) {
             deferForContainer(() => {
                 var window = templating.sub("url-change", { peer: peer });
                 this.container.append(window);
@@ -1215,14 +1219,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     
            method: deferForContainer(function (args) {...})
            */
-        return function() {
+        return function(...args: A) {
+            // TODO I made some tests and this is always undefined apparently so no need to pretend it's usable. all "null" here were "this".
             if(ui.container) {
-                func.apply(this, arguments);
+                func.apply(null, args);
             }
-            var self = this;
-            var args = Array.prototype.slice.call(arguments) as A; // TODO use args
+            //var args = Array.prototype.slice.call(arguments) as A; // TODO use args
             session.once("ui-ready", function() {
-                func.apply(self, args);
+                func.apply(null, args);
             });
         };
     }
@@ -1232,7 +1236,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             let canvas = document.createElement("canvas");
             canvas.height = session.AVATAR_SIZE;
             canvas.width = session.AVATAR_SIZE;
-            let context = canvas.getContext("2d");
+            let context = canvas.getContext("2d")!; // TODO !
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -1317,14 +1321,14 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         $("#togetherjs-pick-color").hide();
     }
 
-    function maybeHideMenu(event) {
-        var t = event.target;
+    function maybeHideMenu(event: Event) {
+        var t = event.target as Element;
         while(t) {
             if(t.id == "togetherjs-menu") {
                 // Click inside the menu, ignore this
                 return;
             }
-            t = t.parentNode;
+            t = t.parentElement!;
         }
         hideMenu();
     }
@@ -1431,7 +1435,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         inRefresh = true;
         require(["who"], function(who: TogetherJSNS.Who) {
             var def = who.getList(inviteHubUrl());
-            function addUser(user: TogetherJSNS.AnyPeer, before?: JQuery) {
+            function addUser(user: TogetherJSNS.PeerClass | TogetherJSNS.ExternalPeer, before?: JQuery) {
                 var item = templating.sub("invite-user-item", { peer: user });
                 item.attr("data-clientid", user.id);
                 if(before) {
@@ -1441,7 +1445,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     $("#togetherjs-invite-users").append(item);
                 }
                 item.click(function() {
-                    invite(user.clientId);
+                    invite(user.id); // TODO was user.clientId but it does not exist on any peer-like class so it was changed to id
                 });
             }
             function refresh(users: { [user: string]: TogetherJSNS.ExternalPeer }, finished: boolean) {
@@ -1524,7 +1528,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     var setToolName = false;
 
-    TogetherJS.config.track("toolName", function(name) {
+    TogetherJS.config.track("toolName", function() {
         ui.updateToolName(ui.container);
     });
 

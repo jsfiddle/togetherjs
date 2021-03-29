@@ -33,6 +33,7 @@ function peersMain(util, session, storage, require, templates) {
             if (attrs === void 0) { attrs = {}; }
             this.isSelf = false;
             this.lastMessageDate = 0;
+            this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug
             this.hash = null;
             this.title = null;
             assert(id);
@@ -241,7 +242,7 @@ function peersMain(util, session, storage, require, templates) {
             _this.name = null;
             _this.avatar = null;
             _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
-            _this.defaultName = "defaultName"; // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
+            _this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
             _this.loaded = false;
             _this.isCreator = !session.isClient;
             return _this;
@@ -315,7 +316,7 @@ function peersMain(util, session, storage, require, templates) {
                 storage.settings.get("defaultName"),
                 storage.settings.get("color")
             ]).then(function (args) {
-                var _a = args, name = _a[0], avatar = _a[1], defaultName = _a[2], color = _a[3];
+                var _a = args, name = _a[0], avatar = _a[1], defaultName = _a[2], color = _a[3]; // TODO !
                 if (!defaultName) {
                     defaultName = util.pickRandom(DEFAULT_NICKNAMES);
                     storage.settings.set("defaultName", defaultName);
