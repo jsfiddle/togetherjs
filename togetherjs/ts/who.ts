@@ -63,7 +63,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                 var channel = channels.WebSocketChannel(hubUrl);
                 var users: { [user: string]: ExternalPeer } = {};
                 var responded = 0;
-                // tslint:disable-next-line unused var
+                //tslint:disable-next-line unused var
                 var firstResponse = 0;
                 var lateResponseTimeout: number;
                 channel.onmessage = function(msg) {

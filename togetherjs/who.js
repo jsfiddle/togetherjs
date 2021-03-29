@@ -38,7 +38,7 @@ function whoMain(util, channels, session, ui) {
                 var channel = channels.WebSocketChannel(hubUrl);
                 var users = {};
                 var responded = 0;
-                // tslint:disable-next-line unused var
+                //tslint:disable-next-line unused var
                 var firstResponse = 0;
                 var lateResponseTimeout;
                 channel.onmessage = function (msg) {
