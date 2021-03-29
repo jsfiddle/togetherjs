@@ -105,12 +105,11 @@ class OnClass {
 
     removeListener = this.off.bind(this);
 
-    emit<T extends keyof TogetherJSNS.On.Map>(name: T, ...args2: Parameters<TogetherJSNS.On.Map[T]>) {
+    emit<T extends keyof TogetherJSNS.On.Map>(name: T, ...args: Parameters<TogetherJSNS.On.Map[T]>) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        var args = Array.prototype.slice.call(arguments, 1);
         let l = this._listeners[name];
         l.forEach(function(this: OnClass, callback) {
             callback.apply(this, args);
@@ -514,7 +513,7 @@ function togetherjsMain() {
 
             let localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            const callback = (session: TogetherJSNS.Session, jquery: JQuery) => {
+            const callback = (_session: TogetherJSNS.Session, _jquery: JQuery) => {
                 this._loaded = true;
                 if(!min) {
                     this.require = require.config({ context: "togetherjs" });

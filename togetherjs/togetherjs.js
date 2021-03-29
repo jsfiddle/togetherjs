@@ -117,15 +117,14 @@ var OnClass = /** @class */ (function () {
         }
     };
     OnClass.prototype.emit = function (name) {
-        var args2 = [];
+        var args = [];
         for (var _i = 1; _i < arguments.length; _i++) {
-            args2[_i - 1] = arguments[_i];
+            args[_i - 1] = arguments[_i];
         }
         var offs = this._listenerOffs = [];
         if ((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        var args = Array.prototype.slice.call(arguments, 1);
         var l = this._listeners[name];
         l.forEach(function (callback) {
             callback.apply(this, args);
@@ -503,7 +502,7 @@ function togetherjsMain() {
             this.config("lang", lang);
             var localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            var callback = function (session, jquery) {
+            var callback = function (_session, _jquery) {
                 _this._loaded = true;
                 if (!min) {
                     _this.require = require.config({ context: "togetherjs" });
