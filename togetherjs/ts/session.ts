@@ -313,7 +313,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             processFirstHello(msg);
         }
     }
-    session.hub.on("hello hello-back", cbHelloHelloback);
+    session.hub.on("hello", cbHelloHelloback);
+    session.hub.on("hello-back", cbHelloHelloback);
 
     session.hub.on("who", function() {
         sendHello(true);

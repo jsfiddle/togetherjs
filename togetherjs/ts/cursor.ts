@@ -375,7 +375,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
     // hello-based scroll updates, just so we don't bounce around (we don't intelligently
     // choose which one to use, just the first that comes in)
     var acceptedScrollUpdate = false;
-    session.hub.on("hello-back hello", function(msg) {
+    function cbHelloHelloback(msg) {
         if(msg.type == "hello") {
             // Once a hello comes in, a bunch of hello-backs not intended for us will also
             // come in, and we should ignore them
@@ -391,7 +391,9 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             acceptedScrollUpdate = true;
             msg.peer.view.scrollTo();
         }
-    });
+    }
+    session.hub.on("hello-back", cbHelloHelloback);
+    session.hub.on("hello", cbHelloHelloback);
 
     session.on("ui-ready", function() {
         $(document).mousemove(mousemove);
