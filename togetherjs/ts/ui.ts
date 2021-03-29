@@ -251,6 +251,26 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             protected peer: TogetherJSNS.PeerSelf | TogetherJSNS.PeerClass
         ) { }
 
+        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
+        setElement(el: JQuery) {
+            var count = 0;
+            var classes = ["togetherjs-person", "togetherjs-person-status",
+                "togetherjs-person-name", "togetherjs-person-name-abbrev",
+                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
+                "togetherjs-person-status", "togetherjs-person-role",
+                "togetherjs-person-url", "togetherjs-person-url-title",
+                "togetherjs-person-bordercolor"];
+            classes.forEach(function(this: PeerView, cls) {
+                var els = el.find("." + cls);
+                els.addClass(this.peer.className(cls + "-"));
+                count += els.length;
+            }, this);
+            if(!count) {
+                console.warn("setElement(", el, ") doesn't contain any person items");
+            }
+            this.updateDisplay(el);
+        }
+
         update() {
             this.updateDisplay();
         }
@@ -380,26 +400,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             super(ui, peer);
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
             this.dockClick = this.dockClick.bind(this); // TODO ugly
-        }
-
-        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
-        setElement(el: JQuery) {
-            var count = 0;
-            var classes = ["togetherjs-person", "togetherjs-person-status",
-                "togetherjs-person-name", "togetherjs-person-name-abbrev",
-                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
-                "togetherjs-person-status", "togetherjs-person-role",
-                "togetherjs-person-url", "togetherjs-person-url-title",
-                "togetherjs-person-bordercolor"];
-            classes.forEach(function(this: PeerView, cls) {
-                var els = el.find("." + cls);
-                els.addClass(this.peer.className(cls + "-"));
-                count += els.length;
-            }, this);
-            if(!count) {
-                console.warn("setElement(", el, ") doesn't contain any person items");
-            }
-            this.updateDisplay(el);
         }
 
         update() {

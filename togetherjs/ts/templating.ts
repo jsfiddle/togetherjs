@@ -21,8 +21,9 @@ function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers,
         }
 
         // TODO find if there is another way to do that. Using a restrictive prototype and a less restrictibe implementation because "in" check in if only works with union types which TogetherJSNS.TemplatingSub.Any is but TogetherJSNS.TemplatingSub.Map[K] is not
-        sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery {
+        //sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery {
         //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
+        sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.Any): JQuery {
             let template = this.clone(templateId);
             util.forEachAttr(variables, function(value, attr) {
                 // FIXME: do the substitution... somehow?

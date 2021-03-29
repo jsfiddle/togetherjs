@@ -90,20 +90,20 @@ declare namespace TogetherJSNS {
 
         /** "chat-message" */
         interface ChatMessage {
-            peer: AnyPeer,
+            peer: PeerClass | PeerSelf,
             content: string,
             date: number
         }
 
         /** "chat-joined" */
         interface ChatJoined {
-            peer: TogetherJSNS.PeerClass,
+            peer: PeerClass,
             date: number
         }
 
         /** "chat-left" */
         interface ChatLeft {
-            peer: TogetherJSNS.PeerClass,
+            peer: PeerClass,
             date: number,
             declinedJoin: boolean
         }
@@ -125,7 +125,7 @@ declare namespace TogetherJSNS {
 
         /** "invite" */
         interface Invite {
-            peer: AnyPeer,
+            peer: PeerClass | PeerSelf,
             date: number,
             href: string,
             hrefTitle: string,
