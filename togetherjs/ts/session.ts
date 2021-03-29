@@ -305,7 +305,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
      */
 
     /* Always say hello back, and keep track of peers: */
-    function cbHelloHelloback(msg) {
+    function cbHelloHelloback(msg: TogetherJSNS.On.Hello2 | TogetherJSNS.On.HelloBack2) {
         if(msg.type == "hello") {
             sendHello(true);
         }

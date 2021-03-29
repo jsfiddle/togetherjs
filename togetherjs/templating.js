@@ -17,7 +17,9 @@ function templatingMain($, util, _peers, _windowing, session) {
             // FIXME: if called directly, doesn't emit new-element event:
             return template;
         };
+        // TODO find if there is another way to do that. Using a restrictive prototype and a less restrictibe implementation because "in" check in if only works with union types which TogetherJSNS.TemplatingSub.Any is but TogetherJSNS.TemplatingSub.Map[K] is not
         Templating.prototype.sub = function (templateId, variables) {
+            //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
             var template = this.clone(templateId);
             util.forEachAttr(variables, function (value, attr) {
                 // FIXME: do the substitution... somehow?

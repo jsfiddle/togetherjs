@@ -415,10 +415,26 @@ declare namespace TogetherJSNS {
 
             // hello
             // transit: sameUrl? peer? clientId?
-            "hello": (msg: { type: "hello", sameUrl: boolean }) => void;
-            "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
+            "hello": (msg: Hello2) => void;
+            "hello-back": (msg: HelloBack2) => void; // TODO may be wrong
             "hello-back hello": (msg: { type: "hello" | "hello-back", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
             "hello hello-back": (msg: {type: "hello" | "hello-back", sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.AnyPeer, isClient: boolean}) => void;
+        }
+
+        // TODO this should be done with (In|After)Transit and other Hello interface, no need to introduce new ones
+        interface Hello2Base {
+            sameUrl: boolean,
+            scrollPosition: ElementFinder.Position,
+            peer: PeerClass,
+            isClient?: boolean,
+        }
+
+        interface Hello2 extends Hello2Base {
+            type: "hello"
+        }
+
+        interface HelloBack2 extends Hello2Base {
+            type: "hello-back"
         }
 
         /** Do not use this in your own code, it's just here to be inherited */
