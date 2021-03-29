@@ -40,7 +40,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
             this.avatar = attrs.avatar || null;
             this.color = attrs.color || "#00FF00";
             this.lastMessageDate = 0;
-            this.view = ui.PeerView(this);
+            this.view = ui.PeerView(this); // TODO seems to be unused
         }
 
         className(prefix: string = "") {
