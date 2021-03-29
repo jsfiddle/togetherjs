@@ -271,7 +271,7 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                 return;
             }
             if("clientId" in msg) {
-                const msg2 = msg as typeof msg & { clientId: string, peer?: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf };
+                const msg2 = msg as typeof msg & { clientId: string }; // TODO cast
                 const peer = peers.getPeer(msg2.clientId, msg2);
                 if(peer) {
                     msg2.peer = peer

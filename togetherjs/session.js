@@ -260,7 +260,7 @@ function sessionMain(require, util, channels, $, storage) {
                 return;
             }
             if ("clientId" in msg) {
-                var msg2 = msg;
+                var msg2 = msg; // TODO cast
                 var peer = peers.getPeer(msg2.clientId, msg2);
                 if (peer) {
                     msg2.peer = peer;
