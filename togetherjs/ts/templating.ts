@@ -50,7 +50,7 @@ function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers,
                 }
                 let attrName = "data-togetherjs-subattr-" + attr;
                 let attrs = template.find("[" + attrName + "]");
-                attrs.each(function(index, element) {
+                attrs.each(function(_index, element) {
                     assert(typeof value == "string");
                     const $element = $(element);
                     let subAttribute = $element.attr(attrName);

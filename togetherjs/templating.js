@@ -47,7 +47,7 @@ function templatingMain($, util, _peers, _windowing, session) {
                 }
                 var attrName = "data-togetherjs-subattr-" + attr;
                 var attrs = template.find("[" + attrName + "]");
-                attrs.each(function (index, element) {
+                attrs.each(function (_index, element) {
                     assert(typeof value == "string");
                     var $element = $(element);
                     var subAttribute = $element.attr(attrName);
