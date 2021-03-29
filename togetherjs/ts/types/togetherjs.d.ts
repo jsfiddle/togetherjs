@@ -469,7 +469,7 @@ declare namespace TogetherJSNS {
         /** While a message in in the send process or in the receiving process some fields will be set, they can be undefined for a short time */
         interface InTransit {
             sameUrl?: boolean,
-            peer?: PeerClass | PeerSelf,
+            peer?: PeerClass,
             clientId?: string
         }
 

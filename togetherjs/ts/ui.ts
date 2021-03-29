@@ -249,7 +249,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(
             private ui: Ui,
-            private peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf
+            private peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer
         ) {
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
             this.dockClick = this.dockClick.bind(this); // TODO ugly
@@ -568,7 +568,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     class Ui {
         public container!: JQuery; // TODO !
-        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) => new PeerView(this, peer);
+        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
