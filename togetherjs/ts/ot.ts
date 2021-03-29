@@ -565,7 +565,7 @@ function otMain(util: Util) {
         }
     }
 
-    type StateForClientId = { init: true, clientId: "init", state: Change };
+    type StateForClientId = { init: true, clientId: "init", state: string };
 
     // TODO this class seems to be unused
     //@ts-expect-error unused but we don't removed things for now
@@ -577,7 +577,7 @@ function otMain(util: Util) {
         private mostRecentLocalChange: number = -1; // TODO check, considering how mostRecentLocalChange is used (in a max function) using -1 seems like a good value
         private clientId: string;
 
-        constructor(clientId: string, initState: Change) {
+        constructor(clientId: string, initState: string) {
             this._history.push({
                 init: true, // TODO added this field to have a reliable way to know the type of elements in history by doing `"init" in last`
                 clientId: "init",
@@ -719,10 +719,10 @@ function otMain(util: Util) {
         }
 
         logHistory(prefix: string = "") {
-            var postfix = Array.prototype.slice.call(arguments, 1);
+            var postfix = Array.prototype.slice.call(arguments, 1); // TODO use ... in parameters
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
-            let hstate: Change | string;
+            let hstate: string;
             this._history.walkForward(0, function(c, index) {
                 if("init" in c) { // index == 0
                     assert(c.clientId == "init");
@@ -778,9 +778,9 @@ function otMain(util: Util) {
         */
 
         getState() {
-            let state: Change;
+            let state: string = ""; // TODO change, state init to ""
             this._history.walkForward(0, function(c) {
-                if("init" in c && c.clientId == "init") { // TODO the same kin of logic than in logHistory, there must be some sense to it...
+                if("init" in c && c.clientId == "init") { // TODO the same kind of logic than in logHistory, there must be some sense to it...
                     // Initialization, has the state
                     state = c.state;
                 }

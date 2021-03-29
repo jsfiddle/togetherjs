@@ -664,7 +664,7 @@ function otMain(util) {
         };
         TJSHistory.prototype.logHistory = function (prefix) {
             if (prefix === void 0) { prefix = ""; }
-            var postfix = Array.prototype.slice.call(arguments, 1);
+            var postfix = Array.prototype.slice.call(arguments, 1); // TODO use ... in parameters
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
             var hstate;
@@ -721,9 +721,9 @@ function otMain(util) {
         }
         */
         TJSHistory.prototype.getState = function () {
-            var state;
+            var state = ""; // TODO change, state init to ""
             this._history.walkForward(0, function (c) {
-                if ("init" in c && c.clientId == "init") { // TODO the same kin of logic than in logHistory, there must be some sense to it...
+                if ("init" in c && c.clientId == "init") { // TODO the same kind of logic than in logHistory, there must be some sense to it...
                     // Initialization, has the state
                     state = c.state;
                 }
