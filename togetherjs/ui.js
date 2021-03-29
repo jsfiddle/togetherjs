@@ -2,6 +2,21 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 function uiMain(require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi) {
     var assert = util.assert;
     var AssertionError = util.AssertionError;
@@ -232,42 +247,18 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         };
         return Chat;
     }());
-    /** */
-    var BasePeerView = /** @class */ (function () {
-        function BasePeerView() {
-        }
-        return BasePeerView;
-    }());
-    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
-    var PeerView = /** @class */ (function () {
-        function PeerView(ui, peer) {
+    /** Like PeerView but for PeerSelf objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
+    var PeerSelfView = /** @class */ (function () {
+        function PeerSelfView(ui, peer) {
             this.ui = ui;
             this.peer = peer;
             this.dockElement = null;
             this.detailElement = null;
-            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            this.dockClick = this.dockClick.bind(this); // TODO ugly
         }
-        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
-        PeerView.prototype.setElement = function (el) {
-            var count = 0;
-            var classes = ["togetherjs-person", "togetherjs-person-status",
-                "togetherjs-person-name", "togetherjs-person-name-abbrev",
-                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
-                "togetherjs-person-status", "togetherjs-person-role",
-                "togetherjs-person-url", "togetherjs-person-url-title",
-                "togetherjs-person-bordercolor"];
-            classes.forEach(function (cls) {
-                var els = el.find("." + cls);
-                els.addClass(this.peer.className(cls + "-"));
-                count += els.length;
-            }, this);
-            if (!count) {
-                console.warn("setElement(", el, ") doesn't contain any person items");
-            }
-            this.updateDisplay(el);
+        PeerSelfView.prototype.update = function () {
+            this.updateDisplay();
         };
-        PeerView.prototype.updateDisplay = function (container) {
+        PeerSelfView.prototype.updateDisplay = function (container) {
             var _this = this;
             deferForContainer(function () {
                 container = container || _this.ui.container;
@@ -363,6 +354,55 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 _this.updateFollow();
             })();
         };
+        PeerSelfView.prototype.updateFollow = function () {
+            if (!this.peer.url) {
+                return;
+            }
+            if (!this.detailElement) {
+                return;
+            }
+            var same = this.detailElement.find(".togetherjs-same-url");
+            var different = this.detailElement.find(".togetherjs-different-url");
+            if (this.peer.url == session.currentUrl()) {
+                same.show();
+                different.hide();
+            }
+            else {
+                same.hide();
+                different.show();
+            }
+        };
+        return PeerSelfView;
+    }());
+    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
+    var PeerView = /** @class */ (function (_super) {
+        __extends(PeerView, _super);
+        function PeerView(ui, peer) {
+            var _this = _super.call(this, ui, peer) || this;
+            _this.peer = peer;
+            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
+            _this.dockClick = _this.dockClick.bind(_this); // TODO ugly
+            return _this;
+        }
+        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
+        PeerView.prototype.setElement = function (el) {
+            var count = 0;
+            var classes = ["togetherjs-person", "togetherjs-person-status",
+                "togetherjs-person-name", "togetherjs-person-name-abbrev",
+                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
+                "togetherjs-person-status", "togetherjs-person-role",
+                "togetherjs-person-url", "togetherjs-person-url-title",
+                "togetherjs-person-bordercolor"];
+            classes.forEach(function (cls) {
+                var els = el.find("." + cls);
+                els.addClass(this.peer.className(cls + "-"));
+                count += els.length;
+            }, this);
+            if (!count) {
+                console.warn("setElement(", el, ") doesn't contain any person items");
+            }
+            this.updateDisplay(el);
+        };
         PeerView.prototype.update = function () {
             // Called d0 from PeerSelf & PeerClass
             // Only function directly called from PeerSelf
@@ -374,10 +414,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     this.undock();
                 }
             }
-            else {
-                alert("update self");
-            }
-            this.updateDisplay();
+            _super.prototype.update.call(this);
             this.updateUrlDisplay();
         };
         PeerView.prototype.updateUrlDisplay = function (force) {
@@ -534,24 +571,6 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }
             $("html, body").easeTo(elementFinder.pixelForPosition(pos));
         };
-        PeerView.prototype.updateFollow = function () {
-            if (!this.peer.url) {
-                return;
-            }
-            if (!this.detailElement) {
-                return;
-            }
-            var same = this.detailElement.find(".togetherjs-same-url");
-            var different = this.detailElement.find(".togetherjs-different-url");
-            if (this.peer.url == session.currentUrl()) {
-                same.show();
-                different.hide();
-            }
-            else {
-                same.hide();
-                different.show();
-            }
-        };
         PeerView.prototype.maybeHideDetailWindow = function (windows) {
             if (this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
                 if (this.followCheckbox && this.followCheckbox[0].checked) {
@@ -573,11 +592,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             session.off("hide-window", this.maybeHideDetailWindow);
         };
         return PeerView;
-    }());
+    }(PeerSelfView));
     var Ui = /** @class */ (function () {
         function Ui() {
             var _this = this;
             this.PeerView = function (peer) { return new PeerView(_this, peer); };
+            this.PeerSelfView = function (peer) { return new PeerSelfView(_this, peer); };
             this.chat = new Chat(this);
         }
         /* Displays some toggleable element; toggleable elements have a

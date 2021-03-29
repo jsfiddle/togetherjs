@@ -306,7 +306,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
         // private loaded = false;// TODO unused
         public isCreator = !session.isClient;
-        public view!: TogetherJSNS.PeerView; // TODO !
+        public view!: TogetherJSNS.PeerSelfView; // TODO !
         public url?: string;
 
         update(attrs: Partial<PeerSelfAttributes>) {
@@ -510,7 +510,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         peers.Self = new PeersSelf();
 
 
-        peers.Self.view = ui.PeerView(peers.Self);
+        peers.Self.view = ui.PeerSelfView(peers.Self);
         storage.tab.get("peerCache").then(deserialize);
         peers.Self._loadFromSettings().then(function() {
             peers.Self._loadFromApp();

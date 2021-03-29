@@ -239,44 +239,20 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
     }
 
-    /** */
-    class BasePeerView {
-
-    }
-
-    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
-    class PeerView {
-        private followCheckbox?: JQuery;
-        private _lastUpdateUrlDisplay?: string;
-        private dockElement: JQuery | null = null;
-        private detailElement: JQuery | null = null;
+    /** Like PeerView but for PeerSelf objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
+    class PeerSelfView {
+        protected followCheckbox?: JQuery;
+        protected _lastUpdateUrlDisplay?: string;
+        protected dockElement: JQuery | null = null;
+        protected detailElement: JQuery | null = null;
 
         constructor(
-            private ui: Ui,
-            private peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf
-        ) {
-            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            this.dockClick = this.dockClick.bind(this); // TODO ugly
-        }
+            protected ui: Ui,
+            protected peer: TogetherJSNS.PeerSelf | TogetherJSNS.PeerClass
+        ) { }
 
-        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
-        setElement(el: JQuery) {
-            var count = 0;
-            var classes = ["togetherjs-person", "togetherjs-person-status",
-                "togetherjs-person-name", "togetherjs-person-name-abbrev",
-                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
-                "togetherjs-person-status", "togetherjs-person-role",
-                "togetherjs-person-url", "togetherjs-person-url-title",
-                "togetherjs-person-bordercolor"];
-            classes.forEach(function(this: PeerView, cls) {
-                var els = el.find("." + cls);
-                els.addClass(this.peer.className(cls + "-"));
-                count += els.length;
-            }, this);
-            if(!count) {
-                console.warn("setElement(", el, ") doesn't contain any person items");
-            }
-            this.updateDisplay(el);
+        update() {
+            this.updateDisplay();
         }
 
         updateDisplay(container?: JQuery) {
@@ -342,7 +318,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 if(this.peer.isSelf) {
                     // FIXME: these could also have consistent/reliable class names:
                     var selfName = $(".togetherjs-self-name");
-                    selfName.each((function(this: PeerView, _index: number, elem: Element) {
+                    selfName.each((function(this: PeerSelfView, _index: number, elem: Element) {
                         const el = $(elem);
                         if(el.val() != this.peer.name) {
                             el.val(this.peer.name!); // TODO !
@@ -375,6 +351,57 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             })();
         }
 
+        updateFollow() {
+            if(!this.peer.url) {
+                return;
+            }
+            if(!this.detailElement) {
+                return;
+            }
+            var same = this.detailElement.find(".togetherjs-same-url");
+            var different = this.detailElement.find(".togetherjs-different-url");
+            if(this.peer.url == session.currentUrl()) {
+                same.show();
+                different.hide();
+            }
+            else {
+                same.hide();
+                different.show();
+            }
+        }
+    }
+
+    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
+    class PeerView extends PeerSelfView {
+        constructor(
+            ui: Ui,
+            protected peer: TogetherJSNS.PeerClass
+        ) {
+            super(ui, peer);
+            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
+            this.dockClick = this.dockClick.bind(this); // TODO ugly
+        }
+
+        /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
+        setElement(el: JQuery) {
+            var count = 0;
+            var classes = ["togetherjs-person", "togetherjs-person-status",
+                "togetherjs-person-name", "togetherjs-person-name-abbrev",
+                "togetherjs-person-bgcolor", "togetherjs-person-swatch",
+                "togetherjs-person-status", "togetherjs-person-role",
+                "togetherjs-person-url", "togetherjs-person-url-title",
+                "togetherjs-person-bordercolor"];
+            classes.forEach(function(this: PeerView, cls) {
+                var els = el.find("." + cls);
+                els.addClass(this.peer.className(cls + "-"));
+                count += els.length;
+            }, this);
+            if(!count) {
+                console.warn("setElement(", el, ") doesn't contain any person items");
+            }
+            this.updateDisplay(el);
+        }
+
         update() {
             // Called d0 from PeerSelf & PeerClass
             // Only function directly called from PeerSelf
@@ -386,10 +413,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     this.undock();
                 }
             }
-            else {
-                alert("update self");
-            }
-            this.updateDisplay();
+
+            super.update();
             this.updateUrlDisplay();
         }
 
@@ -554,25 +579,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             $("html, body").easeTo(elementFinder.pixelForPosition(pos));
         }
 
-        updateFollow() {
-            if(!this.peer.url) {
-                return;
-            }
-            if(!this.detailElement) {
-                return;
-            }
-            var same = this.detailElement.find(".togetherjs-same-url");
-            var different = this.detailElement.find(".togetherjs-different-url");
-            if(this.peer.url == session.currentUrl()) {
-                same.show();
-                different.hide();
-            }
-            else {
-                same.hide();
-                different.show();
-            }
-        }
-
         maybeHideDetailWindow(windows: JQuery[]) {
             if(this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
                 if(this.followCheckbox && (this.followCheckbox[0] as HTMLInputElement).checked) {
@@ -600,7 +606,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
     class Ui {
         public container!: JQuery; // TODO !
-        public readonly PeerView = (peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) => new PeerView(this, peer);
+        public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
+        public readonly PeerSelfView = (peer: TogetherJSNS.PeerSelf) => new PeerSelfView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
