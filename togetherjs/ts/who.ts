@@ -29,6 +29,11 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
         lastMessageDate;
         view;
 
+        // TODO hacks to make ExternalPeer pass as a PeerSelf/PeerClass for PeerSelfView
+        isCreator: undefined;
+        url: undefined;
+        defaultName: undefined;
+
         constructor(id: string, attrs: ExternalPeerAttributes) {
             attrs = attrs || {};
             assert(id);
@@ -40,7 +45,7 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
             this.avatar = attrs.avatar || null;
             this.color = attrs.color || "#00FF00";
             this.lastMessageDate = 0;
-            this.view = ui.PeerView(this); // TODO seems to be unused
+            this.view = ui.PeerSelfView(this); // TODO seems to be unused
         }
 
         className(prefix: string = "") {

@@ -239,7 +239,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
     }
 
-    /** Like PeerView but for PeerSelf objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
+    /** Like PeerView but for PeerSelf/ExternalPeer objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
     class PeerSelfView {
         protected followCheckbox?: JQuery;
         protected _lastUpdateUrlDisplay?: string;
@@ -248,7 +248,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         constructor(
             protected ui: Ui,
-            protected peer: TogetherJSNS.PeerSelf | TogetherJSNS.PeerClass
+            protected peer: TogetherJSNS.PeerSelf | TogetherJSNS.PeerClass | TogetherJSNS.ExternalPeer
         ) { }
 
         /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
@@ -345,7 +345,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                         }
                     }).bind(this));
                     $("#togetherjs-menu-avatar").attr("src", this.peer.avatar);
-                    if(!this.peer.name) {
+                    if(!this.peer.name && this.peer.defaultName) {
                         $("#togetherjs-menu .togetherjs-person-name-self").text(this.peer.defaultName);
                     }
                 }
@@ -372,7 +372,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
 
         updateFollow() {
-            if(!this.peer.url) {
+            if(!("url" in this.peer) || !this.peer.url) {
                 return;
             }
             if(!this.detailElement) {
@@ -607,7 +607,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
     class Ui {
         public container!: JQuery; // TODO !
         public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
-        public readonly PeerSelfView = (peer: TogetherJSNS.PeerSelf) => new PeerSelfView(this, peer);
+        public readonly PeerSelfView = (peer: TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerSelfView(this, peer);
         public readonly chat = new Chat(this);
 
         /* Displays some toggleable element; toggleable elements have a
@@ -1424,6 +1424,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
 
         if(ui.container) {
             ui.container.remove();
+            // TODO remove this @ts-expect-error
+            //@ts-expect-error easier typechecking
             ui.container = null;
         }
         // Clear out any other spurious elements:

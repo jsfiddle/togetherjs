@@ -75,7 +75,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly view;
         public lastMessageDate: number = 0;
         public following: boolean;
-        public readonly defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug
+        //public readonly defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug, actually this is probably a problem, we don't want to guess the name of a remote peer
 
         public url?: string;
         private hash: string | null = null;

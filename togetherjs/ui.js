@@ -247,7 +247,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         };
         return Chat;
     }());
-    /** Like PeerView but for PeerSelf objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
+    /** Like PeerView but for PeerSelf/ExternalPeer objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
     var PeerSelfView = /** @class */ (function () {
         function PeerSelfView(ui, peer) {
             this.ui = ui;
@@ -348,7 +348,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                         }
                     }).bind(_this));
                     $("#togetherjs-menu-avatar").attr("src", _this.peer.avatar);
-                    if (!_this.peer.name) {
+                    if (!_this.peer.name && _this.peer.defaultName) {
                         $("#togetherjs-menu .togetherjs-person-name-self").text(_this.peer.defaultName);
                     }
                 }
@@ -374,7 +374,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             })();
         };
         PeerSelfView.prototype.updateFollow = function () {
-            if (!this.peer.url) {
+            if (!("url" in this.peer) || !this.peer.url) {
                 return;
             }
             if (!this.detailElement) {
@@ -1325,6 +1325,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         }
         if (ui.container) {
             ui.container.remove();
+            // TODO remove this @ts-expect-error
+            //@ts-expect-error easier typechecking
             ui.container = null;
         }
         // Clear out any other spurious elements:

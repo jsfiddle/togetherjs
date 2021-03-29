@@ -33,7 +33,6 @@ function peersMain(util, session, storage, require, templates) {
             if (attrs === void 0) { attrs = {}; }
             this.isSelf = false;
             this.lastMessageDate = 0;
-            this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug
             this.hash = null;
             this.title = null;
             assert(id);
