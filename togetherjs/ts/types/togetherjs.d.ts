@@ -414,6 +414,7 @@ declare namespace TogetherJSNS {
             "identityId": (msg: { type: "identityId", identityId: string }) => void, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet, this one is to fix "session.hub.emit(msg.type, msg);" in session.ts
 
             // hello
+            // transit: sameUrl? peer? clientId?
             "hello": (msg: { type: "hello", sameUrl: boolean }) => void;
             "hello-back": (msg: { type: "hello-back" }) => void; // TODO may be wrong
             "hello-back hello": (msg: { type: "hello" | "hello-back", scrollPosition: ElementFinder.Position, sameUrl: boolean, peer: PeerClass }) => void;
