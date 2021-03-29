@@ -278,14 +278,13 @@ define(["jquery"], function($: JQueryStatic) {
 
         //then animate avatar to shrink to nothing, and reset the values again
         // FIXME this needs to animate from the CENTER
-        this.animate({
+        return this.animate({
             marginLeft: margin + width / 2,
             height: 0,
             width: 0,
             backgroundSize: "0 0",
             opacity: 0
         }, 600);
-        return this;
     };
 
     $.fn.animateCursorEntry = function() {

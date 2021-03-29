@@ -15,7 +15,7 @@ interface JQuery {
     slideIn: () => void;
     easeTo: (y: number) => void;
     animateDockEntry: () => void;
-    animateDockExit: () => JQueryDeferred<unknown>;
+    animateDockExit: () => JQuery;
     animateCursorEntry: () => void;
     animateKeyboard: () => void;
     stopKeyboardAnimation: () => void;
