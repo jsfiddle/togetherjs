@@ -116,7 +116,7 @@ declare namespace TogetherJSNS {
 
         /** "url-change" */
         interface UrlChange {
-            peer: TogetherJSNS.PeerClass,
+            peer: PeerClass | PeerSelf,
             date?: number,
             href?: string,
             title?: string,

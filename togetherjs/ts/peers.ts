@@ -63,7 +63,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
     class PeerClass {
-        public readonly isSelf = false;
+        public readonly isSelf: false = false;
 
         public readonly id: string;
         private identityId;
@@ -295,7 +295,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
     });
 
     class PeersSelf extends OnClass {
-        public isSelf = true;
+        public readonly isSelf: true = true;
         public readonly id = session.clientId;
         public identityId = session.identityId;
         public status: TogetherJSNS.PeerStatus = "live";

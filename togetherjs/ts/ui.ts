@@ -115,7 +115,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
             })();
         }
 
-        urlChange(attrs: { peer: TogetherJSNS.PeerClass, url: string, sameUrl: boolean, date?: number, title: string }) {
+        urlChange(attrs: { peer: TogetherJSNS.PeerClass, url: string, sameUrl: boolean, date?: number, title?: string }) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             assert(typeof attrs.sameUrl == "boolean");
@@ -155,9 +155,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 }
             });
             var notify = !attrs.sameUrl;
-            if(attrs.sameUrl && !$("#" + realId).length) {
-                // Don't bother showing a same-url notification, if no previous notification
-                // had been shown
+            if(attrs.sameUrl && $("#" + realId).length === 0) {
+                // Don't bother showing a same-url notification, if no previous notification had been shown
                 return;
             }
             this.add(el, messageId, notify);
@@ -372,6 +371,8 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
 
         update() {
+            // Called d0 from PeerSelf & PeerClass
+            // Only function directly called from PeerSelf
             if(!this.peer.isSelf) {
                 if(this.peer.status == "live") {
                     this.dock();
@@ -380,13 +381,41 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     this.undock();
                 }
             }
+            else {
+                alert("update self");
+            }
             this.updateDisplay();
             this.updateUrlDisplay();
         }
 
         updateUrlDisplay(force = false) {
+            // TODO check that all of that is ok. This function is sometimes called with a this.peer of type PeerSelf which is a problem because:
+            /*
+            1. PeerSelf has no title (but it's okay if it's undefined because chat.urlChange() will replace it with this.peer.url in this case so it's only weird for TS and not JS)
+            2. in chat.urlChange() HTMLElement are created and click callbacks are established on them that access to peer.nudge() and peer.urlHash which don't exist on PeerSelf so that's a problem ...
+            
+            BUT the if at the end of chat.urlChange() can return BEFORE adding the element to the dom, the if is like this:
+                if(attrs.sameUrl && $("#" + realId).length === 0) { return; }
+                this.add(el, messageId, notify); // adds the element to the dom
+            So the element is NOT added to the dom if:
+            1. attrs.sameUrl is true, which I guess it always is if this.peer is a PeerSelf because you're always on the same page as yourself
+            2. AND $("#" + realId).length === 0 is true, meaning that an element with this id can't be found the element WILL NOT be added. messageId and realId are set like this:
+                var messageId = attrs.peer.className("url-change-"); // appends a safe version (without special char) of peer.id to "url-change-"
+                var realId = "togetherjs-chat-" + messageId;
+            which means that we are looking for an element with the id togetherjs-chat-url-change-[peer.id]
+            
+            So if there is never a togetherjs-chat-url-change-[own-id] for your own id in the page then chat.urlChange does nothing. I think. And you will never find a #togetherjs-chat-url-change-[own-id] because that would mean that togetherJS showed you a notification telling you that YOURSELF changed page which wouldn't make any sense.
+
+            document.querySelectorAll("[id^='togetherjs-chat-url-change-']") gives us a few results either in the chat (maybe hiddent by default I'm not sure) or as some kind of popup but non without our id (something like YK5yyks2.wFOBGqpa)
+
+            That is the reason for this code change: we return at the beginning of updateUrlDisplay() if peer.isSelf is true.
+            */
+            if(this.peer.isSelf) {
+                return; // TODO see long explantion above and check that it's ok
+            }
+
             var url = this.peer.url;
-            if((!url) || (url == this._lastUpdateUrlDisplay && !force)) {
+            if(!url || (url == this._lastUpdateUrlDisplay && !force)) {
                 return;
             }
             this._lastUpdateUrlDisplay = url;
@@ -405,9 +434,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
 
         notifyJoined() {
-            this.ui.chat.joinedSession({
-                peer: this.peer
-            });
+            this.ui.chat.joinedSession({ peer: this.peer });
         }
 
         // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
