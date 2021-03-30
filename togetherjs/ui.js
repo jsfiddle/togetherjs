@@ -17,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function uiMain(require, $, util, session, templates, templating, linkify, peers, windowing, tinycolor, elementFinder, visibilityApi) {
+function uiMain(require, $, util, session, templates, templating, linkify, peers, windowing, elementFinder, visibilityApi) {
     var assert = util.assert;
     var AssertionError = util.AssertionError;
     var chat;
@@ -990,10 +990,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             COLORS.forEach(function (color) {
                 var el = templating.sub("swatch", {});
                 el.attr("data-color", color);
-                var darkened = tinycolor(color).darken();
                 el.css({
                     backgroundColor: color,
-                    borderColor: darkened.toHex()
+                    borderColor: "#333333" // TODO was tinycolor.darken(color).toHex()
                 });
                 $("#togetherjs-pick-color").append(el);
             });
@@ -1468,4 +1467,4 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     });
     return ui;
 }
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], uiMain);
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "elementFinder", "visibilityApi"], uiMain);

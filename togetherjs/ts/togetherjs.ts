@@ -832,7 +832,6 @@ function togetherjsMain() {
             walkabout: "libs/walkabout/walkabout",
             esprima: "libs/walkabout/lib/esprima",
             falafel: "libs/walkabout/lib/falafel",
-            tinycolor: "libs/tinycolor",
             whrandom: "libs/whrandom/random"
         },
         map: {

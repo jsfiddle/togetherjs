@@ -3,9 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 // Cursor viewing support
-function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker, peers, templating) {
+function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, templating) {
     var assert = util.assert;
-    var FOREGROUND_COLORS = ["#111", "#eee"];
     var CURSOR_HEIGHT = 50;
     var CURSOR_ANGLE = (35 / 180) * Math.PI;
     var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
@@ -56,7 +55,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHex()
+                color: "#000000" // TODO was tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHex()
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -511,4 +510,4 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
     util.testExpose({ Cursor: Cursor });
     return cursor;
 }
-define(["jquery", "ui", "util", "session", "elementFinder", "tinycolor", "eventMaker", "peers", "templating"], cursorMain);
+define(["jquery", "ui", "util", "session", "elementFinder", "eventMaker", "peers", "templating"], cursorMain);

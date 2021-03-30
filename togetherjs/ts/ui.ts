@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, tinycolor: tinycolor.Constructor, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
+function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
     var assert: typeof util.assert = util.assert;
     var AssertionError = util.AssertionError;
     var chat: TogetherJSNS.Chat;
@@ -1051,10 +1051,9 @@ function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, sess
             COLORS.forEach(function(color) {
                 var el = templating.sub("swatch", {});
                 el.attr("data-color", color);
-                var darkened = tinycolor(color).darken();
                 el.css({
                     backgroundColor: color,
-                    borderColor: darkened.toHex()
+                    borderColor: "#333333" // TODO was tinycolor.darken(color).toHex()
                 });
                 $("#togetherjs-pick-color").append(el);
             });
@@ -1579,4 +1578,4 @@ function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, sess
 
 }
 
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "tinycolor", "elementFinder", "visibilityApi"], uiMain);
+define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "elementFinder", "visibilityApi"], uiMain);
