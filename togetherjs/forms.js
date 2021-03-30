@@ -18,7 +18,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 function formsMain($, util, session, elementFinder, eventMaker, templating, ot) {
-    // TODO this is apparently an empty module object
     var assert = util.assert;
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
@@ -37,9 +36,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         }
     }
     function maybeChange(event) {
+        var _a;
         // Called when we get an event that may or may not indicate a real change (like keyup in a textarea)
-        var tag = event.target.tagName; // TODO may be null
-        if (tag == "TEXTAREA" || tag == "INPUT") {
+        var tag = (_a = event.target) === null || _a === void 0 ? void 0 : _a.tagName;
+        if (tag && (tag == "TEXTAREA" || tag == "INPUT")) {
             change(event);
         }
     }
@@ -133,9 +133,6 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             _this._editor().document.on("change", _this._change);
             return _this;
         }
-        AceEditor.prototype.tracked2 = function (el) {
-            return this.element === $(el)[0];
-        };
         AceEditor.prototype.destroy = function () {
             this._editor().document.removeListener("change", this._change);
         };

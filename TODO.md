@@ -25,11 +25,14 @@
 - check all // tslint- comments (maybe even without the //)
 
 # High priority towards full typing without logic change:
-- Find the logic for PeerSelf, PeerClass, ExternalPeer, PeerView
+- X Find the logic for PeerSelf, PeerClass, ExternalPeer, PeerView
 
 # Architectural changes (only after full typing)
 - Switch to a better import system
 - remove JQuery
+    set JQuery as private at first https://requirejs.org/docs/jquery.html
+        '*': { 'jquery': 'jquery-private' },
+- remove or update tiny colors, it's a whole library for only a few calls
 
 # Logic changes (only after full typing)
 - remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff

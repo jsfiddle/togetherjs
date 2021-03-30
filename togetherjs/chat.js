@@ -35,9 +35,9 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             var parts = message.split(/ /);
             if (parts[0].charAt(0) == "/") {
                 var name = parts[0].substr(1).toLowerCase();
-                var method = commands[("command_" + name)]; // TODO this cast could maybe be removed with string litteral
+                var method = commands["command_" + name];
                 if (method) {
-                    method.apply(commands, parts.slice(1));
+                    method.apply(commands, parts.slice(1)); // TODO any way to remove this "as any" cast?
                     return;
                 }
             }
@@ -227,6 +227,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             windowing.hide("#togetherjs-chat");
         };
         Commands.prototype.command_savelogs = function (name) {
+            if (name === void 0) { name = "default"; }
             document.createElement("a");
             session.send({
                 type: "get-logs",

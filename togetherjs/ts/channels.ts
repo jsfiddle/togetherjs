@@ -63,7 +63,6 @@ function channelsMain(util: Util) {
             super();
         }
 
-        // TODO should only take string, ot not?
         send<K extends keyof TogetherJSNS.AnyMessage.MapInTransit>(data: TogetherJSNS.AnyMessage.MapInTransit[K] | string): void {
             if(this.closed) {
                 throw 'Cannot send to a closed connection';
@@ -130,7 +129,7 @@ function channelsMain(util: Util) {
         maxBackoffTime = 1500;
         backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
         address: string;
-        socket: WebSocket | null = null; // TODO ! initialized in _setupConnection
+        socket: WebSocket | null = null;
         _reopening: boolean = false;
         _lastConnectTime = 0;
         _backoff = 0;
@@ -394,7 +393,7 @@ function channelsMain(util: Util) {
         _setupConnection() {
         }
 
-        _receiveMessage(event: MessageEvent) { // TODO MessageEvent takes a T
+        _receiveMessage(event: MessageEvent<string>) {
             if(this.expectedOrigin && this.expectedOrigin != "*" && event.origin != this.expectedOrigin) {
                 // FIXME: Maybe not worth mentioning?
                 console.info("Expected message from", this.expectedOrigin, "but got message from", event.origin);
@@ -434,11 +433,11 @@ function channelsMain(util: Util) {
         _routes: {[key: string]: Route} = Object.create(null);
         channel!: AbstractChannel; // TODO !
 
+        private boundChannelMessage = this._channelMessage.bind(this);
+        private boundChannelClosed = this._channelClosed.bind(this);
+
         constructor(channel?: AbstractChannel) {
             super();
-            // TODO check calls of _channelMessage and _channelClosed bevause of this weird bindong that has been removed
-            //this._channelMessage = this._channelMessage.bind(this);
-            //this._channelClosed = this._channelClosed.bind(this);
             if(channel) {
                 this.bindChannel(channel);
             }
@@ -446,12 +445,12 @@ function channelsMain(util: Util) {
 
         bindChannel(channel: AbstractChannel) {
             if(this.channel) {
-                this.channel.removeListener("message", this._channelMessage);
-                this.channel.removeListener("close", this._channelClosed);
+                this.channel.removeListener("message", this.boundChannelMessage);
+                this.channel.removeListener("close", this.boundChannelClosed);
             }
             this.channel = channel;
-            this.channel.on("message", this._channelMessage.bind(this));
-            this.channel.on("close", this._channelClosed.bind(this));
+            this.channel.on("message", this.boundChannelMessage);
+            this.channel.on("close", this.boundChannelClosed);
         }
 
         _channelMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {

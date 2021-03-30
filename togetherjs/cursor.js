@@ -38,10 +38,12 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             var peer = peers.getPeer(this.clientId);
             if (peer !== null) {
                 this.updatePeer(peer);
-            } // TODO we should probably show a warning if this peer does not exist
+            }
+            else {
+                console.error("Could not find a peer with id", this.clientId);
+            }
             $(document.body).append(this.element);
             this.element.animateCursorEntry();
-            this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
         }
         Cursor.prototype.updatePeer = function (peer) {
             // FIXME: can I use peer.setElement()?
@@ -54,7 +56,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO we use a very old version of tinycolors
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -170,13 +172,14 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             }
         };
         Cursor.prototype.setKeydown = function () {
+            var _this = this;
             if (this.keydownTimeout) {
                 clearTimeout(this.keydownTimeout);
             }
             else {
                 this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
             }
-            this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
+            this.keydownTimeout = setTimeout(function () { return _this.clearKeydown(); }, this.KEYDOWN_WAIT_TIME);
         };
         Cursor.prototype.clearKeydown = function () {
             this.keydownTimeout = null;

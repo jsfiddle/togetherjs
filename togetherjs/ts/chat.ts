@@ -31,14 +31,16 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
         });
     });
 
+    type CommandStrings = "test" | "clear" | "help" | "test" | "clear" | "exec" | "record" | "playback" | "savelogs" | "baseurl" | "config";
+
     class Chat {
         submit(message: string) {
             var parts = message.split(/ /);
             if(parts[0].charAt(0) == "/") {
-                var name = parts[0].substr(1).toLowerCase();
-                var method = commands[("command_" + name) as keyof typeof commands] as Function; // TODO this cast could maybe be removed with string litteral
+                var name = parts[0].substr(1).toLowerCase() as CommandStrings;
+                var method = commands[`command_${name}` as const];
                 if(method) {
-                    method.apply(commands, parts.slice(1));
+                    method.apply(commands, parts.slice(1) as any); // TODO any way to remove this "as any" cast?
                     return;
                 }
             }
@@ -77,7 +79,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             });
         }
 
-        command_test(argString: string) {
+        command_test(argString?: string) {
             if(!Walkabout) {
                 require(["walkabout"], (WalkaboutModule: TogetherJSNS.Walkabout) => {
                     Walkabout = WalkaboutModule;
@@ -234,7 +236,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             windowing.hide("#togetherjs-chat");
         }
 
-        command_savelogs(name: string) {
+        command_savelogs(name: string = "default") {
             document.createElement("a");
             session.send({
                 type: "get-logs",
@@ -254,7 +256,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             session.hub.on("logs", save);
         }
 
-        command_baseurl(url: string) {
+        command_baseurl(url?: string) {
             if(!url) {
                 storage.get("baseUrlOverride").then(function(b) {
                     if(b) {
@@ -284,7 +286,7 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             });
         }
 
-        command_config(variable: string, value: string) {
+        command_config(variable?: string, value?: string) {
             if(!(variable || value)) {
                 storage.get("configOverride").then(function(c) {
                     if(c) {

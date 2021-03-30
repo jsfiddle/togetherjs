@@ -45,10 +45,12 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             const peer = peers.getPeer(this.clientId);
             if(peer !== null) {
                 this.updatePeer(peer);
-            } // TODO we should probably show a warning if this peer does not exist
+            }
+            else {
+                console.error("Could not find a peer with id", this.clientId);
+            }
             $(document.body).append(this.element);
             this.element.animateCursorEntry();
-            this.clearKeydown = this.clearKeydown.bind(this); // TODO rework this ugly thing
         }
 
         updatePeer(peer: TogetherJSNS.AnyPeer) {
@@ -62,7 +64,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             name.text(peer.name!); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS) //TODO we use a very old version of tinycolors
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);
@@ -195,7 +197,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
             else {
                 this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
             }
-            this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
+            this.keydownTimeout = setTimeout(() => this.clearKeydown(), this.KEYDOWN_WAIT_TIME);
         }
 
         clearKeydown() {

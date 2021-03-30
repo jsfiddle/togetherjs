@@ -41,7 +41,6 @@ function channelsMain(util) {
             _this._buffer = [];
             return _this;
         }
-        // TODO should only take string, ot not?
         AbstractChannel.prototype.send = function (data) {
             if (this.closed) {
                 throw 'Cannot send to a closed connection';
@@ -97,7 +96,7 @@ function channelsMain(util) {
             _this.backoffTime = 50; // Milliseconds to add to each reconnect time
             _this.maxBackoffTime = 1500;
             _this.backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
-            _this.socket = null; // TODO ! initialized in _setupConnection
+            _this.socket = null;
             _this._reopening = false;
             _this._lastConnectTime = 0;
             _this._backoff = 0;
@@ -378,9 +377,8 @@ function channelsMain(util) {
         function Router(channel) {
             var _this = _super.call(this) || this;
             _this._routes = Object.create(null);
-            // TODO check calls of _channelMessage and _channelClosed bevause of this weird bindong that has been removed
-            //this._channelMessage = this._channelMessage.bind(this);
-            //this._channelClosed = this._channelClosed.bind(this);
+            _this.boundChannelMessage = _this._channelMessage.bind(_this);
+            _this.boundChannelClosed = _this._channelClosed.bind(_this);
             if (channel) {
                 _this.bindChannel(channel);
             }
@@ -388,12 +386,12 @@ function channelsMain(util) {
         }
         Router.prototype.bindChannel = function (channel) {
             if (this.channel) {
-                this.channel.removeListener("message", this._channelMessage);
-                this.channel.removeListener("close", this._channelClosed);
+                this.channel.removeListener("message", this.boundChannelMessage);
+                this.channel.removeListener("close", this.boundChannelClosed);
             }
             this.channel = channel;
-            this.channel.on("message", this._channelMessage.bind(this));
-            this.channel.on("close", this._channelClosed.bind(this));
+            this.channel.on("message", this.boundChannelMessage);
+            this.channel.on("close", this.boundChannelClosed);
         };
         Router.prototype._channelMessage = function (msg) {
             if (msg.type == "route") {

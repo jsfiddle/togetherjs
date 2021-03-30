@@ -214,6 +214,7 @@ function consoleMain(util) {
                 throw e;
             }
         };
+        // TODO qw unused and don't work
         Console.prototype.submit = function (options) {
             if (options === void 0) { options = {}; }
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)

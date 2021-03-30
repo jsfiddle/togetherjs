@@ -93,7 +93,7 @@ function consoleMain(util: Util) {
             this.level = llNum;
         }
 
-        write(level: "suppress" | number, ...args: any[]) { // TODO args
+        write(level: "suppress" | number, ...args: any[]) {
             try {
                 this.messages.push([
                     Date.now(),
@@ -237,16 +237,17 @@ function consoleMain(util: Util) {
             }
         }
 
+        // TODO qw unused and don't work
         submit(options: Partial<ConsoleSubmitOptions> = {}) {
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util.Deferred(function(this: object) {
+            return util.Deferred(function(this: object) {  // TODO this is casted as object but I should be able to find a more precise type
                 var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
                 req.setRequestHeader("Content-Type", "application/json");
                 req.send(JSON.stringify({
                     "title": options.title || "TogetherJS log file",
-                    "snippet": this.toString(), // TODO this is casted as object but I should be able to find a more precise type
+                    "snippet": this.toString(),
                     "language": "text"
                 }));
                 req.onreadystatechange = function() {

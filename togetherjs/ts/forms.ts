@@ -6,7 +6,6 @@ declare var CKEDITOR: TogetherJSNS.CKEditor | undefined;
 declare var tinymce: TogetherJSNS.Tinymce | undefined;
 
 function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder, eventMaker: EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
-    // TODO this is apparently an empty module object
     const assert: typeof util.assert = util.assert;
 
     // This is how much larger the focus element is than the element it surrounds
@@ -30,8 +29,8 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
 
     function maybeChange(event: Event) {
         // Called when we get an event that may or may not indicate a real change (like keyup in a textarea)
-        var tag = (event.target as HTMLTextAreaElement | HTMLInputElement).tagName; // TODO may be null
-        if(tag == "TEXTAREA" || tag == "INPUT") {
+        var tag = (event.target as HTMLTextAreaElement | HTMLInputElement | null)?.tagName;
+        if(tag && (tag == "TEXTAREA" || tag == "INPUT")) {
             change(event);
         }
     }
@@ -155,10 +154,6 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             assert($(this.element).hasClass("ace_editor"));
             this._change = this._change.bind(this);
             this._editor().document.on("change", this._change);
-        }
-
-        tracked2(el: JQuery): boolean { // TODO this function is set in the original js file but is overwritten
-            return this.element === $(el)[0];
         }
 
         destroy(): void {
