@@ -227,7 +227,7 @@ tinycolor.prototype = {
     brighten: function() {
         return this._applyModification(brighten, arguments);
     },
-    darken: function() {
+    darken: function() { // keep
         return this._applyModification(darken, arguments);
     },
     desaturate: function() {
@@ -606,7 +606,7 @@ function brighten(color, amount) {
     return tinycolor(rgb);
 }
 
-function darken (color, amount) {
+function darken (color, amount) { // keep
     amount = (amount === 0) ? 0 : (amount || 10);
     var hsl = tinycolor(color).toHsl();
     hsl.l -= amount / 100;
@@ -723,7 +723,7 @@ tinycolor.mix = function(color1, color2, amount) {
 
 // `contrast`
 // Analyze the 2 colors and returns the color contrast defined by (WCAG Version 2)
-tinycolor.readability = function(color1, color2) {
+tinycolor.readability = function(color1, color2) { // keep
     var c1 = tinycolor(color1);
     var c2 = tinycolor(color2);
     return (Math.max(c1.getLuminance(),c2.getLuminance())+0.05) / (Math.min(c1.getLuminance(),c2.getLuminance())+0.05);
@@ -739,7 +739,7 @@ tinycolor.readability = function(color1, color2) {
 // *Example*
 //    tinycolor.isReadable("#000", "#111") => false
 //    tinycolor.isReadable("#000", "#111",{level:"AA",size:"large"}) => false
-tinycolor.isReadable = function(color1, color2, wcag2) {
+tinycolor.isReadable = function(color1, color2, wcag2) { // keep
     var readability = tinycolor.readability(color1, color2);
     var wcag2Parms, out;
 
@@ -771,7 +771,7 @@ tinycolor.isReadable = function(color1, color2, wcag2) {
 //    tinycolor.mostReadable(tinycolor.mostReadable("#123", ["#124", "#125"],{includeFallbackColors:true}).toHexString();  // "#ffffff"
 //    tinycolor.mostReadable("#a8015a", ["#faf3f3"],{includeFallbackColors:true,level:"AAA",size:"large"}).toHexString(); // "#faf3f3"
 //    tinycolor.mostReadable("#a8015a", ["#faf3f3"],{includeFallbackColors:true,level:"AAA",size:"small"}).toHexString(); // "#ffffff"
-tinycolor.mostReadable = function(baseColor, colorList, args) {
+tinycolor.mostReadable = function(baseColor, colorList, args) { // keep
     var bestColor = null;
     var bestScore = 0;
     var readability;
