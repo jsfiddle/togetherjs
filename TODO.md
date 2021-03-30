@@ -31,8 +31,7 @@
 # Architectural changes (only after full typing)
 - [ ] Switch to a better import system
 - [ ] remove JQuery
-    set JQuery as private at first https://requirejs.org/docs/jquery.html
-        '*': { 'jquery': 'jquery-private' },
+    - [x] set JQuery as private at first https://requirejs.org/docs/jquery.html
 - [ ] remove or update tiny colors, it's a whole library for only a few calls
 
 # Logic changes (only after full typing)
