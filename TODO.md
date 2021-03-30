@@ -3,26 +3,27 @@
 - there is many different types of message that overlap in togetherjs.d.ts and peers.ts, and maybe in other places
 
 # Things to check to validate full typing
-- split all .on("event1 event2") as multiple commands to have a good typechecking, the anonymous function would need to be named to be reused obviously
+- X split all .on("event1 event2") as multiple commands to have a good typechecking, the anonymous function would need to be named to be reused obviously
 - check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, lie deleting a lne
 - check all @deprecated tags and see if some are still used (some tags are in the middle of sentences so search for "@deprecated" and not for "/** @deprecated"
 - check all TODO comments
     TODO ! in particular
 - check all TODO any comments
 - check all FIXME comments?
-- check all uses of any
-    - "as any"
-- check all uses of unknown
-- check all type with "undefined | null" or "null | undefined"
-- check all uses of Function
-- search all "!." and "!;" and "!)"
-- check all unknown types
-- check all usages of object
 - Configuration options seriously need to be reduced
 - check all assert that are used for type checking
 - check for @ts- comments
-- search for all variables for which the unused status was hidden by prefixing them by underscore the regex might be something like [(,]_[a-zA-Z]
 - check all // tslint- comments (maybe even without the //)
+- search for all variables for which the unused status was hidden by prefixing them by underscore the regex might be something like [(,]_[a-zA-Z]
+- check types
+    - check all uses of any
+        - "as any"
+    - check all uses of unknown
+    - check all type with "undefined | null" or "null | undefined"
+    - check all uses of Function
+    - search all "!." and "!;" and "!)"
+    - check all unknown types
+    - check all usages of object
 
 # High priority towards full typing without logic change:
 - X Find the logic for PeerSelf, PeerClass, ExternalPeer, PeerView
@@ -35,7 +36,7 @@
 - remove or update tiny colors, it's a whole library for only a few calls
 
 # Logic changes (only after full typing)
-- remove all ref to TowTruckConfig_, it's old enough to throw out legacy stuff
+- remove all ref to TowTruck, it's old enough to throw out legacy stuff
 - use tslint to find useless nullchecks
 - clean the require stuff
 
