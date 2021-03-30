@@ -108,7 +108,7 @@ function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, 
         // FIXME: hardcoding
         let ifacePos : "right" | "left" | "bottom" = "right";
         //var ifacePos = panelPosition();
-        const boundPos = bound.offset()!; // TODO deal with !
+        const boundPos = bound.offset()!; // TODO ! deal with !
         const boundPosHeight = bound.height();
         const boundPosWidth = bound.width();
         var windowHeight = $window.height();

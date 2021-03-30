@@ -133,7 +133,7 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
 
     function publishPlayerStateChange(event: YT.OnStateChangeEvent) {
         var target = event.target;
-        var currentIframe = target.getIframe(); // TODO what is getIframe???
+        var currentIframe = target.getIframe();
         //var currentPlayer = $(currentIframe).data("togetherjs-player");
         var currentPlayer = target;
         var currentTime = currentPlayer.getCurrentTime();

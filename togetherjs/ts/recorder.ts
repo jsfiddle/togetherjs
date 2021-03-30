@@ -4,7 +4,6 @@
 
 define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, channels: TogetherJSNS.Channels) {
     let channel: TogetherJSNS.WebSocketChannel; // TODO potentially not initialized, why does TSC doesn't catch that?
-    //let baseUrl = null; // TODO unused
     let clientId = "recorder";
 
     function display(elOrSelector: HTMLElement | JQuery | string) {
@@ -72,7 +71,6 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
 
         activate(options: Partial<TogetherJSNS.Config & { defaultHubBase: string }>) {
             var match;
-            //baseUrl = options.baseUrl; // TODO baseUrl was never read
             this.shareId = TogetherJS.startup._joinShareId ?? undefined;
             if(!this.shareId) {
                 match = /\&togetherjs=([^&]+)/.exec(location.hash);
@@ -108,7 +106,7 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
         }
 
         logMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
-            (msg as typeof msg & TogetherJSNS.WithDate).date = Date.now(); // TODO as any
+            (msg as typeof msg & TogetherJSNS.WithDate).date = Date.now(); // TODO abusive cast
             var $record = $("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         }

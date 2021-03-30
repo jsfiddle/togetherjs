@@ -110,8 +110,6 @@ function otMain(util) {
             this.delta = delta;
             this.known = known;
             this.outOfOrder = outOfOrder;
-            // TODO since we use TS we can remove this assert
-            assert(typeof version == "number" && typeof clientId == "string", "Bad Change():", version, clientId);
         }
         Change.prototype.toString = function () {
             var _this = this;
@@ -621,7 +619,7 @@ function otMain(util) {
                 }
                 return true;
             }, this);
-            assert(indexToInsert);
+            assert(indexToInsert); // TODO I think this assert fails if this._history is empty which cannot happen, I think...
             this._history.insert(indexToInsert, change);
             // Now we fix up any forward changes
             var fixupDelta = change.delta;
@@ -664,7 +662,10 @@ function otMain(util) {
         };
         TJSHistory.prototype.logHistory = function (prefix) {
             if (prefix === void 0) { prefix = ""; }
-            var postfix = Array.prototype.slice.call(arguments, 1); // TODO use ... in parameters
+            var postfix = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                postfix[_i - 1] = arguments[_i];
+            }
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
             var hstate;
@@ -676,7 +677,7 @@ function otMain(util) {
                 }
                 else {
                     try {
-                        hstate = c.delta.apply(hstate); // TODO really don't know what the type of hstate is supposed to be
+                        hstate = c.delta.apply(hstate);
                     }
                     catch (e) {
                         hstate = "Error: " + e;
@@ -714,12 +715,6 @@ function otMain(util) {
             max = Math.max(max, this.mostRecentLocalChange);
             return max + 1;
         };
-        // TODO seems to be unused
-        /*
-        fault(change: Change) {
-            throw new Error('Fault');
-        }
-        */
         TJSHistory.prototype.getState = function () {
             var state = ""; // TODO change, state init to ""
             this._history.walkForward(0, function (c) {

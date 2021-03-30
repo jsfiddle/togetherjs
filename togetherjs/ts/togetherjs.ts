@@ -306,7 +306,7 @@ function togetherjsMain() {
                 this.tjsInstance._configTrackers[name] = [];
             }
             // TODO any how to make callback typecheck?
-            this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO !
+            this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO ! and any cast
             return callback;
         }
 

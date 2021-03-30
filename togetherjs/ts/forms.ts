@@ -38,7 +38,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
     function change(event: Event) {
         sendData({
             element: event.target as HTMLElement,
-            value: getValue(event.target as HTMLElement) // TODO I tried to put toString here but it makes some tests fail so I don't really know what type value is supposed to be...
+            value: getValue(event.target as HTMLElement)
         });
     }
 
@@ -309,7 +309,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             this._editor().on("change", this._change);
         }
 
-        tracked2(el: JQuery) { // TODO was in original JS but was overridden
+        tracked2(el: JQuery) { // TODO qw was in original JS but was overridden, appear to be unused, we should probably remove it
             return this.element === $(el)[0];
         }
 
@@ -798,6 +798,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             var el = $(this);
             var value = getValue(el[0]);
             if(typeof value === "string") { // no need to create an History if it's not a string value
+                // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
             }
         });

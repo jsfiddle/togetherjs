@@ -197,11 +197,10 @@ declare namespace TogetherJSNS {
             name?: string,
             avatar?: string,
             color?: string,
-            //peer: PeerClass // TODO should be added after transit
         }
 
-        interface VideoEventName {
-            type: "video-something", // TODO string lit
+        interface VideoEventName<T extends string> {
+            type: `video-${T}`,
             location: string,
             position: number
         }
@@ -337,12 +336,13 @@ declare namespace TogetherJSNS {
             "rtc-offer": (msg: RtcOffer) => void;
             "rtc-answer": (msg: RtcAnswer) => void;
             "rtc-ice-candidate": (msg: RtcIceCandidate) => void;
-            "rtc-abort": (msg: RtcAbort) => void; // TODO what is this unknown?
+            "rtc-abort": (msg: RtcAbort) => void;
     
             // session.on
             "prepare-hello": (msg: HelloMessage | HelloBackMessage) => void;
-            "video-timeupdate": (msg: VideoTimeupdateMessage) => void;
-            "video-something": (msg: VideoTimeupdateMessage) => void; // TODO something can be any video event, try to replace with string lit
+            "video-timeupdate": (msg: SessionSend.VideoEventName<"timeupdate">) => void;
+            "video-play": (msg: SessionSend.VideoEventName<"play">) => void;
+            "video-pause": (msg: SessionSend.VideoEventName<"pause">) => void;
     
             // TogetherJS.once
             "ready": () => void;
@@ -446,7 +446,6 @@ declare namespace TogetherJSNS {
         }
 
         // TODO is this mergeable with CursorClick?
-        // TODO clienId is always added by session.send
         interface CursorUpdateTopLeft {
             type: "cursor-update",
             sameUrl?: boolean,
@@ -507,7 +506,9 @@ declare namespace TogetherJSNS {
             "form-focus": SessionSend.ForFocus,
             "ping-back": SessionSend.PingBack,
             //"peer-update": SessionSend.PeerUpdate,
-            "video-something": SessionSend.VideoEventName, // TODO something can be any video event, try to list them with string lits
+            "video-timeupdate": SessionSend.VideoEventName<"timeupdate">,
+            "video-play": SessionSend.VideoEventName<"play">,
+            "video-pause": SessionSend.VideoEventName<"pause">,
             "rtc-ice-candidate": SessionSend.RTCIceCandidate,
             "rtc-offer": SessionSend.RTCOffer,
             "rtc-answer": SessionSend.RTCAnswer,
@@ -764,7 +765,7 @@ declare namespace TogetherJSNS {
         element: string;
         "server-echo"?: boolean;
         value: string | boolean;
-        basis?: number; // TODO seems to be unused
+        basis?: number;
     }
 
     /** a tracker means that value is of type string */
@@ -809,7 +810,7 @@ declare namespace TogetherJSNS {
         <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
         (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
         get<K extends keyof Config>(name: K): Config[K];
-        close<K extends keyof Config>(thing: K): Partial<Config>[K]; // TODO is the return type it boolean?
+        close<K extends keyof Config>(thing: K): Partial<Config>[K];
         track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): (value: Config[K], previous?: Config[K]) => any;
     }
 
@@ -916,9 +917,6 @@ interface Function {
     name: string;
 }
 
-// TODO type this object
-//declare var TogetherJSTestSpy: {[k: string]: unknown} | undefined;
-
 declare var TogetherJS: TogetherJSNS.TogetherJS;
 declare var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
 
@@ -939,6 +937,6 @@ interface Require {
     }
 }
 
-// TODO the code using this in ui.ts should probably ve removed since it does not work
+// TODO the code using this in ui.ts should probably be removed since it does not work
 type MozActivity = any;
 declare var MozActivity: MozActivity;

@@ -140,8 +140,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
                     }
                 },
                 duration: 500
-            }, 'linear' // TODO removing 'linear' fixes the error, but is that really what must be done?
-            ).promise().then(function () {
+            }, 'linear').promise().then(function () {
                 e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
             });
         };

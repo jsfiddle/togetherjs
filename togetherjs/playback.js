@@ -150,7 +150,7 @@ function playbackMain($, _util, session, storage, _require) {
                             def.resolve(undefined);
                             return;
                         }
-                        var logs2 = parseLogs(logs); // TODO I thing the tjs team forgot that storage.get was not returning a string but the actual object so there is no need to parse the logs, but a test would be nice
+                        var logs2 = parseLogs(logs);
                         def.resolve(logs2);
                     }, function (error) {
                         def.reject(error);

@@ -30,7 +30,7 @@ class Util {
     Class!: (superClass: Object, prototype?: Object) => any;
 
     public constructor($: JQueryStatic, tjs: TogetherJSNS.TogetherJS) {
-        this.Deferred = $.Deferred; // TODO defered is of an type because it does not exists
+        this.Deferred = $.Deferred;
         tjs.$ = $;
         this.extend = tjs._extend;
         this.AssertionError = AssertionError;
@@ -305,61 +305,7 @@ define(["jquery", "jqueryPlugins"], function($: JQueryStatic) {
   
     Instantiation does not require "new"
     */
-    // TODO find and modernize all usage
-    /**/
 
-    // TODO once conversion to TS is finished it should be removable
-    function classFunOriginal(superClass: any, prototype: any) {
-        var a;
-        if(prototype === undefined) {
-            prototype = superClass;
-        } else {
-            if(superClass.prototype) {
-                superClass = superClass.prototype;
-            }
-            var newPrototype = Object.create(superClass);
-            for(a in prototype) {
-                if(prototype.hasOwnProperty(a)) {
-                    newPrototype[a] = prototype[a];
-                }
-            }
-            prototype = newPrototype;
-        }
-        var ClassObject = function() {
-            var obj = Object.create(prototype);
-            obj.constructor.apply(obj, arguments);
-            obj.constructor = ClassObject;
-            return obj;
-        } as { (): any; className: string;[field: string]: any };
-        ClassObject.prototype = prototype;
-        if(prototype.constructor.name) {
-            ClassObject.className = prototype.constructor.name;
-            ClassObject.toString = function() {
-                return '[Class ' + this.className + ']';
-            };
-        }
-        if(prototype.classMethods) {
-            for(a in prototype.classMethods) {
-                if(prototype.classMethods.hasOwnProperty(a)) {
-                    ClassObject[a] = prototype.classMethods[a];
-                }
-            }
-        }
-        return ClassObject;
-    };
-
-    util.Class = classFunOriginal;
-    /**/
-
-    /**
-    (util as any).Module = (util as any).Class({
-        constructor: function(name: string) {
-            this._name = name;
-        },
-        toString: function() {
-            return '[Module ' + this._name + ']';
-        }
-    });
     /**/
 
     return util;

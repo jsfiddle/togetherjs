@@ -10,7 +10,7 @@ function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers,
     var assert: typeof util.assert = util.assert;
 
     class Templating {
-        clone(templateId: string) { // TODO may bechanged to a union type with all possibilities?
+        clone(templateId: string) { // TODO may be changed to a union type with all possibilities?
             let templateId2 = "#togetherjs-template-" + templateId;
             var template = $(templateId2);
             assert(template.length, "No template found with id:", templateId2);
@@ -25,7 +25,7 @@ function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers,
         //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
         sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.Any): JQuery {
             let template = this.clone(templateId);
-            util.forEachAttr(variables, function(value, attr) {
+            util.forEachAttr(variables, function(value, attr) { // TODO value has type never
                 // FIXME: do the substitution... somehow?
                 var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
                 if(subs.length) {

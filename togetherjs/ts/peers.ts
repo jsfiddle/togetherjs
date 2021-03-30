@@ -75,7 +75,6 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public readonly view;
         public lastMessageDate: number = 0;
         public following: boolean;
-        //public readonly defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO added to the code since it was used in ui.ts and has very low chance of causing a bug, actually this is probably a problem, we don't want to guess the name of a remote peer
 
         public url?: string;
         private hash: string | null = null;
@@ -140,7 +139,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             delete Peer.peers[this.id];
         }
 
-        updateMessageDate(_msg: unknown) { // TODO this param is not used
+        updateMessageDate() {
             if(this.idle == "inactive") {
                 this.update({ idle: "active" });
             }
@@ -303,7 +302,7 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
         public name: string | null = null;
         public avatar: string | null = null;
         public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
-        public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
+        public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
         // private loaded = false;// TODO unused
         public isCreator = !session.isClient;
         public view!: TogetherJSNS.PeerSelfView; // TODO !

@@ -14,7 +14,7 @@ define(["jquery"], function($: JQueryStatic) {
         $('svg').animate(
             { borderSpacing: -150, opacity: 1 },
             {
-                step: function(now: number, fx: Tween) { // TODO what is fx?
+                step: function(now: number, fx: Tween) {
                     if(fx.prop == "borderSpacing") {
                         $(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
                             .css('-moz-transform', 'rotate(' + now + 'deg)')

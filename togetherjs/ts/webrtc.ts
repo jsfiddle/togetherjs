@@ -171,7 +171,7 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
             const canvas0 = document.createElement("canvas");
             canvas0.height = session.AVATAR_SIZE;
             canvas0.width = session.AVATAR_SIZE;
-            var context = canvas0.getContext("2d")!; // TODO null?
+            var context = canvas0.getContext("2d")!; // TODO ! null?
             context.arc(session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, 0, Math.PI * 2);
             context.closePath();
             context.clip();
@@ -179,7 +179,7 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
             savePicture(canvas0.toDataURL("image/png"));
         }
 
-        $upload.on("change", function(this: DataTransfer) { // TODO is this really a DataTransfer? It was the most relanvat type with a files field
+        $upload.on("change", function(this: DataTransfer) { // TODO is this really a DataTransfer? It was the most relevant type with a files field
             var reader = new FileReader();
             reader.onload = function() {
                 // FIXME: I don't actually know it's JPEG, but it's probably a
@@ -327,7 +327,7 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
                 function(err) {
                     // TODO this code can't work. getUserMedia gets a MediaStreamError but this callback act as if it was receiving a MediaError (https://developer.mozilla.org/en-US/docs/Web/API/MediaError) where a code of 1 would mean "The fetching of the associated resource was aborted by the user's request". I know that it can't work because MediaStreamError doesn't have a `code` field.
                     // FIXME: handle cancel case
-                    if(err && (err as any).code == 1) { // TODO does code actually exists? Maybe it's a MediaError and not a MediaStreamError
+                    if(err && (err as any).code == 1) { // TODO does .code actually exists? Maybe it's a MediaError and not a MediaStreamError
                         // User cancel
                         return;
                     }
@@ -457,7 +457,7 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
                     }
                 }, 2000);
                 connection.createAnswer(function(answer) {
-                    if(answer.sdp !== undefined) { // TODO if add for typecheck
+                    if(answer.sdp !== undefined) { // TODO if added for typecheck
                         answer.sdp = ensureCryptoLine(answer.sdp);
                     }
                     clearTimeout(timeout);

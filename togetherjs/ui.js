@@ -107,7 +107,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             this.add(el, attrs.peer.className("join-message-"), 4000);
         };
         Chat.prototype.system = function (attrs) {
-            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a pee field?
+            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a peer field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-system", {
@@ -400,7 +400,6 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             var _this = _super.call(this, ui, peer) || this;
             _this.peer = peer;
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            _this.dockClick = _this.dockClick.bind(_this); // TODO ugly
             return _this;
         }
         PeerView.prototype.update = function () {
@@ -837,11 +836,13 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 });
                 //for iphone
                 if ($(window).width() < 480) {
-                    $('.togetherjs-dock-right').animate({ width: "204px" }, { duration: 60, easing: "linear" });
+                    $('.togetherjs-dock-right').animate({ width: "204px" }, { duration: 60, easing: "linear" }, "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
+                    );
                 }
                 //for ipad
                 else {
-                    $('.togetherjs-dock-right').animate({ width: "27%" }, { duration: 60, easing: "linear" });
+                    $('.togetherjs-dock-right').animate({ width: "27%" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
+                    );
                 }
                 // add bg overlay
                 // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'>\x3c/div>" );
@@ -868,7 +869,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 $('.togetherjs-window').animate({ opacity: 0 });
                 $('#togetherjs-dock-participants').animate({ opacity: 0 });
                 $('#togetherjs-dock #togetherjs-buttons').animate({ opacity: 0 });
-                $('.togetherjs-dock-right').animate({ width: "40px" }, { duration: 60, easing: "linear" });
+                $('.togetherjs-dock-right').animate({ width: "40px" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
+                );
                 // remove bg overlay
                 //$(".overlay").remove();
             }

@@ -98,7 +98,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         }
 
         system(attrs: { text: string, date?: number }) {
-            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a pee field?
+            assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a peer field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
             var el = templating.sub("chat-system", {
@@ -399,7 +399,6 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
         ) {
             super(ui, peer);
             assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            this.dockClick = this.dockClick.bind(this); // TODO ugly
         }
 
         update() {
@@ -861,7 +860,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     $('.togetherjs-dock-right').animate(
                         { width: "204px" },
                         { duration: 60, easing: "linear" },
-                        // "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
+                        "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
                     );
                 }
 
@@ -870,7 +869,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                     $('.togetherjs-dock-right').animate(
                         { width: "27%" },
                         { duration: 60, easing: "linear" },
-                        // "linear" // TODO see above
+                        "linear" // TODO see above
                     );
                 }
 
@@ -908,7 +907,7 @@ function uiMain(require: Require, $: JQueryStatic, util: Util, session: Together
                 $('.togetherjs-dock-right').animate(
                     { width: "40px" },
                     { duration: 60, easing: "linear" },
-                    // "linear" // TODO see above
+                    "linear" // TODO see above
                 );
 
                 // remove bg overlay

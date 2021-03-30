@@ -155,7 +155,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: Util, session: 
                     },
                     duration: 500
                 },
-                'linear' // TODO removing 'linear' fixes the error, but is that really what must be done?
+                'linear'
             ).promise().then(function() {
                 e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
             });

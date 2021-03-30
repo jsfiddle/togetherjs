@@ -120,10 +120,7 @@ function otMain(util: Util) {
             /** Store the version number for each known client */
             public known: { [clientId: string]: number },
             private outOfOrder: boolean = false
-        ) {
-            // TODO since we use TS we can remove this assert
-            assert(typeof version == "number" && typeof clientId == "string", "Bad Change():", version, clientId);
-        }
+        ) { }
 
         toString() {
             var s = "[Change " + this.version + "." + this.clientId + ": ";
@@ -664,7 +661,7 @@ function otMain(util: Util) {
             }
 
             // Next we insert the change into its proper location
-            var indexToInsert = null;
+            let indexToInsert: number | null = null;
             this._history.walkBack(function(c, index) {
                 if(("init" in c && c.clientId == "init") || c.isBefore(change)) {
                     indexToInsert = index + 1;
@@ -672,7 +669,7 @@ function otMain(util: Util) {
                 }
                 return true;
             }, this);
-            assert(indexToInsert);
+            assert(indexToInsert); // TODO I think this assert fails if this._history is empty which cannot happen, I think...
             this._history.insert(indexToInsert, change);
 
             // Now we fix up any forward changes
@@ -718,8 +715,7 @@ function otMain(util: Util) {
             return delta;
         }
 
-        logHistory(prefix: string = "") {
-            var postfix = Array.prototype.slice.call(arguments, 1); // TODO use ... in parameters
+        logHistory(prefix: string = "", ...postfix: string[]) {
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
             let hstate: string;
@@ -731,7 +727,7 @@ function otMain(util: Util) {
                 }
                 else {
                     try {
-                        hstate = c.delta.apply(hstate); // TODO really don't know what the type of hstate is supposed to be
+                        hstate = c.delta.apply(hstate);
                     }
                     catch(e) {
                         hstate = "Error: " + e;
@@ -769,13 +765,6 @@ function otMain(util: Util) {
             max = Math.max(max, this.mostRecentLocalChange);
             return max + 1;
         }
-
-        // TODO seems to be unused
-        /*
-        fault(change: Change) {
-            throw new Error('Fault');
-        }
-        */
 
         getState() {
             let state: string = ""; // TODO change, state init to ""

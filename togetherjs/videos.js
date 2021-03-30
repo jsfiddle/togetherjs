@@ -34,7 +34,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
             var element = event.target;
             if (!options.silent && element) {
                 session.send({
-                    type: ('video-' + eventName),
+                    type: "video-" + eventName,
                     location: elementFinder.elementLocation(element),
                     position: element.currentTime
                 });
@@ -84,7 +84,6 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
         }
     });
     MIRRORED_EVENTS.forEach(function (eventName) {
-        // TODO fix this call to .on, abuse cast to "video-something"
         session.hub.on("video-" + eventName, function (msg) {
             var element = $findElement(msg.location);
             setTime(element, msg.position);

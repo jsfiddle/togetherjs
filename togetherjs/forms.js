@@ -46,7 +46,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     function change(event) {
         sendData({
             element: event.target,
-            value: getValue(event.target) // TODO I tried to put toString here but it makes some tests fail so I don't really know what type value is supposed to be...
+            value: getValue(event.target)
         });
     }
     function sendData(attrs) {
@@ -713,6 +713,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var el = $(this);
             var value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
+                // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
                 el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
             }
         });

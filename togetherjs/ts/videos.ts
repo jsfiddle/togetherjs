@@ -11,18 +11,12 @@ interface Options {
     silent?: boolean;
 }
 
-interface VideoTimeupdateMessage {
-    type: "video-timeupdate",
-    location: string,
-    position: number,
-}
-
 define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
 
     var listeners: Listener[] = [];
 
-    var TIME_UPDATE = 'timeupdate';
-    var MIRRORED_EVENTS = ['play', 'pause'];
+    var TIME_UPDATE = 'timeupdate' as const;
+    var MIRRORED_EVENTS = ['play', 'pause'] as const;
 
     var TOO_FAR_APART = 3000;
 
@@ -51,12 +45,12 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
         });
     }
 
-    function makeEventSender(eventName: string) { // TODO replace with union type
+    function makeEventSender(eventName: "play" | "pause" | "timeupdate") {
         return function(event: Event, options: Options = {}) {
             var element = event.target as HTMLMediaElement;
             if(!options.silent && element) {
                 session.send({
-                    type: ('video-' + eventName) as "video-something", // TODO abusive cast
+                    type: `video-${eventName}` as const,
                     location: elementFinder.elementLocation(element),
                     position: element.currentTime
                 });
@@ -103,7 +97,7 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
     }
 
 
-    session.hub.on('video-timeupdate', function(msg: VideoTimeupdateMessage) {
+    session.hub.on('video-timeupdate', function(msg: TogetherJSNS.SessionSend.VideoEventName<"timeupdate">) {
         var element = $findElement(msg.location);
         var oldTime = element.prop('currentTime');
         var newTime = msg.position;
@@ -115,8 +109,7 @@ define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic,
     });
 
     MIRRORED_EVENTS.forEach(function(eventName) {
-        // TODO fix this call to .on, abuse cast to "video-something"
-        session.hub.on("video-" + eventName as "video-something", function(msg: VideoTimeupdateMessage) {
+        session.hub.on(`video-${eventName}` as const, function(msg: TogetherJSNS.SessionSend.VideoEventName<typeof eventName>) {
             var element = $findElement(msg.location);
 
             setTime(element, msg.position);

@@ -83,7 +83,7 @@ function peersMain(util, session, storage, require, templates) {
             this.view.destroy();
             delete Peer.peers[this.id];
         };
-        PeerClass.prototype.updateMessageDate = function (_msg) {
+        PeerClass.prototype.updateMessageDate = function () {
             if (this.idle == "inactive") {
                 this.update({ idle: "active" });
             }
@@ -241,7 +241,7 @@ function peersMain(util, session, storage, require, templates) {
             _this.name = null;
             _this.avatar = null;
             _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
-            _this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to "defaultName" to avoid non-null casting but is it a valid value?
+            _this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
             // private loaded = false;// TODO unused
             _this.isCreator = !session.isClient;
             return _this;

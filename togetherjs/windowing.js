@@ -105,7 +105,7 @@ function windowingMain($, util, _peers, session) {
         // FIXME: hardcoding
         var ifacePos = "right";
         //var ifacePos = panelPosition();
-        var boundPos = bound.offset(); // TODO deal with !
+        var boundPos = bound.offset(); // TODO ! deal with !
         var boundPosHeight = bound.height();
         var boundPosWidth = bound.width();
         var windowHeight = $window.height();

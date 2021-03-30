@@ -278,11 +278,11 @@ function sessionMain(require, util, channels, $, storage) {
                 if (msg2.peer) {
                     msg2.sameUrl = msg2.peer.url == currentUrl;
                     if (!msg2.peer.isSelf) {
-                        msg2.peer.updateMessageDate(msg);
+                        msg2.peer.updateMessageDate();
                     }
                 }
             }
-            session.hub.emit(msg.type, msg); // TODO emit error
+            session.hub.emit(msg.type, msg);
             TogetherJS._onmessage(msg);
         };
         channel = c;
