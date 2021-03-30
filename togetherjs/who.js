@@ -20,7 +20,7 @@ function whoMain(util, channels, session, ui) {
             this.avatar = attrs.avatar || null;
             this.color = attrs.color || "#00FF00";
             this.lastMessageDate = 0;
-            this.view = ui.PeerSelfView(this); // TODO seems to be unused
+            this.view = ui.PeerSelfView(this);
         }
         ExternalPeer.prototype.className = function (prefix) {
             if (prefix === void 0) { prefix = ""; }
