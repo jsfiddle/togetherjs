@@ -38,7 +38,7 @@ type Origin = string;
 
 type WindowLike = HTMLIFrameElement | WindowProxy | Window;
 
-function channelsMain(util: Util) {
+function channelsMain(util: TogetherJSNS.Util) {
     /* Subclasses must define:
 	
     - ._send(string)

@@ -564,7 +564,7 @@ declare namespace TogetherJSNS {
     type On = OnClass;
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
     type Walkabout = WalkaboutModule;
-    type UtilAlias = Util;
+    type Util = ReturnType<typeof utilMain>;
     type PeerView = ReturnType<Ui["PeerView"]>;
     type PeerSelfView = ReturnType<Ui["PeerSelfView"]>;
     type Walkthrough = ReturnType<typeof walkthroughMain>;
@@ -578,6 +578,8 @@ declare namespace TogetherJSNS {
     type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
     type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
     type TogetherJS = ReturnType<typeof togetherjsMain>;
+    type EventMaker = ReturnType<typeof eventmakerMain>;
+    type ElementFinder = ReturnType<typeof elementFinderMain>;
 
     type AnyPeer = PeerSelf | PeerClass | ExternalPeer | SerializedPeer;
 

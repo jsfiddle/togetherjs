@@ -14,7 +14,7 @@
 
 */
 
-function startupMain (_util: Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
+function startupMain (_util: TogetherJSNS.Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
     let session: TogetherJSNS.Session; // TODO potentially uninitialized, why does TSC doesn't catch that?
 

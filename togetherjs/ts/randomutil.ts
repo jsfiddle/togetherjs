@@ -6,7 +6,7 @@ interface RandomStreamObject {
     (): number;
 }
 
-function randomutilMain(_util: Util, RandomStream: RandomStreamModule) {
+function randomutilMain(_util: TogetherJSNS.Util, RandomStream: RandomStreamModule) {
 
     class Randomizer {
         private stream: RandomStreamObject;

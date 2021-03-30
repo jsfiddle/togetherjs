@@ -12,7 +12,7 @@ interface ConsoleSubmitOptions {
     title: string;
 }
 
-function consoleMain(util: Util) {
+function consoleMain(util: TogetherJSNS.Util) {
 
     var console = window.console || { log: function() { } };
 

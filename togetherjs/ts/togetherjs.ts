@@ -817,7 +817,6 @@ function togetherjsMain() {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const tjsInstance = globalTjs = new TogetherJSClass();
     const TogetherJS = tjsInstance;//() => { tjsInstance.start(); return tjsInstance; }
 
@@ -829,16 +828,20 @@ function togetherjsMain() {
         urlArgs: "bust=" + cacheBust,
         paths: {
             jquery: "libs/jquery-1.11.1.min",
+            "jquery-private": "libs/jquery-private",
             walkabout: "libs/walkabout/walkabout",
             esprima: "libs/walkabout/lib/esprima",
             falafel: "libs/walkabout/lib/falafel",
             tinycolor: "libs/tinycolor",
             whrandom: "libs/whrandom/random"
+        },
+        map: {
+            // '*' means all modules will get 'jquery-private' for their 'jquery' dependency.
+            '*': { 'jquery': 'jquery-private' },
+            // 'jquery-private' wants the real jQuery module though. If this line was not here, there would be an unresolvable cyclic dependency.
+            'jquery-private': { 'jquery': 'jquery' }
         }
     };
-
-    // !!!!!!!!!!!!!!!!!
-
 
     let defaultHubBase = "__hubUrl__";
     if(defaultHubBase == "__" + "hubUrl" + "__") {

@@ -3,7 +3,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
-    var webrtc = util.Module("webrtc");
     var assert = util.assert;
     session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
     if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
@@ -527,6 +526,5 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             $audio[0].removeAttribute("src");
         }
     });
-    return webrtc;
 }
 define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], webrtcMain);

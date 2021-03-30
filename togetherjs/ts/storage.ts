@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function StorageMain(util: Util) {
+function StorageMain(util: TogetherJSNS.Util) {
     var assert: typeof util.assert = util.assert;
     var Deferred = util.Deferred;
     var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {

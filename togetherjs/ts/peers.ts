@@ -48,7 +48,7 @@ interface SerializedPeer {
     fromStorage?: boolean;
 }
 
-function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
+function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert: typeof util.assert = util.assert;
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
     var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes

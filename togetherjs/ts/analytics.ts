@@ -1,4 +1,4 @@
-function analyticsMain(_util: Util) {
+function analyticsMain(_util: TogetherJSNS.Util) {
     class Analytics {
         activate() {
             var enable = TogetherJS.config.get("enableAnalytics");

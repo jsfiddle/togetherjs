@@ -8,7 +8,7 @@ interface ShowOptions {
     onClose: null | (() => any);
 }
 
-function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated

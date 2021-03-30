@@ -11,7 +11,7 @@ interface Options {
     silent?: boolean;
 }
 
-define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, elementFinder: ElementFinder) {
+define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
 
     var listeners: Listener[] = [];
 

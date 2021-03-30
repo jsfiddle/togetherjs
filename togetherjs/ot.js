@@ -13,93 +13,93 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var Queue = /** @class */ (function () {
-    function Queue(size) {
-        this._q = [];
-        this._deleted = 0;
-        this._size = size;
-    }
-    Queue.prototype._trim = function () {
-        if (this._size) {
-            if (this._q.length > this._size) {
-                this._q.splice(0, this._q.length - this._size);
-                this._deleted += this._q.length - this._size;
-            }
-        }
-    };
-    Queue.prototype.push = function (item) {
-        this._q.push(item);
-        this._trim();
-    };
-    Queue.prototype.last = function () {
-        return this._q[this._q.length - 1];
-    };
-    Queue.prototype.walkBack = function (callback, thisArg) {
-        var result = true;
-        for (var i = this._q.length - 1; i >= 0; i--) {
-            var item = this._q[i];
-            result = callback.call(thisArg, item, i + this._deleted);
-            if (result === false) {
-                return result;
-            }
-            else if (!result) {
-                result = true;
-            }
-        }
-        return result;
-    };
-    Queue.prototype.walkForward = function (index, callback, thisArg) {
-        var result = true;
-        for (var i = index; i < this._q.length; i++) {
-            var item = this._q[i - this._deleted];
-            result = callback.call(thisArg, item, i);
-            if (result === false) {
-                return result;
-            }
-            else if (!result) {
-                result = true;
-            }
-        }
-        return result;
-    };
-    Queue.prototype.insert = function (index, item) {
-        this._q.splice(index - this._deleted, 0, item);
-    };
-    return Queue;
-}());
-/** Set that only supports string items */
-var StringSet = /** @class */ (function () {
-    function StringSet() {
-        this._items = {};
-        this._count = 0;
-    }
-    StringSet.prototype.contains = function (k) {
-        assert(typeof k == "string");
-        return this._items.hasOwnProperty(k);
-    };
-    StringSet.prototype.add = function (k) {
-        assert(typeof k == "string");
-        if (this.contains(k)) {
-            return;
-        }
-        this._items[k] = null;
-        this._count++;
-    };
-    StringSet.prototype.remove = function (k) {
-        assert(typeof k == "string");
-        if (!this.contains(k)) {
-            return;
-        }
-        delete this._items[k];
-        this._count++;
-    };
-    StringSet.prototype.isEmpty = function () {
-        return this._count === 0;
-    };
-    return StringSet;
-}());
 function otMain(util) {
     var assert = util.assert;
+    var Queue = /** @class */ (function () {
+        function Queue(size) {
+            this._q = [];
+            this._deleted = 0;
+            this._size = size;
+        }
+        Queue.prototype._trim = function () {
+            if (this._size) {
+                if (this._q.length > this._size) {
+                    this._q.splice(0, this._q.length - this._size);
+                    this._deleted += this._q.length - this._size;
+                }
+            }
+        };
+        Queue.prototype.push = function (item) {
+            this._q.push(item);
+            this._trim();
+        };
+        Queue.prototype.last = function () {
+            return this._q[this._q.length - 1];
+        };
+        Queue.prototype.walkBack = function (callback, thisArg) {
+            var result = true;
+            for (var i = this._q.length - 1; i >= 0; i--) {
+                var item = this._q[i];
+                result = callback.call(thisArg, item, i + this._deleted);
+                if (result === false) {
+                    return result;
+                }
+                else if (!result) {
+                    result = true;
+                }
+            }
+            return result;
+        };
+        Queue.prototype.walkForward = function (index, callback, thisArg) {
+            var result = true;
+            for (var i = index; i < this._q.length; i++) {
+                var item = this._q[i - this._deleted];
+                result = callback.call(thisArg, item, i);
+                if (result === false) {
+                    return result;
+                }
+                else if (!result) {
+                    result = true;
+                }
+            }
+            return result;
+        };
+        Queue.prototype.insert = function (index, item) {
+            this._q.splice(index - this._deleted, 0, item);
+        };
+        return Queue;
+    }());
+    /** Set that only supports string items */
+    var StringSet = /** @class */ (function () {
+        function StringSet() {
+            this._items = {};
+            this._count = 0;
+        }
+        StringSet.prototype.contains = function (k) {
+            assert(typeof k == "string");
+            return this._items.hasOwnProperty(k);
+        };
+        StringSet.prototype.add = function (k) {
+            assert(typeof k == "string");
+            if (this.contains(k)) {
+                return;
+            }
+            this._items[k] = null;
+            this._count++;
+        };
+        StringSet.prototype.remove = function (k) {
+            assert(typeof k == "string");
+            if (!this.contains(k)) {
+                return;
+            }
+            delete this._items[k];
+            this._count++;
+        };
+        StringSet.prototype.isEmpty = function () {
+            return this._count === 0;
+        };
+        return StringSet;
+    }());
     var Change = /** @class */ (function () {
         function Change(version, clientId, delta, 
         /** Store the version number for each known client */

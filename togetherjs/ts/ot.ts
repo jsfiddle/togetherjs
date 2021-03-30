@@ -16,101 +16,102 @@ interface Change2Mandatory {
     sent: boolean,
 }
 
-class Queue<T> {
-    private _q: T[] = [];
-    private _deleted = 0;
-    private _size: number | undefined;
-
-    constructor(size?: number) {
-        this._size = size;
-    }
-
-    _trim() {
-        if(this._size) {
-            if(this._q.length > this._size) {
-                this._q.splice(0, this._q.length - this._size);
-                this._deleted += this._q.length - this._size;
-            }
-        }
-    }
-
-    push(item: T) {
-        this._q.push(item);
-        this._trim();
-    }
-
-    last() {
-        return this._q[this._q.length - 1];
-    }
-
-    walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        var result = true;
-        for(var i = this._q.length - 1; i >= 0; i--) {
-            var item = this._q[i];
-            result = callback.call(thisArg, item, i + this._deleted);
-            if(result === false) {
-                return result;
-            }
-            else if(!result) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        var result = true;
-        for(var i = index; i < this._q.length; i++) {
-            var item = this._q[i - this._deleted];
-            result = callback.call(thisArg, item, i);
-            if(result === false) {
-                return result;
-            }
-            else if(!result) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    insert(index: number, item: T) {
-        this._q.splice(index - this._deleted, 0, item);
-    }
-
-}
-
-/** Set that only supports string items */
-class StringSet {
-    private _items: { [key: string]: null } = {};
-    private _count = 0;
-
-    contains(k: string) {
-        assert(typeof k == "string");
-        return this._items.hasOwnProperty(k);
-    }
-    add(k: string) {
-        assert(typeof k == "string");
-        if(this.contains(k)) {
-            return;
-        }
-        this._items[k] = null;
-        this._count++;
-    }
-    remove(k: string) {
-        assert(typeof k == "string");
-        if(!this.contains(k)) {
-            return;
-        }
-        delete this._items[k];
-        this._count++;
-    }
-    isEmpty() {
-        return this._count === 0;
-    }
-}
-
-function otMain(util: Util) {
+function otMain(util: TogetherJSNS.Util) {
     const assert: typeof util.assert = util.assert;
+
+    class Queue<T> {
+        private _q: T[] = [];
+        private _deleted = 0;
+        private _size: number | undefined;
+    
+        constructor(size?: number) {
+            this._size = size;
+        }
+    
+        _trim() {
+            if(this._size) {
+                if(this._q.length > this._size) {
+                    this._q.splice(0, this._q.length - this._size);
+                    this._deleted += this._q.length - this._size;
+                }
+            }
+        }
+    
+        push(item: T) {
+            this._q.push(item);
+            this._trim();
+        }
+    
+        last() {
+            return this._q[this._q.length - 1];
+        }
+    
+        walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
+            var result = true;
+            for(var i = this._q.length - 1; i >= 0; i--) {
+                var item = this._q[i];
+                result = callback.call(thisArg, item, i + this._deleted);
+                if(result === false) {
+                    return result;
+                }
+                else if(!result) {
+                    result = true;
+                }
+            }
+            return result;
+        }
+    
+        walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
+            var result = true;
+            for(var i = index; i < this._q.length; i++) {
+                var item = this._q[i - this._deleted];
+                result = callback.call(thisArg, item, i);
+                if(result === false) {
+                    return result;
+                }
+                else if(!result) {
+                    result = true;
+                }
+            }
+            return result;
+        }
+    
+        insert(index: number, item: T) {
+            this._q.splice(index - this._deleted, 0, item);
+        }
+    
+    }
+    
+    /** Set that only supports string items */
+    class StringSet {
+        private _items: { [key: string]: null } = {};
+        private _count = 0;
+    
+        contains(k: string) {
+            assert(typeof k == "string");
+            return this._items.hasOwnProperty(k);
+        }
+        add(k: string) {
+            assert(typeof k == "string");
+            if(this.contains(k)) {
+                return;
+            }
+            this._items[k] = null;
+            this._count++;
+        }
+        remove(k: string) {
+            assert(typeof k == "string");
+            if(!this.contains(k)) {
+                return;
+            }
+            delete this._items[k];
+            this._count++;
+        }
+        isEmpty() {
+            return this._count === 0;
+        }
+    }
+
 
     class Change {
         constructor(

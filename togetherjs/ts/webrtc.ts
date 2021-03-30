@@ -10,8 +10,7 @@ interface MediaConstraintsMandatory {
     MozDontOfferDataChannel?: boolean,
 }
 
-function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
-    var webrtc = util.Module("webrtc");
+function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
     var assert: typeof util.assert = util.assert;
 
     session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
@@ -597,11 +596,7 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
             _connection = null;
             $audio[0].removeAttribute("src");
         }
-
     });
-
-    return webrtc;
-
 }
 
 define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], webrtcMain);

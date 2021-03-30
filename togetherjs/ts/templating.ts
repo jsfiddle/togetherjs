@@ -6,7 +6,7 @@ interface MapOfVariables {
     [key: string]: string | number | JQuery;
 };
 
-function templatingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
+function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert: typeof util.assert = util.assert;
 
     class Templating {

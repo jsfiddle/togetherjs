@@ -2,7 +2,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "channels"], function ($, _util, channels) {
+function recorderMain($, util, channels) {
+    var assert = util.assert;
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var clientId = "recorder";
     function display(elOrSelector) {
@@ -116,4 +117,5 @@ define(["jquery", "util", "channels"], function ($, _util, channels) {
         });
     });
     return new Recorder();
-});
+}
+define(["jquery", "util", "channels"], recorderMain);

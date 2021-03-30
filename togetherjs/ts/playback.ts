@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function playbackMain($: JQueryStatic, _util: Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
+function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
 
     var ALWAYS_REPLAY = {
         "cursor-update": true,

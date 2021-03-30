@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, channels: TogetherJSNS.Channels) {
+function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
+    const assert: typeof util.assert = util.assert;
     let channel: TogetherJSNS.WebSocketChannel; // TODO potentially not initialized, why does TSC doesn't catch that?
     let clientId = "recorder";
 
@@ -120,4 +121,6 @@ define(["jquery", "util", "channels"], function($: JQueryStatic, _util: Util, ch
     });
 
     return new Recorder();
-});
+}
+
+define(["jquery", "util", "channels"], recorderMain);

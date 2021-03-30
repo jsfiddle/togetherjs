@@ -4,7 +4,7 @@ $("#other").remove();
 
 Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "templates-en-US");
 // => Loaded modules: ...
-
+console.log("========= jq", $)
 Test.normalStartup();
 
 /* =>

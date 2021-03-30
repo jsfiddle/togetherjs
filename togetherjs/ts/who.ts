@@ -11,7 +11,7 @@ interface ExternalPeerAttributes {
     clientId: string; // TODO is it the same thing as identityId?
 }
 
-function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
+function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
     const assert: typeof util.assert = util.assert;
     var MAX_RESPONSE_TIME = 5000;
     var MAX_LATE_RESPONSE = 2000;

@@ -10,7 +10,7 @@ interface Template {
     walkabout?: string;
 }
 
-function templatesMain(util: Util, require: Require) {
+function templatesMain(util: TogetherJSNS.Util, require: Require) {
     let assert: typeof util.assert = util.assert;
 
     function clean(t: string) {
