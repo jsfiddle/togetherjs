@@ -43,6 +43,9 @@ Test.require = function () {
       for (var i=0; i<modules.length; i++) {
         var localName = aliases[modules[i]] || modules[i];
         window[localName] = arguments[i];
+        if(localName == "jquery") {
+          window["$"] = arguments[i];
+        }
       }
       var msg = ["Loaded modules:"].concat(modules);
       print.apply(null, msg);
