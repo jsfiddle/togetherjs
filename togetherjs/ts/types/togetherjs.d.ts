@@ -578,7 +578,7 @@ declare namespace TogetherJSNS {
     type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
     type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
     type TogetherJS = ReturnType<typeof togetherjsMain>;
-    type EventMaker = ReturnType<typeof eventmakerMain>;
+    type EventMaker = ReturnType<typeof eventMakerMain>;
     type ElementFinder = ReturnType<typeof elementFinderMain>;
 
     type AnyPeer = PeerSelf | PeerClass | ExternalPeer | SerializedPeer;
