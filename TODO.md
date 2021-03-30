@@ -45,7 +45,7 @@
 
 # Maybe towards full typing
 - maybe I should convert the libs? Like walkabout?
-- replace all "} else"
+- X replace all "} else " and "} catch("
 
 # Misc
 - look at all usage of session.hub.on and set a message type for each event
