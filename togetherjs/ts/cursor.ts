@@ -4,7 +4,7 @@
 
 // Cursor viewing support
 
-function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, tinycolor: tinycolor, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
+function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, tinycolor: tinycolor.Constructor, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
     var assert: typeof util.assert = util.assert;
 
     var FOREGROUND_COLORS = ["#111", "#eee"];
@@ -64,7 +64,7 @@ function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Ut
             name.text(peer.name!); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHex()
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);

@@ -56,7 +56,7 @@ function cursorMain($, _ui, util, session, elementFinder, tinycolor, eventMaker,
             name.text(peer.name); // TODO !
             nameContainer.css({
                 backgroundColor: peer.color,
-                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS)
+                color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHex()
             });
             var path = this.element.find("svg path");
             path.attr("fill", peer.color);

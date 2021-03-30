@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/requirejs": "^2.1.26",
+    "@types/tinycolor2": "^1.4.2",
     "@types/youtube": "0.0.42",
     "ejs": "~2.5.5",
     "ejs-locals": "~1.0.2",
@@ -22,6 +23,7 @@
     "newrelic": "0.9.20",
     "node-static": "~0.6.5",
     "optimist": "~0.6.0",
+    "tinycolor2": "^1.4.2",
     "universal-analytics": "~0.1.3",
     "websocket": "~1.0.7",
     "websocket-server": "github:miksago/node-websocket-server#master",
