@@ -32,7 +32,7 @@
 - [ ] Switch to a better import system
 - [ ] remove JQuery
     - [x] set JQuery as private at first https://requirejs.org/docs/jquery.html
-- [ ] remove or update tiny colors, it's a whole library for only a few calls
+- [x] remove or update tiny colors, it's a whole library for only a few calls
 
 # Logic changes (only after full typing)
 - remove all ref to TowTruck, it's old enough to throw out legacy stuff
