@@ -57,9 +57,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (inRemoteUpdate) {
             return;
         }
-        if (elementFinder.ignoreElement(el) ||
-            (elementTracked(el) && !tracker) ||
-            suppressSync(el)) {
+        if (elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
             return;
         }
         var location = elementFinder.elementLocation(el);
@@ -478,12 +476,13 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         return false;
     }
     function getValue(e) {
+        var _a;
         var el = $(e);
         if (isCheckable(el)) {
             return el.prop("checked"); // "as boolean" serves as a reminder of the type of the value
         }
         else {
-            return el.val();
+            return (_a = el.val()) !== null && _a !== void 0 ? _a : ""; // .val() sometimes returns null (for a <select> with no children for example), we still need to return a string in this case because return null causes problem in other places
         }
     }
     // TODO not used
@@ -713,8 +712,9 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value.toString(), 1)); // TODO !
-            // TODO check value.toString() is ok
+            if (typeof value === "string") { // no need to create an History if it's not a string value
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
+            }
         });
         destroyTrackers();
         buildTrackers();

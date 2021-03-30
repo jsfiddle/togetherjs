@@ -66,9 +66,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
         if(inRemoteUpdate) {
             return;
         }
-        if(elementFinder.ignoreElement(el) ||
-            (elementTracked(el) && !tracker) ||
-            suppressSync(el)) {
+        if(elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
             return;
         }
         var location = elementFinder.elementLocation(el);
@@ -557,7 +555,7 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             return el.prop("checked") as boolean; // "as boolean" serves as a reminder of the type of the value
         }
         else {
-            return el.val();
+            return el.val() ?? ""; // .val() sometimes returns null (for a <select> with no children for example), we still need to return a string in this case because return null causes problem in other places
         }
     }
 
@@ -799,8 +797,9 @@ function formsMain($: JQueryStatic, util: Util, session: TogetherJSNS.Session, e
             }
             var el = $(this);
             var value = getValue(el[0]);
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value.toString(), 1)); // TODO !
-            // TODO check value.toString() is ok
+            if(typeof value === "string") { // no need to create an History if it's not a string value
+                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
+            }
         });
         destroyTrackers();
         buildTrackers();
