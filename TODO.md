@@ -4,7 +4,7 @@
 
 # Things to check to validate full typing
 - [x] split all .on("event1 event2") as multiple commands to have a good typechecking, the anonymous function would need to be named to be reused obviously
-- [ ] check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, lie deleting a lne
+- [ ] check all TODO qw (stand for quick win), those should be things that can be done in less than 10 seconds, like deleting a line
 - [ ] check all @deprecated tags and see if some are still used (some tags are in the middle of sentences so search for "@deprecated" and not for "/** @deprecated"
 - [ ] check all TODO comments
     - [ ] TODO ! in particular
@@ -29,11 +29,11 @@
 - [x] Find the logic for PeerSelf, PeerClass, ExternalPeer, PeerView
 
 # Architectural changes (only after full typing)
-- Switch to a better import system
-- remove JQuery
+- [ ] Switch to a better import system
+- [ ] remove JQuery
     set JQuery as private at first https://requirejs.org/docs/jquery.html
         '*': { 'jquery': 'jquery-private' },
-- remove or update tiny colors, it's a whole library for only a few calls
+- [ ] remove or update tiny colors, it's a whole library for only a few calls
 
 # Logic changes (only after full typing)
 - remove all ref to TowTruck, it's old enough to throw out legacy stuff
