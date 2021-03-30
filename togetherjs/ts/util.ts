@@ -156,7 +156,8 @@ class Util {
             let result;
             try {
                 result = func.apply(this, args);
-            } catch(e) {
+            }
+            catch(e) {
                 deferred.reject(e);
                 throw e;
             }
@@ -264,7 +265,8 @@ class Util {
         }
         try {
             return $(el).is(selector);
-        } catch(e) {
+        }
+        catch(e) {
             console.warn("Bad selector:", selector, "error:", e);
             return false;
         }

@@ -37,7 +37,8 @@ function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, 
             }
             if(notification) {
                 element.slideIn();
-            } else if(!modal) {
+            }
+            else if(!modal) {
                 element.popinWindow();
             }
             if(modal) {
@@ -89,7 +90,8 @@ function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, 
             const element = $(el);
             if(element.is(":visible")) {
                 this.hide(element);
-            } else {
+            }
+            else {
                 this.show(element);
             }
         }
@@ -146,12 +148,14 @@ function windowingMain($: JQueryStatic, util: Util, _peers: TogetherJSNS.Peers, 
                     top: boundPos.top + Math.floor(boundPosHeight / 2) + "px",
                     left: left + win.width() + 9 + "px"
                 });
-            } else if(ifacePos == "left") {
+            }
+            else if(ifacePos == "left") {
                 pointer.css({
                     top: boundPos.top + Math.floor(boundPosHeight / 2) + "px",
                     left: (left - 5) + "px"
                 });
-            } else {
+            }
+            else {
                 console.warn("don't know how to deal with position:", ifacePos);
             }
         }

@@ -72,7 +72,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
         currentUrl() {
             if(includeHashInUrl) {
                 return location.href;
-            } else {
+            }
+            else {
                 return location.href.replace(/#.*/, "");
             }
         }
@@ -196,7 +197,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
             storage.tab.get("status").then(function(saved) {
                 if(!saved) {
                     console.warn("No session information saved in", "status." + name);
-                } else {
+                }
+                else {
                     saved.running = false;
                     saved.date = Date.now();
                     storage.tab.set("status", saved);
@@ -446,7 +448,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                             shareId = saved.shareId;
                         }
                         sessionId = saved.sessionId;
-                    } else {
+                    }
+                    else {
                         isClient = TogetherJS.startup.reason == "joined";
                         assert(!sessionId);
                         sessionId = util.generateId();
@@ -464,7 +467,8 @@ function sessionMain(require: Require, util: Util, channels: TogetherJSNS.Channe
                     // The only case when we don't need to set the storage status again is when
                     // we're already set to be running
                     set = !saved.running;
-                } else {
+                }
+                else {
                     throw new util.AssertionError("No saved status, and no startup._launch request; why did TogetherJS start?");
                 }
                 assert(session.identityId);

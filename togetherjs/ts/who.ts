@@ -82,7 +82,8 @@ function whoMain(util: Util, channels: TogetherJSNS.Channels, session: TogetherJ
                             responded++;
                             if(expected && responded >= expected) {
                                 close();
-                            } else {
+                            }
+                            else {
                                 def.notify(users);
                             }
                         }

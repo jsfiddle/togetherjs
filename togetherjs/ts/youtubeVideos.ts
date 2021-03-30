@@ -80,7 +80,8 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
             tag.src = "https://www.youtube.com/iframe_api";
             var firstScriptTag = document.getElementsByTagName('script')[0]!; // TODO !
             firstScriptTag.parentNode!.insertBefore(tag, firstScriptTag); // TODO !
-        } else {
+        }
+        else {
             // manually invoke APIReady function when the API was already loaded by user
             onYouTubeIframeAPIReady!(); // TODO !
         }
@@ -161,7 +162,8 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
                 publishDifferentVideoLoaded(iframeLocation, currentVideoId);
                 // update current video id
                 $(currentIframe).data("currentVideoId", currentVideoId);
-            } else {
+            }
+            else {
                 session.send({
                     type: "playerStateChange",
                     element: iframeLocation,
@@ -169,14 +171,16 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
                     playerTime: currentTime
                 });
             }
-        } else if(event.data == YT.PlayerState.PAUSED) {
+        }
+        else if(event.data == YT.PlayerState.PAUSED) {
             session.send({
                 type: "playerStateChange",
                 element: iframeLocation,
                 playerState: 2,
                 playerTime: currentTime
             });
-        } else {
+        }
+        else {
             // do nothing when the state is buffering, cued, or ended
             return;
         }
@@ -207,7 +211,8 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
             if(areTooFarApart(currentTime, msg.playerTime)) {
                 player.seekTo(msg.playerTime, true);
             }
-        } else if(msg.playerState == 2) {
+        }
+        else if(msg.playerState == 2) {
             // When YouTube videos are advanced while playing,
             // Chrome: pause -> pause -> play (onStateChange is called even when it is from pause to pause)
             // FireFox: buffering -> play -> buffering -> play
@@ -236,7 +241,8 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
         if(msg.videoId != currentVideoId) {
             $(iframe).data("currentVideoId", msg.videoId);
             player.loadVideoById(msg.videoId, msg.playerTime, 'default');
-        } else {
+        }
+        else {
             // if the video is only cued, I do not have to do anything to sync
             if(msg.playerState != 5) {
                 player.seekTo(msg.playerTime, true).playVideo();
@@ -279,7 +285,8 @@ function youtubeVideosMain($: JQueryStatic, _util: Util, session: TogetherJSNS.S
         // I have to compare the video ids
         if(currentVideoId != lastVideoId) {
             return currentVideoId;
-        } else {
+        }
+        else {
             return false;
         }
     }

@@ -26,7 +26,8 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
                 //@ts-ignore this var is unused but we don't remove code
                 var conn = new window.mozRTCPeerConnection!();
             })();
-        } catch(e) {
+        }
+        catch(e) {
             session.RTCSupported = false;
         }
     }
@@ -225,7 +226,8 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
         ui.displayToggle(selector);
         if(selector == "#togetherjs-audio-incoming") {
             $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
-        } else {
+        }
+        else {
             $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
         }
     }
@@ -238,7 +240,8 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
             }
             if(session.RTCSupported) {
                 enableAudio();
-            } else {
+            }
+            else {
                 windowing.show("#togetherjs-rtc-not-supported");
             }
         });
@@ -293,11 +296,13 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
                 var a = args[i];
                 if(typeof a == "string") {
                     s += a;
-                } else {
+                }
+                else {
                     var repl;
                     try {
                         repl = JSON.stringify(a);
-                    } catch(e) {
+                    }
+                    catch(e) {
                     }
                     if(!repl) {
                         repl = "" + a;
@@ -356,7 +361,8 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
             }
             try {
                 _connection = makePeerConnection();
-            } catch(e) {
+            }
+            catch(e) {
                 error("Error creating PeerConnection:", e);
                 throw e;
             }
@@ -568,7 +574,8 @@ function webrtcMain(_require: Require, $: JQueryStatic, util: Util, session: Tog
                 startStreaming(function() {
                     connect();
                 });
-            } else {
+            }
+            else {
                 connect();
             }
         });

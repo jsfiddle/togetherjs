@@ -38,7 +38,8 @@ function templatesMain(util: Util, require: Require) {
         if(!templatesLang) {
             try {
                 templatesLang = require(moduleName);
-            } catch(e) {
+            }
+            catch(e) {
                 console.warn("Error requiring module:", e);
             }
         }

@@ -178,7 +178,8 @@ function consoleMain(util: Util) {
             if(typeof item == "object" && "repr" in item) {
                 try {
                     return item.repr();
-                } catch(e) {
+                }
+                catch(e) {
                     console.warn("Error getting object repr:", item, e);
                 }
             }

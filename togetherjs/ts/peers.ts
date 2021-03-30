@@ -415,7 +415,8 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             if(getUserName) {
                 if(typeof getUserName == "string") {
                     name = getUserName;
-                } else {
+                }
+                else {
                     name = getUserName();
                 }
                 if(name && typeof name != "string") {
@@ -428,7 +429,8 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             if(getUserColor) {
                 if(typeof getUserColor == "string") {
                     color = getUserColor;
-                } else {
+                }
+                else {
                     color = getUserColor();
                 }
                 if(color && typeof color != "string") {
@@ -440,7 +442,8 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             if(getUserAvatar) {
                 if(typeof getUserAvatar == "string") {
                     avatar = getUserAvatar;
-                } else {
+                }
+                else {
                     avatar = getUserAvatar();
                 }
                 if(avatar && typeof avatar != "string") {
@@ -605,7 +608,8 @@ function peersMain(util: Util, session: TogetherJSNS.Session, storage: TogetherJ
             tabIdleTimeout = setTimeout(function() {
                 peers.Self.update({ idle: "inactive" });
             }, TAB_IDLE_TIME);
-        } else {
+        }
+        else {
             if(tabIdleTimeout) {
                 clearTimeout(tabIdleTimeout);
             }

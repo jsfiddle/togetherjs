@@ -178,7 +178,8 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             var e = eval;
             try {
                 result = e(expr);
-            } catch(error) {
+            }
+            catch(error) {
                 ui.chat.system({
                     text: "Error: " + error
                 });
@@ -326,7 +327,8 @@ function chatMain(require: Require, $: JQueryStatic, util: Util, session: Togeth
             }
             try {
                 value = JSON.parse(value);
-            } catch(e) {
+            }
+            catch(e) {
                 ui.chat.system({
                     text: "Error: value (" + value + ") could not be parsed: " + e
                 });

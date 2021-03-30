@@ -21,7 +21,8 @@ define(["jquery"], function($: JQueryStatic) {
                             .css('-ms-transform', 'rotate(' + now + 'deg)')
                             .css('-o-transform', 'rotate(' + now + 'deg)')
                             .css('transform', 'rotate(' + now + 'deg)');
-                    } else {
+                    }
+                    else {
                         $(this).css(fx.prop, now);
                     }
                 },
@@ -201,7 +202,8 @@ define(["jquery"], function($: JQueryStatic) {
                         .css('-ms-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-o-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('transform', 'perspective( 600px ) rotateX(' + now + 'deg)');
-                } else {
+                }
+                else {
                     $(this).css(fx.prop, now);
                 }
             },
@@ -303,11 +305,14 @@ define(["jquery"], function($: JQueryStatic) {
                 one.css("opacity", 0.5);
                 two.css("opacity", 0.5);
                 three.css("opacity", 0.5);
-            } else if(count == 1) {
+            }
+            else if(count == 1) {
                 one.css("opacity", 1);
-            } else if(count == 2) {
+            }
+            else if(count == 2) {
                 two.css("opacity", 1);
-            } else { // count==3
+            }
+            else { // count==3
                 three.css("opacity", 1);
             }
         }).bind(this);

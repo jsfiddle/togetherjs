@@ -17,7 +17,8 @@ class CannotFind {
         var loc;
         try {
             loc = "loc"; //elementFinder.elementLocation(this.context);
-        } catch(e) {
+        }
+        catch(e) {
             loc = this.context;
         }
         return ("[CannotFind " + this.prefix + "(" + this.location + "): " + this.reason + " in " + loc + "]");
@@ -113,7 +114,8 @@ class ElementFinder {
             el = document.body;
             try {
                 return this.findElement(loc.substr(("body").length), el);
-            } catch(e) {
+            }
+            catch(e) {
                 if(e instanceof CannotFind) {
                     e.prefix = "body" + e.prefix;
                 }
@@ -124,7 +126,8 @@ class ElementFinder {
             el = document.head;
             try {
                 return this.findElement(loc.substr(("head").length), el);
-            } catch(e) {
+            }
+            catch(e) {
                 if(e instanceof CannotFind) {
                     e.prefix = "head" + e.prefix;
                 }
@@ -149,7 +152,8 @@ class ElementFinder {
             if(rest) {
                 try {
                     return this.findElement(rest, el);
-                } catch(e) {
+                }
+                catch(e) {
                     if(e instanceof CannotFind) {
                         e.prefix = "#" + id + e.prefix;
                     }
@@ -190,7 +194,8 @@ class ElementFinder {
             if(loc) {
                 try {
                     return this.findElement(loc, el);
-                } catch(e) {
+                }
+                catch(e) {
                     if(e instanceof CannotFind) {
                         e.prefix = ":nth-child(" + num + ")" + e.prefix;
                     }
@@ -260,7 +265,8 @@ class ElementFinder {
             // element roughly should be.  If the sanity check failed we'd use
             // absoluteTop
             return el_offset.top + position.offset;
-        } catch(e) {
+        }
+        catch(e) {
             if(e instanceof CannotFind && position.absoluteTop) {
                 // We don't trust absoluteTop to be quite right locally, so we adjust
                 // for the total document height differences:
