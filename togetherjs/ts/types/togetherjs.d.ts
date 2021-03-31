@@ -600,7 +600,7 @@ export declare namespace TogetherJSNS {
     type PeerSelf = Peers["Self"];
     type TrackerClass = typeof forms.trackerClassExport;//ReturnType<typeof formsMain>["trackerClassExport"];
     type TextReplace = typeof ot.TextReplaceExport;//ReturnType<typeof otMain>["TextReplaceExport"];
-    type Randomizer = typeof randomutil;//ReturnType<ReturnType<typeof randomutilMain>>;
+    type Randomizer = ReturnType<typeof randomutil>;//ReturnType<ReturnType<typeof randomutilMain>>;
     type SimpleHistory = typeof ot.SimpleHistoryExport;//ReturnType<typeof otMain>["SimpleHistoryExport"];
     type TogetherJS = ReturnType<typeof togetherjsMain>;
     type EventMaker = typeof eventMaker;//ReturnType<typeof eventMakerMain>;
