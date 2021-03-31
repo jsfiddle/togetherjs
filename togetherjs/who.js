@@ -1,9 +1,12 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function whoMain(util, channels, session, ui) {
-    var assert = util.assert;
+define(["require", "exports", "./channels", "./session", "./ui", "./util"], function (require, exports, channels_1, session_1, ui_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.who = void 0;
+    //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
+    var assert = util_1.util.assert;
     var MAX_RESPONSE_TIME = 5000;
     var MAX_LATE_RESPONSE = 2000;
     var ExternalPeer = /** @class */ (function () {
@@ -20,11 +23,11 @@ function whoMain(util, channels, session, ui) {
             this.avatar = attrs.avatar || null;
             this.color = attrs.color || "#00FF00";
             this.lastMessageDate = 0;
-            this.view = ui.PeerSelfView(this);
+            this.view = ui_1.ui.PeerSelfView(this);
         }
         ExternalPeer.prototype.className = function (prefix) {
             if (prefix === void 0) { prefix = ""; }
-            return prefix + util.safeClassName(this.id);
+            return prefix + util_1.util.safeClassName(this.id);
         };
         return ExternalPeer;
     }());
@@ -33,9 +36,9 @@ function whoMain(util, channels, session, ui) {
             this.ExternalPeer = function (id, attrs) { return new ExternalPeer(id, attrs); };
         }
         Who.prototype.getList = function (hubUrl) {
-            return util.Deferred(function (def) {
+            return util_1.util.Deferred(function (def) {
                 var expected;
-                var channel = channels.WebSocketChannel(hubUrl);
+                var channel = channels_1.channels.WebSocketChannel(hubUrl);
                 var users = {};
                 var responded = 0;
                 //tslint:disable-next-line unused var
@@ -53,7 +56,7 @@ function whoMain(util, channels, session, ui) {
                     }
                     if (msg.type == "hello-back") {
                         if (!users[msg.clientId]) {
-                            users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
+                            users[msg.clientId] = exports.who.ExternalPeer(msg.clientId, msg);
                             responded++;
                             if (expected && responded >= expected) {
                                 close();
@@ -85,16 +88,16 @@ function whoMain(util, channels, session, ui) {
             });
         };
         Who.prototype.invite = function (hubUrl, clientId) {
-            return util.Deferred(function (def) {
-                var channel = channels.WebSocketChannel(hubUrl);
-                var id = util.generateId();
+            return util_1.util.Deferred(function (def) {
+                var channel = channels_1.channels.WebSocketChannel(hubUrl);
+                var id = util_1.util.generateId();
                 channel.onmessage = function (msg) {
                     if (msg.type == "invite" && msg.inviteId == id) {
                         channel.close();
                         def.resolve();
                     }
                 };
-                var hello = session.makeHelloMessage(false);
+                var hello = session_1.session.makeHelloMessage(false);
                 var userInfo = {
                     name: hello.name,
                     avatar: hello.avatar,
@@ -105,12 +108,12 @@ function whoMain(util, channels, session, ui) {
                     rtcSupported: hello.rtcSupported,
                     isClient: hello.isClient,
                     starting: hello.starting,
-                    clientId: session.clientId, // TODO !
+                    clientId: session_1.session.clientId, // TODO !
                 };
                 channel.send({
                     type: "invite",
                     inviteId: id,
-                    url: session.shareUrl(),
+                    url: session_1.session.shareUrl(),
                     userInfo: userInfo,
                     forClientId: clientId,
                     "server-echo": true
@@ -119,7 +122,7 @@ function whoMain(util, channels, session, ui) {
         };
         return Who;
     }());
-    var who = new Who();
-    return who;
-}
-define(["util", "channels", "session", "ui"], whoMain);
+    exports.who = new Who();
+});
+//return who;
+//define(["util", "channels", "session", "ui"], whoMain);

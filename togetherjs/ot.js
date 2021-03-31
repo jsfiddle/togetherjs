@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -13,8 +12,12 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-function otMain(util) {
-    var assert = util.assert;
+define(["require", "exports", "./util"], function (require, exports, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ot = void 0;
+    //function otMain(util: TogetherJSNS.Util) {
+    var assert = util_1.util.assert;
     var Queue = /** @class */ (function () {
         function Queue(size) {
             this._q = [];
@@ -372,10 +375,10 @@ function otMain(util) {
             }
             if (this.start > text.length) {
                 console.trace();
-                throw new util.AssertionError("Start after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
+                throw new util_1.util.AssertionError("Start after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
             }
             if (this.start + this.del > text.length) {
-                throw new util.AssertionError("Start+del after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
+                throw new util_1.util.AssertionError("Start+del after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
             }
             return text.substr(0, this.start) + this.text + text.substr(this.start + this.del);
         };
@@ -738,13 +741,13 @@ function otMain(util) {
         };
         return TJSHistory;
     }());
-    var ot = {
+    exports.ot = {
         SimpleHistory: function (clientId, initState, initBasis) { return new SimpleHistory(clientId, initState, initBasis); },
         //History: () => new TJSHistory(), // TODO does not seem to be used
         TextReplace: TextReplace,
         TextReplaceExport: new TextReplace(0, 0, ""),
         SimpleHistoryExport: new SimpleHistory("", "", 0),
     };
-    return ot;
-}
-define(["util"], otMain);
+});
+//return ot;
+//define(["util"], otMain);

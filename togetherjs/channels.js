@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,7 +16,10 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function channelsMain(util) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.channels = void 0;
     /* Subclasses must define:
     
     - ._send(string)
@@ -88,7 +90,7 @@ function channelsMain(util) {
             }
         };
         return AbstractChannel;
-    }(OnClass));
+    }(util_1.OnClass));
     var WebSocketChannel = /** @class */ (function (_super) {
         __extends(WebSocketChannel, _super);
         function WebSocketChannel(address) {
@@ -426,13 +428,13 @@ function channelsMain(util) {
             delete this._routes[id];
         };
         Router.prototype.makeRoute = function (id) {
-            id = id || util.generateId();
+            id = id || util_1.util.generateId();
             var route = new Route(this, id);
             this._routes[id] = route;
             return route;
         };
         return Router;
-    }(OnClass)); // /Router
+    }(util_1.OnClass)); // /Router
     var Route = /** @class */ (function (_super) {
         __extends(Route, _super);
         function Route(router, id) {
@@ -456,13 +458,11 @@ function channelsMain(util) {
             delete this.router._routes[this.id];
         };
         return Route;
-    }(OnClass)); // /Route
-    var channels = {
+    }(util_1.OnClass)); // /Route
+    exports.channels = {
         "WebSocketChannel": function (address) { return new WebSocketChannel(address); },
         "PostMessageChannel": function (win, expectedOrigin) { return new PostMessageChannel(win, expectedOrigin); },
         "PostMessageIncomingChannel": function (expectedOrigin) { return new PostMessageIncomingChannel(expectedOrigin); },
         "Router": function () { return new Router(); },
     };
-    return channels;
-}
-define(["util"], channelsMain);
+});

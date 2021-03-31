@@ -1,20 +1,22 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
-function youtubeVideosMain($, _util, session, elementFinder) {
+define(["require", "exports", "./elementFinder", "./session", "./types/togetherjs"], function (require, exports, elementFinder_1, session_1, togetherjs_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    //function youtubeVideosMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
     // constant var to indicate whether two players are too far apart in sync
     var TOO_FAR_APART = 3000;
     // embedded youtube iframes
     var youTubeIframes = [];
     // youtube API load delay
     var API_LOADING_DELAY = 2000;
-    session.on("reinitialize", function () {
-        if (TogetherJS.config.get("youtube")) {
+    session_1.session.on("reinitialize", function () {
+        if (togetherjs_1.TogetherJS.config.get("youtube")) {
             prepareYouTube();
         }
     });
-    session.on("close", function () {
+    session_1.session.on("close", function () {
         $(youTubeIframes).each(function (_i, iframe) {
             // detach players from iframes
             $(iframe).removeData("togetherjs-player");
@@ -32,11 +34,11 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         });
     });
     $(function () {
-        TogetherJS.config.track("youtube", function (track, previous) {
+        togetherjs_1.TogetherJS.config.track("youtube", function (track, previous) {
             if (track && !previous) {
                 prepareYouTube();
                 // You can enable youtube dynamically, but can't turn it off:
-                TogetherJS.config.close("youtube");
+                togetherjs_1.TogetherJS.config.close("youtube");
             }
         });
     });
@@ -75,7 +77,7 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         }
         else {
             // manually invoke APIReady function when the API was already loaded by user
-            onYouTubeIframeAPIReady(); // TODO !
+            togetherjs_1.onYouTubeIframeAPIReady(); // TODO !
         }
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {
@@ -128,7 +130,7 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         var currentPlayer = target;
         var currentTime = currentPlayer.getCurrentTime();
         //var currentTime = target.k.currentTime;
-        var iframeLocation = elementFinder.elementLocation(currentIframe);
+        var iframeLocation = elementFinder_1.elementFinder.elementLocation(currentIframe);
         if ($(currentPlayer).data("seek")) {
             $(currentPlayer).removeData("seek");
             return;
@@ -149,7 +151,7 @@ function youtubeVideosMain($, _util, session, elementFinder) {
                 $(currentIframe).data("currentVideoId", currentVideoId);
             }
             else {
-                session.send({
+                session_1.session.send({
                     type: "playerStateChange",
                     element: iframeLocation,
                     playerState: 1,
@@ -158,7 +160,7 @@ function youtubeVideosMain($, _util, session, elementFinder) {
             }
         }
         else if (event.data == YT.PlayerState.PAUSED) {
-            session.send({
+            session_1.session.send({
                 type: "playerStateChange",
                 element: iframeLocation,
                 playerState: 2,
@@ -171,14 +173,14 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         }
     }
     function publishDifferentVideoLoaded(iframeLocation, videoId) {
-        session.send({
+        session_1.session.send({
             type: "differentVideoLoaded",
             videoId: videoId,
             element: iframeLocation
         });
     }
-    session.hub.on('playerStateChange', function (msg) {
-        var iframe = elementFinder.findElement(msg.element);
+    session_1.session.hub.on('playerStateChange', function (msg) {
+        var iframe = elementFinder_1.elementFinder.findElement(msg.element);
         var player = $(iframe).data("togetherjs-player");
         var currentTime = player.getCurrentTime();
         var currentState = player.getPlayerState();
@@ -207,13 +209,13 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         }
     });
     // if a late user joins a channel, synchronize his videos
-    session.hub.on('hello', function () {
+    session_1.session.hub.on('hello', function () {
         // wait a couple seconds to make sure the late user has finished loading API
         setTimeout(synchronizeVideosOfLateGuest, API_LOADING_DELAY);
     });
-    session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
+    session_1.session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
         // XXX can this message arrive before we're initialized?
-        var iframe = elementFinder.findElement(msg.element);
+        var iframe = elementFinder_1.elementFinder.findElement(msg.element);
         var player = $(iframe).data("togetherjs-player");
         // check if another video had been loaded to an existing iframe before I joined
         var currentVideoId = getVideoIdFromUrl(player.getVideoUrl());
@@ -228,9 +230,9 @@ function youtubeVideosMain($, _util, session, elementFinder) {
             }
         }
     });
-    session.hub.on('differentVideoLoaded', function (msg) {
+    session_1.session.hub.on('differentVideoLoaded', function (msg) {
         // load a new video if the host has loaded one
-        var iframe = elementFinder.findElement(msg.element);
+        var iframe = elementFinder_1.elementFinder.findElement(msg.element);
         var player = $(iframe).data("togetherjs-player");
         player.loadVideoById(msg.videoId, 0, 'default');
         $(iframe).data("currentVideoId", msg.videoId);
@@ -241,8 +243,8 @@ function youtubeVideosMain($, _util, session, elementFinder) {
             var currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
             var currentState = currentPlayer.getPlayerState();
             var currentTime = currentPlayer.getCurrentTime();
-            var iframeLocation = elementFinder.elementLocation(iframe);
-            session.send({
+            var iframeLocation = elementFinder_1.elementFinder.elementLocation(iframe);
+            session_1.session.send({
                 type: "synchronizeVideosOfLateGuest",
                 element: iframeLocation,
                 videoId: currentVideoId,
@@ -279,5 +281,5 @@ function youtubeVideosMain($, _util, session, elementFinder) {
         var milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;
     }
-}
-define(["jquery", "util", "session", "elementFinder"], youtubeVideosMain);
+});
+//define(["jquery", "util", "session", "elementFinder"], youtubeVideosMain);

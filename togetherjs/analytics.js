@@ -1,13 +1,15 @@
-"use strict";
-function analyticsMain(_util) {
+define(["require", "exports", "./types/togetherjs"], function (require, exports, togetherjs_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.analytics = void 0;
     var Analytics = /** @class */ (function () {
         function Analytics() {
         }
         Analytics.prototype.activate = function () {
-            var enable = TogetherJS.config.get("enableAnalytics");
-            var code = TogetherJS.config.get("analyticsCode");
-            TogetherJS.config.close("enableAnalytics");
-            TogetherJS.config.close("analyticsCode");
+            var enable = togetherjs_1.TogetherJS.config.get("enableAnalytics");
+            var code = togetherjs_1.TogetherJS.config.get("analyticsCode");
+            togetherjs_1.TogetherJS.config.close("enableAnalytics");
+            togetherjs_1.TogetherJS.config.close("analyticsCode");
             if (!(enable && code)) {
                 return;
             }
@@ -29,6 +31,6 @@ function analyticsMain(_util) {
         ;
         return Analytics;
     }());
-    return new Analytics();
-}
-define(["util"], analyticsMain);
+    exports.analytics = new Analytics();
+});
+//define(["util"], analyticsMain);

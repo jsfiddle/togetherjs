@@ -1,10 +1,12 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-;
-function templatingMain($, util, _peers, _windowing, session) {
-    var assert = util.assert;
+define(["require", "exports", "./session", "./util"], function (require, exports, session_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.templating = void 0;
+    //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
+    var assert = util_1.util.assert;
     var Templating = /** @class */ (function () {
         function Templating() {
         }
@@ -22,7 +24,7 @@ function templatingMain($, util, _peers, _windowing, session) {
         //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
         Templating.prototype.sub = function (templateId, variables) {
             var template = this.clone(templateId);
-            util.forEachAttr(variables, function (value, attr) {
+            util_1.util.forEachAttr(variables, function (value, attr) {
                 // FIXME: do the substitution... somehow?
                 var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
                 if (subs.length) {
@@ -79,11 +81,11 @@ function templatingMain($, util, _peers, _windowing, session) {
                 template.find(".togetherjs-ampm").text(ampm);
             }
             // FIXME: silly this is on session:
-            session.emit("new-element", template);
+            session_1.session.emit("new-element", template);
             return template;
         };
         return Templating;
     }());
-    return new Templating();
-}
-define(["jquery", "util", "peers", "windowing", "session"], templatingMain);
+    exports.templating = new Templating();
+});
+//define(["jquery", "util", "peers", "windowing", "session"], templatingMain);

@@ -1,13 +1,16 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*jshint evil:true */
-function chatMain(require, $, util, session, ui, templates, playback, storage, peers, windowing) {
-    var assert = util.assert;
+define(["require", "exports", "./peers", "./playback", "./session", "./storage", "./templates", "./types/togetherjs", "./ui", "./util", "./windowing"], function (require, exports, peers_1, playback_1, session_1, storage_1, templates_1, togetherjs_1, ui_1, util_1, windowing_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.chat = void 0;
+    //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
+    var assert = util_1.util.assert;
     var Walkabout;
-    session.hub.on("chat", function (msg) {
-        ui.chat.text({
+    session_1.session.hub.on("chat", function (msg) {
+        ui_1.ui.chat.text({
             text: msg.text,
             peer: msg.peer,
             // FIXME: a little unsure of trusting this (maybe I should prefix it?)
@@ -22,8 +25,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
         });
     });
     // FIXME: this doesn't really belong in this module:
-    session.hub.on("bye", function (msg) {
-        ui.chat.leftSession({
+    session_1.session.hub.on("bye", function (msg) {
+        ui_1.ui.chat.leftSession({
             peer: msg.peer,
             declinedJoin: msg.reason == "declined-join"
         });
@@ -41,28 +44,28 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                     return;
                 }
             }
-            var messageId = session.clientId + "-" + Date.now();
-            session.send({
+            var messageId = session_1.session.clientId + "-" + Date.now();
+            session_1.session.send({
                 type: "chat",
                 text: message,
                 messageId: messageId
             });
-            ui.chat.text({
+            ui_1.ui.chat.text({
                 text: message,
-                peer: peers.Self,
+                peer: peers_1.peers.Self,
                 messageId: messageId,
                 notify: false
             });
             saveChatMessage({
                 text: message,
                 date: Date.now(),
-                peerId: peers.Self.id,
+                peerId: peers_1.peers.Self.id,
                 messageId: messageId
             });
         };
         return Chat;
     }());
-    var chat = new Chat();
+    exports.chat = new Chat();
     var Commands = /** @class */ (function () {
         function Commands() {
             this._testCancel = null;
@@ -70,8 +73,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             this.playing = null;
         }
         Commands.prototype.command_help = function () {
-            var msg = util.trim(templates("help"));
-            ui.chat.system({
+            var msg = util_1.util.trim(templates_1.templates("help"));
+            ui_1.ui.chat.system({
                 text: msg
             });
         };
@@ -84,7 +87,7 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 });
                 return;
             }
-            var args = util.trim(argString || "").split(/\s+/g);
+            var args = util_1.util.trim(argString || "").split(/\s+/g);
             if (args[0] === "" || !args.length) {
                 if (this._testCancel) {
                     args = ["cancel"];
@@ -94,8 +97,8 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 }
             }
             if (args[0] == "cancel") {
-                util.assert(this._testCancel !== null);
-                ui.chat.system({
+                assert(this._testCancel !== null);
+                ui_1.ui.chat.system({
                     text: "Aborting test"
                 });
                 this._testCancel();
@@ -107,11 +110,11 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 if (isNaN(times) || !times) {
                     times = 100;
                 }
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Testing with walkabout.js"
                 });
-                var tmpl = $(templates("walkabout"));
-                var container = ui.container.find(".togetherjs-test-container");
+                var tmpl = $(templates_1.templates("walkabout"));
+                var container = ui_1.ui.container.find(".togetherjs-test-container");
                 container.empty();
                 container.append(tmpl);
                 container.show();
@@ -153,18 +156,18 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
             }
             if (args[0] == "describe") {
                 Walkabout.findActions().forEach(function (action) {
-                    ui.chat.system({
+                    ui_1.ui.chat.system({
                         text: action.description()
                     });
                 }, this);
                 return;
             }
-            ui.chat.system({
+            ui_1.ui.chat.system({
                 text: "Did not understand: " + args.join(" ")
             });
         };
         Commands.prototype.command_clear = function () {
-            ui.chat.clear();
+            ui_1.ui.chat.clear();
         };
         Commands.prototype.command_exec = function () {
             var expr = Array.prototype.slice.call(arguments).join(" ");
@@ -175,21 +178,21 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 result = e(expr);
             }
             catch (error) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Error: " + error
                 });
             }
             if (result !== undefined) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "" + result
                 });
             }
         };
         Commands.prototype.command_record = function () {
-            ui.chat.system({
+            ui_1.ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
-            window.open(session.recordUrl(), "_blank", "left,width=" + ($(window).width() / 2));
+            window.open(session_1.session.recordUrl(), "_blank", "left,width=" + ($(window).width() / 2));
         };
         Commands.prototype.command_playback = function (url) {
             var _this = this;
@@ -197,21 +200,21 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 this.playing.cancel();
                 this.playing.unload();
                 this.playing = null;
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "playback cancelled"
                 });
                 return;
             }
             if (!url) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Nothing is playing"
                 });
                 return;
             }
-            var logLoader = playback.getLogs(url);
+            var logLoader = playback_1.playback.getLogs(url);
             logLoader.then(function (logs) {
                 if (!logs) {
-                    ui.chat.system({
+                    ui_1.ui.chat.system({
                         text: "No logs found."
                     });
                     return;
@@ -220,42 +223,42 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 _this.playing = logs;
                 logs.play();
             }, function (error) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Error fetching " + url + ":\n" + JSON.stringify(error, null, "  ")
                 });
             });
-            windowing.hide("#togetherjs-chat");
+            windowing_1.windowing.hide("#togetherjs-chat");
         };
         Commands.prototype.command_savelogs = function (name) {
             if (name === void 0) { name = "default"; }
             document.createElement("a");
-            session.send({
+            session_1.session.send({
                 type: "get-logs",
-                forClient: session.clientId,
+                forClient: session_1.session.clientId,
                 saveAs: name
             });
             function save(msg) {
-                if (msg.request.forClient == session.clientId && msg.request.saveAs == name) {
-                    storage.set("recording." + name, msg.logs).then(function () {
-                        session.hub.off("logs", save);
-                        ui.chat.system({
+                if (msg.request.forClient == session_1.session.clientId && msg.request.saveAs == name) {
+                    storage_1.storage.set("recording." + name, msg.logs).then(function () {
+                        session_1.session.hub.off("logs", save);
+                        ui_1.ui.chat.system({
                             text: "Saved as local:" + name
                         });
                     });
                 }
             }
-            session.hub.on("logs", save);
+            session_1.session.hub.on("logs", save);
         };
         Commands.prototype.command_baseurl = function (url) {
             if (!url) {
-                storage.get("baseUrlOverride").then(function (b) {
+                storage_1.storage.get("baseUrlOverride").then(function (b) {
                     if (b) {
-                        ui.chat.system({
+                        ui_1.ui.chat.system({
                             text: "Set to: " + b.baseUrl
                         });
                     }
                     else {
-                        ui.chat.system({
+                        ui_1.ui.chat.system({
                             text: "No baseUrl override set"
                         });
                     }
@@ -263,36 +266,36 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 return;
             }
             url = url.replace(/\/*$/, "");
-            ui.chat.system({
+            ui_1.ui.chat.system({
                 text: "If this goes wrong, do this in the console to reset:\n  localStorage.setItem('togetherjs.baseUrlOverride', null)"
             });
-            storage.set("baseUrlOverride", {
+            storage_1.storage.set("baseUrlOverride", {
                 baseUrl: url,
                 expiresAt: Date.now() + (1000 * 60 * 60 * 24)
             }).then(function () {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "baseUrl overridden (to " + url + "), will last for one day."
                 });
             });
         };
         Commands.prototype.command_config = function (variable, value) {
             if (!(variable || value)) {
-                storage.get("configOverride").then(function (c) {
+                storage_1.storage.get("configOverride").then(function (c) {
                     if (c) {
-                        util.forEachAttr(c, function (value, attr) {
+                        util_1.util.forEachAttr(c, function (value, attr) {
                             if (attr == "expiresAt") {
                                 return;
                             }
-                            ui.chat.system({
+                            ui_1.ui.chat.system({
                                 text: "  " + attr + " = " + JSON.stringify(value)
                             });
                         });
-                        ui.chat.system({
+                        ui_1.ui.chat.system({
                             text: "Config expires at " + (new Date(c.expiresAt))
                         });
                     }
                     else {
-                        ui.chat.system({
+                        ui_1.ui.chat.system({
                             text: "No config override"
                         });
                     }
@@ -300,15 +303,15 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 return;
             }
             if (variable == "clear") {
-                storage.set("configOverride", undefined);
-                ui.chat.system({
+                storage_1.storage.set("configOverride", undefined);
+                ui_1.ui.chat.system({
                     text: "Clearing all overridden configuration"
                 });
                 return;
             }
             console.log("config", [variable, value]);
             if (!(variable && value)) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Error: must provide /config VAR VALUE"
                 });
                 return;
@@ -317,24 +320,24 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 value = JSON.parse(value);
             }
             catch (e) {
-                ui.chat.system({
+                ui_1.ui.chat.system({
                     text: "Error: value (" + value + ") could not be parsed: " + e
                 });
                 return;
             }
-            if (!TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
-                ui.chat.system({
+            if (!togetherjs_1.TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+                ui_1.ui.chat.system({
                     text: "Warning: variable " + variable + " is unknown"
                 });
             }
             // TODO find better types
-            storage.get("configOverride").then(function (c) {
+            storage_1.storage.get("configOverride").then(function (c) {
                 var expire = Date.now() + (1000 * 60 * 60 * 24);
                 c = c || { expiresAt: expire };
                 c[variable] = value;
                 c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
-                storage.set("configOverride", c).then(function () {
-                    ui.chat.system({
+                storage_1.storage.set("configOverride", c).then(function () {
+                    ui_1.ui.chat.system({
                         text: "Variable " + variable + " = " + JSON.stringify(value) + "\nValue will be set for one day."
                     });
                 });
@@ -362,26 +365,26 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
                 if (logs.length > maxLogMessages) {
                     logs.splice(0, logs.length - maxLogMessages);
                 }
-                storage.tab.set(chatStorageKey, logs);
+                storage_1.storage.tab.set(chatStorageKey, logs);
             }
         });
     }
     function loadChatLog() {
-        return storage.tab.get(chatStorageKey, []);
+        return storage_1.storage.tab.get(chatStorageKey, []);
     }
-    session.once("ui-ready", function () {
+    session_1.session.once("ui-ready", function () {
         loadChatLog().then(function (log) {
             if (!log) {
                 return;
             }
             for (var i = 0; i < log.length; i++) {
                 // peers should already be loaded from sessionStorage by the peers module
-                var currentPeer = peers.getPeer(log[i].peerId, undefined, true);
+                var currentPeer = peers_1.peers.getPeer(log[i].peerId, undefined, true);
                 if (!currentPeer) {
                     // sometimes peers go away
                     continue;
                 }
-                ui.chat.text({
+                ui_1.ui.chat.text({
                     text: log[i].text,
                     date: log[i].date,
                     peer: currentPeer,
@@ -391,9 +394,9 @@ function chatMain(require, $, util, session, ui, templates, playback, storage, p
         });
     });
     //delete chat log
-    session.on("close", function () {
-        storage.tab.set(chatStorageKey, undefined);
+    session_1.session.on("close", function () {
+        storage_1.storage.tab.set(chatStorageKey, undefined);
     });
-    return chat;
-}
-define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], chatMain);
+});
+//return chat;
+//define(["require", "jquery", "util", "session", "ui", "templates", "playback", "storage", "peers", "windowing"], chatMain);

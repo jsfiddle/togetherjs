@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,8 +16,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function peersMain(util, session, storage, require, templates) {
-    var assert = util.assert;
+define(["require", "exports", "./session", "./storage", "./templates", "./types/togetherjs", "./util"], function (require, exports, session_1, storage_1, templates_1, togetherjs_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.peers = void 0;
+    //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
+    var assert = util_1.util.assert;
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
     var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
     var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
@@ -27,7 +30,7 @@ function peersMain(util, session, storage, require, templates) {
     require(["ui"], function (uiModule) {
         ui = uiModule;
     });
-    var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
+    var DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
     var PeerClass = /** @class */ (function () {
         function PeerClass(id, attrs) {
             if (attrs === void 0) { attrs = {}; }
@@ -54,7 +57,7 @@ function peersMain(util, session, storage, require, templates) {
                     joined = true;
                 }
             }
-            peers.emit("new-peer", this);
+            exports.peers.emit("new-peer", this);
             if (joined) {
                 this.view.notifyJoined();
             }
@@ -122,7 +125,7 @@ function peersMain(util, session, storage, require, templates) {
                 identityUpdated = true;
             }
             if ("avatar" in msg && msg.avatar && msg.avatar != this.avatar) {
-                util.assertValidUrl(msg.avatar);
+                util_1.util.assertValidUrl(msg.avatar);
                 this.avatar = msg.avatar;
                 identityUpdated = true;
             }
@@ -135,24 +138,24 @@ function peersMain(util, session, storage, require, templates) {
             }
             if (this.status != "live") {
                 this.status = "live";
-                peers.emit("status-updated", this);
+                exports.peers.emit("status-updated", this);
             }
             if (this.idle != "active") {
                 this.idle = "active";
-                peers.emit("idle-updated", this);
+                exports.peers.emit("idle-updated", this);
             }
             if ("rtcSupported" in msg && msg.rtcSupported) {
-                peers.emit("rtc-supported", this);
+                exports.peers.emit("rtc-supported", this);
             }
             if (urlUpdated) {
-                peers.emit("url-updated", this);
+                exports.peers.emit("url-updated", this);
             }
             if (identityUpdated) {
-                peers.emit("identity-updated", this);
+                exports.peers.emit("identity-updated", this);
             }
             // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
             if (this.following) {
-                session.emit("follow-peer", this);
+                session_1.session.emit("follow-peer", this);
             }
         };
         PeerClass.prototype.update = function (attrs) {
@@ -167,24 +170,24 @@ function peersMain(util, session, storage, require, templates) {
         };
         PeerClass.prototype.className = function (prefix) {
             if (prefix === void 0) { prefix = ""; }
-            return prefix + util.safeClassName(this.id);
+            return prefix + util_1.util.safeClassName(this.id);
         };
         PeerClass.prototype.bye = function () {
             if (this.status != "bye") {
                 this.status = "bye";
-                peers.emit("status-updated", this);
+                exports.peers.emit("status-updated", this);
             }
             this.view.update();
         };
         PeerClass.prototype.unbye = function () {
             if (this.status == "bye") {
                 this.status = "live";
-                peers.emit("status-updated", this);
+                exports.peers.emit("status-updated", this);
             }
             this.view.update();
         };
         PeerClass.prototype.nudge = function () {
-            session.send({
+            session_1.session.send({
                 type: "url-change-nudge",
                 url: location.href,
                 to: this.id
@@ -194,7 +197,7 @@ function peersMain(util, session, storage, require, templates) {
             if (this.following) {
                 return;
             }
-            peers.getAllPeers().forEach(function (p) {
+            exports.peers.getAllPeers().forEach(function (p) {
                 if (p.following) {
                     p.unfollow();
                 }
@@ -203,7 +206,7 @@ function peersMain(util, session, storage, require, templates) {
             // We have to make sure we remember this, even if we change URLs:
             storeSerialization();
             this.view.update();
-            session.emit("follow-peer", this);
+            session_1.session.emit("follow-peer", this);
         };
         PeerClass.prototype.unfollow = function () {
             this.following = false;
@@ -220,8 +223,8 @@ function peersMain(util, session, storage, require, templates) {
     }());
     var Peer = PeerClass;
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
-    session.on("follow-peer", function (peer) {
-        if (peer.url && peer.url != session.currentUrl()) {
+    session_1.session.on("follow-peer", function (peer) {
+        if (peer.url && peer.url != session_1.session.currentUrl()) {
             var url = peer.url;
             if (peer.urlHash) {
                 url += peer.urlHash;
@@ -234,16 +237,16 @@ function peersMain(util, session, storage, require, templates) {
         function PeersSelf() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.isSelf = true;
-            _this.id = session.clientId;
-            _this.identityId = session.identityId;
+            _this.id = session_1.session.clientId;
+            _this.identityId = session_1.session.identityId;
             _this.status = "live";
             _this.idle = "active";
             _this.name = null;
             _this.avatar = null;
             _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
-            _this.defaultName = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
+            _this.defaultName = util_1.util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
             // private loaded = false;// TODO unused
-            _this.isCreator = !session.isClient;
+            _this.isCreator = !session_1.session.isClient;
             return _this;
         }
         PeersSelf.prototype.update = function (attrs) {
@@ -254,16 +257,16 @@ function peersMain(util, session, storage, require, templates) {
                 this.name = attrs.name;
                 updateMsg.name = this.name;
                 if (!attrs.fromLoad) {
-                    storage.settings.set("name", this.name);
+                    storage_1.storage.settings.set("name", this.name);
                     updatePeers = true;
                 }
             }
             if (attrs.avatar && attrs.avatar != this.avatar) {
-                util.assertValidUrl(attrs.avatar);
+                util_1.util.assertValidUrl(attrs.avatar);
                 this.avatar = attrs.avatar;
                 updateMsg.avatar = this.avatar;
                 if (!attrs.fromLoad) {
-                    storage.settings.set("avatar", this.avatar);
+                    storage_1.storage.settings.set("avatar", this.avatar);
                     updatePeers = true;
                 }
             }
@@ -271,33 +274,33 @@ function peersMain(util, session, storage, require, templates) {
                 this.color = attrs.color;
                 updateMsg.color = this.color;
                 if (!attrs.fromLoad) {
-                    storage.settings.set("color", this.color);
+                    storage_1.storage.settings.set("color", this.color);
                     updatePeers = true;
                 }
             }
             if (attrs.defaultName && attrs.defaultName != this.defaultName) {
                 this.defaultName = attrs.defaultName;
                 if (!attrs.fromLoad) {
-                    storage.settings.set("defaultName", this.defaultName);
+                    storage_1.storage.settings.set("defaultName", this.defaultName);
                     updatePeers = true;
                 }
             }
             if (attrs.status && attrs.status != this.status) {
                 this.status = attrs.status;
-                peers.emit("status-updated", this);
+                exports.peers.emit("status-updated", this);
             }
             if (attrs.idle && attrs.idle != this.idle) {
                 this.idle = attrs.idle;
                 updateIdle = true;
-                peers.emit("idle-updated", this);
+                exports.peers.emit("idle-updated", this);
             }
             this.view.update();
             if (updatePeers && !attrs.fromLoad) {
-                session.emit("self-updated");
-                session.send(updateMsg);
+                session_1.session.emit("self-updated");
+                session_1.session.send(updateMsg);
             }
             if (updateIdle && !attrs.fromLoad) {
-                session.send({
+                session_1.session.send({
                     type: "idle-status",
                     idle: this.idle
                 });
@@ -309,16 +312,16 @@ function peersMain(util, session, storage, require, templates) {
         };
         PeersSelf.prototype._loadFromSettings = function () {
             var _this = this;
-            return util.resolveMany([
-                storage.settings.get("name"),
-                storage.settings.get("avatar"),
-                storage.settings.get("defaultName"),
-                storage.settings.get("color")
+            return util_1.util.resolveMany([
+                storage_1.storage.settings.get("name"),
+                storage_1.storage.settings.get("avatar"),
+                storage_1.storage.settings.get("defaultName"),
+                storage_1.storage.settings.get("color")
             ]).then(function (args) {
                 var _a = args, name = _a[0], avatar = _a[1], defaultName = _a[2], color = _a[3]; // TODO !
                 if (!defaultName) {
-                    defaultName = util.pickRandom(DEFAULT_NICKNAMES);
-                    storage.settings.set("defaultName", defaultName);
+                    defaultName = util_1.util.pickRandom(DEFAULT_NICKNAMES);
+                    storage_1.storage.settings.set("defaultName", defaultName);
                 }
                 if (!color) {
                     color = Math.floor(Math.random() * 0xffffff).toString(16);
@@ -326,10 +329,10 @@ function peersMain(util, session, storage, require, templates) {
                         color = "0" + color;
                     }
                     color = "#" + color;
-                    storage.settings.set("color", color);
+                    storage_1.storage.settings.set("color", color);
                 }
                 if (!avatar) {
-                    avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
+                    avatar = togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
                 }
                 _this.update({
                     name: name,
@@ -338,15 +341,15 @@ function peersMain(util, session, storage, require, templates) {
                     color: color,
                     fromLoad: true
                 });
-                peers._SelfLoaded.resolve();
+                exports.peers._SelfLoaded.resolve();
             }); // FIXME: ignoring error
         };
         PeersSelf.prototype._loadFromApp = function () {
             // FIXME: I wonder if these should be optionally functions?
             // We could test typeof==function to distinguish between a getter and a concrete value
-            var getUserName = TogetherJS.config.get("getUserName");
-            var getUserColor = TogetherJS.config.get("getUserColor");
-            var getUserAvatar = TogetherJS.config.get("getUserAvatar");
+            var getUserName = togetherjs_1.TogetherJS.config.get("getUserName");
+            var getUserColor = togetherjs_1.TogetherJS.config.get("getUserColor");
+            var getUserAvatar = togetherjs_1.TogetherJS.config.get("getUserAvatar");
             var name = null;
             var color = null;
             var avatar = null;
@@ -398,20 +401,20 @@ function peersMain(util, session, storage, require, templates) {
             }
         };
         return PeersSelf;
-    }(OnClass));
+    }(util_1.OnClass));
     var Peers = /** @class */ (function (_super) {
         __extends(Peers, _super);
         function Peers() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._SelfLoaded = util.Deferred();
+            _this._SelfLoaded = util_1.util.Deferred();
             return _this;
         }
         Peers.prototype.getPeer = function (id, message, ignoreMissing) {
             if (ignoreMissing === void 0) { ignoreMissing = false; }
             assert(id);
             var peer = Peer.peers[id];
-            if (id === session.clientId) {
-                return peers.Self;
+            if (id === session_1.session.clientId) {
+                return exports.peers.Self;
             }
             if (message && !peer) {
                 peer = new Peer(id, { fromHelloMessage: message });
@@ -430,7 +433,7 @@ function peersMain(util, session, storage, require, templates) {
         Peers.prototype.getAllPeers = function (liveOnly) {
             if (liveOnly === void 0) { liveOnly = false; }
             var result = [];
-            util.forEachAttr(Peer.peers, function (peer) {
+            util_1.util.forEachAttr(Peer.peers, function (peer) {
                 if (liveOnly && peer.status != "live") {
                     return;
                 }
@@ -439,36 +442,36 @@ function peersMain(util, session, storage, require, templates) {
             return result;
         };
         return Peers;
-    }(OnClass));
-    var peers = new Peers();
-    session.on("start", function () {
-        if (peers.Self) {
+    }(util_1.OnClass));
+    exports.peers = new Peers();
+    session_1.session.on("start", function () {
+        if (exports.peers.Self) {
             return;
         }
         /* Same interface as Peer, represents oneself (local user): */
         // peer.Self init
-        peers.Self = new PeersSelf();
-        peers.Self.view = ui.PeerSelfView(peers.Self);
-        storage.tab.get("peerCache").then(deserialize);
-        peers.Self._loadFromSettings().then(function () {
-            peers.Self._loadFromApp();
-            peers.Self.view.update();
-            session.emit("self-updated");
+        exports.peers.Self = new PeersSelf();
+        exports.peers.Self.view = ui.PeerSelfView(exports.peers.Self);
+        storage_1.storage.tab.get("peerCache").then(deserialize);
+        exports.peers.Self._loadFromSettings().then(function () {
+            exports.peers.Self._loadFromApp();
+            exports.peers.Self.view.update();
+            session_1.session.emit("self-updated");
         });
     });
-    session.on("refresh-user-data", function () {
-        if (peers.Self) {
-            peers.Self._loadFromApp();
+    session_1.session.on("refresh-user-data", function () {
+        if (exports.peers.Self) {
+            exports.peers.Self._loadFromApp();
         }
     });
-    TogetherJS.config.track("getUserName", TogetherJS.config.track("getUserColor", TogetherJS.config.track("getUserAvatar", function () {
-        if (peers.Self) {
-            peers.Self._loadFromApp();
+    togetherjs_1.TogetherJS.config.track("getUserName", togetherjs_1.TogetherJS.config.track("getUserColor", togetherjs_1.TogetherJS.config.track("getUserAvatar", function () {
+        if (exports.peers.Self) {
+            exports.peers.Self._loadFromApp();
         }
     })));
     function serialize() {
         var peers = [];
-        util.forEachAttr(Peer.peers, function (peer) {
+        util_1.util.forEachAttr(Peer.peers, function (peer) {
             peers.push(peer.serialize());
         });
         return { peers: peers };
@@ -482,7 +485,7 @@ function peersMain(util, session, storage, require, templates) {
         });
     }
     function checkActivity() {
-        var ps = peers.getAllPeers();
+        var ps = exports.peers.getAllPeers();
         var now = Date.now();
         ps.forEach(function (p) {
             if (p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
@@ -493,66 +496,66 @@ function peersMain(util, session, storage, require, templates) {
             }
         });
     }
-    session.hub.on("bye", function (msg) {
-        var peer = peers.getPeer(msg.clientId);
+    session_1.session.hub.on("bye", function (msg) {
+        var peer = exports.peers.getPeer(msg.clientId);
         peer.bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
     });
     var checkActivityTask = null;
-    session.on("start", function () {
+    session_1.session.on("start", function () {
         if (checkActivityTask) {
             console.warn("Old peers checkActivityTask left over?");
             clearTimeout(checkActivityTask);
         }
         checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
     });
-    session.on("close", function () {
-        util.forEachAttr(Peer.peers, function (peer) {
+    session_1.session.on("close", function () {
+        util_1.util.forEachAttr(Peer.peers, function (peer) {
             peer.destroy();
         });
-        storage.tab.set("peerCache", undefined);
+        storage_1.storage.tab.set("peerCache", undefined);
         if (checkActivityTask !== null) {
             clearTimeout(checkActivityTask);
         }
         checkActivityTask = null;
     });
     var tabIdleTimeout = null;
-    session.on("visibility-change", function (hidden) {
+    session_1.session.on("visibility-change", function (hidden) {
         if (hidden) {
             if (tabIdleTimeout) {
                 clearTimeout(tabIdleTimeout);
             }
             tabIdleTimeout = setTimeout(function () {
-                peers.Self.update({ idle: "inactive" });
+                exports.peers.Self.update({ idle: "inactive" });
             }, TAB_IDLE_TIME);
         }
         else {
             if (tabIdleTimeout) {
                 clearTimeout(tabIdleTimeout);
             }
-            if (peers.Self.idle == "inactive") {
-                peers.Self.update({ idle: "active" });
+            if (exports.peers.Self.idle == "inactive") {
+                exports.peers.Self.update({ idle: "active" });
             }
         }
     });
-    session.hub.on("idle-status", function (msg) {
+    session_1.session.hub.on("idle-status", function (msg) {
         msg.peer.update({ idle: msg.idle });
     });
     // Pings are a straight alive check, and contain no more information:
-    session.hub.on("ping", function () {
-        session.send({ type: "ping-back" });
+    session_1.session.hub.on("ping", function () {
+        session_1.session.send({ type: "ping-back" });
     });
     window.addEventListener("pagehide", function () {
         // FIXME: not certain if this should be tab local or not:
         storeSerialization();
     }, false);
     function storeSerialization() {
-        storage.tab.set("peerCache", serialize());
+        storage_1.storage.tab.set("peerCache", serialize());
     }
-    util.testExpose({
+    util_1.util.testExpose({
         setIdleTime: function (time) {
             IDLE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = time / 2;
-            if (TogetherJS.running) {
+            if (togetherjs_1.TogetherJS.running) {
                 if (checkActivityTask !== null) {
                     clearTimeout(checkActivityTask);
                 }
@@ -560,11 +563,11 @@ function peersMain(util, session, storage, require, templates) {
             }
         }
     });
-    util.testExpose({
+    util_1.util.testExpose({
         setByeTime: function (time) {
             BYE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
-            if (TogetherJS.running) {
+            if (togetherjs_1.TogetherJS.running) {
                 if (checkActivityTask !== null) {
                     clearTimeout(checkActivityTask);
                 }
@@ -572,6 +575,6 @@ function peersMain(util, session, storage, require, templates) {
             }
         }
     });
-    return peers;
-}
-define(["util", "session", "storage", "require", "templates"], peersMain);
+});
+//return peers;
+//define(["util", "session", "storage", "require", "templates"], peersMain);

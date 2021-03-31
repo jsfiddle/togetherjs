@@ -1,9 +1,12 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function recorderMain($, util, channels) {
-    var assert = util.assert;
+define(["require", "exports", "./channels", "./types/togetherjs", "./util"], function (require, exports, channels_1, togetherjs_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.recorder = void 0;
+    //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
+    var assert = util_1.util.assert;
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var clientId = "recorder";
     function display(elOrSelector) {
@@ -20,7 +23,7 @@ function recorderMain($, util, channels) {
                 type: "hello-back",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -34,7 +37,7 @@ function recorderMain($, util, channels) {
                 type: "hello",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -70,7 +73,7 @@ function recorderMain($, util, channels) {
             var _this = this;
             var _a;
             var match;
-            this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
+            this.shareId = (_a = togetherjs_1.TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
             if (!this.shareId) {
                 match = /\&togetherjs=([^&]+)/.exec(location.hash);
                 if (!match) {
@@ -87,7 +90,7 @@ function recorderMain($, util, channels) {
             }
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
-            channel = channels.WebSocketChannel(url);
+            channel = channels_1.channels.WebSocketChannel(url);
             channel.onmessage = function (msg) {
                 if (msg.type == "hello-back") {
                     display("#connected");
@@ -116,6 +119,6 @@ function recorderMain($, util, channels) {
             clientId: clientId
         });
     });
-    return new Recorder();
-}
-define(["jquery", "util", "channels"], recorderMain);
+    exports.recorder = new Recorder();
+});
+//define(["jquery", "util", "channels"], recorderMain);

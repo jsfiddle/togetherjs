@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -7,7 +6,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-function consoleMain(util) {
+define(["require", "exports", "./types/togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.appConsole = void 0;
+    //function consoleMain(util: TogetherJSNS.Util) {
     var console = window.console || { log: function () { } };
     var Console = /** @class */ (function () {
         function Console() {
@@ -34,10 +37,10 @@ function consoleMain(util) {
                 "error" in console ? console.error : [],
                 "fatal" in console ? console.fatal : []
             ];
-            util.forEachAttr(Console.levels, function (value, _name) {
+            util_1.util.forEachAttr(Console.levels, function (value, _name) {
                 _this.maxLevel = Math.max(_this.maxLevel, value);
             });
-            util.forEachAttr(Console.levels, function (value, name) {
+            util_1.util.forEachAttr(Console.levels, function (value, name) {
                 _this.levelNames[value] = name;
             });
         }
@@ -126,10 +129,10 @@ function consoleMain(util) {
         Console.prototype._browserInfo = function () {
             // FIXME: add TogetherJS version and
             return [
-                "TogetherJS base URL: " + TogetherJS.baseUrl,
+                "TogetherJS base URL: " + togetherjs_1.TogetherJS.baseUrl,
                 "User Agent: " + navigator.userAgent,
-                "Page loaded: " + this._formatDate(TogetherJS.pageLoaded),
-                "Age: " + this._formatMinutes(Date.now() - TogetherJS.pageLoaded) + " minutes",
+                "Page loaded: " + this._formatDate(togetherjs_1.TogetherJS.pageLoaded),
+                "Age: " + this._formatMinutes(Date.now() - togetherjs_1.TogetherJS.pageLoaded) + " minutes",
                 // FIXME: make this right:
                 //"Window: height: " + window.screen.height + " width: " + window.screen.width
                 "URL: " + location.href,
@@ -175,7 +178,7 @@ function consoleMain(util) {
             return (new Date(timestamp)).toISOString();
         };
         Console.prototype._formatTime = function (timestamp) {
-            return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
+            return ((timestamp - togetherjs_1.TogetherJS.pageLoaded) / 1000).toFixed(2);
         };
         Console.prototype._formatMinutes = function (milliseconds) {
             var m = Math.floor(milliseconds / 1000 / 60);
@@ -218,8 +221,8 @@ function consoleMain(util) {
         Console.prototype.submit = function (options) {
             if (options === void 0) { options = {}; }
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util.Deferred(function () {
-                var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
+            return util_1.util.Deferred(function () {
+                var site = options.site || togetherjs_1.TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
                 req.setRequestHeader("Content-Type", "application/json");
@@ -291,7 +294,7 @@ function consoleMain(util) {
             this.write.apply(this, a);
         };
     }
-    var appConsole = new Console();
-    return appConsole;
-}
-define(["util"], consoleMain);
+    exports.appConsole = new Console();
+});
+//return appConsole;
+//define(["util"], consoleMain);

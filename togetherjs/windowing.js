@@ -1,15 +1,18 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function windowingMain($, util, _peers, session) {
-    var assert = util.assert;
+define(["require", "exports", "./session", "./util"], function (require, exports, session_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.windowing = void 0;
+    //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+    var assert = util_1.util.assert;
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
     var ANIMATION_DURATION = 1000;
     var onClose = null;
     /* Displays one window.  A window must already exist.  This hides other windows, and
-       positions the window according to its data-bound-to attributes */
+        positions the window according to its data-bound-to attributes */
     var Windowing = /** @class */ (function () {
         function Windowing() {
         }
@@ -43,7 +46,7 @@ function windowingMain($, util, _peers, session) {
                 modalEscape.bind();
             }
             onClose = options.onClose || null;
-            session.emit("display-window", element.attr("id"), element);
+            session_1.session.emit("display-window", element.attr("id"), element);
         };
         Windowing.prototype.hide = function (selector) {
             if (selector === void 0) { selector = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification"; }
@@ -79,7 +82,7 @@ function windowingMain($, util, _peers, session) {
                 onClose = null;
             }
             if (windows.length) {
-                session.emit("hide-window", windows);
+                session_1.session.emit("hide-window", windows);
             }
         };
         Windowing.prototype.toggle = function (el) {
@@ -93,9 +96,9 @@ function windowingMain($, util, _peers, session) {
         };
         return Windowing;
     }());
-    var windowing = new Windowing();
+    exports.windowing = new Windowing();
     /* Moves a window to be attached to data-bind-to, e.g., the button
-       that opened the window. Or you can provide an element that it should bind to. */
+        that opened the window. Or you can provide an element that it should bind to. */
     function bind(window, bound) {
         if ($.browser.mobile) {
             return;
@@ -157,7 +160,7 @@ function windowingMain($, util, _peers, session) {
         win.data("boundTo", bound.selector || "#" + bound.attr("id"));
         bound.addClass("togetherjs-active");
     }
-    session.on("resize", function () {
+    session_1.session.on("resize", function () {
         var win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
         if (!win.length) {
             return;
@@ -172,7 +175,7 @@ function windowingMain($, util, _peers, session) {
     function bindEvents(el) {
         el.find(".togetherjs-close, .togetherjs-dismiss").click(function (event) {
             var w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
-            windowing.hide(w);
+            exports.windowing.hide(w);
             event.stopPropagation();
             return false;
         });
@@ -186,7 +189,7 @@ function windowingMain($, util, _peers, session) {
         assert(background.length);
         getModalBackgroundElement = background;
         background.click(function () {
-            windowing.hide();
+            exports.windowing.hide();
         });
         return background;
     }
@@ -201,19 +204,19 @@ function windowingMain($, util, _peers, session) {
         };
         ModalEscape.prototype.onKeydown = function (event) {
             if (event.which == 27) {
-                windowing.hide();
+                exports.windowing.hide();
             }
         };
         return ModalEscape;
     }());
     ;
     var modalEscape = new ModalEscape();
-    session.on("close", function () {
+    session_1.session.on("close", function () {
         modalEscape.unbind();
     });
-    session.on("new-element", function (el) {
+    session_1.session.on("new-element", function (el) {
         bindEvents(el);
     });
-    return windowing;
-}
-define(["jquery", "util", "peers", "session"], windowingMain);
+});
+//return windowing;
+//define(["jquery", "util", "peers", "session"], windowingMain);

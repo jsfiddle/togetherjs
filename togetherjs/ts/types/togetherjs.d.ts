@@ -1,4 +1,29 @@
-declare namespace TogetherJSNS {
+import "linkify";
+import { linkify } from "linkify";
+import { analytics } from "../analytics";
+import { channels } from "../channels";
+import { chat } from "../chat";
+import { appConsole } from "../console";
+import { elementFinder } from "../elementFinder";
+import { eventMaker } from "../eventMaker";
+import { forms } from "../forms";
+import { ot } from "../ot";
+import { peers } from "../peers";
+import { playback } from "../playback";
+import { randomutil } from "../randomutil";
+import { session } from "../session";
+import { storage } from "../storage";
+import { templates } from "../templates";
+import { templating } from "../templating";
+import { togetherjsMain } from "../togetherjs";
+import { ui } from "../ui";
+import { OnClass, util } from "../util";
+import { visibilityApi } from "../visibilityApi";
+import { walkthrough } from "../walkthrough";
+import { who } from "../who";
+import { windowing } from "../windowing";
+
+export declare namespace TogetherJSNS {
     // Utility types
     type ValueOf<T> = T[keyof T];
 
@@ -545,41 +570,41 @@ declare namespace TogetherJSNS {
         }
     }
 
-    type Channels = ReturnType<typeof channelsMain>;
-    type Storage = ReturnType<typeof StorageMain>;
-    type Session = ReturnType<typeof sessionMain>;
-    type Templates = ReturnType<typeof templatesMain>;
-    type Peers = ReturnType<typeof peersMain>;
-    type Windowing = ReturnType<typeof windowingMain>;
-    type Templating = ReturnType<typeof templatingMain>;
-    type Ot = ReturnType<typeof otMain>;
-    type Linkify = ReturnType<typeof linkifyMain>;
-    type VisibilityApi = ReturnType<typeof visibilityApiMain>;
-    type Playback = ReturnType<typeof playbackMain>;
-    type Chat = ReturnType<typeof chatMain>;
-    type Ui = ReturnType<typeof uiMain>;
-    type Who = ReturnType<typeof whoMain>;
-    type Console = ReturnType<typeof consoleMain>;
+    type Channels = typeof channels;//ReturnType<typeof channelsMain>;
+    type Storage = typeof storage; //ReturnType<typeof StorageMain>;
+    type Session = typeof session;//ReturnType<typeof sessionMain>;
+    type Templates = typeof templates;//ReturnType<typeof templatesMain>;
+    type Peers = typeof peers;//ReturnType<typeof peersMain>;
+    type Windowing = typeof windowing;//ReturnType<typeof windowingMain>;
+    type Templating = typeof templating; //ReturnType<typeof templatingMain>;
+    type Ot = typeof ot;//ReturnType<typeof otMain>;
+    type Linkify = typeof linkify;//ReturnType<typeof linkifyMain>;
+    type VisibilityApi = typeof visibilityApi;//ReturnType<typeof visibilityApiMain>;
+    type Playback = typeof playback;//ReturnType<typeof playbackMain>;
+    type Chat = typeof chat;//ReturnType<typeof chatMain>;
+    type Ui = typeof ui;//ReturnType<typeof uiMain>;
+    type Who = typeof who;//ReturnType<typeof whoMain>;
+    type Console = typeof appConsole;//ReturnType<typeof consoleMain>;
     type TogetherJSClass = ReturnType<typeof togetherjsMain>;
     type On = OnClass;
     type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
-    type Walkabout = WalkaboutModule;
-    type Util = ReturnType<typeof utilMain>;
+    type Walkabout = WalkaboutModule;//WalkaboutModule;
+    type Util = typeof util;//ReturnType<typeof utilMain>;
     type PeerView = ReturnType<Ui["PeerView"]>;
-    type PeerSelfView = ReturnType<Ui["PeerSelfView"]>;
-    type Walkthrough = ReturnType<typeof walkthroughMain>;
-    type Analytics = ReturnType<typeof analyticsMain>;
+    type PeerSelfView = ReturnType<Ui["PeerSelfView"]>;//ReturnType<Ui["PeerSelfView"]>;
+    type Walkthrough = typeof walkthrough;//ReturnType<typeof walkthroughMain>;
+    type Analytics = typeof analytics;//ReturnType<typeof analyticsMain>;
     type ExternalPeer = Who["ExternalPeerExport"];
     type PeerClass = Peers["PeerClassExport"];
     type Logs = Playback["LogsExport"];
     type PeerSelf = Peers["Self"];
-    type TrackerClass = ReturnType<typeof formsMain>["trackerClassExport"];
-    type TextReplace = ReturnType<typeof otMain>["TextReplaceExport"];
-    type Randomizer = ReturnType<ReturnType<typeof randomutilMain>>;
-    type SimpleHistory = ReturnType<typeof otMain>["SimpleHistoryExport"];
+    type TrackerClass = typeof forms.trackerClassExport;//ReturnType<typeof formsMain>["trackerClassExport"];
+    type TextReplace = typeof ot.TextReplaceExport;//ReturnType<typeof otMain>["TextReplaceExport"];
+    type Randomizer = typeof randomutil;//ReturnType<ReturnType<typeof randomutilMain>>;
+    type SimpleHistory = typeof ot.SimpleHistoryExport;//ReturnType<typeof otMain>["SimpleHistoryExport"];
     type TogetherJS = ReturnType<typeof togetherjsMain>;
-    type EventMaker = ReturnType<typeof eventMakerMain>;
-    type ElementFinder = ReturnType<typeof elementFinderMain>;
+    type EventMaker = typeof eventMaker;//ReturnType<typeof eventMakerMain>;
+    type ElementFinder = typeof elementFinder;//ReturnType<typeof elementFinderMain>;
 
     type AnyPeer = PeerSelf | PeerClass | ExternalPeer | SerializedPeer;
 
@@ -890,55 +915,154 @@ declare namespace TogetherJSNS {
             documentHeight: number
         }
     }
+
+    interface IdleAndStatus {
+        status: TogetherJSNS.PeerStatus;
+        idle: TogetherJSNS.PeerStatus;
+    }
+    
+    interface PeerClassAttributes {
+        avatar: string | null;
+        color: string;
+        following: boolean;
+        fromHelloMessage: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapInTransit>;
+        fromStorage?: boolean;
+        id: string;
+        identityId: string;
+        idle: TogetherJSNS.PeerStatus;
+        joined: boolean;
+        lastMessageDate: number;
+        name: string;
+        status: TogetherJSNS.PeerStatus;
+    }
+    
+    interface PeerSelfAttributes {
+        name: string,
+        avatar: string,
+        defaultName: string,
+        color: string,
+        fromLoad: boolean,
+        status: TogetherJSNS.PeerStatus,
+        idle: TogetherJSNS.PeerStatus,
+    }
+    
+    interface SerializedPeer {
+        avatar: string | null,
+        color: string,
+        following: boolean;
+        hash: string | null;
+        id: string;
+        identityId: string | undefined;
+        idle: TogetherJSNS.PeerStatus;
+        name?: string,
+        rtcSupported?: boolean,
+        status: TogetherJSNS.PeerStatus;
+        title: string | null;
+        url: string | undefined;
+        fromStorage?: boolean;
+    }
+
+    interface ExternalPeerAttributes {
+        identityId?: string;
+        status?: TogetherJSNS.PeerStatus;
+        name: string;
+        avatar: string;
+        color: string;
+        clientId: string; // TODO is it the same thing as identityId?
+    }
+
+    interface Change2 {
+        id: string,
+        delta: TogetherJSNS.TextReplace,
+        basis?: number,
+        sent?: boolean,
+    }
+    
+    interface Change2Mandatory {
+        id: string,
+        delta: TogetherJSNS.TextReplace,
+        basis: number,
+        sent: boolean,
+    }
+
+    interface Template {
+        interface?: string;
+        walkthrough?: string;
+        names?: string;
+        help?: string;
+        walkabout?: string;
+    }
+
+
+interface MediaConstraintsMandatory {
+    OfferToReceiveAudio: boolean,
+    OfferToReceiveVideo: boolean,
+    MozDontOfferDataChannel?: boolean,
+}
 }
 
-interface Window {
-    TogetherJSConfig: TogetherJSNS.Config;
-    TogetherJSConfig_baseUrl?: string;
-    TogetherJS: TogetherJSNS.TogetherJS;
-    TowTruckConfig?: TogetherJSNS.Config;
-    TogetherJSConfig_noAutoStart?: boolean;
-    TogetherJSConfig_callToStart?: TogetherJSNS.CallToStart;
-    TowTruckConfig_callToStart?: TogetherJSNS.CallToStart;
-    _TogetherJSBookmarklet: unknown;
-    //require?: RequireConfig;
-    _TogetherJSShareId?: string;
-    TogetherJSConfig_autoStart?: boolean;
-    TogetherJSConfig_enableShortcut?: boolean;
-    TowTruck: TogetherJSNS.TogetherJS;
-    TogetherJSTestSpy?: { [k: string]: unknown };
-    _gaq?: [string, string?][];
-}
-
-interface EventHtmlElement extends Event {
+export interface EventHtmlElement extends Event {
     target: HTMLElement | null;
 }
 
-// Only in ES6 apparently
-interface Function {
-    name: string;
-}
+export var TogetherJS: TogetherJSNS.TogetherJS;
+export var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
 
-declare var TogetherJS: TogetherJSNS.TogetherJS;
-declare var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
+declare global {
 
-interface Navigator {
-    /** @deprecated */
-    mozGetUserMedia?: Navigator["getUserMedia"];
-    /** @deprecated */
-    webkitGetUserMedia?: Navigator["getUserMedia"];
-    /** @deprecated */
-    msGetUserMedia?: Navigator["getUserMedia"];
-}
+    interface Window {
+        TogetherJSConfig: TogetherJSNS.Config;
+        TogetherJSConfig_baseUrl?: string;
+        TogetherJS: TogetherJSNS.TogetherJS;
+        TowTruckConfig?: TogetherJSNS.Config;
+        TogetherJSConfig_noAutoStart?: boolean;
+        TogetherJSConfig_callToStart?: TogetherJSNS.CallToStart;
+        TowTruckConfig_callToStart?: TogetherJSNS.CallToStart;
+        _TogetherJSBookmarklet: unknown;
+        //require?: RequireConfig;
+        _TogetherJSShareId?: string;
+        TogetherJSConfig_autoStart?: boolean;
+        TogetherJSConfig_enableShortcut?: boolean;
+        TowTruck: TogetherJSNS.TogetherJS;
+        TogetherJSTestSpy?: { [k: string]: unknown };
+        _gaq?: [string, string?][];
+        CKEDITOR: typeof CKEDITOR;
+        tinymce: typeof tinymce;
+        onYouTubeIframeAPIReady: typeof onYouTubeIframeAPIReady;
+    }
 
-interface Require {
-    s?: {
-        contexts?: {
-            togetherjs?: never;
+    var CKEDITOR: TogetherJSNS.CKEditor | undefined;
+    var tinymce: TogetherJSNS.Tinymce | undefined;
+
+    // Only in ES6 apparently
+    interface Function {
+        name: string;
+    }
+
+    interface Navigator {
+        /** @deprecated */
+        mozGetUserMedia?: Navigator["getUserMedia"];
+        /** @deprecated */
+        webkitGetUserMedia?: Navigator["getUserMedia"];
+        /** @deprecated */
+        msGetUserMedia?: Navigator["getUserMedia"];
+    }
+
+    interface Require {
+        s?: {
+            contexts?: {
+                togetherjs?: never;
+            }
         }
     }
-}
 
-// TODO the code using this in ui.ts should probably be removed since it does not work
-type MozActivity = any;
-declare var MozActivity: MozActivity;
+    interface Document {
+        mozHidden?: boolean;
+        msHidden?: boolean;
+        webkitHidden?: boolean;
+    }
+
+    // TODO the code using this in ui.ts should probably be removed since it does not work
+    type MozActivity = any;
+    var MozActivity: MozActivity;
+}

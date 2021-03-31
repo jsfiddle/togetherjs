@@ -1,8 +1,10 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function eventMakerMain($, _util) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.eventMaker = void 0;
     function createTogetherjsMouseEvent() {
         var event = document.createEvent("MouseEvents");
         // FIXME: I'm not sure this custom attribute always propagates?
@@ -56,7 +58,7 @@ function eventMakerMain($, _util) {
         };
         return EventMaker;
     }());
-    var eventMaker = new EventMaker();
-    return eventMaker;
-}
-define(["jquery", "util"], eventMakerMain);
+    exports.eventMaker = new EventMaker();
+});
+//return eventMaker;
+//define(["jquery", "util"], eventMakerMain);

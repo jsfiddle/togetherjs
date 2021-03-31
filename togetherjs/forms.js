@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,14 +16,18 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function formsMain($, util, session, elementFinder, eventMaker, templating, ot) {
-    var assert = util.assert;
+define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./types/togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, togetherjs_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.forms = void 0;
+    //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
+    var assert = util_1.util.assert;
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
     var FOCUS_BUFFER = 5;
     var inRemoteUpdate = false;
     function suppressSync(element) {
-        var ignoreForms = TogetherJS.config.get("ignoreForms");
+        var ignoreForms = togetherjs_1.TogetherJS.config.get("ignoreForms");
         if (ignoreForms === true) {
             return true;
         }
@@ -57,10 +60,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (inRemoteUpdate) {
             return;
         }
-        if (elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
+        if (elementFinder_1.elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
             return;
         }
-        var location = elementFinder.elementLocation(el);
+        var location = elementFinder_1.elementFinder.elementLocation(el);
         var msg = {
             type: "form-update",
             element: location,
@@ -73,7 +76,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 if (history.current == value) {
                     return;
                 }
-                var delta = ot.TextReplace.fromChange(history.current, value);
+                var delta = ot_1.ot.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
                 maybeSendUpdate(location, history, tracker);
@@ -81,10 +84,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             else {
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1));
             }
         }
-        session.send(msg);
+        session_1.session.send(msg);
     }
     function isCheckable(element) {
         var el = $(element);
@@ -96,7 +99,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     }
     var editTrackers = {};
     var liveTrackers = [];
-    TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
+    togetherjs_1.TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
@@ -177,7 +180,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         AceEditor.trackerName = "AceEditor";
         return AceEditor;
     }(Editor));
-    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
+    togetherjs_1.TogetherJS.addTracker(AceEditor, true /* skip setInit */);
     var CodeMirrorEditor = /** @class */ (function (_super) {
         __extends(CodeMirrorEditor, _super);
         function CodeMirrorEditor(el) {
@@ -253,7 +256,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         CodeMirrorEditor.trackerName = "CodeMirrorEditor";
         return CodeMirrorEditor;
     }(Editor));
-    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+    togetherjs_1.TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
     var CKEditor = /** @class */ (function (_super) {
         __extends(CKEditor, _super);
         function CKEditor(el) {
@@ -330,7 +333,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         CKEditor.trackerName = "CKEditor";
         return CKEditor;
     }(Editor));
-    TogetherJS.addTracker(CKEditor, true /* skip setInit */);
+    togetherjs_1.TogetherJS.addTracker(CKEditor, true /* skip setInit */);
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
     var tinymceEditor = /** @class */ (function (_super) {
         __extends(tinymceEditor, _super);
@@ -405,25 +408,25 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return !!$(elem).data("tinyEditor");
             /*var flag = false;
             $(window.tinymce.editors).each(function (i, ed) {
-              if (el.id == ed.id) {
+                if (el.id == ed.id) {
                 flag = true;
-              }
+                }
             });
             return flag;*/
         };
         tinymceEditor.trackerName = "tinymceEditor";
         return tinymceEditor;
     }(Editor));
-    TogetherJS.addTracker(tinymceEditor, true);
+    togetherjs_1.TogetherJS.addTracker(tinymceEditor, true);
     ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
         assert(!liveTrackers.length);
-        util.forEachAttr(editTrackers, function (TrackerClass) {
+        util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
             var els = TrackerClass.scan();
             if (els) {
                 $.each(els, function () {
                     var tracker = new TrackerClass(this);
-                    $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+                    $(this).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
                     liveTrackers.push(tracker);
                 });
             }
@@ -437,7 +440,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     }
     function elementTracked(el) {
         var result = false;
-        util.forEachAttr(editTrackers, function (TrackerClass) {
+        util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
             if (TrackerClass.tracked(el)) {
                 result = true;
             }
@@ -519,7 +522,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
         }
         if (changed) {
-            eventMaker.fireChange(el);
+            eventMaker_1.eventMaker.fireChange(el);
         }
     }
     /** Send the top of this history queue, if it hasn't been already sent. */
@@ -546,14 +549,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (tracker) {
             msg.tracker = tracker;
         }
-        session.send(msg);
+        session_1.session.send(msg);
     }
-    session.hub.on("form-update", function (msg) {
+    session_1.session.hub.on("form-update", function (msg) {
         var _a;
         if (!msg.sameUrl) {
             return;
         }
-        var el = $(elementFinder.findElement(msg.element));
+        var el = $(elementFinder_1.elementFinder.findElement(msg.element));
         var el0 = el[0]; // TODO is this cast right?
         if (typeof msg.value === "boolean") {
             setValue(el, msg.value);
@@ -586,7 +589,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             history_1.setSelection(selection);
             // make a real TextReplace object.
-            var delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            var delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             var change_1 = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
             var changed = history_1.commit(change_1);
@@ -634,12 +637,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         initSent = true;
         var msg = {
             type: "form-init",
-            pageAge: Date.now() - TogetherJS.pageLoaded,
+            pageAge: Date.now() - togetherjs_1.TogetherJS.pageLoaded,
             updates: []
         };
         var els = $("textarea, input, select");
         els.each(function () {
-            if (elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
+            if (elementFinder_1.elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
             var el = $(this);
@@ -659,7 +662,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 var history = el.data("togetherjsHistory");
                 if (history) {
                     var upd = {
-                        element: elementFinder.elementLocation(this),
+                        element: elementFinder_1.elementFinder.elementLocation(this),
                         value: history.committed,
                         basis: history.basis,
                     };
@@ -667,7 +670,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 }
                 else {
                     var upd = {
-                        element: elementFinder.elementLocation(this),
+                        element: elementFinder_1.elementFinder.elementLocation(this),
                         value: value,
                     };
                     msg.updates.push(upd);
@@ -675,7 +678,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             else {
                 var upd = {
-                    element: elementFinder.elementLocation(this),
+                    element: elementFinder_1.elementFinder.elementLocation(this),
                     value: value,
                 };
                 msg.updates.push(upd);
@@ -687,7 +690,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             var history = $(init0.element).data("togetherjsHistory");
             // TODO check the logic change
             var init = {
-                element: elementFinder.elementLocation($(init0.element)),
+                element: elementFinder_1.elementFinder.elementLocation($(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
             };
@@ -698,7 +701,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             msg.updates.push(init);
         });
         if (msg.updates.length) {
-            session.send(msg);
+            session_1.session.send(msg);
         }
     }
     function setInit() {
@@ -707,23 +710,23 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             if (elementTracked(this)) {
                 return;
             }
-            if (elementFinder.ignoreElement(this)) {
+            if (elementFinder_1.elementFinder.ignoreElement(this)) {
                 return;
             }
             var el = $(this);
             var value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
                 // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
+                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1)); // TODO !
             }
         });
         destroyTrackers();
         buildTrackers();
     }
-    session.on("reinitialize", setInit);
-    session.on("ui-ready", setInit);
-    session.on("close", destroyTrackers);
-    session.hub.on("form-init", function (msg) {
+    session_1.session.on("reinitialize", setInit);
+    session_1.session.on("ui-ready", setInit);
+    session_1.session.on("close", destroyTrackers);
+    session_1.session.hub.on("form-init", function (msg) {
         if (!msg.sameUrl) {
             return;
         }
@@ -731,7 +734,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             // In a 3+-peer situation more than one client may init; in this case
             // we're probably the other peer, and not the peer that needs the init
             // A quick check to see if we should init...
-            var myAge = Date.now() - TogetherJS.pageLoaded;
+            var myAge = Date.now() - togetherjs_1.TogetherJS.pageLoaded;
             if (msg.pageAge < myAge) {
                 // We've been around longer than the other person...
                 return;
@@ -741,7 +744,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         msg.updates.forEach(function (update) {
             var el;
             try {
-                el = elementFinder.findElement(update.element);
+                el = elementFinder_1.elementFinder.findElement(update.element);
             }
             catch (e) {
                 /* skip missing element */
@@ -764,7 +767,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                     // (we might have outstanding queued changes we don't want to lose)
                     if (!(history && history.basis === update.basis && history.basis !== 1)) {
                         // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
-                        $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
+                        $(el).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, update.value, update.basis));
                     }
                 }
             }
@@ -776,23 +779,23 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var lastFocus = null;
     function focus(event) {
         var target = event.target;
-        if (elementFinder.ignoreElement(target) || elementTracked(target)) {
+        if (elementFinder_1.elementFinder.ignoreElement(target) || elementTracked(target)) {
             blur(event);
             return;
         }
         if (target != lastFocus) {
             lastFocus = target;
-            session.send({ type: "form-focus", element: elementFinder.elementLocation(target) });
+            session_1.session.send({ type: "form-focus", element: elementFinder_1.elementFinder.elementLocation(target) });
         }
     }
     function blur(_event) {
         if (lastFocus) {
             lastFocus = null;
-            session.send({ type: "form-focus", element: null });
+            session_1.session.send({ type: "form-focus", element: null });
         }
     }
     var focusElements = {};
-    session.hub.on("form-focus", function (msg) {
+    session_1.session.hub.on("form-focus", function (msg) {
         if (!msg.sameUrl) {
             return;
         }
@@ -805,7 +808,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             // A blur
             return;
         }
-        var element = elementFinder.findElement(msg.element);
+        var element = elementFinder_1.elementFinder.findElement(msg.element);
         var el = createFocusElement(msg.peer, element);
         if (el) {
             focusElements[msg.peer.id] = el;
@@ -818,7 +821,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             console.warn("Could not get offset of element:", around[0]);
             return null;
         }
-        var el = templating.sub("focus", { peer: peer });
+        var el = templating_1.templating.sub("focus", { peer: peer });
         el = el.find(".togetherjs-focus");
         el.css({
             top: aroundOffset.top - FOCUS_BUFFER + "px",
@@ -829,7 +832,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         $(document.body).append(el);
         return el;
     }
-    session.on("ui-ready", function () {
+    session_1.session.on("ui-ready", function () {
         $(document).on("change", change);
         // note that textInput, keydown, and keypress aren't appropriate events
         // to watch, since they fire *before* the element's value changes.
@@ -837,22 +840,23 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         $(document).on("focusin", focus);
         $(document).on("focusout", blur);
     });
-    session.on("close", function () {
+    session_1.session.on("close", function () {
         $(document).off("change", change);
         $(document).off("input keyup cut paste", maybeChange);
         $(document).off("focusin", focus);
         $(document).off("focusout", blur);
     });
-    session.hub.on("hello", function (msg) {
+    session_1.session.hub.on("hello", function (msg) {
         if (msg.sameUrl) {
             setTimeout(function () {
                 sendInit();
                 if (lastFocus) {
-                    session.send({ type: "form-focus", element: elementFinder.elementLocation(lastFocus) });
+                    session_1.session.send({ type: "form-focus", element: elementFinder_1.elementFinder.elementLocation(lastFocus) });
                 }
             });
         }
     });
-    return { trackerClassExport: null }; // TODO ugly export
-}
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);
+    exports.forms = { trackerClassExport: null }; // TODO ugly export
+});
+//}
+//define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

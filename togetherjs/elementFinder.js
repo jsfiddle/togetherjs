@@ -1,6 +1,9 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-function elementFinderMain(_util, $) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.elementFinder = void 0;
+    //function elementFinderMain(_util: TogetherJSNS.Util, $: JQueryStatic) {
     function isJQuery(o) {
         return o instanceof $;
     }
@@ -270,6 +273,6 @@ function elementFinderMain(_util, $) {
         };
         return ElementFinder;
     }());
-    return new ElementFinder();
-}
-define(["util", "jquery"], elementFinderMain);
+    exports.elementFinder = new ElementFinder();
+});
+//define(["util", "jquery"], elementFinderMain);
