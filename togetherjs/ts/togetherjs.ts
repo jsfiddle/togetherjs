@@ -283,10 +283,10 @@ class TogetherJSClass extends OnClass {
     public require!: Require; // TODO !
     private configObject = new ConfigClass(this);
     public readonly config: TogetherJSNS.ConfigFunObj;
-    private hub: TogetherJSNS.Hub = new OnClass();
+    public hub: TogetherJSNS.Hub = new OnClass();
     public requireConfig!: RequireConfig; // TODO !
-    private _loaded?: boolean;
-    private _requireObject!: Require; // TODO !
+    public _loaded?: boolean;
+    public _requireObject!: Require; // TODO !
     public pageLoaded: number = Date.now();
     private _startupInit: TogetherJSNS.Startup = defaultStartupInit;
     public startup: TogetherJSNS.Startup = clone(this._startupInit);
