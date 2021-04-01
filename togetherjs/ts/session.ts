@@ -329,7 +329,7 @@ session.hub.on("who", function() {
     sendHello(true);
 });
 
-function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf}) {
+function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.PeerClass}) {
     if(!msg.sameUrl) {
         var url = msg.url;
         if(msg.urlHash) {
