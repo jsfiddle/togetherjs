@@ -5,6 +5,17 @@ path = require("path"),
 fs   = require("fs"),
 port = process.argv[2] || process.env['PORT'] || 8080;
 
+mimeTypes = {
+  "html": "text/html",
+  "jpeg": "image/jpeg",
+  "jpg": "image/jpeg",
+  "png": "image/png",
+  "svg": "image/svg+xml",
+  "json": "application/json",
+  "js": "text/javascript",
+  "css": "text/css"
+};
+
 http.createServer(function(request, response) {
 
   var uri = url.parse(request.url).pathname
@@ -19,6 +30,11 @@ http.createServer(function(request, response) {
     }
 
     if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+    
+    var mimeType = mimeTypes[filename.split('.').pop()];
+    if (!mimeType) {
+      mimeType = 'text/plain';
+    }
 
     fs.readFile(filename, "binary", function(err, file) {
       if(err) {
@@ -28,7 +44,7 @@ http.createServer(function(request, response) {
         return;
       }
 
-      response.writeHead(200);
+      response.writeHead(200, { "Content-Type": mimeType });
       response.write(file, "binary");
       response.end();
     });
