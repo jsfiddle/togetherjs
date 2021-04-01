@@ -1,4 +1,4 @@
-//import type { EventHtmlElement, TogetherJSNS } from "./types/togetherjs";
+import type { EventHtmlElement, TogetherJSNS } from "./types/togetherjs";
 
 let min = false;
 const baseUrl = "../../../";

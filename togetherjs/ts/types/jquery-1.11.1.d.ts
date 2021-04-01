@@ -3850,7 +3850,7 @@ interface JQuery {
     extend(object: { [method: string]: (...args: any[]) => any; }): JQuery;
 }
 // Change: no global JQuery
-/**
+/**/
 declare module "jquery" {
     export = $;
 }

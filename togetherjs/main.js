@@ -1,5 +1,3 @@
-"use strict";
-//import type { EventHtmlElement, TogetherJSNS } from "./types/togetherjs";
 var min = false;
 var baseUrl = "../../../";
 var cacheBust = Date.now() + "";
@@ -226,6 +224,7 @@ require(['../togetherjs'], function (a) {
     //a.TogetherJS.start()
     starttjs(a.TogetherJS, document.documentElement);
 });
+export {};
 //});
 //});
 /**/
