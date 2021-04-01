@@ -21,7 +21,6 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.togetherjsMain = exports.TogetherJS = void 0;
-    var globalTjs;
     var styleSheet = "/togetherjs/togetherjs.css";
     // True if this file should use minimized sub-resources:
     //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in code
@@ -455,7 +454,7 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
                 if (typeof require == "function") {
                     if (!require.config) {
                         console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
-                        throw new Error("Conflict with window.require");
+                        //throw new Error("Conflict with window.require");
                     }
                     this.require = require.config(requireConfig);
                 }
@@ -738,7 +737,7 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
         window["TogetherJS"] = TogetherJS;
         tjsInstance.requireConfig = {
             context: "togetherjs",
-            baseUrl: baseUrl + "/togetherjs",
+            baseUrl: baseUrl,
             urlArgs: "bust=" + cacheBust,
             paths: {
                 jquery: "libs/jquery-1.11.1.min",
@@ -807,5 +806,5 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
         return tjsInstance;
     }
     exports.togetherjsMain = togetherjsMain;
-    globalTjs = togetherjsMain();
+    exports.TogetherJS = togetherjsMain();
 });

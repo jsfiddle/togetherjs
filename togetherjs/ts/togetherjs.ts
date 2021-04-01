@@ -6,7 +6,6 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 import { OnClass } from "./init";
 import type { TogetherJSNS, EventHtmlElement } from "./types/togetherjs";
 
-let globalTjs;
 export let TogetherJS: TogetherJSClass;
 
 let styleSheet = "/togetherjs/togetherjs.css";
@@ -473,7 +472,7 @@ class TogetherJSClass extends OnClass {
             if(typeof require == "function") {
                 if(!require.config) {
                     console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
-                    throw new Error("Conflict with window.require");
+                    //throw new Error("Conflict with window.require");
                 }
                 this.require = require.config(requireConfig);
             }
@@ -781,7 +780,7 @@ export function togetherjsMain() {
 
     tjsInstance.requireConfig = {
         context: "togetherjs",
-        baseUrl: baseUrl + "/togetherjs",
+        baseUrl: baseUrl,
         urlArgs: "bust=" + cacheBust,
         paths: {
             jquery: "libs/jquery-1.11.1.min",
@@ -860,4 +859,4 @@ export function togetherjsMain() {
     return tjsInstance;
 }
 
-globalTjs = togetherjsMain();
+TogetherJS = togetherjsMain();

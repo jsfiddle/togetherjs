@@ -69,6 +69,7 @@
 		"./togetherjs/build/"
 	],
 	"include": [
-		"./togetherjs/ts/"
+		"./togetherjs/ts/",
+		"./togetherjs/libs/"
 	],
 }
