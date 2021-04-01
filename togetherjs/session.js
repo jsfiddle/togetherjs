@@ -155,13 +155,14 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 initShareId().then(function () {
                     readyForMessages = false;
                     openChannel();
-                    require(["ui"], function (ui) {
+                    require(["ui"], function (uiModule) {
+                        var ui = uiModule.ui;
                         togetherjs_1.TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function () {
                             $(function () {
-                                peers = require("peers");
-                                var startup = require("startup");
+                                var peers = require("peers").peers;
+                                var startup = require("startup").startup;
                                 exports.session.emit("start");
                                 exports.session.once("ui-ready", function () {
                                     readyForMessages = true;
@@ -170,7 +171,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                                 ui.activateUI();
                                 togetherjs_1.TogetherJS.config.close("enableAnalytics");
                                 if (togetherjs_1.TogetherJS.config.get("enableAnalytics")) {
-                                    require(["analytics"], function (analytics) {
+                                    require(["analytics"], function (_a) {
+                                        var analytics = _a.analytics;
                                         analytics.activate();
                                     });
                                 }
@@ -314,7 +316,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
             if (msg.urlHash) {
                 url += msg.urlHash;
             }
-            require("ui").showUrlChangeMessage(msg.peer, url);
+            var ui = require("ui").ui;
+            ui.showUrlChangeMessage(msg.peer, url);
             location.href = url;
         }
     }

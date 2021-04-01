@@ -28,9 +28,7 @@ require([moduleName], function(mod: TogetherJSNS.Template) {
 });
 
 export function templates(resourceName: keyof TogetherJSNS.Template) {
-    // Sometimes require([moduleName]) doesn't return even after the
-    // module has been loaded, but this sync version of require() will
-    // pick up the module in that case:
+    // Sometimes require([moduleName]) doesn't return even after the module has been loaded, but this sync version of require() will pick up the module in that case:
     if(!templatesLang) {
         try {
             templatesLang = require(moduleName);

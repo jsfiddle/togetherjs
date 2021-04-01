@@ -161,13 +161,14 @@ class Session extends OnClass {
             initShareId().then(function() {
                 readyForMessages = false;
                 openChannel();
-                require(["ui"], function(ui: TogetherJSNS.Ui) {
+                require(["ui"], function(uiModule: typeof import("ui")) {
+                    const ui = uiModule.ui;
                     TogetherJS.running = true;
                     ui.prepareUI();
                     require(features, function() {
                         $(function() {
-                            peers = require("peers");
-                            var startup = require("startup");
+                            const { peers } = require("peers") as typeof import("peers");
+                            const { startup } = require("startup") as typeof import("startup");
                             session.emit("start");
                             session.once("ui-ready", function() {
                                 readyForMessages = true;
@@ -176,7 +177,7 @@ class Session extends OnClass {
                             ui.activateUI();
                             TogetherJS.config.close("enableAnalytics");
                             if(TogetherJS.config.get("enableAnalytics")) {
-                                require(["analytics"], function(analytics: TogetherJSNS.Analytics) {
+                                require(["analytics"], function({ analytics }: typeof import("analytics")) {
                                     analytics.activate();
                                 });
                             }
@@ -334,7 +335,8 @@ function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string,
         if(msg.urlHash) {
             url += msg.urlHash;
         }
-        require("ui").showUrlChangeMessage(msg.peer, url);
+        const { ui } = require("ui") as typeof import("ui");
+        ui.showUrlChangeMessage(msg.peer, url);
         location.href = url;
     }
 }

@@ -300,7 +300,8 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
             var _this = this;
             var session;
             if (this.running) {
-                session = this.require("session");
+                var sessionModule = this.require("session");
+                session = sessionModule.session;
                 session.close();
                 return;
             }
@@ -393,7 +394,8 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
             }
             // FIXME: maybe I should just test for this.require:
             if (this._loaded) {
-                session = this.require("session");
+                var sessionModule = this.require("session");
+                session = sessionModule.session;
                 addStyle();
                 session.start();
                 return;
@@ -446,17 +448,17 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
             var callback = function (_session, _jquery) {
                 _this._loaded = true;
                 if (!min) {
-                    _this.require = require.config({ context: "togetherjs" });
+                    _this.require = window.require.config({ context: "togetherjs" });
                     _this._requireObject = require;
                 }
             };
             if (!min) {
                 if (typeof require == "function") {
-                    if (!require.config) {
+                    if (!window.require.config) {
                         console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
                         //throw new Error("Conflict with window.require");
                     }
-                    this.require = require.config(requireConfig);
+                    this.require = window.require.config(requireConfig);
                 }
             }
             if (typeof this.require == "function") {
@@ -494,7 +496,8 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
         };
         TogetherJSClass.prototype.reinitialize = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
+                this.require(["session"], function (_a) {
+                    var session = _a.session;
                     session.emit("reinitialize");
                 });
             }
@@ -512,7 +515,8 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
         };
         TogetherJSClass.prototype.refreshUserData = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
+                this.require(["session"], function (_a) {
+                    var session = _a.session;
                     session.emit("refresh-user-data");
                 });
             }
@@ -533,14 +537,14 @@ define(["require", "exports", "./init"], function (require, exports, init_1) {
             if (!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             session.appSend(msg);
         };
         TogetherJSClass.prototype.shareUrl = function () {
             if (!this.require) {
                 return null;
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             return session.shareUrl();
         };
         TogetherJSClass.prototype.listenForShortcut = function () {

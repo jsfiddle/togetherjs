@@ -28,7 +28,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
     var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
     var ui;
     require(["ui"], function (uiModule) {
-        ui = uiModule;
+        ui = uiModule.ui;
     });
     var DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
     var PeerClass = /** @class */ (function () {

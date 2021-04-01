@@ -18,8 +18,8 @@ var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'l
 var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
 var ui: TogetherJSNS.Ui;
-require(["ui"], function(uiModule: TogetherJSNS.Ui) {
-    ui = uiModule;
+require(["ui"], function(uiModule: typeof import("ui")) {
+    ui = uiModule.ui;
 });
 
 var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);

@@ -39,8 +39,8 @@ type StepHandler = () => any;
 class Statup {
     start() {
         if(!session) {
-            require(["session"], function(sessionModule: TogetherJSNS.Session) {
-                session = sessionModule;
+            require(["session"], function(sessionModule: typeof import("session")) {
+                session = sessionModule.session;
                 startup.start();
             });
             return;
@@ -112,8 +112,8 @@ class Handlers {
                 next();
                 return;
             }
-            require(["walkthrough"], function(walkthrough: TogetherJSNS.Walkthrough) {
-                walkthrough.start(true, function() {
+            require(["walkthrough"], function(walkthroughModule: { walkthrough: TogetherJSNS.Walkthrough }) {
+                walkthroughModule.walkthrough.start(true, function() {
                     storage.settings.set("seenIntroDialog", true);
                     next();
                 });
@@ -128,7 +128,7 @@ class Handlers {
             next();
             return;
         }
-        require(["windowing"], function(windowing: TogetherJSNS.Windowing) {
+        require(["windowing"], function({ windowing }: typeof import("windowing")) {
             windowing.show("#togetherjs-share");
             // FIXME: no way to detect when the window is closed
             // If there was a next() step then it would not work

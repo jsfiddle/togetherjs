@@ -93,8 +93,8 @@ class Commands {
 
     command_test(argString?: string) {
         if(!Walkabout) {
-            require(["walkabout"], (WalkaboutModule: TogetherJSNS.Walkabout) => {
-                Walkabout = WalkaboutModule;
+            require(["walkabout"], (WalkaboutModule: { walkabout: TogetherJSNS.Walkabout }) => {
+                Walkabout = WalkaboutModule.walkabout;
                 this.command_test(argString);
             });
             return;

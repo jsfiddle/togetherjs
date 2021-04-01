@@ -4,6 +4,7 @@
 define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.cursor = void 0;
     // Cursor viewing support
     //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
     var assert = util_1.util.assert;
@@ -190,7 +191,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
         };
         Cursor.getClient = function (clientId) {
-            return cursor.getClient(clientId);
+            return exports.cursor.getClient(clientId);
         };
         Cursor.forEach = function (callback, context) {
             if (context === void 0) { context = null; }
@@ -219,7 +220,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         };
         return cursor2;
     }());
-    var cursor = new cursor2();
+    exports.cursor = new cursor2();
     function cbCursor(peer) {
         var c = Cursor.getClient(peer.id);
         c.updatePeer(peer);

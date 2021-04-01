@@ -82,7 +82,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             var _this = this;
             if (!Walkabout) {
                 require(["walkabout"], function (WalkaboutModule) {
-                    Walkabout = WalkaboutModule;
+                    Walkabout = WalkaboutModule.walkabout;
                     _this.command_test(argString);
                 });
                 return;

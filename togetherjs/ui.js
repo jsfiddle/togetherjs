@@ -48,8 +48,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     ];
     // This would be a circular import, but we just need the chat module sometime
     // after everything is loaded, and this is sure to complete by that time:
-    require(["chat"], function (c) {
-        chat = c;
+    require(["chat"], function (chatModule) {
+        chat = chatModule.chat;
     });
     var Chat = /** @class */ (function () {
         function Chat(ui) {
@@ -587,7 +587,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             // FIXME: scroll to person
         };
         PeerView.prototype.cursor = function () {
-            return require("cursor").getClient(this.peer.id);
+            var cursorModule = require("cursor");
+            return cursorModule.cursor.getClient(this.peer.id);
         };
         PeerView.prototype.destroy = function () {
             // FIXME: should I get rid of the dockElement?
@@ -924,7 +925,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
                 windowing_1.windowing.hide();
                 hideMenu();
-                require(["walkthrough"], function (walkthrough) {
+                require(["walkthrough"], function (_a) {
+                    var walkthrough = _a.walkthrough;
                     windowing_1.windowing.hide();
                     walkthrough.start(false);
                 });
@@ -1376,7 +1378,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             return;
         }
         inRefresh = true;
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             var def = who.getList(inviteHubUrl());
             function addUser(user, before) {
                 var item = templating_1.templating.sub("invite-user-item", { peer: user });
@@ -1438,13 +1441,15 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         if (msg.forClientId && msg.clientId != peers_1.peers.Self.id) {
             return;
         }
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
             exports.ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
         });
     });
     function invite(clientId) {
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             // FIXME: use the return value of this to give a signal that
             // the invite has been successfully sent:
             who.invite(inviteHubUrl(), clientId).then(function () {

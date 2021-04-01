@@ -34,7 +34,7 @@ define(["require", "exports", "./storage", "./togetherjs", "./windowing"], funct
         Statup.prototype.start = function () {
             if (!session) {
                 require(["session"], function (sessionModule) {
-                    session = sessionModule;
+                    session = sessionModule.session;
                     exports.startup.start();
                 });
                 return;
@@ -104,8 +104,8 @@ define(["require", "exports", "./storage", "./togetherjs", "./windowing"], funct
                     next();
                     return;
                 }
-                require(["walkthrough"], function (walkthrough) {
-                    walkthrough.start(true, function () {
+                require(["walkthrough"], function (walkthroughModule) {
+                    walkthroughModule.walkthrough.start(true, function () {
                         storage_1.storage.settings.set("seenIntroDialog", true);
                         next();
                     });
@@ -119,7 +119,8 @@ define(["require", "exports", "./storage", "./togetherjs", "./windowing"], funct
                 next();
                 return;
             }
-            require(["windowing"], function (windowing) {
+            require(["windowing"], function (_a) {
+                var windowing = _a.windowing;
                 windowing.show("#togetherjs-share");
                 // FIXME: no way to detect when the window is closed
                 // If there was a next() step then it would not work

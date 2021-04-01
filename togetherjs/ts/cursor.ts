@@ -246,7 +246,7 @@ class cursor2 {
     }
 }
 
-const cursor = new cursor2();
+export const cursor = new cursor2();
 
 function cbCursor(peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) {
     var c = Cursor.getClient(peer.id);
