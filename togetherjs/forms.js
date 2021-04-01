@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./types/togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, togetherjs_1, util_1) {
+define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.forms = void 0;

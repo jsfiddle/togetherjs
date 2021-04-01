@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./types/togetherjs", "./util", "./visibilityApi", "./windowing"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, togetherjs_1, util_1, visibilityApi_1, windowing_1) {
+define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./togetherjs", "./util", "./visibilityApi", "./windowing"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, togetherjs_1, util_1, visibilityApi_1, windowing_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ui = void 0;

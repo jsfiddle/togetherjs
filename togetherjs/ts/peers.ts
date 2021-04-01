@@ -2,11 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { OnClass } from "./init";
 import { session } from "./session";
 import { storage } from "./storage";
 import { templates } from "./templates";
-import { TogetherJSNS, TogetherJS } from "./types/togetherjs";
-import { OnClass, util } from "./util";
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
+import { util } from "./util";
 
 //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
 const assert: typeof util.assert = util.assert;

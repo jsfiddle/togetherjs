@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./types/togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, togetherjs_1, util_1) {
+define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // Cursor viewing support

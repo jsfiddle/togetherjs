@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./util"], function (require, exports, util_1) {
+define(["require", "exports", "./init", "./util"], function (require, exports, init_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.channels = void 0;
@@ -90,7 +90,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
         };
         return AbstractChannel;
-    }(util_1.OnClass));
+    }(init_1.OnClass));
     var WebSocketChannel = /** @class */ (function (_super) {
         __extends(WebSocketChannel, _super);
         function WebSocketChannel(address) {
@@ -434,7 +434,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             return route;
         };
         return Router;
-    }(util_1.OnClass)); // /Router
+    }(init_1.OnClass)); // /Router
     var Route = /** @class */ (function (_super) {
         __extends(Route, _super);
         function Route(router, id) {
@@ -458,7 +458,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             delete this.router._routes[this.id];
         };
         return Route;
-    }(util_1.OnClass)); // /Route
+    }(init_1.OnClass)); // /Route
     exports.channels = {
         "WebSocketChannel": function (address) { return new WebSocketChannel(address); },
         "PostMessageChannel": function (win, expectedOrigin) { return new PostMessageChannel(win, expectedOrigin); },

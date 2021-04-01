@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { session } from "./session";
-import { TogetherJSNS } from "./types/togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {

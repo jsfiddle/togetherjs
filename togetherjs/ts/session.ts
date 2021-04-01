@@ -3,10 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { channels } from "./channels";
+import { OnClass } from "./init";
 import { storage } from "./storage";
-import { TogetherJS, TogetherJSNS } from "./types/togetherjs";
-import { OnClass, util } from "./util";
-
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
+import { util } from "./util";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
 var DEBUG = true;

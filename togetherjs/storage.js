@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./types/togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
+define(["require", "exports", "./init", "./togetherjs", "./util"], function (require, exports, init_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.storage = void 0;
@@ -54,7 +54,7 @@ define(["require", "exports", "./types/togetherjs", "./util"], function (require
             return exports.storage.set(key, value);
         };
         return StorageSettings;
-    }(util_1.OnClass));
+    }(init_1.OnClass));
     var TJSStorage = /** @class */ (function () {
         function TJSStorage(name, storage, prefix) {
             this.name = name;

@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { TogetherJSNS } from "./types/togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 
 //function elementFinderMain(_util: TogetherJSNS.Util, $: JQueryStatic) {
 

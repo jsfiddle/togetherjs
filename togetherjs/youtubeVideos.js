@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./elementFinder", "./session", "./types/togetherjs"], function (require, exports, elementFinder_1, session_1, togetherjs_1) {
+define(["require", "exports", "./elementFinder", "./session", "./togetherjs"], function (require, exports, elementFinder_1, session_1, togetherjs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     //function youtubeVideosMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
@@ -77,7 +77,7 @@ define(["require", "exports", "./elementFinder", "./session", "./types/togetherj
         }
         else {
             // manually invoke APIReady function when the API was already loaded by user
-            togetherjs_1.onYouTubeIframeAPIReady(); // TODO !
+            onYouTubeIframeAPIReady(); // TODO !
         }
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {

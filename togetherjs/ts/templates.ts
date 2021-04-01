@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { TogetherJS, TogetherJSNS } from "./types/togetherjs";
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function templatesMain(util: TogetherJSNS.Util, require: Require) {

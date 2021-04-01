@@ -6,7 +6,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-define(["require", "exports", "./types/togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
+define(["require", "exports", "./togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.appConsole = void 0;

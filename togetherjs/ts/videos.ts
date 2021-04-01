@@ -4,7 +4,7 @@
 
 import { elementFinder } from "./elementFinder";
 import { session } from "./session";
-import { TogetherJSNS } from "./types/togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 
 interface Listener {
     name: string,

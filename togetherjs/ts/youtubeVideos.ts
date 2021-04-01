@@ -4,7 +4,10 @@
 
 import { elementFinder } from "./elementFinder";
 import { session } from "./session";
-import { onYouTubeIframeAPIReady, TogetherJS } from "./types/togetherjs";
+import { TogetherJS } from "./togetherjs";
+import type { onYouTubeIframeAPIReady as onYouTubeIframeAPIReadyType} from "./types/togetherjs";
+
+declare const onYouTubeIframeAPIReady: typeof onYouTubeIframeAPIReadyType;
 
 //function youtubeVideosMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
 

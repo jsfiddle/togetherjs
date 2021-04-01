@@ -1,4 +1,4 @@
-import { TogetherJS } from "./types/togetherjs";
+import { TogetherJS } from "./togetherjs";
 
 class Analytics {
     activate() {

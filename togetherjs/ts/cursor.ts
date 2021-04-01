@@ -7,7 +7,8 @@ import { eventMaker } from "./eventMaker";
 import { peers } from "./peers";
 import { session } from "./session";
 import { templating } from "./templating";
-import { TogetherJSNS, TogetherJS } from "./types/togetherjs";
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 // Cursor viewing support

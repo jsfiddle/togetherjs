@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./peers", "./session", "./templates", "./templating", "./types/togetherjs", "./ui", "./util", "./windowing"], function (require, exports, peers_1, session_1, templates_1, templating_1, togetherjs_1, ui_1, util_1, windowing_1) {
+define(["require", "exports", "./peers", "./session", "./templates", "./templating", "./togetherjs", "./ui", "./util", "./windowing"], function (require, exports, peers_1, session_1, templates_1, templating_1, togetherjs_1, ui_1, util_1, windowing_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.walkthrough = void 0;

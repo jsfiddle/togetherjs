@@ -3,7 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { channels } from "./channels";
-import { TogetherJS, TogetherJSNS } from "./types/togetherjs";
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {

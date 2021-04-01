@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./channels", "./types/togetherjs", "./util"], function (require, exports, channels_1, togetherjs_1, util_1) {
+define(["require", "exports", "./channels", "./togetherjs", "./util"], function (require, exports, channels_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.recorder = void 0;

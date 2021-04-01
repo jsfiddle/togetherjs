@@ -1,4 +1,4 @@
-define(["require", "exports", "./types/togetherjs"], function (require, exports, togetherjs_1) {
+define(["require", "exports", "./togetherjs"], function (require, exports, togetherjs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.analytics = void 0;

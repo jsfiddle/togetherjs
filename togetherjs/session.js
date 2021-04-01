@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./channels", "./storage", "./types/togetherjs", "./util"], function (require, exports, channels_1, storage_1, togetherjs_1, util_1) {
+define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs", "./util"], function (require, exports, channels_1, init_1, storage_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.session = void 0;
@@ -44,7 +44,7 @@ define(["require", "exports", "./channels", "./storage", "./types/togetherjs", "
             /** Setting, essentially global: */
             _this.AVATAR_SIZE = 90;
             _this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
-            _this.hub = new util_1.OnClass();
+            _this.hub = new init_1.OnClass();
             return _this;
         }
         Session.prototype.hubUrl = function (id) {
@@ -214,7 +214,7 @@ define(["require", "exports", "./channels", "./storage", "./types/togetherjs", "
             return channel; // TODO !
         };
         return Session;
-    }(util_1.OnClass));
+    }(init_1.OnClass));
     exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************

@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./session", "./storage", "./templates", "./types/togetherjs", "./util"], function (require, exports, session_1, storage_1, templates_1, togetherjs_1, util_1) {
+define(["require", "exports", "./init", "./session", "./storage", "./templates", "./togetherjs", "./util"], function (require, exports, init_1, session_1, storage_1, templates_1, togetherjs_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.peers = void 0;
@@ -401,7 +401,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./types/
             }
         };
         return PeersSelf;
-    }(util_1.OnClass));
+    }(init_1.OnClass));
     var Peers = /** @class */ (function (_super) {
         __extends(Peers, _super);
         function Peers() {
@@ -442,7 +442,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./types/
             return result;
         };
         return Peers;
-    }(util_1.OnClass));
+    }(init_1.OnClass));
     exports.peers = new Peers();
     session_1.session.on("start", function () {
         if (exports.peers.Self) {

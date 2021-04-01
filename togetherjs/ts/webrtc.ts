@@ -5,7 +5,7 @@
 import { peers } from "./peers";
 import { session } from "./session";
 import { storage } from "./storage";
-import { TogetherJSNS } from "./types/togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";

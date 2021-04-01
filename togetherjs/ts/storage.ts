@@ -2,8 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { TogetherJSNS, TogetherJS } from "./types/togetherjs";
-import { OnClass, util } from "./util";
+import { OnClass } from "./init";
+import { TogetherJS } from "./togetherjs";
+import type { TogetherJSNS } from "./types/togetherjs";
+import { util } from "./util";
 
 //function StorageMain(util: TogetherJSNS.Util) {
 var assert: typeof util.assert = util.assert;

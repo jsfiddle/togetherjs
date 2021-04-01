@@ -7,6 +7,7 @@ import { appConsole } from "../console";
 import { elementFinder } from "../elementFinder";
 import { eventMaker } from "../eventMaker";
 import { forms } from "../forms";
+import { OnClass } from "../init";
 import { ot } from "../ot";
 import { peers } from "../peers";
 import { playback } from "../playback";
@@ -17,7 +18,7 @@ import { templates } from "../templates";
 import { templating } from "../templating";
 import { togetherjsMain } from "../togetherjs";
 import { ui } from "../ui";
-import { OnClass, util } from "../util";
+import { util } from "../util";
 import { visibilityApi } from "../visibilityApi";
 import { walkthrough } from "../walkthrough";
 import { who } from "../who";
@@ -1005,8 +1006,8 @@ export interface EventHtmlElement extends Event {
     target: HTMLElement | null;
 }
 
-export var TogetherJS: TogetherJSNS.TogetherJS;
-export var onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
+//export var TogetherJS: TogetherJSNS.TogetherJS;
+export let onYouTubeIframeAPIReady: ((oldf?: () => void) => void) | undefined;
 
 declare global {
 
