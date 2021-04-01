@@ -24,7 +24,6 @@ class Module {
 
 class Util {
     public Deferred;
-    extend: (base: { [key: string]: unknown; }, extensions?: any) => { [key: string]: unknown; }
     AssertionError: typeof AssertionError;
     Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
@@ -32,7 +31,6 @@ class Util {
     public constructor($: JQueryStatic, tjs: TogetherJSNS.TogetherJS) {
         this.Deferred = $.Deferred;
         tjs.$ = $;
-        this.extend = tjs._extend;
         this.AssertionError = AssertionError;
         
     }

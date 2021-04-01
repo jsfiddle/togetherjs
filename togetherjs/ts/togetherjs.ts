@@ -498,11 +498,6 @@ class TogetherJSClass extends OnClass {
         }
     }
 
-    /** Can also be used to clone an object */
-    _extend(base: { [key: string]: unknown }, extensions?: any) {
-        return extend(base, extensions);
-    }
-
     _teardown() {
         let requireObject = this._requireObject || window.require;
         // FIXME: this doesn't clear the context for min-case
