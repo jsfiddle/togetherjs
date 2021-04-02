@@ -79,7 +79,7 @@ Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update", "keypress"];
 
 Test.viewSend = function () {
   // Prints out all send() messages
-  var session = TogetherJS.require("session");
+  var session = TogetherJS.require("session").session;
   if (! TogetherJS.running) {
     session.once("start", Test.viewSend);
     return;
@@ -238,8 +238,8 @@ Test.waitMessage = function (messageType) {
 };
 
 Test.resetSettings = function () {
-  var util = TogetherJS.require("util");
-  var storage = TogetherJS.require("storage");
+  var util = TogetherJS.require("util").util;
+  var storage = TogetherJS.require("storage").storage;
   return $.Deferred(function (def) {
     util.resolveMany([
       storage.settings.set("name", ""),
@@ -259,7 +259,7 @@ Test.resetSettings = function () {
 
 Test.startTogetherJS = function () {
   return $.Deferred(function (def) {
-    var session = TogetherJS.require("session");
+    var session = TogetherJS.require("session").session;
     Test.viewSend();
     session.once("ui-ready", function () {
       session.clientId = "me";

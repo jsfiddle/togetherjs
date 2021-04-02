@@ -1,5 +1,5 @@
 interface JQueryStatic {
-    browser : {
+    browser? : {
         mobile?: boolean,
         mozilla?: boolean,
         version: string;
