@@ -9,9 +9,10 @@ let assert: typeof util.assert = util.assert.bind(util);
 
 function clean(t: string) {
     // Removes <% /* ... */ %> comments:
+    console.log("TogetherJS.baseUrl", TogetherJS.baseUrl);
     t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
     t = util.trim(t);
-    t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
+    t = t.replace(/http:\/\/localhost:8080\/togetherjs/g, TogetherJS.baseUrl);
     t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
     t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
     t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');

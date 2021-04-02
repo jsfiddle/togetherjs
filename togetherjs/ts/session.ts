@@ -165,7 +165,8 @@ class Session extends OnClass {
                     ui.prepareUI();
                     require(features, function() {
                         $(function() {
-                            const { peers } = require("peers") as typeof import("peers");
+                            const peersModule = require("peers") as typeof import("peers");
+                            peers = peersModule.peers;
                             const { startup } = require("startup") as typeof import("startup");
                             session.emit("start");
                             session.once("ui-ready", function() {

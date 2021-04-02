@@ -9,9 +9,10 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     var assert = util_1.util.assert.bind(util_1.util);
     function clean(t) {
         // Removes <% /* ... */ %> comments:
+        console.log("TogetherJS.baseUrl", TogetherJS.baseUrl);
         t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
         t = util_1.util.trim(t);
-        t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
+        t = t.replace(/http:\/\/localhost:8080\/togetherjs/g, TogetherJS.baseUrl);
         t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
         t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
         t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');

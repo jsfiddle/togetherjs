@@ -161,7 +161,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
                         ui.prepareUI();
                         require(features, function () {
                             $(function () {
-                                var peers = require("peers").peers;
+                                var peersModule = require("peers");
+                                peers = peersModule.peers;
                                 var startup = require("startup").startup;
                                 exports.session.emit("start");
                                 exports.session.once("ui-ready", function () {
