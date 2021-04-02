@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./storage", "./togetherjs", "./windowing"], function (require, exports, storage_1, togetherjs_1, windowing_1) {
+define(["require", "exports", "./storage", "./windowing"], function (require, exports, storage_1, windowing_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.startup = void 0;
@@ -79,8 +79,8 @@ define(["require", "exports", "./storage", "./togetherjs", "./windowing"], funct
                 next();
                 return;
             }
-            togetherjs_1.TogetherJS.config.close("suppressJoinConfirmation");
-            if (togetherjs_1.TogetherJS.config.get("suppressJoinConfirmation")) {
+            TogetherJS.config.close("suppressJoinConfirmation");
+            if (TogetherJS.config.get("suppressJoinConfirmation")) {
                 next();
                 return;
             }
@@ -113,9 +113,9 @@ define(["require", "exports", "./storage", "./togetherjs", "./windowing"], funct
             });
         };
         Handlers.prototype.share = function (next) {
-            togetherjs_1.TogetherJS.config.close("suppressInvite");
+            TogetherJS.config.close("suppressInvite");
             if (session.isClient || (!session.firstRun) ||
-                togetherjs_1.TogetherJS.config.get("suppressInvite")) {
+                TogetherJS.config.get("suppressInvite")) {
                 next();
                 return;
             }

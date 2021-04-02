@@ -6,7 +6,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-define(["require", "exports", "./togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.appConsole = void 0;
@@ -129,10 +129,10 @@ define(["require", "exports", "./togetherjs", "./util"], function (require, expo
         Console.prototype._browserInfo = function () {
             // FIXME: add TogetherJS version and
             return [
-                "TogetherJS base URL: " + togetherjs_1.TogetherJS.baseUrl,
+                "TogetherJS base URL: " + TogetherJS.baseUrl,
                 "User Agent: " + navigator.userAgent,
-                "Page loaded: " + this._formatDate(togetherjs_1.TogetherJS.pageLoaded),
-                "Age: " + this._formatMinutes(Date.now() - togetherjs_1.TogetherJS.pageLoaded) + " minutes",
+                "Page loaded: " + this._formatDate(TogetherJS.pageLoaded),
+                "Age: " + this._formatMinutes(Date.now() - TogetherJS.pageLoaded) + " minutes",
                 // FIXME: make this right:
                 //"Window: height: " + window.screen.height + " width: " + window.screen.width
                 "URL: " + location.href,
@@ -178,7 +178,7 @@ define(["require", "exports", "./togetherjs", "./util"], function (require, expo
             return (new Date(timestamp)).toISOString();
         };
         Console.prototype._formatTime = function (timestamp) {
-            return ((timestamp - togetherjs_1.TogetherJS.pageLoaded) / 1000).toFixed(2);
+            return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
         };
         Console.prototype._formatMinutes = function (milliseconds) {
             var m = Math.floor(milliseconds / 1000 / 60);
@@ -222,7 +222,7 @@ define(["require", "exports", "./togetherjs", "./util"], function (require, expo
             if (options === void 0) { options = {}; }
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
             return util_1.util.Deferred(function () {
-                var site = options.site || togetherjs_1.TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
+                var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
                 req.setRequestHeader("Content-Type", "application/json");

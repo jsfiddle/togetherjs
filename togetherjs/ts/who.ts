@@ -4,7 +4,6 @@
 
 import { channels } from "./channels";
 import { session } from "./session";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { ui } from "./ui";
 import { util } from "./util";
 

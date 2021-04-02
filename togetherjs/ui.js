@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./togetherjs", "./util", "./visibilityApi", "./windowing"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, togetherjs_1, util_1, visibilityApi_1, windowing_1) {
+define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./util", "./visibilityApi", "./windowing"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, util_1, visibilityApi_1, windowing_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ui = void 0;
@@ -480,7 +480,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     // decrease/reset dock height
                     $("#togetherjs-dock").css("height", 260);
                     //replace participant button
-                    $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
+                    $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
                     // new full participant window created on toggle
                     $("#togetherjs-participantlist-button").click(function () {
                         windowing_1.windowing.toggle("#togetherjs-participantlist");
@@ -637,7 +637,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             assert(container.length);
             $("body").append(container);
             fixupAvatars(container);
-            if (session_1.session.firstRun && togetherjs_1.TogetherJS.startTarget) {
+            if (session_1.session.firstRun && TogetherJS.startTarget) {
                 // Time at which the UI will be fully ready: (We have to do this because the offset won't be quite right until the animation finishes - attempts to calculate the offset without taking into account CSS transforms have so far failed.)
                 var timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
                 finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
@@ -645,7 +645,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
                     var start = iface.offset(); // TODO !
-                    var pos = $(togetherjs_1.TogetherJS.startTarget).offset(); // TODO !
+                    var pos = $(TogetherJS.startTarget).offset(); // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -676,8 +676,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     }, 5);
                 }, 5);
             }
-            if (togetherjs_1.TogetherJS.startTarget) {
-                var el = $(togetherjs_1.TogetherJS.startTarget);
+            if (TogetherJS.startTarget) {
+                var el = $(TogetherJS.startTarget);
                 var text = el.text().toLowerCase().replace(/\s+/g, " ");
                 text = text.replace(/^\s*/, "").replace(/\s*$/, "");
                 if (text == "start togetherjs") {
@@ -692,7 +692,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
                 $(this).append($('<button class="togetherjs-close"></button>'));
             });
-            togetherjs_1.TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+            TogetherJS.config.track("disableWebRTC", function (hide, previous) {
                 if (hide && !previous) {
                     _this.container.find("#togetherjs-audio-button").hide();
                     adjustDockSize(-1);
@@ -1055,7 +1055,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             });
             // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
             // TODO also inviter is always null apparently???
-            togetherjs_1.TogetherJS.config.track("inviteFromRoom", function (inviter) {
+            TogetherJS.config.track("inviteFromRoom", function (inviter) {
                 if (inviter) {
                     container.find("#togetherjs-invite").show();
                 }
@@ -1145,7 +1145,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         };
         Ui.prototype.updateToolName = function (container) {
             container = container || $(document.body);
-            var name = togetherjs_1.TogetherJS.config.get("toolName");
+            var name = TogetherJS.config.get("toolName");
             if (setToolName && !name) {
                 name = "TogetherJS";
             }
@@ -1343,8 +1343,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             starterButton.text(starterButton.attr("data-start-text"));
             starterButton.attr("data-start-text", "");
         }
-        if (togetherjs_1.TogetherJS.startTarget) {
-            var el = $(togetherjs_1.TogetherJS.startTarget);
+        if (TogetherJS.startTarget) {
+            var el = $(TogetherJS.startTarget);
             if (el.attr("data-start-togetherjs-html")) {
                 el.html(el.attr("data-start-togetherjs-html"));
             }
@@ -1368,7 +1368,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         }
     }
     function inviteHubUrl() {
-        var base = togetherjs_1.TogetherJS.config.get("inviteFromRoom");
+        var base = TogetherJS.config.get("inviteFromRoom");
         assert(base);
         return util_1.util.makeUrlAbsolute(base, session_1.session.hubUrl());
     }
@@ -1465,12 +1465,12 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         msg.peer.urlNudge();
     });
     session_1.session.on("new-element", function (el) {
-        if (togetherjs_1.TogetherJS.config.get("toolName")) {
+        if (TogetherJS.config.get("toolName")) {
             exports.ui.updateToolName(el);
         }
     });
     var setToolName = false;
-    togetherjs_1.TogetherJS.config.track("toolName", function () {
+    TogetherJS.config.track("toolName", function () {
         exports.ui.updateToolName(exports.ui.container);
     });
 });

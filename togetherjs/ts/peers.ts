@@ -6,8 +6,6 @@ import { OnClass } from "./init";
 import { session } from "./session";
 import { storage } from "./storage";
 import { templates } from "./templates";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {

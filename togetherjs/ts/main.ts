@@ -29,7 +29,7 @@ var tjs;
 /**/
 //require(["require", "exports"], () => {
     //require(["../init.js"], () => {
-        require(["../libs/jquery-1.11.1.min", '../togetherjs'], function(jq: JQueryStatic, a: typeof import("./togetherjs")) {
+        require(["../libs/jquery-1.11.1.min", '../togetherjs'], function(jq: JQueryStatic, a) {
             //main is loaded, probably don't need to do anything here..
             console.log("========== require togetherjs loaded", a);
             //a.TogetherJS.start()

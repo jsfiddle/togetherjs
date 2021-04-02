@@ -1,5 +1,3 @@
-import type { TogetherJSNS } from "./types/togetherjs";
-
 export class OnClass {
     _knownEvents?: string[];
     _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any

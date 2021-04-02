@@ -8,8 +8,6 @@ import { peers } from "./peers";
 import { session } from "./session";
 import { templates } from "./templates";
 import { templating } from "./templating";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 import { visibilityApi } from "./visibilityApi";
 import { windowing } from "./windowing";

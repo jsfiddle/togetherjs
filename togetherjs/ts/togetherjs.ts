@@ -3,9 +3,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-import type { TogetherJSNS, EventHtmlElement } from "./types/togetherjs";
-
-export let TogetherJS: TogetherJSNS.TogetherJSClass;
+let TogetherJS: TogetherJSNS.TogetherJSClass;
 
 function clone<T>(o: T): T {
     return extend(o as any) as unknown as T; // TODO all those casts!!!!!
@@ -819,7 +817,7 @@ function togetherjsMain() {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
 
-    const tjsInstance = globalTjs = new TogetherJSClass();
+    const tjsInstance = new TogetherJSClass();
     const TogetherJS = tjsInstance;//() => { tjsInstance.start(); return tjsInstance; }
 
     window["TogetherJS"] = TogetherJS;

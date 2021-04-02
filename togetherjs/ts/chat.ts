@@ -8,8 +8,6 @@ import { playback } from "./playback";
 import { session } from "./session";
 import { storage } from "./storage";
 import { templates } from "./templates";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";

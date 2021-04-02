@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { OnClass } from "./init";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function StorageMain(util: TogetherJSNS.Util) {

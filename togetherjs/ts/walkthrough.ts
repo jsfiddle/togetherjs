@@ -6,7 +6,6 @@ import { peers } from "./peers";
 import { session } from "./session";
 import { templates } from "./templates";
 import { templating } from "./templating";
-import { TogetherJS } from "./togetherjs";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";

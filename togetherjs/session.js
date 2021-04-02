@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs", "./util"], function (require, exports, channels_1, init_1, storage_1, togetherjs_1, util_1) {
+define(["require", "exports", "./channels", "./init", "./storage", "./util"], function (require, exports, channels_1, init_1, storage_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.session = void 0;
@@ -51,8 +51,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
             if (id === void 0) { id = null; }
             id = id || this.shareId;
             assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
-            togetherjs_1.TogetherJS.config.close("hubBase");
-            var hubBase = togetherjs_1.TogetherJS.config.get("hubBase");
+            TogetherJS.config.close("hubBase");
+            var hubBase = TogetherJS.config.get("hubBase");
             assert(hubBase != null);
             return hubBase.replace(/\/*$/, "") + "/hub/" + id;
         };
@@ -71,8 +71,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
         };
         Session.prototype.recordUrl = function () {
             assert(this.shareId);
-            var url = togetherjs_1.TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
-            url += "#&togetherjs=" + this.shareId + "&hubBase=" + togetherjs_1.TogetherJS.config.get("hubBase");
+            var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
+            url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
             return url;
         };
         /* location.href without the hash */
@@ -106,7 +106,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
         };
         Session.prototype.makeHelloMessage = function (helloBack) {
             var starting = false;
-            if (!togetherjs_1.TogetherJS.startup.continued) {
+            if (!TogetherJS.startup.continued) {
                 starting = true;
             }
             if (helloBack) {
@@ -142,7 +142,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                     rtcSupported: !!exports.session.RTCSupported,
                     isClient: exports.session.isClient,
                     starting: starting,
-                    clientVersion: togetherjs_1.TogetherJS.version
+                    clientVersion: TogetherJS.version
                 };
                 // This is a chance for other modules to effect the hello message:
                 exports.session.emit("prepare-hello", msg);
@@ -157,7 +157,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                     openChannel();
                     require(["ui"], function (uiModule) {
                         var ui = uiModule.ui;
-                        togetherjs_1.TogetherJS.running = true;
+                        TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function () {
                             $(function () {
@@ -169,8 +169,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                                     startup.start();
                                 });
                                 ui.activateUI();
-                                togetherjs_1.TogetherJS.config.close("enableAnalytics");
-                                if (togetherjs_1.TogetherJS.config.get("enableAnalytics")) {
+                                TogetherJS.config.close("enableAnalytics");
+                                if (TogetherJS.config.get("enableAnalytics")) {
                                     require(["analytics"], function (_a) {
                                         var analytics = _a.analytics;
                                         analytics.activate();
@@ -179,7 +179,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                                 peers._SelfLoaded.then(function () {
                                     sendHello(false);
                                 });
-                                togetherjs_1.TogetherJS.emit("ready");
+                                TogetherJS.emit("ready");
                             });
                         });
                     });
@@ -187,7 +187,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
             });
         };
         Session.prototype.close = function (reason) {
-            togetherjs_1.TogetherJS.running = false;
+            TogetherJS.running = false;
             var msg = { type: "bye" };
             if (reason) {
                 msg.reason = reason;
@@ -208,8 +208,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 channel = null;
                 exports.session.shareId = null;
                 exports.session.emit("shareId");
-                togetherjs_1.TogetherJS.emit("close");
-                togetherjs_1.TogetherJS._teardown();
+                TogetherJS.emit("close");
+                TogetherJS._teardown();
             });
         };
         Session.prototype._getChannel = function () {
@@ -222,8 +222,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
     /****************************************
      * URLs
      */
-    var includeHashInUrl = togetherjs_1.TogetherJS.config.get("includeHashInUrl");
-    togetherjs_1.TogetherJS.config.close("includeHashInUrl");
+    var includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
+    TogetherJS.config.close("includeHashInUrl");
     var currentUrl = (location.href + "").replace(/\#.*$/, "");
     if (includeHashInUrl) {
         currentUrl = location.href;
@@ -231,7 +231,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
     /****************************************
      * Message handling/dispatching
      */
-    var IGNORE_MESSAGES = togetherjs_1.TogetherJS.config.get("ignoreMessages");
+    var IGNORE_MESSAGES = TogetherJS.config.get("ignoreMessages");
     if (IGNORE_MESSAGES === true) {
         DEBUG = false;
         IGNORE_MESSAGES = [];
@@ -288,7 +288,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 }
             }
             exports.session.hub.emit(msg.type, msg);
-            togetherjs_1.TogetherJS._onmessage(msg);
+            TogetherJS._onmessage(msg);
         };
         channel = c;
         exports.session.router.bindChannel(channel);
@@ -335,7 +335,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
     // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
     var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     function getRoomName(prefix, maxSize) {
-        var hubBase = togetherjs_1.TogetherJS.config.get("hubBase");
+        var hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
         var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
         return $.ajax({
@@ -371,12 +371,12 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
             var isClient = true;
             var set = true;
             var sessionId;
-            exports.session.firstRun = !togetherjs_1.TogetherJS.startup.continued;
+            exports.session.firstRun = !TogetherJS.startup.continued;
             if (!shareId) {
-                if (togetherjs_1.TogetherJS.startup._joinShareId) {
+                if (TogetherJS.startup._joinShareId) {
                     // Like, below, this *also* means we got the shareId from the hash
                     // (in togetherjs.js):
-                    shareId = togetherjs_1.TogetherJS.startup._joinShareId;
+                    shareId = TogetherJS.startup._joinShareId;
                 }
             }
             if (!shareId) {
@@ -391,21 +391,21 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 }
             }
             return storage_1.storage.tab.get("status").then(function (saved) {
-                var findRoom = togetherjs_1.TogetherJS.config.get("findRoom");
-                togetherjs_1.TogetherJS.config.close("findRoom");
+                var findRoom = TogetherJS.config.get("findRoom");
+                TogetherJS.config.close("findRoom");
                 if (findRoom && saved && findRoom != saved.shareId) {
                     console.info("Ignoring findRoom in lieu of continued session");
                 }
-                else if (findRoom && togetherjs_1.TogetherJS.startup._joinShareId) {
+                else if (findRoom && TogetherJS.startup._joinShareId) {
                     console.info("Ignoring findRoom in lieu of explicit invite to session");
                 }
-                if (findRoom && typeof findRoom == "string" && (!saved) && (!togetherjs_1.TogetherJS.startup._joinShareId)) {
+                if (findRoom && typeof findRoom == "string" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     isClient = true;
                     shareId = findRoom;
                     sessionId = util_1.util.generateId();
                 }
                 // TODO added 'typeof findRoom == "object"' check
-                else if (findRoom && typeof findRoom == "object" && (!saved) && (!togetherjs_1.TogetherJS.startup._joinShareId)) {
+                else if (findRoom && typeof findRoom == "object" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
                     assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0, "Bad findRoom.max", findRoom);
                     sessionId = util_1.util.generateId();
@@ -423,7 +423,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                     });
                     return;
                 }
-                else if (togetherjs_1.TogetherJS.startup._launch) {
+                else if (TogetherJS.startup._launch) {
                     if (saved) {
                         isClient = saved.reason == "joined";
                         if (!shareId) {
@@ -432,7 +432,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                         sessionId = saved.sessionId;
                     }
                     else {
-                        isClient = togetherjs_1.TogetherJS.startup.reason == "joined";
+                        isClient = TogetherJS.startup.reason == "joined";
                         assert(!sessionId);
                         sessionId = util_1.util.generateId();
                     }
@@ -442,8 +442,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 }
                 else if (saved) {
                     isClient = saved.reason == "joined";
-                    togetherjs_1.TogetherJS.startup.reason = saved.reason;
-                    togetherjs_1.TogetherJS.startup.continued = true;
+                    TogetherJS.startup.reason = saved.reason;
+                    TogetherJS.startup.continued = true;
                     shareId = saved.shareId;
                     sessionId = saved.sessionId;
                     // The only case when we don't need to set the storage status again is when
@@ -456,7 +456,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
                 assert(exports.session.identityId);
                 exports.session.clientId = exports.session.identityId + "." + sessionId;
                 if (set) {
-                    storage_1.storage.tab.set("status", { reason: togetherjs_1.TogetherJS.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
+                    storage_1.storage.tab.set("status", { reason: TogetherJS.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
                 }
                 exports.session.isClient = isClient;
                 exports.session.shareId = shareId;
@@ -467,8 +467,8 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
     }
     function initStartTarget() {
         var id;
-        if (togetherjs_1.TogetherJS.startup.button) {
-            id = togetherjs_1.TogetherJS.startup.button.id;
+        if (TogetherJS.startup.button) {
+            id = TogetherJS.startup.button.id;
             if (id) {
                 storage_1.storage.set("startTarget", id);
             }
@@ -478,7 +478,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
             if (id) {
                 var el = document.getElementById(id);
                 if (el) {
-                    togetherjs_1.TogetherJS.startup.button = el;
+                    TogetherJS.startup.button = el;
                 }
             }
         });
@@ -503,7 +503,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./togetherjs
     function resizeEvent() {
         exports.session.emit("resize");
     }
-    if (togetherjs_1.TogetherJS.startup._launch) {
+    if (TogetherJS.startup._launch) {
         setTimeout(exports.session.start);
     }
     util_1.util.testExpose({

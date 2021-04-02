@@ -1,5 +1,3 @@
-import { TogetherJS } from "./togetherjs";
-
 class Analytics {
     activate() {
         var enable = TogetherJS.config.get("enableAnalytics");

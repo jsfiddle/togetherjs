@@ -1,4 +1,4 @@
-define(["require", "exports", "./togetherjs"], function (require, exports, togetherjs_1) {
+define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.analytics = void 0;
@@ -6,10 +6,10 @@ define(["require", "exports", "./togetherjs"], function (require, exports, toget
         function Analytics() {
         }
         Analytics.prototype.activate = function () {
-            var enable = togetherjs_1.TogetherJS.config.get("enableAnalytics");
-            var code = togetherjs_1.TogetherJS.config.get("analyticsCode");
-            togetherjs_1.TogetherJS.config.close("enableAnalytics");
-            togetherjs_1.TogetherJS.config.close("analyticsCode");
+            var enable = TogetherJS.config.get("enableAnalytics");
+            var code = TogetherJS.config.get("analyticsCode");
+            TogetherJS.config.close("enableAnalytics");
+            TogetherJS.config.close("analyticsCode");
             if (!(enable && code)) {
                 return;
             }

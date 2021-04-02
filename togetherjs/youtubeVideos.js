@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./elementFinder", "./session", "./togetherjs"], function (require, exports, elementFinder_1, session_1, togetherjs_1) {
+define(["require", "exports", "./elementFinder", "./session"], function (require, exports, elementFinder_1, session_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     //function youtubeVideosMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
@@ -12,7 +12,7 @@ define(["require", "exports", "./elementFinder", "./session", "./togetherjs"], f
     // youtube API load delay
     var API_LOADING_DELAY = 2000;
     session_1.session.on("reinitialize", function () {
-        if (togetherjs_1.TogetherJS.config.get("youtube")) {
+        if (TogetherJS.config.get("youtube")) {
             prepareYouTube();
         }
     });
@@ -34,11 +34,11 @@ define(["require", "exports", "./elementFinder", "./session", "./togetherjs"], f
         });
     });
     $(function () {
-        togetherjs_1.TogetherJS.config.track("youtube", function (track, previous) {
+        TogetherJS.config.track("youtube", function (track, previous) {
             if (track && !previous) {
                 prepareYouTube();
                 // You can enable youtube dynamically, but can't turn it off:
-                togetherjs_1.TogetherJS.config.close("youtube");
+                TogetherJS.config.close("youtube");
             }
         });
     });

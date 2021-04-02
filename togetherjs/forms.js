@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, togetherjs_1, util_1) {
+define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./util"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.forms = void 0;
@@ -27,7 +27,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     var FOCUS_BUFFER = 5;
     var inRemoteUpdate = false;
     function suppressSync(element) {
-        var ignoreForms = togetherjs_1.TogetherJS.config.get("ignoreForms");
+        var ignoreForms = TogetherJS.config.get("ignoreForms");
         if (ignoreForms === true) {
             return true;
         }
@@ -99,7 +99,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     }
     var editTrackers = {};
     var liveTrackers = [];
-    togetherjs_1.TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
+    TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
         // Test for required instance methods.
@@ -180,7 +180,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         AceEditor.trackerName = "AceEditor";
         return AceEditor;
     }(Editor));
-    togetherjs_1.TogetherJS.addTracker(AceEditor, true /* skip setInit */);
+    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
     var CodeMirrorEditor = /** @class */ (function (_super) {
         __extends(CodeMirrorEditor, _super);
         function CodeMirrorEditor(el) {
@@ -256,7 +256,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         CodeMirrorEditor.trackerName = "CodeMirrorEditor";
         return CodeMirrorEditor;
     }(Editor));
-    togetherjs_1.TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
     var CKEditor = /** @class */ (function (_super) {
         __extends(CKEditor, _super);
         function CKEditor(el) {
@@ -333,7 +333,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         CKEditor.trackerName = "CKEditor";
         return CKEditor;
     }(Editor));
-    togetherjs_1.TogetherJS.addTracker(CKEditor, true /* skip setInit */);
+    TogetherJS.addTracker(CKEditor, true /* skip setInit */);
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
     var tinymceEditor = /** @class */ (function (_super) {
         __extends(tinymceEditor, _super);
@@ -417,7 +417,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         tinymceEditor.trackerName = "tinymceEditor";
         return tinymceEditor;
     }(Editor));
-    togetherjs_1.TogetherJS.addTracker(tinymceEditor, true);
+    TogetherJS.addTracker(tinymceEditor, true);
     ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
         assert(!liveTrackers.length);
@@ -637,7 +637,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         initSent = true;
         var msg = {
             type: "form-init",
-            pageAge: Date.now() - togetherjs_1.TogetherJS.pageLoaded,
+            pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
         };
         var els = $("textarea, input, select");
@@ -734,7 +734,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             // In a 3+-peer situation more than one client may init; in this case
             // we're probably the other peer, and not the peer that needs the init
             // A quick check to see if we should init...
-            var myAge = Date.now() - togetherjs_1.TogetherJS.pageLoaded;
+            var myAge = Date.now() - TogetherJS.pageLoaded;
             if (msg.pageAge < myAge) {
                 // We've been around longer than the other person...
                 return;

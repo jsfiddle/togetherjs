@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./init", "./togetherjs", "./util"], function (require, exports, init_1, togetherjs_1, util_1) {
+define(["require", "exports", "./init", "./util"], function (require, exports, init_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.storage = void 0;
@@ -162,8 +162,8 @@ define(["require", "exports", "./init", "./togetherjs", "./util"], function (req
         }
         return TJSStorageWithTab;
     }(TJSStorage));
-    var namePrefix = togetherjs_1.TogetherJS.config.get("storagePrefix");
-    togetherjs_1.TogetherJS.config.close("storagePrefix");
+    var namePrefix = TogetherJS.config.get("storagePrefix");
+    TogetherJS.config.close("storagePrefix");
     var tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     exports.storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
 });

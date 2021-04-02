@@ -1,6 +1,6 @@
 // RTC Patches
 
-import { TogetherJSNS } from "./togetherjs";
+export {}
 
 declare global {
     interface Window {

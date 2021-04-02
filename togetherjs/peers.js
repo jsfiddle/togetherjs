@@ -16,7 +16,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./init", "./session", "./storage", "./templates", "./togetherjs", "./util"], function (require, exports, init_1, session_1, storage_1, templates_1, togetherjs_1, util_1) {
+define(["require", "exports", "./init", "./session", "./storage", "./templates", "./util"], function (require, exports, init_1, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.peers = void 0;
@@ -332,7 +332,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                     storage_1.storage.settings.set("color", color);
                 }
                 if (!avatar) {
-                    avatar = togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
+                    avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
                 }
                 _this.update({
                     name: name,
@@ -347,9 +347,9 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
         PeersSelf.prototype._loadFromApp = function () {
             // FIXME: I wonder if these should be optionally functions?
             // We could test typeof==function to distinguish between a getter and a concrete value
-            var getUserName = togetherjs_1.TogetherJS.config.get("getUserName");
-            var getUserColor = togetherjs_1.TogetherJS.config.get("getUserColor");
-            var getUserAvatar = togetherjs_1.TogetherJS.config.get("getUserAvatar");
+            var getUserName = TogetherJS.config.get("getUserName");
+            var getUserColor = TogetherJS.config.get("getUserColor");
+            var getUserAvatar = TogetherJS.config.get("getUserAvatar");
             var name = null;
             var color = null;
             var avatar = null;
@@ -464,7 +464,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             exports.peers.Self._loadFromApp();
         }
     });
-    togetherjs_1.TogetherJS.config.track("getUserName", togetherjs_1.TogetherJS.config.track("getUserColor", togetherjs_1.TogetherJS.config.track("getUserAvatar", function () {
+    TogetherJS.config.track("getUserName", TogetherJS.config.track("getUserColor", TogetherJS.config.track("getUserAvatar", function () {
         if (exports.peers.Self) {
             exports.peers.Self._loadFromApp();
         }
@@ -555,7 +555,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
         setIdleTime: function (time) {
             IDLE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = time / 2;
-            if (togetherjs_1.TogetherJS.running) {
+            if (TogetherJS.running) {
                 if (checkActivityTask !== null) {
                     clearTimeout(checkActivityTask);
                 }
@@ -567,7 +567,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
         setByeTime: function (time) {
             BYE_TIME = time;
             CHECK_ACTIVITY_INTERVAL = Math.min(CHECK_ACTIVITY_INTERVAL, time / 2);
-            if (togetherjs_1.TogetherJS.running) {
+            if (TogetherJS.running) {
                 if (checkActivityTask !== null) {
                     clearTimeout(checkActivityTask);
                 }

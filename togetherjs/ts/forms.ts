@@ -7,8 +7,6 @@ import { eventMaker } from "./eventMaker";
 import { ot } from "./ot";
 import { session } from "./session";
 import { templating } from "./templating";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { util } from "./util";
 
 //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {

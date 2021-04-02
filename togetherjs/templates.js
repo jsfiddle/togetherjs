@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./togetherjs", "./util"], function (require, exports, togetherjs_1, util_1) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.templates = void 0;
@@ -11,13 +11,13 @@ define(["require", "exports", "./togetherjs", "./util"], function (require, expo
         // Removes <% /* ... */ %> comments:
         t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
         t = util_1.util.trim(t);
-        t = t.replace(/http:\/\/localhost:8080/g, togetherjs_1.TogetherJS.baseUrl);
+        t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
         t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
         t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
         t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
         return t;
     }
-    var lang = togetherjs_1.TogetherJS.getConfig("lang") || "en-US";
+    var lang = TogetherJS.getConfig("lang") || "en-US";
     var moduleName = "templates-" + lang;
     var templatesLang;
     require([moduleName], function (mod) {

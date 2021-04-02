@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { storage } from "./storage";
-import { TogetherJS } from "./togetherjs";
-import type { TogetherJSNS } from "./types/togetherjs";
 import { windowing } from "./windowing";
 
 /* This module handles all the different UI that happens (sometimes in order) when

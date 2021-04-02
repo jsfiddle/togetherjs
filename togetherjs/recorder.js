@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./channels", "./togetherjs", "./util"], function (require, exports, channels_1, togetherjs_1, util_1) {
+define(["require", "exports", "./channels", "./util"], function (require, exports, channels_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.recorder = void 0;
@@ -23,7 +23,7 @@ define(["require", "exports", "./channels", "./togetherjs", "./util"], function 
                 type: "hello-back",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -37,7 +37,7 @@ define(["require", "exports", "./channels", "./togetherjs", "./util"], function 
                 type: "hello",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: togetherjs_1.TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -73,7 +73,7 @@ define(["require", "exports", "./channels", "./togetherjs", "./util"], function 
             var _this = this;
             var _a;
             var match;
-            this.shareId = (_a = togetherjs_1.TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
+            this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
             if (!this.shareId) {
                 match = /\&togetherjs=([^&]+)/.exec(location.hash);
                 if (!match) {

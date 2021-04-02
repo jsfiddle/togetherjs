@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./togetherjs", "./util"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, togetherjs_1, util_1) {
+define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./util"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.cursor = void 0;
@@ -407,7 +407,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         // handling (since I'm catching every click), and I'll just do
         // something real soon:
         setTimeout(function () {
-            if (!togetherjs_1.TogetherJS.running) {
+            if (!TogetherJS.running) {
                 // This can end up running right after TogetherJS has been closed, often
                 // because TogetherJS was closed with a click...
                 return;
@@ -425,8 +425,8 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             if (element.nodeName.toLowerCase() === 'video') {
                 return;
             }
-            var dontShowClicks = togetherjs_1.TogetherJS.config.get("dontShowClicks");
-            var cloneClicks = togetherjs_1.TogetherJS.config.get("cloneClicks");
+            var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+            var cloneClicks = TogetherJS.config.get("cloneClicks");
             // If you dont want to clone the click for this element
             // and you dont want to show the click for this element or you dont want to show any clicks
             // then return to avoid sending a useless click
@@ -465,11 +465,11 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         var offset = target.offset(); // TODO !
         var top = offset.top + pos.offsetY;
         var left = offset.left + pos.offsetX;
-        var cloneClicks = togetherjs_1.TogetherJS.config.get("cloneClicks");
+        var cloneClicks = TogetherJS.config.get("cloneClicks");
         if (util_1.util.matchElement(target, cloneClicks)) {
             eventMaker_1.eventMaker.performClick(target);
         }
-        var dontShowClicks = togetherjs_1.TogetherJS.config.get("dontShowClicks");
+        var dontShowClicks = TogetherJS.config.get("dontShowClicks");
         if (util_1.util.matchElement(target, dontShowClicks)) {
             return;
         }
