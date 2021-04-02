@@ -350,7 +350,7 @@ class PeersSelf extends OnClass {
                     storage.settings.set("color", color);
                 }
                 if(!avatar) {
-                    avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
+                    avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
                 }
                 this.update({
                     name: name,

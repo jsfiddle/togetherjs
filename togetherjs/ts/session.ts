@@ -67,7 +67,7 @@ class Session extends OnClass {
 
     recordUrl() {
         assert(this.shareId);
-        var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
+        var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
         url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
         return url;
     }

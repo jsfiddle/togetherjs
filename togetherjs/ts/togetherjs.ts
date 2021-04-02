@@ -154,7 +154,7 @@ function addScript(url: string) {
 }
 
 function togetherjsMain() {
-    let styleSheet = "/togetherjs/togetherjs.css";
+    let styleSheet = "/togetherjs.css";
 
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
@@ -537,16 +537,16 @@ function togetherjsMain() {
                 requireConfig.deps = deps;
                 requireConfig.callback = callback;
                 if(!min) {
-                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/togetherjs/libs/require.js"); (see below) will be executed
+                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/libs/require.js"); (see below) will be executed
                     //@ts-expect-error weird stuff
                     window.require = requireConfig;
                 }
             }
             if(min) {
-                addScriptInner("/togetherjs/togetherjsPackage.js");
+                addScriptInner("/togetherjsPackage.js");
             }
             else {
-                addScriptInner("/togetherjs/libs/require.js");
+                addScriptInner("/libs/require.js");
             }
         }
 
@@ -824,7 +824,7 @@ function togetherjsMain() {
 
     tjsInstance.requireConfig = {
         context: "togetherjs",
-        baseUrl: baseUrl + "/togetherjs",
+        baseUrl: baseUrl,
         urlArgs: "bust=" + cacheBust,
         paths: {
             jquery: "libs/jquery-1.11.1.min",

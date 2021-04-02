@@ -491,7 +491,7 @@ class PeerView extends PeerSelfView {
                 // decrease/reset dock height
                 $("#togetherjs-dock").css("height", 260);
                 //replace participant button
-                $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
+                $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
                 // new full participant window created on toggle
                 $("#togetherjs-participantlist-button").click(function() {
                     windowing.toggle("#togetherjs-participantlist");
@@ -896,7 +896,7 @@ class Ui {
             // });
 
             //replace the anchor icon
-            var src = "/togetherjs/images/togetherjs-logo-close.png";
+            var src = "/images/togetherjs-logo-close.png";
             $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
         }
 
@@ -909,7 +909,7 @@ class Ui {
             });
 
             //replace the anchor icon
-            var src = "/togetherjs/images/togetherjs-logo-open.png";
+            var src = "/images/togetherjs-logo-open.png";
             $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
             $('.togetherjs-window').animate({ opacity: 0 });
@@ -948,7 +948,7 @@ class Ui {
             // });
 
             //replace the anchor icon
-            var src = "/togetherjs/images/togetherjs-logo-close.png";
+            var src = "/images/togetherjs-logo-close.png";
             $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
             // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click

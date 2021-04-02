@@ -71,7 +71,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
         };
         Session.prototype.recordUrl = function () {
             assert(this.shareId);
-            var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
+            var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
             url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
             return url;
         };

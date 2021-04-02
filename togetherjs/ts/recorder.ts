@@ -25,7 +25,7 @@ function sendHello(helloBack: boolean) {
             type: "hello-back",
             name: "Recorder 'bot",
             // FIXME: replace with robot:
-            avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+            avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
             color: "#888888",
             rtcSupported: false,
             clientId: clientId,
@@ -39,7 +39,7 @@ function sendHello(helloBack: boolean) {
             type: "hello",
             name: "Recorder 'bot",
             // FIXME: replace with robot:
-            avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+            avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
             color: "#888888",
             rtcSupported: false,
             clientId: clientId,

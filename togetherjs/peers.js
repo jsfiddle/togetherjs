@@ -332,7 +332,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                     storage_1.storage.settings.set("color", color);
                 }
                 if (!avatar) {
-                    avatar = TogetherJS.baseUrl + "/togetherjs/images/default-avatar.png";
+                    avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
                 }
                 _this.update({
                     name: name,

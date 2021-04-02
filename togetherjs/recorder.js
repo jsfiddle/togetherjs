@@ -23,7 +23,7 @@ define(["require", "exports", "./channels", "./util"], function (require, export
                 type: "hello-back",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -37,7 +37,7 @@ define(["require", "exports", "./channels", "./util"], function (require, export
                 type: "hello",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
