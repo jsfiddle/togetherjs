@@ -14,7 +14,7 @@ import { windowing } from "./windowing";
 
 //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
 
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 var Walkabout: TogetherJSNS.Walkabout;
 
 session.hub.on("chat", function(msg) {

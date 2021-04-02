@@ -13,7 +13,7 @@ import { visibilityApi } from "./visibilityApi";
 import { windowing } from "./windowing";
 
 //function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 var AssertionError = util.AssertionError;
 var chat: TogetherJSNS.Chat;
 var $window = $(window);

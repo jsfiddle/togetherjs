@@ -7,7 +7,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
     exports.cursor = void 0;
     // Cursor viewing support
     //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var CURSOR_HEIGHT = 50;
     var CURSOR_ANGLE = (35 / 180) * Math.PI;
     var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);

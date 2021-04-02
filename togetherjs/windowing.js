@@ -6,7 +6,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.windowing = void 0;
     //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var $window = $(window);
     // This is also in togetherjs.less, under .togetherjs-animated
     var ANIMATION_DURATION = 1000;

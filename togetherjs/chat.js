@@ -7,7 +7,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.chat = void 0;
     //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var Walkabout;
     session_1.session.hub.on("chat", function (msg) {
         ui_1.ui.chat.text({

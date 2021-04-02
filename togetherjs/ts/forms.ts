@@ -10,7 +10,7 @@ import { templating } from "./templating";
 import { util } from "./util";
 
 //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
-const assert: typeof util.assert = util.assert;
+const assert: typeof util.assert = util.assert.bind(util);
 
 // This is how much larger the focus element is than the element it surrounds
 // (this is padding on each side)

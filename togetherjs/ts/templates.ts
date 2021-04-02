@@ -5,7 +5,7 @@
 import { util } from "./util";
 
 //function templatesMain(util: TogetherJSNS.Util, require: Require) {
-let assert: typeof util.assert = util.assert;
+let assert: typeof util.assert = util.assert.bind(util);
 
 function clean(t: string) {
     // Removes <% /* ... */ %> comments:

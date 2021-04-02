@@ -6,7 +6,7 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.walkthrough = void 0;
     //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var onHideAll = null;
     var container; // TODO init
     var slides; // TODO init

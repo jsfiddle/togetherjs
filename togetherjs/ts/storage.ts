@@ -6,7 +6,7 @@ import { OnClass } from "./init";
 import { util } from "./util";
 
 //function StorageMain(util: TogetherJSNS.Util) {
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 var Deferred = util.Deferred;
 var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
     name: "",

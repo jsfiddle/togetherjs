@@ -12,7 +12,7 @@ import { windowing } from "./windowing";
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
 //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 
 session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
 

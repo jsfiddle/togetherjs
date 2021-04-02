@@ -6,7 +6,7 @@ define(["require", "exports", "./channels", "./util"], function (require, export
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.recorder = void 0;
     //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var clientId = "recorder";
     function display(elOrSelector) {

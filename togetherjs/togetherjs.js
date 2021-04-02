@@ -359,7 +359,7 @@ function togetherjsMain() {
             var _this = this;
             var session;
             if (this.running) {
-                session = this.require("session");
+                session = this.require("session").session;
                 session.close();
                 return;
             }
@@ -452,7 +452,7 @@ function togetherjsMain() {
             }
             // FIXME: maybe I should just test for this.require:
             if (this._loaded) {
-                session = this.require("session");
+                session = this.require("session").session;
                 addStyle();
                 session.start();
                 return;
@@ -557,8 +557,8 @@ function togetherjsMain() {
         };
         TogetherJSClass.prototype.reinitialize = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
-                    session.emit("reinitialize");
+                this.require(["session"], function (sessionModule) {
+                    sessionModule.session.emit("reinitialize");
                 });
             }
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
@@ -575,8 +575,8 @@ function togetherjsMain() {
         };
         TogetherJSClass.prototype.refreshUserData = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
-                    session.emit("refresh-user-data");
+                this.require(["session"], function (sessionModule) {
+                    sessionModule.session.emit("refresh-user-data");
                 });
             }
         };
@@ -596,14 +596,14 @@ function togetherjsMain() {
             if (!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             session.appSend(msg);
         };
         TogetherJSClass.prototype.shareUrl = function () {
             if (!this.require) {
                 return null;
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             return session.shareUrl();
         };
         TogetherJSClass.prototype.listenForShortcut = function () {

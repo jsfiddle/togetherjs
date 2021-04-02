@@ -14,7 +14,7 @@ var DEBUG = true;
 // for us to respect a URL change:
 var HELLO_BACK_CUTOFF = 1500;
 
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 
 // We will load this module later (there's a circular import):
 var peers: TogetherJSNS.Peers;

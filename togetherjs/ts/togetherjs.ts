@@ -362,7 +362,7 @@ function togetherjsMain() {
         start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
             let session;
             if(this.running) {
-                session = this.require("session");
+                session = this.require("session").session;
                 session.close();
                 return;
             }
@@ -459,7 +459,7 @@ function togetherjsMain() {
 
             // FIXME: maybe I should just test for this.require:
             if(this._loaded) {
-                session = this.require("session");
+                session = this.require("session").session;
                 addStyle();
                 session.start();
                 return;
@@ -572,8 +572,8 @@ function togetherjsMain() {
 
         reinitialize() {
             if(this.running && typeof this.require == "function") {
-                this.require(["session"], function(session: TogetherJSNS.On) {
-                    session.emit("reinitialize");
+                this.require(["session"], function(sessionModule: { session: TogetherJSNS.Session }) {
+                    sessionModule.session.emit("reinitialize");
                 });
             }
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
@@ -592,8 +592,8 @@ function togetherjsMain() {
 
         refreshUserData() {
             if(this.running && typeof this.require == "function") {
-                this.require(["session"], function(session: TogetherJSNS.On) {
-                    session.emit("refresh-user-data");
+                this.require(["session"], function(sessionModule: { session: TogetherJSNS.Session }) {
+                    sessionModule.session.emit("refresh-user-data");
                 });
             }
         }
@@ -615,7 +615,7 @@ function togetherjsMain() {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            let session = this.require("session") as TogetherJSNS.Session;
+            let session = this.require("session").session as TogetherJSNS.Session;
             session.appSend(msg);
         }
 
@@ -623,7 +623,7 @@ function togetherjsMain() {
             if(!this.require) {
                 return null;
             }
-            let session = this.require("session");
+            let session = this.require("session").session;
             return session.shareUrl();
         }
 

@@ -6,7 +6,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.templating = void 0;
     //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var Templating = /** @class */ (function () {
         function Templating() {
         }

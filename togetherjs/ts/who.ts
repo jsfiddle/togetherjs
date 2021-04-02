@@ -8,7 +8,7 @@ import { ui } from "./ui";
 import { util } from "./util";
 
 //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
-const assert: typeof util.assert = util.assert;
+const assert: typeof util.assert = util.assert.bind(util);
 var MAX_RESPONSE_TIME = 5000;
 var MAX_LATE_RESPONSE = 2000;
 

@@ -12,7 +12,7 @@ interface ShowOptions {
 }
 
 //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 var $window = $(window);
 // This is also in togetherjs.less, under .togetherjs-animated
 var ANIMATION_DURATION = 1000;

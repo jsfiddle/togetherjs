@@ -25,7 +25,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
     // This is the amount of time in which a hello-back must be received after a hello
     // for us to respect a URL change:
     var HELLO_BACK_CUTOFF = 1500;
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     // We will load this module later (there's a circular import):
     var peers;
     // This is the channel to the hub:

@@ -21,7 +21,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.forms = void 0;
     //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
     var FOCUS_BUFFER = 5;

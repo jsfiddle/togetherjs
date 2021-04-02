@@ -5,7 +5,7 @@
 import { util } from "./util";
 
 //function otMain(util: TogetherJSNS.Util) {
-const assert: typeof util.assert = util.assert;
+const assert: typeof util.assert = util.assert.bind(util);
 
 class Queue<T> {
     private _q: T[] = [];

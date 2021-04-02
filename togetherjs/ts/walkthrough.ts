@@ -11,7 +11,7 @@ import { util } from "./util";
 import { windowing } from "./windowing";
 
 //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-let assert: typeof util.assert = util.assert;
+let assert: typeof util.assert = util.assert.bind(util);
 let onHideAll: (() => void) | null = null;
 let container: JQuery; // TODO init
 let slides: JQuery; // TODO init

@@ -6,7 +6,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.who = void 0;
     //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var MAX_RESPONSE_TIME = 5000;
     var MAX_LATE_RESPONSE = 2000;
     var ExternalPeer = /** @class */ (function () {

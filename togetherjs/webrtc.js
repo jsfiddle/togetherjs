@@ -6,7 +6,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
     Object.defineProperty(exports, "__esModule", { value: true });
     // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
     //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     session_1.session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
     if (session_1.session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
         // In a few versions of Firefox (18 and 19) these APIs are present but

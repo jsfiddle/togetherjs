@@ -17,7 +17,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ot = void 0;
     //function otMain(util: TogetherJSNS.Util) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var Queue = /** @class */ (function () {
         function Queue(size) {
             this._q = [];

@@ -21,7 +21,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ui = void 0;
     //function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var AssertionError = util_1.util.AssertionError;
     var chat;
     var $window = $(window);

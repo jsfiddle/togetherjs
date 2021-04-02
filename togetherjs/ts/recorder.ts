@@ -6,7 +6,7 @@ import { channels } from "./channels";
 import { util } from "./util";
 
 //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
-const assert: typeof util.assert = util.assert;
+const assert: typeof util.assert = util.assert.bind(util);
 let channel: TogetherJSNS.WebSocketChannel; // TODO potentially not initialized, why does TSC doesn't catch that?
 let clientId = "recorder";
 

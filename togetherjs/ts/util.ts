@@ -30,7 +30,6 @@ class Util {
         this.Deferred = $.Deferred;
         tjs.$ = $;
         this.AssertionError = AssertionError;
-        
     }
 
     public forEachAttr<T extends object>(obj: T, callback: (o: T[keyof T], k: keyof T) => void, context?: unknown) {

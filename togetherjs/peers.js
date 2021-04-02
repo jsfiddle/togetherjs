@@ -21,7 +21,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.peers = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
-    var assert = util_1.util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
     var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
     var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle

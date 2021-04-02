@@ -12,7 +12,7 @@ import { util } from "./util";
 // Cursor viewing support
 
 //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
-var assert: typeof util.assert = util.assert;
+var assert: typeof util.assert = util.assert.bind(util);
 
 var CURSOR_HEIGHT = 50;
 var CURSOR_ANGLE = (35 / 180) * Math.PI;
