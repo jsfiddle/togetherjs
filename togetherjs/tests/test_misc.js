@@ -2,17 +2,17 @@
 Test.require("util");
 // => Loaded modules: util
 
-util.assertValidUrl("http://foo.com");
+util.util.assertValidUrl("http://foo.com");
 // =>
-util.assertValidUrl("//foobar");
+util.util.assertValidUrl("//foobar");
 // =>
-util.assertValidUrl("data:image/png,asdf");
+util.util.assertValidUrl("data:image/png,asdf");
 // =>
-util.assertValidUrl("javascript:alert()");
+util.util.assertValidUrl("javascript:alert()");
 // => Error: AssertionError: ...
-util.assertValidUrl("foobar.com");
+util.util.assertValidUrl("foobar.com");
 // => Error: AssertionError: ...
-util.assertValidUrl("http://test.com); something: foo");
+util.util.assertValidUrl("http://test.com); something: foo");
 // => Error: AssertionError: ...
-util.assertValidUrl("HTTPS://test.com");
+util.util.assertValidUrl("HTTPS://test.com");
 // =>

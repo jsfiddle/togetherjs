@@ -1,27 +1,34 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function windowingMain($, util, _peers, session) {
-    var assert = util.assert;
-    var $window = $(window);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./session", "./util", "jquery"], function (require, exports, session_1, util_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.windowing = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
+    var assert = util_1.util.assert.bind(util_1.util);
+    var $window = jquery_1.default(window);
     // This is also in togetherjs.less, under .togetherjs-animated
     var ANIMATION_DURATION = 1000;
     var onClose = null;
     /* Displays one window.  A window must already exist.  This hides other windows, and
-       positions the window according to its data-bound-to attributes */
+        positions the window according to its data-bound-to attributes */
     var Windowing = /** @class */ (function () {
         function Windowing() {
         }
         Windowing.prototype.show = function (el, options) {
             if (options === void 0) { options = {}; }
-            var element = $(el);
+            var element = jquery_1.default(el);
             options.bind = options.bind || element.attr("data-bind-to");
             var notification = element.hasClass("togetherjs-notification");
             var modal = element.hasClass("togetherjs-modal");
             var bindElement = null;
             if (options.bind) {
-                bindElement = $(options.bind);
+                bindElement = jquery_1.default(options.bind);
             }
             this.hide();
             element.stop();
@@ -43,24 +50,24 @@ function windowingMain($, util, _peers, session) {
                 modalEscape.bind();
             }
             onClose = options.onClose || null;
-            session.emit("display-window", element.attr("id"), element);
+            session_1.session.emit("display-window", element.attr("id"), element);
         };
         Windowing.prototype.hide = function (selector) {
             if (selector === void 0) { selector = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification"; }
             // FIXME: also hide modals?
-            var els = $(selector);
+            var els = jquery_1.default(selector);
             els = els.filter(":visible");
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
             var windows = [];
             els.each(function (_index, el) {
-                var element = $(el);
+                var element = jquery_1.default(el);
                 windows.push(element);
                 var bound = element.data("boundTo");
                 if (!bound) {
                     return;
                 }
-                bound = $(bound);
+                bound = jquery_1.default(bound);
                 bound.addClass("togetherjs-animated").addClass("togetherjs-color-pulse");
                 setTimeout(function () {
                     bound.removeClass("togetherjs-color-pulse").removeClass("togetherjs-animated");
@@ -73,17 +80,17 @@ function windowingMain($, util, _peers, session) {
                     });
                 }
             });
-            $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+            jquery_1.default("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
             if (onClose) {
                 onClose();
                 onClose = null;
             }
             if (windows.length) {
-                session.emit("hide-window", windows);
+                session_1.session.emit("hide-window", windows);
             }
         };
         Windowing.prototype.toggle = function (el) {
-            var element = $(el);
+            var element = jquery_1.default(el);
             if (element.is(":visible")) {
                 this.hide(element);
             }
@@ -93,14 +100,14 @@ function windowingMain($, util, _peers, session) {
         };
         return Windowing;
     }());
-    var windowing = new Windowing();
+    exports.windowing = new Windowing();
     /* Moves a window to be attached to data-bind-to, e.g., the button
-       that opened the window. Or you can provide an element that it should bind to. */
+        that opened the window. Or you can provide an element that it should bind to. */
     function bind(window, bound) {
-        if ($.browser.mobile) {
+        if (jquery_1.default.browser.mobile) {
             return;
         }
-        var win = $(window);
+        var win = jquery_1.default(window);
         assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
         // FIXME: hardcoding
         var ifacePos = "right";
@@ -135,8 +142,8 @@ function windowingMain($, util, _peers, session) {
             left: left + "px"
         });
         if (win.hasClass("togetherjs-window")) {
-            $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-            var pointer = $("#togetherjs-window-pointer-" + ifacePos);
+            jquery_1.default("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+            var pointer = jquery_1.default("#togetherjs-window-pointer-" + ifacePos);
             pointer.show();
             if (ifacePos == "right") {
                 pointer.css({
@@ -157,8 +164,8 @@ function windowingMain($, util, _peers, session) {
         win.data("boundTo", bound.selector || "#" + bound.attr("id"));
         bound.addClass("togetherjs-active");
     }
-    session.on("resize", function () {
-        var win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
+    session_1.session.on("resize", function () {
+        var win = jquery_1.default(".togetherjs-modal:visible, .togetherjs-window:visible");
         if (!win.length) {
             return;
         }
@@ -166,13 +173,13 @@ function windowingMain($, util, _peers, session) {
         if (!boundTo) {
             return;
         }
-        boundTo = $(boundTo);
+        boundTo = jquery_1.default(boundTo);
         bind(win, boundTo);
     });
     function bindEvents(el) {
         el.find(".togetherjs-close, .togetherjs-dismiss").click(function (event) {
-            var w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
-            windowing.hide(w);
+            var w = jquery_1.default(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
+            exports.windowing.hide(w);
             event.stopPropagation();
             return false;
         });
@@ -182,11 +189,11 @@ function windowingMain($, util, _peers, session) {
         if (getModalBackgroundElement) {
             return getModalBackgroundElement;
         }
-        var background = $("#togetherjs-modal-background");
+        var background = jquery_1.default("#togetherjs-modal-background");
         assert(background.length);
         getModalBackgroundElement = background;
         background.click(function () {
-            windowing.hide();
+            exports.windowing.hide();
         });
         return background;
     }
@@ -194,26 +201,26 @@ function windowingMain($, util, _peers, session) {
         function ModalEscape() {
         }
         ModalEscape.prototype.bind = function () {
-            $(document).keydown(this.onKeydown);
+            jquery_1.default(document).keydown(this.onKeydown);
         };
         ModalEscape.prototype.unbind = function () {
-            $(document).unbind("keydown", this.onKeydown);
+            jquery_1.default(document).unbind("keydown", this.onKeydown);
         };
         ModalEscape.prototype.onKeydown = function (event) {
             if (event.which == 27) {
-                windowing.hide();
+                exports.windowing.hide();
             }
         };
         return ModalEscape;
     }());
     ;
     var modalEscape = new ModalEscape();
-    session.on("close", function () {
+    session_1.session.on("close", function () {
         modalEscape.unbind();
     });
-    session.on("new-element", function (el) {
+    session_1.session.on("new-element", function (el) {
         bindEvents(el);
     });
-    return windowing;
-}
-define(["jquery", "util", "peers", "session"], windowingMain);
+});
+//return windowing;
+//define(["jquery", "util", "peers", "session"], windowingMain);

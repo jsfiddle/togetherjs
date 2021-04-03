@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,11 +16,19 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function uiMain(require, $, util, session, templates, templating, linkify, peers, windowing, elementFinder, visibilityApi) {
-    var assert = util.assert;
-    var AssertionError = util.AssertionError;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./util", "./visibilityApi", "./windowing", "jquery"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, util_1, visibilityApi_1, windowing_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ui = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
+    var assert = util_1.util.assert.bind(util_1.util);
+    var AssertionError = util_1.util.AssertionError;
     var chat;
-    var $window = $(window);
+    var $window = jquery_1.default(window);
     // This is also in togetherjs.less, as @button-height:
     var BUTTON_HEIGHT = 60 + 1; // 60 is button height, 1 is border
     // chat TextArea
@@ -45,8 +52,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     ];
     // This would be a circular import, but we just need the chat module sometime
     // after everything is loaded, and this is sure to complete by that time:
-    require(["chat"], function (c) {
-        chat = c;
+    require(["chat"], function (chatModule) {
+        chat = chatModule.chat;
     });
     var Chat = /** @class */ (function () {
         function Chat(ui) {
@@ -59,7 +66,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             var date = attrs.date || Date.now();
             var lastEl = this.ui.container.find("#togetherjs-chat .togetherjs-chat-message");
             if (lastEl.length) {
-                lastEl = $(lastEl[lastEl.length - 1]);
+                lastEl = jquery_1.default(lastEl[lastEl.length - 1]);
             }
             var lastDate = null;
             if (lastEl) {
@@ -74,12 +81,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 attrs.messageId = lastEl.attr("data-message-id");
                 lastEl.remove();
             }
-            var el = templating.sub("chat-message", {
+            var el = templating_1.templating.sub("chat-message", {
                 peer: attrs.peer,
                 content: attrs.text,
                 date: date,
             });
-            linkify(el.find(".togetherjs-chat-content"));
+            linkify_1.linkify(el.find(".togetherjs-chat-content"));
             el.attr("data-person", attrs.peer.id)
                 .attr("data-date", date)
                 .attr("data-message-id", attrs.messageId);
@@ -88,7 +95,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         Chat.prototype.joinedSession = function (attrs) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
-            var el = templating.sub("chat-joined", {
+            var el = templating_1.templating.sub("chat-joined", {
                 peer: attrs.peer,
                 date: date
             });
@@ -98,7 +105,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         Chat.prototype.leftSession = function (attrs) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
-            var el = templating.sub("chat-left", {
+            var el = templating_1.templating.sub("chat-left", {
                 peer: attrs.peer,
                 date: date,
                 declinedJoin: attrs.declinedJoin
@@ -110,7 +117,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a peer field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
-            var el = templating.sub("chat-system", {
+            var el = templating_1.templating.sub("chat-system", {
                 content: attrs.text,
                 date: date,
             });
@@ -142,7 +149,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             else {
                 title = attrs.url;
             }
-            var el = templating.sub("url-change", {
+            var el = templating_1.templating.sub("url-change", {
                 peer: attrs.peer,
                 date: date,
                 href: attrs.url,
@@ -163,7 +170,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
             });
             var notify = !attrs.sameUrl;
-            if (attrs.sameUrl && $("#" + realId).length === 0) {
+            if (attrs.sameUrl && jquery_1.default("#" + realId).length === 0) {
                 // Don't bother showing a same-url notification, if no previous notification had been shown
                 return;
             }
@@ -175,7 +182,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             var messageId = attrs.peer.className("invite-");
             var date = attrs.date || Date.now();
             var hrefTitle = attrs.url.replace(/\#?&togetherjs=.*/, "").replace(/^\w+:\/\//, "");
-            var el = templating.sub("invite", {
+            var el = templating_1.templating.sub("invite", {
                 peer: attrs.peer,
                 date: date,
                 href: attrs.url,
@@ -195,7 +202,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             if (notify === void 0) { notify = false; }
             deferForContainer(function () {
                 if (id) {
-                    el.attr("id", "togetherjs-chat-" + util.safeClassName(id));
+                    el.attr("id", "togetherjs-chat-" + util_1.util.safeClassName(id));
                 }
                 var container = _this.ui.container.find("#togetherjs-chat-messages");
                 assert(container.length);
@@ -204,7 +211,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 _this.scroll();
                 var doNotify = !!notify;
                 var section = popup.find("#togetherjs-chat-notifier-message");
-                if (notify && visibilityApi.hidden()) {
+                if (notify && visibilityApi_1.visibilityApi.hidden()) {
                     var mediaElement = _this.ui.container.find("#togetherjs-notification")[0];
                     mediaElement.play();
                 }
@@ -219,10 +226,10 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     section.append(el.clone(true, true));
                     if (section.data("message-id") != id) {
                         section.data("message-id", id || "");
-                        windowing.show(popup);
+                        windowing_1.windowing.show(popup);
                     }
                     else if (!popup.is(":visible")) {
-                        windowing.show(popup);
+                        windowing_1.windowing.show(popup);
                     }
                     if (typeof notify == "number") {
                         // This is the amount of time we're supposed to notify
@@ -231,7 +238,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                             _this.hideTimeout = undefined;
                         }
                         _this.hideTimeout = setTimeout(function () {
-                            windowing.hide(popup);
+                            windowing_1.windowing.hide(popup);
                             _this.hideTimeout = undefined;
                         }, notify);
                     }
@@ -289,7 +296,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 container.find("." + _this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev); // TODO !
                 var avatarEl = container.find("." + _this.peer.className("togetherjs-person-"));
                 if (_this.peer.avatar) {
-                    util.assertValidUrl(_this.peer.avatar);
+                    util_1.util.assertValidUrl(_this.peer.avatar);
                     avatarEl.css({
                         backgroundImage: "url(" + _this.peer.avatar + ")"
                     });
@@ -322,7 +329,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
                 container.find("." + _this.peer.className("togetherjs-person-role-")).text(_this.peer.isCreator ? "Creator" : "Participant");
                 var urlName;
-                var domain = util.truncateCommonDomain(_this.peer.url, location.href); // TODO !
+                var domain = util_1.util.truncateCommonDomain(_this.peer.url, location.href); // TODO !
                 // TODO code change
                 if ("title" in _this.peer && _this.peer.title) {
                     urlName = _this.peer.title + " (" + domain + ")";
@@ -340,19 +347,19 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 container.find("." + _this.peer.className("togetherjs-person-status-")).text(_this.peer.idle == "active" ? "Active" : "Inactive");
                 if (_this.peer.isSelf) {
                     // FIXME: these could also have consistent/reliable class names:
-                    var selfName = $(".togetherjs-self-name");
+                    var selfName = jquery_1.default(".togetherjs-self-name");
                     selfName.each((function (_index, elem) {
-                        var el = $(elem);
+                        var el = jquery_1.default(elem);
                         if (el.val() != this.peer.name) {
                             el.val(this.peer.name); // TODO !
                         }
                     }).bind(_this));
-                    $("#togetherjs-menu-avatar").attr("src", _this.peer.avatar);
+                    jquery_1.default("#togetherjs-menu-avatar").attr("src", _this.peer.avatar);
                     if (!_this.peer.name && _this.peer.defaultName) {
-                        $("#togetherjs-menu .togetherjs-person-name-self").text(_this.peer.defaultName);
+                        jquery_1.default("#togetherjs-menu .togetherjs-person-name-self").text(_this.peer.defaultName);
                     }
                 }
-                if (_this.peer.url != session.currentUrl()) {
+                if (_this.peer.url != session_1.session.currentUrl()) {
                     container.find("." + _this.peer.className("togetherjs-person-")).addClass("togetherjs-person-other-url");
                 }
                 else {
@@ -382,7 +389,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }
             var same = this.detailElement.find(".togetherjs-same-url");
             var different = this.detailElement.find(".togetherjs-different-url");
-            if (this.peer.url == session.currentUrl()) {
+            if (this.peer.url == session_1.session.currentUrl()) {
                 same.show();
                 different.hide();
             }
@@ -434,9 +441,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             which means that we are looking for an element with the id togetherjs-chat-url-change-[peer.id]
             
             So if there is never a togetherjs-chat-url-change-[own-id] for your own id in the page then chat.urlChange does nothing. I think. And you will never find a #togetherjs-chat-url-change-[own-id] because that would mean that togetherJS showed you a notification telling you that YOURSELF changed page which wouldn't make any sense.
-
+    
             document.querySelectorAll("[id^='togetherjs-chat-url-change-']") gives us a few results either in the chat (maybe hiddent by default I'm not sure) or as some kind of popup but non without our id (something like YK5yyks2.wFOBGqpa)
-
+    
             That is the reason for this code change: we return at the beginning of updateUrlDisplay() if peer.isSelf is true.
             */
             if (this.peer.isSelf) {
@@ -447,7 +454,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 return;
             }
             this._lastUpdateUrlDisplay = url;
-            var sameUrl = url == session.currentUrl();
+            var sameUrl = url == session_1.session.currentUrl();
             this.ui.chat.urlChange({
                 peer: this.peer,
                 url: this.peer.url,
@@ -471,16 +478,16 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         PeerView.prototype.dock = function () {
             var _this = this;
             deferForContainer(function () {
-                var numberOfUsers = peers.getAllPeers().length;
+                var numberOfUsers = peers_1.peers.getAllPeers().length;
                 // collapse the Dock if too many users
                 function CollapsedDock() {
                     // decrease/reset dock height
-                    $("#togetherjs-dock").css("height", 260);
+                    jquery_1.default("#togetherjs-dock").css("height", 260);
                     //replace participant button
-                    $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
+                    jquery_1.default("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
                     // new full participant window created on toggle
-                    $("#togetherjs-participantlist-button").click(function () {
-                        windowing.toggle("#togetherjs-participantlist");
+                    jquery_1.default("#togetherjs-participantlist-button").click(function () {
+                        windowing_1.windowing.toggle("#togetherjs-participantlist");
                     });
                 }
                 // FIXME: turned off for now
@@ -493,21 +500,21 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 if (_this.dockElement) {
                     return;
                 }
-                _this.dockElement = templating.sub("dock-person", {
+                _this.dockElement = templating_1.templating.sub("dock-person", {
                     peer: _this.peer
                 });
                 _this.dockElement.attr("id", _this.peer.className("togetherjs-dock-element-"));
                 _this.ui.container.find("#togetherjs-dock-participants").append(_this.dockElement);
                 _this.dockElement.find(".togetherjs-person").animateDockEntry();
                 adjustDockSize(1);
-                _this.detailElement = templating.sub("participant-window", {
+                _this.detailElement = templating_1.templating.sub("participant-window", {
                     peer: _this.peer
                 });
                 var followId = _this.peer.className("togetherjs-person-status-follow-");
                 _this.detailElement.find('[for="togetherjs-person-status-follow"]').attr("for", followId);
                 _this.detailElement.find('#togetherjs-person-status-follow').attr("id", followId);
                 _this.detailElement.find(".togetherjs-follow").click(function () {
-                    location.href = $(this).attr("href");
+                    location.href = jquery_1.default(this).attr("href");
                 });
                 _this.detailElement.find(".togetherjs-nudge").click(function () {
                     _this.peer.nudge();
@@ -522,15 +529,15 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     // FIXME: should we tell the user this?
                 });
                 _this.maybeHideDetailWindow = _this.maybeHideDetailWindow.bind(_this);
-                session.on("hide-window", _this.maybeHideDetailWindow);
+                session_1.session.on("hide-window", _this.maybeHideDetailWindow);
                 _this.ui.container.append(_this.detailElement);
                 _this.dockElement.click(function () {
                     var _a;
                     if (_this.detailElement.is(":visible")) { // TODO ! detailElement is probably set when we click on the dock, we should find a way to signify that more clearly
-                        windowing.hide(_this.detailElement); // TODO !
+                        windowing_1.windowing.hide(_this.detailElement); // TODO !
                     }
                     else {
-                        windowing.show(_this.detailElement, { bind: (_a = _this.dockElement) !== null && _a !== void 0 ? _a : undefined }); // TODO !
+                        windowing_1.windowing.show(_this.detailElement, { bind: (_a = _this.dockElement) !== null && _a !== void 0 ? _a : undefined }); // TODO !
                         _this.scrollTo();
                         _this.cursor().element.animate({
                             opacity: 0.3
@@ -560,7 +567,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             });
         };
         PeerView.prototype.scrollTo = function () {
-            if (this.peer.url != session.currentUrl()) {
+            if (this.peer.url != session_1.session.currentUrl()) {
                 return;
             }
             var pos = this.peer.scrollPosition;
@@ -568,7 +575,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 console.warn("Peer has no scroll position:", this.peer);
                 return;
             }
-            $("html, body").easeTo(elementFinder.pixelForPosition(pos));
+            jquery_1.default("html, body").easeTo(elementFinder_1.elementFinder.pixelForPosition(pos));
         };
         PeerView.prototype.maybeHideDetailWindow = function (windows) {
             if (this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
@@ -584,11 +591,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             // FIXME: scroll to person
         };
         PeerView.prototype.cursor = function () {
-            return require("cursor").getClient(this.peer.id);
+            var cursorModule = require("cursor");
+            return cursorModule.cursor.getClient(this.peer.id);
         };
         PeerView.prototype.destroy = function () {
             // FIXME: should I get rid of the dockElement?
-            session.off("hide-window", this.maybeHideDetailWindow);
+            session_1.session.off("hide-window", this.maybeHideDetailWindow);
         };
         return PeerView;
     }(PeerSelfView));
@@ -603,9 +611,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         data-toggles attribute that indicates what other elements should
         be hidden when this element is shown. */
         Ui.prototype.displayToggle = function (elem) {
-            var el = $(elem);
+            var el = jquery_1.default(elem);
             assert(el.length, "No element", arguments[0]);
-            var other = $(el.attr("data-toggles"));
+            var other = jquery_1.default(el.attr("data-toggles"));
             assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
             other.hide();
             el.show();
@@ -629,11 +637,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 });
                 return;
             }
-            var container = this.container = $(templates("interface"));
+            var container = this.container = jquery_1.default(templates_1.templates("interface"));
             assert(container.length);
-            $("body").append(container);
+            jquery_1.default("body").append(container);
             fixupAvatars(container);
-            if (session.firstRun && TogetherJS.startTarget) {
+            if (session_1.session.firstRun && TogetherJS.startTarget) {
                 // Time at which the UI will be fully ready: (We have to do this because the offset won't be quite right until the animation finishes - attempts to calculate the offset without taking into account CSS transforms have so far failed.)
                 var timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
                 finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
@@ -641,7 +649,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
                     var start = iface.offset(); // TODO !
-                    var pos = $(TogetherJS.startTarget).offset(); // TODO !
+                    var pos = jquery_1.default(TogetherJS.startTarget).offset(); // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -673,7 +681,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }, 5);
             }
             if (TogetherJS.startTarget) {
-                var el = $(TogetherJS.startTarget);
+                var el = jquery_1.default(TogetherJS.startTarget);
                 var text = el.text().toLowerCase().replace(/\s+/g, " ");
                 text = text.replace(/^\s*/, "").replace(/\s*$/, "");
                 if (text == "start togetherjs") {
@@ -686,7 +694,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 el.addClass("togetherjs-started");
             }
             this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
-                $(this).append($('<button class="togetherjs-close"></button>'));
+                jquery_1.default(this).append(jquery_1.default('<button class="togetherjs-close"></button>'));
             });
             TogetherJS.config.track("disableWebRTC", function (hide, previous) {
                 if (hide && !previous) {
@@ -712,19 +720,19 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }
             var container = this.container;
             //create the overlay
-            if ($.browser.mobile) {
+            if (jquery_1.default.browser.mobile) {
                 // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'>\x3c/div>" );
             }
             // The share link:
             this.prepareShareLink(container);
             container.find("input.togetherjs-share-link").on("keydown", function (event) {
                 if (event.which == 27) {
-                    windowing.hide("#togetherjs-share");
+                    windowing_1.windowing.hide("#togetherjs-share");
                     return false;
                 }
                 return undefined;
             });
-            session.on("shareId", updateShareLink);
+            session_1.session.on("shareId", updateShareLink);
             // The chat input element:
             var input = container.find("#togetherjs-chat-input");
             //@
@@ -734,14 +742,14 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     return false;
                 }
                 if (event.which == 27) { // Escape
-                    windowing.hide("#togetherjs-chat");
+                    windowing_1.windowing.hide("#togetherjs-chat");
                     return false;
                 }
                 return; // just for the lint rule saying "not all path return a value"
             });
             function submitChat() {
                 var val = input.val();
-                if ($.trim(val)) {
+                if (jquery_1.default.trim(val)) {
                     input.val("");
                     // triggering the event manually to avoid the addition of newline character to the textarea:
                     input.trigger("input").trigger("propertychange");
@@ -750,7 +758,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }
             // auto-resize textarea:
             input.on("input propertychange", function () {
-                var $this = $(this);
+                var $this = jquery_1.default(this);
                 var actualHeight = $this.height();
                 // reset the height of textarea to remove trailing empty space (used for shrinking):
                 $this.height(TEXTAREA_LINE_HEIGHT);
@@ -768,11 +776,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
                 this.style.height = newHeight + "px";
                 var diff = newHeight - actualHeight;
-                $("#togetherjs-chat-input-box").height($("#togetherjs-chat-input-box").height() + diff);
-                $("#togetherjs-chat-messages").height($("#togetherjs-chat-messages").height() - diff);
+                jquery_1.default("#togetherjs-chat-input-box").height(jquery_1.default("#togetherjs-chat-input-box").height() + diff);
+                jquery_1.default("#togetherjs-chat-messages").height(jquery_1.default("#togetherjs-chat-messages").height() - diff);
                 return false;
             });
-            util.testExpose({ submitChat: submitChat });
+            util_1.util.testExpose({ submitChat: submitChat });
             // Moving the window:
             // FIXME: this should probably be stickier, and not just move the window around
             // so abruptly
@@ -781,7 +789,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             // FIXME: This is in place to temporarily disable dock dragging:
             anchor = container.find("#togetherjs-dock-anchor-disabled");
             anchor.mousedown(function (_event) {
-                var iface = $("#togetherjs-dock");
+                var iface = jquery_1.default("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
                 var startPos = panelPosition();
                 function selectoff() {
@@ -808,40 +816,40 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     iface.removeClass("togetherjs-dock-bottom");
                     iface.addClass("togetherjs-dock-" + pos);
                     if (startPos && pos != startPos) {
-                        windowing.hide();
+                        windowing_1.windowing.hide();
                         startPos = null;
                     }
                 }
-                $(document).bind("mousemove", mousemove);
+                jquery_1.default(document).bind("mousemove", mousemove);
                 // If you don't turn selection off it will still select text, and show a
                 // text selection cursor:
-                $(document).bind("selectstart", selectoff);
+                jquery_1.default(document).bind("selectstart", selectoff);
                 // FIXME: it seems like sometimes we lose the mouseup event, and it's as though
                 // the mouse is stuck down:
-                $(document).one("mouseup", function () {
-                    $(document).unbind("mousemove", mousemove);
-                    $(document).unbind("selectstart", selectoff);
+                jquery_1.default(document).one("mouseup", function () {
+                    jquery_1.default(document).unbind("mousemove", mousemove);
+                    jquery_1.default(document).unbind("selectstart", selectoff);
                 });
                 return false;
             });
             function openDock() {
-                $('.togetherjs-window').animate({
+                jquery_1.default('.togetherjs-window').animate({
                     opacity: 1
                 });
-                $('#togetherjs-dock-participants').animate({
+                jquery_1.default('#togetherjs-dock-participants').animate({
                     opacity: 1
                 });
-                $('#togetherjs-dock #togetherjs-buttons').animate({
+                jquery_1.default('#togetherjs-dock #togetherjs-buttons').animate({
                     opacity: 1
                 });
                 //for iphone
-                if ($(window).width() < 480) {
-                    $('.togetherjs-dock-right').animate({ width: "204px" }, { duration: 60, easing: "linear" }, "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
+                if (jquery_1.default(window).width() < 480) {
+                    jquery_1.default('.togetherjs-dock-right').animate({ width: "204px" }, { duration: 60, easing: "linear" }, "linear" // TODO adding that seems to match the prototy more closly, check that it's ok, anyway we want to remove JQuery and at worst this parameter will be ignored
                     );
                 }
                 //for ipad
                 else {
-                    $('.togetherjs-dock-right').animate({ width: "27%" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
+                    jquery_1.default('.togetherjs-dock-right').animate({ width: "27%" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
                     );
                 }
                 // add bg overlay
@@ -853,36 +861,36 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 //   left: 0
                 // });
                 //replace the anchor icon
-                var src = "/togetherjs/images/togetherjs-logo-close.png";
-                $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
+                var src = "/images/togetherjs-logo-close.png";
+                jquery_1.default("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
             }
             function closeDock() {
                 //enable vertical scrolling
-                $("body").css({
+                jquery_1.default("body").css({
                     "position": "",
                     top: "",
                     left: ""
                 });
                 //replace the anchor icon
-                var src = "/togetherjs/images/togetherjs-logo-open.png";
-                $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
-                $('.togetherjs-window').animate({ opacity: 0 });
-                $('#togetherjs-dock-participants').animate({ opacity: 0 });
-                $('#togetherjs-dock #togetherjs-buttons').animate({ opacity: 0 });
-                $('.togetherjs-dock-right').animate({ width: "40px" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
+                var src = "/images/togetherjs-logo-open.png";
+                jquery_1.default("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
+                jquery_1.default('.togetherjs-window').animate({ opacity: 0 });
+                jquery_1.default('#togetherjs-dock-participants').animate({ opacity: 0 });
+                jquery_1.default('#togetherjs-dock #togetherjs-buttons').animate({ opacity: 0 });
+                jquery_1.default('.togetherjs-dock-right').animate({ width: "40px" }, { duration: 60, easing: "linear" }, "linear" // TODO see above
                 );
                 // remove bg overlay
                 //$(".overlay").remove();
             }
             // Setting the anchor button + dock mobile actions
-            if ($.browser.mobile) {
+            if (jquery_1.default.browser.mobile) {
                 // toggle the audio button
-                $("#togetherjs-audio-button").click(function () {
-                    windowing.toggle("#togetherjs-rtc-not-supported");
+                jquery_1.default("#togetherjs-audio-button").click(function () {
+                    windowing_1.windowing.toggle("#togetherjs-rtc-not-supported");
                 });
                 // toggle the profile button
-                $("#togetherjs-profile-button").click(function () {
-                    windowing.toggle("#togetherjs-menu-window");
+                jquery_1.default("#togetherjs-profile-button").click(function () {
+                    windowing_1.windowing.toggle("#togetherjs-menu-window");
                 });
                 // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'>\x3c/div>" );
                 //disable vertical scrolling
@@ -892,78 +900,79 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 //   left: 0
                 // });
                 //replace the anchor icon
-                var src = "/togetherjs/images/togetherjs-logo-close.png";
-                $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
+                var src = "/images/togetherjs-logo-close.png";
+                jquery_1.default("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
                 // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
                 //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
-                $("#togetherjs-dock-anchor").click(function () {
+                jquery_1.default("#togetherjs-dock-anchor").click(function () {
                     closeDock();
                     setTimeout(openDock, 1000); // TODO change: this is obviously not what should happen, it should close the dock on the 2n+1 click and open it again on the 2n click but since openDock and closeDock don't work yet I can't test it.
                 });
             }
-            $("#togetherjs-share-button").click(function () {
-                windowing.toggle("#togetherjs-share");
+            jquery_1.default("#togetherjs-share-button").click(function () {
+                windowing_1.windowing.toggle("#togetherjs-share");
             });
-            $("#togetherjs-profile-button").click(function (event) {
-                if ($.browser.mobile) {
-                    windowing.show("#togetherjs-menu-window");
+            jquery_1.default("#togetherjs-profile-button").click(function (event) {
+                if (jquery_1.default.browser.mobile) {
+                    windowing_1.windowing.show("#togetherjs-menu-window");
                     return false;
                 }
                 toggleMenu();
                 event.stopPropagation();
                 return false;
             });
-            $("#togetherjs-menu-feedback, #togetherjs-menu-feedback-button").click(function () {
-                windowing.hide();
+            jquery_1.default("#togetherjs-menu-feedback, #togetherjs-menu-feedback-button").click(function () {
+                windowing_1.windowing.hide();
                 hideMenu();
-                windowing.show("#togetherjs-feedback-form");
+                windowing_1.windowing.show("#togetherjs-feedback-form");
             });
-            $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
-                windowing.hide();
+            jquery_1.default("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
+                windowing_1.windowing.hide();
                 hideMenu();
-                require(["walkthrough"], function (walkthrough) {
-                    windowing.hide();
+                require(["walkthrough"], function (_a) {
+                    var walkthrough = _a.walkthrough;
+                    windowing_1.windowing.hide();
                     walkthrough.start(false);
                 });
             });
-            $("#togetherjs-menu-update-name").click(function () {
-                var input = $("#togetherjs-menu .togetherjs-self-name");
+            jquery_1.default("#togetherjs-menu-update-name").click(function () {
+                var input = jquery_1.default("#togetherjs-menu .togetherjs-self-name");
                 input.css({
-                    width: $("#togetherjs-menu").width() - 32 + "px"
+                    width: jquery_1.default("#togetherjs-menu").width() - 32 + "px"
                 });
                 _this.displayToggle("#togetherjs-menu .togetherjs-self-name");
-                $("#togetherjs-menu .togetherjs-self-name").focus();
+                jquery_1.default("#togetherjs-menu .togetherjs-self-name").focus();
             });
-            $("#togetherjs-menu-update-name-button").click(function () {
-                windowing.show("#togetherjs-edit-name-window");
-                $("#togetherjs-edit-name-window input").focus();
+            jquery_1.default("#togetherjs-menu-update-name-button").click(function () {
+                windowing_1.windowing.show("#togetherjs-edit-name-window");
+                jquery_1.default("#togetherjs-edit-name-window input").focus();
             });
-            $("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
+            jquery_1.default("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
                 console.log("alrighty", event);
                 if (event.which == 13) {
                     _this.displayToggle("#togetherjs-self-name-display");
                     return;
                 }
-                var val = $("#togetherjs-menu .togetherjs-self-name").val();
+                var val = jquery_1.default("#togetherjs-menu .togetherjs-self-name").val();
                 console.log("values!!", val);
                 if (val) {
-                    peers.Self.update({ name: val });
+                    peers_1.peers.Self.update({ name: val });
                 }
             });
-            $("#togetherjs-menu-update-avatar, #togetherjs-menu-update-avatar-button").click(function () {
+            jquery_1.default("#togetherjs-menu-update-avatar, #togetherjs-menu-update-avatar-button").click(function () {
                 hideMenu();
-                windowing.show("#togetherjs-avatar-edit");
+                windowing_1.windowing.show("#togetherjs-avatar-edit");
             });
-            $("#togetherjs-menu-end, #togetherjs-menu-end-button").click(function () {
+            jquery_1.default("#togetherjs-menu-end, #togetherjs-menu-end-button").click(function () {
                 hideMenu();
-                windowing.show("#togetherjs-confirm-end");
+                windowing_1.windowing.show("#togetherjs-confirm-end");
             });
-            $("#togetherjs-end-session").click(function () {
-                session.close();
+            jquery_1.default("#togetherjs-end-session").click(function () {
+                session_1.session.close();
                 //$(".overlay").remove();
             });
-            $("#togetherjs-menu-update-color").click(function () {
-                var picker = $("#togetherjs-pick-color");
+            jquery_1.default("#togetherjs-menu-update-color").click(function () {
+                var picker = jquery_1.default("#togetherjs-pick-color");
                 if (picker.is(":visible")) {
                     picker.hide();
                     return;
@@ -971,38 +980,38 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 picker.show();
                 bindPicker();
                 picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
-                picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
+                picker.find(".togetherjs-swatch[data-color=\"" + peers_1.peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
             });
-            $("#togetherjs-pick-color").click(".togetherjs-swatch", function (event) {
-                var swatch = $(event.target);
+            jquery_1.default("#togetherjs-pick-color").click(".togetherjs-swatch", function (event) {
+                var swatch = jquery_1.default(event.target);
                 var color = swatch.attr("data-color");
-                peers.Self.update({
+                peers_1.peers.Self.update({
                     color: color
                 });
                 event.stopPropagation();
                 return false;
             });
-            $("#togetherjs-pick-color").click(function (event) {
-                $("#togetherjs-pick-color").hide();
+            jquery_1.default("#togetherjs-pick-color").click(function (event) {
+                jquery_1.default("#togetherjs-pick-color").hide();
                 event.stopPropagation();
                 return false;
             });
             COLORS.forEach(function (color) {
-                var el = templating.sub("swatch", {});
+                var el = templating_1.templating.sub("swatch", {});
                 el.attr("data-color", color);
                 el.css({
                     backgroundColor: color,
                     borderColor: "#333333" // TODO was tinycolor.darken(color).toHex()
                 });
-                $("#togetherjs-pick-color").append(el);
+                jquery_1.default("#togetherjs-pick-color").append(el);
             });
-            $("#togetherjs-chat-button").click(function () {
-                windowing.toggle("#togetherjs-chat");
+            jquery_1.default("#togetherjs-chat-button").click(function () {
+                windowing_1.windowing.toggle("#togetherjs-chat");
             });
-            session.on("display-window", function (id, element) {
+            session_1.session.on("display-window", function (id, element) {
                 if (id == "togetherjs-chat") {
-                    if (!$.browser.mobile) {
-                        $("#togetherjs-chat-input").focus();
+                    if (!jquery_1.default.browser.mobile) {
+                        jquery_1.default("#togetherjs-chat-input").focus();
                     }
                 }
                 else if (id == "togetherjs-share") {
@@ -1013,31 +1022,31 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
             });
             container.find("#togetherjs-chat-notifier").click(function (event) {
-                if ($(event.target).is("a") || container.is(".togetherjs-close")) {
+                if (jquery_1.default(event.target).is("a") || container.is(".togetherjs-close")) {
                     return;
                 }
-                windowing.show("#togetherjs-chat");
+                windowing_1.windowing.show("#togetherjs-chat");
             });
             // FIXME: Don't think this makes sense
-            $(".togetherjs header.togetherjs-title").each(function (_index, item) {
-                var button = $('<button class="togetherjs-minimize"></button>');
+            jquery_1.default(".togetherjs header.togetherjs-title").each(function (_index, item) {
+                var button = jquery_1.default('<button class="togetherjs-minimize"></button>');
                 button.click(function (_event) {
                     var window = button.closest(".togetherjs-window");
-                    windowing.hide(window);
+                    windowing_1.windowing.hide(window);
                 });
-                $(item).append(button);
+                jquery_1.default(item).append(button);
             });
-            $("#togetherjs-avatar-done").click(function () {
+            jquery_1.default("#togetherjs-avatar-done").click(function () {
                 _this.displayToggle("#togetherjs-no-avatar-edit");
             });
-            $("#togetherjs-self-color").css({ backgroundColor: peers.Self.color });
-            var avatar = peers.Self.avatar;
+            jquery_1.default("#togetherjs-self-color").css({ backgroundColor: peers_1.peers.Self.color });
+            var avatar = peers_1.peers.Self.avatar;
             if (avatar) {
-                $("#togetherjs-self-avatar").attr("src", avatar);
+                jquery_1.default("#togetherjs-self-avatar").attr("src", avatar);
             }
-            var starterButton = $("#togetherjs-starter button");
+            var starterButton = jquery_1.default("#togetherjs-starter button");
             starterButton.click(function () {
-                windowing.show("#togetherjs-about");
+                windowing_1.windowing.show("#togetherjs-about");
             }).addClass("togetherjs-running");
             if (starterButton.text() == "Start TogetherJS") {
                 starterButton.attr("data-start-text", starterButton.text());
@@ -1045,7 +1054,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             }
             this.activateAvatarEdit(container, {
                 onSave: function () {
-                    windowing.hide("#togetherjs-avatar-edit");
+                    windowing_1.windowing.hide("#togetherjs-avatar-edit");
                 }
             });
             // TODO some feature seem to be hidden in the HTML like #togetherjs-invite in interface.html
@@ -1063,15 +1072,15 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 invite(null);
             });
             // The following lines should be at the end of this function (new code goes above)
-            session.emit("new-element", this.container); // TODO !
+            session_1.session.emit("new-element", this.container); // TODO !
             if (finishedAt && finishedAt > Date.now()) {
                 setTimeout(function () {
                     finishedAt = null;
-                    session.emit("ui-ready", ui);
+                    session_1.session.emit("ui-ready", exports.ui);
                 }, finishedAt - Date.now());
             }
             else {
-                session.emit("ui-ready", ui);
+                session_1.session.emit("ui-ready", exports.ui);
             }
         }; // End ui.activateUI()
         Ui.prototype.activateAvatarEdit = function (container, options) {
@@ -1080,7 +1089,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             container.find(".togetherjs-avatar-save").prop("disabled", true);
             container.find(".togetherjs-avatar-save").click(function () {
                 if (pendingImage) {
-                    peers.Self.update({ avatar: pendingImage });
+                    peers_1.peers.Self.update({ avatar: pendingImage });
                     container.find(".togetherjs-avatar-save").prop("disabled", true);
                     if (options.onSave) {
                         options.onSave();
@@ -1088,7 +1097,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                 }
             });
             container.find(".togetherjs-upload-avatar").on("change", function () {
-                util.readFileImage(this).then(function (url) {
+                util_1.util.readFileImage(this).then(function (url) {
                     if (!url) {
                         return;
                     }
@@ -1107,7 +1116,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         };
         Ui.prototype.prepareShareLink = function (container) {
             container.find("input.togetherjs-share-link").click(function () {
-                $(this).select();
+                jquery_1.default(this).select();
             }).change(function () {
                 updateShareLink();
             });
@@ -1120,7 +1129,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                         name: "share",
                         data: {
                             type: "url",
-                            url: $(this).attr("href")
+                            url: jquery_1.default(this).attr("href")
                         }
                     });
                 }
@@ -1133,13 +1142,13 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         Ui.prototype.showUrlChangeMessage = function (peer, _url) {
             var _this = this;
             deferForContainer(function () {
-                var window = templating.sub("url-change", { peer: peer });
+                var window = templating_1.templating.sub("url-change", { peer: peer });
                 _this.container.append(window);
-                windowing.show(window);
+                windowing_1.windowing.show(window);
             })();
         };
         Ui.prototype.updateToolName = function (container) {
-            container = container || $(document.body);
+            container = container || jquery_1.default(document.body);
             var name = TogetherJS.config.get("toolName");
             if (setToolName && !name) {
                 name = "TogetherJS";
@@ -1152,7 +1161,7 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         return Ui;
     }());
     function panelPosition() {
-        var iface = $("#togetherjs-dock");
+        var iface = jquery_1.default("#togetherjs-dock");
         if (iface.hasClass("togetherjs-dock-right")) {
             return "right";
         }
@@ -1166,37 +1175,37 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             throw new AssertionError("#togetherjs-dock doesn't have positioning class");
         }
     }
-    var ui = new Ui();
+    exports.ui = new Ui();
     // This is used for some signalling when ui.prepareUI and/or
     // ui.activateUI is called before the DOM is fully loaded:
     var deferringPrepareUI = null;
     function deferForContainer(func) {
         /* Defers any calls to func() until after ui.container is set
-           Function cannot have a return value (as sometimes the call will
-           become async).  Use like:
+            Function cannot have a return value (as sometimes the call will
+            become async).  Use like:
     
-           method: deferForContainer(function (args) {...})
-           */
+            method: deferForContainer(function (args) {...})
+            */
         return function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
             // TODO I made some tests and this is always undefined apparently so no need to pretend it's usable. all "null" here were "this".
-            if (ui.container) {
+            if (exports.ui.container) {
                 func.apply(null, args);
             }
             //var args = Array.prototype.slice.call(arguments) as A; // TODO use args
-            session.once("ui-ready", function () {
+            session_1.session.once("ui-ready", function () {
                 func.apply(null, args);
             });
         };
     }
     function sizeDownImage(imageUrl) {
-        return util.Deferred(function (def) {
+        return util_1.util.Deferred(function (def) {
             var canvas = document.createElement("canvas");
-            canvas.height = session.AVATAR_SIZE;
-            canvas.width = session.AVATAR_SIZE;
+            canvas.height = session_1.session.AVATAR_SIZE;
+            canvas.width = session_1.session.AVATAR_SIZE;
             var context = canvas.getContext("2d"); // TODO !
             var img = new Image();
             img.src = imageUrl;
@@ -1206,8 +1215,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             setTimeout(function () {
                 var width = img.naturalWidth || img.width;
                 var height = img.naturalHeight || img.height;
-                width = width * (session.AVATAR_SIZE / height);
-                height = session.AVATAR_SIZE;
+                width = width * (session_1.session.AVATAR_SIZE / height);
+                height = session_1.session.AVATAR_SIZE;
                 context.drawImage(img, 0, 0, width, height);
                 def.resolve(canvas.toDataURL("image/png"));
             });
@@ -1215,9 +1224,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     }
     function fixupAvatars(container) {
         /* All <div class="togetherjs-person" /> elements need an element inside,
-           so we add that element here */
+            so we add that element here */
         container.find(".togetherjs-person").each(function () {
-            var $this = $(this);
+            var $this = jquery_1.default(this);
             var inner = $this.find(".togetherjs-person-avatar-swatch");
             if (!inner.length) {
                 $this.append('<div class="togetherjs-person-avatar-swatch"></div>');
@@ -1226,16 +1235,16 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     }
     // Menu
     function showMenu() {
-        var el = $("#togetherjs-menu");
+        var el = jquery_1.default("#togetherjs-menu");
         assert(el.length);
         el.show();
         bindMenu();
-        $(document).bind("click", maybeHideMenu);
+        jquery_1.default(document).bind("click", maybeHideMenu);
     }
     function bindMenu() {
-        var el = $("#togetherjs-menu:visible");
+        var el = jquery_1.default("#togetherjs-menu:visible");
         if (el.length) {
-            var bound = $("#togetherjs-profile-button");
+            var bound = jquery_1.default("#togetherjs-profile-button");
             var boundOffset = bound.offset(); // TODO !
             el.css({
                 top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
@@ -1244,9 +1253,9 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         }
     }
     function bindPicker() {
-        var picker = $("#togetherjs-pick-color:visible");
+        var picker = jquery_1.default("#togetherjs-pick-color:visible");
         if (picker.length) {
-            var menu = $("#togetherjs-menu-update-color");
+            var menu = jquery_1.default("#togetherjs-menu-update-color");
             var menuOffset = menu.offset(); // TODO !
             picker.css({
                 top: menuOffset.top + menu.height(),
@@ -1254,12 +1263,12 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             });
         }
     }
-    session.on("resize", function () {
+    session_1.session.on("resize", function () {
         bindMenu();
         bindPicker();
     });
     function toggleMenu() {
-        if ($("#togetherjs-menu").is(":visible")) {
+        if (jquery_1.default("#togetherjs-menu").is(":visible")) {
             hideMenu();
         }
         else {
@@ -1267,11 +1276,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
         }
     }
     function hideMenu() {
-        var el = $("#togetherjs-menu");
+        var el = jquery_1.default("#togetherjs-menu");
         el.hide();
-        $(document).unbind("click", maybeHideMenu);
-        ui.displayToggle("#togetherjs-self-name-display");
-        $("#togetherjs-pick-color").hide();
+        jquery_1.default(document).unbind("click", maybeHideMenu);
+        exports.ui.displayToggle("#togetherjs-self-name-display");
+        jquery_1.default("#togetherjs-pick-color").hide();
     }
     function maybeHideMenu(event) {
         var t = event.target;
@@ -1286,11 +1295,11 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     }
     function adjustDockSize(buttons) {
         /* Add or remove spots from the dock; positive number to
-           add button(s), negative number to remove button(s)
-           */
+            add button(s), negative number to remove button(s)
+            */
         assert(typeof buttons == "number");
         assert(buttons && Math.floor(buttons) == buttons);
-        var iface = $("#togetherjs-dock");
+        var iface = jquery_1.default("#togetherjs-dock");
         var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
         assert(newHeight >= BUTTON_HEIGHT * 3, "Height went too low (", newHeight, "), should never be less than 3 buttons high (", BUTTON_HEIGHT * 3, ")");
         iface.css({
@@ -1299,73 +1308,73 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
     }
     // Misc
     function updateShareLink() {
-        var input = $("input.togetherjs-share-link");
-        var link = $("a.togetherjs-share-link");
-        var display = $("#togetherjs-session-id");
-        if (!session.shareId) {
+        var input = jquery_1.default("input.togetherjs-share-link");
+        var link = jquery_1.default("a.togetherjs-share-link");
+        var display = jquery_1.default("#togetherjs-session-id");
+        if (!session_1.session.shareId) {
             input.val("");
             link.attr("href", "#");
             display.text("(none)");
         }
         else {
-            input.val(session.shareUrl());
-            link.attr("href", session.shareUrl());
-            display.text(session.shareId);
+            input.val(session_1.session.shareUrl());
+            link.attr("href", session_1.session.shareUrl());
+            display.text(session_1.session.shareId);
         }
     }
-    session.on("close", function () {
-        if ($.browser.mobile) {
+    session_1.session.on("close", function () {
+        if (jquery_1.default.browser.mobile) {
             // remove bg overlay
             //$(".overlay").remove();
             //after hitting End, reset window draggin
-            $("body").css({
+            jquery_1.default("body").css({
                 "position": "",
                 top: "",
                 left: ""
             });
         }
-        if (ui.container) {
-            ui.container.remove();
+        if (exports.ui.container) {
+            exports.ui.container.remove();
             // TODO remove this @ts-expect-error
             //@ts-expect-error easier typechecking
-            ui.container = null;
+            exports.ui.container = null;
         }
         // Clear out any other spurious elements:
-        $(".togetherjs").remove();
-        var starterButton = $("#togetherjs-starter button");
+        jquery_1.default(".togetherjs").remove();
+        var starterButton = jquery_1.default("#togetherjs-starter button");
         starterButton.removeClass("togetherjs-running");
         if (starterButton.attr("data-start-text")) {
             starterButton.text(starterButton.attr("data-start-text"));
             starterButton.attr("data-start-text", "");
         }
         if (TogetherJS.startTarget) {
-            var el = $(TogetherJS.startTarget);
+            var el = jquery_1.default(TogetherJS.startTarget);
             if (el.attr("data-start-togetherjs-html")) {
                 el.html(el.attr("data-start-togetherjs-html"));
             }
             el.removeClass("togetherjs-started");
         }
     });
-    session.on("display-window", function (id, _win) {
+    session_1.session.on("display-window", function (id, _win) {
         if (id == "togetherjs-chat") {
-            ui.chat.scroll();
-            windowing.hide("#togetherjs-chat-notifier");
+            exports.ui.chat.scroll();
+            windowing_1.windowing.hide("#togetherjs-chat-notifier");
         }
     });
     function updateChatParticipantList() {
-        var live = peers.getAllPeers(true);
+        var live = peers_1.peers.getAllPeers(true);
         if (live.length) {
-            ui.displayToggle("#togetherjs-chat-participants");
-            $("#togetherjs-chat-participant-list").text(live.map(function (p) { return p.name; }).join(", "));
+            exports.ui.displayToggle("#togetherjs-chat-participants");
+            jquery_1.default("#togetherjs-chat-participant-list").text(live.map(function (p) { return p.name; }).join(", "));
         }
         else {
-            ui.displayToggle("#togetherjs-chat-no-participants");
+            exports.ui.displayToggle("#togetherjs-chat-no-participants");
         }
     }
     function inviteHubUrl() {
         var base = TogetherJS.config.get("inviteFromRoom");
         assert(base);
-        return util.makeUrlAbsolute(base, session.hubUrl());
+        return util_1.util.makeUrlAbsolute(base, session_1.session.hubUrl());
     }
     var inRefresh = false;
     function refreshInvite() {
@@ -1373,16 +1382,17 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             return;
         }
         inRefresh = true;
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             var def = who.getList(inviteHubUrl());
             function addUser(user, before) {
-                var item = templating.sub("invite-user-item", { peer: user });
+                var item = templating_1.templating.sub("invite-user-item", { peer: user });
                 item.attr("data-clientid", user.id);
                 if (before) {
                     item.insertBefore(before);
                 }
                 else {
-                    $("#togetherjs-invite-users").append(item);
+                    jquery_1.default("#togetherjs-invite-users").append(item);
                 }
                 item.click(function () {
                     invite(user.id); // TODO was user.clientId but it does not exist on any peer-like class so it was changed to id
@@ -1399,8 +1409,8 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
                     return (a.name || "") < (b.name || "") ? -1 : 1;
                 });
                 var pos = 0;
-                ui.container.find("#togetherjs-invite-users .togetherjs-menu-item").each(function () {
-                    var $this = $(this);
+                exports.ui.container.find("#togetherjs-invite-users .togetherjs-menu-item").each(function () {
+                    var $this = jquery_1.default(this);
                     if (finished && !users[$this.attr("data-clientid")]) {
                         $this.remove();
                         return;
@@ -1431,17 +1441,19 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             def.progress(refresh);
         });
     }
-    session.hub.on("invite", function (msg) {
-        if (msg.forClientId && msg.clientId != peers.Self.id) {
+    session_1.session.hub.on("invite", function (msg) {
+        if (msg.forClientId && msg.clientId != peers_1.peers.Self.id) {
             return;
         }
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
-            ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
+            exports.ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
         });
     });
     function invite(clientId) {
-        require(["who"], function (who) {
+        require(["who"], function (_a) {
+            var who = _a.who;
             // FIXME: use the return value of this to give a signal that
             // the invite has been successfully sent:
             who.invite(inviteHubUrl(), clientId).then(function () {
@@ -1449,22 +1461,22 @@ function uiMain(require, $, util, session, templates, templating, linkify, peers
             });
         });
     }
-    session.hub.on("url-change-nudge", function (msg) {
-        if (msg.to && msg.to != session.clientId) {
+    session_1.session.hub.on("url-change-nudge", function (msg) {
+        if (msg.to && msg.to != session_1.session.clientId) {
             // Not directed to us
             return;
         }
         msg.peer.urlNudge();
     });
-    session.on("new-element", function (el) {
+    session_1.session.on("new-element", function (el) {
         if (TogetherJS.config.get("toolName")) {
-            ui.updateToolName(el);
+            exports.ui.updateToolName(el);
         }
     });
     var setToolName = false;
     TogetherJS.config.track("toolName", function () {
-        ui.updateToolName(ui.container);
+        exports.ui.updateToolName(exports.ui.container);
     });
-    return ui;
-}
-define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "elementFinder", "visibilityApi"], uiMain);
+});
+//return ui;
+//define(["require", "jquery", "util", "session", "templates", "templating", "linkify", "peers", "windowing", "elementFinder", "visibilityApi"], uiMain);

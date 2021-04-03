@@ -1,16 +1,23 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function recorderMain($, util, channels) {
-    var assert = util.assert;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./channels", "./util", "jquery"], function (require, exports, channels_1, util_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.recorder = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
+    var assert = util_1.util.assert.bind(util_1.util);
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var clientId = "recorder";
     function display(elOrSelector) {
-        var el = $(elOrSelector);
+        var el = jquery_1.default(elOrSelector);
         var toggles = el.attr("data-toggles");
         if (toggles) {
-            $(toggles).hide();
+            jquery_1.default(toggles).hide();
         }
         el.show();
     }
@@ -20,7 +27,7 @@ function recorderMain($, util, channels) {
                 type: "hello-back",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -34,7 +41,7 @@ function recorderMain($, util, channels) {
                 type: "hello",
                 name: "Recorder 'bot",
                 // FIXME: replace with robot:
-                avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+                avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
                 color: "#888888",
                 rtcSupported: false,
                 clientId: clientId,
@@ -46,7 +53,7 @@ function recorderMain($, util, channels) {
         channel.send({
             type: "logs",
             clientId: clientId,
-            logs: $("#record").val(),
+            logs: jquery_1.default("#record").val(),
             request: req
         });
     }
@@ -55,13 +62,13 @@ function recorderMain($, util, channels) {
         }
         Recorder.prototype.start = function (options) {
             var _this = this;
-            $(function () {
-                $("#record").css({ height: $(window).height() - 50 });
-                $("#restart").click(function () {
+            jquery_1.default(function () {
+                jquery_1.default("#record").css({ height: jquery_1.default(window).height() - 50 });
+                jquery_1.default("#restart").click(function () {
                     location.reload();
                 });
-                $("#select").click(function () {
-                    $("#record").select();
+                jquery_1.default("#select").click(function () {
+                    jquery_1.default("#record").select();
                 });
                 _this.activate(options);
             });
@@ -87,7 +94,7 @@ function recorderMain($, util, channels) {
             }
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
-            channel = channels.WebSocketChannel(url);
+            channel = channels_1.channels.WebSocketChannel(url);
             channel.onmessage = function (msg) {
                 if (msg.type == "hello-back") {
                     display("#connected");
@@ -105,17 +112,17 @@ function recorderMain($, util, channels) {
         };
         Recorder.prototype.logMessage = function (msg) {
             msg.date = Date.now(); // TODO abusive cast
-            var $record = $("#record");
+            var $record = jquery_1.default("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         };
         return Recorder;
     }());
-    $(window).unload(function () {
+    jquery_1.default(window).unload(function () {
         channel.send({
             type: "bye",
             clientId: clientId
         });
     });
-    return new Recorder();
-}
-define(["jquery", "util", "channels"], recorderMain);
+    exports.recorder = new Recorder();
+});
+//define(["jquery", "util", "channels"], recorderMain);

@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,9 +16,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function StorageMain(util) {
-    var assert = util.assert;
-    var Deferred = util.Deferred;
+define(["require", "exports", "./init", "./util"], function (require, exports, init_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.storage = void 0;
+    //function StorageMain(util: TogetherJSNS.Util) {
+    var assert = util_1.util.assert.bind(util_1.util);
+    var Deferred = util_1.util.Deferred;
     var DEFAULT_SETTINGS = {
         name: "",
         defaultName: "",
@@ -43,15 +46,15 @@ function StorageMain(util) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             var key = "settings." + name; // as keyof TogetherJSNS.StorageGet.MapForSettings;
             var value = this.storageInstance.settings.defaults[name]; // TODO is it possible to avoid the as unknown?
-            return storage.get(key, value);
+            return exports.storage.get(key, value);
         };
         StorageSettings.prototype.set = function (name, value) {
             assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
             var key = "settings." + name;
-            return storage.set(key, value);
+            return exports.storage.set(key, value);
         };
         return StorageSettings;
-    }(OnClass));
+    }(init_1.OnClass));
     var TJSStorage = /** @class */ (function () {
         function TJSStorage(name, storage, prefix) {
             this.name = name;
@@ -64,7 +67,7 @@ function StorageMain(util) {
             var self = this;
             return Deferred(function (def) {
                 // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
-                setTimeout(util.resolver(def, function () {
+                setTimeout(util_1.util.resolver(def, function () {
                     var prefixedKey = self.prefix + key;
                     var value;
                     var valueAsString = self.storage.getItem(prefixedKey);
@@ -117,7 +120,7 @@ function StorageMain(util) {
                         // FIXME: technically we're ignoring the promise returned by all these sets:
                         promises.push(self.set(key, undefined));
                     });
-                    util.resolveMany(promises).then(function () {
+                    util_1.util.resolveMany(promises).then(function () {
                         def.resolve();
                     });
                 });
@@ -128,7 +131,7 @@ function StorageMain(util) {
             // Returns a list of keys, potentially with the given prefix
             var self = this;
             return Deferred(function (def) {
-                setTimeout(util.resolver(def, function () {
+                setTimeout(util_1.util.resolver(def, function () {
                     prefix = prefix || "";
                     var result = [];
                     for (var i = 0; i < self.storage.length; i++) {
@@ -162,7 +165,7 @@ function StorageMain(util) {
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
     var tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
-    var storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
-    return storage;
-}
-define(["util"], StorageMain);
+    exports.storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
+});
+//return storage;
+//define(["util"], StorageMain);

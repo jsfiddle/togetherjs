@@ -1,19 +1,25 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery", "util", "session", "elementFinder"], function ($, _util, session, elementFinder) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./elementFinder", "./session", "jquery"], function (require, exports, elementFinder_1, session_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    jquery_1 = __importDefault(jquery_1);
+    //define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
     var listeners = [];
     var TIME_UPDATE = 'timeupdate';
     var MIRRORED_EVENTS = ['play', 'pause'];
     var TOO_FAR_APART = 3000;
-    session.on("reinitialize", function () {
+    session_1.session.on("reinitialize", function () {
         unsetListeners();
         setupListeners();
     });
-    session.on("ui-ready", setupListeners);
+    session_1.session.on("ui-ready", setupListeners);
     function setupListeners() {
-        var videos = $('video');
+        var videos = jquery_1.default('video');
         setupMirroredEvents(videos);
         setupTimeSync(videos);
     }
@@ -33,9 +39,9 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
             if (options === void 0) { options = {}; }
             var element = event.target;
             if (!options.silent && element) {
-                session.send({
+                session_1.session.send({
                     type: "video-" + eventName,
-                    location: elementFinder.elementLocation(element),
+                    location: elementFinder_1.elementFinder.elementLocation(element),
                     position: element.currentTime
                 });
             }
@@ -44,7 +50,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
     function setupTimeSync(videos) {
         videos.each(function (_i, video) {
             var onTimeUpdate = makeTimeUpdater();
-            $(video).on(TIME_UPDATE, onTimeUpdate);
+            jquery_1.default(video).on(TIME_UPDATE, onTimeUpdate);
             listeners.push({
                 name: TIME_UPDATE,
                 listener: onTimeUpdate
@@ -66,15 +72,15 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
         var milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;
     }
-    session.on("close", unsetListeners);
+    session_1.session.on("close", unsetListeners);
     function unsetListeners() {
-        var videos = $('video');
+        var videos = jquery_1.default('video');
         listeners.forEach(function (event) {
             videos.off(event.name, event.listener);
         });
         listeners = [];
     }
-    session.hub.on('video-timeupdate', function (msg) {
+    session_1.session.hub.on('video-timeupdate', function (msg) {
         var element = $findElement(msg.location);
         var oldTime = element.prop('currentTime');
         var newTime = msg.position;
@@ -84,7 +90,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
         }
     });
     MIRRORED_EVENTS.forEach(function (eventName) {
-        session.hub.on("video-" + eventName, function (msg) {
+        session_1.session.hub.on("video-" + eventName, function (msg) {
             var element = $findElement(msg.location);
             setTime(element, msg.position);
             element.trigger(eventName, { silent: true });
@@ -92,7 +98,7 @@ define(["jquery", "util", "session", "elementFinder"], function ($, _util, sessi
     });
     //Currently does not discriminate between visible and invisible videos
     function $findElement(location) {
-        return $(elementFinder.findElement(location));
+        return jquery_1.default(elementFinder_1.elementFinder.findElement(location));
     }
     function setTime(video, time) {
         video.prop('currentTime', time);

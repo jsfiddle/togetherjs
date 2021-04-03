@@ -1,8 +1,9 @@
-"use strict";
-function linkifyMain() {
-    // FIXME: this could be moved to a different module, it's pretty stand-alone
-    /* Finds any links in the text of an element (or its children) and turns them
-       into anchors (with target=_blank) */
+// FIXME: this could be moved to a different module, it's pretty stand-alone
+/* Finds any links in the text of an element (or its children) and turns them into anchors (with target=_blank) */
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.linkify = void 0;
     function linkify(el) {
         if ("jquery" in el) {
             el = el[0];
@@ -53,6 +54,5 @@ function linkifyMain() {
         linkifyNode(el);
         return el;
     }
-    return linkify;
-}
-define([], linkifyMain);
+    exports.linkify = linkify;
+});

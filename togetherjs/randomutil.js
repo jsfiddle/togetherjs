@@ -1,5 +1,8 @@
-"use strict";
-function randomutilMain(_util, RandomStream) {
+define(["require", "exports", "./libs/random"], function (require, exports, random_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.randomutil = void 0;
+    //function randomutilMain(_util: TogetherJSNS.Util, RandomStream: RandomStreamModule) {
     var Randomizer = /** @class */ (function () {
         function Randomizer(seed) {
             this.lower = "abcdefghijklmnopqrstuvwxyz";
@@ -8,7 +11,7 @@ function randomutilMain(_util, RandomStream) {
             this.whitespace = " \t\n";
             this.punctuation = "~`!@#$%^&*()_-+={}[]|\\;:'\"<>,./?";
             this.defaultChars = this.lower + this.upper + this.numberCharacters + this.whitespace + this.punctuation;
-            this.stream = RandomStream(seed);
+            this.stream = random_1.RandomStream(seed);
         }
         Randomizer.prototype.number = function (max) {
             return Math.floor(this.stream() * max);
@@ -55,6 +58,7 @@ function randomutilMain(_util, RandomStream) {
         };
         return Randomizer;
     }());
-    return function (seed) { return new Randomizer(seed); };
-}
-define(["util", "whrandom"], randomutilMain);
+    var randomutil = function (seed) { return new Randomizer(seed); };
+    exports.randomutil = randomutil;
+});
+//define(["util", "whrandom"], randomutilMain);

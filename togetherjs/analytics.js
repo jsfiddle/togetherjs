@@ -1,5 +1,7 @@
-"use strict";
-function analyticsMain(_util) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.analytics = void 0;
     var Analytics = /** @class */ (function () {
         function Analytics() {
         }
@@ -29,6 +31,6 @@ function analyticsMain(_util) {
         ;
         return Analytics;
     }());
-    return new Analytics();
-}
-define(["util"], analyticsMain);
+    exports.analytics = new Analytics();
+});
+//define(["util"], analyticsMain);

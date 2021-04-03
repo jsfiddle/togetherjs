@@ -1,4 +1,3 @@
-"use strict";
 /*
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -19,7 +18,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function utilMain($) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, exports, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.util = void 0;
+    jquery_1 = __importDefault(jquery_1);
     var AssertionError = /** @class */ (function (_super) {
         __extends(AssertionError, _super);
         function AssertionError(message) {
@@ -30,6 +36,7 @@ function utilMain($) {
         }
         return AssertionError;
     }(Error));
+    // TODO remove
     var Module = /** @class */ (function () {
         function Module(_name) {
             this._name = _name;
@@ -44,7 +51,6 @@ function utilMain($) {
             this.Module = function (name) { return new Module(name); };
             this.Deferred = $.Deferred;
             tjs.$ = $;
-            this.extend = tjs._extend;
             this.AssertionError = AssertionError;
         }
         Util.prototype.forEachAttr = function (obj, callback, context) {
@@ -196,7 +202,7 @@ function utilMain($) {
                 return obj;
             }
             else {
-                return $.Deferred(function (def) {
+                return jquery_1.default.Deferred(function (def) {
                     def.resolve(obj);
                 });
             }
@@ -266,7 +272,7 @@ function utilMain($) {
                 return !!selector;
             }
             try {
-                return $(el).is(selector);
+                return jquery_1.default(el).is(selector);
             }
             catch (e) {
                 console.warn("Bad selector:", selector, "error:", e);
@@ -285,9 +291,7 @@ function utilMain($) {
         };
         return Util;
     }());
-    var util = new Util($, window.TogetherJS);
-    util.Deferred = $.Deferred;
-    window.TogetherJS.$ = $;
-    return util;
-}
-define(["jquery", "jqueryPlugins"], utilMain);
+    exports.util = new Util(jquery_1.default, window.TogetherJS);
+    exports.util.Deferred = jquery_1.default.Deferred;
+    window.TogetherJS.$ = jquery_1.default;
+});

@@ -1,26 +1,32 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["jquery"], function ($) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    jquery_1 = __importDefault(jquery_1);
+    //define(["jquery"], function($: JQueryStatic) {
     // This isn't really a "module" since it just patches jQuery itself
     // FIX ME Animations TO DO
     // walkthrough animations go here
     // animate participant cursor and box popping in when they enter the session
     // animate participant cursor and box popping out when they leave the session
     // animate the participant cursor -> rotate down when they're down the page
-    $.fn.rotateCursorDown = function () {
-        $('svg').animate({ borderSpacing: -150, opacity: 1 }, {
+    jquery_1.default.fn.rotateCursorDown = function () {
+        jquery_1.default('svg').animate({ borderSpacing: -150, opacity: 1 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    $(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
+                    jquery_1.default(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
                         .css('-moz-transform', 'rotate(' + now + 'deg)')
                         .css('-ms-transform', 'rotate(' + now + 'deg)')
                         .css('-o-transform', 'rotate(' + now + 'deg)')
                         .css('transform', 'rotate(' + now + 'deg)');
                 }
                 else {
-                    $(this).css(fx.prop, now);
+                    jquery_1.default(this).css(fx.prop, now);
                 }
             },
             duration: 500
@@ -35,18 +41,18 @@ define(["jquery"], function ($) {
         });
     };
     // animate the participant cursor -> rotate up when they're on the same frame as the user
-    $.fn.rotateCursorDown = function () {
-        $('.togetherjs-cursor svg').animate({ borderSpacing: 0, opacity: 1 }, {
+    jquery_1.default.fn.rotateCursorDown = function () {
+        jquery_1.default('.togetherjs-cursor svg').animate({ borderSpacing: 0, opacity: 1 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    $(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
+                    jquery_1.default(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
                         .css('-moz-transform', 'rotate(' + now + 'deg)')
                         .css('-ms-transform', 'rotate(' + now + 'deg)')
                         .css('-o-transform', 'rotate(' + now + 'deg)')
                         .css('transform', 'rotate(' + now + 'deg)');
                 }
                 else {
-                    $(this).css(fx.prop, now);
+                    jquery_1.default(this).css(fx.prop, now);
                 }
             },
             duration: 500
@@ -63,9 +69,9 @@ define(["jquery"], function ($) {
     };
     // Move notification when another notification slides in //
     /* Pop in window from dock button: */
-    $.fn.popinWindow = function () {
+    jquery_1.default.fn.popinWindow = function () {
         //mobile popout window with no animation
-        if ($.browser.mobile) {
+        if (jquery_1.default.browser.mobile) {
             //starting position
             this.css({
                 left: "0px",
@@ -73,21 +79,21 @@ define(["jquery"], function ($) {
                 "zIndex": 8888
             });
             //starting position for arrow
-            $('#togetherjs-window-pointer-right').css({
+            jquery_1.default('#togetherjs-window-pointer-right').css({
                 left: "+=74px",
                 opacity: 1,
                 "zIndex": 8888
             });
             //animate arrow out
-            $('#togetherjs-window-pointer-right').animate({
+            jquery_1.default('#togetherjs-window-pointer-right').animate({
                 opacity: 1,
                 left: "-=78px"
             }, {
                 duration: 60, easing: "linear"
             });
-            $('#togetherjs-window-pointer-right').queue();
+            jquery_1.default('#togetherjs-window-pointer-right').queue();
             //bounce arrow back
-            $('#togetherjs-window-pointer-right').animate({
+            jquery_1.default('#togetherjs-window-pointer-right').animate({
                 left: '+=4px'
             }, {
                 duration: 60, easing: "linear"
@@ -115,21 +121,21 @@ define(["jquery"], function ($) {
                 "zIndex": 8888
             });
             //starting position for arrow
-            $('#togetherjs-window-pointer-right').css({
+            jquery_1.default('#togetherjs-window-pointer-right').css({
                 left: "+=74px",
                 opacity: 1,
                 "zIndex": 8888
             });
             //animate arrow out
-            $('#togetherjs-window-pointer-right').animate({
+            jquery_1.default('#togetherjs-window-pointer-right').animate({
                 opacity: 1,
                 left: "-=78px"
             }, {
                 duration: 60, easing: "linear"
             });
-            $('#togetherjs-window-pointer-right').queue();
+            jquery_1.default('#togetherjs-window-pointer-right').queue();
             //bounce arrow back
-            $('#togetherjs-window-pointer-right').animate({
+            jquery_1.default('#togetherjs-window-pointer-right').animate({
                 left: '+=4px'
             }, {
                 duration: 60, easing: "linear"
@@ -151,7 +157,7 @@ define(["jquery"], function ($) {
         }
     };
     /* Slide in notification window: */
-    $.fn.slideIn = function () {
+    jquery_1.default.fn.slideIn = function () {
         this.css({
             //top: "240px",
             left: "+=74px",
@@ -165,18 +171,18 @@ define(["jquery"], function ($) {
         }, "fast");
     };
     /* Used to fade away notification windows + flip the bottom of them out: */
-    $.fn.fadeOut = function () {
+    jquery_1.default.fn.fadeOut = function () {
         this.animate({ borderSpacing: -90, opacity: 0.5 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    $(this).css('-webkit-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
+                    jquery_1.default(this).css('-webkit-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-moz-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-ms-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-o-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('transform', 'perspective( 600px ) rotateX(' + now + 'deg)');
                 }
                 else {
-                    $(this).css(fx.prop, now);
+                    jquery_1.default(this).css(fx.prop, now);
                 }
             },
             duration: 500
@@ -192,7 +198,7 @@ define(["jquery"], function ($) {
         return this;
     };
     /* used when user goes down to participant cursor location on screen */
-    $.fn.easeTo = function (y) {
+    jquery_1.default.fn.easeTo = function (y) {
         return this.animate({
             scrollTop: y
         }, {
@@ -201,7 +207,7 @@ define(["jquery"], function ($) {
         });
     };
     // avatar animate in
-    $.fn.animateDockEntry = function () {
+    jquery_1.default.fn.animateDockEntry = function () {
         var height = this.height();
         var width = this.width();
         var backgroundSize = height + 4;
@@ -233,7 +239,7 @@ define(["jquery"], function ($) {
         return this;
     };
     // avatar animate out, reverse of above
-    $.fn.animateDockExit = function () {
+    jquery_1.default.fn.animateDockExit = function () {
         // get the current avatar dimenensions
         // TODO qw height was commented because it was unused
         //var height = this.height();
@@ -251,11 +257,11 @@ define(["jquery"], function ($) {
             opacity: 0
         }, 600);
     };
-    $.fn.animateCursorEntry = function () {
+    jquery_1.default.fn.animateCursorEntry = function () {
         // Make the cursor bubble pop in
     };
     // keyboard typing animation
-    $.fn.animateKeyboard = function () {
+    jquery_1.default.fn.animateKeyboard = function () {
         var one = this.find(".togetherjs-typing-ellipse-one");
         var two = this.find(".togetherjs-typing-ellipse-two");
         var three = this.find(".togetherjs-typing-ellipse-three");
@@ -281,22 +287,23 @@ define(["jquery"], function ($) {
         var interval = setInterval(run, 300);
         this.data("animateKeyboard", interval);
     };
-    $.fn.stopKeyboardAnimation = function () {
+    jquery_1.default.fn.stopKeyboardAnimation = function () {
         clearTimeout(this.data("animateKeyboard"));
         this.data("animateKeyboard", null);
     };
     // FIXME: not sure if this is legit, but at least the modern mobile devices we
     // care about should have this defined:
-    if (!$.browser) {
-        $.browser = { version: "unknown" };
+    if (!jquery_1.default.browser) {
+        jquery_1.default.browser = { version: "unknown" };
     }
-    $.browser.mobile = window.orientation !== undefined;
+    jquery_1.default.browser.mobile = window.orientation !== undefined;
     if (navigator.userAgent.search(/mobile/i) != -1) {
         // FIXME: At least on the Firefox OS simulator I need this
-        $.browser.mobile = true;
+        jquery_1.default.browser.mobile = true;
     }
-    if ($.browser.mobile && window.matchMedia && !window.matchMedia("screen and (max-screen-width: 480px)").matches) {
+    if (jquery_1.default.browser.mobile && window.matchMedia && !window.matchMedia("screen and (max-screen-width: 480px)").matches) {
         // FIXME: for Firefox OS simulator really:
         document.body.className += " togetherjs-mobile-browser";
     }
 });
+//});

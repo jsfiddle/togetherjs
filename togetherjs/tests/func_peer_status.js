@@ -15,7 +15,7 @@ Test.newPeer();
 
 // =SECTION Test
 
-var peer = peers.getPeer("faker");
+var peer = peers.peers.getPeer("faker");
 print(peer.status, peer.idle);
 
 // => live active

@@ -1,19 +1,26 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* This module handles all the different UI that happens (sometimes in order) when
-   TogetherJS is started:
-
-   - Introduce the session when you've been invited
-   - Show any browser compatibility indicators
-   - Show the walkthrough the first time
-   - Show the share link window
-
-   When everything is done it fires session.emit("startup-ready")
-
-*/
-function startupMain(_util, require, $, windowing, storage) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./storage", "./windowing", "jquery"], function (require, exports, storage_1, windowing_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.startup = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    /* This module handles all the different UI that happens (sometimes in order) when
+       TogetherJS is started:
+    
+       - Introduce the session when you've been invited
+       - Show any browser compatibility indicators
+       - Show the walkthrough the first time
+       - Show the share link window
+    
+       When everything is done it fires session.emit("startup-ready")
+    
+    */
+    //function startupMain (_util: TogetherJSNS.Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
     var session; // TODO potentially uninitialized, why does TSC doesn't catch that?
     var STEPS = [
@@ -31,8 +38,8 @@ function startupMain(_util, require, $, windowing, storage) {
         Statup.prototype.start = function () {
             if (!session) {
                 require(["session"], function (sessionModule) {
-                    session = sessionModule;
-                    startup.start();
+                    session = sessionModule.session;
+                    exports.startup.start();
                 });
                 return;
             }
@@ -46,11 +53,11 @@ function startupMain(_util, require, $, windowing, storage) {
                 return;
             }
             currentStep = STEPS[index];
-            handlers[currentStep](startup.start);
+            handlers[currentStep](exports.startup.start);
         };
         return Statup;
     }());
-    var startup = new Statup();
+    exports.startup = new Statup();
     var Handlers = /** @class */ (function () {
         function Handlers() {
         }
@@ -59,13 +66,13 @@ function startupMain(_util, require, $, windowing, storage) {
                 next();
                 return;
             }
-            windowing.show("#togetherjs-browser-broken", {
+            windowing_1.windowing.show("#togetherjs-browser-broken", {
                 onClose: function () {
                     session.close();
                 }
             });
-            if ($.browser.msie) {
-                $("#togetherjs-browser-broken-is-ie").show();
+            if (jquery_1.default.browser.msie) {
+                jquery_1.default("#togetherjs-browser-broken-is-ie").show();
             }
         };
         Handlers.prototype.browserUnsupported = function (next) {
@@ -82,28 +89,28 @@ function startupMain(_util, require, $, windowing, storage) {
                 return;
             }
             var cancelled = false;
-            windowing.show("#togetherjs-intro", {
+            windowing_1.windowing.show("#togetherjs-intro", {
                 onClose: function () {
                     if (!cancelled) {
                         next();
                     }
                 }
             });
-            $("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
+            jquery_1.default("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
                 cancelled = true;
-                windowing.hide();
+                windowing_1.windowing.hide();
                 session.close("declined-join");
             });
         };
         Handlers.prototype.walkthrough = function (next) {
-            storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
+            storage_1.storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
                 if (seenIntroDialog) {
                     next();
                     return;
                 }
-                require(["walkthrough"], function (walkthrough) {
-                    walkthrough.start(true, function () {
-                        storage.settings.set("seenIntroDialog", true);
+                require(["walkthrough"], function (walkthroughModule) {
+                    walkthroughModule.walkthrough.start(true, function () {
+                        storage_1.storage.settings.set("seenIntroDialog", true);
                         next();
                     });
                 });
@@ -116,7 +123,8 @@ function startupMain(_util, require, $, windowing, storage) {
                 next();
                 return;
             }
-            require(["windowing"], function (windowing) {
+            require(["windowing"], function (_a) {
+                var windowing = _a.windowing;
                 windowing.show("#togetherjs-share");
                 // FIXME: no way to detect when the window is closed
                 // If there was a next() step then it would not work
@@ -125,6 +133,6 @@ function startupMain(_util, require, $, windowing, storage) {
         return Handlers;
     }());
     var handlers = new Handlers();
-    return startup;
-}
-define(["util", "require", "jquery", "windowing", "storage"], startupMain);
+});
+//return startup;
+//define(["util", "require", "jquery", "windowing", "storage"], startupMain);

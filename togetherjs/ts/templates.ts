@@ -2,52 +2,44 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface Template {
-    interface?: string;
-    walkthrough?: string;
-    names?: string;
-    help?: string;
-    walkabout?: string;
+import { util } from "./util";
+
+//function templatesMain(util: TogetherJSNS.Util, require: Require) {
+let assert: typeof util.assert = util.assert.bind(util);
+
+function clean(t: string) {
+    // Removes <% /* ... */ %> comments:
+    console.log("TogetherJS.baseUrl", TogetherJS.baseUrl);
+    t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
+    t = util.trim(t);
+    t = t.replace(/http:\/\/localhost:8080\/togetherjs/g, TogetherJS.baseUrl);
+    t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
+    t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
+    t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
+    return t;
 }
 
-function templatesMain(util: TogetherJSNS.Util, require: Require) {
-    let assert: typeof util.assert = util.assert;
+var lang = TogetherJS.getConfig("lang") || "en-US";
+var moduleName = "templates-" + lang;
+var templatesLang: TogetherJSNS.Template;
+require([moduleName], function(mod: TogetherJSNS.Template) {
+    templatesLang = mod;
+});
 
-    function clean(t: string) {
-        // Removes <% /* ... */ %> comments:
-        t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
-        t = util.trim(t);
-        t = t.replace(/http:\/\/localhost:8080/g, TogetherJS.baseUrl);
-        t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
-        t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
-        t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
-        return t;
-    }
-
-    var lang = TogetherJS.getConfig("lang") || "en-US";
-    var moduleName = "templates-" + lang;
-    var templatesLang: Template;
-    require([moduleName], function(mod: Template) {
-        templatesLang = mod;
-    });
-
-    return function(resourceName: keyof Template) {
-        // Sometimes require([moduleName]) doesn't return even after the
-        // module has been loaded, but this sync version of require() will
-        // pick up the module in that case:
-        if(!templatesLang) {
-            try {
-                templatesLang = require(moduleName);
-            }
-            catch(e) {
-                console.warn("Error requiring module:", e);
-            }
+export function templates(resourceName: keyof TogetherJSNS.Template) {
+    // Sometimes require([moduleName]) doesn't return even after the module has been loaded, but this sync version of require() will pick up the module in that case:
+    if(!templatesLang) {
+        try {
+            templatesLang = require(moduleName);
         }
-        assert(templatesLang, "Templates not yet loaded");
-        return clean(templatesLang[resourceName] || "");
-    };
-}
+        catch(e) {
+            console.warn("Error requiring module:", e);
+        }
+    }
+    assert(templatesLang, "Templates not yet loaded");
+    return clean(templatesLang[resourceName] || "");
+};
 
 // FIXME: maybe it would be better to dynamically assemble the first
 // argument to define() here to include the localized module:
-define(["util", "require"], templatesMain);
+//define(["util", "require"], templatesMain);

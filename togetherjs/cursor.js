@@ -1,17 +1,24 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-// Cursor viewing support
-function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, templating) {
-    var assert = util.assert;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./util", "jquery"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, util_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.cursor = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    // Cursor viewing support
+    //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
+    var assert = util_1.util.assert.bind(util_1.util);
     var CURSOR_HEIGHT = 50;
     var CURSOR_ANGLE = (35 / 180) * Math.PI;
     var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
     // Number of milliseconds after page load in which a scroll-update
     // related hello-back message will be processed:
     var SCROLL_UPDATE_CUTOFF = 2000;
-    session.hub.on("cursor-update", function (msg) {
+    session_1.session.hub.on("cursor-update", function (msg) {
         if (msg.sameUrl) {
             Cursor.getClient(msg.clientId).updatePosition(msg);
         }
@@ -31,17 +38,17 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             this.lastLeft = null;
             this.keydownTimeout = null;
             this.atOtherUrl = false;
-            this.element = templating.clone("cursor");
+            this.element = templating_1.templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            var peer = peers.getPeer(this.clientId);
+            var peer = peers_1.peers.getPeer(this.clientId);
             if (peer !== null) {
                 this.updatePeer(peer);
             }
             else {
                 console.error("Could not find a peer with id", this.clientId);
             }
-            $(document.body).append(this.element);
+            jquery_1.default(document.body).append(this.element);
             this.element.animateCursorEntry();
         }
         Cursor.prototype.updatePeer = function (peer) {
@@ -99,7 +106,7 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
                 this.atOtherUrl = false;
             }
             if ("element" in pos) {
-                var target = $(elementFinder.findElement(pos.element));
+                var target = jquery_1.default(elementFinder_1.elementFinder.findElement(pos.element));
                 var offset = target.offset(); // TODO !
                 top = offset.top + pos.offsetY;
                 left = offset.left + pos.offsetX;
@@ -124,7 +131,7 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         };
         // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
         Cursor.prototype.rotateCursorDown = function () {
-            var e = $(this.element).find('svg');
+            var e = jquery_1.default(this.element).find('svg');
             e.animate({ borderSpacing: -150, opacity: 1 }, {
                 step: function (now, fx) {
                     if (fx.prop == "borderSpacing") {
@@ -144,8 +151,8 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             });
         };
         Cursor.prototype.setPosition = function (top, left) {
-            var wTop = $(window).scrollTop();
-            var height = $(window).height();
+            var wTop = jquery_1.default(window).scrollTop();
+            var height = jquery_1.default(window).height();
             if (top < wTop) {
                 // FIXME: this is a totally arbitrary number, but is meant to be big enough
                 // to keep the cursor name from being off the top of the screen.
@@ -188,7 +195,7 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
         };
         Cursor.getClient = function (clientId) {
-            return cursor.getClient(clientId);
+            return exports.cursor.getClient(clientId);
         };
         Cursor.forEach = function (callback, context) {
             if (context === void 0) { context = null; }
@@ -217,14 +224,14 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         };
         return cursor2;
     }());
-    var cursor = new cursor2();
+    exports.cursor = new cursor2();
     function cbCursor(peer) {
         var c = Cursor.getClient(peer.id);
         c.updatePeer(peer);
     }
-    peers.on("new-peer", cbCursor);
-    peers.on("identity-updated", cbCursor);
-    peers.on("status-updated", cbCursor);
+    peers_1.peers.on("new-peer", cbCursor);
+    peers_1.peers.on("identity-updated", cbCursor);
+    peers_1.peers.on("status-updated", cbCursor);
     var lastTime = 0;
     var MIN_TIME = 100;
     var lastPosX = -1;
@@ -245,11 +252,11 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         lastPosX = pageX;
         lastPosY = pageY;
         var target = event.target;
-        var parent = $(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
+        var parent = jquery_1.default(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
         if (parent.length) {
             target = parent[0];
         }
-        else if (elementFinder.ignoreElement(target)) {
+        else if (elementFinder_1.elementFinder.ignoreElement(target)) {
             target = null;
         }
         if ((!target) || target == document.documentElement || target == document.body) {
@@ -258,10 +265,10 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
                 top: pageY,
                 left: pageX
             };
-            session.send(lastMessage);
+            session_1.session.send(lastMessage);
             return;
         }
-        var $target = $(target);
+        var $target = jquery_1.default(target);
         var offset = $target.offset();
         if (!offset) {
             // FIXME: this really is walkabout.js's problem to fire events on the
@@ -273,14 +280,14 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         var offsetY = pageY - offset.top;
         lastMessage = {
             type: "cursor-update",
-            element: elementFinder.elementLocation($target),
+            element: elementFinder_1.elementFinder.elementLocation($target),
             offsetX: Math.floor(offsetX),
             offsetY: Math.floor(offsetY)
         };
-        session.send(lastMessage);
+        session_1.session.send(lastMessage);
     }
     function makeCursor(color) {
-        var canvas = $("<canvas></canvas>");
+        var canvas = jquery_1.default("<canvas></canvas>");
         canvas.attr("height", CURSOR_HEIGHT);
         canvas.attr("width", CURSOR_WIDTH);
         var canvas0 = canvas[0];
@@ -330,17 +337,17 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         });
         lastScrollMessage = {
             type: "scroll-update",
-            position: elementFinder.elementByPixel($(window).scrollTop())
+            position: elementFinder_1.elementFinder.elementByPixel(jquery_1.default(window).scrollTop())
         };
-        session.send(lastScrollMessage);
+        session_1.session.send(lastScrollMessage);
     }
     // FIXME: do the same thing for cursor position?  And give up on the ad hoc update-on-hello?
-    session.on("prepare-hello", function (helloMessage) {
+    session_1.session.on("prepare-hello", function (helloMessage) {
         if (lastScrollMessage) {
             helloMessage.scrollPosition = lastScrollMessage.position;
         }
     });
-    session.hub.on("scroll-update", function (msg) {
+    session_1.session.hub.on("scroll-update", function (msg) {
         msg.peer.scrollPosition = msg.position;
         if (msg.peer.following) {
             msg.peer.view.scrollTo();
@@ -362,36 +369,36 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
         msg.peer.scrollPosition = msg.scrollPosition;
         if ((!acceptedScrollUpdate) &&
             msg.sameUrl &&
-            Date.now() - session.timeHelloSent < SCROLL_UPDATE_CUTOFF) {
+            Date.now() - session_1.session.timeHelloSent < SCROLL_UPDATE_CUTOFF) {
             acceptedScrollUpdate = true;
             msg.peer.view.scrollTo();
         }
     }
-    session.hub.on("hello-back", cbHelloHelloback);
-    session.hub.on("hello", cbHelloHelloback);
-    session.on("ui-ready", function () {
-        $(document).mousemove(mousemove);
+    session_1.session.hub.on("hello-back", cbHelloHelloback);
+    session_1.session.hub.on("hello", cbHelloHelloback);
+    session_1.session.on("ui-ready", function () {
+        jquery_1.default(document).mousemove(mousemove);
         document.addEventListener("click", documentClick, true);
         document.addEventListener("keydown", documentKeydown, true);
-        $(window).scroll(scroll);
+        jquery_1.default(window).scroll(scroll);
         scroll();
     });
-    session.on("close", function () {
+    session_1.session.on("close", function () {
         Cursor.forEach(function (_c, clientId) {
             Cursor.destroy(clientId);
         });
-        $(document).unbind("mousemove", mousemove);
+        jquery_1.default(document).unbind("mousemove", mousemove);
         document.removeEventListener("click", documentClick, true);
         document.removeEventListener("keydown", documentKeydown, true);
-        $(window).unbind("scroll", scroll);
+        jquery_1.default(window).unbind("scroll", scroll);
     });
-    session.hub.on("hello", function () {
+    session_1.session.hub.on("hello", function () {
         // Immediately get our cursor onto this new person's screen:
         if (lastMessage) {
-            session.send(lastMessage);
+            session_1.session.send(lastMessage);
         }
         if (lastScrollMessage) {
-            session.send(lastScrollMessage);
+            session_1.session.send(lastScrollMessage);
         }
     });
     function documentClick(event) {
@@ -414,7 +421,7 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
                 // For some reason clicking on <body> gives the <html> element here
                 element = document.body;
             }
-            if (elementFinder.ignoreElement(element)) {
+            if (elementFinder_1.elementFinder.ignoreElement(element)) {
                 return;
             }
             //Prevent click events on video objects to avoid conflicts with
@@ -427,27 +434,27 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             // If you dont want to clone the click for this element
             // and you dont want to show the click for this element or you dont want to show any clicks
             // then return to avoid sending a useless click
-            if ((!util.matchElement(element, cloneClicks)) && util.matchElement(element, dontShowClicks)) {
+            if ((!util_1.util.matchElement(element, cloneClicks)) && util_1.util.matchElement(element, dontShowClicks)) {
                 return;
             }
-            var location = elementFinder.elementLocation(element);
-            var offset = $(element).offset(); // TODO !
+            var location = elementFinder_1.elementFinder.elementLocation(element);
+            var offset = jquery_1.default(element).offset(); // TODO !
             var offsetX = event.pageX - offset.left;
             var offsetY = event.pageY - offset.top;
-            session.send({
+            session_1.session.send({
                 type: "cursor-click",
                 element: location,
                 offsetX: offsetX,
                 offsetY: offsetY
             });
-            if (util.matchElement(element, dontShowClicks)) {
+            if (util_1.util.matchElement(element, dontShowClicks)) {
                 return;
             }
-            displayClick({ top: event.pageY, left: event.pageX }, peers.Self.color);
+            displayClick({ top: event.pageY, left: event.pageX }, peers_1.peers.Self.color);
         });
     }
     var CLICK_TRANSITION_TIME = 3000;
-    session.hub.on("cursor-click", function (pos) {
+    session_1.session.hub.on("cursor-click", function (pos) {
         // When the click is calculated isn't always the same as how the
         // last cursor update was calculated, so we force the cursor to
         // the last location during a click:
@@ -458,16 +465,16 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             return;
         }
         Cursor.getClient(pos.clientId).updatePosition(pos);
-        var target = $(elementFinder.findElement(pos.element));
+        var target = jquery_1.default(elementFinder_1.elementFinder.findElement(pos.element));
         var offset = target.offset(); // TODO !
         var top = offset.top + pos.offsetY;
         var left = offset.left + pos.offsetX;
         var cloneClicks = TogetherJS.config.get("cloneClicks");
-        if (util.matchElement(target, cloneClicks)) {
-            eventMaker.performClick(target);
+        if (util_1.util.matchElement(target, cloneClicks)) {
+            eventMaker_1.eventMaker.performClick(target);
         }
         var dontShowClicks = TogetherJS.config.get("dontShowClicks");
-        if (util.matchElement(target, dontShowClicks)) {
+        if (util_1.util.matchElement(target, dontShowClicks)) {
             return;
         }
         displayClick({ top: top, left: left }, pos.peer.color);
@@ -475,8 +482,8 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
     function displayClick(pos, color) {
         // FIXME: should we hide the local click if no one else is going to see it?
         // That means tracking who might be able to see our screen.
-        var element = templating.clone("click");
-        $(document.body).append(element);
+        var element = templating_1.templating.clone("click");
+        jquery_1.default(document.body).append(element);
         element.css({
             top: pos.top,
             left: pos.left,
@@ -499,15 +506,15 @@ function cursorMain($, _ui, util, session, elementFinder, eventMaker, peers, tem
             }
             lastKeydown = now;
             // FIXME: is event.target interesting here?  That is, *what* the user is typing into, not just that the user is typing? Also I'm assuming we don't care if the user it typing into a togetherjs-related field, since chat activity is as interesting as any other activity.
-            session.send({ type: "keydown" });
+            session_1.session.send({ type: "keydown" });
         });
     }
-    session.hub.on("keydown", function (msg) {
+    session_1.session.hub.on("keydown", function (msg) {
         // FIXME: when the cursor is hidden there's nothing to show with setKeydown().
         var cursor = Cursor.getClient(msg.clientId);
         cursor.setKeydown();
     });
-    util.testExpose({ Cursor: Cursor });
-    return cursor;
-}
-define(["jquery", "ui", "util", "session", "elementFinder", "eventMaker", "peers", "templating"], cursorMain);
+    util_1.util.testExpose({ Cursor: Cursor });
+});
+//    return cursor;
+//define(["jquery", "ui", "util", "session", "elementFinder", "eventMaker", "peers", "templating"], cursorMain);

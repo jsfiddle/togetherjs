@@ -18,7 +18,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var globalTjs;
+var TogetherJS;
 function clone(o) {
     return extend(o); // TODO all those casts!!!!!
 }
@@ -165,7 +165,7 @@ function addScript(url) {
     document.head.appendChild(script);
 }
 function togetherjsMain() {
-    var styleSheet = "/togetherjs/togetherjs.css";
+    var styleSheet = "/togetherjs.css";
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
         if (typeof console == "undefined") {
@@ -359,7 +359,7 @@ function togetherjsMain() {
             var _this = this;
             var session;
             if (this.running) {
-                session = this.require("session");
+                session = this.require("session").session;
                 session.close();
                 return;
             }
@@ -452,7 +452,7 @@ function togetherjsMain() {
             }
             // FIXME: maybe I should just test for this.require:
             if (this._loaded) {
-                session = this.require("session");
+                session = this.require("session").session;
                 addStyle();
                 session.start();
                 return;
@@ -526,16 +526,16 @@ function togetherjsMain() {
                 requireConfig.deps = deps;
                 requireConfig.callback = callback;
                 if (!min) {
-                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/togetherjs/libs/require.js"); (see below) will be executed
+                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/libs/require.js"); (see below) will be executed
                     //@ts-expect-error weird stuff
                     window.require = requireConfig;
                 }
             }
             if (min) {
-                addScriptInner("/togetherjs/togetherjsPackage.js");
+                addScriptInner("/togetherjsPackage.js");
             }
             else {
-                addScriptInner("/togetherjs/libs/require.js");
+                addScriptInner("/libs/require.js");
             }
         };
         /** Can also be used to clone an object */
@@ -557,8 +557,8 @@ function togetherjsMain() {
         };
         TogetherJSClass.prototype.reinitialize = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
-                    session.emit("reinitialize");
+                this.require(["session"], function (sessionModule) {
+                    sessionModule.session.emit("reinitialize");
                 });
             }
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
@@ -575,8 +575,8 @@ function togetherjsMain() {
         };
         TogetherJSClass.prototype.refreshUserData = function () {
             if (this.running && typeof this.require == "function") {
-                this.require(["session"], function (session) {
-                    session.emit("refresh-user-data");
+                this.require(["session"], function (sessionModule) {
+                    sessionModule.session.emit("refresh-user-data");
                 });
             }
         };
@@ -596,14 +596,14 @@ function togetherjsMain() {
             if (!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             session.appSend(msg);
         };
         TogetherJSClass.prototype.shareUrl = function () {
             if (!this.require) {
                 return null;
             }
-            var session = this.require("session");
+            var session = this.require("session").session;
             return session.shareUrl();
         };
         TogetherJSClass.prototype.listenForShortcut = function () {
@@ -781,12 +781,12 @@ function togetherjsMain() {
     if (!baseUrl) {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
-    var tjsInstance = globalTjs = new TogetherJSClass();
+    var tjsInstance = new TogetherJSClass();
     var TogetherJS = tjsInstance; //() => { tjsInstance.start(); return tjsInstance; }
     window["TogetherJS"] = TogetherJS;
     tjsInstance.requireConfig = {
         context: "togetherjs",
-        baseUrl: baseUrl + "/togetherjs",
+        baseUrl: baseUrl,
         urlArgs: "bust=" + cacheBust,
         paths: {
             jquery: "libs/jquery-1.11.1.min",
@@ -906,4 +906,4 @@ function togetherjsMain() {
     window.TowTruck = TogetherJS;
     return tjsInstance;
 }
-globalTjs = togetherjsMain();
+TogetherJS = togetherjsMain();

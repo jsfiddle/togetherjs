@@ -1,8 +1,15 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function playbackMain($, _util, session, storage, _require) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./session", "./storage", "jquery"], function (require, exports, session_1, storage_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.playback = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
     var ALWAYS_REPLAY = {
         "cursor-update": true,
         "scroll-update": true
@@ -115,7 +122,7 @@ function playbackMain($, _util, session, storage, _require) {
                 }
             }
             try {
-                session._getChannel().onmessage(item);
+                session_1.session._getChannel().onmessage(item);
             }
             catch (e) {
                 console.warn("Could not play back message:", item, "error:", e);
@@ -123,16 +130,16 @@ function playbackMain($, _util, session, storage, _require) {
         };
         Logs.prototype.save = function () {
             this.fromStorage = true;
-            storage.set("playback.logs", this.logs);
+            storage_1.storage.set("playback.logs", this.logs);
             this.savePos();
         };
         Logs.prototype.savePos = function () {
-            storage.set("playback.pos", this.pos);
+            storage_1.storage.set("playback.pos", this.pos);
         };
         Logs.prototype.unload = function () {
             if (this.fromStorage) {
-                storage.set("playback.logs", undefined);
-                storage.set("playback.pos", undefined);
+                storage_1.storage.set("playback.logs", undefined);
+                storage_1.storage.set("playback.pos", undefined);
             }
             // FIXME: should do a bye message here
         };
@@ -143,9 +150,9 @@ function playbackMain($, _util, session, storage, _require) {
         }
         Playback.prototype.getLogs = function (url) {
             if (url.search(/^local:/) === 0) {
-                return $.Deferred(function (def) {
+                return jquery_1.default.Deferred(function (def) {
                     var name = url.substr("local:".length);
-                    storage.get("recording." + name).then(function (logs) {
+                    storage_1.storage.get("recording." + name).then(function (logs) {
                         if (!logs) {
                             def.resolve(undefined);
                             return;
@@ -157,8 +164,8 @@ function playbackMain($, _util, session, storage, _require) {
                     });
                 });
             }
-            return $.Deferred(function (def) {
-                $.ajax({
+            return jquery_1.default.Deferred(function (def) {
+                jquery_1.default.ajax({
                     url: url,
                     dataType: "text"
                 }).then(function (logs) {
@@ -170,12 +177,12 @@ function playbackMain($, _util, session, storage, _require) {
             });
         };
         Playback.prototype.getRunningLogs = function () {
-            return storage.get("playback.logs").then(function (value) {
+            return storage_1.storage.get("playback.logs").then(function (value) {
                 if (!value) {
                     return null;
                 }
                 var logs = new Logs(value, true);
-                return storage.get("playback.pos").then(function (pos) {
+                return storage_1.storage.get("playback.pos").then(function (pos) {
                     logs.pos = pos || 0;
                     return logs;
                 });
@@ -183,6 +190,6 @@ function playbackMain($, _util, session, storage, _require) {
         };
         return Playback;
     }());
-    return new Playback();
-}
-define(["jquery", "util", "session", "storage", "require"], playbackMain);
+    exports.playback = new Playback();
+});
+//define(["jquery", "util", "session", "storage", "require"], playbackMain);

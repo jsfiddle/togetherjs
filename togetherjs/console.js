@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -7,7 +6,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-function consoleMain(util) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.appConsole = void 0;
+    //function consoleMain(util: TogetherJSNS.Util) {
     var console = window.console || { log: function () { } };
     var Console = /** @class */ (function () {
         function Console() {
@@ -34,10 +37,10 @@ function consoleMain(util) {
                 "error" in console ? console.error : [],
                 "fatal" in console ? console.fatal : []
             ];
-            util.forEachAttr(Console.levels, function (value, _name) {
+            util_1.util.forEachAttr(Console.levels, function (value, _name) {
                 _this.maxLevel = Math.max(_this.maxLevel, value);
             });
-            util.forEachAttr(Console.levels, function (value, name) {
+            util_1.util.forEachAttr(Console.levels, function (value, name) {
                 _this.levelNames[value] = name;
             });
         }
@@ -218,7 +221,7 @@ function consoleMain(util) {
         Console.prototype.submit = function (options) {
             if (options === void 0) { options = {}; }
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util.Deferred(function () {
+            return util_1.util.Deferred(function () {
                 var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
                 var req = new XMLHttpRequest();
                 req.open("POST", site);
@@ -291,7 +294,7 @@ function consoleMain(util) {
             this.write.apply(this, a);
         };
     }
-    var appConsole = new Console();
-    return appConsole;
-}
-define(["util"], consoleMain);
+    exports.appConsole = new Console();
+});
+//return appConsole;
+//define(["util"], consoleMain);

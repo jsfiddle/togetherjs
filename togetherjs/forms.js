@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,8 +16,16 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function formsMain($, util, session, elementFinder, eventMaker, templating, ot) {
-    var assert = util.assert;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./util", "jquery"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, util_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.forms = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
+    var assert = util_1.util.assert.bind(util_1.util);
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
     var FOCUS_BUFFER = 5;
@@ -32,7 +39,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return false;
         }
         else {
-            return $(element).is(ignoreForms.join(","));
+            return jquery_1.default(element).is(ignoreForms.join(","));
         }
     }
     function maybeChange(event) {
@@ -50,17 +57,17 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         });
     }
     function sendData(attrs) {
-        var el = $(attrs.element);
+        var el = jquery_1.default(attrs.element);
         assert(el);
         var tracker = "tracker" in attrs ? attrs.tracker : undefined;
         var value = attrs.value;
         if (inRemoteUpdate) {
             return;
         }
-        if (elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
+        if (elementFinder_1.elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
             return;
         }
-        var location = elementFinder.elementLocation(el);
+        var location = elementFinder_1.elementFinder.elementLocation(el);
         var msg = {
             type: "form-update",
             element: location,
@@ -73,7 +80,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 if (history.current == value) {
                     return;
                 }
-                var delta = ot.TextReplace.fromChange(history.current, value);
+                var delta = ot_1.ot.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
                 maybeSendUpdate(location, history, tracker);
@@ -81,13 +88,13 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             else {
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1));
             }
         }
-        session.send(msg);
+        session_1.session.send(msg);
     }
     function isCheckable(element) {
-        var el = $(element);
+        var el = jquery_1.default(element);
         var type = (el.prop("type") || "text").toLowerCase();
         if (el.prop("tagName") == "INPUT" && ["radio", "checkbox"].indexOf(type) != -1) {
             return true;
@@ -125,8 +132,8 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var AceEditor = /** @class */ (function (_super) {
         __extends(AceEditor, _super);
         function AceEditor(el) {
-            var _this = _super.call(this, "AceEditor", $(el)[0]) || this;
-            assert($(_this.element).hasClass("ace_editor"));
+            var _this = _super.call(this, "AceEditor", jquery_1.default(el)[0]) || this;
+            assert(jquery_1.default(_this.element).hasClass("ace_editor"));
             _this._change = _this._change.bind(_this);
             _this._editor().document.on("change", _this._change);
             return _this;
@@ -165,14 +172,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return this._editor().document.getValue();
         };
         AceEditor.scan = function () {
-            return $(".ace_editor");
+            return jquery_1.default(".ace_editor");
         };
         /** Non-static version */
         AceEditor.prototype.tracked = function (el) {
             return AceEditor.tracked(el);
         };
         AceEditor.tracked = function (el) {
-            return !!$(el).closest(".ace_editor").length;
+            return !!jquery_1.default(el).closest(".ace_editor").length;
         };
         AceEditor.trackerName = "AceEditor";
         return AceEditor;
@@ -181,14 +188,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var CodeMirrorEditor = /** @class */ (function (_super) {
         __extends(CodeMirrorEditor, _super);
         function CodeMirrorEditor(el) {
-            var _this = _super.call(this, "CodeMirrorEditor", $(el)[0]) || this;
+            var _this = _super.call(this, "CodeMirrorEditor", jquery_1.default(el)[0]) || this;
             assert("CodeMirror" in _this.element);
             _this._change = _this._change.bind(_this);
             _this._editor().on("change", _this._change);
             return _this;
         }
         CodeMirrorEditor.prototype.tracked2 = function (el) {
-            return this.element === $(el)[0];
+            return this.element === jquery_1.default(el)[0];
         };
         CodeMirrorEditor.prototype.destroy = function () {
             this._editor().off("change", this._change);
@@ -234,14 +241,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                     result.push(el);
                 }
             }
-            return $(result);
+            return jquery_1.default(result);
         };
         /** Non-static version */
         CodeMirrorEditor.prototype.tracked = function (el) {
             return CodeMirrorEditor.tracked(el);
         };
         CodeMirrorEditor.tracked = function (e) {
-            var el = $(e)[0];
+            var el = jquery_1.default(e)[0];
             while (el) {
                 if ("CodeMirror" in el) {
                     return true;
@@ -257,7 +264,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var CKEditor = /** @class */ (function (_super) {
         __extends(CKEditor, _super);
         function CKEditor(el) {
-            var _this = _super.call(this, "CKEditor", $(el)[0]) || this;
+            var _this = _super.call(this, "CKEditor", jquery_1.default(el)[0]) || this;
             assert(CKEDITOR);
             assert(CKEDITOR.dom.element.get(_this.element));
             _this._change = _this._change.bind(_this);
@@ -266,7 +273,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             return _this;
         }
         CKEditor.prototype.tracked2 = function (el) {
-            return this.element === $(el)[0];
+            return this.element === jquery_1.default(el)[0];
         };
         CKEditor.prototype.destroy = function () {
             this._editor().removeListener("change", this._change);
@@ -314,7 +321,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                     result.push(editorInstance);
                 }
             }
-            return $(result);
+            return jquery_1.default(result);
         };
         /** Non-static version */
         CKEditor.prototype.tracked = function (el) {
@@ -324,7 +331,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             if (typeof CKEDITOR == "undefined") {
                 return false;
             }
-            var elem = $(el)[0];
+            var elem = jquery_1.default(el)[0];
             return !!(CKEDITOR.dom.element.get(elem) && CKEDITOR.dom.element.get(elem).getEditor());
         };
         CKEditor.trackerName = "CKEditor";
@@ -335,14 +342,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var tinymceEditor = /** @class */ (function (_super) {
         __extends(tinymceEditor, _super);
         function tinymceEditor(el) {
-            var _this = _super.call(this, "tinymceEditor", $(el)[0]) || this;
-            assert($(_this.element).attr('id').indexOf('mce_') != -1);
+            var _this = _super.call(this, "tinymceEditor", jquery_1.default(el)[0]) || this;
+            assert(jquery_1.default(_this.element).attr('id').indexOf('mce_') != -1);
             _this._change = _this._change.bind(_this);
             _this._editor().on("input keyup cut paste change", _this._change);
             return _this;
         }
         tinymceEditor.prototype.tracked2 = function (el) {
-            return this.element === $(el)[0];
+            return this.element === jquery_1.default(el)[0];
         };
         tinymceEditor.prototype.destroy = function () {
             this._editor().destroy(); // TODO was "destory", probably a typo, fixed
@@ -375,7 +382,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 throw new Error("TinyEditor is undefined");
                 //return; // TODO was returning undefined, remove for now for easier typechecking
             }
-            return $(this.element).data("tinyEditor");
+            return jquery_1.default(this.element).data("tinyEditor");
         };
         tinymceEditor.prototype.getContent = function () {
             return this._editor().getContent();
@@ -386,12 +393,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 return;
             }
             var result = [];
-            $(window.tinymce.editors).each(function (_i, ed) {
-                result.push($('#' + ed.id));
+            jquery_1.default(window.tinymce.editors).each(function (_i, ed) {
+                result.push(jquery_1.default('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
-                $('#' + ed.id).data("tinyEditor", ed);
+                jquery_1.default('#' + ed.id).data("tinyEditor", ed);
             });
-            return $(result);
+            return jquery_1.default(result);
         };
         /** Non-static version */
         tinymceEditor.prototype.tracked = function (el) {
@@ -401,13 +408,13 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             if (typeof tinymce == "undefined") {
                 return false;
             }
-            var elem = $(el)[0];
-            return !!$(elem).data("tinyEditor");
+            var elem = jquery_1.default(el)[0];
+            return !!jquery_1.default(elem).data("tinyEditor");
             /*var flag = false;
             $(window.tinymce.editors).each(function (i, ed) {
-              if (el.id == ed.id) {
+                if (el.id == ed.id) {
                 flag = true;
-              }
+                }
             });
             return flag;*/
         };
@@ -418,12 +425,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
         assert(!liveTrackers.length);
-        util.forEachAttr(editTrackers, function (TrackerClass) {
+        util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
             var els = TrackerClass.scan();
             if (els) {
-                $.each(els, function () {
+                jquery_1.default.each(els, function () {
                     var tracker = new TrackerClass(this);
-                    $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+                    jquery_1.default(this).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
                     liveTrackers.push(tracker);
                 });
             }
@@ -437,7 +444,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     }
     function elementTracked(el) {
         var result = false;
-        util.forEachAttr(editTrackers, function (TrackerClass) {
+        util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
             if (TrackerClass.tracked(el)) {
                 result = true;
             }
@@ -448,7 +455,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (name === null) {
             return null;
         }
-        var el = $(e)[0];
+        var el = jquery_1.default(e)[0];
         for (var i = 0; i < liveTrackers.length; i++) {
             var tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
@@ -464,7 +471,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     }
     var TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
     function isText(e) {
-        var el = $(e);
+        var el = jquery_1.default(e);
         var tag = el.prop("tagName");
         var type = (el.prop("type") || "text").toLowerCase();
         if (tag == "TEXTAREA") {
@@ -477,7 +484,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     }
     function getValue(e) {
         var _a;
-        var el = $(e);
+        var el = jquery_1.default(e);
         if (isCheckable(el)) {
             return el.prop("checked"); // "as boolean" serves as a reminder of the type of the value
         }
@@ -488,7 +495,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     // TODO not used
     //@ts-expect-error unused but we don't remove functions for now
     function getElementType(e) {
-        var el = $(e)[0];
+        var el = jquery_1.default(e)[0];
         if (el.tagName == "TEXTAREA") {
             return "textarea";
         }
@@ -501,7 +508,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         return "?";
     }
     function setValue(e, value) {
-        var el = $(e);
+        var el = jquery_1.default(e);
         var changed = false;
         if (isCheckable(el)) {
             assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
@@ -519,7 +526,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
         }
         if (changed) {
-            eventMaker.fireChange(el);
+            eventMaker_1.eventMaker.fireChange(el);
         }
     }
     /** Send the top of this history queue, if it hasn't been already sent. */
@@ -546,14 +553,14 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         if (tracker) {
             msg.tracker = tracker;
         }
-        session.send(msg);
+        session_1.session.send(msg);
     }
-    session.hub.on("form-update", function (msg) {
+    session_1.session.hub.on("form-update", function (msg) {
         var _a;
         if (!msg.sameUrl) {
             return;
         }
-        var el = $(elementFinder.findElement(msg.element));
+        var el = jquery_1.default(elementFinder_1.elementFinder.findElement(msg.element));
         var el0 = el[0]; // TODO is this cast right?
         if (typeof msg.value === "boolean") {
             setValue(el, msg.value);
@@ -586,7 +593,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             history_1.setSelection(selection);
             // make a real TextReplace object.
-            var delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            var delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             var change_1 = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
             var changed = history_1.commit(change_1);
@@ -637,12 +644,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
         };
-        var els = $("textarea, input, select");
+        var els = jquery_1.default("textarea, input, select");
         els.each(function () {
-            if (elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
+            if (elementFinder_1.elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
-            var el = $(this);
+            var el = jquery_1.default(this);
             var el0 = el[0];
             var value = getValue(el0);
             // TODO old code in /**/
@@ -659,7 +666,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 var history = el.data("togetherjsHistory");
                 if (history) {
                     var upd = {
-                        element: elementFinder.elementLocation(this),
+                        element: elementFinder_1.elementFinder.elementLocation(this),
                         value: history.committed,
                         basis: history.basis,
                     };
@@ -667,7 +674,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                 }
                 else {
                     var upd = {
-                        element: elementFinder.elementLocation(this),
+                        element: elementFinder_1.elementFinder.elementLocation(this),
                         value: value,
                     };
                     msg.updates.push(upd);
@@ -675,7 +682,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             }
             else {
                 var upd = {
-                    element: elementFinder.elementLocation(this),
+                    element: elementFinder_1.elementFinder.elementLocation(this),
                     value: value,
                 };
                 msg.updates.push(upd);
@@ -684,10 +691,10 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         liveTrackers.forEach(function (tracker) {
             var init0 = tracker.makeInit();
             assert(tracker.tracked(init0.element));
-            var history = $(init0.element).data("togetherjsHistory");
+            var history = jquery_1.default(init0.element).data("togetherjsHistory");
             // TODO check the logic change
             var init = {
-                element: elementFinder.elementLocation($(init0.element)),
+                element: elementFinder_1.elementFinder.elementLocation(jquery_1.default(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
             };
@@ -698,32 +705,32 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             msg.updates.push(init);
         });
         if (msg.updates.length) {
-            session.send(msg);
+            session_1.session.send(msg);
         }
     }
     function setInit() {
-        var els = $("textarea, input, select");
+        var els = jquery_1.default("textarea, input, select");
         els.each(function () {
             if (elementTracked(this)) {
                 return;
             }
-            if (elementFinder.ignoreElement(this)) {
+            if (elementFinder_1.elementFinder.ignoreElement(this)) {
                 return;
             }
-            var el = $(this);
+            var el = jquery_1.default(this);
             var value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
                 // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
-                el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1)); // TODO !
+                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1)); // TODO !
             }
         });
         destroyTrackers();
         buildTrackers();
     }
-    session.on("reinitialize", setInit);
-    session.on("ui-ready", setInit);
-    session.on("close", destroyTrackers);
-    session.hub.on("form-init", function (msg) {
+    session_1.session.on("reinitialize", setInit);
+    session_1.session.on("ui-ready", setInit);
+    session_1.session.on("close", destroyTrackers);
+    session_1.session.hub.on("form-init", function (msg) {
         if (!msg.sameUrl) {
             return;
         }
@@ -741,7 +748,7 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
         msg.updates.forEach(function (update) {
             var el;
             try {
-                el = elementFinder.findElement(update.element);
+                el = elementFinder_1.elementFinder.findElement(update.element);
             }
             catch (e) {
                 /* skip missing element */
@@ -759,12 +766,12 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
                     setValue(el, update.value);
                 }
                 if ("basis" in update && update.basis) {
-                    var history = $(el).data("togetherjsHistory");
+                    var history = jquery_1.default(el).data("togetherjsHistory");
                     // don't overwrite history if we're already up to date
                     // (we might have outstanding queued changes we don't want to lose)
                     if (!(history && history.basis === update.basis && history.basis !== 1)) {
                         // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
-                        $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
+                        jquery_1.default(el).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, update.value, update.basis));
                     }
                 }
             }
@@ -776,23 +783,23 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
     var lastFocus = null;
     function focus(event) {
         var target = event.target;
-        if (elementFinder.ignoreElement(target) || elementTracked(target)) {
+        if (elementFinder_1.elementFinder.ignoreElement(target) || elementTracked(target)) {
             blur(event);
             return;
         }
         if (target != lastFocus) {
             lastFocus = target;
-            session.send({ type: "form-focus", element: elementFinder.elementLocation(target) });
+            session_1.session.send({ type: "form-focus", element: elementFinder_1.elementFinder.elementLocation(target) });
         }
     }
     function blur(_event) {
         if (lastFocus) {
             lastFocus = null;
-            session.send({ type: "form-focus", element: null });
+            session_1.session.send({ type: "form-focus", element: null });
         }
     }
     var focusElements = {};
-    session.hub.on("form-focus", function (msg) {
+    session_1.session.hub.on("form-focus", function (msg) {
         if (!msg.sameUrl) {
             return;
         }
@@ -805,20 +812,20 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             // A blur
             return;
         }
-        var element = elementFinder.findElement(msg.element);
+        var element = elementFinder_1.elementFinder.findElement(msg.element);
         var el = createFocusElement(msg.peer, element);
         if (el) {
             focusElements[msg.peer.id] = el;
         }
     });
     function createFocusElement(peer, around) {
-        around = $(around);
+        around = jquery_1.default(around);
         var aroundOffset = around.offset();
         if (!aroundOffset) {
             console.warn("Could not get offset of element:", around[0]);
             return null;
         }
-        var el = templating.sub("focus", { peer: peer });
+        var el = templating_1.templating.sub("focus", { peer: peer });
         el = el.find(".togetherjs-focus");
         el.css({
             top: aroundOffset.top - FOCUS_BUFFER + "px",
@@ -826,33 +833,34 @@ function formsMain($, util, session, elementFinder, eventMaker, templating, ot) 
             width: around.outerWidth() + (FOCUS_BUFFER * 2) + "px",
             height: around.outerHeight() + (FOCUS_BUFFER * 2) + "px"
         });
-        $(document.body).append(el);
+        jquery_1.default(document.body).append(el);
         return el;
     }
-    session.on("ui-ready", function () {
-        $(document).on("change", change);
+    session_1.session.on("ui-ready", function () {
+        jquery_1.default(document).on("change", change);
         // note that textInput, keydown, and keypress aren't appropriate events
         // to watch, since they fire *before* the element's value changes.
-        $(document).on("input keyup cut paste", maybeChange);
-        $(document).on("focusin", focus);
-        $(document).on("focusout", blur);
+        jquery_1.default(document).on("input keyup cut paste", maybeChange);
+        jquery_1.default(document).on("focusin", focus);
+        jquery_1.default(document).on("focusout", blur);
     });
-    session.on("close", function () {
-        $(document).off("change", change);
-        $(document).off("input keyup cut paste", maybeChange);
-        $(document).off("focusin", focus);
-        $(document).off("focusout", blur);
+    session_1.session.on("close", function () {
+        jquery_1.default(document).off("change", change);
+        jquery_1.default(document).off("input keyup cut paste", maybeChange);
+        jquery_1.default(document).off("focusin", focus);
+        jquery_1.default(document).off("focusout", blur);
     });
-    session.hub.on("hello", function (msg) {
+    session_1.session.hub.on("hello", function (msg) {
         if (msg.sameUrl) {
             setTimeout(function () {
                 sendInit();
                 if (lastFocus) {
-                    session.send({ type: "form-focus", element: elementFinder.elementLocation(lastFocus) });
+                    session_1.session.send({ type: "form-focus", element: elementFinder_1.elementFinder.elementLocation(lastFocus) });
                 }
             });
         }
     });
-    return { trackerClassExport: null }; // TODO ugly export
-}
-define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);
+    exports.forms = { trackerClassExport: null }; // TODO ugly export
+});
+//}
+//define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

@@ -1,4 +1,3 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -17,12 +16,20 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-function sessionMain(require, util, channels, $, storage) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./channels", "./init", "./storage", "./util", "jquery"], function (require, exports, channels_1, init_1, storage_1, util_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.session = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
     var DEBUG = true;
     // This is the amount of time in which a hello-back must be received after a hello
     // for us to respect a URL change:
     var HELLO_BACK_CUTOFF = 1500;
-    var assert = util.assert;
+    var assert = util_1.util.assert.bind(util_1.util);
     // We will load this module later (there's a circular import):
     var peers;
     // This is the channel to the hub:
@@ -35,13 +42,13 @@ function sessionMain(require, util, channels, $, storage) {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             /** This is the hub we connect to: */
             _this.shareId = null;
-            _this.router = channels.Router();
+            _this.router = channels_1.channels.Router();
             /** Indicates if TogetherJS has just started (not continuing from a saved session): */
             _this.firstRun = false;
             /** Setting, essentially global: */
             _this.AVATAR_SIZE = 90;
             _this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
-            _this.hub = new OnClass();
+            _this.hub = new init_1.OnClass();
             return _this;
         }
         Session.prototype.hubUrl = function (id) {
@@ -68,7 +75,7 @@ function sessionMain(require, util, channels, $, storage) {
         };
         Session.prototype.recordUrl = function () {
             assert(this.shareId);
-            var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/togetherjs/recorder.html";
+            var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
             url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
             return url;
         };
@@ -86,7 +93,7 @@ function sessionMain(require, util, channels, $, storage) {
                 console.info("Send:", msg);
             }
             var msg2 = msg;
-            msg2.clientId = session.clientId; // TODO !
+            msg2.clientId = exports.session.clientId; // TODO !
             channel.send(msg2); // TODO !
         };
         // TODO this function appears to never been used (since it's only caller never is), and it does weird things. Tried with a "type MapForAppSending = { [P in keyof MapForSending & string as `app.${P}`]: MapForSending[P] }" but it doesn't change the type of the `type` field and hence doesn't work
@@ -99,7 +106,7 @@ function sessionMain(require, util, channels, $, storage) {
                 type = "app." + type; // TODO very abusive typing, I don't really see how to fix that except by duplicating MapForSending and all the types it uses which is a lot for a function that isn't used...
             }
             msg.type = type;
-            session.send(msg);
+            exports.session.send(msg);
         };
         Session.prototype.makeHelloMessage = function (helloBack) {
             var starting = false;
@@ -112,18 +119,18 @@ function sessionMain(require, util, channels, $, storage) {
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
                     color: peers.Self.color || "",
-                    url: session.currentUrl(),
+                    url: exports.session.currentUrl(),
                     urlHash: location.hash,
                     // FIXME: titles update, we should track those changes:
                     title: document.title,
-                    rtcSupported: !!session.RTCSupported,
-                    isClient: session.isClient,
+                    rtcSupported: !!exports.session.RTCSupported,
+                    isClient: exports.session.isClient,
                     starting: starting,
                     identityId: peers.Self.identityId,
                     status: peers.Self.status,
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg);
+                exports.session.emit("prepare-hello", msg);
                 return msg;
             }
             else {
@@ -132,17 +139,17 @@ function sessionMain(require, util, channels, $, storage) {
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
                     color: peers.Self.color || "",
-                    url: session.currentUrl(),
+                    url: exports.session.currentUrl(),
                     urlHash: location.hash,
                     // FIXME: titles update, we should track those changes:
                     title: document.title,
-                    rtcSupported: !!session.RTCSupported,
-                    isClient: session.isClient,
+                    rtcSupported: !!exports.session.RTCSupported,
+                    isClient: exports.session.isClient,
                     starting: starting,
                     clientVersion: TogetherJS.version
                 };
                 // This is a chance for other modules to effect the hello message:
-                session.emit("prepare-hello", msg);
+                exports.session.emit("prepare-hello", msg);
                 return msg;
             }
         };
@@ -152,22 +159,25 @@ function sessionMain(require, util, channels, $, storage) {
                 initShareId().then(function () {
                     readyForMessages = false;
                     openChannel();
-                    require(["ui"], function (ui) {
+                    require(["ui"], function (uiModule) {
+                        var ui = uiModule.ui;
                         TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function () {
-                            $(function () {
-                                peers = require("peers");
-                                var startup = require("startup");
-                                session.emit("start");
-                                session.once("ui-ready", function () {
+                            jquery_1.default(function () {
+                                var peersModule = require("peers");
+                                peers = peersModule.peers;
+                                var startup = require("startup").startup;
+                                exports.session.emit("start");
+                                exports.session.once("ui-ready", function () {
                                     readyForMessages = true;
                                     startup.start();
                                 });
                                 ui.activateUI();
                                 TogetherJS.config.close("enableAnalytics");
                                 if (TogetherJS.config.get("enableAnalytics")) {
-                                    require(["analytics"], function (analytics) {
+                                    require(["analytics"], function (_a) {
+                                        var analytics = _a.analytics;
                                         analytics.activate();
                                     });
                                 }
@@ -187,22 +197,22 @@ function sessionMain(require, util, channels, $, storage) {
             if (reason) {
                 msg.reason = reason;
             }
-            session.send(msg);
-            session.emit("close");
+            exports.session.send(msg);
+            exports.session.emit("close");
             var name = window.name;
-            storage.tab.get("status").then(function (saved) {
+            storage_1.storage.tab.get("status").then(function (saved) {
                 if (!saved) {
                     console.warn("No session information saved in", "status." + name);
                 }
                 else {
                     saved.running = false;
                     saved.date = Date.now();
-                    storage.tab.set("status", saved);
+                    storage_1.storage.tab.set("status", saved);
                 }
                 channel.close(); // TODO !
                 channel = null;
-                session.shareId = null;
-                session.emit("shareId");
+                exports.session.shareId = null;
+                exports.session.emit("shareId");
                 TogetherJS.emit("close");
                 TogetherJS._teardown();
             });
@@ -211,8 +221,8 @@ function sessionMain(require, util, channels, $, storage) {
             return channel; // TODO !
         };
         return Session;
-    }(OnClass));
-    var session = new Session();
+    }(init_1.OnClass));
+    exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************
      * URLs
@@ -237,8 +247,8 @@ function sessionMain(require, util, channels, $, storage) {
     var readyForMessages = false;
     function openChannel() {
         assert(!channel, "Attempt to re-open channel");
-        console.info("Connecting to", session.hubUrl(), location.href);
-        var c = channels.WebSocketChannel(session.hubUrl());
+        console.info("Connecting to", exports.session.hubUrl(), location.href);
+        var c = channels_1.channels.WebSocketChannel(exports.session.hubUrl());
         c.onmessage = function (msg) {
             if (!readyForMessages) {
                 if (DEBUG) {
@@ -282,11 +292,11 @@ function sessionMain(require, util, channels, $, storage) {
                     }
                 }
             }
-            session.hub.emit(msg.type, msg);
+            exports.session.hub.emit(msg.type, msg);
             TogetherJS._onmessage(msg);
         };
         channel = c;
-        session.router.bindChannel(channel);
+        exports.session.router.bindChannel(channel);
     }
     /****************************************
      * Standard message responses
@@ -296,13 +306,13 @@ function sessionMain(require, util, channels, $, storage) {
         if (msg.type == "hello") {
             sendHello(true);
         }
-        if (session.isClient && (!msg.isClient) && session.firstRun && session.timeHelloSent && Date.now() - session.timeHelloSent < HELLO_BACK_CUTOFF) {
+        if (exports.session.isClient && (!msg.isClient) && exports.session.firstRun && exports.session.timeHelloSent && Date.now() - exports.session.timeHelloSent < HELLO_BACK_CUTOFF) {
             processFirstHello(msg);
         }
     }
-    session.hub.on("hello", cbHelloHelloback);
-    session.hub.on("hello-back", cbHelloHelloback);
-    session.hub.on("who", function () {
+    exports.session.hub.on("hello", cbHelloHelloback);
+    exports.session.hub.on("hello-back", cbHelloHelloback);
+    exports.session.hub.on("who", function () {
         sendHello(true);
     });
     function processFirstHello(msg) {
@@ -311,17 +321,18 @@ function sessionMain(require, util, channels, $, storage) {
             if (msg.urlHash) {
                 url += msg.urlHash;
             }
-            require("ui").showUrlChangeMessage(msg.peer, url);
+            var ui = require("ui").ui;
+            ui.showUrlChangeMessage(msg.peer, url);
             location.href = url;
         }
     }
     function sendHello(helloBack) {
-        var msg = session.makeHelloMessage(helloBack);
+        var msg = exports.session.makeHelloMessage(helloBack);
         if (!helloBack) {
-            session.timeHelloSent = Date.now();
+            exports.session.timeHelloSent = Date.now();
             peers.Self.url = msg.url;
         }
-        session.send(msg);
+        exports.session.send(msg);
     }
     /****************************************
      * Lifecycle (start and end)
@@ -330,9 +341,9 @@ function sessionMain(require, util, channels, $, storage) {
     var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     function getRoomName(prefix, maxSize) {
         var hubBase = TogetherJS.config.get("hubBase");
-        util.assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
+        assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
         var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
-        return $.ajax({
+        return jquery_1.default.ajax({
             url: findRoom,
             dataType: "json",
             data: { prefix: prefix, max: maxSize }
@@ -341,17 +352,17 @@ function sessionMain(require, util, channels, $, storage) {
         });
     }
     function initIdentityId() {
-        return util.Deferred(function (def) {
-            if (session.identityId) {
+        return util_1.util.Deferred(function (def) {
+            if (exports.session.identityId) {
                 def.resolve();
                 return;
             }
-            storage.get("identityId").then(function (identityId) {
+            storage_1.storage.get("identityId").then(function (identityId) {
                 if (!identityId) {
-                    identityId = util.generateId();
-                    storage.set("identityId", identityId);
+                    identityId = util_1.util.generateId();
+                    storage_1.storage.set("identityId", identityId);
                 }
-                session.identityId = identityId;
+                exports.session.identityId = identityId;
                 // We don't actually have to wait for the set to succede, so long as session.identityId is set
                 def.resolve();
             });
@@ -359,13 +370,13 @@ function sessionMain(require, util, channels, $, storage) {
     }
     initIdentityId.done = initIdentityId();
     function initShareId() {
-        return util.Deferred(function (def) {
+        return util_1.util.Deferred(function (def) {
             var hash = location.hash;
-            var shareId = session.shareId;
+            var shareId = exports.session.shareId;
             var isClient = true;
             var set = true;
             var sessionId;
-            session.firstRun = !TogetherJS.startup.continued;
+            exports.session.firstRun = !TogetherJS.startup.continued;
             if (!shareId) {
                 if (TogetherJS.startup._joinShareId) {
                     // Like, below, this *also* means we got the shareId from the hash
@@ -384,7 +395,7 @@ function sessionMain(require, util, channels, $, storage) {
                     location.hash = newHash;
                 }
             }
-            return storage.tab.get("status").then(function (saved) {
+            return storage_1.storage.tab.get("status").then(function (saved) {
                 var findRoom = TogetherJS.config.get("findRoom");
                 TogetherJS.config.close("findRoom");
                 if (findRoom && saved && findRoom != saved.shareId) {
@@ -396,24 +407,24 @@ function sessionMain(require, util, channels, $, storage) {
                 if (findRoom && typeof findRoom == "string" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     isClient = true;
                     shareId = findRoom;
-                    sessionId = util.generateId();
+                    sessionId = util_1.util.generateId();
                 }
                 // TODO added 'typeof findRoom == "object"' check
                 else if (findRoom && typeof findRoom == "object" && (!saved) && (!TogetherJS.startup._joinShareId)) {
                     assert(findRoom.prefix && typeof findRoom.prefix == "string", "Bad findRoom.prefix", findRoom);
                     assert(findRoom.max && typeof findRoom.max == "number" && findRoom.max > 0, "Bad findRoom.max", findRoom);
-                    sessionId = util.generateId();
+                    sessionId = util_1.util.generateId();
                     if (findRoom.prefix.search(/[^a-zA-Z0-9]/) != -1) {
                         console.warn("Bad value for findRoom.prefix:", JSON.stringify(findRoom.prefix));
                     }
                     getRoomName(findRoom.prefix, findRoom.max).then(function (shareId) {
                         // FIXME: duplicates code below:
-                        session.clientId = session.identityId + "." + sessionId;
-                        storage.tab.set("status", { reason: "joined", shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
-                        session.isClient = true;
-                        session.shareId = shareId;
-                        session.emit("shareId");
-                        def.resolve(session.shareId);
+                        exports.session.clientId = exports.session.identityId + "." + sessionId;
+                        storage_1.storage.tab.set("status", { reason: "joined", shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
+                        exports.session.isClient = true;
+                        exports.session.shareId = shareId;
+                        exports.session.emit("shareId");
+                        def.resolve(exports.session.shareId);
                     });
                     return;
                 }
@@ -428,10 +439,10 @@ function sessionMain(require, util, channels, $, storage) {
                     else {
                         isClient = TogetherJS.startup.reason == "joined";
                         assert(!sessionId);
-                        sessionId = util.generateId();
+                        sessionId = util_1.util.generateId();
                     }
                     if (!shareId) {
-                        shareId = util.generateId();
+                        shareId = util_1.util.generateId();
                     }
                 }
                 else if (saved) {
@@ -445,17 +456,17 @@ function sessionMain(require, util, channels, $, storage) {
                     set = !saved.running;
                 }
                 else {
-                    throw new util.AssertionError("No saved status, and no startup._launch request; why did TogetherJS start?");
+                    throw new util_1.util.AssertionError("No saved status, and no startup._launch request; why did TogetherJS start?");
                 }
-                assert(session.identityId);
-                session.clientId = session.identityId + "." + sessionId;
+                assert(exports.session.identityId);
+                exports.session.clientId = exports.session.identityId + "." + sessionId;
                 if (set) {
-                    storage.tab.set("status", { reason: TogetherJS.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
+                    storage_1.storage.tab.set("status", { reason: TogetherJS.startup.reason, shareId: shareId, running: true, date: Date.now(), sessionId: sessionId });
                 }
-                session.isClient = isClient;
-                session.shareId = shareId;
-                session.emit("shareId");
-                def.resolve(session.shareId);
+                exports.session.isClient = isClient;
+                exports.session.shareId = shareId;
+                exports.session.emit("shareId");
+                def.resolve(exports.session.shareId);
             });
         });
     }
@@ -464,11 +475,11 @@ function sessionMain(require, util, channels, $, storage) {
         if (TogetherJS.startup.button) {
             id = TogetherJS.startup.button.id;
             if (id) {
-                storage.set("startTarget", id);
+                storage_1.storage.set("startTarget", id);
             }
             return;
         }
-        storage.get("startTarget").then(function (id) {
+        storage_1.storage.get("startTarget").then(function (id) {
             if (id) {
                 var el = document.getElementById(id);
                 if (el) {
@@ -477,16 +488,16 @@ function sessionMain(require, util, channels, $, storage) {
             }
         });
     }
-    session.on("start", function () {
-        $(window).on("resize", resizeEvent);
+    exports.session.on("start", function () {
+        jquery_1.default(window).on("resize", resizeEvent);
         if (includeHashInUrl) {
-            $(window).on("hashchange", hashchangeEvent);
+            jquery_1.default(window).on("hashchange", hashchangeEvent);
         }
     });
-    session.on("close", function () {
-        $(window).off("resize", resizeEvent);
+    exports.session.on("close", function () {
+        jquery_1.default(window).off("resize", resizeEvent);
         if (includeHashInUrl) {
-            $(window).off("hashchange", hashchangeEvent);
+            jquery_1.default(window).off("hashchange", hashchangeEvent);
         }
     });
     function hashchangeEvent() {
@@ -495,16 +506,16 @@ function sessionMain(require, util, channels, $, storage) {
         sendHello(false);
     }
     function resizeEvent() {
-        session.emit("resize");
+        exports.session.emit("resize");
     }
     if (TogetherJS.startup._launch) {
-        setTimeout(session.start);
+        setTimeout(exports.session.start);
     }
-    util.testExpose({
+    util_1.util.testExpose({
         getChannel: function () {
             return channel;
         }
     });
-    return session;
-}
-define(["require", "util", "channels", "jquery", "storage"], sessionMain);
+});
+//return session;
+//define(["require", "util", "channels", "jquery", "storage"], sessionMain);

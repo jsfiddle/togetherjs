@@ -24,7 +24,7 @@ send: hello
 Walkthrough closed
  */
 
-printResolved(storage.settings.get("seenIntroDialog"));
+printResolved(storage.storage.settings.get("seenIntroDialog"));
 
 // => true
 
@@ -52,7 +52,7 @@ print(fakeCursor.element && fakeCursor.element.is(":visible"));
 
 // => true
 
-var faker = peers.getPeer("faker");
+var faker = peers.peers.getPeer("faker");
 print(faker);
 
 // => Peer("faker")
@@ -118,7 +118,7 @@ print($("#togetherjs-chat")[0]);
 ...
 */
 
-windowing.hide();
+windowing.windowing.hide();
 $("#togetherjs-profile-button").click();
 print($("#togetherjs-menu").is(":visible"), $("#togetherjs-menu .togetherjs-self-name").is(":visible"));
 // => true false
@@ -131,7 +131,7 @@ $("#togetherjs-menu .togetherjs-self-name").val("Joe");
 $("#togetherjs-menu .togetherjs-self-name").trigger("keyup");
 // Then we submit:
 $("#togetherjs-menu .togetherjs-self-name").trigger($.Event("keyup", {which: 13}));
-print(peers.Self.name);
+print(peers.peers.Self.name);
 print($("#togetherjs-menu").is(":visible"), $("#togetherjs-menu .togetherjs-self-name").is(":visible"));
 print($("#togetherjs-self-name-display").text());
 /* =>
@@ -147,8 +147,8 @@ Joe
 
 var lastEl = $('<div id="last-element" />');
 $(document.body).append(lastEl);
-var dockEl = peers.getPeer("faker").view.dockElement;
-var partEl = peers.getPeer("faker").view.detailElement;
+var dockEl = peers.peers.getPeer("faker").view.dockElement;
+var partEl = peers.peers.getPeer("faker").view.detailElement;
 print("Starts visible:", partEl.is(":visible"));
 Test.incoming({
   type: "scroll-update",

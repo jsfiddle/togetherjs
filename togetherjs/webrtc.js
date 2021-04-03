@@ -1,11 +1,18 @@
-"use strict";
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
-    var assert = util.assert;
-    session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
-    if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, session_1, storage_1, ui_1, util_1, windowing_1, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    jquery_1 = __importDefault(jquery_1);
+    // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
+    //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
+    var assert = util_1.util.assert.bind(util_1.util);
+    session_1.session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
+    if (session_1.session.RTCSupported && jquery_1.default.browser.mozilla && parseInt(jquery_1.default.browser.version, 10) <= 19) {
         // In a few versions of Firefox (18 and 19) these APIs are present but
         // not actually usable
         // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
@@ -17,7 +24,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             })();
         }
         catch (e) {
-            session.RTCSupported = false;
+            session_1.session.RTCSupported = false;
         }
     }
     var mediaConstraints = {
@@ -45,7 +52,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             return new window.mozRTCPeerConnection({ /* Or stun:124.124.124..2 ? */ "iceServers": [{ "urls": "stun:23.21.150.121" }] }, // TODO changed url to urls
             { "optional": [] });
         }
-        throw new util.AssertionError("Called makePeerConnection() without supported connection");
+        throw new util_1.util.AssertionError("Called makePeerConnection() without supported connection");
     }
     function ensureCryptoLine(sdp) {
         if (!window.mozRTCPeerConnection) {
@@ -72,25 +79,25 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
     /****************************************
      * getUserMedia Avatar support
      */
-    session.on("ui-ready", function () {
-        $("#togetherjs-self-avatar").click(function () {
-            var avatar = peers.Self.avatar;
+    session_1.session.on("ui-ready", function () {
+        jquery_1.default("#togetherjs-self-avatar").click(function () {
+            var avatar = peers_1.peers.Self.avatar;
             if (avatar) {
                 $preview.attr("src", avatar);
             }
-            ui.displayToggle("#togetherjs-avatar-edit");
+            ui_1.ui.displayToggle("#togetherjs-avatar-edit");
         });
-        if (!session.RTCSupported) {
-            $("#togetherjs-avatar-edit-rtc").hide();
+        if (!session_1.session.RTCSupported) {
+            jquery_1.default("#togetherjs-avatar-edit-rtc").hide();
         }
         var avatarData;
-        var $preview = $("#togetherjs-self-avatar-preview");
-        var $accept = $("#togetherjs-self-avatar-accept");
-        var $cancel = $("#togetherjs-self-avatar-cancel");
-        var $takePic = $("#togetherjs-avatar-use-camera");
-        var $video = $("#togetherjs-avatar-video");
+        var $preview = jquery_1.default("#togetherjs-self-avatar-preview");
+        var $accept = jquery_1.default("#togetherjs-self-avatar-accept");
+        var $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
+        var $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
+        var $video = jquery_1.default("#togetherjs-avatar-video");
         var video0 = $video[0];
-        var $upload = $("#togetherjs-avatar-upload");
+        var $upload = jquery_1.default("#togetherjs-avatar-upload");
         $takePic.click(function () {
             if (!streaming) {
                 startStreaming();
@@ -104,16 +111,16 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             $accept.attr("disabled", null);
         }
         $accept.click(function () {
-            peers.Self.update({ avatar: avatarData });
-            ui.displayToggle("#togetherjs-no-avatar-edit");
+            peers_1.peers.Self.update({ avatar: avatarData });
+            ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: these probably shouldn't be two elements:
-            $("#togetherjs-participants-other").show();
+            jquery_1.default("#togetherjs-participants-other").show();
             $accept.attr("disabled", "1");
         });
         $cancel.click(function () {
-            ui.displayToggle("#togetherjs-no-avatar-edit");
+            ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: like above:
-            $("#togetherjs-participants-other").show();
+            jquery_1.default("#togetherjs-participants-other").show();
         });
         var streaming = false;
         function startStreaming() {
@@ -134,16 +141,16 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             assert(streaming);
             var height = video0.videoHeight;
             var width = video0.videoWidth;
-            width = width * (session.AVATAR_SIZE / height);
-            height = session.AVATAR_SIZE;
+            width = width * (session_1.session.AVATAR_SIZE / height);
+            height = session_1.session.AVATAR_SIZE;
             var canvas0 = document.createElement("canvas");
-            canvas0.height = session.AVATAR_SIZE;
-            canvas0.width = session.AVATAR_SIZE;
+            canvas0.height = session_1.session.AVATAR_SIZE;
+            canvas0.width = session_1.session.AVATAR_SIZE;
             var context = canvas0.getContext("2d"); // TODO ! null?
-            context.arc(session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, 0, Math.PI * 2);
+            context.arc(session_1.session.AVATAR_SIZE / 2, session_1.session.AVATAR_SIZE / 2, session_1.session.AVATAR_SIZE / 2, 0, Math.PI * 2);
             context.closePath();
             context.clip();
-            context.drawImage(video0, (session.AVATAR_SIZE - width) / 2, 0, width, height);
+            context.drawImage(video0, (session_1.session.AVATAR_SIZE - width) / 2, 0, width, height);
             savePicture(canvas0.toDataURL("image/png"));
         }
         $upload.on("change", function () {
@@ -151,7 +158,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             reader.onload = function () {
                 // FIXME: I don't actually know it's JPEG, but it's probably a
                 // good enough guess:
-                var url = "data:image/jpeg;base64," + util.blobToBase64(this.result); // TODO !
+                var url = "data:image/jpeg;base64," + util_1.util.blobToBase64(this.result); // TODO !
                 convertImage(url, function (result) {
                     savePicture(result);
                 });
@@ -163,8 +170,8 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
         });
         function convertImage(imageUrl, callback) {
             var canvas = document.createElement("canvas");
-            canvas.height = session.AVATAR_SIZE;
-            canvas.width = session.AVATAR_SIZE;
+            canvas.height = session_1.session.AVATAR_SIZE;
+            canvas.width = session_1.session.AVATAR_SIZE;
             var context = canvas.getContext("2d"); // TODO !
             var img = new Image();
             img.src = imageUrl;
@@ -174,8 +181,8 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             setTimeout(function () {
                 var width = img.naturalWidth || img.width;
                 var height = img.naturalHeight || img.height;
-                width = width * (session.AVATAR_SIZE / height);
-                height = session.AVATAR_SIZE;
+                width = width * (session_1.session.AVATAR_SIZE / height);
+                height = session_1.session.AVATAR_SIZE;
                 context.drawImage(img, 0, 0, width, height);
                 callback(canvas.toDataURL("image/png"));
             });
@@ -185,28 +192,28 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
      * RTC support
      */
     function audioButton(selector) {
-        ui.displayToggle(selector);
+        ui_1.ui.displayToggle(selector);
         if (selector == "#togetherjs-audio-incoming") {
-            $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
+            jquery_1.default("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
         }
         else {
-            $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
+            jquery_1.default("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
         }
     }
-    session.on("ui-ready", function () {
-        $("#togetherjs-audio-button").click(function () {
-            if ($("#togetherjs-rtc-info").is(":visible")) {
-                windowing.hide();
+    session_1.session.on("ui-ready", function () {
+        jquery_1.default("#togetherjs-audio-button").click(function () {
+            if (jquery_1.default("#togetherjs-rtc-info").is(":visible")) {
+                windowing_1.windowing.hide();
                 return;
             }
-            if (session.RTCSupported) {
+            if (session_1.session.RTCSupported) {
                 enableAudio();
             }
             else {
-                windowing.show("#togetherjs-rtc-not-supported");
+                windowing_1.windowing.show("#togetherjs-rtc-not-supported");
             }
         });
-        if (!session.RTCSupported) {
+        if (!session_1.session.RTCSupported) {
             audioButton("#togetherjs-audio-unavailable");
             return;
         }
@@ -214,7 +221,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
         var audioStream = null;
         var accepted = false;
         var connected = false;
-        var $audio = $("#togetherjs-audio-element");
+        var $audio = jquery_1.default("#togetherjs-audio-element");
         var offerSent = null;
         var offerReceived = null;
         var offerDescription = false;
@@ -225,9 +232,9 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
         var iceCandidate = null;
         function enableAudio() {
             accepted = true;
-            storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
+            storage_1.storage.settings.get("dontShowRtcInfo").then(function (dontShow) {
                 if (!dontShow) {
-                    windowing.show("#togetherjs-rtc-info");
+                    windowing_1.windowing.show("#togetherjs-rtc-info");
                 }
             });
             if (!audioStream) {
@@ -239,8 +246,8 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             }
             toggleMute();
         }
-        ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
-            storage.settings.set("dontShowRtcInfo", this.checked);
+        ui_1.ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
+            storage_1.storage.settings.set("dontShowRtcInfo", this.checked);
         });
         function error() {
             var args = [];
@@ -272,7 +279,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             }
             audioButton("#togetherjs-audio-error");
             // FIXME: this title doesn't seem to display?
-            $("#togetherjs-audio-error").attr("title", s);
+            jquery_1.default("#togetherjs-audio-error").attr("title", s);
         }
         function startStreaming(callback) {
             /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
@@ -296,7 +303,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             });
         }
         function attachMedia(element, media) {
-            element = $(element)[0];
+            element = jquery_1.default(element)[0];
             console.log("Attaching", media, "to", element);
             if (window.mozRTCPeerConnection) {
                 element.mozSrcObject = media;
@@ -339,7 +346,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             };
             _connection.onicecandidate = function (event) {
                 if (event.candidate) {
-                    session.send({
+                    session_1.session.send({
                         type: "rtc-ice-candidate",
                         candidate: {
                             sdpMLineIndex: event.candidate.sdpMLineIndex,
@@ -386,7 +393,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
                     connection.setLocalDescription(offer, 
                     //).then( // TODO toggle to switch to promise mode (the new api)
                     function () {
-                        session.send({
+                        session_1.session.send({
                             type: "rtc-offer",
                             offer: offer.sdp // TODO !
                         });
@@ -415,7 +422,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
                     //).then(
                     function () {
                         var _a;
-                        session.send({
+                        session_1.session.send({
                             type: "rtc-answer",
                             answer: (_a = answer.sdp) !== null && _a !== void 0 ? _a : "" // TODO added ?? ""
                         });
@@ -434,7 +441,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             // muting of localStreams isn't possible
             // FIXME: replace with hang-up?
         }
-        session.hub.on("rtc-offer", function (msg) {
+        session_1.session.hub.on("rtc-offer", function (msg) {
             if (offerReceived || answerSent || answerReceived || offerSent) {
                 abort();
             }
@@ -464,12 +471,12 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
                 run();
             }
         });
-        session.hub.on("rtc-answer", function (msg) {
+        session_1.session.hub.on("rtc-answer", function (msg) {
             if (answerSent || answerReceived || offerReceived || (!offerSent)) {
                 abort();
                 // Basically we have to abort and try again.  We'll expect the other
                 // client to restart when appropriate
-                session.send({ type: "rtc-abort" });
+                session_1.session.send({ type: "rtc-abort" });
                 return;
             }
             answerReceived = msg.answer;
@@ -489,13 +496,13 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
                 error("Error doing RTC setRemoteDescription:", err);
             });
         });
-        session.hub.on("rtc-ice-candidate", function (msg) {
+        session_1.session.hub.on("rtc-ice-candidate", function (msg) {
             iceCandidate = msg.candidate;
             if (offerDescription || answerDescription) {
                 addIceCandidate();
             }
         });
-        session.hub.on("rtc-abort", function (_msg) {
+        session_1.session.hub.on("rtc-abort", function (_msg) {
             abort();
             if (!accepted) {
                 return;
@@ -509,7 +516,7 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
                 connect();
             }
         });
-        session.hub.on("hello", function (_msg) {
+        session_1.session.hub.on("hello", function (_msg) {
             // FIXME: displayToggle should be set due to
             // _connection.onstatechange, but that's not working, so
             // instead:
@@ -526,5 +533,5 @@ function webrtcMain(_require, $, util, session, ui, peers, storage, windowing) {
             $audio[0].removeAttribute("src");
         }
     });
-}
-define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], webrtcMain);
+});
+//define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windowing"], webrtcMain);

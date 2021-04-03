@@ -77,7 +77,6 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
     less: {
       development: {
         files: {
@@ -147,14 +146,9 @@ module.exports = function (grunt) {
         files: ["togetherjs/**/*", "Gruntfile.js", "site/**/*", "!**/*_flymake*", "!**/*~", "!**/.*"],
         tasks: ["build", "buildsite"]
       },
-      // FIXME: I thought I wouldn't have to watch for
-      // togetherjs/**/*.js, but because the hard links are regularly
-      // broken by git, this needs to be run often, and it's easy to
-      // forget.  Then between git action the build will be over-run,
-      // but that's harmless.
+      // FIXME: I thought I wouldn't have to watch for togetherjs/**/*.js, but because the hard links are regularly broken by git, this needs to be run often, and it's easy to forget.  Then between git action the build will be over-run, but that's harmless.
       minimal: {
-        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", 
-                "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
+        files: ["togetherjs/**/*.less", "togetherjs/togetherjs.js", "togetherjs/templates-localized.js", "togetherjs/**/*.html", "togetherjs/**/*.js", "!**/*_flymake*", "togetherjs/locales/**/*.json"],
         tasks: ["build"]
       }
     },
@@ -215,7 +209,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask("copylib", "copy the library", function () {
-    var pattern = ["**", "!togetherjs.js", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
+    var pattern = ["**", "!templates-localized.js", "!**/*.less", "!#*", "!**/*_flymake*", "!**/*.md", "!**/*.tmp", "!**/#*"];
     grunt.log.writeln("Copying files from " + "togetherjs/".cyan + " to " + path.join(grunt.option("dest"), "togetherjs").cyan);
     if (grunt.option("exclude-tests")) {
       pattern.push("!tests/");
