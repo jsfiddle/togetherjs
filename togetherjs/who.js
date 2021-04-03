@@ -42,7 +42,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                 var users = {};
                 var responded = 0;
                 //tslint:disable-next-line unused var
-                var firstResponse = 0;
+                var firstResponse = 0; // TODO unused
                 var lateResponseTimeout;
                 channel.onmessage = function (msg) {
                     if (msg.type == "init-connection") {
@@ -50,7 +50,8 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     }
                     if (msg.type == "who") {
                         // Our message back to ourselves probably
-                        firstResponse = setTimeout(function () {
+                        //firstResponse =  // TODO unused
+                        setTimeout(function () {
                             close();
                         }, MAX_LATE_RESPONSE);
                     }

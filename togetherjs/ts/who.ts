@@ -59,8 +59,7 @@ class Who {
             var channel = channels.WebSocketChannel(hubUrl);
             var users: { [user: string]: ExternalPeer } = {};
             var responded = 0;
-            //tslint:disable-next-line unused var
-            var firstResponse = 0;
+            //var firstResponse = 0; // TODO unused
             var lateResponseTimeout: number;
             channel.onmessage = function(msg) {
                 if(msg.type == "init-connection") {
@@ -68,7 +67,8 @@ class Who {
                 }
                 if(msg.type == "who") {
                     // Our message back to ourselves probably
-                    firstResponse = setTimeout(function() {
+                    //firstResponse =  // TODO unused
+                    setTimeout(function() {
                         close();
                     }, MAX_LATE_RESPONSE);
                 }
