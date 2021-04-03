@@ -155,7 +155,7 @@ function baseUrl1() {
     return baseUrl;
 }
 // True if this file should use minimized sub-resources:
-//@ts-expect-error _min_ is replaced in packaging so comparison always looks false in code
+//@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 var baseUrl = baseUrl1();
 var cacheBust = Date.now() + "";
@@ -531,6 +531,8 @@ function togetherjsMain() {
                     window.require = requireConfig;
                 }
             }
+            alert("min?");
+            alert("min2?");
             if (min) {
                 addScriptInner("/togetherjsPackage.js");
             }

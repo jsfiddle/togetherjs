@@ -19,7 +19,7 @@ var __extends = (this && this.__extends) || (function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "./channels", "./init", "./storage", "./util", "jquery"], function (require, exports, channels_1, init_1, storage_1, util_1, jquery_1) {
+define(["require", "exports", "./channels", "./storage", "./util", "jquery"], function (require, exports, channels_1, storage_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.session = void 0;
@@ -48,7 +48,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util", "jq
             /** Setting, essentially global: */
             _this.AVATAR_SIZE = 90;
             _this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
-            _this.hub = new init_1.OnClass();
+            _this.hub = new OnClass();
             return _this;
         }
         Session.prototype.hubUrl = function (id) {
@@ -221,7 +221,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util", "jq
             return channel; // TODO !
         };
         return Session;
-    }(init_1.OnClass));
+    }(OnClass));
     exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************

@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { channels } from "./channels";
-import { OnClass } from "./init";
 import { storage } from "./storage";
 import { util } from "./util";
 import $ from "jquery";

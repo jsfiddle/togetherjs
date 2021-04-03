@@ -64,12 +64,18 @@
 			"./togetherjs/ts/types/"
 		],
 		"outDir": "togetherjs/",
+		"paths": {
+			// Ignore some libs, advice taken from https://github.com/microsoft/TypeScript/issues/17042
+			"node": [ "./togetherjs/ts/types/no-def.ts" ],
+			"typescript": [ "./togetherjs/ts/types/no-def.d.ts" ],
+			"@types/node": [ "./togetherjs/ts/types/no-def.d.ts" ]
+		}
 	},
 	"exclude": [
-		"./togetherjs/build/"
+		"./togetherjs/build/",
 	],
 	"include": [
 		"./togetherjs/ts/",
 		"./togetherjs/libs/"
-	],
+	]
 }

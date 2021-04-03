@@ -113,3 +113,7 @@ The api at this date can be browsed here: https://web.archive.org/web/2014052021
 # Playback
 
 Typing `/record` in the chat starts the recording which will open a popup. Then, do some things on the page like moving your cursor or clicking. Then `/savelogs l2` will save it in the localstorage. Then `/playback local:l2` will replay those events.
+
+# Browserify
+
+node node_modules/browserify/bin/cmd.js -p tsify  > togetherjs-package.js
