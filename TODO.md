@@ -29,7 +29,7 @@
 - [x] Find the logic for PeerSelf, PeerClass, ExternalPeer, PeerView
 
 # Architectural changes (only after full typing)
-- [ ] Switch to a better import system
+- [X] Switch to a better import system
 - [ ] remove JQuery
     - [x] set JQuery as private at first https://requirejs.org/docs/jquery.html
 - [x] remove or update tiny colors, it's a whole library for only a few calls
