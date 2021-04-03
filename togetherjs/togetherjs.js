@@ -139,7 +139,7 @@ var OnClass = /** @class */ (function () {
     return OnClass;
 }());
 function baseUrl1() {
-    var baseUrl = "__baseUrl__";
+    var baseUrl = "http://localhost:40941/test-build/";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -156,7 +156,7 @@ function baseUrl1() {
 }
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
-var min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+var min = "no" == "__" + "min__" ? false : "no" == "yes";
 var baseUrl = baseUrl1();
 var cacheBust = Date.now() + "";
 function addScript(url) {
@@ -667,7 +667,7 @@ function togetherjsMain() {
         return TogetherJSClass;
     }(OnClass));
     function baseUrl1Inner() {
-        var baseUrl = "__baseUrl__";
+        var baseUrl = "http://localhost:40941/test-build/";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -756,8 +756,8 @@ function togetherjsMain() {
     }
     var version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    var cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
+    var cacheBust = "";
+    if ((!cacheBust) || cacheBust == "") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -803,7 +803,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    var defaultHubBase = "__hubUrl__";
+    var defaultHubBase = "http://localhost:42899";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
