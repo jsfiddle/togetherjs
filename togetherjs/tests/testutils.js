@@ -218,7 +218,7 @@ Test.newPeer = function (options) {
     isClient: false,
     clientId: options.clientId || "faker",
     name: options.name || "Faker",
-    avatar: options.avatar || TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+    avatar: options.avatar || TogetherJS.baseUrl + "/images/robot-avatar.png",
     color: options.color || "#ff0000",
     url: options.url || location.href.replace(/#.*/, ""),
     urlHash: options.urlHash || "",

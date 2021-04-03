@@ -2,17 +2,17 @@
 Test.require("storage", "util");
 // => Loaded modules: storage util
 
-print(storage);
+print(storage.storage);
 // => [storage for localStorage]
 
-printResolved(storage.clear(), storage.tab.clear());
+printResolved(storage.storage.clear(), storage.storage.tab.clear());
 // => (resolved) (resolved)
 
-printResolved(storage.keys(), storage.tab.keys());
+printResolved(storage.storage.keys(), storage.storage.tab.keys());
 // => [] []
 
-printResolved(storage.tab.set("foo", "bar"));
+printResolved(storage.storage.tab.set("foo", "bar"));
 // => (resolved)
 
-printResolved(storage.tab.keys());
+printResolved(storage.storage.tab.keys());
 // => ["foo"]

@@ -12,13 +12,13 @@ Test.require("forms", "session", "ui", "windowing", "eventMaker", "templates-en-
 Test.normalStartup();
 // =>...
 
-var fireChange = eventMaker.fireChange;
+var fireChange = eventMaker.eventMaker.fireChange;
 var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
 var $password = $("#password");
 
-windowing.hide("#togetherjs-share");
+windowing.windowing.hide("#togetherjs-share");
 
 // =SECTION Changes
 
@@ -154,7 +154,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+  avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false
