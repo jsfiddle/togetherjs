@@ -586,27 +586,27 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         }
         var value;
         if ("replace" in msg) {
-            var history_1 = el.data("togetherjsHistory");
-            if (!history_1) {
+            var history = el.data("togetherjsHistory");
+            if (!history) {
                 console.warn("form update received for uninitialized form element");
                 return;
             }
-            history_1.setSelection(selection);
+            history.setSelection(selection);
             // make a real TextReplace object.
             var delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             var change_1 = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
-            var changed = history_1.commit(change_1);
+            var changed = history.commit(change_1);
             var trackerName = undefined;
             if (typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
             }
-            maybeSendUpdate(msg.element, history_1, trackerName);
+            maybeSendUpdate(msg.element, history, trackerName);
             if (!changed) {
                 return;
             }
-            value = history_1.current;
-            selection = history_1.getSelection() || undefined;
+            value = history.current;
+            selection = history.getSelection() || undefined;
         }
         else {
             value = msg.value;

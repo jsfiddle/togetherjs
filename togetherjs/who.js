@@ -41,8 +41,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                 var channel = channels_1.channels.WebSocketChannel(hubUrl);
                 var users = {};
                 var responded = 0;
-                //tslint:disable-next-line unused var
-                var firstResponse = 0; // TODO unused
+                //var firstResponse = 0; // TODO unused
                 var lateResponseTimeout;
                 channel.onmessage = function (msg) {
                     if (msg.type == "init-connection") {

@@ -18,7 +18,7 @@ var TESTDIR = "test-build";
 module.exports = function (grunt) {
 
   if (! grunt.option("dest")) {
-    grunt.option("dest", "build/togetherjs");
+    grunt.option("dest", "build/");
   }
 
   var dumpLineNumbers = false;
@@ -296,7 +296,7 @@ module.exports = function (grunt) {
         var info = filenames[dest];
         var src = info.src;
         var extraVariables = info.extraVariables;
-        dest = destBase + "/" + dest;
+        dest = destBase + "/togetherjs/" + dest;
         var content = fs.readFileSync(src, "UTF-8");
         var s = subs;
 
