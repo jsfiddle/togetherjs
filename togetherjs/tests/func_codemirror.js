@@ -1,5 +1,8 @@
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 var cmSrc = "./codemirror4.js";
 var script = $("<script>").attr("onload", Spy("cmLoad", {wait: true})).attr("src", cmSrc);
 $(document.head).append(script);

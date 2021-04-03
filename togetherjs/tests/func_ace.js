@@ -1,5 +1,8 @@
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 $("#fixture").empty();
 var aceSrc = "./ace.js";
 var script = $("<script>").attr("onload", Spy("aceLoad", {wait: true})).attr("src", aceSrc);

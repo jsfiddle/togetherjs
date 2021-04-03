@@ -1,6 +1,9 @@
 /*global forms, session, ui, windowing, eventMaker */
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 $("#fixture").append('<textarea id="textarea" style="width: 10em; height: 3em;"></textarea>');
 $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');

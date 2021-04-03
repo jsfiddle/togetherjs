@@ -1,4 +1,4 @@
-Test.require("elementFinder");
+Test.require("jquery", "elementFinder");
 // => Loaded modules: ...
 
 var els = $(document.body).find("*");

@@ -1,5 +1,8 @@
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 $("#other").remove();
 
 Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cursor", "windowing", "templates-en-US");

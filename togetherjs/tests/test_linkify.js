@@ -1,6 +1,6 @@
 /*global linkify */
-Test.require("linkify");
-// => Loaded modules: linkify
+Test.require("jquery", "linkify");
+// => Loaded modules: jquery linkify
 
 print(linkify.linkify($("<span>this is a test</span>")));
 // => <span>this is a test</span>
