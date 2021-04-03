@@ -1,5 +1,4 @@
 /*global tjconsole */
-console.log("test_console");
 var origConsole = window.console;
 Test.require({tjconsole: "console"});
 // => Loaded modules: console
