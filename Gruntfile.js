@@ -18,7 +18,7 @@ var TESTDIR = "test-build";
 module.exports = function (grunt) {
 
   if (! grunt.option("dest")) {
-    grunt.option("dest", "build");
+    grunt.option("dest", "build/togetherjs");
   }
 
   var dumpLineNumbers = false;
@@ -257,7 +257,7 @@ module.exports = function (grunt) {
       if (! baseUrl) {
         grunt.log.writeln("No --base-url, using auto-detect");
       }
-      var destBase = grunt.option("dest") || "build"; // where to put the built files. If not indicated then into build/
+      var destBase = grunt.option("dest") || "build/togetherjs"; // where to put the built files. If not indicated then into build/
       var hubUrl = grunt.option("hub-url") || process.env.HUB_URL || "https://ks3371053.kimsufi.com:7071"; // URL of the hub server
       grunt.log.writeln("Using hub URL " + hubUrl.cyan);
       var gitCommit = process.env.GIT_COMMIT || "";
