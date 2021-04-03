@@ -1,19 +1,23 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./channels", "./util"], function (require, exports, channels_1, util_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./channels", "./util", "jquery"], function (require, exports, channels_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.recorder = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
     var assert = util_1.util.assert.bind(util_1.util);
     var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     var clientId = "recorder";
     function display(elOrSelector) {
-        var el = $(elOrSelector);
+        var el = jquery_1.default(elOrSelector);
         var toggles = el.attr("data-toggles");
         if (toggles) {
-            $(toggles).hide();
+            jquery_1.default(toggles).hide();
         }
         el.show();
     }
@@ -49,7 +53,7 @@ define(["require", "exports", "./channels", "./util"], function (require, export
         channel.send({
             type: "logs",
             clientId: clientId,
-            logs: $("#record").val(),
+            logs: jquery_1.default("#record").val(),
             request: req
         });
     }
@@ -58,13 +62,13 @@ define(["require", "exports", "./channels", "./util"], function (require, export
         }
         Recorder.prototype.start = function (options) {
             var _this = this;
-            $(function () {
-                $("#record").css({ height: $(window).height() - 50 });
-                $("#restart").click(function () {
+            jquery_1.default(function () {
+                jquery_1.default("#record").css({ height: jquery_1.default(window).height() - 50 });
+                jquery_1.default("#restart").click(function () {
                     location.reload();
                 });
-                $("#select").click(function () {
-                    $("#record").select();
+                jquery_1.default("#select").click(function () {
+                    jquery_1.default("#record").select();
                 });
                 _this.activate(options);
             });
@@ -108,12 +112,12 @@ define(["require", "exports", "./channels", "./util"], function (require, export
         };
         Recorder.prototype.logMessage = function (msg) {
             msg.date = Date.now(); // TODO abusive cast
-            var $record = $("#record");
+            var $record = jquery_1.default("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         };
         return Recorder;
     }());
-    $(window).unload(function () {
+    jquery_1.default(window).unload(function () {
         channel.send({
             type: "bye",
             clientId: clientId

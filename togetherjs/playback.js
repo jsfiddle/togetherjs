@@ -1,10 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./session", "./storage"], function (require, exports, session_1, storage_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./session", "./storage", "jquery"], function (require, exports, session_1, storage_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.playback = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
     var ALWAYS_REPLAY = {
         "cursor-update": true,
@@ -146,7 +150,7 @@ define(["require", "exports", "./session", "./storage"], function (require, expo
         }
         Playback.prototype.getLogs = function (url) {
             if (url.search(/^local:/) === 0) {
-                return $.Deferred(function (def) {
+                return jquery_1.default.Deferred(function (def) {
                     var name = url.substr("local:".length);
                     storage_1.storage.get("recording." + name).then(function (logs) {
                         if (!logs) {
@@ -160,8 +164,8 @@ define(["require", "exports", "./session", "./storage"], function (require, expo
                     });
                 });
             }
-            return $.Deferred(function (def) {
-                $.ajax({
+            return jquery_1.default.Deferred(function (def) {
+                jquery_1.default.ajax({
                     url: url,
                     dataType: "text"
                 }).then(function (logs) {

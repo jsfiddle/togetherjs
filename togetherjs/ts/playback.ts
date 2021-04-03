@@ -4,6 +4,7 @@
 
 import { session } from "./session";
 import { storage } from "./storage";
+import $ from "jquery";
 
 //function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
 

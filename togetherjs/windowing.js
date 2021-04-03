@@ -1,13 +1,17 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./session", "./util"], function (require, exports, session_1, util_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./session", "./util", "jquery"], function (require, exports, session_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.windowing = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
     var assert = util_1.util.assert.bind(util_1.util);
-    var $window = $(window);
+    var $window = jquery_1.default(window);
     // This is also in togetherjs.less, under .togetherjs-animated
     var ANIMATION_DURATION = 1000;
     var onClose = null;
@@ -18,13 +22,13 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         }
         Windowing.prototype.show = function (el, options) {
             if (options === void 0) { options = {}; }
-            var element = $(el);
+            var element = jquery_1.default(el);
             options.bind = options.bind || element.attr("data-bind-to");
             var notification = element.hasClass("togetherjs-notification");
             var modal = element.hasClass("togetherjs-modal");
             var bindElement = null;
             if (options.bind) {
-                bindElement = $(options.bind);
+                bindElement = jquery_1.default(options.bind);
             }
             this.hide();
             element.stop();
@@ -51,19 +55,19 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         Windowing.prototype.hide = function (selector) {
             if (selector === void 0) { selector = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification"; }
             // FIXME: also hide modals?
-            var els = $(selector);
+            var els = jquery_1.default(selector);
             els = els.filter(":visible");
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
             var windows = [];
             els.each(function (_index, el) {
-                var element = $(el);
+                var element = jquery_1.default(el);
                 windows.push(element);
                 var bound = element.data("boundTo");
                 if (!bound) {
                     return;
                 }
-                bound = $(bound);
+                bound = jquery_1.default(bound);
                 bound.addClass("togetherjs-animated").addClass("togetherjs-color-pulse");
                 setTimeout(function () {
                     bound.removeClass("togetherjs-color-pulse").removeClass("togetherjs-animated");
@@ -76,7 +80,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
                     });
                 }
             });
-            $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+            jquery_1.default("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
             if (onClose) {
                 onClose();
                 onClose = null;
@@ -86,7 +90,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
             }
         };
         Windowing.prototype.toggle = function (el) {
-            var element = $(el);
+            var element = jquery_1.default(el);
             if (element.is(":visible")) {
                 this.hide(element);
             }
@@ -100,10 +104,10 @@ define(["require", "exports", "./session", "./util"], function (require, exports
     /* Moves a window to be attached to data-bind-to, e.g., the button
         that opened the window. Or you can provide an element that it should bind to. */
     function bind(window, bound) {
-        if ($.browser.mobile) {
+        if (jquery_1.default.browser.mobile) {
             return;
         }
-        var win = $(window);
+        var win = jquery_1.default(window);
         assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
         // FIXME: hardcoding
         var ifacePos = "right";
@@ -138,8 +142,8 @@ define(["require", "exports", "./session", "./util"], function (require, exports
             left: left + "px"
         });
         if (win.hasClass("togetherjs-window")) {
-            $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-            var pointer = $("#togetherjs-window-pointer-" + ifacePos);
+            jquery_1.default("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+            var pointer = jquery_1.default("#togetherjs-window-pointer-" + ifacePos);
             pointer.show();
             if (ifacePos == "right") {
                 pointer.css({
@@ -161,7 +165,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         bound.addClass("togetherjs-active");
     }
     session_1.session.on("resize", function () {
-        var win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
+        var win = jquery_1.default(".togetherjs-modal:visible, .togetherjs-window:visible");
         if (!win.length) {
             return;
         }
@@ -169,12 +173,12 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         if (!boundTo) {
             return;
         }
-        boundTo = $(boundTo);
+        boundTo = jquery_1.default(boundTo);
         bind(win, boundTo);
     });
     function bindEvents(el) {
         el.find(".togetherjs-close, .togetherjs-dismiss").click(function (event) {
-            var w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
+            var w = jquery_1.default(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
             exports.windowing.hide(w);
             event.stopPropagation();
             return false;
@@ -185,7 +189,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         if (getModalBackgroundElement) {
             return getModalBackgroundElement;
         }
-        var background = $("#togetherjs-modal-background");
+        var background = jquery_1.default("#togetherjs-modal-background");
         assert(background.length);
         getModalBackgroundElement = background;
         background.click(function () {
@@ -197,10 +201,10 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         function ModalEscape() {
         }
         ModalEscape.prototype.bind = function () {
-            $(document).keydown(this.onKeydown);
+            jquery_1.default(document).keydown(this.onKeydown);
         };
         ModalEscape.prototype.unbind = function () {
-            $(document).unbind("keydown", this.onKeydown);
+            jquery_1.default(document).unbind("keydown", this.onKeydown);
         };
         ModalEscape.prototype.onKeydown = function (event) {
             if (event.which == 27) {

@@ -1,9 +1,13 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./elementFinder", "./session"], function (require, exports, elementFinder_1, session_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./elementFinder", "./session", "jquery"], function (require, exports, elementFinder_1, session_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    jquery_1 = __importDefault(jquery_1);
     //define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
     var listeners = [];
     var TIME_UPDATE = 'timeupdate';
@@ -15,7 +19,7 @@ define(["require", "exports", "./elementFinder", "./session"], function (require
     });
     session_1.session.on("ui-ready", setupListeners);
     function setupListeners() {
-        var videos = $('video');
+        var videos = jquery_1.default('video');
         setupMirroredEvents(videos);
         setupTimeSync(videos);
     }
@@ -46,7 +50,7 @@ define(["require", "exports", "./elementFinder", "./session"], function (require
     function setupTimeSync(videos) {
         videos.each(function (_i, video) {
             var onTimeUpdate = makeTimeUpdater();
-            $(video).on(TIME_UPDATE, onTimeUpdate);
+            jquery_1.default(video).on(TIME_UPDATE, onTimeUpdate);
             listeners.push({
                 name: TIME_UPDATE,
                 listener: onTimeUpdate
@@ -70,7 +74,7 @@ define(["require", "exports", "./elementFinder", "./session"], function (require
     }
     session_1.session.on("close", unsetListeners);
     function unsetListeners() {
-        var videos = $('video');
+        var videos = jquery_1.default('video');
         listeners.forEach(function (event) {
             videos.off(event.name, event.listener);
         });
@@ -94,7 +98,7 @@ define(["require", "exports", "./elementFinder", "./session"], function (require
     });
     //Currently does not discriminate between visible and invisible videos
     function $findElement(location) {
-        return $(elementFinder_1.elementFinder.findElement(location));
+        return jquery_1.default(elementFinder_1.elementFinder.findElement(location));
     }
     function setTime(video, time) {
         video.prop('currentTime', time);

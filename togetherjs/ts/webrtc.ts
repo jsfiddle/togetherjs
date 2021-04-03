@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";
+import $ from "jquery";
 
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
@@ -15,7 +16,6 @@ import { windowing } from "./windowing";
 var assert: typeof util.assert = util.assert.bind(util);
 
 session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
-
 if(session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
     // In a few versions of Firefox (18 and 19) these APIs are present but
     // not actually usable

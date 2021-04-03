@@ -2,10 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 /*jshint evil:true */
-define(["require", "exports", "./peers", "./playback", "./session", "./storage", "./templates", "./ui", "./util", "./windowing"], function (require, exports, peers_1, playback_1, session_1, storage_1, templates_1, ui_1, util_1, windowing_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./peers", "./playback", "./session", "./storage", "./templates", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, playback_1, session_1, storage_1, templates_1, ui_1, util_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.chat = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
     var assert = util_1.util.assert.bind(util_1.util);
     var Walkabout;
@@ -113,7 +117,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 ui_1.ui.chat.system({
                     text: "Testing with walkabout.js"
                 });
-                var tmpl = $(templates_1.templates("walkabout"));
+                var tmpl = jquery_1.default(templates_1.templates("walkabout"));
                 var container = ui_1.ui.container.find(".togetherjs-test-container");
                 container.empty();
                 container.append(tmpl);
@@ -192,7 +196,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             ui_1.ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
-            window.open(session_1.session.recordUrl(), "_blank", "left,width=" + ($(window).width() / 2));
+            window.open(session_1.session.recordUrl(), "_blank", "left,width=" + (jquery_1.default(window).width() / 2));
         };
         Commands.prototype.command_playback = function (url) {
             var _this = this;

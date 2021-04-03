@@ -11,6 +11,8 @@ import { templates } from "./templates";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";
+import $ from "jquery";
+
 
 //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
 

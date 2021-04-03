@@ -4,6 +4,7 @@
 
 import { elementFinder } from "./elementFinder";
 import { session } from "./session";
+import $ from "jquery";
 
 interface Listener {
     name: string,

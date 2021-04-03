@@ -1,10 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./session", "./util"], function (require, exports, session_1, util_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./session", "./util", "jquery"], function (require, exports, session_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.templating = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert = util_1.util.assert.bind(util_1.util);
     var Templating = /** @class */ (function () {
@@ -12,7 +16,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
         }
         Templating.prototype.clone = function (templateId) {
             var templateId2 = "#togetherjs-template-" + templateId;
-            var template = $(templateId2);
+            var template = jquery_1.default(templateId2);
             assert(template.length, "No template found with id:", templateId2);
             template = template.clone();
             template.attr("id", null);
@@ -31,7 +35,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
                     if (typeof value == "string") {
                         subs.text(value);
                     }
-                    else if (value instanceof $) { // TODO check cast, because TogetherJSNS.TemplatingSub.Any is reduced to never (or is it for another reason?), value is of type never which is not ok with in checks
+                    else if (value instanceof jquery_1.default) { // TODO check cast, because TogetherJSNS.TemplatingSub.Any is reduced to never (or is it for another reason?), value is of type never which is not ok with in checks
                         subs.append(value); // TODO instanceof check does not constrains value as JQuery so we need this cast, can we remove it?
                     }
                     else {
@@ -51,7 +55,7 @@ define(["require", "exports", "./session", "./util"], function (require, exports
                 var attrs = template.find("[" + attrName + "]");
                 attrs.each(function (_index, element) {
                     assert(typeof value == "string");
-                    var $element = $(element);
+                    var $element = jquery_1.default(element);
                     var subAttribute = $element.attr(attrName);
                     $element.attr(attrName, null);
                     $element.attr(subAttribute, value);

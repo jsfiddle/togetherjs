@@ -6,6 +6,7 @@ import { channels } from "./channels";
 import { OnClass } from "./init";
 import { storage } from "./storage";
 import { util } from "./util";
+import $ from "jquery";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
 var DEBUG = true;

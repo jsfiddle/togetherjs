@@ -1,10 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./peers", "./session", "./templates", "./templating", "./ui", "./util", "./windowing"], function (require, exports, peers_1, session_1, templates_1, templating_1, ui_1, util_1, windowing_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./peers", "./session", "./templates", "./templating", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, session_1, templates_1, templating_1, ui_1, util_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.walkthrough = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
     var assert = util_1.util.assert.bind(util_1.util);
     var onHideAll = null;
@@ -12,12 +16,12 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     var slides; // TODO init
     function show(index) {
         slides.hide();
-        $(slides[index]).show();
+        jquery_1.default(slides[index]).show();
         var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
         bullets.removeClass("togetherjs-active");
-        $(bullets[index]).addClass("togetherjs-active");
-        var $next = $("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
-        var $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
+        jquery_1.default(bullets[index]).addClass("togetherjs-active");
+        var $next = jquery_1.default("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+        var $previous = jquery_1.default("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
         if (index == slides.length - 1) {
             $next.addClass("togetherjs-disabled");
         }
@@ -59,12 +63,12 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
         Walkthrough.prototype.start = function (firstTime, doneCallback) {
             if (doneCallback === void 0) { doneCallback = null; }
             if (!container) {
-                container = $(templates_1.templates("walkthrough"));
+                container = jquery_1.default(templates_1.templates("walkthrough"));
                 container.hide();
                 ui_1.ui.container.append(container);
                 slides = container.find(".togetherjs-walkthrough-slide");
                 slides.hide();
-                var progress = $("#togetherjs-walkthrough-progress");
+                var progress = jquery_1.default("#togetherjs-walkthrough-progress");
                 slides.each(function (index) {
                     var bullet = templating_1.templating.sub("walkthrough-slide-progress", {});
                     progress.append(bullet);
@@ -76,11 +80,11 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
                 container.find("#togetherjs-walkthrough-next").click(next);
                 ui_1.ui.prepareShareLink(container);
                 container.find(".togetherjs-self-name").bind("keyup", function (event) {
-                    var val = $(event.target).val();
+                    var val = jquery_1.default(event.target).val();
                     peers_1.peers.Self.update({ name: val });
                 });
                 container.find(".togetherjs-swatch").click(function () {
-                    var picker = $("#togetherjs-pick-color");
+                    var picker = jquery_1.default("#togetherjs-pick-color");
                     if (picker.is(":visible")) {
                         picker.hide();
                         return;

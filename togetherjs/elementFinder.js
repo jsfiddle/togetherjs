@@ -1,11 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports"], function (require, exports) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.elementFinder = void 0;
-    //function elementFinderMain(_util: TogetherJSNS.Util, $: JQueryStatic) {
+    jquery_1 = __importDefault(jquery_1);
     function isJQuery(o) {
-        return o instanceof $;
+        return o instanceof jquery_1.default;
     }
     var CannotFind = /** @class */ (function () {
         function CannotFind(location, reason, context) {
@@ -35,7 +38,7 @@ define(["require", "exports"], function (require, exports) {
                 el = el[0];
             }
             while (el) {
-                if ($(el).hasClass("togetherjs")) {
+                if (jquery_1.default(el).hasClass("togetherjs")) {
                     return true;
                 }
                 el = el.parentNode;
@@ -218,7 +221,7 @@ define(["require", "exports"], function (require, exports) {
                 var last = null;
                 var children = start.children();
                 children.each(function () {
-                    var el = $(this);
+                    var el = jquery_1.default(this);
                     if (el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                         return;
                     }
@@ -236,12 +239,12 @@ define(["require", "exports"], function (require, exports) {
                         location: self.elementLocation(start[0]),
                         offset: height - start_offset_top,
                         absoluteTop: height,
-                        documentHeight: $(document).height()
+                        documentHeight: jquery_1.default(document).height()
                     };
                 }
                 return search(last, height);
             }
-            return search($(document.body), height);
+            return search(jquery_1.default(document.body), height);
         };
         ElementFinder.prototype.pixelForPosition = function (position) {
             /* Inverse of elementFinder.elementByPixel */
@@ -251,7 +254,7 @@ define(["require", "exports"], function (require, exports) {
             var el;
             try {
                 el = this.findElement(position.location);
-                var el_offset = $(el).offset();
+                var el_offset = jquery_1.default(el).offset();
                 if (el_offset === undefined) {
                     throw new Error("pixelForPosition called on element without offset");
                 }
@@ -266,7 +269,7 @@ define(["require", "exports"], function (require, exports) {
                     // We don't trust absoluteTop to be quite right locally, so we adjust
                     // for the total document height differences:
                     var percent = position.absoluteTop / position.documentHeight;
-                    return $(document).height() * percent;
+                    return jquery_1.default(document).height() * percent;
                 }
                 throw e;
             }

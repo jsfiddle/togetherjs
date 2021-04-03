@@ -4,6 +4,7 @@
 
 import { elementFinder } from "./elementFinder";
 import { session } from "./session";
+import $ from "jquery";
 
 //function youtubeVideosMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
 

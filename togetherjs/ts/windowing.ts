@@ -4,6 +4,7 @@
 
 import { session } from "./session";
 import { util } from "./util";
+import $ from "jquery";
 
 interface ShowOptions {
     /** Selector or Element */

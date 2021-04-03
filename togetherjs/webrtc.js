@@ -1,14 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./util", "./windowing"], function (require, exports, peers_1, session_1, storage_1, ui_1, util_1, windowing_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, session_1, storage_1, ui_1, util_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    jquery_1 = __importDefault(jquery_1);
     // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
     //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
     var assert = util_1.util.assert.bind(util_1.util);
     session_1.session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
-    if (session_1.session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
+    if (session_1.session.RTCSupported && jquery_1.default.browser.mozilla && parseInt(jquery_1.default.browser.version, 10) <= 19) {
         // In a few versions of Firefox (18 and 19) these APIs are present but
         // not actually usable
         // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
@@ -76,7 +80,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
      * getUserMedia Avatar support
      */
     session_1.session.on("ui-ready", function () {
-        $("#togetherjs-self-avatar").click(function () {
+        jquery_1.default("#togetherjs-self-avatar").click(function () {
             var avatar = peers_1.peers.Self.avatar;
             if (avatar) {
                 $preview.attr("src", avatar);
@@ -84,16 +88,16 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             ui_1.ui.displayToggle("#togetherjs-avatar-edit");
         });
         if (!session_1.session.RTCSupported) {
-            $("#togetherjs-avatar-edit-rtc").hide();
+            jquery_1.default("#togetherjs-avatar-edit-rtc").hide();
         }
         var avatarData;
-        var $preview = $("#togetherjs-self-avatar-preview");
-        var $accept = $("#togetherjs-self-avatar-accept");
-        var $cancel = $("#togetherjs-self-avatar-cancel");
-        var $takePic = $("#togetherjs-avatar-use-camera");
-        var $video = $("#togetherjs-avatar-video");
+        var $preview = jquery_1.default("#togetherjs-self-avatar-preview");
+        var $accept = jquery_1.default("#togetherjs-self-avatar-accept");
+        var $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
+        var $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
+        var $video = jquery_1.default("#togetherjs-avatar-video");
         var video0 = $video[0];
-        var $upload = $("#togetherjs-avatar-upload");
+        var $upload = jquery_1.default("#togetherjs-avatar-upload");
         $takePic.click(function () {
             if (!streaming) {
                 startStreaming();
@@ -110,13 +114,13 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             peers_1.peers.Self.update({ avatar: avatarData });
             ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: these probably shouldn't be two elements:
-            $("#togetherjs-participants-other").show();
+            jquery_1.default("#togetherjs-participants-other").show();
             $accept.attr("disabled", "1");
         });
         $cancel.click(function () {
             ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: like above:
-            $("#togetherjs-participants-other").show();
+            jquery_1.default("#togetherjs-participants-other").show();
         });
         var streaming = false;
         function startStreaming() {
@@ -190,15 +194,15 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
     function audioButton(selector) {
         ui_1.ui.displayToggle(selector);
         if (selector == "#togetherjs-audio-incoming") {
-            $("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
+            jquery_1.default("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
         }
         else {
-            $("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
+            jquery_1.default("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
         }
     }
     session_1.session.on("ui-ready", function () {
-        $("#togetherjs-audio-button").click(function () {
-            if ($("#togetherjs-rtc-info").is(":visible")) {
+        jquery_1.default("#togetherjs-audio-button").click(function () {
+            if (jquery_1.default("#togetherjs-rtc-info").is(":visible")) {
                 windowing_1.windowing.hide();
                 return;
             }
@@ -217,7 +221,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
         var audioStream = null;
         var accepted = false;
         var connected = false;
-        var $audio = $("#togetherjs-audio-element");
+        var $audio = jquery_1.default("#togetherjs-audio-element");
         var offerSent = null;
         var offerReceived = null;
         var offerDescription = false;
@@ -275,7 +279,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             }
             audioButton("#togetherjs-audio-error");
             // FIXME: this title doesn't seem to display?
-            $("#togetherjs-audio-error").attr("title", s);
+            jquery_1.default("#togetherjs-audio-error").attr("title", s);
         }
         function startStreaming(callback) {
             /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
@@ -299,7 +303,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             });
         }
         function attachMedia(element, media) {
-            element = $(element)[0];
+            element = jquery_1.default(element)[0];
             console.log("Attaching", media, "to", element);
             if (window.mozRTCPeerConnection) {
                 element.mozSrcObject = media;

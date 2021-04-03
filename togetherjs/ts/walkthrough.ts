@@ -9,6 +9,7 @@ import { templating } from "./templating";
 import { ui } from "./ui";
 import { util } from "./util";
 import { windowing } from "./windowing";
+import $ from "jquery";
 
 //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
 let assert: typeof util.assert = util.assert.bind(util);

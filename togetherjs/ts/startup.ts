@@ -4,6 +4,7 @@
 
 import { storage } from "./storage";
 import { windowing } from "./windowing";
+import $ from "jquery";
 
 /* This module handles all the different UI that happens (sometimes in order) when
    TogetherJS is started:

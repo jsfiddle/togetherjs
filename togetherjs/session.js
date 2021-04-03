@@ -16,10 +16,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./channels", "./init", "./storage", "./util"], function (require, exports, channels_1, init_1, storage_1, util_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./channels", "./init", "./storage", "./util", "jquery"], function (require, exports, channels_1, init_1, storage_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.session = void 0;
+    jquery_1 = __importDefault(jquery_1);
     //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
     var DEBUG = true;
     // This is the amount of time in which a hello-back must be received after a hello
@@ -160,7 +164,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
                         TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function () {
-                            $(function () {
+                            jquery_1.default(function () {
                                 var peersModule = require("peers");
                                 peers = peersModule.peers;
                                 var startup = require("startup").startup;
@@ -339,7 +343,7 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
         var hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
         var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
-        return $.ajax({
+        return jquery_1.default.ajax({
             url: findRoom,
             dataType: "json",
             data: { prefix: prefix, max: maxSize }
@@ -485,15 +489,15 @@ define(["require", "exports", "./channels", "./init", "./storage", "./util"], fu
         });
     }
     exports.session.on("start", function () {
-        $(window).on("resize", resizeEvent);
+        jquery_1.default(window).on("resize", resizeEvent);
         if (includeHashInUrl) {
-            $(window).on("hashchange", hashchangeEvent);
+            jquery_1.default(window).on("hashchange", hashchangeEvent);
         }
     });
     exports.session.on("close", function () {
-        $(window).off("resize", resizeEvent);
+        jquery_1.default(window).off("resize", resizeEvent);
         if (includeHashInUrl) {
-            $(window).off("hashchange", hashchangeEvent);
+            jquery_1.default(window).off("hashchange", hashchangeEvent);
         }
     });
     function hashchangeEvent() {

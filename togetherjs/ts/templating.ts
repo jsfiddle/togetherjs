@@ -4,6 +4,7 @@
 
 import { session } from "./session";
 import { util } from "./util";
+import $ from "jquery";
 
 //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
 var assert: typeof util.assert = util.assert.bind(util);

@@ -8,6 +8,7 @@ import { peers } from "./peers";
 import { session } from "./session";
 import { templating } from "./templating";
 import { util } from "./util";
+import $ from "jquery";
 
 // Cursor viewing support
 

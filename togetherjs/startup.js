@@ -1,10 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./storage", "./windowing"], function (require, exports, storage_1, windowing_1) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "./storage", "./windowing", "jquery"], function (require, exports, storage_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.startup = void 0;
+    jquery_1 = __importDefault(jquery_1);
     /* This module handles all the different UI that happens (sometimes in order) when
        TogetherJS is started:
     
@@ -67,8 +71,8 @@ define(["require", "exports", "./storage", "./windowing"], function (require, ex
                     session.close();
                 }
             });
-            if ($.browser.msie) {
-                $("#togetherjs-browser-broken-is-ie").show();
+            if (jquery_1.default.browser.msie) {
+                jquery_1.default("#togetherjs-browser-broken-is-ie").show();
             }
         };
         Handlers.prototype.browserUnsupported = function (next) {
@@ -92,7 +96,7 @@ define(["require", "exports", "./storage", "./windowing"], function (require, ex
                     }
                 }
             });
-            $("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
+            jquery_1.default("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
                 cancelled = true;
                 windowing_1.windowing.hide();
                 session.close("declined-join");

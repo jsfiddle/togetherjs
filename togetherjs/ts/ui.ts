@@ -11,6 +11,7 @@ import { templating } from "./templating";
 import { util } from "./util";
 import { visibilityApi } from "./visibilityApi";
 import { windowing } from "./windowing";
+import $ from "jquery";
 
 //function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
 var assert: typeof util.assert = util.assert.bind(util);

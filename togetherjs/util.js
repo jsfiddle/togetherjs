@@ -18,10 +18,14 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./jqueryPlugins"], function (require, exports) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.util = void 0;
+    jquery_1 = __importDefault(jquery_1);
     var AssertionError = /** @class */ (function (_super) {
         __extends(AssertionError, _super);
         function AssertionError(message) {
@@ -198,7 +202,7 @@ define(["require", "exports", "./jqueryPlugins"], function (require, exports) {
                 return obj;
             }
             else {
-                return $.Deferred(function (def) {
+                return jquery_1.default.Deferred(function (def) {
                     def.resolve(obj);
                 });
             }
@@ -268,7 +272,7 @@ define(["require", "exports", "./jqueryPlugins"], function (require, exports) {
                 return !!selector;
             }
             try {
-                return $(el).is(selector);
+                return jquery_1.default(el).is(selector);
             }
             catch (e) {
                 console.warn("Bad selector:", selector, "error:", e);
@@ -287,7 +291,7 @@ define(["require", "exports", "./jqueryPlugins"], function (require, exports) {
         };
         return Util;
     }());
-    exports.util = new Util($, window.TogetherJS);
-    exports.util.Deferred = $.Deferred;
-    window.TogetherJS.$ = $;
+    exports.util = new Util(jquery_1.default, window.TogetherJS);
+    exports.util.Deferred = jquery_1.default.Deferred;
+    window.TogetherJS.$ = jquery_1.default;
 });

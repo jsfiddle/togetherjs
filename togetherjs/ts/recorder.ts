@@ -4,6 +4,7 @@
 
 import { channels } from "./channels";
 import { util } from "./util";
+import $ from "jquery";
 
 //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
 const assert: typeof util.assert = util.assert.bind(util);

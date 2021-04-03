@@ -1,10 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports"], function (require, exports) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.eventMaker = void 0;
+    jquery_1 = __importDefault(jquery_1);
     function createTogetherjsMouseEvent() {
         var event = document.createEvent("MouseEvents");
         // FIXME: I'm not sure this custom attribute always propagates?
@@ -35,7 +39,7 @@ define(["require", "exports"], function (require, exports) {
             0, // button
             null // relatedTarget
             );
-            target = $(target)[0];
+            target = jquery_1.default(target)[0];
             var cancelled = target.dispatchEvent(event);
             if (cancelled) {
                 return;
@@ -51,7 +55,7 @@ define(["require", "exports"], function (require, exports) {
             // FIXME: should run .onclick() as well
         };
         EventMaker.prototype.fireChange = function (target) {
-            target = $(target)[0];
+            target = jquery_1.default(target)[0];
             var event = document.createEvent("HTMLEvents");
             event.initEvent("change", true, true);
             target.dispatchEvent(event);

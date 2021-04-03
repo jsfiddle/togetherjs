@@ -2,6 +2,8 @@
 
 //function elementFinderMain(_util: TogetherJSNS.Util, $: JQueryStatic) {
 
+import $ from "jquery";
+
 function isJQuery(o: unknown): o is JQuery {
     return o instanceof $;
 }
