@@ -542,8 +542,6 @@ function togetherjsMain() {
                     window.require = requireConfig;
                 }
             }
-            alert("min?");
-            alert("min2?");
             if(min) {
                 addScriptInner("/togetherjsPackage.js");
             }
