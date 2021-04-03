@@ -116,4 +116,6 @@ Typing `/record` in the chat starts the recording which will open a popup. Then,
 
 # Browserify
 
-node node_modules/browserify/bin/cmd.js -p tsify  > togetherjs-package.js
+`node node_modules/browserify/bin/cmd.js togetherjs/ts/main.ts -p \[ tsify -p . \] > togetherjs-package.js`
+
+Cannot work for now. Would have to do an entrypoint that imports everything (named main.ts for example), needs some work.
