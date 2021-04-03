@@ -6,7 +6,9 @@ dump.rdb
 app/http/public/recorder.css
 build
 test-build
+*.code-workspace
 togetherjs.mozillalabs.com
 addon/togetherjs.xpi
 togetherjs/togetherjs.css
 togetherjs/togetherjsPackage.js
+/original/
