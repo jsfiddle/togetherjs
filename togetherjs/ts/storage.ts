@@ -20,7 +20,7 @@ var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
 
 var DEBUG_STORAGE = false;
 
-class StorageSettings extends OnClass {
+class StorageSettings extends OnClass<TogetherJSNS.On.Map> {
     defaults = DEFAULT_SETTINGS;
 
     constructor(private storageInstance: TJSStorage) {

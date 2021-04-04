@@ -25,7 +25,7 @@ let channel: TogetherJSNS.WebSocketChannel | null = null;
 // This is the key we use for localStorage:
 //var localStoragePrefix = "togetherjs."; // TODO not used
 
-class Session extends OnClass {
+class Session extends OnClass<TogetherJSNS.On.Map> {
     /** This is the hub we connect to: */
     public shareId: string | null = null;
     /** This is the ID that identifies this client: */
@@ -39,7 +39,7 @@ class Session extends OnClass {
     public identityId?: string;
     public RTCSupported: boolean | undefined;
 
-    public readonly hub = new OnClass();
+    public readonly hub = new OnClass<TogetherJSNS.On.Map>();
     public isClient?: boolean;
 
     hubUrl(id: string | null = null) {

@@ -63,13 +63,14 @@ class OnClass {
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!cb[attr]) {
-            cb[attr] = function onceCallback(...args) {
+            const onceCallback = function (...args) {
                 cb.apply(this, args);
                 this.off(name, onceCallback);
                 delete cb[attr];
             };
+            cb[attr] = onceCallback;
         }
-        this.on(name, cb[attr]);
+        this.on(name, cb[attr]); // TODO cast
     }
     off(name, callback) {
         if (this._listenerOffs) {
@@ -110,6 +111,9 @@ class OnClass {
                 this.off(item[0], item[1]);
             }, this);
         }
+    }
+    forProtocol() {
+        return this;
     }
 }
 function baseUrl1() {

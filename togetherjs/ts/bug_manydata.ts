@@ -10,6 +10,10 @@ interface Packet {
 
 type SerializedArguments = { type: string, content: string };
 
+type Protocol = {
+    "manydata": (msg: Packet) => any;
+}
+
 function hashCode(s: string) {
     var hash = 0, i, chr;
     if(s.length === 0) return hash;
@@ -129,7 +133,7 @@ function startListening() {
     //TogetherJS.on("manydata", (msg) => { console.log("manydata received", msg); });
     //TogetherJS.hub.on("app.manydata", (msg) => { console.log("hub app.manydata received", msg); });
     //TogetherJS.hub.on("togetherjs.manydata", (msg) => { console.log("hub togetherjs.manydata received", msg); });
-    TogetherJS.hub.on("manydata", (msg) => {
+    TogetherJS.hub.forProtocol<Protocol>().on("manydata", (msg) => {
         const msg2 = msg;
         console.log("hub manydata received", msg2.payload.length);
         const maybeMessage = assembler.storeReceivedPacket(msg2);

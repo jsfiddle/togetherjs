@@ -23,12 +23,12 @@ function extend(base: { [key: string]: unknown }, extensions?: any) {
     return base;
 }
 
-class OnClass {
+class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any>}> {
     _knownEvents?: string[];
     _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
     _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
 
-    on<T extends keyof TogetherJSNS.On.Map>(name: T, callback: TogetherJSNS.On.Map[T]) {
+    on<T extends Extract<keyof Map, string>>(name: T, callback: Map[T]) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
@@ -36,7 +36,7 @@ class OnClass {
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
             names.forEach((n) => {
-                this.on(n as keyof TogetherJSNS.On.Map, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
+                this.on(n as Extract<keyof Map, string>, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
             });
             return;
         }
@@ -60,25 +60,26 @@ class OnClass {
         }
     }
 
-    once<T extends keyof TogetherJSNS.On.Map>(name: T, callback: TogetherJSNS.On.Map[T]) {
+    once<T extends Extract<keyof Map, string>>(name: T, callback: Map[T]) {
         if(typeof callback != "function") {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
-        const cb = callback as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
+        const cb = callback as unknown as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!cb[attr]) {
-            cb[attr] = function onceCallback(this: OnClass, ...args: any[]) {
+            const onceCallback = function (this: OnClass<Map>, ...args: any[]) {
                 cb.apply(this, args);
                 this.off(name, onceCallback);
                 delete cb[attr];
-            };
+            } as Map[T];
+            cb[attr] = onceCallback;
         }
-        this.on(name, cb[attr]);
+        this.on(name, cb[attr] as Map[T]); // TODO cast
     }
 
-    off<T extends keyof TogetherJSNS.On.Map>(name: T, callback: TogetherJSNS.On.Map[T]) {
+    off<T extends Extract<keyof Map, string>>(name: T, callback: Map[T]) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
             this._listenerOffs.push([name, callback]);
@@ -86,8 +87,8 @@ class OnClass {
         }
         if(name.search(" ") != -1) {
             let names = name.split(/ +/g);
-            names.forEach(function(this: OnClass, n) {
-                this.off(n as keyof TogetherJSNS.On.Map, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
+            names.forEach(function(this: OnClass<Map>, n) {
+                this.off(n as Extract<keyof Map, string>, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
             }, this);
             return;
         }
@@ -105,21 +106,25 @@ class OnClass {
 
     removeListener = this.off.bind(this); // TODO can be removed apparently
 
-    emit<T extends keyof TogetherJSNS.On.Map>(name: T, ...args: Parameters<TogetherJSNS.On.Map[T]>) {
+    emit<T extends Extract<keyof Map, string>>(name: T, ...args: Parameters<Map[T]>) {
         let offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
         let l = this._listeners[name];
-        l.forEach(function(this: OnClass, callback) {
+        l.forEach(function(this: OnClass<Map>, callback) {
             callback.apply(this, args);
         }, this);
         delete this._listenerOffs;
         if(offs.length) {
-            offs.forEach(function(this: OnClass, item) {
+            offs.forEach(function(this: OnClass<Map>, item) {
                 this.off(item[0], item[1]);
             }, this);
         }
+    }
+
+    forProtocol<Map2 extends {[messageName: string]: TogetherJSNS.CallbackForOn<any>}>() {
+        return this as unknown as OnClass<Map2>;
     }
 }
 
@@ -328,14 +333,14 @@ function togetherjsMain() {
         return config;
     }
 
-    class TogetherJSClass extends OnClass {
+    class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         public startupReason: TogetherJSNS.Reason | null = null;
         public $!: JQueryStatic; // TODO !
         public running: boolean = false;
         public require!: Require; // TODO !
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
-        public hub: TogetherJSNS.Hub = new OnClass();
+        public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
         public requireConfig!: RequireConfig; // TODO !
         private _loaded?: boolean;
         private _requireObject!: Require; // TODO !

@@ -55,7 +55,7 @@ And must call:
 - emit("close")
 */
 
-abstract class AbstractChannel extends OnClass {
+abstract class AbstractChannel extends OnClass<TogetherJSNS.On.Map> {
     rawdata = false;
     closed = false;
     _buffer: string[] = [];
@@ -430,7 +430,7 @@ class PostMessageIncomingChannel extends AbstractChannel {
     onmessage = () => {}
 }; // /PostMessageIncomingChannel
 
-class Router extends OnClass {
+class Router extends OnClass<TogetherJSNS.On.Map> {
     _routes: {[key: string]: Route} = Object.create(null);
     channel!: AbstractChannel; // TODO !
 
@@ -497,7 +497,7 @@ class Router extends OnClass {
     }
 } // /Router
 
-class Route extends OnClass {
+class Route extends OnClass<TogetherJSNS.On.Map> {
     private router: Router;
     public readonly id: string;
     public readonly onmessage: ((msg: TogetherJSNS.AnyMessage.AnyForReceiving) => void) | undefined;

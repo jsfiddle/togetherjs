@@ -252,7 +252,7 @@ session.on("follow-peer", function(peer) {
     }
 });
 
-class PeersSelf extends OnClass {
+class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public readonly isSelf: true = true;
     public readonly id = session.clientId;
     public identityId = session.identityId;
@@ -420,7 +420,7 @@ class PeersSelf extends OnClass {
     }
 }
 
-class Peers extends OnClass {
+class Peers extends OnClass<TogetherJSNS.On.Map> {
     //@ts-expect-error export
     private PeerClassExport!: PeerClass; // TODO very ugly way to export the class
     public Self!: PeersSelf; // TODO !

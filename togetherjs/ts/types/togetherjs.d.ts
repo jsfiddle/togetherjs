@@ -328,9 +328,8 @@ declare global {
         }
 
         namespace On {
-            interface Map {
-                //[messageName in keyof Map]: TogetherJSNS.CallbackForOn<any>;
-
+            // This needs to be a type an not an interface because of the way OnClass deals with generic, see https://stackoverflow.com/questions/60697214/how-to-fix-index-signature-is-missing-in-type-error
+            type Map = {
                 // channel.on & session.on
                 "close": () => void;
         
@@ -587,7 +586,7 @@ declare global {
         type Who = typeof who;//ReturnType<typeof whoMain>;
         type Console = typeof appConsole;//ReturnType<typeof consoleMain>;
         type TogetherJSClass = ReturnType<typeof togetherjsMain>;
-        type On = OnClass;
+        type On<T extends { [messageName: string]: CallbackForOn<any>; }> = OnClass<T>;
         type WebSocketChannel = ReturnType<Channels["WebSocketChannel"]>;
         type Walkabout = WalkaboutModule;//WalkaboutModule;
         type Util = typeof util;//ReturnType<typeof utilMain>;
@@ -626,7 +625,7 @@ declare global {
             pressed?: boolean;
         }
 
-        interface Hub extends OnClass { }
+        interface Hub extends OnClass<On.Map> { }
 
         interface Startup {
             button: HTMLElement | null;
