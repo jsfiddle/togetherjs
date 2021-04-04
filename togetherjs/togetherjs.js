@@ -113,7 +113,7 @@ class OnClass {
         }
     }
     forProtocol() {
-        return this;
+        return this; // TODO cast
     }
 }
 function baseUrl1() {
@@ -566,6 +566,7 @@ function togetherjsMain() {
             msg.type = type2; // TODO cast!!!
             this.hub.emit(msg.type, msg); // TODO emit error
         }
+        /** Use this method if you want you app to send custom messages */
         send(msg) {
             if (!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";

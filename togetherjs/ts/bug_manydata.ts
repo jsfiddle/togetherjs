@@ -1,18 +1,27 @@
-interface Packet {
-    type: string;
+interface Packet<Type> {
+    type: Type;
     /** strings that uniquely describe the whole string of packets that will be assembled into a message */
     key: string;
     /** index of the part of the message, starts at 0, ends at length - 1 */
     index: number;
+    /** Number of parts in which the message will be split */
     length: number;
+    /** Part (or all if the message is small) of the stringified message that will be reassembled */
     payload: string;
+}
+
+interface AppMessageMap {
+    "manydata": { type: "manydata", content: string };
+    "somethingelse": {type: "somethingelse", other: number}
 }
 
 type SerializedArguments = { type: string, content: string };
 
-type Protocol = {
-    "manydata": (msg: Packet) => any;
+type ProtocolMessageMap = {
+    [P in keyof AppMessageMap]: Packet<P>
 }
+
+type ProtocolOn = { [P in keyof ProtocolMessageMap]: (msg: ProtocolMessageMap[P]) => void }
 
 function hashCode(s: string) {
     var hash = 0, i, chr;
@@ -25,15 +34,15 @@ function hashCode(s: string) {
     return hash;
 };
 
-class PacketAssembler {
+class PacketAssembler<Protocol extends {[messageName: string]: any}> {
     private uid = 0;
-    private packets = new Map<string, Packet[]>();
+    private packets = new Map<string, Packet<Extract<keyof Protocol, string>>[]>();
 
     private getNewUid(): number {
         return this.uid++;
     }
 
-    public storeReceivedPacket(p: Packet): SerializedArguments | null {
+    public storeReceivedPacket<K extends Extract<keyof Protocol, string>>(p: Packet<K>): Protocol[K] | null {
         let packetList = this.packets.get(p.key);
         if(!packetList) {
             packetList = [];
@@ -61,7 +70,7 @@ class PacketAssembler {
         if(p.index === (p.length - 1)) {
             this.packets.delete(p.key);
             packetList.sort((a, b) => a.index - b.index);
-            const msg = PacketAssembler.assemble(packetList);
+            const msg = this.assemble(packetList);
             //console.log("Message finished, assembled as", msg);
             return msg;
         }
@@ -69,7 +78,7 @@ class PacketAssembler {
         return null; // message is not finished
     }
 
-    private static assemble(packets: Packet[]): SerializedArguments | null {
+    private assemble<K extends keyof Protocol>(packets: Packet<K>[]): Protocol[K] | null {
         let assemblage = "";
         let previousIndex: number | null = null;
         for(const p of packets) {
@@ -79,10 +88,10 @@ class PacketAssembler {
             assemblage += p.payload;
             previousIndex = p.index;
         }
-        return JSON.parse(assemblage) as SerializedArguments;
+        return JSON.parse(assemblage) as Protocol[K];
     }
 
-    public send(msg: SerializedArguments) {
+    public send<K extends Extract<keyof Protocol, string>>(msg: Protocol[K]) {
         //console.log("Sending", msg.type, msg);
         const jsonString = JSON.stringify(msg);
         const parts: string[] = [];
@@ -103,7 +112,7 @@ class PacketAssembler {
         }
         let packetNumber = 0;
         for(const part of parts) {
-            const packet: Packet = {
+            const packet: Packet<Extract<keyof Protocol, string>> = {
                 type: msg.type,
                 key: author.id + "_" + uid.toString() + "_" + msg.type,
                 index: packetNumber,
@@ -121,7 +130,7 @@ class PacketAssembler {
     }
 }
 
-const assembler = new PacketAssembler();
+const assembler = new PacketAssembler<AppMessageMap>();
 
 function startTjs() {
     TogetherJS.start();
@@ -133,7 +142,7 @@ function startListening() {
     //TogetherJS.on("manydata", (msg) => { console.log("manydata received", msg); });
     //TogetherJS.hub.on("app.manydata", (msg) => { console.log("hub app.manydata received", msg); });
     //TogetherJS.hub.on("togetherjs.manydata", (msg) => { console.log("hub togetherjs.manydata received", msg); });
-    TogetherJS.hub.forProtocol<Protocol>().on("manydata", (msg) => {
+    TogetherJS.hub.forProtocol<ProtocolMessageMap>().on("manydata", (msg) => {
         const msg2 = msg;
         console.log("hub manydata received", msg2.payload.length);
         const maybeMessage = assembler.storeReceivedPacket(msg2);

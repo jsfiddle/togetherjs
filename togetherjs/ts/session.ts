@@ -91,17 +91,16 @@ class Session extends OnClass<TogetherJSNS.On.Map> {
         channel!.send(msg2); // TODO !
     }
 
-    // TODO this function appears to never been used (since it's only caller never is), and it does weird things. Tried with a "type MapForAppSending = { [P in keyof MapForSending & string as `app.${P}`]: MapForSending[P] }" but it doesn't change the type of the `type` field and hence doesn't work
-    appSend<T extends keyof TogetherJSNS.AnyMessage.MapForSending>(msg: TogetherJSNS.AnyMessage.MapForSending[T]) {
+    appSend<T extends {type: string}>(msg: T) {
         let type = msg.type;
         if(type.search(/^togetherjs\./) === 0) {
-            type = type.substr("togetherjs.".length) as typeof type;
+            msg.type = type.substr("togetherjs.".length) as typeof type;
         }
         else if(type.search(/^app\./) === -1) {
-            type = "app." + type as typeof type; // TODO very abusive typing, I don't really see how to fix that except by duplicating MapForSending and all the types it uses which is a lot for a function that isn't used...
+            msg.type = `app.${type}` as const;
         }
         msg.type = type;
-        session.send(msg);
+        session.send(msg as TogetherJSNS.AnyMessage.AnyForSending); // TODO cast
     }
 
     makeHelloMessage(helloBack: true): TogetherJSNS.AnyMessage.MapForSending["hello-back"];

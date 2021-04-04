@@ -555,6 +555,11 @@ declare global {
                 "identityId": On.IdentityId, // TODO this a fictive message, peers.ts hints that a message more or less like this exists (with a identityId field) but I can't find it yet
             }
 
+            type AppMessageName = `app.${string}`;
+            type AppMessage = {
+                type: string
+            }
+
             type MapInTransit = { [P in keyof MapForSending]: MapForSending[P] & InTransit }
             type MapForReceiving = { [P in keyof MapForSending]: MapForSending[P] & AfterTransit }
             type AnyForSending = ValueOf<MapForSending>;

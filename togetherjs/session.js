@@ -78,17 +78,16 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             msg2.clientId = exports.session.clientId; // TODO !
             channel.send(msg2); // TODO !
         }
-        // TODO this function appears to never been used (since it's only caller never is), and it does weird things. Tried with a "type MapForAppSending = { [P in keyof MapForSending & string as `app.${P}`]: MapForSending[P] }" but it doesn't change the type of the `type` field and hence doesn't work
         appSend(msg) {
             let type = msg.type;
             if (type.search(/^togetherjs\./) === 0) {
-                type = type.substr("togetherjs.".length);
+                msg.type = type.substr("togetherjs.".length);
             }
             else if (type.search(/^app\./) === -1) {
-                type = "app." + type; // TODO very abusive typing, I don't really see how to fix that except by duplicating MapForSending and all the types it uses which is a lot for a function that isn't used...
+                msg.type = `app.${type}`;
             }
             msg.type = type;
-            exports.session.send(msg);
+            exports.session.send(msg); // TODO cast
         }
         makeHelloMessage(helloBack) {
             let starting = false;

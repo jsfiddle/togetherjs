@@ -123,8 +123,8 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
         }
     }
 
-    forProtocol<Map2 extends {[messageName: string]: TogetherJSNS.CallbackForOn<any>}>() {
-        return this as unknown as OnClass<Map2>;
+    forProtocol<Map2 extends {[messageName: string]: any}>() {
+        return this as unknown as OnClass<{[M in keyof Map2]: (msg: Map2[M]) => any}>; // TODO cast
     }
 }
 
@@ -616,7 +616,8 @@ function togetherjsMain() {
             this.hub.emit(msg.type, msg); // TODO emit error
         }
 
-        send(msg: TogetherJSNS.AnyMessage.AnyForSending) {
+        /** Use this method if you want you app to send custom messages */
+        send<Map>(msg: {type: Extract<keyof Map, string>}) {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
