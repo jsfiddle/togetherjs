@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./init", "./util"], function (require, exports, init_1, util_1) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.storage = void 0;
@@ -19,7 +19,7 @@ define(["require", "exports", "./init", "./util"], function (require, exports, i
         dontShowRtcInfo: false
     };
     var DEBUG_STORAGE = false;
-    class StorageSettings extends init_1.OnClass {
+    class StorageSettings extends OnClass {
         constructor(storageInstance) {
             super();
             this.storageInstance = storageInstance;

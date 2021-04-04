@@ -23,7 +23,7 @@ function extend(base, extensions) {
 class OnClass {
     constructor() {
         this._listeners = {}; // TODO any
-        this.removeListener = this.off.bind(this);
+        this.removeListener = this.off.bind(this); // TODO can be removed apparently
     }
     on(name, callback) {
         if (typeof callback != "function") {
@@ -50,9 +50,8 @@ class OnClass {
         if (!this._listeners[name]) {
             this._listeners[name] = [];
         }
-        const cb = callback; // TODO how to avoid this cast?
-        if (this._listeners[name].indexOf(cb) == -1) {
-            this._listeners[name].push(cb);
+        if (this._listeners[name].indexOf(callback) == -1) {
+            this._listeners[name].push(callback);
         }
     }
     once(name, callback) {
@@ -60,7 +59,7 @@ class OnClass {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
-        const cb = callback;
+        const cb = callback; // TODO avoid this cast?
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!cb[attr]) {
@@ -114,7 +113,7 @@ class OnClass {
     }
 }
 function baseUrl1() {
-    let baseUrl = "";
+    let baseUrl = "__baseUrl__";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -131,7 +130,7 @@ function baseUrl1() {
 }
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 const baseUrl = baseUrl1();
 const cacheBust = Date.now() + "";
 function addScript(url) {
@@ -635,7 +634,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -724,8 +723,8 @@ function togetherjsMain() {
     }
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -771,7 +770,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";

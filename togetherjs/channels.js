@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./init", "./util"], function (require, exports, init_1, util_1) {
+define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.channels = void 0;
@@ -19,7 +19,7 @@ define(["require", "exports", "./init", "./util"], function (require, exports, i
     - onclose() (not onmessage - instead _incoming)
     - emit("close")
     */
-    class AbstractChannel extends init_1.OnClass {
+    class AbstractChannel extends OnClass {
         constructor() {
             super();
             this.rawdata = false;
@@ -346,7 +346,7 @@ define(["require", "exports", "./init", "./util"], function (require, exports, i
         onclose() { }
     }
     ; // /PostMessageIncomingChannel
-    class Router extends init_1.OnClass {
+    class Router extends OnClass {
         constructor(channel) {
             super();
             this._routes = Object.create(null);
@@ -404,7 +404,7 @@ define(["require", "exports", "./init", "./util"], function (require, exports, i
             return route;
         }
     } // /Router
-    class Route extends init_1.OnClass {
+    class Route extends OnClass {
         constructor(router, id) {
             super();
             this.router = router;

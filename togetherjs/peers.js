@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-define(["require", "exports", "./init", "./session", "./storage", "./templates", "./util"], function (require, exports, init_1, session_1, storage_1, templates_1, util_1) {
+define(["require", "exports", "./session", "./storage", "./templates", "./util"], function (require, exports, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.peers = void 0;
@@ -214,7 +214,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             location.href = url;
         }
     });
-    class PeersSelf extends init_1.OnClass {
+    class PeersSelf extends OnClass {
         constructor() {
             super(...arguments);
             this.isSelf = true;
@@ -379,7 +379,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             }
         }
     }
-    class Peers extends init_1.OnClass {
+    class Peers extends OnClass {
         constructor() {
             super(...arguments);
             this._SelfLoaded = util_1.util.Deferred();

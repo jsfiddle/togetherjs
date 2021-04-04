@@ -129,8 +129,8 @@ function startListening() {
     //TogetherJS.on("manydata", (msg) => { console.log("manydata received", msg); });
     //TogetherJS.hub.on("app.manydata", (msg) => { console.log("hub app.manydata received", msg); });
     //TogetherJS.hub.on("togetherjs.manydata", (msg) => { console.log("hub togetherjs.manydata received", msg); });
-    TogetherJS.hub.on("manydata" as keyof TogetherJSNS.AnyMessage.MapForReceiving, (msg: any) => {
-        const msg2 = msg as any;
+    TogetherJS.hub.on("manydata", (msg) => {
+        const msg2 = msg;
         console.log("hub manydata received", msg2.payload.length);
         const maybeMessage = assembler.storeReceivedPacket(msg2);
         if(maybeMessage != null) {

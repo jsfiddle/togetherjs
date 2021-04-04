@@ -6,7 +6,6 @@ import type { appConsole } from "../console";
 import type { elementFinder } from "../elementFinder";
 import type { eventMaker } from "../eventMaker";
 import type { forms } from "../forms";
-import type { OnClass } from "../init";
 import type { ot } from "../ot";
 import type { peers } from "../peers";
 import type { playback } from "../playback";
@@ -330,6 +329,8 @@ declare global {
 
         namespace On {
             interface Map {
+                //[messageName in keyof Map]: TogetherJSNS.CallbackForOn<any>;
+
                 // channel.on & session.on
                 "close": () => void;
         
@@ -826,7 +827,7 @@ declare global {
         }
 
         interface CallbackForOnce<T> extends CallbackForOn<T> {
-            [name: string]: CallbackForOnce<T>; // TODO weird field for once callbacks
+            [name: string]: CallbackForOn<T>; // TODO weird field for once callbacks
         }
 
         interface Ons<T> {
