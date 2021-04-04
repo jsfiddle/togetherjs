@@ -6,7 +6,7 @@ interface Packet<Type> {
     index: number;
     /** Number of parts in which the message will be split */
     length: number;
-    /** Part (or all if the message is small) of the stringified message that will be reassembled */
+    /** Part of the stringified message (or all of it if the message is small) that will be reassembled */
     payload: string;
 }
 
@@ -15,13 +15,9 @@ interface AppMessageMap {
     "somethingelse": {type: "somethingelse", other: number}
 }
 
-type SerializedArguments = { type: string, content: string };
-
 type ProtocolMessageMap = {
     [P in keyof AppMessageMap]: Packet<P>
 }
-
-type ProtocolOn = { [P in keyof ProtocolMessageMap]: (msg: ProtocolMessageMap[P]) => void }
 
 function hashCode(s: string) {
     var hash = 0, i, chr;
