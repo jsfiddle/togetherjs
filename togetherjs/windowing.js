@@ -17,16 +17,13 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     var onClose = null;
     /* Displays one window.  A window must already exist.  This hides other windows, and
         positions the window according to its data-bound-to attributes */
-    var Windowing = /** @class */ (function () {
-        function Windowing() {
-        }
-        Windowing.prototype.show = function (el, options) {
-            if (options === void 0) { options = {}; }
-            var element = jquery_1.default(el);
+    class Windowing {
+        show(el, options = {}) {
+            const element = jquery_1.default(el);
             options.bind = options.bind || element.attr("data-bind-to");
             var notification = element.hasClass("togetherjs-notification");
             var modal = element.hasClass("togetherjs-modal");
-            var bindElement = null;
+            let bindElement = null;
             if (options.bind) {
                 bindElement = jquery_1.default(options.bind);
             }
@@ -51,17 +48,16 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             }
             onClose = options.onClose || null;
             session_1.session.emit("display-window", element.attr("id"), element);
-        };
-        Windowing.prototype.hide = function (selector) {
-            if (selector === void 0) { selector = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification"; }
+        }
+        hide(selector = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification") {
             // FIXME: also hide modals?
-            var els = jquery_1.default(selector);
+            let els = jquery_1.default(selector);
             els = els.filter(":visible");
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
             var windows = [];
             els.each(function (_index, el) {
-                var element = jquery_1.default(el);
+                const element = jquery_1.default(el);
                 windows.push(element);
                 var bound = element.data("boundTo");
                 if (!bound) {
@@ -88,18 +84,17 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             if (windows.length) {
                 session_1.session.emit("hide-window", windows);
             }
-        };
-        Windowing.prototype.toggle = function (el) {
-            var element = jquery_1.default(el);
+        }
+        toggle(el) {
+            const element = jquery_1.default(el);
             if (element.is(":visible")) {
                 this.hide(element);
             }
             else {
                 this.show(element);
             }
-        };
-        return Windowing;
-    }());
+        }
+    }
     exports.windowing = new Windowing();
     /* Moves a window to be attached to data-bind-to, e.g., the button
         that opened the window. Or you can provide an element that it should bind to. */
@@ -107,14 +102,14 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         if (jquery_1.default.browser.mobile) {
             return;
         }
-        var win = jquery_1.default(window);
+        const win = jquery_1.default(window);
         assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
         // FIXME: hardcoding
-        var ifacePos = "right";
+        let ifacePos = "right";
         //var ifacePos = panelPosition();
-        var boundPos = bound.offset(); // TODO ! deal with !
-        var boundPosHeight = bound.height();
-        var boundPosWidth = bound.width();
+        const boundPos = bound.offset(); // TODO ! deal with !
+        const boundPosHeight = bound.height();
+        const boundPosWidth = bound.width();
         var windowHeight = $window.height();
         boundPos.top -= $window.scrollTop();
         boundPos.left -= $window.scrollLeft();
@@ -122,8 +117,8 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         // width.  But it's still not entirely consistent.
         var height = win.height() + 5;
         var width = win.width() + 20;
-        var left;
-        var top;
+        let left;
+        let top;
         if (ifacePos == "right") {
             left = boundPos.left - 11 - width;
             top = boundPos.top + (boundPosHeight / 2) - (height / 2);
@@ -169,7 +164,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         if (!win.length) {
             return;
         }
-        var boundTo = win.data("boundTo");
+        let boundTo = win.data("boundTo");
         if (!boundTo) {
             return;
         }
@@ -184,7 +179,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             return false;
         });
     }
-    var getModalBackgroundElement = null;
+    let getModalBackgroundElement = null;
     function getModalBackground() {
         if (getModalBackgroundElement) {
             return getModalBackgroundElement;
@@ -197,24 +192,21 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         });
         return background;
     }
-    var ModalEscape = /** @class */ (function () {
-        function ModalEscape() {
-        }
-        ModalEscape.prototype.bind = function () {
+    class ModalEscape {
+        bind() {
             jquery_1.default(document).keydown(this.onKeydown);
-        };
-        ModalEscape.prototype.unbind = function () {
+        }
+        unbind() {
             jquery_1.default(document).unbind("keydown", this.onKeydown);
-        };
-        ModalEscape.prototype.onKeydown = function (event) {
+        }
+        onKeydown(event) {
             if (event.which == 27) {
                 exports.windowing.hide();
             }
-        };
-        return ModalEscape;
-    }());
+        }
+    }
     ;
-    var modalEscape = new ModalEscape();
+    const modalEscape = new ModalEscape();
     session_1.session.on("close", function () {
         modalEscape.unbind();
     });

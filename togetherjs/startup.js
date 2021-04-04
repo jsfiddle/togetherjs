@@ -22,7 +22,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
     */
     //function startupMain (_util: TogetherJSNS.Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
-    var session; // TODO potentially uninitialized, why does TSC doesn't catch that?
+    let session; // TODO potentially uninitialized, why does TSC doesn't catch that?
     var STEPS = [
         "browserBroken",
         "browserUnsupported",
@@ -31,11 +31,9 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
         // Look in the share() below if you add anything after here:
         "share"
     ];
-    var currentStep = null;
-    var Statup = /** @class */ (function () {
-        function Statup() {
-        }
-        Statup.prototype.start = function () {
+    let currentStep = null;
+    class Statup {
+        start() {
             if (!session) {
                 require(["session"], function (sessionModule) {
                     session = sessionModule.session;
@@ -54,14 +52,11 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
             }
             currentStep = STEPS[index];
             handlers[currentStep](exports.startup.start);
-        };
-        return Statup;
-    }());
-    exports.startup = new Statup();
-    var Handlers = /** @class */ (function () {
-        function Handlers() {
         }
-        Handlers.prototype.browserBroken = function (next) {
+    }
+    exports.startup = new Statup();
+    class Handlers {
+        browserBroken(next) {
             if (window.WebSocket) {
                 next();
                 return;
@@ -74,11 +69,11 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
             if (jquery_1.default.browser.msie) {
                 jquery_1.default("#togetherjs-browser-broken-is-ie").show();
             }
-        };
-        Handlers.prototype.browserUnsupported = function (next) {
+        }
+        browserUnsupported(next) {
             next();
-        };
-        Handlers.prototype.sessionIntro = function (next) {
+        }
+        sessionIntro(next) {
             if ((!session.isClient) || !session.firstRun) {
                 next();
                 return;
@@ -101,8 +96,8 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                 windowing_1.windowing.hide();
                 session.close("declined-join");
             });
-        };
-        Handlers.prototype.walkthrough = function (next) {
+        }
+        walkthrough(next) {
             storage_1.storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
                 if (seenIntroDialog) {
                     next();
@@ -115,24 +110,22 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                     });
                 });
             });
-        };
-        Handlers.prototype.share = function (next) {
+        }
+        share(next) {
             TogetherJS.config.close("suppressInvite");
             if (session.isClient || (!session.firstRun) ||
                 TogetherJS.config.get("suppressInvite")) {
                 next();
                 return;
             }
-            require(["windowing"], function (_a) {
-                var windowing = _a.windowing;
+            require(["windowing"], function ({ windowing }) {
                 windowing.show("#togetherjs-share");
                 // FIXME: no way to detect when the window is closed
                 // If there was a next() step then it would not work
             });
-        };
-        return Handlers;
-    }());
-    var handlers = new Handlers();
+        }
+    }
+    const handlers = new Handlers();
 });
 //return startup;
 //define(["util", "require", "jquery", "windowing", "storage"], startupMain);

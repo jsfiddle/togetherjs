@@ -6,11 +6,11 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.who = void 0;
     //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
-    var assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     var MAX_RESPONSE_TIME = 5000;
     var MAX_LATE_RESPONSE = 2000;
-    var ExternalPeer = /** @class */ (function () {
-        function ExternalPeer(id, attrs) {
+    class ExternalPeer {
+        constructor(id, attrs) {
             this.isSelf = false;
             this.isExternal = true;
             attrs = attrs || {};
@@ -25,17 +25,15 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
             this.lastMessageDate = 0;
             this.view = ui_1.ui.PeerSelfView(this);
         }
-        ExternalPeer.prototype.className = function (prefix) {
-            if (prefix === void 0) { prefix = ""; }
+        className(prefix = "") {
             return prefix + util_1.util.safeClassName(this.id);
-        };
-        return ExternalPeer;
-    }());
-    var Who = /** @class */ (function () {
-        function Who() {
-            this.ExternalPeer = function (id, attrs) { return new ExternalPeer(id, attrs); };
         }
-        Who.prototype.getList = function (hubUrl) {
+    }
+    class Who {
+        constructor() {
+            this.ExternalPeer = (id, attrs) => new ExternalPeer(id, attrs);
+        }
+        getList(hubUrl) {
             return util_1.util.Deferred(function (def) {
                 var expected;
                 var channel = channels_1.channels.WebSocketChannel(hubUrl);
@@ -86,8 +84,8 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     def.resolve(users);
                 }
             });
-        };
-        Who.prototype.invite = function (hubUrl, clientId) {
+        }
+        invite(hubUrl, clientId) {
             return util_1.util.Deferred(function (def) {
                 var channel = channels_1.channels.WebSocketChannel(hubUrl);
                 var id = util_1.util.generateId();
@@ -98,7 +96,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     }
                 };
                 var hello = session_1.session.makeHelloMessage(false);
-                var userInfo = {
+                const userInfo = {
                     name: hello.name,
                     avatar: hello.avatar,
                     color: hello.color,
@@ -119,9 +117,8 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     "server-echo": true
                 });
             });
-        };
-        return Who;
-    }());
+        }
+    }
     exports.who = new Who();
 });
 //return who;

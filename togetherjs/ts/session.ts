@@ -8,7 +8,7 @@ import { util } from "./util";
 import $ from "jquery";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
-var DEBUG = true;
+var DEBUG = false;
 
 // This is the amount of time in which a hello-back must be received after a hello
 // for us to respect a URL change:

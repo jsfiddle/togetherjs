@@ -1,21 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,7 +10,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     exports.forms = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
-    var assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
     var FOCUS_BUFFER = 5;
@@ -57,9 +42,9 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         });
     }
     function sendData(attrs) {
-        var el = jquery_1.default(attrs.element);
+        const el = jquery_1.default(attrs.element);
         assert(el);
-        var tracker = "tracker" in attrs ? attrs.tracker : undefined;
+        const tracker = "tracker" in attrs ? attrs.tracker : undefined;
         var value = attrs.value;
         if (inRemoteUpdate) {
             return;
@@ -68,7 +53,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             return;
         }
         var location = elementFinder_1.elementFinder.elementLocation(el);
-        var msg = {
+        let msg = {
             type: "form-update",
             element: location,
             value: value,
@@ -94,15 +79,15 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         session_1.session.send(msg);
     }
     function isCheckable(element) {
-        var el = jquery_1.default(element);
+        const el = jquery_1.default(element);
         var type = (el.prop("type") || "text").toLowerCase();
         if (el.prop("tagName") == "INPUT" && ["radio", "checkbox"].indexOf(type) != -1) {
             return true;
         }
         return false;
     }
-    var editTrackers = {};
-    var liveTrackers = [];
+    let editTrackers = {};
+    let liveTrackers = [];
     TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
         //assert(typeof TrackerClass === "function", "You must pass in a class");
         //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
@@ -121,43 +106,40 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             setInit();
         }
     };
-    var Editor = /** @class */ (function () {
-        function Editor(trackerName, element) {
+    class Editor {
+        constructor(trackerName, element) {
             this.trackerName = trackerName;
             this.element = element;
         }
-        return Editor;
-    }());
+    }
     // TODO factorize code between editors
-    var AceEditor = /** @class */ (function (_super) {
-        __extends(AceEditor, _super);
-        function AceEditor(el) {
-            var _this = _super.call(this, "AceEditor", jquery_1.default(el)[0]) || this;
-            assert(jquery_1.default(_this.element).hasClass("ace_editor"));
-            _this._change = _this._change.bind(_this);
-            _this._editor().document.on("change", _this._change);
-            return _this;
+    class AceEditor extends Editor {
+        constructor(el) {
+            super("AceEditor", jquery_1.default(el)[0]);
+            assert(jquery_1.default(this.element).hasClass("ace_editor"));
+            this._change = this._change.bind(this);
+            this._editor().document.on("change", this._change);
         }
-        AceEditor.prototype.destroy = function () {
+        destroy() {
             this._editor().document.removeListener("change", this._change);
-        };
-        AceEditor.prototype.update = function (msg) {
+        }
+        update(msg) {
             this._editor().document.setValue(msg.value);
-        };
-        AceEditor.prototype.init = function (update) {
+        }
+        init(update) {
             this.update(update);
-        };
-        AceEditor.prototype.makeInit = function () {
+        }
+        makeInit() {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this._editor().document.getValue()
             };
-        };
-        AceEditor.prototype._editor = function () {
+        }
+        _editor() {
             return this.element.env;
-        };
-        AceEditor.prototype._change = function () {
+        }
+        _change() {
             // FIXME: I should have an internal .send() function that automatically asserts !inRemoteUpdate, among other things
             if (inRemoteUpdate) {
                 return;
@@ -167,55 +149,52 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 element: this.element,
                 value: this.getContent()
             });
-        };
-        AceEditor.prototype.getContent = function () {
-            return this._editor().document.getValue();
-        };
-        AceEditor.scan = function () {
-            return jquery_1.default(".ace_editor");
-        };
-        /** Non-static version */
-        AceEditor.prototype.tracked = function (el) {
-            return AceEditor.tracked(el);
-        };
-        AceEditor.tracked = function (el) {
-            return !!jquery_1.default(el).closest(".ace_editor").length;
-        };
-        AceEditor.trackerName = "AceEditor";
-        return AceEditor;
-    }(Editor));
-    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
-    var CodeMirrorEditor = /** @class */ (function (_super) {
-        __extends(CodeMirrorEditor, _super);
-        function CodeMirrorEditor(el) {
-            var _this = _super.call(this, "CodeMirrorEditor", jquery_1.default(el)[0]) || this;
-            assert("CodeMirror" in _this.element);
-            _this._change = _this._change.bind(_this);
-            _this._editor().on("change", _this._change);
-            return _this;
         }
-        CodeMirrorEditor.prototype.tracked2 = function (el) {
+        getContent() {
+            return this._editor().document.getValue();
+        }
+        static scan() {
+            return jquery_1.default(".ace_editor");
+        }
+        /** Non-static version */
+        tracked(el) {
+            return AceEditor.tracked(el);
+        }
+        static tracked(el) {
+            return !!jquery_1.default(el).closest(".ace_editor").length;
+        }
+    }
+    AceEditor.trackerName = "AceEditor";
+    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
+    class CodeMirrorEditor extends Editor {
+        constructor(el) {
+            super("CodeMirrorEditor", jquery_1.default(el)[0]);
+            assert("CodeMirror" in this.element);
+            this._change = this._change.bind(this);
+            this._editor().on("change", this._change);
+        }
+        tracked2(el) {
             return this.element === jquery_1.default(el)[0];
-        };
-        CodeMirrorEditor.prototype.destroy = function () {
+        }
+        destroy() {
             this._editor().off("change", this._change);
-        };
-        CodeMirrorEditor.prototype.update = function (msg) {
+        }
+        update(msg) {
             this._editor().setValue(msg.value);
-        };
-        CodeMirrorEditor.prototype.init = function (msg) {
+        }
+        init(msg) {
             if (msg.value) {
                 this.update(msg);
             }
-        };
-        CodeMirrorEditor.prototype.makeInit = function () {
+        }
+        makeInit() {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this._editor().getValue()
             };
-        };
-        CodeMirrorEditor.prototype._change = function () {
+        }
+        _change() {
             if (inRemoteUpdate) {
                 return;
             }
@@ -224,14 +203,14 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 element: this.element,
                 value: this.getContent()
             });
-        };
-        CodeMirrorEditor.prototype._editor = function () {
+        }
+        _editor() {
             return this.element.CodeMirror;
-        };
-        CodeMirrorEditor.prototype.getContent = function () {
+        }
+        getContent() {
             return this._editor().getValue();
-        };
-        CodeMirrorEditor.scan = function () {
+        }
+        static scan() {
             var result = [];
             var els = document.body.getElementsByTagName("*");
             var _len = els.length;
@@ -242,13 +221,13 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 }
             }
             return jquery_1.default(result);
-        };
+        }
         /** Non-static version */
-        CodeMirrorEditor.prototype.tracked = function (el) {
+        tracked(el) {
             return CodeMirrorEditor.tracked(el);
-        };
-        CodeMirrorEditor.tracked = function (e) {
-            var el = jquery_1.default(e)[0];
+        }
+        static tracked(e) {
+            let el = jquery_1.default(e)[0];
             while (el) {
                 if ("CodeMirror" in el) {
                     return true;
@@ -256,43 +235,40 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 el = el.parentNode;
             }
             return false;
-        };
-        CodeMirrorEditor.trackerName = "CodeMirrorEditor";
-        return CodeMirrorEditor;
-    }(Editor));
-    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
-    var CKEditor = /** @class */ (function (_super) {
-        __extends(CKEditor, _super);
-        function CKEditor(el) {
-            var _this = _super.call(this, "CKEditor", jquery_1.default(el)[0]) || this;
-            assert(CKEDITOR);
-            assert(CKEDITOR.dom.element.get(_this.element));
-            _this._change = _this._change.bind(_this);
-            // FIXME: change event is available since CKEditor 4.2
-            _this._editor().on("change", _this._change);
-            return _this;
         }
-        CKEditor.prototype.tracked2 = function (el) {
+    }
+    CodeMirrorEditor.trackerName = "CodeMirrorEditor";
+    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+    class CKEditor extends Editor {
+        constructor(el) {
+            super("CKEditor", jquery_1.default(el)[0]);
+            assert(CKEDITOR);
+            assert(CKEDITOR.dom.element.get(this.element));
+            this._change = this._change.bind(this);
+            // FIXME: change event is available since CKEditor 4.2
+            this._editor().on("change", this._change);
+        }
+        tracked2(el) {
             return this.element === jquery_1.default(el)[0];
-        };
-        CKEditor.prototype.destroy = function () {
+        }
+        destroy() {
             this._editor().removeListener("change", this._change);
-        };
-        CKEditor.prototype.update = function (msg) {
+        }
+        update(msg) {
             //FIXME: use setHtml instead of setData to avoid frame reloading overhead
             this._editor().editable().setHtml(msg.value);
-        };
-        CKEditor.prototype.init = function (update) {
+        }
+        init(update) {
             this.update(update);
-        };
-        CKEditor.prototype.makeInit = function () {
+        }
+        makeInit() {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this.getContent()
             };
-        };
-        CKEditor.prototype._change = function () {
+        }
+        _change() {
             if (inRemoteUpdate) {
                 return;
             }
@@ -301,15 +277,15 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 element: this.element,
                 value: this.getContent()
             });
-        };
-        CKEditor.prototype._editor = function () {
+        }
+        _editor() {
             assert(CKEDITOR); // TODO assert added
             return CKEDITOR.dom.element.get(this.element).getEditor();
-        };
-        CKEditor.prototype.getContent = function () {
+        }
+        getContent() {
             return this._editor().getData();
-        };
-        CKEditor.scan = function () {
+        }
+        static scan() {
             var result = [];
             if (typeof CKEDITOR == "undefined") {
                 return;
@@ -322,52 +298,49 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 }
             }
             return jquery_1.default(result);
-        };
+        }
         /** Non-static version */
-        CKEditor.prototype.tracked = function (el) {
+        tracked(el) {
             return CKEditor.tracked(el);
-        };
-        CKEditor.tracked = function (el) {
+        }
+        static tracked(el) {
             if (typeof CKEDITOR == "undefined") {
                 return false;
             }
-            var elem = jquery_1.default(el)[0];
+            const elem = jquery_1.default(el)[0];
             return !!(CKEDITOR.dom.element.get(elem) && CKEDITOR.dom.element.get(elem).getEditor());
-        };
-        CKEditor.trackerName = "CKEditor";
-        return CKEditor;
-    }(Editor));
+        }
+    }
+    CKEditor.trackerName = "CKEditor";
     TogetherJS.addTracker(CKEditor, true /* skip setInit */);
     //////////////////// BEGINNING OF TINYMCE ////////////////////////
-    var tinymceEditor = /** @class */ (function (_super) {
-        __extends(tinymceEditor, _super);
-        function tinymceEditor(el) {
-            var _this = _super.call(this, "tinymceEditor", jquery_1.default(el)[0]) || this;
-            assert(jquery_1.default(_this.element).attr('id').indexOf('mce_') != -1);
-            _this._change = _this._change.bind(_this);
-            _this._editor().on("input keyup cut paste change", _this._change);
-            return _this;
+    class tinymceEditor extends Editor {
+        constructor(el) {
+            super("tinymceEditor", jquery_1.default(el)[0]);
+            assert(jquery_1.default(this.element).attr('id').indexOf('mce_') != -1);
+            this._change = this._change.bind(this);
+            this._editor().on("input keyup cut paste change", this._change);
         }
-        tinymceEditor.prototype.tracked2 = function (el) {
+        tracked2(el) {
             return this.element === jquery_1.default(el)[0];
-        };
-        tinymceEditor.prototype.destroy = function () {
+        }
+        destroy() {
             this._editor().destroy(); // TODO was "destory", probably a typo, fixed
-        };
-        tinymceEditor.prototype.update = function (msg) {
+        }
+        update(msg) {
             this._editor().setContent(msg.value, { format: 'raw' });
-        };
-        tinymceEditor.prototype.init = function (update) {
+        }
+        init(update) {
             this.update(update);
-        };
-        tinymceEditor.prototype.makeInit = function () {
+        }
+        makeInit() {
             return {
                 element: this.element,
                 tracker: this.trackerName,
                 value: this.getContent()
             };
-        };
-        tinymceEditor.prototype._change = function () {
+        }
+        _change() {
             if (inRemoteUpdate) {
                 return;
             }
@@ -376,18 +349,18 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 element: this.element,
                 value: this.getContent()
             });
-        };
-        tinymceEditor.prototype._editor = function () {
+        }
+        _editor() {
             if (typeof tinymce == "undefined") {
                 throw new Error("TinyEditor is undefined");
                 //return; // TODO was returning undefined, remove for now for easier typechecking
             }
             return jquery_1.default(this.element).data("tinyEditor");
-        };
-        tinymceEditor.prototype.getContent = function () {
+        }
+        getContent() {
             return this._editor().getContent();
-        };
-        tinymceEditor.scan = function () {
+        }
+        static scan() {
             //scan all the elements that contain tinyMCE editors
             if (typeof window.tinymce == "undefined") {
                 return;
@@ -399,16 +372,16 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 jquery_1.default('#' + ed.id).data("tinyEditor", ed);
             });
             return jquery_1.default(result);
-        };
+        }
         /** Non-static version */
-        tinymceEditor.prototype.tracked = function (el) {
+        tracked(el) {
             return tinymceEditor.tracked(el);
-        };
-        tinymceEditor.tracked = function (el) {
+        }
+        static tracked(el) {
             if (typeof tinymce == "undefined") {
                 return false;
             }
-            var elem = jquery_1.default(el)[0];
+            const elem = jquery_1.default(el)[0];
             return !!jquery_1.default(elem).data("tinyEditor");
             /*var flag = false;
             $(window.tinymce.editors).each(function (i, ed) {
@@ -417,16 +390,15 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 }
             });
             return flag;*/
-        };
-        tinymceEditor.trackerName = "tinymceEditor";
-        return tinymceEditor;
-    }(Editor));
+        }
+    }
+    tinymceEditor.trackerName = "tinymceEditor";
     TogetherJS.addTracker(tinymceEditor, true);
     ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
         assert(!liveTrackers.length);
         util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
-            var els = TrackerClass.scan();
+            const els = TrackerClass.scan();
             if (els) {
                 jquery_1.default.each(els, function () {
                     var tracker = new TrackerClass(this);
@@ -455,7 +427,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         if (name === null) {
             return null;
         }
-        var el = jquery_1.default(e)[0];
+        const el = jquery_1.default(e)[0];
         for (var i = 0; i < liveTrackers.length; i++) {
             var tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
@@ -471,7 +443,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     }
     var TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
     function isText(e) {
-        var el = jquery_1.default(e);
+        const el = jquery_1.default(e);
         var tag = el.prop("tagName");
         var type = (el.prop("type") || "text").toLowerCase();
         if (tag == "TEXTAREA") {
@@ -484,7 +456,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     }
     function getValue(e) {
         var _a;
-        var el = jquery_1.default(e);
+        const el = jquery_1.default(e);
         if (isCheckable(el)) {
             return el.prop("checked"); // "as boolean" serves as a reminder of the type of the value
         }
@@ -495,7 +467,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     // TODO not used
     //@ts-expect-error unused but we don't remove functions for now
     function getElementType(e) {
-        var el = jquery_1.default(e)[0];
+        const el = jquery_1.default(e)[0];
         if (el.tagName == "TEXTAREA") {
             return "textarea";
         }
@@ -508,7 +480,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         return "?";
     }
     function setValue(e, value) {
-        var el = jquery_1.default(e);
+        const el = jquery_1.default(e);
         var changed = false;
         if (isCheckable(el)) {
             assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
@@ -560,43 +532,43 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         if (!msg.sameUrl) {
             return;
         }
-        var el = jquery_1.default(elementFinder_1.elementFinder.findElement(msg.element));
-        var el0 = el[0]; // TODO is this cast right?
+        const el = jquery_1.default(elementFinder_1.elementFinder.findElement(msg.element));
+        const el0 = el[0]; // TODO is this cast right?
         if (typeof msg.value === "boolean") {
             setValue(el, msg.value);
             return;
         }
-        var tracker;
+        let tracker;
         if ("tracker" in msg) {
             // TODO weird gymnastic with tmp var here
-            var tracker0 = getTracker(el, (_a = msg.tracker) !== null && _a !== void 0 ? _a : null);
+            const tracker0 = getTracker(el, (_a = msg.tracker) !== null && _a !== void 0 ? _a : null);
             assert(tracker0);
             tracker = tracker0;
         }
         var focusedEl = el0.ownerDocument.activeElement;
-        var focusedElSelection;
+        let focusedElSelection;
         if (isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart || 0, focusedEl.selectionEnd || 0];
         }
-        var selection;
+        let selection;
         if (isText(el0)) {
             //assert(el0.selectionStart);
             //assert(el0.selectionEnd);
             selection = [el0.selectionStart || 0, el0.selectionEnd || 0];
         }
-        var value;
+        let value;
         if ("replace" in msg) {
-            var history = el.data("togetherjsHistory");
+            let history = el.data("togetherjsHistory");
             if (!history) {
                 console.warn("form update received for uninitialized form element");
                 return;
             }
             history.setSelection(selection);
             // make a real TextReplace object.
-            var delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
-            var change_1 = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
+            const delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            const change = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
-            var changed = history.commit(change_1);
+            var changed = history.commit(change);
             var trackerName = undefined;
             if (typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
@@ -650,7 +622,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 return;
             }
             var el = jquery_1.default(this);
-            var el0 = el[0];
+            const el0 = el[0];
             var value = getValue(el0);
             // TODO old code in /**/
             /*
@@ -665,7 +637,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             if (isText(el0)) {
                 var history = el.data("togetherjsHistory");
                 if (history) {
-                    var upd = {
+                    let upd = {
                         element: elementFinder_1.elementFinder.elementLocation(this),
                         value: history.committed,
                         basis: history.basis,
@@ -673,7 +645,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                     msg.updates.push(upd);
                 }
                 else {
-                    var upd = {
+                    let upd = {
                         element: elementFinder_1.elementFinder.elementLocation(this),
                         value: value,
                     };
@@ -681,7 +653,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 }
             }
             else {
-                var upd = {
+                let upd = {
                     element: elementFinder_1.elementFinder.elementLocation(this),
                     value: value,
                 };
@@ -693,7 +665,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             assert(tracker.tracked(init0.element));
             var history = jquery_1.default(init0.element).data("togetherjsHistory");
             // TODO check the logic change
-            var init = {
+            let init = {
                 element: elementFinder_1.elementFinder.elementLocation(jquery_1.default(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
@@ -758,7 +730,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             inRemoteUpdate = true;
             try {
                 if ("tracker" in update && update.tracker) {
-                    var tracker = getTracker(el, update.tracker);
+                    const tracker = getTracker(el, update.tracker);
                     assert(tracker);
                     tracker.init(update); // TODO remove arg msg that was unused in the called function
                 }
@@ -782,7 +754,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
     });
     var lastFocus = null;
     function focus(event) {
-        var target = event.target;
+        const target = event.target;
         if (elementFinder_1.elementFinder.ignoreElement(target) || elementTracked(target)) {
             blur(event);
             return;
@@ -803,7 +775,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
         if (!msg.sameUrl) {
             return;
         }
-        var current = focusElements[msg.peer.id];
+        let current = focusElements[msg.peer.id];
         if (current) {
             current.remove();
             current = null;

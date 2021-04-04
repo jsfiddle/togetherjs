@@ -10,11 +10,11 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
     exports.recorder = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var channel; // TODO potentially not initialized, why does TSC doesn't catch that?
-    var clientId = "recorder";
+    const assert = util_1.util.assert.bind(util_1.util);
+    let channel; // TODO potentially not initialized, why does TSC doesn't catch that?
+    let clientId = "recorder";
     function display(elOrSelector) {
-        var el = jquery_1.default(elOrSelector);
+        let el = jquery_1.default(elOrSelector);
         var toggles = el.attr("data-toggles");
         if (toggles) {
             jquery_1.default(toggles).hide();
@@ -57,12 +57,9 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
             request: req
         });
     }
-    var Recorder = /** @class */ (function () {
-        function Recorder() {
-        }
-        Recorder.prototype.start = function (options) {
-            var _this = this;
-            jquery_1.default(function () {
+    class Recorder {
+        start(options) {
+            jquery_1.default(() => {
                 jquery_1.default("#record").css({ height: jquery_1.default(window).height() - 50 });
                 jquery_1.default("#restart").click(function () {
                     location.reload();
@@ -70,11 +67,10 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
                 jquery_1.default("#select").click(function () {
                     jquery_1.default("#record").select();
                 });
-                _this.activate(options);
+                this.activate(options);
             });
-        };
-        Recorder.prototype.activate = function (options) {
-            var _this = this;
+        }
+        activate(options) {
             var _a;
             var match;
             this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
@@ -95,7 +91,7 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
             channel = channels_1.channels.WebSocketChannel(url);
-            channel.onmessage = function (msg) {
+            channel.onmessage = msg => {
                 if (msg.type == "hello-back") {
                     display("#connected");
                 }
@@ -106,17 +102,16 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
                     sendLogs(msg);
                     return;
                 }
-                _this.logMessage(msg);
+                this.logMessage(msg);
             };
             sendHello(false);
-        };
-        Recorder.prototype.logMessage = function (msg) {
+        }
+        logMessage(msg) {
             msg.date = Date.now(); // TODO abusive cast
             var $record = jquery_1.default("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
-        };
-        return Recorder;
-    }());
+        }
+    }
     jquery_1.default(window).unload(function () {
         channel.send({
             type: "bye",

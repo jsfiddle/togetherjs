@@ -1034,7 +1034,7 @@ declare global {
 
     // Only in ES6 apparently
     interface Function {
-        name: string;
+        //name: string;
     }
 
     interface Navigator {

@@ -10,17 +10,15 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     exports.eventMaker = void 0;
     jquery_1 = __importDefault(jquery_1);
     function createTogetherjsMouseEvent() {
-        var event = document.createEvent("MouseEvents");
+        const event = document.createEvent("MouseEvents");
         // FIXME: I'm not sure this custom attribute always propagates?
         // seems okay in Firefox/Chrome, but I've had problems with
         // setting attributes on keyboard events in the past.
         event.togetherjsInternal = true;
         return event;
     }
-    var EventMaker = /** @class */ (function () {
-        function EventMaker() {
-        }
-        EventMaker.prototype.performClick = function (target) {
+    class EventMaker {
+        performClick(target) {
             // FIXME: should accept other parameters, like Ctrl/Alt/etc
             var event = createTogetherjsMouseEvent();
             event.initMouseEvent("click", // type
@@ -53,15 +51,14 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             }
             // FIXME: should do button clicks (like a form submit)
             // FIXME: should run .onclick() as well
-        };
-        EventMaker.prototype.fireChange = function (target) {
+        }
+        fireChange(target) {
             target = jquery_1.default(target)[0];
             var event = document.createEvent("HTMLEvents");
             event.initEvent("change", true, true);
             target.dispatchEvent(event);
-        };
-        return EventMaker;
-    }());
+        }
+    }
     exports.eventMaker = new EventMaker();
 });
 //return eventMaker;

@@ -1,21 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -55,11 +40,11 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     require(["chat"], function (chatModule) {
         chat = chatModule.chat;
     });
-    var Chat = /** @class */ (function () {
-        function Chat(ui) {
+    class Chat {
+        constructor(ui) {
             this.ui = ui;
         }
-        Chat.prototype.text = function (attrs) {
+        text(attrs) {
             assert(typeof attrs.text == "string");
             assert(attrs.peer);
             assert(attrs.messageId);
@@ -91,8 +76,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 .attr("data-date", date)
                 .attr("data-message-id", attrs.messageId);
             this.add(el, attrs.messageId, attrs.notify);
-        };
-        Chat.prototype.joinedSession = function (attrs) {
+        }
+        joinedSession(attrs) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating_1.templating.sub("chat-joined", {
@@ -101,8 +86,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             });
             // FIXME: should bind the notification to the dock location
             this.add(el, attrs.peer.className("join-message-"), 4000);
-        };
-        Chat.prototype.leftSession = function (attrs) {
+        }
+        leftSession(attrs) {
             assert(attrs.peer);
             var date = attrs.date || Date.now();
             var el = templating_1.templating.sub("chat-left", {
@@ -112,8 +97,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             });
             // FIXME: should bind the notification to the dock location
             this.add(el, attrs.peer.className("join-message-"), 4000);
-        };
-        Chat.prototype.system = function (attrs) {
+        }
+        system(attrs) {
             assert(!("peer" in attrs)); // TODO why does it asserts that we DON'T have a peer field?
             assert(typeof attrs.text == "string");
             var date = attrs.date || Date.now();
@@ -122,15 +107,14 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 date: date,
             });
             this.add(el, undefined, true);
-        };
-        Chat.prototype.clear = function () {
-            var _this = this;
-            deferForContainer(function () {
-                var container = _this.ui.container.find("#togetherjs-chat-messages");
+        }
+        clear() {
+            deferForContainer(() => {
+                var container = this.ui.container.find("#togetherjs-chat-messages");
                 container.empty();
             })();
-        };
-        Chat.prototype.urlChange = function (attrs) {
+        }
+        urlChange(attrs) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             assert(typeof attrs.sameUrl == "boolean");
@@ -175,8 +159,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 return;
             }
             this.add(el, messageId, notify);
-        };
-        Chat.prototype.invite = function (attrs) {
+        }
+        invite(attrs) {
             assert(attrs.peer);
             assert(typeof attrs.url == "string");
             var messageId = attrs.peer.className("invite-");
@@ -196,23 +180,21 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 });
             }
             this.add(el, messageId, true);
-        };
-        Chat.prototype.add = function (el, id, notify) {
-            var _this = this;
-            if (notify === void 0) { notify = false; }
-            deferForContainer(function () {
+        }
+        add(el, id, notify = false) {
+            deferForContainer(() => {
                 if (id) {
                     el.attr("id", "togetherjs-chat-" + util_1.util.safeClassName(id));
                 }
-                var container = _this.ui.container.find("#togetherjs-chat-messages");
+                var container = this.ui.container.find("#togetherjs-chat-messages");
                 assert(container.length);
-                var popup = _this.ui.container.find("#togetherjs-chat-notifier");
+                var popup = this.ui.container.find("#togetherjs-chat-notifier");
                 container.append(el);
-                _this.scroll();
+                this.scroll();
                 var doNotify = !!notify;
                 var section = popup.find("#togetherjs-chat-notifier-message");
                 if (notify && visibilityApi_1.visibilityApi.hidden()) {
-                    var mediaElement = _this.ui.container.find("#togetherjs-notification")[0];
+                    const mediaElement = this.ui.container.find("#togetherjs-notification")[0];
                     mediaElement.play();
                 }
                 if (id && section.data("message-id") == id) {
@@ -233,37 +215,35 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     }
                     if (typeof notify == "number") {
                         // This is the amount of time we're supposed to notify
-                        if (_this.hideTimeout) {
-                            clearTimeout(_this.hideTimeout);
-                            _this.hideTimeout = undefined;
+                        if (this.hideTimeout) {
+                            clearTimeout(this.hideTimeout);
+                            this.hideTimeout = undefined;
                         }
-                        _this.hideTimeout = setTimeout(function () {
+                        this.hideTimeout = setTimeout(() => {
                             windowing_1.windowing.hide(popup);
-                            _this.hideTimeout = undefined;
+                            this.hideTimeout = undefined;
                         }, notify);
                     }
                 }
             })();
-        };
-        Chat.prototype.scroll = function () {
-            var _this = this;
-            deferForContainer(function () {
-                var container = _this.ui.container.find("#togetherjs-chat-messages")[0];
+        }
+        scroll() {
+            deferForContainer(() => {
+                var container = this.ui.container.find("#togetherjs-chat-messages")[0];
                 container.scrollTop = container.scrollHeight;
             })();
-        };
-        return Chat;
-    }());
+        }
+    }
     /** Like PeerView but for PeerSelf/ExternalPeer objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
-    var PeerSelfView = /** @class */ (function () {
-        function PeerSelfView(ui, peer) {
+    class PeerSelfView {
+        constructor(ui, peer) {
             this.ui = ui;
             this.peer = peer;
             this.dockElement = null;
             this.detailElement = null;
         }
         /** Takes an element and sets any person-related attributes on the element. Different from updates, which use the class names we set here: */
-        PeerSelfView.prototype.setElement = function (el) {
+        setElement(el) {
             var count = 0;
             var classes = ["togetherjs-person", "togetherjs-person-status",
                 "togetherjs-person-name", "togetherjs-person-name-abbrev",
@@ -280,107 +260,106 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 console.warn("setElement(", el, ") doesn't contain any person items");
             }
             this.updateDisplay(el);
-        };
-        PeerSelfView.prototype.update = function () {
+        }
+        update() {
             this.updateDisplay();
-        };
-        PeerSelfView.prototype.updateDisplay = function (container) {
-            var _this = this;
-            deferForContainer(function () {
-                container = container || _this.ui.container;
-                var abbrev = _this.peer.name;
-                if (_this.peer.isSelf) {
+        }
+        updateDisplay(container) {
+            deferForContainer(() => {
+                container = container || this.ui.container;
+                var abbrev = this.peer.name;
+                if (this.peer.isSelf) {
                     abbrev = "me";
                 }
-                container.find("." + _this.peer.className("togetherjs-person-name-")).text(_this.peer.name || "");
-                container.find("." + _this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev); // TODO !
-                var avatarEl = container.find("." + _this.peer.className("togetherjs-person-"));
-                if (_this.peer.avatar) {
-                    util_1.util.assertValidUrl(_this.peer.avatar);
+                container.find("." + this.peer.className("togetherjs-person-name-")).text(this.peer.name || "");
+                container.find("." + this.peer.className("togetherjs-person-name-abbrev-")).text(abbrev); // TODO !
+                var avatarEl = container.find("." + this.peer.className("togetherjs-person-"));
+                if (this.peer.avatar) {
+                    util_1.util.assertValidUrl(this.peer.avatar);
                     avatarEl.css({
-                        backgroundImage: "url(" + _this.peer.avatar + ")"
+                        backgroundImage: "url(" + this.peer.avatar + ")"
                     });
                 }
-                if (_this.peer.idle == "inactive") {
+                if (this.peer.idle == "inactive") {
                     avatarEl.addClass("togetherjs-person-inactive");
                 }
                 else {
                     avatarEl.removeClass("togetherjs-person-inactive");
                 }
-                avatarEl.attr("title", _this.peer.name);
-                if (_this.peer.color) {
+                avatarEl.attr("title", this.peer.name);
+                if (this.peer.color) {
                     avatarEl.css({
-                        borderColor: _this.peer.color
+                        borderColor: this.peer.color
                     });
                     avatarEl.find(".togetherjs-person-avatar-swatch").css({
-                        borderTopColor: _this.peer.color,
-                        borderRightColor: _this.peer.color
+                        borderTopColor: this.peer.color,
+                        borderRightColor: this.peer.color
                     });
                 }
-                if (_this.peer.color) {
-                    var colors = container.find("." + _this.peer.className("togetherjs-person-bgcolor-"));
+                if (this.peer.color) {
+                    var colors = container.find("." + this.peer.className("togetherjs-person-bgcolor-"));
                     colors.css({
-                        backgroundColor: _this.peer.color
+                        backgroundColor: this.peer.color
                     });
-                    colors = container.find("." + _this.peer.className("togetherjs-person-bordercolor-"));
+                    colors = container.find("." + this.peer.className("togetherjs-person-bordercolor-"));
                     colors.css({
-                        borderColor: _this.peer.color
+                        borderColor: this.peer.color
                     });
                 }
-                container.find("." + _this.peer.className("togetherjs-person-role-")).text(_this.peer.isCreator ? "Creator" : "Participant");
-                var urlName;
-                var domain = util_1.util.truncateCommonDomain(_this.peer.url, location.href); // TODO !
+                container.find("." + this.peer.className("togetherjs-person-role-")).text(this.peer.isCreator ? "Creator" : "Participant");
+                let urlName;
+                const domain = util_1.util.truncateCommonDomain(this.peer.url, location.href); // TODO !
                 // TODO code change
-                if ("title" in _this.peer && _this.peer.title) {
-                    urlName = _this.peer.title + " (" + domain + ")";
+                if ("title" in this.peer && this.peer.title) {
+                    urlName = this.peer.title + " (" + domain + ")";
                 }
                 else {
                     urlName = domain;
                 }
-                container.find("." + _this.peer.className("togetherjs-person-url-title-")).text(urlName);
-                var url = _this.peer.url;
-                if ("urlHash" in _this.peer && _this.peer.urlHash) {
-                    url += _this.peer.urlHash;
+                container.find("." + this.peer.className("togetherjs-person-url-title-")).text(urlName);
+                var url = this.peer.url;
+                if ("urlHash" in this.peer && this.peer.urlHash) {
+                    url += this.peer.urlHash;
                 }
-                container.find("." + _this.peer.className("togetherjs-person-url-")).attr("href", url); // TODO !
+                container.find("." + this.peer.className("togetherjs-person-url-")).attr("href", url); // TODO !
                 // FIXME: should have richer status:
-                container.find("." + _this.peer.className("togetherjs-person-status-")).text(_this.peer.idle == "active" ? "Active" : "Inactive");
-                if (_this.peer.isSelf) {
+                container.find("." + this.peer.className("togetherjs-person-status-")).text(this.peer.idle == "active" ? "Active" : "Inactive");
+                if (this.peer.isSelf) {
                     // FIXME: these could also have consistent/reliable class names:
                     var selfName = jquery_1.default(".togetherjs-self-name");
                     selfName.each((function (_index, elem) {
-                        var el = jquery_1.default(elem);
+                        const el = jquery_1.default(elem);
                         if (el.val() != this.peer.name) {
                             el.val(this.peer.name); // TODO !
                         }
-                    }).bind(_this));
-                    jquery_1.default("#togetherjs-menu-avatar").attr("src", _this.peer.avatar);
-                    if (!_this.peer.name && _this.peer.defaultName) {
-                        jquery_1.default("#togetherjs-menu .togetherjs-person-name-self").text(_this.peer.defaultName);
+                    }).bind(this));
+                    jquery_1.default("#togetherjs-menu-avatar").attr("src", this.peer.avatar);
+                    if (!this.peer.name && this.peer.defaultName) {
+                        jquery_1.default("#togetherjs-menu .togetherjs-person-name-self").text(this.peer.defaultName);
                     }
                 }
-                if (_this.peer.url != session_1.session.currentUrl()) {
-                    container.find("." + _this.peer.className("togetherjs-person-")).addClass("togetherjs-person-other-url");
+                if (this.peer.url != session_1.session.currentUrl()) {
+                    container.find("." + this.peer.className("togetherjs-person-")).addClass("togetherjs-person-other-url");
                 }
                 else {
-                    container.find("." + _this.peer.className("togetherjs-person-")).removeClass("togetherjs-person-other-url");
+                    container.find("." + this.peer.className("togetherjs-person-")).removeClass("togetherjs-person-other-url");
                 }
-                if ("following" in _this.peer && _this.peer.following) {
-                    if (_this.followCheckbox) {
-                        _this.followCheckbox.prop("checked", true);
+                if ("following" in this.peer && this.peer.following) {
+                    if (this.followCheckbox) {
+                        this.followCheckbox.prop("checked", true);
                     }
                 }
                 else {
-                    if (_this.followCheckbox) {
-                        _this.followCheckbox.prop("checked", false);
+                    if (this.followCheckbox) {
+                        this.followCheckbox.prop("checked", false);
                     }
                 }
                 // FIXME: add some style based on following?
                 updateChatParticipantList();
-                _this.updateFollow();
+                this.updateFollow();
             })();
-        };
-        PeerSelfView.prototype.updateFollow = function () {
+        }
+        updateFollow() {
             if (!("url" in this.peer) || !this.peer.url) {
                 return;
             }
@@ -397,19 +376,16 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 same.hide();
                 different.show();
             }
-        };
-        return PeerSelfView;
-    }());
-    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
-    var PeerView = /** @class */ (function (_super) {
-        __extends(PeerView, _super);
-        function PeerView(ui, peer) {
-            var _this = _super.call(this, ui, peer) || this;
-            _this.peer = peer;
-            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
-            return _this;
         }
-        PeerView.prototype.update = function () {
+    }
+    /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
+    class PeerView extends PeerSelfView {
+        constructor(ui, peer) {
+            super(ui, peer);
+            this.peer = peer;
+            assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
+        }
+        update() {
             // Called d0 from PeerSelf & PeerClass
             // Only function directly called from PeerSelf
             if (!this.peer.isSelf) {
@@ -420,11 +396,10 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     this.undock();
                 }
             }
-            _super.prototype.update.call(this);
+            super.update();
             this.updateUrlDisplay();
-        };
-        PeerView.prototype.updateUrlDisplay = function (force) {
-            if (force === void 0) { force = false; }
+        }
+        updateUrlDisplay(force = false) {
             // TODO check that all of that is ok. This function is sometimes called with a this.peer of type PeerSelf which is a problem because:
             /*
             1. PeerSelf has no title (but it's okay if it's undefined because chat.urlChange() will replace it with this.peer.url in this case so it's only weird for TS and not JS)
@@ -461,23 +436,22 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 title: this.peer.title,
                 sameUrl: sameUrl
             });
-        };
-        PeerView.prototype.urlNudge = function () {
+        }
+        urlNudge() {
             // FIXME: do something more distinct here
             this.updateUrlDisplay(true);
-        };
-        PeerView.prototype.notifyJoined = function () {
+        }
+        notifyJoined() {
             this.ui.chat.joinedSession({ peer: this.peer });
-        };
+        }
         // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
         // if there are X users in the session
         // then hide the users in the dock
         // and shrink the size of the dock
         // and if you rollover the dock, it expands and reveals the rest of the participants in the dock
         // if users hit X then show the participant button with the consol
-        PeerView.prototype.dock = function () {
-            var _this = this;
-            deferForContainer(function () {
+        dock() {
+            deferForContainer(() => {
                 var numberOfUsers = peers_1.peers.getAllPeers().length;
                 // collapse the Dock if too many users
                 function CollapsedDock() {
@@ -497,49 +471,49 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 else {
                     // reset
                 }
-                if (_this.dockElement) {
+                if (this.dockElement) {
                     return;
                 }
-                _this.dockElement = templating_1.templating.sub("dock-person", {
-                    peer: _this.peer
+                this.dockElement = templating_1.templating.sub("dock-person", {
+                    peer: this.peer
                 });
-                _this.dockElement.attr("id", _this.peer.className("togetherjs-dock-element-"));
-                _this.ui.container.find("#togetherjs-dock-participants").append(_this.dockElement);
-                _this.dockElement.find(".togetherjs-person").animateDockEntry();
+                this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
+                this.ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
+                this.dockElement.find(".togetherjs-person").animateDockEntry();
                 adjustDockSize(1);
-                _this.detailElement = templating_1.templating.sub("participant-window", {
-                    peer: _this.peer
+                this.detailElement = templating_1.templating.sub("participant-window", {
+                    peer: this.peer
                 });
-                var followId = _this.peer.className("togetherjs-person-status-follow-");
-                _this.detailElement.find('[for="togetherjs-person-status-follow"]').attr("for", followId);
-                _this.detailElement.find('#togetherjs-person-status-follow').attr("id", followId);
-                _this.detailElement.find(".togetherjs-follow").click(function () {
+                var followId = this.peer.className("togetherjs-person-status-follow-");
+                this.detailElement.find('[for="togetherjs-person-status-follow"]').attr("for", followId);
+                this.detailElement.find('#togetherjs-person-status-follow').attr("id", followId);
+                this.detailElement.find(".togetherjs-follow").click(function () {
                     location.href = jquery_1.default(this).attr("href");
                 });
-                _this.detailElement.find(".togetherjs-nudge").click(function () {
-                    _this.peer.nudge();
+                this.detailElement.find(".togetherjs-nudge").click(() => {
+                    this.peer.nudge();
                 });
-                _this.followCheckbox = _this.detailElement.find("#" + followId);
-                var self = _this;
-                _this.followCheckbox.change(function () {
+                this.followCheckbox = this.detailElement.find("#" + followId);
+                const self = this;
+                this.followCheckbox.change(function () {
                     if (!this.checked) {
                         self.peer.unfollow();
                     }
                     // Following doesn't happen until the window is closed
                     // FIXME: should we tell the user this?
                 });
-                _this.maybeHideDetailWindow = _this.maybeHideDetailWindow.bind(_this);
-                session_1.session.on("hide-window", _this.maybeHideDetailWindow);
-                _this.ui.container.append(_this.detailElement);
-                _this.dockElement.click(function () {
+                this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
+                session_1.session.on("hide-window", this.maybeHideDetailWindow);
+                this.ui.container.append(this.detailElement);
+                this.dockElement.click(() => {
                     var _a;
-                    if (_this.detailElement.is(":visible")) { // TODO ! detailElement is probably set when we click on the dock, we should find a way to signify that more clearly
-                        windowing_1.windowing.hide(_this.detailElement); // TODO !
+                    if (this.detailElement.is(":visible")) { // TODO ! detailElement is probably set when we click on the dock, we should find a way to signify that more clearly
+                        windowing_1.windowing.hide(this.detailElement); // TODO !
                     }
                     else {
-                        windowing_1.windowing.show(_this.detailElement, { bind: (_a = _this.dockElement) !== null && _a !== void 0 ? _a : undefined }); // TODO !
-                        _this.scrollTo();
-                        _this.cursor().element.animate({
+                        windowing_1.windowing.show(this.detailElement, { bind: (_a = this.dockElement) !== null && _a !== void 0 ? _a : undefined }); // TODO !
+                        this.scrollTo();
+                        this.cursor().element.animate({
                             opacity: 0.3
                         }).animate({
                             opacity: 1
@@ -550,23 +524,22 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                         });
                     }
                 });
-                _this.updateFollow();
+                this.updateFollow();
             })();
-        };
-        PeerView.prototype.undock = function () {
-            var _this = this;
+        }
+        undock() {
             if (!this.dockElement) {
                 return;
             }
-            this.dockElement.animateDockExit().promise().then(function () {
-                _this.dockElement.remove(); // TODO !
-                _this.dockElement = null;
-                _this.detailElement.remove(); // TODO !
-                _this.detailElement = null;
+            this.dockElement.animateDockExit().promise().then(() => {
+                this.dockElement.remove(); // TODO !
+                this.dockElement = null;
+                this.detailElement.remove(); // TODO !
+                this.detailElement = null;
                 adjustDockSize(-1);
             });
-        };
-        PeerView.prototype.scrollTo = function () {
+        }
+        scrollTo() {
             if (this.peer.url != session_1.session.currentUrl()) {
                 return;
             }
@@ -576,8 +549,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 return;
             }
             jquery_1.default("html, body").easeTo(elementFinder_1.elementFinder.pixelForPosition(pos));
-        };
-        PeerView.prototype.maybeHideDetailWindow = function (windows) {
+        }
+        maybeHideDetailWindow(windows) {
             if (this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
                 if (this.followCheckbox && this.followCheckbox[0].checked) {
                     this.peer.follow();
@@ -586,53 +559,50 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     this.peer.unfollow();
                 }
             }
-        };
-        PeerView.prototype.dockClick = function () {
+        }
+        dockClick() {
             // FIXME: scroll to person
-        };
-        PeerView.prototype.cursor = function () {
-            var cursorModule = require("cursor");
+        }
+        cursor() {
+            const cursorModule = require("cursor");
             return cursorModule.cursor.getClient(this.peer.id);
-        };
-        PeerView.prototype.destroy = function () {
+        }
+        destroy() {
             // FIXME: should I get rid of the dockElement?
             session_1.session.off("hide-window", this.maybeHideDetailWindow);
-        };
-        return PeerView;
-    }(PeerSelfView));
-    var Ui = /** @class */ (function () {
-        function Ui() {
-            var _this = this;
-            this.PeerView = function (peer) { return new PeerView(_this, peer); };
-            this.PeerSelfView = function (peer) { return new PeerSelfView(_this, peer); };
+        }
+    }
+    class Ui {
+        constructor() {
+            this.PeerView = (peer) => new PeerView(this, peer);
+            this.PeerSelfView = (peer) => new PeerSelfView(this, peer);
             this.chat = new Chat(this);
         }
         /* Displays some toggleable element; toggleable elements have a
         data-toggles attribute that indicates what other elements should
         be hidden when this element is shown. */
-        Ui.prototype.displayToggle = function (elem) {
-            var el = jquery_1.default(elem);
+        displayToggle(elem) {
+            const el = jquery_1.default(elem);
             assert(el.length, "No element", arguments[0]);
             var other = jquery_1.default(el.attr("data-toggles"));
             assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
             other.hide();
             el.show();
-        };
+        }
         // This is called before activateUI; it doesn't bind anything, but does display the dock
         // FIXME: because this module has lots of requirements we can't do this before those requirements are loaded.  Maybe worth splitting this out?  OTOH, in production we should have all the files combined so there's not much problem loading those modules.
-        Ui.prototype.prepareUI = function () {
-            var _this = this;
+        prepareUI() {
             if (!(document.readyState == "complete" || document.readyState == "interactive")) {
                 // Too soon!  Wait a sec...
                 deferringPrepareUI = "deferring";
-                document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", () => {
                     var d = deferringPrepareUI;
                     deferringPrepareUI = null;
-                    _this.prepareUI();
+                    this.prepareUI();
                     // This happens when ui.activateUI is called before the document has been
                     // loaded:
                     if (d == "activate") {
-                        _this.activateUI();
+                        this.activateUI();
                     }
                 });
                 return;
@@ -649,7 +619,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
                     var iface = container.find("#togetherjs-dock");
                     var start = iface.offset(); // TODO !
-                    var pos = jquery_1.default(TogetherJS.startTarget).offset(); // TODO !
+                    let pos = jquery_1.default(TogetherJS.startTarget).offset(); // TODO !
                     pos.top = Math.floor(pos.top - start.top);
                     pos.left = Math.floor(pos.left - start.left);
                     var translate = "translate(" + pos.left + "px, " + pos.top + "px)";
@@ -696,20 +666,19 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
                 jquery_1.default(this).append(jquery_1.default('<button class="togetherjs-close"></button>'));
             });
-            TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+            TogetherJS.config.track("disableWebRTC", (hide, previous) => {
                 if (hide && !previous) {
-                    _this.container.find("#togetherjs-audio-button").hide();
+                    this.container.find("#togetherjs-audio-button").hide();
                     adjustDockSize(-1);
                 }
                 else if ((!hide) && previous) {
-                    _this.container.find("#togetherjs-audio-button").show();
+                    this.container.find("#togetherjs-audio-button").show();
                     adjustDockSize(1);
                 }
             });
-        };
+        }
         // After prepareUI, this actually makes the interface live.  We have to do this later because we call prepareUI when many components aren't initialized, so we don't even want the user to be able to interact with the interface.  But activateUI is called once everything is loaded and ready for interaction.
-        Ui.prototype.activateUI = function () {
-            var _this = this;
+        activateUI() {
             if (deferringPrepareUI) {
                 console.warn("ui.activateUI called before document is ready; waiting...");
                 deferringPrepareUI = "activate";
@@ -791,7 +760,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             anchor.mousedown(function (_event) {
                 var iface = jquery_1.default("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
-                var startPos = panelPosition();
+                let startPos = panelPosition();
                 function selectoff() {
                     return false;
                 }
@@ -904,7 +873,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 jquery_1.default("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
                 // TODO this is a very old use of the toggle function that would do cb1 on odd click and cb2 on even click
                 //$("#togetherjs-dock-anchor").toggle(() => closeDock(), () => openDock());
-                jquery_1.default("#togetherjs-dock-anchor").click(function () {
+                jquery_1.default("#togetherjs-dock-anchor").click(() => {
                     closeDock();
                     setTimeout(openDock, 1000); // TODO change: this is obviously not what should happen, it should close the dock on the 2n+1 click and open it again on the 2n click but since openDock and closeDock don't work yet I can't test it.
                 });
@@ -929,28 +898,27 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             jquery_1.default("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
                 windowing_1.windowing.hide();
                 hideMenu();
-                require(["walkthrough"], function (_a) {
-                    var walkthrough = _a.walkthrough;
+                require(["walkthrough"], function ({ walkthrough }) {
                     windowing_1.windowing.hide();
                     walkthrough.start(false);
                 });
             });
-            jquery_1.default("#togetherjs-menu-update-name").click(function () {
+            jquery_1.default("#togetherjs-menu-update-name").click(() => {
                 var input = jquery_1.default("#togetherjs-menu .togetherjs-self-name");
                 input.css({
                     width: jquery_1.default("#togetherjs-menu").width() - 32 + "px"
                 });
-                _this.displayToggle("#togetherjs-menu .togetherjs-self-name");
+                this.displayToggle("#togetherjs-menu .togetherjs-self-name");
                 jquery_1.default("#togetherjs-menu .togetherjs-self-name").focus();
             });
             jquery_1.default("#togetherjs-menu-update-name-button").click(function () {
                 windowing_1.windowing.show("#togetherjs-edit-name-window");
                 jquery_1.default("#togetherjs-edit-name-window input").focus();
             });
-            jquery_1.default("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
+            jquery_1.default("#togetherjs-menu .togetherjs-self-name").bind("keyup change", (event) => {
                 console.log("alrighty", event);
                 if (event.which == 13) {
-                    _this.displayToggle("#togetherjs-self-name-display");
+                    this.displayToggle("#togetherjs-self-name-display");
                     return;
                 }
                 var val = jquery_1.default("#togetherjs-menu .togetherjs-self-name").val();
@@ -1036,8 +1004,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 });
                 jquery_1.default(item).append(button);
             });
-            jquery_1.default("#togetherjs-avatar-done").click(function () {
-                _this.displayToggle("#togetherjs-no-avatar-edit");
+            jquery_1.default("#togetherjs-avatar-done").click(() => {
+                this.displayToggle("#togetherjs-no-avatar-edit");
             });
             jquery_1.default("#togetherjs-self-color").css({ backgroundColor: peers_1.peers.Self.color });
             var avatar = peers_1.peers.Self.avatar;
@@ -1082,9 +1050,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             else {
                 session_1.session.emit("ui-ready", exports.ui);
             }
-        }; // End ui.activateUI()
-        Ui.prototype.activateAvatarEdit = function (container, options) {
-            if (options === void 0) { options = {}; }
+        } // End ui.activateUI()
+        activateAvatarEdit(container, options = {}) {
             var pendingImage = null;
             container.find(".togetherjs-avatar-save").prop("disabled", true);
             container.find(".togetherjs-avatar-save").click(function () {
@@ -1113,8 +1080,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     });
                 });
             });
-        };
-        Ui.prototype.prepareShareLink = function (container) {
+        }
+        prepareShareLink(container) {
             container.find("input.togetherjs-share-link").click(function () {
                 jquery_1.default(this).select();
             }).change(function () {
@@ -1138,16 +1105,15 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 return false;
             });
             updateShareLink();
-        };
-        Ui.prototype.showUrlChangeMessage = function (peer, _url) {
-            var _this = this;
-            deferForContainer(function () {
+        }
+        showUrlChangeMessage(peer, _url) {
+            deferForContainer(() => {
                 var window = templating_1.templating.sub("url-change", { peer: peer });
-                _this.container.append(window);
+                this.container.append(window);
                 windowing_1.windowing.show(window);
             })();
-        };
-        Ui.prototype.updateToolName = function (container) {
+        }
+        updateToolName(container) {
             container = container || jquery_1.default(document.body);
             var name = TogetherJS.config.get("toolName");
             if (setToolName && !name) {
@@ -1157,9 +1123,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 container.find(".togetherjs-tool-name").text(name);
                 setToolName = true;
             }
-        };
-        return Ui;
-    }());
+        }
+    }
     function panelPosition() {
         var iface = jquery_1.default("#togetherjs-dock");
         if (iface.hasClass("togetherjs-dock-right")) {
@@ -1178,7 +1143,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     exports.ui = new Ui();
     // This is used for some signalling when ui.prepareUI and/or
     // ui.activateUI is called before the DOM is fully loaded:
-    var deferringPrepareUI = null;
+    let deferringPrepareUI = null;
     function deferForContainer(func) {
         /* Defers any calls to func() until after ui.container is set
             Function cannot have a return value (as sometimes the call will
@@ -1186,11 +1151,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     
             method: deferForContainer(function (args) {...})
             */
-        return function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
+        return function (...args) {
             // TODO I made some tests and this is always undefined apparently so no need to pretend it's usable. all "null" here were "this".
             if (exports.ui.container) {
                 func.apply(null, args);
@@ -1203,10 +1164,10 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     }
     function sizeDownImage(imageUrl) {
         return util_1.util.Deferred(function (def) {
-            var canvas = document.createElement("canvas");
+            let canvas = document.createElement("canvas");
             canvas.height = session_1.session.AVATAR_SIZE;
             canvas.width = session_1.session.AVATAR_SIZE;
-            var context = canvas.getContext("2d"); // TODO !
+            let context = canvas.getContext("2d"); // TODO !
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
@@ -1382,8 +1343,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             return;
         }
         inRefresh = true;
-        require(["who"], function (_a) {
-            var who = _a.who;
+        require(["who"], function ({ who }) {
             var def = who.getList(inviteHubUrl());
             function addUser(user, before) {
                 var item = templating_1.templating.sub("invite-user-item", { peer: user });
@@ -1445,15 +1405,13 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         if (msg.forClientId && msg.clientId != peers_1.peers.Self.id) {
             return;
         }
-        require(["who"], function (_a) {
-            var who = _a.who;
+        require(["who"], function ({ who }) {
             var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
             exports.ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
         });
     });
     function invite(clientId) {
-        require(["who"], function (_a) {
-            var who = _a.who;
+        require(["who"], function ({ who }) {
             // FIXME: use the return value of this to give a signal that
             // the invite has been successfully sent:
             who.invite(inviteHubUrl(), clientId).then(function () {

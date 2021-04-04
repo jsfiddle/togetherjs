@@ -3,21 +3,6 @@ This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -26,82 +11,73 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.util = void 0;
     jquery_1 = __importDefault(jquery_1);
-    var AssertionError = /** @class */ (function (_super) {
-        __extends(AssertionError, _super);
-        function AssertionError(message) {
-            var _this = _super.call(this) || this;
-            _this.message = message || "";
-            _this.name = "AssertionError";
-            return _this;
+    class AssertionError extends Error {
+        constructor(message) {
+            super();
+            this.message = message || "";
+            this.name = "AssertionError";
         }
-        return AssertionError;
-    }(Error));
+    }
     // TODO remove
-    var Module = /** @class */ (function () {
-        function Module(_name) {
+    class Module {
+        constructor(_name) {
             this._name = _name;
         }
-        Module.prototype.toString = function () {
+        toString() {
             return '[Module ' + this._name + ']';
-        };
-        return Module;
-    }());
-    var Util = /** @class */ (function () {
-        function Util($, tjs) {
-            this.Module = function (name) { return new Module(name); };
+        }
+    }
+    class Util {
+        constructor($, tjs) {
+            this.Module = (name) => new Module(name);
             this.Deferred = $.Deferred;
             tjs.$ = $;
             this.AssertionError = AssertionError;
         }
-        Util.prototype.forEachAttr = function (obj, callback, context) {
+        forEachAttr(obj, callback, context) {
             context = context || obj;
-            var a;
+            let a;
             for (a in obj) {
                 if (obj.hasOwnProperty(a)) {
                     callback.call(context, obj[a], a);
                 }
             }
-        };
-        Util.prototype.trim = function (s) {
+        }
+        trim(s) {
             return s.replace(/^\s+/, "").replace(/\s+$/, "");
-        };
+        }
         ;
-        Util.prototype.safeClassName = function (name) {
+        safeClassName(name) {
             return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
-        };
+        }
         ;
-        Util.prototype.assert = function (cond) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
+        assert(cond, ...args) {
             if (!cond) {
-                var args2 = ["Assertion error:"].concat(args);
+                let args2 = ["Assertion error:"].concat(args);
                 console.error.apply(console, args2);
                 if (console.trace) {
                     console.trace();
                 }
                 throw new this.AssertionError(args2.join(" "));
             }
-        };
+        }
         /** Generates a random ID */
-        Util.prototype.generateId = function (length) {
-            if (length === void 0) { length = 10; }
-            var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
-            var s = '';
-            for (var i = 0; i < length; i++) {
+        generateId(length = 10) {
+            let letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
+            let s = '';
+            for (let i = 0; i < length; i++) {
                 s += letters.charAt(Math.floor(Math.random() * letters.length));
             }
             return s;
-        };
-        Util.prototype.pickRandom = function (array) {
+        }
+        pickRandom(array) {
             return array[Math.floor(Math.random() * array.length)];
-        };
-        Util.prototype.blobToBase64 = function (blob) {
+        }
+        blobToBase64(blob) {
             // TODO
             // Oh this is just terrible
-            var binary = '';
-            var bytes;
+            let binary = '';
+            let bytes;
             if (typeof blob === "string") {
                 var enc = new TextEncoder();
                 bytes = enc.encode(blob);
@@ -109,47 +85,47 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             else {
                 bytes = new Uint8Array(blob);
             }
-            var len = bytes.byteLength;
-            for (var i = 0; i < len; i++) {
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
             return btoa(binary);
-        };
-        Util.prototype.truncateCommonDomain = function (url, base) {
+        }
+        truncateCommonDomain(url, base) {
             /* Remove the scheme and domain from url, if it matches the scheme and domain of base */
             if (!base) {
                 return url;
             }
-            var regex = /^https?:\/\/[^\/]*/i;
-            var match = regex.exec(url);
-            var matchBase = regex.exec(base);
+            let regex = /^https?:\/\/[^\/]*/i;
+            let match = regex.exec(url);
+            let matchBase = regex.exec(base);
             if (match && matchBase && match[0] == matchBase[0]) {
                 // There is a common scheme and domain
                 return url.substr(match[0].length);
             }
             return url;
-        };
-        Util.prototype.makeUrlAbsolute = function (url, base) {
+        }
+        makeUrlAbsolute(url, base) {
             if (url.search(/^(http|https|ws|wss):/i) === 0) {
                 // Absolute URL
                 return url;
             }
             if (url.search(/^\/\/[^\/]/) === 0) {
-                var scheme = (/^(http|https|ws|wss):/i).exec(base);
+                let scheme = (/^(http|https|ws|wss):/i).exec(base);
                 this.assert(scheme, "No scheme on base URL", base);
                 return scheme[1] + ":" + url;
             }
             if (url.search(/^\//) === 0) {
-                var domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
+                let domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
                 this.assert(domain, "No scheme/domain on base URL", base);
                 return domain[0] + url;
             }
-            var last = (/[^\/]+$/).exec(base);
+            let last = (/[^\/]+$/).exec(base);
             this.assert(last, "Does not appear to be a URL?", base);
-            var lastBase = base.substr(0, last.index);
+            let lastBase = base.substr(0, last.index);
             return lastBase + url;
-        };
-        Util.prototype.assertValidUrl = function (url) {
+        }
+        assertValidUrl(url) {
             /* This does some simple assertions that the url is valid:
             - it must be a string
             - it must be http(s)://... or data:...
@@ -158,16 +134,12 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             this.assert(typeof url == "string", "URLs must be a string:", url);
             this.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0, "URL must have an http, https, data, or // scheme:", url);
             this.assert(url.search(/[\)\'\"\ ]/) === -1, "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
-        };
-        Util.prototype.resolver = function (deferred, func) {
+        }
+        resolver(deferred, func) {
             this.assert(deferred.then, "Bad deferred:", deferred);
             this.assert(typeof func == "function", "Not a function:", func);
-            return function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i] = arguments[_i];
-                }
-                var result;
+            return function (...args) {
+                let result;
                 try {
                     result = func.apply(this, args);
                 }
@@ -191,13 +163,13 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 }
                 return result;
             };
-        };
+        }
         /** Detects if a value is a promise. Right now the presence of a `.then()` method is the best we can do. */
-        Util.prototype.isPromise = function (obj) {
+        isPromise(obj) {
             return typeof obj == "object" && "then" in obj;
-        };
+        }
         /** Makes a value into a promise, by returning an already-resolved promise if a non-promise objectx is given. */
-        Util.prototype.makePromise = function (obj) {
+        makePromise(obj) {
             if (this.isPromise(obj)) {
                 return obj;
             }
@@ -206,7 +178,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     def.resolve(obj);
                 });
             }
-        };
+        }
         // TODO should we just replace resolveMany with promises and promise.all?
         /** Resolves several promises givent as one argument as an array of promises.
             Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
@@ -218,7 +190,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 // ...
             }
         */
-        Util.prototype.resolveMany = function (defs) {
+        resolveMany(defs) {
             return this.Deferred(function (def) {
                 var count = defs.length;
                 if (!count) {
@@ -252,10 +224,10 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     }
                 }
             });
-        };
-        Util.prototype.readFileImage = function (file) {
+        }
+        readFileImage(file) {
             return this.Deferred(function (def) {
-                var reader = new FileReader();
+                let reader = new FileReader();
                 reader.onload = function () {
                     if (this.result) {
                         def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
@@ -266,8 +238,8 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 };
                 reader.readAsArrayBuffer(file);
             });
-        };
-        Util.prototype.matchElement = function (el, selector) {
+        }
+        matchElement(el, selector) {
             if (selector === true || !selector) {
                 return !!selector;
             }
@@ -278,19 +250,18 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 console.warn("Bad selector:", selector, "error:", e);
                 return false;
             }
-        };
+        }
         // TODO what ???
-        Util.prototype.testExpose = function (objs) {
-            var tsjTestSpy = window.TogetherJSTestSpy;
+        testExpose(objs) {
+            const tsjTestSpy = window.TogetherJSTestSpy;
             if (!tsjTestSpy) {
                 return;
             }
             this.forEachAttr(objs, function (value, attr) {
                 tsjTestSpy[attr] = value;
             });
-        };
-        return Util;
-    }());
+        }
+    }
     exports.util = new Util(jquery_1.default, window.TogetherJS);
     exports.util.Deferred = jquery_1.default.Deferred;
     window.TogetherJS.$ = jquery_1.default;

@@ -11,23 +11,21 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     jquery_1 = __importDefault(jquery_1);
     //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert = util_1.util.assert.bind(util_1.util);
-    var Templating = /** @class */ (function () {
-        function Templating() {
-        }
-        Templating.prototype.clone = function (templateId) {
-            var templateId2 = "#togetherjs-template-" + templateId;
+    class Templating {
+        clone(templateId) {
+            let templateId2 = "#togetherjs-template-" + templateId;
             var template = jquery_1.default(templateId2);
             assert(template.length, "No template found with id:", templateId2);
             template = template.clone();
             template.attr("id", null);
             // FIXME: if called directly, doesn't emit new-element event:
             return template;
-        };
+        }
         // TODO find if there is another way to do that. Using a restrictive prototype and a less restrictibe implementation because "in" check in if only works with union types which TogetherJSNS.TemplatingSub.Any is but TogetherJSNS.TemplatingSub.Map[K] is not
         //sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery {
         //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
-        Templating.prototype.sub = function (templateId, variables) {
-            var template = this.clone(templateId);
+        sub(templateId, variables) {
+            let template = this.clone(templateId);
             util_1.util.forEachAttr(variables, function (value, attr) {
                 // FIXME: do the substitution... somehow?
                 var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
@@ -43,7 +41,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                         assert(false, "Unknown variable value type:", attr, "=", value);
                     }
                 }
-                var ifs = template.find(".togetherjs-if-" + attr).removeClass("togetherjs-sub-" + attr);
+                let ifs = template.find(".togetherjs-if-" + attr).removeClass("togetherjs-sub-" + attr);
                 if (!value) {
                     ifs.hide();
                 }
@@ -51,12 +49,12 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                 if (value) {
                     ifs.hide();
                 }
-                var attrName = "data-togetherjs-subattr-" + attr;
-                var attrs = template.find("[" + attrName + "]");
+                let attrName = "data-togetherjs-subattr-" + attr;
+                let attrs = template.find("[" + attrName + "]");
                 attrs.each(function (_index, element) {
                     assert(typeof value == "string");
-                    var $element = jquery_1.default(element);
-                    var subAttribute = $element.attr(attrName);
+                    const $element = jquery_1.default(element);
+                    let subAttribute = $element.attr(attrName);
                     $element.attr(attrName, null);
                     $element.attr(subAttribute, value);
                 });
@@ -65,7 +63,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                 variables.peer.view.setElement(template);
             }
             if ("date" in variables && variables.date) {
-                var date = variables.date;
+                let date = variables.date;
                 if (typeof date == "number") {
                     date = new Date(date);
                 }
@@ -87,9 +85,8 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             // FIXME: silly this is on session:
             session_1.session.emit("new-element", template);
             return template;
-        };
-        return Templating;
-    }());
+        }
+    }
     exports.templating = new Templating();
 });
 //define(["jquery", "util", "peers", "windowing", "session"], templatingMain);

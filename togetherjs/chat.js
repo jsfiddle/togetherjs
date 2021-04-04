@@ -35,14 +35,12 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             declinedJoin: msg.reason == "declined-join"
         });
     });
-    var Chat = /** @class */ (function () {
-        function Chat() {
-        }
-        Chat.prototype.submit = function (message) {
+    class Chat {
+        submit(message) {
             var parts = message.split(/ /);
             if (parts[0].charAt(0) == "/") {
                 var name = parts[0].substr(1).toLowerCase();
-                var method = commands["command_" + name];
+                var method = commands[`command_${name}`];
                 if (method) {
                     method.apply(commands, parts.slice(1)); // TODO any way to remove this "as any" cast?
                     return;
@@ -66,32 +64,30 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 peerId: peers_1.peers.Self.id,
                 messageId: messageId
             });
-        };
-        return Chat;
-    }());
+        }
+    }
     exports.chat = new Chat();
-    var Commands = /** @class */ (function () {
-        function Commands() {
+    class Commands {
+        constructor() {
             this._testCancel = null;
             this._testShow = [];
             this.playing = null;
         }
-        Commands.prototype.command_help = function () {
+        command_help() {
             var msg = util_1.util.trim(templates_1.templates("help"));
             ui_1.ui.chat.system({
                 text: msg
             });
-        };
-        Commands.prototype.command_test = function (argString) {
-            var _this = this;
+        }
+        command_test(argString) {
             if (!Walkabout) {
-                require(["walkabout"], function (WalkaboutModule) {
+                require(["walkabout"], (WalkaboutModule) => {
                     Walkabout = WalkaboutModule.walkabout;
-                    _this.command_test(argString);
+                    this.command_test(argString);
                 });
                 return;
             }
-            var args = util_1.util.trim(argString || "").split(/\s+/g);
+            let args = util_1.util.trim(argString || "").split(/\s+/g);
             if (args[0] === "" || !args.length) {
                 if (this._testCancel) {
                     args = ["cancel"];
@@ -124,14 +120,14 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 container.show();
                 var statusContainer = container.find(".togetherjs-status");
                 statusContainer.text("starting...");
-                var self_1 = this;
+                const self = this;
                 this._testCancel = Walkabout.runManyActions({
                     ondone: function () {
                         statusContainer.text("done");
                         statusContainer.one("click", function () {
                             container.hide();
                         });
-                        self_1._testCancel = null;
+                        self._testCancel = null;
                     },
                     onstatus: function (status) {
                         var note = "actions: " + status.actions.length + " running: " +
@@ -169,11 +165,11 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             ui_1.ui.chat.system({
                 text: "Did not understand: " + args.join(" ")
             });
-        };
-        Commands.prototype.command_clear = function () {
+        }
+        command_clear() {
             ui_1.ui.chat.clear();
-        };
-        Commands.prototype.command_exec = function () {
+        }
+        command_exec() {
             var expr = Array.prototype.slice.call(arguments).join(" ");
             var result;
             // We use this to force global eval (not in this scope):
@@ -191,15 +187,14 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                     text: "" + result
                 });
             }
-        };
-        Commands.prototype.command_record = function () {
+        }
+        command_record() {
             ui_1.ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
             window.open(session_1.session.recordUrl(), "_blank", "left,width=" + (jquery_1.default(window).width() / 2));
-        };
-        Commands.prototype.command_playback = function (url) {
-            var _this = this;
+        }
+        command_playback(url) {
             if (this.playing) {
                 this.playing.cancel();
                 this.playing.unload();
@@ -216,7 +211,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 return;
             }
             var logLoader = playback_1.playback.getLogs(url);
-            logLoader.then(function (logs) {
+            logLoader.then((logs) => {
                 if (!logs) {
                     ui_1.ui.chat.system({
                         text: "No logs found."
@@ -224,7 +219,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                     return;
                 }
                 logs.save();
-                _this.playing = logs;
+                this.playing = logs;
                 logs.play();
             }, function (error) {
                 ui_1.ui.chat.system({
@@ -232,9 +227,8 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 });
             });
             windowing_1.windowing.hide("#togetherjs-chat");
-        };
-        Commands.prototype.command_savelogs = function (name) {
-            if (name === void 0) { name = "default"; }
+        }
+        command_savelogs(name = "default") {
             document.createElement("a");
             session_1.session.send({
                 type: "get-logs",
@@ -243,7 +237,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             });
             function save(msg) {
                 if (msg.request.forClient == session_1.session.clientId && msg.request.saveAs == name) {
-                    storage_1.storage.set("recording." + name, msg.logs).then(function () {
+                    storage_1.storage.set(`recording.${name}`, msg.logs).then(function () {
                         session_1.session.hub.off("logs", save);
                         ui_1.ui.chat.system({
                             text: "Saved as local:" + name
@@ -252,8 +246,8 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 }
             }
             session_1.session.hub.on("logs", save);
-        };
-        Commands.prototype.command_baseurl = function (url) {
+        }
+        command_baseurl(url) {
             if (!url) {
                 storage_1.storage.get("baseUrlOverride").then(function (b) {
                     if (b) {
@@ -281,8 +275,8 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                     text: "baseUrl overridden (to " + url + "), will last for one day."
                 });
             });
-        };
-        Commands.prototype.command_config = function (variable, value) {
+        }
+        command_config(variable, value) {
             if (!(variable || value)) {
                 storage_1.storage.get("configOverride").then(function (c) {
                     if (c) {
@@ -336,7 +330,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             }
             // TODO find better types
             storage_1.storage.get("configOverride").then(function (c) {
-                var expire = Date.now() + (1000 * 60 * 60 * 24);
+                const expire = Date.now() + (1000 * 60 * 60 * 24);
                 c = c || { expiresAt: expire };
                 c[variable] = value;
                 c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
@@ -346,12 +340,11 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                     });
                 });
             });
-        };
-        return Commands;
-    }());
-    var commands = new Commands();
+        }
+    }
+    const commands = new Commands();
     // this section deal with saving/restoring chat history as long as session is alive
-    var chatStorageKey = "chatlog";
+    const chatStorageKey = "chatlog";
     var maxLogMessages = 100;
     function saveChatMessage(obj) {
         assert(obj.peerId);

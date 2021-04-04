@@ -6,7 +6,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.templates = void 0;
     //function templatesMain(util: TogetherJSNS.Util, require: Require) {
-    var assert = util_1.util.assert.bind(util_1.util);
+    let assert = util_1.util.assert.bind(util_1.util);
     function clean(t) {
         // Removes <% /* ... */ %> comments:
         console.log("TogetherJS.baseUrl", TogetherJS.baseUrl);

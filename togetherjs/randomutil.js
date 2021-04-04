@@ -3,8 +3,8 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.randomutil = void 0;
     //function randomutilMain(_util: TogetherJSNS.Util, RandomStream: RandomStreamModule) {
-    var Randomizer = /** @class */ (function () {
-        function Randomizer(seed) {
+    class Randomizer {
+        constructor(seed) {
             this.lower = "abcdefghijklmnopqrstuvwxyz";
             this.upper = this.lower.toUpperCase();
             this.numberCharacters = "0123456789";
@@ -13,13 +13,13 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             this.defaultChars = this.lower + this.upper + this.numberCharacters + this.whitespace + this.punctuation;
             this.stream = random_1.RandomStream(seed);
         }
-        Randomizer.prototype.number = function (max) {
+        number(max) {
             return Math.floor(this.stream() * max);
-        };
-        Randomizer.prototype.pick = function (seq) {
+        }
+        pick(seq) {
             return seq[this.number(seq.length)];
-        };
-        Randomizer.prototype.pickDist = function (items) {
+        }
+        pickDist(items) {
             var total = 0;
             for (var a in items) {
                 if (!items.hasOwnProperty(a)) {
@@ -44,21 +44,20 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             }
             // FIXME: not sure if this should ever h
             return last;
-        };
-        Randomizer.prototype.string = function (len, chars) {
+        }
+        string(len, chars) {
             var s = "";
             for (var i = 0; i < len; i++) {
                 s += this.character(chars);
             }
             return s;
-        };
-        Randomizer.prototype.character = function (chars) {
+        }
+        character(chars) {
             chars = chars || this.defaultChars;
             return chars.charAt(this.number(chars.length));
-        };
-        return Randomizer;
-    }());
-    var randomutil = function (seed) { return new Randomizer(seed); };
+        }
+    }
+    const randomutil = (seed) => new Randomizer(seed);
     exports.randomutil = randomutil;
 });
 //define(["util", "whrandom"], randomutilMain);

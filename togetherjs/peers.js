@@ -1,27 +1,12 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 define(["require", "exports", "./init", "./session", "./storage", "./templates", "./util"], function (require, exports, init_1, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.peers = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
-    var assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
     var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
     var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
@@ -31,9 +16,8 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
         ui = uiModule.ui;
     });
     var DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
-    var PeerClass = /** @class */ (function () {
-        function PeerClass(id, attrs) {
-            if (attrs === void 0) { attrs = {}; }
+    class PeerClass {
+        constructor(id, attrs = {}) {
             this.isSelf = false;
             this.lastMessageDate = 0;
             this.hash = null;
@@ -63,10 +47,10 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             }
             this.view.update();
         }
-        PeerClass.prototype.repr = function () {
+        repr() {
             return "Peer(" + JSON.stringify(this.id) + ")";
-        };
-        PeerClass.prototype.serialize = function () {
+        }
+        serialize() {
             return {
                 id: this.id,
                 status: this.status,
@@ -81,12 +65,12 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 color: this.color,
                 following: this.following
             };
-        };
-        PeerClass.prototype.destroy = function () {
+        }
+        destroy() {
             this.view.destroy();
             delete Peer.peers[this.id];
-        };
-        PeerClass.prototype.updateMessageDate = function () {
+        }
+        updateMessageDate() {
             if (this.idle == "inactive") {
                 this.update({ idle: "active" });
             }
@@ -94,8 +78,8 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 this.unbye();
             }
             this.lastMessageDate = Date.now();
-        };
-        PeerClass.prototype.updateFromHello = function (msg) {
+        }
+        updateFromHello(msg) {
             var _a;
             var urlUpdated = false;
             // var activeRTC = false; // TODO code change, unused
@@ -157,8 +141,8 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             if (this.following) {
                 session_1.session.emit("follow-peer", this);
             }
-        };
-        PeerClass.prototype.update = function (attrs) {
+        }
+        update(attrs) {
             // FIXME: should probably test that only a couple attributes are settable particularly status and idle
             if (attrs.idle) {
                 this.idle = attrs.idle;
@@ -167,33 +151,32 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 this.status = attrs.status;
             }
             this.view.update();
-        };
-        PeerClass.prototype.className = function (prefix) {
-            if (prefix === void 0) { prefix = ""; }
+        }
+        className(prefix = "") {
             return prefix + util_1.util.safeClassName(this.id);
-        };
-        PeerClass.prototype.bye = function () {
+        }
+        bye() {
             if (this.status != "bye") {
                 this.status = "bye";
                 exports.peers.emit("status-updated", this);
             }
             this.view.update();
-        };
-        PeerClass.prototype.unbye = function () {
+        }
+        unbye() {
             if (this.status == "bye") {
                 this.status = "live";
                 exports.peers.emit("status-updated", this);
             }
             this.view.update();
-        };
-        PeerClass.prototype.nudge = function () {
+        }
+        nudge() {
             session_1.session.send({
                 type: "url-change-nudge",
                 url: location.href,
                 to: this.id
             });
-        };
-        PeerClass.prototype.follow = function () {
+        }
+        follow() {
             if (this.following) {
                 return;
             }
@@ -207,21 +190,20 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             storeSerialization();
             this.view.update();
             session_1.session.emit("follow-peer", this);
-        };
-        PeerClass.prototype.unfollow = function () {
+        }
+        unfollow() {
             this.following = false;
             storeSerialization();
             this.view.update();
-        };
-        PeerClass.deserialize = function (obj) {
+        }
+        static deserialize(obj) {
             obj.fromStorage = true;
             new Peer(obj.id, obj);
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
-        };
-        PeerClass.peers = {};
-        return PeerClass;
-    }());
-    var Peer = PeerClass;
+        }
+    }
+    PeerClass.peers = {};
+    const Peer = PeerClass;
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session_1.session.on("follow-peer", function (peer) {
         if (peer.url && peer.url != session_1.session.currentUrl()) {
@@ -232,24 +214,22 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
             location.href = url;
         }
     });
-    var PeersSelf = /** @class */ (function (_super) {
-        __extends(PeersSelf, _super);
-        function PeersSelf() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.isSelf = true;
-            _this.id = session_1.session.clientId;
-            _this.identityId = session_1.session.identityId;
-            _this.status = "live";
-            _this.idle = "active";
-            _this.name = null;
-            _this.avatar = null;
-            _this.color = "#00FF00"; // TODO I added a default value, but is that ok?
-            _this.defaultName = util_1.util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
+    class PeersSelf extends init_1.OnClass {
+        constructor() {
+            super(...arguments);
+            this.isSelf = true;
+            this.id = session_1.session.clientId;
+            this.identityId = session_1.session.identityId;
+            this.status = "live";
+            this.idle = "active";
+            this.name = null;
+            this.avatar = null;
+            this.color = "#00FF00"; // TODO I added a default value, but is that ok?
+            this.defaultName = util_1.util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
             // private loaded = false;// TODO unused
-            _this.isCreator = !session_1.session.isClient;
-            return _this;
+            this.isCreator = !session_1.session.isClient;
         }
-        PeersSelf.prototype.update = function (attrs) {
+        update(attrs) {
             var updatePeers = false;
             var updateIdle = false;
             var updateMsg = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
@@ -305,20 +285,18 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                     idle: this.idle
                 });
             }
-        };
-        PeersSelf.prototype.className = function (prefix) {
-            if (prefix === void 0) { prefix = ""; }
+        }
+        className(prefix = "") {
             return prefix + "self";
-        };
-        PeersSelf.prototype._loadFromSettings = function () {
-            var _this = this;
+        }
+        _loadFromSettings() {
             return util_1.util.resolveMany([
                 storage_1.storage.settings.get("name"),
                 storage_1.storage.settings.get("avatar"),
                 storage_1.storage.settings.get("defaultName"),
                 storage_1.storage.settings.get("color")
-            ]).then(function (args) {
-                var _a = args, name = _a[0], avatar = _a[1], defaultName = _a[2], color = _a[3]; // TODO !
+            ]).then(args => {
+                let [name, avatar, defaultName, color] = args; // TODO !
                 if (!defaultName) {
                     defaultName = util_1.util.pickRandom(DEFAULT_NICKNAMES);
                     storage_1.storage.settings.set("defaultName", defaultName);
@@ -334,7 +312,7 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 if (!avatar) {
                     avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
                 }
-                _this.update({
+                this.update({
                     name: name,
                     avatar: avatar,
                     defaultName: defaultName,
@@ -343,16 +321,16 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 });
                 exports.peers._SelfLoaded.resolve();
             }); // FIXME: ignoring error
-        };
-        PeersSelf.prototype._loadFromApp = function () {
+        }
+        _loadFromApp() {
             // FIXME: I wonder if these should be optionally functions?
             // We could test typeof==function to distinguish between a getter and a concrete value
             var getUserName = TogetherJS.config.get("getUserName");
             var getUserColor = TogetherJS.config.get("getUserColor");
             var getUserAvatar = TogetherJS.config.get("getUserAvatar");
-            var name = null;
-            var color = null;
-            var avatar = null;
+            let name = null;
+            let color = null;
+            let avatar = null;
             if (getUserName) {
                 if (typeof getUserName == "string") {
                     name = getUserName;
@@ -399,18 +377,14 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                     avatar: avatar || undefined
                 });
             }
-        };
-        return PeersSelf;
-    }(init_1.OnClass));
-    var Peers = /** @class */ (function (_super) {
-        __extends(Peers, _super);
-        function Peers() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._SelfLoaded = util_1.util.Deferred();
-            return _this;
         }
-        Peers.prototype.getPeer = function (id, message, ignoreMissing) {
-            if (ignoreMissing === void 0) { ignoreMissing = false; }
+    }
+    class Peers extends init_1.OnClass {
+        constructor() {
+            super(...arguments);
+            this._SelfLoaded = util_1.util.Deferred();
+        }
+        getPeer(id, message, ignoreMissing = false) {
             assert(id);
             var peer = Peer.peers[id];
             if (id === session_1.session.clientId) {
@@ -429,9 +403,8 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 peer.view.update();
             }
             return Peer.peers[id];
-        };
-        Peers.prototype.getAllPeers = function (liveOnly) {
-            if (liveOnly === void 0) { liveOnly = false; }
+        }
+        getAllPeers(liveOnly = false) {
             var result = [];
             util_1.util.forEachAttr(Peer.peers, function (peer) {
                 if (liveOnly && peer.status != "live") {
@@ -440,9 +413,8 @@ define(["require", "exports", "./init", "./session", "./storage", "./templates",
                 result.push(peer);
             });
             return result;
-        };
-        return Peers;
-    }(init_1.OnClass));
+        }
+    }
     exports.peers = new Peers();
     session_1.session.on("start", function () {
         if (exports.peers.Self) {

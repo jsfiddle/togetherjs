@@ -87,7 +87,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         function setupYouTubeIframes() {
             var iframes = jquery_1.default('iframe');
             iframes.each(function (i, f) {
-                var iframe = f;
+                const iframe = f;
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?

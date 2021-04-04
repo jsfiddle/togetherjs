@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    var tpl = {
+    const tpl = {
         "interface": "__interface_html__",
         walkthrough: "__walkthrough_html__",
         names: "__names__"

@@ -29,8 +29,8 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
     });
     // FIXME: should check for a peer leaving and remove the cursor object
-    var Cursor = /** @class */ (function () {
-        function Cursor(clientId) {
+    class Cursor {
+        constructor(clientId) {
             this.clientId = clientId;
             // How long after receiving a setKeydown call that we should show the user typing.  This should be more than MIN_KEYDOWN_TIME:
             this.KEYDOWN_WAIT_TIME = 2000;
@@ -41,7 +41,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             this.element = templating_1.templating.clone("cursor");
             this.elementClass = "togetherjs-scrolled-normal";
             this.element.addClass(this.elementClass);
-            var peer = peers_1.peers.getPeer(this.clientId);
+            const peer = peers_1.peers.getPeer(this.clientId);
             if (peer !== null) {
                 this.updatePeer(peer);
             }
@@ -51,7 +51,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             jquery_1.default(document.body).append(this.element);
             this.element.animateCursorEntry();
         }
-        Cursor.prototype.updatePeer = function (peer) {
+        updatePeer(peer) {
             // FIXME: can I use peer.setElement()?
             this.element.css({ color: peer.color });
             var img = this.element.find("img.togetherjs-cursor-img");
@@ -92,14 +92,14 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
                     opacity: 1
                 });
             }
-        };
-        Cursor.prototype.setClass = function (name) {
+        }
+        setClass(name) {
             if (name != this.elementClass) {
                 this.element.removeClass(this.elementClass).addClass(name);
                 this.elementClass = name;
             }
-        };
-        Cursor.prototype.updatePosition = function (pos) {
+        }
+        updatePosition(pos) {
             var top, left;
             if (this.atOtherUrl) {
                 this.element.show();
@@ -120,17 +120,17 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             this.lastTop = top;
             this.lastLeft = left;
             this.setPosition(top, left);
-        };
-        Cursor.prototype.hideOtherUrl = function () {
+        }
+        hideOtherUrl() {
             if (this.atOtherUrl) {
                 return;
             }
             this.atOtherUrl = true;
             // FIXME: should show away status better:
             this.element.hide();
-        };
+        }
         // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
-        Cursor.prototype.rotateCursorDown = function () {
+        rotateCursorDown() {
             var e = jquery_1.default(this.element).find('svg');
             e.animate({ borderSpacing: -150, opacity: 1 }, {
                 step: function (now, fx) {
@@ -149,8 +149,8 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             }, 'linear').promise().then(function () {
                 e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
             });
-        };
-        Cursor.prototype.setPosition = function (top, left) {
+        }
+        setPosition(top, left) {
             var wTop = jquery_1.default(window).scrollTop();
             var height = jquery_1.default(window).height();
             if (top < wTop) {
@@ -170,60 +170,54 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
                 top: top,
                 left: left
             });
-        };
-        Cursor.prototype.refresh = function () {
+        }
+        refresh() {
             if (this.lastTop !== null && this.lastLeft !== null) {
                 this.setPosition(this.lastTop, this.lastLeft);
             }
-        };
-        Cursor.prototype.setKeydown = function () {
-            var _this = this;
+        }
+        setKeydown() {
             if (this.keydownTimeout) {
                 clearTimeout(this.keydownTimeout);
             }
             else {
                 this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
             }
-            this.keydownTimeout = setTimeout(function () { return _this.clearKeydown(); }, this.KEYDOWN_WAIT_TIME);
-        };
-        Cursor.prototype.clearKeydown = function () {
+            this.keydownTimeout = setTimeout(() => this.clearKeydown(), this.KEYDOWN_WAIT_TIME);
+        }
+        clearKeydown() {
             this.keydownTimeout = null;
             this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
-        };
-        Cursor.prototype._destroy = function () {
+        }
+        _destroy() {
             this.element.remove();
             //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
-        };
-        Cursor.getClient = function (clientId) {
+        }
+        static getClient(clientId) {
             return exports.cursor.getClient(clientId);
-        };
-        Cursor.forEach = function (callback, context) {
-            if (context === void 0) { context = null; }
+        }
+        static forEach(callback, context = null) {
             for (var a in Cursor._cursors) {
                 if (Cursor._cursors.hasOwnProperty(a)) {
                     callback.call(context, Cursor._cursors[a], a);
                 }
             }
-        };
-        Cursor.destroy = function (clientId) {
+        }
+        static destroy(clientId) {
             Cursor._cursors[clientId]._destroy();
             delete Cursor._cursors[clientId];
-        };
-        Cursor._cursors = {};
-        return Cursor;
-    }());
-    var cursor2 = /** @class */ (function () {
-        function cursor2() {
         }
-        cursor2.prototype.getClient = function (clientId) {
+    }
+    Cursor._cursors = {};
+    class cursor2 {
+        getClient(clientId) {
             var c = Cursor._cursors[clientId];
             if (!c) {
                 c = Cursor._cursors[clientId] = new Cursor(clientId);
             }
             return c;
-        };
-        return cursor2;
-    }());
+        }
+    }
     exports.cursor = new cursor2();
     function cbCursor(peer) {
         var c = Cursor.getClient(peer.id);
@@ -251,7 +245,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
         lastPosX = pageX;
         lastPosY = pageY;
-        var target = event.target;
+        let target = event.target;
         var parent = jquery_1.default(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
         if (parent.length) {
             target = parent[0];
@@ -268,7 +262,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             session_1.session.send(lastMessage);
             return;
         }
-        var $target = jquery_1.default(target);
+        let $target = jquery_1.default(target);
         var offset = $target.offset();
         if (!offset) {
             // FIXME: this really is walkabout.js's problem to fire events on the
@@ -290,7 +284,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         var canvas = jquery_1.default("<canvas></canvas>");
         canvas.attr("height", CURSOR_HEIGHT);
         canvas.attr("width", CURSOR_WIDTH);
-        var canvas0 = canvas[0];
+        const canvas0 = canvas[0];
         var context = canvas0.getContext('2d'); // TODO !
         context.fillStyle = color;
         context.moveTo(0, 0);

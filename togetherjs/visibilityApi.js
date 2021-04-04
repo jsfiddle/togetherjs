@@ -11,8 +11,8 @@ define(["require", "exports", "./session"], function (require, exports, session_
        it.
        */
     //function visibilityApiMain(_util: TogetherJSNS.Util, session: TogetherJSNS.On) {
-    var hidden;
-    var visibilityChange;
+    let hidden;
+    let visibilityChange;
     if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
         hidden = "hidden";
         visibilityChange = "visibilitychange";

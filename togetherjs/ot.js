@@ -1,45 +1,34 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ot = void 0;
     //function otMain(util: TogetherJSNS.Util) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var Queue = /** @class */ (function () {
-        function Queue(size) {
+    const assert = util_1.util.assert.bind(util_1.util);
+    class Queue {
+        constructor(size) {
             this._q = [];
             this._deleted = 0;
             this._size = size;
         }
-        Queue.prototype._trim = function () {
+        _trim() {
             if (this._size) {
                 if (this._q.length > this._size) {
                     this._q.splice(0, this._q.length - this._size);
                     this._deleted += this._q.length - this._size;
                 }
             }
-        };
-        Queue.prototype.push = function (item) {
+        }
+        push(item) {
             this._q.push(item);
             this._trim();
-        };
-        Queue.prototype.last = function () {
+        }
+        last() {
             return this._q[this._q.length - 1];
-        };
-        Queue.prototype.walkBack = function (callback, thisArg) {
+        }
+        walkBack(callback, thisArg) {
             var result = true;
             for (var i = this._q.length - 1; i >= 0; i--) {
                 var item = this._q[i];
@@ -52,8 +41,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }
             }
             return result;
-        };
-        Queue.prototype.walkForward = function (index, callback, thisArg) {
+        }
+        walkForward(index, callback, thisArg) {
             var result = true;
             for (var i = index; i < this._q.length; i++) {
                 var item = this._q[i - this._deleted];
@@ -66,56 +55,52 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }
             }
             return result;
-        };
-        Queue.prototype.insert = function (index, item) {
+        }
+        insert(index, item) {
             this._q.splice(index - this._deleted, 0, item);
-        };
-        return Queue;
-    }());
+        }
+    }
     /** Set that only supports string items */
-    var StringSet = /** @class */ (function () {
-        function StringSet() {
+    class StringSet {
+        constructor() {
             this._items = {};
             this._count = 0;
         }
-        StringSet.prototype.contains = function (k) {
+        contains(k) {
             assert(typeof k == "string");
             return this._items.hasOwnProperty(k);
-        };
-        StringSet.prototype.add = function (k) {
+        }
+        add(k) {
             assert(typeof k == "string");
             if (this.contains(k)) {
                 return;
             }
             this._items[k] = null;
             this._count++;
-        };
-        StringSet.prototype.remove = function (k) {
+        }
+        remove(k) {
             assert(typeof k == "string");
             if (!this.contains(k)) {
                 return;
             }
             delete this._items[k];
             this._count++;
-        };
-        StringSet.prototype.isEmpty = function () {
+        }
+        isEmpty() {
             return this._count === 0;
-        };
-        return StringSet;
-    }());
-    var Change = /** @class */ (function () {
-        function Change(version, clientId, delta, 
+        }
+    }
+    class Change {
+        constructor(version, clientId, delta, 
         /** Store the version number for each known client */
-        known, outOfOrder) {
-            if (outOfOrder === void 0) { outOfOrder = false; }
+        known, outOfOrder = false) {
             this.version = version;
             this.clientId = clientId;
             this.delta = delta;
             this.known = known;
             this.outOfOrder = outOfOrder;
         }
-        Change.prototype.toString = function () {
-            var _this = this;
+        toString() {
             var s = "[Change " + this.version + "." + this.clientId + ": ";
             s += this.delta + " ";
             if (this.outOfOrder) {
@@ -133,24 +118,24 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 s += "nothing known";
             }
             else {
-                cids.forEach(function (a, index) {
+                cids.forEach((a, index) => {
                     if (index) {
                         s += ";";
                     }
-                    s += a + ":" + _this.known[a];
+                    s += a + ":" + this.known[a];
                 }, this);
             }
             return s + "}]";
-        };
-        Change.prototype.clone = function () {
+        }
+        clone() {
             // TODO {...this.known} was util.extend(this.known), check that this change is ok
-            return new Change(this.version, this.clientId, this.delta.clone(), __assign({}, this.known), this.outOfOrder);
-        };
-        Change.prototype.isBefore = function (otherChange) {
+            return new Change(this.version, this.clientId, this.delta.clone(), Object.assign({}, this.known), this.outOfOrder);
+        }
+        isBefore(otherChange) {
             assert(otherChange !== this, "Tried to compare a change to itself", this);
             return otherChange.version > this.version || (otherChange.version == this.version && otherChange.clientId > this.clientId);
-        };
-        Change.prototype.knowsAboutAll = function (versions) {
+        }
+        knowsAboutAll(versions) {
             for (var clientId in versions) {
                 if (!versions.hasOwnProperty(clientId)) {
                     continue;
@@ -163,17 +148,17 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }
             }
             return true;
-        };
-        Change.prototype.knowsAboutChange = function (change) {
+        }
+        knowsAboutChange(change) {
             return change.clientId == this.clientId || (this.known[change.clientId] && this.known[change.clientId] >= change.version);
-        };
-        Change.prototype.knowsAboutVersion = function (version, clientId) {
+        }
+        knowsAboutVersion(version, clientId) {
             if ((!version) || clientId == this.clientId) {
                 return true;
             }
             return this.known[clientId] && this.known[clientId] >= version;
-        };
-        Change.prototype.maybeMissingChanges = function (mostRecentVersion, clientId) {
+        }
+        maybeMissingChanges(mostRecentVersion, clientId) {
             if (!mostRecentVersion) {
                 // No actual changes for clientId exist
                 return false;
@@ -194,9 +179,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             // We may or may not be missing something
             return true;
-        };
-        return Change;
-    }());
+        }
+    }
     /** SimpleHistory synchronizes peers by relying on the server to serialize
      * the order of all updates.  Each client maintains a queue of patches
      * which have not yet been 'committed' (by being echoed back from the
@@ -235,8 +219,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
      * which is the main difference with ot.History.  Everyone applies
      * the same patches in the same order.
      */
-    var SimpleHistory = /** @class */ (function () {
-        function SimpleHistory(clientId, initState, initBasis) {
+    class SimpleHistory {
+        constructor(clientId, initState, initBasis) {
             this.queue = [];
             this.deltaId = 1;
             this.selection = null;
@@ -246,24 +230,24 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.basis = initBasis;
         }
         /** Use a fake change to represent the selection. (This is the only bit that hard codes ot.TextReplace as the delta representation; override this in a subclass (or don't set the selection) if you are using a different delta representation. */
-        SimpleHistory.prototype.setSelection = function (selection) {
+        setSelection(selection) {
             if (selection) {
                 this.selection = new TextReplace(selection[0], selection[1] - selection[0], '@');
             }
             else {
                 this.selection = null;
             }
-        };
+        }
         /** Decode the fake change to reconstruct the updated selection. */
-        SimpleHistory.prototype.getSelection = function () {
+        getSelection() {
             if (!this.selection) {
                 return null;
             }
             return [this.selection.start, this.selection.start + this.selection.del];
-        };
+        }
         /** Add this delta to this client's queue. */
-        SimpleHistory.prototype.add = function (delta) {
-            var change = {
+        add(delta) {
+            let change = {
                 id: this.clientId + '.' + (this.deltaId++),
                 delta: delta,
             };
@@ -273,10 +257,9 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.queue.push(change);
             this.current = delta.apply(this.current);
             return !!change.basis;
-        };
+        }
         /** Apply a delta received from the server. Return true iff the current text changed as a result. */
-        SimpleHistory.prototype.commit = function (change) {
-            var _this = this;
+        commit(change) {
             // ignore it if the basis doesn't match (this patch doesn't apply) if so, this delta is out of order; we expect the original client to retransmit an updated delta.
             if (change.basis !== this.basis) {
                 return false; // 'current' text did not change
@@ -313,14 +296,14 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             // Update current by replaying queued changes starting from 'committed'
             this.current = this.committed;
-            this.queue.forEach(function (qchange) {
-                _this.current = qchange.delta.apply(_this.current);
+            this.queue.forEach((qchange) => {
+                this.current = qchange.delta.apply(this.current);
             });
             return true; // The 'current' text changed.
-        };
+        }
         /** Return the next change to transmit to the server, or null if there isn't one. */
-        SimpleHistory.prototype.getNextToSend = function () {
-            var qchange = this.queue[0];
+        getNextToSend() {
+            let qchange = this.queue[0];
             if (!qchange) {
                 /* nothing to send */
                 return null;
@@ -332,18 +315,17 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             assert(qchange.basis);
             qchange.sent = true;
             return qchange; // TODO is there any way to avoid this cast?
-        };
-        return SimpleHistory;
-    }());
-    var TextReplace = /** @class */ (function () {
-        function TextReplace(start, del, text) {
+        }
+    }
+    class TextReplace {
+        constructor(start, del, text) {
             this.start = start;
             this.del = del;
             this.text = text;
             assert(typeof start == "number" && typeof del == "number" && typeof text == "string", start, del, text);
             assert(start >= 0 && del >= 0, start, del);
         }
-        TextReplace.prototype.toString = function () {
+        toString() {
             if (this.empty()) {
                 return '[no-op]';
             }
@@ -356,20 +338,17 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             else {
                 return '[replace ' + this.del + ' chars with ' + JSON.stringify(this.text) + ' @' + this.start + ']';
             }
-        };
-        TextReplace.prototype.equals = function (other) {
+        }
+        equals(other) {
             return other.constructor === this.constructor && other.del === this.del && other.start === this.start && other.text === this.text;
-        };
-        TextReplace.prototype.clone = function (start, del, text) {
-            if (start === void 0) { start = this.start; }
-            if (del === void 0) { del = this.del; }
-            if (text === void 0) { text = this.text; }
+        }
+        clone(start = this.start, del = this.del, text = this.text) {
             return new TextReplace(start, del, text);
-        };
-        TextReplace.prototype.empty = function () {
+        }
+        empty() {
             return (!this.del) && (!this.text);
-        };
-        TextReplace.prototype.apply = function (text) {
+        }
+        apply(text) {
             if (this.empty()) {
                 return text;
             }
@@ -381,8 +360,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 throw new util_1.util.AssertionError("Start+del after end of text (" + JSON.stringify(text) + "/" + text.length + "): " + this);
             }
             return text.substr(0, this.start) + this.text + text.substr(this.start + this.del);
-        };
-        TextReplace.prototype.transpose = function (delta) {
+        }
+        transpose(delta) {
             /* Transform this delta as though the other delta had come before it.
                 Returns a [new_version_of_this, transformed_delta], where transformed_delta
                 satisfies:
@@ -441,21 +420,21 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     delta.clone(undefined, delta.del - overlap)];
             }
             throw 'Should not happen';
-        };
-        TextReplace.prototype.before = function (other) {
+        }
+        before(other) {
             return this.start + this.del <= other.start;
-        };
-        TextReplace.prototype.contains = function (other) {
+        }
+        contains(other) {
             return other.start >= this.start && other.start + other.del < this.start + this.del;
-        };
-        TextReplace.prototype.sameRange = function (other) {
+        }
+        sameRange(other) {
             return other.start == this.start && other.del == this.del;
-        };
-        TextReplace.prototype.overlapsStart = function (other) {
+        }
+        overlapsStart(other) {
             return this.start < other.start && this.start + this.del > other.start;
-        };
+        }
         /* Make a new ot.TextReplace that converts oldValue to newValue. */
-        TextReplace.fromChange = function (oldValue, newValue) {
+        static fromChange(oldValue, newValue) {
             assert(typeof oldValue == "string");
             assert(typeof newValue == "string");
             var commonStart = 0;
@@ -476,8 +455,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 return null;
             }
             return new this(commonStart, removed.length, inserted);
-        };
-        TextReplace.random = function (source, generator) {
+        }
+        static random(source, generator) {
             var text, start, len;
             var ops = ["ins", "del", "repl"];
             if (!source.length) {
@@ -522,13 +501,12 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     return new this(start, len, text);
             }
             throw 'Unreachable';
-        };
-        return TextReplace;
-    }());
+        }
+    }
     // TODO this class seems to be unused
     //@ts-expect-error unused but we don't removed things for now
-    var TJSHistory = /** @class */ (function () {
-        function TJSHistory(clientId, initState) {
+    class TJSHistory {
+        constructor(clientId, initState) {
             /** Contains the changes, the 0th element is a different type (@link StateForClientId) */
             this._history = new Queue();
             /** version number for known clients */
@@ -541,7 +519,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             });
             this.clientId = clientId;
         }
-        TJSHistory.prototype.add = function (change) {
+        add(change) {
             // Simplest cast, it is our change:
             if (change.clientId == this.clientId) {
                 this._history.push(change);
@@ -577,9 +555,9 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 clientsToCheck.add(this.clientId);
             }
             if (!clientsToCheck.isEmpty()) {
-                var indexToCheckFrom_1 = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
+                let indexToCheckFrom = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
                 this._history.walkBack(function (c, index) {
-                    indexToCheckFrom_1 = index;
+                    indexToCheckFrom = index;
                     if ("init" in c && c.clientId == "init") {
                         return false;
                     }
@@ -592,7 +570,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     }
                     return true;
                 }, this);
-                this._history.walkForward(indexToCheckFrom_1, function (c, index) {
+                this._history.walkForward(indexToCheckFrom, function (c, index) {
                     if ("init" in c && c.clientId == "init") {
                         return true;
                     }
@@ -614,7 +592,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }, this);
             }
             // Next we insert the change into its proper location
-            var indexToInsert = null;
+            let indexToInsert = null;
             this._history.walkBack(function (c, index) {
                 if (("init" in c && c.clientId == "init") || c.isBefore(change)) {
                     indexToInsert = index + 1;
@@ -645,8 +623,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             // changes that should be made to the state:
             this.logHistory("!!");
             return fixupDelta;
-        };
-        TJSHistory.prototype.promoteDelta = function (delta, deltaIndex, untilChange) {
+        }
+        promoteDelta(delta, deltaIndex, untilChange) {
             this._history.walkForward(deltaIndex + 1, function (c) {
                 if (!("init" in c)) {
                     if (untilChange.isBefore(c)) {
@@ -662,16 +640,11 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 return;
             }, null);
             return delta;
-        };
-        TJSHistory.prototype.logHistory = function (prefix) {
-            if (prefix === void 0) { prefix = ""; }
-            var postfix = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                postfix[_i - 1] = arguments[_i];
-            }
+        }
+        logHistory(prefix = "", ...postfix) {
             console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
             console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
-            var hstate;
+            let hstate;
             this._history.walkForward(0, function (c, index) {
                 if ("init" in c) { // index == 0
                     assert(c.clientId == "init");
@@ -688,12 +661,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     console.log(prefix + "  ", index, c + "", JSON.stringify(hstate));
                 }
             }, null);
-        };
-        TJSHistory.prototype.logChange = function (prefix, change, callback) {
-            var args = [];
-            for (var _i = 3; _i < arguments.length; _i++) {
-                args[_i - 3] = arguments[_i];
-            }
+        }
+        logChange(prefix, change, callback, ...args) {
             prefix = prefix || "before";
             var postfix = args; // TODO was Array.prototype.slice.call(arguments, 3);
             console.log.apply(console, [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe())]));
@@ -703,23 +672,23 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             finally {
                 console.log(prefix + " after:", change + "", JSON.stringify(this.getStateSafe()));
             }
-        };
-        TJSHistory.prototype.addDelta = function (delta) {
+        }
+        addDelta(delta) {
             var version = this._createVersion();
-            var change = new Change(version, this.clientId, delta, __assign({}, this.known)); // TODO changed copy with extend for copyt with ..., knownVersions does not exists, replaced by known
+            var change = new Change(version, this.clientId, delta, Object.assign({}, this.known)); // TODO changed copy with extend for copyt with ..., knownVersions does not exists, replaced by known
             this.add(change);
             return change;
-        };
-        TJSHistory.prototype._createVersion = function () {
+        }
+        _createVersion() {
             var max = 1;
             for (var id in this.known) { // TODO knownVersions does not exists, replaced by known
                 max = Math.max(max, this.known[id]); // TODO knownVersions does not exists, replaced by known
             }
             max = Math.max(max, this.mostRecentLocalChange);
             return max + 1;
-        };
-        TJSHistory.prototype.getState = function () {
-            var state = ""; // TODO change, state init to ""
+        }
+        getState() {
+            let state = ""; // TODO change, state init to ""
             this._history.walkForward(0, function (c) {
                 if ("init" in c && c.clientId == "init") { // TODO the same kind of logic than in logHistory, there must be some sense to it...
                     // Initialization, has the state
@@ -730,19 +699,18 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }
             }, this);
             return state;
-        };
-        TJSHistory.prototype.getStateSafe = function () {
+        }
+        getStateSafe() {
             try {
                 return this.getState();
             }
             catch (e) {
                 return 'Error: ' + e;
             }
-        };
-        return TJSHistory;
-    }());
+        }
+    }
     exports.ot = {
-        SimpleHistory: function (clientId, initState, initBasis) { return new SimpleHistory(clientId, initState, initBasis); },
+        SimpleHistory: (clientId, initState, initBasis) => new SimpleHistory(clientId, initState, initBasis),
         //History: () => new TJSHistory(), // TODO does not seem to be used
         TextReplace: TextReplace,
         TextReplaceExport: new TextReplace(0, 0, ""),

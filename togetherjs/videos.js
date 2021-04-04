@@ -35,12 +35,11 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         });
     }
     function makeEventSender(eventName) {
-        return function (event, options) {
-            if (options === void 0) { options = {}; }
+        return function (event, options = {}) {
             var element = event.target;
             if (!options.silent && element) {
                 session_1.session.send({
-                    type: "video-" + eventName,
+                    type: `video-${eventName}`,
                     location: elementFinder_1.elementFinder.elementLocation(element),
                     position: element.currentTime
                 });
@@ -90,7 +89,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         }
     });
     MIRRORED_EVENTS.forEach(function (eventName) {
-        session_1.session.hub.on("video-" + eventName, function (msg) {
+        session_1.session.hub.on(`video-${eventName}`, function (msg) {
             var element = $findElement(msg.location);
             setTime(element, msg.position);
             element.trigger(eventName, { silent: true });

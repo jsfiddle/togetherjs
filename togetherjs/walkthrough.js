@@ -10,10 +10,10 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     exports.walkthrough = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var onHideAll = null;
-    var container; // TODO init
-    var slides; // TODO init
+    let assert = util_1.util.assert.bind(util_1.util);
+    let onHideAll = null;
+    let container; // TODO init
+    let slides; // TODO init
     function show(index) {
         slides.hide();
         jquery_1.default(slides[index]).show();
@@ -57,11 +57,8 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
         }
         return 0;
     }
-    var Walkthrough = /** @class */ (function () {
-        function Walkthrough() {
-        }
-        Walkthrough.prototype.start = function (firstTime, doneCallback) {
-            if (doneCallback === void 0) { doneCallback = null; }
+    class Walkthrough {
+        start(firstTime, doneCallback = null) {
             if (!container) {
                 container = jquery_1.default(templates_1.templates("walkthrough"));
                 container.hide();
@@ -137,16 +134,15 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
             onHideAll = doneCallback;
             show(0);
             windowing_1.windowing.show(container);
-        };
-        Walkthrough.prototype.stop = function () {
+        }
+        stop() {
             windowing_1.windowing.hide(container);
             if (onHideAll) {
                 onHideAll();
                 onHideAll = null;
             }
-        };
-        return Walkthrough;
-    }());
+        }
+    }
     exports.walkthrough = new Walkthrough();
     session_1.session.on("hide-window", function () {
         if (onHideAll) {

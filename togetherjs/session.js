@@ -1,21 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,7 +10,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
     exports.session = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
-    var DEBUG = true;
+    var DEBUG = false;
     // This is the amount of time in which a hello-back must be received after a hello
     // for us to respect a URL change:
     var HELLO_BACK_CUTOFF = 1500;
@@ -33,34 +18,31 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
     // We will load this module later (there's a circular import):
     var peers;
     // This is the channel to the hub:
-    var channel = null;
+    let channel = null;
     // This is the key we use for localStorage:
     //var localStoragePrefix = "togetherjs."; // TODO not used
-    var Session = /** @class */ (function (_super) {
-        __extends(Session, _super);
-        function Session() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
+    class Session extends OnClass {
+        constructor() {
+            super(...arguments);
             /** This is the hub we connect to: */
-            _this.shareId = null;
-            _this.router = channels_1.channels.Router();
+            this.shareId = null;
+            this.router = channels_1.channels.Router();
             /** Indicates if TogetherJS has just started (not continuing from a saved session): */
-            _this.firstRun = false;
+            this.firstRun = false;
             /** Setting, essentially global: */
-            _this.AVATAR_SIZE = 90;
-            _this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
-            _this.hub = new OnClass();
-            return _this;
+            this.AVATAR_SIZE = 90;
+            this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
+            this.hub = new OnClass();
         }
-        Session.prototype.hubUrl = function (id) {
-            if (id === void 0) { id = null; }
+        hubUrl(id = null) {
             id = id || this.shareId;
             assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
             TogetherJS.config.close("hubBase");
             var hubBase = TogetherJS.config.get("hubBase");
             assert(hubBase != null);
             return hubBase.replace(/\/*$/, "") + "/hub/" + id;
-        };
-        Session.prototype.shareUrl = function () {
+        }
+        shareUrl() {
             assert(this.shareId, "Attempted to access shareUrl() before shareId is set");
             var hash = location.hash;
             var m = /\?[^#]*/.exec(location.href);
@@ -72,33 +54,33 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             hash = hash || "#";
             return location.protocol + "//" + location.host + location.pathname + query +
                 hash + "&togetherjs=" + this.shareId;
-        };
-        Session.prototype.recordUrl = function () {
+        }
+        recordUrl() {
             assert(this.shareId);
             var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
             url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
             return url;
-        };
+        }
         /* location.href without the hash */
-        Session.prototype.currentUrl = function () {
+        currentUrl() {
             if (includeHashInUrl) {
                 return location.href;
             }
             else {
                 return location.href.replace(/#.*/, "");
             }
-        };
-        Session.prototype.send = function (msg) {
+        }
+        send(msg) {
             if (DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            var msg2 = msg;
+            const msg2 = msg;
             msg2.clientId = exports.session.clientId; // TODO !
             channel.send(msg2); // TODO !
-        };
+        }
         // TODO this function appears to never been used (since it's only caller never is), and it does weird things. Tried with a "type MapForAppSending = { [P in keyof MapForSending & string as `app.${P}`]: MapForSending[P] }" but it doesn't change the type of the `type` field and hence doesn't work
-        Session.prototype.appSend = function (msg) {
-            var type = msg.type;
+        appSend(msg) {
+            let type = msg.type;
             if (type.search(/^togetherjs\./) === 0) {
                 type = type.substr("togetherjs.".length);
             }
@@ -107,14 +89,14 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             }
             msg.type = type;
             exports.session.send(msg);
-        };
-        Session.prototype.makeHelloMessage = function (helloBack) {
-            var starting = false;
+        }
+        makeHelloMessage(helloBack) {
+            let starting = false;
             if (!TogetherJS.startup.continued) {
                 starting = true;
             }
             if (helloBack) {
-                var msg = {
+                let msg = {
                     type: "hello-back",
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
@@ -134,7 +116,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                 return msg;
             }
             else {
-                var msg = {
+                let msg = {
                     type: "hello",
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
@@ -152,22 +134,22 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                 exports.session.emit("prepare-hello", msg);
                 return msg;
             }
-        };
-        Session.prototype.start = function () {
+        }
+        start() {
             initStartTarget();
             initIdentityId().then(function () {
                 initShareId().then(function () {
                     readyForMessages = false;
                     openChannel();
                     require(["ui"], function (uiModule) {
-                        var ui = uiModule.ui;
+                        const ui = uiModule.ui;
                         TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, function () {
                             jquery_1.default(function () {
-                                var peersModule = require("peers");
+                                const peersModule = require("peers");
                                 peers = peersModule.peers;
-                                var startup = require("startup").startup;
+                                const { startup } = require("startup");
                                 exports.session.emit("start");
                                 exports.session.once("ui-ready", function () {
                                     readyForMessages = true;
@@ -176,8 +158,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                                 ui.activateUI();
                                 TogetherJS.config.close("enableAnalytics");
                                 if (TogetherJS.config.get("enableAnalytics")) {
-                                    require(["analytics"], function (_a) {
-                                        var analytics = _a.analytics;
+                                    require(["analytics"], function ({ analytics }) {
                                         analytics.activate();
                                     });
                                 }
@@ -190,8 +171,8 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                     });
                 });
             });
-        };
-        Session.prototype.close = function (reason) {
+        }
+        close(reason) {
             TogetherJS.running = false;
             var msg = { type: "bye" };
             if (reason) {
@@ -216,12 +197,11 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                 TogetherJS.emit("close");
                 TogetherJS._teardown();
             });
-        };
-        Session.prototype._getChannel = function () {
+        }
+        _getChannel() {
             return channel; // TODO !
-        };
-        return Session;
-    }(OnClass));
+        }
+    }
     exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************
@@ -271,7 +251,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                 return;
             }
             if ("clientId" in msg) {
-                var peer = peers.getPeer(msg.clientId, msg);
+                const peer = peers.getPeer(msg.clientId, msg);
                 if (peer) {
                     msg.peer = peer;
                 }
@@ -284,7 +264,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
                 }
             }
             if ("peer" in msg) {
-                var msg2 = msg;
+                const msg2 = msg;
                 if (msg2.peer) {
                     msg2.sameUrl = msg2.peer.url == currentUrl;
                     if (!msg2.peer.isSelf) {
@@ -321,7 +301,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             if (msg.urlHash) {
                 url += msg.urlHash;
             }
-            var ui = require("ui").ui;
+            const { ui } = require("ui");
             ui.showUrlChangeMessage(msg.peer, url);
             location.href = url;
         }
@@ -340,7 +320,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
     // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
     var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     function getRoomName(prefix, maxSize) {
-        var hubBase = TogetherJS.config.get("hubBase");
+        const hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
         var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
         return jquery_1.default.ajax({

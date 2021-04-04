@@ -2,10 +2,8 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.analytics = void 0;
-    var Analytics = /** @class */ (function () {
-        function Analytics() {
-        }
-        Analytics.prototype.activate = function () {
+    class Analytics {
+        activate() {
             var enable = TogetherJS.config.get("enableAnalytics");
             var code = TogetherJS.config.get("analyticsCode");
             TogetherJS.config.close("enableAnalytics");
@@ -27,10 +25,9 @@ define(["require", "exports"], function (require, exports) {
                 var s = document.getElementsByTagName('script')[0];
                 s.parentNode.insertBefore(ga, s); // TODO !
             })();
-        };
+        }
         ;
-        return Analytics;
-    }());
+    }
     exports.analytics = new Analytics();
 });
 //define(["util"], analyticsMain);

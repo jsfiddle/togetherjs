@@ -10,14 +10,14 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     function isJQuery(o) {
         return o instanceof jquery_1.default;
     }
-    var CannotFind = /** @class */ (function () {
-        function CannotFind(location, reason, context) {
+    class CannotFind {
+        constructor(location, reason, context) {
             this.location = location;
             this.reason = reason;
             this.context = context;
             this.prefix = "";
         }
-        CannotFind.prototype.toString = function () {
+        toString() {
             var loc;
             try {
                 loc = "loc"; //elementFinder.elementLocation(this.context);
@@ -26,14 +26,11 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 loc = this.context;
             }
             return ("[CannotFind " + this.prefix + "(" + this.location + "): " + this.reason + " in " + loc + "]");
-        };
-        return CannotFind;
-    }());
-    var ElementFinder = /** @class */ (function () {
-        function ElementFinder() {
         }
-        ElementFinder.prototype.ignoreElement = function (element) {
-            var el = element;
+    }
+    class ElementFinder {
+        ignoreElement(element) {
+            let el = element;
             if (isJQuery(el)) {
                 el = el[0];
             }
@@ -44,10 +41,10 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 el = el.parentNode;
             }
             return false;
-        };
-        ElementFinder.prototype.elementLocation = function (element) {
+        }
+        elementLocation(element) {
             //assert(element !== null, "Got null element");
-            var el = element;
+            let el = element;
             if (0 in el && "attr" in el && el[0].nodeType == 1) {
                 // Or a jQuery element not made by us
                 el = el[0];
@@ -68,17 +65,17 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             if (el.tagName == "HEAD") {
                 return "head";
             }
-            var parent = el.parentNode;
+            let parent = el.parentNode;
             if ((!parent) || parent == el) {
                 console.warn("elementLocation(", el, ") has null parent");
                 throw new Error("No locatable parent found");
             }
-            var parentLocation = this.elementLocation(parent);
-            var children = parent.childNodes;
-            var _len = children.length;
-            var index = 0;
-            for (var i = 0; i < _len; i++) {
-                var child = children[i];
+            let parentLocation = this.elementLocation(parent);
+            let children = parent.childNodes;
+            let _len = children.length;
+            let index = 0;
+            for (let i = 0; i < _len; i++) {
+                let child = children[i];
                 if (child == el) {
                     break;
                 }
@@ -92,14 +89,14 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 }
             }
             return parentLocation + ":nth-child(" + (index + 1) + ")";
-        };
-        ElementFinder.prototype.findElement = function (loc, container) {
+        }
+        findElement(loc, container) {
             // FIXME: should this all just be done with document.querySelector()?
             // But no!  We can't ignore togetherjs elements with querySelector.
             // But maybe!  We *could* make togetherjs elements less obtrusive?
             container = container || document;
-            var el;
-            var rest;
+            let el;
+            let rest;
             if (loc === "body") {
                 return document.body;
             }
@@ -168,8 +165,8 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 if (loc.indexOf(")") == -1) {
                     throw "Invalid location, missing ): " + loc;
                 }
-                var num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
-                var count = num;
+                let num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
+                let count = num;
                 loc = loc.substr(loc.indexOf(")") + 1);
                 var children = container.childNodes;
                 el = null;
@@ -208,9 +205,9 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             else {
                 throw new CannotFind(loc, "Malformed location", container);
             }
-        };
-        ElementFinder.prototype.elementByPixel = function (height) {
-            var self = this;
+        }
+        elementByPixel(height) {
+            let self = this;
             /* Returns {location: "...", offset: pixels}
             
             To get the pixel position back, you'd do:
@@ -225,7 +222,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                     if (el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                         return;
                     }
-                    var offset = el.offset();
+                    let offset = el.offset();
                     if (offset && offset.top > height) {
                         return false;
                     }
@@ -234,7 +231,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 });
                 if ((!children.length) || (!last)) {
                     // There are no children, or only inapplicable children
-                    var start_offset_top = (_b = (_a = start.offset()) === null || _a === void 0 ? void 0 : _a.top) !== null && _b !== void 0 ? _b : 0;
+                    let start_offset_top = (_b = (_a = start.offset()) === null || _a === void 0 ? void 0 : _a.top) !== null && _b !== void 0 ? _b : 0;
                     return {
                         location: self.elementLocation(start[0]),
                         offset: height - start_offset_top,
@@ -245,8 +242,8 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 return search(last, height);
             }
             return search(jquery_1.default(document.body), height);
-        };
-        ElementFinder.prototype.pixelForPosition = function (position) {
+        }
+        pixelForPosition(position) {
             /* Inverse of elementFinder.elementByPixel */
             if (position.location == "body") {
                 return position.offset;
@@ -273,9 +270,8 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 }
                 throw e;
             }
-        };
-        return ElementFinder;
-    }());
+        }
+    }
     exports.elementFinder = new ElementFinder();
 });
 //define(["util", "jquery"], elementFinderMain);

@@ -335,7 +335,7 @@ function togetherjsMain() {
         public require!: Require; // TODO !
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
-        private hub: TogetherJSNS.Hub = new OnClass();
+        public hub: TogetherJSNS.Hub = new OnClass();
         public requireConfig!: RequireConfig; // TODO !
         private _loaded?: boolean;
         private _requireObject!: Require; // TODO !

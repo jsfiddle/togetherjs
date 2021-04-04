@@ -91,13 +91,13 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             jquery_1.default("#togetherjs-avatar-edit-rtc").hide();
         }
         var avatarData;
-        var $preview = jquery_1.default("#togetherjs-self-avatar-preview");
-        var $accept = jquery_1.default("#togetherjs-self-avatar-accept");
-        var $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
-        var $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
-        var $video = jquery_1.default("#togetherjs-avatar-video");
-        var video0 = $video[0];
-        var $upload = jquery_1.default("#togetherjs-avatar-upload");
+        const $preview = jquery_1.default("#togetherjs-self-avatar-preview");
+        const $accept = jquery_1.default("#togetherjs-self-avatar-accept");
+        const $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
+        const $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
+        const $video = jquery_1.default("#togetherjs-avatar-video");
+        const video0 = $video[0];
+        const $upload = jquery_1.default("#togetherjs-avatar-upload");
         $takePic.click(function () {
             if (!streaming) {
                 startStreaming();
@@ -143,7 +143,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             var width = video0.videoWidth;
             width = width * (session_1.session.AVATAR_SIZE / height);
             height = session_1.session.AVATAR_SIZE;
-            var canvas0 = document.createElement("canvas");
+            const canvas0 = document.createElement("canvas");
             canvas0.height = session_1.session.AVATAR_SIZE;
             canvas0.width = session_1.session.AVATAR_SIZE;
             var context = canvas0.getContext("2d"); // TODO ! null?
@@ -169,7 +169,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             reader.readAsArrayBuffer(this.files[0]);
         });
         function convertImage(imageUrl, callback) {
-            var canvas = document.createElement("canvas");
+            const canvas = document.createElement("canvas");
             canvas.height = session_1.session.AVATAR_SIZE;
             canvas.width = session_1.session.AVATAR_SIZE;
             var context = canvas.getContext("2d"); // TODO !
@@ -249,11 +249,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
         ui_1.ui.container.find("#togetherjs-rtc-info .togetherjs-dont-show-again").change(function () {
             storage_1.storage.settings.set("dontShowRtcInfo", this.checked);
         });
-        function error() {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
+        function error(...args) {
             console.warn(args);
             var s = "";
             for (var i = 0; i < args.length; i++) {

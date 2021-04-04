@@ -16,7 +16,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
     };
     function parseLogs(rawlog) {
         rawlog = rawlog.replace(/\r\n/g, '\n');
-        var logs = rawlog.split(/\n/g);
+        let logs = rawlog.split(/\n/g);
         var result = [];
         for (var i = 0; i < logs.length; i++) {
             var line = logs[i];
@@ -33,14 +33,13 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             if (!line) {
                 continue;
             }
-            var logItem = JSON.parse(line);
+            const logItem = JSON.parse(line);
             result.push(logItem);
         }
         return new Logs(result);
     }
-    var Logs = /** @class */ (function () {
-        function Logs(logs, fromStorage) {
-            if (fromStorage === void 0) { fromStorage = false; }
+    class Logs {
+        constructor(logs, fromStorage = false) {
             this.logs = logs;
             this.fromStorage = fromStorage;
             //@ts-expect-error this field is just for debug so its main usage is in the console
@@ -48,7 +47,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             this.playTimer = null;
             this.pos = 0;
         }
-        Logs.prototype.play = function () {
+        play() {
             this.start = Date.now();
             if (this.pos >= this.logs.length) {
                 this.unload();
@@ -78,8 +77,8 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                 }
             }
             this.playOne();
-        };
-        Logs.prototype.cancel = function () {
+        }
+        cancel() {
             if (this.playTimer) {
                 clearTimeout(this.playTimer);
                 this.playTimer = null;
@@ -87,14 +86,14 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             this.start = null;
             this.pos = 0;
             this.unload();
-        };
-        Logs.prototype.pause = function () {
+        }
+        pause() {
             if (this.playTimer) {
                 clearTimeout(this.playTimer);
                 this.playTimer = null;
             }
-        };
-        Logs.prototype.playOne = function () {
+        }
+        playOne() {
             this.playTimer = null;
             if (this.pos >= this.logs.length) {
                 this.unload();
@@ -113,8 +112,8 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             if (this.fromStorage) {
                 this.savePos();
             }
-        };
-        Logs.prototype.playItem = function (item) {
+        }
+        playItem(item) {
             if (item.type == "hello") {
                 // We may need to pause here
                 if (item.url != (location.href + "").replace(/\#.*/, "")) {
@@ -127,37 +126,34 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             catch (e) {
                 console.warn("Could not play back message:", item, "error:", e);
             }
-        };
-        Logs.prototype.save = function () {
+        }
+        save() {
             this.fromStorage = true;
             storage_1.storage.set("playback.logs", this.logs);
             this.savePos();
-        };
-        Logs.prototype.savePos = function () {
+        }
+        savePos() {
             storage_1.storage.set("playback.pos", this.pos);
-        };
-        Logs.prototype.unload = function () {
+        }
+        unload() {
             if (this.fromStorage) {
                 storage_1.storage.set("playback.logs", undefined);
                 storage_1.storage.set("playback.pos", undefined);
             }
             // FIXME: should do a bye message here
-        };
-        return Logs;
-    }());
-    var Playback = /** @class */ (function () {
-        function Playback() {
         }
-        Playback.prototype.getLogs = function (url) {
+    }
+    class Playback {
+        getLogs(url) {
             if (url.search(/^local:/) === 0) {
                 return jquery_1.default.Deferred(function (def) {
-                    var name = url.substr("local:".length);
-                    storage_1.storage.get("recording." + name).then(function (logs) {
+                    const name = url.substr("local:".length);
+                    storage_1.storage.get(`recording.${name}`).then(function (logs) {
                         if (!logs) {
                             def.resolve(undefined);
                             return;
                         }
-                        var logs2 = parseLogs(logs);
+                        const logs2 = parseLogs(logs);
                         def.resolve(logs2);
                     }, function (error) {
                         def.reject(error);
@@ -175,8 +171,8 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                     def.reject(error);
                 });
             });
-        };
-        Playback.prototype.getRunningLogs = function () {
+        }
+        getRunningLogs() {
             return storage_1.storage.get("playback.logs").then(function (value) {
                 if (!value) {
                     return null;
@@ -187,9 +183,8 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                     return logs;
                 });
             });
-        };
-        return Playback;
-    }());
+        }
+    }
     exports.playback = new Playback();
 });
 //define(["jquery", "util", "session", "storage", "require"], playbackMain);

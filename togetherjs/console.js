@@ -1,20 +1,14 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.appConsole = void 0;
     //function consoleMain(util: TogetherJSNS.Util) {
     var console = window.console || { log: function () { } };
-    var Console = /** @class */ (function () {
-        function Console() {
-            var _this = this;
+    class Console {
+        constructor() {
             this.messages = [];
             this.level = Console.levels.log;
             // Gets set below:
@@ -37,16 +31,16 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 "error" in console ? console.error : [],
                 "fatal" in console ? console.fatal : []
             ];
-            util_1.util.forEachAttr(Console.levels, function (value, _name) {
-                _this.maxLevel = Math.max(_this.maxLevel, value);
+            util_1.util.forEachAttr(Console.levels, (value, _name) => {
+                this.maxLevel = Math.max(this.maxLevel, value);
             });
-            util_1.util.forEachAttr(Console.levels, function (value, name) {
-                _this.levelNames[value] = name;
+            util_1.util.forEachAttr(Console.levels, (value, name) => {
+                this.levelNames[value] = name;
             });
         }
-        Console.prototype.setLevel = function (l) {
-            var number;
-            var llNum;
+        setLevel(l) {
+            let number;
+            let llNum;
             if (typeof l == "string") {
                 number = Console.levels[l];
                 if (number === undefined) {
@@ -71,25 +65,21 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 llNum = l;
             }
             this.level = llNum;
-        };
-        Console.prototype.write = function (level) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
+        }
+        write(level, ...args) {
             try {
                 this.messages.push([
                     Date.now(),
                     level,
-                    this._stringify.apply(this, args)
+                    this._stringify(...args)
                 ]);
             }
             catch (e) {
                 console.warn("Error stringifying argument:", e);
             }
             if (level != "suppress" && this.level <= level) {
-                var l = this.levelNames[level];
-                var method = void 0;
+                const l = this.levelNames[level];
+                let method;
                 if (l in console) {
                     method = console[l];
                 }
@@ -98,18 +88,13 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 }
                 method.apply(console, args);
             }
-        };
-        Console.prototype.suppressedWrite = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            var w = this.write;
-            var a = __spreadArray(["suppress"], args);
+        }
+        suppressedWrite(...args) {
+            let w = this.write;
+            const a = ["suppress", ...args];
             this.write.apply(this, a);
-        };
-        Console.prototype.trace = function (level) {
-            if (level === void 0) { level = "log"; }
+        }
+        trace(level = "log") {
             if ("trace" in console) {
                 level = "suppressedWrite";
             }
@@ -125,8 +110,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             if ("trace" in console) {
                 console.trace();
             }
-        };
-        Console.prototype._browserInfo = function () {
+        }
+        _browserInfo() {
             // FIXME: add TogetherJS version and
             return [
                 "TogetherJS base URL: " + TogetherJS.baseUrl,
@@ -138,12 +123,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 "URL: " + location.href,
                 "------+------+----------------------------------------------"
             ];
-        };
-        Console.prototype._stringify = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
+        }
+        _stringify(...args) {
             var s = "";
             for (var i = 0; i < args.length; i++) {
                 if (s) {
@@ -152,8 +133,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 s += this._stringifyItem(args[i]);
             }
             return s;
-        };
-        Console.prototype._stringifyItem = function (item) {
+        }
+        _stringifyItem(item) {
             if (typeof item == "string") {
                 if (item === "") {
                     return '""';
@@ -173,16 +154,16 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 item = JSON.stringify(item);
             }
             return item.toString();
-        };
-        Console.prototype._formatDate = function (timestamp) {
+        }
+        _formatDate(timestamp) {
             return (new Date(timestamp)).toISOString();
-        };
-        Console.prototype._formatTime = function (timestamp) {
+        }
+        _formatTime(timestamp) {
             return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
-        };
-        Console.prototype._formatMinutes = function (milliseconds) {
-            var m = Math.floor(milliseconds / 1000 / 60);
-            var formatted = "" + m;
+        }
+        _formatMinutes(milliseconds) {
+            let m = Math.floor(milliseconds / 1000 / 60);
+            let formatted = "" + m;
             var remaining = milliseconds - (m * 1000 * 60);
             if (m > 10) {
                 // Over 10 minutes, just ignore the seconds
@@ -196,14 +177,14 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 formatted += ((remaining / 1000).toFixed(3) + "").substr(1);
             }
             return formatted;
-        };
-        Console.prototype._formatLevel = function (l) {
+        }
+        _formatLevel(l) {
             if (l === "suppress") {
                 return "";
             }
             return this.levelNames[l];
-        };
-        Console.prototype.toString = function () {
+        }
+        toString() {
             try {
                 var lines = this._browserInfo();
                 this.messages.forEach(function (m) {
@@ -216,10 +197,9 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 console.warn("Error running console.toString():", e);
                 throw e;
             }
-        };
+        }
         // TODO qw unused and don't work
-        Console.prototype.submit = function (options) {
-            if (options === void 0) { options = {}; }
+        submit(options = {}) {
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
             return util_1.util.Deferred(function () {
                 var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
@@ -238,39 +218,35 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     }
                 };
             });
-        };
-        Console.levels = {
-            debug: 1,
-            // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved
-            log: 2,
-            info: 3,
-            notify: 4,
-            warn: 5,
-            error: 6,
-            fatal: 7,
-            suppressedWrite: 8,
-        };
-        return Console;
-    }());
+        }
+    }
+    Console.levels = {
+        debug: 1,
+        // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved
+        log: 2,
+        info: 3,
+        notify: 4,
+        warn: 5,
+        error: 6,
+        fatal: 7,
+        suppressedWrite: 8,
+    };
     ;
-    function rpad(s, len, pad) {
-        if (pad === void 0) { pad = " "; }
+    function rpad(s, len, pad = " ") {
         s = s + "";
         while (s.length < len) {
             s += pad;
         }
         return s;
     }
-    function lpad(s, len, pad) {
-        if (pad === void 0) { pad = " "; }
+    function lpad(s, len, pad = " ") {
         s = s + "";
         while (s.length < len) {
             s = pad + s;
         }
         return s;
     }
-    function lpadLines(s, len, pad) {
-        if (pad === void 0) { pad = " "; }
+    function lpadLines(s, len, pad = " ") {
         var i;
         s = s + "";
         if (s.indexOf("\n") == -1) {
@@ -280,7 +256,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         for (i = 0; i < len; i++) {
             fullPad += pad;
         }
-        var lines = s.split(/\n/g);
+        let lines = s.split(/\n/g);
         for (i = 1; i < s.length; i++) {
             lines[i] = fullPad + s[i];
         }
@@ -289,8 +265,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     // This is a factory that creates `Console.prototype.debug`, `.error` etc:
     function logFunction(_name, level) {
         return function () {
-            var args = Array.prototype.slice.call(arguments);
-            var a = __spreadArray([level], args);
+            const args = Array.prototype.slice.call(arguments);
+            const a = [level, ...args];
             this.write.apply(this, a);
         };
     }

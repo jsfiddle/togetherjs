@@ -2,26 +2,25 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.OnClass = void 0;
-    var OnClass = /** @class */ (function () {
-        function OnClass() {
+    class OnClass {
+        constructor() {
             this._listeners = {}; // TODO any
             this.removeListener = this.off.bind(this);
         }
-        OnClass.prototype.on = function (name, callback) {
-            var _this = this;
+        on(name, callback) {
             if (typeof callback != "function") {
                 console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
                 throw "Error: .once() called with non-callback";
             }
             if (name.search(" ") != -1) {
-                var names = name.split(/ +/g);
-                names.forEach(function (n) {
-                    _this.on(n, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
+                let names = name.split(/ +/g);
+                names.forEach((n) => {
+                    this.on(n, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
                 });
                 return;
             }
             if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
-                var thisString = "" + this;
+                let thisString = "" + this;
                 if (thisString.length > 20) {
                     thisString = thisString.substr(0, 20) + "...";
                 }
@@ -33,40 +32,36 @@ define(["require", "exports"], function (require, exports) {
             if (!this._listeners[name]) {
                 this._listeners[name] = [];
             }
-            var cb = callback; // TODO how to avoid this cast?
+            const cb = callback; // TODO how to avoid this cast?
             if (this._listeners[name].indexOf(cb) == -1) {
                 this._listeners[name].push(cb);
             }
-        };
-        OnClass.prototype.once = function (name, callback) {
+        }
+        once(name, callback) {
             if (typeof callback != "function") {
                 console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
                 throw "Error: .once() called with non-callback";
             }
-            var cb = callback;
-            var attr = "onceCallback_" + name;
+            const cb = callback;
+            let attr = "onceCallback_" + name;
             // FIXME: maybe I should add the event name to the .once attribute:
             if (!cb[attr]) {
-                cb[attr] = function onceCallback() {
-                    var args = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        args[_i] = arguments[_i];
-                    }
+                cb[attr] = function onceCallback(...args) {
                     cb.apply(this, args);
                     this.off(name, onceCallback);
                     delete cb[attr];
                 };
             }
             this.on(name, cb[attr]);
-        };
-        OnClass.prototype.off = function (name, callback) {
+        }
+        off(name, callback) {
             if (this._listenerOffs) {
                 // Defer the .off() call until the .emit() is done.
                 this._listenerOffs.push([name, callback]);
                 return;
             }
             if (name.search(" ") != -1) {
-                var names = name.split(/ +/g);
+                let names = name.split(/ +/g);
                 names.forEach(function (n) {
                     this.off(n, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
                 }, this);
@@ -75,24 +70,20 @@ define(["require", "exports"], function (require, exports) {
             if (!this._listeners[name]) {
                 return;
             }
-            var l = this._listeners[name], _len = l.length;
-            for (var i = 0; i < _len; i++) {
+            let l = this._listeners[name], _len = l.length;
+            for (let i = 0; i < _len; i++) {
                 if (l[i] == callback) {
                     l.splice(i, 1);
                     break;
                 }
             }
-        };
-        OnClass.prototype.emit = function (name) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            var offs = this._listenerOffs = [];
+        }
+        emit(name, ...args) {
+            let offs = this._listenerOffs = [];
             if ((!this._listeners) || !this._listeners[name]) {
                 return;
             }
-            var l = this._listeners[name];
+            let l = this._listeners[name];
             l.forEach(function (callback) {
                 callback.apply(this, args);
             }, this);
@@ -102,8 +93,7 @@ define(["require", "exports"], function (require, exports) {
                     this.off(item[0], item[1]);
                 }, this);
             }
-        };
-        return OnClass;
-    }());
+        }
+    }
     exports.OnClass = OnClass;
 });
