@@ -25,8 +25,8 @@ function extend(base: { [key: string]: unknown }, extensions?: any) {
 
 class OnClass {
     _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJSNS.CallbackForOnce<any>[] } = {}; // TODO any
-    _listenerOffs?: [string, TogetherJSNS.CallbackForOnce<any>][];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
 
     on<T extends keyof TogetherJSNS.On.Map>(name: T, callback: TogetherJSNS.On.Map[T]) {
         if(typeof callback != "function") {
@@ -54,9 +54,9 @@ class OnClass {
         if(!this._listeners[name]) {
             this._listeners[name] = [];
         }
-        const cb = callback as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
-        if(this._listeners[name].indexOf(cb) == -1) {
-            this._listeners[name].push(cb);
+
+        if(this._listeners[name].indexOf(callback) == -1) {
+            this._listeners[name].push(callback);
         }
     }
 
@@ -65,7 +65,7 @@ class OnClass {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
-        const cb = callback as TogetherJSNS.CallbackForOnce<any>;
+        const cb = callback as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!cb[attr]) {
@@ -73,7 +73,7 @@ class OnClass {
                 cb.apply(this, args);
                 this.off(name, onceCallback);
                 delete cb[attr];
-            } as TogetherJSNS.CallbackForOnce<any>;
+            };
         }
         this.on(name, cb[attr]);
     }
@@ -81,7 +81,7 @@ class OnClass {
     off<T extends keyof TogetherJSNS.On.Map>(name: T, callback: TogetherJSNS.On.Map[T]) {
         if(this._listenerOffs) {
             // Defer the .off() call until the .emit() is done.
-            this._listenerOffs.push([name, callback as TogetherJSNS.CallbackForOnce<any>]);
+            this._listenerOffs.push([name, callback]);
             return;
         }
         if(name.search(" ") != -1) {
