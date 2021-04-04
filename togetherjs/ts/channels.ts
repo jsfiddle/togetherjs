@@ -446,8 +446,8 @@ class Router extends OnClass {
 
     bindChannel(channel: AbstractChannel) {
         if(this.channel) {
-            this.channel.removeListener("message", this.boundChannelMessage);
-            this.channel.removeListener("close", this.boundChannelClosed);
+            this.channel.off("message", this.boundChannelMessage);
+            this.channel.off("close", this.boundChannelClosed);
         }
         this.channel = channel;
         this.channel.on("message", this.boundChannelMessage);

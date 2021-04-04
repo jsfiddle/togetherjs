@@ -50,8 +50,9 @@ class OnClass {
         if (!this._listeners[name]) {
             this._listeners[name] = [];
         }
-        if (this._listeners[name].indexOf(callback) == -1) {
-            this._listeners[name].push(callback);
+        const cb = callback; // TODO how to avoid this cast?
+        if (this._listeners[name].indexOf(cb) == -1) {
+            this._listeners[name].push(cb);
         }
     }
     once(name, callback) {
@@ -59,7 +60,7 @@ class OnClass {
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
-        const cb = callback; // TODO avoid this cast?
+        const cb = callback;
         let attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!cb[attr]) {

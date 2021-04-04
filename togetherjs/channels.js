@@ -358,8 +358,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         bindChannel(channel) {
             if (this.channel) {
-                this.channel.removeListener("message", this.boundChannelMessage);
-                this.channel.removeListener("close", this.boundChannelClosed);
+                this.channel.off("message", this.boundChannelMessage);
+                this.channel.off("close", this.boundChannelClosed);
             }
             this.channel = channel;
             this.channel.on("message", this.boundChannelMessage);
