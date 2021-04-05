@@ -576,8 +576,8 @@ function togetherjsMain() {
 
         reinitialize() {
             if(this.running && typeof this.require == "function") {
-                this.require(["session"], function(sessionModule: { session: TogetherJSNS.Session }) {
-                    sessionModule.session.emit("reinitialize");
+                this.require(["session"], function({ session }) {
+                    session.emit("reinitialize");
                 });
             }
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
@@ -596,8 +596,8 @@ function togetherjsMain() {
 
         refreshUserData() {
             if(this.running && typeof this.require == "function") {
-                this.require(["session"], function(sessionModule: { session: TogetherJSNS.Session }) {
-                    sessionModule.session.emit("refresh-user-data");
+                this.require(["session"], function({ session }) {
+                    session.emit("refresh-user-data");
                 });
             }
         }
@@ -620,7 +620,7 @@ function togetherjsMain() {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            let session = this.require("session").session as TogetherJSNS.Session;
+            let session = this.require("session").session;
             session.appSend(msg);
         }
 

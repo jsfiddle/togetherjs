@@ -42,7 +42,7 @@ var COLORS = [
 
 // This would be a circular import, but we just need the chat module sometime
 // after everything is loaded, and this is sure to complete by that time:
-require(["chat"], function(chatModule: typeof import("chat")) {
+require(["chat"], function(chatModule) {
     chat = chatModule.chat;
 });
 
@@ -605,7 +605,7 @@ export class PeerView extends PeerSelfView {
     }
 
     cursor() {
-        const cursorModule = require("cursor") as typeof import("cursor");
+        const cursorModule = require("cursor");
         return cursorModule.cursor.getClient(this.peer.id);
     }
 
@@ -989,7 +989,7 @@ export class Ui {
         $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function() {
             windowing.hide();
             hideMenu();
-            require(["walkthrough"], function({ walkthrough }: typeof import("walkthrough")) {
+            require(["walkthrough"], function({ walkthrough }) {
                 windowing.hide();
                 walkthrough.start(false);
             });
@@ -1493,7 +1493,7 @@ function refreshInvite() {
         return;
     }
     inRefresh = true;
-    require(["who"], function({ who }: typeof import("who")) {
+    require(["who"], function({ who }) {
         var def = who.getList(inviteHubUrl());
         function addUser(user: TogetherJSNS.PeerClass | TogetherJSNS.ExternalPeer, before?: JQuery) {
             var item = templating.sub("invite-user-item", { peer: user });
@@ -1556,14 +1556,14 @@ session.hub.on("invite", function(msg) {
     if(msg.forClientId && msg.clientId != peers.Self.id) {
         return;
     }
-    require(["who"], function({ who }: typeof import("who")) {
+    require(["who"], function({ who }) {
         var peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
         ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
     });
 });
 
 function invite(clientId: string | null) {
-    require(["who"], function({ who }: typeof import("who")) {
+    require(["who"], function({ who }) {
         // FIXME: use the return value of this to give a signal that
         // the invite has been successfully sent:
         who.invite(inviteHubUrl(), clientId).then(function() {

@@ -158,15 +158,15 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
             initShareId().then(function() {
                 readyForMessages = false;
                 openChannel();
-                require(["ui"], function(uiModule: typeof import("ui")) {
+                require(["ui"], function(uiModule) {
                     const ui = uiModule.ui;
                     TogetherJS.running = true;
                     ui.prepareUI();
                     require(features, function() {
                         $(function() {
-                            const peersModule = require("peers") as typeof import("peers");
+                            const peersModule = require("peers");
                             peers = peersModule.peers;
-                            const { startup } = require("startup") as typeof import("startup");
+                            const { startup } = require("startup");
                             session.emit("start");
                             session.once("ui-ready", function() {
                                 readyForMessages = true;
@@ -175,7 +175,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
                             ui.activateUI();
                             TogetherJS.config.close("enableAnalytics");
                             if(TogetherJS.config.get("enableAnalytics")) {
-                                require(["analytics"], function({ analytics }: typeof import("analytics")) {
+                                require(["analytics"], function({ analytics }) {
                                     analytics.activate();
                                 });
                             }
@@ -235,8 +235,6 @@ var currentUrl = (location.href + "").replace(/\#.*$/, "");
 if(includeHashInUrl) {
     currentUrl = location.href;
 }
-
-
 
 /****************************************
  * Message handling/dispatching
@@ -333,7 +331,7 @@ function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string,
         if(msg.urlHash) {
             url += msg.urlHash;
         }
-        const { ui } = require("ui") as typeof import("ui");
+        const { ui } = require("ui");
         ui.showUrlChangeMessage(msg.peer, url);
         location.href = url;
     }

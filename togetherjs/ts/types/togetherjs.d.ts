@@ -1064,4 +1064,77 @@ declare global {
     // TODO the code using this in ui.ts should probably be removed since it does not work
     type MozActivity = any;
     var MozActivity: MozActivity;
+
+    interface Require {
+        (moduleName: "ui"): typeof import("ui");
+        (moduleName: "analytics"): typeof import("analytics");
+        (moduleName: "channels"): typeof import("channels");
+        (moduleName: "chat"): typeof import("chat");
+        (moduleName: "console"): typeof import("console");
+        (moduleName: "cursor"): typeof import("cursor");
+        (moduleName: "elementFinder"): typeof import("elementFinder");
+        (moduleName: "eventMaker"): typeof import("eventMaker");
+        (moduleName: "forms"): typeof import("forms");
+        (moduleName: "jqueryPlugins"): typeof import("jqueryPlugins");
+        (moduleName: "linkify"): typeof import("linkify");
+        (moduleName: "ot"): typeof import("ot");
+        (moduleName: "peers"): typeof import("peers");
+        (moduleName: "playback"): typeof import("playback");
+        (moduleName: "randomutil"): typeof import("randomutil");
+        (moduleName: "recorder"): typeof import("recorder");
+        (moduleName: "session"): typeof import("session");
+        (moduleName: "startup"): typeof import("startup");
+        (moduleName: "storage"): typeof import("storage");
+        (moduleName: "templates-en-US"): typeof import("templates-en-US");
+        (moduleName: "templates-localized"): typeof import("templates-localized");
+        (moduleName: "templates"): typeof import("templates");
+        (moduleName: "templating"): typeof import("templating");
+        (moduleName: "togetherjs"): typeof import("togetherjs");
+        (moduleName: "ui"): typeof import("ui");
+        (moduleName: "util"): typeof import("util");
+        (moduleName: "videos"): typeof import("videos");
+        (moduleName: "visibilityApi"): typeof import("visibilityApi");
+        (moduleName: "walkthrough"): typeof import("walkthrough");
+        (moduleName: "webrtc"): typeof import("webrtc");
+        (moduleName: "who"): typeof import("who");
+        (moduleName: "windowing"): typeof import("windowing");
+        (moduleName: "youtubeVideos"): typeof import("youtubeVideos");
+        (moduleName: "walkabout"): typeof import("youtubeVideos");
+
+        (moduleName: ["ui"], ready: (module: typeof import("ui")) => void): void;
+        (moduleName: ["analytics"], ready: (module: typeof import("analytics")) => void): void;
+        (moduleName: ["channels"], ready: (module: typeof import("channels")) => void): void;
+        (moduleName: ["chat"], ready: (module: typeof import("chat")) => void): void;
+        (moduleName: ["console"], ready: (module: typeof import("console")) => void): void;
+        (moduleName: ["cursor"], ready: (module: typeof import("cursor")) => void): void;
+        (moduleName: ["elementFinder"], ready: (module: typeof import("elementFinder")) => void): void;
+        (moduleName: ["eventMaker"], ready: (module: typeof import("eventMaker")) => void): void;
+        (moduleName: ["forms"], ready: (module: typeof import("forms")) => void): void;
+        (moduleName: ["jqueryPlugins"], ready: (module: typeof import("jqueryPlugins")) => void): void;
+        (moduleName: ["linkify"], ready: (module: typeof import("linkify")) => void): void;
+        (moduleName: ["ot"], ready: (module: typeof import("ot")) => void): void;
+        (moduleName: ["peers"], ready: (module: typeof import("peers")) => void): void;
+        (moduleName: ["playback"], ready: (module: typeof import("playback")) => void): void;
+        (moduleName: ["randomutil"], ready: (module: typeof import("randomutil")) => void): void;
+        (moduleName: ["recorder"], ready: (module: typeof import("recorder")) => void): void;
+        (moduleName: ["session"], ready: (module: typeof import("session")) => void): void;
+        (moduleName: ["startup"], ready: (module: typeof import("startup")) => void): void;
+        (moduleName: ["storage"], ready: (module: typeof import("storage")) => void): void;
+        (moduleName: ["templates-en-US"], ready: (module: typeof import("templates-en-US")) => void): void;
+        (moduleName: ["templates-localized"], ready: (module: typeof import("templates-localized")) => void): void;
+        (moduleName: ["templates"], ready: (module: typeof import("templates")) => void): void;
+        (moduleName: ["templating"], ready: (module: typeof import("templating")) => void): void;
+        (moduleName: ["togetherjs"], ready: (module: typeof import("togetherjs")) => void): void;
+        (moduleName: ["ui"], ready: (module: typeof import("ui")) => void): void;
+        (moduleName: ["util"], ready: (module: typeof import("util")) => void): void;
+        (moduleName: ["videos"], ready: (module: typeof import("videos")) => void): void;
+        (moduleName: ["visibilityApi"], ready: (module: typeof import("visibilityApi")) => void): void;
+        (moduleName: ["walkthrough"], ready: (module: typeof import("walkthrough")) => void): void;
+        (moduleName: ["webrtc"], ready: (module: typeof import("webrtc")) => void): void;
+        (moduleName: ["who"], ready: (module: typeof import("who")) => void): void;
+        (moduleName: ["windowing"], ready: (module: typeof import("windowing")) => void): void;
+        (moduleName: ["youtubeVideos"], ready: (module: typeof import("youtubeVideos")) => void): void;
+        (moduleName: ["walkabout"], ready: (module: typeof import("youtubeVideos")) => void): void;
+        
+    }
 }
