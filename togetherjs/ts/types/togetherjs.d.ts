@@ -1065,6 +1065,7 @@ declare global {
     type MozActivity = any;
     var MozActivity: MozActivity;
 
+    /** These typings are to avoid "as typeof import" casts, and errors that could go with them, everytime an import is made */
     interface Require {
         (moduleName: "ui"): typeof import("ui");
         (moduleName: "analytics"): typeof import("analytics");
@@ -1135,6 +1136,5 @@ declare global {
         (moduleName: ["windowing"], ready: (module: typeof import("windowing")) => void): void;
         (moduleName: ["youtubeVideos"], ready: (module: typeof import("youtubeVideos")) => void): void;
         (moduleName: ["walkabout"], ready: (module: typeof import("youtubeVideos")) => void): void;
-        
     }
 }
