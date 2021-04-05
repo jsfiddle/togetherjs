@@ -28,10 +28,9 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         }
     }
     class Util {
-        constructor($, tjs) {
+        constructor($) {
             this.Module = (name) => new Module(name);
             this.Deferred = $.Deferred;
-            tjs.$ = $;
             this.AssertionError = AssertionError;
         }
         forEachAttr(obj, callback, context) {
@@ -263,7 +262,5 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         }
     }
     exports.Util = Util;
-    exports.util = new Util(jquery_1.default, window.TogetherJS);
-    exports.util.Deferred = jquery_1.default.Deferred;
-    window.TogetherJS.$ = jquery_1.default;
+    exports.util = new Util(jquery_1.default);
 });

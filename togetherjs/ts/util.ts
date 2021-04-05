@@ -29,9 +29,8 @@ export class Util {
     Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
 
-    public constructor($: JQueryStatic, tjs: TogetherJSNS.TogetherJS) {
+    public constructor($: JQueryStatic) {
         this.Deferred = $.Deferred;
-        tjs.$ = $;
         this.AssertionError = AssertionError;
     }
 
@@ -283,7 +282,4 @@ export class Util {
     }
 }
 
-export let util = new Util($, window.TogetherJS);
-util.Deferred = $.Deferred;
-window.TogetherJS.$ = $;
-
+export let util = new Util($);

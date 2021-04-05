@@ -335,7 +335,6 @@ function togetherjsMain() {
 
     class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         public startupReason: TogetherJSNS.Reason | null = null;
-        public $!: JQueryStatic; // TODO !
         public running: boolean = false;
         public require!: Require; // TODO !
         private configObject = new ConfigClass(this);
