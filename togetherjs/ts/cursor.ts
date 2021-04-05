@@ -316,7 +316,7 @@ function makeCursor(color: string) {
     canvas.attr("height", CURSOR_HEIGHT);
     canvas.attr("width", CURSOR_WIDTH);
     const canvas0 = canvas[0] as HTMLCanvasElement;
-    var context = canvas0.getContext('2d')!; // TODO !
+    var context = canvas0.getContext('2d')!; // ! ok
     context.fillStyle = color;
     context.moveTo(0, 0);
     context.beginPath();
