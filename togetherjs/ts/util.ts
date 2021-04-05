@@ -15,18 +15,9 @@ class AssertionError extends Error {
     }
 }
 
-// TODO remove
-class Module {
-    constructor(public _name: string) { }
-    toString() {
-        return '[Module ' + this._name + ']';
-    }
-}
-
 export class Util {
     public Deferred;
     AssertionError: typeof AssertionError;
-    Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
 
     public constructor() {

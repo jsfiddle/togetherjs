@@ -18,18 +18,8 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             this.name = "AssertionError";
         }
     }
-    // TODO remove
-    class Module {
-        constructor(_name) {
-            this._name = _name;
-        }
-        toString() {
-            return '[Module ' + this._name + ']';
-        }
-    }
     class Util {
         constructor() {
-            this.Module = (name) => new Module(name);
             this.Deferred = jquery_1.default.Deferred;
             this.AssertionError = AssertionError;
         }
