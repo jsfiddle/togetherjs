@@ -1288,7 +1288,7 @@ function sizeDownImage(imageUrl: string) {
         let canvas = document.createElement("canvas");
         canvas.height = session.AVATAR_SIZE;
         canvas.width = session.AVATAR_SIZE;
-        let context = canvas.getContext("2d")!; // TODO !
+        let context = canvas.getContext("2d")!;
         var img = new Image();
         img.src = imageUrl;
         // Sometimes the DOM updates immediately to call

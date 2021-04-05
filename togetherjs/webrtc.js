@@ -146,7 +146,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             const canvas0 = document.createElement("canvas");
             canvas0.height = session_1.session.AVATAR_SIZE;
             canvas0.width = session_1.session.AVATAR_SIZE;
-            var context = canvas0.getContext("2d"); // TODO ! null?
+            var context = canvas0.getContext("2d"); // ! is ok because the first call to getContext can't fail if it's "2d"
             context.arc(session_1.session.AVATAR_SIZE / 2, session_1.session.AVATAR_SIZE / 2, session_1.session.AVATAR_SIZE / 2, 0, Math.PI * 2);
             context.closePath();
             context.clip();
@@ -172,7 +172,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             const canvas = document.createElement("canvas");
             canvas.height = session_1.session.AVATAR_SIZE;
             canvas.width = session_1.session.AVATAR_SIZE;
-            var context = canvas.getContext("2d"); // TODO !
+            var context = canvas.getContext("2d"); // ! is ok because the first call to getContext can't fail if it's "2d"
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
