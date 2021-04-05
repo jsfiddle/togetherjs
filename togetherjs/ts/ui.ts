@@ -978,6 +978,12 @@ export class Ui {
             windowing.hide();
             hideMenu();
             windowing.show("#togetherjs-feedback-form");
+            // Lazy loading of content
+            const feedbackForm = document.getElementById("togetherjs-feedback-form");
+            const iframe = feedbackForm?.querySelector("iframe");
+            if(iframe && iframe.dataset.src) { 
+                iframe.src = iframe?.dataset.src;
+            }
         });
 
         $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function() {

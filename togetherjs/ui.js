@@ -896,6 +896,12 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                 windowing_1.windowing.hide();
                 hideMenu();
                 windowing_1.windowing.show("#togetherjs-feedback-form");
+                // Lazy loading of content
+                const feedbackForm = document.getElementById("togetherjs-feedback-form");
+                const iframe = feedbackForm === null || feedbackForm === void 0 ? void 0 : feedbackForm.querySelector("iframe");
+                if (iframe && iframe.dataset.src) {
+                    iframe.src = iframe === null || iframe === void 0 ? void 0 : iframe.dataset.src;
+                }
             });
             jquery_1.default("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
                 windowing_1.windowing.hide();
