@@ -40,7 +40,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._send(data);
         }
         _flush() {
-            for (var i = 0; i < this._buffer.length; i++) {
+            for (let i = 0; i < this._buffer.length; i++) {
                 this._send(this._buffer[i]);
             }
             this._buffer = [];
@@ -91,7 +91,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._setupConnection();
         }
         toString() {
-            var s = '[WebSocketChannel to ' + this.address;
+            let s = '[WebSocketChannel to ' + this.address;
             if (!this.socket) {
                 s += ' (socket unopened)';
             }
@@ -138,7 +138,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             };
             this.socket.onclose = event => {
                 this.socket = null;
-                var method = "error";
+                let method = "error";
                 if (event.wasClean) {
                     // FIXME: should I even log clean closes?
                     method = "log";
@@ -152,7 +152,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                     else {
                         this._backoff++;
                     }
-                    var time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
+                    const time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
                     setTimeout(() => {
                         this._setupConnection();
                     }, time);
@@ -187,7 +187,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._setupConnection();
         }
         toString() {
-            var s = '[PostMessageChannel';
+            let s = '[PostMessageChannel';
             if (this.window) {
                 s += ' to window ' + this.window;
             }
@@ -217,7 +217,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 this.window = win;
             }
             // FIXME: The distinction between this.window and window seems unimportant in the case of postMessage
-            var w = this.window;
+            let w = this.window;
             // In a Content context we add the listener to the local window object, but in the addon context we add the listener to some other window, like the one we were given:
             if (typeof window != "undefined") {
                 w = window;
@@ -240,7 +240,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._pingFailures++;
             this._send("hello");
             // We'll keep sending ping messages until we get a reply
-            var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
+            let time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
             time = time > this._pingMax ? this._pingMax : time;
             this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
         }
@@ -293,7 +293,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._setupConnection();
         }
         toString() {
-            var s = '[PostMessageIncomingChannel';
+            let s = '[PostMessageIncomingChannel';
             if (this.source) {
                 s += ' bound to source ' + s;
             }
@@ -368,8 +368,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         _channelMessage(msg) {
             if (msg.type == "route") {
-                var id = msg.routeId;
-                var route = this._routes[id];
+                const id = msg.routeId;
+                const route = this._routes[id];
                 if (!route) {
                     console.warn("No route with the id", id);
                     return;
@@ -386,12 +386,12 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
         }
         _channelClosed() {
-            for (let id in this._routes) {
+            for (const id in this._routes) {
                 this._closeRoute(id);
             }
         }
         _closeRoute(id) {
-            var route = this._routes[id];
+            const route = this._routes[id];
             if (route.onclose) {
                 route.onclose();
             }
@@ -400,7 +400,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         makeRoute(id) {
             id = id || util_1.util.generateId();
-            var route = new Route(this, id);
+            const route = new Route(this, id);
             this._routes[id] = route;
             return route;
         }

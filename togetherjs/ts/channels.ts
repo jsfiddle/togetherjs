@@ -79,7 +79,7 @@ abstract class AbstractChannel extends OnClass<TogetherJSNS.On.Map> {
     }
 
     _flush() {
-        for(var i = 0; i < this._buffer.length; i++) {
+        for(let i = 0; i < this._buffer.length; i++) {
             this._send(this._buffer[i]);
         }
         this._buffer = [];
@@ -131,7 +131,7 @@ export class WebSocketChannel extends AbstractChannel {
     backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off
     address: string;
     socket: WebSocket | null = null;
-    _reopening: boolean = false;
+    _reopening = false;
     _lastConnectTime = 0;
     _backoff = 0;
 
@@ -145,7 +145,7 @@ export class WebSocketChannel extends AbstractChannel {
     }
 
     toString() {
-        var s = '[WebSocketChannel to ' + this.address;
+        let s = '[WebSocketChannel to ' + this.address;
         if(!this.socket) {
             s += ' (socket unopened)';
         }
@@ -196,7 +196,7 @@ export class WebSocketChannel extends AbstractChannel {
         };
         this.socket.onclose = event => {
             this.socket = null;
-            var method: keyof Console = "error";
+            let method: keyof Console = "error";
             if(event.wasClean) {
                 // FIXME: should I even log clean closes?
                 method = "log";
@@ -210,7 +210,7 @@ export class WebSocketChannel extends AbstractChannel {
                 else {
                     this._backoff++;
                 }
-                var time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
+                const time = Math.min(this._backoff * this.backoffTime, this.maxBackoffTime);
                 setTimeout(() => {
                     this._setupConnection();
                 }, time);
@@ -235,7 +235,7 @@ class PostMessageChannel extends AbstractChannel {
     private _pingPollIncrease = 100; // +100 milliseconds for each failure
     private _pingMax= 2000; // up to a max of 2000 milliseconds
     expectedOrigin: Origin;
-    private _pingReceived: boolean = false;
+    private _pingReceived = false;
     private _pingFailures = 0;
     private _pingTimeout: number | null = null;
     window!: Window; // TODO !
@@ -251,7 +251,7 @@ class PostMessageChannel extends AbstractChannel {
     }
 
     toString() {
-        var s = '[PostMessageChannel';
+        let s = '[PostMessageChannel';
         if(this.window) {
             s += ' to window ' + this.window;
         }
@@ -282,7 +282,7 @@ class PostMessageChannel extends AbstractChannel {
             this.window = win;
         }
         // FIXME: The distinction between this.window and window seems unimportant in the case of postMessage
-        var w = this.window;
+        let w = this.window;
         // In a Content context we add the listener to the local window object, but in the addon context we add the listener to some other window, like the one we were given:
         if(typeof window != "undefined") {
             w = window;
@@ -308,7 +308,7 @@ class PostMessageChannel extends AbstractChannel {
         this._pingFailures++;
         this._send("hello");
         // We'll keep sending ping messages until we get a reply
-        var time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
+        let time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
         time = time > this._pingMax ? this._pingMax : time;
         this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
     }
@@ -369,7 +369,7 @@ class PostMessageIncomingChannel extends AbstractChannel {
     }
 
     toString() {
-        var s = '[PostMessageIncomingChannel';
+        let s = '[PostMessageIncomingChannel';
         if(this.source) {
             s += ' bound to source ' + s;
         }
@@ -456,8 +456,8 @@ export class Router extends OnClass<TogetherJSNS.On.Map> {
 
     _channelMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
         if(msg.type == "route") {
-            var id = msg.routeId;
-            var route = this._routes[id];
+            const id = msg.routeId;
+            const route = this._routes[id];
             if(!route) {
                 console.warn("No route with the id", id);
                 return;
@@ -475,13 +475,13 @@ export class Router extends OnClass<TogetherJSNS.On.Map> {
     }
 
     _channelClosed() {
-        for(let id in this._routes) {
+        for(const id in this._routes) {
             this._closeRoute(id);
         }
     }
 
     _closeRoute(id: string) {
-        var route = this._routes[id];
+        const route = this._routes[id];
         if(route.onclose) {
             route.onclose();
         }
@@ -491,7 +491,7 @@ export class Router extends OnClass<TogetherJSNS.On.Map> {
 
     makeRoute(id: string) {
         id = id || util.generateId();
-        var route = new Route(this, id);
+        const route = new Route(this, id);
         this._routes[id] = route;
         return route;
     }

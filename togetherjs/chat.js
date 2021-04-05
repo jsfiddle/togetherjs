@@ -11,8 +11,8 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
     exports.chat = exports.Chat = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var Walkabout;
+    const assert = util_1.util.assert.bind(util_1.util);
+    let Walkabout;
     session_1.session.hub.on("chat", function (msg) {
         ui_1.ui.chat.text({
             text: msg.text,
@@ -37,16 +37,16 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
     });
     class Chat {
         submit(message) {
-            var parts = message.split(/ /);
+            const parts = message.split(/ /);
             if (parts[0].charAt(0) == "/") {
-                var name = parts[0].substr(1).toLowerCase();
-                var method = commands[`command_${name}`];
+                const name = parts[0].substr(1).toLowerCase();
+                const method = commands[`command_${name}`];
                 if (method) {
                     method.apply(commands, parts.slice(1)); // TODO any way to remove this "as any" cast?
                     return;
                 }
             }
-            var messageId = session_1.session.clientId + "-" + Date.now();
+            const messageId = session_1.session.clientId + "-" + Date.now();
             session_1.session.send({
                 type: "chat",
                 text: message,
@@ -75,7 +75,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             this.playing = null;
         }
         command_help() {
-            var msg = util_1.util.trim(templates_1.templates("help"));
+            const msg = util_1.util.trim(templates_1.templates("help"));
             ui_1.ui.chat.system({
                 text: msg
             });
@@ -107,19 +107,19 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 return;
             }
             if (args[0] == "start") {
-                var times = parseInt(args[1], 10);
+                let times = parseInt(args[1], 10);
                 if (isNaN(times) || !times) {
                     times = 100;
                 }
                 ui_1.ui.chat.system({
                     text: "Testing with walkabout.js"
                 });
-                var tmpl = jquery_1.default(templates_1.templates("walkabout"));
-                var container = ui_1.ui.container.find(".togetherjs-test-container");
+                const tmpl = jquery_1.default(templates_1.templates("walkabout"));
+                const container = ui_1.ui.container.find(".togetherjs-test-container");
                 container.empty();
                 container.append(tmpl);
                 container.show();
-                var statusContainer = container.find(".togetherjs-status");
+                const statusContainer = container.find(".togetherjs-status");
                 statusContainer.text("starting...");
                 const self = this;
                 this._testCancel = Walkabout.runManyActions({
@@ -131,7 +131,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                         self._testCancel = null;
                     },
                     onstatus: function (status) {
-                        var note = "actions: " + status.actions.length + " running: " +
+                        const note = "actions: " + status.actions.length + " running: " +
                             (status.times - status.remaining) + " / " + status.times;
                         statusContainer.text(note);
                     }
@@ -148,7 +148,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                     this._testShow = [];
                 }
                 else {
-                    var actions = Walkabout.findActions();
+                    const actions = Walkabout.findActions();
                     actions.forEach(function (action) {
                         this._testShow.push(action.show());
                     }, this);
@@ -171,10 +171,10 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             ui_1.ui.chat.clear();
         }
         command_exec() {
-            var expr = Array.prototype.slice.call(arguments).join(" ");
-            var result;
+            const expr = Array.prototype.slice.call(arguments).join(" ");
+            let result;
             // We use this to force global eval (not in this scope):
-            var e = eval;
+            const e = eval;
             try {
                 result = e(expr);
             }
@@ -211,7 +211,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 });
                 return;
             }
-            var logLoader = playback_1.playback.getLogs(url);
+            const logLoader = playback_1.playback.getLogs(url);
             logLoader.then((logs) => {
                 if (!logs) {
                     ui_1.ui.chat.system({
@@ -346,7 +346,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
     const commands = new Commands();
     // this section deal with saving/restoring chat history as long as session is alive
     const chatStorageKey = "chatlog";
-    var maxLogMessages = 100;
+    const maxLogMessages = 100;
     function saveChatMessage(obj) {
         assert(obj.peerId);
         assert(obj.messageId);
@@ -354,7 +354,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
         assert(typeof obj.text == "string");
         loadChatLog().then(function (logs) {
             if (logs) {
-                for (var i = logs.length - 1; i >= 0; i--) {
+                for (let i = logs.length - 1; i >= 0; i--) {
                     if (logs[i].messageId === obj.messageId) {
                         return;
                     }
@@ -375,9 +375,9 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             if (!log) {
                 return;
             }
-            for (var i = 0; i < log.length; i++) {
+            for (let i = 0; i < log.length; i++) {
                 // peers should already be loaded from sessionStorage by the peers module
-                var currentPeer = peers_1.peers.getPeer(log[i].peerId, undefined, true);
+                const currentPeer = peers_1.peers.getPeer(log[i].peerId, undefined, true);
                 if (!currentPeer) {
                     // sometimes peers go away
                     continue;

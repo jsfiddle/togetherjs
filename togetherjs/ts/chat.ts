@@ -16,8 +16,8 @@ import $ from "jquery";
 
 //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
 
-var assert: typeof util.assert = util.assert.bind(util);
-var Walkabout: TogetherJSNS.Walkabout;
+const assert: typeof util.assert = util.assert.bind(util);
+let Walkabout: TogetherJSNS.Walkabout;
 
 session.hub.on("chat", function(msg) {
     ui.chat.text({
@@ -47,16 +47,16 @@ type CommandStrings = "test" | "clear" | "help" | "test" | "clear" | "exec" | "r
 
 export class Chat {
     submit(message: string) {
-        var parts = message.split(/ /);
+        const parts = message.split(/ /);
         if(parts[0].charAt(0) == "/") {
-            var name = parts[0].substr(1).toLowerCase() as CommandStrings;
-            var method = commands[`command_${name}` as const];
+            const name = parts[0].substr(1).toLowerCase() as CommandStrings;
+            const method = commands[`command_${name}` as const];
             if(method) {
                 method.apply(commands, parts.slice(1) as any); // TODO any way to remove this "as any" cast?
                 return;
             }
         }
-        var messageId = session.clientId + "-" + Date.now();
+        const messageId = session.clientId + "-" + Date.now();
         session.send({
             type: "chat",
             text: message,
@@ -85,7 +85,7 @@ class Commands {
     playing: TogetherJSNS.Logs | null = null;
 
     command_help() {
-        var msg = util.trim(templates("help"));
+        const msg = util.trim(templates("help"));
         ui.chat.system({
             text: msg
         });
@@ -118,19 +118,19 @@ class Commands {
             return;
         }
         if(args[0] == "start") {
-            var times = parseInt(args[1], 10);
+            let times = parseInt(args[1], 10);
             if(isNaN(times) || !times) {
                 times = 100;
             }
             ui.chat.system({
                 text: "Testing with walkabout.js"
             });
-            var tmpl = $(templates("walkabout"));
-            var container = ui.container.find(".togetherjs-test-container");
+            const tmpl = $(templates("walkabout"));
+            const container = ui.container.find(".togetherjs-test-container");
             container.empty();
             container.append(tmpl);
             container.show();
-            var statusContainer = container.find(".togetherjs-status");
+            const statusContainer = container.find(".togetherjs-status");
             statusContainer.text("starting...");
             const self = this;
             this._testCancel = Walkabout.runManyActions({
@@ -142,7 +142,7 @@ class Commands {
                     self._testCancel = null;
                 },
                 onstatus: function(status) {
-                    var note = "actions: " + status.actions.length + " running: " +
+                    const note = "actions: " + status.actions.length + " running: " +
                         (status.times - status.remaining) + " / " + status.times;
                     statusContainer.text(note);
                 }
@@ -159,7 +159,7 @@ class Commands {
                 this._testShow = [];
             }
             else {
-                var actions = Walkabout.findActions();
+                const actions = Walkabout.findActions();
                 actions.forEach(function(this: Commands, action) {
                     this._testShow.push(action.show());
                 }, this);
@@ -184,10 +184,10 @@ class Commands {
     }
 
     command_exec() {
-        var expr = Array.prototype.slice.call(arguments).join(" ");
-        var result;
+        const expr = Array.prototype.slice.call(arguments).join(" ");
+        let result;
         // We use this to force global eval (not in this scope):
-        var e = eval;
+        const e = eval;
         try {
             result = e(expr);
         }
@@ -228,7 +228,7 @@ class Commands {
             });
             return;
         }
-        var logLoader = playback.getLogs(url);
+        const logLoader = playback.getLogs(url);
         logLoader.then(
             (logs) => {
                 if(!logs) {
@@ -370,7 +370,7 @@ const commands = new Commands();
 
 // this section deal with saving/restoring chat history as long as session is alive
 const chatStorageKey = "chatlog";
-var maxLogMessages = 100;
+const maxLogMessages = 100;
 
 function saveChatMessage(obj: {text: string, peerId: string, messageId: string, date: number}) {
     assert(obj.peerId);
@@ -380,7 +380,7 @@ function saveChatMessage(obj: {text: string, peerId: string, messageId: string, 
 
     loadChatLog().then(function(logs) {
         if(logs) {
-            for(var i = logs.length - 1; i >= 0; i--) {
+            for(let i = logs.length - 1; i >= 0; i--) {
                 if(logs[i].messageId === obj.messageId) {
                     return;
                 }
@@ -403,9 +403,9 @@ session.once("ui-ready", function() {
         if(!log) {
             return;
         }
-        for(var i = 0; i < log.length; i++) {
+        for(let i = 0; i < log.length; i++) {
             // peers should already be loaded from sessionStorage by the peers module
-            var currentPeer = peers.getPeer(log[i].peerId, undefined, true);
+            const currentPeer = peers.getPeer(log[i].peerId, undefined, true);
             if(!currentPeer) {
                 // sometimes peers go away
                 continue;
