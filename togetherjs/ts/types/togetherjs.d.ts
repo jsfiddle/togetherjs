@@ -1100,7 +1100,7 @@ declare global {
         (moduleName: "who"): typeof import("who");
         (moduleName: "windowing"): typeof import("windowing");
         (moduleName: "youtubeVideos"): typeof import("youtubeVideos");
-        (moduleName: "walkabout"): typeof import("youtubeVideos");
+        (moduleName: "walkabout"): { walkabout: WalkaboutModule };
 
         (moduleName: ["ui"], ready: (module: typeof import("ui")) => void): void;
         (moduleName: ["analytics"], ready: (module: typeof import("analytics")) => void): void;
@@ -1135,6 +1135,6 @@ declare global {
         (moduleName: ["who"], ready: (module: typeof import("who")) => void): void;
         (moduleName: ["windowing"], ready: (module: typeof import("windowing")) => void): void;
         (moduleName: ["youtubeVideos"], ready: (module: typeof import("youtubeVideos")) => void): void;
-        (moduleName: ["walkabout"], ready: (module: typeof import("youtubeVideos")) => void): void;
+        (moduleName: ["walkabout"], ready: (module: { walkabout: WalkaboutModule }) => void): void;
     }
 }
