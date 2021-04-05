@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.appConsole = void 0;
+    exports.appConsole = exports.Console = void 0;
     //function consoleMain(util: TogetherJSNS.Util) {
     var console = window.console || { log: function () { } };
     class Console {
@@ -220,6 +220,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             });
         }
     }
+    exports.Console = Console;
     Console.levels = {
         debug: 1,
         // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved

@@ -145,7 +145,7 @@ class TJSStorage {
     }
 }
 
-class TJSStorageWithTab extends TJSStorage {
+export class TJSStorageWithTab extends TJSStorage {
     constructor(
         name: string,
         storage: Storage,

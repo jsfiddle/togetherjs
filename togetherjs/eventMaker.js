@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.eventMaker = void 0;
+    exports.eventMaker = exports.EventMaker = void 0;
     jquery_1 = __importDefault(jquery_1);
     function createTogetherjsMouseEvent() {
         const event = document.createEvent("MouseEvents");
@@ -59,6 +59,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             target.dispatchEvent(event);
         }
     }
+    exports.EventMaker = EventMaker;
     exports.eventMaker = new EventMaker();
 });
 //return eventMaker;

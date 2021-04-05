@@ -1,4 +1,4 @@
-class Analytics {
+export class Analytics {
     activate() {
         var enable = TogetherJS.config.get("enableAnalytics");
         var code = TogetherJS.config.get("analyticsCode");

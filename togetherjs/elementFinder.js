@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.elementFinder = void 0;
+    exports.elementFinder = exports.ElementFinder = void 0;
     jquery_1 = __importDefault(jquery_1);
     function isJQuery(o) {
         return o instanceof jquery_1.default;
@@ -272,6 +272,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             }
         }
     }
+    exports.ElementFinder = ElementFinder;
     exports.elementFinder = new ElementFinder();
 });
 //define(["util", "jquery"], elementFinderMain);

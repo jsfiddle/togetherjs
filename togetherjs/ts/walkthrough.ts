@@ -64,7 +64,7 @@ function getIndex() {
     return 0;
 }
 
-class Walkthrough {
+export class Walkthrough {
 
     start(firstTime: boolean, doneCallback: (() => void) | null = null) {
         if(!container) {

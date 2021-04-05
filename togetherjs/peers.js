@@ -4,7 +4,7 @@
 define(["require", "exports", "./session", "./storage", "./templates", "./util"], function (require, exports, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.peers = void 0;
+    exports.peers = exports.Peers = exports.PeersSelf = exports.PeerClass = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert = util_1.util.assert.bind(util_1.util);
     var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
@@ -202,6 +202,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             // TODO this function does nothing? except maybe adding the peer to the static list of peers
         }
     }
+    exports.PeerClass = PeerClass;
     PeerClass.peers = {};
     const Peer = PeerClass;
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
@@ -379,6 +380,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             }
         }
     }
+    exports.PeersSelf = PeersSelf;
     class Peers extends OnClass {
         constructor() {
             super(...arguments);
@@ -415,6 +417,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             return result;
         }
     }
+    exports.Peers = Peers;
     exports.peers = new Peers();
     session_1.session.on("start", function () {
         if (exports.peers.Self) {

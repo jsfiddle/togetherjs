@@ -18,7 +18,7 @@ function createTogetherjsMouseEvent() {
     return event;
 }
 
-class EventMaker {
+export class EventMaker {
     performClick(target: HTMLElement | JQuery) {
         // FIXME: should accept other parameters, like Ctrl/Alt/etc
         var event = createTogetherjsMouseEvent();

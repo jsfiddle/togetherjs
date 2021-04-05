@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.channels = void 0;
+    exports.channels = exports.WebSocketChannel = void 0;
     /* Subclasses must define:
     
     - ._send(string)
@@ -167,6 +167,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         onclose() { }
     } // /WebSocketChannel
+    exports.WebSocketChannel = WebSocketChannel;
     /* Sends TO a window or iframe */
     class PostMessageChannel extends AbstractChannel {
         constructor(win, expectedOrigin) {

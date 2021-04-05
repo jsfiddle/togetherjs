@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.storage = void 0;
+    exports.storage = exports.TJSStorageWithTab = void 0;
     //function StorageMain(util: TogetherJSNS.Util) {
     var assert = util_1.util.assert.bind(util_1.util);
     var Deferred = util_1.util.Deferred;
@@ -138,6 +138,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.tab = tab;
         }
     }
+    exports.TJSStorageWithTab = TJSStorageWithTab;
     var namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
     const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");

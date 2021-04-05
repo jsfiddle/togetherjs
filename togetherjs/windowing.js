@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./session", "./util", "jquery"], function (require, exports, session_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.windowing = void 0;
+    exports.windowing = exports.Windowing = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
     var assert = util_1.util.assert.bind(util_1.util);
@@ -95,6 +95,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             }
         }
     }
+    exports.Windowing = Windowing;
     exports.windowing = new Windowing();
     /* Moves a window to be attached to data-bind-to, e.g., the button
         that opened the window. Or you can provide an element that it should bind to. */

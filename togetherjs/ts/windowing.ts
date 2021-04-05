@@ -20,7 +20,7 @@ var ANIMATION_DURATION = 1000;
 var onClose: null | (() => any) = null;
 /* Displays one window.  A window must already exist.  This hides other windows, and
     positions the window according to its data-bound-to attributes */
-class Windowing {
+export class Windowing {
     show(el: HTMLElement | JQuery | string, options: Partial<ShowOptions> = {}) {
         const element = $(el);
         options.bind = options.bind || element.attr("data-bind-to");

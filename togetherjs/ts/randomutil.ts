@@ -2,7 +2,7 @@ import { RandomStream } from "./libs/random";
 
 //function randomutilMain(_util: TogetherJSNS.Util, RandomStream: RandomStreamModule) {
 
-class Randomizer {
+export class Randomizer {
     private stream;
 
     private lower = "abcdefghijklmnopqrstuvwxyz";

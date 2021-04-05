@@ -23,7 +23,7 @@ class Module {
     }
 }
 
-class Util {
+export class Util {
     public Deferred;
     AssertionError: typeof AssertionError;
     Module = (name: string) => new Module(name);

@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./peers", "./session", "./templates", "./templating", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, session_1, templates_1, templating_1, ui_1, util_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.walkthrough = void 0;
+    exports.walkthrough = exports.Walkthrough = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
     let assert = util_1.util.assert.bind(util_1.util);
@@ -143,6 +143,7 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
             }
         }
     }
+    exports.Walkthrough = Walkthrough;
     exports.walkthrough = new Walkthrough();
     session_1.session.on("hide-window", function () {
         if (onHideAll) {

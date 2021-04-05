@@ -484,7 +484,7 @@ class tinymceEditor extends Editor {
 }
 
 type Tracker = tinymceEditor | CKEditor | CodeMirrorEditor | AceEditor;
-type TrackerClass = typeof tinymceEditor | typeof CKEditor | typeof CodeMirrorEditor | typeof AceEditor;
+export type TrackerClass = typeof tinymceEditor | typeof CKEditor | typeof CodeMirrorEditor | typeof AceEditor;
 
 TogetherJS.addTracker(tinymceEditor, true);
 ///////////////// END OF TINYMCE ///////////////////////////////////
@@ -957,7 +957,6 @@ session.hub.on("hello", function(msg) {
     }
 });
 
-export const forms = { trackerClassExport: null } as unknown as { trackerClassExport: TrackerClass }; // TODO ugly export
 //}
 
 //define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);

@@ -125,7 +125,7 @@ abstract class AbstractChannel extends OnClass<TogetherJSNS.On.Map> {
     abstract onclose(): void;
 }
 
-class WebSocketChannel extends AbstractChannel {
+export class WebSocketChannel extends AbstractChannel {
     backoffTime = 50; // Milliseconds to add to each reconnect time
     maxBackoffTime = 1500;
     backoffDetection = 2000; // Amount of time since last connection attempt that shows we need to back off

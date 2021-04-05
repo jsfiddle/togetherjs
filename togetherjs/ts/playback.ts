@@ -38,7 +38,7 @@ function parseLogs(rawlog: string) {
     return new Logs(result);
 }
 
-class Logs {
+export class Logs {
     public pos: number;
     //@ts-expect-error this field is just for debug so its main usage is in the console
     private start: number | null = null;
@@ -152,8 +152,7 @@ class Logs {
     }
 }
 
-class Playback {
-    LogsExport!: Logs; // TODO ugly export;
+export class Playback {
     getLogs(url: string) {
         if(url.search(/^local:/) === 0) {
             return $.Deferred<Logs>(function(def) {

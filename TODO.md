@@ -110,6 +110,8 @@ For legacy reasons we use JQuery 1.11.1 which is apparently the last version of 
 It was released on May 1st 2014 according to [this](https://blog.jquery.com/2014/05/01/jquery-1-11-1-and-2-1-1-released/)
 The api at this date can be browsed here: https://web.archive.org/web/20140520215629/http://api.jquery.com/
 
+Regex for finding jquery usage: \$[(.]
+
 # Playback
 
 Typing `/record` in the chat starts the recording which will open a popup. Then, do some things on the page like moving your cursor or clicking. Then `/savelogs l2` will save it in the localstorage. Then `/playback local:l2` will replay those events.

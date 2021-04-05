@@ -9,7 +9,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, exports, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.util = void 0;
+    exports.util = exports.Util = void 0;
     jquery_1 = __importDefault(jquery_1);
     class AssertionError extends Error {
         constructor(message) {
@@ -262,6 +262,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             });
         }
     }
+    exports.Util = Util;
     exports.util = new Util(jquery_1.default, window.TogetherJS);
     exports.util.Deferred = jquery_1.default.Deferred;
     window.TogetherJS.$ = jquery_1.default;

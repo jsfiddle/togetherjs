@@ -9,7 +9,7 @@ import $ from "jquery";
 //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
 var assert: typeof util.assert = util.assert.bind(util);
 
-class Templating {
+export class Templating {
     clone(templateId: string) { // TODO may be changed to a union type with all possibilities?
         let templateId2 = "#togetherjs-template-" + templateId;
         var template = $(templateId2);

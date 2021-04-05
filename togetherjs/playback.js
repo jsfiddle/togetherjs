@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./session", "./storage", "jquery"], function (require, exports, session_1, storage_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.playback = void 0;
+    exports.playback = exports.Playback = exports.Logs = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
     var ALWAYS_REPLAY = {
@@ -143,6 +143,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             // FIXME: should do a bye message here
         }
     }
+    exports.Logs = Logs;
     class Playback {
         getLogs(url) {
             if (url.search(/^local:/) === 0) {
@@ -185,6 +186,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             });
         }
     }
+    exports.Playback = Playback;
     exports.playback = new Playback();
 });
 //define(["jquery", "util", "session", "storage", "require"], playbackMain);

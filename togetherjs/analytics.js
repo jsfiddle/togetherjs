@@ -1,7 +1,7 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.analytics = void 0;
+    exports.analytics = exports.Analytics = void 0;
     class Analytics {
         activate() {
             var enable = TogetherJS.config.get("enableAnalytics");
@@ -28,6 +28,7 @@ define(["require", "exports"], function (require, exports) {
         }
         ;
     }
+    exports.Analytics = Analytics;
     exports.analytics = new Analytics();
 });
 //define(["util"], analyticsMain);

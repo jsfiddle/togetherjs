@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./session", "./templates", "./templating", "./util", "./visibilityApi", "./windowing", "jquery"], function (require, exports, elementFinder_1, linkify_1, peers_1, session_1, templates_1, templating_1, util_1, visibilityApi_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ui = void 0;
+    exports.ui = exports.Ui = exports.PeerView = exports.PeerSelfView = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function uiMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, linkify: TogetherJSNS.Linkify, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing, elementFinder: TogetherJSNS.ElementFinder, visibilityApi: TogetherJSNS.VisibilityApi) {
     var assert = util_1.util.assert.bind(util_1.util);
@@ -378,6 +378,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             }
         }
     }
+    exports.PeerSelfView = PeerSelfView;
     /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
     class PeerView extends PeerSelfView {
         constructor(ui, peer) {
@@ -572,6 +573,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             session_1.session.off("hide-window", this.maybeHideDetailWindow);
         }
     }
+    exports.PeerView = PeerView;
     class Ui {
         constructor() {
             this.PeerView = (peer) => new PeerView(this, peer);
@@ -1125,6 +1127,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             }
         }
     }
+    exports.Ui = Ui;
     function panelPosition() {
         var iface = jquery_1.default("#togetherjs-dock");
         if (iface.hasClass("togetherjs-dock-right")) {

@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./session", "./util", "jquery"], function (require, exports, session_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.templating = void 0;
+    exports.templating = exports.Templating = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
     var assert = util_1.util.assert.bind(util_1.util);
@@ -87,6 +87,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             return template;
         }
     }
+    exports.Templating = Templating;
     exports.templating = new Templating();
 });
 //define(["jquery", "util", "peers", "windowing", "session"], templatingMain);

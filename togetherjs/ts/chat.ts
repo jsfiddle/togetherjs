@@ -45,7 +45,7 @@ session.hub.on("bye", function(msg) {
 
 type CommandStrings = "test" | "clear" | "help" | "test" | "clear" | "exec" | "record" | "playback" | "savelogs" | "baseurl" | "config";
 
-class Chat {
+export class Chat {
     submit(message: string) {
         var parts = message.split(/ /);
         if(parts[0].charAt(0) == "/") {

@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ot = void 0;
+    exports.ot = exports.TextReplace = exports.SimpleHistory = void 0;
     //function otMain(util: TogetherJSNS.Util) {
     const assert = util_1.util.assert.bind(util_1.util);
     class Queue {
@@ -317,6 +317,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             return qchange; // TODO is there any way to avoid this cast?
         }
     }
+    exports.SimpleHistory = SimpleHistory;
     class TextReplace {
         constructor(start, del, text) {
             this.start = start;
@@ -503,6 +504,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             throw 'Unreachable';
         }
     }
+    exports.TextReplace = TextReplace;
     // TODO this class seems to be unused
     //@ts-expect-error unused but we don't removed things for now
     class TJSHistory {
@@ -712,9 +714,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     exports.ot = {
         SimpleHistory: (clientId, initState, initBasis) => new SimpleHistory(clientId, initState, initBasis),
         //History: () => new TJSHistory(), // TODO does not seem to be used
-        TextReplace: TextReplace,
-        TextReplaceExport: new TextReplace(0, 0, ""),
-        SimpleHistoryExport: new SimpleHistory("", "", 0),
+        TextReplace: TextReplace, //(start, del, text) => new TextReplace(start, del, text),
     };
 });
 //return ot;

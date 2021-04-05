@@ -21,7 +21,7 @@ require(["ui"], function(uiModule: typeof import("ui")) {
 
 var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
-class PeerClass {
+export class PeerClass {
     public readonly isSelf: false = false;
 
     public readonly id: string;
@@ -252,7 +252,7 @@ session.on("follow-peer", function(peer) {
     }
 });
 
-class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
+export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public readonly isSelf: true = true;
     public readonly id = session.clientId;
     public identityId = session.identityId;
@@ -420,9 +420,7 @@ class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     }
 }
 
-class Peers extends OnClass<TogetherJSNS.On.Map> {
-    //@ts-expect-error export
-    private PeerClassExport!: PeerClass; // TODO very ugly way to export the class
+export class Peers extends OnClass<TogetherJSNS.On.Map> {
     public Self!: PeersSelf; // TODO !
     public readonly _SelfLoaded = util.Deferred();
 

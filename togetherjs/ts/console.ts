@@ -18,7 +18,7 @@ interface ConsoleSubmitOptions {
 
 var console = window.console || { log: function() { } };
 
-class Console {
+export class Console {
     public static levels: {[ll in LogLevelString]: number} = {
         debug: 1,
         // FIXME: I'm considering *not* wrapping console.log, and strictly keeping it as a debugging tool; also line numbers would be preserved

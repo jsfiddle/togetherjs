@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./peers", "./playback", "./session", "./storage", "./templates", "./ui", "./util", "./windowing", "jquery"], function (require, exports, peers_1, playback_1, session_1, storage_1, templates_1, ui_1, util_1, windowing_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.chat = void 0;
+    exports.chat = exports.Chat = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function chatMain(require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, templates: TogetherJSNS.Templates, playback: TogetherJSNS.Playback, storage: TogetherJSNS.Storage, peers: TogetherJSNS.Peers, windowing: TogetherJSNS.Windowing) {
     var assert = util_1.util.assert.bind(util_1.util);
@@ -66,6 +66,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             });
         }
     }
+    exports.Chat = Chat;
     exports.chat = new Chat();
     class Commands {
         constructor() {

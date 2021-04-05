@@ -251,7 +251,7 @@ class Chat {
 }
 
 /** Like PeerView but for PeerSelf/ExternalPeer objects, also acts as a base for PeerView since PeerView extends PeerSelfView */
-class PeerSelfView {
+export class PeerSelfView {
     protected followCheckbox?: JQuery;
     protected _lastUpdateUrlDisplay?: string;
     protected dockElement: JQuery | null = null;
@@ -403,7 +403,7 @@ class PeerSelfView {
 }
 
 /* This class is bound to peers.Peer instances as peer.view. The .update() method is regularly called by peer objects when info changes. */
-class PeerView extends PeerSelfView {
+export class PeerView extends PeerSelfView {
     constructor(
         ui: Ui,
         protected peer: TogetherJSNS.PeerClass
@@ -615,7 +615,7 @@ class PeerView extends PeerSelfView {
     }
 }
 
-class Ui {
+export class Ui {
     public container!: JQuery; // TODO !
     public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
     public readonly PeerSelfView = (peer: TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerSelfView(this, peer);

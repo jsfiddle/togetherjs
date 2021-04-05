@@ -29,7 +29,7 @@ class CannotFind {
     }
 }
 
-class ElementFinder {
+export class ElementFinder {
     ignoreElement(element: HTMLElement | JQuery) {
         let el: Node | JQuery | null = element;
         if(isJQuery(el)) {

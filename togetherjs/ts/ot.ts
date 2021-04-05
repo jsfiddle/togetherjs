@@ -237,7 +237,7 @@ class Change {
  * which is the main difference with ot.History.  Everyone applies
  * the same patches in the same order.
  */
-class SimpleHistory {
+export class SimpleHistory {
     private clientId;
     public committed: string;
     public current;
@@ -348,7 +348,7 @@ class SimpleHistory {
     }
 }
 
-class TextReplace {
+export class TextReplace {
     constructor(
         public readonly start: number,
         public readonly del: number,
@@ -783,8 +783,6 @@ export const ot = {
     SimpleHistory: (clientId: string, initState: string, initBasis: number) => new SimpleHistory(clientId, initState, initBasis),
     //History: () => new TJSHistory(), // TODO does not seem to be used
     TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
-    TextReplaceExport: new TextReplace(0, 0, ""), // TODO ugly export
-    SimpleHistoryExport: new SimpleHistory("", "", 0),
 }
 
 //return ot;

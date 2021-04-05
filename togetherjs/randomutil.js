@@ -1,7 +1,7 @@
 define(["require", "exports", "./libs/random"], function (require, exports, random_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.randomutil = void 0;
+    exports.randomutil = exports.Randomizer = void 0;
     //function randomutilMain(_util: TogetherJSNS.Util, RandomStream: RandomStreamModule) {
     class Randomizer {
         constructor(seed) {
@@ -57,6 +57,7 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             return chars.charAt(this.number(chars.length));
         }
     }
+    exports.Randomizer = Randomizer;
     const randomutil = (seed) => new Randomizer(seed);
     exports.randomutil = randomutil;
 });

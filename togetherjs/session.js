@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./channels", "./storage", "./util", "jquery"], function (require, exports, channels_1, storage_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.session = void 0;
+    exports.session = exports.Session = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
     var DEBUG = false;
@@ -201,6 +201,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             return channel; // TODO !
         }
     }
+    exports.Session = Session;
     exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     /****************************************

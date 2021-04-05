@@ -4,7 +4,7 @@
 define(["require", "exports", "./channels", "./session", "./ui", "./util"], function (require, exports, channels_1, session_1, ui_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.who = void 0;
+    exports.who = exports.Who = exports.ExternalPeer = void 0;
     //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
     const assert = util_1.util.assert.bind(util_1.util);
     var MAX_RESPONSE_TIME = 5000;
@@ -29,6 +29,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
             return prefix + util_1.util.safeClassName(this.id);
         }
     }
+    exports.ExternalPeer = ExternalPeer;
     class Who {
         constructor() {
             this.ExternalPeer = (id, attrs) => new ExternalPeer(id, attrs);
@@ -119,6 +120,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
             });
         }
     }
+    exports.Who = Who;
     exports.who = new Who();
 });
 //return who;

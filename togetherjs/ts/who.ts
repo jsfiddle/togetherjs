@@ -12,7 +12,7 @@ const assert: typeof util.assert = util.assert.bind(util);
 var MAX_RESPONSE_TIME = 5000;
 var MAX_LATE_RESPONSE = 2000;
 
-class ExternalPeer {
+export class ExternalPeer {
     isSelf = false;
     isExternal = true;
     id;
@@ -49,8 +49,7 @@ class ExternalPeer {
     }
 }
 
-class Who {
-    ExternalPeerExport!: ExternalPeer; // TODO ugly export
+export class Who {
     ExternalPeer = (id: string, attrs: TogetherJSNS.ExternalPeerAttributes) => new ExternalPeer(id, attrs);
 
     getList(hubUrl: string) {

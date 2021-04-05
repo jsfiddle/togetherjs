@@ -7,7 +7,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./util", "jquery"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.forms = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
     const assert = util_1.util.assert.bind(util_1.util);
@@ -832,7 +831,6 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             });
         }
     });
-    exports.forms = { trackerClassExport: null }; // TODO ugly export
 });
 //}
 //define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating", "ot"], formsMain);
