@@ -29,7 +29,7 @@ export class Util {
     Module = (name: string) => new Module(name);
     Class!: (superClass: Object, prototype?: Object) => any;
 
-    public constructor($: JQueryStatic) {
+    public constructor() {
         this.Deferred = $.Deferred;
         this.AssertionError = AssertionError;
     }
@@ -282,4 +282,4 @@ export class Util {
     }
 }
 
-export let util = new Util($);
+export let util = new Util();
