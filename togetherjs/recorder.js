@@ -4,7 +4,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "./channels", "./util", "jquery"], function (require, exports, channels_1, util_1, jquery_1) {
+define(["require", "exports", "jquery", "./channels", "./util"], function (require, exports, jquery_1, channels_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.recorder = void 0;
@@ -90,7 +90,7 @@ define(["require", "exports", "./channels", "./util", "jquery"], function (requi
             }
             hubBase = hubBase.replace(/\/*$/, "");
             var url = hubBase + "/hub/" + this.shareId;
-            channel = channels_1.channels.WebSocketChannel(url);
+            channel = new channels_1.WebSocketChannel(url);
             channel.onmessage = msg => {
                 if (msg.type == "hello-back") {
                     display("#connected");

@@ -4,30 +4,26 @@
 
 import { session } from "./session";
 
-/* Loading this module will cause, when TogetherJS is active, the
-   session object to emit visibility-change with a `hidden` argument
-   whenever the visibility changes, on browsers where we can detect
-   it.
-   */
+// Loading this module will cause, when TogetherJS is active, the session object to emit visibility-change with a `hidden` argument whenever the visibility changes, on browsers where we can detect it.
 
 //function visibilityApiMain(_util: TogetherJSNS.Util, session: TogetherJSNS.On) {
-let hidden: "hidden" | "mozHidden" | "msHidden" | "webkitHidden";
+let hiddenProp: "hidden" | "mozHidden" | "msHidden" | "webkitHidden";
 let visibilityChange: "visibilitychange" | "mozvisibilitychange" | "msvisibilitychange" | "webkitvisibilitychange";
 
 if(document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
-    hidden = "hidden";
+    hiddenProp = "hidden";
     visibilityChange = "visibilitychange";
 }
 else if(document.mozHidden !== undefined) {
-    hidden = "mozHidden";
+    hiddenProp = "mozHidden";
     visibilityChange = "mozvisibilitychange";
 }
 else if(document.msHidden !== undefined) {
-    hidden = "msHidden";
+    hiddenProp = "msHidden";
     visibilityChange = "msvisibilitychange";
 }
 else if(document.webkitHidden !== undefined) {
-    hidden = "webkitHidden";
+    hiddenProp = "webkitHidden";
     visibilityChange = "webkitvisibilitychange";
 }
 
@@ -40,13 +36,15 @@ session.on("close", function() {
 });
 
 function change() {
-    session.emit("visibility-change", !!document[hidden]);
+    session.emit("visibility-change", !!document[hiddenProp]);
+}
+
+function hidden() {
+    return document[hiddenProp];
 }
 
 export const visibilityApi = {
-    hidden: function() {
-        return document[hidden];
-    }
+    hidden: hidden
 }
 
 //return visibilityApi;

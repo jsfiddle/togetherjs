@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ot = exports.TextReplace = exports.SimpleHistory = void 0;
+    exports.TextReplace = exports.SimpleHistory = void 0;
     //function otMain(util: TogetherJSNS.Util) {
     const assert = util_1.util.assert.bind(util_1.util);
     class Queue {
@@ -711,11 +711,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
         }
     }
-    exports.ot = {
-        SimpleHistory: (clientId, initState, initBasis) => new SimpleHistory(clientId, initState, initBasis),
-        //History: () => new TJSHistory(), // TODO does not seem to be used
-        TextReplace: TextReplace, //(start, del, text) => new TextReplace(start, del, text),
-    };
 });
 //return ot;
 //define(["util"], otMain);

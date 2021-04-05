@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { channels } from "./channels";
+import $ from "jquery";
+import { Router, WebSocketChannel } from "./channels";
 import { storage } from "./storage";
 import { util } from "./util";
-import $ from "jquery";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
 var DEBUG = false;
@@ -30,7 +30,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     public shareId: string | null = null;
     /** This is the ID that identifies this client: */
     public clientId!: string; // TODO !
-    public readonly router = channels.Router();
+    public readonly router = new Router();
     /** Indicates if TogetherJS has just started (not continuing from a saved session): */
     public firstRun = false;
     /** Setting, essentially global: */
@@ -256,7 +256,7 @@ var readyForMessages = false;
 function openChannel() {
     assert(!channel, "Attempt to re-open channel");
     console.info("Connecting to", session.hubUrl(), location.href);
-    var c = channels.WebSocketChannel(session.hubUrl());
+    var c = new WebSocketChannel(session.hubUrl());
     c.onmessage = function(msg) {
         if(!readyForMessages) {
             if(DEBUG) {

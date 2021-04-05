@@ -430,7 +430,7 @@ class PostMessageIncomingChannel extends AbstractChannel {
     onmessage = () => {}
 }; // /PostMessageIncomingChannel
 
-class Router extends OnClass<TogetherJSNS.On.Map> {
+export class Router extends OnClass<TogetherJSNS.On.Map> {
     _routes: {[key: string]: Route} = Object.create(null);
     channel!: AbstractChannel; // TODO !
 
@@ -526,10 +526,3 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
     }
 
 } // /Route
-
-export let channels = {
-    "WebSocketChannel": (address: string) => new WebSocketChannel(address),
-    "PostMessageChannel": (win: WindowProxy, expectedOrigin: Origin) => new PostMessageChannel(win, expectedOrigin),
-    "PostMessageIncomingChannel": (expectedOrigin: Origin) => new PostMessageIncomingChannel(expectedOrigin),
-    "Router": () => new Router(),
-}

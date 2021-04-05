@@ -5,28 +5,24 @@ define(["require", "exports", "./session"], function (require, exports, session_
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.visibilityApi = void 0;
-    /* Loading this module will cause, when TogetherJS is active, the
-       session object to emit visibility-change with a `hidden` argument
-       whenever the visibility changes, on browsers where we can detect
-       it.
-       */
+    // Loading this module will cause, when TogetherJS is active, the session object to emit visibility-change with a `hidden` argument whenever the visibility changes, on browsers where we can detect it.
     //function visibilityApiMain(_util: TogetherJSNS.Util, session: TogetherJSNS.On) {
-    let hidden;
+    let hiddenProp;
     let visibilityChange;
     if (document.hidden !== undefined) { // Opera 12.10 and Firefox 18 and later support
-        hidden = "hidden";
+        hiddenProp = "hidden";
         visibilityChange = "visibilitychange";
     }
     else if (document.mozHidden !== undefined) {
-        hidden = "mozHidden";
+        hiddenProp = "mozHidden";
         visibilityChange = "mozvisibilitychange";
     }
     else if (document.msHidden !== undefined) {
-        hidden = "msHidden";
+        hiddenProp = "msHidden";
         visibilityChange = "msvisibilitychange";
     }
     else if (document.webkitHidden !== undefined) {
-        hidden = "webkitHidden";
+        hiddenProp = "webkitHidden";
         visibilityChange = "webkitvisibilitychange";
     }
     session_1.session.on("start", function () {
@@ -36,12 +32,13 @@ define(["require", "exports", "./session"], function (require, exports, session_
         document.removeEventListener(visibilityChange, change, false);
     });
     function change() {
-        session_1.session.emit("visibility-change", !!document[hidden]);
+        session_1.session.emit("visibility-change", !!document[hiddenProp]);
+    }
+    function hidden() {
+        return document[hiddenProp];
     }
     exports.visibilityApi = {
-        hidden: function () {
-            return document[hidden];
-        }
+        hidden: hidden
     };
 });
 //return visibilityApi;

@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import $ from "jquery";
 import { elementFinder } from "./elementFinder";
 import { eventMaker } from "./eventMaker";
-import { ot } from "./ot";
+import { SimpleHistory, TextReplace } from "./ot";
 import { session } from "./session";
 import { templating } from "./templating";
 import { util } from "./util";
-import $ from "jquery";
 
 //function formsMain($: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, templating: TogetherJSNS.Templating, ot: TogetherJSNS.Ot) {
 const assert: typeof util.assert = util.assert.bind(util);
@@ -88,7 +88,7 @@ function sendData(attrs: SendDataAttributes) {
             if(history.current == value) {
                 return;
             }
-            var delta = ot.TextReplace.fromChange(history.current, value);
+            var delta = TextReplace.fromChange(history.current, value);
             assert(delta);
             history.add(delta);
             maybeSendUpdate(location, history, tracker);
@@ -96,7 +96,7 @@ function sendData(attrs: SendDataAttributes) {
         }
         else {
             msg.basis = 1;
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId, value, 1));
+            el.data("togetherjsHistory", new SimpleHistory(session.clientId, value, 1));
         }
     }
 
@@ -496,7 +496,7 @@ function buildTrackers() {
         if(els) {
             $.each(els, function(this: JQuery) {
                 var tracker = new TrackerClass(this);
-                $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+                $(this).data("togetherjsHistory", new SimpleHistory(session.clientId, tracker.getContent(), 1));
                 liveTrackers.push(tracker);
             });
         }
@@ -670,7 +670,7 @@ session.hub.on("form-update", function(msg) {
         }
         history.setSelection(selection);
         // make a real TextReplace object.
-        const delta = new ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+        const delta = new TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
         const change: TogetherJSNS.Change2 = {id: msg.replace.id, delta: delta, basis: msg.replace.basis};
         // apply this change to the history
         var changed = history.commit(change);
@@ -804,7 +804,7 @@ function setInit() {
         var value = getValue(el[0]);
         if(typeof value === "string") { // no need to create an History if it's not a string value
             // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
-            el.data("togetherjsHistory", ot.SimpleHistory(session.clientId!, value, 1)); // TODO !
+            el.data("togetherjsHistory", new SimpleHistory(session.clientId!, value, 1)); // TODO !
         }
     });
     destroyTrackers();
@@ -858,7 +858,7 @@ session.hub.on("form-init", function(msg) {
                 // (we might have outstanding queued changes we don't want to lose)
                 if(!(history && history.basis === update.basis && history.basis !== 1)) {
                     // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
-                    $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, update.value, update.basis));
+                    $(el).data("togetherjsHistory", new SimpleHistory(session.clientId, update.value, update.basis));
                 }
             }
         }

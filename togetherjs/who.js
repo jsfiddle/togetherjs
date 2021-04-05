@@ -37,7 +37,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
         getList(hubUrl) {
             return util_1.util.Deferred(function (def) {
                 var expected;
-                var channel = channels_1.channels.WebSocketChannel(hubUrl);
+                var channel = new channels_1.WebSocketChannel(hubUrl);
                 var users = {};
                 var responded = 0;
                 //var firstResponse = 0; // TODO unused
@@ -88,7 +88,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
         }
         invite(hubUrl, clientId) {
             return util_1.util.Deferred(function (def) {
-                var channel = channels_1.channels.WebSocketChannel(hubUrl);
+                var channel = new channels_1.WebSocketChannel(hubUrl);
                 var id = util_1.util.generateId();
                 channel.onmessage = function (msg) {
                     if (msg.type == "invite" && msg.inviteId == id) {

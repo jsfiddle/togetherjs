@@ -779,12 +779,6 @@ class TJSHistory {
     }
 }
 
-export const ot = {
-    SimpleHistory: (clientId: string, initState: string, initBasis: number) => new SimpleHistory(clientId, initState, initBasis),
-    //History: () => new TJSHistory(), // TODO does not seem to be used
-    TextReplace: TextReplace,//(start, del, text) => new TextReplace(start, del, text),
-}
-
 //return ot;
 
 //define(["util"], otMain);

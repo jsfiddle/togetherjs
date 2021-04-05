@@ -1,33 +1,24 @@
 import type { linkify } from "linkify";
-import type { channels } from "../channels";
-import type { ot } from "../ot";
-import type { TextReplace as TextReplaceType } from "../ot";
-import type { visibilityApi } from "../visibilityApi";
+import type { Analytics as AnalyticsType } from "../analytics";
 import type { WebSocketChannel as WebSocketChannelType } from "../channels";
-import type { TJSStorageWithTab } from "../storage";
-import type { Session  as SessionType } from "../session";
-import type { Peers  as PeersType } from "../peers";
-import type { PeerClass  as PeerClassType } from "../peers";
-import type { PeersSelf  as PeersSelfType } from "../peers";
-import type { Windowing  as WindowingType } from "../windowing";
-import type { Templating  as TemplatingType } from "../templating";
-import type { Playback  as PlaybackType } from "../playback";
-import type { Chat  as ChatType } from "../chat";
-import type { Util  as UtilType } from "../util";
-import type { Ui  as UiType } from "../ui";
-import type { Who  as WhoType } from "../who";
-import type { ExternalPeer  as ExternalPeerType } from "../who";
-import type { Console  as ConsoleType } from "../console";
-import type { PeerView  as PeerViewType } from "../ui";
-import type { PeerSelfView  as PeerSelfViewType } from "../ui";
-import type { Walkthrough  as WalkthroughType } from "../walkthrough";
-import type { Analytics  as AnalyticsType } from "../analytics";
-import type { Logs as LogsType } from "../playback";
-import type { TrackerClass as TrackerClassType } from "../forms";
-import type { Randomizer as RandomizerType } from "../randomutil";
-import type { SimpleHistory as SimpleHistoryType } from "../ot";
-import type { EventMaker as EventMakerType } from "../eventMaker";
+import type { Chat as ChatType } from "../chat";
+import type { Console as ConsoleType } from "../console";
 import type { ElementFinder as ElementFinderType } from "../elementFinder";
+import type { EventMaker as EventMakerType } from "../eventMaker";
+import type { TrackerClass as TrackerClassType } from "../forms";
+import type { SimpleHistory as SimpleHistoryType, TextReplace as TextReplaceType } from "../ot";
+import type { PeerClass as PeerClassType, Peers as PeersType, PeersSelf as PeersSelfType } from "../peers";
+import type { Logs as LogsType, Playback as PlaybackType } from "../playback";
+import type { Randomizer as RandomizerType } from "../randomutil";
+import type { Session as SessionType } from "../session";
+import type { TJSStorageWithTab } from "../storage";
+import type { Templating as TemplatingType } from "../templating";
+import type { PeerSelfView as PeerSelfViewType, PeerView as PeerViewType, Ui as UiType } from "../ui";
+import type { Util as UtilType } from "../util";
+import type { visibilityApi } from "../visibilityApi";
+import type { Walkthrough as WalkthroughType } from "../walkthrough";
+import type { ExternalPeer as ExternalPeerType, Who as WhoType } from "../who";
+import type { Windowing as WindowingType } from "../windowing";
 
 declare global {
     namespace TogetherJSNS {
@@ -583,13 +574,11 @@ declare global {
             }
         }
 
-        type Channels = typeof channels;
         type Storage = TJSStorageWithTab; 
         type Session = SessionType;
         type Peers = PeersType;
         type Windowing = WindowingType;
         type Templating = TemplatingType; 
-        type Ot = typeof ot;
         type Linkify = typeof linkify;
         type VisibilityApi = typeof visibilityApi;
         type Playback = PlaybackType;

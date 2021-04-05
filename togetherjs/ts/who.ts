@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { channels } from "./channels";
+import { WebSocketChannel } from "./channels";
 import { session } from "./session";
 import { ui } from "./ui";
 import { util } from "./util";
@@ -55,7 +55,7 @@ export class Who {
     getList(hubUrl: string) {
         return util.Deferred<{ [user: string]: ExternalPeer }>(function(def) {
             var expected: number;
-            var channel = channels.WebSocketChannel(hubUrl);
+            var channel = new WebSocketChannel(hubUrl);
             var users: { [user: string]: ExternalPeer } = {};
             var responded = 0;
             //var firstResponse = 0; // TODO unused
@@ -107,7 +107,7 @@ export class Who {
 
     invite(hubUrl: string, clientId: string | null) {
         return util.Deferred(function(def) {
-            var channel = channels.WebSocketChannel(hubUrl);
+            var channel = new WebSocketChannel(hubUrl);
             var id = util.generateId();
             channel.onmessage = function(msg) {
                 if(msg.type == "invite" && msg.inviteId == id) {

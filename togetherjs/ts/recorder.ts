@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { channels } from "./channels";
-import { util } from "./util";
 import $ from "jquery";
+import { WebSocketChannel } from "./channels";
+import { util } from "./util";
 
 //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
 const assert: typeof util.assert = util.assert.bind(util);
@@ -93,7 +93,7 @@ class Recorder {
         }
         hubBase = hubBase.replace(/\/*$/, "");
         var url = hubBase + "/hub/" + this.shareId;
-        channel = channels.WebSocketChannel(url);
+        channel = new WebSocketChannel(url);
         channel.onmessage = msg => {
             if(msg.type == "hello-back") {
                 display("#connected");

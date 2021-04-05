@@ -4,7 +4,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "./channels", "./storage", "./util", "jquery"], function (require, exports, channels_1, storage_1, util_1, jquery_1) {
+define(["require", "exports", "jquery", "./channels", "./storage", "./util"], function (require, exports, jquery_1, channels_1, storage_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.session = exports.Session = void 0;
@@ -26,7 +26,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
             super(...arguments);
             /** This is the hub we connect to: */
             this.shareId = null;
-            this.router = channels_1.channels.Router();
+            this.router = new channels_1.Router();
             /** Indicates if TogetherJS has just started (not continuing from a saved session): */
             this.firstRun = false;
             /** Setting, essentially global: */
@@ -228,7 +228,7 @@ define(["require", "exports", "./channels", "./storage", "./util", "jquery"], fu
     function openChannel() {
         assert(!channel, "Attempt to re-open channel");
         console.info("Connecting to", exports.session.hubUrl(), location.href);
-        var c = channels_1.channels.WebSocketChannel(exports.session.hubUrl());
+        var c = new channels_1.WebSocketChannel(exports.session.hubUrl());
         c.onmessage = function (msg) {
             if (!readyForMessages) {
                 if (DEBUG) {

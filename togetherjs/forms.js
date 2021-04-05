@@ -4,7 +4,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./util", "jquery"], function (require, exports, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, util_1, jquery_1) {
+define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot", "./session", "./templating", "./util"], function (require, exports, jquery_1, elementFinder_1, eventMaker_1, ot_1, session_1, templating_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     jquery_1 = __importDefault(jquery_1);
@@ -64,7 +64,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                 if (history.current == value) {
                     return;
                 }
-                var delta = ot_1.ot.TextReplace.fromChange(history.current, value);
+                var delta = ot_1.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
                 maybeSendUpdate(location, history, tracker);
@@ -72,7 +72,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             }
             else {
                 msg.basis = 1;
-                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1));
+                el.data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, value, 1));
             }
         }
         session_1.session.send(msg);
@@ -401,7 +401,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             if (els) {
                 jquery_1.default.each(els, function () {
                     var tracker = new TrackerClass(this);
-                    jquery_1.default(this).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
+                    jquery_1.default(this).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
                     liveTrackers.push(tracker);
                 });
             }
@@ -564,7 +564,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             }
             history.setSelection(selection);
             // make a real TextReplace object.
-            const delta = new ot_1.ot.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
+            const delta = new ot_1.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             const change = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
             var changed = history.commit(change);
@@ -692,7 +692,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
             var value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
                 // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
-                el.data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, value, 1)); // TODO !
+                el.data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, value, 1)); // TODO !
             }
         });
         destroyTrackers();
@@ -742,7 +742,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./ot", "./sess
                     // (we might have outstanding queued changes we don't want to lose)
                     if (!(history && history.basis === update.basis && history.basis !== 1)) {
                         // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
-                        jquery_1.default(el).data("togetherjsHistory", ot_1.ot.SimpleHistory(session_1.session.clientId, update.value, update.basis));
+                        jquery_1.default(el).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, update.value, update.basis));
                     }
                 }
             }

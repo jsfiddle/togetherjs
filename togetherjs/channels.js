@@ -4,7 +4,7 @@
 define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.channels = exports.WebSocketChannel = void 0;
+    exports.Router = exports.WebSocketChannel = void 0;
     /* Subclasses must define:
     
     - ._send(string)
@@ -405,6 +405,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             return route;
         }
     } // /Router
+    exports.Router = Router;
     class Route extends OnClass {
         constructor(router, id) {
             super();
@@ -426,10 +427,4 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             delete this.router._routes[this.id];
         }
     } // /Route
-    exports.channels = {
-        "WebSocketChannel": (address) => new WebSocketChannel(address),
-        "PostMessageChannel": (win, expectedOrigin) => new PostMessageChannel(win, expectedOrigin),
-        "PostMessageIncomingChannel": (expectedOrigin) => new PostMessageIncomingChannel(expectedOrigin),
-        "Router": () => new Router(),
-    };
 });
