@@ -1170,7 +1170,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             let canvas = document.createElement("canvas");
             canvas.height = session_1.session.AVATAR_SIZE;
             canvas.width = session_1.session.AVATAR_SIZE;
-            let context = canvas.getContext("2d");
+            let context = canvas.getContext("2d"); // ! is ok because the first call to getContext can't fail if it's "2d"
             var img = new Image();
             img.src = imageUrl;
             // Sometimes the DOM updates immediately to call
