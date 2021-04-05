@@ -218,12 +218,16 @@ class Cursor {
     }
 
     static getClient(clientId: string) {
-        return cursor.getClient(clientId);
+        let c = Cursor._cursors[clientId];
+        if(!c) {
+            c = Cursor._cursors[clientId] = new Cursor(clientId);
+        }
+        return c;
     }
 
     static forEach(callback: (c: Cursor, id: string) => void, context: Cursor | null = null) {
         for(const a in Cursor._cursors) {
-            if(Cursor._cursors.hasOwnProperty(a)) {
+            if(Object.prototype.hasOwnProperty.call(Cursor._cursors, a)) {
                 callback.call(context, Cursor._cursors[a], a);
             }
         }
@@ -235,17 +239,10 @@ class Cursor {
     }
 }
 
-class cursor2 {
-    getClient(clientId: string) {
-        let c = Cursor._cursors[clientId];
-        if(!c) {
-            c = Cursor._cursors[clientId] = new Cursor(clientId);
-        }
-        return c;
-    }
+// TODO weird class, investigate
+export function getClient(clientId: string): Cursor {
+    return Cursor.getClient(clientId);
 }
-
-export const cursor = new cursor2();
 
 function cbCursor(peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) {
     const c = Cursor.getClient(peer.id);
@@ -539,7 +536,7 @@ function displayClick(pos: { top: number, left: number }, color: string) {
 let lastKeydown = 0;
 const MIN_KEYDOWN_TIME = 500;
 
-function documentKeydown(_event: Event) {
+function documentKeydown() {
     setTimeout(function() {
         const now = Date.now();
         if(now - lastKeydown < MIN_KEYDOWN_TIME) {

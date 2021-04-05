@@ -19,7 +19,7 @@ function createTogetherjsMouseEvent() {
 }
 
 export class EventMaker {
-    performClick(target: HTMLElement | JQuery) {
+    performClick(target: HTMLElement | JQuery): void {
         // FIXME: should accept other parameters, like Ctrl/Alt/etc
         const event = createTogetherjsMouseEvent();
         event.initMouseEvent(
@@ -56,7 +56,7 @@ export class EventMaker {
         // FIXME: should run .onclick() as well
     }
 
-    fireChange(target: HTMLElement | JQuery) {
+    fireChange(target: HTMLElement | JQuery): void {
         target = $(target)[0];
         const event = document.createEvent("HTMLEvents");
         event.initEvent("change", true, true);

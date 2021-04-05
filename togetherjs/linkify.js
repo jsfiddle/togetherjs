@@ -11,13 +11,13 @@ define(["require", "exports"], function (require, exports) {
         el.normalize();
         function linkifyNode(node) {
             const _len = node.childNodes.length;
-            for (var i = 0; i < _len; i++) {
+            for (let i = 0; i < _len; i++) {
                 if (node.childNodes[i].nodeType == document.ELEMENT_NODE) {
                     linkifyNode(node.childNodes[i]);
                 }
             }
             const texts = [];
-            for (i = 0; i < _len; i++) {
+            for (let i = 0; i < _len; i++) {
                 if (node.childNodes[i].nodeType == document.TEXT_NODE) {
                     texts.push(node.childNodes[i]);
                 }
@@ -27,12 +27,13 @@ define(["require", "exports"], function (require, exports) {
                     linkifyNode(item);
                 }
                 else if (item.nodeType == document.TEXT_NODE) {
+                    // eslint-disable-next-line no-constant-condition
                     while (true) {
                         const text = item.nodeValue;
                         if (text == null) {
                             continue;
                         }
-                        const regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t<>()\[\]]*/i;
+                        const regex = /\bhttps?:\/\/[a-z0-9.\-_](:\d+)?[^ \n\t<>()[\]]*/i;
                         const match = regex.exec(text);
                         if (!match) {
                             break;

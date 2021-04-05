@@ -606,7 +606,7 @@ export class PeerView extends PeerSelfView {
 
     cursor() {
         const cursorModule = require("cursor");
-        return cursorModule.cursor.getClient(this.peer.id);
+        return cursorModule.getClient(this.peer.id);
     }
 
     destroy() {

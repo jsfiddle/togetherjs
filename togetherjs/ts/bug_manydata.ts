@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 interface Packet<Type> {
     type: Type;
     /** strings that uniquely describe the whole string of packets that will be assembled into a message */
@@ -30,6 +32,7 @@ function hashCode(s: string) {
     return hash;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 class PacketAssembler<Protocol extends {[messageName: string]: any}> {
     private uid = 0;
     private packets = new Map<string, Packet<Extract<keyof Protocol, string>>[]>();

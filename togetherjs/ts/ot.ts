@@ -34,8 +34,8 @@ class Queue<T> {
         return this._q[this._q.length - 1];
     }
 
-    walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        let result = true;
+    walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => unknown, thisArg: ThisArg) {
+        let result: unknown = true;
         for(let i = this._q.length - 1; i >= 0; i--) {
             const item = this._q[i];
             result = callback.call(thisArg, item, i + this._deleted);
@@ -49,8 +49,8 @@ class Queue<T> {
         return result;
     }
 
-    walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        let result = true;
+    walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => unknown, thisArg: ThisArg) {
+        let result: unknown = true;
         for(let i = index; i < this._q.length; i++) {
             const item = this._q[i - this._deleted];
             result = callback.call(thisArg, item, i);
@@ -77,7 +77,7 @@ class StringSet {
 
     contains(k: string) {
         assert(typeof k == "string");
-        return this._items.hasOwnProperty(k);
+        return Object.prototype.hasOwnProperty.call(this._items, k);
     }
     add(k: string) {
         assert(typeof k == "string");
@@ -119,7 +119,7 @@ class Change {
         }
         const cids = [];
         for(const a in this.known) {
-            if(this.known.hasOwnProperty(a)) {
+            if(Object.prototype.hasOwnProperty.call(this.known, a)) {
                 cids.push(a);
             }
         }
@@ -151,7 +151,7 @@ class Change {
 
     knowsAboutAll(versions: { [clientId: string]: number }) {
         for(const clientId in versions) {
-            if(!versions.hasOwnProperty(clientId)) {
+            if(!Object.prototype.hasOwnProperty.call(versions, clientId)) {
                 continue;
             }
             if(!versions[clientId]) {
@@ -254,7 +254,7 @@ export class SimpleHistory {
     }
 
     /** Use a fake change to represent the selection. (This is the only bit that hard codes ot.TextReplace as the delta representation; override this in a subclass (or don't set the selection) if you are using a different delta representation. */
-    setSelection(selection?: [number, number]) {
+    setSelection(selection?: [number, number]): void {
         if(selection) {
             this.selection = new TextReplace(selection[0], selection[1] - selection[0], '@');
         }
@@ -272,7 +272,7 @@ export class SimpleHistory {
     }
 
     /** Add this delta to this client's queue. */
-    add(delta: TogetherJSNS.TextReplace) {
+    add(delta: TogetherJSNS.TextReplace): boolean {
         const change: TogetherJSNS.Change2 = {
             id: this.clientId + '.' + (this.deltaId++),
             delta: delta,
@@ -286,7 +286,7 @@ export class SimpleHistory {
     }
 
     /** Apply a delta received from the server. Return true iff the current text changed as a result. */
-    commit(change: TogetherJSNS.Change2) {
+    commit(change: TogetherJSNS.Change2): boolean {
         // ignore it if the basis doesn't match (this patch doesn't apply) if so, this delta is out of order; we expect the original client to retransmit an updated delta.
         if(change.basis !== this.basis) {
             return false; // 'current' text did not change
@@ -358,7 +358,7 @@ export class TextReplace {
         assert(start >= 0 && del >= 0, start, del);
     }
 
-    toString() {
+    toString(): string {
         if(this.empty()) {
             return '[no-op]';
         }
@@ -373,19 +373,19 @@ export class TextReplace {
         }
     }
 
-    equals(other: TogetherJSNS.TextReplace) {
+    equals(other: TogetherJSNS.TextReplace): boolean {
         return other.constructor === this.constructor && other.del === this.del && other.start === this.start && other.text === this.text;
     }
 
-    clone(start: number = this.start, del: number = this.del, text: string = this.text) {
+    clone(start: number = this.start, del: number = this.del, text: string = this.text): TextReplace {
         return new TextReplace(start, del, text);
     }
 
-    empty() {
+    empty(): boolean {
         return (!this.del) && (!this.text);
     }
 
-    apply(text: string) {
+    apply(text: string): string {
         if(this.empty()) {
             return text;
         }
@@ -399,7 +399,7 @@ export class TextReplace {
         return text.substr(0, this.start) + this.text + text.substr(this.start + this.del);
     }
 
-    transpose(delta: TogetherJSNS.TextReplace) {
+    transpose(delta: TogetherJSNS.TextReplace): [TextReplace, TextReplace] {
         /* Transform this delta as though the other delta had come before it.
             Returns a [new_version_of_this, transformed_delta], where transformed_delta
             satisfies:
@@ -423,8 +423,7 @@ export class TextReplace {
 
         if(delta.before(this)) {
             //console.log("  =this after other");
-            return [this.clone(this.start + delta.text.length - delta.del),
-            delta.clone()];
+            return [this.clone(this.start + delta.text.length - delta.del), delta.clone()];
         }
         else if(this.before(delta)) {
             //console.log("  =this before other");
@@ -432,53 +431,48 @@ export class TextReplace {
         }
         else if(delta.sameRange(this)) {
             //console.log("  =same range");
-            return [this.clone(this.start + delta.text.length, 0),
-            delta.clone(undefined, 0)];
+            return [this.clone(this.start + delta.text.length, 0), delta.clone(undefined, 0)];
         }
         else if(delta.contains(this)) {
             //console.log("  =other contains this");
-            return [this.clone(delta.start + delta.text.length, 0, this.text),
-            delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
+            return [this.clone(delta.start + delta.text.length, 0, this.text), delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
         }
         else if(this.contains(delta)) {
             //console.log("  =this contains other");
-            return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text),
-            delta.clone(this.start, 0, delta.text)];
+            return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text), delta.clone(this.start, 0, delta.text)];
         }
         else if(this.overlapsStart(delta)) {
             //console.log("  =this overlaps start of other");
             overlap = this.start + this.del - delta.start;
-            return [this.clone(undefined, this.del - overlap),
-            delta.clone(this.start + this.text.length, delta.del - overlap)];
+            return [this.clone(undefined, this.del - overlap), delta.clone(this.start + this.text.length, delta.del - overlap)];
         }
         else {
             //console.log("  =this overlaps end of other");
             assert(delta.overlapsStart(this), delta + "", "does not overlap start of", this + "", delta.before(this));
             overlap = delta.start + delta.del - this.start;
-            return [this.clone(delta.start + delta.text.length, this.del - overlap),
-            delta.clone(undefined, delta.del - overlap)];
+            return [this.clone(delta.start + delta.text.length, this.del - overlap), delta.clone(undefined, delta.del - overlap)];
         }
         throw 'Should not happen';
     }
 
-    before(other: TogetherJSNS.TextReplace) {
+    before(other: TogetherJSNS.TextReplace): boolean {
         return this.start + this.del <= other.start;
     }
 
-    contains(other: TogetherJSNS.TextReplace) {
+    contains(other: TogetherJSNS.TextReplace): boolean {
         return other.start >= this.start && other.start + other.del < this.start + this.del;
     }
 
-    sameRange(other: TogetherJSNS.TextReplace) {
+    sameRange(other: TogetherJSNS.TextReplace): boolean {
         return other.start == this.start && other.del == this.del;
     }
 
-    overlapsStart(other: TogetherJSNS.TextReplace) {
+    overlapsStart(other: TogetherJSNS.TextReplace): boolean {
         return this.start < other.start && this.start + this.del > other.start;
     }
 
     /* Make a new ot.TextReplace that converts oldValue to newValue. */
-    static fromChange(oldValue: string, newValue: string) {
+    static fromChange(oldValue: string, newValue: string): TextReplace | null {
         assert(typeof oldValue == "string");
         assert(typeof newValue == "string");
         let commonStart = 0;
@@ -501,7 +495,7 @@ export class TextReplace {
         return new this(commonStart, removed.length, inserted);
     }
 
-    static random(source: string, generator: TogetherJSNS.Randomizer) {
+    static random(source: string, generator: TogetherJSNS.Randomizer): TextReplace {
         let text, start, len;
         let ops = ["ins", "del", "repl"];
         if(!source.length) {
@@ -555,6 +549,7 @@ type StateForClientId = { init: true, clientId: "init", state: string };
 
 // TODO this class seems to be unused
 //@ts-expect-error unused but we don't removed things for now
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class TJSHistory {
     /** Contains the changes, the 0th element is a different type (@link StateForClientId) */
     private _history = new Queue<StateForClientId | Change>();
@@ -601,7 +596,7 @@ class TJSHistory {
         // preceed it that are in our local history).
         const clientsToCheck = new StringSet();
         for(const clientId in this.known) {
-            if(!this.known.hasOwnProperty(clientId)) {
+            if(!Object.prototype.hasOwnProperty.call(this.known, clientId)) {
                 continue;
             }
             if(change.maybeMissingChanges(this.known[clientId], clientId)) {
@@ -663,7 +658,7 @@ class TJSHistory {
 
         // Now we fix up any forward changes
         let fixupDelta = change.delta;
-        this._history.walkForward(indexToInsert + 1, function(c, _index) {
+        this._history.walkForward(indexToInsert + 1, function(c) {
             if(!("init" in c) && !c.knowsAboutChange(change)) {
                 //var origChange = c.clone(); // TODO not used
                 this.logChange("^^fix", c, function() {

@@ -83,6 +83,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._reopening = false;
             this._lastConnectTime = 0;
             this._backoff = 0;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             this.onmessage = (_jsonData) => { };
             if (address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
@@ -166,7 +167,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             };
         }
         onclose() { }
-    } // /WebSocketChannel
+    }
     exports.WebSocketChannel = WebSocketChannel;
     /* Sends TO a window or iframe */
     class PostMessageChannel extends AbstractChannel {
@@ -279,7 +280,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.emit("close");
         }
         onclose() { }
-    } // /PostMessageChannel
+    }
     /* Handles message FROM an exterior window/parent */
     class PostMessageIncomingChannel extends AbstractChannel {
         constructor(expectedOrigin) {
@@ -313,6 +314,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             return !!this.source;
         }
         _setupConnection() {
+            // Nothing to do in this case
         }
         _receiveMessage(event) {
             if (this.expectedOrigin && this.expectedOrigin != "*" && event.origin != this.expectedOrigin) {
@@ -344,8 +346,31 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             this.emit("close");
         }
-        onclose() { }
-    } // /PostMessageIncomingChannel
+        onclose() {
+            // Nothing to do in this case
+        }
+    }
+    class Route extends OnClass {
+        constructor(router, id) {
+            super();
+            this.router = router;
+            this.id = id;
+        }
+        send(msg) {
+            this.router.channel.send({
+                type: "route",
+                routeId: this.id,
+                message: msg,
+            });
+        }
+        close() {
+            if (this.router._routes[this.id] !== this) {
+                // This route instance has been overwritten, so ignore
+                return;
+            }
+            delete this.router._routes[this.id];
+        }
+    }
     class Router extends OnClass {
         constructor(channel) {
             super();
@@ -403,27 +428,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._routes[id] = route;
             return route;
         }
-    } // /Router
+    }
     exports.Router = Router;
-    class Route extends OnClass {
-        constructor(router, id) {
-            super();
-            this.router = router;
-            this.id = id;
-        }
-        send(msg) {
-            this.router.channel.send({
-                type: "route",
-                routeId: this.id,
-                message: msg,
-            });
-        }
-        close() {
-            if (this.router._routes[this.id] !== this) {
-                // This route instance has been overwritten, so ignore
-                return;
-            }
-            delete this.router._routes[this.id];
-        }
-    } // /Route
 });

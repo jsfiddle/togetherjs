@@ -85,26 +85,6 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
         return false;
     }
-    const editTrackers = {};
-    let liveTrackers = [];
-    TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
-        //assert(typeof TrackerClass === "function", "You must pass in a class");
-        //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
-        // Test for required instance methods.
-        /*
-        "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
-            //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
-        });
-        // Test for required class methods.
-        "scan tracked".split(/ /).forEach(function(m) {
-            //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
-        });
-        */
-        editTrackers[TrackerClass.trackerName] = TrackerClass;
-        if (!skipSetInit) {
-            setInit();
-        }
-    };
     class Editor {
         constructor(trackerName, element) {
             this.trackerName = trackerName;
@@ -164,7 +144,6 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     AceEditor.trackerName = "AceEditor";
-    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
     class CodeMirrorEditor extends Editor {
         constructor(el) {
             super("CodeMirrorEditor", jquery_1.default(el)[0]);
@@ -237,7 +216,6 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     CodeMirrorEditor.trackerName = "CodeMirrorEditor";
-    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
     class CKEditor extends Editor {
         constructor(el) {
             super("CKEditor", jquery_1.default(el)[0]);
@@ -311,8 +289,6 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     CKEditor.trackerName = "CKEditor";
-    TogetherJS.addTracker(CKEditor, true /* skip setInit */);
-    //////////////////// BEGINNING OF TINYMCE ////////////////////////
     class tinymceEditor extends Editor {
         constructor(el) {
             super("tinymceEditor", jquery_1.default(el)[0]);
@@ -392,8 +368,30 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     tinymceEditor.trackerName = "tinymceEditor";
+    const editTrackers = {};
+    let liveTrackers = [];
+    TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
+        //assert(typeof TrackerClass === "function", "You must pass in a class");
+        //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
+        // Test for required instance methods.
+        /*
+        "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
+            //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
+        });
+        // Test for required class methods.
+        "scan tracked".split(/ /).forEach(function(m) {
+            //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
+        });
+        */
+        editTrackers[TrackerClass.trackerName] = TrackerClass;
+        if (!skipSetInit) {
+            setInit();
+        }
+    };
+    TogetherJS.addTracker(AceEditor, true /* skip setInit */);
+    TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+    TogetherJS.addTracker(CKEditor, true /* skip setInit */);
     TogetherJS.addTracker(tinymceEditor, true);
-    ///////////////// END OF TINYMCE ///////////////////////////////////
     function buildTrackers() {
         assert(!liveTrackers.length);
         util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
@@ -462,21 +460,6 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         else {
             return (_a = el.val()) !== null && _a !== void 0 ? _a : ""; // .val() sometimes returns null (for a <select> with no children for example), we still need to return a string in this case because return null causes problem in other places
         }
-    }
-    // TODO not used
-    //@ts-expect-error unused but we don't remove functions for now
-    function getElementType(e) {
-        const el = jquery_1.default(e)[0];
-        if (el.tagName == "TEXTAREA") {
-            return "textarea";
-        }
-        if (el.tagName == "SELECT") {
-            return "select";
-        }
-        if (el.tagName == "INPUT") {
-            return (el.getAttribute("type") || "text").toLowerCase();
-        }
-        return "?";
     }
     function setValue(e, value) {
         const el = jquery_1.default(e);

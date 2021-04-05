@@ -68,7 +68,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         contains(k) {
             assert(typeof k == "string");
-            return this._items.hasOwnProperty(k);
+            return Object.prototype.hasOwnProperty.call(this._items, k);
         }
         add(k) {
             assert(typeof k == "string");
@@ -108,7 +108,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             const cids = [];
             for (const a in this.known) {
-                if (this.known.hasOwnProperty(a)) {
+                if (Object.prototype.hasOwnProperty.call(this.known, a)) {
                     cids.push(a);
                 }
             }
@@ -137,7 +137,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         knowsAboutAll(versions) {
             for (const clientId in versions) {
-                if (!versions.hasOwnProperty(clientId)) {
+                if (!Object.prototype.hasOwnProperty.call(versions, clientId)) {
                     continue;
                 }
                 if (!versions[clientId]) {
@@ -385,8 +385,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             if (delta.before(this)) {
                 //console.log("  =this after other");
-                return [this.clone(this.start + delta.text.length - delta.del),
-                    delta.clone()];
+                return [this.clone(this.start + delta.text.length - delta.del), delta.clone()];
             }
             else if (this.before(delta)) {
                 //console.log("  =this before other");
@@ -394,31 +393,26 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             else if (delta.sameRange(this)) {
                 //console.log("  =same range");
-                return [this.clone(this.start + delta.text.length, 0),
-                    delta.clone(undefined, 0)];
+                return [this.clone(this.start + delta.text.length, 0), delta.clone(undefined, 0)];
             }
             else if (delta.contains(this)) {
                 //console.log("  =other contains this");
-                return [this.clone(delta.start + delta.text.length, 0, this.text),
-                    delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
+                return [this.clone(delta.start + delta.text.length, 0, this.text), delta.clone(undefined, delta.del - this.del + this.text.length, delta.text + this.text)];
             }
             else if (this.contains(delta)) {
                 //console.log("  =this contains other");
-                return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text),
-                    delta.clone(this.start, 0, delta.text)];
+                return [this.clone(undefined, this.del - delta.del + delta.text.length, delta.text + this.text), delta.clone(this.start, 0, delta.text)];
             }
             else if (this.overlapsStart(delta)) {
                 //console.log("  =this overlaps start of other");
                 overlap = this.start + this.del - delta.start;
-                return [this.clone(undefined, this.del - overlap),
-                    delta.clone(this.start + this.text.length, delta.del - overlap)];
+                return [this.clone(undefined, this.del - overlap), delta.clone(this.start + this.text.length, delta.del - overlap)];
             }
             else {
                 //console.log("  =this overlaps end of other");
                 assert(delta.overlapsStart(this), delta + "", "does not overlap start of", this + "", delta.before(this));
                 overlap = delta.start + delta.del - this.start;
-                return [this.clone(delta.start + delta.text.length, this.del - overlap),
-                    delta.clone(undefined, delta.del - overlap)];
+                return [this.clone(delta.start + delta.text.length, this.del - overlap), delta.clone(undefined, delta.del - overlap)];
             }
             throw 'Should not happen';
         }
@@ -507,6 +501,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     exports.TextReplace = TextReplace;
     // TODO this class seems to be unused
     //@ts-expect-error unused but we don't removed things for now
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class TJSHistory {
         constructor(clientId, initState) {
             /** Contains the changes, the 0th element is a different type (@link StateForClientId) */
@@ -546,7 +541,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             // preceed it that are in our local history).
             const clientsToCheck = new StringSet();
             for (const clientId in this.known) {
-                if (!this.known.hasOwnProperty(clientId)) {
+                if (!Object.prototype.hasOwnProperty.call(this.known, clientId)) {
                     continue;
                 }
                 if (change.maybeMissingChanges(this.known[clientId], clientId)) {
@@ -606,7 +601,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this._history.insert(indexToInsert, change);
             // Now we fix up any forward changes
             let fixupDelta = change.delta;
-            this._history.walkForward(indexToInsert + 1, function (c, _index) {
+            this._history.walkForward(indexToInsert + 1, function (c) {
                 if (!("init" in c) && !c.knowsAboutChange(change)) {
                     //var origChange = c.clone(); // TODO not used
                     this.logChange("^^fix", c, function () {

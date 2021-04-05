@@ -45,40 +45,6 @@ session.hub.on("bye", function(msg) {
 
 type CommandStrings = "test" | "clear" | "help" | "test" | "clear" | "exec" | "record" | "playback" | "savelogs" | "baseurl" | "config";
 
-export class Chat {
-    submit(message: string) {
-        const parts = message.split(/ /);
-        if(parts[0].charAt(0) == "/") {
-            const name = parts[0].substr(1).toLowerCase() as CommandStrings;
-            const method = commands[`command_${name}` as const];
-            if(method) {
-                method.apply(commands, parts.slice(1) as any); // TODO any way to remove this "as any" cast?
-                return;
-            }
-        }
-        const messageId = session.clientId + "-" + Date.now();
-        session.send({
-            type: "chat",
-            text: message,
-            messageId: messageId
-        });
-        ui.chat.text({
-            text: message,
-            peer: peers.Self,
-            messageId: messageId,
-            notify: false
-        });
-        saveChatMessage({
-            text: message,
-            date: Date.now(),
-            peerId: peers.Self.id,
-            messageId: messageId
-        });
-    }
-}
-
-export const chat = new Chat();
-
 class Commands {
     _testCancel: (() => void) | null = null;
     _testShow: WalkaboutNS.Action[] = [];
@@ -183,8 +149,8 @@ class Commands {
         ui.chat.clear();
     }
 
-    command_exec() {
-        const expr = Array.prototype.slice.call(arguments).join(" ");
+    command_exec(...args: string[]) {
+        const expr = Array.prototype.slice.call(args).join(" ");
         let result;
         // We use this to force global eval (not in this scope):
         const e = eval;
@@ -346,7 +312,7 @@ class Commands {
             });
             return;
         }
-        if(!TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+        if(!Object.prototype.hasOwnProperty.call(TogetherJS._defaultConfiguration, variable)) {
             ui.chat.system({
                 text: "Warning: variable " + variable + " is unknown"
             });
@@ -367,6 +333,40 @@ class Commands {
 }
 
 const commands = new Commands();
+
+export class Chat {
+    submit(message: string): void {
+        const parts = message.split(/ /);
+        if(parts[0].charAt(0) == "/") {
+            const name = parts[0].substr(1).toLowerCase() as CommandStrings;
+            const method = commands[`command_${name}` as const];
+            if(method) {
+                method.apply(commands, parts.slice(1) as any); // TODO any way to remove this "as any" cast?
+                return;
+            }
+        }
+        const messageId = session.clientId + "-" + Date.now();
+        session.send({
+            type: "chat",
+            text: message,
+            messageId: messageId
+        });
+        ui.chat.text({
+            text: message,
+            peer: peers.Self,
+            messageId: messageId,
+            notify: false
+        });
+        saveChatMessage({
+            text: message,
+            date: Date.now(),
+            peerId: peers.Self.id,
+            messageId: messageId
+        });
+    }
+}
+
+export const chat = new Chat();
 
 // this section deal with saving/restoring chat history as long as session is alive
 const chatStorageKey = "chatlog";

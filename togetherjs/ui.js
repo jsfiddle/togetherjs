@@ -566,7 +566,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         }
         cursor() {
             const cursorModule = require("cursor");
-            return cursorModule.cursor.getClient(this.peer.id);
+            return cursorModule.getClient(this.peer.id);
         }
         destroy() {
             // FIXME: should I get rid of the dockElement?

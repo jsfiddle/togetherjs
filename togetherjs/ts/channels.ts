@@ -144,7 +144,7 @@ export class WebSocketChannel extends AbstractChannel {
         this._setupConnection();
     }
 
-    toString() {
+    toString(): string {
         let s = '[WebSocketChannel to ' + this.address;
         if(!this.socket) {
             s += ' (socket unopened)';
@@ -158,7 +158,7 @@ export class WebSocketChannel extends AbstractChannel {
         return s + ']';
     }
 
-    close() {
+    close(): void {
         this.closed = true;
         if(this.socket) {
             // socket.onclose will call this.onclose:
@@ -172,7 +172,7 @@ export class WebSocketChannel extends AbstractChannel {
         }
     }
 
-    _send(data: string) {
+    _send(data: string): void {
         if(this.socket == null) {
             console.error("cannot send with an unitialized socket:", data);
             return;
@@ -180,11 +180,11 @@ export class WebSocketChannel extends AbstractChannel {
         this.socket.send(data);
     }
 
-    _ready() {
+    _ready(): boolean {
         return this.socket != null && this.socket.readyState == this.socket.OPEN;
     }
 
-    _setupConnection() {
+    _setupConnection(): void {
         if(this.closed) {
             return;
         }
@@ -224,10 +224,11 @@ export class WebSocketChannel extends AbstractChannel {
         };
     }
 
-    onclose() {}
-    onmessage = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) => {};
+    onclose(): void { /* can be overriden */ }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onmessage: (jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) => void = (_jsonData: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) => { /* Do nothing be default */ };
 
-} // /WebSocketChannel
+}
 
 /* Sends TO a window or iframe */
 class PostMessageChannel extends AbstractChannel {
@@ -350,9 +351,9 @@ class PostMessageChannel extends AbstractChannel {
         this.emit("close");
     }
 
-    onclose() {}
-    onmessage = () => {};
-} // /PostMessageChannel
+    onclose() { /* Do nothing */ }
+    onmessage = () => { /* Do nothing */ };
+}
 
 /* Handles message FROM an exterior window/parent */
 class PostMessageIncomingChannel extends AbstractChannel {
@@ -392,6 +393,7 @@ class PostMessageIncomingChannel extends AbstractChannel {
     }
 
     _setupConnection() {
+        // Nothing to do in this case
     }
 
     _receiveMessage(event: MessageEvent<string>) {
@@ -426,78 +428,15 @@ class PostMessageIncomingChannel extends AbstractChannel {
         this.emit("close");
     }
 
-    onclose() {}
-    onmessage = () => {}
-} // /PostMessageIncomingChannel
-
-export class Router extends OnClass<TogetherJSNS.On.Map> {
-    _routes: {[key: string]: Route} = Object.create(null);
-    channel!: AbstractChannel; // TODO !
-
-    private boundChannelMessage = this._channelMessage.bind(this);
-    private boundChannelClosed = this._channelClosed.bind(this);
-
-    constructor(channel?: AbstractChannel) {
-        super();
-        if(channel) {
-            this.bindChannel(channel);
-        }
+    onclose() {
+        // Nothing to do in this case
     }
 
-    bindChannel(channel: AbstractChannel) {
-        if(this.channel) {
-            this.channel.off("message", this.boundChannelMessage);
-            this.channel.off("close", this.boundChannelClosed);
-        }
-        this.channel = channel;
-        this.channel.on("message", this.boundChannelMessage);
-        this.channel.on("close", this.boundChannelClosed);
-    }
-
-    _channelMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
-        if(msg.type == "route") {
-            const id = msg.routeId;
-            const route = this._routes[id];
-            if(!route) {
-                console.warn("No route with the id", id);
-                return;
-            }
-            if(msg.close) {
-                this._closeRoute(route.id);
-            }
-            else {
-                if(route.onmessage) {
-                    route.onmessage(msg.message);
-                }
-                route.emit("message", msg.message);
-            }
-        }
-    }
-
-    _channelClosed() {
-        for(const id in this._routes) {
-            this._closeRoute(id);
-        }
-    }
-
-    _closeRoute(id: string) {
-        const route = this._routes[id];
-        if(route.onclose) {
-            route.onclose();
-        }
-        route.emit("close");
-        delete this._routes[id];
-    }
-
-    makeRoute(id: string) {
-        id = id || util.generateId();
-        const route = new Route(this, id);
-        this._routes[id] = route;
-        return route;
-    }
-} // /Router
+    onmessage = () => { /* Do nothing */ }
+}
 
 class Route extends OnClass<TogetherJSNS.On.Map> {
+    // eslint-disable-next-line no-use-before-define
     private router: Router;
     public readonly id: string;
     public readonly onmessage: ((msg: TogetherJSNS.AnyMessage.AnyForReceiving) => void) | undefined;
@@ -525,4 +464,71 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
         delete this.router._routes[this.id];
     }
 
-} // /Route
+}
+
+export class Router extends OnClass<TogetherJSNS.On.Map> {
+    _routes: {[key: string]: Route} = Object.create(null);
+    channel!: AbstractChannel; // TODO !
+
+    private boundChannelMessage = this._channelMessage.bind(this);
+    private boundChannelClosed = this._channelClosed.bind(this);
+
+    constructor(channel?: AbstractChannel) {
+        super();
+        if(channel) {
+            this.bindChannel(channel);
+        }
+    }
+
+    bindChannel(channel: AbstractChannel): void {
+        if(this.channel) {
+            this.channel.off("message", this.boundChannelMessage);
+            this.channel.off("close", this.boundChannelClosed);
+        }
+        this.channel = channel;
+        this.channel.on("message", this.boundChannelMessage);
+        this.channel.on("close", this.boundChannelClosed);
+    }
+
+    _channelMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>): void {
+        if(msg.type == "route") {
+            const id = msg.routeId;
+            const route = this._routes[id];
+            if(!route) {
+                console.warn("No route with the id", id);
+                return;
+            }
+            if(msg.close) {
+                this._closeRoute(route.id);
+            }
+            else {
+                if(route.onmessage) {
+                    route.onmessage(msg.message);
+                }
+                route.emit("message", msg.message);
+            }
+        }
+    }
+
+    _channelClosed(): void {
+        for(const id in this._routes) {
+            this._closeRoute(id);
+        }
+    }
+
+    _closeRoute(id: string): void {
+        const route = this._routes[id];
+        if(route.onclose) {
+            route.onclose();
+        }
+        route.emit("close");
+        delete this._routes[id];
+    }
+
+    makeRoute(id: string): Route {
+        id = id || util.generateId();
+        const route = new Route(this, id);
+        this._routes[id] = route;
+        return route;
+    }
+}

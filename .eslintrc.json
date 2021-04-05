@@ -17,15 +17,14 @@
     ],
     "rules": {
         "no-invalid-this": "off",
-        "no-use-before-define": "error",
-        "@typescript-eslint/no-this-alias": [
-            "error",
-            {
-                "allowDestructuring": true, // Allow `const { props, state } = this`; false by default
-                "allowedNames": [
-                    "self"
-                ] // Allow `const self = this`; `[]` by default
-            }
-        ]
+        "@typescript-eslint/no-this-alias": [ "error", { "allowDestructuring": true, "allowedNames": [ "self" ] } ],
+        "no-use-before-define": ["error", { "functions": false, "classes": false }],
+        "no-unused-vars": "off", // must disable the base rule as it can report incorrect errors
+        "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
+        "prefer-spread": "off",
+        "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }],
+        //"@typescript-eslint/no-var-requires": "off",
+        "prefer-const": ["warn", { "destructuring": "all" }],
+        "@typescript-eslint/no-non-null-assertion": "off" // Turn it on later
     }
 }

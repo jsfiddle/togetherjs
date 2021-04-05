@@ -57,7 +57,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                 // First we need to play the hello
                 const toReplay = [];
                 let foundHello = false;
-                for (var i = this.pos - 1; i >= 0; i--) {
+                for (let i = this.pos - 1; i >= 0; i--) {
                     const item = this.logs[i];
                     if (item.type in ALWAYS_REPLAY) {
                         toReplay.push(item);
@@ -72,7 +72,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                     console.warn("No hello message found before position", this.pos);
                 }
                 toReplay.reverse();
-                for (i = 0; i < toReplay.length; i++) {
+                for (let i = 0; i < toReplay.length; i++) {
                     this.playItem(toReplay[i]);
                 }
             }
@@ -116,7 +116,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
         playItem(item) {
             if (item.type == "hello") {
                 // We may need to pause here
-                if (item.url != (location.href + "").replace(/\#.*/, "")) {
+                if (item.url != (location.href + "").replace(/#.*/, "")) {
                     this.pause();
                 }
             }

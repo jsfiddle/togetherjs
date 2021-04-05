@@ -9,14 +9,9 @@ type LogLevelString = "debug" | "log" | "info" | "notify" | "warn" | "error" | "
 
 type LogMessage = [timestamp: number, logLevel: number | "suppress", log: string];
 
-interface ConsoleSubmitOptions {
-    site: string;
-    title: string;
-}
-
 //function consoleMain(util: TogetherJSNS.Util) {
 
-const console = window.console || { log: function() { } };
+const console = window.console || { log: function() { /* Do nothing */ } };
 
 export class Console {
     public static levels: {[ll in LogLevelString]: number} = {
@@ -57,7 +52,7 @@ export class Console {
     ];
 
     constructor() {
-        util.forEachAttr(Console.levels, (value, _name) => {
+        util.forEachAttr(Console.levels, (value) => {
             this.maxLevel = Math.max(this.maxLevel, value);
         });
     
@@ -66,7 +61,7 @@ export class Console {
         });
     }
 
-    setLevel(l: LogLevelString | LogFunction | number) {
+    setLevel(l: LogLevelString | LogFunction | number): void {
         let number: number;
         let llNum: number;
         if(typeof l == "string") {
@@ -95,7 +90,7 @@ export class Console {
         this.level = llNum;
     }
 
-    write(level: "suppress" | number, ...args: any[]) {
+    write(level: "suppress" | number, ...args: unknown[]): void {
         try {
             this.messages.push([
                 Date.now(),
@@ -119,13 +114,13 @@ export class Console {
         }
     }
 
-    suppressedWrite(...args: any[]) {
+    suppressedWrite(...args: unknown[]): void {
         const w = this.write;
         const a: Parameters<typeof w> = ["suppress", ...args];
         this.write.apply(this, a);
     }
 
-    trace(level: LogLevelString = "log") {
+    trace(level: LogLevelString = "log"): void {
         if("trace" in console) {
             level = "suppressedWrite";
         }
@@ -145,7 +140,7 @@ export class Console {
         }
     }
 
-    _browserInfo() {
+    _browserInfo(): string[] {
         // FIXME: add TogetherJS version and
         return [
             "TogetherJS base URL: " + TogetherJS.baseUrl,
@@ -159,7 +154,7 @@ export class Console {
         ];
     }
 
-    _stringify(...args: any[]) {
+    _stringify(...args: any[]): string {
         let s = "";
         for(let i = 0; i < args.length; i++) {
             if(s) {
@@ -170,7 +165,7 @@ export class Console {
         return s;
     }
 
-    _stringifyItem(item: string | TogetherJSNS.PeerClass) {
+    _stringifyItem(item: string | TogetherJSNS.PeerClass): string {
         if(typeof item == "string") {
             if(item === "") {
                 return '""';
@@ -192,11 +187,11 @@ export class Console {
         return item.toString();
     }
 
-    _formatDate(timestamp: number) {
+    _formatDate(timestamp: number): string {
         return (new Date(timestamp)).toISOString();
     }
 
-    _formatTime(timestamp: number) {
+    _formatTime(timestamp: number): string {
         return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
     }
 
@@ -218,14 +213,14 @@ export class Console {
         return formatted;
     }
 
-    _formatLevel(l: number | "suppress") {
+    _formatLevel(l: number | "suppress"): LogLevelString | "" {
         if(l === "suppress") {
             return "";
         }
         return this.levelNames[l];
     }
 
-    toString() {
+    toString(): string {
         try {
             const lines = this._browserInfo();
             this.messages.forEach(function(this: Console, m) {
@@ -239,29 +234,6 @@ export class Console {
             throw e;
         }
     }
-
-    // TODO qw unused and don't work
-    submit(options: Partial<ConsoleSubmitOptions> = {}) {
-        // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-        return util.Deferred(function(this: object) {  // TODO this is casted as object but I should be able to find a more precise type
-            const site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
-            const req = new XMLHttpRequest();
-            req.open("POST", site);
-            req.setRequestHeader("Content-Type", "application/json");
-            req.send(JSON.stringify({
-                "title": options.title || "TogetherJS log file",
-                "snippet": this.toString(),
-                "language": "text"
-            }));
-            req.onreadystatechange = function() {
-                if(req.readyState === 4) {
-                    JSON.parse(req.responseText);
-                    // TODO what is this function supposed to do?
-                }
-            };
-        });
-    }
-
 }
 
 function rpad(s: string, len: number, pad = " ") {
@@ -299,8 +271,7 @@ function lpadLines(s: string, len: number, pad = " ") {
 
 // This is a factory that creates `Console.prototype.debug`, `.error` etc:
 function logFunction(_name: LogLevelString, level: number) {
-    return function(this: Console) {
-        const args = Array.prototype.slice.call(arguments);
+    return function(this: Console, ...args: string[]) {
         const a: Parameters<typeof this.write> = [level as number | "suppress", ...args];
         this.write.apply(this, a);
     };

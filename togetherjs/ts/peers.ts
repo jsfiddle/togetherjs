@@ -21,6 +21,212 @@ require(["ui"], function(uiModule) {
 
 const DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
+export class Peers extends OnClass<TogetherJSNS.On.Map> {
+    public Self!: PeersSelf; // TODO !
+    public readonly _SelfLoaded = util.Deferred();
+
+    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>): PeerClass | PeersSelf | null {
+        assert(id);
+        let peer = PeerClass.peers[id];
+        if(id === session.clientId) {
+            return this.Self;
+        }
+        if(message && !peer) {
+            peer = new PeerClass(id, { fromHelloMessage: message });
+            return peer;
+        }
+        if(!peer) {
+            return null;
+        }
+        if(message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+            peer.updateFromHello(message);
+            peer.view.update();
+        }
+        return PeerClass.peers[id];
+    }
+
+    getAllPeers(liveOnly = false): PeerClass[] {
+        const result: PeerClass[] = [];
+        util.forEachAttr(PeerClass.peers, function(peer) {
+            if(liveOnly && peer.status != "live") {
+                return;
+            }
+            result.push(peer);
+        });
+        return result;
+    }
+}
+
+export const peers = new Peers();
+
+export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
+    public readonly isSelf: true = true;
+    public readonly id = session.clientId;
+    public identityId = session.identityId;
+    public status: TogetherJSNS.PeerStatus = "live";
+    public idle: TogetherJSNS.PeerStatus = "active";
+    public name: string | null = null;
+    public avatar: string | null = null;
+    public color = "#00FF00"; // TODO I added a default value, but is that ok?
+    public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
+    // private loaded = false;// TODO unused
+    public isCreator = !session.isClient;
+    public view!: TogetherJSNS.PeerSelfView; // TODO !
+    public url?: string;
+
+    update(attrs: Partial<TogetherJSNS.PeerSelfAttributes>): void {
+        let updatePeers = false;
+        let updateIdle = false;
+        const updateMsg: TogetherJSNS.SessionSend.PeerUpdate = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
+        if(typeof attrs.name == "string" && attrs.name != this.name) {
+            this.name = attrs.name;
+            updateMsg.name = this.name;
+            if(!attrs.fromLoad) {
+                storage.settings.set("name", this.name);
+                updatePeers = true;
+            }
+        }
+        if(attrs.avatar && attrs.avatar != this.avatar) {
+            util.assertValidUrl(attrs.avatar);
+            this.avatar = attrs.avatar;
+            updateMsg.avatar = this.avatar;
+            if(!attrs.fromLoad) {
+                storage.settings.set("avatar", this.avatar);
+                updatePeers = true;
+            }
+        }
+        if(attrs.color && attrs.color != this.color) {
+            this.color = attrs.color;
+            updateMsg.color = this.color;
+            if(!attrs.fromLoad) {
+                storage.settings.set("color", this.color);
+                updatePeers = true;
+            }
+        }
+        if(attrs.defaultName && attrs.defaultName != this.defaultName) {
+            this.defaultName = attrs.defaultName;
+            if(!attrs.fromLoad) {
+                storage.settings.set("defaultName", this.defaultName);
+                updatePeers = true;
+            }
+        }
+        if(attrs.status && attrs.status != this.status) {
+            this.status = attrs.status;
+            peers.emit("status-updated", this);
+        }
+        if(attrs.idle && attrs.idle != this.idle) {
+            this.idle = attrs.idle;
+            updateIdle = true;
+            peers.emit("idle-updated", this);
+        }
+        this.view.update();
+        if(updatePeers && !attrs.fromLoad) {
+            session.emit("self-updated");
+            session.send(updateMsg);
+        }
+        if(updateIdle && !attrs.fromLoad) {
+            session.send({
+                type: "idle-status",
+                idle: this.idle
+            });
+        }
+    }
+
+    className(prefix = ""): string {
+        return prefix + "self";
+    }
+
+    _loadFromSettings(): JQueryPromise<void> {
+        return util.resolveMany([
+            storage.settings.get("name"),
+            storage.settings.get("avatar"),
+            storage.settings.get("defaultName"),
+            storage.settings.get("color")] as const).then(args => {
+                let [name, avatar, defaultName, color] = args!; // TODO !
+                if(!defaultName) {
+                    defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+                    storage.settings.set("defaultName", defaultName);
+                }
+                if(!color) {
+                    color = Math.floor(Math.random() * 0xffffff).toString(16);
+                    while(color.length < 6) {
+                        color = "0" + color;
+                    }
+                    color = "#" + color;
+                    storage.settings.set("color", color);
+                }
+                if(!avatar) {
+                    avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
+                }
+                this.update({
+                    name: name,
+                    avatar: avatar,
+                    defaultName: defaultName,
+                    color: color,
+                    fromLoad: true
+                });
+                peers._SelfLoaded.resolve();
+            }); // FIXME: ignoring error
+    }
+
+    _loadFromApp(): void {
+        // FIXME: I wonder if these should be optionally functions?
+        // We could test typeof==function to distinguish between a getter and a concrete value
+        const getUserName = TogetherJS.config.get("getUserName");
+        const getUserColor = TogetherJS.config.get("getUserColor");
+        const getUserAvatar = TogetherJS.config.get("getUserAvatar");
+        let name: string | null = null;
+        let color: string | null = null;
+        let avatar: string | null = null;
+        if(getUserName) {
+            if(typeof getUserName == "string") {
+                name = getUserName;
+            }
+            else {
+                name = getUserName();
+            }
+            if(name && typeof name != "string") {
+                // FIXME: test for HTML safe?  Not that we require it, but
+                // <>'s are probably a sign something is wrong.
+                console.warn("Error in getUserName(): should return a string (got", name, ")");
+                name = null;
+            }
+        }
+        if(getUserColor) {
+            if(typeof getUserColor == "string") {
+                color = getUserColor;
+            }
+            else {
+                color = getUserColor();
+            }
+            if(color && typeof color != "string") {
+                // FIXME: would be nice to test for color-ness here.
+                console.warn("Error in getUserColor(): should return a string (got", color, ")");
+                color = null;
+            }
+        }
+        if(getUserAvatar) {
+            if(typeof getUserAvatar == "string") {
+                avatar = getUserAvatar;
+            }
+            else {
+                avatar = getUserAvatar();
+            }
+            if(avatar && typeof avatar != "string") {
+                console.warn("Error in getUserAvatar(): should return a string (got", avatar, ")");
+                avatar = null;
+            }
+        }
+        if(name || color || avatar) {
+            this.update({ // TODO remove weird undefined, be careful that it doesn't screw with comparisons elsewhere in the code
+                name: name || undefined,
+                color: color || undefined,
+                avatar: avatar || undefined
+            });
+        }
+    }
+}
+
 export class PeerClass {
     public readonly isSelf: false = false;
 
@@ -47,7 +253,7 @@ export class PeerClass {
 
     constructor(id: string, attrs: Partial<TogetherJSNS.PeerClassAttributes> = {}) {
         assert(id);
-        assert(!Peer.peers[id]);
+        assert(!PeerClass.peers[id]);
         this.id = id;
         this.identityId = attrs.identityId || null;
         this.status = attrs.status || "live";
@@ -72,7 +278,7 @@ export class PeerClass {
         this.view.update();
     }
 
-    repr() {
+    repr(): string {
         return "Peer(" + JSON.stringify(this.id) + ")";
     }
 
@@ -93,12 +299,12 @@ export class PeerClass {
         };
     }
 
-    destroy() {
+    destroy(): void {
         this.view.destroy();
-        delete Peer.peers[this.id];
+        delete PeerClass.peers[this.id];
     }
 
-    updateMessageDate() {
+    updateMessageDate(): void {
         if(this.idle == "inactive") {
             this.update({ idle: "active" });
         }
@@ -108,7 +314,7 @@ export class PeerClass {
         this.lastMessageDate = Date.now();
     }
 
-    updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForSending>) {
+    updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForSending>): void {
         let urlUpdated = false;
         // var activeRTC = false; // TODO code change, unused
         let identityUpdated = false;
@@ -171,7 +377,7 @@ export class PeerClass {
         }
     }
 
-    update(attrs: Partial<TogetherJSNS.IdleAndStatus>) {
+    update(attrs: Partial<TogetherJSNS.IdleAndStatus>): void {
         // FIXME: should probably test that only a couple attributes are settable particularly status and idle
         if(attrs.idle) {
             this.idle = attrs.idle;
@@ -182,11 +388,11 @@ export class PeerClass {
         this.view.update();
     }
 
-    className(prefix = "") {
+    className(prefix = ""): string {
         return prefix + util.safeClassName(this.id);
     }
 
-    bye() {
+    bye(): void {
         if(this.status != "bye") {
             this.status = "bye";
             peers.emit("status-updated", this);
@@ -194,7 +400,7 @@ export class PeerClass {
         this.view.update();
     }
 
-    unbye() {
+    unbye(): void {
         if(this.status == "bye") {
             this.status = "live";
             peers.emit("status-updated", this);
@@ -202,7 +408,7 @@ export class PeerClass {
         this.view.update();
     }
 
-    nudge() {
+    nudge(): void {
         session.send({
             type: "url-change-nudge",
             url: location.href,
@@ -210,7 +416,7 @@ export class PeerClass {
         });
     }
 
-    follow() {
+    follow(): void {
         if(this.following) {
             return;
         }
@@ -226,20 +432,18 @@ export class PeerClass {
         session.emit("follow-peer", this);
     }
 
-    unfollow() {
+    unfollow(): void {
         this.following = false;
         storeSerialization();
         this.view.update();
     }
 
-    static deserialize(obj: TogetherJSNS.SerializedPeer) {
+    static deserialize(obj: TogetherJSNS.SerializedPeer): PeerClass {
+        // This function is leverage the side-effect of new Peer which is adding the peer to the static list of peers
         obj.fromStorage = true;
-        new Peer(obj.id, obj);
-        // TODO this function does nothing? except maybe adding the peer to the static list of peers
+        return new PeerClass(obj.id, obj);
     }
 }
-
-const Peer = PeerClass;
 
 // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
 session.on("follow-peer", function(peer) {
@@ -251,213 +455,6 @@ session.on("follow-peer", function(peer) {
         location.href = url;
     }
 });
-
-export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
-    public readonly isSelf: true = true;
-    public readonly id = session.clientId;
-    public identityId = session.identityId;
-    public status: TogetherJSNS.PeerStatus = "live";
-    public idle: TogetherJSNS.PeerStatus = "active";
-    public name: string | null = null;
-    public avatar: string | null = null;
-    public color = "#00FF00"; // TODO I added a default value, but is that ok?
-    public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
-    // private loaded = false;// TODO unused
-    public isCreator = !session.isClient;
-    public view!: TogetherJSNS.PeerSelfView; // TODO !
-    public url?: string;
-
-    update(attrs: Partial<TogetherJSNS.PeerSelfAttributes>) {
-        let updatePeers = false;
-        let updateIdle = false;
-        const updateMsg: TogetherJSNS.SessionSend.PeerUpdate = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
-        if(typeof attrs.name == "string" && attrs.name != this.name) {
-            this.name = attrs.name;
-            updateMsg.name = this.name;
-            if(!attrs.fromLoad) {
-                storage.settings.set("name", this.name);
-                updatePeers = true;
-            }
-        }
-        if(attrs.avatar && attrs.avatar != this.avatar) {
-            util.assertValidUrl(attrs.avatar);
-            this.avatar = attrs.avatar;
-            updateMsg.avatar = this.avatar;
-            if(!attrs.fromLoad) {
-                storage.settings.set("avatar", this.avatar);
-                updatePeers = true;
-            }
-        }
-        if(attrs.color && attrs.color != this.color) {
-            this.color = attrs.color;
-            updateMsg.color = this.color;
-            if(!attrs.fromLoad) {
-                storage.settings.set("color", this.color);
-                updatePeers = true;
-            }
-        }
-        if(attrs.defaultName && attrs.defaultName != this.defaultName) {
-            this.defaultName = attrs.defaultName;
-            if(!attrs.fromLoad) {
-                storage.settings.set("defaultName", this.defaultName);
-                updatePeers = true;
-            }
-        }
-        if(attrs.status && attrs.status != this.status) {
-            this.status = attrs.status;
-            peers.emit("status-updated", this);
-        }
-        if(attrs.idle && attrs.idle != this.idle) {
-            this.idle = attrs.idle;
-            updateIdle = true;
-            peers.emit("idle-updated", this);
-        }
-        this.view.update();
-        if(updatePeers && !attrs.fromLoad) {
-            session.emit("self-updated");
-            session.send(updateMsg);
-        }
-        if(updateIdle && !attrs.fromLoad) {
-            session.send({
-                type: "idle-status",
-                idle: this.idle
-            });
-        }
-    }
-
-    className(prefix = "") {
-        return prefix + "self";
-    }
-
-    _loadFromSettings() {
-        return util.resolveMany([
-            storage.settings.get("name"),
-            storage.settings.get("avatar"),
-            storage.settings.get("defaultName"),
-            storage.settings.get("color")] as const).then(args => {
-                let [name, avatar, defaultName, color] = args!; // TODO !
-                if(!defaultName) {
-                    defaultName = util.pickRandom(DEFAULT_NICKNAMES);
-                    storage.settings.set("defaultName", defaultName);
-                }
-                if(!color) {
-                    color = Math.floor(Math.random() * 0xffffff).toString(16);
-                    while(color.length < 6) {
-                        color = "0" + color;
-                    }
-                    color = "#" + color;
-                    storage.settings.set("color", color);
-                }
-                if(!avatar) {
-                    avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
-                }
-                this.update({
-                    name: name,
-                    avatar: avatar,
-                    defaultName: defaultName,
-                    color: color,
-                    fromLoad: true
-                });
-                peers._SelfLoaded.resolve();
-            }); // FIXME: ignoring error
-    }
-
-    _loadFromApp() {
-        // FIXME: I wonder if these should be optionally functions?
-        // We could test typeof==function to distinguish between a getter and a concrete value
-        const getUserName = TogetherJS.config.get("getUserName");
-        const getUserColor = TogetherJS.config.get("getUserColor");
-        const getUserAvatar = TogetherJS.config.get("getUserAvatar");
-        let name: string | null = null;
-        let color: string | null = null;
-        let avatar: string | null = null;
-        if(getUserName) {
-            if(typeof getUserName == "string") {
-                name = getUserName;
-            }
-            else {
-                name = getUserName();
-            }
-            if(name && typeof name != "string") {
-                // FIXME: test for HTML safe?  Not that we require it, but
-                // <>'s are probably a sign something is wrong.
-                console.warn("Error in getUserName(): should return a string (got", name, ")");
-                name = null;
-            }
-        }
-        if(getUserColor) {
-            if(typeof getUserColor == "string") {
-                color = getUserColor;
-            }
-            else {
-                color = getUserColor();
-            }
-            if(color && typeof color != "string") {
-                // FIXME: would be nice to test for color-ness here.
-                console.warn("Error in getUserColor(): should return a string (got", color, ")");
-                color = null;
-            }
-        }
-        if(getUserAvatar) {
-            if(typeof getUserAvatar == "string") {
-                avatar = getUserAvatar;
-            }
-            else {
-                avatar = getUserAvatar();
-            }
-            if(avatar && typeof avatar != "string") {
-                console.warn("Error in getUserAvatar(): should return a string (got", avatar, ")");
-                avatar = null;
-            }
-        }
-        if(name || color || avatar) {
-            this.update({ // TODO remove weird undefined, be careful that it doesn't screw with comparisons elsewhere in the code
-                name: name || undefined,
-                color: color || undefined,
-                avatar: avatar || undefined
-            });
-        }
-    }
-}
-
-export class Peers extends OnClass<TogetherJSNS.On.Map> {
-    public Self!: PeersSelf; // TODO !
-    public readonly _SelfLoaded = util.Deferred();
-
-    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>, ignoreMissing = false) {
-        assert(id);
-        let peer = Peer.peers[id];
-        if(id === session.clientId) {
-            return peers.Self;
-        }
-        if(message && !peer) {
-            peer = new Peer(id, { fromHelloMessage: message });
-            return peer;
-        }
-        if(ignoreMissing && !peer) {
-            return null;
-        }
-        assert(peer, "No peer with id:", id);
-        if(message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
-            peer.updateFromHello(message);
-            peer.view.update();
-        }
-        return Peer.peers[id];
-    }
-
-    getAllPeers(liveOnly = false) {
-        const result: PeerClass[] = [];
-        util.forEachAttr(Peer.peers, function(peer) {
-            if(liveOnly && peer.status != "live") {
-                return;
-            }
-            result.push(peer);
-        });
-        return result;
-    }
-}
-
-export const peers = new Peers();
 
 session.on("start", function() {
     if(peers.Self) {
@@ -500,7 +497,7 @@ TogetherJS.config.track(
 
 function serialize() {
     const peers: TogetherJSNS.SerializedPeer[] = [];
-    util.forEachAttr(Peer.peers, function(peer) {
+    util.forEachAttr(PeerClass.peers, function(peer) {
         peers.push(peer.serialize());
     });
     return { peers: peers };
@@ -511,7 +508,7 @@ function deserialize(obj?: { peers: TogetherJSNS.SerializedPeer[] }) {
         return;
     }
     obj.peers.forEach(function(peer) {
-        Peer.deserialize(peer);
+        PeerClass.deserialize(peer);
     });
 }
 
@@ -544,7 +541,7 @@ session.on("start", function() {
 });
 
 session.on("close", function() {
-    util.forEachAttr(Peer.peers, function(peer) {
+    util.forEachAttr(PeerClass.peers, function(peer) {
         peer.destroy();
     });
     storage.tab.set("peerCache", undefined);

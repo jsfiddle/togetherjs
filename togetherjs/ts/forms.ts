@@ -112,28 +112,6 @@ function isCheckable(element: HTMLElement | JQuery) {
     return false;
 }
 
-const editTrackers: { [trackerName: string]: TrackerClass } = {};
-let liveTrackers: Tracker[] = [];
-
-TogetherJS.addTracker = function(TrackerClass: TrackerClass, skipSetInit: boolean) {
-    //assert(typeof TrackerClass === "function", "You must pass in a class");
-    //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
-    // Test for required instance methods.
-    /*
-    "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
-        //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
-    });
-    // Test for required class methods.
-    "scan tracked".split(/ /).forEach(function(m) {
-        //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
-    });
-    */
-    editTrackers[TrackerClass.trackerName] = TrackerClass;
-    if(!skipSetInit) {
-        setInit();
-    }
-};
-
 abstract class Editor<T = HTMLElement> {
     constructor(public trackerName: string, protected element: T) { }
     /*
@@ -212,8 +190,6 @@ class AceEditor extends Editor<TogetherJSNS.AceEditorElement & HTMLElement> {
         return !!$(el).closest(".ace_editor").length;
     }
 }
-
-TogetherJS.addTracker(AceEditor, true /* skip setInit */);
 
 class CodeMirrorEditor extends Editor<TogetherJSNS.CodeMirrorElement & HTMLElement> {
     public static readonly trackerName = "CodeMirrorEditor";
@@ -299,8 +275,6 @@ class CodeMirrorEditor extends Editor<TogetherJSNS.CodeMirrorElement & HTMLEleme
         return false;
     }
 }
-
-TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
 
 class CKEditor extends Editor {
     public static readonly trackerName = "CKEditor";
@@ -388,9 +362,6 @@ class CKEditor extends Editor {
     }
 }
 
-TogetherJS.addTracker(CKEditor, true /* skip setInit */);
-
-//////////////////// BEGINNING OF TINYMCE ////////////////////////
 class tinymceEditor extends Editor {
     public static readonly trackerName = "tinymceEditor";
 
@@ -485,9 +456,32 @@ class tinymceEditor extends Editor {
 
 type Tracker = tinymceEditor | CKEditor | CodeMirrorEditor | AceEditor;
 export type TrackerClass = typeof tinymceEditor | typeof CKEditor | typeof CodeMirrorEditor | typeof AceEditor;
-
+const editTrackers: { [trackerName: string]: TrackerClass } = {};
+let liveTrackers: Tracker[] = [];
+TogetherJS.addTracker = function(TrackerClass: TrackerClass, skipSetInit: boolean) {
+    //assert(typeof TrackerClass === "function", "You must pass in a class");
+    //assert(typeof TrackerClass.prototype.trackerName === "string", "Needs a .prototype.trackerName string");
+    // Test for required instance methods.
+    /*
+    "destroy update init makeInit tracked".split(/ /).forEach(function(m) {
+        //assert(typeof TrackerClass.prototype[m] === "function", "Missing required tracker method: " + m);
+    });
+    // Test for required class methods.
+    "scan tracked".split(/ /).forEach(function(m) {
+        //assert(typeof TrackerClass[m] === "function", "Missing required tracker class method: " + m);
+    });
+    */
+    editTrackers[TrackerClass.trackerName] = TrackerClass;
+    if(!skipSetInit) {
+        setInit();
+    }
+};
+TogetherJS.addTracker(AceEditor, true /* skip setInit */);
+TogetherJS.addTracker(CodeMirrorEditor, true /* skip setInit */);
+TogetherJS.addTracker(CKEditor, true /* skip setInit */);
 TogetherJS.addTracker(tinymceEditor, true);
-///////////////// END OF TINYMCE ///////////////////////////////////
+
+
 
 function buildTrackers() {
     assert(!liveTrackers.length);
@@ -562,22 +556,6 @@ function getValue(e: HTMLElement): boolean | string {
     else {
         return el.val() ?? ""; // .val() sometimes returns null (for a <select> with no children for example), we still need to return a string in this case because return null causes problem in other places
     }
-}
-
-// TODO not used
-//@ts-expect-error unused but we don't remove functions for now
-function getElementType(e: HTMLElement) {
-    const el = $(e)[0];
-    if(el.tagName == "TEXTAREA") {
-        return "textarea";
-    }
-    if(el.tagName == "SELECT") {
-        return "select";
-    }
-    if(el.tagName == "INPUT") {
-        return (el.getAttribute("type") || "text").toLowerCase();
-    }
-    return "?";
 }
 
 function setValue(e: HTMLElement | JQuery, value: string | boolean) {

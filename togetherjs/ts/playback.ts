@@ -48,7 +48,7 @@ export class Logs {
         this.pos = 0;
     }
 
-    play() {
+    play(): void {
         this.start = Date.now();
         if(this.pos >= this.logs.length) {
             this.unload();
@@ -58,7 +58,7 @@ export class Logs {
             // First we need to play the hello
             const toReplay = [];
             let foundHello = false;
-            for(var i = this.pos - 1; i >= 0; i--) {
+            for(let i = this.pos - 1; i >= 0; i--) {
                 const item = this.logs[i];
                 if(item.type in ALWAYS_REPLAY) {
                     toReplay.push(item);
@@ -73,7 +73,7 @@ export class Logs {
                 console.warn("No hello message found before position", this.pos);
             }
             toReplay.reverse();
-            for(i = 0; i < toReplay.length; i++) {
+            for(let i = 0; i < toReplay.length; i++) {
                 this.playItem(toReplay[i]);
             }
         }
@@ -121,7 +121,7 @@ export class Logs {
     playItem(item: TogetherJSNS.LogItem) {
         if(item.type == "hello") {
             // We may need to pause here
-            if(item.url != (location.href + "").replace(/\#.*/, "")) {
+            if(item.url != (location.href + "").replace(/#.*/, "")) {
                 this.pause();
             }
         }

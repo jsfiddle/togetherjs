@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./session", "./templating", "./util", "jquery"], function (require, exports, elementFinder_1, eventMaker_1, peers_1, session_1, templating_1, util_1, jquery_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.cursor = void 0;
+    exports.getClient = void 0;
     jquery_1 = __importDefault(jquery_1);
     // Cursor viewing support
     //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
@@ -194,11 +194,15 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
         }
         static getClient(clientId) {
-            return exports.cursor.getClient(clientId);
+            let c = Cursor._cursors[clientId];
+            if (!c) {
+                c = Cursor._cursors[clientId] = new Cursor(clientId);
+            }
+            return c;
         }
         static forEach(callback, context = null) {
             for (const a in Cursor._cursors) {
-                if (Cursor._cursors.hasOwnProperty(a)) {
+                if (Object.prototype.hasOwnProperty.call(Cursor._cursors, a)) {
                     callback.call(context, Cursor._cursors[a], a);
                 }
             }
@@ -209,16 +213,11 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
     }
     Cursor._cursors = {};
-    class cursor2 {
-        getClient(clientId) {
-            let c = Cursor._cursors[clientId];
-            if (!c) {
-                c = Cursor._cursors[clientId] = new Cursor(clientId);
-            }
-            return c;
-        }
+    // TODO weird class, investigate
+    function getClient(clientId) {
+        return Cursor.getClient(clientId);
     }
-    exports.cursor = new cursor2();
+    exports.getClient = getClient;
     function cbCursor(peer) {
         const c = Cursor.getClient(peer.id);
         c.updatePeer(peer);
@@ -492,7 +491,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
     }
     let lastKeydown = 0;
     const MIN_KEYDOWN_TIME = 500;
-    function documentKeydown(_event) {
+    function documentKeydown() {
         setTimeout(function () {
             const now = Date.now();
             if (now - lastKeydown < MIN_KEYDOWN_TIME) {

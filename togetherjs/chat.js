@@ -35,39 +35,6 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             declinedJoin: msg.reason == "declined-join"
         });
     });
-    class Chat {
-        submit(message) {
-            const parts = message.split(/ /);
-            if (parts[0].charAt(0) == "/") {
-                const name = parts[0].substr(1).toLowerCase();
-                const method = commands[`command_${name}`];
-                if (method) {
-                    method.apply(commands, parts.slice(1)); // TODO any way to remove this "as any" cast?
-                    return;
-                }
-            }
-            const messageId = session_1.session.clientId + "-" + Date.now();
-            session_1.session.send({
-                type: "chat",
-                text: message,
-                messageId: messageId
-            });
-            ui_1.ui.chat.text({
-                text: message,
-                peer: peers_1.peers.Self,
-                messageId: messageId,
-                notify: false
-            });
-            saveChatMessage({
-                text: message,
-                date: Date.now(),
-                peerId: peers_1.peers.Self.id,
-                messageId: messageId
-            });
-        }
-    }
-    exports.Chat = Chat;
-    exports.chat = new Chat();
     class Commands {
         constructor() {
             this._testCancel = null;
@@ -170,8 +137,8 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
         command_clear() {
             ui_1.ui.chat.clear();
         }
-        command_exec() {
-            const expr = Array.prototype.slice.call(arguments).join(" ");
+        command_exec(...args) {
+            const expr = Array.prototype.slice.call(args).join(" ");
             let result;
             // We use this to force global eval (not in this scope):
             const e = eval;
@@ -324,7 +291,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 });
                 return;
             }
-            if (!TogetherJS._defaultConfiguration.hasOwnProperty(variable)) {
+            if (!Object.prototype.hasOwnProperty.call(TogetherJS._defaultConfiguration, variable)) {
                 ui_1.ui.chat.system({
                     text: "Warning: variable " + variable + " is unknown"
                 });
@@ -344,6 +311,39 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
         }
     }
     const commands = new Commands();
+    class Chat {
+        submit(message) {
+            const parts = message.split(/ /);
+            if (parts[0].charAt(0) == "/") {
+                const name = parts[0].substr(1).toLowerCase();
+                const method = commands[`command_${name}`];
+                if (method) {
+                    method.apply(commands, parts.slice(1)); // TODO any way to remove this "as any" cast?
+                    return;
+                }
+            }
+            const messageId = session_1.session.clientId + "-" + Date.now();
+            session_1.session.send({
+                type: "chat",
+                text: message,
+                messageId: messageId
+            });
+            ui_1.ui.chat.text({
+                text: message,
+                peer: peers_1.peers.Self,
+                messageId: messageId,
+                notify: false
+            });
+            saveChatMessage({
+                text: message,
+                date: Date.now(),
+                peerId: peers_1.peers.Self.id,
+                messageId: messageId
+            });
+        }
+    }
+    exports.Chat = Chat;
+    exports.chat = new Chat();
     // this section deal with saving/restoring chat history as long as session is alive
     const chatStorageKey = "chatlog";
     const maxLogMessages = 100;

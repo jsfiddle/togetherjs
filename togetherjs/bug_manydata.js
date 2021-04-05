@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 function hashCode(s) {
     let hash = 0, i, chr;
     if (s.length === 0)
@@ -10,6 +11,7 @@ function hashCode(s) {
     }
     return hash;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 class PacketAssembler {
     constructor() {
         this.uid = 0;

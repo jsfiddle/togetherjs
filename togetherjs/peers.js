@@ -4,7 +4,7 @@
 define(["require", "exports", "./session", "./storage", "./templates", "./util"], function (require, exports, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.peers = exports.Peers = exports.PeersSelf = exports.PeerClass = void 0;
+    exports.PeerClass = exports.PeersSelf = exports.peers = exports.Peers = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert = util_1.util.assert.bind(util_1.util);
     let CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
@@ -16,205 +16,43 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         ui = uiModule.ui;
     });
     const DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
-    class PeerClass {
-        constructor(id, attrs = {}) {
-            this.isSelf = false;
-            this.lastMessageDate = 0;
-            this.hash = null;
-            this.title = null;
+    class Peers extends OnClass {
+        constructor() {
+            super(...arguments);
+            this._SelfLoaded = util_1.util.Deferred();
+        }
+        getPeer(id, message) {
             assert(id);
-            assert(!Peer.peers[id]);
-            this.id = id;
-            this.identityId = attrs.identityId || null;
-            this.status = attrs.status || "live";
-            this.idle = attrs.status || "active";
-            this.name = attrs.name || null;
-            this.avatar = attrs.avatar || null;
-            this.color = attrs.color || "#00FF00";
-            this.view = ui.PeerView(this);
-            this.following = attrs.following || false;
-            PeerClass.peers[id] = this;
-            let joined = attrs.joined || false;
-            if (attrs.fromHelloMessage) {
-                this.updateFromHello(attrs.fromHelloMessage);
-                if (attrs.fromHelloMessage.type == "hello") {
-                    joined = true;
+            let peer = PeerClass.peers[id];
+            if (id === session_1.session.clientId) {
+                return this.Self;
+            }
+            if (message && !peer) {
+                peer = new PeerClass(id, { fromHelloMessage: message });
+                return peer;
+            }
+            if (!peer) {
+                return null;
+            }
+            if (message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+                peer.updateFromHello(message);
+                peer.view.update();
+            }
+            return PeerClass.peers[id];
+        }
+        getAllPeers(liveOnly = false) {
+            const result = [];
+            util_1.util.forEachAttr(PeerClass.peers, function (peer) {
+                if (liveOnly && peer.status != "live") {
+                    return;
                 }
-            }
-            exports.peers.emit("new-peer", this);
-            if (joined) {
-                this.view.notifyJoined();
-            }
-            this.view.update();
-        }
-        repr() {
-            return "Peer(" + JSON.stringify(this.id) + ")";
-        }
-        serialize() {
-            return {
-                id: this.id,
-                status: this.status,
-                idle: this.idle,
-                url: this.url,
-                hash: this.hash,
-                title: this.title,
-                identityId: this.identityId || undefined,
-                rtcSupported: this.rtcSupported,
-                name: this.name || undefined,
-                avatar: this.avatar,
-                color: this.color,
-                following: this.following
-            };
-        }
-        destroy() {
-            this.view.destroy();
-            delete Peer.peers[this.id];
-        }
-        updateMessageDate() {
-            if (this.idle == "inactive") {
-                this.update({ idle: "active" });
-            }
-            if (this.status == "bye") {
-                this.unbye();
-            }
-            this.lastMessageDate = Date.now();
-        }
-        updateFromHello(msg) {
-            var _a;
-            let urlUpdated = false;
-            // var activeRTC = false; // TODO code change, unused
-            let identityUpdated = false;
-            if ("url" in msg && msg.url && msg.url != this.url) {
-                this.url = msg.url;
-                this.hash = null;
-                this.title = null;
-                urlUpdated = true;
-            }
-            if ("urlHash" in msg && msg.urlHash != this.hash) {
-                this.hash = (_a = msg.urlHash) !== null && _a !== void 0 ? _a : null; // TODO there was a weird mix of hash and urlHash here (see original), check that it's ok
-                urlUpdated = true;
-            }
-            if ("title" in msg && msg.title != this.title) {
-                this.title = msg.title || null;
-                urlUpdated = true;
-            }
-            if ("rtcSupported" in msg && msg.rtcSupported !== undefined) {
-                this.rtcSupported = msg.rtcSupported;
-            }
-            if ("identityId" in msg && msg.identityId !== undefined) {
-                this.identityId = msg.identityId;
-            }
-            if ("name" in msg && msg.name && msg.name != this.name) {
-                this.name = msg.name;
-                identityUpdated = true;
-            }
-            if ("avatar" in msg && msg.avatar && msg.avatar != this.avatar) {
-                util_1.util.assertValidUrl(msg.avatar);
-                this.avatar = msg.avatar;
-                identityUpdated = true;
-            }
-            if ("color" in msg && msg.color && msg.color != this.color) {
-                this.color = msg.color;
-                identityUpdated = true;
-            }
-            if ("isClient" in msg && msg.isClient !== undefined) {
-                this.isCreator = !msg.isClient;
-            }
-            if (this.status != "live") {
-                this.status = "live";
-                exports.peers.emit("status-updated", this);
-            }
-            if (this.idle != "active") {
-                this.idle = "active";
-                exports.peers.emit("idle-updated", this);
-            }
-            if ("rtcSupported" in msg && msg.rtcSupported) {
-                exports.peers.emit("rtc-supported", this);
-            }
-            if (urlUpdated) {
-                exports.peers.emit("url-updated", this);
-            }
-            if (identityUpdated) {
-                exports.peers.emit("identity-updated", this);
-            }
-            // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
-            if (this.following) {
-                session_1.session.emit("follow-peer", this);
-            }
-        }
-        update(attrs) {
-            // FIXME: should probably test that only a couple attributes are settable particularly status and idle
-            if (attrs.idle) {
-                this.idle = attrs.idle;
-            }
-            if (attrs.status) {
-                this.status = attrs.status;
-            }
-            this.view.update();
-        }
-        className(prefix = "") {
-            return prefix + util_1.util.safeClassName(this.id);
-        }
-        bye() {
-            if (this.status != "bye") {
-                this.status = "bye";
-                exports.peers.emit("status-updated", this);
-            }
-            this.view.update();
-        }
-        unbye() {
-            if (this.status == "bye") {
-                this.status = "live";
-                exports.peers.emit("status-updated", this);
-            }
-            this.view.update();
-        }
-        nudge() {
-            session_1.session.send({
-                type: "url-change-nudge",
-                url: location.href,
-                to: this.id
+                result.push(peer);
             });
-        }
-        follow() {
-            if (this.following) {
-                return;
-            }
-            exports.peers.getAllPeers().forEach(function (p) {
-                if (p.following) {
-                    p.unfollow();
-                }
-            });
-            this.following = true;
-            // We have to make sure we remember this, even if we change URLs:
-            storeSerialization();
-            this.view.update();
-            session_1.session.emit("follow-peer", this);
-        }
-        unfollow() {
-            this.following = false;
-            storeSerialization();
-            this.view.update();
-        }
-        static deserialize(obj) {
-            obj.fromStorage = true;
-            new Peer(obj.id, obj);
-            // TODO this function does nothing? except maybe adding the peer to the static list of peers
+            return result;
         }
     }
-    exports.PeerClass = PeerClass;
-    PeerClass.peers = {};
-    const Peer = PeerClass;
-    // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
-    session_1.session.on("follow-peer", function (peer) {
-        if (peer.url && peer.url != session_1.session.currentUrl()) {
-            let url = peer.url;
-            if (peer.urlHash) {
-                url += peer.urlHash;
-            }
-            location.href = url;
-        }
-    });
+    exports.Peers = Peers;
+    exports.peers = new Peers();
     class PeersSelf extends OnClass {
         constructor() {
             super(...arguments);
@@ -381,44 +219,204 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
     }
     exports.PeersSelf = PeersSelf;
-    class Peers extends OnClass {
-        constructor() {
-            super(...arguments);
-            this._SelfLoaded = util_1.util.Deferred();
-        }
-        getPeer(id, message, ignoreMissing = false) {
+    class PeerClass {
+        constructor(id, attrs = {}) {
+            this.isSelf = false;
+            this.lastMessageDate = 0;
+            this.hash = null;
+            this.title = null;
             assert(id);
-            let peer = Peer.peers[id];
-            if (id === session_1.session.clientId) {
-                return exports.peers.Self;
-            }
-            if (message && !peer) {
-                peer = new Peer(id, { fromHelloMessage: message });
-                return peer;
-            }
-            if (ignoreMissing && !peer) {
-                return null;
-            }
-            assert(peer, "No peer with id:", id);
-            if (message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
-                peer.updateFromHello(message);
-                peer.view.update();
-            }
-            return Peer.peers[id];
-        }
-        getAllPeers(liveOnly = false) {
-            const result = [];
-            util_1.util.forEachAttr(Peer.peers, function (peer) {
-                if (liveOnly && peer.status != "live") {
-                    return;
+            assert(!PeerClass.peers[id]);
+            this.id = id;
+            this.identityId = attrs.identityId || null;
+            this.status = attrs.status || "live";
+            this.idle = attrs.status || "active";
+            this.name = attrs.name || null;
+            this.avatar = attrs.avatar || null;
+            this.color = attrs.color || "#00FF00";
+            this.view = ui.PeerView(this);
+            this.following = attrs.following || false;
+            PeerClass.peers[id] = this;
+            let joined = attrs.joined || false;
+            if (attrs.fromHelloMessage) {
+                this.updateFromHello(attrs.fromHelloMessage);
+                if (attrs.fromHelloMessage.type == "hello") {
+                    joined = true;
                 }
-                result.push(peer);
+            }
+            exports.peers.emit("new-peer", this);
+            if (joined) {
+                this.view.notifyJoined();
+            }
+            this.view.update();
+        }
+        repr() {
+            return "Peer(" + JSON.stringify(this.id) + ")";
+        }
+        serialize() {
+            return {
+                id: this.id,
+                status: this.status,
+                idle: this.idle,
+                url: this.url,
+                hash: this.hash,
+                title: this.title,
+                identityId: this.identityId || undefined,
+                rtcSupported: this.rtcSupported,
+                name: this.name || undefined,
+                avatar: this.avatar,
+                color: this.color,
+                following: this.following
+            };
+        }
+        destroy() {
+            this.view.destroy();
+            delete PeerClass.peers[this.id];
+        }
+        updateMessageDate() {
+            if (this.idle == "inactive") {
+                this.update({ idle: "active" });
+            }
+            if (this.status == "bye") {
+                this.unbye();
+            }
+            this.lastMessageDate = Date.now();
+        }
+        updateFromHello(msg) {
+            var _a;
+            let urlUpdated = false;
+            // var activeRTC = false; // TODO code change, unused
+            let identityUpdated = false;
+            if ("url" in msg && msg.url && msg.url != this.url) {
+                this.url = msg.url;
+                this.hash = null;
+                this.title = null;
+                urlUpdated = true;
+            }
+            if ("urlHash" in msg && msg.urlHash != this.hash) {
+                this.hash = (_a = msg.urlHash) !== null && _a !== void 0 ? _a : null; // TODO there was a weird mix of hash and urlHash here (see original), check that it's ok
+                urlUpdated = true;
+            }
+            if ("title" in msg && msg.title != this.title) {
+                this.title = msg.title || null;
+                urlUpdated = true;
+            }
+            if ("rtcSupported" in msg && msg.rtcSupported !== undefined) {
+                this.rtcSupported = msg.rtcSupported;
+            }
+            if ("identityId" in msg && msg.identityId !== undefined) {
+                this.identityId = msg.identityId;
+            }
+            if ("name" in msg && msg.name && msg.name != this.name) {
+                this.name = msg.name;
+                identityUpdated = true;
+            }
+            if ("avatar" in msg && msg.avatar && msg.avatar != this.avatar) {
+                util_1.util.assertValidUrl(msg.avatar);
+                this.avatar = msg.avatar;
+                identityUpdated = true;
+            }
+            if ("color" in msg && msg.color && msg.color != this.color) {
+                this.color = msg.color;
+                identityUpdated = true;
+            }
+            if ("isClient" in msg && msg.isClient !== undefined) {
+                this.isCreator = !msg.isClient;
+            }
+            if (this.status != "live") {
+                this.status = "live";
+                exports.peers.emit("status-updated", this);
+            }
+            if (this.idle != "active") {
+                this.idle = "active";
+                exports.peers.emit("idle-updated", this);
+            }
+            if ("rtcSupported" in msg && msg.rtcSupported) {
+                exports.peers.emit("rtc-supported", this);
+            }
+            if (urlUpdated) {
+                exports.peers.emit("url-updated", this);
+            }
+            if (identityUpdated) {
+                exports.peers.emit("identity-updated", this);
+            }
+            // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
+            if (this.following) {
+                session_1.session.emit("follow-peer", this);
+            }
+        }
+        update(attrs) {
+            // FIXME: should probably test that only a couple attributes are settable particularly status and idle
+            if (attrs.idle) {
+                this.idle = attrs.idle;
+            }
+            if (attrs.status) {
+                this.status = attrs.status;
+            }
+            this.view.update();
+        }
+        className(prefix = "") {
+            return prefix + util_1.util.safeClassName(this.id);
+        }
+        bye() {
+            if (this.status != "bye") {
+                this.status = "bye";
+                exports.peers.emit("status-updated", this);
+            }
+            this.view.update();
+        }
+        unbye() {
+            if (this.status == "bye") {
+                this.status = "live";
+                exports.peers.emit("status-updated", this);
+            }
+            this.view.update();
+        }
+        nudge() {
+            session_1.session.send({
+                type: "url-change-nudge",
+                url: location.href,
+                to: this.id
             });
-            return result;
+        }
+        follow() {
+            if (this.following) {
+                return;
+            }
+            exports.peers.getAllPeers().forEach(function (p) {
+                if (p.following) {
+                    p.unfollow();
+                }
+            });
+            this.following = true;
+            // We have to make sure we remember this, even if we change URLs:
+            storeSerialization();
+            this.view.update();
+            session_1.session.emit("follow-peer", this);
+        }
+        unfollow() {
+            this.following = false;
+            storeSerialization();
+            this.view.update();
+        }
+        static deserialize(obj) {
+            // This function is leverage the side-effect of new Peer which is adding the peer to the static list of peers
+            obj.fromStorage = true;
+            return new PeerClass(obj.id, obj);
         }
     }
-    exports.Peers = Peers;
-    exports.peers = new Peers();
+    exports.PeerClass = PeerClass;
+    PeerClass.peers = {};
+    // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
+    session_1.session.on("follow-peer", function (peer) {
+        if (peer.url && peer.url != session_1.session.currentUrl()) {
+            let url = peer.url;
+            if (peer.urlHash) {
+                url += peer.urlHash;
+            }
+            location.href = url;
+        }
+    });
     session_1.session.on("start", function () {
         if (exports.peers.Self) {
             return;
@@ -446,7 +444,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
     })));
     function serialize() {
         const peers = [];
-        util_1.util.forEachAttr(Peer.peers, function (peer) {
+        util_1.util.forEachAttr(PeerClass.peers, function (peer) {
             peers.push(peer.serialize());
         });
         return { peers: peers };
@@ -456,7 +454,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             return;
         }
         obj.peers.forEach(function (peer) {
-            Peer.deserialize(peer);
+            PeerClass.deserialize(peer);
         });
     }
     function checkActivity() {
@@ -484,7 +482,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
     });
     session_1.session.on("close", function () {
-        util_1.util.forEachAttr(Peer.peers, function (peer) {
+        util_1.util.forEachAttr(PeerClass.peers, function (peer) {
             peer.destroy();
         });
         storage_1.storage.tab.set("peerCache", undefined);

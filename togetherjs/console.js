@@ -31,7 +31,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 "error" in console ? console.error : [],
                 "fatal" in console ? console.fatal : []
             ];
-            util_1.util.forEachAttr(Console.levels, (value, _name) => {
+            util_1.util.forEachAttr(Console.levels, (value) => {
                 this.maxLevel = Math.max(this.maxLevel, value);
             });
             util_1.util.forEachAttr(Console.levels, (value, name) => {
@@ -198,27 +198,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 throw e;
             }
         }
-        // TODO qw unused and don't work
-        submit(options = {}) {
-            // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
-            return util_1.util.Deferred(function () {
-                const site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
-                const req = new XMLHttpRequest();
-                req.open("POST", site);
-                req.setRequestHeader("Content-Type", "application/json");
-                req.send(JSON.stringify({
-                    "title": options.title || "TogetherJS log file",
-                    "snippet": this.toString(),
-                    "language": "text"
-                }));
-                req.onreadystatechange = function () {
-                    if (req.readyState === 4) {
-                        JSON.parse(req.responseText);
-                        // TODO what is this function supposed to do?
-                    }
-                };
-            });
-        }
     }
     exports.Console = Console;
     Console.levels = {
@@ -264,8 +243,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     }
     // This is a factory that creates `Console.prototype.debug`, `.error` etc:
     function logFunction(_name, level) {
-        return function () {
-            const args = Array.prototype.slice.call(arguments);
+        return function (...args) {
             const a = [level, ...args];
             this.write.apply(this, a);
         };
