@@ -468,7 +468,6 @@ session.on("start", function() {
     // peer.Self init
     peers.Self = new PeersSelf();
 
-
     peers.Self.view = ui.PeerSelfView(peers.Self);
     storage.tab.get("peerCache").then(deserialize);
     peers.Self._loadFromSettings().then(function() {
