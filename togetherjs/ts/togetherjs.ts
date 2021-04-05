@@ -220,7 +220,7 @@ function togetherjsMain() {
         storagePrefix: "togetherjs",
         includeHashInUrl: false,
         disableWebRTC: false,
-        youtube: true,
+        youtube: false,
         ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
         ignoreForms: [":password"],
         lang: undefined,

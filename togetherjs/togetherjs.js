@@ -117,7 +117,7 @@ class OnClass {
     }
 }
 function baseUrl1() {
-    let baseUrl = "";
+    let baseUrl = "__baseUrl__";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -134,7 +134,7 @@ function baseUrl1() {
 }
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 const baseUrl = baseUrl1();
 const cacheBust = Date.now() + "";
 function addScript(url) {
@@ -201,7 +201,7 @@ function togetherjsMain() {
         storagePrefix: "togetherjs",
         includeHashInUrl: false,
         disableWebRTC: false,
-        youtube: true,
+        youtube: false,
         ignoreMessages: ["cursor-update", "keydown", "scroll-update"],
         ignoreForms: [":password"],
         lang: undefined,
@@ -639,7 +639,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -728,8 +728,8 @@ function togetherjsMain() {
     }
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -775,7 +775,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
