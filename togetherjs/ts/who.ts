@@ -9,8 +9,8 @@ import { util } from "./util";
 
 //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
 const assert: typeof util.assert = util.assert.bind(util);
-var MAX_RESPONSE_TIME = 5000;
-var MAX_LATE_RESPONSE = 2000;
+const MAX_RESPONSE_TIME = 5000;
+const MAX_LATE_RESPONSE = 2000;
 
 export class ExternalPeer {
     isSelf = false;
@@ -44,7 +44,7 @@ export class ExternalPeer {
         this.view = ui.PeerSelfView(this);
     }
 
-    className(prefix: string = "") {
+    className(prefix = "") {
         return prefix + util.safeClassName(this.id);
     }
 }
@@ -54,12 +54,12 @@ export class Who {
 
     getList(hubUrl: string) {
         return util.Deferred<{ [user: string]: ExternalPeer }>(function(def) {
-            var expected: number;
-            var channel = new WebSocketChannel(hubUrl);
-            var users: { [user: string]: ExternalPeer } = {};
-            var responded = 0;
+            let expected: number;
+            const channel = new WebSocketChannel(hubUrl);
+            const users: { [user: string]: ExternalPeer } = {};
+            let responded = 0;
             //var firstResponse = 0; // TODO unused
-            var lateResponseTimeout: number;
+            let lateResponseTimeout: number;
             channel.onmessage = function(msg) {
                 if(msg.type == "init-connection") {
                     expected = msg.peerCount;
@@ -89,7 +89,7 @@ export class Who {
                 type: "who",
                 "server-echo": true,
             });
-            var timeout = setTimeout(function() {
+            const timeout = setTimeout(function() {
                 close();
             }, MAX_RESPONSE_TIME);
             function close() {
@@ -107,15 +107,15 @@ export class Who {
 
     invite(hubUrl: string, clientId: string | null) {
         return util.Deferred(function(def) {
-            var channel = new WebSocketChannel(hubUrl);
-            var id = util.generateId();
+            const channel = new WebSocketChannel(hubUrl);
+            const id = util.generateId();
             channel.onmessage = function(msg) {
                 if(msg.type == "invite" && msg.inviteId == id) {
                     channel.close();
                     def.resolve();
                 }
             };
-            var hello = session.makeHelloMessage(false);
+            const hello = session.makeHelloMessage(false);
 
             const userInfo: TogetherJSNS.ChannelSend.UserInfo = {
                 name: hello.name,

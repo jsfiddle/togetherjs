@@ -13,7 +13,7 @@ function extend(base, extensions) {
         extensions = base;
         base = {};
     }
-    for (let a in extensions) {
+    for (const a in extensions) {
         if (extensions.hasOwnProperty(a)) {
             base[a] = extensions[a];
         }
@@ -31,7 +31,7 @@ class OnClass {
             throw "Error: .once() called with non-callback";
         }
         if (name.search(" ") != -1) {
-            let names = name.split(/ +/g);
+            const names = name.split(/ +/g);
             names.forEach((n) => {
                 this.on(n, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
             });
@@ -60,7 +60,7 @@ class OnClass {
             throw "Error: .once() called with non-callback";
         }
         const cb = callback; // TODO how to avoid this cast?
-        let attr = "onceCallback_" + name;
+        const attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if (!cb[attr]) {
             const onceCallback = function (...args) {
@@ -79,7 +79,7 @@ class OnClass {
             return;
         }
         if (name.search(" ") != -1) {
-            let names = name.split(/ +/g);
+            const names = name.split(/ +/g);
             names.forEach(function (n) {
                 this.off(n, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
             }, this);
@@ -88,7 +88,7 @@ class OnClass {
         if (!this._listeners[name]) {
             return;
         }
-        let l = this._listeners[name], _len = l.length;
+        const l = this._listeners[name], _len = l.length;
         for (let i = 0; i < _len; i++) {
             if (l[i] == callback) {
                 l.splice(i, 1);
@@ -97,11 +97,11 @@ class OnClass {
         }
     }
     emit(name, ...args) {
-        let offs = this._listenerOffs = [];
+        const offs = this._listenerOffs = [];
         if ((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        let l = this._listeners[name];
+        const l = this._listeners[name];
         l.forEach(function (callback) {
             callback.apply(this, args);
         }, this);
@@ -138,12 +138,12 @@ let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 const baseUrl = baseUrl1();
 const cacheBust = Date.now() + "";
 function addScript(url) {
-    var script = document.createElement("script");
+    const script = document.createElement("script");
     script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
     document.head.appendChild(script);
 }
 function togetherjsMain() {
-    let styleSheet = "/togetherjs.css";
+    const styleSheet = "/togetherjs.css";
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
         if (typeof console == "undefined") {
@@ -243,10 +243,10 @@ function togetherjsMain() {
                 if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
                     console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
                 }
-                let previous = this.tjsInstance._configuration[attr];
-                let value = settings[attr];
+                const previous = this.tjsInstance._configuration[attr];
+                const value = settings[attr];
                 this.tjsInstance._configuration[attr] = value; // TODO any, how to remove this any
-                let trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
+                const trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
                 let failed = false;
                 for (let i = 0; i < trackers.length; i++) {
                     try {
@@ -304,7 +304,7 @@ function togetherjsMain() {
     }
     // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
     function createConfigFunObj(confObj) {
-        let config = ((name, maybeValue) => confObj.call(name, maybeValue));
+        const config = ((name, maybeValue) => confObj.call(name, maybeValue));
         config.get = (name) => confObj.get(name);
         config.close = (name) => confObj.close(name);
         config.track = (name, callback) => confObj.track(name, callback);
@@ -373,7 +373,7 @@ function togetherjsMain() {
             // the "on" configuration value.
             let attr;
             let attrName;
-            let globalOns = {};
+            const globalOns = {};
             for (attr in window) {
                 if (attr.indexOf("TogetherJSConfig_on_") === 0) {
                     attrName = attr.substr(("TogetherJSConfig_on_").length);
@@ -397,7 +397,7 @@ function togetherjsMain() {
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
             // FIXME: close these configs?
-            let ons = this.config.get("on") || {};
+            const ons = this.config.get("on") || {};
             for (attr in globalOns) {
                 if (globalOns.hasOwnProperty(attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -408,7 +408,7 @@ function togetherjsMain() {
             for (attr in ons) {
                 this.on(attr, ons[attr]); // TODO check cast
             }
-            let hubOns = this.config.get("hub_on");
+            const hubOns = this.config.get("hub_on");
             if (hubOns) {
                 for (attr in hubOns) {
                     if (hubOns.hasOwnProperty(attr)) {
@@ -435,16 +435,16 @@ function togetherjsMain() {
             // start itself (i.e., put up a UI and try to activate)
             this.startup._launch = true;
             addStyle();
-            let minSetting = this.config.get("useMinimizedCode");
+            const minSetting = this.config.get("useMinimizedCode");
             this.config.close("useMinimizedCode");
             if (minSetting !== undefined) {
                 min = !!minSetting;
             }
-            let requireConfig = clone(this.requireConfig);
-            let deps = ["session", "jquery"];
+            const requireConfig = clone(this.requireConfig);
+            const deps = ["session", "jquery"];
             let lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-            let availableTranslations = {
+            const availableTranslations = {
                 "en-US": true,
                 "en": "en-US",
                 "es": "es-BO",
@@ -474,7 +474,7 @@ function togetherjsMain() {
                 lang = availableTranslations[lang];
             }
             this.config("lang", lang);
-            let localeTemplates = "templates-" + lang;
+            const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
             const callback = (_session, _jquery) => {
                 this._loaded = true;
@@ -517,7 +517,7 @@ function togetherjsMain() {
             return extend(base, extensions);
         }
         _teardown() {
-            let requireObject = this._requireObject || window.require;
+            const requireObject = this._requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
             if (requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
@@ -555,7 +555,7 @@ function togetherjsMain() {
             }
         }
         _onmessage(msg) {
-            let type = msg.type;
+            const type = msg.type;
             let type2 = type;
             if (type.search(/^app\./) === 0) {
                 type2 = type2.substr("app.".length);
@@ -571,14 +571,14 @@ function togetherjsMain() {
             if (!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            let session = this.require("session").session;
+            const session = this.require("session").session;
             session.appSend(msg);
         }
         shareUrl() {
             if (!this.require) {
                 return null;
             }
-            let session = this.require("session").session;
+            const session = this.require("session").session;
             return session.shareUrl();
         }
         listenForShortcut() {
@@ -612,10 +612,10 @@ function togetherjsMain() {
             if (address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }
-            let socket = new WebSocket(address);
+            const socket = new WebSocket(address);
             let gotAnswer = false;
             socket.onmessage = function (event) {
-                let msg = JSON.parse(event.data);
+                const msg = JSON.parse(event.data);
                 if (msg.type != "init-connection") {
                     console.warn("Got unexpected first message (should be init-connection):", msg);
                     return;
@@ -655,9 +655,9 @@ function togetherjsMain() {
         return baseUrl;
     }
     function addStyle() {
-        var existing = document.getElementById("togetherjs-stylesheet");
+        const existing = document.getElementById("togetherjs-stylesheet");
         if (!existing) {
-            var link = document.createElement("link");
+            const link = document.createElement("link");
             link.id = "togetherjs-stylesheet";
             link.setAttribute("rel", "stylesheet");
             link.href = baseUrl + styleSheet +
@@ -666,13 +666,13 @@ function togetherjsMain() {
         }
     }
     function addScriptInner(url) {
-        var script = document.createElement("script");
+        const script = document.createElement("script");
         script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
     let baseUrl = baseUrl1Inner();
     defaultConfiguration.baseUrl = baseUrl;
-    let baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
+    const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride;
     if (baseUrlOverrideString) {
         try {
@@ -687,13 +687,13 @@ function togetherjsMain() {
         }
         else {
             baseUrl = baseUrlOverride.baseUrl;
-            let logger = console.warn || console.log;
+            const logger = console.warn || console.log;
             logger.call(console, "Using TogetherJS baseUrlOverride:", baseUrl);
             logger.call(console, "To undo run: localStorage.removeItem('togetherjs.baseUrlOverride')");
         }
     }
     function copyConfigInWindow(configOverride) {
-        let shownAny = false;
+        const shownAny = false;
         for (const _attr in configOverride) {
             const attr = _attr;
             if (!configOverride.hasOwnProperty(attr)) {
@@ -710,7 +710,7 @@ function togetherjsMain() {
             console.log("Config override:", attr, "=", configOverride[attr]);
         }
     }
-    let configOverrideString = localStorage.getItem("togetherjs.configOverride");
+    const configOverrideString = localStorage.getItem("togetherjs.configOverride");
     let configOverride;
     if (configOverrideString) {
         try {
@@ -737,9 +737,9 @@ function togetherjsMain() {
     }
     polyfillConsole();
     if (!baseUrl) {
-        let scripts = document.getElementsByTagName("script");
+        const scripts = document.getElementsByTagName("script");
         for (let i = 0; i < scripts.length; i++) {
-            let src = scripts[i].src;
+            const src = scripts[i].src;
             if (src && src.search(/togetherjs(-min)?.js(\?.*)?$/) !== -1) {
                 baseUrl = src.replace(/\/*togetherjs(-min)?.js(\?.*)?$/, "");
                 console.warn("Detected baseUrl as", baseUrl);
@@ -807,12 +807,12 @@ function togetherjsMain() {
     });
     // It's nice to replace this early, before the load event fires, so we conflict
     // as little as possible with the app we are embedded in:
-    let hash = location.hash.replace(/^#/, "");
-    let m = /&?togetherjs=([^&]*)/.exec(hash);
+    const hash = location.hash.replace(/^#/, "");
+    const m = /&?togetherjs=([^&]*)/.exec(hash);
     if (m) {
         tjsInstance.startup._joinShareId = m[1];
         tjsInstance.startup.reason = "joined";
-        let newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+        const newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
         location.hash = newHash;
     }
     if (window._TogetherJSShareId) {
@@ -854,10 +854,10 @@ function togetherjsMain() {
         }
         else {
             // FIXME: this doesn't respect storagePrefix:
-            let key = "togetherjs-session.status";
-            let valueString = sessionStorage.getItem(key);
+            const key = "togetherjs-session.status";
+            const valueString = sessionStorage.getItem(key);
             if (valueString) {
-                let value = JSON.parse(valueString);
+                const value = JSON.parse(valueString);
                 if (value && value.running) {
                     tjsInstance.startup.continued = true;
                     tjsInstance.startup.reason = value.startupReason;

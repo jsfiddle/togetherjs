@@ -9,17 +9,17 @@ import { util } from "./util";
 
 //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
 const assert: typeof util.assert = util.assert.bind(util);
-var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
-var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
-var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
-var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
+let CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
+let IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
+const TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
+let BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
-var ui: TogetherJSNS.Ui;
+let ui: TogetherJSNS.Ui;
 require(["ui"], function(uiModule) {
     ui = uiModule.ui;
 });
 
-var DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
+const DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
 export class PeerClass {
     public readonly isSelf: false = false;
@@ -32,7 +32,7 @@ export class PeerClass {
     public avatar: string | null;
     public color: string;
     public readonly view;
-    public lastMessageDate: number = 0;
+    public lastMessageDate = 0;
     public following: boolean;
 
     public url?: string;
@@ -58,7 +58,7 @@ export class PeerClass {
         this.view = ui.PeerView(this);
         this.following = attrs.following || false;
         PeerClass.peers[id] = this;
-        var joined = attrs.joined || false;
+        let joined = attrs.joined || false;
         if(attrs.fromHelloMessage) {
             this.updateFromHello(attrs.fromHelloMessage);
             if(attrs.fromHelloMessage.type == "hello") {
@@ -109,9 +109,9 @@ export class PeerClass {
     }
 
     updateFromHello(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForSending>) {
-        var urlUpdated = false;
+        let urlUpdated = false;
         // var activeRTC = false; // TODO code change, unused
-        var identityUpdated = false;
+        let identityUpdated = false;
         if("url" in msg && msg.url && msg.url != this.url) {
             this.url = msg.url;
             this.hash = null;
@@ -182,7 +182,7 @@ export class PeerClass {
         this.view.update();
     }
 
-    className(prefix: string = "") {
+    className(prefix = "") {
         return prefix + util.safeClassName(this.id);
     }
 
@@ -244,7 +244,7 @@ const Peer = PeerClass;
 // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
 session.on("follow-peer", function(peer) {
     if(peer.url && peer.url != session.currentUrl()) {
-        var url = peer.url;
+        let url = peer.url;
         if(peer.urlHash) {
             url += peer.urlHash;
         }
@@ -260,7 +260,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public idle: TogetherJSNS.PeerStatus = "active";
     public name: string | null = null;
     public avatar: string | null = null;
-    public color: string = "#00FF00"; // TODO I added a default value, but is that ok?
+    public color = "#00FF00"; // TODO I added a default value, but is that ok?
     public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
     // private loaded = false;// TODO unused
     public isCreator = !session.isClient;
@@ -268,9 +268,9 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public url?: string;
 
     update(attrs: Partial<TogetherJSNS.PeerSelfAttributes>) {
-        var updatePeers = false;
-        var updateIdle = false;
-        var updateMsg: TogetherJSNS.SessionSend.PeerUpdate = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
+        let updatePeers = false;
+        let updateIdle = false;
+        const updateMsg: TogetherJSNS.SessionSend.PeerUpdate = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
         if(typeof attrs.name == "string" && attrs.name != this.name) {
             this.name = attrs.name;
             updateMsg.name = this.name;
@@ -325,7 +325,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
         }
     }
 
-    className(prefix: string = "") {
+    className(prefix = "") {
         return prefix + "self";
     }
 
@@ -365,9 +365,9 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     _loadFromApp() {
         // FIXME: I wonder if these should be optionally functions?
         // We could test typeof==function to distinguish between a getter and a concrete value
-        var getUserName = TogetherJS.config.get("getUserName");
-        var getUserColor = TogetherJS.config.get("getUserColor");
-        var getUserAvatar = TogetherJS.config.get("getUserAvatar");
+        const getUserName = TogetherJS.config.get("getUserName");
+        const getUserColor = TogetherJS.config.get("getUserColor");
+        const getUserAvatar = TogetherJS.config.get("getUserAvatar");
         let name: string | null = null;
         let color: string | null = null;
         let avatar: string | null = null;
@@ -424,9 +424,9 @@ export class Peers extends OnClass<TogetherJSNS.On.Map> {
     public Self!: PeersSelf; // TODO !
     public readonly _SelfLoaded = util.Deferred();
 
-    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>, ignoreMissing: boolean = false) {
+    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>, ignoreMissing = false) {
         assert(id);
-        var peer = Peer.peers[id];
+        let peer = Peer.peers[id];
         if(id === session.clientId) {
             return peers.Self;
         }
@@ -445,8 +445,8 @@ export class Peers extends OnClass<TogetherJSNS.On.Map> {
         return Peer.peers[id];
     }
 
-    getAllPeers(liveOnly: boolean = false) {
-        var result: PeerClass[] = [];
+    getAllPeers(liveOnly = false) {
+        const result: PeerClass[] = [];
         util.forEachAttr(Peer.peers, function(peer) {
             if(liveOnly && peer.status != "live") {
                 return;
@@ -499,7 +499,7 @@ TogetherJS.config.track(
 );
 
 function serialize() {
-    var peers: TogetherJSNS.SerializedPeer[] = [];
+    const peers: TogetherJSNS.SerializedPeer[] = [];
     util.forEachAttr(Peer.peers, function(peer) {
         peers.push(peer.serialize());
     });
@@ -516,8 +516,8 @@ function deserialize(obj?: { peers: TogetherJSNS.SerializedPeer[] }) {
 }
 
 function checkActivity() {
-    var ps = peers.getAllPeers();
-    var now = Date.now();
+    const ps = peers.getAllPeers();
+    const now = Date.now();
     ps.forEach(function(p) {
         if(p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
             p.update({ idle: "inactive" });
@@ -529,11 +529,11 @@ function checkActivity() {
 }
 
 session.hub.on("bye", function(msg) {
-    var peer = peers.getPeer(msg.clientId);
+    const peer = peers.getPeer(msg.clientId);
     (peer as PeerClass).bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
 });
 
-var checkActivityTask: number | null = null;
+let checkActivityTask: number | null = null;
 
 session.on("start", function() {
     if(checkActivityTask) {
@@ -554,7 +554,7 @@ session.on("close", function() {
     checkActivityTask = null;
 });
 
-var tabIdleTimeout: number | null = null;
+let tabIdleTimeout: number | null = null;
 
 session.on("visibility-change", function(hidden) {
     if(hidden) {

@@ -16,7 +16,7 @@ interface ConsoleSubmitOptions {
 
 //function consoleMain(util: TogetherJSNS.Util) {
 
-var console = window.console || { log: function() { } };
+const console = window.console || { log: function() { } };
 
 export class Console {
     public static levels: {[ll in LogLevelString]: number} = {
@@ -120,7 +120,7 @@ export class Console {
     }
 
     suppressedWrite(...args: any[]) {
-        let w = this.write;
+        const w = this.write;
         const a: Parameters<typeof w> = ["suppress", ...args];
         this.write.apply(this, a);
     }
@@ -135,7 +135,7 @@ export class Console {
         }
         catch(e) {
             // FIXME: trim this frame
-            var stack = e.stack;
+            let stack = e.stack;
             stack = stack.replace(/^[^\n]*\n/, "");
             this[level](stack);
         }
@@ -160,8 +160,8 @@ export class Console {
     }
 
     _stringify(...args: any[]) {
-        var s = "";
-        for(var i = 0; i < args.length; i++) {
+        let s = "";
+        for(let i = 0; i < args.length; i++) {
             if(s) {
                 s += " ";
             }
@@ -201,14 +201,14 @@ export class Console {
     }
 
     _formatMinutes(milliseconds: number): string {
-        let m: number = Math.floor(milliseconds / 1000 / 60);
+        const m: number = Math.floor(milliseconds / 1000 / 60);
         let formatted = "" + m;
-        var remaining = milliseconds - (m * 1000 * 60);
+        const remaining = milliseconds - (m * 1000 * 60);
         if(m > 10) {
             // Over 10 minutes, just ignore the seconds
             return formatted;
         }
-        var seconds = Math.floor(remaining / 1000) + "";
+        let seconds = Math.floor(remaining / 1000) + "";
         formatted += ":";
         seconds = lpad(seconds, 2, "0");
         formatted += seconds;
@@ -227,7 +227,7 @@ export class Console {
 
     toString() {
         try {
-            var lines = this._browserInfo();
+            const lines = this._browserInfo();
             this.messages.forEach(function(this: Console, m) {
                 lines.push(lpad(this._formatTime(m[0]), 6) + " " + rpad(this._formatLevel(m[1]), 6) + " " + lpadLines(m[2], 14));
             }, this);
@@ -244,8 +244,8 @@ export class Console {
     submit(options: Partial<ConsoleSubmitOptions> = {}) {
         // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
         return util.Deferred(function(this: object) {  // TODO this is casted as object but I should be able to find a more precise type
-            var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
-            var req = new XMLHttpRequest();
+            const site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
+            const req = new XMLHttpRequest();
             req.open("POST", site);
             req.setRequestHeader("Content-Type", "application/json");
             req.send(JSON.stringify({
@@ -262,7 +262,7 @@ export class Console {
         });
     }
 
-};
+}
 
 function rpad(s: string, len: number, pad = " ") {
     s = s + "";
@@ -281,16 +281,16 @@ function lpad(s: string, len: number, pad = " ") {
 }
 
 function lpadLines(s: string, len: number, pad = " ") {
-    var i;
+    let i;
     s = s + "";
     if(s.indexOf("\n") == -1) {
         return s;
     }
-    var fullPad = "";
+    let fullPad = "";
     for(i = 0; i < len; i++) {
         fullPad += pad;
     }
-    let lines = s.split(/\n/g);
+    const lines = s.split(/\n/g);
     for(i = 1; i < s.length; i++) {
         lines[i] = fullPad + s[i];
     }

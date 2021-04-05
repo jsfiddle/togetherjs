@@ -6,7 +6,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.templates = void 0;
     //function templatesMain(util: TogetherJSNS.Util, require: Require) {
-    let assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     function clean(t) {
         // Removes <% /* ... */ %> comments:
         console.log("TogetherJS.baseUrl", TogetherJS.baseUrl);
@@ -18,9 +18,9 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
         return t;
     }
-    var lang = TogetherJS.getConfig("lang") || "en-US";
-    var moduleName = "templates-" + lang;
-    var templatesLang;
+    const lang = TogetherJS.getConfig("lang") || "en-US";
+    const moduleName = "templates-" + lang;
+    let templatesLang;
     require([moduleName], function (mod) {
         templatesLang = mod;
     });
@@ -38,7 +38,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         return clean(templatesLang[resourceName] || "");
     }
     exports.templates = templates;
-    ;
 });
 // FIXME: maybe it would be better to dynamically assemble the first
 // argument to define() here to include the localized module:

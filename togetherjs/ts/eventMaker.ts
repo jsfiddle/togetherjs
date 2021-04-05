@@ -21,7 +21,7 @@ function createTogetherjsMouseEvent() {
 export class EventMaker {
     performClick(target: HTMLElement | JQuery) {
         // FIXME: should accept other parameters, like Ctrl/Alt/etc
-        var event = createTogetherjsMouseEvent();
+        const event = createTogetherjsMouseEvent();
         event.initMouseEvent(
             "click", // type
             true, // canBubble
@@ -41,12 +41,12 @@ export class EventMaker {
         );
 
         target = $(target)[0];
-        var cancelled = target.dispatchEvent(event);
+        const cancelled = target.dispatchEvent(event);
         if(cancelled) {
             return;
         }
         if(target.tagName == "A") {
-            var href = (target as HTMLAnchorElement).href;
+            const href = (target as HTMLAnchorElement).href;
             if(href) {
                 location.href = href;
                 return;
@@ -58,7 +58,7 @@ export class EventMaker {
 
     fireChange(target: HTMLElement | JQuery) {
         target = $(target)[0];
-        var event = document.createEvent("HTMLEvents");
+        const event = document.createEvent("HTMLEvents");
         event.initEvent("change", true, true);
         target.dispatchEvent(event);
     }

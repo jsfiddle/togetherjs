@@ -13,14 +13,14 @@ import $ from "jquery";
 // Cursor viewing support
 
 //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
-var assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 
-var CURSOR_HEIGHT = 50;
-var CURSOR_ANGLE = (35 / 180) * Math.PI;
-var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
+const CURSOR_HEIGHT = 50;
+const CURSOR_ANGLE = (35 / 180) * Math.PI;
+const CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
 // Number of milliseconds after page load in which a scroll-update
 // related hello-back message will be processed:
-var SCROLL_UPDATE_CUTOFF = 2000;
+const SCROLL_UPDATE_CUTOFF = 2000;
 
 session.hub.on("cursor-update", function(msg) {
     if(msg.sameUrl) {
@@ -63,17 +63,17 @@ class Cursor {
     updatePeer(peer: TogetherJSNS.AnyPeer) {
         // FIXME: can I use peer.setElement()?
         this.element.css({ color: peer.color });
-        var img = this.element.find("img.togetherjs-cursor-img");
+        const img = this.element.find("img.togetherjs-cursor-img");
         img.attr("src", makeCursor(peer.color));
-        var name = this.element.find(".togetherjs-cursor-name");
-        var nameContainer = this.element.find(".togetherjs-cursor-container");
+        const name = this.element.find(".togetherjs-cursor-name");
+        const nameContainer = this.element.find(".togetherjs-cursor-container");
         assert(name.length);
         name.text(peer.name!); // TODO !
         nameContainer.css({
             backgroundColor: peer.color,
             color: "#000000" // TODO was tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHex()
         });
-        var path = this.element.find("svg path");
+        const path = this.element.find("svg path");
         path.attr("fill", peer.color);
         // FIXME: should I just remove the element?
         if(peer.status != "live") {
@@ -111,14 +111,14 @@ class Cursor {
     }
 
     updatePosition(pos: TogetherJSNS.SessionSend.CursorClick | TogetherJSNS.On.CursorUpdate) {
-        var top, left;
+        let top, left;
         if(this.atOtherUrl) {
             this.element.show();
             this.atOtherUrl = false;
         }
         if("element" in pos) {
-            var target = $(elementFinder.findElement(pos.element));
-            var offset = target.offset()!; // TODO !
+            const target = $(elementFinder.findElement(pos.element));
+            const offset = target.offset()!; // TODO !
             top = offset.top + pos.offsetY;
             left = offset.left + pos.offsetX;
         }
@@ -144,7 +144,7 @@ class Cursor {
 
     // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
     rotateCursorDown() {
-        var e = $(this.element).find('svg');
+        const e = $(this.element).find('svg');
         e.animate(
             { borderSpacing: -150, opacity: 1 },
             {
@@ -169,8 +169,8 @@ class Cursor {
     }
 
     setPosition(top: number, left: number) {
-        var wTop = $(window).scrollTop();
-        var height = $(window).height();
+        const wTop = $(window).scrollTop();
+        const height = $(window).height();
 
         if(top < wTop) {
             // FIXME: this is a totally arbitrary number, but is meant to be big enough
@@ -222,7 +222,7 @@ class Cursor {
     }
 
     static forEach(callback: (c: Cursor, id: string) => void, context: Cursor | null = null) {
-        for(var a in Cursor._cursors) {
+        for(const a in Cursor._cursors) {
             if(Cursor._cursors.hasOwnProperty(a)) {
                 callback.call(context, Cursor._cursors[a], a);
             }
@@ -237,7 +237,7 @@ class Cursor {
 
 class cursor2 {
     getClient(clientId: string) {
-        var c = Cursor._cursors[clientId];
+        let c = Cursor._cursors[clientId];
         if(!c) {
             c = Cursor._cursors[clientId] = new Cursor(clientId);
         }
@@ -248,7 +248,7 @@ class cursor2 {
 export const cursor = new cursor2();
 
 function cbCursor(peer: TogetherJSNS.PeerClass | TogetherJSNS.PeerSelf) {
-    var c = Cursor.getClient(peer.id);
+    const c = Cursor.getClient(peer.id);
     c.updatePeer(peer);
 }
 
@@ -256,19 +256,19 @@ peers.on("new-peer", cbCursor);
 peers.on("identity-updated", cbCursor);
 peers.on("status-updated", cbCursor);
 
-var lastTime = 0;
-var MIN_TIME = 100;
-var lastPosX = -1;
-var lastPosY = -1;
-var lastMessage: TogetherJSNS.On.CursorUpdate | null = null;
+let lastTime = 0;
+const MIN_TIME = 100;
+let lastPosX = -1;
+let lastPosY = -1;
+let lastMessage: TogetherJSNS.On.CursorUpdate | null = null;
 function mousemove(event: JQueryMouseEventObject) {
-    var now = Date.now();
+    const now = Date.now();
     if(now - lastTime < MIN_TIME) {
         return;
     }
     lastTime = now;
-    var pageX = event.pageX;
-    var pageY = event.pageY;
+    const pageX = event.pageX;
+    const pageY = event.pageY;
     if(Math.abs(lastPosX - pageX) < 3 && Math.abs(lastPosY - pageY) < 3) {
         // Not a substantial enough change
         return;
@@ -276,7 +276,7 @@ function mousemove(event: JQueryMouseEventObject) {
     lastPosX = pageX;
     lastPosY = pageY;
     let target: HTMLElement | null = event.target as HTMLElement;
-    var parent = $(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
+    const parent = $(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
     if(parent.length) {
         target = parent[0];
     }
@@ -292,16 +292,16 @@ function mousemove(event: JQueryMouseEventObject) {
         session.send(lastMessage);
         return;
     }
-    let $target = $(target);
-    var offset = $target.offset();
+    const $target = $(target);
+    const offset = $target.offset();
     if(!offset) {
         // FIXME: this really is walkabout.js's problem to fire events on the
         // document instead of a specific element
         console.warn("Could not get offset of element:", $target[0]);
         return;
     }
-    var offsetX = pageX - offset.left;
-    var offsetY = pageY - offset.top;
+    const offsetX = pageX - offset.left;
+    const offsetY = pageY - offset.top;
     lastMessage = {
         type: "cursor-update",
         element: elementFinder.elementLocation($target),
@@ -312,11 +312,11 @@ function mousemove(event: JQueryMouseEventObject) {
 }
 
 function makeCursor(color: string) {
-    var canvas = $("<canvas></canvas>");
+    const canvas = $("<canvas></canvas>");
     canvas.attr("height", CURSOR_HEIGHT);
     canvas.attr("width", CURSOR_WIDTH);
     const canvas0 = canvas[0] as HTMLCanvasElement;
-    var context = canvas0.getContext('2d')!; // ! ok
+    const context = canvas0.getContext('2d')!; // ! ok
     context.fillStyle = color;
     context.moveTo(0, 0);
     context.beginPath();
@@ -334,13 +334,13 @@ function makeCursor(color: string) {
     return canvas0.toDataURL("image/png");
 }
 
-var scrollTimeout: number | null = null;
-var scrollTimeoutSet = 0;
-var SCROLL_DELAY_TIMEOUT = 75;
-var SCROLL_DELAY_LIMIT = 300;
+let scrollTimeout: number | null = null;
+let scrollTimeoutSet = 0;
+const SCROLL_DELAY_TIMEOUT = 75;
+const SCROLL_DELAY_LIMIT = 300;
 
 function scroll() {
-    var now = Date.now();
+    const now = Date.now();
     if(scrollTimeout) {
         if(now - scrollTimeoutSet < SCROLL_DELAY_LIMIT) {
             clearTimeout(scrollTimeout);
@@ -356,7 +356,7 @@ function scroll() {
     }
 }
 
-var lastScrollMessage: TogetherJSNS.SessionSend.ScrollUpdate | null = null;
+let lastScrollMessage: TogetherJSNS.SessionSend.ScrollUpdate | null = null;
 function _scrollRefresh() {
     scrollTimeout = null;
     scrollTimeoutSet = 0;
@@ -387,7 +387,7 @@ session.hub.on("scroll-update", function(msg) {
 // In case there are multiple peers, we track that we've accepted one of their
 // hello-based scroll updates, just so we don't bounce around (we don't intelligently
 // choose which one to use, just the first that comes in)
-var acceptedScrollUpdate = false;
+let acceptedScrollUpdate = false;
 function cbHelloHelloback(msg: TogetherJSNS.On.Hello2 | TogetherJSNS.On.HelloBack2) {
     if(msg.type == "hello") {
         // Once a hello comes in, a bunch of hello-backs not intended for us will also
@@ -451,7 +451,7 @@ function documentClick(event: MouseEvent & { togetherjsInternal?: boolean }) {
             // because TogetherJS was closed with a click...
             return;
         }
-        var element = event.target as HTMLElement;
+        let element = event.target as HTMLElement;
         if(element == document.documentElement) {
             // For some reason clicking on <body> gives the <html> element here
             element = document.body;
@@ -465,18 +465,18 @@ function documentClick(event: MouseEvent & { togetherjsInternal?: boolean }) {
             return;
         }
 
-        var dontShowClicks = TogetherJS.config.get("dontShowClicks");
-        var cloneClicks = TogetherJS.config.get("cloneClicks");
+        const dontShowClicks = TogetherJS.config.get("dontShowClicks");
+        const cloneClicks = TogetherJS.config.get("cloneClicks");
         // If you dont want to clone the click for this element
         // and you dont want to show the click for this element or you dont want to show any clicks
         // then return to avoid sending a useless click
         if((!util.matchElement(element, cloneClicks)) && util.matchElement(element, dontShowClicks)) {
             return;
         }
-        var location = elementFinder.elementLocation(element);
-        var offset = $(element).offset()!; // TODO !
-        var offsetX = event.pageX - offset.left;
-        var offsetY = event.pageY - offset.top;
+        const location = elementFinder.elementLocation(element);
+        const offset = $(element).offset()!; // TODO !
+        const offsetX = event.pageX - offset.left;
+        const offsetY = event.pageY - offset.top;
         session.send({
             type: "cursor-click",
             element: location,
@@ -490,7 +490,7 @@ function documentClick(event: MouseEvent & { togetherjsInternal?: boolean }) {
     });
 }
 
-var CLICK_TRANSITION_TIME = 3000;
+const CLICK_TRANSITION_TIME = 3000;
 
 session.hub.on("cursor-click", function(pos) {
     // When the click is calculated isn't always the same as how the
@@ -503,15 +503,15 @@ session.hub.on("cursor-click", function(pos) {
         return;
     }
     Cursor.getClient(pos.clientId).updatePosition(pos);
-    var target = $(elementFinder.findElement(pos.element));
-    var offset = target.offset()!; // TODO !
-    var top = offset.top + pos.offsetY;
-    var left = offset.left + pos.offsetX;
-    var cloneClicks = TogetherJS.config.get("cloneClicks");
+    const target = $(elementFinder.findElement(pos.element));
+    const offset = target.offset()!; // TODO !
+    const top = offset.top + pos.offsetY;
+    const left = offset.left + pos.offsetX;
+    const cloneClicks = TogetherJS.config.get("cloneClicks");
     if(util.matchElement(target, cloneClicks)) {
         eventMaker.performClick(target);
     }
-    var dontShowClicks = TogetherJS.config.get("dontShowClicks");
+    const dontShowClicks = TogetherJS.config.get("dontShowClicks");
     if(util.matchElement(target, dontShowClicks)) {
         return;
     }
@@ -521,7 +521,7 @@ session.hub.on("cursor-click", function(pos) {
 function displayClick(pos: { top: number, left: number }, color: string) {
     // FIXME: should we hide the local click if no one else is going to see it?
     // That means tracking who might be able to see our screen.
-    var element = templating.clone("click");
+    const element = templating.clone("click");
     $(document.body).append(element);
     element.css({
         top: pos.top,
@@ -536,12 +536,12 @@ function displayClick(pos: { top: number, left: number }, color: string) {
     }, CLICK_TRANSITION_TIME);
 }
 
-var lastKeydown = 0;
-var MIN_KEYDOWN_TIME = 500;
+let lastKeydown = 0;
+const MIN_KEYDOWN_TIME = 500;
 
 function documentKeydown(_event: Event) {
     setTimeout(function() {
-        var now = Date.now();
+        const now = Date.now();
         if(now - lastKeydown < MIN_KEYDOWN_TIME) {
             return;
         }
@@ -553,7 +553,7 @@ function documentKeydown(_event: Event) {
 
 session.hub.on("keydown", function(msg) {
     // FIXME: when the cursor is hidden there's nothing to show with setKeydown().
-    var cursor = Cursor.getClient(msg.clientId);
+    const cursor = Cursor.getClient(msg.clientId);
     cursor.setKeydown();
 });
 

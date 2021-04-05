@@ -17,12 +17,12 @@ interface Options {
 
 //define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
 
-var listeners: Listener[] = [];
+let listeners: Listener[] = [];
 
-var TIME_UPDATE = 'timeupdate' as const;
-var MIRRORED_EVENTS = ['play', 'pause'] as const;
+const TIME_UPDATE = 'timeupdate' as const;
+const MIRRORED_EVENTS = ['play', 'pause'] as const;
 
-var TOO_FAR_APART = 3000;
+const TOO_FAR_APART = 3000;
 
 session.on("reinitialize", function() {
     unsetListeners();
@@ -32,13 +32,13 @@ session.on("reinitialize", function() {
 session.on("ui-ready", setupListeners);
 
 function setupListeners() {
-    var videos = $('video');
+    const videos = $('video');
     setupMirroredEvents(videos);
     setupTimeSync(videos);
 }
 
 function setupMirroredEvents(videos: JQuery) {
-    var currentListener;
+    let currentListener;
     MIRRORED_EVENTS.forEach(function(eventName) {
         currentListener = makeEventSender(eventName);
         videos.on(eventName, currentListener);
@@ -51,7 +51,7 @@ function setupMirroredEvents(videos: JQuery) {
 
 function makeEventSender(eventName: "play" | "pause" | "timeupdate") {
     return function(event: Event, options: Options = {}) {
-        var element = event.target as HTMLMediaElement;
+        const element = event.target as HTMLMediaElement;
         if(!options.silent && element) {
             session.send({
                 type: `video-${eventName}` as const,
@@ -64,7 +64,7 @@ function makeEventSender(eventName: "play" | "pause" | "timeupdate") {
 
 function setupTimeSync(videos: JQuery) {
     videos.each(function(_i, video) {
-        var onTimeUpdate = makeTimeUpdater();
+        const onTimeUpdate = makeTimeUpdater();
         $(video).on(TIME_UPDATE, onTimeUpdate);
         listeners.push({
             name: TIME_UPDATE,
@@ -74,9 +74,9 @@ function setupTimeSync(videos: JQuery) {
 }
 
 function makeTimeUpdater() {
-    var last = 0;
+    let last = 0;
     return function(event: Event) {
-        var currentTime = (event.target as HTMLMediaElement).currentTime;
+        const currentTime = (event.target as HTMLMediaElement).currentTime;
         if(areTooFarApart(currentTime, last)) {
             makeEventSender(TIME_UPDATE)(event);
         }
@@ -85,15 +85,15 @@ function makeTimeUpdater() {
 }
 
 function areTooFarApart(currentTime: number, lastTime: number) {
-    var secDiff = Math.abs(currentTime - lastTime);
-    var milliDiff = secDiff * 1000;
+    const secDiff = Math.abs(currentTime - lastTime);
+    const milliDiff = secDiff * 1000;
     return milliDiff > TOO_FAR_APART;
 }
 
 session.on("close", unsetListeners);
 
 function unsetListeners() {
-    var videos = $('video');
+    const videos = $('video');
     listeners.forEach(function(event) {
         videos.off(event.name, event.listener);
     });
@@ -102,9 +102,9 @@ function unsetListeners() {
 
 
 session.hub.on('video-timeupdate', function(msg: TogetherJSNS.SessionSend.VideoEventName<"timeupdate">) {
-    var element = $findElement(msg.location);
-    var oldTime = element.prop('currentTime');
-    var newTime = msg.position;
+    const element = $findElement(msg.location);
+    const oldTime = element.prop('currentTime');
+    const newTime = msg.position;
 
     //to help throttle uneccesary position changes
     if(areTooFarApart(oldTime, newTime)) {
@@ -114,7 +114,7 @@ session.hub.on('video-timeupdate', function(msg: TogetherJSNS.SessionSend.VideoE
 
 MIRRORED_EVENTS.forEach(function(eventName) {
     session.hub.on(`video-${eventName}` as const, function(msg: TogetherJSNS.SessionSend.VideoEventName<typeof eventName>) {
-        var element = $findElement(msg.location);
+        const element = $findElement(msg.location);
 
         setTime(element, msg.position);
 

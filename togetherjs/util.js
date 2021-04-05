@@ -35,14 +35,12 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         trim(s) {
             return s.replace(/^\s+/, "").replace(/\s+$/, "");
         }
-        ;
         safeClassName(name) {
             return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
         }
-        ;
         assert(cond, ...args) {
             if (!cond) {
-                let args2 = ["Assertion error:"].concat(args);
+                const args2 = ["Assertion error:"].concat(args);
                 console.error.apply(console, args2);
                 if (console.trace) {
                     console.trace();
@@ -52,7 +50,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         }
         /** Generates a random ID */
         generateId(length = 10) {
-            let letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
+            const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
             let s = '';
             for (let i = 0; i < length; i++) {
                 s += letters.charAt(Math.floor(Math.random() * letters.length));
@@ -68,13 +66,13 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             let binary = '';
             let bytes;
             if (typeof blob === "string") {
-                var enc = new TextEncoder();
+                const enc = new TextEncoder();
                 bytes = enc.encode(blob);
             }
             else {
                 bytes = new Uint8Array(blob);
             }
-            let len = bytes.byteLength;
+            const len = bytes.byteLength;
             for (let i = 0; i < len; i++) {
                 binary += String.fromCharCode(bytes[i]);
             }
@@ -85,9 +83,9 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             if (!base) {
                 return url;
             }
-            let regex = /^https?:\/\/[^\/]*/i;
-            let match = regex.exec(url);
-            let matchBase = regex.exec(base);
+            const regex = /^https?:\/\/[^\/]*/i;
+            const match = regex.exec(url);
+            const matchBase = regex.exec(base);
             if (match && matchBase && match[0] == matchBase[0]) {
                 // There is a common scheme and domain
                 return url.substr(match[0].length);
@@ -100,18 +98,18 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 return url;
             }
             if (url.search(/^\/\/[^\/]/) === 0) {
-                let scheme = (/^(http|https|ws|wss):/i).exec(base);
+                const scheme = (/^(http|https|ws|wss):/i).exec(base);
                 this.assert(scheme, "No scheme on base URL", base);
                 return scheme[1] + ":" + url;
             }
             if (url.search(/^\//) === 0) {
-                let domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
+                const domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
                 this.assert(domain, "No scheme/domain on base URL", base);
                 return domain[0] + url;
             }
-            let last = (/[^\/]+$/).exec(base);
+            const last = (/[^\/]+$/).exec(base);
             this.assert(last, "Does not appear to be a URL?", base);
-            let lastBase = base.substr(0, last.index);
+            const lastBase = base.substr(0, last.index);
             return lastBase + url;
         }
         assertValidUrl(url) {
@@ -181,13 +179,13 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         */
         resolveMany(defs) {
             return this.Deferred(function (def) {
-                var count = defs.length;
+                let count = defs.length;
                 if (!count) {
                     def.resolve();
                     return;
                 }
-                var allResults = [];
-                var anyError = false;
+                const allResults = [];
+                let anyError = false;
                 defs.forEach(function (arg, index) {
                     arg.then(function (result) {
                         if (result) {
@@ -216,7 +214,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
         }
         readFileImage(file) {
             return this.Deferred(function (def) {
-                let reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = function () {
                     if (this.result) {
                         def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));

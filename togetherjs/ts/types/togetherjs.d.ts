@@ -626,7 +626,7 @@ declare global {
             pressed?: boolean;
         }
 
-        interface Hub extends OnClass<On.Map> { }
+        type Hub = OnClass<On.Map>
 
         interface Startup {
             button: HTMLElement | null;
@@ -896,7 +896,7 @@ declare global {
         }
 
         /** type for storage.tab.set(chatStorageKey, log); */
-        interface ChatLogs extends Array<ChatLog> { }
+        type ChatLogs = Array<ChatLog>
 
         interface ChatLog {
             messageId: string,

@@ -5,9 +5,9 @@
 import { util } from "./util";
 
 //function StorageMain(util: TogetherJSNS.Util) {
-var assert: typeof util.assert = util.assert.bind(util);
-var Deferred = util.Deferred;
-var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
+const assert: typeof util.assert = util.assert.bind(util);
+const Deferred = util.Deferred;
+const DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
     name: "",
     defaultName: "",
     avatar: null,
@@ -18,7 +18,7 @@ var DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
     dontShowRtcInfo: false
 };
 
-var DEBUG_STORAGE = false;
+const DEBUG_STORAGE = false;
 
 class StorageSettings extends OnClass<TogetherJSNS.On.Map> {
     defaults = DEFAULT_SETTINGS;
@@ -53,13 +53,13 @@ class TJSStorage {
     }
 
     get<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, defaultValue: TogetherJSNS.StorageGet.StorageValue<T> | null = null): JQueryDeferred<TogetherJSNS.StorageGet.StorageValue<T>> {
-        var self = this;
+        const self = this;
         return Deferred<TogetherJSNS.StorageGet.StorageValue<T>>(function(def) {
             // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
             setTimeout(util.resolver(def, function() {
                 const prefixedKey = self.prefix + key;
                 let value: TogetherJSNS.StorageGet.StorageValue<T> | null;
-                var valueAsString = self.storage.getItem(prefixedKey);
+                const valueAsString = self.storage.getItem(prefixedKey);
                 if(!valueAsString) {
                     value = defaultValue;
                     if(DEBUG_STORAGE) {
@@ -78,7 +78,7 @@ class TJSStorage {
     }
 
     set<T extends TogetherJSNS.StorageGet.StorageKey>(key: T, value?: TogetherJSNS.StorageGet.StorageValue<T>) {
-        var self = this;
+        const self = this;
         let stringyfiedValue: string | undefined;
         if(value !== undefined) {
             stringyfiedValue = JSON.stringify(value);
@@ -102,8 +102,8 @@ class TJSStorage {
     }
 
     clear() {
-        var self = this;
-        var promises: JQueryDeferred<unknown>[] = [];
+        const self = this;
+        const promises: JQueryDeferred<unknown>[] = [];
         return Deferred((function(def: JQueryDeferred<unknown>) {
             self.keys().then(function(keys) {
                 assert(keys !== undefined);
@@ -118,17 +118,17 @@ class TJSStorage {
         }).bind(this));
     }
 
-    keys(prefix?: string, excludePrefix: boolean = false) {
+    keys(prefix?: string, excludePrefix = false) {
         // Returns a list of keys, potentially with the given prefix
-        var self = this;
+        const self = this;
         return Deferred<TogetherJSNS.StorageGet.StorageKey[]>(function(def) {
             setTimeout(util.resolver(def, function() {
                 prefix = prefix || "";
-                let result: string[] = [];
-                for(var i = 0; i < self.storage.length; i++) {
-                    let key = self.storage.key(i)!; // TODO !
+                const result: string[] = [];
+                for(let i = 0; i < self.storage.length; i++) {
+                    const key = self.storage.key(i)!; // TODO !
                     if(key.indexOf(self.prefix + prefix) === 0) {
-                        var shortKey = key.substr(self.prefix.length);
+                        let shortKey = key.substr(self.prefix.length);
                         if(excludePrefix) {
                             shortKey = shortKey.substr(prefix.length);
                         }
@@ -156,7 +156,7 @@ export class TJSStorageWithTab extends TJSStorage {
     }
 }
 
-var namePrefix = TogetherJS.config.get("storagePrefix");
+const namePrefix = TogetherJS.config.get("storagePrefix");
 TogetherJS.config.close("storagePrefix");
 
 const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");

@@ -249,7 +249,7 @@ class Commands {
         windowing.hide("#togetherjs-chat");
     }
 
-    command_savelogs(name: string = "default") {
+    command_savelogs(name = "default") {
         document.createElement("a");
         session.send({
             type: "get-logs",

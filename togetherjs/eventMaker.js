@@ -20,7 +20,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     class EventMaker {
         performClick(target) {
             // FIXME: should accept other parameters, like Ctrl/Alt/etc
-            var event = createTogetherjsMouseEvent();
+            const event = createTogetherjsMouseEvent();
             event.initMouseEvent("click", // type
             true, // canBubble
             true, // cancelable
@@ -38,12 +38,12 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             null // relatedTarget
             );
             target = jquery_1.default(target)[0];
-            var cancelled = target.dispatchEvent(event);
+            const cancelled = target.dispatchEvent(event);
             if (cancelled) {
                 return;
             }
             if (target.tagName == "A") {
-                var href = target.href;
+                const href = target.href;
                 if (href) {
                     location.href = href;
                     return;
@@ -54,7 +54,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
         }
         fireChange(target) {
             target = jquery_1.default(target)[0];
-            var event = document.createEvent("HTMLEvents");
+            const event = document.createEvent("HTMLEvents");
             event.initEvent("change", true, true);
             target.dispatchEvent(event);
         }

@@ -9,22 +9,22 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     Object.defineProperty(exports, "__esModule", { value: true });
     jquery_1 = __importDefault(jquery_1);
     //define(["jquery", "util", "session", "elementFinder"], function($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder) {
-    var listeners = [];
-    var TIME_UPDATE = 'timeupdate';
-    var MIRRORED_EVENTS = ['play', 'pause'];
-    var TOO_FAR_APART = 3000;
+    let listeners = [];
+    const TIME_UPDATE = 'timeupdate';
+    const MIRRORED_EVENTS = ['play', 'pause'];
+    const TOO_FAR_APART = 3000;
     session_1.session.on("reinitialize", function () {
         unsetListeners();
         setupListeners();
     });
     session_1.session.on("ui-ready", setupListeners);
     function setupListeners() {
-        var videos = jquery_1.default('video');
+        const videos = jquery_1.default('video');
         setupMirroredEvents(videos);
         setupTimeSync(videos);
     }
     function setupMirroredEvents(videos) {
-        var currentListener;
+        let currentListener;
         MIRRORED_EVENTS.forEach(function (eventName) {
             currentListener = makeEventSender(eventName);
             videos.on(eventName, currentListener);
@@ -36,7 +36,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     }
     function makeEventSender(eventName) {
         return function (event, options = {}) {
-            var element = event.target;
+            const element = event.target;
             if (!options.silent && element) {
                 session_1.session.send({
                     type: `video-${eventName}`,
@@ -48,7 +48,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     }
     function setupTimeSync(videos) {
         videos.each(function (_i, video) {
-            var onTimeUpdate = makeTimeUpdater();
+            const onTimeUpdate = makeTimeUpdater();
             jquery_1.default(video).on(TIME_UPDATE, onTimeUpdate);
             listeners.push({
                 name: TIME_UPDATE,
@@ -57,9 +57,9 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         });
     }
     function makeTimeUpdater() {
-        var last = 0;
+        let last = 0;
         return function (event) {
-            var currentTime = event.target.currentTime;
+            const currentTime = event.target.currentTime;
             if (areTooFarApart(currentTime, last)) {
                 makeEventSender(TIME_UPDATE)(event);
             }
@@ -67,22 +67,22 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         };
     }
     function areTooFarApart(currentTime, lastTime) {
-        var secDiff = Math.abs(currentTime - lastTime);
-        var milliDiff = secDiff * 1000;
+        const secDiff = Math.abs(currentTime - lastTime);
+        const milliDiff = secDiff * 1000;
         return milliDiff > TOO_FAR_APART;
     }
     session_1.session.on("close", unsetListeners);
     function unsetListeners() {
-        var videos = jquery_1.default('video');
+        const videos = jquery_1.default('video');
         listeners.forEach(function (event) {
             videos.off(event.name, event.listener);
         });
         listeners = [];
     }
     session_1.session.hub.on('video-timeupdate', function (msg) {
-        var element = $findElement(msg.location);
-        var oldTime = element.prop('currentTime');
-        var newTime = msg.position;
+        const element = $findElement(msg.location);
+        const oldTime = element.prop('currentTime');
+        const newTime = msg.position;
         //to help throttle uneccesary position changes
         if (areTooFarApart(oldTime, newTime)) {
             setTime(element, msg.position);
@@ -90,7 +90,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     });
     MIRRORED_EVENTS.forEach(function (eventName) {
         session_1.session.hub.on(`video-${eventName}`, function (msg) {
-            var element = $findElement(msg.location);
+            const element = $findElement(msg.location);
             setTime(element, msg.position);
             element.trigger(eventName, { silent: true });
         });

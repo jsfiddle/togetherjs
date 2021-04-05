@@ -23,7 +23,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
     //function startupMain (_util: TogetherJSNS.Util, require: Require, $: JQueryStatic, windowing: TogetherJSNS.Windowing, storage: TogetherJSNS.Storage) {
     // Avoid circular import:
     let session; // TODO potentially uninitialized, why does TSC doesn't catch that?
-    var STEPS = [
+    const STEPS = [
         "browserBroken",
         "browserUnsupported",
         "sessionIntro",
@@ -41,7 +41,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                 });
                 return;
             }
-            var index = -1;
+            let index = -1;
             if (currentStep) {
                 index = STEPS.indexOf(currentStep);
             }
@@ -83,7 +83,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                 next();
                 return;
             }
-            var cancelled = false;
+            let cancelled = false;
             windowing_1.windowing.show("#togetherjs-intro", {
                 onClose: function () {
                     if (!cancelled) {

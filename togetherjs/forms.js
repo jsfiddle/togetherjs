@@ -12,10 +12,10 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     const assert = util_1.util.assert.bind(util_1.util);
     // This is how much larger the focus element is than the element it surrounds
     // (this is padding on each side)
-    var FOCUS_BUFFER = 5;
-    var inRemoteUpdate = false;
+    const FOCUS_BUFFER = 5;
+    let inRemoteUpdate = false;
     function suppressSync(element) {
-        var ignoreForms = TogetherJS.config.get("ignoreForms");
+        const ignoreForms = TogetherJS.config.get("ignoreForms");
         if (ignoreForms === true) {
             return true;
         }
@@ -29,7 +29,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     function maybeChange(event) {
         var _a;
         // Called when we get an event that may or may not indicate a real change (like keyup in a textarea)
-        var tag = (_a = event.target) === null || _a === void 0 ? void 0 : _a.tagName;
+        const tag = (_a = event.target) === null || _a === void 0 ? void 0 : _a.tagName;
         if (tag && (tag == "TEXTAREA" || tag == "INPUT")) {
             change(event);
         }
@@ -44,27 +44,27 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         const el = jquery_1.default(attrs.element);
         assert(el);
         const tracker = "tracker" in attrs ? attrs.tracker : undefined;
-        var value = attrs.value;
+        const value = attrs.value;
         if (inRemoteUpdate) {
             return;
         }
         if (elementFinder_1.elementFinder.ignoreElement(el) || (elementTracked(el) && !tracker) || suppressSync(el)) {
             return;
         }
-        var location = elementFinder_1.elementFinder.elementLocation(el);
-        let msg = {
+        const location = elementFinder_1.elementFinder.elementLocation(el);
+        const msg = {
             type: "form-update",
             element: location,
             value: value,
         };
         // TODO I added this typeof value == "string" check because normally value is a string when isText(el[0]) but TS doesn't know that, maybe there is a better way to do that
         if (typeof value == "string" && (isText(el[0]) || tracker)) {
-            var history = el.data("togetherjsHistory");
+            const history = el.data("togetherjsHistory");
             if (history) {
                 if (history.current == value) {
                     return;
                 }
-                var delta = ot_1.TextReplace.fromChange(history.current, value);
+                const delta = ot_1.TextReplace.fromChange(history.current, value);
                 assert(delta);
                 history.add(delta);
                 maybeSendUpdate(location, history, tracker);
@@ -79,13 +79,13 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     }
     function isCheckable(element) {
         const el = jquery_1.default(element);
-        var type = (el.prop("type") || "text").toLowerCase();
+        const type = (el.prop("type") || "text").toLowerCase();
         if (el.prop("tagName") == "INPUT" && ["radio", "checkbox"].indexOf(type) != -1) {
             return true;
         }
         return false;
     }
-    let editTrackers = {};
+    const editTrackers = {};
     let liveTrackers = [];
     TogetherJS.addTracker = function (TrackerClass, skipSetInit) {
         //assert(typeof TrackerClass === "function", "You must pass in a class");
@@ -210,11 +210,11 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             return this._editor().getValue();
         }
         static scan() {
-            var result = [];
-            var els = document.body.getElementsByTagName("*");
-            var _len = els.length;
-            for (var i = 0; i < _len; i++) {
-                var el = els[i];
+            const result = [];
+            const els = document.body.getElementsByTagName("*");
+            const _len = els.length;
+            for (let i = 0; i < _len; i++) {
+                const el = els[i];
                 if ("CodeMirror" in el) {
                     result.push(el);
                 }
@@ -285,12 +285,12 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             return this._editor().getData();
         }
         static scan() {
-            var result = [];
+            const result = [];
             if (typeof CKEDITOR == "undefined") {
                 return;
             }
-            var editorInstance;
-            for (var instanceIdentifier in CKEDITOR.instances) {
+            let editorInstance;
+            for (const instanceIdentifier in CKEDITOR.instances) {
                 editorInstance = document.getElementById(instanceIdentifier) || document.getElementsByName(instanceIdentifier)[0];
                 if (editorInstance) {
                     result.push(editorInstance);
@@ -364,7 +364,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (typeof window.tinymce == "undefined") {
                 return;
             }
-            var result = [];
+            const result = [];
             jquery_1.default(window.tinymce.editors).each(function (_i, ed) {
                 result.push(jquery_1.default('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
@@ -400,7 +400,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             const els = TrackerClass.scan();
             if (els) {
                 jquery_1.default.each(els, function () {
-                    var tracker = new TrackerClass(this);
+                    const tracker = new TrackerClass(this);
                     jquery_1.default(this).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
                     liveTrackers.push(tracker);
                 });
@@ -414,7 +414,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         liveTrackers = [];
     }
     function elementTracked(el) {
-        var result = false;
+        let result = false;
         util_1.util.forEachAttr(editTrackers, function (TrackerClass) {
             if (TrackerClass.tracked(el)) {
                 result = true;
@@ -427,8 +427,8 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             return null;
         }
         const el = jquery_1.default(e)[0];
-        for (var i = 0; i < liveTrackers.length; i++) {
-            var tracker = liveTrackers[i];
+        for (let i = 0; i < liveTrackers.length; i++) {
+            const tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
                 // TODO read the comment below, weird!
                 //FIXME: assert statement below throws an exception when data is submitted to the hub too fast
@@ -440,11 +440,11 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
         return null;
     }
-    var TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
+    const TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
     function isText(e) {
         const el = jquery_1.default(e);
-        var tag = el.prop("tagName");
-        var type = (el.prop("type") || "text").toLowerCase();
+        const tag = el.prop("tagName");
+        const type = (el.prop("type") || "text").toLowerCase();
         if (tag == "TEXTAREA") {
             return true;
         }
@@ -480,10 +480,10 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     }
     function setValue(e, value) {
         const el = jquery_1.default(e);
-        var changed = false;
+        let changed = false;
         if (isCheckable(el)) {
             assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
-            var checked = !!el.prop("checked");
+            const checked = !!el.prop("checked");
             if (checked != value) {
                 changed = true;
                 el.prop("checked", value);
@@ -502,12 +502,12 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     }
     /** Send the top of this history queue, if it hasn't been already sent. */
     function maybeSendUpdate(element, history, tracker) {
-        var change = history.getNextToSend();
+        const change = history.getNextToSend();
         if (!change) {
             /* nothing to send */
             return;
         }
-        var msg = {
+        const msg = {
             type: "form-update",
             element: element,
             "server-echo": true,
@@ -544,7 +544,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             assert(tracker0);
             tracker = tracker0;
         }
-        var focusedEl = el0.ownerDocument.activeElement;
+        const focusedEl = el0.ownerDocument.activeElement;
         let focusedElSelection;
         if (isText(focusedEl)) {
             focusedElSelection = [focusedEl.selectionStart || 0, focusedEl.selectionEnd || 0];
@@ -557,7 +557,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
         let value;
         if ("replace" in msg) {
-            let history = el.data("togetherjsHistory");
+            const history = el.data("togetherjsHistory");
             if (!history) {
                 console.warn("form update received for uninitialized form element");
                 return;
@@ -567,8 +567,8 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             const delta = new ot_1.TextReplace(msg.replace.delta.start, msg.replace.delta.del, msg.replace.delta.text);
             const change = { id: msg.replace.id, delta: delta, basis: msg.replace.basis };
             // apply this change to the history
-            var changed = history.commit(change);
-            var trackerName = undefined;
+            const changed = history.commit(change);
+            let trackerName = undefined;
             if (typeof tracker != "undefined") {
                 trackerName = tracker.trackerName;
             }
@@ -607,22 +607,22 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             inRemoteUpdate = false;
         }
     });
-    var initSent = false;
+    let initSent = false;
     function sendInit() {
         initSent = true;
-        var msg = {
+        const msg = {
             type: "form-init",
             pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
         };
-        var els = jquery_1.default("textarea, input, select");
+        const els = jquery_1.default("textarea, input, select");
         els.each(function () {
             if (elementFinder_1.elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
-            var el = jquery_1.default(this);
+            const el = jquery_1.default(this);
             const el0 = el[0];
-            var value = getValue(el0);
+            const value = getValue(el0);
             // TODO old code in /**/
             /*
             let upd: TogetherJSNS.MessageForEditor.StringElement_WithoutTracker = {
@@ -634,9 +634,9 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             // TODO added this typeof check because isText(el0) implies that value is of type string but TS doesn't know that
             // TODO logic has been changed to typecheck reasons, we need to verify that the behavior is the same
             if (isText(el0)) {
-                var history = el.data("togetherjsHistory");
+                const history = el.data("togetherjsHistory");
                 if (history) {
-                    let upd = {
+                    const upd = {
                         element: elementFinder_1.elementFinder.elementLocation(this),
                         value: history.committed,
                         basis: history.basis,
@@ -644,7 +644,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                     msg.updates.push(upd);
                 }
                 else {
-                    let upd = {
+                    const upd = {
                         element: elementFinder_1.elementFinder.elementLocation(this),
                         value: value,
                     };
@@ -652,7 +652,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                 }
             }
             else {
-                let upd = {
+                const upd = {
                     element: elementFinder_1.elementFinder.elementLocation(this),
                     value: value,
                 };
@@ -660,11 +660,11 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             }
         });
         liveTrackers.forEach(function (tracker) {
-            var init0 = tracker.makeInit();
+            const init0 = tracker.makeInit();
             assert(tracker.tracked(init0.element));
-            var history = jquery_1.default(init0.element).data("togetherjsHistory");
+            const history = jquery_1.default(init0.element).data("togetherjsHistory");
             // TODO check the logic change
-            let init = {
+            const init = {
                 element: elementFinder_1.elementFinder.elementLocation(jquery_1.default(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
@@ -680,7 +680,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     function setInit() {
-        var els = jquery_1.default("textarea, input, select");
+        const els = jquery_1.default("textarea, input, select");
         els.each(function () {
             if (elementTracked(this)) {
                 return;
@@ -688,8 +688,8 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (elementFinder_1.elementFinder.ignoreElement(this)) {
                 return;
             }
-            var el = jquery_1.default(this);
-            var value = getValue(el[0]);
+            const el = jquery_1.default(this);
+            const value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
                 // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
                 el.data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, value, 1)); // TODO !
@@ -709,7 +709,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             // In a 3+-peer situation more than one client may init; in this case
             // we're probably the other peer, and not the peer that needs the init
             // A quick check to see if we should init...
-            var myAge = Date.now() - TogetherJS.pageLoaded;
+            const myAge = Date.now() - TogetherJS.pageLoaded;
             if (msg.pageAge < myAge) {
                 // We've been around longer than the other person...
                 return;
@@ -717,7 +717,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
         // FIXME: need to figure out when to ignore inits
         msg.updates.forEach(function (update) {
-            var el;
+            let el;
             try {
                 el = elementFinder_1.elementFinder.findElement(update.element);
             }
@@ -737,7 +737,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                     setValue(el, update.value);
                 }
                 if ("basis" in update && update.basis) {
-                    var history = jquery_1.default(el).data("togetherjsHistory");
+                    const history = jquery_1.default(el).data("togetherjsHistory");
                     // don't overwrite history if we're already up to date
                     // (we might have outstanding queued changes we don't want to lose)
                     if (!(history && history.basis === update.basis && history.basis !== 1)) {
@@ -751,7 +751,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             }
         });
     });
-    var lastFocus = null;
+    let lastFocus = null;
     function focus(event) {
         const target = event.target;
         if (elementFinder_1.elementFinder.ignoreElement(target) || elementTracked(target)) {
@@ -769,7 +769,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             session_1.session.send({ type: "form-focus", element: null });
         }
     }
-    var focusElements = {};
+    const focusElements = {};
     session_1.session.hub.on("form-focus", function (msg) {
         if (!msg.sameUrl) {
             return;
@@ -783,20 +783,20 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             // A blur
             return;
         }
-        var element = elementFinder_1.elementFinder.findElement(msg.element);
-        var el = createFocusElement(msg.peer, element);
+        const element = elementFinder_1.elementFinder.findElement(msg.element);
+        const el = createFocusElement(msg.peer, element);
         if (el) {
             focusElements[msg.peer.id] = el;
         }
     });
     function createFocusElement(peer, around) {
         around = jquery_1.default(around);
-        var aroundOffset = around.offset();
+        const aroundOffset = around.offset();
         if (!aroundOffset) {
             console.warn("Could not get offset of element:", around[0]);
             return null;
         }
-        var el = templating_1.templating.sub("focus", { peer: peer });
+        let el = templating_1.templating.sub("focus", { peer: peer });
         el = el.find(".togetherjs-focus");
         el.css({
             top: aroundOffset.top - FOCUS_BUFFER + "px",

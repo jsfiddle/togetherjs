@@ -9,11 +9,11 @@ import { util } from "./util";
 //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
 const assert: typeof util.assert = util.assert.bind(util);
 let channel: TogetherJSNS.WebSocketChannel; // TODO potentially not initialized, why does TSC doesn't catch that?
-let clientId = "recorder";
+const clientId = "recorder";
 
 function display(elOrSelector: HTMLElement | JQuery | string) {
-    let el = $(elOrSelector);
-    var toggles = el.attr("data-toggles");
+    const el = $(elOrSelector);
+    const toggles = el.attr("data-toggles");
     if(toggles) {
         $(toggles).hide();
     }
@@ -75,7 +75,7 @@ class Recorder {
     }
 
     activate(options: Partial<TogetherJSNS.Config & { defaultHubBase: string }>) {
-        var match;
+        let match;
         this.shareId = TogetherJS.startup._joinShareId ?? undefined;
         if(!this.shareId) {
             match = /\&togetherjs=([^&]+)/.exec(location.hash);
@@ -86,13 +86,13 @@ class Recorder {
             this.shareId = match[1];
         }
         assert(options.defaultHubBase != undefined); // TODO add assert for easier typechecking
-        var hubBase = options.defaultHubBase;
+        let hubBase = options.defaultHubBase;
         match = /\&hubBase=([^&]+)/.exec(location.hash);
         if(match) {
             hubBase = match[1];
         }
         hubBase = hubBase.replace(/\/*$/, "");
-        var url = hubBase + "/hub/" + this.shareId;
+        const url = hubBase + "/hub/" + this.shareId;
         channel = new WebSocketChannel(url);
         channel.onmessage = msg => {
             if(msg.type == "hello-back") {
@@ -112,7 +112,7 @@ class Recorder {
 
     logMessage(msg: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>) {
         (msg as typeof msg & TogetherJSNS.WithDate).date = Date.now(); // TODO abusive cast
-        var $record = $("#record");
+        const $record = $("#record");
         $record.val($record.val() + JSON.stringify(msg) + "\n\n");
     }
 }

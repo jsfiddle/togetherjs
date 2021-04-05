@@ -208,10 +208,10 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     };
     // avatar animate in
     jquery_1.default.fn.animateDockEntry = function () {
-        var height = this.height();
-        var width = this.width();
-        var backgroundSize = height + 4;
-        var margin = parseInt(this.css("marginLeft"), 10);
+        const height = this.height();
+        const width = this.width();
+        const backgroundSize = height + 4;
+        const margin = parseInt(this.css("marginLeft"), 10);
         // set starting position CSS for avatar
         this.css({
             marginLeft: margin + width / 2,
@@ -219,7 +219,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             width: 0,
             backgroundSize: "0 0"
         });
-        var self = this;
+        const self = this;
         //then animate avatar to the actual dimensions, and reset the values
         this.animate({
             marginLeft: margin,
@@ -243,10 +243,10 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
         // get the current avatar dimenensions
         // TODO qw height was commented because it was unused
         //var height = this.height();
-        var width = this.width();
+        const width = this.width();
         // TODO qw background size has been commented out because it was unused, maybe it was intended to be used
         //var backgroundSize = height + 4;
-        var margin = parseInt(this.css("marginLeft"), 10);
+        const margin = parseInt(this.css("marginLeft"), 10);
         //then animate avatar to shrink to nothing, and reset the values again
         // FIXME this needs to animate from the CENTER
         return this.animate({
@@ -262,11 +262,11 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     };
     // keyboard typing animation
     jquery_1.default.fn.animateKeyboard = function () {
-        var one = this.find(".togetherjs-typing-ellipse-one");
-        var two = this.find(".togetherjs-typing-ellipse-two");
-        var three = this.find(".togetherjs-typing-ellipse-three");
-        var count = -1;
-        var run = (function () {
+        const one = this.find(".togetherjs-typing-ellipse-one");
+        const two = this.find(".togetherjs-typing-ellipse-two");
+        const three = this.find(".togetherjs-typing-ellipse-three");
+        let count = -1;
+        const run = (function () {
             count = (count + 1) % 4;
             if (count === 0) {
                 one.css("opacity", 0.5);
@@ -284,7 +284,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             }
         }).bind(this);
         run();
-        var interval = setInterval(run, 300);
+        const interval = setInterval(run, 300);
         this.data("animateKeyboard", interval);
     };
     jquery_1.default.fn.stopKeyboardAnimation = function () {

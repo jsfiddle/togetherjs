@@ -16,7 +16,16 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-invalid-this": 1,
-        "no-use-before-define": 1
+        "no-invalid-this": "off",
+        "no-use-before-define": "error",
+        "@typescript-eslint/no-this-alias": [
+            "error",
+            {
+                "allowDestructuring": true, // Allow `const { props, state } = this`; false by default
+                "allowedNames": [
+                    "self"
+                ] // Allow `const self = this`; `[]` by default
+            }
+        ]
     }
 }

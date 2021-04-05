@@ -20,7 +20,7 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             return seq[this.number(seq.length)];
         }
         pickDist(items) {
-            var total = 0;
+            let total = 0;
             for (var a in items) {
                 if (!items.hasOwnProperty(a)) {
                     continue;
@@ -30,8 +30,8 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
                 }
                 total += items[a];
             }
-            var num = this.number(total);
-            var last;
+            let num = this.number(total);
+            let last;
             for (a in items) {
                 if (!items.hasOwnProperty(a)) {
                     continue;
@@ -46,8 +46,8 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             return last;
         }
         string(len, chars) {
-            var s = "";
-            for (var i = 0; i < len; i++) {
+            let s = "";
+            for (let i = 0; i < len; i++) {
                 s += this.character(chars);
             }
             return s;

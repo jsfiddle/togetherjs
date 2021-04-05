@@ -23,7 +23,7 @@ import $ from "jquery";
 let session: TogetherJSNS.Session; // TODO potentially uninitialized, why does TSC doesn't catch that?
 
 type StepKind = "browserBroken" | "browserUnsupported" | "sessionIntro" | "walkthrough" | "share";
-var STEPS: StepKind[] = [
+const STEPS: StepKind[] = [
     "browserBroken",
     "browserUnsupported",
     "sessionIntro",
@@ -44,7 +44,7 @@ class Statup {
             });
             return;
         }
-        var index = -1;
+        let index = -1;
         if(currentStep) {
             index = STEPS.indexOf(currentStep);
         }
@@ -90,7 +90,7 @@ class Handlers {
             next();
             return;
         }
-        var cancelled = false;
+        let cancelled = false;
         windowing.show("#togetherjs-intro", {
             onClose: function() {
                 if(!cancelled) {

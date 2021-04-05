@@ -7,12 +7,12 @@ import { util } from "./util";
 import $ from "jquery";
 
 //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
-var assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 
 export class Templating {
     clone(templateId: string) { // TODO may be changed to a union type with all possibilities?
-        let templateId2 = "#togetherjs-template-" + templateId;
-        var template = $(templateId2);
+        const templateId2 = "#togetherjs-template-" + templateId;
+        let template = $(templateId2);
         assert(template.length, "No template found with id:", templateId2);
         template = template.clone();
         template.attr("id", null);
@@ -24,10 +24,10 @@ export class Templating {
     //sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery {
     //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
     sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.Any): JQuery {
-        let template = this.clone(templateId);
+        const template = this.clone(templateId);
         util.forEachAttr(variables, function(value, attr) { // TODO value has type never
             // FIXME: do the substitution... somehow?
-            var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
+            const subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
             if(subs.length) {
                 if(typeof value == "string") {
                     subs.text(value);
@@ -48,12 +48,12 @@ export class Templating {
             if(value) {
                 ifs.hide();
             }
-            let attrName = "data-togetherjs-subattr-" + attr;
-            let attrs = template.find("[" + attrName + "]");
+            const attrName = "data-togetherjs-subattr-" + attr;
+            const attrs = template.find("[" + attrName + "]");
             attrs.each(function(_index, element) {
                 assert(typeof value == "string");
                 const $element = $(element);
-                let subAttribute = $element.attr(attrName);
+                const subAttribute = $element.attr(attrName);
                 $element.attr(attrName, null);
                 $element.attr(subAttribute, value);
             });
@@ -66,14 +66,14 @@ export class Templating {
             if(typeof date == "number") {
                 date = new Date(date);
             }
-            var ampm = "AM";
-            var hour = date.getHours();
+            let ampm = "AM";
+            let hour = date.getHours();
             if(hour > 12) {
                 hour -= 12;
                 ampm = "PM";
             }
-            var minute = date.getMinutes();
-            var t = hour + ":";
+            const minute = date.getMinutes();
+            let t = hour + ":";
             if(minute < 10) {
                 t += "0";
             }

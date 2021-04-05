@@ -9,11 +9,11 @@ define(["require", "exports"], function (require, exports) {
         if ((!seed) || isNaN(seed)) {
             throw new Error("Bad seed");
         }
-        var x = (seed % 30268) + 1;
+        let x = (seed % 30268) + 1;
         seed = (seed - (seed % 30268)) / 30268;
-        var y = (seed % 30306) + 1;
+        let y = (seed % 30306) + 1;
         seed = (seed - (seed % 30306)) / 30306;
-        var z = (seed % 30322) + 1;
+        let z = (seed % 30322) + 1;
         seed = (seed - (seed % 30322)) / 30322;
         return function random() {
             x = (171 * x) % 30269;

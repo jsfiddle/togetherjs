@@ -7,15 +7,15 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
     exports.peers = exports.Peers = exports.PeersSelf = exports.PeerClass = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert = util_1.util.assert.bind(util_1.util);
-    var CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
-    var IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
-    var TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
-    var BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
-    var ui;
+    let CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
+    let IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
+    const TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
+    let BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
+    let ui;
     require(["ui"], function (uiModule) {
         ui = uiModule.ui;
     });
-    var DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
+    const DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
     class PeerClass {
         constructor(id, attrs = {}) {
             this.isSelf = false;
@@ -34,7 +34,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             this.view = ui.PeerView(this);
             this.following = attrs.following || false;
             PeerClass.peers[id] = this;
-            var joined = attrs.joined || false;
+            let joined = attrs.joined || false;
             if (attrs.fromHelloMessage) {
                 this.updateFromHello(attrs.fromHelloMessage);
                 if (attrs.fromHelloMessage.type == "hello") {
@@ -81,9 +81,9 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
         updateFromHello(msg) {
             var _a;
-            var urlUpdated = false;
+            let urlUpdated = false;
             // var activeRTC = false; // TODO code change, unused
-            var identityUpdated = false;
+            let identityUpdated = false;
             if ("url" in msg && msg.url && msg.url != this.url) {
                 this.url = msg.url;
                 this.hash = null;
@@ -208,7 +208,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
     // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
     session_1.session.on("follow-peer", function (peer) {
         if (peer.url && peer.url != session_1.session.currentUrl()) {
-            var url = peer.url;
+            let url = peer.url;
             if (peer.urlHash) {
                 url += peer.urlHash;
             }
@@ -231,9 +231,9 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             this.isCreator = !session_1.session.isClient;
         }
         update(attrs) {
-            var updatePeers = false;
-            var updateIdle = false;
-            var updateMsg = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
+            let updatePeers = false;
+            let updateIdle = false;
+            const updateMsg = { type: "peer-update" }; // TODO maybe all fields in "peer-update" should be optional?
             if (typeof attrs.name == "string" && attrs.name != this.name) {
                 this.name = attrs.name;
                 updateMsg.name = this.name;
@@ -326,9 +326,9 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         _loadFromApp() {
             // FIXME: I wonder if these should be optionally functions?
             // We could test typeof==function to distinguish between a getter and a concrete value
-            var getUserName = TogetherJS.config.get("getUserName");
-            var getUserColor = TogetherJS.config.get("getUserColor");
-            var getUserAvatar = TogetherJS.config.get("getUserAvatar");
+            const getUserName = TogetherJS.config.get("getUserName");
+            const getUserColor = TogetherJS.config.get("getUserColor");
+            const getUserAvatar = TogetherJS.config.get("getUserAvatar");
             let name = null;
             let color = null;
             let avatar = null;
@@ -388,7 +388,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
         getPeer(id, message, ignoreMissing = false) {
             assert(id);
-            var peer = Peer.peers[id];
+            let peer = Peer.peers[id];
             if (id === session_1.session.clientId) {
                 return exports.peers.Self;
             }
@@ -407,7 +407,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             return Peer.peers[id];
         }
         getAllPeers(liveOnly = false) {
-            var result = [];
+            const result = [];
             util_1.util.forEachAttr(Peer.peers, function (peer) {
                 if (liveOnly && peer.status != "live") {
                     return;
@@ -445,7 +445,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
     })));
     function serialize() {
-        var peers = [];
+        const peers = [];
         util_1.util.forEachAttr(Peer.peers, function (peer) {
             peers.push(peer.serialize());
         });
@@ -460,8 +460,8 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         });
     }
     function checkActivity() {
-        var ps = exports.peers.getAllPeers();
-        var now = Date.now();
+        const ps = exports.peers.getAllPeers();
+        const now = Date.now();
         ps.forEach(function (p) {
             if (p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
                 p.update({ idle: "inactive" });
@@ -472,10 +472,10 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         });
     }
     session_1.session.hub.on("bye", function (msg) {
-        var peer = exports.peers.getPeer(msg.clientId);
+        const peer = exports.peers.getPeer(msg.clientId);
         peer.bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
     });
-    var checkActivityTask = null;
+    let checkActivityTask = null;
     session_1.session.on("start", function () {
         if (checkActivityTask) {
             console.warn("Old peers checkActivityTask left over?");
@@ -493,7 +493,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
         checkActivityTask = null;
     });
-    var tabIdleTimeout = null;
+    let tabIdleTimeout = null;
     session_1.session.on("visibility-change", function (hidden) {
         if (hidden) {
             if (tabIdleTimeout) {

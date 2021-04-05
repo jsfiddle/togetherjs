@@ -10,11 +10,11 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     exports.templating = exports.Templating = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function templatingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, _windowing: TogetherJSNS.Windowing, session: TogetherJSNS.Session) {
-    var assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     class Templating {
         clone(templateId) {
-            let templateId2 = "#togetherjs-template-" + templateId;
-            var template = jquery_1.default(templateId2);
+            const templateId2 = "#togetherjs-template-" + templateId;
+            let template = jquery_1.default(templateId2);
             assert(template.length, "No template found with id:", templateId2);
             template = template.clone();
             template.attr("id", null);
@@ -25,10 +25,10 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         //sub<K extends keyof TogetherJSNS.TemplatingSub.Map>(templateId: K, variables: TogetherJSNS.TemplatingSub.Map[K]): JQuery {
         //sub(templateId: keyof TogetherJSNS.TemplatingSub.Map, variables: TogetherJSNS.TemplatingSub.All): JQuery {
         sub(templateId, variables) {
-            let template = this.clone(templateId);
+            const template = this.clone(templateId);
             util_1.util.forEachAttr(variables, function (value, attr) {
                 // FIXME: do the substitution... somehow?
-                var subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
+                const subs = template.find(".togetherjs-sub-" + attr).removeClass("togetherjs-sub-" + attr);
                 if (subs.length) {
                     if (typeof value == "string") {
                         subs.text(value);
@@ -49,12 +49,12 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                 if (value) {
                     ifs.hide();
                 }
-                let attrName = "data-togetherjs-subattr-" + attr;
-                let attrs = template.find("[" + attrName + "]");
+                const attrName = "data-togetherjs-subattr-" + attr;
+                const attrs = template.find("[" + attrName + "]");
                 attrs.each(function (_index, element) {
                     assert(typeof value == "string");
                     const $element = jquery_1.default(element);
-                    let subAttribute = $element.attr(attrName);
+                    const subAttribute = $element.attr(attrName);
                     $element.attr(attrName, null);
                     $element.attr(subAttribute, value);
                 });
@@ -67,14 +67,14 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                 if (typeof date == "number") {
                     date = new Date(date);
                 }
-                var ampm = "AM";
-                var hour = date.getHours();
+                let ampm = "AM";
+                let hour = date.getHours();
                 if (hour > 12) {
                     hour -= 12;
                     ampm = "PM";
                 }
-                var minute = date.getMinutes();
-                var t = hour + ":";
+                const minute = date.getMinutes();
+                let t = hour + ":";
                 if (minute < 10) {
                     t += "0";
                 }

@@ -8,16 +8,16 @@ import { storage } from "./storage";
 import { util } from "./util";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
-var DEBUG = false;
+let DEBUG = false;
 
 // This is the amount of time in which a hello-back must be received after a hello
 // for us to respect a URL change:
-var HELLO_BACK_CUTOFF = 1500;
+const HELLO_BACK_CUTOFF = 1500;
 
-var assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 
 // We will load this module later (there's a circular import):
-var peers: TogetherJSNS.Peers;
+let peers: TogetherJSNS.Peers;
 
 // This is the channel to the hub:
 let channel: TogetherJSNS.WebSocketChannel | null = null;
@@ -35,7 +35,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     public firstRun = false;
     /** Setting, essentially global: */
     public readonly AVATAR_SIZE = 90;
-    timeHelloSent: number = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
+    timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
     public identityId?: string;
     public RTCSupported: boolean | undefined;
 
@@ -46,16 +46,16 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
         id = id || this.shareId;
         assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
         TogetherJS.config.close("hubBase");
-        var hubBase = TogetherJS.config.get("hubBase");
+        const hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase != null);
         return hubBase.replace(/\/*$/, "") + "/hub/" + id;
     }
 
     shareUrl() {
         assert(this.shareId, "Attempted to access shareUrl() before shareId is set");
-        var hash = location.hash;
-        var m = /\?[^#]*/.exec(location.href);
-        var query = "";
+        let hash = location.hash;
+        const m = /\?[^#]*/.exec(location.href);
+        let query = "";
         if(m) {
             query = m[0];
         }
@@ -67,7 +67,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
 
     recordUrl() {
         assert(this.shareId);
-        var url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
+        let url = TogetherJS.baseUrl.replace(/\/*$/, "") + "/recorder.html";
         url += "#&togetherjs=" + this.shareId + "&hubBase=" + TogetherJS.config.get("hubBase");
         return url;
     }
@@ -92,7 +92,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     }
 
     appSend<T extends {type: string}>(msg: T) {
-        let type = msg.type;
+        const type = msg.type;
         if(type.search(/^togetherjs\./) === 0) {
             msg.type = type.substr("togetherjs.".length) as typeof type;
         }
@@ -107,12 +107,12 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     makeHelloMessage(helloBack: false): TogetherJSNS.AnyMessage.MapForSending["hello"];
     makeHelloMessage(helloBack: boolean): TogetherJSNS.AnyMessage.MapForSending["hello-back"] | TogetherJSNS.AnyMessage.MapForSending["hello"];
     makeHelloMessage(helloBack: boolean) {
-        let starting: boolean = false;
+        let starting = false;
         if(!TogetherJS.startup.continued) {
             starting = true;
         }
         if(helloBack) {
-            let msg: TogetherJSNS.On.HelloBackMessage = {
+            const msg: TogetherJSNS.On.HelloBackMessage = {
                 type: "hello-back",
                 name: peers.Self.name || peers.Self.defaultName,
                 avatar: peers.Self.avatar || "", // TODO find a way to remove this || "", maybe the value in self should be non-null (other occurences of this below)
@@ -132,7 +132,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
             return msg;
         }
         else {
-            let msg: TogetherJSNS.On.HelloMessage = {
+            const msg: TogetherJSNS.On.HelloMessage = {
                 type: "hello",
                 name: peers.Self.name || peers.Self.defaultName,
                 avatar: peers.Self.avatar || "", // same as above
@@ -192,13 +192,13 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
 
     close(reason?: string) {
         TogetherJS.running = false;
-        var msg: TogetherJSNS.SessionSend.Bye = { type: "bye" };
+        const msg: TogetherJSNS.SessionSend.Bye = { type: "bye" };
         if(reason) {
             msg.reason = reason;
         }
         session.send(msg);
         session.emit("close");
-        var name = window.name;
+        const name = window.name;
         storage.tab.get("status").then(function(saved) {
             if(!saved) {
                 console.warn("No session information saved in", "status." + name);
@@ -231,7 +231,7 @@ export const session = new Session();
  */
 var includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
 TogetherJS.config.close("includeHashInUrl");
-var currentUrl = (location.href + "").replace(/\#.*$/, "");
+let currentUrl = (location.href + "").replace(/\#.*$/, "");
 if(includeHashInUrl) {
     currentUrl = location.href;
 }
@@ -246,7 +246,7 @@ if(IGNORE_MESSAGES === true) {
     IGNORE_MESSAGES = [];
 }
 // These are messages sent by clients who aren't "part" of the TogetherJS session:
-var MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
+const MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
 
 // We ignore incoming messages from the channel until this is true:
 var readyForMessages = false;
@@ -254,7 +254,7 @@ var readyForMessages = false;
 function openChannel() {
     assert(!channel, "Attempt to re-open channel");
     console.info("Connecting to", session.hubUrl(), location.href);
-    var c = new WebSocketChannel(session.hubUrl());
+    const c = new WebSocketChannel(session.hubUrl());
     c.onmessage = function(msg) {
         if(!readyForMessages) {
             if(DEBUG) {
@@ -327,7 +327,7 @@ session.hub.on("who", function() {
 
 function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string, peer: TogetherJSNS.PeerClass}) {
     if(!msg.sameUrl) {
-        var url = msg.url;
+        let url = msg.url;
         if(msg.urlHash) {
             url += msg.urlHash;
         }
@@ -338,7 +338,7 @@ function processFirstHello(msg: {sameUrl: boolean, url: string, urlHash: string,
 }
 
 function sendHello(helloBack: boolean) {
-    var msg = session.makeHelloMessage(helloBack);
+    const msg = session.makeHelloMessage(helloBack);
     if(!helloBack) {
         session.timeHelloSent = Date.now();
         peers.Self.url = msg.url;
@@ -356,7 +356,7 @@ var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", 
 function getRoomName(prefix: string, maxSize: number) {
     const hubBase = TogetherJS.config.get("hubBase");
     assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?
-    var findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
+    const findRoom = hubBase.replace(/\/*$/, "") + "/findroom";
     return $.ajax({
         url: findRoom,
         dataType: "json",
@@ -388,11 +388,11 @@ initIdentityId.done = initIdentityId();
 
 function initShareId() {
     return util.Deferred(function(def) {
-        var hash = location.hash;
-        var shareId = session.shareId;
-        var isClient = true;
-        var set = true;
-        var sessionId: string;
+        const hash = location.hash;
+        let shareId = session.shareId;
+        let isClient = true;
+        let set = true;
+        let sessionId: string;
         session.firstRun = !TogetherJS.startup.continued;
         if(!shareId) {
             if(TogetherJS.startup._joinShareId) {
@@ -404,16 +404,16 @@ function initShareId() {
         if(!shareId) {
             // FIXME: I'm not sure if this will ever happen, because togetherjs.js should
             // handle it
-            var m = /&?togetherjs=([^&]*)/.exec(hash);
+            const m = /&?togetherjs=([^&]*)/.exec(hash);
             if(m) {
                 isClient = !m[1];
                 shareId = m[2];
-                var newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+                const newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
                 location.hash = newHash;
             }
         }
         return storage.tab.get("status").then(function(saved) {
-            var findRoom = TogetherJS.config.get("findRoom");
+            const findRoom = TogetherJS.config.get("findRoom");
             TogetherJS.config.close("findRoom");
             if(findRoom && saved && findRoom != saved.shareId) {
                 console.info("Ignoring findRoom in lieu of continued session");
@@ -489,7 +489,7 @@ function initShareId() {
 }
 
 function initStartTarget() {
-    var id;
+    let id;
     if(TogetherJS.startup.button) {
         id = TogetherJS.startup.button.id;
         if(id) {
@@ -499,7 +499,7 @@ function initStartTarget() {
     }
     storage.get("startTarget").then(function(id) {
         if(id) {
-            var el = document.getElementById(id);
+            const el = document.getElementById(id);
             if(el) {
                 TogetherJS.startup.button = el;
             }

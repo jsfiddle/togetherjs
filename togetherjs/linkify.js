@@ -10,13 +10,13 @@ define(["require", "exports"], function (require, exports) {
         }
         el.normalize();
         function linkifyNode(node) {
-            var _len = node.childNodes.length;
+            const _len = node.childNodes.length;
             for (var i = 0; i < _len; i++) {
                 if (node.childNodes[i].nodeType == document.ELEMENT_NODE) {
                     linkifyNode(node.childNodes[i]);
                 }
             }
-            var texts = [];
+            const texts = [];
             for (i = 0; i < _len; i++) {
                 if (node.childNodes[i].nodeType == document.TEXT_NODE) {
                     texts.push(node.childNodes[i]);
@@ -28,23 +28,23 @@ define(["require", "exports"], function (require, exports) {
                 }
                 else if (item.nodeType == document.TEXT_NODE) {
                     while (true) {
-                        var text = item.nodeValue;
+                        const text = item.nodeValue;
                         if (text == null) {
                             continue;
                         }
-                        var regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t<>()\[\]]*/i;
-                        var match = regex.exec(text);
+                        const regex = /\bhttps?:\/\/[a-z0-9\.\-_](:\d+)?[^ \n\t<>()\[\]]*/i;
+                        const match = regex.exec(text);
                         if (!match) {
                             break;
                         }
-                        var leadingNode = document.createTextNode(text.substr(0, match.index));
+                        const leadingNode = document.createTextNode(text.substr(0, match.index));
                         node.replaceChild(leadingNode, item);
-                        var anchor = document.createElement("a");
+                        const anchor = document.createElement("a");
                         anchor.setAttribute("target", "_blank");
                         anchor.href = match[0];
                         anchor.appendChild(document.createTextNode(match[0]));
                         node.insertBefore(anchor, leadingNode.nextSibling);
-                        var trailing = document.createTextNode(text.substr(match.index + match[0].length));
+                        const trailing = document.createTextNode(text.substr(match.index + match[0].length));
                         node.insertBefore(trailing, anchor.nextSibling);
                         item = trailing;
                     }

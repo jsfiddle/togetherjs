@@ -20,7 +20,7 @@ type ProtocolMessageMap = {
 }
 
 function hashCode(s: string) {
-    var hash = 0, i, chr;
+    let hash = 0, i, chr;
     if(s.length === 0) return hash;
     for(i = 0; i < s.length; i++) {
         chr = s.charCodeAt(i);
@@ -28,7 +28,7 @@ function hashCode(s: string) {
         hash |= 0; // Convert to 32bit integer
     }
     return hash;
-};
+}
 
 class PacketAssembler<Protocol extends {[messageName: string]: any}> {
     private uid = 0;
@@ -152,8 +152,8 @@ function startListening() {
 }
 
 function sendManyData() {
-    var content = "";
-    for(var i = 0; i < 1000000; i++) {
+    let content = "";
+    for(let i = 0; i < 1000000; i++) {
         content += Math.random().toString();
     }
     console.log("content length", content.length, "hash", hashCode(content));

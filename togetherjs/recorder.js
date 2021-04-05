@@ -12,10 +12,10 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
     //function recorderMain($: JQueryStatic, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels) {
     const assert = util_1.util.assert.bind(util_1.util);
     let channel; // TODO potentially not initialized, why does TSC doesn't catch that?
-    let clientId = "recorder";
+    const clientId = "recorder";
     function display(elOrSelector) {
-        let el = jquery_1.default(elOrSelector);
-        var toggles = el.attr("data-toggles");
+        const el = jquery_1.default(elOrSelector);
+        const toggles = el.attr("data-toggles");
         if (toggles) {
             jquery_1.default(toggles).hide();
         }
@@ -72,7 +72,7 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
         }
         activate(options) {
             var _a;
-            var match;
+            let match;
             this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
             if (!this.shareId) {
                 match = /\&togetherjs=([^&]+)/.exec(location.hash);
@@ -83,13 +83,13 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
                 this.shareId = match[1];
             }
             assert(options.defaultHubBase != undefined); // TODO add assert for easier typechecking
-            var hubBase = options.defaultHubBase;
+            let hubBase = options.defaultHubBase;
             match = /\&hubBase=([^&]+)/.exec(location.hash);
             if (match) {
                 hubBase = match[1];
             }
             hubBase = hubBase.replace(/\/*$/, "");
-            var url = hubBase + "/hub/" + this.shareId;
+            const url = hubBase + "/hub/" + this.shareId;
             channel = new channels_1.WebSocketChannel(url);
             channel.onmessage = msg => {
                 if (msg.type == "hello-back") {
@@ -108,7 +108,7 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
         }
         logMessage(msg) {
             msg.date = Date.now(); // TODO abusive cast
-            var $record = jquery_1.default("#record");
+            const $record = jquery_1.default("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         }
     }

@@ -25,7 +25,7 @@ export class Randomizer {
     }
 
     pickDist(items: number[]) {
-        var total = 0;
+        let total = 0;
         for(var a in items) {
             if(!items.hasOwnProperty(a)) {
                 continue;
@@ -35,8 +35,8 @@ export class Randomizer {
             }
             total += items[a];
         }
-        var num = this.number(total);
-        var last;
+        let num = this.number(total);
+        let last;
         for(a in items) {
             if(!items.hasOwnProperty(a)) {
                 continue;
@@ -52,8 +52,8 @@ export class Randomizer {
     }
 
     string(len: number, chars?: string) {
-        var s = "";
-        for(var i = 0; i < len; i++) {
+        let s = "";
+        for(let i = 0; i < len; i++) {
             s += this.character(chars);
         }
         return s;

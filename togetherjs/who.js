@@ -7,8 +7,8 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
     exports.who = exports.Who = exports.ExternalPeer = void 0;
     //function whoMain(util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui) {
     const assert = util_1.util.assert.bind(util_1.util);
-    var MAX_RESPONSE_TIME = 5000;
-    var MAX_LATE_RESPONSE = 2000;
+    const MAX_RESPONSE_TIME = 5000;
+    const MAX_LATE_RESPONSE = 2000;
     class ExternalPeer {
         constructor(id, attrs) {
             this.isSelf = false;
@@ -36,12 +36,12 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
         }
         getList(hubUrl) {
             return util_1.util.Deferred(function (def) {
-                var expected;
-                var channel = new channels_1.WebSocketChannel(hubUrl);
-                var users = {};
-                var responded = 0;
+                let expected;
+                const channel = new channels_1.WebSocketChannel(hubUrl);
+                const users = {};
+                let responded = 0;
                 //var firstResponse = 0; // TODO unused
-                var lateResponseTimeout;
+                let lateResponseTimeout;
                 channel.onmessage = function (msg) {
                     if (msg.type == "init-connection") {
                         expected = msg.peerCount;
@@ -71,7 +71,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     type: "who",
                     "server-echo": true,
                 });
-                var timeout = setTimeout(function () {
+                const timeout = setTimeout(function () {
                     close();
                 }, MAX_RESPONSE_TIME);
                 function close() {
@@ -88,15 +88,15 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
         }
         invite(hubUrl, clientId) {
             return util_1.util.Deferred(function (def) {
-                var channel = new channels_1.WebSocketChannel(hubUrl);
-                var id = util_1.util.generateId();
+                const channel = new channels_1.WebSocketChannel(hubUrl);
+                const id = util_1.util.generateId();
                 channel.onmessage = function (msg) {
                     if (msg.type == "invite" && msg.inviteId == id) {
                         channel.close();
                         def.resolve();
                     }
                 };
-                var hello = session_1.session.makeHelloMessage(false);
+                const hello = session_1.session.makeHelloMessage(false);
                 const userInfo = {
                     name: hello.name,
                     avatar: hello.avatar,

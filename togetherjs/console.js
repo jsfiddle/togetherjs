@@ -6,7 +6,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.appConsole = exports.Console = void 0;
     //function consoleMain(util: TogetherJSNS.Util) {
-    var console = window.console || { log: function () { } };
+    const console = window.console || { log: function () { } };
     class Console {
         constructor() {
             this.messages = [];
@@ -90,7 +90,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
         }
         suppressedWrite(...args) {
-            let w = this.write;
+            const w = this.write;
             const a = ["suppress", ...args];
             this.write.apply(this, a);
         }
@@ -103,7 +103,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
             catch (e) {
                 // FIXME: trim this frame
-                var stack = e.stack;
+                let stack = e.stack;
                 stack = stack.replace(/^[^\n]*\n/, "");
                 this[level](stack);
             }
@@ -125,8 +125,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             ];
         }
         _stringify(...args) {
-            var s = "";
-            for (var i = 0; i < args.length; i++) {
+            let s = "";
+            for (let i = 0; i < args.length; i++) {
                 if (s) {
                     s += " ";
                 }
@@ -162,14 +162,14 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
         }
         _formatMinutes(milliseconds) {
-            let m = Math.floor(milliseconds / 1000 / 60);
+            const m = Math.floor(milliseconds / 1000 / 60);
             let formatted = "" + m;
-            var remaining = milliseconds - (m * 1000 * 60);
+            const remaining = milliseconds - (m * 1000 * 60);
             if (m > 10) {
                 // Over 10 minutes, just ignore the seconds
                 return formatted;
             }
-            var seconds = Math.floor(remaining / 1000) + "";
+            let seconds = Math.floor(remaining / 1000) + "";
             formatted += ":";
             seconds = lpad(seconds, 2, "0");
             formatted += seconds;
@@ -186,7 +186,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         toString() {
             try {
-                var lines = this._browserInfo();
+                const lines = this._browserInfo();
                 this.messages.forEach(function (m) {
                     lines.push(lpad(this._formatTime(m[0]), 6) + " " + rpad(this._formatLevel(m[1]), 6) + " " + lpadLines(m[2], 14));
                 }, this);
@@ -202,8 +202,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         submit(options = {}) {
             // FIXME: friendpaste is broken for this (and other pastebin sites aren't really Browser-accessible)
             return util_1.util.Deferred(function () {
-                var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
-                var req = new XMLHttpRequest();
+                const site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
+                const req = new XMLHttpRequest();
                 req.open("POST", site);
                 req.setRequestHeader("Content-Type", "application/json");
                 req.send(JSON.stringify({
@@ -232,7 +232,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         fatal: 7,
         suppressedWrite: 8,
     };
-    ;
     function rpad(s, len, pad = " ") {
         s = s + "";
         while (s.length < len) {
@@ -248,16 +247,16 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         return s;
     }
     function lpadLines(s, len, pad = " ") {
-        var i;
+        let i;
         s = s + "";
         if (s.indexOf("\n") == -1) {
             return s;
         }
-        var fullPad = "";
+        let fullPad = "";
         for (i = 0; i < len; i++) {
             fullPad += pad;
         }
-        let lines = s.split(/\n/g);
+        const lines = s.split(/\n/g);
         for (i = 1; i < s.length; i++) {
             lines[i] = fullPad + s[i];
         }

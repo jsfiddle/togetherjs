@@ -12,7 +12,7 @@ import { windowing } from "./windowing";
 import $ from "jquery";
 
 //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-let assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 let onHideAll: (() => void) | null = null;
 let container: JQuery; // TODO init
 let slides: JQuery; // TODO init
@@ -20,11 +20,11 @@ let slides: JQuery; // TODO init
 function show(index: number) {
     slides.hide();
     $(slides[index]).show();
-    var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
+    const bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
     bullets.removeClass("togetherjs-active");
     $(bullets[index]).addClass("togetherjs-active");
-    var $next = $("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
-    var $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
+    const $next = $("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+    const $previous = $("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
     if(index == slides.length - 1) {
         $next.addClass("togetherjs-disabled");
     }
@@ -34,7 +34,7 @@ function show(index: number) {
 }
 
 function previous() {
-    var index = getIndex();
+    let index = getIndex();
     index--;
     if(index < 0) {
         index = 0;
@@ -43,7 +43,7 @@ function previous() {
 }
 
 function next() {
-    var index = getIndex();
+    let index = getIndex();
     index++;
     if(index >= slides.length) {
         index = slides.length - 1;
@@ -52,11 +52,11 @@ function next() {
 }
 
 function getIndex() {
-    var active = slides.filter(":visible");
+    const active = slides.filter(":visible");
     if(!active.length) {
         return 0;
     }
-    for(var i = 0; i < slides.length; i++) {
+    for(let i = 0; i < slides.length; i++) {
         if(slides[i] == active[0]) {
             return i;
         }
@@ -73,9 +73,9 @@ export class Walkthrough {
             ui.container.append(container);
             slides = container.find(".togetherjs-walkthrough-slide");
             slides.hide();
-            var progress = $("#togetherjs-walkthrough-progress");
+            const progress = $("#togetherjs-walkthrough-progress");
             slides.each(function(index) {
-                var bullet = templating.sub("walkthrough-slide-progress", {});
+                const bullet = templating.sub("walkthrough-slide-progress", {});
                 progress.append(bullet);
                 bullet.click(function() {
                     show(index);
@@ -85,11 +85,11 @@ export class Walkthrough {
             container.find("#togetherjs-walkthrough-next").click(next);
             ui.prepareShareLink(container);
             container.find(".togetherjs-self-name").bind("keyup", function(event) {
-                var val = $(event.target).val();
+                const val = $(event.target).val();
                 peers.Self.update({ name: val });
             });
             container.find(".togetherjs-swatch").click(function() {
-                var picker = $("#togetherjs-pick-color");
+                const picker = $("#togetherjs-pick-color");
                 if(picker.is(":visible")) {
                     picker.hide();
                     return;
@@ -97,7 +97,7 @@ export class Walkthrough {
                 picker.show();
                 picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
                 picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
-                var location = container.find(".togetherjs-swatch").offset()!; // TODO !
+                const location = container.find(".togetherjs-swatch").offset()!; // TODO !
                 picker.css({
                     top: location.top,
                     // The -7 comes out of thin air, but puts it in the right place:

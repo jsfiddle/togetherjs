@@ -13,19 +13,19 @@ interface ShowOptions {
 }
 
 //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
-var assert: typeof util.assert = util.assert.bind(util);
-var $window = $(window);
+const assert: typeof util.assert = util.assert.bind(util);
+const $window = $(window);
 // This is also in togetherjs.less, under .togetherjs-animated
-var ANIMATION_DURATION = 1000;
-var onClose: null | (() => any) = null;
+const ANIMATION_DURATION = 1000;
+let onClose: null | (() => any) = null;
 /* Displays one window.  A window must already exist.  This hides other windows, and
     positions the window according to its data-bound-to attributes */
 export class Windowing {
     show(el: HTMLElement | JQuery | string, options: Partial<ShowOptions> = {}) {
         const element = $(el);
         options.bind = options.bind || element.attr("data-bind-to");
-        var notification = element.hasClass("togetherjs-notification");
-        var modal = element.hasClass("togetherjs-modal");
+        const notification = element.hasClass("togetherjs-notification");
+        const modal = element.hasClass("togetherjs-modal");
         let bindElement: JQuery | null = null;
         if(options.bind) {
             bindElement = $(options.bind);
@@ -59,11 +59,11 @@ export class Windowing {
         els = els.filter(":visible");
         els.filter(":not(.togetherjs-notification)").hide();
         getModalBackground().hide();
-        var windows: JQuery[] = [];
+        const windows: JQuery[] = [];
         els.each(function(_index, el) {
             const element = $(el);
             windows.push(element);
-            var bound = element.data("boundTo");
+            let bound = element.data("boundTo");
             if(!bound) {
                 return;
             }
@@ -112,18 +112,18 @@ function bind(window: HTMLElement | JQuery, bound: JQuery) {
     const win = $(window);
     assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
     // FIXME: hardcoding
-    let ifacePos : "right" | "left" | "bottom" = "right";
+    const ifacePos : "right" | "left" | "bottom" = "right";
     //var ifacePos = panelPosition();
     const boundPos = bound.offset()!; // TODO ! deal with !
     const boundPosHeight = bound.height();
     const boundPosWidth = bound.width();
-    var windowHeight = $window.height();
+    const windowHeight = $window.height();
     boundPos.top -= $window.scrollTop();
     boundPos.left -= $window.scrollLeft();
     // FIXME: I appear to have to add the padding to the width to get a "true"
     // width.  But it's still not entirely consistent.
-    var height = win.height() + 5;
-    var width = win.width() + 20;
+    const height = win.height() + 5;
+    const width = win.width() + 20;
     let left: number;
     let top: number;
     if(ifacePos == "right") {
@@ -145,7 +145,7 @@ function bind(window: HTMLElement | JQuery, bound: JQuery) {
     });
     if(win.hasClass("togetherjs-window")) {
         $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-        var pointer = $("#togetherjs-window-pointer-" + ifacePos);
+        const pointer = $("#togetherjs-window-pointer-" + ifacePos);
         pointer.show();
         if(ifacePos == "right") {
             pointer.css({
@@ -168,7 +168,7 @@ function bind(window: HTMLElement | JQuery, bound: JQuery) {
 }
 
 session.on("resize", function() {
-    var win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
+    const win = $(".togetherjs-modal:visible, .togetherjs-window:visible");
     if(!win.length) {
         return;
     }
@@ -182,7 +182,7 @@ session.on("resize", function() {
 
 function bindEvents(el: JQuery) {
     el.find(".togetherjs-close, .togetherjs-dismiss").click(function(event) {
-        var w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
+        const w = $(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
         windowing.hide(w);
         event.stopPropagation();
         return false;
@@ -194,7 +194,7 @@ function getModalBackground() {
     if(getModalBackgroundElement) {
         return getModalBackgroundElement;
     }
-    var background = $("#togetherjs-modal-background");
+    const background = $("#togetherjs-modal-background");
     assert(background.length);
     getModalBackgroundElement = background;
     background.click(function() {
@@ -215,7 +215,7 @@ class ModalEscape {
             windowing.hide();
         }
     }
-};
+}
 
 const modalEscape = new ModalEscape();
 

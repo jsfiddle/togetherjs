@@ -18,7 +18,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             this.prefix = "";
         }
         toString() {
-            var loc;
+            let loc;
             try {
                 loc = "loc"; //elementFinder.elementLocation(this.context);
             }
@@ -65,17 +65,17 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             if (el.tagName == "HEAD") {
                 return "head";
             }
-            let parent = el.parentNode;
+            const parent = el.parentNode;
             if ((!parent) || parent == el) {
                 console.warn("elementLocation(", el, ") has null parent");
                 throw new Error("No locatable parent found");
             }
-            let parentLocation = this.elementLocation(parent);
-            let children = parent.childNodes;
-            let _len = children.length;
+            const parentLocation = this.elementLocation(parent);
+            const children = parent.childNodes;
+            const _len = children.length;
             let index = 0;
             for (let i = 0; i < _len; i++) {
-                let child = children[i];
+                const child = children[i];
                 if (child == el) {
                     break;
                 }
@@ -131,7 +131,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 }
             }
             else if (loc.indexOf("#") === 0) {
-                var id;
+                let id;
                 loc = loc.substr(1);
                 if (loc.indexOf(":") === -1) {
                     id = loc;
@@ -165,13 +165,13 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 if (loc.indexOf(")") == -1) {
                     throw "Invalid location, missing ): " + loc;
                 }
-                let num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
+                const num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
                 let count = num;
                 loc = loc.substr(loc.indexOf(")") + 1);
-                var children = container.childNodes;
+                const children = container.childNodes;
                 el = null;
-                for (var i = 0; i < children.length; i++) {
-                    var child = children[i];
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
                     if (child.nodeType == document.ELEMENT_NODE) {
                         if (child.className.indexOf("togetherjs") != -1) {
                             continue;
@@ -207,7 +207,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             }
         }
         elementByPixel(height) {
-            let self = this;
+            const self = this;
             /* Returns {location: "...", offset: pixels}
             
             To get the pixel position back, you'd do:
@@ -215,14 +215,14 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             */
             function search(start, height) {
                 var _a, _b;
-                var last = null;
-                var children = start.children();
+                let last = null;
+                const children = start.children();
                 children.each(function () {
-                    var el = jquery_1.default(this);
+                    const el = jquery_1.default(this);
                     if (el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                         return;
                     }
-                    let offset = el.offset();
+                    const offset = el.offset();
                     if (offset && offset.top > height) {
                         return false;
                     }
@@ -231,7 +231,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 });
                 if ((!children.length) || (!last)) {
                     // There are no children, or only inapplicable children
-                    let start_offset_top = (_b = (_a = start.offset()) === null || _a === void 0 ? void 0 : _a.top) !== null && _b !== void 0 ? _b : 0;
+                    const start_offset_top = (_b = (_a = start.offset()) === null || _a === void 0 ? void 0 : _a.top) !== null && _b !== void 0 ? _b : 0;
                     return {
                         location: self.elementLocation(start[0]),
                         offset: height - start_offset_top,
@@ -248,10 +248,10 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             if (position.location == "body") {
                 return position.offset;
             }
-            var el;
+            let el;
             try {
                 el = this.findElement(position.location);
-                var el_offset = jquery_1.default(el).offset();
+                const el_offset = jquery_1.default(el).offset();
                 if (el_offset === undefined) {
                     throw new Error("pixelForPosition called on element without offset");
                 }
@@ -265,7 +265,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 if (e instanceof CannotFind && position.absoluteTop) {
                     // We don't trust absoluteTop to be quite right locally, so we adjust
                     // for the total document height differences:
-                    var percent = position.absoluteTop / position.documentHeight;
+                    const percent = position.absoluteTop / position.documentHeight;
                     return jquery_1.default(document).height() * percent;
                 }
                 throw e;

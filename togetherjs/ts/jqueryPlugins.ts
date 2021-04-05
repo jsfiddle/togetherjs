@@ -235,10 +235,10 @@ $.fn.easeTo = function(y) {
 
 // avatar animate in
 $.fn.animateDockEntry = function() {
-    var height = this.height();
-    var width = this.width();
-    var backgroundSize = height + 4;
-    var margin = parseInt(this.css("marginLeft"), 10);
+    const height = this.height();
+    const width = this.width();
+    const backgroundSize = height + 4;
+    const margin = parseInt(this.css("marginLeft"), 10);
 
     // set starting position CSS for avatar
     this.css({
@@ -248,7 +248,7 @@ $.fn.animateDockEntry = function() {
         backgroundSize: "0 0"
     });
 
-    var self = this;
+    const self = this;
 
     //then animate avatar to the actual dimensions, and reset the values
     this.animate({
@@ -275,10 +275,10 @@ $.fn.animateDockExit = function() {
     // get the current avatar dimenensions
     // TODO qw height was commented because it was unused
     //var height = this.height();
-    var width = this.width();
+    const width = this.width();
     // TODO qw background size has been commented out because it was unused, maybe it was intended to be used
     //var backgroundSize = height + 4;
-    var margin = parseInt(this.css("marginLeft"), 10);
+    const margin = parseInt(this.css("marginLeft"), 10);
 
     //then animate avatar to shrink to nothing, and reset the values again
     // FIXME this needs to animate from the CENTER
@@ -297,11 +297,11 @@ $.fn.animateCursorEntry = function() {
 
 // keyboard typing animation
 $.fn.animateKeyboard = function() {
-    var one = this.find(".togetherjs-typing-ellipse-one");
-    var two = this.find(".togetherjs-typing-ellipse-two");
-    var three = this.find(".togetherjs-typing-ellipse-three");
-    var count = -1;
-    var run = (function() {
+    const one = this.find(".togetherjs-typing-ellipse-one");
+    const two = this.find(".togetherjs-typing-ellipse-two");
+    const three = this.find(".togetherjs-typing-ellipse-three");
+    let count = -1;
+    const run = (function() {
         count = (count + 1) % 4;
         if(count === 0) {
             one.css("opacity", 0.5);
@@ -319,7 +319,7 @@ $.fn.animateKeyboard = function() {
         }
     }).bind(this);
     run();
-    var interval = setInterval(run, 300);
+    const interval = setInterval(run, 300);
     this.data("animateKeyboard", interval);
 };
 

@@ -1,6 +1,6 @@
 "use strict";
 function hashCode(s) {
-    var hash = 0, i, chr;
+    let hash = 0, i, chr;
     if (s.length === 0)
         return hash;
     for (i = 0; i < s.length; i++) {
@@ -10,7 +10,6 @@ function hashCode(s) {
     }
     return hash;
 }
-;
 class PacketAssembler {
     constructor() {
         this.uid = 0;
@@ -120,8 +119,8 @@ function startListening() {
     });
 }
 function sendManyData() {
-    var content = "";
-    for (var i = 0; i < 1000000; i++) {
+    let content = "";
+    for (let i = 0; i < 1000000; i++) {
         content += Math.random().toString();
     }
     console.log("content length", content.length, "hash", hashCode(content));

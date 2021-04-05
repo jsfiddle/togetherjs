@@ -428,7 +428,7 @@ class PostMessageIncomingChannel extends AbstractChannel {
 
     onclose() {}
     onmessage = () => {}
-}; // /PostMessageIncomingChannel
+} // /PostMessageIncomingChannel
 
 export class Router extends OnClass<TogetherJSNS.On.Map> {
     _routes: {[key: string]: Route} = Object.create(null);

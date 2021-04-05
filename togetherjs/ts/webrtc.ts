@@ -13,7 +13,7 @@ import $ from "jquery";
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
 //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
-var assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 
 session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
 if(session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
@@ -24,7 +24,7 @@ if(session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) 
     try {
         (function() {
             //@ts-ignore this var is unused but we don't remove code
-            var conn = new window.mozRTCPeerConnection!();
+            const conn = new window.mozRTCPeerConnection!();
         })();
     }
     catch(e) {
@@ -32,7 +32,7 @@ if(session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) 
     }
 }
 
-var mediaConstraints: {mandatory: TogetherJSNS.MediaConstraintsMandatory} = {
+const mediaConstraints: {mandatory: TogetherJSNS.MediaConstraintsMandatory} = {
     mandatory: {
         OfferToReceiveAudio: true,
         OfferToReceiveVideo: false,
@@ -42,9 +42,9 @@ if(window.mozRTCPeerConnection) {
     mediaConstraints.mandatory.MozDontOfferDataChannel = true;
 }
 
-var URL = window.webkitURL || window.URL;
-var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
-var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
+const URL = window.webkitURL || window.URL;
+const RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+const RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
 
 function makePeerConnection() {
     // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
@@ -69,11 +69,11 @@ function ensureCryptoLine(sdp: string) {
         return sdp;
     }
 
-    var sdpLinesIn = sdp.split('\r\n');
-    var sdpLinesOut = [];
+    const sdpLinesIn = sdp.split('\r\n');
+    const sdpLinesOut = [];
 
     // Search for m line.
-    for(var i = 0; i < sdpLinesIn.length; i++) {
+    for(let i = 0; i < sdpLinesIn.length; i++) {
         sdpLinesOut.push(sdpLinesIn[i]);
         if(sdpLinesIn[i].search('m=') !== -1) {
             sdpLinesOut.push("a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
@@ -97,7 +97,7 @@ function getUserMedia(options: MediaStreamConstraints, success: NavigatorUserMed
 
 session.on("ui-ready", function() {
     $("#togetherjs-self-avatar").click(function() {
-        var avatar = peers.Self.avatar;
+        const avatar = peers.Self.avatar;
         if(avatar) {
             $preview.attr("src", avatar);
         }
@@ -107,7 +107,7 @@ session.on("ui-ready", function() {
         $("#togetherjs-avatar-edit-rtc").hide();
     }
 
-    var avatarData: string | undefined;
+    let avatarData: string | undefined;
     const $preview = $("#togetherjs-self-avatar-preview");
     const $accept = $("#togetherjs-self-avatar-accept");
     const $cancel = $("#togetherjs-self-avatar-cancel");
@@ -165,14 +165,14 @@ session.on("ui-ready", function() {
 
     function takePicture() {
         assert(streaming);
-        var height = video0.videoHeight;
-        var width = video0.videoWidth;
+        let height = video0.videoHeight;
+        let width = video0.videoWidth;
         width = width * (session.AVATAR_SIZE / height);
         height = session.AVATAR_SIZE;
         const canvas0 = document.createElement("canvas");
         canvas0.height = session.AVATAR_SIZE;
         canvas0.width = session.AVATAR_SIZE;
-        var context = canvas0.getContext("2d")!; // ! is ok because the first call to getContext can't fail if it's "2d"
+        const context = canvas0.getContext("2d")!; // ! is ok because the first call to getContext can't fail if it's "2d"
         context.arc(session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, session.AVATAR_SIZE / 2, 0, Math.PI * 2);
         context.closePath();
         context.clip();
@@ -181,11 +181,11 @@ session.on("ui-ready", function() {
     }
 
     $upload.on("change", function(this: DataTransfer) { // TODO is this really a DataTransfer? It was the most relevant type with a files field
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function() {
             // FIXME: I don't actually know it's JPEG, but it's probably a
             // good enough guess:
-            var url = "data:image/jpeg;base64," + util.blobToBase64(this.result!); // TODO !
+            const url = "data:image/jpeg;base64," + util.blobToBase64(this.result!); // TODO !
             convertImage(url, function(result) {
                 savePicture(result);
             });
@@ -200,15 +200,15 @@ session.on("ui-ready", function() {
         const canvas = document.createElement("canvas");
         canvas.height = session.AVATAR_SIZE;
         canvas.width = session.AVATAR_SIZE;
-        var context = canvas.getContext("2d")!; // ! is ok because the first call to getContext can't fail if it's "2d"
-        var img = new Image();
+        const context = canvas.getContext("2d")!; // ! is ok because the first call to getContext can't fail if it's "2d"
+        const img = new Image();
         img.src = imageUrl;
         // Sometimes the DOM updates immediately to call
         // naturalWidth/etc, and sometimes it doesn't; using setTimeout
         // gives it a chance to catch up
         setTimeout(function() {
-            var width = img.naturalWidth || img.width;
-            var height = img.naturalHeight || img.height;
+            let width = img.naturalWidth || img.width;
+            let height = img.naturalHeight || img.height;
             width = width * (session.AVATAR_SIZE / height);
             height = session.AVATAR_SIZE;
             context.drawImage(img, 0, 0, width, height);
@@ -252,18 +252,18 @@ session.on("ui-ready", function() {
     }
     audioButton("#togetherjs-audio-ready");
 
-    var audioStream: MediaStream | null = null;
-    var accepted = false;
-    var connected = false;
-    var $audio = $("#togetherjs-audio-element");
-    var offerSent: RTCSessionDescriptionInit | null = null;
-    var offerReceived: RTCSessionDescriptionInit | null = null;
-    var offerDescription = false;
-    var answerSent: RTCSessionDescriptionInit | null = null;
-    var answerReceived: RTCSessionDescriptionInit | null = null;
-    var answerDescription = false;
-    var _connection: RTCPeerConnection | null = null;
-    var iceCandidate: RTCIceCandidateInit | null = null;
+    let audioStream: MediaStream | null = null;
+    let accepted = false;
+    const connected = false;
+    const $audio = $("#togetherjs-audio-element");
+    let offerSent: RTCSessionDescriptionInit | null = null;
+    let offerReceived: RTCSessionDescriptionInit | null = null;
+    let offerDescription = false;
+    let answerSent: RTCSessionDescriptionInit | null = null;
+    let answerReceived: RTCSessionDescriptionInit | null = null;
+    let answerDescription = false;
+    let _connection: RTCPeerConnection | null = null;
+    let iceCandidate: RTCIceCandidateInit | null = null;
 
     function enableAudio() {
         accepted = true;
@@ -288,12 +288,12 @@ session.on("ui-ready", function() {
 
     function error(...args: any[]) {
         console.warn(args);
-        var s = "";
-        for(var i = 0; i < args.length; i++) {
+        let s = "";
+        for(let i = 0; i < args.length; i++) {
             if(s) {
                 s += " ";
             }
-            var a = args[i];
+            const a = args[i];
             if(typeof a == "string") {
                 s += a;
             }
@@ -409,7 +409,7 @@ session.on("ui-ready", function() {
     }
 
     function connect() {
-        var connection = getConnection();
+        const connection = getConnection();
         if(offerReceived && (!offerDescription)) {
             connection.setRemoteDescription(
                 new RTCSessionDescription({
@@ -457,7 +457,7 @@ session.on("ui-ready", function() {
         }
         else if(!(answerSent || answerReceived)) {
             // FIXME: I might have only needed this due to my own bugs, this might not actually time out
-            var timeout = setTimeout(function() {
+            const timeout = setTimeout(function() {
                 if(!answerSent) {
                     error("createAnswer Timed out; reload or restart browser");
                 }
@@ -505,7 +505,7 @@ session.on("ui-ready", function() {
             return;
         }
         function run() {
-            var connection = getConnection();
+            const connection = getConnection();
             connection.setRemoteDescription(
                 new RTCSessionDescription({
                     type: "offer",
@@ -540,7 +540,7 @@ session.on("ui-ready", function() {
         answerReceived = msg.answer;
         assert(offerSent);
         assert(audioStream);
-        var connection = getConnection();
+        const connection = getConnection();
         connection.setRemoteDescription(
             new RTCSessionDescription({
                 type: "answer",

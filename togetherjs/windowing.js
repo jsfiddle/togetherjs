@@ -10,19 +10,19 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     exports.windowing = exports.Windowing = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var $window = jquery_1.default(window);
+    const assert = util_1.util.assert.bind(util_1.util);
+    const $window = jquery_1.default(window);
     // This is also in togetherjs.less, under .togetherjs-animated
-    var ANIMATION_DURATION = 1000;
-    var onClose = null;
+    const ANIMATION_DURATION = 1000;
+    let onClose = null;
     /* Displays one window.  A window must already exist.  This hides other windows, and
         positions the window according to its data-bound-to attributes */
     class Windowing {
         show(el, options = {}) {
             const element = jquery_1.default(el);
             options.bind = options.bind || element.attr("data-bind-to");
-            var notification = element.hasClass("togetherjs-notification");
-            var modal = element.hasClass("togetherjs-modal");
+            const notification = element.hasClass("togetherjs-notification");
+            const modal = element.hasClass("togetherjs-modal");
             let bindElement = null;
             if (options.bind) {
                 bindElement = jquery_1.default(options.bind);
@@ -55,11 +55,11 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             els = els.filter(":visible");
             els.filter(":not(.togetherjs-notification)").hide();
             getModalBackground().hide();
-            var windows = [];
+            const windows = [];
             els.each(function (_index, el) {
                 const element = jquery_1.default(el);
                 windows.push(element);
-                var bound = element.data("boundTo");
+                let bound = element.data("boundTo");
                 if (!bound) {
                     return;
                 }
@@ -106,18 +106,18 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         const win = jquery_1.default(window);
         assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
         // FIXME: hardcoding
-        let ifacePos = "right";
+        const ifacePos = "right";
         //var ifacePos = panelPosition();
         const boundPos = bound.offset(); // TODO ! deal with !
         const boundPosHeight = bound.height();
         const boundPosWidth = bound.width();
-        var windowHeight = $window.height();
+        const windowHeight = $window.height();
         boundPos.top -= $window.scrollTop();
         boundPos.left -= $window.scrollLeft();
         // FIXME: I appear to have to add the padding to the width to get a "true"
         // width.  But it's still not entirely consistent.
-        var height = win.height() + 5;
-        var width = win.width() + 20;
+        const height = win.height() + 5;
+        const width = win.width() + 20;
         let left;
         let top;
         if (ifacePos == "right") {
@@ -139,7 +139,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         });
         if (win.hasClass("togetherjs-window")) {
             jquery_1.default("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-            var pointer = jquery_1.default("#togetherjs-window-pointer-" + ifacePos);
+            const pointer = jquery_1.default("#togetherjs-window-pointer-" + ifacePos);
             pointer.show();
             if (ifacePos == "right") {
                 pointer.css({
@@ -161,7 +161,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         bound.addClass("togetherjs-active");
     }
     session_1.session.on("resize", function () {
-        var win = jquery_1.default(".togetherjs-modal:visible, .togetherjs-window:visible");
+        const win = jquery_1.default(".togetherjs-modal:visible, .togetherjs-window:visible");
         if (!win.length) {
             return;
         }
@@ -174,7 +174,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     });
     function bindEvents(el) {
         el.find(".togetherjs-close, .togetherjs-dismiss").click(function (event) {
-            var w = jquery_1.default(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
+            const w = jquery_1.default(event.target).closest(".togetherjs-window, .togetherjs-modal, .togetherjs-notification");
             exports.windowing.hide(w);
             event.stopPropagation();
             return false;
@@ -185,7 +185,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         if (getModalBackgroundElement) {
             return getModalBackgroundElement;
         }
-        var background = jquery_1.default("#togetherjs-modal-background");
+        const background = jquery_1.default("#togetherjs-modal-background");
         assert(background.length);
         getModalBackgroundElement = background;
         background.click(function () {
@@ -206,7 +206,6 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             }
         }
     }
-    ;
     const modalEscape = new ModalEscape();
     session_1.session.on("close", function () {
         modalEscape.unbind();

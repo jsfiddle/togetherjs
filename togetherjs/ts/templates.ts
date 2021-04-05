@@ -5,7 +5,7 @@
 import { util } from "./util";
 
 //function templatesMain(util: TogetherJSNS.Util, require: Require) {
-let assert: typeof util.assert = util.assert.bind(util);
+const assert: typeof util.assert = util.assert.bind(util);
 
 function clean(t: string) {
     // Removes <% /* ... */ %> comments:
@@ -19,9 +19,9 @@ function clean(t: string) {
     return t;
 }
 
-var lang = TogetherJS.getConfig("lang") || "en-US";
-var moduleName = "templates-" + lang;
-var templatesLang: TogetherJSNS.Template;
+const lang = TogetherJS.getConfig("lang") || "en-US";
+const moduleName = "templates-" + lang;
+let templatesLang: TogetherJSNS.Template;
 require([moduleName], function(mod: TogetherJSNS.Template) {
     templatesLang = mod;
 });
@@ -38,7 +38,7 @@ export function templates(resourceName: keyof TogetherJSNS.Template) {
     }
     assert(templatesLang, "Templates not yet loaded");
     return clean(templatesLang[resourceName] || "");
-};
+}
 
 // FIXME: maybe it would be better to dynamically assemble the first
 // argument to define() here to include the localized module:

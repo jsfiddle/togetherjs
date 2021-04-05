@@ -6,9 +6,9 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.storage = exports.TJSStorageWithTab = void 0;
     //function StorageMain(util: TogetherJSNS.Util) {
-    var assert = util_1.util.assert.bind(util_1.util);
-    var Deferred = util_1.util.Deferred;
-    var DEFAULT_SETTINGS = {
+    const assert = util_1.util.assert.bind(util_1.util);
+    const Deferred = util_1.util.Deferred;
+    const DEFAULT_SETTINGS = {
         name: "",
         defaultName: "",
         avatar: null,
@@ -18,7 +18,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         seenWalkthrough: false,
         dontShowRtcInfo: false
     };
-    var DEBUG_STORAGE = false;
+    const DEBUG_STORAGE = false;
     class StorageSettings extends OnClass {
         constructor(storageInstance) {
             super();
@@ -45,13 +45,13 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.settings = new StorageSettings(this);
         }
         get(key, defaultValue = null) {
-            var self = this;
+            const self = this;
             return Deferred(function (def) {
                 // Strictly this isn't necessary, but eventually I want to move to something more async for the storage, and this simulates that much better.
                 setTimeout(util_1.util.resolver(def, function () {
                     const prefixedKey = self.prefix + key;
                     let value;
-                    var valueAsString = self.storage.getItem(prefixedKey);
+                    const valueAsString = self.storage.getItem(prefixedKey);
                     if (!valueAsString) {
                         value = defaultValue;
                         if (DEBUG_STORAGE) {
@@ -69,7 +69,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             });
         }
         set(key, value) {
-            var self = this;
+            const self = this;
             let stringyfiedValue;
             if (value !== undefined) {
                 stringyfiedValue = JSON.stringify(value);
@@ -92,8 +92,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             });
         }
         clear() {
-            var self = this;
-            var promises = [];
+            const self = this;
+            const promises = [];
             return Deferred((function (def) {
                 self.keys().then(function (keys) {
                     assert(keys !== undefined);
@@ -109,15 +109,15 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
         keys(prefix, excludePrefix = false) {
             // Returns a list of keys, potentially with the given prefix
-            var self = this;
+            const self = this;
             return Deferred(function (def) {
                 setTimeout(util_1.util.resolver(def, function () {
                     prefix = prefix || "";
-                    let result = [];
-                    for (var i = 0; i < self.storage.length; i++) {
-                        let key = self.storage.key(i); // TODO !
+                    const result = [];
+                    for (let i = 0; i < self.storage.length; i++) {
+                        const key = self.storage.key(i); // TODO !
                         if (key.indexOf(self.prefix + prefix) === 0) {
-                            var shortKey = key.substr(self.prefix.length);
+                            let shortKey = key.substr(self.prefix.length);
                             if (excludePrefix) {
                                 shortKey = shortKey.substr(prefix.length);
                             }
@@ -139,7 +139,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         }
     }
     exports.TJSStorageWithTab = TJSStorageWithTab;
-    var namePrefix = TogetherJS.config.get("storagePrefix");
+    const namePrefix = TogetherJS.config.get("storagePrefix");
     TogetherJS.config.close("storagePrefix");
     const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     exports.storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);

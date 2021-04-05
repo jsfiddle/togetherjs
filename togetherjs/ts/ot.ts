@@ -35,9 +35,9 @@ class Queue<T> {
     }
 
     walkBack<ThisArg>(callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        var result = true;
-        for(var i = this._q.length - 1; i >= 0; i--) {
-            var item = this._q[i];
+        let result = true;
+        for(let i = this._q.length - 1; i >= 0; i--) {
+            const item = this._q[i];
             result = callback.call(thisArg, item, i + this._deleted);
             if(result === false) {
                 return result;
@@ -50,9 +50,9 @@ class Queue<T> {
     }
 
     walkForward<ThisArg>(index: number, callback: (this: ThisArg, item: T, index: number) => any, thisArg: ThisArg) {
-        var result = true;
-        for(var i = index; i < this._q.length; i++) {
-            var item = this._q[i - this._deleted];
+        let result = true;
+        for(let i = index; i < this._q.length; i++) {
+            const item = this._q[i - this._deleted];
             result = callback.call(thisArg, item, i);
             if(result === false) {
                 return result;
@@ -112,13 +112,13 @@ class Change {
     ) { }
 
     toString() {
-        var s = "[Change " + this.version + "." + this.clientId + ": ";
+        let s = "[Change " + this.version + "." + this.clientId + ": ";
         s += this.delta + " ";
         if(this.outOfOrder) {
             s += "(out of order) ";
         }
-        var cids = [];
-        for(var a in this.known) {
+        const cids = [];
+        for(const a in this.known) {
             if(this.known.hasOwnProperty(a)) {
                 cids.push(a);
             }
@@ -150,7 +150,7 @@ class Change {
     }
 
     knowsAboutAll(versions: { [clientId: string]: number }) {
-        for(var clientId in versions) {
+        for(const clientId in versions) {
             if(!versions.hasOwnProperty(clientId)) {
                 continue;
             }
@@ -273,7 +273,7 @@ export class SimpleHistory {
 
     /** Add this delta to this client's queue. */
     add(delta: TogetherJSNS.TextReplace) {
-        let change: TogetherJSNS.Change2 = {
+        const change: TogetherJSNS.Change2 = {
             id: this.clientId + '.' + (this.deltaId++),
             delta: delta,
         };
@@ -305,9 +305,9 @@ export class SimpleHistory {
         }
 
         // Transpose all bits on the queue to put this patch first.
-        var inserted = change.delta;
+        let inserted = change.delta;
         this.queue = this.queue.map(function(qchange) {
-            var tt = qchange.delta.transpose(inserted);
+            const tt = qchange.delta.transpose(inserted);
             inserted = tt[1];
             return {
                 id: qchange.id,
@@ -333,7 +333,7 @@ export class SimpleHistory {
 
     /** Return the next change to transmit to the server, or null if there isn't one. */
     getNextToSend(): TogetherJSNS.Change2Mandatory | null {
-        let qchange = this.queue[0];
+        const qchange = this.queue[0];
         if(!qchange) {
             /* nothing to send */
             return null;
@@ -410,7 +410,7 @@ export class TextReplace {
     
             Does not modify this object.
         */
-        var overlap;
+        let overlap;
         assert(delta instanceof TextReplace, "Transposing with non-TextReplace:", delta);
         if(this.empty()) {
             //console.log("  =this is empty");
@@ -481,20 +481,20 @@ export class TextReplace {
     static fromChange(oldValue: string, newValue: string) {
         assert(typeof oldValue == "string");
         assert(typeof newValue == "string");
-        var commonStart = 0;
+        let commonStart = 0;
         while(commonStart < newValue.length &&
             newValue.charAt(commonStart) == oldValue.charAt(commonStart)) {
             commonStart++;
         }
-        var commonEnd = 0;
+        let commonEnd = 0;
         while(commonEnd < (newValue.length - commonStart) &&
             commonEnd < (oldValue.length - commonStart) &&
             newValue.charAt(newValue.length - commonEnd - 1) ==
             oldValue.charAt(oldValue.length - commonEnd - 1)) {
             commonEnd++;
         }
-        var removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
-        var inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
+        const removed = oldValue.substr(commonStart, oldValue.length - commonStart - commonEnd);
+        const inserted = newValue.substr(commonStart, newValue.length - commonStart - commonEnd);
         if(!(removed.length || inserted)) {
             return null;
         }
@@ -502,8 +502,8 @@ export class TextReplace {
     }
 
     static random(source: string, generator: TogetherJSNS.Randomizer) {
-        var text, start, len;
-        var ops = ["ins", "del", "repl"];
+        let text, start, len;
+        let ops = ["ins", "del", "repl"];
         if(!source.length) {
             ops = ["ins"];
         }
@@ -560,7 +560,7 @@ class TJSHistory {
     private _history = new Queue<StateForClientId | Change>();
     /** version number for known clients */
     private known: { [clientId: string]: number } = {};
-    private mostRecentLocalChange: number = -1; // TODO check, considering how mostRecentLocalChange is used (in a max function) using -1 seems like a good value
+    private mostRecentLocalChange = -1; // TODO check, considering how mostRecentLocalChange is used (in a max function) using -1 seems like a good value
     private clientId: string;
 
     constructor(clientId: string, initState: string) {
@@ -582,7 +582,7 @@ class TJSHistory {
         assert((!this.known[change.clientId]) || this.known[change.clientId] < change.version, "Got a change", change, "that appears older (or same as) a known change", this.known[change.clientId]);
         // Second simplest case, we get a change that we can add to our
         // history without modification:
-        var last = this._history.last();
+        const last = this._history.last();
         if(
             (("init" in last && last.clientId == "init") || last.isBefore(change)) &&
             change.knowsAboutAll(this.known) &&
@@ -599,8 +599,8 @@ class TJSHistory {
         // First we check if we need to modify this change because we
         // know about changes that it should know about (changes that
         // preceed it that are in our local history).
-        var clientsToCheck = new StringSet();
-        for(var clientId in this.known) {
+        const clientsToCheck = new StringSet();
+        for(const clientId in this.known) {
             if(!this.known.hasOwnProperty(clientId)) {
                 continue;
             }
@@ -612,7 +612,7 @@ class TJSHistory {
             clientsToCheck.add(this.clientId);
         }
         if(!clientsToCheck.isEmpty()) {
-            let indexToCheckFrom: number = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
+            let indexToCheckFrom = 0; // TODO check that set to 0 is ok, it was set to null in the original version of tjs. The rational is that since one element is put in _history in the constructor at least one element will be in it so the following call to walkBack will always set it to at least 0
             this._history.walkBack(function(c: Change | StateForClientId, index) {
                 indexToCheckFrom = index;
                 if("init" in c && c.clientId == "init") {
@@ -635,12 +635,12 @@ class TJSHistory {
                     return false;
                 }
                 if(!change.knowsAboutChange(c)) {
-                    var presentDelta = this.promoteDelta(c.delta, index, change);
+                    const presentDelta = this.promoteDelta(c.delta, index, change);
                     if(!presentDelta.equals(c.delta)) {
                         //console.log("->rebase delta rewrite", presentDelta+"");
                     }
                     this.logChange("->rebase", change, function() {
-                        var result = change.delta.transpose(presentDelta);
+                        const result = change.delta.transpose(presentDelta);
                         change.delta = result[0];
                         change.known[c.clientId] = c.version;
                     }, "with:", c);
@@ -662,14 +662,14 @@ class TJSHistory {
         this._history.insert(indexToInsert, change);
 
         // Now we fix up any forward changes
-        var fixupDelta = change.delta;
+        let fixupDelta = change.delta;
         this._history.walkForward(indexToInsert + 1, function(c, _index) {
             if(!("init" in c) && !c.knowsAboutChange(change)) {
                 //var origChange = c.clone(); // TODO not used
                 this.logChange("^^fix", c, function() {
-                    var fixupResult = c.delta.transpose(fixupDelta);
+                    const fixupResult = c.delta.transpose(fixupDelta);
                     console.log("  ^^real");
-                    var result = c.delta.transpose(fixupDelta);
+                    const result = c.delta.transpose(fixupDelta);
                     c.delta = result[0];
                     c.known[change.clientId] = change.version;
                     fixupDelta = fixupResult[1];
@@ -694,7 +694,7 @@ class TJSHistory {
                 }
                 // FIXME: not sure if this clientId check here is right. Maybe if untilChange.knowsAbout(c)?
                 if(untilChange.knowsAboutChange(c)) {
-                    var result = c.delta.transpose(delta);
+                    const result = c.delta.transpose(delta);
                     delta = result[1];
                 }
                 return true;
@@ -704,7 +704,7 @@ class TJSHistory {
         return delta;
     }
 
-    logHistory(prefix: string = "", ...postfix: string[]) {
+    logHistory(prefix = "", ...postfix: string[]) {
         console.log.apply(console, [prefix + "history", this.clientId, ":"].concat(postfix));
         console.log(prefix + " state:", JSON.stringify(this.getStateSafe()));
         let hstate: string;
@@ -728,7 +728,7 @@ class TJSHistory {
 
     logChange(prefix: string, change: Change, callback: () => void, ...args: any[]) { // TODO use args intead of postfix, also, is any ok?
         prefix = prefix || "before";
-        var postfix = args; // TODO was Array.prototype.slice.call(arguments, 3);
+        const postfix = args; // TODO was Array.prototype.slice.call(arguments, 3);
         console.log.apply(
             console,
             [prefix, this.clientId, ":", change + ""].concat(postfix).concat([JSON.stringify(this.getStateSafe())]));
@@ -740,15 +740,15 @@ class TJSHistory {
     }
 
     addDelta(delta: TogetherJSNS.TextReplace) {
-        var version = this._createVersion();
-        var change = new Change(version, this.clientId, delta, {...this.known}); // TODO changed copy with extend for copyt with ..., knownVersions does not exists, replaced by known
+        const version = this._createVersion();
+        const change = new Change(version, this.clientId, delta, {...this.known}); // TODO changed copy with extend for copyt with ..., knownVersions does not exists, replaced by known
         this.add(change);
         return change;
     }
 
     _createVersion() {
-        var max = 1;
-        for(var id in this.known) { // TODO knownVersions does not exists, replaced by known
+        let max = 1;
+        for(const id in this.known) { // TODO knownVersions does not exists, replaced by known
             max = Math.max(max, this.known[id]); // TODO knownVersions does not exists, replaced by known
         }
         max = Math.max(max, this.mostRecentLocalChange);
@@ -756,7 +756,7 @@ class TJSHistory {
     }
 
     getState() {
-        let state: string = ""; // TODO change, state init to ""
+        let state = ""; // TODO change, state init to ""
         this._history.walkForward(0, function(c) {
             if("init" in c && c.clientId == "init") { // TODO the same kind of logic than in logHistory, there must be some sense to it...
                 // Initialization, has the state

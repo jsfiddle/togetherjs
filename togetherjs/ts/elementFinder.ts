@@ -9,7 +9,7 @@ function isJQuery(o: unknown): o is JQuery {
 }
 
 class CannotFind {
-    public prefix: string = "";
+    public prefix = "";
 
     constructor(
         private location: string,
@@ -18,7 +18,7 @@ class CannotFind {
     ) { }
 
     toString() {
-        var loc;
+        let loc;
         try {
             loc = "loc"; //elementFinder.elementLocation(this.context);
         }
@@ -30,7 +30,7 @@ class CannotFind {
 }
 
 export class ElementFinder {
-    ignoreElement(element: HTMLElement | JQuery) {
+    ignoreElement(element: HTMLElement | JQuery): boolean {
         let el: Node | JQuery | null = element;
         if(isJQuery(el)) {
             el = el[0];
@@ -72,17 +72,17 @@ export class ElementFinder {
             return "head";
         }
 
-        let parent = el.parentNode as HTMLElement;
+        const parent = el.parentNode as HTMLElement;
         if((!parent) || parent == el) {
             console.warn("elementLocation(", el, ") has null parent");
             throw new Error("No locatable parent found");
         }
-        let parentLocation = this.elementLocation(parent);
-        let children = parent.childNodes;
-        let _len = children.length;
+        const parentLocation = this.elementLocation(parent);
+        const children = parent.childNodes;
+        const _len = children.length;
         let index = 0;
         for(let i = 0; i < _len; i++) {
-            let child = children[i] as HTMLElement;
+            const child = children[i] as HTMLElement;
             if(child == el) {
                 break;
             }
@@ -139,7 +139,7 @@ export class ElementFinder {
             }
         }
         else if(loc.indexOf("#") === 0) {
-            var id;
+            let id;
             loc = loc.substr(1);
             if(loc.indexOf(":") === -1) {
                 id = loc;
@@ -173,13 +173,13 @@ export class ElementFinder {
             if(loc.indexOf(")") == -1) {
                 throw "Invalid location, missing ): " + loc;
             }
-            let num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
+            const num = parseInt(loc.substr(0, loc.indexOf(")")), 10);
             let count = num;
             loc = loc.substr(loc.indexOf(")") + 1);
-            var children = container.childNodes;
+            const children = container.childNodes;
             el = null;
-            for(var i = 0; i < children.length; i++) {
-                var child = children[i] as HTMLElement;
+            for(let i = 0; i < children.length; i++) {
+                const child = children[i] as HTMLElement;
                 if(child.nodeType == document.ELEMENT_NODE) {
                     if(child.className.indexOf("togetherjs") != -1) {
                         continue;
@@ -215,22 +215,22 @@ export class ElementFinder {
         }
     }
 
-    elementByPixel(height: number) {
-        let self = this;
+    elementByPixel(height: number): TogetherJSNS.ElementFinder.Position {
+        const self = this;
         /* Returns {location: "...", offset: pixels}
         
         To get the pixel position back, you'd do:
         $(location).offset().top + offset
         */
         function search(start: JQuery, height: number): TogetherJSNS.ElementFinder.Position {
-            var last = null;
-            var children = start.children();
+            let last = null;
+            const children = start.children();
             children.each(function(this: HTMLElement) {
-                var el = $(this);
+                const el = $(this);
                 if(el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                     return;
                 }
-                let offset = el.offset();
+                const offset = el.offset();
                 if(offset && offset.top > height) {
                     return false;
                 }
@@ -239,7 +239,7 @@ export class ElementFinder {
             });
             if ((!children.length) || (!last)) {
                 // There are no children, or only inapplicable children
-                let start_offset_top = start.offset()?.top ?? 0;
+                const start_offset_top = start.offset()?.top ?? 0;
                 return {
                     location: self.elementLocation(start[0]),
                     offset: height - start_offset_top,
@@ -257,10 +257,10 @@ export class ElementFinder {
         if(position.location == "body") {
             return position.offset;
         }
-        var el;
+        let el;
         try {
             el = this.findElement(position.location);
-            var el_offset = $(el).offset();
+            const el_offset = $(el).offset();
             if(el_offset === undefined) {
                 throw new Error("pixelForPosition called on element without offset");
             }
@@ -274,7 +274,7 @@ export class ElementFinder {
             if(e instanceof CannotFind && position.absoluteTop) {
                 // We don't trust absoluteTop to be quite right locally, so we adjust
                 // for the total document height differences:
-                var percent = position.absoluteTop / position.documentHeight;
+                const percent = position.absoluteTop / position.documentHeight;
                 return $(document).height() * percent;
             }
             throw e;

@@ -10,19 +10,19 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
     exports.playback = exports.Playback = exports.Logs = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function playbackMain($: JQueryStatic, _util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, _require: Require) {
-    var ALWAYS_REPLAY = {
+    const ALWAYS_REPLAY = {
         "cursor-update": true,
         "scroll-update": true
     };
     function parseLogs(rawlog) {
         rawlog = rawlog.replace(/\r\n/g, '\n');
-        let logs = rawlog.split(/\n/g);
-        var result = [];
-        for (var i = 0; i < logs.length; i++) {
-            var line = logs[i];
+        const logs = rawlog.split(/\n/g);
+        const result = [];
+        for (let i = 0; i < logs.length; i++) {
+            let line = logs[i];
             line = line.replace(/^\s+/, "").replace(/\s+$/, "");
             if (line.search(/\/\*/) === 0) {
-                var last = line.search(/\*\//);
+                const last = line.search(/\*\//);
                 if (last == -1) {
                     console.warn("bad line:", line);
                     continue;
@@ -55,10 +55,10 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
             }
             if (this.pos !== 0) {
                 // First we need to play the hello
-                var toReplay = [];
-                var foundHello = false;
+                const toReplay = [];
+                let foundHello = false;
                 for (var i = this.pos - 1; i >= 0; i--) {
-                    var item = this.logs[i];
+                    const item = this.logs[i];
                     if (item.type in ALWAYS_REPLAY) {
                         toReplay.push(item);
                     }
@@ -99,15 +99,15 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                 this.unload();
                 return;
             }
-            var item = this.logs[this.pos];
+            const item = this.logs[this.pos];
             this.playItem(item);
             this.pos++;
             if (this.pos >= this.logs.length) {
                 this.unload();
                 return;
             }
-            var next = this.logs[this.pos];
-            var pause = next.date - item.date;
+            const next = this.logs[this.pos];
+            const pause = next.date - item.date;
             this.playTimer = setTimeout(this.playOne.bind(this), pause);
             if (this.fromStorage) {
                 this.savePos();
@@ -178,7 +178,7 @@ define(["require", "exports", "./session", "./storage", "jquery"], function (req
                 if (!value) {
                     return null;
                 }
-                var logs = new Logs(value, true);
+                const logs = new Logs(value, true);
                 return storage_1.storage.get("playback.pos").then(function (pos) {
                     logs.pos = pos || 0;
                     return logs;

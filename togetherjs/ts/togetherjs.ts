@@ -15,7 +15,7 @@ function extend(base: { [key: string]: unknown }, extensions?: any) {
         extensions = base;
         base = {};
     }
-    for(let a in extensions) {
+    for(const a in extensions) {
         if(extensions.hasOwnProperty(a)) {
             base[a] = extensions[a];
         }
@@ -34,7 +34,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
             throw "Error: .once() called with non-callback";
         }
         if(name.search(" ") != -1) {
-            let names = name.split(/ +/g);
+            const names = name.split(/ +/g);
             names.forEach((n) => {
                 this.on(n as Extract<keyof Map, string>, callback); // TODO this cast is abusive, changing the name argument to be a array of event could solve that
             });
@@ -66,7 +66,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
             throw "Error: .once() called with non-callback";
         }
         const cb = callback as unknown as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
-        let attr = "onceCallback_" + name;
+        const attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!cb[attr]) {
             const onceCallback = function (this: OnClass<Map>, ...args: any[]) {
@@ -86,7 +86,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
             return;
         }
         if(name.search(" ") != -1) {
-            let names = name.split(/ +/g);
+            const names = name.split(/ +/g);
             names.forEach(function(this: OnClass<Map>, n) {
                 this.off(n as Extract<keyof Map, string>, callback); // TODO cast as keyof TogetherJSNS.OnMap is abusive, we should forbid passing multiple events (as a space separated string) to this function
             }, this);
@@ -95,7 +95,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
         if(!this._listeners[name]) {
             return;
         }
-        let l = this._listeners[name], _len = l.length;
+        const l = this._listeners[name], _len = l.length;
         for(let i = 0; i < _len; i++) {
             if(l[i] == callback) {
                 l.splice(i, 1);
@@ -107,11 +107,11 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
     removeListener = this.off.bind(this); // TODO can be removed apparently
 
     emit<T extends Extract<keyof Map, string>>(name: T, ...args: Parameters<Map[T]>) {
-        let offs = this._listenerOffs = [];
+        const offs = this._listenerOffs = [];
         if((!this._listeners) || !this._listeners[name]) {
             return;
         }
-        let l = this._listeners[name];
+        const l = this._listeners[name];
         l.forEach(function(this: OnClass<Map>, callback) {
             callback.apply(this, args);
         }, this);
@@ -153,13 +153,13 @@ const baseUrl = baseUrl1();
 const cacheBust = Date.now() + "";
 
 function addScript(url: string) {
-    var script = document.createElement("script");
+    const script = document.createElement("script");
     script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
     document.head.appendChild(script);
 }
 
 function togetherjsMain() {
-    let styleSheet = "/togetherjs.css";
+    const styleSheet = "/togetherjs.css";
 
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
@@ -261,10 +261,10 @@ function togetherjsMain() {
                 if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
                     console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
                 }
-                let previous = this.tjsInstance._configuration[attr];
-                let value = settings[attr];
+                const previous = this.tjsInstance._configuration[attr];
+                const value = settings[attr];
                 this.tjsInstance._configuration[attr] = value as any; // TODO any, how to remove this any
-                let trackers = this.tjsInstance._configTrackers[name] ?? [];
+                const trackers = this.tjsInstance._configTrackers[name] ?? [];
                 let failed = false;
                 for(let i = 0; i < trackers.length; i++) {
                     try {
@@ -326,7 +326,7 @@ function togetherjsMain() {
 
     // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
     function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
-        let config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
+        const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
         config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
         config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
         config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
@@ -335,7 +335,7 @@ function togetherjsMain() {
 
     class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         public startupReason: TogetherJSNS.Reason | null = null;
-        public running: boolean = false;
+        public running = false;
         public require!: Require; // TODO !
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
@@ -408,7 +408,7 @@ function togetherjsMain() {
             // the "on" configuration value.
             let attr;
             let attrName: keyof TogetherJSNS.Config;
-            let globalOns: TogetherJSNS.Ons<unknown> = {};
+            const globalOns: TogetherJSNS.Ons<unknown> = {};
             for(attr in window) {
                 if(attr.indexOf("TogetherJSConfig_on_") === 0) {
                     attrName = attr.substr(("TogetherJSConfig_on_").length) as keyof TogetherJSNS.Config;
@@ -432,7 +432,7 @@ function togetherjsMain() {
             // FIXME: copy existing config?
             // FIXME: do this directly in this.config() ?
             // FIXME: close these configs?
-            let ons: TogetherJSNS.Ons<unknown> = this.config.get("on") || {};
+            const ons: TogetherJSNS.Ons<unknown> = this.config.get("on") || {};
             for(attr in globalOns) {
                 if(globalOns.hasOwnProperty(attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
@@ -443,7 +443,7 @@ function togetherjsMain() {
             for(attr in ons) {
                 this.on(attr as keyof TogetherJSNS.On.Map, ons[attr]); // TODO check cast
             }
-            let hubOns = this.config.get("hub_on");
+            const hubOns = this.config.get("hub_on");
             if(hubOns) {
                 for(attr in hubOns) {
                     if(hubOns.hasOwnProperty(attr)) {
@@ -473,16 +473,16 @@ function togetherjsMain() {
             this.startup._launch = true;
 
             addStyle();
-            let minSetting = this.config.get("useMinimizedCode");
+            const minSetting = this.config.get("useMinimizedCode");
             this.config.close("useMinimizedCode");
             if(minSetting !== undefined) {
                 min = !!minSetting;
             }
-            let requireConfig: RequireConfig = clone(this.requireConfig);
-            let deps = ["session", "jquery"];
+            const requireConfig: RequireConfig = clone(this.requireConfig);
+            const deps = ["session", "jquery"];
             let lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-            let availableTranslations = {
+            const availableTranslations = {
                 "en-US": true,
                 "en": "en-US",
                 "es": "es-BO",
@@ -515,7 +515,7 @@ function togetherjsMain() {
             }
             this.config("lang", lang);
 
-            let localeTemplates = "templates-" + lang;
+            const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
             const callback = (_session: TogetherJSNS.Session, _jquery: JQuery) => {
                 this._loaded = true;
@@ -560,7 +560,7 @@ function togetherjsMain() {
         }
 
         _teardown() {
-            let requireObject = this._requireObject || window.require;
+            const requireObject = this._requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
             if(requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
@@ -603,7 +603,7 @@ function togetherjsMain() {
         }
 
         _onmessage(msg: TogetherJSNS.AnyMessage.AnyForTransit) {
-            let type = msg.type;
+            const type = msg.type;
             let type2: string = type;
             if(type.search(/^app\./) === 0) {
                 type2 = type2.substr("app.".length);
@@ -620,7 +620,7 @@ function togetherjsMain() {
             if(!this.require) {
                 throw "You cannot use TogetherJS.send() when TogetherJS is not running";
             }
-            let session = this.require("session").session;
+            const session = this.require("session").session;
             session.appSend(msg);
         }
 
@@ -628,7 +628,7 @@ function togetherjsMain() {
             if(!this.require) {
                 return null;
             }
-            let session = this.require("session").session;
+            const session = this.require("session").session;
             return session.shareUrl();
         }
 
@@ -665,10 +665,10 @@ function togetherjsMain() {
             if(address.search(/^https?:/i) === 0) {
                 address = address.replace(/^http/i, 'ws');
             }
-            let socket = new WebSocket(address);
+            const socket = new WebSocket(address);
             let gotAnswer = false;
             socket.onmessage = function(event) {
-                let msg = JSON.parse(event.data) as TogetherJSNS.Message;
+                const msg = JSON.parse(event.data) as TogetherJSNS.Message;
                 if(msg.type != "init-connection") {
                     console.warn("Got unexpected first message (should be init-connection):", msg);
                     return;
@@ -713,9 +713,9 @@ function togetherjsMain() {
     }
 
     function addStyle() {
-        var existing = document.getElementById("togetherjs-stylesheet");
+        const existing = document.getElementById("togetherjs-stylesheet");
         if(!existing) {
-            var link = document.createElement("link");
+            const link = document.createElement("link");
             link.id = "togetherjs-stylesheet";
             link.setAttribute("rel", "stylesheet");
             link.href = baseUrl + styleSheet +
@@ -725,7 +725,7 @@ function togetherjsMain() {
     }
 
     function addScriptInner(url: string) {
-        var script = document.createElement("script");
+        const script = document.createElement("script");
         script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
@@ -733,7 +733,7 @@ function togetherjsMain() {
     let baseUrl = baseUrl1Inner();
     defaultConfiguration.baseUrl = baseUrl;
 
-    let baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
+    const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride: TogetherJSNS.BaseUrlOverride | null;
     if(baseUrlOverrideString) {
         try {
@@ -748,14 +748,14 @@ function togetherjsMain() {
         }
         else {
             baseUrl = baseUrlOverride.baseUrl;
-            let logger = console.warn || console.log;
+            const logger = console.warn || console.log;
             logger.call(console, "Using TogetherJS baseUrlOverride:", baseUrl);
             logger.call(console, "To undo run: localStorage.removeItem('togetherjs.baseUrlOverride')");
         }
     }
 
     function copyConfigInWindow(configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null) {
-        let shownAny = false;
+        const shownAny = false;
         for(const _attr in configOverride) {
             const attr = _attr as keyof typeof configOverride;
             if(!configOverride.hasOwnProperty(attr)) {
@@ -773,7 +773,7 @@ function togetherjsMain() {
         }
     }
 
-    let configOverrideString = localStorage.getItem("togetherjs.configOverride");
+    const configOverrideString = localStorage.getItem("togetherjs.configOverride");
     let configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null;
     if(configOverrideString) {
         try {
@@ -803,9 +803,9 @@ function togetherjsMain() {
     polyfillConsole();
 
     if(!baseUrl) {
-        let scripts = document.getElementsByTagName("script");
+        const scripts = document.getElementsByTagName("script");
         for(let i = 0; i < scripts.length; i++) {
-            let src = scripts[i].src;
+            const src = scripts[i].src;
             if(src && src.search(/togetherjs(-min)?.js(\?.*)?$/) !== -1) {
                 baseUrl = src.replace(/\/*togetherjs(-min)?.js(\?.*)?$/, "");
                 console.warn("Detected baseUrl as", baseUrl);
@@ -887,12 +887,12 @@ function togetherjsMain() {
 
     // It's nice to replace this early, before the load event fires, so we conflict
     // as little as possible with the app we are embedded in:
-    let hash = location.hash.replace(/^#/, "");
-    let m = /&?togetherjs=([^&]*)/.exec(hash);
+    const hash = location.hash.replace(/^#/, "");
+    const m = /&?togetherjs=([^&]*)/.exec(hash);
     if(m) {
         tjsInstance.startup._joinShareId = m[1];
         tjsInstance.startup.reason = "joined";
-        let newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
+        const newHash = hash.substr(0, m.index) + hash.substr(m.index + m[0].length);
         location.hash = newHash;
     }
     if(window._TogetherJSShareId) {
@@ -936,10 +936,10 @@ function togetherjsMain() {
         }
         else {
             // FIXME: this doesn't respect storagePrefix:
-            let key = "togetherjs-session.status";
-            let valueString = sessionStorage.getItem(key);
+            const key = "togetherjs-session.status";
+            const valueString = sessionStorage.getItem(key);
             if(valueString) {
-                let value = JSON.parse(valueString) as TogetherJSNS.TogetherJS;
+                const value = JSON.parse(valueString) as TogetherJSNS.TogetherJS;
                 if(value && value.running) {
                     tjsInstance.startup.continued = true;
                     tjsInstance.startup.reason = value.startupReason;

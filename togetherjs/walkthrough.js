@@ -10,18 +10,18 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     exports.walkthrough = exports.Walkthrough = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function walkthroughMain(util: TogetherJSNS.Util, ui: TogetherJSNS.Ui, $: JQueryStatic, windowing: TogetherJSNS.Windowing, templates: TogetherJSNS.Templates, templating: TogetherJSNS.Templating, session: TogetherJSNS.Session, peers: TogetherJSNS.Peers) {
-    let assert = util_1.util.assert.bind(util_1.util);
+    const assert = util_1.util.assert.bind(util_1.util);
     let onHideAll = null;
     let container; // TODO init
     let slides; // TODO init
     function show(index) {
         slides.hide();
         jquery_1.default(slides[index]).show();
-        var bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
+        const bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
         bullets.removeClass("togetherjs-active");
         jquery_1.default(bullets[index]).addClass("togetherjs-active");
-        var $next = jquery_1.default("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
-        var $previous = jquery_1.default("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
+        const $next = jquery_1.default("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+        const $previous = jquery_1.default("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
         if (index == slides.length - 1) {
             $next.addClass("togetherjs-disabled");
         }
@@ -30,7 +30,7 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
         }
     }
     function previous() {
-        var index = getIndex();
+        let index = getIndex();
         index--;
         if (index < 0) {
             index = 0;
@@ -38,7 +38,7 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
         show(index);
     }
     function next() {
-        var index = getIndex();
+        let index = getIndex();
         index++;
         if (index >= slides.length) {
             index = slides.length - 1;
@@ -46,11 +46,11 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
         show(index);
     }
     function getIndex() {
-        var active = slides.filter(":visible");
+        const active = slides.filter(":visible");
         if (!active.length) {
             return 0;
         }
-        for (var i = 0; i < slides.length; i++) {
+        for (let i = 0; i < slides.length; i++) {
             if (slides[i] == active[0]) {
                 return i;
             }
@@ -65,9 +65,9 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
                 ui_1.ui.container.append(container);
                 slides = container.find(".togetherjs-walkthrough-slide");
                 slides.hide();
-                var progress = jquery_1.default("#togetherjs-walkthrough-progress");
+                const progress = jquery_1.default("#togetherjs-walkthrough-progress");
                 slides.each(function (index) {
-                    var bullet = templating_1.templating.sub("walkthrough-slide-progress", {});
+                    const bullet = templating_1.templating.sub("walkthrough-slide-progress", {});
                     progress.append(bullet);
                     bullet.click(function () {
                         show(index);
@@ -77,11 +77,11 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
                 container.find("#togetherjs-walkthrough-next").click(next);
                 ui_1.ui.prepareShareLink(container);
                 container.find(".togetherjs-self-name").bind("keyup", function (event) {
-                    var val = jquery_1.default(event.target).val();
+                    const val = jquery_1.default(event.target).val();
                     peers_1.peers.Self.update({ name: val });
                 });
                 container.find(".togetherjs-swatch").click(function () {
-                    var picker = jquery_1.default("#togetherjs-pick-color");
+                    const picker = jquery_1.default("#togetherjs-pick-color");
                     if (picker.is(":visible")) {
                         picker.hide();
                         return;
@@ -89,7 +89,7 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
                     picker.show();
                     picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
                     picker.find(".togetherjs-swatch[data-color=\"" + peers_1.peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
-                    var location = container.find(".togetherjs-swatch").offset(); // TODO !
+                    const location = container.find(".togetherjs-swatch").offset(); // TODO !
                     picker.css({
                         top: location.top,
                         // The -7 comes out of thin air, but puts it in the right place:

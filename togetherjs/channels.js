@@ -345,8 +345,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.emit("close");
         }
         onclose() { }
-    }
-    ; // /PostMessageIncomingChannel
+    } // /PostMessageIncomingChannel
     class Router extends OnClass {
         constructor(channel) {
             super();
