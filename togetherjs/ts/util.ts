@@ -150,7 +150,7 @@ export class Util {
                 deferred.reject(e);
                 throw e;
             }
-            if(result && "then" in result) {
+            if(result && result.then) {
                 result.then(function(this: This) {
                     deferred.resolveWith(this, args);
                 }, function(this: This) {

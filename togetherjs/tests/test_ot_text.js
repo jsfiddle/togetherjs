@@ -9,8 +9,8 @@ generator.defaultChars = "XYZ/_ ";
 function run() {
   var base = "abcdefg";
   console.log("Start:", JSON.stringify(base) + "/" + base.length);
-  var delta1 = ot.ot.TextReplace.random(base, generator);
-  var delta2 = ot.ot.TextReplace.random(base, generator);
+  var delta1 = ot.TextReplace.random(base, generator);
+  var delta2 = ot.TextReplace.random(base, generator);
   console.log("Delta1:", delta1+"");
   console.log("Delta2:", delta2+"");
   var sub1 = delta1.transpose(delta2);
@@ -41,7 +41,7 @@ function run() {
 // =SECTION Simple Test Setup expand-on-failure
 
 function r(start, length, text) {
-  return new ot.ot.TextReplace(start, length, text);
+  return new ot.TextReplace(start, length, text);
 }
 
 function trans(text, d1, d2) {
@@ -273,9 +273,9 @@ print("done.");
 function runTp2() {
   var base = "abcdefg";
   console.log("Start:", JSON.stringify(base) + "/" + base.length);
-  var deltaFirst = ot.ot.TextReplace.random(base, generator);
-  var delta1 = ot.ot.TextReplace.random(base, generator);
-  var delta2 = ot.ot.TextReplace.random(base, generator);
+  var deltaFirst = ot.TextReplace.random(base, generator);
+  var delta1 = ot.TextReplace.random(base, generator);
+  var delta2 = ot.TextReplace.random(base, generator);
   console.log("Delta First:", deltaFirst+"");
   console.log("Delta1:", delta1+"");
   console.log("Delta2:", delta2+"");

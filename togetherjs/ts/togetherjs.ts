@@ -131,7 +131,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<voi
 // eslint-disable-next-line no-constant-condition
 let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
-const TogetherJS: TogetherJSNS.TogetherJSClass = togetherjsMain();
+var TogetherJS: TogetherJSNS.TogetherJSClass = togetherjsMain();
 
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";

@@ -136,7 +136,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     deferred.reject(e);
                     throw e;
                 }
-                if (result && "then" in result) {
+                if (result && result.then) {
                     result.then(function () {
                         deferred.resolveWith(this, args);
                     }, function () {
