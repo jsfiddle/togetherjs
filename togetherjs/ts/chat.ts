@@ -405,10 +405,9 @@ session.once("ui-ready", function() {
         }
         for(let i = 0; i < log.length; i++) {
             // peers should already be loaded from sessionStorage by the peers module
-            const currentPeer = peers.getPeer(log[i].peerId, undefined, true);
+            const currentPeer = peers.getPeer(log[i].peerId, undefined);
             if(!currentPeer) {
-                // sometimes peers go away
-                continue;
+                continue; // sometimes peers go away
             }
             ui.chat.text({
                 text: log[i].text,

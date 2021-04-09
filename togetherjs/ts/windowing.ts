@@ -9,7 +9,7 @@ import $ from "jquery";
 interface ShowOptions {
     /** Selector or Element */
     bind: string | JQuery;
-    onClose: null | (() => any);
+    onClose: null | (() => void);
 }
 
 //function windowingMain($: JQueryStatic, util: TogetherJSNS.Util, _peers: TogetherJSNS.Peers, session: TogetherJSNS.Session) {
@@ -17,11 +17,31 @@ const assert: typeof util.assert = util.assert.bind(util);
 const $window = $(window);
 // This is also in togetherjs.less, under .togetherjs-animated
 const ANIMATION_DURATION = 1000;
-let onClose: null | (() => any) = null;
+let onClose: null | (() => void) = null;
+
+class ModalEscape {
+    constructor(private windowing: Windowing) { }
+    bind() {
+        $(document).keydown(this.onKeydown);
+    }
+    unbind() {
+        $(document).unbind("keydown", this.onKeydown);
+    }
+    onKeydown(event: JQueryEventObject) {
+        if(event.which == 27) {
+            this.windowing.hide();
+        }
+    }
+}
+
 /* Displays one window.  A window must already exist.  This hides other windows, and
     positions the window according to its data-bound-to attributes */
 export class Windowing {
-    show(el: HTMLElement | JQuery | string, options: Partial<ShowOptions> = {}) {
+    public readonly modalEscape: ModalEscape;
+    constructor() {
+        this.modalEscape = new ModalEscape(this);
+    }
+    show(el: HTMLElement | JQuery | string, options: Partial<ShowOptions> = {}): void {
         const element = $(el);
         options.bind = options.bind || element.attr("data-bind-to");
         const notification = element.hasClass("togetherjs-notification");
@@ -47,13 +67,13 @@ export class Windowing {
         }
         if(modal) {
             getModalBackground().show();
-            modalEscape.bind();
+            this.modalEscape.bind();
         }
         onClose = options.onClose || null;
         session.emit("display-window", element.attr("id"), element);
     }
 
-    hide(selector: string | JQuery = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification") {
+    hide(selector: string | JQuery = ".togetherjs-window, .togetherjs-modal, .togetherjs-notification"): void {
         // FIXME: also hide modals?
         let els = $(selector);
         els = els.filter(":visible");
@@ -90,7 +110,7 @@ export class Windowing {
         }
     }
 
-    toggle(el: HTMLElement | string) {
+    toggle(el: HTMLElement | string): void {
         const element = $(el);
         if(element.is(":visible")) {
             this.hide(element);
@@ -203,24 +223,8 @@ function getModalBackground() {
     return background;
 }
 
-class ModalEscape {
-    bind() {
-        $(document).keydown(this.onKeydown);
-    }
-    unbind() {
-        $(document).unbind("keydown", this.onKeydown);
-    }
-    onKeydown(event: JQueryEventObject) {
-        if(event.which == 27) {
-            windowing.hide();
-        }
-    }
-}
-
-const modalEscape = new ModalEscape();
-
 session.on("close", function() {
-    modalEscape.unbind();
+    windowing.modalEscape.unbind();
 });
 
 session.on("new-element", function(el) {

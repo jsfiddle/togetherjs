@@ -2,6 +2,19 @@ TogetherJSTestSpy = {};
 
 var Test = {};
 
+function extend(base, extensions) {
+  if(!extensions) {
+      extensions = base;
+      base = {};
+  }
+  for(const a in extensions) {
+      if(Object.prototype.hasOwnProperty.call(extensions, a)) {
+          base[a] = extensions[a];
+      }
+  }
+  return base;
+}
+
 /* Loads the modules that are listed as individual arguments, and adds
    them to the global scope.  Blocks on the loading.  Use like:
 
@@ -61,7 +74,7 @@ Test.require = function () {
     console.log("require.js already loaded; configuring");
     loadModules();
   } else {
-    window.require = TogetherJS._extend(TogetherJS.requireConfig);
+    window.require = extend(TogetherJS.requireConfig);
     window.require.callback = function () {
       TogetherJS.require = require.config({context: "togetherjs"});
       loadModules();
@@ -92,7 +105,7 @@ Test.viewSend = function () {
     if (Test.viewSend.running && Test.IGNORE_MESSAGES.indexOf(msg.type) == -1) {
       if (typeof print == "function") {
         print("send:", msg.type);
-        var shortMsg = TogetherJS._extend(msg);
+        var shortMsg = extend(msg);
         delete shortMsg.type;
         var r = repr(shortMsg, undefined, 10);
         r = "  " + r.replace(/^\{\s+/, "");
@@ -229,7 +242,7 @@ Test.newPeer = function (options) {
 };
 
 Test.waitEvent = function (context, event, options) {
-  var ops = TogetherJS._extend({wait: true, ignoreThis: true}, options);
+  var ops = extend({wait: true, ignoreThis: true}, options);
   context.once(event, Spy(event, ops));
 };
 

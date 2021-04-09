@@ -15,9 +15,28 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     // This is also in togetherjs.less, under .togetherjs-animated
     const ANIMATION_DURATION = 1000;
     let onClose = null;
+    class ModalEscape {
+        constructor(windowing) {
+            this.windowing = windowing;
+        }
+        bind() {
+            jquery_1.default(document).keydown(this.onKeydown);
+        }
+        unbind() {
+            jquery_1.default(document).unbind("keydown", this.onKeydown);
+        }
+        onKeydown(event) {
+            if (event.which == 27) {
+                this.windowing.hide();
+            }
+        }
+    }
     /* Displays one window.  A window must already exist.  This hides other windows, and
         positions the window according to its data-bound-to attributes */
     class Windowing {
+        constructor() {
+            this.modalEscape = new ModalEscape(this);
+        }
         show(el, options = {}) {
             const element = jquery_1.default(el);
             options.bind = options.bind || element.attr("data-bind-to");
@@ -44,7 +63,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
             }
             if (modal) {
                 getModalBackground().show();
-                modalEscape.bind();
+                this.modalEscape.bind();
             }
             onClose = options.onClose || null;
             session_1.session.emit("display-window", element.attr("id"), element);
@@ -193,22 +212,8 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         });
         return background;
     }
-    class ModalEscape {
-        bind() {
-            jquery_1.default(document).keydown(this.onKeydown);
-        }
-        unbind() {
-            jquery_1.default(document).unbind("keydown", this.onKeydown);
-        }
-        onKeydown(event) {
-            if (event.which == 27) {
-                exports.windowing.hide();
-            }
-        }
-    }
-    const modalEscape = new ModalEscape();
     session_1.session.on("close", function () {
-        modalEscape.unbind();
+        exports.windowing.modalEscape.unbind();
     });
     session_1.session.on("new-element", function (el) {
         bindEvents(el);

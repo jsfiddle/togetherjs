@@ -18,33 +18,34 @@ class AssertionError extends Error {
 export class Util {
     public Deferred;
     AssertionError: typeof AssertionError;
-    Class!: (superClass: Object, prototype?: Object) => any;
 
     public constructor() {
         this.Deferred = $.Deferred;
         this.AssertionError = AssertionError;
     }
 
-    public forEachAttr<T extends object>(obj: T, callback: (o: T[keyof T], k: keyof T) => void, context?: unknown) {
+    // TODO uses of forEachAttr could often be replaced by a loop
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    public forEachAttr<T extends object>(obj: T, callback: (o: T[keyof T], k: keyof T) => void, context?: unknown): void {
         context = context || obj;
         let a: keyof typeof obj;
         for(a in obj) {
-            if(obj.hasOwnProperty(a)) {
+            if(Object.prototype.hasOwnProperty.call(obj, a)) {
                 callback.call(context, obj[a], a);
             }
         }
     }
 
-    public trim(s: string) {
+    public trim(s: string): string {
         return s.replace(/^\s+/, "").replace(/\s+$/, "");
     }
 
-    public safeClassName(name: string) {
-        return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
+    public safeClassName(name: string): string {
+        return name.replace(/[^a-zA-Z0-9_-]/g, "_") || "class";
     }
 
-    public assert(nullable: any, ...args: any): asserts nullable;
-    public assert(cond: boolean, ...args: any): asserts cond is true {
+    public assert(nullable: unknown, ...args: any[]): asserts nullable;
+    public assert(cond: boolean, ...args: any[]): asserts cond is true {
         if(!cond) {
             const args2 = ["Assertion error:"].concat(args);
             console.error.apply(console, args2);
@@ -56,7 +57,7 @@ export class Util {
     }
 
     /** Generates a random ID */
-    public generateId(length = 10) {
+    public generateId(length = 10): string {
         const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
         let s = '';
         for(let i = 0; i < length; i++) {
@@ -65,11 +66,11 @@ export class Util {
         return s;
     }
 
-    public pickRandom<T>(array: T[]) {
+    public pickRandom<T>(array: T[]): T {
         return array[Math.floor(Math.random() * array.length)];
     }
 
-    public blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string) {
+    public blobToBase64(blob: ArrayLike<number> | ArrayBufferLike | string): string {
         // TODO
         // Oh this is just terrible
         let binary = '';
@@ -88,12 +89,12 @@ export class Util {
         return btoa(binary);
     }
 
-    public truncateCommonDomain(url: string, base?: string) {
+    public truncateCommonDomain(url: string, base?: string): string {
         /* Remove the scheme and domain from url, if it matches the scheme and domain of base */
         if(!base) {
             return url;
         }
-        const regex = /^https?:\/\/[^\/]*/i;
+        const regex = /^https?:\/\/[^/]*/i;
         const match = regex.exec(url);
         const matchBase = regex.exec(base);
         if(match && matchBase && match[0] == matchBase[0]) {
@@ -103,28 +104,28 @@ export class Util {
         return url;
     }
 
-    public makeUrlAbsolute(url: string, base: string) {
+    public makeUrlAbsolute(url: string, base: string): string {
         if(url.search(/^(http|https|ws|wss):/i) === 0) {
             // Absolute URL
             return url;
         }
-        if(url.search(/^\/\/[^\/]/) === 0) {
+        if(url.search(/^\/\/[^/]/) === 0) {
             const scheme = (/^(http|https|ws|wss):/i).exec(base);
             this.assert(scheme, "No scheme on base URL", base);
             return scheme[1] + ":" + url;
         }
         if(url.search(/^\//) === 0) {
-            const domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
+            const domain = (/^(http|https|ws|wss):\/\/[^/]+/i).exec(base);
             this.assert(domain, "No scheme/domain on base URL", base);
             return domain[0] + url;
         }
-        const last = (/[^\/]+$/).exec(base);
+        const last = (/[^/]+$/).exec(base);
         this.assert(last, "Does not appear to be a URL?", base);
         const lastBase = base.substr(0, last.index);
         return lastBase + url;
     }
 
-    public assertValidUrl(url: string) {
+    public assertValidUrl(url: string): void {
         /* This does some simple assertions that the url is valid:
         - it must be a string
         - it must be http(s)://... or data:...
@@ -133,14 +134,14 @@ export class Util {
         this.assert(typeof url == "string", "URLs must be a string:", url);
         this.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0,
             "URL must have an http, https, data, or // scheme:", url);
-        this.assert(url.search(/[\)\'\"\ ]/) === -1,
+        this.assert(url.search(/[)'" ]/) === -1,
             "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
     }
 
-    public resolver<T>(deferred: JQueryDeferred<T>, func: (this: any, ...args: any[]) => any) {
+    public resolver<T, This>(deferred: JQueryDeferred<T>, func: (this: This, ...args: any[]) => (Promise<T> | T)): (this: This, ...args: any[]) => void {
         this.assert(deferred.then, "Bad deferred:", deferred);
         this.assert(typeof func == "function", "Not a function:", func);
-        return function(this: any, ...args: any[]) {
+        return function(this: This, ...args: any[]) {
             let result;
             try {
                 result = func.apply(this, args);
@@ -149,10 +150,10 @@ export class Util {
                 deferred.reject(e);
                 throw e;
             }
-            if(result && result.then) {
-                result.then(function(this: any) {
+            if(result && "then" in result) {
+                result.then(function(this: This) {
                     deferred.resolveWith(this, args);
-                }, function(this: any) {
+                }, function(this: This) {
                     deferred.rejectWith(this, args);
                 });
                 // FIXME: doesn't pass progress through
@@ -167,13 +168,15 @@ export class Util {
         };
     }
 
+    // TODO this function accepts null value but it shouldn't
     /** Detects if a value is a promise. Right now the presence of a `.then()` method is the best we can do. */
-    public isPromise<T>(obj: any): obj is Promise<T> {
-        return typeof obj == "object" && "then" in obj;
+    public isPromise<T>(obj: unknown): obj is Promise<T> {
+        return typeof obj == "object" && obj != null && "then" in obj;
     }
 
+    // TODO this function seems to never been used (even in tests)
     /** Makes a value into a promise, by returning an already-resolved promise if a non-promise objectx is given. */
-    public makePromise<T>(obj: T) {
+    public makePromise<T>(obj: T): (T & Promise<unknown>) | JQueryDeferred<unknown> {
         if(this.isPromise(obj)) {
             return obj;
         }
@@ -195,6 +198,7 @@ export class Util {
             // ...
         }
     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public resolveMany<T extends readonly any[]>(defs: { [I in keyof T]: JQueryDeferred<T[I]> }): JQueryDeferred<T> {
         return this.Deferred<T>(function(def) {
             let count = defs.length;
@@ -202,6 +206,7 @@ export class Util {
                 def.resolve();
                 return;
             }
+            // eslint-disable-next-line no-use-before-define
             const allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };
             let anyError = false;
             defs.forEach(function(arg, index) {
@@ -232,7 +237,7 @@ export class Util {
         });
     }
 
-    public readFileImage(file: File) {
+    public readFileImage(file: File): JQueryDeferred<string> {
         return this.Deferred(function(def: JQueryDeferred<string>) {
             const reader = new FileReader();
             reader.onload = function() {
@@ -247,7 +252,7 @@ export class Util {
         });
     }
 
-    public matchElement(el: HTMLElement | JQuery, selector?: string | boolean) {
+    public matchElement(el: HTMLElement | JQuery, selector?: string | boolean): boolean {
         if(selector === true || !selector) {
             return !!selector;
         }
@@ -262,7 +267,7 @@ export class Util {
     }
 
     // TODO what ???
-    public testExpose(objs: object) {
+    public testExpose(objs: Record<string, unknown>): void {
         const tsjTestSpy = window.TogetherJSTestSpy;
         if(!tsjTestSpy) {
             return;

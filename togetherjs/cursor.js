@@ -213,7 +213,6 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
     }
     Cursor._cursors = {};
-    // TODO weird class, investigate
     function getClient(clientId) {
         return Cursor.getClient(clientId);
     }

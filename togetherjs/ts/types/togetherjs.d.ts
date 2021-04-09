@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+// TODO we disable this in this file since it's only types
+/* eslint-disable no-use-before-define */
+
 import type { linkify } from "linkify";
 import type { Analytics as AnalyticsType } from "../analytics";
 import type { WebSocketChannel as WebSocketChannelType } from "../channels";
@@ -660,7 +664,7 @@ declare global {
             /** Append cache-busting queries (useful for development!) */
             cacheBust: boolean,
             /** Any events to bind to */
-            on: {},
+            on: Ons<unknown>,
             /** Hub events to bind to */
             hub_on: { [name: string]: CallbackForOn<unknown> },
             /** Enables the alt-T alt-T TogetherJS shortcut; however, this setting must be enabled early as TogetherJSConfig_enableShortcut = true; */
@@ -822,6 +826,8 @@ declare global {
             basis?: number; // TODO seems to be unused
         }
 
+        // TODO T is unused, it should probably be T extends any[]
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         interface CallbackForOn<T> {
             (...args: any[]): void;
         }
@@ -1030,8 +1036,8 @@ declare global {
         onYouTubeIframeAPIReady: typeof onYouTubeIframeAPIReady;
     }
 
-    var CKEDITOR: TogetherJSNS.CKEditor | undefined;
-    var tinymce: TogetherJSNS.Tinymce | undefined;
+    const CKEDITOR: TogetherJSNS.CKEditor | undefined;
+    const tinymce: TogetherJSNS.Tinymce | undefined;
 
     // Only in ES6 apparently
     interface Function {
@@ -1063,7 +1069,7 @@ declare global {
 
     // TODO the code using this in ui.ts should probably be removed since it does not work
     type MozActivity = any;
-    var MozActivity: MozActivity;
+    const MozActivity: MozActivity;
 
     /** These typings are to avoid "as typeof import" casts, and errors that could go with them, everytime an import is made */
     interface Require {

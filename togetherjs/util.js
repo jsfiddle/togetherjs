@@ -23,11 +23,13 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             this.Deferred = jquery_1.default.Deferred;
             this.AssertionError = AssertionError;
         }
+        // TODO uses of forEachAttr could often be replaced by a loop
+        // eslint-disable-next-line @typescript-eslint/ban-types
         forEachAttr(obj, callback, context) {
             context = context || obj;
             let a;
             for (a in obj) {
-                if (obj.hasOwnProperty(a)) {
+                if (Object.prototype.hasOwnProperty.call(obj, a)) {
                     callback.call(context, obj[a], a);
                 }
             }
@@ -36,7 +38,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             return s.replace(/^\s+/, "").replace(/\s+$/, "");
         }
         safeClassName(name) {
-            return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
+            return name.replace(/[^a-zA-Z0-9_-]/g, "_") || "class";
         }
         assert(cond, ...args) {
             if (!cond) {
@@ -83,7 +85,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             if (!base) {
                 return url;
             }
-            const regex = /^https?:\/\/[^\/]*/i;
+            const regex = /^https?:\/\/[^/]*/i;
             const match = regex.exec(url);
             const matchBase = regex.exec(base);
             if (match && matchBase && match[0] == matchBase[0]) {
@@ -97,17 +99,17 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 // Absolute URL
                 return url;
             }
-            if (url.search(/^\/\/[^\/]/) === 0) {
+            if (url.search(/^\/\/[^/]/) === 0) {
                 const scheme = (/^(http|https|ws|wss):/i).exec(base);
                 this.assert(scheme, "No scheme on base URL", base);
                 return scheme[1] + ":" + url;
             }
             if (url.search(/^\//) === 0) {
-                const domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
+                const domain = (/^(http|https|ws|wss):\/\/[^/]+/i).exec(base);
                 this.assert(domain, "No scheme/domain on base URL", base);
                 return domain[0] + url;
             }
-            const last = (/[^\/]+$/).exec(base);
+            const last = (/[^/]+$/).exec(base);
             this.assert(last, "Does not appear to be a URL?", base);
             const lastBase = base.substr(0, last.index);
             return lastBase + url;
@@ -120,7 +122,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
             */
             this.assert(typeof url == "string", "URLs must be a string:", url);
             this.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0, "URL must have an http, https, data, or // scheme:", url);
-            this.assert(url.search(/[\)\'\"\ ]/) === -1, "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
+            this.assert(url.search(/[)'" ]/) === -1, "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
         }
         resolver(deferred, func) {
             this.assert(deferred.then, "Bad deferred:", deferred);
@@ -134,7 +136,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     deferred.reject(e);
                     throw e;
                 }
-                if (result && result.then) {
+                if (result && "then" in result) {
                     result.then(function () {
                         deferred.resolveWith(this, args);
                     }, function () {
@@ -151,10 +153,12 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 return result;
             };
         }
+        // TODO this function accepts null value but it shouldn't
         /** Detects if a value is a promise. Right now the presence of a `.then()` method is the best we can do. */
         isPromise(obj) {
-            return typeof obj == "object" && "then" in obj;
+            return typeof obj == "object" && obj != null && "then" in obj;
         }
+        // TODO this function seems to never been used (even in tests)
         /** Makes a value into a promise, by returning an already-resolved promise if a non-promise objectx is given. */
         makePromise(obj) {
             if (this.isPromise(obj)) {
@@ -177,6 +181,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 // ...
             }
         */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolveMany(defs) {
             return this.Deferred(function (def) {
                 let count = defs.length;
@@ -184,6 +189,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     def.resolve();
                     return;
                 }
+                // eslint-disable-next-line no-use-before-define
                 const allResults = [];
                 let anyError = false;
                 defs.forEach(function (arg, index) {

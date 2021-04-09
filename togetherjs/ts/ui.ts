@@ -32,16 +32,17 @@ const TEXTAREA_MAX_LINES = 5;
 let finishedAt: number | null = null;
 // Time in milliseconds for the dock to animate out:
 const DOCK_ANIMATION_TIME = 300;
-// If two chat messages come from the same person in this time
-// (milliseconds) then they are collapsed into one message:
+// If two chat messages come from the same person in this time (milliseconds) then they are collapsed into one message:
 const COLLAPSE_MESSAGE_LIMIT = 5000;
 
-const COLORS = [
-    "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
-    "#FFD700", "#F08080", "#90EE90", "#FF6347"];
+const COLORS = ["#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF", "#FFD700", "#F08080", "#90EE90", "#FF6347"];
 
-// This would be a circular import, but we just need the chat module sometime
-// after everything is loaded, and this is sure to complete by that time:
+// This is used for some signalling when ui.prepareUI and/or ui.activateUI is called before the DOM is fully loaded:
+let deferringPrepareUI: string | null = null;
+
+let setToolName = false;
+
+// This would be a circular import, but we just need the chat module sometime after everything is loaded, and this is sure to complete by that time:
 require(["chat"], function(chatModule) {
     chat = chatModule.chat;
 });
@@ -505,7 +506,6 @@ export class PeerView extends PeerSelfView {
             }
             else {
                 // reset
-
             }
 
             if(this.dockElement) {
@@ -626,7 +626,6 @@ export class Ui {
     be hidden when this element is shown. */
     displayToggle(elem: HTMLElement | string) {
         const el = $(elem);
-        assert(el.length, "No element", arguments[0]);
         const other = $(el.attr("data-toggles"));
         assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
         other.hide();
@@ -810,7 +809,7 @@ export class Ui {
         assert(anchor.length);
         // FIXME: This is in place to temporarily disable dock dragging:
         anchor = container.find("#togetherjs-dock-anchor-disabled");
-        anchor.mousedown(function(_event) {
+        anchor.mousedown(function() {
             const iface = $("#togetherjs-dock");
             // FIXME: switch to .offset() and pageX/Y
             let startPos: string | null = panelPosition();
@@ -1104,7 +1103,7 @@ export class Ui {
         // FIXME: Don't think this makes sense
         $(".togetherjs header.togetherjs-title").each(function(_index, item) {
             const button = $('<button class="togetherjs-minimize"></button>');
-            button.click(function(_event) {
+            button.click(function() {
                 const window = button.closest(".togetherjs-window");
                 windowing.hide(window);
             });
@@ -1157,13 +1156,13 @@ export class Ui {
         session.emit("new-element", this.container!); // TODO !
 
         if(finishedAt && finishedAt > Date.now()) {
-            setTimeout(function() {
+            setTimeout(() => {
                 finishedAt = null;
-                session.emit("ui-ready", ui);
+                session.emit("ui-ready", this);
             }, finishedAt - Date.now());
         }
         else {
-            session.emit("ui-ready", ui);
+            session.emit("ui-ready", this);
         }
 
     } // End ui.activateUI()
@@ -1266,10 +1265,7 @@ function panelPosition() {
 
 export const ui = new Ui();
 
-// This is used for some signalling when ui.prepareUI and/or
-// ui.activateUI is called before the DOM is fully loaded:
-let deferringPrepareUI: string | null = null;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function deferForContainer<A extends any[]>(func: (...args: A) => void) {
     /* Defers any calls to func() until after ui.container is set
         Function cannot have a return value (as sometimes the call will
@@ -1461,7 +1457,7 @@ session.on("close", function() {
     }
 });
 
-session.on("display-window", function(id, _win) {
+session.on("display-window", function(id) {
     if(id == "togetherjs-chat") {
         ui.chat.scroll();
         windowing.hide("#togetherjs-chat-notifier");
@@ -1511,7 +1507,7 @@ function refreshInvite() {
         function refresh(users: { [user: string]: TogetherJSNS.ExternalPeer }, finished: boolean) {
             const sorted: TogetherJSNS.ExternalPeer[] = [];
             for(const id in users) {
-                if(users.hasOwnProperty(id)) {
+                if(Object.prototype.hasOwnProperty.call(users, id)) {
                     sorted.push(users[id]);
                 }
             }
@@ -1556,8 +1552,8 @@ session.hub.on("invite", function(msg) {
     if(msg.forClientId && msg.clientId != peers.Self.id) {
         return;
     }
-    require(["who"], function({ who }) {
-        const peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
+    require(["who"], function(whoModule) {
+        const peer = new whoModule.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
         ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
     });
 });
@@ -1585,8 +1581,6 @@ session.on("new-element", function(el) {
         ui.updateToolName(el);
     }
 });
-
-let setToolName = false;
 
 TogetherJS.config.track("toolName", function() {
     ui.updateToolName(ui.container);

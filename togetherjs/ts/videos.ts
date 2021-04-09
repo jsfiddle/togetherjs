@@ -8,7 +8,7 @@ import $ from "jquery";
 
 interface Listener {
     name: string,
-    listener: (eventObject: JQueryEventObject, ...args: any[]) => any,
+    listener: (eventObject: JQueryEventObject, ...args: any[]) => void,
 }
 
 interface Options {

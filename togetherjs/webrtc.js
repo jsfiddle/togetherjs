@@ -80,6 +80,15 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
      * getUserMedia Avatar support
      */
     session_1.session.on("ui-ready", function () {
+        let avatarData;
+        const $preview = jquery_1.default("#togetherjs-self-avatar-preview");
+        const $accept = jquery_1.default("#togetherjs-self-avatar-accept");
+        const $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
+        const $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
+        const $video = jquery_1.default("#togetherjs-avatar-video");
+        const video0 = $video[0];
+        const $upload = jquery_1.default("#togetherjs-avatar-upload");
+        let streaming = false;
         jquery_1.default("#togetherjs-self-avatar").click(function () {
             const avatar = peers_1.peers.Self.avatar;
             if (avatar) {
@@ -90,14 +99,6 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
         if (!session_1.session.RTCSupported) {
             jquery_1.default("#togetherjs-avatar-edit-rtc").hide();
         }
-        let avatarData;
-        const $preview = jquery_1.default("#togetherjs-self-avatar-preview");
-        const $accept = jquery_1.default("#togetherjs-self-avatar-accept");
-        const $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
-        const $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
-        const $video = jquery_1.default("#togetherjs-avatar-video");
-        const video0 = $video[0];
-        const $upload = jquery_1.default("#togetherjs-avatar-upload");
         $takePic.click(function () {
             if (!streaming) {
                 startStreaming();
@@ -122,7 +123,6 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             // FIXME: like above:
             jquery_1.default("#togetherjs-participants-other").show();
         });
-        var streaming = false;
         function startStreaming() {
             getUserMedia({
                 video: true,
@@ -261,13 +261,11 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
                     s += a;
                 }
                 else {
-                    var repl;
+                    let repl;
                     try {
                         repl = JSON.stringify(a);
                     }
                     catch (e) {
-                    }
-                    if (!repl) {
                         repl = "" + a;
                     }
                     s += repl;
@@ -498,7 +496,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
                 addIceCandidate();
             }
         });
-        session_1.session.hub.on("rtc-abort", function (_msg) {
+        session_1.session.hub.on("rtc-abort", function () {
             abort();
             if (!accepted) {
                 return;
@@ -512,10 +510,8 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
                 connect();
             }
         });
-        session_1.session.hub.on("hello", function (_msg) {
-            // FIXME: displayToggle should be set due to
-            // _connection.onstatechange, but that's not working, so
-            // instead:
+        session_1.session.hub.on("hello", function () {
+            // FIXME: displayToggle should be set due to _connection.onstatechange, but that's not working, so instead:
             audioButton("#togetherjs-audio-ready");
             if (accepted && (offerSent || answerSent)) {
                 abort();

@@ -239,7 +239,6 @@ class Cursor {
     }
 }
 
-// TODO weird class, investigate
 export function getClient(clientId: string): Cursor {
     return Cursor.getClient(clientId);
 }

@@ -26,8 +26,8 @@ export class Randomizer {
 
     pickDist(items: number[]) {
         let total = 0;
-        for(var a in items) {
-            if(!items.hasOwnProperty(a)) {
+        for(const a in items) {
+            if(!Object.prototype.hasOwnProperty.call(items, a)) {
                 continue;
             }
             if(typeof items[a] != "number") {
@@ -37,8 +37,8 @@ export class Randomizer {
         }
         let num = this.number(total);
         let last;
-        for(a in items) {
-            if(!items.hasOwnProperty(a)) {
+        for(const a in items) {
+            if(!Object.prototype.hasOwnProperty.call(items, a)) {
                 continue;
             }
             last = a;

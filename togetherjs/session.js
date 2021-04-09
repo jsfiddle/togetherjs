@@ -21,6 +21,29 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     let channel = null;
     // This is the key we use for localStorage:
     //var localStoragePrefix = "togetherjs."; // TODO not used
+    /****************************************
+     * URLs
+     */
+    const includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
+    TogetherJS.config.close("includeHashInUrl");
+    let currentUrl = (location.href + "").replace(/#.*$/, "");
+    if (includeHashInUrl) {
+        currentUrl = location.href;
+    }
+    /****************************************
+     * Message handling/dispatching
+     */
+    let IGNORE_MESSAGES = TogetherJS.config.get("ignoreMessages");
+    if (IGNORE_MESSAGES === true) {
+        DEBUG = false;
+        IGNORE_MESSAGES = [];
+    }
+    // These are messages sent by clients who aren't "part" of the TogetherJS session:
+    const MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
+    // We ignore incoming messages from the channel until this is true:
+    let readyForMessages = false;
+    // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
+    const features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     class Session extends OnClass {
         constructor() {
             super(...arguments);
@@ -75,7 +98,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                 console.info("Send:", msg);
             }
             const msg2 = msg;
-            msg2.clientId = exports.session.clientId; // TODO !
+            msg2.clientId = this.clientId; // TODO !
             channel.send(msg2); // TODO !
         }
         appSend(msg) {
@@ -87,7 +110,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                 msg.type = `app.${type}`;
             }
             msg.type = type;
-            exports.session.send(msg); // TODO cast
+            this.send(msg); // TODO cast
         }
         makeHelloMessage(helloBack) {
             let starting = false;
@@ -100,18 +123,18 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
                     color: peers.Self.color || "",
-                    url: exports.session.currentUrl(),
+                    url: this.currentUrl(),
                     urlHash: location.hash,
                     // FIXME: titles update, we should track those changes:
                     title: document.title,
-                    rtcSupported: !!exports.session.RTCSupported,
-                    isClient: exports.session.isClient,
+                    rtcSupported: !!this.RTCSupported,
+                    isClient: this.isClient,
                     starting: starting,
                     identityId: peers.Self.identityId,
                     status: peers.Self.status,
                 };
                 // This is a chance for other modules to effect the hello message:
-                exports.session.emit("prepare-hello", msg);
+                this.emit("prepare-hello", msg);
                 return msg;
             }
             else {
@@ -120,37 +143,37 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                     name: peers.Self.name || peers.Self.defaultName,
                     avatar: peers.Self.avatar || "",
                     color: peers.Self.color || "",
-                    url: exports.session.currentUrl(),
+                    url: this.currentUrl(),
                     urlHash: location.hash,
                     // FIXME: titles update, we should track those changes:
                     title: document.title,
-                    rtcSupported: !!exports.session.RTCSupported,
-                    isClient: exports.session.isClient,
+                    rtcSupported: !!this.RTCSupported,
+                    isClient: this.isClient,
                     starting: starting,
                     clientVersion: TogetherJS.version
                 };
                 // This is a chance for other modules to effect the hello message:
-                exports.session.emit("prepare-hello", msg);
+                this.emit("prepare-hello", msg);
                 return msg;
             }
         }
         start() {
             initStartTarget();
-            initIdentityId().then(function () {
-                initShareId().then(function () {
+            initIdentityId().then(() => {
+                initShareId().then(() => {
                     readyForMessages = false;
                     openChannel();
-                    require(["ui"], function (uiModule) {
+                    require(["ui"], (uiModule) => {
                         const ui = uiModule.ui;
                         TogetherJS.running = true;
                         ui.prepareUI();
-                        require(features, function () {
-                            jquery_1.default(function () {
+                        require(features, () => {
+                            jquery_1.default(() => {
                                 const peersModule = require("peers");
                                 peers = peersModule.peers;
                                 const { startup } = require("startup");
-                                exports.session.emit("start");
-                                exports.session.once("ui-ready", function () {
+                                this.emit("start");
+                                this.once("ui-ready", function () {
                                     readyForMessages = true;
                                     startup.start();
                                 });
@@ -177,10 +200,10 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             if (reason) {
                 msg.reason = reason;
             }
-            exports.session.send(msg);
-            exports.session.emit("close");
+            this.send(msg);
+            this.emit("close");
             const name = window.name;
-            storage_1.storage.tab.get("status").then(function (saved) {
+            storage_1.storage.tab.get("status").then((saved) => {
                 if (!saved) {
                     console.warn("No session information saved in", "status." + name);
                 }
@@ -191,8 +214,8 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                 }
                 channel.close(); // TODO !
                 channel = null;
-                exports.session.shareId = null;
-                exports.session.emit("shareId");
+                this.shareId = null;
+                this.emit("shareId");
                 TogetherJS.emit("close");
                 TogetherJS._teardown();
             });
@@ -204,27 +227,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     exports.Session = Session;
     exports.session = new Session();
     //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
-    /****************************************
-     * URLs
-     */
-    var includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
-    TogetherJS.config.close("includeHashInUrl");
-    let currentUrl = (location.href + "").replace(/\#.*$/, "");
-    if (includeHashInUrl) {
-        currentUrl = location.href;
-    }
-    /****************************************
-     * Message handling/dispatching
-     */
-    var IGNORE_MESSAGES = TogetherJS.config.get("ignoreMessages");
-    if (IGNORE_MESSAGES === true) {
-        DEBUG = false;
-        IGNORE_MESSAGES = [];
-    }
-    // These are messages sent by clients who aren't "part" of the TogetherJS session:
-    const MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
-    // We ignore incoming messages from the channel until this is true:
-    var readyForMessages = false;
     function openChannel() {
         assert(!channel, "Attempt to re-open channel");
         console.info("Connecting to", exports.session.hubUrl(), location.href);
@@ -317,8 +319,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     /****************************************
      * Lifecycle (start and end)
      */
-    // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
-    var features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     function getRoomName(prefix, maxSize) {
         const hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase !== null && hubBase !== undefined); // TODO this assert was added, is it a good idea?

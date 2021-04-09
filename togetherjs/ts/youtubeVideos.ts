@@ -98,7 +98,8 @@ function prepareYouTube() {
             // if the iframe's unique id is already set, skip it
             // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
             // maybe we should set iframes everytime togetherjs is reinitialized?
-            let osrc = $(iframe).attr("src"), src = osrc;
+            const osrc = $(iframe).attr("src");
+            let src = osrc;
             if((src || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
                 $(iframe).attr("id", "youtube-player" + i);
                 $(iframe).attr("enablejsapi", 1);

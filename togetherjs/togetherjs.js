@@ -3,7 +3,6 @@
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-let TogetherJS;
 function clone(o) {
     return extend(o); // TODO all those casts!!!!!
 }
@@ -14,7 +13,7 @@ function extend(base, extensions) {
         base = {};
     }
     for (const a in extensions) {
-        if (extensions.hasOwnProperty(a)) {
+        if (Object.prototype.hasOwnProperty.call(extensions, a)) {
             base[a] = extensions[a];
         }
     }
@@ -22,7 +21,7 @@ function extend(base, extensions) {
 }
 class OnClass {
     constructor() {
-        this._listeners = {}; // TODO any
+        this._listeners = {};
         this.removeListener = this.off.bind(this); // TODO can be removed apparently
     }
     on(name, callback) {
@@ -116,37 +115,18 @@ class OnClass {
         return this; // TODO cast
     }
 }
-function baseUrl1() {
-    let baseUrl = "__baseUrl__";
-    if (baseUrl == "__" + "baseUrl__") {
-        // Reset the variable if it doesn't get substituted
-        baseUrl = "";
-    }
-    // Allow override of baseUrl (this is done separately because it needs
-    // to be done very early)
-    if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
-        baseUrl = window.TogetherJSConfig.baseUrl;
-    }
-    if (window.TogetherJSConfig_baseUrl) {
-        baseUrl = window.TogetherJSConfig_baseUrl;
-    }
-    return baseUrl;
-}
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
+// eslint-disable-next-line no-constant-condition
 let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
-const baseUrl = baseUrl1();
-const cacheBust = Date.now() + "";
-function addScript(url) {
-    const script = document.createElement("script");
-    script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
-    document.head.appendChild(script);
-}
+const TogetherJS = togetherjsMain();
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
+    let listener = null;
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
         if (typeof console == "undefined") {
+            // eslint-disable-next-line no-global-assign
             console = {};
         }
         if (!console.log) {
@@ -207,6 +187,15 @@ function togetherjsMain() {
         lang: undefined,
         fallbackLang: "en-US"
     };
+    let version = "unknown";
+    // FIXME: we could/should use a version from the checkout, at least for production
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
+        cacheBust = Date.now() + "";
+    }
+    else {
+        version = cacheBust;
+    }
     class ConfigClass {
         constructor(tjsInstance) {
             this.tjsInstance = tjsInstance;
@@ -227,20 +216,20 @@ function togetherjsMain() {
             let tracker;
             let attr;
             for (attr in settings) {
-                if (settings.hasOwnProperty(attr)) {
+                if (Object.prototype.hasOwnProperty.call(settings, attr)) {
                     if (this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
                         throw new Error("The configuration " + attr + " is finalized and cannot be changed");
                     }
                 }
             }
             for (attr in settings) {
-                if (!settings.hasOwnProperty(attr)) {
+                if (!Object.prototype.hasOwnProperty.call(settings, attr)) {
                     continue;
                 }
                 if (attr == "loaded" || attr == "callToStart") {
                     continue;
                 }
-                if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
+                if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, attr)) {
                     console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
                 }
                 const previous = this.tjsInstance._configuration[attr];
@@ -282,7 +271,7 @@ function togetherjsMain() {
             return this.getValueOrDefault(this.tjsInstance._configuration, name, this.tjsInstance._defaultConfiguration[name]);
         }
         track(name, callback) {
-            if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+            if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
             const v = this.tjsInstance.config.get(name);
@@ -295,7 +284,7 @@ function togetherjsMain() {
             return callback;
         }
         close(name) {
-            if (!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+            if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
             this.tjsInstance._configClosed[name] = true;
@@ -381,7 +370,7 @@ function togetherjsMain() {
                 }
                 else if (attr.indexOf("TogetherJSConfig_") === 0) {
                     attrName = attr.substr(("TogetherJSConfig_").length);
-                    this.config(attrName, window[attr]);
+                    this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
                 }
                 else if (attr.indexOf("TowTruckConfig_on_") === 0) {
                     attrName = attr.substr(("TowTruckConfig_on_").length);
@@ -391,7 +380,7 @@ function togetherjsMain() {
                 else if (attr.indexOf("TowTruckConfig_") === 0) {
                     attrName = attr.substr(("TowTruckConfig_").length);
                     console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
-                    this.config(attrName, window[attr]);
+                    this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
                 }
             }
             // FIXME: copy existing config?
@@ -399,7 +388,7 @@ function togetherjsMain() {
             // FIXME: close these configs?
             const ons = this.config.get("on") || {};
             for (attr in globalOns) {
-                if (globalOns.hasOwnProperty(attr)) {
+                if (Object.prototype.hasOwnProperty.call(globalOns, attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
                     ons[attr] = globalOns[attr];
                 }
@@ -411,7 +400,7 @@ function togetherjsMain() {
             const hubOns = this.config.get("hub_on");
             if (hubOns) {
                 for (attr in hubOns) {
-                    if (hubOns.hasOwnProperty(attr)) {
+                    if (Object.prototype.hasOwnProperty.call(hubOns, attr)) {
                         this.hub.on(attr, hubOns[attr]); // TODO check cast
                     }
                 }
@@ -476,7 +465,7 @@ function togetherjsMain() {
             this.config("lang", lang);
             const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            const callback = (_session, _jquery) => {
+            const callback = ( /*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
                 this._loaded = true;
                 if (!min) {
                     this.require = require.config({ context: "togetherjs" });
@@ -512,10 +501,6 @@ function togetherjsMain() {
                 addScriptInner("/libs/require.js");
             }
         }
-        /** Can also be used to clone an object */
-        _extend(base, extensions) {
-            return extend(base, extensions);
-        }
         _teardown() {
             const requireObject = this._requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
@@ -540,7 +525,7 @@ function togetherjsMain() {
         getConfig(name) {
             let value = this._configuration[name];
             if (value === undefined) {
-                if (!this._defaultConfiguration.hasOwnProperty(name)) {
+                if (!Object.prototype.hasOwnProperty.call(this._defaultConfiguration, name)) {
                     console.error("Tried to load unknown configuration value:", name);
                 }
                 value = this._defaultConfiguration[name];
@@ -654,6 +639,7 @@ function togetherjsMain() {
         }
         return baseUrl;
     }
+    let baseUrl = baseUrl1Inner();
     function addStyle() {
         const existing = document.getElementById("togetherjs-stylesheet");
         if (!existing) {
@@ -670,7 +656,6 @@ function togetherjsMain() {
         script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
-    let baseUrl = baseUrl1Inner();
     defaultConfiguration.baseUrl = baseUrl;
     const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride;
@@ -696,10 +681,10 @@ function togetherjsMain() {
         const shownAny = false;
         for (const _attr in configOverride) {
             const attr = _attr;
-            if (!configOverride.hasOwnProperty(attr)) {
+            if (!Object.prototype.hasOwnProperty.call(configOverride, attr)) {
                 continue;
             }
-            if (attr == "expiresAt" || !configOverride.hasOwnProperty(attr)) {
+            if (attr == "expiresAt" || !Object.prototype.hasOwnProperty.call(configOverride, attr)) {
                 continue;
             }
             if (!shownAny) {
@@ -726,15 +711,6 @@ function togetherjsMain() {
             copyConfigInWindow(configOverride);
         }
     }
-    let version = "unknown";
-    // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
-        cacheBust = Date.now() + "";
-    }
-    else {
-        version = cacheBust;
-    }
     polyfillConsole();
     if (!baseUrl) {
         const scripts = document.getElementsByTagName("script");
@@ -756,8 +732,7 @@ function togetherjsMain() {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
     const tjsInstance = new TogetherJSClass();
-    const TogetherJS = tjsInstance; //() => { tjsInstance.start(); return tjsInstance; }
-    window["TogetherJS"] = TogetherJS;
+    window["TogetherJS"] = tjsInstance;
     tjsInstance.requireConfig = {
         context: "togetherjs",
         baseUrl: baseUrl,
@@ -796,7 +771,6 @@ function togetherjsMain() {
     // FIXME: substitute this on the server (and update make-static-client)
     tjsInstance.version = version;
     tjsInstance.baseUrl = baseUrl;
-    let listener = null;
     tjsInstance.config.track("enableShortcut", function (enable, previous) {
         if (enable) {
             tjsInstance.listenForShortcut();
@@ -880,4 +854,3 @@ function togetherjsMain() {
     window.TowTruck = TogetherJS;
     return tjsInstance;
 }
-TogetherJS = togetherjsMain();

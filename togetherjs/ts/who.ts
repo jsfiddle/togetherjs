@@ -44,15 +44,13 @@ export class ExternalPeer {
         this.view = ui.PeerSelfView(this);
     }
 
-    className(prefix = "") {
+    className(prefix = ""): string {
         return prefix + util.safeClassName(this.id);
     }
 }
 
 export class Who {
-    ExternalPeer = (id: string, attrs: TogetherJSNS.ExternalPeerAttributes) => new ExternalPeer(id, attrs);
-
-    getList(hubUrl: string) {
+    getList(hubUrl: string): JQueryDeferred<{ [user: string]: ExternalPeer; }> {
         return util.Deferred<{ [user: string]: ExternalPeer }>(function(def) {
             let expected: number;
             const channel = new WebSocketChannel(hubUrl);
@@ -73,7 +71,7 @@ export class Who {
                 }
                 if(msg.type == "hello-back") {
                     if(!users[msg.clientId]) {
-                        users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
+                        users[msg.clientId] = new ExternalPeer(msg.clientId, msg);
                         responded++;
                         if(expected && responded >= expected) {
                             close();
@@ -105,7 +103,7 @@ export class Who {
         });
     }
 
-    invite(hubUrl: string, clientId: string | null) {
+    invite(hubUrl: string, clientId: string | null): JQueryDeferred<unknown> { // TODO unknown
         return util.Deferred(function(def) {
             const channel = new WebSocketChannel(hubUrl);
             const id = util.generateId();

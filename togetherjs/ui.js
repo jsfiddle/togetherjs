@@ -28,15 +28,13 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     let finishedAt = null;
     // Time in milliseconds for the dock to animate out:
     const DOCK_ANIMATION_TIME = 300;
-    // If two chat messages come from the same person in this time
-    // (milliseconds) then they are collapsed into one message:
+    // If two chat messages come from the same person in this time (milliseconds) then they are collapsed into one message:
     const COLLAPSE_MESSAGE_LIMIT = 5000;
-    const COLORS = [
-        "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
-        "#FFD700", "#F08080", "#90EE90", "#FF6347"
-    ];
-    // This would be a circular import, but we just need the chat module sometime
-    // after everything is loaded, and this is sure to complete by that time:
+    const COLORS = ["#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF", "#FFD700", "#F08080", "#90EE90", "#FF6347"];
+    // This is used for some signalling when ui.prepareUI and/or ui.activateUI is called before the DOM is fully loaded:
+    let deferringPrepareUI = null;
+    let setToolName = false;
+    // This would be a circular import, but we just need the chat module sometime after everything is loaded, and this is sure to complete by that time:
     require(["chat"], function (chatModule) {
         chat = chatModule.chat;
     });
@@ -585,7 +583,6 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         be hidden when this element is shown. */
         displayToggle(elem) {
             const el = jquery_1.default(elem);
-            assert(el.length, "No element", arguments[0]);
             const other = jquery_1.default(el.attr("data-toggles"));
             assert(other.length, "Cannot toggle", el[0], "selector", other.selector);
             other.hide();
@@ -759,7 +756,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             assert(anchor.length);
             // FIXME: This is in place to temporarily disable dock dragging:
             anchor = container.find("#togetherjs-dock-anchor-disabled");
-            anchor.mousedown(function (_event) {
+            anchor.mousedown(function () {
                 const iface = jquery_1.default("#togetherjs-dock");
                 // FIXME: switch to .offset() and pageX/Y
                 let startPos = panelPosition();
@@ -1006,7 +1003,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             // FIXME: Don't think this makes sense
             jquery_1.default(".togetherjs header.togetherjs-title").each(function (_index, item) {
                 const button = jquery_1.default('<button class="togetherjs-minimize"></button>');
-                button.click(function (_event) {
+                button.click(function () {
                     const window = button.closest(".togetherjs-window");
                     windowing_1.windowing.hide(window);
                 });
@@ -1050,13 +1047,13 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             // The following lines should be at the end of this function (new code goes above)
             session_1.session.emit("new-element", this.container); // TODO !
             if (finishedAt && finishedAt > Date.now()) {
-                setTimeout(function () {
+                setTimeout(() => {
                     finishedAt = null;
-                    session_1.session.emit("ui-ready", exports.ui);
+                    session_1.session.emit("ui-ready", this);
                 }, finishedAt - Date.now());
             }
             else {
-                session_1.session.emit("ui-ready", exports.ui);
+                session_1.session.emit("ui-ready", this);
             }
         } // End ui.activateUI()
         activateAvatarEdit(container, options = {}) {
@@ -1150,9 +1147,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         }
     }
     exports.ui = new Ui();
-    // This is used for some signalling when ui.prepareUI and/or
-    // ui.activateUI is called before the DOM is fully loaded:
-    let deferringPrepareUI = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function deferForContainer(func) {
         /* Defers any calls to func() until after ui.container is set
             Function cannot have a return value (as sometimes the call will
@@ -1325,7 +1320,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             el.removeClass("togetherjs-started");
         }
     });
-    session_1.session.on("display-window", function (id, _win) {
+    session_1.session.on("display-window", function (id) {
         if (id == "togetherjs-chat") {
             exports.ui.chat.scroll();
             windowing_1.windowing.hide("#togetherjs-chat-notifier");
@@ -1370,7 +1365,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             function refresh(users, finished) {
                 const sorted = [];
                 for (const id in users) {
-                    if (users.hasOwnProperty(id)) {
+                    if (Object.prototype.hasOwnProperty.call(users, id)) {
                         sorted.push(users[id]);
                     }
                 }
@@ -1414,8 +1409,8 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
         if (msg.forClientId && msg.clientId != peers_1.peers.Self.id) {
             return;
         }
-        require(["who"], function ({ who }) {
-            const peer = who.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
+        require(["who"], function (whoModule) {
+            const peer = new whoModule.ExternalPeer(msg.userInfo.clientId, msg.userInfo);
             exports.ui.chat.invite({ peer: peer, url: msg.url, forEveryone: !msg.forClientId });
         });
     });
@@ -1440,7 +1435,6 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
             exports.ui.updateToolName(el);
         }
     });
-    let setToolName = false;
     TogetherJS.config.track("toolName", function () {
         exports.ui.updateToolName(exports.ui.container);
     });

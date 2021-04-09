@@ -28,16 +28,16 @@ class StorageSettings extends OnClass<TogetherJSNS.On.Map> {
     }
 
     get<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K): JQueryDeferred<TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>> {
-        assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+        assert(Object.prototype.hasOwnProperty.call(this.storageInstance.settings.defaults, name), "Unknown setting:", name);
         const key = `settings.${name}` as const; // as keyof TogetherJSNS.StorageGet.MapForSettings;
         const value = this.storageInstance.settings.defaults[name] as unknown as TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>; // TODO is it possible to avoid the as unknown?
-        return storage.get(key, value);
+        return this.storageInstance.get(key, value);
     }
 
     set<K extends keyof TogetherJSNS.StorageGet.Settings>(name: K, value: TogetherJSNS.StorageGet.StorageValue<`settings.${K}`>) {
-        assert(this.storageInstance.settings.defaults.hasOwnProperty(name), "Unknown setting:", name);
+        assert(Object.prototype.hasOwnProperty.call(this.storageInstance.settings.defaults, name), "Unknown setting:", name);
         const key = `settings.${name}` as const;
-        return storage.set(key, value);
+        return this.storageInstance.set(key, value);
     }
 }
 

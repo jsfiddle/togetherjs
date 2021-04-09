@@ -75,7 +75,7 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
             let match;
             this.shareId = (_a = TogetherJS.startup._joinShareId) !== null && _a !== void 0 ? _a : undefined;
             if (!this.shareId) {
-                match = /\&togetherjs=([^&]+)/.exec(location.hash);
+                match = /&togetherjs=([^&]+)/.exec(location.hash);
                 if (!match) {
                     display("#no-session-id");
                     return;
@@ -84,7 +84,7 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
             }
             assert(options.defaultHubBase != undefined); // TODO add assert for easier typechecking
             let hubBase = options.defaultHubBase;
-            match = /\&hubBase=([^&]+)/.exec(location.hash);
+            match = /&hubBase=([^&]+)/.exec(location.hash);
             if (match) {
                 hubBase = match[1];
             }

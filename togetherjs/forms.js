@@ -738,7 +738,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     function focus(event) {
         const target = event.target;
         if (elementFinder_1.elementFinder.ignoreElement(target) || elementTracked(target)) {
-            blur(event);
+            blur();
             return;
         }
         if (target != lastFocus) {
@@ -746,7 +746,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             session_1.session.send({ type: "form-focus", element: elementFinder_1.elementFinder.elementLocation(target) });
         }
     }
-    function blur(_event) {
+    function blur() {
         if (lastFocus) {
             lastFocus = null;
             session_1.session.send({ type: "form-focus", element: null });

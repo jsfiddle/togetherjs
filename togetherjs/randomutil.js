@@ -21,8 +21,8 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
         }
         pickDist(items) {
             let total = 0;
-            for (var a in items) {
-                if (!items.hasOwnProperty(a)) {
+            for (const a in items) {
+                if (!Object.prototype.hasOwnProperty.call(items, a)) {
                     continue;
                 }
                 if (typeof items[a] != "number") {
@@ -32,8 +32,8 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             }
             let num = this.number(total);
             let last;
-            for (a in items) {
-                if (!items.hasOwnProperty(a)) {
+            for (const a in items) {
+                if (!Object.prototype.hasOwnProperty.call(items, a)) {
                     continue;
                 }
                 last = a;

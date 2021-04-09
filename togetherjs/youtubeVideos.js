@@ -91,7 +91,8 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?
-                let osrc = jquery_1.default(iframe).attr("src"), src = osrc;
+                const osrc = jquery_1.default(iframe).attr("src");
+                let src = osrc;
                 if ((src || "").indexOf("youtube") != -1 && !jquery_1.default(iframe).attr("id")) {
                     jquery_1.default(iframe).attr("id", "youtube-player" + i);
                     jquery_1.default(iframe).attr("enablejsapi", 1);

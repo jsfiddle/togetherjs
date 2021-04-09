@@ -32,29 +32,6 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
         "share"
     ];
     let currentStep = null;
-    class Statup {
-        start() {
-            if (!session) {
-                require(["session"], function (sessionModule) {
-                    session = sessionModule.session;
-                    exports.startup.start();
-                });
-                return;
-            }
-            let index = -1;
-            if (currentStep) {
-                index = STEPS.indexOf(currentStep);
-            }
-            index++;
-            if (index >= STEPS.length) {
-                session.emit("startup-ready");
-                return;
-            }
-            currentStep = STEPS[index];
-            handlers[currentStep](exports.startup.start);
-        }
-    }
-    exports.startup = new Statup();
     class Handlers {
         browserBroken(next) {
             if (window.WebSocket) {
@@ -126,6 +103,29 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
         }
     }
     const handlers = new Handlers();
+    class Statup {
+        start() {
+            if (!session) {
+                require(["session"], (sessionModule) => {
+                    session = sessionModule.session;
+                    this.start();
+                });
+                return;
+            }
+            let index = -1;
+            if (currentStep) {
+                index = STEPS.indexOf(currentStep);
+            }
+            index++;
+            if (index >= STEPS.length) {
+                session.emit("startup-ready");
+                return;
+            }
+            currentStep = STEPS[index];
+            handlers[currentStep](this.start.bind(this)); // TODO is the bind really necessary?
+        }
+    }
+    exports.startup = new Statup();
 });
 //return startup;
 //define(["util", "require", "jquery", "windowing", "storage"], startupMain);

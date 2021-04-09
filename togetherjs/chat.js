@@ -377,10 +377,9 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             }
             for (let i = 0; i < log.length; i++) {
                 // peers should already be loaded from sessionStorage by the peers module
-                const currentPeer = peers_1.peers.getPeer(log[i].peerId, undefined, true);
+                const currentPeer = peers_1.peers.getPeer(log[i].peerId, undefined);
                 if (!currentPeer) {
-                    // sometimes peers go away
-                    continue;
+                    continue; // sometimes peers go away
                 }
                 ui_1.ui.chat.text({
                     text: log[i].text,

@@ -3,8 +3,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-let TogetherJS: TogetherJSNS.TogetherJSClass;
-
 function clone<T>(o: T): T {
     return extend(o as any) as unknown as T; // TODO all those casts!!!!!
 }
@@ -16,17 +14,17 @@ function extend(base: { [key: string]: unknown }, extensions?: any) {
         base = {};
     }
     for(const a in extensions) {
-        if(extensions.hasOwnProperty(a)) {
+        if(Object.prototype.hasOwnProperty.call(extensions, a)) {
             base[a] = extensions[a];
         }
     }
     return base;
 }
 
-class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any>}> {
+class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<void>}> {
     _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<any>[] } = {}; // TODO any
-    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<any>][];
+    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<void>[] } = {};
+    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<void>][];
 
     on<T extends Extract<keyof Map, string>>(name: T, callback: Map[T]) {
         if(typeof callback != "function") {
@@ -65,7 +63,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
             console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
             throw "Error: .once() called with non-callback";
         }
-        const cb = callback as unknown as TogetherJSNS.CallbackForOnce<any>; // TODO how to avoid this cast?
+        const cb = callback as unknown as TogetherJSNS.CallbackForOnce<void>; // TODO how to avoid this cast?
         const attr = "onceCallback_" + name;
         // FIXME: maybe I should add the event name to the .once attribute:
         if(!cb[attr]) {
@@ -124,50 +122,29 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<any
     }
 
     forProtocol<Map2 extends {[messageName: string]: any}>() {
-        return this as unknown as OnClass<{[M in keyof Map2]: (msg: Map2[M]) => any}>; // TODO cast
+        return this as unknown as OnClass<{[M in keyof Map2]: (msg: Map2[M]) => void}>; // TODO cast
     }
-}
-
-function baseUrl1() {
-    let baseUrl = "__baseUrl__";
-    if(baseUrl == "__" + "baseUrl__") {
-        // Reset the variable if it doesn't get substituted
-        baseUrl = "";
-    }
-    // Allow override of baseUrl (this is done separately because it needs
-    // to be done very early)
-    if(window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
-        baseUrl = window.TogetherJSConfig.baseUrl;
-    }
-    if(window.TogetherJSConfig_baseUrl) {
-        baseUrl = window.TogetherJSConfig_baseUrl;
-    }
-    return baseUrl;
 }
 
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
+// eslint-disable-next-line no-constant-condition
 let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 
-const baseUrl = baseUrl1();
-const cacheBust = Date.now() + "";
-
-function addScript(url: string) {
-    const script = document.createElement("script");
-    script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
-    document.head.appendChild(script);
-}
+const TogetherJS: TogetherJSNS.TogetherJSClass = togetherjsMain();
 
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
+    let listener: TogetherJSNS.KeyboardListener | null = null;
 
     function polyfillConsole() {
         // Make sure we have all of the console.* methods:
         if(typeof console == "undefined") {
+            // eslint-disable-next-line no-global-assign
             (console as unknown) = {};
         }
         if(!console.log) {
-            console.log = function() { };
+            console.log = function() { /* No real fallback here so we just do nothing */ };
         }
         ["debug", "info", "warn", "error"].forEach(function(method) {
             if(!(console as any)[method]) {
@@ -227,6 +204,16 @@ function togetherjsMain() {
         fallbackLang: "en-US"
     };
 
+    let version = "unknown";
+    // FIXME: we could/should use a version from the checkout, at least for production
+    let cacheBust = "__gitCommit__";
+    if((!cacheBust) || cacheBust == "__gitCommit__") {
+        cacheBust = Date.now() + "";
+    }
+    else {
+        version = cacheBust;
+    }
+
     class ConfigClass {
         constructor(public tjsInstance: TogetherJSClass) { }
 
@@ -245,20 +232,20 @@ function togetherjsMain() {
             let tracker;
             let attr: keyof typeof settings;
             for(attr in settings) {
-                if(settings.hasOwnProperty(attr)) {
+                if(Object.prototype.hasOwnProperty.call(settings, attr)) {
                     if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
                         throw new Error("The configuration " + attr + " is finalized and cannot be changed");
                     }
                 }
             }
             for(attr in settings) {
-                if(!settings.hasOwnProperty(attr)) {
+                if(!Object.prototype.hasOwnProperty.call(settings, attr)) {
                     continue;
                 }
                 if(attr == "loaded" || attr == "callToStart") {
                     continue;
                 }
-                if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(attr)) {
+                if(!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, attr)) {
                     console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
                 }
                 const previous = this.tjsInstance._configuration[attr];
@@ -293,7 +280,7 @@ function togetherjsMain() {
         }
 
         // We need this for this weird reason: https://github.com/microsoft/TypeScript/issues/31675
-        private getValueOrDefault<K extends keyof T, T>(obj: Partial<T>, key: K, defaultValue: T[K]): T[K] {
+        private getValueOrDefault<T, K extends keyof T>(obj: Partial<T>, key: K, defaultValue: T[K]): T[K] {
             return obj[key] ?? defaultValue;
         }
 
@@ -301,8 +288,8 @@ function togetherjsMain() {
             return this.getValueOrDefault(this.tjsInstance._configuration, name, this.tjsInstance._defaultConfiguration[name]);
         }
 
-        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => any) {
-            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => void) {
+            if(!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
             const v = this.tjsInstance.config.get(name);
@@ -316,7 +303,7 @@ function togetherjsMain() {
         }
 
         close<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] {
-            if(!this.tjsInstance._defaultConfiguration.hasOwnProperty(name)) {
+            if(!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
             this.tjsInstance._configClosed[name] = true;
@@ -406,7 +393,7 @@ function togetherjsMain() {
             // This handles loading configuration from global variables.  This
             // includes TogetherJSConfig_on_*, which are attributes folded into
             // the "on" configuration value.
-            let attr;
+            let attr: string;
             let attrName: keyof TogetherJSNS.Config;
             const globalOns: TogetherJSNS.Ons<unknown> = {};
             for(attr in window) {
@@ -416,7 +403,7 @@ function togetherjsMain() {
                 }
                 else if(attr.indexOf("TogetherJSConfig_") === 0) {
                     attrName = attr.substr(("TogetherJSConfig_").length) as keyof TogetherJSNS.Config;
-                    this.config(attrName, window[attr]);
+                    this.config(attrName, window[attr] as unknown as TogetherJSNS.Config[keyof TogetherJSNS.Config]); // TODO this cast is here because Window has an index signature that always return a Window
                 }
                 else if(attr.indexOf("TowTruckConfig_on_") === 0) {
                     attrName = attr.substr(("TowTruckConfig_on_").length) as keyof TogetherJSNS.Config;
@@ -426,7 +413,7 @@ function togetherjsMain() {
                 else if(attr.indexOf("TowTruckConfig_") === 0) {
                     attrName = attr.substr(("TowTruckConfig_").length) as keyof TogetherJSNS.Config;
                     console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
-                    this.config(attrName, window[attr]);
+                    this.config(attrName, window[attr] as unknown as TogetherJSNS.Config[keyof TogetherJSNS.Config]); // TODO this cast is here because Window has an index signature that always return a Window
                 }
             }
             // FIXME: copy existing config?
@@ -434,7 +421,7 @@ function togetherjsMain() {
             // FIXME: close these configs?
             const ons: TogetherJSNS.Ons<unknown> = this.config.get("on") || {};
             for(attr in globalOns) {
-                if(globalOns.hasOwnProperty(attr)) {
+                if(Object.prototype.hasOwnProperty.call(globalOns, attr)) {
                     // FIXME: should we avoid overwriting?  Maybe use arrays?
                     ons[attr] = globalOns[attr];
                 }
@@ -446,7 +433,7 @@ function togetherjsMain() {
             const hubOns = this.config.get("hub_on");
             if(hubOns) {
                 for(attr in hubOns) {
-                    if(hubOns.hasOwnProperty(attr)) {
+                    if(Object.prototype.hasOwnProperty.call(hubOns, attr)) {
                         this.hub.on(attr as keyof TogetherJSNS.On.Map, hubOns[attr]); // TODO check cast
                     }
                 }
@@ -517,7 +504,7 @@ function togetherjsMain() {
 
             const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
-            const callback = (_session: TogetherJSNS.Session, _jquery: JQuery) => {
+            const callback = (/*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
                 this._loaded = true;
                 if(!min) {
                     this.require = require.config({ context: "togetherjs" });
@@ -554,11 +541,6 @@ function togetherjsMain() {
             }
         }
 
-        /** Can also be used to clone an object */
-        _extend(base: { [key: string]: unknown }, extensions?: any) {
-            return extend(base, extensions);
-        }
-
         _teardown() {
             const requireObject = this._requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
@@ -586,7 +568,7 @@ function togetherjsMain() {
         getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] { // rename into TogetherJS.config.get()?
             let value = this._configuration[name];
             if(value === undefined) {
-                if(!this._defaultConfiguration.hasOwnProperty(name)) {
+                if(!Object.prototype.hasOwnProperty.call(this._defaultConfiguration, name)) {
                     console.error("Tried to load unknown configuration value:", name);
                 }
                 value = this._defaultConfiguration[name];
@@ -712,6 +694,8 @@ function togetherjsMain() {
         return baseUrl;
     }
 
+    let baseUrl = baseUrl1Inner();
+
     function addStyle() {
         const existing = document.getElementById("togetherjs-stylesheet");
         if(!existing) {
@@ -730,7 +714,6 @@ function togetherjsMain() {
         document.head.appendChild(script);
     }
 
-    let baseUrl = baseUrl1Inner();
     defaultConfiguration.baseUrl = baseUrl;
 
     const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
@@ -758,10 +741,10 @@ function togetherjsMain() {
         const shownAny = false;
         for(const _attr in configOverride) {
             const attr = _attr as keyof typeof configOverride;
-            if(!configOverride.hasOwnProperty(attr)) {
+            if(!Object.prototype.hasOwnProperty.call(configOverride, attr)) {
                 continue;
             }
-            if(attr == "expiresAt" || !configOverride.hasOwnProperty(attr)) {
+            if(attr == "expiresAt" || !Object.prototype.hasOwnProperty.call(configOverride, attr)) {
                 continue;
             }
             if(!shownAny) {
@@ -790,16 +773,6 @@ function togetherjsMain() {
         }
     }
 
-    let version = "unknown";
-    // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if((!cacheBust) || cacheBust == "__gitCommit__") {
-        cacheBust = Date.now() + "";
-    }
-    else {
-        version = cacheBust;
-    }
-
     polyfillConsole();
 
     if(!baseUrl) {
@@ -823,9 +796,8 @@ function togetherjsMain() {
     }
 
     const tjsInstance = new TogetherJSClass();
-    const TogetherJS = tjsInstance;//() => { tjsInstance.start(); return tjsInstance; }
 
-    window["TogetherJS"] = TogetherJS;
+    window["TogetherJS"] = tjsInstance;
 
     tjsInstance.requireConfig = {
         context: "togetherjs",
@@ -873,8 +845,6 @@ function togetherjsMain() {
     // FIXME: substitute this on the server (and update make-static-client)
     tjsInstance.version = version;
     tjsInstance.baseUrl = baseUrl;
-
-    let listener: TogetherJSNS.KeyboardListener | null = null;
 
     tjsInstance.config.track("enableShortcut", function(enable: boolean, previous: unknown) {
         if(enable) {
@@ -965,5 +935,3 @@ function togetherjsMain() {
     window.TowTruck = TogetherJS;
     return tjsInstance;
 }
-
-TogetherJS = togetherjsMain();

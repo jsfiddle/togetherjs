@@ -25,6 +25,8 @@
         "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }],
         //"@typescript-eslint/no-var-requires": "off",
         "prefer-const": ["warn", { "destructuring": "all" }],
-        "@typescript-eslint/no-non-null-assertion": "off" // Turn it on later
+        "@typescript-eslint/no-var-requires": "off", // TODO maybe we should find other ways
+        "@typescript-eslint/explicit-module-boundary-types": "off", // TODO off for now
+        "@typescript-eslint/no-non-null-assertion": "off" // TODO turn it on later
     }
 }

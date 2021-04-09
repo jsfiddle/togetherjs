@@ -4,7 +4,7 @@
 define(["require", "exports", "./session", "./storage", "./templates", "./util"], function (require, exports, session_1, storage_1, templates_1, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PeerClass = exports.PeersSelf = exports.peers = exports.Peers = void 0;
+    exports.PeerClass = exports.peers = exports.Peers = exports.PeersSelf = void 0;
     //function peersMain(util: TogetherJSNS.Util, session: TogetherJSNS.Session, storage: TogetherJSNS.Storage, require: Require, templates: TogetherJSNS.Templates) {
     const assert = util_1.util.assert.bind(util_1.util);
     let CHECK_ACTIVITY_INTERVAL = 10 * 1000; // Every 10 seconds see if someone has gone idle
@@ -16,46 +16,10 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         ui = uiModule.ui;
     });
     const DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
-    class Peers extends OnClass {
-        constructor() {
-            super(...arguments);
-            this._SelfLoaded = util_1.util.Deferred();
-        }
-        getPeer(id, message) {
-            assert(id);
-            let peer = PeerClass.peers[id];
-            if (id === session_1.session.clientId) {
-                return this.Self;
-            }
-            if (message && !peer) {
-                peer = new PeerClass(id, { fromHelloMessage: message });
-                return peer;
-            }
-            if (!peer) {
-                return null;
-            }
-            if (message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
-                peer.updateFromHello(message);
-                peer.view.update();
-            }
-            return PeerClass.peers[id];
-        }
-        getAllPeers(liveOnly = false) {
-            const result = [];
-            util_1.util.forEachAttr(PeerClass.peers, function (peer) {
-                if (liveOnly && peer.status != "live") {
-                    return;
-                }
-                result.push(peer);
-            });
-            return result;
-        }
-    }
-    exports.Peers = Peers;
-    exports.peers = new Peers();
     class PeersSelf extends OnClass {
-        constructor() {
-            super(...arguments);
+        constructor(peers) {
+            super();
+            this.peers = peers;
             this.isSelf = true;
             this.id = session_1.session.clientId;
             this.identityId = session_1.session.identityId;
@@ -106,12 +70,12 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
             }
             if (attrs.status && attrs.status != this.status) {
                 this.status = attrs.status;
-                exports.peers.emit("status-updated", this);
+                this.peers.emit("status-updated", this);
             }
             if (attrs.idle && attrs.idle != this.idle) {
                 this.idle = attrs.idle;
                 updateIdle = true;
-                exports.peers.emit("idle-updated", this);
+                this.peers.emit("idle-updated", this);
             }
             this.view.update();
             if (updatePeers && !attrs.fromLoad) {
@@ -158,7 +122,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
                     color: color,
                     fromLoad: true
                 });
-                exports.peers._SelfLoaded.resolve();
+                this.peers._SelfLoaded.resolve();
             }); // FIXME: ignoring error
         }
         _loadFromApp() {
@@ -219,6 +183,43 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
     }
     exports.PeersSelf = PeersSelf;
+    class Peers extends OnClass {
+        constructor() {
+            super(...arguments);
+            this._SelfLoaded = util_1.util.Deferred();
+        }
+        getPeer(id, message) {
+            assert(id);
+            let peer = PeerClass.peers[id];
+            if (id === session_1.session.clientId) {
+                return this.Self;
+            }
+            if (message && !peer) {
+                peer = new PeerClass(id, { fromHelloMessage: message });
+                return peer;
+            }
+            if (!peer) {
+                return null;
+            }
+            if (message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+                peer.updateFromHello(message);
+                peer.view.update();
+            }
+            return PeerClass.peers[id];
+        }
+        getAllPeers(liveOnly = false) {
+            const result = [];
+            util_1.util.forEachAttr(PeerClass.peers, function (peer) {
+                if (liveOnly && peer.status != "live") {
+                    return;
+                }
+                result.push(peer);
+            });
+            return result;
+        }
+    }
+    exports.Peers = Peers;
+    exports.peers = new Peers();
     class PeerClass {
         constructor(id, attrs = {}) {
             this.isSelf = false;
@@ -423,7 +424,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
         /* Same interface as Peer, represents oneself (local user): */
         // peer.Self init
-        exports.peers.Self = new PeersSelf();
+        exports.peers.Self = new PeersSelf(exports.peers);
         exports.peers.Self.view = ui.PeerSelfView(exports.peers.Self);
         storage_1.storage.tab.get("peerCache").then(deserialize);
         exports.peers.Self._loadFromSettings().then(function () {

@@ -851,7 +851,7 @@ let lastFocus: HTMLElement | null = null;
 function focus(event: Event) {
     const target = event.target as HTMLElement;
     if(elementFinder.ignoreElement(target) || elementTracked(target)) {
-        blur(event);
+        blur();
         return;
     }
     if(target != lastFocus) {
@@ -860,7 +860,7 @@ function focus(event: Event) {
     }
 }
 
-function blur(_event: Event) {
+function blur() {
     if(lastFocus) {
         lastFocus = null;
         session.send({ type: "form-focus", element: null });

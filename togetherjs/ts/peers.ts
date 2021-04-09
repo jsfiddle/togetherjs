@@ -21,44 +21,6 @@ require(["ui"], function(uiModule) {
 
 const DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
-export class Peers extends OnClass<TogetherJSNS.On.Map> {
-    public Self!: PeersSelf; // TODO !
-    public readonly _SelfLoaded = util.Deferred();
-
-    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>): PeerClass | PeersSelf | null {
-        assert(id);
-        let peer = PeerClass.peers[id];
-        if(id === session.clientId) {
-            return this.Self;
-        }
-        if(message && !peer) {
-            peer = new PeerClass(id, { fromHelloMessage: message });
-            return peer;
-        }
-        if(!peer) {
-            return null;
-        }
-        if(message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
-            peer.updateFromHello(message);
-            peer.view.update();
-        }
-        return PeerClass.peers[id];
-    }
-
-    getAllPeers(liveOnly = false): PeerClass[] {
-        const result: PeerClass[] = [];
-        util.forEachAttr(PeerClass.peers, function(peer) {
-            if(liveOnly && peer.status != "live") {
-                return;
-            }
-            result.push(peer);
-        });
-        return result;
-    }
-}
-
-export const peers = new Peers();
-
 export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public readonly isSelf: true = true;
     public readonly id = session.clientId;
@@ -73,6 +35,10 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public isCreator = !session.isClient;
     public view!: TogetherJSNS.PeerSelfView; // TODO !
     public url?: string;
+
+    constructor(private peers: Peers) {
+        super();
+    }
 
     update(attrs: Partial<TogetherJSNS.PeerSelfAttributes>): void {
         let updatePeers = false;
@@ -112,12 +78,12 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
         }
         if(attrs.status && attrs.status != this.status) {
             this.status = attrs.status;
-            peers.emit("status-updated", this);
+            this.peers.emit("status-updated", this);
         }
         if(attrs.idle && attrs.idle != this.idle) {
             this.idle = attrs.idle;
             updateIdle = true;
-            peers.emit("idle-updated", this);
+            this.peers.emit("idle-updated", this);
         }
         this.view.update();
         if(updatePeers && !attrs.fromLoad) {
@@ -165,7 +131,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
                     color: color,
                     fromLoad: true
                 });
-                peers._SelfLoaded.resolve();
+                this.peers._SelfLoaded.resolve();
             }); // FIXME: ignoring error
     }
 
@@ -226,6 +192,44 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
         }
     }
 }
+
+export class Peers extends OnClass<TogetherJSNS.On.Map> {
+    public Self!: PeersSelf; // TODO !
+    public readonly _SelfLoaded = util.Deferred();
+
+    getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>): PeerClass | PeersSelf | null {
+        assert(id);
+        let peer = PeerClass.peers[id];
+        if(id === session.clientId) {
+            return this.Self;
+        }
+        if(message && !peer) {
+            peer = new PeerClass(id, { fromHelloMessage: message });
+            return peer;
+        }
+        if(!peer) {
+            return null;
+        }
+        if(message && (message.type == "hello" || message.type == "hello-back" || message.type == "peer-update")) {
+            peer.updateFromHello(message);
+            peer.view.update();
+        }
+        return PeerClass.peers[id];
+    }
+
+    getAllPeers(liveOnly = false): PeerClass[] {
+        const result: PeerClass[] = [];
+        util.forEachAttr(PeerClass.peers, function(peer) {
+            if(liveOnly && peer.status != "live") {
+                return;
+            }
+            result.push(peer);
+        });
+        return result;
+    }
+}
+
+export const peers = new Peers();
 
 export class PeerClass {
     public readonly isSelf: false = false;
@@ -463,7 +467,7 @@ session.on("start", function() {
     /* Same interface as Peer, represents oneself (local user): */
 
     // peer.Self init
-    peers.Self = new PeersSelf();
+    peers.Self = new PeersSelf(peers);
 
     peers.Self.view = ui.PeerSelfView(peers.Self);
     storage.tab.get("peerCache").then(deserialize);

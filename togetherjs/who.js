@@ -31,9 +31,6 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
     }
     exports.ExternalPeer = ExternalPeer;
     class Who {
-        constructor() {
-            this.ExternalPeer = (id, attrs) => new ExternalPeer(id, attrs);
-        }
         getList(hubUrl) {
             return util_1.util.Deferred(function (def) {
                 let expected;
@@ -55,7 +52,7 @@ define(["require", "exports", "./channels", "./session", "./ui", "./util"], func
                     }
                     if (msg.type == "hello-back") {
                         if (!users[msg.clientId]) {
-                            users[msg.clientId] = exports.who.ExternalPeer(msg.clientId, msg);
+                            users[msg.clientId] = new ExternalPeer(msg.clientId, msg);
                             responded++;
                             if (expected && responded >= expected) {
                                 close();
