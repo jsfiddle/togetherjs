@@ -248,14 +248,15 @@ function togetherjsMain() {
         public startupReason: TogetherJSNS.Reason | null = null;
         public running = false;
         public require: Require | null = null;
-        private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         public readonly hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
-        private requireObject: Require | null = null;
         /** Time at which the page was loaded */
         public pageLoaded: number = Date.now();
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
+
+        private requireObject: Require | null = null;
+        private configObject = new ConfigClass(this);
         /** a copy of startup to be used on _teardown */
         private _startupInit: TogetherJSNS.Startup;
 

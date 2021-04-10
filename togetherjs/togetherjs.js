@@ -236,12 +236,12 @@ function togetherjsMain() {
             this.startupReason = null;
             this.running = false;
             this.require = null;
-            this.configObject = new ConfigClass(this);
             this.hub = new OnClass();
-            this.requireObject = null;
             /** Time at which the page was loaded */
             this.pageLoaded = Date.now();
             this.editTrackers = {};
+            this.requireObject = null;
+            this.configObject = new ConfigClass(this);
             this._startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
