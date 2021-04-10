@@ -312,7 +312,7 @@ class Commands {
             });
             return;
         }
-        if(!Object.prototype.hasOwnProperty.call(TogetherJS.configuration, variable)) {
+        if(!TogetherJS.config.has(variable)) {
             ui.chat.system({
                 text: "Warning: variable " + variable + " is unknown"
             });
@@ -322,7 +322,7 @@ class Commands {
             const expire = Date.now() + (1000 * 60 * 60 * 24);
             c = c || {expiresAt: expire};
             c[variable] = value;
-            c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
+            c.expiresAt = expire; 
             storage.set("configOverride", c).then(function() {
                 ui.chat.system({
                     text: "Variable " + variable + " = " + JSON.stringify(value) + "\nValue will be set for one day."

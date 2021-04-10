@@ -291,7 +291,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 });
                 return;
             }
-            if (!Object.prototype.hasOwnProperty.call(TogetherJS.configuration, variable)) {
+            if (!TogetherJS.config.has(variable)) {
                 ui_1.ui.chat.system({
                     text: "Warning: variable " + variable + " is unknown"
                 });
@@ -301,7 +301,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 const expire = Date.now() + (1000 * 60 * 60 * 24);
                 c = c || { expiresAt: expire };
                 c[variable] = value;
-                c.expiresAt = Date.now() + (1000 * 60 * 60 * 24);
+                c.expiresAt = expire;
                 storage_1.storage.set("configOverride", c).then(function () {
                     ui_1.ui.chat.system({
                         text: "Variable " + variable + " = " + JSON.stringify(value) + "\nValue will be set for one day."

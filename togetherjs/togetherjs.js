@@ -167,8 +167,8 @@ function togetherjsMain() {
         version = cacheBust;
     }
     class ConfigClass {
-        constructor(tjsInstance) {
-            this.tjsInstance = tjsInstance;
+        constructor(configuration) {
+            this.configuration = configuration;
             this._configTrackers = {};
         }
         call(name, maybeValue) {
@@ -177,9 +177,9 @@ function togetherjsMain() {
                 console.error("Cannot change loaded or callToStart values");
                 return;
             }
-            const previous = this.tjsInstance.configuration[name];
+            const previous = this.configuration[name];
             const value = maybeValue;
-            this.tjsInstance.configuration[name] = value; // TODO any, how to remove this any
+            this.configuration[name] = value; // TODO any, how to remove this any
             const trackers = (_a = this._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
             let failed = false;
             for (let i = 0; i < trackers.length; i++) {
@@ -193,7 +193,7 @@ function togetherjsMain() {
                 }
             }
             if (failed) {
-                this.tjsInstance.configuration[name] = previous; // TODO any, how to remove this any?
+                this.configuration[name] = previous; // TODO any, how to remove this any?
                 for (let i = 0; i < trackers.length; i++) {
                     try {
                         trackers[i](value);
@@ -205,10 +205,10 @@ function togetherjsMain() {
             }
         }
         get(name) {
-            return this.tjsInstance.configuration[name];
+            return this.configuration[name];
         }
         track(name, callback) {
-            const v = this.tjsInstance.config.get(name);
+            const v = this.get(name);
             callback(v);
             if (!this._configTrackers[name]) {
                 this._configTrackers[name] = [];
@@ -223,6 +223,7 @@ function togetherjsMain() {
         const config = ((name, maybeValue) => confObj.call(name, maybeValue));
         config.get = (name) => confObj.get(name);
         config.track = (name, callback) => confObj.track(name, callback);
+        config.has = (name) => name in confObj;
         return config;
     }
     class TogetherJSClass extends OnClass {
@@ -231,7 +232,6 @@ function togetherjsMain() {
             this.requireConfig = requireConfig;
             this.version = version;
             this.baseUrl = baseUrl;
-            this.configuration = configuration;
             this.startup = startup;
             this.startupReason = null;
             this.running = false;
@@ -241,9 +241,9 @@ function togetherjsMain() {
             this.pageLoaded = Date.now();
             this.editTrackers = {};
             this.requireObject = null;
-            this.configObject = new ConfigClass(this);
             this.startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
+            this.configObject = new ConfigClass(configuration);
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
         }
@@ -422,7 +422,7 @@ function togetherjsMain() {
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
         }
         getConfig(name) {
-            return this.configuration[name];
+            return this.configObject.get(name);
         }
         refreshUserData() {
             if (this.running && typeof this.require == "function") {

@@ -184,7 +184,7 @@ function togetherjsMain() {
     class ConfigClass {
         private readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
 
-        constructor(public tjsInstance: TogetherJSClass) { }
+        constructor(private configuration: TogetherJSNS.Config) { }
 
         call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) {
             if(name == "loaded" || name == "callToStart") {
@@ -192,9 +192,9 @@ function togetherjsMain() {
                 return;
             }
 
-            const previous = this.tjsInstance.configuration[name];
+            const previous = this.configuration[name];
             const value = maybeValue;
-            this.tjsInstance.configuration[name] = value as any; // TODO any, how to remove this any
+            this.configuration[name] = value as any; // TODO any, how to remove this any
             const trackers = this._configTrackers[name] ?? [];
             let failed = false;
             for(let i = 0; i < trackers.length; i++) {
@@ -208,7 +208,7 @@ function togetherjsMain() {
                 }
             }
             if(failed) {
-                this.tjsInstance.configuration[name] = previous as any; // TODO any, how to remove this any?
+                this.configuration[name] = previous as any; // TODO any, how to remove this any?
                 for(let i = 0; i < trackers.length; i++) {
                     try {
                         trackers[i](value);
@@ -221,11 +221,11 @@ function togetherjsMain() {
         }
 
         get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
-            return this.tjsInstance.configuration[name];
+            return this.configuration[name];
         }
 
         track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => void) {
-            const v = this.tjsInstance.config.get(name);
+            const v = this.get(name);
             callback(v);
             if(!this._configTrackers[name]) {
                 this._configTrackers[name] = [];
@@ -241,6 +241,7 @@ function togetherjsMain() {
         const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
         config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
         config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => void) => confObj.track(name, callback);
+        config.has = (name: string) => name in confObj;
         return config;
     }
 
@@ -255,7 +256,7 @@ function togetherjsMain() {
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
 
         private requireObject: Require | null = null;
-        private configObject = new ConfigClass(this);
+        private configObject: ConfigClass;
         /** a copy of startup to be used on _teardown */
         private startupInit: TogetherJSNS.Startup;
 
@@ -263,12 +264,13 @@ function togetherjsMain() {
             private requireConfig: RequireConfig,
             public readonly version: string,
             public readonly baseUrl: string,
-            public configuration: TogetherJSNS.Config,
+            configuration: TogetherJSNS.Config,
             public startup: TogetherJSNS.Startup,
         ) {
             super();
             this.startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
+            this.configObject = new ConfigClass(configuration)
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
         }
@@ -460,7 +462,7 @@ function togetherjsMain() {
         }
 
         getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] { // rename into TogetherJS.config.get()?
-            return this.configuration[name];
+            return this.configObject.get(name);
         }
 
         refreshUserData() {

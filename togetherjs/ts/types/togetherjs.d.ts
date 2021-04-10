@@ -842,6 +842,7 @@ declare global {
             (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
             get<K extends keyof Config>(name: K): Config[K];
             track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => void): (value: Config[K], previous?: Config[K]) => void;
+            has(name: string): boolean;
         }
 
         interface CodeMirrorElement {
