@@ -5,6 +5,37 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Router = exports.WebSocketChannel = void 0;
+    /* Channel abstraction.  Supported channels:
+    
+    - WebSocket to an address
+    - postMessage between windows
+    
+    In the future:
+    
+    - XMLHttpRequest to a server (with some form of queuing)
+    
+    The interface:
+    
+      channel = new ChannelName(parameters)
+    
+    The instantiation is specific to the kind of channel
+    
+    Methods:
+    
+      onmessage: set to function (jsonData)
+      rawdata: set to true if you want onmessage to receive raw string data
+      onclose: set to function ()
+      send: function (string or jsonData)
+      close: function ()
+    
+    .send() will encode the data if it is not a string.
+    
+    (should I include readyState as an attribute?)
+    
+    Channels must accept messages immediately, caching if the connection
+    is not fully established yet.
+    
+    */
     /* Subclasses must define:
     
     - ._send(string)
@@ -169,187 +200,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         onclose() { }
     }
     exports.WebSocketChannel = WebSocketChannel;
-    /* Sends TO a window or iframe */
-    class PostMessageChannel extends AbstractChannel {
-        constructor(win, expectedOrigin) {
-            super();
-            this._pingPollPeriod = 100; // milliseconds
-            this._pingPollIncrease = 100; // +100 milliseconds for each failure
-            this._pingMax = 2000; // up to a max of 2000 milliseconds
-            this._pingReceived = false;
-            this._pingFailures = 0;
-            this._pingTimeout = null;
-            this.onmessage = () => { };
-            this.expectedOrigin = expectedOrigin;
-            this._receiveMessage = this._receiveMessage.bind(this);
-            if (win) {
-                this.bindWindow(win, true);
-            }
-            this._setupConnection();
-        }
-        toString() {
-            let s = '[PostMessageChannel';
-            if (this.window) {
-                s += ' to window ' + this.window;
-            }
-            else {
-                s += ' not bound to a window';
-            }
-            if (this.window && !this._pingReceived) {
-                s += ' still establishing';
-            }
-            return s + ']';
-        }
-        bindWindow(win, noSetup) {
-            if (this.window) {
-                this.close();
-                // Though we deinitialized everything, we aren't exactly closed:
-                this.closed = false;
-            }
-            if (win && "contentWindow" in win) {
-                if (win.contentWindow) {
-                    this.window = win.contentWindow;
-                }
-                else {
-                    throw new Error("Can't bind to an iframe without contentWindow, probably because the iframe hasn't loaded yet"); // TODO can we do something better here?
-                }
-            }
-            else {
-                this.window = win;
-            }
-            // FIXME: The distinction between this.window and window seems unimportant in the case of postMessage
-            let w = this.window;
-            // In a Content context we add the listener to the local window object, but in the addon context we add the listener to some other window, like the one we were given:
-            if (typeof window != "undefined") {
-                w = window;
-            }
-            w.addEventListener("message", this._receiveMessage, false);
-            if (!noSetup) {
-                this._setupConnection();
-            }
-        }
-        _send(data) {
-            this.window.postMessage(data, this.expectedOrigin || "*");
-        }
-        _ready() {
-            return this.window != null && this._pingReceived;
-        }
-        _setupConnection() {
-            if (this.closed || this._pingReceived || (!this.window)) {
-                return;
-            }
-            this._pingFailures++;
-            this._send("hello");
-            // We'll keep sending ping messages until we get a reply
-            let time = this._pingPollPeriod + (this._pingPollIncrease * this._pingFailures);
-            time = time > this._pingMax ? this._pingMax : time;
-            this._pingTimeout = setTimeout(this._setupConnection.bind(this), time);
-        }
-        _receiveMessage(event) {
-            if (event.source !== this.window) {
-                return;
-            }
-            if (this.expectedOrigin && event.origin != this.expectedOrigin) {
-                console.info("Expected message from", this.expectedOrigin, "but got message from", event.origin);
-                return;
-            }
-            if (!this.expectedOrigin) {
-                this.expectedOrigin = event.origin;
-            }
-            if (event.data == "hello") {
-                this._pingReceived = true;
-                if (this._pingTimeout) {
-                    clearTimeout(this._pingTimeout);
-                    this._pingTimeout = null;
-                }
-                this._flush();
-                return;
-            }
-            this._incoming(event.data);
-        }
-        close() {
-            this.closed = true;
-            this._pingReceived = false;
-            if (this._pingTimeout) {
-                clearTimeout(this._pingTimeout);
-            }
-            window.removeEventListener("message", this._receiveMessage, false);
-            if (this.onclose) {
-                this.onclose();
-            }
-            this.emit("close");
-        }
-        onclose() { }
-    }
-    /* Handles message FROM an exterior window/parent */
-    class PostMessageIncomingChannel extends AbstractChannel {
-        constructor(expectedOrigin) {
-            super();
-            this._pingTimeout = null;
-            this.source = null;
-            this.onmessage = () => { };
-            this.expectedOrigin = expectedOrigin;
-            this._receiveMessage = this._receiveMessage.bind(this);
-            window.addEventListener("message", this._receiveMessage, false);
-            this._setupConnection();
-        }
-        toString() {
-            let s = '[PostMessageIncomingChannel';
-            if (this.source) {
-                s += ' bound to source ' + s;
-            }
-            else {
-                s += ' awaiting source';
-            }
-            return s + ']';
-        }
-        _send(data) {
-            if (this.source == null) {
-                console.error("Cannot send with uninitialized channel:", data);
-                return;
-            }
-            this.source.postMessage(data, this.expectedOrigin);
-        }
-        _ready() {
-            return !!this.source;
-        }
-        _setupConnection() {
-            // Nothing to do in this case
-        }
-        _receiveMessage(event) {
-            if (this.expectedOrigin && this.expectedOrigin != "*" && event.origin != this.expectedOrigin) {
-                // FIXME: Maybe not worth mentioning?
-                console.info("Expected message from", this.expectedOrigin, "but got message from", event.origin);
-                return;
-            }
-            if (!this.expectedOrigin) {
-                this.expectedOrigin = event.origin;
-            }
-            if (!this.source) {
-                this.source = event.source; // TODO theoratically event.source could be other types in the union but since we only only use Window I don't think it's possible
-            }
-            if (event.data == "hello") {
-                // Just a ping
-                this.source.postMessage("hello", this.expectedOrigin);
-                return;
-            }
-            this._incoming(event.data);
-        }
-        close() {
-            this.closed = true;
-            window.removeEventListener("message", this._receiveMessage, false);
-            if (this._pingTimeout) {
-                clearTimeout(this._pingTimeout);
-            }
-            if (this.onclose) {
-                this.onclose();
-            }
-            this.emit("close");
-        }
-        onclose() {
-            // Nothing to do in this case
-        }
-    }
     class Route extends OnClass {
         constructor(router, id) {
             super();
