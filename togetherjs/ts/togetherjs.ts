@@ -252,7 +252,7 @@ function togetherjsMain() {
         public readonly config: TogetherJSNS.ConfigFunObj;
         public readonly hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
         /** Time at which the page was loaded */
-        public pageLoaded: number = Date.now();
+        public readonly pageLoaded: number = Date.now();
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
 
         private requireObject: Require | null = null;
