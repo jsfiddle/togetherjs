@@ -406,9 +406,6 @@ class TogetherJSClass extends OnClass {
         }
         // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
     }
-    getConfig(name) {
-        return this.configObject.get(name);
-    }
     refreshUserData() {
         if (this.running && typeof this.require == "function") {
             this.require(["session"], function ({ session }) {
