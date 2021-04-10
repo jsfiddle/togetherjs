@@ -58,11 +58,13 @@ declare global {
     */
     interface webkitRTCPeerConnection extends RTCPeerConnection {
         /** @deprecated Not even sure this is a valid constructor, there is some notes about it here https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling */
+        // eslint-disable-next-line @typescript-eslint/no-misused-new
         new(configuration: RTCConfiguration, options: { "optional": [{ "DtlsSrtpKeyAgreement"?: boolean }] }): webkitRTCPeerConnection;
     }
 
     interface mozRTCPeerConnection extends RTCPeerConnection {
         /** @deprecated */
+        // eslint-disable-next-line @typescript-eslint/no-misused-new
         new(configuration?: RTCConfiguration, options?: { "optional": [] }): mozRTCPeerConnection;
     }
 
