@@ -102,7 +102,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 // eslint-disable-next-line no-var
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
@@ -159,8 +159,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -225,22 +225,22 @@ function togetherjsMain() {
         return config;
     }
     class TogetherJSClass extends OnClass {
-        constructor(requireConfig, version, baseUrl, configuration) {
+        constructor(requireConfig, version, baseUrl, configuration, startup) {
             super();
             this.requireConfig = requireConfig;
             this.version = version;
             this.baseUrl = baseUrl;
             this.configuration = configuration;
+            this.startup = startup;
             this.startupReason = null;
             this.running = false;
             this.configObject = new ConfigClass(this);
             this.hub = new OnClass();
             this.pageLoaded = Date.now();
-            this._startupInit = defaultStartupInit;
-            this.startup = Object.assign({}, this._startupInit);
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             this._configTrackers = {};
             this.editTrackers = {};
+            this._startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
@@ -519,7 +519,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -643,9 +643,9 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration);
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
     window["TogetherJS"] = tjsInstance;
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";

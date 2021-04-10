@@ -252,20 +252,22 @@ function togetherjsMain() {
         private _loaded?: boolean;
         private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
-        private _startupInit: TogetherJSNS.Startup = defaultStartupInit;
-        public startup: TogetherJSNS.Startup = Object.assign({}, this._startupInit);
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
-        public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
+        public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
+        /** a copy of startup to be used on _teardown */
+        private _startupInit: TogetherJSNS.Startup;
 
         constructor(
             private requireConfig: RequireConfig,
             public readonly version: string,
             public readonly baseUrl: string,
             public configuration: TogetherJSNS.Config,
+            public startup: TogetherJSNS.Startup,
         ) {
             super();
+            this._startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
@@ -702,7 +704,7 @@ function togetherjsMain() {
         }
     };
 
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration);
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
 
     window["TogetherJS"] = tjsInstance;
 
