@@ -102,7 +102,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+let min = "no" == "__" + "min__" ? false : "no" == "yes";
 // eslint-disable-next-line no-var
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
@@ -159,8 +159,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
+    let cacheBust = "";
+    if ((!cacheBust) || cacheBust == "") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -519,7 +519,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "__baseUrl__";
+        let baseUrl = "";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -643,7 +643,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "__hubUrl__";
+    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
