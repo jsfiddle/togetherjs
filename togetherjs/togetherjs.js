@@ -239,7 +239,6 @@ function togetherjsMain() {
             this.hub = new OnClass();
             this.requireObject = null;
             this.pageLoaded = Date.now();
-            //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             this._configTrackers = {};
             this.editTrackers = {};
             this._startupInit = Object.assign({}, startup);
@@ -276,9 +275,7 @@ function togetherjsMain() {
                 this.config(window.TogetherJSConfig);
                 window.TogetherJSConfig.loaded = true;
             }
-            // This handles loading configuration from global variables.  This
-            // includes TogetherJSConfig_on_*, which are attributes folded into
-            // the "on" configuration value.
+            // This handles loading configuration from global variables.  This includes TogetherJSConfig_on_*, which are attributes folded into the "on" configuration value.
             let attr;
             let attrName;
             const globalOns = {};

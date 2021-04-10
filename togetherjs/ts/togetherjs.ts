@@ -251,7 +251,6 @@ function togetherjsMain() {
         public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
         private requireObject: Require | null = null;
         public pageLoaded: number = Date.now();
-        //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
@@ -303,9 +302,7 @@ function togetherjsMain() {
                 window.TogetherJSConfig.loaded = true;
             }
 
-            // This handles loading configuration from global variables.  This
-            // includes TogetherJSConfig_on_*, which are attributes folded into
-            // the "on" configuration value.
+            // This handles loading configuration from global variables.  This includes TogetherJSConfig_on_*, which are attributes folded into the "on" configuration value.
             let attr: string;
             let attrName: keyof TogetherJSNS.Config;
             const globalOns: TogetherJSNS.Ons<unknown> = {};
