@@ -843,7 +843,7 @@ declare global {
             (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
             get<K extends keyof Config>(name: K): Config[K];
             close<K extends keyof Config>(thing: K): Partial<Config>[K];
-            track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => any): (value: Config[K], previous?: Config[K]) => any;
+            track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => void): (value: Config[K], previous?: Config[K]) => void;
         }
 
         interface CodeMirrorElement {
@@ -1068,10 +1068,6 @@ declare global {
         msHidden?: boolean;
         webkitHidden?: boolean;
     }
-
-    // TODO the code using this in ui.ts should probably be removed since it does not work
-    type MozActivity = any;
-    const MozActivity: MozActivity;
 
     /** These typings are to avoid "as typeof import" casts, and errors that could go with them, everytime an import is made */
     interface Require {
