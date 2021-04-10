@@ -182,6 +182,8 @@ function togetherjsMain() {
     }
 
     class ConfigClass {
+        private readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
+
         constructor(public tjsInstance: TogetherJSClass) { }
 
         call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) {
@@ -193,7 +195,7 @@ function togetherjsMain() {
             const previous = this.tjsInstance.configuration[name];
             const value = maybeValue;
             this.tjsInstance.configuration[name] = value as any; // TODO any, how to remove this any
-            const trackers = this.tjsInstance._configTrackers[name] ?? [];
+            const trackers = this._configTrackers[name] ?? [];
             let failed = false;
             for(let i = 0; i < trackers.length; i++) {
                 try {
@@ -225,11 +227,11 @@ function togetherjsMain() {
         track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => void) {
             const v = this.tjsInstance.config.get(name);
             callback(v);
-            if(!this.tjsInstance._configTrackers[name]) {
-                this.tjsInstance._configTrackers[name] = [];
+            if(!this._configTrackers[name]) {
+                this._configTrackers[name] = [];
             }
             // TODO any how to make callback typecheck?
-            this.tjsInstance._configTrackers[name]!.push(callback as any); // TODO ! and any cast
+            this._configTrackers[name]!.push(callback as any); // TODO ! and any cast
             return callback;
         }
     }
@@ -248,10 +250,10 @@ function togetherjsMain() {
         public require: Require | null = null;
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
-        public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
+        public readonly hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
         private requireObject: Require | null = null;
+        /** Time at which the page was loaded */
         public pageLoaded: number = Date.now();
-        public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
         /** a copy of startup to be used on _teardown */

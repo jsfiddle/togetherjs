@@ -169,6 +169,7 @@ function togetherjsMain() {
     class ConfigClass {
         constructor(tjsInstance) {
             this.tjsInstance = tjsInstance;
+            this._configTrackers = {};
         }
         call(name, maybeValue) {
             var _a;
@@ -179,7 +180,7 @@ function togetherjsMain() {
             const previous = this.tjsInstance.configuration[name];
             const value = maybeValue;
             this.tjsInstance.configuration[name] = value; // TODO any, how to remove this any
-            const trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
+            const trackers = (_a = this._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
             let failed = false;
             for (let i = 0; i < trackers.length; i++) {
                 try {
@@ -209,11 +210,11 @@ function togetherjsMain() {
         track(name, callback) {
             const v = this.tjsInstance.config.get(name);
             callback(v);
-            if (!this.tjsInstance._configTrackers[name]) {
-                this.tjsInstance._configTrackers[name] = [];
+            if (!this._configTrackers[name]) {
+                this._configTrackers[name] = [];
             }
             // TODO any how to make callback typecheck?
-            this.tjsInstance._configTrackers[name].push(callback); // TODO ! and any cast
+            this._configTrackers[name].push(callback); // TODO ! and any cast
             return callback;
         }
     }
@@ -238,8 +239,8 @@ function togetherjsMain() {
             this.configObject = new ConfigClass(this);
             this.hub = new OnClass();
             this.requireObject = null;
+            /** Time at which the page was loaded */
             this.pageLoaded = Date.now();
-            this._configTrackers = {};
             this.editTrackers = {};
             this._startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
